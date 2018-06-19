@@ -13,12 +13,21 @@ import (
 )
 
 type config struct {
+	// etcd certificates
 	EtcdCaKey      *rsa.PrivateKey
 	EtcdCaCert     *x509.Certificate
 	EtcdServerKey  *rsa.PrivateKey
 	EtcdServerCert *x509.Certificate
 	EtcdPeerKey    *rsa.PrivateKey
 	EtcdPeerCert   *x509.Certificate
+
+	// azure config
+	TenantID        string
+	SubscriptionID  string
+	AadClientID     string
+	AadClientSecret string
+	AadTenantID     string
+	ResourceGroup   string
 }
 
 func (c config) MarshalYAML() (interface{}, error) {
@@ -62,6 +71,14 @@ func run() (err error) {
 	if c.EtcdPeerKey, c.EtcdPeerCert, err = tls.NewCert("etcd-peer", nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth}, c.EtcdCaKey, c.EtcdCaCert); err != nil {
 		return
 	}
+
+	c.TenantID = os.Getenv("TENANT_ID")
+	c.SubscriptionID = os.Getenv("SUBSCRIPTION_ID")
+	c.AadClientID = os.Getenv("CLIENT_ID")
+	c.AadClientSecret = os.Getenv("CLIENT_SECRET")
+	c.AadTenantID = os.Getenv("TENANT_ID")
+	// TODO: How do we properly discover the correct resource group?
+	c.ResourceGroup = os.Getenv("RESOURCE_GROUP")
 
 	b, err := yaml.Marshal(c)
 	if err != nil {

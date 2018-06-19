@@ -4,10 +4,10 @@ metadata:
   name: etc-origin-cloudprovider
 ddata:
   azure.conf: |
-    tenantId: XXX
-    subscriptionId: XXX
-    aadClientId: XXX
-    aadClientSecret: XXX
-    aadTenantId: XXX
-    resourceGroup: XXX
+    tenantId: {{ .Values.tenantId }}
+    subscriptionId: {{ .Values.subscriptionId }}
+    aadClientId: {{ .Values.aadClientId }}
+    aadClientSecret: {{ .Values.aadClientSecret }}
+    aadTenantId: {{ .Values.aadTenantId }}
+    resourceGroup: {{ .Values.resourceGroup }}
     location: eastus
