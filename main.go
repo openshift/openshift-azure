@@ -21,6 +21,12 @@ type config struct {
 	EtcdPeerKey    *rsa.PrivateKey
 	EtcdPeerCert   *x509.Certificate
 
+	// control plane certificates
+	MasterServerCaKey  *rsa.PrivateKey
+	MasterServerCaCert *x509.Certificate
+	MasterServerKey    *rsa.PrivateKey
+	MasterServerCert   *x509.Certificate
+
 	// azure config
 	TenantID        string
 	SubscriptionID  string
@@ -60,6 +66,7 @@ func (c config) MarshalYAML() (interface{}, error) {
 var c config
 
 func run() (err error) {
+	// Generate etcd certs
 	if c.EtcdCaKey, c.EtcdCaCert, err = tls.NewCA("etcd-signer"); err != nil {
 		return
 	}
@@ -72,6 +79,16 @@ func run() (err error) {
 		return
 	}
 
+	// Generate openshift master certs
+	if c.MasterServerCaKey, c.MasterServerCaCert, err = tls.NewCA("openshift-signer"); err != nil {
+		return
+	}
+
+	if c.MasterServerKey, c.MasterServerCert, err = tls.NewCert("master-server", nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, c.MasterServerCaKey, c.MasterServerCaCert); err != nil {
+		return
+	}
+
+	// azure conf
 	c.TenantID = os.Getenv("TENANT_ID")
 	c.SubscriptionID = os.Getenv("SUBSCRIPTION_ID")
 	c.AadClientID = os.Getenv("CLIENT_ID")

@@ -54,8 +54,12 @@ spec:
           mountPath: /var/lib/origin/
       volumes:
       - name: master-config
-        configMap:
-          name: etc-origin-master
+        projected:
+          sources:
+          - secret:
+              name: master-certs
+          - configMap:
+              name: etc-origin-master
       - name: master-cloud-provider
         configMap:
           name: etc-origin-cloudprovider
