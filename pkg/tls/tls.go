@@ -74,14 +74,22 @@ func NewCA(cn string) (*rsa.PrivateKey, *x509.Certificate, error) {
 	return key, cert, nil
 }
 
-func NewCert(cn string, dnsNames []string, ipAddresses []net.IP, extKeyUsage []x509.ExtKeyUsage, signingkey *rsa.PrivateKey, signingcert *x509.Certificate) (*rsa.PrivateKey, *x509.Certificate, error) {
+func NewCert(
+	cn string,
+	organization []string,
+	dnsNames []string,
+	ipAddresses []net.IP,
+	extKeyUsage []x509.ExtKeyUsage,
+	signingkey *rsa.PrivateKey,
+	signingcert *x509.Certificate,
+) (*rsa.PrivateKey, *x509.Certificate, error) {
 	now := time.Now()
 
 	template := &x509.Certificate{
 		SerialNumber:          serial.Get(),
 		NotBefore:             now,
 		NotAfter:              now.AddDate(2, 0, 0),
-		Subject:               pkix.Name{CommonName: cn},
+		Subject:               pkix.Name{CommonName: cn, Organization: organization},
 		BasicConstraintsValid: true,
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
 		ExtKeyUsage:           extKeyUsage,

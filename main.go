@@ -22,10 +22,24 @@ type config struct {
 	EtcdPeerCert   *x509.Certificate
 
 	// control plane certificates
-	MasterServerCaKey  *rsa.PrivateKey
-	MasterServerCaCert *x509.Certificate
-	MasterServerKey    *rsa.PrivateKey
-	MasterServerCert   *x509.Certificate
+	MasterServerCaKey        *rsa.PrivateKey
+	MasterServerCaCert       *x509.Certificate
+	MasterServerKey          *rsa.PrivateKey
+	MasterServerCert         *x509.Certificate
+	Front_ProxyCaKey         *rsa.PrivateKey
+	Front_ProxyCaCert        *x509.Certificate
+	FrontProxyCaKey          *rsa.PrivateKey
+	FrontProxyCaCert         *x509.Certificate
+	ServiceServingKey        *rsa.PrivateKey
+	ServiceServingCert       *x509.Certificate
+	AdminKey                 *rsa.PrivateKey
+	AdminCert                *x509.Certificate
+	AggregatorFrontProxyKey  *rsa.PrivateKey
+	AggregatorFrontProxyCert *x509.Certificate
+	MasterKubeletClientKey   *rsa.PrivateKey
+	MasterKubeletClientCert  *x509.Certificate
+	MasterProxyClientKey     *rsa.PrivateKey
+	MasterProxyClientCert    *x509.Certificate
 
 	// azure config
 	TenantID        string
@@ -70,12 +84,10 @@ func run() (err error) {
 	if c.EtcdCaKey, c.EtcdCaCert, err = tls.NewCA("etcd-signer"); err != nil {
 		return
 	}
-
-	if c.EtcdServerKey, c.EtcdServerCert, err = tls.NewCert("master-etcd", nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, c.EtcdCaKey, c.EtcdCaCert); err != nil {
+	if c.EtcdServerKey, c.EtcdServerCert, err = tls.NewCert("master-etcd", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, c.EtcdCaKey, c.EtcdCaCert); err != nil {
 		return
 	}
-
-	if c.EtcdPeerKey, c.EtcdPeerCert, err = tls.NewCert("etcd-peer", nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth}, c.EtcdCaKey, c.EtcdCaCert); err != nil {
+	if c.EtcdPeerKey, c.EtcdPeerCert, err = tls.NewCert("etcd-peer", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth}, c.EtcdCaKey, c.EtcdCaCert); err != nil {
 		return
 	}
 
@@ -83,8 +95,30 @@ func run() (err error) {
 	if c.MasterServerCaKey, c.MasterServerCaCert, err = tls.NewCA("openshift-signer"); err != nil {
 		return
 	}
-
-	if c.MasterServerKey, c.MasterServerCert, err = tls.NewCert("master-server", nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, c.MasterServerCaKey, c.MasterServerCaCert); err != nil {
+	if c.MasterServerKey, c.MasterServerCert, err = tls.NewCert("master-server", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, c.MasterServerCaKey, c.MasterServerCaCert); err != nil {
+		return
+	}
+	if c.Front_ProxyCaKey, c.Front_ProxyCaCert, err = tls.NewCA("openshift-signer"); err != nil {
+		return
+	}
+	if c.FrontProxyCaKey, c.FrontProxyCaCert, err = tls.NewCA("aggregator-proxy-car"); err != nil {
+		return
+	}
+	if c.ServiceServingKey, c.ServiceServingCert, err = tls.NewCA("openshift-service-serving-signer"); err != nil {
+		return
+	}
+	adminOrg := []string{"system:cluster-admins", "system:masters"}
+	if c.AdminKey, c.AdminCert, err = tls.NewCert("system:admin", adminOrg, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.MasterServerCaKey, c.MasterServerCaCert); err != nil {
+		return
+	}
+	if c.AggregatorFrontProxyKey, c.AggregatorFrontProxyCert, err = tls.NewCert("aggregator-front-proxy", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.Front_ProxyCaKey, c.Front_ProxyCaCert); err != nil {
+		return
+	}
+	nodeAdminOrg := []string{"system:node-admins"}
+	if c.MasterKubeletClientKey, c.MasterKubeletClientCert, err = tls.NewCert("system:openshift-node-admin", nodeAdminOrg, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.MasterServerCaKey, c.MasterServerCaCert); err != nil {
+		return
+	}
+	if c.MasterProxyClientKey, c.MasterProxyClientCert, err = tls.NewCert("system:master-proxy", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.MasterServerCaKey, c.MasterServerCaCert); err != nil {
 		return
 	}
 
