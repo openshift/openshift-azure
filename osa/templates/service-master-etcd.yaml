@@ -1,0 +1,9 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: master-etcd
+spec:
+  selector:
+    openshift.io/component: etcd
+  ports:
+  - port: 2379

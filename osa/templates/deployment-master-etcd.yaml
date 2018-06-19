@@ -1,0 +1,52 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: master-etcd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      openshift.io/component: etcd
+  template:
+    metadata:
+      labels:
+        openshift.io/component: etcd
+    spec:
+      containers:
+      - name: etcd
+        image: quay.io/coreos/etcd:v3.2.15
+        workingDir: /var/lib/etcd
+        command:
+        - /bin/sh
+        - -c
+        args:
+        - |
+          set -o allexport
+          source /etc/etcd/etcd.conf
+          exec etcd
+        livenessProbe:
+          exec:
+            command:
+            - etcdctl
+            - --ca-file
+            - /etc/etcd/ca.crt
+            - --cert-file
+            - /etc/etcd/peer.crt
+            - --key-file
+            - /etc/etcd/peer.key
+            - -C
+            - https://localhost:2379
+            - cluster-health
+          initialDelaySeconds: 45
+        volumeMounts:
+        - name: master-config
+          mountPath: /etc/etcd/
+          readOnly: true
+        - name: master-data
+          mountPath: /var/lib/etcd/
+      volumes:
+      - name: master-config
+        configMap:
+          name: etc-etcd
+      - name: master-data
+        emptyDir:  ### BIG FAT WARNING, CHANGE THIS BEFORE PRODUCTION :)

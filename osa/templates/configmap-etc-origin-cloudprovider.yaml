@@ -1,0 +1,13 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: etc-origin-cloudprovider
+ddata:
+  azure.conf: |
+    tenantId: XXX
+    subscriptionId: XXX
+    aadClientId: XXX
+    aadClientSecret: XXX
+    aadTenantId: XXX
+    resourceGroup: XXX
+    location: eastus

@@ -1,0 +1,43 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: etc-etcd
+data:
+  etcd.conf: |
+    ETCD_NAME=etcd
+    ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+    ETCD_DATA_DIR=/var/lib/etcd/
+    ETCD_HEARTBEAT_INTERVAL=500
+    ETCD_ELECTION_TIMEOUT=2500
+    ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
+    ETCD_INITIAL_ADVERTISE_PEER_URLS=https://master-etcd:2380
+    ETCD_INITIAL_CLUSTER=etcd=https://master-etcd:2380
+    ETCD_INITIAL_CLUSTER_STATE=new
+    ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster-1
+    ETCD_ADVERTISE_CLIENT_URLS=https://master-etcd:2379
+    ETCD_QUOTA_BACKEND_BYTES=4294967296
+    ETCD_TRUSTED_CA_FILE=/etc/etcd/ca.crt
+    ETCD_CLIENT_CERT_AUTH="true"
+    ETCD_CERT_FILE=/etc/etcd/server.crt
+    ETCD_KEY_FILE=/etc/etcd/server.key
+    ETCD_PEER_TRUSTED_CA_FILE=/etc/etcd/ca.crt
+    ETCD_PEER_CLIENT_CERT_AUTH="true"
+    ETCD_PEER_CERT_FILE=/etc/etcd/peer.crt
+    ETCD_PEER_KEY_FILE=/etc/etcd/peer.key
+    ETCD_DEBUG="False"
+    ETCD_LOG_PACKAGE_LEVELS="etcdserver=DEBUG"
+
+  ca.crt: |
+{{ .Values.etcdCaCert | b64dec | indent 4 }}
+
+  server.crt: |
+{{ .Values.etcdServerCert | b64dec | indent 4 }}
+
+  server.key: |
+{{ .Values.etcdServerKey | b64dec | indent 4 }}
+
+  peer.crt: |
+{{ .Values.etcdPeerCert | b64dec | indent 4 }}
+
+  peer.key: |
+{{ .Values.etcdPeerKey | b64dec | indent 4 }}
