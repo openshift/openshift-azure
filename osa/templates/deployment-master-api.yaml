@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: docker.io/openshift/origin-control-plane:v3.10
+        image: {{ .Values.masterAPIImage }}
         command:
         - /bin/bash
         - -c
@@ -30,7 +30,6 @@ spec:
         - name: DEBUG_LOGLEVEL
           value: "4"
         # TODO: need to re-enable these
-        # TODO: need to make a call on 8443/443?
         #livenessProbe:
         #  httpGet:
         #    path: healthz

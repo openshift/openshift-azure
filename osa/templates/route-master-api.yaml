@@ -1,9 +1,10 @@
+# TODO: should be an Ingress?
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: master-api
 spec:
-  host: {{ .Values.externalHostname }}
+  host: {{ .Values.publicHostname }}
   tls:
     termination: passthrough
   to:

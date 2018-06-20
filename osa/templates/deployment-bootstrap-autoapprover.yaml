@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: signer
-        image: docker.io/openshift/origin-node:v3.10.0
+        image: {{ .Values.bootstrapAutoapproverImage }}
         command:
         - /bin/bash
         - -c

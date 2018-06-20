@@ -32,6 +32,12 @@ type config struct {
 	ServiceCatalogCaKey  *rsa.PrivateKey
 	ServiceCatalogCaCert *x509.Certificate
 
+	// container images for pods
+	BootstrapAutoapproverImage string
+	MasterAPIImage             string
+	MasterControllersImage     string
+	MasterEtcdImage            string
+
 	// etcd certificates
 	EtcdServerKey  *rsa.PrivateKey
 	EtcdServerCert *x509.Certificate
@@ -54,14 +60,19 @@ type config struct {
 	OpenShiftMasterKey       *rsa.PrivateKey
 	OpenShiftMasterCert      *x509.Certificate
 
+	// master-config configurables
+	RoutingConfigSubdomain string
+	PublicHostname         string
+	ImageConfigFormat      string
+
+	// misc control plane configurables
 	ServiceAccountPrivateKey *rsa.PrivateKey
 	ServiceAccountPublicKey  *rsa.PublicKey
+	SessionSecretAuth        []byte
+	SessionSecretEnc         []byte
+	HtPasswd                 []byte
 
-	SessionSecretAuth []byte
-	SessionSecretEnc  []byte
-
-	HtPasswd []byte
-
+	// kubeconfigs
 	AdminKubeconfig  *v1.Config
 	MasterKubeconfig *v1.Config
 
@@ -73,9 +84,6 @@ type config struct {
 	AadTenantID     string
 	ResourceGroup   string
 	Location        string
-
-	RoutingSubdomain string
-	ExternalHostname string
 }
 
 func (c config) MarshalJSON() ([]byte, error) {
@@ -125,8 +133,14 @@ func run() (err error) {
 	// Eventually these will be passed in from OSA config
 	c.Location = "eastus"
 	c.ResourceGroup = "jminterhcp"
-	c.RoutingSubdomain = "example.com"
-	c.ExternalHostname = "master-api-demo.104.45.157.35.nip.io"
+	c.RoutingConfigSubdomain = "example.com"
+	c.PublicHostname = "master-api-demo.104.45.157.35.nip.io"
+
+	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
+	c.BootstrapAutoapproverImage = "docker.io/openshift/origin-node:v3.10.0"
+	c.MasterAPIImage = "docker.io/openshift/origin-control-plane:v3.10"
+	c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
+	c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
 
 	// TODO: need to cross-check all the below with acs-engine, especially SANs and IPs
 
@@ -173,7 +187,7 @@ func run() (err error) {
 	if c.MasterProxyClientKey, c.MasterProxyClientCert, err = tls.NewCert("system:master-proxy", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.CaKey, c.CaCert); err != nil {
 		return
 	}
-	if c.MasterServerKey, c.MasterServerCert, err = tls.NewCert("master-api", nil, []string{"master-api", c.ExternalHostname}, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, c.CaKey, c.CaCert); err != nil {
+	if c.MasterServerKey, c.MasterServerCert, err = tls.NewCert("master-api", nil, []string{"master-api", c.PublicHostname}, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, c.CaKey, c.CaCert); err != nil {
 		return
 	}
 	// currently skipping openshift-aggregator, doesn't seem to hurt
@@ -186,20 +200,16 @@ func run() (err error) {
 	}
 	c.ServiceAccountPublicKey = &c.ServiceAccountPrivateKey.PublicKey
 
-	c.SessionSecretAuth = make([]byte, 24)
-	if _, err = io.ReadAtLeast(rand.Reader, c.SessionSecretAuth, 24); err != nil {
+	if c.SessionSecretAuth, err = randomBytes(24); err != nil {
 		return
 	}
-	c.SessionSecretEnc = make([]byte, 24)
-	if _, err = io.ReadAtLeast(rand.Reader, c.SessionSecretEnc, 24); err != nil {
+	if c.SessionSecretEnc, err = randomBytes(24); err != nil {
 		return
 	}
 
-	pw, err := bcrypt.GenerateFromPassword([]byte("demo"), bcrypt.DefaultCost)
-	if err != nil {
+	if c.HtPasswd, err = makeHtPasswd("demo", "demo"); err != nil {
 		return
 	}
-	c.HtPasswd = append([]byte("demo:"), pw...)
 
 	// azure conf
 	c.TenantID = os.Getenv("AZURE_TENANT_ID")
@@ -208,73 +218,8 @@ func run() (err error) {
 	c.AadClientSecret = os.Getenv("AZURE_CLIENT_SECRET")
 	c.AadTenantID = os.Getenv("AZURE_TENANT_ID")
 
-	c.MasterKubeconfig = &v1.Config{
-		APIVersion: "v1",
-		Kind:       "Config",
-		Clusters: []v1.NamedCluster{
-			{
-				Name: "master-api",
-				Cluster: v1.Cluster{
-					Server: "https://master-api",
-					CertificateAuthorityData: tls.MustCertAsBytes(c.CaCert),
-				},
-			},
-		},
-		AuthInfos: []v1.NamedAuthInfo{
-			{
-				Name: "system:openshift-master/master-api",
-				AuthInfo: v1.AuthInfo{
-					ClientCertificateData: tls.MustCertAsBytes(c.OpenShiftMasterCert),
-					ClientKeyData:         tls.MustPrivateKeyAsBytes(c.OpenShiftMasterKey),
-				},
-			},
-		},
-		Contexts: []v1.NamedContext{
-			{
-				Name: "default/master-api/system:openshift-master",
-				Context: v1.Context{
-					Cluster:   "master-api",
-					Namespace: "default",
-					AuthInfo:  "system:openshift-master/master-api",
-				},
-			},
-		},
-		CurrentContext: "default/master-api/system:openshift-master",
-	}
-
-	c.AdminKubeconfig = &v1.Config{
-		APIVersion: "v1",
-		Kind:       "Config",
-		Clusters: []v1.NamedCluster{
-			{
-				Name: strings.Replace(c.ExternalHostname, ".", "-", -1),
-				Cluster: v1.Cluster{
-					Server: "https://" + c.ExternalHostname,
-					CertificateAuthorityData: tls.MustCertAsBytes(c.CaCert),
-				},
-			},
-		},
-		AuthInfos: []v1.NamedAuthInfo{
-			{
-				Name: "system:admin/" + strings.Replace(c.ExternalHostname, ".", "-", -1),
-				AuthInfo: v1.AuthInfo{
-					ClientCertificateData: tls.MustCertAsBytes(c.AdminCert),
-					ClientKeyData:         tls.MustPrivateKeyAsBytes(c.AdminKey),
-				},
-			},
-		},
-		Contexts: []v1.NamedContext{
-			{
-				Name: "default/" + strings.Replace(c.ExternalHostname, ".", "-", -1) + "/system:admin",
-				Context: v1.Context{
-					Cluster:   strings.Replace(c.ExternalHostname, ".", "-", -1),
-					Namespace: "default",
-					AuthInfo:  "system:admin/" + strings.Replace(c.ExternalHostname, ".", "-", -1),
-				},
-			},
-		},
-		CurrentContext: "default/" + strings.Replace(c.ExternalHostname, ".", "-", -1) + "/system:admin",
-	}
+	c.MasterKubeconfig = makeKubeConfig(c.OpenShiftMasterKey, c.OpenShiftMasterCert, c.CaCert, "master-api", "system:openshift-master", "default")
+	c.AdminKubeconfig = makeKubeConfig(c.AdminKey, c.AdminCert, c.CaCert, c.PublicHostname, "system:admin", "default")
 
 	b, err := yaml.Marshal(c)
 	if err != nil {
@@ -295,4 +240,61 @@ func main() {
 	if err := run(); err != nil {
 		panic(err)
 	}
+}
+
+func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certificate, endpoint, username, namespace string) *v1.Config {
+	clustername := strings.Replace(endpoint, ".", "-", -1)
+	authinfoname := username + "/" + clustername
+	contextname := namespace + "/" + clustername + "/" + username
+
+	return &v1.Config{
+		APIVersion: "v1",
+		Kind:       "Config",
+		Clusters: []v1.NamedCluster{
+			{
+				Name: clustername,
+				Cluster: v1.Cluster{
+					Server: "https://" + endpoint,
+					CertificateAuthorityData: tls.MustCertAsBytes(caCert),
+				},
+			},
+		},
+		AuthInfos: []v1.NamedAuthInfo{
+			{
+				Name: authinfoname,
+				AuthInfo: v1.AuthInfo{
+					ClientCertificateData: tls.MustCertAsBytes(clientCert),
+					ClientKeyData:         tls.MustPrivateKeyAsBytes(clientKey),
+				},
+			},
+		},
+		Contexts: []v1.NamedContext{
+			{
+				Name: contextname,
+				Context: v1.Context{
+					Cluster:   clustername,
+					Namespace: namespace,
+					AuthInfo:  authinfoname,
+				},
+			},
+		},
+		CurrentContext: contextname,
+	}
+}
+
+func makeHtPasswd(username, password string) ([]byte, error) {
+	b, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	return append([]byte(username+":"), b...), nil
+}
+
+func randomBytes(n int) ([]byte, error) {
+	b := make([]byte, n)
+	if _, err := io.ReadAtLeast(rand.Reader, b, n); err != nil {
+		return nil, err
+	}
+	return b, nil
 }
