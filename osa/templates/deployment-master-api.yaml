@@ -56,14 +56,10 @@ spec:
           mountPath: /var/lib/origin/
       volumes:
       - name: master-config
-        projected:
-          sources:
-          - secret:
-              name: etc-origin-master
-          - configMap:
-              name: etc-origin-master
+        secret:
+          secretName: etc-origin-master
       - name: master-cloud-provider
-        configMap:
-          name: etc-origin-cloudprovider
+        secret:
+          secretName: etc-origin-cloudprovider
       - name: master-data
         emptyDir: # TODO: BIG FAT WARNING, CHANGE THIS BEFORE PRODUCTION :)

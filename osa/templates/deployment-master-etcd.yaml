@@ -46,11 +46,7 @@ spec:
           mountPath: /var/lib/etcd/
       volumes:
       - name: master-config
-        projected:
-          sources:
-          - secret:
-              name: etc-etcd
-          - configMap:
-              name: etc-etcd
+        secret:
+          secretName: etc-etcd
       - name: master-data
         emptyDir: # TODO: BIG FAT WARNING, CHANGE THIS BEFORE PRODUCTION :)
