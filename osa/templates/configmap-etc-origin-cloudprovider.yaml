@@ -1,13 +1,13 @@
-kind: ConfigMap
 apiVersion: v1
+kind: ConfigMap
 metadata:
   name: etc-origin-cloudprovider
-ddata:
+data:
   azure.conf: |
-    tenantId: {{ .Values.tenantId }}
-    subscriptionId: {{ .Values.subscriptionId }}
-    aadClientId: {{ .Values.aadClientId }}
+    tenantId: {{ .Values.tenantID }}
+    subscriptionId: {{ .Values.subscriptionID }}
+    aadClientId: {{ .Values.aadClientID }}
     aadClientSecret: {{ .Values.aadClientSecret }}
-    aadTenantId: {{ .Values.aadTenantId }}
+    aadTenantId: {{ .Values.aadTenantID }}
     resourceGroup: {{ .Values.resourceGroup }}
-    location: eastus
+    location: {{ .Values.location }}

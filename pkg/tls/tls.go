@@ -4,17 +4,15 @@ import (
 	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/sha1"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"math/big"
 	"net"
-	"sync"
 	"time"
 )
 
-func newPrivateKey() (*rsa.PrivateKey, error) {
+func NewPrivateKey() (*rsa.PrivateKey, error) {
 	return rsa.GenerateKey(rand.Reader, 2048)
 }
 
@@ -33,26 +31,16 @@ func newCert(key *rsa.PrivateKey, template *x509.Certificate, signingkey *rsa.Pr
 	return x509.ParseCertificate(b)
 }
 
-type serialNumber struct {
-	m sync.Mutex
-	i int64
-}
-
-func (s *serialNumber) Get() *big.Int {
-	s.m.Lock()
-	defer s.m.Unlock()
-
-	s.i++
-	return big.NewInt(s.i)
-}
-
-var serial serialNumber
-
 func NewCA(cn string) (*rsa.PrivateKey, *x509.Certificate, error) {
 	now := time.Now()
 
+	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	if err != nil {
+		return nil, nil, err
+	}
+
 	template := &x509.Certificate{
-		SerialNumber:          serial.Get(),
+		SerialNumber:          serialNumber,
 		NotBefore:             now,
 		NotAfter:              now.AddDate(5, 0, 0),
 		Subject:               pkix.Name{CommonName: cn},
@@ -61,7 +49,7 @@ func NewCA(cn string) (*rsa.PrivateKey, *x509.Certificate, error) {
 		IsCA:                  true,
 	}
 
-	key, err := newPrivateKey()
+	key, err := NewPrivateKey()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -85,8 +73,13 @@ func NewCert(
 ) (*rsa.PrivateKey, *x509.Certificate, error) {
 	now := time.Now()
 
+	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	if err != nil {
+		return nil, nil, err
+	}
+
 	template := &x509.Certificate{
-		SerialNumber:          serial.Get(),
+		SerialNumber:          serialNumber,
 		NotBefore:             now,
 		NotAfter:              now.AddDate(2, 0, 0),
 		Subject:               pkix.Name{CommonName: cn, Organization: organization},
@@ -97,7 +90,7 @@ func NewCert(
 		IPAddresses:           ipAddresses,
 	}
 
-	key, err := newPrivateKey()
+	key, err := NewPrivateKey()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -121,6 +114,30 @@ func PrivateKeyAsBytes(key *rsa.PrivateKey) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+func MustPrivateKeyAsBytes(key *rsa.PrivateKey) []byte {
+	b, err := PrivateKeyAsBytes(key)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
+func PublicKeyAsBytes(key *rsa.PublicKey) ([]byte, error) {
+	buf := &bytes.Buffer{}
+
+	b, err := x509.MarshalPKIXPublicKey(key)
+	if err != nil {
+		return nil, err
+	}
+
+	err = pem.Encode(buf, &pem.Block{Type: "PUBLIC KEY", Bytes: b})
+	if err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
 func CertAsBytes(cert *x509.Certificate) ([]byte, error) {
 	buf := &bytes.Buffer{}
 
@@ -132,8 +149,10 @@ func CertAsBytes(cert *x509.Certificate) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func intsha1(n *big.Int) []byte {
-	h := sha1.New()
-	h.Write(n.Bytes())
-	return h.Sum(nil)
+func MustCertAsBytes(cert *x509.Certificate) []byte {
+	b, err := CertAsBytes(cert)
+	if err != nil {
+		panic(err)
+	}
+	return b
 }

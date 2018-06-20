@@ -1,5 +1,5 @@
-kind: Deployment
 apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: master-controllers
 spec:
@@ -14,6 +14,7 @@ spec:
     spec:
       containers:
       - name: controllers
+        # TODO: all images need to be parameterised
         image: docker.io/openshift/origin-control-plane:v3.10
         command:
         - /bin/bash
@@ -43,8 +44,12 @@ spec:
           readOnly: true
       volumes:
       - name: master-config
-        configMap:
-          name: etc-origin-master
+        projected:
+          sources:
+          - secret:
+              name: etc-origin-master
+          - configMap:
+              name: etc-origin-master
       - name: master-cloud-provider
         configMap:
           name: etc-origin-cloudprovider

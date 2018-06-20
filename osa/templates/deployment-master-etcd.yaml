@@ -1,5 +1,5 @@
-kind: Deployment
 apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: master-etcd
 spec:
@@ -34,8 +34,8 @@ spec:
             - /etc/etcd/peer.crt
             - --key-file
             - /etc/etcd/peer.key
-            - -C
-            - https://localhost:2379
+            - --endpoints
+            - https://master-etcd:2379
             - cluster-health
           initialDelaySeconds: 45
         volumeMounts:
@@ -46,7 +46,11 @@ spec:
           mountPath: /var/lib/etcd/
       volumes:
       - name: master-config
-        configMap:
-          name: etc-etcd
+        projected:
+          sources:
+          - secret:
+              name: etc-etcd
+          - configMap:
+              name: etc-etcd
       - name: master-data
-        emptyDir:  ### BIG FAT WARNING, CHANGE THIS BEFORE PRODUCTION :)
+        emptyDir: # TODO: BIG FAT WARNING, CHANGE THIS BEFORE PRODUCTION :)
