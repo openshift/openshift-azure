@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"net"
 	"os"
 	"reflect"
 	"strings"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/jim-minter/azure-helm/pkg/tls"
+	"github.com/satori/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 )
@@ -27,16 +29,18 @@ type config struct {
 	CaCert               *x509.Certificate
 	FrontProxyCaKey      *rsa.PrivateKey
 	FrontProxyCaCert     *x509.Certificate
-	ServiceServingCaKey  *rsa.PrivateKey
-	ServiceServingCaCert *x509.Certificate
+	ServiceSigningCaKey  *rsa.PrivateKey
+	ServiceSigningCaCert *x509.Certificate
 	ServiceCatalogCaKey  *rsa.PrivateKey
 	ServiceCatalogCaCert *x509.Certificate
 
 	// container images for pods
-	BootstrapAutoapproverImage string
+	MasterEtcdImage            string
 	MasterAPIImage             string
 	MasterControllersImage     string
-	MasterEtcdImage            string
+	BootstrapAutoapproverImage string
+	ServiceCatalogImage        string
+	ImportImage                string
 
 	// etcd certificates
 	EtcdServerKey  *rsa.PrivateKey
@@ -59,6 +63,9 @@ type config struct {
 	MasterProxyClientCert    *x509.Certificate
 	OpenShiftMasterKey       *rsa.PrivateKey
 	OpenShiftMasterCert      *x509.Certificate
+
+	ServiceCatalogServerKey  *rsa.PrivateKey
+	ServiceCatalogServerCert *x509.Certificate
 
 	// master-config configurables
 	RoutingConfigSubdomain string
@@ -84,6 +91,22 @@ type config struct {
 	AadTenantID     string
 	ResourceGroup   string
 	Location        string
+
+	// needed by import
+	RouterIP                       net.IP
+	EtcdHostname                   string
+	RegistryStorageAccount         string
+	RegistryAccountKey             string
+	RegistryServiceIP              net.IP
+	RegistryHTTPSecret             []byte
+	AlertManagerProxySessionSecret []byte
+	AlertsProxySessionSecret       []byte
+	PrometheusProxySessionSecret   []byte
+	ServiceCatalogClusterID        uuid.UUID
+	RegistryKey                    *rsa.PrivateKey
+	RegistryCert                   *x509.Certificate
+	RouterKey                      *rsa.PrivateKey
+	RouterCert                     *x509.Certificate
 }
 
 func (c config) MarshalJSON() ([]byte, error) {
@@ -94,32 +117,37 @@ func (c config) MarshalJSON() ([]byte, error) {
 		k = string(unicode.ToLower(rune(k[0]))) + k[1:]
 
 		switch v := v.Field(i).Interface().(type) {
-		case (*x509.Certificate):
+		case *x509.Certificate:
 			b, err := tls.CertAsBytes(v)
 			if err != nil {
 				return nil, err
 			}
 			m[k] = base64.StdEncoding.EncodeToString(b)
-		case (*rsa.PrivateKey):
+
+		case *rsa.PrivateKey:
 			b, err := tls.PrivateKeyAsBytes(v)
 			if err != nil {
 				return nil, err
 			}
 			m[k] = base64.StdEncoding.EncodeToString(b)
-		case (*rsa.PublicKey):
+
+		case *rsa.PublicKey:
 			b, err := tls.PublicKeyAsBytes(v)
 			if err != nil {
 				return nil, err
 			}
 			m[k] = base64.StdEncoding.EncodeToString(b)
-		case (*v1.Config):
+
+		case *v1.Config:
 			b, err := yaml.Marshal(v)
 			if err != nil {
 				return nil, err
 			}
 			m[k] = base64.StdEncoding.EncodeToString(b)
+
 		case []byte:
 			m[k] = base64.StdEncoding.EncodeToString(v)
+
 		default:
 			m[k] = v
 		}
@@ -133,14 +161,17 @@ func run() (err error) {
 	// Eventually these will be passed in from OSA config
 	c.Location = "eastus"
 	c.ResourceGroup = "jminterhcp"
+
 	c.RoutingConfigSubdomain = "example.com"
 	c.PublicHostname = "master-api-demo.104.45.157.35.nip.io"
-
 	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
-	c.BootstrapAutoapproverImage = "docker.io/openshift/origin-node:v3.10.0"
+
+	c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
 	c.MasterAPIImage = "docker.io/openshift/origin-control-plane:v3.10"
 	c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
-	c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
+	c.BootstrapAutoapproverImage = "docker.io/openshift/origin-node:v3.10.0"
+	c.ServiceCatalogImage = "docker.io/openshift/origin-service-catalog:v3.10.0"
+	c.ImportImage = "docker.io/jimminter/import:latest"
 
 	// TODO: need to cross-check all the below with acs-engine, especially SANs and IPs
 
@@ -155,7 +186,7 @@ func run() (err error) {
 	if c.FrontProxyCaKey, c.FrontProxyCaCert, err = tls.NewCA("openshift-frontproxy-signer"); err != nil {
 		return
 	}
-	if c.ServiceServingCaKey, c.ServiceServingCaCert, err = tls.NewCA("openshift-service-serving-signer"); err != nil {
+	if c.ServiceSigningCaKey, c.ServiceSigningCaCert, err = tls.NewCA("openshift-service-serving-signer"); err != nil {
 		return
 	}
 	if c.ServiceCatalogCaKey, c.ServiceCatalogCaCert, err = tls.NewCA("service-catalog-signer"); err != nil {
@@ -195,6 +226,10 @@ func run() (err error) {
 		return
 	}
 
+	if c.ServiceCatalogServerKey, c.ServiceCatalogServerCert, err = tls.NewCert("servicecatalog-api", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, c.ServiceCatalogCaKey, c.ServiceCatalogCaCert); err != nil {
+		return
+	}
+
 	if c.ServiceAccountPrivateKey, err = tls.NewPrivateKey(); err != nil {
 		return
 	}
@@ -220,6 +255,59 @@ func run() (err error) {
 
 	c.MasterKubeconfig = makeKubeConfig(c.OpenShiftMasterKey, c.OpenShiftMasterCert, c.CaCert, "master-api", "system:openshift-master", "default")
 	c.AdminKubeconfig = makeKubeConfig(c.AdminKey, c.AdminCert, c.CaCert, c.PublicHostname, "system:admin", "default")
+
+	// needed by import
+	// TODO: these need to be filled out sanely, and need to fully migrate the
+	// service catalog over from impexp to helm.
+	c.RouterIP = net.ParseIP("0.0.0.0")
+	c.EtcdHostname = "garbage"
+	c.RegistryStorageAccount = "garbage"
+	c.RegistryAccountKey = "garbage"
+	c.RegistryServiceIP = net.ParseIP("172.30.190.177") // TODO: choose a particular IP address?
+	if c.RegistryHTTPSecret, err = randomBytes(32); err != nil {
+		return err
+	}
+	if c.AlertManagerProxySessionSecret, err = randomBytes(32); err != nil {
+		return err
+	}
+	if c.AlertsProxySessionSecret, err = randomBytes(32); err != nil {
+		return err
+	}
+	if c.PrometheusProxySessionSecret, err = randomBytes(32); err != nil {
+		return err
+	}
+	if c.ServiceCatalogClusterID, err = uuid.NewV4(); err != nil {
+		return err
+	}
+	// TODO: is it possible for the registry to use
+	// service.alpha.openshift.io/serving-cert-secret-name?
+	// TODO: remove nip.io
+	c.RegistryKey, c.RegistryCert, err =
+		tls.NewCert(c.RegistryServiceIP.String(), nil,
+			[]string{"docker-registry-default." + c.RegistryServiceIP.String() + ".nip.io",
+				"docker-registry.default.svc",
+				"docker-registry.default.svc.cluster.local",
+			},
+			[]net.IP{c.RegistryServiceIP},
+			[]x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			c.CaKey,
+			c.CaCert)
+	if err != nil {
+		return err
+	}
+	// TODO: the router CN and SANs should be configurables.
+	c.RouterKey, c.RouterCert, err =
+		tls.NewCert("*."+c.RouterIP.String()+".nip.io", nil,
+			[]string{"*." + c.RouterIP.String() + ".nip.io",
+				c.RouterIP.String() + ".nip.io",
+			},
+			nil,
+			[]x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			c.CaKey,
+			c.CaCert)
+	if err != nil {
+		return err
+	}
 
 	b, err := yaml.Marshal(c)
 	if err != nil {
