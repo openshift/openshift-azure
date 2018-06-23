@@ -1,0 +1,508 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2016-03-30",
+            "location": "{{ .Manifest.Location }}",
+            "name": "nsg-compute",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow_ssh",
+                        "properties": {
+                            "access": "Allow",
+                            "description": "Allow SSH traffic",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "22-22",
+                            "direction": "Inbound",
+                            "priority": 101,
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2016-03-30",
+            "location": "{{ .Manifest.Location }}",
+            "name": "nsg-infra",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow_ssh",
+                        "properties": {
+                            "access": "Allow",
+                            "description": "Allow SSH traffic",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "22-22",
+                            "direction": "Inbound",
+                            "priority": 101,
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*"
+                        }
+                    },
+                    {
+                        "name": "allow_http",
+                        "properties": {
+                            "access": "Allow",
+                            "description": "Allow http traffic",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "80",
+                            "direction": "Inbound",
+                            "priority": 102,
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*"
+                        }
+                    },
+                    {
+                        "name": "allow_https",
+                        "properties": {
+                            "access": "Allow",
+                            "description": "Allow https traffic",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "443",
+                            "direction": "Inbound",
+                            "priority": 103,
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2016-03-30",
+            "location": "{{ .Manifest.Location }}",
+            "name": "vnet",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/8"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "subnet",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/24"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2017-08-01",
+            "location": "{{ .Manifest.Location }}",
+            "name": "ip-router",
+            "properties": {
+                "publicIPAllocationMethod": "Static"
+            },
+            "sku": {
+                "name": "Basic"
+            }
+        },
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "apiVersion": "2017-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-router')]"
+            ],
+            "location": "{{ .Manifest.Location }}",
+            "name": "lb-router",
+            "properties": {
+                "backendAddressPools": [
+                    {
+                        "name": "backend"
+                    }
+                ],
+                "frontendIPConfigurations": [
+                    {
+                        "name": "frontend",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-router')]"
+                            }
+                        }
+                    }
+                ],
+                "inboundNatPools": [],
+                "inboundNatRules": [],
+                "loadBalancingRules": [
+                    {
+                        "name": "port-80",
+                        "properties": {
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/backendAddressPools/backend')]"
+                            },
+                            "backendPort": 80,
+                            "enableFloatingIP": false,
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/frontendIPConfigurations/frontend')]"
+                            },
+                            "frontendPort": 80,
+                            "idleTimeoutInMinutes": 4,
+                            "loadDistribution": "Default",
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/probes/port-80')]"
+                            },
+                            "protocol": "Tcp"
+                        }
+                    },
+                    {
+                        "name": "port-443",
+                        "properties": {
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/backendAddressPools/backend')]"
+                            },
+                            "backendPort": 443,
+                            "enableFloatingIP": false,
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/frontendIPConfigurations/frontend')]"
+                            },
+                            "frontendPort": 443,
+                            "idleTimeoutInMinutes": 4,
+                            "loadDistribution": "Default",
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/probes/port-443')]"
+                            },
+                            "protocol": "Tcp"
+                        }
+                    }
+                ],
+                "outboundNatRules": [],
+                "probes": [
+                    {
+                        "name": "port-80",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "port": 80,
+                            "protocol": "Tcp"
+                        }
+                    },
+                    {
+                        "name": "port-443",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "port": 443,
+                            "protocol": "Tcp"
+                        }
+                    }
+                ]
+            },
+            "sku": {
+                "name": "Basic"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2015-06-15",
+            "location": "{{ .Manifest.Location }}",
+            "name": "{{ .Config.RegistryStorageAccount }}",
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2016-04-30-preview",
+            "location": "{{ .Manifest.Location }}",
+            "name": "as-compute",
+            "properties": {
+                "managed": true,
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 3
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2017-08-01",
+            "copy": {
+                "count": {{ .Manifest.ComputeCount }},
+                "name": "loop"
+            },
+            "location": "{{ .Manifest.Location }}",
+            "name": "[concat('ip-compute-', copyIndex())]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            },
+            "sku": {
+                "name": "Basic"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2016-03-30",
+            "copy": {
+                "count": {{ .Manifest.ComputeCount }},
+                "name": "loop"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat('ip-compute-', copyIndex()))]"
+            ],
+            "location": "{{ .Manifest.Location }}",
+            "name": "[concat('nic-compute-', copyIndex())]",
+            "properties": {
+                "enableAcceleratedNetworking": "false",
+                "enableIPForwarding": true,
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig",
+                        "properties": {
+                            "primary": true,
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/subnet')]"
+                            },
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat('ip-compute-', copyIndex()))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2016-04-30-preview",
+            "copy": {
+                "count": {{ .Manifest.ComputeCount }},
+                "name": "loop"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-compute-', copyIndex()))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', 'as-compute')]"
+            ],
+            "location": "{{ .Manifest.Location }}",
+            "name": "[concat('vm-compute-', copyIndex())]",
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'as-compute')]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "{{ .Manifest.VMSize }}"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-compute-', copyIndex()))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "adminUsername": "cloud-user",
+                    "computername": "[concat('vm-compute-', copyIndex())]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "keyData": "{{ SSHPublicKeyAsString .Config.SSHPublicKey }}",
+                                    "path": "/home/cloud-user/.ssh/authorized_keys"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "id": "[resourceId('{{ .Manifest.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Manifest.ImageResourceName }}')]"
+                    },
+                    "osDisk": {
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2016-03-30",
+            "copy": {
+                "count": {{ .Manifest.ComputeCount }},
+                "name": "loop"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', concat('vm-compute-', copyIndex()))]"
+            ],
+            "location": "{{ .Manifest.Location }}",
+            "name": "[concat('vm-compute-', copyIndex(), '/cse')]",
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "script": "{{ Base64Encode (Startup `compute`) }}"
+                },
+                "publisher": "Microsoft.Azure.Extensions",
+                "settings": {},
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2016-04-30-preview",
+            "location": "{{ .Manifest.Location }}",
+            "name": "as-infra",
+            "properties": {
+                "managed": true,
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 3
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2017-08-01",
+            "copy": {
+                "count": {{ .Manifest.InfraCount }},
+                "name": "loop"
+            },
+            "location": "{{ .Manifest.Location }}",
+            "name": "[concat('ip-infra-', copyIndex())]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            },
+            "sku": {
+                "name": "Basic"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2016-03-30",
+            "copy": {
+                "count": {{ .Manifest.InfraCount }},
+                "name": "loop"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-infra')]",
+                "[resourceId('Microsoft.Network/loadBalancers', 'lb-router')]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat('ip-infra-', copyIndex()))]"
+            ],
+            "location": "{{ .Manifest.Location }}",
+            "name": "[concat('nic-infra-', copyIndex())]",
+            "properties": {
+                "enableAcceleratedNetworking": "false",
+                "enableIPForwarding": true,
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig",
+                        "properties": {
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/backendAddressPools/backend')]"
+                                }
+                            ],
+                            "primary": true,
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/subnet')]"
+                            },
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat('ip-infra-', copyIndex()))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-infra')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2016-04-30-preview",
+            "copy": {
+                "count": {{ .Manifest.InfraCount }},
+                "name": "loop"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-infra-', copyIndex()))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', 'as-infra')]"
+            ],
+            "location": "{{ .Manifest.Location }}",
+            "name": "[concat('vm-infra-', copyIndex())]",
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'as-infra')]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "{{ .Manifest.VMSize }}"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-infra-', copyIndex()))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "adminUsername": "cloud-user",
+                    "computername": "[concat('vm-infra-', copyIndex())]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "keyData": "{{ SSHPublicKeyAsString .Config.SSHPublicKey }}",
+                                    "path": "/home/cloud-user/.ssh/authorized_keys"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "id": "[resourceId('{{ .Manifest.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Manifest.ImageResourceName }}')]"
+                    },
+                    "osDisk": {
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2016-03-30",
+            "copy": {
+                "count": {{ .Manifest.InfraCount }},
+                "name": "loop"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', concat('vm-infra-', copyIndex()))]"
+            ],
+            "location": "{{ .Manifest.Location }}",
+            "name": "[concat('vm-infra-', copyIndex(), '/cse')]",
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "script": "{{ Base64Encode (Startup `infra`) }}"
+                },
+                "publisher": "Microsoft.Azure.Extensions",
+                "settings": {},
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0"
+            }
+        }
+    ],
+    "outputs": {}
+}

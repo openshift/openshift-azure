@@ -1,0 +1,11 @@
+package: github.com/jim-minter/azure-helm
+import:
+- package: github.com/ghodss/yaml
+- package: github.com/satori/uuid
+- package: golang.org/x/crypto
+  subpackages:
+  - bcrypt
+  - ssh
+- package: k8s.io/client-go
+  subpackages:
+  - tools/clientcmd/api/v1

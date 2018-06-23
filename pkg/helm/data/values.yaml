@@ -1,0 +1,84 @@
+# CAs
+EtcdCaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdCaKey) }}
+EtcdCaCert: {{ Base64Encode (CertAsBytes .Config.EtcdCaCert) }}
+CaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.CaKey) }}
+CaCert: {{ Base64Encode (CertAsBytes .Config.CaCert) }}
+FrontProxyCaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.FrontProxyCaKey) }}
+FrontProxyCaCert: {{ Base64Encode (CertAsBytes .Config.FrontProxyCaCert) }}
+ServiceSigningCaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceSigningCaKey) }}
+ServiceSigningCaCert: {{ Base64Encode (CertAsBytes .Config.ServiceSigningCaCert) }}
+ServiceCatalogCaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceCatalogCaKey) }}
+ServiceCatalogCaCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogCaCert) }}
+
+# container images for pods
+MasterEtcdImage: {{ .Config.MasterEtcdImage }}
+MasterAPIImage: {{ .Config.MasterAPIImage }}
+MasterControllersImage: {{ .Config.MasterControllersImage }}
+BootstrapAutoapproverImage: {{ .Config.BootstrapAutoapproverImage }}
+ServiceCatalogImage: {{ .Config.ServiceCatalogImage }}
+ImportImage: {{ .Config.ImportImage }}
+
+# etcd certificates
+EtcdServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdServerKey) }}
+EtcdServerCert: {{ Base64Encode (CertAsBytes .Config.EtcdServerCert) }}
+EtcdPeerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdPeerKey) }}
+EtcdPeerCert: {{ Base64Encode (CertAsBytes .Config.EtcdPeerCert) }}
+EtcdClientKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdClientKey) }}
+EtcdClientCert: {{ Base64Encode (CertAsBytes .Config.EtcdClientCert) }}
+
+# control plane certificates
+MasterServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterServerKey) }}
+MasterServerCert: {{ Base64Encode (CertAsBytes .Config.MasterServerCert) }}
+AdminKey: {{ Base64Encode (PrivateKeyAsBytes .Config.AdminKey) }}
+AdminCert: {{ Base64Encode (CertAsBytes .Config.AdminCert) }}
+AggregatorFrontProxyKey: {{ Base64Encode (PrivateKeyAsBytes .Config.AggregatorFrontProxyKey) }}
+AggregatorFrontProxyCert: {{ Base64Encode (CertAsBytes .Config.AggregatorFrontProxyCert) }}
+MasterKubeletClientKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterKubeletClientKey) }}
+MasterKubeletClientCert: {{ Base64Encode (CertAsBytes .Config.MasterKubeletClientCert) }}
+MasterProxyClientKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterProxyClientKey) }}
+MasterProxyClientCert: {{ Base64Encode (CertAsBytes .Config.MasterProxyClientCert) }}
+OpenShiftMasterKey: {{ Base64Encode (PrivateKeyAsBytes .Config.OpenShiftMasterKey) }}
+OpenShiftMasterCert: {{ Base64Encode (CertAsBytes .Config.OpenShiftMasterCert) }}
+
+ServiceCatalogServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceCatalogServerKey) }}
+ServiceCatalogServerCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogServerCert) }}
+
+# master-config configurables
+RoutingConfigSubdomain: {{ .Config.RoutingConfigSubdomain }}
+PublicHostname: {{ .Config.PublicHostname }}
+ImageConfigFormat: {{ .Config.ImageConfigFormat }}
+
+# misc control plane configurables
+ServiceAccountPrivateKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceAccountPrivateKey) }}
+ServiceAccountPublicKey: {{ Base64Encode (PublicKeyAsBytes .Config.ServiceAccountPublicKey) }}
+SessionSecretAuth: {{ Base64Encode .Config.SessionSecretAuth }}
+SessionSecretEnc: {{ Base64Encode .Config.SessionSecretEnc }}
+HtPasswd: {{ Base64Encode .Config.HtPasswd }}
+
+# kubeconfigs
+AdminKubeconfig: {{ Base64Encode (YamlMarshal .Config.AdminKubeconfig) }}
+MasterKubeconfig: {{ Base64Encode (YamlMarshal .Config.MasterKubeconfig) }}
+
+# azure config
+TenantID: {{ .Manifest.TenantID }}
+SubscriptionID: {{ .Manifest.SubscriptionID }}
+ClientID: {{ .Manifest.ClientID }}
+ClientSecret: {{ .Manifest.ClientSecret }}
+ResourceGroup: {{ .Manifest.ResourceGroup }}
+Location: {{ .Manifest.Location }}
+
+# needed by import
+RouterIP: {{ .Config.RouterIP }}
+EtcdHostname: {{ .Config.EtcdHostname }}
+RegistryStorageAccount: {{ .Config.RegistryStorageAccount }}
+RegistryAccountKey: {{ .Config.RegistryAccountKey }}
+RegistryServiceIP: {{ .Config.RegistryServiceIP }}
+RegistryHTTPSecret: {{ Base64Encode .Config.RegistryHTTPSecret }}
+AlertManagerProxySessionSecret: {{ Base64Encode .Config.AlertManagerProxySessionSecret }}
+AlertsProxySessionSecret: {{ Base64Encode .Config.AlertsProxySessionSecret }}
+PrometheusProxySessionSecret: {{ Base64Encode .Config.PrometheusProxySessionSecret }}
+ServiceCatalogClusterID: {{ .Config.ServiceCatalogClusterID }}
+RegistryKey: {{ Base64Encode (PrivateKeyAsBytes .Config.RegistryKey) }}
+RegistryCert: {{ Base64Encode (CertAsBytes .Config.RegistryCert) }}
+RouterKey: {{ Base64Encode (PrivateKeyAsBytes .Config.RouterKey) }}
+RouterCert: {{ Base64Encode (CertAsBytes .Config.RouterCert) }}

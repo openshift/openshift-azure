@@ -6,10 +6,13 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/base64"
 	"encoding/pem"
 	"math/big"
 	"net"
 	"time"
+
+	"golang.org/x/crypto/ssh"
 )
 
 func NewPrivateKey() (*rsa.PrivateKey, error) {
@@ -136,6 +139,10 @@ func PublicKeyAsBytes(key *rsa.PublicKey) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
+}
+
+func SSHPublicKeyAsString(key ssh.PublicKey) string {
+	return key.Type() + " " + base64.StdEncoding.EncodeToString(key.Marshal())
 }
 
 func CertAsBytes(cert *x509.Certificate) ([]byte, error) {

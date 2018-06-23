@@ -1,0 +1,87 @@
+hash: aef4ac2a6f34b451b1414f29114c38b999a1d76f9864b5056357bbb4670bfba1
+updated: 2018-06-24T08:37:28.227563073-05:00
+imports:
+- name: github.com/ghodss/yaml
+  version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
+- name: github.com/gogo/protobuf
+  version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
+  subpackages:
+  - proto
+  - sortkeys
+- name: github.com/golang/glog
+  version: 44145f04b68cf362d9c4df2182967c2275eaefed
+- name: github.com/satori/uuid
+  version: 36e9d2ebbde5e3f13ab2e25625fd453271d6522e
+- name: golang.org/x/crypto
+  version: 81e90905daefcd6fd217b62423c0908922eadb30
+  subpackages:
+  - bcrypt
+  - blowfish
+  - curve25519
+  - ed25519
+  - ed25519/internal/edwards25519
+  - ssh
+- name: gopkg.in/yaml.v2
+  version: 670d4cfef0544295bc27a114dbac37980d83185a
+- name: k8s.io/apimachinery
+  version: 302974c03f7e50f16561ba237db776ab93594ef6
+  subpackages:
+  - pkg/api/equality
+  - pkg/api/errors
+  - pkg/api/meta
+  - pkg/api/resource
+  - pkg/api/testing
+  - pkg/api/testing/fuzzer
+  - pkg/api/testing/roundtrip
+  - pkg/apimachinery
+  - pkg/apimachinery/announced
+  - pkg/apimachinery/registered
+  - pkg/apis/meta/fuzzer
+  - pkg/apis/meta/internalversion
+  - pkg/apis/meta/v1
+  - pkg/apis/meta/v1/unstructured
+  - pkg/apis/meta/v1beta1
+  - pkg/conversion
+  - pkg/conversion/queryparams
+  - pkg/fields
+  - pkg/labels
+  - pkg/runtime
+  - pkg/runtime/schema
+  - pkg/runtime/serializer
+  - pkg/runtime/serializer/json
+  - pkg/runtime/serializer/protobuf
+  - pkg/runtime/serializer/recognizer
+  - pkg/runtime/serializer/streaming
+  - pkg/runtime/serializer/versioning
+  - pkg/selection
+  - pkg/types
+  - pkg/util/cache
+  - pkg/util/clock
+  - pkg/util/diff
+  - pkg/util/errors
+  - pkg/util/framer
+  - pkg/util/httpstream
+  - pkg/util/httpstream/spdy
+  - pkg/util/intstr
+  - pkg/util/json
+  - pkg/util/mergepatch
+  - pkg/util/net
+  - pkg/util/remotecommand
+  - pkg/util/runtime
+  - pkg/util/sets
+  - pkg/util/strategicpatch
+  - pkg/util/validation
+  - pkg/util/validation/field
+  - pkg/util/wait
+  - pkg/util/yaml
+  - pkg/version
+  - pkg/watch
+  - third_party/forked/golang/json
+  - third_party/forked/golang/netutil
+  - third_party/forked/golang/reflect
+- name: k8s.io/client-go
+  version: 33f2870a2b83179c823ddc90e5513f9e5fe43b38
+  subpackages:
+  - tools/clientcmd/api
+  - tools/clientcmd/api/v1
+testImports: []
