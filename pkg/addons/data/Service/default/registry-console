@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: registry-console
+    createdBy: registry-console-template
+    name: registry-console
+  name: registry-console
+  namespace: default
+spec:
+  clusterIP: 172.30.189.18
+  ports:
+  - name: registry-console
+    port: 9000
+    protocol: TCP
+    targetPort: 9090
+  selector:
+    name: registry-console
+  sessionAffinity: None
+  type: ClusterIP

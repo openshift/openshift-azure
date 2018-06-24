@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    image.openshift.io/triggers: |
+      [{"from":{"kind":"ImageStreamTag","name":"node:v3.10"},"fieldPath":"spec.template.spec.containers[?(@.name==\"signer\")].image"}]
+  labels:
+    app: bootstrap-autoapprover
+  name: bootstrap-autoapprover
+  namespace: openshift-infra
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: bootstrap-autoapprover
+  serviceName: ""
+  template:
+    metadata:
+      labels:
+        app: bootstrap-autoapprover
+    spec:
+      containers:
+      - args:
+        - "#!/bin/bash\nset -o errexit\nset -o nounset\nset -o pipefail\n\nunset KUBECONFIG\ncat
+          <<SCRIPT > /tmp/signer\n#!/bin/bash\n#\n# It will approve any CSR that is
+          not approved yet, and delete any CSR that expired more than 60 seconds\n#
+          ago.\n#\n\nset -o errexit\nset -o nounset\nset -o pipefail\n\nname=\\${1}\ncondition=\\${2}\ncertificate=\\${3}\nusername=\\${4}\n\n#
+          auto approve\nif [[ -z \"\\${condition}\" && (\"\\${username}\" == \"system:serviceaccount:openshift-infra:node-bootstrapper\"
+          || \"\\${username}\" == \"system:node:\"* ) ]]; then\n  oc adm certificate
+          approve \"\\${name}\"\n  exit 0\nfi\n\n# check certificate age\nif [[ -n
+          \"\\${certificate}\" ]]; then\n  text=\"\\$( echo \"\\${certificate}\" |
+          base64 -d - )\"\n  if ! echo \"\\${text}\" | openssl x509 -noout; then\n
+          \   echo \"error: Unable to parse certificate\" 2>&1\n    exit 1\n  fi \n
+          \ if ! echo \"\\${text}\" | openssl x509 -checkend -60 > /dev/null; then\n
+          \   echo \"Certificate is expired, deleting\"\n    oc delete csr \"\\${name}\"\n
+          \ fi\n  exit 0\nfi\nSCRIPT\nchmod u+x /tmp/signer\n\nexec oc observe csr
+          --maximum-errors=1 --resync-period=10m -a '{.status.conditions[*].type}'
+          -a '{.status.certificate}' -a '{.spec.username}' -- /tmp/signer\n"
+        command:
+        - /bin/bash
+        - -c
+        image: openshift/origin-node:v3.10.0
+        imagePullPolicy: IfNotPresent
+        name: signer
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: bootstrap-autoapprover
+      serviceAccountName: bootstrap-autoapprover
+      terminationGracePeriodSeconds: 1
+  updateStrategy:
+    type: RollingUpdate

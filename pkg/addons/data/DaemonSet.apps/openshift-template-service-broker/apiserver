@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    apiserver: "true"
+  name: apiserver
+  namespace: openshift-template-service-broker
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      apiserver: "true"
+  template:
+    metadata:
+      labels:
+        apiserver: "true"
+      name: apiserver
+    spec:
+      containers:
+      - command:
+        - /usr/bin/template-service-broker
+        - start
+        - template-service-broker
+        - --secure-port=8443
+        - --audit-log-path=-
+        - --tls-cert-file=/var/serving-cert/tls.crt
+        - --tls-private-key-file=/var/serving-cert/tls.key
+        - --v=0
+        - --config=/var/apiserver-config/apiserver-config.yaml
+        image: openshift/origin-template-service-broker:v3.10.0
+        imagePullPolicy: IfNotPresent
+        name: c
+        ports:
+        - containerPort: 8443
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 8443
+            scheme: HTTPS
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/serving-cert
+          name: serving-cert
+        - mountPath: /var/apiserver-config
+          name: apiserver-config
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: apiserver
+      serviceAccountName: apiserver
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: serving-cert
+        secret:
+          defaultMode: 420
+          secretName: apiserver-serving-cert
+      - configMap:
+          defaultMode: 420
+          name: apiserver-config
+        name: apiserver-config
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate

@@ -1,0 +1,24 @@
+apiVersion: v1
+data:
+  node-config.yaml: "allowDisabledDocker: false\napiVersion: v1\ndnsBindAddress: 127.0.0.1:53\ndnsRecursiveResolvConf:
+    /etc/origin/node/resolv.conf\ndnsDomain: cluster.local\ndnsIP: 172.17.0.1\ndockerConfig:\n
+    \ dockerShimRootDirectory: /var/lib/dockershim\n  dockerShimSocket: /var/run/dockershim.sock\n
+    \ execHandlerName: native\niptablesSyncPeriod: \"30s\"\nimageConfig:\n  format:
+    openshift/origin-${component}:${version}\n  latest: False\nkind: NodeConfig\nkubeletArguments:\n
+    \ pod-manifest-path:\n  - /etc/origin/node/pods\n  bootstrap-kubeconfig:\n  -
+    /etc/origin/node/bootstrap.kubeconfig\n  feature-gates:\n  - RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true\n
+    \ rotate-certificates:\n  - \"true\"\n  cert-dir:\n  - /etc/origin/node/certificates\n
+    \ enable-controller-attach-detach:\n  - 'true'\n  node-labels:\n  - node-role.kubernetes.io/compute=true\n
+    \ - region=primary\n  cloud-provider:\n  - \"azure\"\n  cloud-config:\n  - \"/etc/origin/cloudprovider/azure.conf\"\nmasterClientConnectionOverrides:\n
+    \ acceptContentTypes: application/vnd.kubernetes.protobuf,application/json\n  contentType:
+    application/vnd.kubernetes.protobuf\n  burst: 200\n  qps: 100\nmasterKubeConfig:
+    node.kubeconfig\nnetworkPluginName: redhat/openshift-ovs-subnet\n# networkConfig
+    struct introduced in origin 1.0.6 and OSE 3.0.2 which\n# deprecates networkPluginName
+    above. The two should match.\nnetworkConfig:\n  mtu: 1450\n  networkPluginName:
+    redhat/openshift-ovs-subnet\npodManifestConfig:\nservingInfo:\n  bindAddress:
+    0.0.0.0:10250\n  bindNetwork: tcp4  \n  clientCA: ca.crt\nvolumeDirectory: /var/lib/origin/openshift.local.volumes\nproxyArguments:\n
+    \ proxy-mode:\n     - iptables\nvolumeConfig:\n  localQuota:\n    perFSGroup:\n"
+kind: ConfigMap
+metadata:
+  name: node-config-compute
+  namespace: openshift-node

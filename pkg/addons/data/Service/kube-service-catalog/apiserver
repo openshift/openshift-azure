@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: apiserver
+  namespace: kube-service-catalog
+spec:
+  clusterIP: 172.30.17.226
+  ports:
+  - name: secure
+    port: 443
+    protocol: TCP
+    targetPort: 6443
+  selector:
+    app: apiserver
+  sessionAffinity: None
+  type: ClusterIP

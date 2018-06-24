@@ -1,0 +1,18 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    openshift.io/host.generated: "true"
+  name: apiserver
+  namespace: kube-service-catalog
+spec:
+  host: '*** GENERATED ***'
+  port:
+    targetPort: secure
+  tls:
+    termination: passthrough
+  to:
+    kind: Service
+    name: apiserver
+    weight: 100
+  wildcardPolicy: None

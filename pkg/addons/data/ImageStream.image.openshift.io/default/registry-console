@@ -1,0 +1,23 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  annotations:
+    description: Atomic Registry console
+  labels:
+    app: registry-console
+    createdBy: registry-console-template
+  name: registry-console
+  namespace: default
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - annotations: null
+    from:
+      kind: DockerImage
+      name: cockpit/kubernetes:latest
+    generation: 2
+    importPolicy: {}
+    name: latest
+    referencePolicy:
+      type: Source

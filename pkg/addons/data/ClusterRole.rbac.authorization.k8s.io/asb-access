@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: asb-access
+rules:
+- nonResourceURLs:
+  - /ansible-service-broker
+  - /ansible-service-broker/*
+  verbs:
+  - delete
+  - get
+  - patch
+  - post
+  - put

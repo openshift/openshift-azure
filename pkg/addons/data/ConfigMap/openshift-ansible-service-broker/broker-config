@@ -1,0 +1,19 @@
+apiVersion: v1
+data:
+  broker-config: "registry:\n  - type: dockerhub\n    name: dh\n    url:  \n    org:
+    \ ansibleplaybookbundle\n    tag:  latest\n    white_list: []\n\n    auth_type:
+    \"\"\n    auth_name: \"\"\n  - type: local_openshift\n    name: localregistry\n
+    \   namespaces: ['openshift']\n    white_list: []\n\ndao:\n  type: crd\nlog:\n
+    \ stdout: true\n  level: info\n  color: true\nopenshift:\n  host: \"\"\n  ca_file:
+    \"\"\n  bearer_token_file: \"\"\n  namespace: openshift-ansible-service-broker\n
+    \ sandbox_role: edit\n  image_pull_policy: Always\n  keep_namespace: false\n  keep_namespace_on_error:
+    true\nbroker:\n  dev_broker: false\n  bootstrap_on_startup: true\n  refresh_interval:
+    600s\n  launch_apb_on_bind: false\n  output_request: false\n  recovery: true\n
+    \ ssl_cert_key: /etc/tls/private/tls.key\n  ssl_cert: /etc/tls/private/tls.crt\n
+    \ auto_escalate: False\n  auth:\n    - type: basic\n      enabled: false\n"
+kind: ConfigMap
+metadata:
+  labels:
+    app: openshift-ansible-service-broker
+  name: broker-config
+  namespace: openshift-ansible-service-broker

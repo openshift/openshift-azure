@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    authorization.openshift.io/system-only: "true"
+    openshift.io/description: A super-user that can perform any action in the cluster.
+      When granted to a user within a project, they have full control over quota and
+      membership and can perform every action on every resource in the project.
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: cluster-admin
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - '*'

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    component: apiserver
+    provider: kubernetes
+  name: kubernetes
+  namespace: default
+spec:
+  clusterIP: 172.30.0.1
+  ports:
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 8443
+  - name: dns
+    port: 53
+    protocol: UDP
+    targetPort: 8053
+  - name: dns-tcp
+    port: 53
+    protocol: TCP
+    targetPort: 8053
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  type: ClusterIP

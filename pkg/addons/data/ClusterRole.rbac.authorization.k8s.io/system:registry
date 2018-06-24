@@ -1,0 +1,48 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    authorization.openshift.io/system-only: "true"
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: system:registry
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - limitranges
+  - resourcequotas
+  verbs:
+  - list
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - images
+  - imagestreamtags
+  verbs:
+  - delete
+  - get
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreamimages
+  - imagestreams/secrets
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - images
+  - imagestreams
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreammappings
+  verbs:
+  - create

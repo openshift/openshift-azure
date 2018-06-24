@@ -1,0 +1,21 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    openshift.io/host.generated: "true"
+  labels:
+    app: openshift-ansible-service-broker
+    service: asb
+  name: asb-1338
+  namespace: openshift-ansible-service-broker
+spec:
+  host: '*** GENERATED ***'
+  port:
+    targetPort: 1338
+  tls:
+    termination: reencrypt
+  to:
+    kind: Service
+    name: asb
+    weight: 100
+  wildcardPolicy: None

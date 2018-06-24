@@ -1,0 +1,37 @@
+{{if 0}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sync
+  template:
+    metadata:
+      labels:
+        app: sync
+    spec:
+      containers:
+      - name: sync
+        image: {{ .Values.SyncImage }}
+        imagePullPolicy: Always
+        env:
+        - name: KUBECONFIG
+          value: /tmp/kubeconfig/admin.kubeconfig
+        volumeMounts:
+        - name: config
+          mountPath: /_out
+          readOnly: true
+        - name: kubeconfig
+          mountPath: /tmp/kubeconfig
+          readOnly: true
+      volumes:
+      - name: config
+        secret:
+          secretName: sync
+      - name: kubeconfig
+        secret:
+          secretName: admin-kubeconfig # TODO: need to use a less powerful token
+{{end}}

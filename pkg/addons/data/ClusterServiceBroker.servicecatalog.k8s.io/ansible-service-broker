@@ -1,0 +1,17 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ClusterServiceBroker
+metadata:
+  finalizers:
+  - kubernetes-incubator/service-catalog
+  name: ansible-service-broker
+spec:
+  authInfo:
+    bearer:
+      secretRef:
+        name: asb-client
+        namespace: openshift-ansible-service-broker
+  caBundle: '*** GENERATED ***'
+  relistBehavior: Duration
+  relistDuration: 15m0s
+  relistRequests: 0
+  url: https://asb.openshift-ansible-service-broker.svc:1338/ansible-service-broker

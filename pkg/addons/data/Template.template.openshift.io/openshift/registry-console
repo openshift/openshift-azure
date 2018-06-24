@@ -1,0 +1,133 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  createdBy: registry-console-template
+metadata:
+  annotations:
+    description: Template for deploying registry web console. Requires cluster-admin.
+    tags: infrastructure
+  name: registry-console
+  namespace: openshift
+objects:
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      name: registry-console
+    name: registry-console
+  spec:
+    replicas: 1
+    selector:
+      name: registry-console
+    template:
+      metadata:
+        labels:
+          name: registry-console
+      spec:
+        containers:
+        - env:
+          - name: OPENSHIFT_OAUTH_PROVIDER_URL
+            value: ${OPENSHIFT_OAUTH_PROVIDER_URL}
+          - name: OPENSHIFT_OAUTH_CLIENT_ID
+            value: ${OPENSHIFT_OAUTH_CLIENT_ID}
+          - name: KUBERNETES_INSECURE
+            value: "false"
+          - name: COCKPIT_KUBE_INSECURE
+            value: "false"
+          - name: REGISTRY_ONLY
+            value: "true"
+          - name: REGISTRY_HOST
+            value: ${REGISTRY_HOST}
+          image: ${IMAGE_PREFIX}${IMAGE_BASENAME}:${IMAGE_VERSION}
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port: 9090
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: registry-console
+          ports:
+          - containerPort: 9090
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port: 9090
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+    triggers:
+    - type: ConfigChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      name: registry-console
+    name: registry-console
+  spec:
+    ports:
+    - name: registry-console
+      port: 9000
+      protocol: TCP
+      targetPort: 9090
+    selector:
+      name: registry-console
+    type: ClusterIP
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      description: Atomic Registry console
+    name: registry-console
+  spec:
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: ${IMAGE_PREFIX}${IMAGE_BASENAME}:${IMAGE_VERSION}
+      name: ${IMAGE_VERSION}
+- apiVersion: v1
+  kind: OAuthClient
+  metadata:
+    name: ${OPENSHIFT_OAUTH_CLIENT_ID}
+    respondWithChallenges: false
+  redirectURIs:
+  - ${COCKPIT_KUBE_URL}
+  secret: ${OPENSHIFT_OAUTH_CLIENT_SECRET}
+parameters:
+- description: Specify "registry/namespace" prefix for container image; e.g. for "registry.example.com/cockpit/kubernetes:latest",
+    set prefix "registry.example.com/cockpit/"
+  name: IMAGE_PREFIX
+  value: cockpit/
+- description: Specify component name for container image; e.g. for "registry.example.com/cockpit/kubernetes:latest",
+    use base name "kubernetes"
+  name: IMAGE_BASENAME
+  value: kubernetes
+- description: Specify image version; e.g. for "cockpit/kubernetes:latest", set version
+    "latest"
+  name: IMAGE_VERSION
+  value: latest
+- description: The public URL for the Openshift OAuth Provider, e.g. https://openshift.example.com:8443
+  name: OPENSHIFT_OAUTH_PROVIDER_URL
+  required: true
+- description: The registry console URL. This should be created beforehand using 'oc
+    create route passthrough --service registry-console --port registry-console -n
+    default', e.g. https://registry-console-default.example.com
+  name: COCKPIT_KUBE_URL
+  required: true
+- description: Oauth client secret
+  from: user[a-zA-Z0-9]{64}
+  generate: expression
+  name: OPENSHIFT_OAUTH_CLIENT_SECRET
+- description: Oauth client id
+  name: OPENSHIFT_OAUTH_CLIENT_ID
+  value: cockpit-oauth-client
+- description: The integrated registry hostname exposed via route, e.g. registry.example.com
+  name: REGISTRY_HOST
+  required: true

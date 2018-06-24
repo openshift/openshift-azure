@@ -1,0 +1,17 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ClusterServiceBroker
+metadata:
+  finalizers:
+  - kubernetes-incubator/service-catalog
+  name: template-service-broker
+spec:
+  authInfo:
+    bearer:
+      secretRef:
+        name: templateservicebroker-client
+        namespace: openshift-template-service-broker
+  caBundle: '*** GENERATED ***'
+  relistBehavior: Duration
+  relistDuration: 15m0s
+  relistRequests: 0
+  url: https://apiserver.openshift-template-service-broker.svc:443/brokers/template.openshift.io

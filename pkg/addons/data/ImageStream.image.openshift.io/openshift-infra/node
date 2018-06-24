@@ -1,0 +1,19 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: node
+  namespace: openshift-infra
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - annotations: null
+    from:
+      kind: DockerImage
+      name: openshift/origin-node:v3.10.0
+    generation: 1
+    importPolicy: {}
+    name: v3.10
+    reference: true
+    referencePolicy:
+      type: Source

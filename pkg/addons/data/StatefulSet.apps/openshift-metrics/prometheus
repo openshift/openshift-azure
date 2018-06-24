@@ -1,0 +1,229 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: prometheus
+  name: prometheus
+  namespace: openshift-metrics
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: prometheus
+  serviceName: ""
+  template:
+    metadata:
+      labels:
+        app: prometheus
+      name: prometheus
+    spec:
+      containers:
+      - args:
+        - -provider=openshift
+        - -https-address=:8443
+        - -http-address=
+        - -email-domain=*
+        - -upstream=http://localhost:9090
+        - -client-id=system:serviceaccount:openshift-metrics:prometheus
+        - '-openshift-sar={"resource": "namespaces", "verb": "get", "resourceName":
+          "openshift-metrics", "namespace": "openshift-metrics"}'
+        - '-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get",
+          "resourceName": "openshift-metrics", "namespace": "openshift-metrics"}}'
+        - -tls-cert=/etc/tls/private/tls.crt
+        - -tls-key=/etc/tls/private/tls.key
+        - -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+        - -cookie-secret-file=/etc/proxy/secrets/session_secret
+        - -openshift-ca=/etc/pki/tls/cert.pem
+        - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - -skip-auth-regex=^/metrics
+        image: openshift/oauth-proxy:v1.0.0
+        imagePullPolicy: IfNotPresent
+        name: prom-proxy
+        ports:
+        - containerPort: 8443
+          name: web
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/tls/private
+          name: prometheus-tls-secret
+        - mountPath: /etc/proxy/secrets
+          name: prometheus-proxy-secret
+        - mountPath: /prometheus
+          name: prometheus-data
+      - args:
+        - --storage.tsdb.retention=3d
+        - --config.file=/etc/prometheus/prometheus.yml
+        - --web.listen-address=localhost:9090
+        image: openshift/prometheus:v2.2.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - |-
+              set -euo pipefail;
+              touch /tmp/prometheusconfig.hash;
+              if [[ $(find /etc/prometheus -type f | sort | xargs md5sum | md5sum) != $(cat /tmp/prometheusconfig.hash) ]]; then
+                find /etc/prometheus -type f | sort | xargs md5sum | md5sum > /tmp/prometheusconfig.hash;
+                kill -HUP 1;
+              fi
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: prometheus
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/prometheus
+          name: prometheus-config
+        - mountPath: /prometheus
+          name: prometheus-data
+      - args:
+        - -provider=openshift
+        - -https-address=:9443
+        - -http-address=
+        - -email-domain=*
+        - -upstream=http://localhost:9099
+        - -client-id=system:serviceaccount:openshift-metrics:prometheus
+        - '-openshift-sar={"resource": "namespaces", "verb": "get", "resourceName":
+          "openshift-metrics", "namespace": "openshift-metrics"}'
+        - '-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get",
+          "resourceName": "openshift-metrics", "namespace": "openshift-metrics"}}'
+        - -tls-cert=/etc/tls/private/tls.crt
+        - -tls-key=/etc/tls/private/tls.key
+        - -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+        - -cookie-secret-file=/etc/proxy/secrets/session_secret
+        - -openshift-ca=/etc/pki/tls/cert.pem
+        - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - -skip-auth-regex=^/metrics
+        image: openshift/oauth-proxy:v1.0.0
+        imagePullPolicy: IfNotPresent
+        name: alerts-proxy
+        ports:
+        - containerPort: 9443
+          name: web
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/tls/private
+          name: alerts-tls-secret
+        - mountPath: /etc/proxy/secrets
+          name: alerts-proxy-secret
+      - args:
+        - --storage-path=/alert-buffer/messages.db
+        image: openshift/prometheus-alert-buffer:v0.0.2
+        imagePullPolicy: IfNotPresent
+        name: alert-buffer
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /alert-buffer
+          name: alerts-data
+      - args:
+        - -provider=openshift
+        - -https-address=:10443
+        - -http-address=
+        - -email-domain=*
+        - -upstream=http://localhost:9093
+        - -client-id=system:serviceaccount:openshift-metrics:prometheus
+        - -openshift-ca=/etc/pki/tls/cert.pem
+        - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - '-openshift-sar={"resource": "namespaces", "verb": "get", "resourceName":
+          "openshift-metrics", "namespace": "openshift-metrics"}'
+        - '-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get",
+          "resourceName": "openshift-metrics", "namespace": "openshift-metrics"}}'
+        - -tls-cert=/etc/tls/private/tls.crt
+        - -tls-key=/etc/tls/private/tls.key
+        - -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
+        - -cookie-secret-file=/etc/proxy/secrets/session_secret
+        - -skip-auth-regex=^/metrics
+        image: openshift/oauth-proxy:v1.0.0
+        imagePullPolicy: IfNotPresent
+        name: alertmanager-proxy
+        ports:
+        - containerPort: 10443
+          name: web
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/tls/private
+          name: alertmanager-tls-secret
+        - mountPath: /etc/proxy/secrets
+          name: alertmanager-proxy-secret
+      - args:
+        - --config.file=/etc/alertmanager/alertmanager.yml
+        image: openshift/prometheus-alertmanager:v0.14.0
+        imagePullPolicy: IfNotPresent
+        name: alertmanager
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/alertmanager
+          name: alertmanager-config
+        - mountPath: /alertmanager
+          name: alertmanager-data
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        region: infra
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: prometheus
+      serviceAccountName: prometheus
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: prometheus
+        name: prometheus-config
+      - name: prometheus-proxy-secret
+        secret:
+          defaultMode: 420
+          secretName: prometheus-proxy
+      - name: prometheus-tls-secret
+        secret:
+          defaultMode: 420
+          secretName: prometheus-tls
+      - emptyDir: {}
+        name: prometheus-data
+      - configMap:
+          defaultMode: 420
+          name: alertmanager
+        name: alertmanager-config
+      - name: alertmanager-proxy-secret
+        secret:
+          defaultMode: 420
+          secretName: alertmanager-proxy
+      - name: alertmanager-tls-secret
+        secret:
+          defaultMode: 420
+          secretName: alertmanager-tls
+      - name: alerts-tls-secret
+        secret:
+          defaultMode: 420
+          secretName: alerts-tls
+      - name: alerts-proxy-secret
+        secret:
+          defaultMode: 420
+          secretName: alerts-proxy
+      - emptyDir: {}
+        name: alertmanager-data
+      - emptyDir: {}
+        name: alerts-data
+  updateStrategy:
+    type: RollingUpdate

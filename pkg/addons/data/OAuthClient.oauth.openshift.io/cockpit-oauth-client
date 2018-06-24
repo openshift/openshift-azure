@@ -1,0 +1,10 @@
+apiVersion: oauth.openshift.io/v1
+kind: OAuthClient
+metadata:
+  labels:
+    app: registry-console
+    createdBy: registry-console-template
+  name: cockpit-oauth-client
+redirectURIs:
+- '*** GENERATED ***'
+secret: userHnthX0QtYb21p6jO3BGLFLNiFktncJvmkNcturw6XU4UoCM5EJfxIDdTJ6p0C0Ek

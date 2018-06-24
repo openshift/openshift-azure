@@ -1,0 +1,44 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  annotations:
+    openshift.io/display-name: .NET Core Runtime
+  name: dotnet-runtime
+  namespace: openshift
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - annotations:
+      description: Run .NET Core applications on CentOS 7. For more information about
+        using this image, including OpenShift considerations, see https://github.com/redhat-developer/s2i-dotnetcore/tree/master/2.0/runtime/README.md.
+      iconClass: icon-dotnet
+      openshift.io/display-name: .NET Core 2.0 Runtime
+      supports: dotnet-runtime
+      tags: runtime,.net-runtime,dotnet-runtime,dotnetcore-runtime
+      version: "2.0"
+    from:
+      kind: DockerImage
+      name: registry.centos.org/dotnet/dotnet-20-runtime-centos7:latest
+    generation: 2
+    importPolicy: {}
+    name: "2.0"
+    referencePolicy:
+      type: Source
+  - annotations:
+      description: |-
+        Run .NET Core applications on CentOS 7. For more information about using this image, including OpenShift considerations, see https://github.com/redhat-developer/s2i-dotnetcore/tree/master/2.0/runtime/README.md.
+
+        WARNING: By selecting this tag, your application will automatically update to use the latest version of .NET Core Runtime available on OpenShift, including major versions updates.
+      iconClass: icon-dotnet
+      openshift.io/display-name: .NET Core Runtime (Latest)
+      supports: dotnet-runtime
+      tags: runtime,.net-runtime,dotnet-runtime,dotnetcore-runtime
+    from:
+      kind: ImageStreamTag
+      name: "2.0"
+    generation: 1
+    importPolicy: {}
+    name: latest
+    referencePolicy:
+      type: Source

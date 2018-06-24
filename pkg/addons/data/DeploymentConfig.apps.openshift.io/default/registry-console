@@ -1,0 +1,80 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: registry-console
+    createdBy: registry-console-template
+    name: registry-console
+  name: registry-console
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    name: registry-console
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: registry-console
+        name: registry-console
+    spec:
+      containers:
+      - env:
+        - name: OPENSHIFT_OAUTH_PROVIDER_URL
+          value: '*** GENERATED ***'
+        - name: OPENSHIFT_OAUTH_CLIENT_ID
+          value: cockpit-oauth-client
+        - name: KUBERNETES_INSECURE
+          value: "false"
+        - name: COCKPIT_KUBE_INSECURE
+          value: "false"
+        - name: REGISTRY_ONLY
+          value: "true"
+        - name: REGISTRY_HOST
+          value: '*** GENERATED ***'
+        image: cockpit/kubernetes:latest
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ping
+            port: 9090
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: registry-console
+        ports:
+        - containerPort: 9090
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ping
+            port: 9090
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - type: ConfigChange

@@ -1,0 +1,93 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: openshift-ansible-service-broker
+    service: asb
+  name: asb
+  namespace: openshift-ansible-service-broker
+spec:
+  replicas: 1
+  selector:
+    app: openshift-ansible-service-broker
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: openshift-ansible-service-broker
+        service: asb
+    spec:
+      containers:
+      - env:
+        - name: BROKER_CONFIG
+          value: /etc/ansible-service-broker/config.yaml
+        - name: HTTP_PROXY
+        - name: HTTPS_PROXY
+        - name: NO_PROXY
+        image: ansibleplaybookbundle/origin-ansible-service-broker:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 1338
+            scheme: HTTPS
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: asb
+        ports:
+        - containerPort: 1338
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 1338
+            scheme: HTTPS
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        terminationMessagePath: /tmp/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/ansible-service-broker
+          name: config-volume
+        - mountPath: /etc/tls/private
+          name: asb-tls
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: asb
+      serviceAccountName: asb
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: broker-config
+            path: config.yaml
+          name: broker-config
+        name: config-volume
+      - name: asb-tls
+        secret:
+          defaultMode: 420
+          secretName: asb-tls
+  test: false
+  triggers:
+  - type: ConfigChange

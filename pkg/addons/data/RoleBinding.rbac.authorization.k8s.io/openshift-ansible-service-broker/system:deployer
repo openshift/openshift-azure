@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: system:deployer
+  namespace: openshift-ansible-service-broker
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:deployer
+subjects:
+- kind: ServiceAccount
+  name: deployer
+  namespace: openshift-ansible-service-broker

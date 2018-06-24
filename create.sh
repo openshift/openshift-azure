@@ -33,3 +33,6 @@ oc create -Rf _out/osa/templates
 
 az group create -n $RESOURCEGROUP -l eastus
 az group deployment create -g $RESOURCEGROUP --template-file _out/azuredeploy.json
+
+# will eventually run as an HCP pod, for development run it locally
+KUBECONFIG=_out/admin.kubeconfig go run cmd/sync/sync.go

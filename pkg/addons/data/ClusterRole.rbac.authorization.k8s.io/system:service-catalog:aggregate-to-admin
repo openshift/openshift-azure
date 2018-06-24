@@ -1,0 +1,31 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+  name: system:service-catalog:aggregate-to-admin
+rules:
+- apiGroups:
+  - servicecatalog.k8s.io
+  resources:
+  - serviceinstances
+  - servicebindings
+  verbs:
+  - create
+  - update
+  - delete
+  - get
+  - list
+  - watch
+  - patch
+- apiGroups:
+  - settings.k8s.io
+  resources:
+  - podpresets
+  verbs:
+  - create
+  - update
+  - delete
+  - get
+  - list
+  - watch

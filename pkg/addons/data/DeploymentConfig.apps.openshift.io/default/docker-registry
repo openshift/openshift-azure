@@ -1,0 +1,107 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    docker-registry: default
+  name: docker-registry
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    docker-registry: default
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        docker-registry: default
+    spec:
+      containers:
+      - env:
+        - name: REGISTRY_HTTP_ADDR
+          value: :5000
+        - name: REGISTRY_HTTP_NET
+          value: tcp
+        - name: REGISTRY_HTTP_SECRET
+          value: '*** GENERATED ***'
+        - name: REGISTRY_MIDDLEWARE_REPOSITORY_OPENSHIFT_ENFORCEQUOTA
+          value: "false"
+        - name: REGISTRY_HTTP_TLS_KEY
+          value: /etc/secrets/registry.key
+        - name: REGISTRY_OPENSHIFT_SERVER_ADDR
+          value: docker-registry.default.svc:5000
+        - name: REGISTRY_CONFIGURATION_PATH
+          value: /etc/registry/config.yml
+        - name: REGISTRY_HTTP_TLS_CERTIFICATE
+          value: /etc/secrets/registry.crt
+        image: openshift/origin-docker-registry:v3.10.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 5000
+            scheme: HTTPS
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: registry
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 5000
+            scheme: HTTPS
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /registry
+          name: registry-storage
+        - mountPath: /etc/secrets
+          name: registry-certificates
+        - mountPath: /etc/registry
+          name: docker-config
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        region: infra
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: registry
+      serviceAccountName: registry
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: registry-storage
+      - name: registry-certificates
+        secret:
+          defaultMode: 420
+          secretName: registry-certificates
+      - name: docker-config
+        secret:
+          defaultMode: 420
+          secretName: registry-config
+  test: false
+  triggers:
+  - type: ConfigChange

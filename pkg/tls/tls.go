@@ -1,18 +1,13 @@
 package tls
 
 import (
-	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/base64"
-	"encoding/pem"
 	"math/big"
 	"net"
 	"time"
-
-	"golang.org/x/crypto/ssh"
 )
 
 func NewPrivateKey() (*rsa.PrivateKey, error) {
@@ -104,62 +99,4 @@ func NewCert(
 	}
 
 	return key, cert, nil
-}
-
-func PrivateKeyAsBytes(key *rsa.PrivateKey) ([]byte, error) {
-	buf := &bytes.Buffer{}
-
-	err := pem.Encode(buf, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
-	if err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
-}
-
-func MustPrivateKeyAsBytes(key *rsa.PrivateKey) []byte {
-	b, err := PrivateKeyAsBytes(key)
-	if err != nil {
-		panic(err)
-	}
-	return b
-}
-
-func PublicKeyAsBytes(key *rsa.PublicKey) ([]byte, error) {
-	buf := &bytes.Buffer{}
-
-	b, err := x509.MarshalPKIXPublicKey(key)
-	if err != nil {
-		return nil, err
-	}
-
-	err = pem.Encode(buf, &pem.Block{Type: "PUBLIC KEY", Bytes: b})
-	if err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
-}
-
-func SSHPublicKeyAsString(key ssh.PublicKey) string {
-	return key.Type() + " " + base64.StdEncoding.EncodeToString(key.Marshal())
-}
-
-func CertAsBytes(cert *x509.Certificate) ([]byte, error) {
-	buf := &bytes.Buffer{}
-
-	err := pem.Encode(buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
-	if err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
-}
-
-func MustCertAsBytes(cert *x509.Certificate) []byte {
-	b, err := CertAsBytes(cert)
-	if err != nil {
-		panic(err)
-	}
-	return b
 }
