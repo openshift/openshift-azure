@@ -7,6 +7,19 @@ fi
 
 RESOURCEGROUP=$1
 
+set +e
+HAS_GOBINDATA=$(command -v go-bindata)
+HAS_GOYACC=$(command -v go-yacc)
+set -e
+
+# GOPATH/bin needs to be set in $PATH
+if [[ -z "${HAS_GOBINDATA:-}" ]]; then
+	go get github.com/go-bindata/go-bindata/...
+fi
+if [[ -z "${HAS_GOYACC:-}" ]]; then
+	go get github.com/cznic/goyacc
+fi
+
 rm -rf _out
 mkdir _out
 go generate ./...
