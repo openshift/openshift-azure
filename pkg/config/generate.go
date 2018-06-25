@@ -9,12 +9,13 @@ import (
 	"net"
 	"strings"
 
-	"github.com/jim-minter/azure-helm/pkg/api"
-	"github.com/jim-minter/azure-helm/pkg/tls"
 	"github.com/satori/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/crypto/ssh"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
+
+	"github.com/jim-minter/azure-helm/pkg/api"
+	"github.com/jim-minter/azure-helm/pkg/tls"
 )
 
 func Generate(m *api.Manifest) (c *Config, err error) {

@@ -4,8 +4,9 @@ import (
 	"encoding/base64"
 
 	"github.com/ghodss/yaml"
-	"github.com/jim-minter/azure-helm/pkg/jsonpath"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	"github.com/jim-minter/azure-helm/pkg/jsonpath"
 )
 
 func KeyFunc(gk schema.GroupKind, namespace, name string) string {

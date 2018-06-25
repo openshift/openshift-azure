@@ -10,10 +10,11 @@ import (
 	"reflect"
 
 	"github.com/ghodss/yaml"
-	"github.com/jim-minter/azure-helm/pkg/tls"
 	"github.com/satori/uuid"
 	"golang.org/x/crypto/ssh"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
+
+	"github.com/jim-minter/azure-helm/pkg/tls"
 )
 
 func (c Config) MarshalJSON() ([]byte, error) {

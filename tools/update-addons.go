@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
-	"github.com/jim-minter/azure-helm/pkg/addons"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -17,6 +16,8 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+
+	"github.com/jim-minter/azure-helm/pkg/addons"
 )
 
 var (

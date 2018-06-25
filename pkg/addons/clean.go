@@ -3,8 +3,9 @@ package addons
 import (
 	"regexp"
 
-	"github.com/jim-minter/azure-helm/pkg/jsonpath"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+
+	"github.com/jim-minter/azure-helm/pkg/jsonpath"
 )
 
 // cleanMetadata cleans an ObjectMeta structure

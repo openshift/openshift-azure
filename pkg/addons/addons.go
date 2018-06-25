@@ -12,8 +12,6 @@ import (
 	"time"
 
 	"github.com/ghodss/yaml"
-	"github.com/jim-minter/azure-helm/pkg/config"
-	"github.com/jim-minter/azure-helm/pkg/util"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,6 +25,9 @@ import (
 	"k8s.io/client-go/util/retry"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
+
+	"github.com/jim-minter/azure-helm/pkg/config"
+	"github.com/jim-minter/azure-helm/pkg/util"
 )
 
 var (

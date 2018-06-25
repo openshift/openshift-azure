@@ -4,8 +4,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/jim-minter/azure-helm/pkg/jsonpath"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+
+	"github.com/jim-minter/azure-helm/pkg/jsonpath"
 )
 
 // Wants determines if we want to handle the object.
