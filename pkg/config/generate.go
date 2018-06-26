@@ -29,7 +29,7 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	c.MasterAPIImage = "docker.io/openshift/origin-control-plane:v3.10"
 	c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
 	c.BootstrapAutoapproverImage = "docker.io/openshift/origin-node:v3.10.0"
-	c.ServiceCatalogImage = "docker.io/openshift/origin-service-catalog:v3.10.0"
+	c.ServiceCatalogImage = "quay.io/kargakis/servicecatalog:kubeconfig" // TODO: "docker.io/openshift/origin-service-catalog:v3.10.0"
 	c.SyncImage = "docker.io/jimminter/sync:latest"
 
 	// TODO: need to cross-check all the below with acs-engine, especially SANs and IPs

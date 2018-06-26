@@ -12,6 +12,7 @@ spec:
       labels:
         app: servicecatalog-api
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: apiserver
         image: {{ .Values.ServiceCatalogImage }}
@@ -39,11 +40,23 @@ spec:
         - KubernetesNamespaceLifecycle,DefaultServicePlan,ServiceBindingsLifecycle,ServicePlanChangeValidator,BrokerAuthSarCheck
         - --feature-gates
         - OriginatingIdentity=true
+        - --authorization-kubeconfig
+        - /tmp/kubeconfig/admin.kubeconfig
+        - --authentication-kubeconfig
+        - /tmp/kubeconfig/admin.kubeconfig
+        - --kubeconfig
+        - /tmp/kubeconfig/admin.kubeconfig
         volumeMounts:
         - name: config
           mountPath: /var/run/kubernetes-service-catalog
+          readOnly: true
+        - name: kubeconfig
+          mountPath: /tmp/kubeconfig
           readOnly: true
       volumes:
       - name: config
         secret:
           secretName: servicecatalog-api
+      - name: kubeconfig
+        secret:
+          secretName: admin-kubeconfig # TODO: need to use a less powerful token
