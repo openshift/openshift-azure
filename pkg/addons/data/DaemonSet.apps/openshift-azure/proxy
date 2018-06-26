@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: proxy
+  namespace: openshift-azure
+spec:
+  selector:
+    matchLabels:
+      app: proxy
+  template:
+    metadata:
+      labels:
+        app: proxy
+    spec:
+      containers:
+      - name: proxy
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
+        args:
+        - 172.29.255.255:443
+        - '*** GENERATED ***'
+        securityContext:
+          privileged: true
+          runAsUser: 0
+      hostNetwork: true

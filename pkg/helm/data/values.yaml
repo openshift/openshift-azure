@@ -44,8 +44,8 @@ ServiceCatalogServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceCatal
 ServiceCatalogServerCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogServerCert) }}
 
 # master-config configurables
-RoutingConfigSubdomain: {{ .Config.RoutingConfigSubdomain }}
-PublicHostname: {{ .Config.PublicHostname }}
+RoutingConfigSubdomain: {{ .Manifest.RoutingConfigSubdomain }}
+PublicHostname: {{ .Manifest.PublicHostname }}
 ImageConfigFormat: {{ .Config.ImageConfigFormat }}
 
 # misc control plane configurables

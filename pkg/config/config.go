@@ -29,6 +29,7 @@ type Config struct {
 	MasterControllersImage     string
 	BootstrapAutoapproverImage string
 	ServiceCatalogImage        string
+	ProxyImage                 string
 	SyncImage                  string
 
 	// etcd certificates
@@ -57,9 +58,7 @@ type Config struct {
 	ServiceCatalogServerCert *x509.Certificate
 
 	// master-config configurables
-	RoutingConfigSubdomain string
-	PublicHostname         string
-	ImageConfigFormat      string
+	ImageConfigFormat string
 
 	// misc control plane configurables
 	ServiceAccountPrivateKey *rsa.PrivateKey

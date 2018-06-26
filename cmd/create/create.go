@@ -2,7 +2,6 @@ package main
 
 import (
 	"io/ioutil"
-	"os"
 
 	"github.com/ghodss/yaml"
 
@@ -14,7 +13,7 @@ import (
 )
 
 func create() error {
-	b, err := ioutil.ReadAll(os.Stdin)
+	b, err := ioutil.ReadFile("_in/manifest")
 	if err != nil {
 		return err
 	}
