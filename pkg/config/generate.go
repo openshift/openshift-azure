@@ -21,8 +21,6 @@ import (
 func Generate(m *api.Manifest) (c *Config, err error) {
 	c = &Config{}
 
-	c.RoutingConfigSubdomain = "example.com"
-	c.PublicHostname = "master-api-demo.104.45.157.35.nip.io"
 	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
 
 	c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
@@ -30,63 +28,159 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
 	c.BootstrapAutoapproverImage = "docker.io/openshift/origin-node:v3.10.0"
 	c.ServiceCatalogImage = "quay.io/kargakis/servicecatalog:kubeconfig" // TODO: "docker.io/openshift/origin-service-catalog:v3.10.0"
+	c.ProxyImage = "docker.io/jimminter/proxy:latest"
 	c.SyncImage = "docker.io/jimminter/sync:latest"
 
 	// TODO: need to cross-check all the below with acs-engine, especially SANs and IPs
 
 	// Generate CAs
-	if c.EtcdCaKey, c.EtcdCaCert, err = tls.NewCA("etcd-signer"); err != nil {
-		return
+	cas := []struct {
+		cn   string
+		key  **rsa.PrivateKey
+		cert **x509.Certificate
+	}{
+		{
+			cn:   "etcd-signer",
+			key:  &c.EtcdCaKey,
+			cert: &c.EtcdCaCert,
+		},
+		{
+			cn:   "openshift-signer",
+			key:  &c.CaKey,
+			cert: &c.CaCert,
+		},
+		// currently skipping the other frontproxy, doesn't seem to hurt
+		{
+			cn:   "openshift-frontproxy-signer",
+			key:  &c.FrontProxyCaKey,
+			cert: &c.FrontProxyCaCert,
+		},
+		{
+			cn:   "openshift-service-serving-signer",
+			key:  &c.ServiceSigningCaKey,
+			cert: &c.ServiceSigningCaCert,
+		},
+		{
+			cn:   "service-catalog-signer",
+			key:  &c.ServiceCatalogCaKey,
+			cert: &c.ServiceCatalogCaCert,
+		},
 	}
-	if c.CaKey, c.CaCert, err = tls.NewCA("openshift-signer"); err != nil {
-		return
-	}
-	// currently skipping the other frontproxy, doesn't seem to hurt
-	if c.FrontProxyCaKey, c.FrontProxyCaCert, err = tls.NewCA("openshift-frontproxy-signer"); err != nil {
-		return
-	}
-	if c.ServiceSigningCaKey, c.ServiceSigningCaCert, err = tls.NewCA("openshift-service-serving-signer"); err != nil {
-		return
-	}
-	if c.ServiceCatalogCaKey, c.ServiceCatalogCaCert, err = tls.NewCA("service-catalog-signer"); err != nil {
-		return
-	}
-
-	// Generate etcd certs
-	if c.EtcdServerKey, c.EtcdServerCert, err = tls.NewCert("master-etcd", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, c.EtcdCaKey, c.EtcdCaCert); err != nil {
-		return
-	}
-	if c.EtcdPeerKey, c.EtcdPeerCert, err = tls.NewCert("etcd-peer", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth}, c.EtcdCaKey, c.EtcdCaCert); err != nil {
-		return
-	}
-	if c.EtcdClientKey, c.EtcdClientCert, err = tls.NewCert("etcd-client", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.EtcdCaKey, c.EtcdCaCert); err != nil {
-		return
-	}
-
-	// Generate openshift master certs
-	if c.AdminKey, c.AdminCert, err = tls.NewCert("system:admin", []string{"system:cluster-admins", "system:masters"}, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.CaKey, c.CaCert); err != nil {
-		return
-	}
-	if c.AggregatorFrontProxyKey, c.AggregatorFrontProxyCert, err = tls.NewCert("aggregator-front-proxy", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.FrontProxyCaKey, c.FrontProxyCaCert); err != nil {
-		return
-	}
-	// currently skipping etcd.server, doesn't seem to hurt
-	if c.MasterKubeletClientKey, c.MasterKubeletClientCert, err = tls.NewCert("system:openshift-node-admin", []string{"system:node-admins"}, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.CaKey, c.CaCert); err != nil {
-		return
-	}
-	if c.MasterProxyClientKey, c.MasterProxyClientCert, err = tls.NewCert("system:master-proxy", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.CaKey, c.CaCert); err != nil {
-		return
-	}
-	if c.MasterServerKey, c.MasterServerCert, err = tls.NewCert("master-api", nil, []string{"master-api", c.PublicHostname}, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, c.CaKey, c.CaCert); err != nil {
-		return
-	}
-	// currently skipping openshift-aggregator, doesn't seem to hurt
-	if c.OpenShiftMasterKey, c.OpenShiftMasterCert, err = tls.NewCert("system:openshift-master", []string{"system:cluster-admins", "system:masters"}, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.CaKey, c.CaCert); err != nil {
-		return
+	for _, ca := range cas {
+		if *ca.key, *ca.cert, err = tls.NewCA(ca.cn); err != nil {
+			return
+		}
 	}
 
-	if c.ServiceCatalogServerKey, c.ServiceCatalogServerCert, err = tls.NewCert("servicecatalog-api", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, c.ServiceCatalogCaKey, c.ServiceCatalogCaCert); err != nil {
-		return
+	certs := []struct {
+		cn           string
+		organization []string
+		dnsNames     []string
+		ipAddresses  []net.IP
+		extKeyUsage  []x509.ExtKeyUsage
+		signingKey   *rsa.PrivateKey
+		signingCert  *x509.Certificate
+		key          **rsa.PrivateKey
+		cert         **x509.Certificate
+	}{
+		// Generate etcd certs
+		{
+			cn:          "master-etcd",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			signingKey:  c.EtcdCaKey,
+			signingCert: c.EtcdCaCert,
+			key:         &c.EtcdServerKey,
+			cert:        &c.EtcdServerCert,
+		},
+		{
+			cn:          "etcd-peer",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
+			signingKey:  c.EtcdCaKey,
+			signingCert: c.EtcdCaCert,
+			key:         &c.EtcdPeerKey,
+			cert:        &c.EtcdPeerCert,
+		},
+		{
+			cn:          "etcd-client",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			signingKey:  c.EtcdCaKey,
+			signingCert: c.EtcdCaCert,
+			key:         &c.EtcdClientKey,
+			cert:        &c.EtcdClientCert,
+		},
+		// Generate openshift master certs
+		{
+			cn:           "system:admin",
+			organization: []string{"system:cluster-admins", "system:masters"},
+			extKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			key:          &c.AdminKey,
+			cert:         &c.AdminCert,
+		},
+		{
+			cn:          "aggregator-front-proxy",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			signingKey:  c.FrontProxyCaKey,
+			signingCert: c.FrontProxyCaCert,
+			key:         &c.AggregatorFrontProxyKey,
+			cert:        &c.AggregatorFrontProxyCert,
+		},
+		// currently skipping etcd.server, doesn't seem to hurt
+		{
+			cn:           "system:openshift-node-admin",
+			organization: []string{"system:node-admins"},
+			extKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			key:          &c.MasterKubeletClientKey,
+			cert:         &c.MasterKubeletClientCert,
+		},
+		{
+			cn:          "system:master-proxy",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			key:         &c.MasterProxyClientKey,
+			cert:        &c.MasterProxyClientCert,
+		},
+		{
+			cn: "master-api",
+			dnsNames: []string{
+				"master-api",
+				m.PublicHostname,
+				"kubernetes",
+				"kubernetes.default",
+				"kubernetes.default.svc",
+				"kubernetes.default.svc.cluster.local",
+				"openshift",
+				"openshift.default",
+				"openshift.default.svc",
+				"openshift.default.svc.cluster.local",
+			},
+			ipAddresses: []net.IP{net.ParseIP("172.30.0.1")},
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			key:         &c.MasterServerKey,
+			cert:        &c.MasterServerCert,
+		},
+		// currently skipping openshift-aggregator, doesn't seem to hurt
+		{
+			cn:           "system:openshift-master",
+			organization: []string{"system:cluster-admins", "system:masters"},
+			extKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			key:          &c.OpenShiftMasterKey,
+			cert:         &c.OpenShiftMasterCert,
+		},
+		{
+			cn:          "servicecatalog-api",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			signingKey:  c.ServiceCatalogCaKey,
+			signingCert: c.ServiceCatalogCaCert,
+			key:         &c.ServiceCatalogServerKey,
+			cert:        &c.ServiceCatalogServerCert,
+		},
+	}
+	for _, cert := range certs {
+		if cert.signingKey == nil && cert.signingCert == nil {
+			cert.signingKey, cert.signingCert = c.CaKey, c.CaCert
+		}
+		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert); err != nil {
+			return
+		}
 	}
 
 	if c.ServiceAccountPrivateKey, err = tls.NewPrivateKey(); err != nil {
@@ -108,7 +202,7 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	if c.MasterKubeconfig, err = makeKubeConfig(c.OpenShiftMasterKey, c.OpenShiftMasterCert, c.CaCert, "master-api", "system:openshift-master", "default"); err != nil {
 		return
 	}
-	if c.AdminKubeconfig, err = makeKubeConfig(c.AdminKey, c.AdminCert, c.CaCert, c.PublicHostname, "system:admin", "default"); err != nil {
+	if c.AdminKubeconfig, err = makeKubeConfig(c.AdminKey, c.AdminCert, c.CaCert, m.PublicHostname, "system:admin", "default"); err != nil {
 		return
 	}
 
@@ -121,7 +215,7 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	if c.NodeBootstrapKey, c.NodeBootstrapCert, err = tls.NewCert("system:serviceaccount:openshift-infra:node-bootstrapper", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.CaKey, c.CaCert); err != nil {
 		return
 	}
-	if c.NodeBootstrapKubeconfig, err = makeKubeConfig(c.NodeBootstrapKey, c.NodeBootstrapCert, c.CaCert, c.PublicHostname, "system:serviceaccount:openshift-infra:node-bootstrapper", "default"); err != nil {
+	if c.NodeBootstrapKubeconfig, err = makeKubeConfig(c.NodeBootstrapKey, c.NodeBootstrapCert, c.CaCert, m.PublicHostname, "system:serviceaccount:openshift-infra:node-bootstrapper", "default"); err != nil {
 		return
 	}
 

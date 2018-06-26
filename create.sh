@@ -7,11 +7,10 @@ fi
 
 RESOURCEGROUP=$1
 
-rm -rf _out
-mkdir _out
-go generate ./...
+rm -rf _in _out
+mkdir _in _out
 
-go run cmd/create/create.go <<EOF
+cat >_in/manifest <<EOF
 TenantID: $AZURE_TENANT_ID
 SubscriptionID: $AZURE_SUBSCRIPTION_ID
 ClientID: $AZURE_CLIENT_ID
@@ -23,16 +22,36 @@ ComputeCount: 1
 InfraCount: 1
 ImageResourceGroup: images
 ImageResourceName: centos7-3.10-201806231427
+PublicHostname: openshift.$RESOURCEGROUP.osadev.cloud
+RoutingConfigSubdomain: $RESOURCEGROUP.osadev.cloud
 EOF
+cp _in/manifest _out/manifest
+
+go generate ./...
+go run cmd/create/create.go
 
 helm template pkg/helm/chart -f _out/values.yaml --output-dir _out
 
-# poor man's helm create (without tiller running)
+# poor man's helm (without tiller running)
 oc delete -Rf _out/osa/templates || true
 oc create -Rf _out/osa/templates
+
+while true; do
+    MASTERIP=$(oc get service master-api -o template --template '{{ if .status.loadBalancer }}{{ (index .status.loadBalancer.ingress 0).ip }}{{ end }}')
+    if [[ -n "$MASTERIP" ]]; then
+        break
+    fi
+    sleep 1
+done
+
+tools/dns.sh zone-create $RESOURCEGROUP
+tools/dns.sh a-create $RESOURCEGROUP openshift $MASTERIP
+# when we know the router IP, do tools/dns.sh a-create $RESOURCEGROUP '*' $ROUTERIP
 
 az group create -n $RESOURCEGROUP -l eastus
 az group deployment create -g $RESOURCEGROUP --template-file _out/azuredeploy.json
 
 # will eventually run as an HCP pod, for development run it locally
 KUBECONFIG=_out/admin.kubeconfig go run cmd/sync/sync.go
+
+# TODO: health check

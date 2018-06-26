@@ -36,6 +36,8 @@ update-ca-trust
 
 echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
 mkdir -p /etc/origin/cloudprovider
+
+# TODO: this is duplicated in the helm charts for the master pods, and that's not ideal
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
 tenantId: {{ .Manifest.TenantID }}
 subscriptionId: {{ .Manifest.SubscriptionID }}
@@ -44,6 +46,8 @@ aadClientSecret: {{ .Manifest.ClientSecret }}
 aadTenantId: {{ .Manifest.TenantID }}
 resourceGroup: {{ .Manifest.ResourceGroup }}
 location: {{ .Manifest.Location }}
+securityGroupName: nsg-compute
+primaryAvailabilitySetName: as-compute
 EOF
 
 # note: ${SERVICE_TYPE}-node crash loops until master is up

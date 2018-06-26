@@ -35,6 +35,7 @@ supplementalGroups:
   type: RunAsAny
 users:
 - system:admin
+- system:serviceaccount:openshift-azure:default
 - system:serviceaccount:openshift-infra:build-controller
 - system:serviceaccount:openshift-sdn:sdn
 - system:serviceaccount:openshift-node:sync

@@ -13,6 +13,7 @@ spec:
       labels:
         app: sync
     spec:
+      automountServiceAccountToken: false
       containers:
       - name: sync
         image: {{ .Values.SyncImage }}

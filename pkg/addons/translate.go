@@ -111,12 +111,22 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.consolePublicURL"),
-			Template:   "https://{{ .Config.PublicHostname }}/console/",
+			Template:   "https://{{ .Manifest.PublicHostname }}/console/",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.masterPublicURL"),
-			Template:   "https://{{ .Config.PublicHostname }}.cloudapp.azure.com",
+			Template:   "https://{{ .Manifest.PublicHostname }}.cloudapp.azure.com",
+		},
+	},
+	"DaemonSet.apps/openshift-azure/proxy": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.ProxyImage }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].args[1]"),
+			Template: "{{ .Manifest.PublicHostname }}:443",
 		},
 	},
 	"DaemonSet.apps/kube-service-catalog/apiserver": {
@@ -134,7 +144,7 @@ var Translations = map[string][]struct {
 	"DeploymentConfig.apps.openshift.io/default/registry-console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='OPENSHIFT_OAUTH_PROVIDER_URL')].value"),
-			Template: "https://{{ .Config.PublicHostname }}.cloudapp.azure.com",
+			Template: "https://{{ .Manifest.PublicHostname }}.cloudapp.azure.com",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HOST')].value"),

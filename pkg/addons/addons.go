@@ -26,6 +26,7 @@ import (
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
+	"github.com/jim-minter/azure-helm/pkg/api"
 	"github.com/jim-minter/azure-helm/pkg/config"
 	"github.com/jim-minter/azure-helm/pkg/util"
 )
@@ -37,7 +38,7 @@ var (
 
 // readDB reads previously exported objects into a map via go-bindata as well as
 // populating configuration items via Translate().
-func readDB(c *config.Config) (map[string]unstructured.Unstructured, error) {
+func readDB(m *api.Manifest, c *config.Config) (map[string]unstructured.Unstructured, error) {
 	db := map[string]unstructured.Unstructured{}
 
 	for _, asset := range AssetNames() {
@@ -62,7 +63,7 @@ func readDB(c *config.Config) (map[string]unstructured.Unstructured, error) {
 
 		ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
 		for _, tr := range ts {
-			b, err := util.Template(tr.Template, nil, nil, c, nil)
+			b, err := util.Template(tr.Template, nil, m, c, nil)
 			if err != nil {
 				return nil, err
 			}
@@ -269,13 +270,13 @@ func getClients() (err error) {
 	return
 }
 
-func Main(c *config.Config) error {
+func Main(m *api.Manifest, c *config.Config) error {
 	err := getClients()
 	if err != nil {
 		return err
 	}
 
-	db, err := readDB(c)
+	db, err := readDB(m, c)
 	if err != nil {
 		return err
 	}

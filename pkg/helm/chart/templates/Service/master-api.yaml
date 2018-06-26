@@ -7,3 +7,4 @@ spec:
     openshift.io/component: api
   ports:
   - port: 443
+  type: LoadBalancer
