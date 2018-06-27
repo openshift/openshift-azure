@@ -76,7 +76,7 @@ spec:
           name: webconsole-config
       dnsPolicy: ClusterFirst
       nodeSelector:
-        node-role.kubernetes.io/master: "true"
+        node-role.kubernetes.io/infra: "true"
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
