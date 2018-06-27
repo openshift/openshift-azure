@@ -1,5 +1,5 @@
-apiVersion: apps.openshift.io/v1
-kind: DeploymentConfig
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   labels:
     router: router
@@ -8,17 +8,13 @@ metadata:
 spec:
   replicas: 1
   selector:
-    router: router
+    matchLabels:
+      router: router
   strategy:
-    activeDeadlineSeconds: 21600
-    resources: {}
-    rollingParams:
-      intervalSeconds: 1
+    rollingUpdate:
       maxSurge: 0
       maxUnavailable: 25%
-      timeoutSeconds: 600
-      updatePeriodSeconds: 1
-    type: Rolling
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -63,7 +59,6 @@ spec:
         - name: STATS_USERNAME
           value: admin
         image: openshift/origin-haproxy-router:v3.10.0
-        imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -102,27 +97,16 @@ spec:
           requests:
             cpu: 100m
             memory: 256Mi
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /etc/pki/tls/private
           name: server-certificate
           readOnly: true
-      dnsPolicy: ClusterFirst
       hostNetwork: true
       nodeSelector:
         region: infra
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: router
       serviceAccountName: router
-      terminationGracePeriodSeconds: 30
       volumes:
       - name: server-certificate
         secret:
           defaultMode: 420
           secretName: router-certs
-  test: false
-  triggers:
-  - type: ConfigChange

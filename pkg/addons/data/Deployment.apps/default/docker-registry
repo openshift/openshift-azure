@@ -1,5 +1,5 @@
-apiVersion: apps.openshift.io/v1
-kind: DeploymentConfig
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   labels:
     docker-registry: default
@@ -8,17 +8,13 @@ metadata:
 spec:
   replicas: 1
   selector:
-    docker-registry: default
+    matchLabels:
+      docker-registry: default
   strategy:
-    activeDeadlineSeconds: 21600
-    resources: {}
-    rollingParams:
-      intervalSeconds: 1
+    rollingUpdate:
       maxSurge: 25%
       maxUnavailable: 25%
-      timeoutSeconds: 600
-      updatePeriodSeconds: 1
-    type: Rolling
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -43,7 +39,6 @@ spec:
         - name: REGISTRY_HTTP_TLS_CERTIFICATE
           value: /etc/secrets/registry.crt
         image: openshift/origin-docker-registry:v3.10.0
-        imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -71,10 +66,6 @@ spec:
           requests:
             cpu: 100m
             memory: 256Mi
-        securityContext:
-          privileged: false
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /registry
           name: registry-storage
@@ -82,15 +73,9 @@ spec:
           name: registry-certificates
         - mountPath: /etc/registry
           name: docker-config
-      dnsPolicy: ClusterFirst
       nodeSelector:
         region: infra
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: registry
       serviceAccountName: registry
-      terminationGracePeriodSeconds: 30
       volumes:
       - emptyDir: {}
         name: registry-storage
@@ -102,6 +87,3 @@ spec:
         secret:
           defaultMode: 420
           secretName: registry-config
-  test: false
-  triggers:
-  - type: ConfigChange

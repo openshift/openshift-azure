@@ -1,5 +1,5 @@
-apiVersion: apps.openshift.io/v1
-kind: DeploymentConfig
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   labels:
     app: openshift-ansible-service-broker
@@ -9,17 +9,13 @@ metadata:
 spec:
   replicas: 1
   selector:
-    app: openshift-ansible-service-broker
+    matchLabels:
+      app: openshift-ansible-service-broker
   strategy:
-    activeDeadlineSeconds: 21600
-    resources: {}
-    rollingParams:
-      intervalSeconds: 1
+    rollingUpdate:
       maxSurge: 25%
       maxUnavailable: 25%
-      timeoutSeconds: 600
-      updatePeriodSeconds: 1
-    type: Rolling
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -59,23 +55,14 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 1
-        resources: {}
-        terminationMessagePath: /tmp/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /etc/ansible-service-broker
           name: config-volume
         - mountPath: /etc/tls/private
           name: asb-tls
-      dnsPolicy: ClusterFirst
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: asb
       serviceAccountName: asb
-      terminationGracePeriodSeconds: 30
       volumes:
       - configMap:
           defaultMode: 420
@@ -88,6 +75,3 @@ spec:
         secret:
           defaultMode: 420
           secretName: asb-tls
-  test: false
-  triggers:
-  - type: ConfigChange
