@@ -38,7 +38,6 @@ spec:
         - name: REGISTRY_HOST
           value: '*** GENERATED ***'
         image: cockpit/kubernetes:latest
-        imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -62,11 +61,3 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 5
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
