@@ -8,7 +8,7 @@ metadata:
   name: registry-console
   namespace: default
 spec:
-  clusterIP: 172.30.189.18
+  clusterIP: 172.31.189.18
   ports:
   - name: registry-console
     port: 9000

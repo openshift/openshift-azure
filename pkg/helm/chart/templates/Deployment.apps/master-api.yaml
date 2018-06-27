@@ -53,6 +53,20 @@ spec:
           readOnly: true
         - name: master-data
           mountPath: /var/lib/origin/
+      - name: tunnel
+        image: {{ .Values.TunnelImage }}
+        imagePullPolicy: Always
+        args:
+        - /etc/tunnel/tunnel.conf
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: master-config
+          mountPath: /etc/origin/master/
+          readOnly: true
+        - name: config
+          mountPath: /etc/tunnel
+          readOnly: true
       volumes:
       - name: master-config
         secret:
@@ -60,5 +74,8 @@ spec:
       - name: master-cloud-provider
         secret:
           secretName: etc-origin-cloudprovider
+      - name: config
+        secret:
+          secretName: tunnel
       - name: master-data
         emptyDir: # TODO: BIG FAT WARNING, CHANGE THIS BEFORE PRODUCTION :)

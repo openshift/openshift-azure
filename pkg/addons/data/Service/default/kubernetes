@@ -7,7 +7,7 @@ metadata:
   name: kubernetes
   namespace: default
 spec:
-  clusterIP: 172.30.0.1
+  clusterIP: 172.31.0.1
   ports:
   - name: https
     port: 443

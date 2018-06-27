@@ -116,17 +116,13 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.masterPublicURL"),
-			Template:   "https://{{ .Manifest.PublicHostname }}.cloudapp.azure.com",
+			Template:   "https://{{ .Manifest.PublicHostname }}",
 		},
 	},
-	"DaemonSet.apps/openshift-azure/proxy": {
+	"DaemonSet.apps/openshift-azure/tunnel": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.ProxyImage }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].args[1]"),
-			Template: "{{ .Manifest.PublicHostname }}:443",
+			Template: "{{ .Config.TunnelImage }}",
 		},
 	},
 	"DaemonSet.apps/kube-service-catalog/apiserver": {
@@ -148,7 +144,7 @@ var Translations = map[string][]struct {
 	"Deployment.apps/default/registry-console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='OPENSHIFT_OAUTH_PROVIDER_URL')].value"),
-			Template: "https://{{ .Manifest.PublicHostname }}.cloudapp.azure.com",
+			Template: "https://{{ .Manifest.PublicHostname }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HOST')].value"),
@@ -275,6 +271,13 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.data.'tls.key'"),
 			Template: "{{ Base64Encode (PrivateKeyAsBytes .Config.ServiceCatalogServerKey) }}",
+		},
+	},
+	"Secret/openshift-azure/tunnel": {
+		{
+			Path:       jsonpath.MustCompile("$.stringData.'tunnel.conf'"),
+			NestedPath: jsonpath.MustCompile("$.address"),
+			Template:   "{{ .Manifest.PublicHostname }}:444",
 		},
 	},
 	"Secret/openshift-metrics/alertmanager-proxy": {

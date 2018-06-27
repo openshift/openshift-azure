@@ -5,6 +5,12 @@ if [[ $# -eq 0 ]]; then
     exit 1
 fi
 
+# To run this, you need:
+# - to be logged in to the hosting cluster (oc login)
+# - the default service account in your namespace to be in the privileged SCC
+#   (oc adm policy add-scc-to-user privileged system:serviceaccount:demo:default)
+# - to have the AZURE_* environment variables set
+
 RESOURCEGROUP=$1
 
 rm -rf _in _out
