@@ -6,4 +6,5 @@ spec:
   selector:
     app: servicecatalog-api
   ports:
-  - port: 6443
+  - port: 443
+    targetPort: 6443
