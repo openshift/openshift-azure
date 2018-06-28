@@ -10,7 +10,7 @@ metadata:
   name: prometheus
   namespace: openshift-metrics
 spec:
-  clusterIP: 172.30.98.145
+  clusterIP: 172.31.98.145
   ports:
   - name: prometheus
     port: 443

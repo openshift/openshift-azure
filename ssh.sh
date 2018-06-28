@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-if [[ $# -eq 0 ]]; then
+if [[ $# -ne 2 ]]; then
     echo "usage: $0 resourcegroup vm-infra-0|vm-compute-0"
     exit 1
 fi

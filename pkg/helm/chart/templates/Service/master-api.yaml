@@ -6,5 +6,8 @@ spec:
   selector:
     openshift.io/component: api
   ports:
-  - port: 443
+  - name: apiserver
+    port: 443
+  - name: tunnel
+    port: 444
   type: LoadBalancer

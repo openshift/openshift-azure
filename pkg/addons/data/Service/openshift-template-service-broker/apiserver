@@ -6,7 +6,7 @@ metadata:
   name: apiserver
   namespace: openshift-template-service-broker
 spec:
-  clusterIP: 172.30.48.23
+  clusterIP: 172.31.48.23
   ports:
   - port: 443
     protocol: TCP

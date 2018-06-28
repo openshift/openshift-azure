@@ -17,6 +17,7 @@ MasterControllersImage: {{ .Config.MasterControllersImage }}
 BootstrapAutoapproverImage: {{ .Config.BootstrapAutoapproverImage }}
 ServiceCatalogImage: {{ .Config.ServiceCatalogImage }}
 SyncImage: {{ .Config.SyncImage }}
+TunnelImage: {{ .Config.TunnelImage }}
 
 # etcd certificates
 EtcdServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdServerKey) }}

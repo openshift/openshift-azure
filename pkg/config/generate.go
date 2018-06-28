@@ -28,7 +28,7 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
 	c.BootstrapAutoapproverImage = "docker.io/openshift/origin-node:v3.10.0"
 	c.ServiceCatalogImage = "quay.io/kargakis/servicecatalog:kubeconfig" // TODO: "docker.io/openshift/origin-service-catalog:v3.10.0"
-	c.ProxyImage = "docker.io/jimminter/proxy:latest"
+	c.TunnelImage = "docker.io/jimminter/tunnel:latest"
 	c.SyncImage = "docker.io/jimminter/sync:latest"
 
 	// TODO: need to cross-check all the below with acs-engine, especially SANs and IPs
@@ -152,7 +152,7 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 				"openshift.default.svc",
 				"openshift.default.svc.cluster.local",
 			},
-			ipAddresses: []net.IP{net.ParseIP("172.30.0.1")},
+			ipAddresses: []net.IP{net.ParseIP("172.31.0.1")},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.MasterServerKey,
 			cert:        &c.MasterServerCert,
@@ -231,7 +231,7 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	if c.RegistryStorageAccount, err = randomStorageAccountName(); err != nil {
 		return
 	}
-	c.RegistryServiceIP = net.ParseIP("172.30.190.177") // TODO: choose a particular IP address?
+	c.RegistryServiceIP = net.ParseIP("172.31.190.177") // TODO: choose a particular IP address?
 	if c.RegistryHTTPSecret, err = randomBytes(32); err != nil {
 		return nil, err
 	}

@@ -8,7 +8,7 @@ metadata:
   name: controller-manager
   namespace: kube-service-catalog
 spec:
-  clusterIP: 172.30.248.183
+  clusterIP: 172.31.248.183
   ports:
   - name: secure
     port: 443

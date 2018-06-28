@@ -29,7 +29,7 @@ type Config struct {
 	MasterControllersImage     string
 	BootstrapAutoapproverImage string
 	ServiceCatalogImage        string
-	ProxyImage                 string
+	TunnelImage                string
 	SyncImage                  string
 
 	// etcd certificates

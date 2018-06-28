@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: tunnel
+  namespace: openshift-azure
+spec:
+  selector:
+    matchLabels:
+      app: tunnel
+  template:
+    metadata:
+      labels:
+        app: tunnel
+    spec:
+      containers:
+      - name: tunnel
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
+        args:
+        - /etc/tunnel/tunnel.conf
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: host-config
+          mountPath: /etc/origin/node
+          readOnly: true
+        - name: config
+          mountPath: /etc/tunnel
+          readOnly: true
+      hostNetwork: true
+      volumes:
+      - name: host-config
+        hostPath:
+          path: /etc/origin/node
+      - name: config
+        secret:
+          secretName: tunnel
