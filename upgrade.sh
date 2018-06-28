@@ -7,12 +7,7 @@
 # - to be logged in to Azure (az login)
 # - to have the AZURE_* environment variables set
 
-if [[ $# -eq 0 ]]; then
-    echo usage: $0 resourcegroup
-    exit 1
-fi
-
-RESOURCEGROUP=$1
+RESOURCEGROUP=$(awk '/^ResourceGroup:/ { print $2 }' <_data/manifest.yaml)
 
 go generate ./...
 go run cmd/upgrade/upgrade.go

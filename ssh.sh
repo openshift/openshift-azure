@@ -1,12 +1,12 @@
 #!/bin/bash -e
 
-if [[ $# -ne 2 ]]; then
-    echo "usage: $0 resourcegroup vm-infra-0|vm-compute-0"
+if [[ $# -ne 1 ]]; then
+    echo "usage: $0 vm-infra-0|vm-compute-0"
     exit 1
 fi
 
-RESOURCEGROUP=$1
-HOST=$2
+RESOURCEGROUP=$(awk '/^ResourceGroup:/ { print $2 }' <_data/manifest.yaml)
+HOST=$1
 
 IP=$(az vm list-ip-addresses -g $RESOURCEGROUP -n $HOST --query '[0].virtualMachine.network.publicIpAddresses[0].ipAddress' | tr -d '"')
 
