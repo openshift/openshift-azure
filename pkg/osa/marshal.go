@@ -10,8 +10,8 @@ import (
 	"github.com/jim-minter/azure-helm/pkg/tls"
 )
 
-func readManifest() (*api.Manifest, error) {
-	b, err := ioutil.ReadFile("_data/manifest.yaml")
+func readManifest(path string) (*api.Manifest, error) {
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

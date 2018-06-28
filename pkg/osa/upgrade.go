@@ -10,7 +10,7 @@ import (
 )
 
 func Upgrade() error {
-	m, err := readManifest()
+	m, err := readManifest("_data/manifest.yaml")
 	if err != nil {
 		return err
 	}
