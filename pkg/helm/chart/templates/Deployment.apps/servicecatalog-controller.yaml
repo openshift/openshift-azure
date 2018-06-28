@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: servicecatalog-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: servicecatalog-controller
+  template:
+    metadata:
+      labels:
+        app: servicecatalog-controller
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: controller-manager
+        image: {{ .Values.ServiceCatalogImage }}
+        command:
+        - /usr/bin/service-catalog
+        args:
+        - controller-manager
+        - --secure-port
+        - "8080"
+        - -v
+        - "3"
+        - --leader-election-namespace
+        - kube-service-catalog
+        - --leader-elect-resource-lock
+        - configmaps
+        - --broker-relist-interval
+        - 5m
+        - --feature-gates
+        - OriginatingIdentity=true
+        - --k8s-kubeconfig
+        - /tmp/kubeconfig/admin.kubeconfig
+        - --service-catalog-kubeconfig
+        - /tmp/kubeconfig/admin.kubeconfig # needs to point to the core api server
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+        - name: kubeconfig
+          mountPath: /tmp/kubeconfig
+          readOnly: true
+        - name: service-catalog-ssl
+          mountPath: /var/run/kubernetes-service-catalog
+          readOnly: true
+      volumes:
+      - name: kubeconfig
+        secret:
+          secretName: admin-kubeconfig # TODO: need to use a less powerful kubeconfig
+      - name: service-catalog-ssl
+        secret:
+          defaultMode: 420
+          items:
+          - key: apiserver.crt
+            path: apiserver.crt
+          - key: apiserver.key
+            path: apiserver.key
+          secretName: servicecatalog-api
