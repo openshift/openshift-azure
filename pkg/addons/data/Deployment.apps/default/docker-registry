@@ -20,6 +20,38 @@ spec:
       labels:
         docker-registry: default
     spec:
+      initContainers:
+      - name: storage-setup
+        image: docker.io/microsoft/azure-cli:latest
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - |
+          set -o errexit
+          set -o nounset
+          set -o pipefail
+
+          . <(sed -e 's/: */=/' /etc/origin/cloudprovider/azure.conf)
+          az login --service-principal -u "$aadClientId" -p "$aadClientSecret" --tenant "$aadTenantId" &>/dev/null
+          REGISTRY_STORAGE_ACCOUNT_KEY=$(az storage account keys list -g "$resourceGroup" -n "$REGISTRY_STORAGE_ACCOUNT_NAME" --query "[?keyName == 'key1'].value" -o tsv)
+          az logout
+
+          cp /etc/registry/config.yml /tmp/registry/config.yml
+          sed -i -e "s#REGISTRY_STORAGE_ACCOUNT_KEY#$REGISTRY_STORAGE_ACCOUNT_KEY#" /tmp/registry/config.yml
+
+        env:
+        - name: REGISTRY_STORAGE_ACCOUNT_NAME
+          value: '*** GENERATED ***'
+        volumeMounts:
+        - mountPath: /etc/origin/cloudprovider
+          name: azure-config
+        - mountPath: /etc/registry
+          name: docker-config
+        - mountPath: /tmp/registry
+          name: shared-config
+        - mountPath: /.azure
+          name: empty-dir
       containers:
       - env:
         - name: REGISTRY_HTTP_ADDR
@@ -72,17 +104,25 @@ spec:
         - mountPath: /etc/secrets
           name: registry-certificates
         - mountPath: /etc/registry
-          name: docker-config
+          name: shared-config
       nodeSelector:
         region: infra
       serviceAccountName: registry
       volumes:
       - emptyDir: {}
         name: registry-storage
+      - emptyDir: {}
+        name: shared-config
+      - emptyDir: {} # allows az to write in the init container since emptyDir filesystem is tmpfs
+        name: empty-dir
       - name: registry-certificates
         secret:
           defaultMode: 420
           secretName: registry-certificates
+      - name: azure-config
+        secret:
+          defaultMode: 420
+          secretName: etc-origin-cloudprovider
       - name: docker-config
         secret:
           defaultMode: 420

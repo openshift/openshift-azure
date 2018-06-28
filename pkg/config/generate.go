@@ -227,7 +227,6 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	if c.RegistryStorageAccount, err = randomStorageAccountName(); err != nil {
 		return
 	}
-	c.RegistryAccountKey = "garbage"
 	c.RegistryServiceIP = net.ParseIP("172.30.190.177") // TODO: choose a particular IP address?
 	if c.RegistryHTTPSecret, err = randomBytes(32); err != nil {
 		return nil, err

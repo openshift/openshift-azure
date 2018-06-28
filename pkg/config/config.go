@@ -82,7 +82,6 @@ type Config struct {
 	RouterIP                       net.IP
 	EtcdHostname                   string
 	RegistryStorageAccount         string
-	RegistryAccountKey             string
 	RegistryServiceIP              net.IP
 	RegistryHTTPSecret             []byte
 	AlertManagerProxySessionSecret []byte

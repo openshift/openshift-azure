@@ -71,7 +71,6 @@ Location: {{ .Manifest.Location }}
 RouterIP: {{ .Config.RouterIP }}
 EtcdHostname: {{ .Config.EtcdHostname }}
 RegistryStorageAccount: {{ .Config.RegistryStorageAccount }}
-RegistryAccountKey: {{ .Config.RegistryAccountKey }}
 RegistryServiceIP: {{ .Config.RegistryServiceIP }}
 RegistryHTTPSecret: {{ Base64Encode .Config.RegistryHTTPSecret }}
 AlertManagerProxySessionSecret: {{ Base64Encode .Config.AlertManagerProxySessionSecret }}

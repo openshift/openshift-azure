@@ -140,6 +140,10 @@ var Translations = map[string][]struct {
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HTTP_SECRET')].value"),
 			Template: "{{ Base64Encode .Config.RegistryHTTPSecret }}",
 		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.initContainers[0].env[?(@.name='REGISTRY_STORAGE_ACCOUNT_NAME')].value"),
+			Template: "{{ .Config.RegistryStorageAccount }}",
+		},
 	},
 	"Deployment.apps/default/registry-console": {
 		{
@@ -211,16 +215,46 @@ var Translations = map[string][]struct {
 	},
 	"Secret/default/registry-config": {
 		{
-			Path:        jsonpath.MustCompile("$.data.'config.yml'"),
-			NestedPath:  jsonpath.MustCompile("$.storage.azure.accountname"),
-			NestedFlags: NestedFlagsBase64,
-			Template:    "{{ .Config.RegistryStorageAccount }}",
+			Path:       jsonpath.MustCompile("$.stringData.'config.yml'"),
+			NestedPath: jsonpath.MustCompile("$.storage.azure.accountname"),
+			Template:   "{{ .Config.RegistryStorageAccount }}",
+		},
+	},
+	"Secret/default/etc-origin-cloudprovider": {
+		{
+			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
+			NestedPath: jsonpath.MustCompile("$.tenantId"),
+			Template:   "{{ .Manifest.TenantID }}",
 		},
 		{
-			Path:        jsonpath.MustCompile("$.data.'config.yml'"),
-			NestedPath:  jsonpath.MustCompile("$.storage.azure.accountkey"),
-			NestedFlags: NestedFlagsBase64,
-			Template:    "{{ .Config.RegistryAccountKey }}",
+			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
+			NestedPath: jsonpath.MustCompile("$.subscriptionId"),
+			Template:   "{{ .Manifest.SubscriptionID }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
+			NestedPath: jsonpath.MustCompile("$.aadClientId"),
+			Template:   "{{ .Manifest.ClientID }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
+			NestedPath: jsonpath.MustCompile("$.aadClientSecret"),
+			Template:   "{{ .Manifest.ClientSecret }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
+			NestedPath: jsonpath.MustCompile("$.aadTenantId"),
+			Template:   "{{ .Manifest.TenantID }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
+			NestedPath: jsonpath.MustCompile("$.resourceGroup"),
+			Template:   "{{ .Manifest.ResourceGroup }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
+			NestedPath: jsonpath.MustCompile("$.location"),
+			Template:   "{{ .Manifest.Location }}",
 		},
 	},
 	"Secret/default/router-certs": {
