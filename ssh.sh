@@ -11,4 +11,4 @@ HOST=$2
 IP=$(az vm list-ip-addresses -g $RESOURCEGROUP -n $HOST --query '[0].virtualMachine.network.publicIpAddresses[0].ipAddress' | tr -d '"')
 
 ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=QUIET \
-    -i _out/id_rsa cloud-user@$IP
+    -i _data/_out/id_rsa cloud-user@$IP

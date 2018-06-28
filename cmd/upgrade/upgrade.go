@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	if err := osa.Create(); err != nil {
+	if err := osa.Upgrade(); err != nil {
 		panic(err)
 	}
 }

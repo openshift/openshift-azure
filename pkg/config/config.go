@@ -11,6 +11,8 @@ import (
 )
 
 type Config struct {
+	Version int
+
 	// CAs
 	EtcdCaKey            *rsa.PrivateKey
 	EtcdCaCert           *x509.Certificate

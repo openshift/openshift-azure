@@ -21,6 +21,8 @@ import (
 func Generate(m *api.Manifest) (c *Config, err error) {
 	c = &Config{}
 
+	c.Version = versionLatest
+
 	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
 
 	c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
