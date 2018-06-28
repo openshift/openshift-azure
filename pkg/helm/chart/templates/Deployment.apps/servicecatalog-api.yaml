@@ -59,4 +59,4 @@ spec:
           secretName: servicecatalog-api
       - name: kubeconfig
         secret:
-          secretName: admin-kubeconfig # TODO: need to use a less powerful kubeconfig
+          secretName: admin-kubeconfig # TODO: need to use a less powerful token
