@@ -6,7 +6,7 @@ tunnel: clean
 
 tunnel-image: tunnel
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-	imagebuilder -f Dockerfile -t docker.io/jimminter/tunnel:latest .
+	imagebuilder -f Dockerfile.tunnel -t docker.io/jimminter/tunnel:latest .
 
 tunnel-push: tunnel-image
 	docker push docker.io/jimminter/tunnel:latest
