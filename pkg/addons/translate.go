@@ -135,13 +135,13 @@ var Translations = map[string][]struct {
 			Template: "https://{{ .Config.EtcdHostname }}:2379",
 		},
 	},
-	"DeploymentConfig.apps.openshift.io/default/docker-registry": {
+	"Deployment.apps/default/docker-registry": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HTTP_SECRET')].value"),
 			Template: "{{ Base64Encode .Config.RegistryHTTPSecret }}",
 		},
 	},
-	"DeploymentConfig.apps.openshift.io/default/registry-console": {
+	"Deployment.apps/default/registry-console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='OPENSHIFT_OAUTH_PROVIDER_URL')].value"),
 			Template: "https://{{ .Manifest.PublicHostname }}.cloudapp.azure.com",
