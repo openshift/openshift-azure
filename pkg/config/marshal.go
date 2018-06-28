@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
@@ -66,8 +67,11 @@ func (c Config) MarshalJSON() ([]byte, error) {
 }
 
 func (c *Config) UnmarshalJSON(b []byte) error {
+	d := json.NewDecoder(bytes.NewBuffer(b))
+	d.UseNumber()
+
 	m := map[string]interface{}{}
-	err := json.Unmarshal(b, &m)
+	err := d.Decode(&m)
 	if err != nil {
 		return err
 	}
@@ -159,6 +163,14 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 			}
 
 			v.Field(i).Set(reflect.ValueOf(b))
+
+		case "int":
+			ii, err := m[k].(json.Number).Int64()
+			if err != nil {
+				return err
+			}
+
+			v.Field(i).Set(reflect.ValueOf(int(ii)))
 
 		default:
 			v.Field(i).Set(reflect.ValueOf(m[k]))
