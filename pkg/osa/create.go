@@ -3,19 +3,21 @@ package osa
 import (
 	"io/ioutil"
 	"os"
-
-	"github.com/jim-minter/azure-helm/pkg/arm"
-	"github.com/jim-minter/azure-helm/pkg/config"
-	"github.com/jim-minter/azure-helm/pkg/helm"
 )
 
-func Create() error {
-	m, err := readManifest()
+type RP struct{}
+
+func (*RP) Run() error {
+	osa, err := NewOSAByPath("_data/manifest.yaml", "")
 	if err != nil {
 		return err
 	}
 
-	c, err := config.Generate(m)
+	if errs := osa.Validate(); errs != nil {
+		return err
+	}
+
+	c, err := osa.GenerateConfig()
 	if err != nil {
 		return err
 	}
@@ -30,7 +32,7 @@ func Create() error {
 		return err
 	}
 
-	values, err := helm.Generate(m, c)
+	values, err := osa.GenerateHelm()
 	if err != nil {
 		return err
 	}
@@ -39,7 +41,7 @@ func Create() error {
 		return err
 	}
 
-	azuredeploy, err := arm.Generate(m, c)
+	azuredeploy, err := osa.GenerateARM()
 	if err != nil {
 		return err
 	}
