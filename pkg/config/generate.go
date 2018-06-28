@@ -166,7 +166,11 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			cert:         &c.OpenShiftMasterCert,
 		},
 		{
-			cn:          "servicecatalog-api",
+			cn: "servicecatalog-api",
+			dnsNames: []string{
+				"servicecatalog-api",
+				"apiserver.kube-service-catalog.svc", // TODO: unclear how safe this is
+			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			signingKey:  c.ServiceCatalogCaKey,
 			signingCert: c.ServiceCatalogCaCert,
