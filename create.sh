@@ -1,22 +1,23 @@
 #!/bin/bash -ex
 
+# To run this, you need:
+# - to be logged in to the hosting cluster (oc login)
+# - the default service account in your namespace to be in the privileged SCC
+#   (oc adm policy add-scc-to-user privileged system:serviceaccount:demo:default)
+# - to be logged in to Azure (az login)
+# - to have the AZURE_* environment variables set
+
 if [[ $# -eq 0 ]]; then
     echo usage: $0 resourcegroup
     exit 1
 fi
 
-# To run this, you need:
-# - to be logged in to the hosting cluster (oc login)
-# - the default service account in your namespace to be in the privileged SCC
-#   (oc adm policy add-scc-to-user privileged system:serviceaccount:demo:default)
-# - to have the AZURE_* environment variables set
-
 RESOURCEGROUP=$1
 
-rm -rf _in _out
-mkdir _in _out
+rm -rf _data
+mkdir -p _data/_out
 
-cat >_in/manifest <<EOF
+cat >_data/manifest.yaml <<EOF
 TenantID: $AZURE_TENANT_ID
 SubscriptionID: $AZURE_SUBSCRIPTION_ID
 ClientID: $AZURE_CLIENT_ID
@@ -31,16 +32,13 @@ ImageResourceName: centos7-3.10-201806231427
 PublicHostname: openshift.$RESOURCEGROUP.osadev.cloud
 RoutingConfigSubdomain: $RESOURCEGROUP.osadev.cloud
 EOF
-cp _in/manifest _out/manifest
 
 go generate ./...
 go run cmd/create/create.go
 
-helm template pkg/helm/chart -f _out/values.yaml --output-dir _out
-
 # poor man's helm (without tiller running)
-oc delete -Rf _out/osa/templates || true
-oc create -Rf _out/osa/templates
+helm template pkg/helm/chart -f _data/_out/values.yaml --output-dir _data/_out
+oc create -Rf _data/_out/osa/templates
 
 while true; do
     MASTERIP=$(oc get service master-api -o template --template '{{ if .status.loadBalancer }}{{ (index .status.loadBalancer.ingress 0).ip }}{{ end }}')
@@ -55,9 +53,9 @@ tools/dns.sh a-create $RESOURCEGROUP openshift $MASTERIP
 # when we know the router IP, do tools/dns.sh a-create $RESOURCEGROUP '*' $ROUTERIP
 
 az group create -n $RESOURCEGROUP -l eastus
-az group deployment create -g $RESOURCEGROUP --template-file _out/azuredeploy.json
+az group deployment create -g $RESOURCEGROUP --template-file _data/_out/azuredeploy.json
 
 # will eventually run as an HCP pod, for development run it locally
-KUBECONFIG=_out/admin.kubeconfig go run cmd/sync/sync.go
+KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go
 
-# TODO: health check
+KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/health/health.go

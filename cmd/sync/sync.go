@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	b, err := ioutil.ReadFile("_out/manifest")
+	b, err := ioutil.ReadFile("_data/manifest.yaml")
 	if err != nil {
 		panic(err)
 	}
@@ -22,7 +22,7 @@ func main() {
 		panic(err)
 	}
 
-	b, err = ioutil.ReadFile("_out/config")
+	b, err = ioutil.ReadFile("_data/config.yaml")
 	if err != nil {
 		panic(err)
 	}

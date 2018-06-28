@@ -23,7 +23,7 @@ spec:
           value: /tmp/kubeconfig/admin.kubeconfig
         volumeMounts:
         - name: config
-          mountPath: /_out
+          mountPath: /_data
           readOnly: true
         - name: kubeconfig
           mountPath: /tmp/kubeconfig
