@@ -5,8 +5,7 @@ import (
 )
 
 func main() {
-	rp := &osa.RP{}
-	if err := rp.Run(); err != nil {
+	if err := osa.Create(); err != nil {
 		panic(err)
 	}
 }

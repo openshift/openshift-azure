@@ -1,17 +1,19 @@
 package osa
 
 import (
+	"io/ioutil"
+
 	"github.com/ghodss/yaml"
+
 	"github.com/jim-minter/azure-helm/pkg/api"
 	"github.com/jim-minter/azure-helm/pkg/arm"
 	"github.com/jim-minter/azure-helm/pkg/config"
 	"github.com/jim-minter/azure-helm/pkg/helm"
-	"io/ioutil"
 )
 
 type OSA interface {
 	Validate() error
-	GenerateConfig() (*config.Config, error)
+	GenerateConfig() ([]byte, error)
 	GenerateHelm() ([]byte, error)
 	GenerateARM() ([]byte, error)
 	Healthz() error
@@ -80,12 +82,16 @@ func (m *osaManager) Validate() error {
 	return nil
 }
 
-func (m *osaManager) GenerateConfig() (*config.Config, error) {
+func (m *osaManager) GenerateConfig() ([]byte, error) {
 	c, err := config.Generate(m.newManifest)
 	if err == nil {
 		m.config = c
 	}
-	return c, err
+	b, err := yaml.Marshal(c)
+	if err != nil {
+		return nil, err
+	}
+	return b, err
 }
 
 func (m *osaManager) GenerateHelm() ([]byte, error) {
