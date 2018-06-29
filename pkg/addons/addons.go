@@ -5,7 +5,9 @@ package addons
 //go:generate gofmt -s -l -w bindata.go
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 	"log"
 	"reflect"
 	"sort"
@@ -270,7 +272,7 @@ func getClients() (err error) {
 	return
 }
 
-func Main(m *api.Manifest, c *config.Config) error {
+func Main(m *api.Manifest, c *config.Config, dryRun bool) error {
 	err := getClients()
 	if err != nil {
 		return err
@@ -279,6 +281,17 @@ func Main(m *api.Manifest, c *config.Config) error {
 	db, err := readDB(m, c)
 	if err != nil {
 		return err
+	}
+
+	if dryRun {
+		var buf *bytes.Buffer
+		var p *YAMLPrinter
+		for _, obj := range db {
+			buf = bytes.NewBuffer(nil)
+			p.PrintObj(&obj, buf)
+			fmt.Println(string(buf.Bytes()))
+		}
+		return nil
 	}
 
 	err = writeDB(db)
