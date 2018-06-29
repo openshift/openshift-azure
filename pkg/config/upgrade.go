@@ -1,6 +1,8 @@
 package config
 
-import "github.com/jim-minter/azure-helm/pkg/api"
+import (
+	"github.com/jim-minter/azure-helm/pkg/api"
+)
 
 const (
 	versionLatest = 1

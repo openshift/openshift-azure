@@ -95,4 +95,8 @@ type Config struct {
 	RegistryCert                   *x509.Certificate
 	RouterKey                      *rsa.PrivateKey
 	RouterCert                     *x509.Certificate
+
+	// for development
+	ImageResourceGroup string
+	ImageResourceName  string
 }

@@ -32,14 +32,13 @@ ResourceGroup: $RESOURCEGROUP
 VMSize: Standard_D4s_v3
 ComputeCount: 1
 InfraCount: 1
-ImageResourceGroup: images
-ImageResourceName: centos7-3.10-201806231427
 PublicHostname: openshift.$RESOURCEGROUP.osadev.cloud
 RoutingConfigSubdomain: $RESOURCEGROUP.osadev.cloud
 EOF
 
 go generate ./...
-go run cmd/create/create.go
+ImageResourceGroup=images ImageResourceName=centos7-3.10-201806231427 \
+    go run cmd/createorupdate/createorupdate.go
 
 # poor man's helm (without tiller running)
 helm template pkg/helm/chart -f _data/_out/values.yaml --output-dir _data/_out
@@ -63,4 +62,4 @@ az group deployment create -g $RESOURCEGROUP --template-file _data/_out/azuredep
 # will eventually run as an HCP pod, for development run it locally
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go
 
-KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/health/health.go
+KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go
