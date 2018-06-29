@@ -142,7 +142,7 @@ var Translations = map[string][]struct {
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HOST')].value"),
-			Template: "docker-registry-default.{{ .Config.RouterIP }}.nip.io",
+			Template: "docker-registry-default.{{ .Manifest.RoutingConfigSubdomain }}",
 		},
 	},
 	"Deployment.apps/kube-service-catalog/controller-manager": {
@@ -160,49 +160,49 @@ var Translations = map[string][]struct {
 	"OAuthClient.oauth.openshift.io/cockpit-oauth-client": {
 		{
 			Path:     jsonpath.MustCompile("$.redirectURIs[0]"),
-			Template: "https://registry-console-default.{{ .Config.RouterIP }}.nip.io",
+			Template: "https://registry-console-default.{{ .Manifest.RoutingConfigSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/default/docker-registry": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "docker-registry-default.{{ .Config.RouterIP }}.nip.io",
+			Template: "docker-registry-default.{{ .Manifest.RoutingConfigSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/default/registry-console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "registry-console-default.{{ .Config.RouterIP }}.nip.io",
+			Template: "registry-console-default.{{ .Manifest.RoutingConfigSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/kube-service-catalog/apiserver": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "apiserver-kube-service-catalog.{{ .Config.RouterIP }}.nip.io",
+			Template: "apiserver-kube-service-catalog.{{ .Manifest.RoutingConfigSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/openshift-ansible-service-broker/asb-1338": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "asb-1338-openshift-ansible-service-broker.{{ .Config.RouterIP }}.nip.io",
+			Template: "asb-1338-openshift-ansible-service-broker.{{ .Manifest.RoutingConfigSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/openshift-metrics/alertmanager": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "alertmanager-openshift-metrics.{{ .Config.RouterIP }}.nip.io",
+			Template: "alertmanager-openshift-metrics.{{ .Manifest.RoutingConfigSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/openshift-metrics/alerts": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "alerts-openshift-metrics.{{ .Config.RouterIP }}.nip.io",
+			Template: "alerts-openshift-metrics.{{ .Manifest.RoutingConfigSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/openshift-metrics/prometheus": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "prometheus-openshift-metrics.{{ .Config.RouterIP }}.nip.io",
+			Template: "prometheus-openshift-metrics.{{ .Manifest.RoutingConfigSubdomain }}",
 		},
 	},
 	"Secret/default/registry-certificates": {

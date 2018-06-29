@@ -231,8 +231,6 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	// needed by import
 	// TODO: these need to be filled out sanely, and need to fully migrate the
 	// service catalog over from impexp to helm.
-	c.RouterIP = net.ParseIP("0.0.0.0")
-	c.EtcdHostname = "garbage"
 	if c.RegistryStorageAccount, err = randomStorageAccountName(); err != nil {
 		return
 	}
@@ -270,9 +268,10 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	}
 	// TODO: the router CN and SANs should be configurables.
 	c.RouterKey, c.RouterCert, err =
-		tls.NewCert("*."+c.RouterIP.String()+".nip.io", nil,
-			[]string{"*." + c.RouterIP.String() + ".nip.io",
-				c.RouterIP.String() + ".nip.io",
+		tls.NewCert("*."+m.RoutingConfigSubdomain, nil,
+			[]string{
+				"*." + m.RoutingConfigSubdomain,
+				m.RoutingConfigSubdomain,
 			},
 			nil,
 			[]x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},

@@ -69,8 +69,6 @@ ResourceGroup: {{ .Manifest.ResourceGroup }}
 Location: {{ .Manifest.Location }}
 
 # needed by import
-RouterIP: {{ .Config.RouterIP }}
-EtcdHostname: {{ .Config.EtcdHostname }}
 RegistryStorageAccount: {{ .Config.RegistryStorageAccount }}
 RegistryServiceIP: {{ .Config.RegistryServiceIP }}
 RegistryHTTPSecret: {{ Base64Encode .Config.RegistryHTTPSecret }}

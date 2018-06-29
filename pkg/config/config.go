@@ -82,8 +82,6 @@ type Config struct {
 	NodeBootstrapKubeconfig *v1.Config
 
 	// needed by import
-	RouterIP                       net.IP
-	EtcdHostname                   string
 	RegistryStorageAccount         string
 	RegistryServiceIP              net.IP
 	RegistryHTTPSecret             []byte
