@@ -1,6 +1,10 @@
 // Package api defines the external API for the plugin.
 package api
 
+import (
+	"context"
+)
+
 type Manifest struct {
 	TenantID               string
 	SubscriptionID         string
@@ -22,5 +26,5 @@ type Plugin interface {
 	GenerateConfig() ([]byte, error)
 	GenerateHelm() ([]byte, error)
 	GenerateARM() ([]byte, error)
-	HealthCheck() error
+	HealthCheck(context.Context) error
 }

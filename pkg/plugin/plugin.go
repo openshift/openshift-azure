@@ -2,6 +2,7 @@
 package plugin
 
 import (
+	"context"
 	"io/ioutil"
 
 	"github.com/ghodss/yaml"
@@ -9,6 +10,7 @@ import (
 	"github.com/jim-minter/azure-helm/pkg/api"
 	"github.com/jim-minter/azure-helm/pkg/arm"
 	"github.com/jim-minter/azure-helm/pkg/config"
+	"github.com/jim-minter/azure-helm/pkg/healthcheck"
 	"github.com/jim-minter/azure-helm/pkg/helm"
 	"github.com/jim-minter/azure-helm/pkg/tls"
 )
@@ -88,8 +90,8 @@ func (p *Plugin) GenerateARM() ([]byte, error) {
 	return arm.Generate(p.manifest, p.config)
 }
 
-func (p *Plugin) HealthCheck() error {
-	return nil
+func (p *Plugin) HealthCheck(ctx context.Context) error {
+	return healthcheck.HealthCheck(ctx, p.manifest, p.config)
 }
 
 // WriteHelpers is for development - not part of the external API
