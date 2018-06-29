@@ -1,26 +1,36 @@
 package cdb
 
 import (
-	"io"
 	"log"
 	"net"
 	"sync"
-
-	"github.com/jim-minter/azure-helm/pkg/tunnel/config"
 )
 
+type PacketReader interface {
+	ReadPacket() ([]byte, error)
+}
+
+type PacketWriter interface {
+	WritePacket([]byte) error
+}
+
+type PacketReadWriteCloser interface {
+	PacketReader
+	PacketWriter
+	Close() error
+}
+
 type Cdb struct {
-	Config *config.Config
-	m      sync.Mutex
-	nets   []cdbnet
+	m    sync.Mutex
+	nets []cdbnet
 }
 
 type cdbnet struct {
 	n net.IPNet
-	w io.Writer
+	w PacketWriter
 }
 
-func (cdb *Cdb) AddNets(nets []net.IPNet, w io.Writer) {
+func (cdb *Cdb) AddNets(nets []net.IPNet, w PacketWriter) {
 	cdb.m.Lock()
 	defer cdb.m.Unlock()
 
@@ -29,7 +39,7 @@ func (cdb *Cdb) AddNets(nets []net.IPNet, w io.Writer) {
 	}
 }
 
-func (cdb *Cdb) DeleteConn(w io.Writer) {
+func (cdb *Cdb) DeleteWriter(w PacketWriter) {
 	cdb.m.Lock()
 	defer cdb.m.Unlock()
 
@@ -42,7 +52,7 @@ func (cdb *Cdb) DeleteConn(w io.Writer) {
 	cdb.nets = newNets
 }
 
-func (cdb *Cdb) Write(pkt []byte) (int, error) {
+func (cdb *Cdb) WritePacket(pkt []byte) error {
 	cdb.m.Lock()
 	defer cdb.m.Unlock()
 
@@ -51,10 +61,10 @@ func (cdb *Cdb) Write(pkt []byte) (int, error) {
 
 	for _, cdbn := range cdb.nets {
 		if cdbn.n.Contains(dst) {
-			return cdbn.w.Write(pkt)
+			return cdbn.w.WritePacket(pkt)
 		}
 	}
 
 	log.Printf("dropped %s->%s %d\n", src.String(), dst.String(), pkt[9])
-	return 0, nil
+	return nil
 }

@@ -11,6 +11,7 @@ import (
 	"net"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/ghodss/yaml"
 )
@@ -24,6 +25,8 @@ type Config struct {
 	Key                crypto.PrivateKey
 	ClientOrganization string
 	AdvertiseCIDRs     []net.IPNet
+	Heartbeat          time.Duration
+	HeartbeatTimeout   time.Duration
 }
 
 func (c *Config) UnmarshalJSON(b []byte) error {
@@ -36,6 +39,8 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 		CACertPath         string   `json:"caCertPath"`
 		ClientOrganization string   `json:"clientOrganization"`
 		AdvertiseCIDRs     []string `json:"advertiseCIDRs"`
+		Heartbeat          int      `json:"heartbeatSeconds"`
+		HeartbeatTimeout   int      `json:"heartbeatTimeoutSeconds"`
 	}{}
 
 	err := json.Unmarshal(b, &ext)
@@ -49,6 +54,8 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 		Interface:          ext.Interface,
 		CACertPool:         x509.NewCertPool(),
 		ClientOrganization: ext.ClientOrganization,
+		Heartbeat:          time.Duration(ext.Heartbeat) * time.Second,
+		HeartbeatTimeout:   time.Duration(ext.HeartbeatTimeout) * time.Second,
 	}
 
 	cc.AdvertiseCIDRs = make([]net.IPNet, 0, len(ext.AdvertiseCIDRs))
@@ -70,6 +77,7 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 		if err != nil {
 			return err
 		}
+		n.IP = n.IP.To4()
 		cc.AdvertiseCIDRs = append(c.AdvertiseCIDRs, *n)
 	}
 
@@ -103,6 +111,20 @@ func (c *Config) Validate() error {
 
 	if c.Mode == "client" && c.ClientOrganization != "" {
 		return fmt.Errorf("clientOrganization can't be set in client mode")
+	}
+
+	switch {
+	case c.Heartbeat < 0:
+		return fmt.Errorf("invalid heartbeatSeconds %q", c.Heartbeat)
+	case c.Heartbeat == 0:
+		c.Heartbeat = 10 * time.Second
+	}
+
+	switch {
+	case c.HeartbeatTimeout < 0:
+		return fmt.Errorf("invalid heartbeatTimeoutSeconds %q", c.HeartbeatTimeout)
+	case c.HeartbeatTimeout == 0:
+		c.HeartbeatTimeout = 30 * time.Second
 	}
 
 	_, err := getInterfaceIP(c.Interface)

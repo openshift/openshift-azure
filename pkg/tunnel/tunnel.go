@@ -9,28 +9,23 @@ import (
 
 	"github.com/jim-minter/azure-helm/pkg/tunnel/cdb"
 	"github.com/jim-minter/azure-helm/pkg/tunnel/config"
+	"github.com/jim-minter/azure-helm/pkg/tunnel/protocol"
 	"github.com/jim-minter/azure-helm/pkg/tunnel/routes"
 	"github.com/jim-minter/azure-helm/pkg/tunnel/tun"
 )
 
-func forwarder(r io.Reader, cdb *cdb.Cdb) error {
+func forwarder(cdb *cdb.Cdb, r cdb.PacketReader) error {
 	for {
-		pkt := make([]byte, 65536)
-		n, err := r.Read(pkt)
+		pkt, err := r.ReadPacket()
 		if err != nil {
 			return err
 		}
-		pkt = pkt[:n]
 
-		if len(pkt) < 20 {
-			continue // too short
-		}
-
-		if pkt[0]&0xF0 != 0x40 {
+		if len(pkt) < 1 || pkt[0]&0xF0 != 0x40 {
 			continue // not IPv4
 		}
 
-		_, err = cdb.Write(pkt)
+		err = cdb.WritePacket(pkt)
 		if err != nil {
 			return err
 		}
@@ -44,15 +39,16 @@ func handleConn(config *config.Config, cdb *cdb.Cdb, c net.Conn) (err error) {
 		}
 	}()
 
-	defer c.Close()
+	p := protocol.NewProtocol(config, c)
+	defer p.Close()
 
-	remotenets, err := handshake(c, config.AdvertiseCIDRs)
+	remotenets, err := p.Handshake(config.AdvertiseCIDRs)
 	if err != nil {
 		return err
 	}
 
-	cdb.AddNets(remotenets, c)
-	defer cdb.DeleteConn(c)
+	cdb.AddNets(remotenets, p)
+	defer cdb.DeleteWriter(p)
 
 	err = routes.Add(remotenets, config.Interface)
 	if err != nil {
@@ -60,7 +56,7 @@ func handleConn(config *config.Config, cdb *cdb.Cdb, c net.Conn) (err error) {
 	}
 	defer routes.Delete(remotenets, config.Interface)
 
-	return forwarder(&packetConn{Conn: c}, cdb)
+	return forwarder(cdb, p)
 }
 
 var servicesSubnet = net.IPNet{IP: net.ParseIP("172.31.0.0"), Mask: net.CIDRMask(16, 32)}
@@ -78,7 +74,7 @@ func Run() error {
 		return err
 	}
 
-	tun, err := tun.Tun(config.Interface)
+	tun, err := tun.NewTun(config.Interface)
 	if err != nil {
 		return err
 	}
@@ -95,10 +91,10 @@ func Run() error {
 		}
 	}
 
-	cdb := &cdb.Cdb{Config: config}
+	cdb := &cdb.Cdb{}
 	cdb.AddNets(config.AdvertiseCIDRs, tun)
 
-	go forwarder(tun, cdb)
+	go forwarder(cdb, tun)
 
 	switch config.Mode {
 	case "server":
@@ -110,7 +106,9 @@ func Run() error {
 		for {
 			c, err := accept(config, l)
 			if err != nil {
-				log.Println(err)
+				if err != io.EOF { // don't log LB probes which don't negotiate TLS
+					log.Println(err)
+				}
 			} else {
 				go handleConn(config, cdb, c)
 			}

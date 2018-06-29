@@ -1,13 +1,20 @@
 package tun
 
 import (
-	"io"
 	"os"
 	"syscall"
 	"unsafe"
+
+	"github.com/jim-minter/azure-helm/pkg/tunnel/cdb"
 )
 
-func Tun(iface string) (io.ReadWriteCloser, error) {
+type tun struct {
+	f *os.File
+}
+
+var _ cdb.PacketReadWriteCloser = &tun{}
+
+func NewTun(iface string) (cdb.PacketReadWriteCloser, error) {
 	err := os.RemoveAll("tun")
 	if err != nil {
 		return nil, err
@@ -48,5 +55,25 @@ func Tun(iface string) (io.ReadWriteCloser, error) {
 		return nil, syscall.Errno(errno)
 	}
 
-	return f, nil
+	return &tun{f: f}, nil
+}
+
+func (t *tun) ReadPacket() ([]byte, error) {
+	pkt := make([]byte, 65536)
+
+	n, err := t.f.Read(pkt)
+	if err != nil {
+		return nil, err
+	}
+
+	return pkt[:n], nil
+}
+
+func (t *tun) WritePacket(pkt []byte) error {
+	_, err := t.f.Write(pkt)
+	return err
+}
+
+func (t *tun) Close() error {
+	return t.f.Close()
 }

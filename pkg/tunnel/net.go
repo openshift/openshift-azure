@@ -6,25 +6,12 @@ import (
 	"errors"
 	"log"
 	"net"
-	"time"
 
 	"github.com/jim-minter/azure-helm/pkg/tunnel/config"
 )
 
 func accept(config *config.Config, l net.Listener) (net.Conn, error) {
 	c, err := l.Accept()
-	if err != nil {
-		return nil, err
-	}
-
-	log.Printf("accepted connection from %s", c.RemoteAddr())
-
-	err = c.(*net.TCPConn).SetKeepAlive(true)
-	if err != nil {
-		return nil, err
-	}
-
-	err = c.(*net.TCPConn).SetKeepAlivePeriod(10 * time.Second)
 	if err != nil {
 		return nil, err
 	}
@@ -57,25 +44,13 @@ func accept(config *config.Config, l net.Listener) (net.Conn, error) {
 		return nil, err
 	}
 
-	log.Printf("tls connected to %s", c.RemoteAddr())
+	log.Printf("accepted connection from %s", c.RemoteAddr())
 
 	return tc, nil
 }
 
 func dial(config *config.Config) (net.Conn, error) {
-	log.Printf("dialing %s", config.Address)
-
 	c, err := net.Dial("tcp4", config.Address)
-	if err != nil {
-		return nil, err
-	}
-
-	err = c.(*net.TCPConn).SetKeepAlive(true)
-	if err != nil {
-		return nil, err
-	}
-
-	err = c.(*net.TCPConn).SetKeepAlivePeriod(10 * time.Second)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +78,7 @@ func dial(config *config.Config) (net.Conn, error) {
 		return nil, err
 	}
 
-	log.Printf("tls connected to %s", c.RemoteAddr())
+	log.Printf("connected to %s", c.RemoteAddr())
 	return tc, nil
 }
 
