@@ -7,7 +7,10 @@ package addons
 import (
 	"errors"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"net/url"
 	"reflect"
 	"sort"
 	"time"
@@ -271,8 +274,46 @@ func getClients() (err error) {
 	return
 }
 
+func waitForHealthz() error {
+	transport, err := rest.TransportFor(restconfig)
+	if err != nil {
+		return err
+	}
+
+	cli := &http.Client{
+		Transport: transport,
+		Timeout:   10 * time.Second,
+	}
+
+	req, err := http.NewRequest("GET", restconfig.Host+"/healthz", nil)
+	if err != nil {
+		return err
+	}
+
+	for {
+		resp, err := cli.Do(req)
+		if err, ok := err.(*url.Error); ok && (err.Timeout() || err.Err == io.EOF) {
+			time.Sleep(time.Second)
+			continue
+		}
+		if err != nil {
+			return err
+		}
+		if resp.StatusCode == http.StatusOK {
+			return nil
+		}
+
+		time.Sleep(time.Second)
+	}
+}
+
 func Main(m *api.Manifest, c *config.Config, dryRun bool) error {
 	err := getClients()
+	if err != nil {
+		return err
+	}
+
+	err = waitForHealthz()
 	if err != nil {
 		return err
 	}
