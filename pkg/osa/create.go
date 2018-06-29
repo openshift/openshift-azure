@@ -5,9 +5,7 @@ import (
 	"os"
 )
 
-type RP struct{}
-
-func (*RP) Run() error {
+func Create() error {
 	osa, err := NewOSAByPath("_data/manifest.yaml", "")
 	if err != nil {
 		return err
