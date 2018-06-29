@@ -80,3 +80,5 @@ RegistryKey: {{ Base64Encode (PrivateKeyAsBytes .Config.RegistryKey) }}
 RegistryCert: {{ Base64Encode (CertAsBytes .Config.RegistryCert) }}
 RouterKey: {{ Base64Encode (PrivateKeyAsBytes .Config.RouterKey) }}
 RouterCert: {{ Base64Encode (CertAsBytes .Config.RouterCert) }}
+
+TunnelHostname: {{ .Config.TunnelHostname }}

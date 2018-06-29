@@ -1,0 +1,11 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: master-api
+spec:
+  host: {{ .Values.PublicHostname }}
+  tls:
+    termination: passthrough
+  to:
+    kind: Service
+    name: master-api
