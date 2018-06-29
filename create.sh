@@ -62,7 +62,7 @@ tools/dns.sh zone-create $RESOURCEGROUP
 tools/dns.sh a-create $RESOURCEGROUP openshift $MASTERIP
 # when we know the router IP, do tools/dns.sh a-create $RESOURCEGROUP '*' $ROUTERIP
 
-az group create -n $RESOURCEGROUP -l eastus >dev/null
+az group create -n $RESOURCEGROUP -l eastus >/dev/null
 az role assignment create -g $RESOURCEGROUP --assignee $AppClientID --role contributor >/dev/null
 az group deployment create -g $RESOURCEGROUP --template-file _data/_out/azuredeploy.json >/dev/null
 
