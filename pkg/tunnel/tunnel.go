@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"github.com/jim-minter/azure-helm/pkg/tunnel/cdb"
 	"github.com/jim-minter/azure-helm/pkg/tunnel/config"
@@ -12,17 +13,11 @@ import (
 	"github.com/jim-minter/azure-helm/pkg/tunnel/tun"
 )
 
-type socket interface {
-	GetConn() net.Conn
-	Close() error
-}
-
 func forwarder(r io.Reader, cdb *cdb.Cdb) error {
 	for {
 		pkt := make([]byte, 65536)
 		n, err := r.Read(pkt)
 		if err != nil {
-			log.Println(err)
 			return err
 		}
 		pkt = pkt[:n]
@@ -37,13 +32,18 @@ func forwarder(r io.Reader, cdb *cdb.Cdb) error {
 
 		_, err = cdb.Write(pkt)
 		if err != nil {
-			log.Println(err)
 			return err
 		}
 	}
 }
 
-func handleConn(config *config.Config, cdb *cdb.Cdb, c net.Conn) error {
+func handleConn(config *config.Config, cdb *cdb.Cdb, c net.Conn) (err error) {
+	defer func() {
+		if err != nil {
+			log.Println(err)
+		}
+	}()
+
 	defer c.Close()
 
 	remotenets, err := handshake(c, config.AdvertiseCIDRs)
@@ -100,26 +100,32 @@ func Run() error {
 
 	go forwarder(tun, cdb)
 
-	var s socket
 	switch config.Mode {
 	case "server":
-		s, err = newListener(config)
+		l, err := listen(config)
 		if err != nil {
 			return err
 		}
 
 		for {
-			go handleConn(config, cdb, s.GetConn())
+			c, err := accept(config, l)
+			if err != nil {
+				log.Println(err)
+			} else {
+				go handleConn(config, cdb, c)
+			}
 		}
 
 	case "client":
-		s, err = newDialer(config)
-		if err != nil {
-			return err
-		}
-
 		for {
-			handleConn(config, cdb, s.GetConn())
+			c, err := dial(config)
+			if err != nil {
+				log.Println(err)
+			} else {
+				handleConn(config, cdb, c)
+			}
+
+			time.Sleep(time.Second)
 		}
 	}
 

@@ -3,6 +3,7 @@ package tunnel
 import (
 	"encoding/binary"
 	"fmt"
+	"log"
 	"net"
 )
 
@@ -35,6 +36,8 @@ func handshake(c net.Conn, nets []net.IPNet) ([]net.IPNet, error) {
 		}
 	}
 
+	log.Printf("sent nets %v\n", nets)
+
 	var h helloMessage
 	err = binary.Read(c, binary.BigEndian, &h)
 	if err != nil {
@@ -42,7 +45,7 @@ func handshake(c net.Conn, nets []net.IPNet) ([]net.IPNet, error) {
 	}
 
 	if h.Version != version {
-		return nil, fmt.Errorf("received invalid protocol version %d", h.Version)
+		return nil, fmt.Errorf("invalid protocol version %d", h.Version)
 	}
 
 	nets = make([]net.IPNet, 0, h.Nets)
@@ -54,6 +57,8 @@ func handshake(c net.Conn, nets []net.IPNet) ([]net.IPNet, error) {
 		}
 		nets = append(nets, net.IPNet{IP: nm.IP[:], Mask: nm.Mask[:]})
 	}
+
+	log.Printf("received nets %v\n", nets)
 
 	return nets, nil
 }
