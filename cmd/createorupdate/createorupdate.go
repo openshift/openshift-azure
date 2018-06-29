@@ -69,13 +69,7 @@ func createOrUpdate() error {
 	}
 
 	// WriteHelpers is for development - not part of the external API
-	err = p.(*plugin.Plugin).WriteHelpers()
-	if err != nil {
-		return err
-	}
-
-	return p.HealthCheck()
-
+	return p.(*plugin.Plugin).WriteHelpers()
 }
 
 func main() {
