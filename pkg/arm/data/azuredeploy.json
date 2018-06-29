@@ -325,7 +325,7 @@
                 },
                 "storageProfile": {
                     "imageReference": {
-                        "id": "[resourceId('{{ .Manifest.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Manifest.ImageResourceName }}')]"
+                        "id": "[resourceId('{{ .Config.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName }}')]"
                     },
                     "osDisk": {
                         "caching": "ReadWrite",
@@ -471,7 +471,7 @@
                 },
                 "storageProfile": {
                     "imageReference": {
-                        "id": "[resourceId('{{ .Manifest.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Manifest.ImageResourceName }}')]"
+                        "id": "[resourceId('{{ .Config.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName }}')]"
                     },
                     "osDisk": {
                         "caching": "ReadWrite",

@@ -1,7 +1,6 @@
 /_data
-/create
-/health
+/createorupdate
+/healthcheck
 /sync
 /tun
 /tunnel
-/upgrade

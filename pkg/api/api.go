@@ -1,3 +1,4 @@
+// Package api defines the external API for the plugin.
 package api
 
 type Manifest struct {
@@ -10,8 +11,16 @@ type Manifest struct {
 	VMSize                 string
 	ComputeCount           int
 	InfraCount             int
-	ImageResourceGroup     string
-	ImageResourceName      string
 	RoutingConfigSubdomain string
 	PublicHostname         string
+}
+
+type NewPlugin func(manifestBytes, oldManifestBytes, configBytes []byte) (Plugin, error)
+
+type Plugin interface {
+	Validate() error
+	GenerateConfig() ([]byte, error)
+	GenerateHelm() ([]byte, error)
+	GenerateARM() ([]byte, error)
+	HealthCheck() error
 }
