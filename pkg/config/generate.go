@@ -36,6 +36,8 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	c.SyncImage = "docker.io/jimminter/sync:latest"
 	c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.10"
 
+	c.TunnelHostname = strings.Replace(m.PublicHostname, "openshift", "openshift-tunnel", 1)
+
 	// TODO: need to cross-check all the below with acs-engine, especially SANs and IPs
 
 	// Generate CAs
@@ -148,6 +150,7 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			dnsNames: []string{
 				"master-api",
 				m.PublicHostname,
+				c.TunnelHostname,
 				"kubernetes",
 				"kubernetes.default",
 				"kubernetes.default.svc",

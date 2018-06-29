@@ -97,4 +97,6 @@ type Config struct {
 	// for development
 	ImageResourceGroup string
 	ImageResourceName  string
+
+	TunnelHostname string
 }

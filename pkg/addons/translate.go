@@ -283,7 +283,7 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.stringData.'tunnel.conf'"),
 			NestedPath: jsonpath.MustCompile("$.address"),
-			Template:   "{{ .Manifest.PublicHostname }}:444",
+			Template:   "{{ .Config.TunnelHostname }}:443",
 		},
 	},
 	"Secret/openshift-metrics/alertmanager-proxy": {
