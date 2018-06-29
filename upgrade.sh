@@ -2,9 +2,6 @@
 
 # To run this, you need:
 # - to be logged in to the hosting cluster (oc login)
-# - the default service account in your namespace to be in the privileged SCC
-#   (oc adm policy add-scc-to-user privileged system:serviceaccount:demo:default)
-# - to be logged in to Azure (az login)
 # - to have the AZURE_* environment variables set
 
 RESOURCEGROUP=$(awk '/^ResourceGroup:/ { print $2 }' <_data/manifest.yaml)
