@@ -5,7 +5,6 @@ package addons
 //go:generate gofmt -s -l -w bindata.go
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"log"
@@ -284,13 +283,22 @@ func Main(m *api.Manifest, c *config.Config, dryRun bool) error {
 	}
 
 	if dryRun {
-		var buf *bytes.Buffer
-		var p *YAMLPrinter
-		for _, obj := range db {
-			buf = bytes.NewBuffer(nil)
-			p.PrintObj(&obj, buf)
-			fmt.Println(string(buf.Bytes()))
+		// impose an order to improve debuggability.
+		var keys []string
+		for k := range db {
+			keys = append(keys, k)
 		}
+		sort.Strings(keys)
+
+		for _, k := range keys {
+			b, err := yaml.Marshal(db[k].Object)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(b))
+		}
+
 		return nil
 	}
 
