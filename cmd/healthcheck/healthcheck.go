@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"io/ioutil"
 
 	"github.com/jim-minter/azure-helm/pkg/plugin"
@@ -26,7 +27,7 @@ func healthCheck() error {
 		return err
 	}
 
-	return p.HealthCheck()
+	return p.HealthCheck(context.Background())
 }
 
 func main() {
