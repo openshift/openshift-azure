@@ -10,7 +10,7 @@ import (
 )
 
 func Upgrade() error {
-	m, err := readManifest()
+	m, err := readManifest("_data/manifest.yaml")
 	if err != nil {
 		return err
 	}
@@ -20,12 +20,12 @@ func Upgrade() error {
 		return err
 	}
 
-	c, err = config.Upgrade(m, c)
+	configBytes, err := config.Upgrade(m, c)
 	if err != nil {
 		return err
 	}
 
-	err = writeConfig(c)
+	err = writeConfig(configBytes)
 	if err != nil {
 		return err
 	}
@@ -53,5 +53,5 @@ func Upgrade() error {
 		return err
 	}
 
-	return writeHelpers(c)
+	return writeHelpers(configBytes)
 }

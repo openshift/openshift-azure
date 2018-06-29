@@ -10,8 +10,8 @@ import (
 	"github.com/jim-minter/azure-helm/pkg/tls"
 )
 
-func readManifest() (*api.Manifest, error) {
-	b, err := ioutil.ReadFile("_data/manifest.yaml")
+func readManifest(path string) (*api.Manifest, error) {
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -40,27 +40,29 @@ func readConfig() (*config.Config, error) {
 	return c, nil
 }
 
-func writeConfig(c *config.Config) error {
-	b, err := yaml.Marshal(c)
-	if err != nil {
-		return err
-	}
+func writeConfig(b []byte) error {
 	return ioutil.WriteFile("_data/config.yaml", b, 0600)
 }
 
-func writeHelpers(c *config.Config) error {
-	b, err := tls.PrivateKeyAsBytes(c.SSHPrivateKey)
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile("_data/_out/id_rsa", b, 0600)
+func writeHelpers(b []byte) error {
+	var c *config.Config
+	err := yaml.Unmarshal(b, &c)
 	if err != nil {
 		return err
 	}
 
-	b, err = yaml.Marshal(c.AdminKubeconfig)
+	out, err := tls.PrivateKeyAsBytes(c.SSHPrivateKey)
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
+	err = ioutil.WriteFile("_data/_out/id_rsa", out, 0600)
+	if err != nil {
+		return err
+	}
+
+	out, err = yaml.Marshal(c.AdminKubeconfig)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile("_data/_out/admin.kubeconfig", out, 0600)
 }
