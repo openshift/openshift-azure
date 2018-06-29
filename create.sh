@@ -2,6 +2,8 @@
 
 # To run this, you need:
 # - to be logged in to the hosting cluster (oc login)
+# - the default service account in your namespace to be in the privileged SCC
+#   (oc adm policy add-scc-to-user privileged system:serviceaccount:demo:default)
 # - to be logged in to Azure (az login)
 # - to have the AZURE_* environment variables set
 
@@ -35,9 +37,6 @@ ImageResourceName: centos7-3.10-201806231427
 PublicHostname: openshift.$RESOURCEGROUP.osadev.cloud
 RoutingConfigSubdomain: $RESOURCEGROUP.osadev.cloud
 EOF
-
-NAMESPACE=$(oc project -q)
-oc adm policy add-scc-to-user privileged system:serviceaccount:$NAMESPACE:default
 
 go generate ./...
 go run cmd/create/create.go
