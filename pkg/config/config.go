@@ -33,6 +33,7 @@ type Config struct {
 	ServiceCatalogImage        string
 	TunnelImage                string
 	SyncImage                  string
+	TemplateServiceBrokerImage string
 
 	// etcd certificates
 	EtcdServerKey  *rsa.PrivateKey
