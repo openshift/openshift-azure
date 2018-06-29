@@ -125,10 +125,10 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.TunnelImage }}",
 		},
 	},
-	"DaemonSet.apps/kube-service-catalog/apiserver": {
+	"Deployment.apps/kube-service-catalog/controller-manager": {
 		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].args[6]"),
-			Template: "https://{{ .Config.EtcdHostname }}:2379",
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.ServiceCatalogImage }}",
 		},
 	},
 	"Deployment.apps/default/docker-registry": {
