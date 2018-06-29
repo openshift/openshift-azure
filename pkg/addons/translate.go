@@ -125,12 +125,6 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.TunnelImage }}",
 		},
 	},
-	"Deployment.apps/kube-service-catalog/controller-manager": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.ServiceCatalogImage }}",
-		},
-	},
 	"Deployment.apps/default/docker-registry": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HTTP_SECRET')].value"),
@@ -149,6 +143,18 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HOST')].value"),
 			Template: "docker-registry-default.{{ .Config.RouterIP }}.nip.io",
+		},
+	},
+	"Deployment.apps/kube-service-catalog/controller-manager": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.ServiceCatalogImage }}",
+		},
+	},
+	"Deployment.apps/openshift-template-service-broker/apiserver": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.TemplateServiceBrokerImage }}",
 		},
 	},
 	"OAuthClient.oauth.openshift.io/cockpit-oauth-client": {
