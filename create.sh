@@ -22,11 +22,17 @@ RESOURCEGROUP=$1
 rm -rf _data
 mkdir -p _data/_out
 
+set +x
+AppClientSecret=$(uuidgen)
+AppClientID=$(tools/aad.sh app-create openshift.$RESOURCEGROUP.osadev.cloud $AppClientSecret)
+set -x
+az ad sp create --id $AppClientID >/dev/null
+
 cat >_data/manifest.yaml <<EOF
 TenantID: $AZURE_TENANT_ID
 SubscriptionID: $AZURE_SUBSCRIPTION_ID
-ClientID: $AZURE_CLIENT_ID
-ClientSecret: $AZURE_CLIENT_SECRET
+ClientID: $AppClientID
+ClientSecret: $AppClientSecret
 Location: eastus
 ResourceGroup: $RESOURCEGROUP
 VMSize: Standard_D4s_v3
@@ -56,8 +62,9 @@ tools/dns.sh zone-create $RESOURCEGROUP
 tools/dns.sh a-create $RESOURCEGROUP openshift $MASTERIP
 # when we know the router IP, do tools/dns.sh a-create $RESOURCEGROUP '*' $ROUTERIP
 
-az group create -n $RESOURCEGROUP -l eastus
-az group deployment create -g $RESOURCEGROUP --template-file _data/_out/azuredeploy.json
+az group create -n $RESOURCEGROUP -l eastus >dev/null
+az role assignment create -g $RESOURCEGROUP --assignee $AppClientID --role contributor >/dev/null
+az group deployment create -g $RESOURCEGROUP --template-file _data/_out/azuredeploy.json >/dev/null
 
 # will eventually run as an HCP pod, for development run it locally
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go
