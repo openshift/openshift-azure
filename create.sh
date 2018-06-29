@@ -7,7 +7,7 @@
 # - to be logged in to Azure (az login)
 # - to have the AZURE_* environment variables set
 
-if [ -z "$AZURE_CLIENT_ID" ]; then
+if [[ -z "$AZURE_CLIENT_ID" ]]; then
     echo error: must set AZURE_* environment variables
     exit 1
 fi
@@ -27,6 +27,8 @@ AppClientSecret=$(uuidgen)
 AppClientID=$(tools/aad.sh app-create openshift.$RESOURCEGROUP.osadev.cloud $AppClientSecret)
 set -x
 az ad sp create --id $AppClientID >/dev/null
+
+# TODO: if the user interrupts the process here, the AAD application will leak.
 
 cat >_data/manifest.yaml <<EOF
 TenantID: $AZURE_TENANT_ID

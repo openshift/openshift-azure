@@ -252,10 +252,9 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	}
 	// TODO: is it possible for the registry to use
 	// service.alpha.openshift.io/serving-cert-secret-name?
-	// TODO: remove nip.io
 	c.RegistryKey, c.RegistryCert, err =
 		tls.NewCert(c.RegistryServiceIP.String(), nil,
-			[]string{"docker-registry-default." + c.RegistryServiceIP.String() + ".nip.io",
+			[]string{"docker-registry-default." + m.RoutingConfigSubdomain,
 				"docker-registry.default.svc",
 				"docker-registry.default.svc.cluster.local",
 			},
