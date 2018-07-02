@@ -4,7 +4,7 @@ usage() {
     cat <<EOF >&2
 usage:
 
-$0 app-create hostname password
+$0 app-create hostname resourcegroup
 $0 app-delete hostname
 
 EOF
@@ -15,12 +15,13 @@ case "$1" in
 app-create)
     if [[ "$#" -ne 3 ]]; then usage; fi
 
-    az ad app create \
+    AZURE_CLIENT_SECRET=$(uuidgen)
+    AZURE_CLIENT_ID=$(az ad app create \
         --display-name "$2" \
         --homepage "https://$2/" \
         --identifier-uris "https://$2/" \
         --key-type password \
-        --password "$3" \
+        --password "$AZURE_CLIENT_SECRET" \
         --query appId \
         --reply-urls "https://$2/oauth2callback/Azure%20AD" \
         --required-resource-accesses @- <<'EOF' | tr -d '"'
@@ -35,6 +36,27 @@ app-create)
         ]
     }
 ]
+EOF
+)
+
+    az ad sp create --id $AZURE_CLIENT_ID >/dev/null
+
+    success=
+    for ((i=0; i<12; i++)); do
+        if az role assignment create -g $3 --assignee $AZURE_CLIENT_ID --role contributor &>/dev/null; then
+            success=true
+            break
+        fi
+        sleep 5
+    done
+    if [[ -z "$success" ]]; then
+        echo 'error: failed to assign contributor role to SP' >&2
+        exit 1
+    fi
+
+    cat <<EOF
+AZURE_CLIENT_ID=$AZURE_CLIENT_ID
+AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET
 EOF
     ;;
 
