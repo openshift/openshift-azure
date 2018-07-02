@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"errors"
 	"io"
 	"math/big"
 	"net"
@@ -24,6 +23,11 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	c = &Config{}
 
 	c.Version = versionLatest
+
+	c.ImageOffer = "origin-acsengine-preview"
+	c.ImagePublisher = "redhat"
+	c.ImageSKU = "centos7"
+	c.ImageVersion = "latest"
 
 	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
 
@@ -282,9 +286,6 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 
 	c.ImageResourceGroup = os.Getenv("ImageResourceGroup")
 	c.ImageResourceName = os.Getenv("ImageResourceName")
-	if c.ImageResourceGroup == "" || c.ImageResourceName == "" {
-		return nil, errors.New("must set ImageResourceGroup and ImageResourceName env vars")
-	}
 
 	return c, nil
 }

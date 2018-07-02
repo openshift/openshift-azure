@@ -294,6 +294,13 @@
             ],
             "location": "{{ .Manifest.Location }}",
             "name": "[concat('vm-compute-', copyIndex())]",
+{{ if eq .Config.ImageResourceName "" }}
+            "plan": {
+                "name": "{{ .Config.ImageSKU }}",
+                "publisher": "{{ .Config.ImagePublisher }}",
+                "product": "{{ .Config.ImageOffer }}"
+            },
+{{ end }}
             "properties": {
                 "availabilitySet": {
                     "id": "[resourceId('Microsoft.Compute/availabilitySets', 'as-compute')]"
@@ -325,7 +332,14 @@
                 },
                 "storageProfile": {
                     "imageReference": {
+{{ if eq .Config.ImageResourceName "" }}
+                        "offer": "{{ .Config.ImageOffer }}",
+                        "publisher": "{{ .Config.ImagePublisher }}",
+                        "sku": "{{ .Config.ImageSKU }}",
+                        "version": "{{ .Config.ImageVersion }}"
+{{ else }}
                         "id": "[resourceId('{{ .Config.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName }}')]"
+{{ end }}
                     },
                     "osDisk": {
                         "caching": "ReadWrite",
@@ -440,6 +454,13 @@
             ],
             "location": "{{ .Manifest.Location }}",
             "name": "[concat('vm-infra-', copyIndex())]",
+{{ if eq .Config.ImageResourceName "" }}
+            "plan": {
+                "name": "{{ .Config.ImageSKU }}",
+                "publisher": "{{ .Config.ImagePublisher }}",
+                "product": "{{ .Config.ImageOffer }}"
+            },
+{{ end }}
             "properties": {
                 "availabilitySet": {
                     "id": "[resourceId('Microsoft.Compute/availabilitySets', 'as-infra')]"
@@ -471,7 +492,14 @@
                 },
                 "storageProfile": {
                     "imageReference": {
+                        {{ if eq .Config.ImageResourceName "" }}
+                        "offer": "{{ .Config.ImageOffer }}",
+                        "publisher": "{{ .Config.ImagePublisher }}",
+                        "sku": "{{ .Config.ImageSKU }}",
+                        "version": "{{ .Config.ImageVersion }}"
+{{ else }}
                         "id": "[resourceId('{{ .Config.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName }}')]"
+{{ end }}
                     },
                     "osDisk": {
                         "caching": "ReadWrite",
