@@ -1,12 +1,11 @@
 #!/bin/bash -ex
 
-# To run this, you need:
-# - aks/admin.kubeconfig for the hosting cluster
-# - to be logged in to Azure (az login)
-# - to have the AZURE_{SUBSCRIPTION,TENANT}_ID environment variables set
-
 if [[ ! -e aks/admin.kubeconfig ]]; then
     echo error: aks/admin.kubeconfig must exist
+    exit 1
+fi
+
+if ! az account show >/dev/null; then
     exit 1
 fi
 
@@ -17,6 +16,16 @@ fi
 
 if [[ -z "$AZURE_TENANT_ID" ]]; then
     echo error: must set AZURE_TENANT_ID
+    exit 1
+fi
+
+if [[ -z "$DNS_DOMAIN" ]]; then
+    echo error: must set DNS_DOMAIN
+    exit 1
+fi
+
+if [[ -z "$DNS_RESOURCEGROUP" ]]; then
+    echo error: must set DNS_RESOURCEGROUP
     exit 1
 fi
 
@@ -34,7 +43,7 @@ az group create -n $RESOURCEGROUP -l eastus >/dev/null
 
 if [[ -z "$AZURE_CLIENT_ID" ]]; then
     set +x
-    . <(tools/aad.sh app-create openshift.$RESOURCEGROUP.osadev.cloud $RESOURCEGROUP)
+    . <(tools/aad.sh app-create openshift.$RESOURCEGROUP.$DNS_DOMAIN $RESOURCEGROUP)
     set -x
 fi
 
@@ -50,14 +59,12 @@ ResourceGroup: $RESOURCEGROUP
 VMSize: Standard_D2s_v3
 ComputeCount: 1
 InfraCount: 1
-PublicHostname: openshift.$RESOURCEGROUP.osadev.cloud
-RoutingConfigSubdomain: $RESOURCEGROUP.osadev.cloud
+PublicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+RoutingConfigSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
 EOF
 
 go generate ./...
-IMAGE=$(az image list -g images -o json --query "[?starts_with(name, 'centos7-3.10') && tags.valid=='true'].name | sort(@) | [-1]" | tr -d '"')
-ImageResourceGroup=images ImageResourceName=$IMAGE \
-    go run cmd/createorupdate/createorupdate.go
+go run cmd/createorupdate/createorupdate.go
 
 az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _data/_out/azuredeploy.json --no-wait
 

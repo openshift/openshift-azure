@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
-if [[ -z "$AZURE_CLIENT_ID" || -z "$AZURE_CLIENT_SECRET" ]]; then
-    echo error: must set AZURE_* environment variables
+if [[ -z "$AZURE_CLIENT_ID" ]]; then
+    echo error: must set AZURE_CLIENT_ID and AZURE_CLIENT_SECRET environment variables
     exit 1
 fi
 

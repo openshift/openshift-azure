@@ -287,8 +287,8 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 		return nil, err
 	}
 
-	c.ImageResourceGroup = os.Getenv("ImageResourceGroup")
-	c.ImageResourceName = os.Getenv("ImageResourceName")
+	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
+	c.ImageResourceName = os.Getenv("IMAGE_RESOURCENAME")
 
 	return c, nil
 }

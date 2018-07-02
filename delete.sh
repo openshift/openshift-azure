@@ -1,9 +1,5 @@
 #!/bin/bash -x
 
-# To run this, you need:
-# - aks/admin.kubeconfig for the hosting cluster
-# - to be logged in to Azure (az login)
-
 PUBLICHOSTNAME=$(awk '/^PublicHostname:/ { print $2 }' <_data/manifest.yaml)
 RESOURCEGROUP=$(awk '/^ResourceGroup:/ { print $2 }' <_data/manifest.yaml)
 
