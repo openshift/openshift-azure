@@ -45,7 +45,8 @@ RoutingConfigSubdomain: $RESOURCEGROUP.osadev.cloud
 EOF
 
 go generate ./...
-ImageResourceGroup=images ImageResourceName=centos7-3.10-201806231427 \
+IMAGE=$(az image list -g images -o json --query "[?starts_with(name, 'centos7-3.10') && tags.valid=='true'].name | sort(@) | [-1]" | tr -d '"')
+ImageResourceGroup=images ImageResourceName=$IMAGE \
     go run cmd/createorupdate/createorupdate.go
 
 # poor man's helm (without tiller running)
