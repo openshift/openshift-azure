@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "clientId": {
+            "type": "securestring"
+        },
+        "clientSecret": {
+            "type": "securestring"
+        },
+        "keyData": {
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ContainerService/managedClusters",
+            "apiVersion": "2018-03-31",
+            "location": "[resourceGroup().location]",
+            "name": "aks",
+            "properties": {
+                "kubernetesVersion": "1.10.3",
+                "enableRBAC": true,
+                "dnsPrefix": "[resourceGroup().name]",
+                "addonProfiles": {},
+                "agentPoolProfiles": [
+                    {
+                        "name": "agentpool",
+                        "osDiskSizeGB": 0,
+                        "count": 1,
+                        "vmSize": "Standard_D2s_v3",
+                        "osType": "Linux",
+                        "storageProfile": "ManagedDisks"
+                    }
+                ],
+                "linuxProfile": {
+                    "adminUsername": "cloud-user",
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "[parameters('keyData')]"
+                            }
+                        ]
+                    }
+                },
+                "servicePrincipalProfile": {
+                    "ClientId": "[parameters('clientId')]",
+                    "Secret": "[parameters('clientSecret')]"
+                },
+                "networkProfile": {
+                    "networkPlugin": "kubenet"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
