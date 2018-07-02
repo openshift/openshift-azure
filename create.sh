@@ -7,8 +7,13 @@
 # - to be logged in to Azure (az login)
 # - to have the AZURE_* environment variables set
 
-if [[ -z "$AZURE_CLIENT_ID" ]]; then
-    echo error: must set AZURE_* environment variables
+if [[ -z "$AZURE_SUBSCRIPTION_ID" ]]; then
+    echo error: must set AZURE_SUBSCRIPTION_ID
+    exit 1
+fi
+
+if [[ -z "$AZURE_TENANT_ID" ]]; then
+    echo error: must set AZURE_TENANT_ID
     exit 1
 fi
 
@@ -22,19 +27,21 @@ RESOURCEGROUP=$1
 rm -rf _data
 mkdir -p _data/_out
 
-set +x
-AppClientSecret=$(uuidgen)
-AppClientID=$(tools/aad.sh app-create openshift.$RESOURCEGROUP.osadev.cloud $AppClientSecret)
-set -x
-az ad sp create --id $AppClientID >/dev/null
+az group create -n $RESOURCEGROUP -l eastus >/dev/null
+
+if [[ -z "$AZURE_CLIENT_ID" || -z "$AZURE_CLIENT_SECRET" ]]; then
+    set +x
+    . <(tools/aad.sh app-create openshift.$RESOURCEGROUP.osadev.cloud $RESOURCEGROUP)
+    set -x
+fi
 
 # TODO: if the user interrupts the process here, the AAD application will leak.
 
 cat >_data/manifest.yaml <<EOF
 TenantID: $AZURE_TENANT_ID
 SubscriptionID: $AZURE_SUBSCRIPTION_ID
-ClientID: $AppClientID
-ClientSecret: $AppClientSecret
+ClientID: $AZURE_CLIENT_ID
+ClientSecret: $AZURE_CLIENT_SECRET
 Location: eastus
 ResourceGroup: $RESOURCEGROUP
 VMSize: Standard_D4s_v3
@@ -65,8 +72,6 @@ tools/dns.sh zone-create $RESOURCEGROUP
 tools/dns.sh a-create $RESOURCEGROUP openshift $MASTERIP
 # when we know the router IP, do tools/dns.sh a-create $RESOURCEGROUP '*' $ROUTERIP
 
-az group create -n $RESOURCEGROUP -l eastus >/dev/null
-az role assignment create -g $RESOURCEGROUP --assignee $AppClientID --role contributor >/dev/null
 az group deployment create -g $RESOURCEGROUP --template-file _data/_out/azuredeploy.json >/dev/null
 
 # will eventually run as an HCP pod, for development run it locally
