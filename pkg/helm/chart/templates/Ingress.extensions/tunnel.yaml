@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: tunnel
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/secure-backends: "true"
+    # TODO: nginx.ingress.kubernetes.io/secure-verify-ca-secret
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.TunnelHostname }}
+  rules:
+  - host: {{ .Values.TunnelHostname }}
+    http:
+      paths:
+      - backend:
+          serviceName: tunnel
+          servicePort: 444

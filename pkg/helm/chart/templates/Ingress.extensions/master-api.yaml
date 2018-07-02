@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: master-api
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/secure-backends: "true"
+    # TODO: nginx.ingress.kubernetes.io/secure-verify-ca-secret
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.PublicHostname }}
+  rules:
+  - host: {{ .Values.PublicHostname }}
+    http:
+      paths:
+      - backend:
+          serviceName: master-api
+          servicePort: 443

@@ -9,6 +9,7 @@ if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
 fi
 
 systemctl stop docker.service
+umount /mnt/resource || true
 mkfs.xfs -f /dev/sdb1
 echo '/dev/sdb1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
 mount /var/lib/docker

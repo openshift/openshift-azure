@@ -24,9 +24,9 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 
 	c.Version = versionLatest
 
-	c.ImageOffer = "origin-acsengine-preview"
+	c.ImageOffer = "osa-preview"
 	c.ImagePublisher = "redhat"
-	c.ImageSKU = "centos7"
+	c.ImageSKU = "origin_310"
 	c.ImageVersion = "latest"
 
 	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
@@ -39,6 +39,8 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	c.TunnelImage = "docker.io/jimminter/tunnel:latest"
 	c.SyncImage = "docker.io/jimminter/sync:latest"
 	c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.10"
+
+	c.TunnelHostname = strings.Replace(m.PublicHostname, "openshift", "openshift-tunnel", 1)
 
 	// TODO: need to cross-check all the below with acs-engine, especially SANs and IPs
 
@@ -152,6 +154,7 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			dnsNames: []string{
 				"master-api",
 				m.PublicHostname,
+				c.TunnelHostname,
 				"kubernetes",
 				"kubernetes.default",
 				"kubernetes.default.svc",
