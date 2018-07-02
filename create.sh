@@ -1,11 +1,13 @@
 #!/bin/bash -ex
 
-# To run this, you need:
-# - to be logged in to the hosting cluster (oc login)
-# - the default service account in your namespace to be in the privileged SCC
-#   (oc adm policy add-scc-to-user privileged system:serviceaccount:demo:default)
-# - to be logged in to Azure (az login)
-# - to have the AZURE_* environment variables set
+if [[ ! -e aks/admin.kubeconfig ]]; then
+    echo error: aks/admin.kubeconfig must exist
+    exit 1
+fi
+
+if ! az account show >/dev/null; then
+    exit 1
+fi
 
 if [[ -z "$AZURE_SUBSCRIPTION_ID" ]]; then
     echo error: must set AZURE_SUBSCRIPTION_ID
@@ -17,7 +19,17 @@ if [[ -z "$AZURE_TENANT_ID" ]]; then
     exit 1
 fi
 
-if [[ $# -eq 0 ]]; then
+if [[ -z "$DNS_DOMAIN" ]]; then
+    echo error: must set DNS_DOMAIN
+    exit 1
+fi
+
+if [[ -z "$DNS_RESOURCEGROUP" ]]; then
+    echo error: must set DNS_RESOURCEGROUP
+    exit 1
+fi
+
+if [[ $# -ne 1 ]]; then
     echo usage: $0 resourcegroup
     exit 1
 fi
@@ -29,9 +41,9 @@ mkdir -p _data/_out
 
 az group create -n $RESOURCEGROUP -l eastus >/dev/null
 
-if [[ -z "$AZURE_CLIENT_ID" || -z "$AZURE_CLIENT_SECRET" ]]; then
+if [[ -z "$AZURE_CLIENT_ID" ]]; then
     set +x
-    . <(tools/aad.sh app-create openshift.$RESOURCEGROUP.osadev.cloud $RESOURCEGROUP)
+    . <(tools/aad.sh app-create openshift.$RESOURCEGROUP.$DNS_DOMAIN $RESOURCEGROUP)
     set -x
 fi
 
@@ -44,37 +56,41 @@ ClientID: $AZURE_CLIENT_ID
 ClientSecret: $AZURE_CLIENT_SECRET
 Location: eastus
 ResourceGroup: $RESOURCEGROUP
-VMSize: Standard_D4s_v3
+VMSize: Standard_D2s_v3
 ComputeCount: 1
 InfraCount: 1
-PublicHostname: openshift.$RESOURCEGROUP.osadev.cloud
-RoutingConfigSubdomain: $RESOURCEGROUP.osadev.cloud
+PublicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+RoutingConfigSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
 EOF
 
 go generate ./...
-IMAGE=$(az image list -g images -o json --query "[?starts_with(name, 'centos7-3.10') && tags.valid=='true'].name | sort(@) | [-1]" | tr -d '"')
-ImageResourceGroup=images ImageResourceName=$IMAGE \
-    go run cmd/createorupdate/createorupdate.go
+go run cmd/createorupdate/createorupdate.go
+
+az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _data/_out/azuredeploy.json --no-wait
 
 # poor man's helm (without tiller running)
 helm template pkg/helm/chart -f _data/_out/values.yaml --output-dir _data/_out
-oc create -Rf _data/_out/osa/templates
+KUBECONFIG=aks/admin.kubeconfig kubectl create namespace $RESOURCEGROUP
+KUBECONFIG=aks/admin.kubeconfig kubectl apply -n $RESOURCEGROUP -Rf _data/_out/osa/templates
 
 while true; do
-    MASTERIP=$(oc get service master-api -o template --template '{{ if .status.loadBalancer }}{{ (index .status.loadBalancer.ingress 0).ip }}{{ end }}')
-    if [[ -n "$MASTERIP" ]]; then
+    HCPINGRESSIP=$(KUBECONFIG=aks/admin.kubeconfig kubectl get ingress -n $RESOURCEGROUP master-api -o template --template '{{ if .status.loadBalancer }}{{ (index .status.loadBalancer.ingress 0).ip }}{{ end }}')
+    if [[ -n "$HCPINGRESSIP" ]]; then
         break
     fi
     sleep 1
 done
 
 tools/dns.sh zone-create $RESOURCEGROUP
-tools/dns.sh a-create $RESOURCEGROUP openshift $MASTERIP
-# when we know the router IP, do tools/dns.sh a-create $RESOURCEGROUP '*' $ROUTERIP
-
-az group deployment create -g $RESOURCEGROUP --template-file _data/_out/azuredeploy.json >/dev/null
+tools/dns.sh a-create $RESOURCEGROUP openshift $HCPINGRESSIP
+tools/dns.sh a-create $RESOURCEGROUP openshift-tunnel $HCPINGRESSIP
 
 # will eventually run as an HCP pod, for development run it locally
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go
+
+az group deployment wait -g $RESOURCEGROUP -n azuredeploy --created --interval 10
+
+ROUTERIP=$(az network public-ip list -g $RESOURCEGROUP --query "[?name == 'ip-router'].ipAddress | [0]" | tr -d '"')
+tools/dns.sh a-create $RESOURCEGROUP '*' $ROUTERIP
 
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go

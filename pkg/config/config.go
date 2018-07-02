@@ -13,6 +13,11 @@ import (
 type Config struct {
 	Version int
 
+	ImageOffer     string
+	ImagePublisher string
+	ImageSKU       string
+	ImageVersion   string
+
 	// CAs
 	EtcdCaKey            *rsa.PrivateKey
 	EtcdCaCert           *x509.Certificate
@@ -97,4 +102,6 @@ type Config struct {
 	// for development
 	ImageResourceGroup string
 	ImageResourceName  string
+
+	TunnelHostname string
 }

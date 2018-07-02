@@ -1,7 +1,14 @@
 #!/bin/bash -e
 
-RG=dns
-ROOT=osadev.cloud
+if [[ -z "$DNS_DOMAIN" ]]; then
+    echo error: must set DNS_DOMAIN
+    exit 1
+fi
+
+if [[ -z "$DNS_RESOURCEGROUP" ]]; then
+    echo error: must set DNS_RESOURCEGROUP
+    exit 1
+fi
 
 usage() {
     cat <<EOF >&2
@@ -16,7 +23,7 @@ example:
 
 $0 zone-create testzone
 $0 a-create testzone '*' 1.2.3.4
-dig +short foo.testzone.$ROOT
+dig +short foo.testzone.$DNS_DOMAIN
 $0 a-delete testzone '*'
 $0 zone-delete testzone
 
@@ -31,34 +38,34 @@ zone-create)
     if [[ "$#" -ne 2 ]]; then usage; fi
 
     # create the new zone
-    az network dns zone create -g "$RG" -n "$2.$ROOT"
-    az network dns record-set soa update -g "$RG" -z "$2.$ROOT" -f 60 -r 60 -x 60 -m 60
-    az network dns record-set ns update -g "$RG" -z "$2.$ROOT" -n @ --set ttl=60
+    az network dns zone create -g "$DNS_RESOURCEGROUP" -n "$2.$DNS_DOMAIN"
+    az network dns record-set soa update -g "$DNS_RESOURCEGROUP" -z "$2.$DNS_DOMAIN" -f 60 -r 60 -x 60 -m 60
+    az network dns record-set ns update -g "$DNS_RESOURCEGROUP" -z "$2.$DNS_DOMAIN" -n @ --set ttl=60
 
-    # register the new zone in the "$ROOT" zone
-    NS=$(az network dns zone show -g "$RG" -n "$2.$ROOT" --query 'nameServers[].{nsdname: @}')
-    az network dns record-set ns create -g "$RG" -z "$ROOT" -n "$2" --ttl 60
-    az network dns record-set ns update -g "$RG" -z "$ROOT" -n "$2" --set nsRecords="$NS"
+    # register the new zone in the "$DNS_DOMAIN" zone
+    NS=$(az network dns zone show -g "$DNS_RESOURCEGROUP" -n "$2.$DNS_DOMAIN" --query 'nameServers[].{nsdname: @}')
+    az network dns record-set ns create -g "$DNS_RESOURCEGROUP" -z "$DNS_DOMAIN" -n "$2" --ttl 60
+    az network dns record-set ns update -g "$DNS_RESOURCEGROUP" -z "$DNS_DOMAIN" -n "$2" --set nsRecords="$NS"
     ;;
 
 zone-delete)
     if [[ "$#" -ne 2 ]]; then usage; fi
 
-    az network dns record-set ns delete -g "$RG" -z "$ROOT" -n "$2" -y
-    az network dns zone delete -g "$RG" -n "$2.$ROOT" -y
+    az network dns record-set ns delete -g "$DNS_RESOURCEGROUP" -z "$DNS_DOMAIN" -n "$2" -y
+    az network dns zone delete -g "$DNS_RESOURCEGROUP" -n "$2.$DNS_DOMAIN" -y
     ;;
 
 a-create)
     if [[ "$#" -ne 4 ]]; then usage; fi
 
-    az network dns record-set a create -g "$RG" -z "$2.$ROOT" -n "$3" --ttl 60
-    az network dns record-set a update -g "$RG" -z "$2.$ROOT" -n "$3" --set arecords='[{"ipv4Address": "'"$4"'"}]'
+    az network dns record-set a create -g "$DNS_RESOURCEGROUP" -z "$2.$DNS_DOMAIN" -n "$3" --ttl 60
+    az network dns record-set a update -g "$DNS_RESOURCEGROUP" -z "$2.$DNS_DOMAIN" -n "$3" --set arecords='[{"ipv4Address": "'"$4"'"}]'
     ;;
 
 a-delete)
     if [[ "$#" -ne 3 ]]; then usage; fi
 
-    az network dns record-set a delete -g "$RG" -z "$2.$ROOT" -n "$3" -y
+    az network dns record-set a delete -g "$DNS_RESOURCEGROUP" -z "$2.$DNS_DOMAIN" -n "$3" -y
     ;;
 
 *)

@@ -292,7 +292,7 @@ func waitForHealthz() error {
 
 	for {
 		resp, err := cli.Do(req)
-		if err, ok := err.(*url.Error); ok && (err.Timeout() || err.Err == io.EOF) {
+		if err, ok := err.(*url.Error); ok && (err.Timeout() || err.Err == io.EOF || err.Err == io.ErrUnexpectedEOF) {
 			time.Sleep(time.Second)
 			continue
 		}

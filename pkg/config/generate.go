@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"errors"
 	"io"
 	"math/big"
 	"net"
@@ -25,6 +24,11 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 
 	c.Version = versionLatest
 
+	c.ImageOffer = "osa-preview"
+	c.ImagePublisher = "redhat"
+	c.ImageSKU = "origin_310"
+	c.ImageVersion = "latest"
+
 	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
 
 	c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
@@ -35,6 +39,8 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	c.TunnelImage = "docker.io/jimminter/tunnel:latest"
 	c.SyncImage = "docker.io/jimminter/sync:latest"
 	c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.10"
+
+	c.TunnelHostname = strings.Replace(m.PublicHostname, "openshift", "openshift-tunnel", 1)
 
 	// TODO: need to cross-check all the below with acs-engine, especially SANs and IPs
 
@@ -148,6 +154,7 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			dnsNames: []string{
 				"master-api",
 				m.PublicHostname,
+				c.TunnelHostname,
 				"kubernetes",
 				"kubernetes.default",
 				"kubernetes.default.svc",
@@ -280,11 +287,8 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 		return nil, err
 	}
 
-	c.ImageResourceGroup = os.Getenv("ImageResourceGroup")
-	c.ImageResourceName = os.Getenv("ImageResourceName")
-	if c.ImageResourceGroup == "" || c.ImageResourceName == "" {
-		return nil, errors.New("must set ImageResourceGroup and ImageResourceName env vars")
-	}
+	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
+	c.ImageResourceName = os.Getenv("IMAGE_RESOURCENAME")
 
 	return c, nil
 }
