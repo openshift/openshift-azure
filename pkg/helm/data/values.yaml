@@ -59,6 +59,8 @@ HtPasswd: {{ Base64Encode .Config.HtPasswd }}
 # kubeconfigs
 AdminKubeconfig: {{ Base64Encode (YamlMarshal .Config.AdminKubeconfig) }}
 MasterKubeconfig: {{ Base64Encode (YamlMarshal .Config.MasterKubeconfig) }}
+ServiceCatalogApiKubeconfig: {{ Base64Encode (YamlMarshal .Config.ServiceCatalogApiKubeconfig) }}
+BootstrapAutoapproverKubeconfig: {{ Base64Encode (YamlMarshal .Config.BootstrapAutoapproverKubeconfig) }}
 
 # azure config
 TenantID: {{ .Manifest.TenantID }}

@@ -24,7 +24,7 @@ spec:
           set -o nounset
           set -o pipefail
 
-          export KUBECONFIG=/tmp/kubeconfig/admin.kubeconfig
+          export KUBECONFIG=/tmp/kubeconfig/bootstrap-autoapprover.kubeconfig
           cat <<'SCRIPT' >/tmp/signer
           #!/bin/bash
           #
@@ -71,5 +71,4 @@ spec:
       volumes:
       - name: kubeconfig
         secret:
-          secretName: admin-kubeconfig # TODO: need to use a less powerful token
-
+          secretName: bootstrap-autoapprover-kubeconfig

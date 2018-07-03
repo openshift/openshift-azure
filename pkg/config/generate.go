@@ -189,6 +189,18 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			key:         &c.ServiceCatalogServerKey,
 			cert:        &c.ServiceCatalogServerCert,
 		},
+		{
+			cn:          "system:serviceaccount:kube-service-catalog:service-catalog-apiserver",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			key:         &c.ServiceCatalogApiClientKey,
+			cert:        &c.ServiceCatalogApiClientCert,
+		},
+		{
+			cn:          "system:serviceaccount:openshift-infra:bootstrap-autoapprover",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			key:         &c.BootstrapAutoapproverKey,
+			cert:        &c.BootstrapAutoapproverCert,
+		},
 	}
 	for _, cert := range certs {
 		if cert.signingKey == nil && cert.signingCert == nil {
@@ -219,6 +231,12 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 		return
 	}
 	if c.AdminKubeconfig, err = makeKubeConfig(c.AdminKey, c.AdminCert, c.CaCert, m.PublicHostname, "system:admin", "default"); err != nil {
+		return
+	}
+	if c.ServiceCatalogApiKubeconfig, err = makeKubeConfig(c.ServiceCatalogApiClientKey, c.ServiceCatalogApiClientCert, c.CaCert, "master-api", "system:serviceaccount:kube-service-catalog:service-catalog-apiserver", "kube-service-catalog"); err != nil {
+		return
+	}
+	if c.BootstrapAutoapproverKubeconfig, err = makeKubeConfig(c.BootstrapAutoapproverKey, c.BootstrapAutoapproverCert, c.CaCert, "master-api", "system:serviceaccount:openshift-infra:bootstrap-autoapprover", "openshift-infra"); err != nil {
 		return
 	}
 
