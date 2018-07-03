@@ -120,6 +120,7 @@ func Clean(o unstructured.Unstructured) error {
 
 	case "Service":
 		jsonpath.MustCompile("$.metadata.annotations.'service.alpha.openshift.io/serving-cert-signed-by'").Delete(o.Object)
+		jsonpath.MustCompile("$.spec.clusterIP").Delete(o.Object)
 
 	case "ServiceAccount":
 		// TODO: the intention is to remove references to automatically created
