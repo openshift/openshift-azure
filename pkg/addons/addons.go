@@ -248,6 +248,7 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		if err != nil {
 			return
 		}
+		Default(*existing)
 
 		if reflect.DeepEqual(*existing, *o) {
 			log.Println("Skip " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))

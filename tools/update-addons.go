@@ -124,6 +124,8 @@ func writeDB(db map[string]unstructured.Unstructured) error {
 			return err
 		}
 
+		addons.Default(o)
+
 		o, err := blank(o)
 		if err != nil {
 			return err
