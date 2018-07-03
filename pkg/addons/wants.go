@@ -1,6 +1,7 @@
 package addons
 
 import (
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -109,6 +110,49 @@ func Wants(o unstructured.Unstructured) bool {
 		for _, ref := range o.GetOwnerReferences() {
 			switch ref.Kind {
 			case "DeploymentConfig":
+				return false
+			}
+		}
+
+	case "RoleBinding.rbac.authorization.k8s.io":
+		// TODO: the intention here is to skip default rolebindings.
+		matchRoleRef := func() bool {
+			return reflect.DeepEqual(o.Object["roleRef"], map[string]interface{}{
+				"apiGroup": "rbac.authorization.k8s.io",
+				"kind":     "ClusterRole",
+				"name":     strings.TrimSuffix(o.GetName(), "s"),
+			})
+		}
+
+		switch o.GetName() {
+		case "system:deployer", "system:deployers":
+			if matchRoleRef() && reflect.DeepEqual(o.Object["subjects"], []interface{}{
+				map[string]interface{}{
+					"kind":      "ServiceAccount",
+					"name":      "deployer",
+					"namespace": ns,
+				},
+			}) {
+				return false
+			}
+		case "system:image-builder", "system:image-builders":
+			if matchRoleRef() && reflect.DeepEqual(o.Object["subjects"], []interface{}{
+				map[string]interface{}{
+					"kind":      "ServiceAccount",
+					"name":      "builder",
+					"namespace": ns,
+				},
+			}) {
+				return false
+			}
+		case "system:image-puller", "system:image-pullers":
+			if matchRoleRef() && reflect.DeepEqual(o.Object["subjects"], []interface{}{
+				map[string]interface{}{
+					"apiGroup": "rbac.authorization.k8s.io",
+					"kind":     "Group",
+					"name":     "system:serviceaccounts:" + ns,
+				},
+			}) {
 				return false
 			}
 		}
