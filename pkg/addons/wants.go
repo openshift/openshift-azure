@@ -124,6 +124,11 @@ func Wants(o unstructured.Unstructured) bool {
 			return false
 		}
 
+	case "Service":
+		if ns == "default" && o.GetName() == "kubernetes" {
+			return false
+		}
+
 	case "ServiceAccount":
 		// TODO: the intention here is to skip default service accounts.
 		switch o.GetName() {
