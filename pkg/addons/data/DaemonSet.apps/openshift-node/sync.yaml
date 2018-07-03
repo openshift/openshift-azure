@@ -16,7 +16,6 @@ metadata:
   name: sync
   namespace: openshift-node
 spec:
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: sync
@@ -132,37 +131,26 @@ spec:
               apiVersion: v1
               fieldPath: spec.nodeName
         image: openshift/origin-node:v3.10.0
-        imagePullPolicy: IfNotPresent
         name: sync
-        resources: {}
         securityContext:
           privileged: true
           runAsUser: 0
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /etc/origin/node/
           name: host-config
         - mountPath: /etc/sysconfig
           name: host-sysconfig-node
           readOnly: true
-      dnsPolicy: ClusterFirst
       hostNetwork: true
       hostPID: true
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: sync
       serviceAccountName: sync
       terminationGracePeriodSeconds: 1
       volumes:
       - hostPath:
           path: /etc/origin/node
-          type: ""
         name: host-config
       - hostPath:
           path: /etc/sysconfig
-          type: ""
         name: host-sysconfig-node
   updateStrategy:
     rollingUpdate:

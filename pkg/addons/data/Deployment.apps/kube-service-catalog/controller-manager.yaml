@@ -14,11 +14,7 @@ spec:
         app: controller-manager
     spec:
       containers:
-      - name: controller-manager
-        image: '*** GENERATED ***'
-        command:
-        - /usr/bin/service-catalog
-        args:
+      - args:
         - controller-manager
         - --secure-port
         - "8080"
@@ -32,20 +28,22 @@ spec:
         - 5m
         - --feature-gates
         - OriginatingIdentity=true
+        command:
+        - /usr/bin/service-catalog
+        image: '*** GENERATED ***'
+        name: controller-manager
         ports:
         - containerPort: 8080
-          protocol: TCP
         volumeMounts:
-        - name: service-catalog-ssl
-          mountPath: /var/run/kubernetes-service-catalog
+        - mountPath: /var/run/kubernetes-service-catalog
+          name: service-catalog-ssl
           readOnly: true
-      serviceAccountName: service-catalog-controller
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
+      serviceAccountName: service-catalog-controller
       volumes:
       - name: service-catalog-ssl
         secret:
-          defaultMode: 420
           items:
           - key: tls.crt
             path: apiserver.crt

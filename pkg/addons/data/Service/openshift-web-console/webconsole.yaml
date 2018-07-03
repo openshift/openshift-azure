@@ -10,13 +10,9 @@ metadata:
   name: webconsole
   namespace: openshift-web-console
 spec:
-  clusterIP: 172.30.212.200
   ports:
   - name: https
     port: 443
-    protocol: TCP
     targetPort: 8443
   selector:
     webconsole: "true"
-  sessionAffinity: None
-  type: ClusterIP

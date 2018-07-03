@@ -4,5 +4,5 @@ metadata:
   name: apiserver
   namespace: kube-service-catalog
 spec:
-  type: ExternalName
   externalName: servicecatalog-api
+  type: ExternalName

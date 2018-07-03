@@ -13,25 +13,24 @@ spec:
         app: tunnel
     spec:
       containers:
-      - name: tunnel
-        image: '*** GENERATED ***'
-        imagePullPolicy: Always
-        args:
+      - args:
         - /etc/tunnel/tunnel.conf
+        image: '*** GENERATED ***'
+        name: tunnel
         securityContext:
           privileged: true
         volumeMounts:
-        - name: host-config
-          mountPath: /etc/origin/node
+        - mountPath: /etc/origin/node
+          name: host-config
           readOnly: true
-        - name: config
-          mountPath: /etc/tunnel
+        - mountPath: /etc/tunnel
+          name: config
           readOnly: true
       hostNetwork: true
       volumes:
-      - name: host-config
-        hostPath:
+      - hostPath:
           path: /etc/origin/node
+        name: host-config
       - name: config
         secret:
           secretName: tunnel

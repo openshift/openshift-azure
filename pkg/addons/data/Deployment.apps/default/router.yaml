@@ -60,39 +60,28 @@ spec:
           value: admin
         image: openshift/origin-haproxy-router:v3.10.0
         livenessProbe:
-          failureThreshold: 3
           httpGet:
             host: localhost
             path: /healthz
             port: 1936
             scheme: HTTP
           initialDelaySeconds: 10
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
         name: router
         ports:
         - containerPort: 80
           hostPort: 80
-          protocol: TCP
         - containerPort: 443
           hostPort: 443
-          protocol: TCP
         - containerPort: 1936
           hostPort: 1936
           name: stats
-          protocol: TCP
         readinessProbe:
-          failureThreshold: 3
           httpGet:
             host: localhost
             path: /healthz
             port: 1936
             scheme: HTTP
           initialDelaySeconds: 10
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
         resources:
           requests:
             cpu: 100m
@@ -108,5 +97,4 @@ spec:
       volumes:
       - name: server-certificate
         secret:
-          defaultMode: 420
           secretName: router-certs

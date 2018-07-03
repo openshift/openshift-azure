@@ -4,6 +4,7 @@ metadata:
   name: apiserver
   namespace: openshift-template-service-broker
 spec:
+  replicas: 1
   selector:
     matchLabels:
       apiserver: "true"
@@ -28,16 +29,11 @@ spec:
         name: apiserver
         ports:
         - containerPort: 8443
-          protocol: TCP
         readinessProbe:
-          failureThreshold: 3
           httpGet:
             path: /healthz
             port: 8443
             scheme: HTTPS
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
         volumeMounts:
         - mountPath: /var/serving-cert
           name: serving-cert
@@ -49,9 +45,7 @@ spec:
       volumes:
       - name: serving-cert
         secret:
-          defaultMode: 420
           secretName: apiserver-serving-cert
       - configMap:
-          defaultMode: 420
           name: apiserver-config
         name: apiserver-config

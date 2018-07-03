@@ -10,12 +10,9 @@ spec:
   ports:
   - name: 5000-tcp
     port: 5000
-    protocol: TCP
-    targetPort: 5000
   selector:
     docker-registry: default
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
       timeoutSeconds: 10800
-  type: ClusterIP
