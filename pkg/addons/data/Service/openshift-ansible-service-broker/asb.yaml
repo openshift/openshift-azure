@@ -9,7 +9,7 @@ metadata:
   name: asb
   namespace: openshift-ansible-service-broker
 spec:
-  clusterIP: 172.31.118.8
+  clusterIP: 172.30.118.8
   ports:
   - name: port-1338
     port: 1338

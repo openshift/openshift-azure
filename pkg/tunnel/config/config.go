@@ -27,6 +27,7 @@ type Config struct {
 	AdvertiseCIDRs     []net.IPNet
 	Heartbeat          time.Duration
 	HeartbeatTimeout   time.Duration
+	ServicesSubnet     net.IPNet
 }
 
 func (c *Config) UnmarshalJSON(b []byte) error {
@@ -41,6 +42,7 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 		AdvertiseCIDRs     []string `json:"advertiseCIDRs"`
 		Heartbeat          int      `json:"heartbeatSeconds"`
 		HeartbeatTimeout   int      `json:"heartbeatTimeoutSeconds"`
+		ServicesSubnet     string   `json:"servicesSubnet"`
 	}{}
 
 	err := json.Unmarshal(b, &ext)
@@ -80,6 +82,17 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 		n.IP = n.IP.To4()
 		cc.AdvertiseCIDRs = append(c.AdvertiseCIDRs, *n)
 	}
+
+	// TODO: remove this
+	if ext.ServicesSubnet == "" {
+		ext.ServicesSubnet = "172.31.0.0/16"
+	}
+	_, n, err := net.ParseCIDR(ext.ServicesSubnet)
+	if err != nil {
+		return err
+	}
+	n.IP = n.IP.To4()
+	cc.ServicesSubnet = *n
 
 	cc.Key, err = readKey(ext.KeyPath)
 	if err != nil {

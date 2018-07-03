@@ -164,7 +164,7 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 				"openshift.default.svc",
 				"openshift.default.svc.cluster.local",
 			},
-			ipAddresses: []net.IP{net.ParseIP("172.31.0.1")},
+			ipAddresses: []net.IP{net.ParseIP("172.30.0.1")},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.MasterServerKey,
 			cert:        &c.MasterServerCert,
@@ -241,7 +241,7 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 	if c.RegistryStorageAccount, err = randomStorageAccountName(); err != nil {
 		return
 	}
-	c.RegistryServiceIP = net.ParseIP("172.31.190.177") // TODO: choose a particular IP address?
+	c.RegistryServiceIP = net.ParseIP("172.30.190.177") // TODO: choose a particular IP address?
 	if c.RegistryHTTPSecret, err = randomBytes(32); err != nil {
 		return nil, err
 	}

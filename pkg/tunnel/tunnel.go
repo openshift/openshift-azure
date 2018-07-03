@@ -59,8 +59,6 @@ func handleConn(config *config.Config, cdb *cdb.Cdb, c net.Conn) (err error) {
 	return forwarder(cdb, p)
 }
 
-var servicesSubnet = net.IPNet{IP: net.ParseIP("172.31.0.0"), Mask: net.CIDRMask(16, 32)}
-
 func Run() error {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
@@ -87,7 +85,7 @@ func Run() error {
 			return err
 		}
 		if hostname == "vm-infra-0" {
-			config.AdvertiseCIDRs = append(config.AdvertiseCIDRs, servicesSubnet)
+			config.AdvertiseCIDRs = append(config.AdvertiseCIDRs, config.ServicesSubnet)
 		}
 	}
 

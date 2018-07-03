@@ -11,7 +11,7 @@ metadata:
   name: router
   namespace: default
 spec:
-  clusterIP: 172.31.22.137
+  clusterIP: 172.30.22.137
   ports:
   - name: 80-tcp
     port: 80
