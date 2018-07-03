@@ -119,7 +119,10 @@ func writeDB(db map[string]unstructured.Unstructured) error {
 			continue
 		}
 
-		addons.Clean(o)
+		err := addons.Clean(o)
+		if err != nil {
+			return err
+		}
 
 		o, err := blank(o)
 		if err != nil {
