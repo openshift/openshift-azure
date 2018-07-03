@@ -32,6 +32,14 @@ func cleanMetadata(obj map[string]interface{}) {
 	}
 }
 
+// cleanPodTemplate cleans a pod template structure
+func cleanPodTemplate(obj map[string]interface{}) {
+	jsonpath.MustCompile("$.spec.initContainers.*.imagePullPolicy").Delete(obj)
+	jsonpath.MustCompile("$.spec.containers.*.imagePullPolicy").Delete(obj)
+
+	cleanMetadata(obj)
+}
+
 // convertSecretData converts data fields in a Secret to stringData fields
 // wherever it can.
 func convertSecretData(o unstructured.Unstructured) error {
@@ -73,14 +81,14 @@ func Clean(o unstructured.Unstructured) error {
 	switch gk.String() {
 	case "DaemonSet.apps":
 		jsonpath.MustCompile("$.metadata.annotations.'deprecated.daemonset.template.generation'").Delete(o.Object)
-		cleanMetadata(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
+		cleanPodTemplate(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
 
 	case "Deployment.apps":
 		jsonpath.MustCompile("$.metadata.annotations.'deployment.kubernetes.io/revision'").Delete(o.Object)
-		cleanMetadata(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
+		cleanPodTemplate(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
 
 	case "DeploymentConfig.apps.openshift.io":
-		cleanMetadata(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
+		cleanPodTemplate(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
 
 	case "ImageStream.image.openshift.io":
 		jsonpath.MustCompile("$.metadata.annotations.'openshift.io/image.dockerRepositoryCheck'").Delete(o.Object)
@@ -131,7 +139,7 @@ func Clean(o unstructured.Unstructured) error {
 		}
 
 	case "StatefulSet.apps":
-		cleanMetadata(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
+		cleanPodTemplate(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
 	}
 
 	cleanMetadata(o.Object)
