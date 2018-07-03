@@ -310,4 +310,10 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.RegistryServiceIP }}",
 		},
 	},
+	"Service/kube-service-catalog/apiserver": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.externalName"),
+			Template: "servicecatalog-api.{{ .Manifest.ResourceGroup }}.svc.cluster.local",
+		},
+	},
 }
