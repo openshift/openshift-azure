@@ -64,8 +64,8 @@ type Config struct {
 
 	ServiceCatalogServerKey     *rsa.PrivateKey
 	ServiceCatalogServerCert    *x509.Certificate
-	ServiceCatalogApiClientKey  *rsa.PrivateKey
-	ServiceCatalogApiClientCert *x509.Certificate
+	ServiceCatalogAPIClientKey  *rsa.PrivateKey
+	ServiceCatalogAPIClientCert *x509.Certificate
 	BootstrapAutoapproverKey    *rsa.PrivateKey
 	BootstrapAutoapproverCert   *x509.Certificate
 
@@ -82,7 +82,7 @@ type Config struct {
 	// kubeconfigs
 	AdminKubeconfig                 *v1.Config
 	MasterKubeconfig                *v1.Config
-	ServiceCatalogApiKubeconfig     *v1.Config
+	ServiceCatalogAPIKubeconfig     *v1.Config
 	BootstrapAutoapproverKubeconfig *v1.Config
 
 	// nodes
