@@ -51,8 +51,6 @@ spec:
         - name: master-cloud-provider
           mountPath: /etc/origin/cloudprovider/
           readOnly: true
-        - name: master-data
-          mountPath: /var/lib/origin/
       - name: tunnel
         image: {{ .Values.TunnelImage }}
         imagePullPolicy: Always
@@ -77,5 +75,3 @@ spec:
       - name: config
         secret:
           secretName: tunnel
-      - name: master-data
-        emptyDir: # TODO: BIG FAT WARNING, CHANGE THIS BEFORE PRODUCTION :)
