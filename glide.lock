@@ -1,8 +1,10 @@
 hash: 1804644c4f9d07a0746b00572475941bead5994737b5c32f47575f51942c9eb1
-updated: 2018-06-28T08:25:50.011697981-05:00
+updated: 2018-07-03T19:31:43.077356504-05:00
 imports:
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
+- name: github.com/go-test/deep
+  version: 57af0be209c537ba1d9c2a4b285ab7aea0897e51
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:

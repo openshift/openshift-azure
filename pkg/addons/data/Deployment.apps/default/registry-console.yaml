@@ -12,11 +12,6 @@ spec:
   selector:
     matchLabels:
       name: registry-console
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -39,25 +34,18 @@ spec:
           value: '*** GENERATED ***'
         image: cockpit/kubernetes:latest
         livenessProbe:
-          failureThreshold: 3
           httpGet:
             path: /ping
             port: 9090
             scheme: HTTP
           initialDelaySeconds: 10
-          periodSeconds: 10
-          successThreshold: 1
           timeoutSeconds: 5
         name: registry-console
         ports:
         - containerPort: 9090
-          protocol: TCP
         readinessProbe:
-          failureThreshold: 3
           httpGet:
             path: /ping
             port: 9090
             scheme: HTTP
-          periodSeconds: 10
-          successThreshold: 1
           timeoutSeconds: 5

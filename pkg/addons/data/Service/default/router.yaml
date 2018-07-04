@@ -11,21 +11,12 @@ metadata:
   name: router
   namespace: default
 spec:
-  clusterIP: 172.31.22.137
   ports:
   - name: 80-tcp
     port: 80
-    protocol: TCP
-    targetPort: 80
   - name: 443-tcp
     port: 443
-    protocol: TCP
-    targetPort: 443
   - name: 1936-tcp
     port: 1936
-    protocol: TCP
-    targetPort: 1936
   selector:
     router: router
-  sessionAffinity: None
-  type: ClusterIP

@@ -8,11 +8,9 @@ metadata:
 spec:
   podManagementPolicy: Parallel
   replicas: 1
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: prometheus
-  serviceName: ""
   template:
     metadata:
       labels:
@@ -39,15 +37,10 @@ spec:
         - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         - -skip-auth-regex=^/metrics
         image: openshift/oauth-proxy:v1.0.0
-        imagePullPolicy: IfNotPresent
         name: prom-proxy
         ports:
         - containerPort: 8443
           name: web
-          protocol: TCP
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /etc/tls/private
           name: prometheus-tls-secret
@@ -60,7 +53,6 @@ spec:
         - --config.file=/etc/prometheus/prometheus.yml
         - --web.listen-address=localhost:9090
         image: openshift/prometheus:v2.2.1
-        imagePullPolicy: IfNotPresent
         livenessProbe:
           exec:
             command:
@@ -73,15 +65,9 @@ spec:
                 find /etc/prometheus -type f | sort | xargs md5sum | md5sum > /tmp/prometheusconfig.hash;
                 kill -HUP 1;
               fi
-          failureThreshold: 3
           initialDelaySeconds: 60
           periodSeconds: 60
-          successThreshold: 1
-          timeoutSeconds: 1
         name: prometheus
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /etc/prometheus
           name: prometheus-config
@@ -106,15 +92,10 @@ spec:
         - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         - -skip-auth-regex=^/metrics
         image: openshift/oauth-proxy:v1.0.0
-        imagePullPolicy: IfNotPresent
         name: alerts-proxy
         ports:
         - containerPort: 9443
           name: web
-          protocol: TCP
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /etc/tls/private
           name: alerts-tls-secret
@@ -123,11 +104,7 @@ spec:
       - args:
         - --storage-path=/alert-buffer/messages.db
         image: openshift/prometheus-alert-buffer:v0.0.2
-        imagePullPolicy: IfNotPresent
         name: alert-buffer
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /alert-buffer
           name: alerts-data
@@ -150,15 +127,10 @@ spec:
         - -cookie-secret-file=/etc/proxy/secrets/session_secret
         - -skip-auth-regex=^/metrics
         image: openshift/oauth-proxy:v1.0.0
-        imagePullPolicy: IfNotPresent
         name: alertmanager-proxy
         ports:
         - containerPort: 10443
           name: web
-          protocol: TCP
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /etc/tls/private
           name: alertmanager-tls-secret
@@ -167,59 +139,41 @@ spec:
       - args:
         - --config.file=/etc/alertmanager/alertmanager.yml
         image: openshift/prometheus-alertmanager:v0.14.0
-        imagePullPolicy: IfNotPresent
         name: alertmanager
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /etc/alertmanager
           name: alertmanager-config
         - mountPath: /alertmanager
           name: alertmanager-data
-      dnsPolicy: ClusterFirst
       nodeSelector:
         region: infra
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: prometheus
       serviceAccountName: prometheus
-      terminationGracePeriodSeconds: 30
       volumes:
       - configMap:
-          defaultMode: 420
           name: prometheus
         name: prometheus-config
       - name: prometheus-proxy-secret
         secret:
-          defaultMode: 420
           secretName: prometheus-proxy
       - name: prometheus-tls-secret
         secret:
-          defaultMode: 420
           secretName: prometheus-tls
       - emptyDir: {}
         name: prometheus-data
       - configMap:
-          defaultMode: 420
           name: alertmanager
         name: alertmanager-config
       - name: alertmanager-proxy-secret
         secret:
-          defaultMode: 420
           secretName: alertmanager-proxy
       - name: alertmanager-tls-secret
         secret:
-          defaultMode: 420
           secretName: alertmanager-tls
       - name: alerts-tls-secret
         secret:
-          defaultMode: 420
           secretName: alerts-tls
       - name: alerts-proxy-secret
         secret:
-          defaultMode: 420
           secretName: alerts-proxy
       - emptyDir: {}
         name: alertmanager-data

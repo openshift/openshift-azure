@@ -17,7 +17,6 @@ metadata:
   name: sdn
   namespace: openshift-sdn
 spec:
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: sdn
@@ -118,13 +117,11 @@ spec:
         - name: OPENSHIFT_DNS_DOMAIN
           value: cluster.local
         image: openshift/origin-node:v3.10.0
-        imagePullPolicy: IfNotPresent
         name: sdn
         ports:
         - containerPort: 10256
           hostPort: 10256
           name: healthz
-          protocol: TCP
         resources:
           requests:
             cpu: 100m
@@ -132,8 +129,6 @@ spec:
         securityContext:
           privileged: true
           runAsUser: 0
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /etc/origin/node/
           name: host-config
@@ -160,61 +155,40 @@ spec:
           name: host-etc-cni-netd
         - mountPath: /var/lib/cni/networks/openshift-sdn
           name: host-var-lib-cni-networks-openshift-sdn
-      dnsPolicy: ClusterFirst
       hostNetwork: true
       hostPID: true
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: sdn
       serviceAccountName: sdn
-      terminationGracePeriodSeconds: 30
       volumes:
       - hostPath:
           path: /etc/origin/node
-          type: ""
         name: host-config
       - hostPath:
           path: /etc/sysconfig/origin-node
-          type: ""
         name: host-sysconfig-node
       - hostPath:
           path: /lib/modules
-          type: ""
         name: host-modules
       - hostPath:
           path: /var/run
-          type: ""
         name: host-var-run
       - hostPath:
           path: /var/run/dbus
-          type: ""
         name: host-var-run-dbus
       - hostPath:
           path: /var/run/openvswitch
-          type: ""
         name: host-var-run-ovs
       - hostPath:
           path: /var/run/kubernetes
-          type: ""
         name: host-var-run-kubernetes
       - hostPath:
           path: /var/run/openshift-sdn
-          type: ""
         name: host-var-run-openshift-sdn
       - hostPath:
           path: /opt/cni/bin
-          type: ""
         name: host-opt-cni-bin
       - hostPath:
           path: /etc/cni/net.d
-          type: ""
         name: host-etc-cni-netd
       - hostPath:
           path: /var/lib/cni/networks/openshift-sdn
-          type: ""
         name: host-var-lib-cni-networks-openshift-sdn
-  updateStrategy:
-    rollingUpdate:
-      maxUnavailable: 1
-    type: RollingUpdate

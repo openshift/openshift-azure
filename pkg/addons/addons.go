@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/ghodss/yaml"
+	"github.com/go-test/deep"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -244,15 +245,27 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		}
 
 		rv := existing.GetResourceVersion()
-		Clean(*existing)
+		err = Clean(*existing)
+		if err != nil {
+			return
+		}
+		Default(*existing)
 
 		if reflect.DeepEqual(*existing, *o) {
 			log.Println("Skip " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 			return
 		}
 
-		o.SetResourceVersion(rv)
 		log.Println("Update " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+
+		// TODO: we should have tests that monitor these diffs:
+		// 1) when a cluster is created
+		// 2) when sync is run twice back-to-back on the same cluster
+		for _, diff := range deep.Equal(*existing, *o) {
+			log.Println("- " + diff)
+		}
+
+		o.SetResourceVersion(rv)
 		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
 		return
 	})

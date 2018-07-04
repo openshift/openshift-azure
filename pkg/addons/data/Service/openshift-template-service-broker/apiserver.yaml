@@ -8,8 +8,6 @@ metadata:
 spec:
   ports:
   - port: 443
-    protocol: TCP
     targetPort: 8443
   selector:
     apiserver: "true"
-  type: ClusterIP

@@ -11,6 +11,7 @@ import (
 
 type Path interface {
 	Delete(interface{})
+	DeleteIfMatch(interface{}, interface{})
 	Get(interface{}) []interface{}
 	MustGetString(interface{}) string
 	MustGetStrings(interface{}) []string
@@ -93,6 +94,21 @@ func (r rules) Delete(i interface{}) {
 
 	for _, i := range is {
 		i.Delete()
+	}
+
+	return
+}
+
+func (r rules) DeleteIfMatch(i interface{}, j interface{}) {
+	is := []value{val{v: reflect.ValueOf(i)}}
+	for _, rule := range r {
+		is = rule.execute(is)
+	}
+
+	for _, i := range is {
+		if reflect.DeepEqual(i.Get().Interface(), j) {
+			i.Delete()
+		}
 	}
 
 	return

@@ -23,8 +23,6 @@ func Template(tmpl string, f template.FuncMap, m *api.Manifest, c *config.Config
 		"YamlMarshal":          yaml.Marshal,
 		"Base64Encode":         base64.StdEncoding.EncodeToString,
 		"String":               func(b []byte) string { return string(b) },
-		"Bytes":                func(s string) []byte { return []byte(s) },
-		"JoinBytes":            func(b ...[]byte) []byte { return bytes.Join(b, []byte("\n")) },
 	}).Funcs(f).Parse(tmpl)
 	if err != nil {
 		return nil, err

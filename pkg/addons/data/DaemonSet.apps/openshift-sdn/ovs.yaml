@@ -14,7 +14,6 @@ metadata:
   name: ovs
   namespace: openshift-sdn
 spec:
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: ovs
@@ -71,7 +70,6 @@ spec:
           fi
           while true; do sleep 5; done
         image: openshift/origin-node:v3.10.0
-        imagePullPolicy: IfNotPresent
         name: openvswitch
         resources:
           limits:
@@ -83,8 +81,6 @@ spec:
         securityContext:
           privileged: true
           runAsUser: 0
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /lib/modules
           name: host-modules
@@ -98,33 +94,19 @@ spec:
           readOnly: true
         - mountPath: /etc/openvswitch
           name: host-config-openvswitch
-      dnsPolicy: ClusterFirst
       hostNetwork: true
       hostPID: true
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: sdn
       serviceAccountName: sdn
-      terminationGracePeriodSeconds: 30
       volumes:
       - hostPath:
           path: /lib/modules
-          type: ""
         name: host-modules
       - hostPath:
           path: /run/openvswitch
-          type: ""
         name: host-run-ovs
       - hostPath:
           path: /sys
-          type: ""
         name: host-sys
       - hostPath:
           path: /etc/origin/openvswitch
-          type: ""
         name: host-config-openvswitch
-  updateStrategy:
-    rollingUpdate:
-      maxUnavailable: 1
-    type: RollingUpdate

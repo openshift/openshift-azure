@@ -30,7 +30,6 @@ supplementalGroups:
   type: RunAsAny
 users:
 - system:serviceaccount:openshift-infra:pv-recycler-controller
-- system:serviceaccount:kube-service-catalog:service-catalog-apiserver
 volumes:
 - configMap
 - downwardAPI

@@ -8,13 +8,8 @@ metadata:
   name: prometheus-node-exporter
   namespace: openshift-metrics
 spec:
-  clusterIP: None
   ports:
   - name: scrape
     port: 9100
-    protocol: TCP
-    targetPort: 9100
   selector:
     app: prometheus-node-exporter
-  sessionAffinity: None
-  type: ClusterIP

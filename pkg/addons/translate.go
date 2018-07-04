@@ -207,12 +207,12 @@ var Translations = map[string][]struct {
 	},
 	"Secret/default/registry-certificates": {
 		{
-			Path:     jsonpath.MustCompile("$.data.'registry.crt'"),
-			Template: "{{ Base64Encode (JoinBytes (CertAsBytes .Config.RegistryCert) (CertAsBytes .Config.CaCert)) }}",
+			Path:     jsonpath.MustCompile("$.stringData.'registry.crt'"),
+			Template: "{{ String (CertAsBytes .Config.RegistryCert) }}\n{{ String (CertAsBytes .Config.CaCert) }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.data.'registry.key'"),
-			Template: "{{ Base64Encode (PrivateKeyAsBytes .Config.RegistryKey) }}",
+			Path:     jsonpath.MustCompile("$.stringData.'registry.key'"),
+			Template: "{{ String (PrivateKeyAsBytes .Config.RegistryKey) }}",
 		},
 	},
 	"Secret/default/registry-config": {
@@ -261,22 +261,22 @@ var Translations = map[string][]struct {
 	},
 	"Secret/default/router-certs": {
 		{
-			Path:     jsonpath.MustCompile("$.data.'tls.crt'"),
-			Template: "{{ Base64Encode (JoinBytes (CertAsBytes .Config.RouterCert) (CertAsBytes .Config.CaCert) (PrivateKeyAsBytes .Config.RouterKey)) }}",
+			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),
+			Template: "{{ String (CertAsBytes .Config.RouterCert) }}\n{{ String (CertAsBytes .Config.CaCert) }}\n{{ String (PrivateKeyAsBytes .Config.RouterKey) }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.data.'tls.key'"),
-			Template: "{{ Base64Encode (PrivateKeyAsBytes .Config.RouterKey) }}",
+			Path:     jsonpath.MustCompile("$.stringData.'tls.key'"),
+			Template: "{{ String (PrivateKeyAsBytes .Config.RouterKey) }}",
 		},
 	},
 	"Secret/kube-service-catalog/apiserver-ssl": {
 		{
-			Path:     jsonpath.MustCompile("$.data.'tls.crt'"),
-			Template: "{{ Base64Encode (JoinBytes (CertAsBytes .Config.ServiceCatalogServerCert) (CertAsBytes .Config.ServiceCatalogCaCert)) }}",
+			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),
+			Template: "{{ String (CertAsBytes .Config.ServiceCatalogServerCert) }}\n{{ String (CertAsBytes .Config.ServiceCatalogCaCert) }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.data.'tls.key'"),
-			Template: "{{ Base64Encode (PrivateKeyAsBytes .Config.ServiceCatalogServerKey) }}",
+			Path:     jsonpath.MustCompile("$.stringData.'tls.key'"),
+			Template: "{{ String (PrivateKeyAsBytes .Config.ServiceCatalogServerKey) }}",
 		},
 	},
 	"Secret/openshift-azure/tunnel": {
@@ -288,20 +288,20 @@ var Translations = map[string][]struct {
 	},
 	"Secret/openshift-metrics/alertmanager-proxy": {
 		{
-			Path:     jsonpath.MustCompile("$.data.'session_secret'"),
-			Template: "{{ Base64Encode (Bytes (Base64Encode .Config.AlertManagerProxySessionSecret)) }}",
+			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),
+			Template: "{{ Base64Encode .Config.AlertManagerProxySessionSecret }}",
 		},
 	},
 	"Secret/openshift-metrics/alerts-proxy": {
 		{
-			Path:     jsonpath.MustCompile("$.data.'session_secret'"),
-			Template: "{{ Base64Encode (Bytes (Base64Encode .Config.AlertsProxySessionSecret)) }}",
+			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),
+			Template: "{{ Base64Encode .Config.AlertsProxySessionSecret }}",
 		},
 	},
 	"Secret/openshift-metrics/prometheus-proxy": {
 		{
-			Path:     jsonpath.MustCompile("$.data.'session_secret'"),
-			Template: "{{ Base64Encode (Bytes (Base64Encode .Config.PrometheusProxySessionSecret)) }}",
+			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),
+			Template: "{{ Base64Encode .Config.PrometheusProxySessionSecret }}",
 		},
 	},
 	"Service/default/docker-registry": {
