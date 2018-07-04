@@ -5,7 +5,6 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     nginx.ingress.kubernetes.io/secure-backends: "true"
-    # TODO: nginx.ingress.kubernetes.io/secure-verify-ca-secret
 spec:
   tls:
   - hosts:
