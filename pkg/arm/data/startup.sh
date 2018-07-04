@@ -48,7 +48,8 @@ aadTenantId: {{ .Manifest.TenantID }}
 resourceGroup: {{ .Manifest.ResourceGroup }}
 location: {{ .Manifest.Location }}
 securityGroupName: nsg-compute
-primaryAvailabilitySetName: as-compute
+primaryScaleSetName: ss-compute                                                                                                       
+vmType: vmss
 EOF
 
 # note: ${SERVICE_TYPE}-node crash loops until master is up

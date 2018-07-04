@@ -56,7 +56,8 @@ ClientID: $AZURE_CLIENT_ID
 ClientSecret: $AZURE_CLIENT_SECRET
 Location: eastus
 ResourceGroup: $RESOURCEGROUP
-VMSize: Standard_D2s_v3
+VMSizeCompute: Standard_D2s_v3
+VMSizeInfra: Standard_D2s_v3
 ComputeCount: 1
 InfraCount: 1
 PublicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
@@ -84,8 +85,6 @@ tools/dns.sh a-create $RESOURCEGROUP openshift-tunnel $HCPINGRESSIP
 
 # will eventually run as an HCP pod, for development run it locally
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go
-
-az group deployment wait -g $RESOURCEGROUP -n azuredeploy --created --interval 10
 
 ROUTERIP=$(az network public-ip list -g $RESOURCEGROUP --query "[?name == 'ip-router'].ipAddress | [0]" | tr -d '"')
 tools/dns.sh a-create $RESOURCEGROUP '*' $ROUTERIP

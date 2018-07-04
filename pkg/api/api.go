@@ -12,7 +12,8 @@ type Manifest struct {
 	ClientSecret           string
 	Location               string
 	ResourceGroup          string
-	VMSize                 string
+	VMSizeInfra            string
+	VMSizeCompute          string
 	ComputeCount           int
 	InfraCount             int
 	RoutingConfigSubdomain string
