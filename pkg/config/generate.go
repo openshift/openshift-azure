@@ -41,7 +41,7 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 		c.MasterAPIImage = "docker.io/openshift/origin-control-plane:v3.10"
 		c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
 		c.NodeImage = "docker.io/openshift/origin-node:v3.10.0"
-		c.ServiceCatalogImage = "quay.io/kargakis/servicecatalog:kubeconfig" // TODO: "docker.io/openshift/origin-service-catalog:v3.10.0"
+		c.ServiceCatalogImage = "docker.io/openshift/origin-service-catalog:v3.10"
 		c.TunnelImage = "docker.io/jimminter/tunnel:latest"
 		c.SyncImage = "docker.io/jimminter/sync:latest"
 		c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.10"
