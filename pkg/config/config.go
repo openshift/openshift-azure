@@ -51,6 +51,8 @@ type Config struct {
 	// control plane certificates
 	MasterServerKey          *rsa.PrivateKey
 	MasterServerCert         *x509.Certificate
+	TunnelKey                *rsa.PrivateKey
+	TunnelCert               *x509.Certificate
 	AdminKey                 *rsa.PrivateKey
 	AdminCert                *x509.Certificate
 	AggregatorFrontProxyKey  *rsa.PrivateKey

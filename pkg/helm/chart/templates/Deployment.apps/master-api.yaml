@@ -61,9 +61,6 @@ spec:
         securityContext:
           privileged: true
         volumeMounts:
-        - name: master-config
-          mountPath: /etc/origin/master/
-          readOnly: true
         - name: config
           mountPath: /etc/tunnel
           readOnly: true

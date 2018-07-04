@@ -154,7 +154,6 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			dnsNames: []string{
 				"master-api",
 				m.PublicHostname,
-				c.TunnelHostname,
 				"kubernetes",
 				"kubernetes.default",
 				"kubernetes.default.svc",
@@ -168,6 +167,12 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.MasterServerKey,
 			cert:        &c.MasterServerCert,
+		},
+		{
+			cn:          c.TunnelHostname,
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			key:         &c.TunnelKey,
+			cert:        &c.TunnelCert,
 		},
 		// currently skipping openshift-aggregator, doesn't seem to hurt
 		{
