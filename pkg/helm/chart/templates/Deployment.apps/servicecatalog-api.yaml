@@ -41,11 +41,11 @@ spec:
         - --feature-gates
         - OriginatingIdentity=true
         - --authorization-kubeconfig
-        - /tmp/kubeconfig/admin.kubeconfig
+        - /tmp/kubeconfig/servicecatalog-api.kubeconfig
         - --authentication-kubeconfig
-        - /tmp/kubeconfig/admin.kubeconfig
+        - /tmp/kubeconfig/servicecatalog-api.kubeconfig
         - --kubeconfig
-        - /tmp/kubeconfig/admin.kubeconfig
+        - /tmp/kubeconfig/servicecatalog-api.kubeconfig
         volumeMounts:
         - name: config
           mountPath: /var/run/kubernetes-service-catalog
@@ -59,4 +59,4 @@ spec:
           secretName: servicecatalog-api
       - name: kubeconfig
         secret:
-          secretName: admin-kubeconfig # TODO: need to use a less powerful token
+          secretName: servicecatalog-api-kubeconfig
