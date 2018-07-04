@@ -1,5 +1,10 @@
 #!/bin/bash -x
 
+if [[ ! -e _data/manifest.yaml ]]; then
+    echo error: _data/manifest.yaml must exist
+    exit 1
+fi
+
 PUBLICHOSTNAME=$(awk '/^PublicHostname:/ { print $2 }' <_data/manifest.yaml)
 RESOURCEGROUP=$(awk '/^ResourceGroup:/ { print $2 }' <_data/manifest.yaml)
 

@@ -21,6 +21,15 @@
    node Image resource, or to have whitelisted access to the OpenShift node
    marketplace image.
 
+   Before you deploy for the first time in a subscription using whitelisted
+   access to the OpenShift node marketplace image, you will need to enable
+   programmatic deployment of the image.
+
+   In the Azure web console, click `Create a resource`.  Search for `OpenShift
+   Origin 3.10 on Azure (Staged)` and click the result.  At the bottom of the
+   resulting screen, click `Want to deploy programmatically?  Get started`.
+   Click `Enable`, then `Save`.
+
 1. **DNS domain**.  You'll need a DNS domain hosted using Azure DNS in the same
    subscription.  Deploying a cluster will create a dedicated child DNS zone
    resource for the cluster.  It is assumed that the name of the DNS zone
