@@ -1,13 +1,10 @@
 # CAs
-EtcdCaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdCaKey) }}
 EtcdCaCert: {{ Base64Encode (CertAsBytes .Config.EtcdCaCert) }}
 CaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.CaKey) }}
 CaCert: {{ Base64Encode (CertAsBytes .Config.CaCert) }}
-FrontProxyCaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.FrontProxyCaKey) }}
 FrontProxyCaCert: {{ Base64Encode (CertAsBytes .Config.FrontProxyCaCert) }}
 ServiceSigningCaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceSigningCaKey) }}
 ServiceSigningCaCert: {{ Base64Encode (CertAsBytes .Config.ServiceSigningCaCert) }}
-ServiceCatalogCaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceCatalogCaKey) }}
 ServiceCatalogCaCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogCaCert) }}
 
 # container images for pods
@@ -32,16 +29,12 @@ MasterServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterServerKey) }}
 MasterServerCert: {{ Base64Encode (CertAsBytes .Config.MasterServerCert) }}
 TunnelKey: {{ Base64Encode (PrivateKeyAsBytes .Config.TunnelKey) }}
 TunnelCert: {{ Base64Encode (CertAsBytes .Config.TunnelCert) }}
-AdminKey: {{ Base64Encode (PrivateKeyAsBytes .Config.AdminKey) }}
-AdminCert: {{ Base64Encode (CertAsBytes .Config.AdminCert) }}
 AggregatorFrontProxyKey: {{ Base64Encode (PrivateKeyAsBytes .Config.AggregatorFrontProxyKey) }}
 AggregatorFrontProxyCert: {{ Base64Encode (CertAsBytes .Config.AggregatorFrontProxyCert) }}
 MasterKubeletClientKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterKubeletClientKey) }}
 MasterKubeletClientCert: {{ Base64Encode (CertAsBytes .Config.MasterKubeletClientCert) }}
 MasterProxyClientKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterProxyClientKey) }}
 MasterProxyClientCert: {{ Base64Encode (CertAsBytes .Config.MasterProxyClientCert) }}
-OpenShiftMasterKey: {{ Base64Encode (PrivateKeyAsBytes .Config.OpenShiftMasterKey) }}
-OpenShiftMasterCert: {{ Base64Encode (CertAsBytes .Config.OpenShiftMasterCert) }}
 
 ServiceCatalogServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceCatalogServerKey) }}
 ServiceCatalogServerCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogServerCert) }}
