@@ -181,7 +181,10 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			cn: "servicecatalog-api",
 			dnsNames: []string{
 				"servicecatalog-api",
-				"apiserver.kube-service-catalog.svc", // TODO: unclear how safe this is
+				"servicecatalog-api." + m.ResourceGroup,
+				"servicecatalog-api." + m.ResourceGroup + ".svc",
+				"servicecatalog-api." + m.ResourceGroup + ".svc.cluster.local",
+				"apiserver.kube-service-catalog.svc",
 			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			signingKey:  c.ServiceCatalogCaKey,
