@@ -68,10 +68,7 @@ go run cmd/createorupdate/createorupdate.go
 
 az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _data/_out/azuredeploy.json --no-wait
 
-# poor man's helm (without tiller running)
-helm template pkg/helm/chart -f _data/_out/values.yaml --output-dir _data/_out
-KUBECONFIG=aks/admin.kubeconfig kubectl create namespace $RESOURCEGROUP
-KUBECONFIG=aks/admin.kubeconfig kubectl apply -n $RESOURCEGROUP -Rf _data/_out/osa/templates
+KUBECONFIG=aks/admin.kubeconfig helm install --namespace $RESOURCEGROUP pkg/helm/chart -f _data/_out/values.yaml -n $RESOURCEGROUP >/dev/null
 
 while true; do
     HCPINGRESSIP=$(KUBECONFIG=aks/admin.kubeconfig kubectl get ingress -n $RESOURCEGROUP master-api -o template --template '{{ if .status.loadBalancer }}{{ (index .status.loadBalancer.ingress 0).ip }}{{ end }}')

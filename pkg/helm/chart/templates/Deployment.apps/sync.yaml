@@ -3,6 +3,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sync
+  annotations:
+    checksum/sync: {{ include (print $.Template.BasePath "/Secret/sync.yaml") . | sha256sum }}
+    checksum/admin-kubeconfig: {{ include (print $.Template.BasePath "/Secret/admin-kubeconfig.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:

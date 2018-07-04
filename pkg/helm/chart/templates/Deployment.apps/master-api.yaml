@@ -2,6 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: master-api
+  annotations:
+    checksum/etc-origin-master: {{ include (print $.Template.BasePath "/Secret/etc-origin-master.yaml") . | sha256sum }}
+    checksum/etc-origin-cloudprovider: {{ include (print $.Template.BasePath "/Secret/etc-origin-cloudprovider.yaml") . | sha256sum }}
+    checksum/tunnel: {{ include (print $.Template.BasePath "/Secret/tunnel.yaml") . | sha256sum }}
 spec:
   replicas: 1
   selector:
