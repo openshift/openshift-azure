@@ -218,82 +218,19 @@
             }
         },
         {
-            "type": "Microsoft.Compute/availabilitySets",
-            "apiVersion": "2016-04-30-preview",
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion": "2017-12-01",
             "location": "{{ .Manifest.Location }}",
-            "name": "as-compute",
-            "properties": {
-                "managed": true,
-                "platformFaultDomainCount": 2,
-                "platformUpdateDomainCount": 3
-            }
-        },
-        {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2017-08-01",
-            "copy": {
-                "count": {{ .Manifest.ComputeCount }},
-                "name": "loop"
-            },
-            "location": "{{ .Manifest.Location }}",
-            "name": "[concat('ip-compute-', copyIndex())]",
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic"
-            },
-            "sku": {
-                "name": "Basic"
-            }
-        },
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2016-03-30",
-            "copy": {
-                "count": {{ .Manifest.ComputeCount }},
-                "name": "loop"
-            },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]",
-                "[resourceId('Microsoft.Network/publicIPAddresses', concat('ip-compute-', copyIndex()))]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]"
             ],
-            "location": "{{ .Manifest.Location }}",
-            "name": "[concat('nic-compute-', copyIndex())]",
-            "properties": {
-                "enableAcceleratedNetworking": "false",
-                "enableIPForwarding": true,
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig",
-                        "properties": {
-                            "primary": true,
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/subnet')]"
-                            },
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', concat('ip-compute-', copyIndex()))]"
-                            }
-                        }
-                    }
-                ],
-                "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2016-04-30-preview",
-            "copy": {
-                "count": {{ .Manifest.ComputeCount }},
-                "name": "loop"
+            "name": "ss-compute",
+            "sku": {
+                "tier": "Standard",
+                "capacity": "{{ .Manifest.ComputeCount }}",
+                "name": "{{ .Manifest.VMSize }}"
             },
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-compute-', copyIndex()))]",
-                "[resourceId('Microsoft.Compute/availabilitySets', 'as-compute')]"
-            ],
-            "location": "{{ .Manifest.Location }}",
-            "name": "[concat('vm-compute-', copyIndex())]",
 {{ if eq .Config.ImageResourceName "" }}
             "plan": {
                 "name": "{{ .Config.ImageSKU }}",
@@ -302,73 +239,92 @@
             },
 {{ end }}
             "properties": {
-                "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'as-compute')]"
+                "overprovision": false,
+                "upgradePolicy": {
+                    "mode": "Manual"
                 },
-                "hardwareProfile": {
-                    "vmSize": "{{ .Manifest.VMSize }}"
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-compute-', copyIndex()))]"
+                "virtualMachineProfile":{
+                    "osProfile": {
+                        "adminUsername": "cloud-user",
+                        "computername": "vm-compute",
+                        "computerNamePrefix":"compute",
+                        "linuxConfiguration": {
+                            "disablePasswordAuthentication": true,
+                            "ssh": {
+                                   "publicKeys": [
+                                        {
+                                           "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey }}",
+                                           "path": "/home/cloud-user/.ssh/authorized_keys"
+                                       }
+                                    ]
+                            }
                         }
-                    ]
-                },
-                "osProfile": {
-                    "adminUsername": "cloud-user",
-                    "computername": "[concat('vm-compute-', copyIndex())]",
-                    "linuxConfiguration": {
-                        "disablePasswordAuthentication": true,
-                        "ssh": {
-                            "publicKeys": [
-                                {
-                                    "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey }}",
-                                    "path": "/home/cloud-user/.ssh/authorized_keys"
-                                }
-                            ]
-                        }
-                    }
-                },
-                "storageProfile": {
-                    "imageReference": {
-{{ if eq .Config.ImageResourceName "" }}
-                        "offer": "{{ .Config.ImageOffer }}",
-                        "publisher": "{{ .Config.ImagePublisher }}",
-                        "sku": "{{ .Config.ImageSKU }}",
-                        "version": "{{ .Config.ImageVersion }}"
-{{ else }}
-                        "id": "[resourceId('{{ .Config.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName }}')]"
-{{ end }}
                     },
-                    "osDisk": {
-                        "caching": "ReadWrite",
-                        "createOption": "FromImage"
+                    "storageProfile": {
+                        "imageReference": {
+{{ if eq .Config.ImageResourceName "" }}
+                            "offer": "{{ .Config.ImageOffer }}",
+                            "publisher": "{{ .Config.ImagePublisher }}",
+                            "sku": "{{ .Config.ImageSKU }}",
+                            "version": "{{ .Config.ImageVersion }}"
+{{ else }}
+                            "id": "[resourceId('{{ .Config.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName }}')]"
+{{ end }}
+                        },
+                        "osDisk": {
+                            "caching": "ReadWrite",
+                            "createOption": "FromImage"
+                        }
+                    },
+                    "networkProfile": {
+                        "networkInterfaceConfigurations": [
+                          {
+                            "name": "ss-compute-nic",
+                            "properties": {
+                                "primary": true,
+                                "enableIPForwarding": true,
+                                "networkSecurityGroup": {
+                                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]"
+                                },
+                                "ipConfigurations": [
+                                {
+                                    "name": "ipconfig",
+                                    "properties": {
+                                        "primary": true,
+                                        "subnet": {
+                                            "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/subnet')]"
+                                        },
+                                        "publicIpAddressConfiguration": {
+                                            "name": "pub",
+                                            "properties": {
+                                              "idleTimeoutInMinutes": 15
+                                            }
+                                        }
+                                    }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                    },
+                    "extensionProfile": {
+                        "extensions": [
+                          {
+                            "name": "ss-compute-custom-script",
+                            "properties": {
+                                "autoUpgradeMinorVersion": true,
+                                "protectedSettings": {
+                                    "script": "{{ Base64Encode (Startup `compute`) }}"
+                                },
+                                "publisher": "Microsoft.Azure.Extensions",
+                                "settings": {},
+                                "type": "CustomScript",
+                                "typeHandlerVersion": "2.0"
+                           }
+                        }
+                        ]
                     }
                 }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2016-03-30",
-            "copy": {
-                "count": {{ .Manifest.ComputeCount }},
-                "name": "loop"
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', concat('vm-compute-', copyIndex()))]"
-            ],
-            "location": "{{ .Manifest.Location }}",
-            "name": "[concat('vm-compute-', copyIndex(), '/cse')]",
-            "properties": {
-                "autoUpgradeMinorVersion": true,
-                "protectedSettings": {
-                    "script": "{{ Base64Encode (Startup `compute`) }}"
-                },
-                "publisher": "Microsoft.Azure.Extensions",
-                "settings": {},
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0"
             }
         },
         {

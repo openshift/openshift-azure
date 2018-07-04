@@ -1,14 +1,15 @@
 #!/bin/bash -e
 
-if [[ $# -ne 1 ]]; then
-    echo "usage: $0 vm-infra-0|vm-compute-0"
+if [[ $# -ne 2 ]]; then
+    echo "usage: $0 ss-infra [0,1,2]|ss-compute [0,1,2]"
     exit 1
 fi
 
 RESOURCEGROUP=$(awk '/^ResourceGroup:/ { print $2 }' <_data/manifest.yaml)
 HOST=$1
+ID=$2
 
-IP=$(az vm list-ip-addresses -g $RESOURCEGROUP -n $HOST --query '[0].virtualMachine.network.publicIpAddresses[0].ipAddress' | tr -d '"')
+IP=$(az vmss list-instance-public-ips -g mjudeikisss -n ss-compute --query '['$2'].ipAddress' | tr -d '"')
 
 ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=QUIET \
     -i _data/_out/id_rsa cloud-user@$IP

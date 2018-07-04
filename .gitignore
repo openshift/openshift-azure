@@ -6,3 +6,7 @@
 /sync
 /tun
 /tunnel
+/env
+/aks/admin.kubeconfig
+.vscode
+
