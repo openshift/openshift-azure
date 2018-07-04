@@ -34,5 +34,5 @@ spec:
           secretName: sync
       - name: kubeconfig
         secret:
-          secretName: admin-kubeconfig # TODO: need to use a less powerful token
+          secretName: admin-kubeconfig
 {{end}}
