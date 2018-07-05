@@ -19,7 +19,7 @@ spec:
       name: prometheus-exporter
     spec:
       containers:
-      - image: openshift/prometheus-node-exporter:v0.15.2
+      - image: '*** GENERATED ***'
         name: node-exporter
         ports:
         - containerPort: 9100

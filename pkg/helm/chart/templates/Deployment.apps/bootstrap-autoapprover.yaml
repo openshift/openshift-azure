@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: signer
-        image: {{ .Values.BootstrapAutoapproverImage }}
+        image: {{ .Values.NodeImage }}
         command:
         - /bin/bash
         - -c

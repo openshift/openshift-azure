@@ -24,7 +24,7 @@ spec:
         - name: HTTP_PROXY
         - name: HTTPS_PROXY
         - name: NO_PROXY
-        image: ansibleplaybookbundle/origin-ansible-service-broker:latest
+        image: '*** GENERATED ***'
         livenessProbe:
           httpGet:
             path: /healthz

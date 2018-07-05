@@ -67,7 +67,7 @@ spec:
               ovs-vsctl set Open_vSwitch . other_config:n-handler-threads=10
           fi
           while true; do sleep 5; done
-        image: openshift/origin-node:v3.10.0
+        image: '*** GENERATED ***'
         name: openvswitch
         resources:
           limits:

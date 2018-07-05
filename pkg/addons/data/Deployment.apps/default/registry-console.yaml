@@ -31,7 +31,7 @@ spec:
           value: "true"
         - name: REGISTRY_HOST
           value: '*** GENERATED ***'
-        image: cockpit/kubernetes:latest
+        image: '*** GENERATED ***'
         livenessProbe:
           httpGet:
             path: /ping

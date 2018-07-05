@@ -126,7 +126,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: openshift/origin-node:v3.10.0
+        image: '*** GENERATED ***'
         name: sync
         securityContext:
           privileged: true

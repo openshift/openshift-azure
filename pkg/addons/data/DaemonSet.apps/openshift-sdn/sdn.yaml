@@ -112,7 +112,7 @@ spec:
         env:
         - name: OPENSHIFT_DNS_DOMAIN
           value: cluster.local
-        image: openshift/origin-node:v3.10.0
+        image: '*** GENERATED ***'
         name: sdn
         ports:
         - containerPort: 10256
