@@ -17,6 +17,7 @@ spec:
       containers:
       - name: etcd
         image: {{ .Values.MasterEtcdImage }}
+        imagePullPolicy: Always
         workingDir: /var/lib/etcd
         command:
         - /bin/sh

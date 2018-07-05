@@ -25,6 +25,7 @@ spec:
         - name: HTTPS_PROXY
         - name: NO_PROXY
         image: '*** GENERATED ***'
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /healthz

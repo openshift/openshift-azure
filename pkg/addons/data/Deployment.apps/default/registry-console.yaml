@@ -32,6 +32,7 @@ spec:
         - name: REGISTRY_HOST
           value: '*** GENERATED ***'
         image: '*** GENERATED ***'
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /ping

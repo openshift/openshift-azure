@@ -16,6 +16,7 @@ spec:
       - args:
         - /etc/tunnel/tunnel.conf
         image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: tunnel
         securityContext:
           privileged: true

@@ -31,6 +31,7 @@ spec:
         command:
         - /usr/bin/service-catalog
         image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: controller-manager
         ports:
         - containerPort: 8080

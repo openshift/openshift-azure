@@ -68,6 +68,7 @@ spec:
           fi
           while true; do sleep 5; done
         image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: openvswitch
         resources:
           limits:

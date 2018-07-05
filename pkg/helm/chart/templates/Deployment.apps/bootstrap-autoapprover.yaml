@@ -17,6 +17,7 @@ spec:
       containers:
       - name: signer
         image: {{ .Values.NodeImage }}
+        imagePullPolicy: Always
         command:
         - /bin/bash
         - -c
