@@ -12,6 +12,7 @@ type Manifest struct {
 	ClientSecret           string
 	Location               string
 	ResourceGroup          string
+	OpenShiftVersion       string
 	VMSizeInfra            string
 	VMSizeCompute          string
 	ComputeCount           int

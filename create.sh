@@ -56,6 +56,7 @@ ClientID: $AZURE_CLIENT_ID
 ClientSecret: $AZURE_CLIENT_SECRET
 Location: eastus
 ResourceGroup: $RESOURCEGROUP
+OpenShiftVersion: "$DEPLOY_VERSION"
 VMSizeCompute: Standard_D2s_v3
 VMSizeInfra: Standard_D2s_v3
 ComputeCount: 1
