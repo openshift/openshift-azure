@@ -66,15 +66,20 @@ func (p *Plugin) Validate() error {
 }
 
 func (p *Plugin) GenerateConfig() ([]byte, error) {
-	var err error
 	if p.config == nil {
-		p.config, err = config.Generate(p.manifest)
-	} else {
-		p.config, err = config.Upgrade(p.manifest, p.config)
+		p.config = &config.Config{}
 	}
+
+	err := config.Upgrade(p.manifest, p.config)
 	if err != nil {
 		return nil, err
 	}
+
+	err = config.Generate(p.manifest, p.config)
+	if err != nil {
+		return nil, err
+	}
+
 	b, err := yaml.Marshal(p.config)
 	if err != nil {
 		return nil, err
@@ -96,7 +101,7 @@ func (p *Plugin) HealthCheck(ctx context.Context) error {
 
 // WriteHelpers is for development - not part of the external API
 func (p *Plugin) WriteHelpers() error {
-	b, err := tls.PrivateKeyAsBytes(p.config.SSHPrivateKey)
+	b, err := tls.PrivateKeyAsBytes(p.config.SSHKey)
 	if err != nil {
 		return err
 	}

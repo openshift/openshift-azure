@@ -8,6 +8,6 @@ const (
 	versionLatest = 1
 )
 
-func Upgrade(m *api.Manifest, c *Config) (*Config, error) {
-	return c, nil
+func Upgrade(m *api.Manifest, c *Config) error {
+	return nil
 }

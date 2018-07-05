@@ -6,13 +6,11 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"net"
 	"reflect"
 
 	"github.com/ghodss/yaml"
 	"github.com/satori/uuid"
-	"golang.org/x/crypto/ssh"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/jim-minter/azure-helm/pkg/tls"
@@ -38,16 +36,6 @@ func (c Config) MarshalJSON() ([]byte, error) {
 				return nil, err
 			}
 			m[k] = base64.StdEncoding.EncodeToString(b)
-
-		case *rsa.PublicKey:
-			b, err := tls.PublicKeyAsBytes(v)
-			if err != nil {
-				return nil, err
-			}
-			m[k] = base64.StdEncoding.EncodeToString(b)
-
-		case ssh.PublicKey:
-			m[k] = tls.SSHPublicKeyAsString(v)
 
 		case *v1.Config:
 			b, err := yaml.Marshal(v)
@@ -98,28 +86,6 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 			key, err := tls.ParsePrivateKey(b)
 			if err != nil {
 				return err
-			}
-			v.Field(i).Set(reflect.ValueOf(key))
-
-		case "*rsa.PublicKey":
-			b, err := base64.StdEncoding.DecodeString(m[k].(string))
-			if err != nil {
-				return err
-			}
-
-			key, err := tls.ParsePublicKey(b)
-			if err != nil {
-				return err
-			}
-			v.Field(i).Set(reflect.ValueOf(key))
-
-		case "ssh.PublicKey":
-			key, _, _, rest, err := ssh.ParseAuthorizedKey([]byte(m[k].(string)))
-			if err != nil {
-				return err
-			}
-			if len(rest) > 0 {
-				return errors.New("extra data after decoding SSH public key")
 			}
 			v.Field(i).Set(reflect.ValueOf(key))
 
