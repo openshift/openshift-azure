@@ -67,7 +67,6 @@ Location: {{ .Manifest.Location }}
 
 # needed by import
 RegistryStorageAccount: {{ .Config.RegistryStorageAccount }}
-RegistryServiceIP: {{ .Config.RegistryServiceIP }}
 RegistryHTTPSecret: {{ Base64Encode .Config.RegistryHTTPSecret }}
 AlertManagerProxySessionSecret: {{ Base64Encode .Config.AlertManagerProxySessionSecret }}
 AlertsProxySessionSecret: {{ Base64Encode .Config.AlertsProxySessionSecret }}

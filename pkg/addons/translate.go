@@ -304,10 +304,4 @@ var Translations = map[string][]struct {
 			Template: "{{ Base64Encode .Config.PrometheusProxySessionSecret }}",
 		},
 	},
-	"Service/default/docker-registry": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.clusterIP"),
-			Template: "{{ .Config.RegistryServiceIP }}",
-		},
-	},
 }

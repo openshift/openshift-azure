@@ -6,7 +6,6 @@ metadata:
   name: docker-registry
   namespace: default
 spec:
-  clusterIP: '*** GENERATED ***'
   ports:
   - name: 5000-tcp
     port: 5000
