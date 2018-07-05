@@ -9,6 +9,8 @@ spec:
   selector:
     matchLabels:
       openshift.io/component: etcd
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
