@@ -56,7 +56,8 @@ ClientID: $AZURE_CLIENT_ID
 ClientSecret: $AZURE_CLIENT_SECRET
 Location: eastus
 ResourceGroup: $RESOURCEGROUP
-VMSize: Standard_D2s_v3
+VMSizeCompute: Standard_D2s_v3
+VMSizeInfra: Standard_D2s_v3
 ComputeCount: 1
 InfraCount: 1
 PublicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
