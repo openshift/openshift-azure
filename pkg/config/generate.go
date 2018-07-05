@@ -39,8 +39,6 @@ func Generate(m *api.Manifest, c *Config) (err error) {
 
 	c.TunnelHostname = strings.Replace(m.PublicHostname, "openshift", "openshift-tunnel", 1)
 
-	c.RegistryServiceIP = net.ParseIP("172.30.190.177") // TODO: choose a particular IP address?
-
 	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
 	c.ImageResourceName = os.Getenv("IMAGE_RESOURCENAME")
 
@@ -225,7 +223,6 @@ func Generate(m *api.Manifest, c *Config) (err error) {
 				"docker-registry.default.svc",
 				"docker-registry.default.svc.cluster.local",
 			},
-			ipAddresses: []net.IP{c.RegistryServiceIP},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.RegistryKey,
 			cert:        &c.RegistryCert,

@@ -3,7 +3,6 @@ package config
 import (
 	"crypto/rsa"
 	"crypto/x509"
-	"net"
 
 	"github.com/satori/uuid"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
@@ -93,7 +92,6 @@ type Config struct {
 
 	// needed by import
 	RegistryStorageAccount         string
-	RegistryServiceIP              net.IP
 	RegistryHTTPSecret             []byte
 	AlertManagerProxySessionSecret []byte
 	AlertsProxySessionSecret       []byte

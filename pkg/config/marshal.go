@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
-	"net"
 	"reflect"
 
 	"github.com/ghodss/yaml"
@@ -73,10 +72,6 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 		}
 
 		switch v.Field(i).Type().String() {
-		case "net.IP":
-			ip := net.ParseIP(m[k].(string))
-			v.Field(i).Set(reflect.ValueOf(ip))
-
 		case "*rsa.PrivateKey":
 			b, err := base64.StdEncoding.DecodeString(m[k].(string))
 			if err != nil {
