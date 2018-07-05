@@ -86,6 +86,8 @@ tools/dns.sh a-create $RESOURCEGROUP openshift-tunnel $HCPINGRESSIP
 # will eventually run as an HCP pod, for development run it locally
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go
 
+az group deployment wait -g $RESOURCEGROUP -n azuredeploy --created --interval 10
+
 ROUTERIP=$(az network public-ip list -g $RESOURCEGROUP --query "[?name == 'ip-router'].ipAddress | [0]" | tr -d '"')
 tools/dns.sh a-create $RESOURCEGROUP '*' $ROUTERIP
 

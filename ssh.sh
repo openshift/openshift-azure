@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 if [[ $# -ne 2 ]]; then
-    echo "usage: $0 ss-infra [0,1,2]|ss-compute [0,1,2]"
+    echo "usage: $0 ss-infra|ss-compute {0,1,2,...}"
     exit 1
 fi
 

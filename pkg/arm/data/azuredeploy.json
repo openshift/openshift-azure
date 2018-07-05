@@ -6,7 +6,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2016-03-30",
             "location": "{{ .Manifest.Location }}",
             "name": "nsg-compute",
             "properties": {
@@ -30,7 +30,7 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2016-03-30",
             "location": "{{ .Manifest.Location }}",
             "name": "nsg-infra",
             "properties": {
@@ -82,7 +82,7 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2016-03-30",
             "location": "{{ .Manifest.Location }}",
             "name": "vnet",
             "properties": {
@@ -103,11 +103,12 @@
         },
         {
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2016-03-30",
             "location": "{{ .Manifest.Location }}",
             "name": "ip-router",
             "properties": {
-                "publicIPAllocationMethod": "Static"
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 15
             },
             "sku": {
                 "name": "Basic"
@@ -115,7 +116,7 @@
         },
         {
             "type": "Microsoft.Network/loadBalancers",
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2016-03-30",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-router')]"
             ],
@@ -153,7 +154,7 @@
                                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/frontendIPConfigurations/frontend')]"
                             },
                             "frontendPort": 80,
-                            "idleTimeoutInMinutes": 4,
+                            "idleTimeoutInMinutes": 15,
                             "loadDistribution": "Default",
                             "probe": {
                                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/probes/port-80')]"
@@ -173,7 +174,7 @@
                                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/frontendIPConfigurations/frontend')]"
                             },
                             "frontendPort": 443,
-                            "idleTimeoutInMinutes": 4,
+                            "idleTimeoutInMinutes": 15,
                             "loadDistribution": "Default",
                             "probe": {
                                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/probes/port-443')]"
@@ -210,7 +211,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2017-10-01",
+            "apiVersion": "2015-06-15",
             "location": "{{ .Manifest.Location }}",
             "name": "{{ .Config.RegistryStorageAccount }}",
             "properties": {
@@ -243,19 +244,19 @@
                 "upgradePolicy": {
                     "mode": "Manual"
                 },
-                "virtualMachineProfile":{
+                "virtualMachineProfile": {
                     "osProfile": {
                         "adminUsername": "cloud-user",
-                        "computerNamePrefix":"compute-",
+                        "computerNamePrefix": "compute-",
                         "linuxConfiguration": {
                             "disablePasswordAuthentication": true,
                             "ssh": {
-                                   "publicKeys": [
-                                        {
-                                           "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey }}",
-                                           "path": "/home/cloud-user/.ssh/authorized_keys"
-                                       }
-                                    ]
+                                "publicKeys": [
+                                    {
+                                        "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey }}",
+                                        "path": "/home/cloud-user/.ssh/authorized_keys"
+                                    }
+                                ]
                             }
                         }
                     },
@@ -272,55 +273,58 @@
                         },
                         "osDisk": {
                             "caching": "ReadWrite",
-                            "createOption": "FromImage"
+                            "createOption": "FromImage",
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS"
+                            }
                         }
                     },
                     "networkProfile": {
                         "networkInterfaceConfigurations": [
-                          {
-                            "name": "ss-compute-nic",
-                            "properties": {
-                                "primary": true,
-                                "enableIPForwarding": true,
-                                "networkSecurityGroup": {
-                                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]"
-                                },
-                                "ipConfigurations": [
-                                {
-                                    "name": "ipconfig",
-                                    "properties": {
-                                        "primary": true,
-                                        "subnet": {
-                                            "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/subnet')]"
-                                        },
-                                        "publicIpAddressConfiguration": {
-                                            "name": "pub",
+                            {
+                                "name": "nic",
+                                "properties": {
+                                    "primary": true,
+                                    "enableIPForwarding": true,
+                                    "networkSecurityGroup": {
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]"
+                                    },
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "ipconfig",
                                             "properties": {
-                                              "idleTimeoutInMinutes": 15
+                                                "primary": true,
+                                                "subnet": {
+                                                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/subnet')]"
+                                                },
+                                                "publicIpAddressConfiguration": {
+                                                    "name": "ip",
+                                                    "properties": {
+                                                        "idleTimeoutInMinutes": 15
+                                                    }
+                                                }
                                             }
                                         }
-                                    }
+                                    ]
                                 }
-                              ]
                             }
-                          }
                         ]
                     },
                     "extensionProfile": {
                         "extensions": [
-                          {
-                            "name": "ss-compute-custom-script",
-                            "properties": {
-                                "autoUpgradeMinorVersion": true,
-                                "protectedSettings": {
-                                    "script": "{{ Base64Encode (Startup `compute`) }}"
-                                },
-                                "publisher": "Microsoft.Azure.Extensions",
-                                "settings": {},
-                                "type": "CustomScript",
-                                "typeHandlerVersion": "2.0"
-                           }
-                        }
+                            {
+                                "name": "cse",
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "protectedSettings": {
+                                        "script": "{{ Base64Encode (Startup `compute`) }}"
+                                    },
+                                    "publisher": "Microsoft.Azure.Extensions",
+                                    "settings": {},
+                                    "type": "CustomScript",
+                                    "typeHandlerVersion": "2.0"
+                                }
+                            }
                         ]
                     }
                 }
@@ -347,25 +351,25 @@
                 "publisher": "{{ .Config.ImagePublisher }}",
                 "product": "{{ .Config.ImageOffer }}"
             },
-{{ end }}
+ {{ end }}
             "properties": {
                 "overprovision": false,
                 "upgradePolicy": {
                     "mode": "Manual"
                 },
-                "virtualMachineProfile":{
+                "virtualMachineProfile": {
                     "osProfile": {
                         "adminUsername": "cloud-user",
-                        "computerNamePrefix":"infra-",
+                        "computerNamePrefix": "infra-",
                         "linuxConfiguration": {
                             "disablePasswordAuthentication": true,
                             "ssh": {
-                                   "publicKeys": [
-                                        {
-                                           "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey }}",
-                                           "path": "/home/cloud-user/.ssh/authorized_keys"
-                                       }
-                                    ]
+                                "publicKeys": [
+                                    {
+                                        "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey }}",
+                                        "path": "/home/cloud-user/.ssh/authorized_keys"
+                                    }
+                                ]
                             }
                         }
                     },
@@ -382,60 +386,63 @@
                         },
                         "osDisk": {
                             "caching": "ReadWrite",
-                            "createOption": "FromImage"
+                            "createOption": "FromImage",
+                            "managedDisk": {
+                                "storageAccountType": "Premium_LRS"
+                            }
                         }
                     },
                     "networkProfile": {
                         "networkInterfaceConfigurations": [
-                          {
-                            "name": "ss-infra-nic",
-                            "properties": {
-                                "primary": true,
-                                "enableIPForwarding": true,
-                                "networkSecurityGroup": {
-                                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-infra')]"
-                                },
-                                "ipConfigurations": [
-                                {
-                                    "name": "ipconfig",
-                                    "properties": {
-                                        "primary": true,
-                                        "subnet": {
-                                            "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/subnet')]"
-                                        },
-                                        "publicIpAddressConfiguration": {
-                                            "name": "pub",
+                            {
+                                "name": "nic",
+                                "properties": {
+                                    "primary": true,
+                                    "enableIPForwarding": true,
+                                    "networkSecurityGroup": {
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-infra')]"
+                                    },
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "ipconfig",
                                             "properties": {
-                                              "idleTimeoutInMinutes": 15
+                                                "primary": true,
+                                                "subnet": {
+                                                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/subnet')]"
+                                                },
+                                                "publicIpAddressConfiguration": {
+                                                    "name": "ip",
+                                                    "properties": {
+                                                        "idleTimeoutInMinutes": 15
+                                                    }
+                                                },
+                                                "loadBalancerBackendAddressPools": [
+                                                    {
+                                                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/backendAddressPools/backend')]"
+                                                    }
+                                                ]
                                             }
-                                        },
-                                        "loadBalancerBackendAddressPools":[
-                                            {
-                                              "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/backendAddressPools/backend')]"
-                                            }
-                                        ]
-                                    }
+                                        }
+                                    ]
                                 }
-                              ]
                             }
-                          }
                         ]
                     },
                     "extensionProfile": {
                         "extensions": [
-                          {
-                            "name": "ss-infra-custom-script",
-                            "properties": {
-                                "autoUpgradeMinorVersion": true,
-                                "protectedSettings": {
-                                    "script": "{{ Base64Encode (Startup `infra`) }}"
-                                },
-                                "publisher": "Microsoft.Azure.Extensions",
-                                "settings": {},
-                                "type": "CustomScript",
-                                "typeHandlerVersion": "2.0"
-                           }
-                        }
+                            {
+                                "name": "cse",
+                                "properties": {
+                                    "autoUpgradeMinorVersion": true,
+                                    "protectedSettings": {
+                                        "script": "{{ Base64Encode (Startup `infra`) }}"
+                                    },
+                                    "publisher": "Microsoft.Azure.Extensions",
+                                    "settings": {},
+                                    "type": "CustomScript",
+                                    "typeHandlerVersion": "2.0"
+                                }
+                            }
                         ]
                     }
                 }
