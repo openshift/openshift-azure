@@ -24,3 +24,4 @@ az group deployment create -g $RESOURCEGROUP \
 az aks get-credentials -g $RESOURCEGROUP -n aks -f - >$(dirname $0)/admin.kubeconfig
 
 KUBECONFIG=$(dirname $0)/admin.kubeconfig kubectl create -f $(dirname $0)/ingress-nginx.yaml
+KUBECONFIG=$(dirname $0)/admin.kubeconfig kubectl create -f $(dirname $0)/tiller.yaml

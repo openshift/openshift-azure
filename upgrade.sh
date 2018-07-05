@@ -5,9 +5,7 @@ RESOURCEGROUP=$(awk '/^ResourceGroup:/ { print $2 }' <_data/manifest.yaml)
 go generate ./...
 go run cmd/createorupdate/createorupdate.go
 
-# poor man's helm (without tiller running)
-helm template pkg/helm/chart -f _data/_out/values.yaml --output-dir _data/_out
-KUBECONFIG=aks/admin.kubeconfig kubectl apply -n $RESOURCEGROUP -Rf _data/_out/osa/templates
+KUBECONFIG=aks/admin.kubeconfig helm upgrade $RESOURCEGROUP pkg/helm/chart -f _data/_out/values.yaml >/dev/null
 
 # TODO: need to apply ARM deployment changes
 
