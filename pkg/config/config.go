@@ -6,7 +6,6 @@ import (
 	"net"
 
 	"github.com/satori/uuid"
-	"golang.org/x/crypto/ssh"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
@@ -75,11 +74,10 @@ type Config struct {
 	ImageConfigFormat string
 
 	// misc control plane configurables
-	ServiceAccountPrivateKey *rsa.PrivateKey
-	ServiceAccountPublicKey  *rsa.PublicKey
-	SessionSecretAuth        []byte
-	SessionSecretEnc         []byte
-	HtPasswd                 []byte
+	ServiceAccountKey *rsa.PrivateKey
+	SessionSecretAuth []byte
+	SessionSecretEnc  []byte
+	HtPasswd          []byte
 
 	// kubeconfigs
 	AdminKubeconfig                 *v1.Config
@@ -88,8 +86,7 @@ type Config struct {
 	BootstrapAutoapproverKubeconfig *v1.Config
 
 	// nodes
-	SSHPrivateKey           *rsa.PrivateKey
-	SSHPublicKey            ssh.PublicKey
+	SSHKey                  *rsa.PrivateKey
 	NodeBootstrapKey        *rsa.PrivateKey
 	NodeBootstrapCert       *x509.Certificate
 	NodeBootstrapKubeconfig *v1.Config

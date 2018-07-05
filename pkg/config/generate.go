@@ -12,16 +12,13 @@ import (
 
 	"github.com/satori/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"golang.org/x/crypto/ssh"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/jim-minter/azure-helm/pkg/api"
 	"github.com/jim-minter/azure-helm/pkg/tls"
 )
 
-func Generate(m *api.Manifest) (c *Config, err error) {
-	c = &Config{}
-
+func Generate(m *api.Manifest, c *Config) (err error) {
 	c.Version = versionLatest
 
 	c.ImageOffer = "osa-preview"
@@ -42,7 +39,10 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 
 	c.TunnelHostname = strings.Replace(m.PublicHostname, "openshift", "openshift-tunnel", 1)
 
-	// TODO: need to cross-check all the below with acs-engine, especially SANs and IPs
+	c.RegistryServiceIP = net.ParseIP("172.30.190.177") // TODO: choose a particular IP address?
+
+	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
+	c.ImageResourceName = os.Getenv("IMAGE_RESOURCENAME")
 
 	// Generate CAs
 	cas := []struct {
@@ -60,7 +60,6 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			key:  &c.CaKey,
 			cert: &c.CaCert,
 		},
-		// currently skipping the other frontproxy, doesn't seem to hurt
 		{
 			cn:   "openshift-frontproxy-signer",
 			key:  &c.FrontProxyCaKey,
@@ -78,6 +77,9 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 		},
 	}
 	for _, ca := range cas {
+		if *ca.key != nil && *ca.cert != nil {
+			continue
+		}
 		if *ca.key, *ca.cert, err = tls.NewCA(ca.cn); err != nil {
 			return
 		}
@@ -135,7 +137,6 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			key:         &c.AggregatorFrontProxyKey,
 			cert:        &c.AggregatorFrontProxyCert,
 		},
-		// currently skipping etcd.server, doesn't seem to hurt
 		{
 			cn:           "system:openshift-node-admin",
 			organization: []string{"system:node-admins"},
@@ -150,18 +151,14 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			cert:        &c.MasterProxyClientCert,
 		},
 		{
-			cn: "master-api",
+			cn: m.PublicHostname,
 			dnsNames: []string{
-				"master-api",
 				m.PublicHostname,
+				"master-api",
 				"kubernetes",
 				"kubernetes.default",
 				"kubernetes.default.svc",
 				"kubernetes.default.svc.cluster.local",
-				"openshift",
-				"openshift.default",
-				"openshift.default.svc",
-				"openshift.default.svc.cluster.local",
 			},
 			ipAddresses: []net.IP{net.ParseIP("172.30.0.1")},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
@@ -174,7 +171,6 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			key:         &c.TunnelKey,
 			cert:        &c.TunnelCert,
 		},
-		// currently skipping openshift-aggregator, doesn't seem to hurt
 		{
 			cn:           "system:openshift-master",
 			organization: []string{"system:cluster-admins", "system:masters"},
@@ -206,114 +202,171 @@ func Generate(m *api.Manifest) (c *Config, err error) {
 			key:         &c.BootstrapAutoapproverKey,
 			cert:        &c.BootstrapAutoapproverCert,
 		},
+		{
+			cn:          "system:serviceaccount:openshift-infra:node-bootstrapper",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			key:         &c.NodeBootstrapKey,
+			cert:        &c.NodeBootstrapCert,
+		},
+		{
+			cn: m.RoutingConfigSubdomain,
+			dnsNames: []string{
+				m.RoutingConfigSubdomain,
+				"*." + m.RoutingConfigSubdomain,
+			},
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			key:         &c.RouterKey,
+			cert:        &c.RouterCert,
+		},
+		{
+			cn: "docker-registry-default." + m.RoutingConfigSubdomain,
+			dnsNames: []string{
+				"docker-registry-default." + m.RoutingConfigSubdomain,
+				"docker-registry.default.svc",
+				"docker-registry.default.svc.cluster.local",
+			},
+			ipAddresses: []net.IP{c.RegistryServiceIP},
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			key:         &c.RegistryKey,
+			cert:        &c.RegistryCert,
+		},
 	}
 	for _, cert := range certs {
 		if cert.signingKey == nil && cert.signingCert == nil {
 			cert.signingKey, cert.signingCert = c.CaKey, c.CaCert
+		}
+		if *cert.key != nil && *cert.cert != nil &&
+			(*cert.cert).CheckSignatureFrom(cert.signingCert) == nil {
+			continue
 		}
 		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert); err != nil {
 			return
 		}
 	}
 
-	if c.ServiceAccountPrivateKey, err = tls.NewPrivateKey(); err != nil {
-		return
+	secrets := []struct {
+		secret *[]byte
+		n      int
+	}{
+		{
+			secret: &c.SessionSecretAuth,
+			n:      24,
+		},
+		{
+			secret: &c.SessionSecretEnc,
+			n:      24,
+		},
+		{
+			secret: &c.RegistryHTTPSecret,
+		},
+		{
+			secret: &c.AlertManagerProxySessionSecret,
+		},
+		{
+			secret: &c.AlertsProxySessionSecret,
+		},
+		{
+			secret: &c.PrometheusProxySessionSecret,
+		},
 	}
-	c.ServiceAccountPublicKey = &c.ServiceAccountPrivateKey.PublicKey
-
-	if c.SessionSecretAuth, err = randomBytes(24); err != nil {
-		return
-	}
-	if c.SessionSecretEnc, err = randomBytes(24); err != nil {
-		return
-	}
-
-	if c.HtPasswd, err = makeHtPasswd("demo", "demo"); err != nil {
-		return
-	}
-
-	if c.MasterKubeconfig, err = makeKubeConfig(c.OpenShiftMasterKey, c.OpenShiftMasterCert, c.CaCert, "master-api", "system:openshift-master", "default"); err != nil {
-		return
-	}
-	if c.AdminKubeconfig, err = makeKubeConfig(c.AdminKey, c.AdminCert, c.CaCert, m.PublicHostname, "system:admin", "default"); err != nil {
-		return
-	}
-	if c.ServiceCatalogAPIKubeconfig, err = makeKubeConfig(c.ServiceCatalogAPIClientKey, c.ServiceCatalogAPIClientCert, c.CaCert, "master-api", "system:serviceaccount:kube-service-catalog:service-catalog-apiserver", "kube-service-catalog"); err != nil {
-		return
-	}
-	if c.BootstrapAutoapproverKubeconfig, err = makeKubeConfig(c.BootstrapAutoapproverKey, c.BootstrapAutoapproverCert, c.CaCert, "master-api", "system:serviceaccount:openshift-infra:bootstrap-autoapprover", "openshift-infra"); err != nil {
-		return
-	}
-
-	if c.SSHPrivateKey, err = tls.NewPrivateKey(); err != nil {
-		return
-	}
-	if c.SSHPublicKey, err = ssh.NewPublicKey(&c.SSHPrivateKey.PublicKey); err != nil {
-		return
-	}
-	if c.NodeBootstrapKey, c.NodeBootstrapCert, err = tls.NewCert("system:serviceaccount:openshift-infra:node-bootstrapper", nil, nil, nil, []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth}, c.CaKey, c.CaCert); err != nil {
-		return
-	}
-	if c.NodeBootstrapKubeconfig, err = makeKubeConfig(c.NodeBootstrapKey, c.NodeBootstrapCert, c.CaCert, m.PublicHostname, "system:serviceaccount:openshift-infra:node-bootstrapper", "default"); err != nil {
-		return
+	for _, s := range secrets {
+		if len(*s.secret) != 0 {
+			continue
+		}
+		if s.n == 0 {
+			s.n = 32
+		}
+		if *s.secret, err = randomBytes(s.n); err != nil {
+			return
+		}
 	}
 
-	// needed by import
-	// TODO: these need to be filled out sanely, and need to fully migrate the
-	// service catalog over from impexp to helm.
-	if c.RegistryStorageAccount, err = randomStorageAccountName(); err != nil {
-		return
+	kubeconfigs := []struct {
+		clientKey  *rsa.PrivateKey
+		clientCert *x509.Certificate
+		endpoint   string
+		username   string
+		namespace  string
+		kubeconfig **v1.Config
+	}{
+		{
+			clientKey:  c.OpenShiftMasterKey,
+			clientCert: c.OpenShiftMasterCert,
+			endpoint:   "master-api",
+			username:   "system:openshift-master",
+			kubeconfig: &c.MasterKubeconfig,
+		},
+		{
+			clientKey:  c.ServiceCatalogAPIClientKey,
+			clientCert: c.ServiceCatalogAPIClientCert,
+			endpoint:   "master-api",
+			username:   "system:serviceaccount:kube-service-catalog:service-catalog-apiserver",
+			namespace:  "kube-service-catalog",
+			kubeconfig: &c.ServiceCatalogAPIKubeconfig,
+		},
+		{
+			clientKey:  c.BootstrapAutoapproverKey,
+			clientCert: c.BootstrapAutoapproverCert,
+			endpoint:   "master-api",
+			username:   "system:serviceaccount:openshift-infra:bootstrap-autoapprover",
+			namespace:  "openshift-infra",
+			kubeconfig: &c.BootstrapAutoapproverKubeconfig,
+		},
+		{
+			clientKey:  c.AdminKey,
+			clientCert: c.AdminCert,
+			endpoint:   m.PublicHostname,
+			username:   "system:admin",
+			kubeconfig: &c.AdminKubeconfig,
+		},
+		{
+			clientKey:  c.NodeBootstrapKey,
+			clientCert: c.NodeBootstrapCert,
+			endpoint:   m.PublicHostname,
+			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
+			kubeconfig: &c.NodeBootstrapKubeconfig,
+		},
 	}
-	c.RegistryServiceIP = net.ParseIP("172.30.190.177") // TODO: choose a particular IP address?
-	if c.RegistryHTTPSecret, err = randomBytes(32); err != nil {
-		return nil, err
-	}
-	if c.AlertManagerProxySessionSecret, err = randomBytes(32); err != nil {
-		return nil, err
-	}
-	if c.AlertsProxySessionSecret, err = randomBytes(32); err != nil {
-		return nil, err
-	}
-	if c.PrometheusProxySessionSecret, err = randomBytes(32); err != nil {
-		return nil, err
-	}
-	if c.ServiceCatalogClusterID, err = uuid.NewV4(); err != nil {
-		return nil, err
-	}
-	// TODO: is it possible for the registry to use
-	// service.alpha.openshift.io/serving-cert-secret-name?
-	c.RegistryKey, c.RegistryCert, err =
-		tls.NewCert(c.RegistryServiceIP.String(), nil,
-			[]string{"docker-registry-default." + m.RoutingConfigSubdomain,
-				"docker-registry.default.svc",
-				"docker-registry.default.svc.cluster.local",
-			},
-			[]net.IP{c.RegistryServiceIP},
-			[]x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			c.CaKey,
-			c.CaCert)
-	if err != nil {
-		return nil, err
-	}
-	// TODO: the router CN and SANs should be configurables.
-	c.RouterKey, c.RouterCert, err =
-		tls.NewCert("*."+m.RoutingConfigSubdomain, nil,
-			[]string{
-				"*." + m.RoutingConfigSubdomain,
-				m.RoutingConfigSubdomain,
-			},
-			nil,
-			[]x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			c.CaKey,
-			c.CaCert)
-	if err != nil {
-		return nil, err
+	for _, kc := range kubeconfigs {
+		if kc.namespace == "" {
+			kc.namespace = "default"
+		}
+		if *kc.kubeconfig, err = makeKubeConfig(kc.clientKey, kc.clientCert, c.CaCert, kc.endpoint, kc.username, kc.namespace); err != nil {
+			return
+		}
 	}
 
-	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
-	c.ImageResourceName = os.Getenv("IMAGE_RESOURCENAME")
+	if c.ServiceAccountKey == nil {
+		if c.ServiceAccountKey, err = tls.NewPrivateKey(); err != nil {
+			return
+		}
+	}
 
-	return c, nil
+	if len(c.HtPasswd) == 0 {
+		if c.HtPasswd, err = makeHtPasswd("demo", "demo"); err != nil {
+			return
+		}
+	}
+
+	if c.SSHKey == nil {
+		if c.SSHKey, err = tls.NewPrivateKey(); err != nil {
+			return
+		}
+	}
+
+	if len(c.RegistryStorageAccount) == 0 {
+		if c.RegistryStorageAccount, err = randomStorageAccountName(); err != nil {
+			return
+		}
+	}
+
+	if uuid.Equal(c.ServiceCatalogClusterID, uuid.Nil) {
+		if c.ServiceCatalogClusterID, err = uuid.NewV4(); err != nil {
+			return
+		}
+	}
+
+	return
 }
 
 func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certificate, endpoint, username, namespace string) (*v1.Config, error) {

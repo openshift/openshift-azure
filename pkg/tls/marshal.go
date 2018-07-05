@@ -49,8 +49,13 @@ func PublicKeyAsBytes(key *rsa.PublicKey) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func SSHPublicKeyAsString(key ssh.PublicKey) string {
-	return key.Type() + " " + base64.StdEncoding.EncodeToString(key.Marshal())
+func SSHPublicKeyAsString(key *rsa.PublicKey) (string, error) {
+	sshkey, err := ssh.NewPublicKey(key)
+	if err != nil {
+		return "", err
+	}
+
+	return sshkey.Type() + " " + base64.StdEncoding.EncodeToString(sshkey.Marshal()), nil
 }
 
 func ParseCert(b []byte) (*x509.Certificate, error) {
@@ -79,18 +84,4 @@ func ParsePrivateKey(b []byte) (*rsa.PrivateKey, error) {
 	}
 
 	return key, nil
-}
-
-func ParsePublicKey(b []byte) (*rsa.PublicKey, error) {
-	block, rest := pem.Decode(b)
-	if len(rest) > 0 {
-		return nil, errors.New("extra data after decoding PEM block")
-	}
-
-	key, err := x509.ParsePKIXPublicKey(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-
-	return key.(*rsa.PublicKey), nil
 }

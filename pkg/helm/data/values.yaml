@@ -45,8 +45,8 @@ PublicHostname: {{ .Manifest.PublicHostname }}
 ImageConfigFormat: {{ .Config.ImageConfigFormat }}
 
 # misc control plane configurables
-ServiceAccountPrivateKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceAccountPrivateKey) }}
-ServiceAccountPublicKey: {{ Base64Encode (PublicKeyAsBytes .Config.ServiceAccountPublicKey) }}
+ServiceAccountPrivateKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceAccountKey) }}
+ServiceAccountPublicKey: {{ Base64Encode (PublicKeyAsBytes .Config.ServiceAccountKey.PublicKey) }}
 SessionSecretAuth: {{ Base64Encode .Config.SessionSecretAuth }}
 SessionSecretEnc: {{ Base64Encode .Config.SessionSecretEnc }}
 HtPasswd: {{ Base64Encode .Config.HtPasswd }}
