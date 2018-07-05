@@ -84,7 +84,7 @@ func Run() error {
 		if err != nil {
 			return err
 		}
-		if hostname == "vm-infra-0" {
+		if hostname == "vm-infra-0" || hostname == "infra-000000" {
 			config.AdvertiseCIDRs = append(config.AdvertiseCIDRs, config.ServicesSubnet)
 		}
 	}
