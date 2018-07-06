@@ -3,9 +3,9 @@ kind: Deployment
 metadata:
   name: master-api
   annotations:
-    checksum/etc-origin-master: {{ include (print $.Template.BasePath "/Secret/etc-origin-master.yaml") . | sha256sum }}
-    checksum/etc-origin-cloudprovider: {{ include (print $.Template.BasePath "/Secret/etc-origin-cloudprovider.yaml") . | sha256sum }}
-    checksum/tunnel: {{ include (print $.Template.BasePath "/Secret/tunnel.yaml") . | sha256sum }}
+    checksum/etc-origin-master: {{ include (print $.Template.BasePath "/Secret/etc-origin-master.yaml") . | sha256sum | quote }}
+    checksum/etc-origin-cloudprovider: {{ include (print $.Template.BasePath "/Secret/etc-origin-cloudprovider.yaml") . | sha256sum | quote }}
+    checksum/tunnel: {{ include (print $.Template.BasePath "/Secret/tunnel.yaml") . | sha256sum | quote }}
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: {{ .Values.MasterAPIImage }}
+        image: {{ .Values.MasterAPIImage | quote }}
         imagePullPolicy: Always
         command:
         - /bin/bash
@@ -57,7 +57,7 @@ spec:
           mountPath: /etc/origin/cloudprovider/
           readOnly: true
       - name: tunnel
-        image: {{ .Values.TunnelImage }}
+        image: {{ .Values.TunnelImage | quote }}
         imagePullPolicy: Always
         args:
         - /etc/tunnel/tunnel.conf

@@ -8,9 +8,9 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.PublicHostname }}
+    - {{ .Values.PublicHostname | quote }}
   rules:
-  - host: {{ .Values.PublicHostname }}
+  - host: {{ .Values.PublicHostname | quote }}
     http:
       paths:
       - backend:

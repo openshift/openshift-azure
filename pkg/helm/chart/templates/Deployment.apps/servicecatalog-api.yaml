@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   name: servicecatalog-api
   annotations:
-    checksum/servicecatalog-api: {{ include (print $.Template.BasePath "/Secret/servicecatalog-api.yaml") . | sha256sum }}
-    checksum/servicecatalog-api-kubeconfig: {{ include (print $.Template.BasePath "/Secret/servicecatalog-api-kubeconfig.yaml") . | sha256sum }}
+    checksum/servicecatalog-api: {{ include (print $.Template.BasePath "/Secret/servicecatalog-api.yaml") . | sha256sum | quote }}
+    checksum/servicecatalog-api-kubeconfig: {{ include (print $.Template.BasePath "/Secret/servicecatalog-api-kubeconfig.yaml") . | sha256sum | quote }}
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: apiserver
-        image: {{ .Values.ServiceCatalogImage }}
+        image: {{ .Values.ServiceCatalogImage | quote }}
         imagePullPolicy: Always
         command:
         - /usr/bin/service-catalog

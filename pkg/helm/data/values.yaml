@@ -1,91 +1,91 @@
 # CAs
-EtcdCaCert: {{ Base64Encode (CertAsBytes .Config.EtcdCaCert) }}
-CaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.CaKey) }}
-CaCert: {{ Base64Encode (CertAsBytes .Config.CaCert) }}
-FrontProxyCaCert: {{ Base64Encode (CertAsBytes .Config.FrontProxyCaCert) }}
-ServiceSigningCaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceSigningCaKey) }}
-ServiceSigningCaCert: {{ Base64Encode (CertAsBytes .Config.ServiceSigningCaCert) }}
-ServiceCatalogCaCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogCaCert) }}
+EtcdCaCert: {{ Base64Encode (CertAsBytes .Config.EtcdCaCert) | quote }}
+CaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.CaKey) | quote }}
+CaCert: {{ Base64Encode (CertAsBytes .Config.CaCert) | quote }}
+FrontProxyCaCert: {{ Base64Encode (CertAsBytes .Config.FrontProxyCaCert) | quote }}
+ServiceSigningCaKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceSigningCaKey) | quote }}
+ServiceSigningCaCert: {{ Base64Encode (CertAsBytes .Config.ServiceSigningCaCert) | quote }}
+ServiceCatalogCaCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogCaCert) | quote }}
 
 # container images for pods
-MasterEtcdImage: {{ .Config.MasterEtcdImage }}
-MasterAPIImage: {{ .Config.MasterAPIImage }}
-MasterControllersImage: {{ .Config.MasterControllersImage }}
-NodeImage: {{ .Config.NodeImage }}
-ServiceCatalogImage: {{ .Config.ServiceCatalogImage }}
-SyncImage: {{ .Config.SyncImage }}
-TunnelImage: {{ .Config.TunnelImage }}
-PrometheusNodeExporterImage: {{ .Config.PrometheusNodeExporterImage }}
-RegistryImage: {{ .Config.RegistryImage }}
-RouterImage: {{ .Config.RouterImage }}
-AzureCLIImage: {{ .Config.AzureCLIImage }}
-RegistryConsoleImage: {{ .Config.RegistryConsoleImage }}
-AnsibleServiceBrokerImage: {{ .Config.AnsibleServiceBrokerImage }}
-WebConsoleImage: {{ .Config.WebConsoleImage }}
-OAuthProxyImage: {{ .Config.OAuthProxyImage }}
-PrometheusImage: {{ .Config.PrometheusImage }}
-PrometheusAlertBufferImage: {{ .Config.PrometheusAlertBufferImage }}
-PrometheusAlertManagerImage: {{ .Config.PrometheusAlertManagerImage }}
+MasterEtcdImage: {{ .Config.MasterEtcdImage | quote }}
+MasterAPIImage: {{ .Config.MasterAPIImage | quote }}
+MasterControllersImage: {{ .Config.MasterControllersImage | quote }}
+NodeImage: {{ .Config.NodeImage | quote }}
+ServiceCatalogImage: {{ .Config.ServiceCatalogImage | quote }}
+SyncImage: {{ .Config.SyncImage | quote }}
+TunnelImage: {{ .Config.TunnelImage | quote }}
+PrometheusNodeExporterImage: {{ .Config.PrometheusNodeExporterImage | quote }}
+RegistryImage: {{ .Config.RegistryImage | quote }}
+RouterImage: {{ .Config.RouterImage | quote }}
+AzureCLIImage: {{ .Config.AzureCLIImage | quote }}
+RegistryConsoleImage: {{ .Config.RegistryConsoleImage | quote }}
+AnsibleServiceBrokerImage: {{ .Config.AnsibleServiceBrokerImage | quote }}
+WebConsoleImage: {{ .Config.WebConsoleImage | quote }}
+OAuthProxyImage: {{ .Config.OAuthProxyImage | quote }}
+PrometheusImage: {{ .Config.PrometheusImage | quote }}
+PrometheusAlertBufferImage: {{ .Config.PrometheusAlertBufferImage | quote }}
+PrometheusAlertManagerImage: {{ .Config.PrometheusAlertManagerImage | quote }}
 
 # etcd certificates
-EtcdServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdServerKey) }}
-EtcdServerCert: {{ Base64Encode (CertAsBytes .Config.EtcdServerCert) }}
-EtcdPeerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdPeerKey) }}
-EtcdPeerCert: {{ Base64Encode (CertAsBytes .Config.EtcdPeerCert) }}
-EtcdClientKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdClientKey) }}
-EtcdClientCert: {{ Base64Encode (CertAsBytes .Config.EtcdClientCert) }}
+EtcdServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdServerKey) | quote }}
+EtcdServerCert: {{ Base64Encode (CertAsBytes .Config.EtcdServerCert) | quote }}
+EtcdPeerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdPeerKey) | quote }}
+EtcdPeerCert: {{ Base64Encode (CertAsBytes .Config.EtcdPeerCert) | quote }}
+EtcdClientKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdClientKey) | quote }}
+EtcdClientCert: {{ Base64Encode (CertAsBytes .Config.EtcdClientCert) | quote }}
 
 # control plane certificates
-MasterServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterServerKey) }}
-MasterServerCert: {{ Base64Encode (CertAsBytes .Config.MasterServerCert) }}
-TunnelKey: {{ Base64Encode (PrivateKeyAsBytes .Config.TunnelKey) }}
-TunnelCert: {{ Base64Encode (CertAsBytes .Config.TunnelCert) }}
-AggregatorFrontProxyKey: {{ Base64Encode (PrivateKeyAsBytes .Config.AggregatorFrontProxyKey) }}
-AggregatorFrontProxyCert: {{ Base64Encode (CertAsBytes .Config.AggregatorFrontProxyCert) }}
-MasterKubeletClientKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterKubeletClientKey) }}
-MasterKubeletClientCert: {{ Base64Encode (CertAsBytes .Config.MasterKubeletClientCert) }}
-MasterProxyClientKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterProxyClientKey) }}
-MasterProxyClientCert: {{ Base64Encode (CertAsBytes .Config.MasterProxyClientCert) }}
+MasterServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterServerKey) | quote }}
+MasterServerCert: {{ Base64Encode (CertAsBytes .Config.MasterServerCert) | quote }}
+TunnelKey: {{ Base64Encode (PrivateKeyAsBytes .Config.TunnelKey) | quote }}
+TunnelCert: {{ Base64Encode (CertAsBytes .Config.TunnelCert) | quote }}
+AggregatorFrontProxyKey: {{ Base64Encode (PrivateKeyAsBytes .Config.AggregatorFrontProxyKey) | quote }}
+AggregatorFrontProxyCert: {{ Base64Encode (CertAsBytes .Config.AggregatorFrontProxyCert) | quote }}
+MasterKubeletClientKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterKubeletClientKey) | quote }}
+MasterKubeletClientCert: {{ Base64Encode (CertAsBytes .Config.MasterKubeletClientCert) | quote }}
+MasterProxyClientKey: {{ Base64Encode (PrivateKeyAsBytes .Config.MasterProxyClientKey) | quote }}
+MasterProxyClientCert: {{ Base64Encode (CertAsBytes .Config.MasterProxyClientCert) | quote }}
 
-ServiceCatalogServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceCatalogServerKey) }}
-ServiceCatalogServerCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogServerCert) }}
+ServiceCatalogServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceCatalogServerKey) | quote }}
+ServiceCatalogServerCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogServerCert) | quote }}
 
 # master-config configurables
-RoutingConfigSubdomain: {{ .Manifest.RoutingConfigSubdomain }}
-PublicHostname: {{ .Manifest.PublicHostname }}
-ImageConfigFormat: {{ .Config.ImageConfigFormat }}
+RoutingConfigSubdomain: {{ .Manifest.RoutingConfigSubdomain | quote }}
+PublicHostname: {{ .Manifest.PublicHostname | quote }}
+ImageConfigFormat: {{ .Config.ImageConfigFormat | quote }}
 
 # misc control plane configurables
-ServiceAccountPrivateKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceAccountKey) }}
-ServiceAccountPublicKey: {{ Base64Encode (PublicKeyAsBytes .Config.ServiceAccountKey.PublicKey) }}
-SessionSecretAuth: {{ Base64Encode .Config.SessionSecretAuth }}
-SessionSecretEnc: {{ Base64Encode .Config.SessionSecretEnc }}
-HtPasswd: {{ Base64Encode .Config.HtPasswd }}
+ServiceAccountPrivateKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceAccountKey) | quote }}
+ServiceAccountPublicKey: {{ Base64Encode (PublicKeyAsBytes .Config.ServiceAccountKey.PublicKey) | quote }}
+SessionSecretAuth: {{ Base64Encode .Config.SessionSecretAuth | quote }}
+SessionSecretEnc: {{ Base64Encode .Config.SessionSecretEnc | quote }}
+HtPasswd: {{ Base64Encode .Config.HtPasswd | quote }}
 
 # kubeconfigs
-AdminKubeconfig: {{ Base64Encode (YamlMarshal .Config.AdminKubeconfig) }}
-MasterKubeconfig: {{ Base64Encode (YamlMarshal .Config.MasterKubeconfig) }}
-ServiceCatalogAPIKubeconfig: {{ Base64Encode (YamlMarshal .Config.ServiceCatalogAPIKubeconfig) }}
-BootstrapAutoapproverKubeconfig: {{ Base64Encode (YamlMarshal .Config.BootstrapAutoapproverKubeconfig) }}
+AdminKubeconfig: {{ Base64Encode (YamlMarshal .Config.AdminKubeconfig) | quote }}
+MasterKubeconfig: {{ Base64Encode (YamlMarshal .Config.MasterKubeconfig) | quote }}
+ServiceCatalogAPIKubeconfig: {{ Base64Encode (YamlMarshal .Config.ServiceCatalogAPIKubeconfig) | quote }}
+BootstrapAutoapproverKubeconfig: {{ Base64Encode (YamlMarshal .Config.BootstrapAutoapproverKubeconfig) | quote }}
 
 # azure config
-TenantID: {{ .Manifest.TenantID }}
-SubscriptionID: {{ .Manifest.SubscriptionID }}
-ClientID: {{ .Manifest.ClientID }}
-ClientSecret: {{ .Manifest.ClientSecret }}
-ResourceGroup: {{ .Manifest.ResourceGroup }}
-Location: {{ .Manifest.Location }}
+TenantID: {{ .Manifest.TenantID | quote }}
+SubscriptionID: {{ .Manifest.SubscriptionID | quote }}
+ClientID: {{ .Manifest.ClientID | quote }}
+ClientSecret: {{ .Manifest.ClientSecret | quote }}
+ResourceGroup: {{ .Manifest.ResourceGroup | quote }}
+Location: {{ .Manifest.Location | quote }}
 
 # needed by import
-RegistryStorageAccount: {{ .Config.RegistryStorageAccount }}
-RegistryHTTPSecret: {{ Base64Encode .Config.RegistryHTTPSecret }}
-AlertManagerProxySessionSecret: {{ Base64Encode .Config.AlertManagerProxySessionSecret }}
-AlertsProxySessionSecret: {{ Base64Encode .Config.AlertsProxySessionSecret }}
-PrometheusProxySessionSecret: {{ Base64Encode .Config.PrometheusProxySessionSecret }}
-ServiceCatalogClusterID: {{ .Config.ServiceCatalogClusterID }}
-RegistryKey: {{ Base64Encode (PrivateKeyAsBytes .Config.RegistryKey) }}
-RegistryCert: {{ Base64Encode (CertAsBytes .Config.RegistryCert) }}
-RouterKey: {{ Base64Encode (PrivateKeyAsBytes .Config.RouterKey) }}
-RouterCert: {{ Base64Encode (CertAsBytes .Config.RouterCert) }}
+RegistryStorageAccount: {{ .Config.RegistryStorageAccount | quote }}
+RegistryHTTPSecret: {{ Base64Encode .Config.RegistryHTTPSecret | quote }}
+AlertManagerProxySessionSecret: {{ Base64Encode .Config.AlertManagerProxySessionSecret | quote }}
+AlertsProxySessionSecret: {{ Base64Encode .Config.AlertsProxySessionSecret | quote }}
+PrometheusProxySessionSecret: {{ Base64Encode .Config.PrometheusProxySessionSecret | quote }}
+ServiceCatalogClusterID: {{ .Config.ServiceCatalogClusterID.String | quote }}
+RegistryKey: {{ Base64Encode (PrivateKeyAsBytes .Config.RegistryKey) | quote }}
+RegistryCert: {{ Base64Encode (CertAsBytes .Config.RegistryCert) | quote }}
+RouterKey: {{ Base64Encode (PrivateKeyAsBytes .Config.RouterKey) | quote }}
+RouterCert: {{ Base64Encode (CertAsBytes .Config.RouterCert) | quote }}
 
-TunnelHostname: {{ .Config.TunnelHostname }}
+TunnelHostname: {{ .Config.TunnelHostname | quote }}
