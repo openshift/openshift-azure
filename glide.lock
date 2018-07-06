@@ -1,8 +1,35 @@
-hash: 1804644c4f9d07a0746b00572475941bead5994737b5c32f47575f51942c9eb1
-updated: 2018-07-03T19:31:43.077356504-05:00
+hash: 3d65490d1b857e42f7bd5ed6d390551a9d41e8711dafd74809951b214341e56a
+updated: 2018-07-05T21:17:42.33508664-05:00
 imports:
+- name: github.com/Azure/acs-engine
+  version: 6159c8946de45c5e0c52be95b597edd9908db106
+  repo: git@github.com:jim-minter/acs-engine
+  subpackages:
+  - pkg/api
+  - pkg/api/agentPoolOnlyApi/v20170831
+  - pkg/api/agentPoolOnlyApi/v20180331
+  - pkg/api/agentPoolOnlyApi/vlabs
+  - pkg/api/common
+  - pkg/api/osa/vlabs
+  - pkg/api/v20160330
+  - pkg/api/v20160930
+  - pkg/api/v20170131
+  - pkg/api/v20170701
+  - pkg/api/v20170930
+  - pkg/api/vlabs
+  - pkg/helpers
+  - pkg/i18n
+  - pkg/osa/vlabs
+- name: github.com/blang/semver
+  version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
+- name: github.com/go-playground/locales
+  version: f63010822830b6fe52288ee52d5a1151088ce039
+  subpackages:
+  - currency
+- name: github.com/go-playground/universal-translator
+  version: b32fa301c9fe55953584134cb6853a13c87ec0a1
 - name: github.com/go-test/deep
   version: 57af0be209c537ba1d9c2a4b285ab7aea0897e51
 - name: github.com/gogo/protobuf
@@ -34,8 +61,22 @@ imports:
   version: 6633656539c1639d9d78127b7d47c622b5d7b6dc
 - name: github.com/json-iterator/go
   version: 13f86432b882000a51c6e610c620974462691a97
+- name: github.com/leonelquinteros/gotext
+  version: 1fc8dec04d161fc0b4007e808a48620c537b6a6e
+- name: github.com/mattn/kinako
+  version: 332c0a7e205a29536e672337a4bea6c7a96b04c1
+  subpackages:
+  - ast
+  - parser
+  - vm
+- name: github.com/pkg/errors
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/satori/go.uuid
+  version: 5bf94b69c6b68ee1b541973bb8e1144db23a194b
 - name: github.com/satori/uuid
   version: 36e9d2ebbde5e3f13ab2e25625fd453271d6522e
+- name: github.com/sirupsen/logrus
+  version: f006c2ac4710855cf0f916dd6b77acf6b048dc6e
 - name: github.com/spf13/pflag
   version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
 - name: golang.org/x/crypto
@@ -75,6 +116,10 @@ imports:
   version: f51c12702a4d776e4c1fa9b0fabab841babae631
   subpackages:
   - rate
+- name: gopkg.in/go-playground/validator.v9
+  version: fb68f39656d7ebf8aa339ad4917aa0c260ecc237
+  subpackages:
+  - locales
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
@@ -100,7 +145,6 @@ imports:
   - core/v1
   - events/v1beta1
   - extensions/v1beta1
-  - imagepolicy/v1alpha1
   - networking/v1
   - policy/v1beta1
   - rbac/v1
