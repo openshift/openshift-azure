@@ -58,7 +58,8 @@ spec:
           value: "1936"
         - name: STATS_USERNAME
           value: admin
-        image: openshift/origin-haproxy-router:v3.10.0
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             host: localhost

@@ -2,10 +2,6 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   annotations:
-    image.openshift.io/triggers: |
-      [
-        {"from":{"kind":"ImageStreamTag","name":"node:v3.10"},"fieldPath":"spec.template.spec.containers[?(@.name==\"sdn\")].image"}
-      ]
     kubernetes.io/description: |
       This daemon set launches the OpenShift networking components (kube-proxy, DNS, and openshift-sdn).
       It expects that OVS is running on the node.
@@ -116,7 +112,8 @@ spec:
         env:
         - name: OPENSHIFT_DNS_DOMAIN
           value: cluster.local
-        image: openshift/origin-node:v3.10.0
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: sdn
         ports:
         - containerPort: 10256

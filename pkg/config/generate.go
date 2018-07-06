@@ -18,29 +18,64 @@ import (
 	"github.com/jim-minter/azure-helm/pkg/tls"
 )
 
-func Generate(m *api.Manifest, c *Config) (err error) {
-	c.Version = versionLatest
-
-	c.ImageOffer = "osa-preview"
+func selectNodeImage(m *api.Manifest, c *Config) {
 	c.ImagePublisher = "redhat"
-	c.ImageSKU = "origin_310"
+	c.ImageOffer = "osa-preview"
 	c.ImageVersion = "latest"
 
-	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
-
-	c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
-	c.MasterAPIImage = "docker.io/openshift/origin-control-plane:v3.10"
-	c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
-	c.BootstrapAutoapproverImage = "docker.io/openshift/origin-node:v3.10.0"
-	c.ServiceCatalogImage = "quay.io/kargakis/servicecatalog:kubeconfig" // TODO: "docker.io/openshift/origin-service-catalog:v3.10.0"
-	c.TunnelImage = "docker.io/jimminter/tunnel:latest"
-	c.SyncImage = "docker.io/jimminter/sync:latest"
-	c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.10"
-
-	c.TunnelHostname = strings.Replace(m.PublicHostname, "openshift", "openshift-tunnel", 1)
+	switch os.Getenv("DEPLOY_OS") {
+	case "":
+		c.ImageSKU = "osa_" + strings.Replace(m.OpenShiftVersion, ".", "", -1)
+	case "centos7":
+		c.ImageSKU = "origin_" + strings.Replace(m.OpenShiftVersion, ".", "", -1)
+	}
 
 	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
 	c.ImageResourceName = os.Getenv("IMAGE_RESOURCENAME")
+}
+
+func selectContainerImagesOrigin(m *api.Manifest, c *Config) {
+	switch m.OpenShiftVersion {
+	case "3.10":
+		c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
+		c.MasterAPIImage = "docker.io/openshift/origin-control-plane:v3.10"
+		c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
+		c.NodeImage = "docker.io/openshift/origin-node:v3.10.0"
+		c.ServiceCatalogImage = "quay.io/kargakis/servicecatalog:kubeconfig" // TODO: "docker.io/openshift/origin-service-catalog:v3.10.0"
+		c.TunnelImage = "docker.io/jimminter/tunnel:latest"
+		c.SyncImage = "docker.io/jimminter/sync:latest"
+		c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.10"
+		c.PrometheusNodeExporterImage = "openshift/prometheus-node-exporter:v0.15.2"
+		c.RegistryImage = "openshift/origin-docker-registry:v3.10.0"
+		c.RouterImage = "openshift/origin-haproxy-router:v3.10.0"
+		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
+		c.RegistryConsoleImage = "cockpit/kubernetes:latest"
+		c.AnsibleServiceBrokerImage = "ansibleplaybookbundle/origin-ansible-service-broker:latest"
+		c.WebConsoleImage = "openshift/origin-web-console:v3.10.0"
+		c.OAuthProxyImage = "openshift/oauth-proxy:v1.0.0"
+		c.PrometheusImage = "openshift/prometheus:v2.2.1"
+		c.PrometheusAlertBufferImage = "openshift/prometheus-alert-buffer:v0.0.2"
+		c.PrometheusAlertManagerImage = "openshift/prometheus-alertmanager:v0.14.0"
+	}
+}
+
+func selectContainerImages(m *api.Manifest, c *Config) {
+	switch os.Getenv("DEPLOY_OS") {
+	case "":
+		// TODO: selectContainerImagesOSA(m, c)
+	case "centos7":
+		selectContainerImagesOrigin(m, c)
+	}
+}
+
+func Generate(m *api.Manifest, c *Config) (err error) {
+	c.Version = versionLatest
+	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
+	c.TunnelHostname = strings.Replace(m.PublicHostname, "openshift", "openshift-tunnel", 1)
+
+	selectNodeImage(m, c)
+
+	selectContainerImages(m, c)
 
 	// Generate CAs
 	cas := []struct {

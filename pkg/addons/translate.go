@@ -125,14 +125,46 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.TunnelImage }}",
 		},
 	},
+	"DaemonSet.apps/openshift-metrics/prometheus-node-exporter": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.PrometheusNodeExporterImage }}",
+		},
+	},
+	"DaemonSet.apps/openshift-node/sync": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.NodeImage }}",
+		},
+	},
+	"DaemonSet.apps/openshift-sdn/ovs": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.NodeImage }}",
+		},
+	},
+	"DaemonSet.apps/openshift-sdn/sdn": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.NodeImage }}",
+		},
+	},
 	"Deployment.apps/default/docker-registry": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HTTP_SECRET')].value"),
 			Template: "{{ Base64Encode .Config.RegistryHTTPSecret }}",
 		},
 		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.RegistryImage }}",
+		},
+		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.initContainers[0].env[?(@.name='REGISTRY_STORAGE_ACCOUNT_NAME')].value"),
 			Template: "{{ .Config.RegistryStorageAccount }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.initContainers[0].image"),
+			Template: "{{ .Config.AzureCLIImage }}",
 		},
 	},
 	"Deployment.apps/default/registry-console": {
@@ -144,6 +176,16 @@ var Translations = map[string][]struct {
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HOST')].value"),
 			Template: "docker-registry-default.{{ .Manifest.RoutingConfigSubdomain }}",
 		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.RegistryConsoleImage }}",
+		},
+	},
+	"Deployment.apps/default/router": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.RouterImage }}",
+		},
 	},
 	"Deployment.apps/kube-service-catalog/controller-manager": {
 		{
@@ -151,10 +193,22 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.ServiceCatalogImage }}",
 		},
 	},
+	"Deployment.apps/openshift-ansible-service-broker/asb": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.AnsibleServiceBrokerImage }}",
+		},
+	},
 	"Deployment.apps/openshift-template-service-broker/apiserver": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.TemplateServiceBrokerImage }}",
+		},
+	},
+	"Deployment.apps/openshift-web-console/webconsole": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.WebConsoleImage }}",
 		},
 	},
 	"OAuthClient.oauth.openshift.io/cockpit-oauth-client": {
@@ -302,6 +356,32 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),
 			Template: "{{ Base64Encode .Config.PrometheusProxySessionSecret }}",
+		},
+	},
+	"StatefulSet.apps/openshift-metrics/prometheus": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='prom-proxy')].image"),
+			Template: "{{ .Config.OAuthProxyImage }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='prometheus')].image"),
+			Template: "{{ .Config.PrometheusImage }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alerts-proxy')].image"),
+			Template: "{{ .Config.OAuthProxyImage }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alert-buffer')].image"),
+			Template: "{{ .Config.PrometheusAlertBufferImage }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alertmanager-proxy')].image"),
+			Template: "{{ .Config.OAuthProxyImage }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alertmanager')].image"),
+			Template: "{{ .Config.PrometheusAlertManagerImage }}",
 		},
 	},
 }

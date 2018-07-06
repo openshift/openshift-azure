@@ -19,6 +19,7 @@ spec:
       containers:
       - name: apiserver
         image: {{ .Values.ServiceCatalogImage }}
+        imagePullPolicy: Always
         command:
         - /usr/bin/service-catalog
         args:

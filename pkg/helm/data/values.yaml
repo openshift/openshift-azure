@@ -11,10 +11,21 @@ ServiceCatalogCaCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogCaCert)
 MasterEtcdImage: {{ .Config.MasterEtcdImage }}
 MasterAPIImage: {{ .Config.MasterAPIImage }}
 MasterControllersImage: {{ .Config.MasterControllersImage }}
-BootstrapAutoapproverImage: {{ .Config.BootstrapAutoapproverImage }}
+NodeImage: {{ .Config.NodeImage }}
 ServiceCatalogImage: {{ .Config.ServiceCatalogImage }}
 SyncImage: {{ .Config.SyncImage }}
 TunnelImage: {{ .Config.TunnelImage }}
+PrometheusNodeExporterImage: {{ .Config.PrometheusNodeExporterImage }}
+RegistryImage: {{ .Config.RegistryImage }}
+RouterImage: {{ .Config.RouterImage }}
+AzureCLIImage: {{ .Config.AzureCLIImage }}
+RegistryConsoleImage: {{ .Config.RegistryConsoleImage }}
+AnsibleServiceBrokerImage: {{ .Config.AnsibleServiceBrokerImage }}
+WebConsoleImage: {{ .Config.WebConsoleImage }}
+OAuthProxyImage: {{ .Config.OAuthProxyImage }}
+PrometheusImage: {{ .Config.PrometheusImage }}
+PrometheusAlertBufferImage: {{ .Config.PrometheusAlertBufferImage }}
+PrometheusAlertManagerImage: {{ .Config.PrometheusAlertManagerImage }}
 
 # etcd certificates
 EtcdServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.EtcdServerKey) }}

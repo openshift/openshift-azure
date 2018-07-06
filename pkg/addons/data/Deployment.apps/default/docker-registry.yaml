@@ -33,7 +33,8 @@ spec:
           value: /etc/registry/config.yml
         - name: REGISTRY_HTTP_TLS_CERTIFICATE
           value: /etc/secrets/registry.crt
-        image: openshift/origin-docker-registry:v3.10.0
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /healthz
@@ -81,7 +82,8 @@ spec:
         env:
         - name: REGISTRY_STORAGE_ACCOUNT_NAME
           value: '*** GENERATED ***'
-        image: docker.io/microsoft/azure-cli:latest
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: storage-setup
         volumeMounts:
         - mountPath: /etc/origin/cloudprovider

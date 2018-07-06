@@ -2,10 +2,6 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   annotations:
-    image.openshift.io/triggers: |
-      [
-        {"from":{"kind":"ImageStreamTag","name":"node:v3.10"},"fieldPath":"spec.template.spec.containers[?(@.name==\"sync\")].image"}
-      ]
     kubernetes.io/description: |
       This daemon set provides dynamic configuration of nodes and relabels nodes as appropriate.
   labels:
@@ -130,7 +126,8 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: openshift/origin-node:v3.10.0
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: sync
         securityContext:
           privileged: true

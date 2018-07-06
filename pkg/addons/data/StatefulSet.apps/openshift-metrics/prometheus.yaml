@@ -36,7 +36,8 @@ spec:
         - -openshift-ca=/etc/pki/tls/cert.pem
         - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         - -skip-auth-regex=^/metrics
-        image: openshift/oauth-proxy:v1.0.0
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: prom-proxy
         ports:
         - containerPort: 8443
@@ -52,7 +53,8 @@ spec:
         - --storage.tsdb.retention=3d
         - --config.file=/etc/prometheus/prometheus.yml
         - --web.listen-address=localhost:9090
-        image: openshift/prometheus:v2.2.1
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         livenessProbe:
           exec:
             command:
@@ -91,7 +93,8 @@ spec:
         - -openshift-ca=/etc/pki/tls/cert.pem
         - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         - -skip-auth-regex=^/metrics
-        image: openshift/oauth-proxy:v1.0.0
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: alerts-proxy
         ports:
         - containerPort: 9443
@@ -103,7 +106,8 @@ spec:
           name: alerts-proxy-secret
       - args:
         - --storage-path=/alert-buffer/messages.db
-        image: openshift/prometheus-alert-buffer:v0.0.2
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: alert-buffer
         volumeMounts:
         - mountPath: /alert-buffer
@@ -126,7 +130,8 @@ spec:
         - -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token
         - -cookie-secret-file=/etc/proxy/secrets/session_secret
         - -skip-auth-regex=^/metrics
-        image: openshift/oauth-proxy:v1.0.0
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: alertmanager-proxy
         ports:
         - containerPort: 10443
@@ -138,7 +143,8 @@ spec:
           name: alertmanager-proxy-secret
       - args:
         - --config.file=/etc/alertmanager/alertmanager.yml
-        image: openshift/prometheus-alertmanager:v0.14.0
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: alertmanager
         volumeMounts:
         - mountPath: /etc/alertmanager

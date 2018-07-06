@@ -3,7 +3,6 @@ kind: Service
 metadata:
   labels:
     app: registry-console
-    createdBy: registry-console-template
     name: registry-console
   name: registry-console
   namespace: default

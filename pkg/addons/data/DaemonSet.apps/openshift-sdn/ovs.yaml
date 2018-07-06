@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   annotations:
-    image.openshift.io/triggers: |
-      [{"from":{"kind":"ImageStreamTag","name":"node:v3.10"},"fieldPath":"spec.template.spec.containers[?(@.name==\"openvswitch\")].image"}]
     kubernetes.io/description: |
       This daemon set launches the openvswitch daemon.
   labels:
@@ -69,7 +67,8 @@ spec:
               ovs-vsctl set Open_vSwitch . other_config:n-handler-threads=10
           fi
           while true; do sleep 5; done
-        image: openshift/origin-node:v3.10.0
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         name: openvswitch
         resources:
           limits:

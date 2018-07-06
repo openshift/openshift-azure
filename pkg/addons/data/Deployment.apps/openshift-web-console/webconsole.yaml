@@ -31,7 +31,8 @@ spec:
         - --audit-log-path=-
         - -v=0
         - --config=/var/webconsole-config/webconsole-config.yaml
-        image: openshift/origin-web-console:v3.10.0
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         livenessProbe:
           exec:
             command:

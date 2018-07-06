@@ -3,7 +3,6 @@ kind: OAuthClient
 metadata:
   labels:
     app: registry-console
-    createdBy: registry-console-template
   name: cockpit-oauth-client
 redirectURIs:
 - '*** GENERATED ***'

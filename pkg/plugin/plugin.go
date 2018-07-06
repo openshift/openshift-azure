@@ -62,7 +62,8 @@ func (p *Plugin) Validate() error {
 
 	p.manifest = n
 	p.oldManifest = o
-	return nil
+
+	return config.Validate(p.manifest, p.oldManifest)
 }
 
 func (p *Plugin) GenerateConfig() ([]byte, error) {

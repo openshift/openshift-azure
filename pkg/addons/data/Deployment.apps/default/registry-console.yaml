@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   labels:
     app: registry-console
-    createdBy: registry-console-template
     name: registry-console
   name: registry-console
   namespace: default
@@ -32,7 +31,8 @@ spec:
           value: "true"
         - name: REGISTRY_HOST
           value: '*** GENERATED ***'
-        image: cockpit/kubernetes:latest
+        image: '*** GENERATED ***'
+        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /ping
