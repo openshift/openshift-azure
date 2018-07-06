@@ -321,14 +321,16 @@ func waitForHealthz() error {
 }
 
 func Main(m *api.Manifest, c *config.Config, dryRun bool) error {
-	err := getClients()
-	if err != nil {
-		return err
-	}
+	if !dryRun {
+		err := getClients()
+		if err != nil {
+			return err
+		}
 
-	err = waitForHealthz()
-	if err != nil {
-		return err
+		err = waitForHealthz()
+		if err != nil {
+			return err
+		}
 	}
 
 	db, err := readDB(m, c)
