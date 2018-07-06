@@ -73,6 +73,10 @@ var Translations = map[string][]struct {
 	NestedFlags NestedFlags
 	Template    string
 }{
+	// IMPORTANT: Translations must NOT use the quote function (i.e., write
+	// "{{ .Config.Foo }}", NOT "{{ .Config.Foo | quote }}").  This is because
+	// the translations operate on in-memory objects, not on serialised YAML.
+	// Correct quoting will be handled automatically by the marshaller.
 	"APIService.apiregistration.k8s.io/v1beta1.servicecatalog.k8s.io": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.caBundle"),

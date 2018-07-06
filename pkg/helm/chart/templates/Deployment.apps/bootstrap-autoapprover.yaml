@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: bootstrap-autoapprover
   annotations:
-    checksum/bootstrap-autoapprover-kubeconfig: {{ include (print $.Template.BasePath "/Secret/bootstrap-autoapprover-kubeconfig.yaml") . | sha256sum }}
+    checksum/bootstrap-autoapprover-kubeconfig: {{ include (print $.Template.BasePath "/Secret/bootstrap-autoapprover-kubeconfig.yaml") . | sha256sum | quote }}
 spec:
   replicas: 1
   selector:
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: signer
-        image: {{ .Values.NodeImage }}
+        image: {{ .Values.NodeImage | quote }}
         imagePullPolicy: Always
         command:
         - /bin/bash

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: master-etcd
   annotations:
-    checksum/etc-etcd: {{ include (print $.Template.BasePath "/Secret/etc-etcd.yaml") . | sha256sum }}
+    checksum/etc-etcd: {{ include (print $.Template.BasePath "/Secret/etc-etcd.yaml") . | sha256sum | quote }}
 spec:
   replicas: 1
   selector:
@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: etcd
-        image: {{ .Values.MasterEtcdImage }}
+        image: {{ .Values.MasterEtcdImage | quote }}
         imagePullPolicy: Always
         workingDir: /var/lib/etcd
         command:

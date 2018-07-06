@@ -8,9 +8,9 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.TunnelHostname }}
+    - {{ .Values.TunnelHostname | quote }}
   rules:
-  - host: {{ .Values.TunnelHostname }}
+  - host: {{ .Values.TunnelHostname | quote }}
     http:
       paths:
       - backend:

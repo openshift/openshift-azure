@@ -7,7 +7,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
-            "location": "{{ .Manifest.Location }}",
+            "location": "{{ .Manifest.Location | js }}",
             "name": "nsg-compute",
             "properties": {
                 "securityRules": [
@@ -31,7 +31,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
-            "location": "{{ .Manifest.Location }}",
+            "location": "{{ .Manifest.Location | js }}",
             "name": "nsg-infra",
             "properties": {
                 "securityRules": [
@@ -83,7 +83,7 @@
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2016-03-30",
-            "location": "{{ .Manifest.Location }}",
+            "location": "{{ .Manifest.Location | js }}",
             "name": "vnet",
             "properties": {
                 "addressSpace": {
@@ -104,7 +104,7 @@
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2016-03-30",
-            "location": "{{ .Manifest.Location }}",
+            "location": "{{ .Manifest.Location | js }}",
             "name": "ip-router",
             "properties": {
                 "publicIPAllocationMethod": "Static",
@@ -120,7 +120,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-router')]"
             ],
-            "location": "{{ .Manifest.Location }}",
+            "location": "{{ .Manifest.Location | js }}",
             "name": "lb-router",
             "properties": {
                 "backendAddressPools": [
@@ -212,8 +212,8 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2015-06-15",
-            "location": "{{ .Manifest.Location }}",
-            "name": "{{ .Config.RegistryStorageAccount }}",
+            "location": "{{ .Manifest.Location | js }}",
+            "name": "{{ .Config.RegistryStorageAccount | js }}",
             "properties": {
                 "accountType": "Standard_LRS"
             }
@@ -221,7 +221,7 @@
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2017-12-01",
-            "location": "{{ .Manifest.Location }}",
+            "location": "{{ .Manifest.Location | js }}",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]"
@@ -229,14 +229,14 @@
             "name": "ss-compute",
             "sku": {
                 "tier": "Standard",
-                "capacity": "{{ .Manifest.ComputeCount }}",
-                "name": "{{ .Manifest.VMSizeCompute }}"
+                "capacity": "{{ .Manifest.ComputeCount | js }}",
+                "name": "{{ .Manifest.VMSizeCompute | js }}"
             },
 {{ if eq .Config.ImageResourceName "" }}
             "plan": {
-                "name": "{{ .Config.ImageSKU }}",
-                "publisher": "{{ .Config.ImagePublisher }}",
-                "product": "{{ .Config.ImageOffer }}"
+                "name": "{{ .Config.ImageSKU | js }}",
+                "publisher": "{{ .Config.ImagePublisher | js }}",
+                "product": "{{ .Config.ImageOffer | js }}"
             },
 {{ end }}
             "properties": {
@@ -253,7 +253,7 @@
                             "ssh": {
                                 "publicKeys": [
                                     {
-                                        "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey }}",
+                                        "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey | js }}",
                                         "path": "/home/cloud-user/.ssh/authorized_keys"
                                     }
                                 ]
@@ -263,12 +263,12 @@
                     "storageProfile": {
                         "imageReference": {
 {{ if eq .Config.ImageResourceName "" }}
-                            "offer": "{{ .Config.ImageOffer }}",
-                            "publisher": "{{ .Config.ImagePublisher }}",
-                            "sku": "{{ .Config.ImageSKU }}",
-                            "version": "{{ .Config.ImageVersion }}"
+                            "offer": "{{ .Config.ImageOffer | js }}",
+                            "publisher": "{{ .Config.ImagePublisher | js }}",
+                            "sku": "{{ .Config.ImageSKU | js }}",
+                            "version": "{{ .Config.ImageVersion | js }}"
 {{ else }}
-                            "id": "[resourceId('{{ .Config.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName }}')]"
+                            "id": "[resourceId('{{ .Config.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName | js }}')]"
 {{ end }}
                         },
                         "osDisk": {
@@ -317,7 +317,7 @@
                                 "properties": {
                                     "autoUpgradeMinorVersion": true,
                                     "protectedSettings": {
-                                        "script": "{{ Base64Encode (Startup `compute`) }}"
+                                        "script": "{{ Base64Encode (Startup `compute`) | js }}"
                                     },
                                     "publisher": "Microsoft.Azure.Extensions",
                                     "settings": {},
@@ -333,7 +333,7 @@
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2017-12-01",
-            "location": "{{ .Manifest.Location }}",
+            "location": "{{ .Manifest.Location | js }}",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-infra')]",
@@ -342,14 +342,14 @@
             "name": "ss-infra",
             "sku": {
                 "tier": "Standard",
-                "capacity": "{{ .Manifest.InfraCount }}",
-                "name": "{{ .Manifest.VMSizeInfra }}"
+                "capacity": "{{ .Manifest.InfraCount | js }}",
+                "name": "{{ .Manifest.VMSizeInfra | js }}"
             },
 {{ if eq .Config.ImageResourceName "" }}
             "plan": {
-                "name": "{{ .Config.ImageSKU }}",
-                "publisher": "{{ .Config.ImagePublisher }}",
-                "product": "{{ .Config.ImageOffer }}"
+                "name": "{{ .Config.ImageSKU | js }}",
+                "publisher": "{{ .Config.ImagePublisher | js }}",
+                "product": "{{ .Config.ImageOffer | js }}"
             },
  {{ end }}
             "properties": {
@@ -366,7 +366,7 @@
                             "ssh": {
                                 "publicKeys": [
                                     {
-                                        "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey }}",
+                                        "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey | js }}",
                                         "path": "/home/cloud-user/.ssh/authorized_keys"
                                     }
                                 ]
@@ -376,12 +376,12 @@
                     "storageProfile": {
                         "imageReference": {
 {{ if eq .Config.ImageResourceName "" }}
-                            "offer": "{{ .Config.ImageOffer }}",
-                            "publisher": "{{ .Config.ImagePublisher }}",
-                            "sku": "{{ .Config.ImageSKU }}",
-                            "version": "{{ .Config.ImageVersion }}"
+                            "offer": "{{ .Config.ImageOffer | js }}",
+                            "publisher": "{{ .Config.ImagePublisher | js }}",
+                            "sku": "{{ .Config.ImageSKU | js }}",
+                            "version": "{{ .Config.ImageVersion | js }}"
 {{ else }}
-                            "id": "[resourceId('{{ .Config.ImageResourceGroup }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName }}')]"
+                            "id": "[resourceId('{{ .Config.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName | js }}')]"
 {{ end }}
                         },
                         "osDisk": {
@@ -435,7 +435,7 @@
                                 "properties": {
                                     "autoUpgradeMinorVersion": true,
                                     "protectedSettings": {
-                                        "script": "{{ Base64Encode (Startup `infra`) }}"
+                                        "script": "{{ Base64Encode (Startup `infra`) | js }}"
                                     },
                                     "publisher": "Microsoft.Azure.Extensions",
                                     "settings": {},
