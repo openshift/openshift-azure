@@ -9,15 +9,16 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/jim-minter/azure-helm/pkg/api"
+	acsapi "github.com/Azure/acs-engine/pkg/api"
+
 	"github.com/jim-minter/azure-helm/pkg/config"
 )
 
-func HealthCheck(ctx context.Context, m *api.Manifest, c *config.Config) error {
-	return waitForConsole(ctx, m, c)
+func HealthCheck(ctx context.Context, cs *acsapi.ContainerService, c *config.Config) error {
+	return waitForConsole(ctx, cs, c)
 }
 
-func waitForConsole(ctx context.Context, m *api.Manifest, c *config.Config) error {
+func waitForConsole(ctx context.Context, cs *acsapi.ContainerService, c *config.Config) error {
 	pool := x509.NewCertPool()
 	pool.AddCert(c.CaCert)
 
@@ -30,7 +31,7 @@ func waitForConsole(ctx context.Context, m *api.Manifest, c *config.Config) erro
 		Timeout: 10 * time.Second,
 	}
 
-	req, err := http.NewRequest("HEAD", "https://"+m.PublicHostname+"/console/", nil)
+	req, err := http.NewRequest("HEAD", "https://"+cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname+"/console/", nil)
 	if err != nil {
 		return err
 	}

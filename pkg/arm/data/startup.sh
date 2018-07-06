@@ -40,13 +40,13 @@ mkdir -p /etc/origin/cloudprovider
 
 # TODO: this is duplicated in the helm charts for the master pods, and that's not ideal
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
-tenantId: {{ .Manifest.TenantID | quote }}
-subscriptionId: {{ .Manifest.SubscriptionID | quote }}
-aadClientId: {{ .Manifest.ClientID | quote }}
-aadClientSecret: {{ .Manifest.ClientSecret | quote }}
-aadTenantId: {{ .Manifest.TenantID | quote }}
-resourceGroup: {{ .Manifest.ResourceGroup | quote }}
-location: {{ .Manifest.Location | quote }}
+tenantId: {{ .ContainerService.Properties.AzProfile.TenantID | quote }}
+subscriptionId: {{ .ContainerService.Properties.AzProfile.SubscriptionID | quote }}
+aadClientId: {{ .ContainerService.Properties.ServicePrincipalProfile.ClientID | quote }}
+aadClientSecret: {{ .ContainerService.Properties.ServicePrincipalProfile.Secret | quote }}
+aadTenantId: {{ .ContainerService.Properties.AzProfile.TenantID | quote }}
+resourceGroup: {{ .ContainerService.Properties.AzProfile.ResourceGroup | quote }}
+location: {{ .ContainerService.Location | quote }}
 securityGroupName: nsg-compute
 primaryScaleSetName: ss-compute
 vmType: vmss

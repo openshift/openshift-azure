@@ -51,8 +51,8 @@ ServiceCatalogServerKey: {{ Base64Encode (PrivateKeyAsBytes .Config.ServiceCatal
 ServiceCatalogServerCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogServerCert) | quote }}
 
 # master-config configurables
-RoutingConfigSubdomain: {{ .Manifest.RoutingConfigSubdomain | quote }}
-PublicHostname: {{ .Manifest.PublicHostname | quote }}
+RoutingConfigSubdomain: {{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain | quote }}
+PublicHostname: {{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname | quote }}
 ImageConfigFormat: {{ .Config.ImageConfigFormat | quote }}
 
 # misc control plane configurables
@@ -69,12 +69,12 @@ ServiceCatalogAPIKubeconfig: {{ Base64Encode (YamlMarshal .Config.ServiceCatalog
 BootstrapAutoapproverKubeconfig: {{ Base64Encode (YamlMarshal .Config.BootstrapAutoapproverKubeconfig) | quote }}
 
 # azure config
-TenantID: {{ .Manifest.TenantID | quote }}
-SubscriptionID: {{ .Manifest.SubscriptionID | quote }}
-ClientID: {{ .Manifest.ClientID | quote }}
-ClientSecret: {{ .Manifest.ClientSecret | quote }}
-ResourceGroup: {{ .Manifest.ResourceGroup | quote }}
-Location: {{ .Manifest.Location | quote }}
+TenantID: {{ .ContainerService.Properties.AzProfile.TenantID | quote }}
+SubscriptionID: {{ .ContainerService.Properties.AzProfile.SubscriptionID | quote }}
+ClientID: {{ .ContainerService.Properties.ServicePrincipalProfile.ClientID | quote }}
+ClientSecret: {{ .ContainerService.Properties.ServicePrincipalProfile.Secret | quote }}
+ResourceGroup: {{ .ContainerService.Properties.AzProfile.ResourceGroup | quote }}
+Location: {{ .ContainerService.Location | quote }}
 
 # needed by import
 RegistryStorageAccount: {{ .Config.RegistryStorageAccount | quote }}

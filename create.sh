@@ -34,7 +34,7 @@ if [[ $# -ne 1 ]]; then
     exit 1
 fi
 
-RESOURCEGROUP=$1
+export RESOURCEGROUP=$1
 
 rm -rf _data
 mkdir -p _data/_out
@@ -50,19 +50,22 @@ fi
 # TODO: if the user interrupts the process here, the AAD application will leak.
 
 cat >_data/manifest.yaml <<EOF
-TenantID: $AZURE_TENANT_ID
-SubscriptionID: $AZURE_SUBSCRIPTION_ID
-ClientID: $AZURE_CLIENT_ID
-ClientSecret: $AZURE_CLIENT_SECRET
-Location: eastus
-ResourceGroup: $RESOURCEGROUP
-OpenShiftVersion: "$DEPLOY_VERSION"
-VMSizeCompute: Standard_D2s_v3
-VMSizeInfra: Standard_D2s_v3
-ComputeCount: 1
-InfraCount: 1
-PublicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
-RoutingConfigSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
+name: openshift
+location: eastus
+properties:
+  openShiftVersion: "$DEPLOY_VERSION"
+  publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+  routingConfigSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
+  agentPoolProfiles:
+  - name: compute
+    count: 1
+    vmSize: Standard_D2s_v3
+  - name: infra
+    count: 1
+    vmSize: Standard_D2s_v3
+  servicePrincipalProfile:
+    clientID: $AZURE_CLIENT_ID
+    secret: $AZURE_CLIENT_SECRET
 EOF
 
 go generate ./...
