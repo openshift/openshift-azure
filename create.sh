@@ -63,6 +63,7 @@ properties:
   - name: infra
     count: 1
     vmSize: Standard_D2s_v3
+    role: infra
   servicePrincipalProfile:
     clientID: $AZURE_CLIENT_ID
     secret: $AZURE_CLIENT_SECRET
