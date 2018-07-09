@@ -54,4 +54,5 @@ spec:
         secret:
           secretName: etc-etcd
       - name: master-data
-        emptyDir: # TODO: BIG FAT WARNING, CHANGE THIS BEFORE PRODUCTION :)
+        persistentVolumeClaim:
+          claimName: master-data
