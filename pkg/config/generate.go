@@ -10,32 +10,32 @@ import (
 	"os"
 	"strings"
 
+	acsapi "github.com/Azure/acs-engine/pkg/api"
 	"github.com/satori/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
-	"github.com/jim-minter/azure-helm/pkg/api"
 	"github.com/jim-minter/azure-helm/pkg/tls"
 )
 
-func selectNodeImage(m *api.Manifest, c *Config) {
+func selectNodeImage(cs *acsapi.ContainerService, c *Config) {
 	c.ImagePublisher = "redhat"
 	c.ImageOffer = "osa-preview"
 	c.ImageVersion = "latest"
 
 	switch os.Getenv("DEPLOY_OS") {
 	case "":
-		c.ImageSKU = "osa_" + strings.Replace(m.OpenShiftVersion, ".", "", -1)
+		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion, ".", "", -1)
 	case "centos7":
-		c.ImageSKU = "origin_" + strings.Replace(m.OpenShiftVersion, ".", "", -1)
+		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion, ".", "", -1)
 	}
 
 	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
 	c.ImageResourceName = os.Getenv("IMAGE_RESOURCENAME")
 }
 
-func selectContainerImagesOrigin(m *api.Manifest, c *Config) {
-	switch m.OpenShiftVersion {
+func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
+	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
 	case "3.10":
 		c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
 		c.MasterAPIImage = "docker.io/openshift/origin-control-plane:v3.10"
@@ -59,23 +59,23 @@ func selectContainerImagesOrigin(m *api.Manifest, c *Config) {
 	}
 }
 
-func selectContainerImages(m *api.Manifest, c *Config) {
+func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 	switch os.Getenv("DEPLOY_OS") {
 	case "":
 		// TODO: selectContainerImagesOSA(m, c)
 	case "centos7":
-		selectContainerImagesOrigin(m, c)
+		selectContainerImagesOrigin(cs, c)
 	}
 }
 
-func Generate(m *api.Manifest, c *Config) (err error) {
+func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
 	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
-	c.TunnelHostname = strings.Replace(m.PublicHostname, "openshift", "openshift-tunnel", 1)
+	c.TunnelHostname = strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, "openshift", "openshift-tunnel", 1)
 
-	selectNodeImage(m, c)
+	selectNodeImage(cs, c)
 
-	selectContainerImages(m, c)
+	selectContainerImages(cs, c)
 
 	// Generate CAs
 	cas := []struct {
@@ -184,9 +184,9 @@ func Generate(m *api.Manifest, c *Config) (err error) {
 			cert:        &c.MasterProxyClientCert,
 		},
 		{
-			cn: m.PublicHostname,
+			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
 			dnsNames: []string{
-				m.PublicHostname,
+				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
 				"master-api",
 				"kubernetes",
 				"kubernetes.default",
@@ -242,19 +242,19 @@ func Generate(m *api.Manifest, c *Config) (err error) {
 			cert:        &c.NodeBootstrapCert,
 		},
 		{
-			cn: m.RoutingConfigSubdomain,
+			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain,
 			dnsNames: []string{
-				m.RoutingConfigSubdomain,
-				"*." + m.RoutingConfigSubdomain,
+				cs.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain,
+				"*." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain,
 			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.RouterKey,
 			cert:        &c.RouterCert,
 		},
 		{
-			cn: "docker-registry-default." + m.RoutingConfigSubdomain,
+			cn: "docker-registry-default." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain,
 			dnsNames: []string{
-				"docker-registry-default." + m.RoutingConfigSubdomain,
+				"docker-registry-default." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain,
 				"docker-registry.default.svc",
 				"docker-registry.default.svc.cluster.local",
 			},
@@ -347,14 +347,14 @@ func Generate(m *api.Manifest, c *Config) (err error) {
 		{
 			clientKey:  c.AdminKey,
 			clientCert: c.AdminCert,
-			endpoint:   m.PublicHostname,
+			endpoint:   cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
 			username:   "system:admin",
 			kubeconfig: &c.AdminKubeconfig,
 		},
 		{
 			clientKey:  c.NodeBootstrapKey,
 			clientCert: c.NodeBootstrapCert,
-			endpoint:   m.PublicHostname,
+			endpoint:   cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
 			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
 			kubeconfig: &c.NodeBootstrapKubeconfig,
 		},

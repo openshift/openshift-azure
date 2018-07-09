@@ -4,41 +4,54 @@ import (
 	"flag"
 	"io/ioutil"
 
+	"github.com/Azure/acs-engine/pkg/api/osa/vlabs"
 	"github.com/ghodss/yaml"
 
 	"github.com/jim-minter/azure-helm/pkg/addons"
-	"github.com/jim-minter/azure-helm/pkg/api"
 	"github.com/jim-minter/azure-helm/pkg/config"
+	"github.com/jim-minter/azure-helm/pkg/plugin"
 )
 
 var dryRun = flag.Bool("dry-run", false, "Print resources to be synced instead of mutating cluster state")
 
-func main() {
-	flag.Parse()
-
+func sync() error {
 	b, err := ioutil.ReadFile("_data/manifest.yaml")
 	if err != nil {
-		panic(err)
+		return err
 	}
-
-	var m *api.Manifest
-	err = yaml.Unmarshal(b, &m)
+	var ext *vlabs.OpenShiftCluster
+	err = yaml.Unmarshal(b, &ext)
 	if err != nil {
-		panic(err)
+		return err
+	}
+	err = ext.Validate()
+	if err != nil {
+		return err
+	}
+	cs := ext.AsContainerService()
+	err = plugin.Enrich(cs)
+	if err != nil {
+		return err
 	}
 
 	b, err = ioutil.ReadFile("_data/config.yaml")
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	var c *config.Config
 	err = yaml.Unmarshal(b, &c)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	if err := addons.Main(m, c, *dryRun); err != nil {
+	return addons.Main(cs, c, *dryRun)
+}
+
+func main() {
+	flag.Parse()
+
+	if err := sync(); err != nil {
 		panic(err)
 	}
 }

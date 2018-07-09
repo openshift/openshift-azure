@@ -7,7 +7,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
-            "location": "{{ .Manifest.Location | js }}",
+            "location": "{{ .ContainerService.Location | js }}",
             "name": "nsg-compute",
             "properties": {
                 "securityRules": [
@@ -31,7 +31,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
-            "location": "{{ .Manifest.Location | js }}",
+            "location": "{{ .ContainerService.Location | js }}",
             "name": "nsg-infra",
             "properties": {
                 "securityRules": [
@@ -83,7 +83,7 @@
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2016-03-30",
-            "location": "{{ .Manifest.Location | js }}",
+            "location": "{{ .ContainerService.Location | js }}",
             "name": "vnet",
             "properties": {
                 "addressSpace": {
@@ -104,7 +104,7 @@
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2016-03-30",
-            "location": "{{ .Manifest.Location | js }}",
+            "location": "{{ .ContainerService.Location | js }}",
             "name": "ip-router",
             "properties": {
                 "publicIPAllocationMethod": "Static",
@@ -120,7 +120,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-router')]"
             ],
-            "location": "{{ .Manifest.Location | js }}",
+            "location": "{{ .ContainerService.Location | js }}",
             "name": "lb-router",
             "properties": {
                 "backendAddressPools": [
@@ -212,7 +212,7 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2015-06-15",
-            "location": "{{ .Manifest.Location | js }}",
+            "location": "{{ .ContainerService.Location | js }}",
             "name": "{{ .Config.RegistryStorageAccount | js }}",
             "properties": {
                 "accountType": "Standard_LRS"
@@ -221,7 +221,7 @@
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2017-12-01",
-            "location": "{{ .Manifest.Location | js }}",
+            "location": "{{ .ContainerService.Location | js }}",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]"
@@ -229,16 +229,18 @@
             "name": "ss-compute",
             "sku": {
                 "tier": "Standard",
-                "capacity": "{{ .Manifest.ComputeCount | js }}",
-                "name": "{{ .Manifest.VMSizeCompute | js }}"
+{{- range $app := .ContainerService.Properties.AgentPoolProfiles }}{{ if eq $app.Name `compute` }}
+                "capacity": "{{ $app.Count | js }}",
+                "name": "{{ $app.VMSize | js }}"
+{{- end }}{{ end }}
             },
-{{ if eq .Config.ImageResourceName "" }}
+{{- if eq .Config.ImageResourceName "" }}
             "plan": {
                 "name": "{{ .Config.ImageSKU | js }}",
                 "publisher": "{{ .Config.ImagePublisher | js }}",
                 "product": "{{ .Config.ImageOffer | js }}"
             },
-{{ end }}
+{{- end }}
             "properties": {
                 "overprovision": false,
                 "upgradePolicy": {
@@ -262,14 +264,14 @@
                     },
                     "storageProfile": {
                         "imageReference": {
-{{ if eq .Config.ImageResourceName "" }}
+{{- if eq .Config.ImageResourceName "" }}
                             "offer": "{{ .Config.ImageOffer | js }}",
                             "publisher": "{{ .Config.ImagePublisher | js }}",
                             "sku": "{{ .Config.ImageSKU | js }}",
                             "version": "{{ .Config.ImageVersion | js }}"
-{{ else }}
+{{- else }}
                             "id": "[resourceId('{{ .Config.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName | js }}')]"
-{{ end }}
+{{- end }}
                         },
                         "osDisk": {
                             "caching": "ReadWrite",
@@ -333,7 +335,7 @@
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2017-12-01",
-            "location": "{{ .Manifest.Location | js }}",
+            "location": "{{ .ContainerService.Location | js }}",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-infra')]",
@@ -342,16 +344,18 @@
             "name": "ss-infra",
             "sku": {
                 "tier": "Standard",
-                "capacity": "{{ .Manifest.InfraCount | js }}",
-                "name": "{{ .Manifest.VMSizeInfra | js }}"
+{{- range $app := .ContainerService.Properties.AgentPoolProfiles }}{{ if eq $app.Name `infra` }}
+                "capacity": "{{ $app.Count | js }}",
+                "name": "{{ $app.VMSize | js }}"
+{{- end }}{{ end }}
             },
-{{ if eq .Config.ImageResourceName "" }}
+{{- if eq .Config.ImageResourceName "" }}
             "plan": {
                 "name": "{{ .Config.ImageSKU | js }}",
                 "publisher": "{{ .Config.ImagePublisher | js }}",
                 "product": "{{ .Config.ImageOffer | js }}"
             },
- {{ end }}
+{{- end }}
             "properties": {
                 "overprovision": false,
                 "upgradePolicy": {
@@ -375,14 +379,14 @@
                     },
                     "storageProfile": {
                         "imageReference": {
-{{ if eq .Config.ImageResourceName "" }}
+{{- if eq .Config.ImageResourceName "" }}
                             "offer": "{{ .Config.ImageOffer | js }}",
                             "publisher": "{{ .Config.ImagePublisher | js }}",
                             "sku": "{{ .Config.ImageSKU | js }}",
                             "version": "{{ .Config.ImageVersion | js }}"
-{{ else }}
+{{- else }}
                             "id": "[resourceId('{{ .Config.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName | js }}')]"
-{{ end }}
+{{- end }}
                         },
                         "osDisk": {
                             "caching": "ReadWrite",

@@ -1,5 +1,11 @@
 package: github.com/jim-minter/azure-helm
 import:
+- package: github.com/Azure/acs-engine
+  version: osaapi
+  repo:    git@github.com:jim-minter/acs-engine
+  subpackages:
+  - pkg/api
+  - pkg/osa/vlabs
 - package: github.com/ghodss/yaml
 - package: github.com/satori/uuid
 - package: golang.org/x/crypto

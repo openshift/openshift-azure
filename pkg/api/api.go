@@ -3,25 +3,11 @@ package api
 
 import (
 	"context"
+
+	acsapi "github.com/Azure/acs-engine/pkg/api"
 )
 
-type Manifest struct {
-	TenantID               string
-	SubscriptionID         string
-	ClientID               string
-	ClientSecret           string
-	Location               string
-	ResourceGroup          string
-	OpenShiftVersion       string
-	VMSizeInfra            string
-	VMSizeCompute          string
-	ComputeCount           int
-	InfraCount             int
-	RoutingConfigSubdomain string
-	PublicHostname         string
-}
-
-type NewPlugin func(manifestBytes, oldManifestBytes, configBytes []byte) (Plugin, error)
+type NewPlugin func(cs, oldCs *acsapi.ContainerService, configBytes []byte) (Plugin, error)
 
 type Plugin interface {
 	Validate() error

@@ -1,13 +1,13 @@
 package config
 
 import (
-	"github.com/jim-minter/azure-helm/pkg/api"
+	acsapi "github.com/Azure/acs-engine/pkg/api"
 )
 
 const (
 	versionLatest = 1
 )
 
-func Upgrade(m *api.Manifest, c *Config) error {
+func Upgrade(cs *acsapi.ContainerService, c *Config) error {
 	return nil
 }

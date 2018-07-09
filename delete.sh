@@ -24,8 +24,13 @@ if [[ ! -e _data/manifest.yaml ]]; then
     exit 1
 fi
 
-PUBLICHOSTNAME=$(awk '/^PublicHostname:/ { print $2 }' <_data/manifest.yaml)
-RESOURCEGROUP=$(awk '/^ResourceGroup:/ { print $2 }' <_data/manifest.yaml)
+if [[ $# -ne 1 ]]; then
+    echo usage: $0 resourcegroup
+    exit 1
+fi
+
+RESOURCEGROUP=$1
+PUBLICHOSTNAME=$(awk '/^  publicHostname:/ { print $2 }' <_data/manifest.yaml)
 
 KUBECONFIG=aks/admin.kubeconfig helm delete --purge $RESOURCEGROUP >/dev/null
 

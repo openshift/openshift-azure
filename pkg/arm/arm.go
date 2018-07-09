@@ -7,12 +7,13 @@ package arm
 import (
 	"text/template"
 
-	"github.com/jim-minter/azure-helm/pkg/api"
+	acsapi "github.com/Azure/acs-engine/pkg/api"
+
 	"github.com/jim-minter/azure-helm/pkg/config"
 	"github.com/jim-minter/azure-helm/pkg/util"
 )
 
-func Generate(m *api.Manifest, c *config.Config) ([]byte, error) {
+func Generate(m *acsapi.ContainerService, c *config.Config) ([]byte, error) {
 	startup, err := Asset("startup.sh")
 	if err != nil {
 		return nil, err
