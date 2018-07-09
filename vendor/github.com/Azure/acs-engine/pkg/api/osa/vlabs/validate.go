@@ -35,30 +35,36 @@ func (p *Properties) Validate() error {
 		return fmt.Errorf("invalid provisioningState %q", p.ProvisioningState)
 	}
 
-	if p.OpenShiftVersion != "3.10" {
-		return fmt.Errorf("invalid openShiftVersion %q", p.OpenShiftVersion)
+	if p.OpenShiftVersion == "" {
+		return fmt.Errorf("openShiftVersion must not be empty")
+	}
+
+	if p.PublicHostname == "" {
+		return fmt.Errorf("publicHostname must not be empty")
 	}
 
 	if !isValidHostname(p.PublicHostname) {
 		return fmt.Errorf("invalid publicHostname %q", p.PublicHostname)
 	}
 
+	if p.RoutingConfigSubdomain == "" {
+		return fmt.Errorf("routingConfigSubdomain must not be empty")
+	}
+
 	if !isValidHostname(p.RoutingConfigSubdomain) {
 		return fmt.Errorf("invalid routingConfigSubdomain %q", p.RoutingConfigSubdomain)
 	}
 
-	return p.AgentPoolProfiles.Validate()
+	if err := p.AgentPoolProfiles.Validate(); err != nil {
+		return err
+	}
+
+	return p.ServicePrincipalProfile.Validate()
 }
 
 // Validate validates an AgentPoolProfiles slice
 func (apps AgentPoolProfiles) Validate() error {
 	names := map[string]struct{}{}
-
-	for i := 1; i < len(apps); i++ {
-		if apps[i].VnetSubnetID != apps[i-1].VnetSubnetID {
-			return fmt.Errorf("non-identical vnetSubnetIDs")
-		}
-	}
 
 	for _, app := range apps {
 		if _, found := names[app.Name]; found {
@@ -80,14 +86,31 @@ func (app *AgentPoolProfile) Validate() error {
 		return fmt.Errorf("invalid name %q", app.Name)
 	}
 
-	if app.Count < 0 || app.Count > 100 {
+	switch app.Role {
+	case AgentPoolProfileRoleEmpty, AgentPoolProfileRoleInfra:
+	default:
+		return fmt.Errorf("invalid role %q", app.Role)
+	}
+
+	if app.Count < 1 {
 		return fmt.Errorf("invalid count %q", app.Count)
 	}
 
-	switch app.VMSize {
-	case "Standard_D2s_v3", "Standard_D4s_v3":
-	default:
-		return fmt.Errorf("invalid vmSize %q", app.VMSize)
+	if app.VMSize == "" {
+		return fmt.Errorf("vmSize must not be empty")
+	}
+
+	return nil
+}
+
+// Validate validates a ServicePrincipalProfile struct
+func (spp *ServicePrincipalProfile) Validate() error {
+	if spp.ClientID == "" {
+		return fmt.Errorf("clientId must not be empty")
+	}
+
+	if spp.Secret == "" {
+		return fmt.Errorf("secret must not be empty")
 	}
 
 	return nil

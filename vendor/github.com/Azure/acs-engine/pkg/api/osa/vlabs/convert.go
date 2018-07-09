@@ -43,6 +43,7 @@ func (oc *OpenShiftCluster) AsContainerService() *api.ContainerService {
 		cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles,
 			&api.AgentPoolProfile{
 				Name:         app.Name,
+				Role:         api.AgentPoolProfileRole(app.Role),
 				Count:        app.Count,
 				VMSize:       app.VMSize,
 				VnetSubnetID: app.VnetSubnetID,
