@@ -4,82 +4,7 @@
     "parameters": {},
     "variables": {},
     "resources": [
-        {
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2016-03-30",
-            "location": "{{ .ContainerService.Location | js }}",
-            "name": "nsg-compute",
-            "properties": {
-                "securityRules": [
-                    {
-                        "name": "allow_ssh",
-                        "properties": {
-                            "access": "Allow",
-                            "description": "Allow SSH traffic",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "22-22",
-                            "direction": "Inbound",
-                            "priority": 101,
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2016-03-30",
-            "location": "{{ .ContainerService.Location | js }}",
-            "name": "nsg-infra",
-            "properties": {
-                "securityRules": [
-                    {
-                        "name": "allow_ssh",
-                        "properties": {
-                            "access": "Allow",
-                            "description": "Allow SSH traffic",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "22-22",
-                            "direction": "Inbound",
-                            "priority": 101,
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*"
-                        }
-                    },
-                    {
-                        "name": "allow_http",
-                        "properties": {
-                            "access": "Allow",
-                            "description": "Allow http traffic",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "80",
-                            "direction": "Inbound",
-                            "priority": 102,
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*"
-                        }
-                    },
-                    {
-                        "name": "allow_https",
-                        "properties": {
-                            "access": "Allow",
-                            "description": "Allow https traffic",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "443",
-                            "direction": "Inbound",
-                            "priority": 103,
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*"
-                        }
-                    }
-                ]
-            }
-        },
+{{ if not ( index .ContainerService.Properties.AgentPoolProfiles 0).VnetSubnetID }}              
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2016-03-30",
@@ -93,7 +18,7 @@
                 },
                 "subnets": [
                     {
-                        "name": "subnet",
+                        "name": "default",
                         "properties": {
                             "addressPrefix": "10.0.0.0/24"
                         }
@@ -101,6 +26,7 @@
                 ]
             }
         },
+{{ end }}
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2016-03-30",
@@ -217,24 +143,83 @@
             "properties": {
                 "accountType": "Standard_LRS"
             }
+        }
+{{- range $app := .ContainerService.Properties.AgentPoolProfiles }},
+       {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2016-03-30",
+            "location": "{{ $.ContainerService.Location }}",
+            "name": "nsg-{{ $app.Name }}",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow_ssh",
+                        "properties": {
+                            "access": "Allow",
+                            "description": "Allow SSH traffic",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "22-22",
+                            "direction": "Inbound",
+                            "priority": 101,
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*"
+                    }
+                }
+{{ if eq $app.Role `infra` }}  
+                    ,{
+                        "name": "allow_http",
+                        "properties": {
+                            "access": "Allow",
+                            "description": "Allow http traffic",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "80",
+                            "direction": "Inbound",
+                            "priority": 102,
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*"
+                        }
+                    },
+                    {
+                        "name": "allow_https",
+                        "properties": {
+                            "access": "Allow",
+                            "description": "Allow https traffic",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "443",
+                            "direction": "Inbound",
+                            "priority": 103,
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*"
+                        }
+                    }
+{{ end }}
+                ]
+            }
         },
+
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2017-12-01",
-            "location": "{{ .ContainerService.Location | js }}",
+            "location": "{{ $.ContainerService.Location | js }}",
             "dependsOn": [
+{{ if eq $app.Role `infra` }}                
+                "[resourceId('Microsoft.Network/loadBalancers', 'lb-router')]",
+{{ end }}
+{{ if not $app.VnetSubnetID }}
                 "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]"
+{{ end }}
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}')]"
             ],
-            "name": "ss-compute",
+            "name": "ss-{{ $app.Name }}",
             "sku": {
                 "tier": "Standard",
-{{- range $app := .ContainerService.Properties.AgentPoolProfiles }}{{ if eq $app.Name `compute` }}
                 "capacity": "{{ $app.Count | js }}",
                 "name": "{{ $app.VMSize | js }}"
-{{- end }}{{ end }}
             },
-{{- if eq .Config.ImageResourceName "" }}
+{{- if eq $.Config.ImageResourceName "" }}
             "plan": {
                 "name": "{{ .Config.ImageSKU | js }}",
                 "publisher": "{{ .Config.ImagePublisher | js }}",
@@ -249,13 +234,13 @@
                 "virtualMachineProfile": {
                     "osProfile": {
                         "adminUsername": "cloud-user",
-                        "computerNamePrefix": "compute-",
+                        "computerNamePrefix": "{{ $app.Name }}-",
                         "linuxConfiguration": {
                             "disablePasswordAuthentication": true,
                             "ssh": {
                                 "publicKeys": [
                                     {
-                                        "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey | js }}",
+                                        "keyData": "{{ SSHPublicKeyAsString $.Config.SSHKey.PublicKey }}",
                                         "path": "/home/cloud-user/.ssh/authorized_keys"
                                     }
                                 ]
@@ -264,13 +249,13 @@
                     },
                     "storageProfile": {
                         "imageReference": {
-{{- if eq .Config.ImageResourceName "" }}
-                            "offer": "{{ .Config.ImageOffer | js }}",
-                            "publisher": "{{ .Config.ImagePublisher | js }}",
-                            "sku": "{{ .Config.ImageSKU | js }}",
-                            "version": "{{ .Config.ImageVersion | js }}"
+{{- if eq $.Config.ImageResourceName "" }}
+                            "offer": "{{ $.Config.ImageOffer | js }}",
+                            "publisher": "{{ $.Config.ImagePublisher | js }}",
+                            "sku": "{{ $.Config.ImageSKU | js }}",
+                            "version": "{{ $.Config.ImageVersion | js }}"
 {{- else }}
-                            "id": "[resourceId('{{ .Config.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName | js }}')]"
+                            "id": "[resourceId('{{ $.Config.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ $.Config.ImageResourceName | js }}')]"
 {{- end }}
                         },
                         "osDisk": {
@@ -289,7 +274,7 @@
                                     "primary": true,
                                     "enableIPForwarding": true,
                                     "networkSecurityGroup": {
-                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-compute')]"
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}')]"
                                     },
                                     "ipConfigurations": [
                                         {
@@ -297,7 +282,11 @@
                                             "properties": {
                                                 "primary": true,
                                                 "subnet": {
-                                                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/subnet')]"
+{{ if $app.VnetSubnetID }}
+                                                    "id": "{{ $app.VnetSubnetID }}"
+{{ else }}
+                                                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/default')]"
+{{ end }}
                                                 },
                                                 "publicIpAddressConfiguration": {
                                                     "name": "ip",
@@ -305,126 +294,13 @@
                                                         "idleTimeoutInMinutes": 15
                                                     }
                                                 }
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "extensionProfile": {
-                        "extensions": [
-                            {
-                                "name": "cse",
-                                "properties": {
-                                    "autoUpgradeMinorVersion": true,
-                                    "protectedSettings": {
-                                        "script": "{{ Base64Encode (Startup `compute`) | js }}"
-                                    },
-                                    "publisher": "Microsoft.Azure.Extensions",
-                                    "settings": {},
-                                    "type": "CustomScript",
-                                    "typeHandlerVersion": "2.0"
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachineScaleSets",
-            "apiVersion": "2017-12-01",
-            "location": "{{ .ContainerService.Location | js }}",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-infra')]",
-                "[resourceId('Microsoft.Network/loadBalancers', 'lb-router')]"
-            ],
-            "name": "ss-infra",
-            "sku": {
-                "tier": "Standard",
-{{- range $app := .ContainerService.Properties.AgentPoolProfiles }}{{ if eq $app.Name `infra` }}
-                "capacity": "{{ $app.Count | js }}",
-                "name": "{{ $app.VMSize | js }}"
-{{- end }}{{ end }}
-            },
-{{- if eq .Config.ImageResourceName "" }}
-            "plan": {
-                "name": "{{ .Config.ImageSKU | js }}",
-                "publisher": "{{ .Config.ImagePublisher | js }}",
-                "product": "{{ .Config.ImageOffer | js }}"
-            },
-{{- end }}
-            "properties": {
-                "overprovision": false,
-                "upgradePolicy": {
-                    "mode": "Manual"
-                },
-                "virtualMachineProfile": {
-                    "osProfile": {
-                        "adminUsername": "cloud-user",
-                        "computerNamePrefix": "infra-",
-                        "linuxConfiguration": {
-                            "disablePasswordAuthentication": true,
-                            "ssh": {
-                                "publicKeys": [
-                                    {
-                                        "keyData": "{{ SSHPublicKeyAsString .Config.SSHKey.PublicKey | js }}",
-                                        "path": "/home/cloud-user/.ssh/authorized_keys"
-                                    }
-                                ]
-                            }
-                        }
-                    },
-                    "storageProfile": {
-                        "imageReference": {
-{{- if eq .Config.ImageResourceName "" }}
-                            "offer": "{{ .Config.ImageOffer | js }}",
-                            "publisher": "{{ .Config.ImagePublisher | js }}",
-                            "sku": "{{ .Config.ImageSKU | js }}",
-                            "version": "{{ .Config.ImageVersion | js }}"
-{{- else }}
-                            "id": "[resourceId('{{ .Config.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName | js }}')]"
-{{- end }}
-                        },
-                        "osDisk": {
-                            "caching": "ReadWrite",
-                            "createOption": "FromImage",
-                            "managedDisk": {
-                                "storageAccountType": "Premium_LRS"
-                            }
-                        }
-                    },
-                    "networkProfile": {
-                        "networkInterfaceConfigurations": [
-                            {
-                                "name": "nic",
-                                "properties": {
-                                    "primary": true,
-                                    "enableIPForwarding": true,
-                                    "networkSecurityGroup": {
-                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-infra')]"
-                                    },
-                                    "ipConfigurations": [
-                                        {
-                                            "name": "ipconfig",
-                                            "properties": {
-                                                "primary": true,
-                                                "subnet": {
-                                                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/subnet')]"
-                                                },
-                                                "publicIpAddressConfiguration": {
-                                                    "name": "ip",
-                                                    "properties": {
-                                                        "idleTimeoutInMinutes": 15
-                                                    }
-                                                },
-                                                "loadBalancerBackendAddressPools": [
+{{ if eq $app.Role `infra` }}  
+                                                ,"loadBalancerBackendAddressPools": [
                                                     {
                                                         "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/backendAddressPools/backend')]"
                                                     }
                                                 ]
+{{ end }}
                                             }
                                         }
                                     ]
@@ -439,7 +315,7 @@
                                 "properties": {
                                     "autoUpgradeMinorVersion": true,
                                     "protectedSettings": {
-                                        "script": "{{ Base64Encode (Startup `infra`) | js }}"
+                                        "script": "{{ Base64Encode (Startup $app.Name ) }}"
                                     },
                                     "publisher": "Microsoft.Azure.Extensions",
                                     "settings": {},
@@ -452,6 +328,7 @@
                 }
             }
         }
+{{ end }}
     ],
     "outputs": {}
 }

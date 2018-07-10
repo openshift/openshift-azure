@@ -80,3 +80,58 @@
    `./ssh.sh hostname`.
 
 1. Run `./delete.sh` to delete the deployed cluster.
+
+### Examples
+
+Basic OpenShift configuration:
+
+```yaml
+name: openshift
+location: eastus
+properties:
+  openShiftVersion: "$DEPLOY_VERSION"
+  publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+  routingConfigSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
+  agentPoolProfiles:
+  - name: compute
+    count: 1
+    vmSize: Standard_D2s_v3
+  - name: infra
+    role: infra
+    count: 1
+    vmSize: Standard_D2s_v3
+  servicePrincipalProfile:
+    clientID: $AZURE_CLIENT_ID
+    secret: $AZURE_CLIENT_SECRET
+```
+
+OpenShift with BYO VNET configuration:
+
+```yaml
+name: openshift
+location: eastus
+properties:
+  openShiftVersion: "$DEPLOY_VERSION"
+  publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+  routingConfigSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
+  agentPoolProfiles:
+  - name: compute
+    count: 1
+    vmSize: Standard_D2s_v3
+    vnetSubnetID: /subscriptions/SUB_ID/resourceGroups/RG_NAME/providers/Microsoft.Network/virtualNetworks/VNET_NAME/subnets/SUBNET_NAME
+  - name: infra
+    role: infra
+    count: 1
+    vmSize: Standard_D2s_v3
+    vnetSubnetID: /subscriptions/SUB_ID/resourceGroups/RG_NAME/providers/Microsoft.Network/virtualNetworks/VNET_NAME/subnets/SUBNET_NAME
+  servicePrincipalProfile:
+    clientID: $AZURE_CLIENT_ID
+    secret: $AZURE_CLIENT_SECRET
+```
+
+You can create BYO VNET and subnet with commands:
+
+```bash
+az network vnet create -n $VNET_NAME -l $LOCATION -g $RESOURCEGROUP
+az network vnet subnet create -n $SUBNET_NAME -g $RESOURCEGROUP --vnet-name $VNET_NAME --address-prefix 10.0.0.0/24
+```
