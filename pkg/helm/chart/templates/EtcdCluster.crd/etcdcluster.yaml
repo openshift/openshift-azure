@@ -1,0 +1,27 @@
+apiVersion: etcd.database.coreos.com/v1beta2
+kind: EtcdCluster
+metadata:
+  name: master-etcd
+  annotations:
+    etcd.database.coreos.com/scope: clusterwide
+spec:
+  size: 3
+  version: 3.1.8
+  TLS:
+    static:
+      member:
+        peerSecret: etcd-peer-tls
+        serverSecret: etcd-server-tls
+      operatorSecret: etcd-client-tls
+# repository: quay.io/coreos/etc
+#  backup:
+#    backupIntervalInSecond: 
+#    maxBackups: 
+#    autoDelete: 
+#    storageType: "ABS"
+#    abs:
+#      absContainer: 
+#      absSecret: 
+#   restore:
+#     backupClusterName: ""
+#     storageType: "ABS"

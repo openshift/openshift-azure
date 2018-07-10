@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"fmt"
 	"io"
 	"math/big"
 	"net"
@@ -159,7 +160,14 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	}{
 		// Generate etcd certs
 		{
-			cn:          "master-etcd",
+			cn: "master-etcd",
+			dnsNames: []string{
+				// TODO: Fix be before production.
+				"master-etcd-client",
+				fmt.Sprintf("*.master-etcd.%s.svc", m.ResourceGroup),
+				fmt.Sprintf("master-etcd-client.%s.svc", m.ResourceGroup),
+				"localhost",
+			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			signingKey:  c.EtcdCaKey,
 			signingCert: c.EtcdCaCert,
@@ -167,7 +175,13 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			cert:        &c.EtcdServerCert,
 		},
 		{
-			cn:          "etcd-peer",
+			cn: "etcd-peer",
+			dnsNames: []string{
+				// TODO: Fix be before production.
+				"*.master-etcd",
+				fmt.Sprintf("*.master-etcd.%s.svc", m.ResourceGroup),
+				fmt.Sprintf("*.master-etcd.%s.svc.cluster.local", m.ResourceGroup),
+			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 			signingKey:  c.EtcdCaKey,
 			signingCert: c.EtcdCaCert,
