@@ -59,18 +59,46 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 	}
 }
 
+func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
+	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
+	//TODO: confirm minor version after release
+	case "3.10":
+		c.MasterEtcdImage = "rhel7/etcd:v3.10.15-1"
+		c.MasterAPIImage = "openshift3/ose-control-plane:v3.10.15-1"
+		c.MasterControllersImage = "openshift3/ose-control-plane:v3.10.15-1"
+		c.NodeImage = "openshift3/ose-node:v3.10.15-1"
+		c.ServiceCatalogImage = "openshift3/ose-service-catalog:v3.10.15-1"
+		c.TemplateServiceBrokerImage = "openshift3/ose-template-service-broker:v3.10.15-1"
+		c.PrometheusNodeExporterImage = "openshift3/prometheus-node-exporter:v3.10.15-1"
+		c.RegistryImage = "openshift3/ose-docker-registry:v3.10.15-1"
+		c.RouterImage = "openshift3/ose-haproxy-router:v3.10.15-1"
+		c.RegistryConsoleImage = "openshift3/registry-console:v3.10.15-1"
+		c.AnsibleServiceBrokerImage = "openshift3/ose-ansible-service-broker:v3.10.15-1"
+		c.WebConsoleImage = "openshift3/ose-web-console:v3.10.15-1"
+		c.OAuthProxyImage = "openshift3/oauth-proxy:v3.10.15-1"
+		c.PrometheusImage = "openshift3/prometheus:v3.10.15-1"
+		c.PrometheusAlertBufferImage = "openshift3/prometheus-alert-buffer:v3.10.15-1"
+		c.PrometheusAlertManagerImage = "openshift3/prometheus-alertmanager:v3.10.15-1"
+		c.TunnelImage = "docker.io/jimminter/tunnel:latest"      //TODO: We need to publish it somewhere.
+		c.SyncImage = "docker.io/jimminter/sync:latest"          //TODO: We need to publish it somewhere.
+		c.AzureCLIImage = "docker.io/microsoft/azure-cli:2.0.41" //TODO: create mapping for OSA release to any other image we use
+	}
+
+}
+
 func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 	switch os.Getenv("DEPLOY_OS") {
 	case "":
-		// TODO: selectContainerImagesOSA(m, c)
+		c.ImageConfigFormat = "openshift3/ose-${component}:${version}"
+		selectContainerImagesOSA(cs, c)
 	case "centos7":
+		c.ImageConfigFormat = "openshift/origin-${component}:${version}"
 		selectContainerImagesOrigin(cs, c)
 	}
 }
 
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
-	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
 	c.TunnelHostname = strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, "openshift", "openshift-tunnel", 1)
 
 	selectNodeImage(cs, c)
