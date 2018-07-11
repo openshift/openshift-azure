@@ -62,7 +62,7 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
 	//TODO: confirm minor version after release
-	case "3.10", "3.10.15":
+	case "3.10":
 		c.MasterEtcdImage = "rhel7/etcd:v3.10.15-1"
 		c.MasterAPIImage = "openshift3/ose-control-plane:v3.10.15-1"
 		c.MasterControllersImage = "openshift3/ose-control-plane:v3.10.15-1"
