@@ -13,6 +13,7 @@ type Path interface {
 	Delete(interface{})
 	DeleteIfMatch(interface{}, interface{})
 	Get(interface{}) []interface{}
+	MustGetObject(i interface{}) map[string]interface{}
 	MustGetString(interface{}) string
 	MustGetStrings(interface{}) []string
 	Set(interface{}, interface{})
@@ -60,6 +61,13 @@ func (r rules) Get(i interface{}) (os []interface{}) {
 	}
 
 	return
+}
+
+func (r rules) MustGetObject(i interface{}) map[string]interface{} {
+	if len(r.Get(i)) == 0 {
+		return nil
+	}
+	return r.Get(i)[0].(map[string]interface{})
 }
 
 func (r rules) MustGetString(i interface{}) string {
