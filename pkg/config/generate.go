@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"fmt"
 	"io"
 	"math/big"
 	"net"
@@ -17,6 +18,49 @@ import (
 
 	"github.com/jim-minter/azure-helm/pkg/tls"
 )
+
+// ORIGIN Images
+//		MasterEtcdImage:             "quay.io/coreos/etcd",
+//		MasterAPIImage:              "docker.io/openshift/origin-control-plane",
+//		MasterControllersImage:      "docker.io/openshift/origin-control-plane",
+//		NodeImage:                   "docker.io/openshift/origin-node",
+//		ServiceCatalogImage:         "docker.io/openshift/origin-service-catalog",
+//		TemplateServiceBrokerImage:  "docker.io/openshift/origin-template-service-broker",
+//		PrometheusNodeExporterImage: "docker.io/openshift/prometheus-node-exporter",
+//		RegistryImage:               "docker.io/openshift/origin-docker-registry",
+//		RouterImage:                 "docker.io/openshift/origin-haproxy-router",
+//		RegistryConsoleImage:        "docker.io/cockpit/kubernetes",
+//		AnsibleServiceBrokerImage:   "docker.io/ansibleplaybookbundle/origin-ansible-service-broker",
+//		WebConsoleImage:             "docker.io/openshift/origin-web-console",
+//		OAuthProxyImage:             "docker.io/openshift/oauth-proxy",
+//		PrometheusImage:             "docker.io/openshift/prometheus",
+//		PrometheusAlertBufferImage:  "docker.io/openshift/prometheus-alert-buffer",
+//		PrometheusAlertManagerImage: "docker.io/openshift/prometheus-alertmanager",
+//
+//		TunnelImage:   "docker.io/jimminter/tunnel",
+//		SyncImage:     "docker.io/jimminter/sync",
+//		AzureCLIImage: "docker.io/microsoft/azure-cli",
+//
+// OSA Images
+//		MasterAPIImage:              "registry.access.redhat.com/openshift3/ose-control-plane",
+//		MasterControllersImage:      "registry.access.redhat.com/openshift3/ose-control-plane",
+//		NodeImage:                   "registry.access.redhat.com/openshift3/ose-node",
+//		ServiceCatalogImage:         "registry.access.redhat.com/openshift3/ose-service-catalog",
+//		TemplateServiceBrokerImage:  "registry.access.redhat.com/openshif3t/ose-template-service-broker",
+//		PrometheusNodeExporterImage: "registry.access.redhat.com/openshift3/prometheus-node-exporter",
+//		RegistryImage:               "registry.access.redhat.com/openshift3/ose-docker-registry",
+//		RouterImage:                 "registry.access.redhat.com/openshift3/ose-haproxy-router",
+//		RegistryConsoleImage:        "registry.access.redhat.com/openshift3/registry-console",
+//		AnsibleServiceBrokerImage:   "registry.access.redhat.com/openshift3/ose-ansible-service-broker",
+//		WebConsoleImage:             "registry.access.redhat.com/openshift3/ose-web-console",
+//		OAuthProxyImage:             "registry.access.redhat.com/openshift3/oauth-proxy",
+//		PrometheusImage:             "registry.access.redhat.com/openshift3/prometheus",
+//		PrometheusAlertBufferImage:  "registry.access.redhat.com/openshift3/prometheus-alert-buffer",
+//		PrometheusAlertManagerImage: "registry.access.redhat.com/openshift3/prometheus-alertmanager",
+//
+//		TunnelImage:   "docker.io/jimminter/tunnel",
+//		SyncImage:     "docker.io/jimminter/sync",
+//		AzureCLIImage: "docker.io/microsoft/azure-cli
 
 func selectNodeImage(cs *acsapi.ContainerService, c *Config) {
 	c.ImagePublisher = "redhat"
@@ -35,53 +79,111 @@ func selectNodeImage(cs *acsapi.ContainerService, c *Config) {
 }
 
 func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
+	// TODO:
+	// Publish tunnel, sync, images
+	c.ImageConfigFormat = "openshift/origin-${component}:${version}"
 	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
+	case "3.11":
+		c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
+		c.MasterAPIImage = "docker.io/openshift/origin-control-plane:v3.11"
+		c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.11"
+		c.NodeImage = "docker.io/openshift/origin-node:v3.11"
+		c.ServiceCatalogImage = "docker.io/openshift/origin-service-catalog:v3.11"
+		c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.11"
+		c.PrometheusNodeExporterImage = "docker.io/openshift/prometheus-node-exporter:v0.15.2"
+		c.RegistryImage = "docker.io/openshift/origin-docker-registry:v3.11"
+		c.RouterImage = "docker.io/openshift/origin-haproxy-router:v3.11"
+		c.RegistryConsoleImage = "docker.io/cockpit/kubernetes:latest"
+		c.AnsibleServiceBrokerImage = "docker.io/ansibleplaybookbundle/origin-ansible-service-broker:latest"
+		c.WebConsoleImage = "docker.io/openshift/origin-web-console:v3.11"
+		c.OAuthProxyImage = "docker.io/openshift/oauth-proxy:v3.11"
+		c.PrometheusImage = "docker.io/openshift/prometheusv2.2.1"
+		c.PrometheusAlertBufferImage = "docker.io/openshift/prometheus-alert-buffer:v0.0.2"
+		c.PrometheusAlertManagerImage = "docker.io/openshift/prometheus-alertmanager:v0.14.0"
+
+		c.TunnelImage = "docker.io/jimminter/tunnel:latest"
+		c.SyncImage = "docker.io/jimminter/sync:latest"
+		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
+
 	case "3.10":
 		c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
 		c.MasterAPIImage = "docker.io/openshift/origin-control-plane:v3.10"
 		c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
-		c.NodeImage = "docker.io/openshift/origin-node:v3.10.0"
+		c.NodeImage = "docker.io/openshift/origin-node:v3.10"
 		c.ServiceCatalogImage = "docker.io/openshift/origin-service-catalog:v3.10"
+		c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.10"
+		c.PrometheusNodeExporterImage = "docker.io/openshift/prometheus-node-exporter:v0.15.2"
+		c.RegistryImage = "docker.io/openshift/origin-docker-registry:v3.10"
+		c.RouterImage = "docker.io/openshift/origin-haproxy-router:v3.10"
+		c.RegistryConsoleImage = "docker.io/cockpit/kubernetes:latest"
+		c.AnsibleServiceBrokerImage = "docker.io/ansibleplaybookbundle/origin-ansible-service-broker:latest"
+		c.WebConsoleImage = "docker.io/openshift/origin-web-console:v3.10"
+		c.OAuthProxyImage = "docker.io/openshift/oauth-proxy:v3.10"
+		c.PrometheusImage = "docker.io/openshift/prometheusv2.2.1"
+		c.PrometheusAlertBufferImage = "docker.io/openshift/prometheus-alert-buffer:v0.0.2"
+		c.PrometheusAlertManagerImage = "docker.io/openshift/prometheus-alertmanager:v0.14.0"
+
 		c.TunnelImage = "docker.io/jimminter/tunnel:latest"
 		c.SyncImage = "docker.io/jimminter/sync:latest"
-		c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.10"
-		c.PrometheusNodeExporterImage = "openshift/prometheus-node-exporter:v0.15.2"
-		c.RegistryImage = "openshift/origin-docker-registry:v3.10.0"
-		c.RouterImage = "openshift/origin-haproxy-router:v3.10.0"
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
-		c.RegistryConsoleImage = "cockpit/kubernetes:latest"
-		c.AnsibleServiceBrokerImage = "ansibleplaybookbundle/origin-ansible-service-broker:latest"
-		c.WebConsoleImage = "openshift/origin-web-console:v3.10.0"
-		c.OAuthProxyImage = "openshift/oauth-proxy:v1.0.0"
-		c.PrometheusImage = "openshift/prometheus:v2.2.1"
-		c.PrometheusAlertBufferImage = "openshift/prometheus-alert-buffer:v0.0.2"
-		c.PrometheusAlertManagerImage = "openshift/prometheus-alertmanager:v0.14.0"
 	}
 }
 
 func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
+	// TODO:
+	// Publish tunnel, sync, images
+	// After GA change ImageConfigFormat, default registry and update default tags for released version
+	c.ImageConfigFormat = "openshift3/ose-${component}:${version}"
 	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
-	//TODO: confirm minor version after release
 	case "3.10":
-		c.MasterEtcdImage = "rhel7/etcd:v3.10.15-1"
-		c.MasterAPIImage = "openshift3/ose-control-plane:v3.10.15-1"
-		c.MasterControllersImage = "openshift3/ose-control-plane:v3.10.15-1"
-		c.NodeImage = "openshift3/ose-node:v3.10.15-1"
-		c.ServiceCatalogImage = "openshift3/ose-service-catalog:v3.10.15-1"
-		c.TemplateServiceBrokerImage = "openshift3/ose-template-service-broker:v3.10.15-1"
-		c.PrometheusNodeExporterImage = "openshift3/prometheus-node-exporter:v3.10.15-1"
-		c.RegistryImage = "openshift3/ose-docker-registry:v3.10.15-1"
-		c.RouterImage = "openshift3/ose-haproxy-router:v3.10.15-1"
-		c.RegistryConsoleImage = "openshift3/registry-console:v3.10.15-1"
-		c.AnsibleServiceBrokerImage = "openshift3/ose-ansible-service-broker:v3.10.15-1"
-		c.WebConsoleImage = "openshift3/ose-web-console:v3.10.15-1"
-		c.OAuthProxyImage = "openshift3/oauth-proxy:v3.10.15-1"
-		c.PrometheusImage = "openshift3/prometheus:v3.10.15-1"
-		c.PrometheusAlertBufferImage = "openshift3/prometheus-alert-buffer:v3.10.15-1"
-		c.PrometheusAlertManagerImage = "openshift3/prometheus-alertmanager:v3.10.15-1"
-		c.TunnelImage = "docker.io/jimminter/tunnel:latest"      //TODO: We need to publish it somewhere.
-		c.SyncImage = "docker.io/jimminter/sync:latest"          //TODO: We need to publish it somewhere.
-		c.AzureCLIImage = "docker.io/microsoft/azure-cli:2.0.41" //TODO: create mapping for OSA release to any other image we use
+		c.ImageConfigFormat = "registry.reg-aws.openshift.com/openshift3/ose-${component}:${version}"
+		c.ContainerPullSecret = configureDevRegPullSecret("registry.reg-aws.openshift.com")
+
+		c.MasterEtcdImage = "registry.reg-aws.openshift.com/rhel3/etcd:3.2.22"
+		c.MasterAPIImage = "registry.reg-aws.openshift.com/openshift3/ose-control-plane:v3.10"
+		c.MasterControllersImage = "registry.reg-aws.openshift.com/openshift3/ose-control-plane:v3.10"
+		c.NodeImage = "registry.reg-aws.openshift.com/openshift3/ose-node:v3.10"
+		c.ServiceCatalogImage = "registry.reg-aws.openshift.com/openshift3/ose-service-catalog:v3.10"
+		c.TemplateServiceBrokerImage = "registry.reg-aws.openshift.com/openshift3/ose-template-service-broker:v3.10"
+		c.PrometheusNodeExporterImage = "registry.reg-aws.openshift.com/openshift3/prometheus-node-exporter:v0.15.2"
+		c.RegistryImage = "registry.reg-aws.openshift.com/openshift3/ose-docker-registry:v3.10"
+		c.RouterImage = "registry.reg-aws.openshift.com/openshift3/ose-haproxy-router:v3.10"
+		c.RegistryConsoleImage = "registry.reg-aws.openshift.com/openshift3/registry-console:v3.10"
+		c.AnsibleServiceBrokerImage = "registry.reg-aws.openshift.com/openshift3/ose-ansible-service-broker:v3.10"
+		c.WebConsoleImage = "registry.reg-aws.openshift.com/openshift3/origin-web-console:v3.10"
+		c.OAuthProxyImage = "registry.reg-aws.openshift.com/openshift3/oauth-proxy:v3.10"
+		c.PrometheusImage = "registry.reg-aws.openshift.com/openshift3/prometheus:v2.2.1"
+		c.PrometheusAlertBufferImage = "registry.reg-aws.openshift.com/openshift3/prometheus-alert-buffer:v0.0.2"
+		c.PrometheusAlertManagerImage = "registry.reg-aws.openshift.com/openshift3/prometheus-alertmanager:v0.14.0"
+
+		c.TunnelImage = "docker.io/jimminter/tunnel:latest"
+		c.SyncImage = "docker.io/jimminter/sync:latest"
+		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
+
+	case "3.11":
+		c.ImageConfigFormat = "registry.reg-aws.openshift.com/openshift3/ose-${component}:${version}"
+		c.ContainerPullSecret = configureDevRegPullSecret("registry.reg-aws.openshift.com")
+
+		c.MasterEtcdImage = "registry.reg-aws.openshift.com/rhel3/etcd:3.2.22"
+		c.MasterAPIImage = "registry.reg-aws.openshift.com/openshift3/ose-control-plane:v3.11"
+		c.MasterControllersImage = "registry.reg-aws.openshift.com/openshift3/ose-control-plane:v3.11"
+		c.NodeImage = "registry.reg-aws.openshift.com/openshift3/ose-node:v3.11"
+		c.ServiceCatalogImage = "registry.reg-aws.openshift.com/openshift3/ose-service-catalog:v3.11"
+		c.TemplateServiceBrokerImage = "registry.reg-aws.openshift.com/openshift3/ose-template-service-broker:v3.11"
+		c.PrometheusNodeExporterImage = "registry.reg-aws.openshift.com/openshift3/prometheus-node-exporter:v0.15.2"
+		c.RegistryImage = "registry.reg-aws.openshift.com/openshift3/ose-docker-registry:v3.11"
+		c.RouterImage = "registry.reg-aws.openshift.com/openshift3/ose-haproxy-router:v3.11"
+		c.RegistryConsoleImage = "registry.reg-aws.openshift.com/openshift3/registry-console:v3.11"
+		c.AnsibleServiceBrokerImage = "registry.reg-aws.openshift.com/openshift3/ose-ansible-service-broker:v3.11"
+		c.WebConsoleImage = "registry.reg-aws.openshift.com/openshift3/origin-web-console:v3.11"
+		c.OAuthProxyImage = "registry.reg-aws.openshift.com/openshift3/oauth-proxy:v3.11"
+		c.PrometheusImage = "registry.reg-aws.openshift.com/openshift3/prometheus:v2.2.1"
+		c.PrometheusAlertBufferImage = "registry.reg-aws.openshift.com/openshift3/prometheus-alert-buffer:v0.0.2"
+		c.PrometheusAlertManagerImage = "registry.reg-aws.openshift.com/openshift3/prometheus-alertmanager:v0.14.0"
+
+		c.TunnelImage = "docker.io/jimminter/tunnel:latest"
+		c.SyncImage = "docker.io/jimminter/sync:latest"
+		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
 	}
 
 }
@@ -89,12 +191,14 @@ func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 	switch os.Getenv("DEPLOY_OS") {
 	case "":
-		c.ImageConfigFormat = "openshift3/ose-${component}:${version}"
 		selectContainerImagesOSA(cs, c)
 	case "centos7":
-		c.ImageConfigFormat = "openshift/origin-${component}:${version}"
 		selectContainerImagesOrigin(cs, c)
 	}
+}
+
+func configureDevRegPullSecret(registry string) []byte {
+	return []byte(fmt.Sprintf("{\"auths\":{\"%s\":{\"auth\":\"%s\"}}}", registry, os.Getenv("DEV_PULL_SECRET")))
 }
 
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {

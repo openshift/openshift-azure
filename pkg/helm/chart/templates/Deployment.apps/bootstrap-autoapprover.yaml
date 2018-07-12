@@ -71,6 +71,10 @@ spec:
         - name: kubeconfig
           mountPath: /tmp/kubeconfig
           readOnly: true
+{{if ne "" .Values.ContainerPullSecret }}
+      imagePullSecrets:
+      - name: prerelease-reg 
+{{end}}         
       volumes:
       - name: kubeconfig
         secret:

@@ -67,6 +67,10 @@ spec:
         - name: config
           mountPath: /etc/tunnel
           readOnly: true
+{{if ne "" .Values.ContainerPullSecret }}
+      imagePullSecrets:
+      - name: devreg 
+{{end}}
       volumes:
       - name: master-config
         secret:

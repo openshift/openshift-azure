@@ -49,6 +49,10 @@ spec:
           readOnly: true
         - name: master-data
           mountPath: /var/lib/etcd/
+{{if ne "" .Values.ContainerPullSecret }}
+      imagePullSecrets:
+      - name: devreg 
+{{end}}
       volumes:
       - name: master-config
         secret:
