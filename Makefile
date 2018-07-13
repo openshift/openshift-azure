@@ -6,10 +6,10 @@ tunnel: clean
 
 tunnel-image: tunnel
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-	imagebuilder -f Dockerfile.tunnel -t docker.io/jimminter/tunnel:latest .
+	imagebuilder -f Dockerfile.tunnel -t quay.io/openshift-on-azure/tunnel:latest .
 
 tunnel-push: tunnel-image
-	docker push docker.io/jimminter/tunnel:latest
+	docker push quay.io/openshift-on-azure/tunnel:latest
 
 sync: clean
 	go generate ./...
@@ -17,12 +17,12 @@ sync: clean
 
 sync-image: sync
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-	imagebuilder -f Dockerfile.sync -t docker.io/jimminter/sync:latest .
+	imagebuilder -f Dockerfile.sync -t quay.io/openshift-on-azure/sync:latest .
 
 sync-push: sync-image
-	docker push docker.io/jimminter/sync:latest
+	docker push quay.io/openshift-on-azure/sync:latest
 
 .PHONY: clean sync-image sync-push tunnel-image tunnel-push
 
-# docker pull docker.io/jimminter/sync:latest
-# docker run --dns=8.8.8.8 -i -v /root/.kube:/.kube:z -e KUBECONFIG=/.kube/config docker.io/jimminter/sync:latest
+# docker pull quay.io/openshift-on-azure/sync:latest
+# docker run --dns=8.8.8.8 -i -v /root/.kube:/.kube:z -e KUBECONFIG=/.kube/config quay.io/openshift-on-azure/sync:latest

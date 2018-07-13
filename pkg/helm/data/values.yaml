@@ -21,6 +21,7 @@ RouterImage: {{ .Config.RouterImage | quote }}
 AzureCLIImage: {{ .Config.AzureCLIImage | quote }}
 RegistryConsoleImage: {{ .Config.RegistryConsoleImage | quote }}
 AnsibleServiceBrokerImage: {{ .Config.AnsibleServiceBrokerImage | quote }}
+TemplateServiceBrokerImage: {{ .Config.TemplateServiceBrokerImage | quote }}
 WebConsoleImage: {{ .Config.WebConsoleImage | quote }}
 OAuthProxyImage: {{ .Config.OAuthProxyImage | quote }}
 PrometheusImage: {{ .Config.PrometheusImage | quote }}
@@ -67,6 +68,7 @@ AdminKubeconfig: {{ Base64Encode (YamlMarshal .Config.AdminKubeconfig) | quote }
 MasterKubeconfig: {{ Base64Encode (YamlMarshal .Config.MasterKubeconfig) | quote }}
 ServiceCatalogAPIKubeconfig: {{ Base64Encode (YamlMarshal .Config.ServiceCatalogAPIKubeconfig) | quote }}
 BootstrapAutoapproverKubeconfig: {{ Base64Encode (YamlMarshal .Config.BootstrapAutoapproverKubeconfig) | quote }}
+SyncKubeconfig: {{ Base64Encode (YamlMarshal .Config.SyncKubeconfig) | quote }}
 
 # azure config
 TenantID: {{ .ContainerService.Properties.AzProfile.TenantID | quote }}
@@ -89,3 +91,5 @@ RouterKey: {{ Base64Encode (PrivateKeyAsBytes .Config.RouterKey) | quote }}
 RouterCert: {{ Base64Encode (CertAsBytes .Config.RouterCert) | quote }}
 
 TunnelHostname: {{ .Config.TunnelHostname | quote }}
+
+RunSyncLocal: {{ .Config.RunSyncLocal | quote }}

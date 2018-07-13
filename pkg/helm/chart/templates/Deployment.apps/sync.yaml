@@ -1,11 +1,10 @@
-{{if 0}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sync
   annotations:
     checksum/sync: {{ include (print $.Template.BasePath "/Secret/sync.yaml") . | sha256sum | quote }}
-    checksum/admin-kubeconfig: {{ include (print $.Template.BasePath "/Secret/admin-kubeconfig.yaml") . | sha256sum | quote }}
+    checksum/sync-kubeconfig: {{ include (print $.Template.BasePath "/Secret/sync-kubeconfig.yaml") . | sha256sum | quote }}
 spec:
   replicas: 1
   selector:
@@ -19,11 +18,22 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: sync
+        args:
+        - --run-once=false
+        {{ if eq "true" .Values.RunSyncLocal }}
+        - --dry-run=true
+        {{ end }}
         image: {{ .Values.SyncImage | quote }}
         imagePullPolicy: Always
         env:
         - name: KUBECONFIG
-          value: /tmp/kubeconfig/admin.kubeconfig
+          value: /tmp/kubeconfig/sync.kubeconfig
+        - name: AZURE_TENANT_ID
+          value: {{ .Values.TenantID | quote }}
+        - name: AZURE_SUBSCRIPTION_ID
+          value: {{ .Values.SubscriptionID | quote }}
+        - name: RESOURCEGROUP
+          value: {{ .Values.ResourceGroup | quote }}
         volumeMounts:
         - name: config
           mountPath: /_data
@@ -37,5 +47,4 @@ spec:
           secretName: sync
       - name: kubeconfig
         secret:
-          secretName: admin-kubeconfig
-{{end}}
+          secretName: sync-kubeconfig

@@ -97,6 +97,7 @@ type Config struct {
 	ServiceCatalogAPIKubeconfig     *v1.Config
 	BootstrapAutoapproverKubeconfig *v1.Config
 	NodeBootstrapKubeconfig         *v1.Config
+	SyncKubeconfig                  *v1.Config
 
 	// misc control plane configurables
 	ServiceAccountKey *rsa.PrivateKey
@@ -116,4 +117,7 @@ type Config struct {
 	AlertsProxySessionSecret       []byte
 	PrometheusProxySessionSecret   []byte
 	ServiceCatalogClusterID        uuid.UUID
+
+	// used for development purposes only
+	RunSyncLocal string
 }
