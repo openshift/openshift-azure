@@ -116,4 +116,9 @@ type Config struct {
 	AlertsProxySessionSecret       []byte
 	PrometheusProxySessionSecret   []byte
 	ServiceCatalogClusterID        uuid.UUID
+
+	//HCP configurables
+	Namespace                string
+	EtcdBackupStorageAccount string
+	EtcdBackupContainerName  string
 }

@@ -1,0 +1,21 @@
+apiVersion: etcd.database.coreos.com/v1beta2
+kind: EtcdCluster
+metadata:
+  name: master-etcd
+spec:
+  size: 3
+  version: 3.1.8
+  TLS:
+    static:
+      member:
+        peerSecret: etcd-peer-tls
+        serverSecret: etcd-server-tls
+      operatorSecret: etcd-client-tls
+  backup:
+    # short snapshot interval for testing, do not use this in production!
+    backupIntervalInSecond: 30
+    maxBackups: 5
+    storageType: "PersistentVolume"
+    pv:
+      volumeSizeInMB: 512
+      storageClass: managed-premium

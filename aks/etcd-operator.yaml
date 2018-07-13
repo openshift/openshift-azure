@@ -1,109 +1,46 @@
-# concatenation of
-# https://raw.githubusercontent.com/coreos/etcd-operator/master/example/rbac/cluster-role-binding-template.yaml
-# https://raw.githubusercontent.com/coreos/etcd-operator/master/example/rbac/cluster-role-template.yaml\
-# https://raw.githubusercontent.com/coreos/etcd-operator/master/example/deployment.yaml
-
+# TODO: Move me to helm chart when we can sort ordering:
+# https://github.com/kubernetes/helm/issues/2994
 ---
-
-apiVersion: v1
-kind: Namespace
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
 metadata:
-  name: etcd-operator
----
-
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: etcd-operator-serviceaccount
-  namespace: etcd-operator
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
-metadata:
-  name: etcd-operator
-rules:
-- apiGroups:
-  - etcd.database.coreos.com
-  resources:
-  - etcdclusters
-  - etcdbackups
-  - etcdrestores
-  verbs:
-  - "*"
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - "*"
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  - services
-  - endpoints
-  - persistentvolumeclaims
-  - events
-  verbs:
-  - "*"
-- apiGroups:
-  - apps
-  resources:
-  - deployments
-  verbs:
-  - "*"
-# The following permissions can be removed if not using S3 backup and TLS
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - get
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: etcd-operator
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: etcd-operator
-subjects:
-- kind: ServiceAccount
-  name: etcd-operator-serviceaccount
-  namespace: etcd-operator
-
----
-
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: etcd-operator
-  namespace: etcd-operator
+  name: etcdclusters.etcd.database.coreos.com
 spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        name: etcd-operator
-    spec:
-      serviceAccountName: etcd-operator-serviceaccount
-      containers:
-      - name: etcd-operator
-        image: quay.io/coreos/etcd-operator:v0.9.2
-        command:
-        - etcd-operator
-        - -cluster-wide
-        env:
-        - name: MY_POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: MY_POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
+  group: etcd.database.coreos.com
+  names:
+    kind: EtcdCluster
+    listKind: EtcdClusterList
+    plural: etcdclusters
+    shortNames:
+    - etcd
+    singular: etcdcluster
+  scope: Namespaced
+  version: v1beta2
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: etcdbackups.etcd.database.coreos.com
+spec:
+  group: etcd.database.coreos.com
+  version: v1beta2
+  scope: Namespaced
+  names:
+    kind: EtcdBackup
+    listKind: EtcdBackupList
+    plural: etcdbackups
+    singular: etcdbackup
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: etcdrestores.etcd.database.coreos.com
+spec:
+  group: etcd.database.coreos.com
+  version: v1beta2
+  scope: Namespaced
+  names:
+    kind: EtcdRestore
+    listKind: EtcdRestoreList
+    plural: etcdrestores
+    singular: etcdrestore

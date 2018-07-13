@@ -101,6 +101,10 @@ func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
 	c.TunnelHostname = strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, "openshift", "openshift-tunnel", 1)
+	c.Namespace = cs.Name
+	//TODO: Remove these. These should be created by init container/nanny
+	c.EtcdBackupStorageAccount = "etcdbackups"
+	c.EtcdBackupContainerName = "etcdbackups"
 
 	selectNodeImage(cs, c)
 
@@ -164,8 +168,8 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			dnsNames: []string{
 				// TODO: Fix be before production.
 				"master-etcd-client",
-				fmt.Sprintf("*.master-etcd.%s.svc", m.ResourceGroup),
-				fmt.Sprintf("master-etcd-client.%s.svc", m.ResourceGroup),
+				fmt.Sprintf("*.master-etcd.%s.svc", c.Namespace),
+				fmt.Sprintf("master-etcd-client.%s.svc", c.Namespace),
 				"localhost",
 			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
@@ -179,8 +183,8 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			dnsNames: []string{
 				// TODO: Fix be before production.
 				"*.master-etcd",
-				fmt.Sprintf("*.master-etcd.%s.svc", m.ResourceGroup),
-				fmt.Sprintf("*.master-etcd.%s.svc.cluster.local", m.ResourceGroup),
+				fmt.Sprintf("*.master-etcd.%s.svc", c.Namespace),
+				fmt.Sprintf("*.master-etcd.%s.svc.cluster.local", c.Namespace),
 			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 			signingKey:  c.EtcdCaKey,
@@ -430,6 +434,12 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 
 	if len(c.RegistryStorageAccount) == 0 {
 		if c.RegistryStorageAccount, err = randomStorageAccountName(); err != nil {
+			return
+		}
+	}
+
+	if len(c.EtcdBackupStorageAccount) == 0 {
+		if c.EtcdBackupStorageAccount, err = randomStorageAccountName(); err != nil {
 			return
 		}
 	}
