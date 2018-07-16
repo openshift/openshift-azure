@@ -89,3 +89,8 @@ RouterKey: {{ Base64Encode (PrivateKeyAsBytes .Config.RouterKey) | quote }}
 RouterCert: {{ Base64Encode (CertAsBytes .Config.RouterCert) | quote }}
 
 TunnelHostname: {{ .Config.TunnelHostname | quote }}
+
+# HCP configurables
+Namespace: {{ .Config.Namespace | quote }}
+EtcdBackupStorageAccount: {{ .Config.EtcdBackupStorageAccount | quote }}
+EtcdBackupContainerName: {{ .Config.EtcdBackupContainerName | quote }}

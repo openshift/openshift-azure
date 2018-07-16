@@ -1,0 +1,105 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: etcd-operator
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: etcd-operator
+    spec:
+      serviceAccountName: etcd-operator
+      initContainers:
+      - name: nanny
+        image: docker.io/mangirdas/azure-nanny:latest
+        command:
+        - azure-nanny
+        env:
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: AZURE_TENANT_ID
+          valueFrom:
+             secretKeyRef:
+                name: azure-nanny
+                key: azure_tenant_id
+        - name: AZURE_SUBSCRIPTION_ID
+          valueFrom:
+            secretKeyRef:
+                name: azure-nanny
+                key: azure_subscription_id
+        - name: AZURE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: azure-nanny
+              key: azure_client_id
+        - name: AZURE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: azure-nanny
+              key: azure_client_secret    
+        - name: STORAGE_ACCOUNT
+          valueFrom:
+            secretKeyRef:
+              name: azure-nanny
+              key: storage_account    
+        - name: LOCATION
+          valueFrom:
+            secretKeyRef:
+              name: azure-nanny
+              key: location
+        - name: CONTAINER_NAME
+          valueFrom:
+            secretKeyRef:
+              name: azure-nanny
+              key: container_name
+        - name: RESOURCE_GROUP
+          valueFrom:
+            secretKeyRef:
+              name: azure-nanny
+              key: resource_group
+      containers:
+      - name: operator
+        image: quay.io/coreos/etcd-operator:v0.9.2
+        command:
+        - etcd-operator
+        - --create-crd=false
+        env:
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+      - name: restore
+        image: docker.io/mangirdas/etcd-operator:v0.9.2-dev
+        command:
+        - etcd-restore-operator
+        - --create-crd=false
+        env:
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+      - name: backup
+        image: quay.io/coreos/etcd-operator:v0.9.2
+        command:
+        - etcd-backup-operator
+        - --create-crd=false
+        env:
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name

@@ -1,0 +1,15 @@
+apiVersion: "etcd.database.coreos.com/v1beta2"
+kind: "EtcdBackup"
+metadata:
+  name: master-etcd-cluster-backup
+spec:
+  etcdEndpoints:
+  - "https://master-etcd-client:2379"
+  storageType: "ABS"
+  abs:
+    absSecret: "etcd-backup-abs-credentials"
+    path: {{ .Values.EtcdBackupContainerName }}/etcd.backup
+  clientTLSSecret: etcd-client-tls
+  backupPolicy:
+    TimeoutInSecond: 30
+  

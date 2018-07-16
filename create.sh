@@ -50,7 +50,7 @@ fi
 # TODO: if the user interrupts the process here, the AAD application will leak.
 
 cat >_data/manifest.yaml <<EOF
-name: openshift
+name: $RESOURCEGROUP
 location: eastus
 properties:
   openShiftVersion: "$DEPLOY_VERSION"

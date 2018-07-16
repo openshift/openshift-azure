@@ -47,7 +47,7 @@ KUBECONFIG=aks/admin.kubeconfig helm upgrade $RESOURCEGROUP pkg/helm/chart -f _d
 
 # TODO: when sync runs as an HCP pod (i.e. not in development), hopefully should
 # be able to use helm upgrade --wait here
-for d in master-etcd master-api master-controllers; do
+for d in master-api master-controllers; do
     KUBECONFIG=aks/admin.kubeconfig kubectl rollout status deployment $d -n $RESOURCEGROUP -w
 done
 

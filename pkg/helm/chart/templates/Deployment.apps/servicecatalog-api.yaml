@@ -29,7 +29,7 @@ spec:
         - --secure-port
         - "6443"
         - --etcd-servers
-        - https://master-etcd:2379
+        - https://master-etcd-client:2379
         - --etcd-cafile
         - /var/run/kubernetes-service-catalog/etcd-ca.crt
         - --etcd-certfile
