@@ -247,6 +247,10 @@ var Translations = map[string][]struct {
 			Path:     jsonpath.MustCompile("$.redirectURIs[0]"),
 			Template: "https://registry-console-default.{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain }}",
 		},
+		{
+			Path:     jsonpath.MustCompile("$.secret"),
+			Template: "{{ Base64Encode .Config.RegistryConsoleOAuthSecret }}",
+		},
 	},
 	"Route.route.openshift.io/default/docker-registry": {
 		{

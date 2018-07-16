@@ -107,6 +107,7 @@ type Config struct {
 	// misc infra configurables
 	RegistryStorageAccount         string
 	RegistryHTTPSecret             []byte
+	RegistryConsoleOAuthSecret     []byte
 	AlertManagerProxySessionSecret []byte
 	AlertsProxySessionSecret       []byte
 	PrometheusProxySessionSecret   []byte

@@ -6,4 +6,4 @@ metadata:
   name: cockpit-oauth-client
 redirectURIs:
 - '*** GENERATED ***'
-secret: userHnthX0QtYb21p6jO3BGLFLNiFktncJvmkNcturw6XU4UoCM5EJfxIDdTJ6p0C0Ek
+secret: '*** GENERATED ***'

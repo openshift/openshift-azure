@@ -346,6 +346,10 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			secret: &c.RegistryHTTPSecret,
 		},
 		{
+			secret: &c.RegistryConsoleOAuthSecret,
+			n:      68,
+		},
+		{
 			secret: &c.AlertManagerProxySessionSecret,
 		},
 		{
