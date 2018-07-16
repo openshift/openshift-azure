@@ -45,6 +45,10 @@ spec:
         - name: master-cloud-provider
           mountPath: /etc/origin/cloudprovider/
           readOnly: true
+{{if ne "" .Values.ContainerPullSecret }}
+      imagePullSecrets:
+      - name: devreg 
+{{end}}
       volumes:
       - name: master-config
         secret:

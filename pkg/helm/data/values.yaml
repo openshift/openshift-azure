@@ -89,3 +89,6 @@ RouterKey: {{ Base64Encode (PrivateKeyAsBytes .Config.RouterKey) | quote }}
 RouterCert: {{ Base64Encode (CertAsBytes .Config.RouterCert) | quote }}
 
 TunnelHostname: {{ .Config.TunnelHostname | quote }}
+
+# development settings
+ContainerPullSecret: {{ Base64Encode .Config.ContainerPullSecret | quote }}

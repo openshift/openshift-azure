@@ -17,8 +17,9 @@ type Config struct {
 	ImageVersion   string
 
 	// for development
-	ImageResourceGroup string
-	ImageResourceName  string
+	ImageResourceGroup  string
+	ImageResourceName   string
+	ContainerPullSecret []byte
 
 	// CAs
 	EtcdCaKey            *rsa.PrivateKey

@@ -23,6 +23,7 @@ func Validate(cs, _ *acsapi.ContainerService) error {
 
 	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
 	case "3.10":
+	case "3.11":
 	default:
 		return fmt.Errorf("invalid openShiftVersion %q", cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion)
 	}
