@@ -13,7 +13,7 @@ data:
       execHandlerName: native
     iptablesSyncPeriod: "30s"
     imageConfig:
-      format: openshift/origin-${component}:${version}
+      format: '*** GENERATED ***'
       latest: False
     kind: NodeConfig
     kubeletArguments:
