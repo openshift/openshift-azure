@@ -111,6 +111,20 @@ var Translations = map[string][]struct {
 			Template: "{{ String (CertAsBytes .Config.FrontProxyCaCert) }}",
 		},
 	},
+	"ConfigMap/openshift-node/node-config-compute": {
+		{
+			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
+			Template:   "{{ .Config.ImageConfigFormat }}",
+		},
+	},
+	"ConfigMap/openshift-node/node-config-infra": {
+		{
+			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
+			Template:   "{{ .Config.ImageConfigFormat }}",
+		},
+	},
 	"ConfigMap/openshift-web-console/webconsole-config": {
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
