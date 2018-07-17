@@ -410,6 +410,12 @@ var Translations = map[string][]struct {
 			Template: "{{ Base64Encode .Config.PrometheusProxySessionSecret }}",
 		},
 	},
+	"Service/default/router": {
+		{
+			Path:     jsonpath.MustCompile("$.metadata.annotations['prometheus.openshift.io/password']"),
+			Template: "{{ Base64Encode .Config.RouterPrometheusScrapePassword }}",
+		},
+	},
 	"StatefulSet.apps/openshift-metrics/prometheus": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='prom-proxy')].image"),

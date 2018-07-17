@@ -108,6 +108,7 @@ type Config struct {
 	RegistryStorageAccount         string
 	RegistryHTTPSecret             []byte
 	RegistryConsoleOAuthSecret     []byte
+	RouterPrometheusScrapePassword []byte
 	AlertManagerProxySessionSecret []byte
 	AlertsProxySessionSecret       []byte
 	PrometheusProxySessionSecret   []byte
