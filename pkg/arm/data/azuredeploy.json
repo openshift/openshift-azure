@@ -28,114 +28,6 @@
         },
 {{ end }}
         {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2016-03-30",
-            "location": "{{ .ContainerService.Location | js }}",
-            "name": "ip-router",
-            "properties": {
-                "publicIPAllocationMethod": "Static",
-                "idleTimeoutInMinutes": 15
-            },
-            "sku": {
-                "name": "Basic"
-            }
-        },
-        {
-            "type": "Microsoft.Network/loadBalancers",
-            "apiVersion": "2016-03-30",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-router')]"
-            ],
-            "location": "{{ .ContainerService.Location | js }}",
-            "name": "lb-router",
-            "properties": {
-                "backendAddressPools": [
-                    {
-                        "name": "backend"
-                    }
-                ],
-                "frontendIPConfigurations": [
-                    {
-                        "name": "frontend",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-router')]"
-                            }
-                        }
-                    }
-                ],
-                "inboundNatPools": [],
-                "inboundNatRules": [],
-                "loadBalancingRules": [
-                    {
-                        "name": "port-80",
-                        "properties": {
-                            "backendAddressPool": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/backendAddressPools/backend')]"
-                            },
-                            "backendPort": 80,
-                            "enableFloatingIP": false,
-                            "frontendIPConfiguration": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/frontendIPConfigurations/frontend')]"
-                            },
-                            "frontendPort": 80,
-                            "idleTimeoutInMinutes": 15,
-                            "loadDistribution": "Default",
-                            "probe": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/probes/port-80')]"
-                            },
-                            "protocol": "Tcp"
-                        }
-                    },
-                    {
-                        "name": "port-443",
-                        "properties": {
-                            "backendAddressPool": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/backendAddressPools/backend')]"
-                            },
-                            "backendPort": 443,
-                            "enableFloatingIP": false,
-                            "frontendIPConfiguration": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/frontendIPConfigurations/frontend')]"
-                            },
-                            "frontendPort": 443,
-                            "idleTimeoutInMinutes": 15,
-                            "loadDistribution": "Default",
-                            "probe": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/probes/port-443')]"
-                            },
-                            "protocol": "Tcp"
-                        }
-                    }
-                ],
-                "outboundNatRules": [],
-                "probes": [
-                    {
-                        "name": "port-80",
-                        "properties": {
-                            "intervalInSeconds": 5,
-                            "numberOfProbes": 2,
-                            "port": 80,
-                            "protocol": "Tcp"
-                        }
-                    },
-                    {
-                        "name": "port-443",
-                        "properties": {
-                            "intervalInSeconds": 5,
-                            "numberOfProbes": 2,
-                            "port": 443,
-                            "protocol": "Tcp"
-                        }
-                    }
-                ]
-            },
-            "sku": {
-                "name": "Basic"
-            }
-        },
-        {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2015-06-15",
             "location": "{{ .ContainerService.Location | js }}",
@@ -205,9 +97,6 @@
             "apiVersion": "2017-12-01",
             "location": "{{ $.ContainerService.Location | js }}",
             "dependsOn": [
-{{ if eq $app.Role `infra` }}                
-                "[resourceId('Microsoft.Network/loadBalancers', 'lb-router')]",
-{{ end }}
 {{ if not $app.VnetSubnetID }}
                 "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
 {{ end }}
@@ -294,13 +183,6 @@
                                                         "idleTimeoutInMinutes": 15
                                                     }
                                                 }
-{{ if eq $app.Role `infra` }}  
-                                                ,"loadBalancerBackendAddressPools": [
-                                                    {
-                                                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-router'), '/backendAddressPools/backend')]"
-                                                    }
-                                                ]
-{{ end }}
                                             }
                                         }
                                     ]

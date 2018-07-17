@@ -26,19 +26,10 @@ spec:
           value: /etc/pki/tls/private
         - name: DEFAULT_CERTIFICATE_PATH
           value: /etc/pki/tls/private/tls.crt
-        - name: ROUTER_CIPHERS
-        - name: ROUTER_EXTERNAL_HOST_HOSTNAME
-        - name: ROUTER_EXTERNAL_HOST_HTTPS_VSERVER
-        - name: ROUTER_EXTERNAL_HOST_HTTP_VSERVER
         - name: ROUTER_EXTERNAL_HOST_INSECURE
           value: "false"
-        - name: ROUTER_EXTERNAL_HOST_INTERNAL_ADDRESS
-        - name: ROUTER_EXTERNAL_HOST_PARTITION_PATH
-        - name: ROUTER_EXTERNAL_HOST_PASSWORD
         - name: ROUTER_EXTERNAL_HOST_PRIVKEY
           value: /etc/secret-volume/router.pem
-        - name: ROUTER_EXTERNAL_HOST_USERNAME
-        - name: ROUTER_EXTERNAL_HOST_VXLAN_GW_CIDR
         - name: ROUTER_LISTEN_ADDR
           value: 0.0.0.0:1936
         - name: ROUTER_METRICS_TYPE
@@ -51,7 +42,6 @@ spec:
           value: router
         - name: ROUTER_SERVICE_NAMESPACE
           value: default
-        - name: ROUTER_SUBDOMAIN
         - name: STATS_PASSWORD
           value: 75XmZa2KNV
         - name: STATS_PORT
@@ -62,26 +52,23 @@ spec:
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
-            host: localhost
             path: /healthz
             port: 1936
             scheme: HTTP
           initialDelaySeconds: 10
-        name: router
-        ports:
-        - containerPort: 80
-          hostPort: 80
-        - containerPort: 443
-          hostPort: 443
-        - containerPort: 1936
-          hostPort: 1936
-          name: stats
         readinessProbe:
           httpGet:
-            host: localhost
             path: /healthz
             port: 1936
             scheme: HTTP
+        name: router
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        - containerPort: 1936
+          name: stats
           initialDelaySeconds: 10
         resources:
           requests:
@@ -91,7 +78,6 @@ spec:
         - mountPath: /etc/pki/tls/private
           name: server-certificate
           readOnly: true
-      hostNetwork: true
       nodeSelector:
         region: infra
       serviceAccountName: router

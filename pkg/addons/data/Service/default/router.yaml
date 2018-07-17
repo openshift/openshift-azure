@@ -20,3 +20,4 @@ spec:
     port: 1936
   selector:
     router: router
+  type: LoadBalancer
