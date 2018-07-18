@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: bootstrap-autoapprover
-  annotations:
-    checksum/bootstrap-autoapprover-kubeconfig: {{ include (print $.Template.BasePath "/Secret/bootstrap-autoapprover-kubeconfig.yaml") . | sha256sum | quote }}
 spec:
   replicas: 1
   selector:
@@ -11,6 +9,8 @@ spec:
       app: bootstrap-autoapprover
   template:
     metadata:
+      annotations:
+        checksum/secret-bootstrap-autoapprover-kubeconfig: {{ include (print $.Template.BasePath "/Secret/bootstrap-autoapprover-kubeconfig.yaml") . | sha256sum | quote }}
       labels:
         app: bootstrap-autoapprover
     spec:

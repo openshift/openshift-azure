@@ -2,9 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: master-controllers
-  annotations:
-    checksum/etc-origin-master: {{ include (print $.Template.BasePath "/Secret/etc-origin-master.yaml") . | sha256sum | quote }}
-    checksum/etc-origin-cloudprovider: {{ include (print $.Template.BasePath "/Secret/etc-origin-cloudprovider.yaml") . | sha256sum | quote }}
 spec:
   replicas: 1
   selector:
@@ -12,6 +9,9 @@ spec:
       openshift.io/component: controllers
   template:
     metadata:
+      annotations:
+        checksum/secret-etc-origin-master: {{ include (print $.Template.BasePath "/Secret/etc-origin-master.yaml") . | sha256sum | quote }}
+        checksum/secret-etc-origin-cloudprovider: {{ include (print $.Template.BasePath "/Secret/etc-origin-cloudprovider.yaml") . | sha256sum | quote }}
       labels:
         openshift.io/component: controllers
     spec:
