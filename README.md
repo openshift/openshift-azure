@@ -59,7 +59,7 @@
 ### Deploy an OpenShift cluster
 
 1. If you have access to an AKS cluster, run `az aks get-credentials -g
-   $AKS_RESOURCEGROUP -n $AKS_NAME -f - >$aks/admin.kubeconfig` or manually
+   $AKS_RESOURCEGROUP -n $AKS_NAME -f - >aks/admin.kubeconfig` or manually
    place the admin kubeconfig in `aks/admin.kubeconfig`.
 
    If you don't have access to an AKS cluster, run `aks/create.sh
