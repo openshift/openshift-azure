@@ -76,6 +76,11 @@ az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _dat
 
 KUBECONFIG=aks/admin.kubeconfig helm install --namespace $RESOURCEGROUP pkg/helm/chart -f _data/_out/values.yaml -n $RESOURCEGROUP >/dev/null
 
+# Configure dev settings
+if [[ ! -z "$DEV_PULL_SECRET" ]]; then
+    tools/dev.sh
+fi
+
 while true; do
     HCPINGRESSIP=$(KUBECONFIG=aks/admin.kubeconfig kubectl get ingress -n $RESOURCEGROUP master-api -o template --template '{{ if .status.loadBalancer }}{{ (index .status.loadBalancer.ingress 0).ip }}{{ end }}')
     if [[ -n "$HCPINGRESSIP" ]]; then
