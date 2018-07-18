@@ -47,12 +47,11 @@ spec:
         - name: master-config
           mountPath: /etc/etcd/
           readOnly: true
-        - name: master-etcd
+        - name: master-data
           mountPath: /var/lib/etcd/
       volumes:
       - name: master-config
         secret:
           secretName: etc-etcd
-      - name: master-etcd
-        persistentVolumeClaim:
-          claimName: master-etcd
+      - name: master-data
+        emptyDir: # TODO: BIG FAT WARNING, CHANGE THIS BEFORE PRODUCTION :)
