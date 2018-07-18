@@ -221,9 +221,9 @@
             },
 {{- if eq $.Config.ImageResourceName "" }}
             "plan": {
-                "name": "{{ .Config.ImageSKU | js }}",
-                "publisher": "{{ .Config.ImagePublisher | js }}",
-                "product": "{{ .Config.ImageOffer | js }}"
+                "name": "{{ $.Config.ImageSKU | js }}",
+                "publisher": "{{ $.Config.ImagePublisher | js }}",
+                "product": "{{ $.Config.ImageOffer | js }}"
             },
 {{- end }}
             "properties": {
