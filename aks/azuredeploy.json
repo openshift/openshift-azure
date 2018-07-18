@@ -28,7 +28,7 @@
                         "name": "agentpool",
                         "osDiskSizeGB": 0,
                         "count": 1,
-                        "vmSize": "Standard_D2s_v3",
+                        "vmSize": "Standard_D8s_v3",
                         "osType": "Linux",
                         "storageProfile": "ManagedDisks"
                     }
