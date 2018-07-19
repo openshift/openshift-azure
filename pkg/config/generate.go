@@ -25,9 +25,9 @@ func selectNodeImage(cs *acsapi.ContainerService, c *Config) {
 
 	switch os.Getenv("DEPLOY_OS") {
 	case "":
-		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion, ".", "", -1)
+		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion[1:], ".", "", -1)
 	case "centos7":
-		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion, ".", "", -1)
+		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion[1:], ".", "", -1)
 	}
 
 	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
@@ -36,7 +36,7 @@ func selectNodeImage(cs *acsapi.ContainerService, c *Config) {
 
 func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
-	case "3.10":
+	case "v3.10":
 		c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
 		c.ControlPlaneImage = "docker.io/openshift/origin-control-plane:v3.10"
 		c.NodeImage = "docker.io/openshift/origin-node:v3.10.0"
@@ -61,7 +61,7 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
 	//TODO: confirm minor version after release
-	case "3.10":
+	case "v3.10":
 		c.MasterEtcdImage = "rhel7/etcd:v3.10.15-1"
 		c.ControlPlaneImage = "openshift3/ose-control-plane:v3.10.15-1"
 		c.NodeImage = "openshift3/ose-node:v3.10.15-1"
