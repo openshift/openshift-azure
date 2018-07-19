@@ -75,7 +75,7 @@ go run cmd/createorupdate/createorupdate.go
 az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _data/_out/azuredeploy.json --no-wait
 
 if [[ ! -z "$DEV_PULL_SECRET" ]]; then
-    tools/pull-secret.sh
+    KUBECONFIG=aks/admin.kubeconfig tools/pull-secret.sh
 fi
 
 KUBECONFIG=aks/admin.kubeconfig helm install --namespace $RESOURCEGROUP pkg/helm/chart -f _data/_out/values.yaml -n $RESOURCEGROUP >/dev/null
