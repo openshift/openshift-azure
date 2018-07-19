@@ -9,8 +9,7 @@ ServiceCatalogCaCert: {{ Base64Encode (CertAsBytes .Config.ServiceCatalogCaCert)
 
 # container images for pods
 MasterEtcdImage: {{ .Config.MasterEtcdImage | quote }}
-MasterAPIImage: {{ .Config.MasterAPIImage | quote }}
-MasterControllersImage: {{ .Config.MasterControllersImage | quote }}
+ControlPlaneImage: {{ .Config.ControlPlaneImage | quote }}
 NodeImage: {{ .Config.NodeImage | quote }}
 ServiceCatalogImage: {{ .Config.ServiceCatalogImage | quote }}
 SyncImage: {{ .Config.SyncImage | quote }}

@@ -38,8 +38,7 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
 	case "3.10":
 		c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
-		c.MasterAPIImage = "docker.io/openshift/origin-control-plane:v3.10"
-		c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
+		c.ControlPlaneImage = "docker.io/openshift/origin-control-plane:v3.10"
 		c.NodeImage = "docker.io/openshift/origin-node:v3.10.0"
 		c.ServiceCatalogImage = "docker.io/openshift/origin-service-catalog:v3.10"
 		c.TunnelImage = "quay.io/openshift-on-azure/tunnel:latest"
@@ -64,8 +63,7 @@ func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 	//TODO: confirm minor version after release
 	case "3.10":
 		c.MasterEtcdImage = "rhel7/etcd:v3.10.15-1"
-		c.MasterAPIImage = "openshift3/ose-control-plane:v3.10.15-1"
-		c.MasterControllersImage = "openshift3/ose-control-plane:v3.10.15-1"
+		c.ControlPlaneImage = "openshift3/ose-control-plane:v3.10.15-1"
 		c.NodeImage = "openshift3/ose-node:v3.10.15-1"
 		c.ServiceCatalogImage = "openshift3/ose-service-catalog:v3.10.15-1"
 		c.TemplateServiceBrokerImage = "openshift3/ose-template-service-broker:v3.10.15-1"

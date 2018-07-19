@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: {{ .Values.MasterAPIImage | quote }}
+        image: {{ .Values.ControlPlaneImage | quote }}
         imagePullPolicy: Always
         command:
         - /bin/bash

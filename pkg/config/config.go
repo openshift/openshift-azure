@@ -34,8 +34,7 @@ type Config struct {
 
 	// container images for pods
 	MasterEtcdImage             string
-	MasterAPIImage              string
-	MasterControllersImage      string
+	ControlPlaneImage           string
 	NodeImage                   string
 	ServiceCatalogImage         string
 	TunnelImage                 string
