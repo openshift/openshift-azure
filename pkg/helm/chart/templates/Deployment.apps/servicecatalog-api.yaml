@@ -2,9 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: servicecatalog-api
-  annotations:
-    checksum/servicecatalog-api: {{ include (print $.Template.BasePath "/Secret/servicecatalog-api.yaml") . | sha256sum | quote }}
-    checksum/servicecatalog-api-kubeconfig: {{ include (print $.Template.BasePath "/Secret/servicecatalog-api-kubeconfig.yaml") . | sha256sum | quote }}
 spec:
   replicas: 1
   selector:
@@ -12,6 +9,9 @@ spec:
       app: servicecatalog-api
   template:
     metadata:
+      annotations:
+        checksum/secret-servicecatalog-api: {{ include (print $.Template.BasePath "/Secret/servicecatalog-api.yaml") . | sha256sum | quote }}
+        checksum/secret-servicecatalog-api-kubeconfig: {{ include (print $.Template.BasePath "/Secret/servicecatalog-api-kubeconfig.yaml") . | sha256sum | quote }}
       labels:
         app: servicecatalog-api
     spec:

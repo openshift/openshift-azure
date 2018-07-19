@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: master-etcd
-  annotations:
-    checksum/etc-etcd: {{ include (print $.Template.BasePath "/Secret/etc-etcd.yaml") . | sha256sum | quote }}
 spec:
   replicas: 1
   selector:
@@ -13,6 +11,8 @@ spec:
     type: Recreate
   template:
     metadata:
+      annotations:
+        checksum/secret-etc-etcd: {{ include (print $.Template.BasePath "/Secret/etc-etcd.yaml") . | sha256sum | quote }}
       labels:
         openshift.io/component: etcd
     spec:
