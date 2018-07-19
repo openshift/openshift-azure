@@ -5,40 +5,24 @@ package addons
 //go:generate gofmt -s -l -w bindata.go
 
 import (
-	"errors"
+	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"net/url"
-	"reflect"
 	"sort"
 	"time"
 
 	acsapi "github.com/Azure/acs-engine/pkg/api"
 	"github.com/ghodss/yaml"
-	"github.com/go-test/deep"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/flowcontrol"
-	"k8s.io/client-go/util/retry"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
-	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	"github.com/jim-minter/azure-helm/pkg/config"
+	"github.com/jim-minter/azure-helm/pkg/jsonpath"
 	"github.com/jim-minter/azure-helm/pkg/util"
-)
-
-var (
-	restconfig *rest.Config
-	ac         *kaggregator.Clientset
 )
 
 // readDB reads previously exported objects into a map via go-bindata as well as
@@ -85,34 +69,101 @@ func readDB(cs *acsapi.ContainerService, c *config.Config) (map[string]unstructu
 	return db, nil
 }
 
-// getDynamicClient returns the server API group resource information and a
-// dynamic client pool.
-func getDynamicClient(cli *discovery.DiscoveryClient) (dynamic.ClientPool, []*discovery.APIGroupResources, error) {
-	grs, err := discovery.GetAPIGroupResources(cli)
-	if err != nil {
-		return nil, nil, err
+// syncWorkloadsConfig iterates over all workload controllers (deployments,
+// daemonsets, statefulsets), walks their volumes, and updates their pod
+// templates with annotations that include the hashes of the content for
+// each configmap or secret.
+func syncWorkloadsConfig(db map[string]unstructured.Unstructured) error {
+	// map config resources to their hashed content
+	configToHash := make(map[string][]byte)
+	for _, o := range db {
+		if o.GroupVersionKind().Kind != "Secret" &&
+			o.GroupVersionKind().Kind != "ConfigMap" {
+			continue
+		}
+
+		h := sha256.New()
+		for _, v := range jsonpath.MustCompile("$.data").Get(o.Object) {
+			// NOTE: this relies on the fact that %#v on a map sorts by key
+			fmt.Fprintf(h, "%#v", v)
+		}
+		for _, v := range jsonpath.MustCompile("$.stringData").Get(o.Object) {
+			fmt.Fprintf(h, "%#v", v)
+		}
+		configToHash[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = h.Sum(nil)
 	}
 
-	rm := discovery.NewRESTMapper(grs, meta.InterfacesForUnstructured)
-	dyn := dynamic.NewClientPool(restconfig, rm, dynamic.LegacyAPIPathResolverFunc)
+	secretGk := schema.GroupKind{Kind: "Secret"}
+	configMapGk := schema.GroupKind{Kind: "ConfigMap"}
 
-	return dyn, grs, nil
+	// iterate over all workload controllers and add annotations with the hashes
+	// of every config map or secret appropriately to force redeployments on config
+	// updates.
+	for _, o := range db {
+		if o.GroupVersionKind().Kind != "DaemonSet" &&
+			o.GroupVersionKind().Kind != "Deployment" &&
+			o.GroupVersionKind().Kind != "StatefulSet" {
+			continue
+		}
+
+		volumes := jsonpath.MustCompile("$.spec.template.spec.volumes.*").MustGetObject(o.Object)
+
+		if secretData, found := volumes["secret"]; found {
+			secretName := jsonpath.MustCompile("$.secretName").MustGetString(secretData)
+			key := fmt.Sprintf("checksum/secret-%s", secretName)
+			secretKey := KeyFunc(secretGk, o.GetNamespace(), secretName)
+			if hash, found := configToHash[secretKey]; found {
+				setPodTemplateAnnotation(key, base64.StdEncoding.EncodeToString(hash), o)
+			}
+		}
+
+		if configMapData, found := volumes["configMap"]; found {
+			configMapName := jsonpath.MustCompile("$.name").MustGetString(configMapData)
+			key := fmt.Sprintf("checksum/configmap-%s", configMapName)
+			configMapKey := KeyFunc(configMapGk, o.GetNamespace(), configMapName)
+			if hash, found := configToHash[configMapKey]; found {
+				setPodTemplateAnnotation(key, base64.StdEncoding.EncodeToString(hash), o)
+			}
+		}
+	}
+
+	return nil
 }
+
+// setPodTemplateAnnotation sets the provided key-value pair as an annotation
+// inside the provided object's pod template.
+func setPodTemplateAnnotation(key, value string, o unstructured.Unstructured) {
+	annotations, _, _ := unstructured.NestedStringMap(o.Object, "spec", "template", "metadata", "annotations")
+	if annotations == nil {
+		annotations = make(map[string]string)
+	}
+	annotations[key] = value
+	unstructured.SetNestedStringMap(o.Object, annotations, "spec", "template", "metadata", "annotations")
+}
+
+// resource filters
+var (
+	nsFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().Kind == "Namespace"
+	}
+	saFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().Kind == "ServiceAccount"
+	}
+	cfgFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().Kind == "Secret" || o.GroupVersionKind().Kind == "ConfigMap"
+	}
+	nonScFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().Group != "servicecatalog.k8s.io"
+	}
+	scFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().Group == "servicecatalog.k8s.io"
+	}
+)
 
 // writeDB uses the discovery and dynamic clients to synchronise an API server's
 // objects with db.
-// TODO: this needs substantial refactoring.
-func writeDB(db map[string]unstructured.Unstructured) error {
-	cli, err := discovery.NewDiscoveryClientForConfig(restconfig)
-	if err != nil {
-		return err
-	}
-
-	dyn, grs, err := getDynamicClient(cli)
-	if err != nil {
-		return err
-	}
-
+// TODO: need to implement deleting objects which we don't want any more.
+func writeDB(client *client, db map[string]unstructured.Unstructured) error {
 	// impose an order to improve debuggability.
 	var keys []string
 	for k := range db {
@@ -121,45 +172,26 @@ func writeDB(db map[string]unstructured.Unstructured) error {
 	sort.Strings(keys)
 
 	// namespaces must exist before namespaced objects.
-	for _, k := range keys {
-		o := db[k]
-		if o.GroupVersionKind().Kind == "Namespace" {
-			err = write(dyn, grs, &o)
-			if err != nil {
-				return err
-			}
-		}
+	if err := client.createResources(nsFilter, db, keys); err != nil {
+		return err
 	}
-
-	// don't try to handle groups which don't exist yet.
-	for _, k := range keys {
-		o := db[k]
-		if o.GroupVersionKind().Group != "servicecatalog.k8s.io" &&
-			o.GroupVersionKind().Kind != "Secret" &&
-			o.GroupVersionKind().Kind != "Namespace" {
-			err = write(dyn, grs, &o)
-			if err != nil {
-				return err
-			}
-		}
+	// create serviceaccounts
+	if err := client.createResources(saFilter, db, keys); err != nil {
+		return err
 	}
-
-	// it turns out that secrets of type `kubernetes.io/service-account-token`
-	// must be created after the corresponding serviceaccount has been created.
-	for _, k := range keys {
-		o := db[k]
-		if o.GroupVersionKind().Kind == "Secret" {
-			err = write(dyn, grs, &o)
-			if err != nil {
-				return err
-			}
-		}
+	// create all secrets and configmaps
+	if err := client.createResources(cfgFilter, db, keys); err != nil {
+		return err
+	}
+	// create all non-service catalog resources
+	if err := client.createResources(nonScFilter, db, keys); err != nil {
+		return err
 	}
 
 	// wait for the service catalog api extension to arrive. TODO: we should do
 	// this dynamically, and should not PollInfinite.
-	err = wait.PollInfinite(time.Second, func() (bool, error) {
-		svc, err := ac.ApiregistrationV1().APIServices().Get("v1beta1.servicecatalog.k8s.io", metav1.GetOptions{})
+	err := wait.PollInfinite(time.Second, func() (bool, error) {
+		svc, err := client.ac.ApiregistrationV1().APIServices().Get("v1beta1.servicecatalog.k8s.io", metav1.GetOptions{})
 		switch {
 		case kerrors.IsNotFound(err):
 			return false, nil
@@ -179,162 +211,30 @@ func writeDB(db map[string]unstructured.Unstructured) error {
 	}
 
 	// refresh dynamic client
-	dyn, grs, err = getDynamicClient(cli)
-	if err != nil {
+	if err := client.updateDynamicClient(); err != nil {
 		return err
 	}
 
 	// now write the servicecatalog configurables.
-	for _, k := range keys {
-		o := db[k]
-		if o.GroupVersionKind().Group == "servicecatalog.k8s.io" {
-			err = write(dyn, grs, &o)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
-// write synchronises a single object with the API server.
-func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstructured.Unstructured) error {
-	dc, err := dyn.ClientForGroupVersionKind(o.GroupVersionKind())
-	if err != nil {
-		return err
-	}
-
-	var gr *discovery.APIGroupResources
-	for _, g := range grs {
-		if g.Group.Name == o.GroupVersionKind().Group {
-			gr = g
-			break
-		}
-	}
-	if gr == nil {
-		return errors.New("couldn't find group " + o.GroupVersionKind().Group)
-	}
-
-	var res *metav1.APIResource
-	for _, r := range gr.VersionedResources[o.GroupVersionKind().Version] {
-		if gr.Group.Name == "template.openshift.io" && r.Name == "processedtemplates" {
-			continue
-		}
-		if r.Kind == o.GroupVersionKind().Kind {
-			res = &r
-			break
-		}
-	}
-	if res == nil {
-		return errors.New("couldn't find kind " + o.GroupVersionKind().Kind)
-	}
-
-	o = o.DeepCopy() // TODO: do this much earlier
-
-	err = retry.RetryOnConflict(retry.DefaultRetry, func() (err error) {
-		var existing *unstructured.Unstructured
-		existing, err = dc.Resource(res, o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
-		if kerrors.IsNotFound(err) {
-			log.Println("Create " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
-			_, err = dc.Resource(res, o.GetNamespace()).Create(o)
-			return
-		}
-		if err != nil {
-			return
-		}
-
-		rv := existing.GetResourceVersion()
-		err = Clean(*existing)
-		if err != nil {
-			return
-		}
-		Default(*existing)
-
-		if reflect.DeepEqual(*existing, *o) {
-			log.Println("Skip " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
-			return
-		}
-
-		log.Println("Update " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
-
-		// TODO: we should have tests that monitor these diffs:
-		// 1) when a cluster is created
-		// 2) when sync is run twice back-to-back on the same cluster
-		for _, diff := range deep.Equal(*existing, *o) {
-			log.Println("- " + diff)
-		}
-
-		o.SetResourceVersion(rv)
-		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
-		return
-	})
-
-	return err
-}
-
-// getClients populates the Kubernetes client object(s).
-func getClients() (err error) {
-	kubeconfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(clientcmd.NewDefaultClientConfigLoadingRules(), &clientcmd.ConfigOverrides{})
-
-	restconfig, err = kubeconfig.ClientConfig()
-	if err != nil {
-		return
-	}
-	restconfig.RateLimiter = flowcontrol.NewFakeAlwaysRateLimiter()
-
-	ac, err = kaggregator.NewForConfig(restconfig)
-	return
-}
-
-func waitForHealthz() error {
-	transport, err := rest.TransportFor(restconfig)
-	if err != nil {
-		return err
-	}
-
-	cli := &http.Client{
-		Transport: transport,
-		Timeout:   10 * time.Second,
-	}
-
-	req, err := http.NewRequest("GET", restconfig.Host+"/healthz", nil)
-	if err != nil {
-		return err
-	}
-
-	for {
-		resp, err := cli.Do(req)
-		if err, ok := err.(*url.Error); ok && (err.Timeout() || err.Err == io.EOF || err.Err == io.ErrUnexpectedEOF) {
-			time.Sleep(time.Second)
-			continue
-		}
-		if err != nil {
-			return err
-		}
-		if resp.StatusCode == http.StatusOK {
-			return nil
-		}
-
-		time.Sleep(time.Second)
-	}
+	return client.createResources(scFilter, db, keys)
 }
 
 func Main(cs *acsapi.ContainerService, c *config.Config, dryRun bool) error {
-	if !dryRun {
-		err := getClients()
-		if err != nil {
-			return err
-		}
+	client, err := newClient(dryRun)
+	if err != nil {
+		return err
+	}
 
-		err = waitForHealthz()
-		if err != nil {
-			return err
-		}
+	if err := client.waitForHealthz(); err != nil {
+		return err
 	}
 
 	db, err := readDB(cs, c)
 	if err != nil {
+		return err
+	}
+
+	if err := syncWorkloadsConfig(db); err != nil {
 		return err
 	}
 
@@ -358,11 +258,5 @@ func Main(cs *acsapi.ContainerService, c *config.Config, dryRun bool) error {
 		return nil
 	}
 
-	err = writeDB(db)
-	if err != nil {
-		return err
-	}
-
-	// TODO: need to implement deleting objects which we don't want any more.
-	return nil
+	return writeDB(client, db)
 }
