@@ -350,7 +350,7 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			n:      68,
 		},
 		{
-			secret: &c.RouterPrometheusScrapePassword,
+			secret: &c.RouterStatsPassword,
 			n:      24,
 		},
 		{
