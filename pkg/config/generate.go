@@ -42,7 +42,7 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 		c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
 		c.NodeImage = "docker.io/openshift/origin-node:v3.10.0"
 		c.ServiceCatalogImage = "docker.io/openshift/origin-service-catalog:v3.10"
-		c.TunnelImage = "docker.io/jimminter/tunnel:latest"
+		c.TunnelImage = "quay.io/openshift-on-azure/tunnel:latest"
 		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
 		c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.10"
 		c.PrometheusNodeExporterImage = "openshift/prometheus-node-exporter:v0.15.2"
@@ -79,7 +79,7 @@ func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 		c.PrometheusImage = "openshift3/prometheus:v3.10.15-1"
 		c.PrometheusAlertBufferImage = "openshift3/prometheus-alert-buffer:v3.10.15-1"
 		c.PrometheusAlertManagerImage = "openshift3/prometheus-alertmanager:v3.10.15-1"
-		c.TunnelImage = "docker.io/jimminter/tunnel:latest" //TODO: We need to publish it somewhere.
+		c.TunnelImage = "quay.io/openshift-on-azure/tunnel:latest"
 		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:2.0.41" //TODO: create mapping for OSA release to any other image we use
 	}
