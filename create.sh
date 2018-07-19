@@ -88,8 +88,10 @@ tools/dns.sh zone-create $RESOURCEGROUP
 tools/dns.sh a-create $RESOURCEGROUP openshift $HCPINGRESSIP
 tools/dns.sh a-create $RESOURCEGROUP openshift-tunnel $HCPINGRESSIP
 
-# will eventually run as an HCP pod, for development run it locally
-KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go
+if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
+    # will eventually run as an HCP pod, for development run it locally
+    KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go -run-once=true
+fi
 
 az group deployment wait -g $RESOURCEGROUP -n azuredeploy --created --interval 10
 

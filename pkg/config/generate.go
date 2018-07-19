@@ -43,7 +43,7 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 		c.NodeImage = "docker.io/openshift/origin-node:v3.10.0"
 		c.ServiceCatalogImage = "docker.io/openshift/origin-service-catalog:v3.10"
 		c.TunnelImage = "docker.io/jimminter/tunnel:latest"
-		c.SyncImage = "docker.io/jimminter/sync:latest"
+		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
 		c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.10"
 		c.PrometheusNodeExporterImage = "openshift/prometheus-node-exporter:v0.15.2"
 		c.RegistryImage = "openshift/origin-docker-registry:v3.10.0"
@@ -79,8 +79,8 @@ func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 		c.PrometheusImage = "openshift3/prometheus:v3.10.15-1"
 		c.PrometheusAlertBufferImage = "openshift3/prometheus-alert-buffer:v3.10.15-1"
 		c.PrometheusAlertManagerImage = "openshift3/prometheus-alertmanager:v3.10.15-1"
-		c.TunnelImage = "docker.io/jimminter/tunnel:latest"      //TODO: We need to publish it somewhere.
-		c.SyncImage = "docker.io/jimminter/sync:latest"          //TODO: We need to publish it somewhere.
+		c.TunnelImage = "docker.io/jimminter/tunnel:latest" //TODO: We need to publish it somewhere.
+		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:2.0.41" //TODO: create mapping for OSA release to any other image we use
 	}
 
@@ -386,6 +386,16 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
 			kubeconfig: &c.NodeBootstrapKubeconfig,
 		},
+		{
+			clientKey:  c.AdminKey,
+			clientCert: c.AdminCert,
+			// sync kubeconfig has the same capabilities as admin kubeconfig, only difference
+			// is the use of HCP internal DNS to avoid waiting for the Azure loadbalancer to
+			// come up in order to start creating cluster objects.
+			endpoint:   "master-api",
+			username:   "system:admin",
+			kubeconfig: &c.SyncKubeconfig,
+		},
 	}
 	for _, kc := range kubeconfigs {
 		if kc.namespace == "" {
@@ -426,6 +436,7 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		}
 	}
 
+	c.RunSyncLocal = os.Getenv("RUN_SYNC_LOCAL")
 	return
 }
 
