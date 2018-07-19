@@ -3,7 +3,7 @@ updated: 2018-07-05T21:17:42.33508664-05:00
 imports:
 - name: github.com/Azure/acs-engine
   version: 13e1c470a7e0fd7ee80f680bbe303a90eb6c4314
-  repo: git@github.com:jim-minter/acs-engine
+  repo: https://github.com/jim-minter/acs-engine
   subpackages:
   - pkg/api
   - pkg/api/agentPoolOnlyApi/v20170831

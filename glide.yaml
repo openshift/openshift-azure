@@ -2,7 +2,7 @@ package: github.com/jim-minter/azure-helm
 import:
 - package: github.com/Azure/acs-engine
   version: osaapi
-  repo:    git@github.com:jim-minter/acs-engine
+  repo:    https://github.com/jim-minter/acs-engine
   subpackages:
   - pkg/api
   - pkg/osa/vlabs
