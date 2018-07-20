@@ -187,6 +187,7 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		}
 
 		rv := existing.GetResourceVersion()
+		HandleSpecialObjects(*existing, *o)
 		err = Clean(*existing)
 		if err != nil {
 			return
