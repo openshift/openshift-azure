@@ -346,14 +346,6 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			secret: &c.RegistryHTTPSecret,
 		},
 		{
-			secret: &c.RegistryConsoleOAuthSecret,
-			n:      68,
-		},
-		{
-			secret: &c.RouterStatsPassword,
-			n:      24,
-		},
-		{
 			secret: &c.AlertManagerProxySessionSecret,
 		},
 		{
@@ -371,6 +363,36 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			s.n = 32
 		}
 		if *s.secret, err = randomBytes(s.n); err != nil {
+			return
+		}
+	}
+
+	// random string based configurables
+	strSecrets := []struct {
+		secret *string
+		l      int
+	}{
+		{
+			secret: &c.RegistryConsoleOAuthSecret,
+			l:      68,
+		},
+		{
+			secret: &c.RouterStatsPassword,
+			l:      10,
+		},
+		{
+			secret: &c.RegistryStorageAccount,
+			l:      24,
+		},
+	}
+	for _, s := range strSecrets {
+		if len(*s.secret) != 0 {
+			continue
+		}
+		if s.l == 0 {
+			s.l = 32
+		}
+		if *s.secret, err = randomString(s.l); err != nil {
 			return
 		}
 	}
@@ -446,12 +468,6 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 
 	if c.SSHKey == nil {
 		if c.SSHKey, err = tls.NewPrivateKey(); err != nil {
-			return
-		}
-	}
-
-	if len(c.RegistryStorageAccount) == 0 {
-		if c.RegistryStorageAccount, err = randomStorageAccountName(); err != nil {
 			return
 		}
 	}
@@ -536,10 +552,10 @@ func randomBytes(n int) ([]byte, error) {
 	return b, nil
 }
 
-func randomStorageAccountName() (string, error) {
-	const letterBytes = "abcdefghijklmnopqrstuvwxyz0123456789"
+func randomString(length int) (string, error) {
+	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-	b := make([]byte, 24)
+	b := make([]byte, length)
 	for i := range b {
 		o, err := rand.Int(rand.Reader, big.NewInt(int64(len(letterBytes))))
 		if err != nil {

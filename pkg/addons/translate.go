@@ -207,7 +207,7 @@ var Translations = map[string][]struct {
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='STATS_PASSWORD')].value"),
-			Template: "{{ Base64Encode .Config.RouterStatsPassword }}",
+			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
 	"Deployment.apps/kube-service-catalog/apiserver": {
@@ -253,7 +253,7 @@ var Translations = map[string][]struct {
 		},
 		{
 			Path:     jsonpath.MustCompile("$.secret"),
-			Template: "{{ Base64Encode .Config.RegistryConsoleOAuthSecret }}",
+			Template: "{{ .Config.RegistryConsoleOAuthSecret }}",
 		},
 	},
 	"Route.route.openshift.io/default/docker-registry": {
@@ -417,7 +417,7 @@ var Translations = map[string][]struct {
 	"Service/default/router": {
 		{
 			Path:     jsonpath.MustCompile("$.metadata.annotations['prometheus.openshift.io/password']"),
-			Template: "{{ Base64Encode .Config.RouterStatsPassword }}",
+			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
 	"StatefulSet.apps/openshift-metrics/prometheus": {
