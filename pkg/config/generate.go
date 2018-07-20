@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"fmt"
 	"io"
 	"math/big"
 	"net"
@@ -101,6 +102,8 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
 	c.TunnelHostname = strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, "openshift", "openshift-tunnel", 1)
 
+	// TODO: Need unique name, potentially derivative from PublicHostname
+	c.RouterLBCName = fmt.Sprintf("router-%s", strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, ".")[1])
 	selectNodeImage(cs, c)
 
 	selectContainerImages(cs, c)

@@ -99,7 +99,6 @@ fi
 
 az group deployment wait -g $RESOURCEGROUP -n azuredeploy --created --interval 10
 
-ROUTERIP=$(az network public-ip list -g $RESOURCEGROUP --query "[?name == 'ip-router'].ipAddress | [0]" | tr -d '"')
-tools/dns.sh a-create $RESOURCEGROUP '*' $ROUTERIP
+tools/dns.sh cname-create $RESOURCEGROUP '*' router-${RESOURCEGROUP}.eastus.cloudapp.azure.com
 
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go

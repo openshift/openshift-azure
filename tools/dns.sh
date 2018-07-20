@@ -18,6 +18,8 @@ $0 zone-create zone
 $0 zone-delete zone
 $0 a-create zone name ip
 $0 a-delete zone name
+$0 cname-create zone name cname
+$0 cname-delete zone name
 
 example:
 
@@ -26,6 +28,8 @@ $0 a-create testzone '*' 1.2.3.4
 dig +short foo.testzone.$DNS_DOMAIN
 $0 a-delete testzone '*'
 $0 zone-delete testzone
+$0 cname-create testzone '*' app.eastus.cloudapp.azure.com 
+$0 cname-delete testzone '*'
 
 EOF
     exit 1
@@ -66,6 +70,18 @@ a-delete)
     if [[ "$#" -ne 3 ]]; then usage; fi
 
     az network dns record-set a delete -g "$DNS_RESOURCEGROUP" -z "$2.$DNS_DOMAIN" -n "$3" -y
+    ;;
+
+cname-create)
+    if [[ "$#" -ne 4 ]]; then usage; fi
+
+    az network dns record-set cname set-record -g "$DNS_RESOURCEGROUP" -z "$2.$DNS_DOMAIN" -n "$3" -c "$4"
+    ;;
+
+cname-delete)
+    if [[ "$#" -ne 3 ]]; then usage; fi
+
+    az network dns record-set cname delete -g "$DNS_RESOURCEGROUP" -z "$2.$DNS_DOMAIN" -n "$3"
     ;;
 
 *)

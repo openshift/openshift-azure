@@ -120,7 +120,10 @@ func Clean(o unstructured.Unstructured) error {
 
 	case "Service":
 		jsonpath.MustCompile("$.metadata.annotations.'service.alpha.openshift.io/serving-cert-signed-by'").Delete(o.Object)
-		jsonpath.MustCompile("$.spec.clusterIP").Delete(o.Object)
+		// for LoadBalancer type we need to preserve clusterIP
+		if o.Object["spec"].(map[string]interface{})["type"] != "LoadBalancer" {
+			jsonpath.MustCompile("$.spec.clusterIP").Delete(o.Object)
+		}
 
 	case "ServiceAccount":
 		// TODO: the intention is to remove references to automatically created
@@ -146,4 +149,19 @@ func Clean(o unstructured.Unstructured) error {
 	cleanMetadata(o.Object)
 
 	return nil
+}
+
+// handleSpecialObjects manages special object migration during upgrade state
+func handleSpecialObjects(existing, o unstructured.Unstructured) {
+
+	switch existing.GetKind() {
+	// Service type Loadbalancer
+	case "Service":
+		// copy existing clusterIP new object
+		if existing.Object["spec"].(map[string]interface{})["type"] == "LoadBalancer" {
+			o.Object["spec"].(map[string]interface{})["clusterIP"] = existing.Object["spec"].(map[string]interface{})["clusterIP"]
+			o.Object["spec"].(map[string]interface{})["externalTrafficPolicy"] = existing.Object["spec"].(map[string]interface{})["externalTrafficPolicy"]
+			o.Object["spec"].(map[string]interface{})["ports"] = existing.Object["spec"].(map[string]interface{})["ports"]
+		}
+	}
 }

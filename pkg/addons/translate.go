@@ -370,6 +370,12 @@ var Translations = map[string][]struct {
 			Template: "{{ Base64Encode .Config.AlertsProxySessionSecret }}",
 		},
 	},
+	"Service/default/router": {
+		{
+			Path:     jsonpath.MustCompile("$.metadata.annotations['service.beta.kubernetes.io/azure-dns-label-name']"),
+			Template: "{{ .Config.RouterLBCName }}",
+		},
+	},
 	"Secret/openshift-metrics/prometheus-proxy": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),

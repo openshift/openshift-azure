@@ -117,6 +117,7 @@ type Config struct {
 	AlertsProxySessionSecret       []byte
 	PrometheusProxySessionSecret   []byte
 	ServiceCatalogClusterID        uuid.UUID
+	RouterLBCName                  string
 
 	// used for development purposes only
 	RunSyncLocal string
