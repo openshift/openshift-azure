@@ -148,8 +148,8 @@ func Clean(o unstructured.Unstructured) error {
 	return nil
 }
 
-// HandleSpecialObjects manages special object migration during upgrade state
-func HandleSpecialObjects(existing, o unstructured.Unstructured) {
+// handleSpecialObjects manages special object migration during upgrade state
+func handleSpecialObjects(existing, o unstructured.Unstructured) {
 
 	switch existing.GetKind() {
 	// Service type Loadbalancer
