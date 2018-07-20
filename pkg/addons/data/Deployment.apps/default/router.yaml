@@ -56,11 +56,6 @@ spec:
             port: 1936
             scheme: HTTP
           initialDelaySeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: 1936
-            scheme: HTTP
         name: router
         ports:
         - containerPort: 80
@@ -69,6 +64,11 @@ spec:
           name: https
         - containerPort: 1936
           name: stats
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 1936
+            scheme: HTTP
           initialDelaySeconds: 10
         resources:
           requests:

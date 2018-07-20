@@ -99,13 +99,6 @@ fi
 
 az group deployment wait -g $RESOURCEGROUP -n azuredeploy --created --interval 10
 
-while true; do
-    ROUTERIP=$(KUBECONFIG=_data/_out/admin.kubeconfig kubectl get service -n default router -o template --template '{{ if .status.loadBalancer }}{{ (index .status.loadBalancer.ingress 0).ip }}{{ end }}')
-    if [[ -n "$ROUTERIP" ]]; then
-        break
-    fi
-    sleep 1
-done
-tools/dns.sh a-create $RESOURCEGROUP '*' $ROUTERIP
+tools/dns.sh cname-create $RESOURCEGROUP '*' router-${RESOURCEGROUP}.eastus.cloudapp.azure.com
 
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go

@@ -247,10 +247,10 @@ data:
 
     # Scrape config for the router
     - job_name: 'openshift-router'
-      scheme: https
+      scheme: http
       tls_config:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
-        server_name: router.default.svc
+        server_name: router-stats.default.svc
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
 
       kubernetes_sd_configs:
