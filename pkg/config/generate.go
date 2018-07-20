@@ -367,36 +367,6 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		}
 	}
 
-	// random string based configurables
-	strSecrets := []struct {
-		secret *string
-		l      int
-	}{
-		{
-			secret: &c.RegistryConsoleOAuthSecret,
-			l:      68,
-		},
-		{
-			secret: &c.RouterStatsPassword,
-			l:      10,
-		},
-		{
-			secret: &c.RegistryStorageAccount,
-			l:      24,
-		},
-	}
-	for _, s := range strSecrets {
-		if len(*s.secret) != 0 {
-			continue
-		}
-		if s.l == 0 {
-			s.l = 32
-		}
-		if *s.secret, err = randomString(s.l); err != nil {
-			return
-		}
-	}
-
 	kubeconfigs := []struct {
 		clientKey  *rsa.PrivateKey
 		clientCert *x509.Certificate
@@ -468,6 +438,25 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 
 	if c.SSHKey == nil {
 		if c.SSHKey, err = tls.NewPrivateKey(); err != nil {
+			return
+		}
+	}
+
+	if len(c.RegistryStorageAccount) == 0 {
+		if c.RegistryStorageAccount, err = randomStorageAccountName(); err != nil {
+			return
+		}
+	}
+
+	if len(c.RegistryConsoleOAuthSecret) == 0 {
+		if pass, err := randomString(64); err != nil {
+			c.RegistryConsoleOAuthSecret = fmt.Sprintf("user%s", pass)
+			return nil
+		}
+	}
+
+	if len(c.RouterStatsPassword) == 0 {
+		if c.RouterStatsPassword, err = randomString(10); err != nil {
 			return
 		}
 	}
@@ -550,6 +539,21 @@ func randomBytes(n int) ([]byte, error) {
 		return nil, err
 	}
 	return b, nil
+}
+
+func randomStorageAccountName() (string, error) {
+	const letterBytes = "abcdefghijklmnopqrstuvwxyz0123456789"
+
+	b := make([]byte, 24)
+	for i := range b {
+		o, err := rand.Int(rand.Reader, big.NewInt(int64(len(letterBytes))))
+		if err != nil {
+			return "", err
+		}
+		b[i] = letterBytes[o.Int64()]
+	}
+
+	return string(b), nil
 }
 
 func randomString(length int) (string, error) {
