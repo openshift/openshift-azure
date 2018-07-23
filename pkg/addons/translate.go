@@ -408,16 +408,16 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.RouterLBCName }}",
 		},
 	},
+	"Service/default/router-stats": {
+		{
+			Path:     jsonpath.MustCompile("$.metadata.annotations['prometheus.openshift.io/password']"),
+			Template: "{{ .Config.RouterStatsPassword }}",
+		},
+	},
 	"Secret/openshift-metrics/prometheus-proxy": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),
 			Template: "{{ Base64Encode .Config.PrometheusProxySessionSecret }}",
-		},
-	},
-	"Service/default/router": {
-		{
-			Path:     jsonpath.MustCompile("$.metadata.annotations['prometheus.openshift.io/password']"),
-			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
 	"StatefulSet.apps/openshift-metrics/prometheus": {
