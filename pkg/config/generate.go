@@ -71,7 +71,6 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
 
-		c.TunnelImage = "quay.io/openshift-on-azure/tunnel:latest"
 		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
 	}
 }
@@ -107,7 +106,6 @@ func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest" //TODO: create mapping for OSA release to any other image we use
 
-		c.TunnelImage = "quay.io/openshift-on-azure/tunnel:latest"
 		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
 	}
 }
@@ -123,7 +121,6 @@ func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
-	c.TunnelHostname = strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, "openshift", "openshift-tunnel", 1)
 
 	// TODO: Need unique name, potentially derivative from PublicHostname
 	c.RouterLBCName = fmt.Sprintf("router-%s", strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, ".")[1])
@@ -251,12 +248,6 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.MasterServerKey,
 			cert:        &c.MasterServerCert,
-		},
-		{
-			cn:          c.TunnelHostname,
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			key:         &c.TunnelKey,
-			cert:        &c.TunnelCert,
 		},
 		{
 			cn:           "system:openshift-master",

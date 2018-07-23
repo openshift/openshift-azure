@@ -137,12 +137,6 @@ var Translations = map[string][]struct {
 			Template:   "https://{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname }}",
 		},
 	},
-	"DaemonSet.apps/openshift-azure/tunnel": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.TunnelImage }}",
-		},
-	},
 	"DaemonSet.apps/openshift-metrics/prometheus-node-exporter": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
@@ -349,13 +343,6 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.key'"),
 			Template: "{{ String (PrivateKeyAsBytes .Config.ServiceCatalogServerKey) }}",
-		},
-	},
-	"Secret/openshift-azure/tunnel": {
-		{
-			Path:       jsonpath.MustCompile("$.stringData.'tunnel.conf'"),
-			NestedPath: jsonpath.MustCompile("$.address"),
-			Template:   "{{ .Config.TunnelHostname }}:443",
 		},
 	},
 	"Secret/openshift-metrics/alertmanager-proxy": {

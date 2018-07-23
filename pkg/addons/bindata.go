@@ -254,7 +254,6 @@
 // data/CustomResourceDefinition.apiextensions.k8s.io/bundlebindings.automationbroker.io.yaml
 // data/CustomResourceDefinition.apiextensions.k8s.io/bundleinstances.automationbroker.io.yaml
 // data/CustomResourceDefinition.apiextensions.k8s.io/bundles.automationbroker.io.yaml
-// data/DaemonSet.apps/openshift-azure/tunnel.yaml
 // data/DaemonSet.apps/openshift-metrics/prometheus-node-exporter.yaml
 // data/DaemonSet.apps/openshift-node/sync.yaml
 // data/DaemonSet.apps/openshift-sdn/ovs.yaml
@@ -287,7 +286,6 @@
 // data/Namespace/kube-service-catalog.yaml
 // data/Namespace/kube-system.yaml
 // data/Namespace/openshift-ansible-service-broker.yaml
-// data/Namespace/openshift-azure.yaml
 // data/Namespace/openshift-infra.yaml
 // data/Namespace/openshift-metrics.yaml
 // data/Namespace/openshift-node.yaml
@@ -335,7 +333,6 @@
 // data/Secret/default/router-certs.yaml
 // data/Secret/kube-service-catalog/apiserver-ssl.yaml
 // data/Secret/openshift-ansible-service-broker/asb-client.yaml
-// data/Secret/openshift-azure/tunnel.yaml
 // data/Secret/openshift-metrics/alertmanager-proxy.yaml
 // data/Secret/openshift-metrics/alerts-proxy.yaml
 // data/Secret/openshift-metrics/prometheus-proxy.yaml
@@ -5598,26 +5595,6 @@ func customresourcedefinitionApiextensionsK8sIoBundlesAutomationbrokerIoYaml() (
 	return a, nil
 }
 
-var _daemonsetAppsOpenshiftAzureTunnelYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x51\x3b\x6f\xe3\x30\x0c\xde\xfd\x2b\xb8\x05\x30\xe0\x33\x6e\xd5\x16\x5c\x82\x5b\xda\x34\x68\x8b\xee\xac\xcc\xd8\x42\xf4\x82\x44\x27\x75\x7f\x7d\xa1\x3a\x71\x65\xf7\x81\x72\x49\x4c\x7e\x0f\x7e\x14\x7a\xf5\x44\x21\x2a\x67\x05\xa0\xf7\xb1\x3e\xfd\x2d\x8e\xca\x36\x02\x36\x48\xc6\xd9\x07\xe2\xc2\x10\x63\x83\x8c\xa2\x00\xb0\x68\x48\x00\xf7\xd6\x92\xbe\x7c\x46\x8f\x92\x04\x38\x4f\x36\x76\xea\xc0\x15\xbe\xf6\x81\x8a\xe8\x49\x26\x46\x24\x4d\x92\x5d\x48\xff\x01\x0c\xb2\xec\x6e\xf0\x99\x74\x1c\x1b\x90\x6c\x33\x45\x26\xe3\x35\x32\x5d\xe0\x99\x75\x2a\x3d\x63\x2e\xb9\x00\x57\xd3\x54\xd2\x59\x46\x65\x29\x4c\xf8\x0a\x30\xb4\x19\xbb\x82\x9a\x58\xd6\x23\xff\xf2\xf3\x47\x3a\x7b\x98\x10\xca\x60\x4b\x02\x56\x65\x59\xc2\xff\xed\x6e\x7b\xbf\x7e\xdc\x6e\xa0\x2c\xcb\xd5\x1c\xb2\xef\xb5\xde\x3b\xad\xe4\x20\x60\xad\xcf\x38\xc4\x69\xbe\xb8\xd8\x58\x91\x64\x1f\x14\x0f\xff\x9c\x65\x7a\xe1\x8f\x95\x00\x7c\x50\x27\xa5\xa9\xa5\x46\x00\x87\x9e\xa6\xd1\xc9\xe9\xde\xd0\xad\xeb\x2d\xcf\x32\x98\xd4\xd9\x23\x77\x62\x8c\xe3\x82\x6a\x95\xad\xad\x6b\x28\x93\x1d\xd7\xe8\x5c\xe4\x2a\x25\x54\x6d\x36\x0b\x84\xcd\x9d\xd5\xc3\xc2\xf0\xb3\xf4\x22\xc5\x55\xf5\x77\x82\xc9\x7b\x47\x7c\x76\xe1\x38\xeb\x8f\xb9\xb2\x47\x4a\xc0\x77\xd3\xfc\x2a\x3f\xe7\xfb\x2e\x5d\xf5\xf5\x86\x91\x64\xa0\xd9\xd5\xc7\xce\x2e\x7f\xab\xb7\x00\x00\x00\xff\xff\xb0\x63\x01\xd4\x1b\x03\x00\x00")
-
-func daemonsetAppsOpenshiftAzureTunnelYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_daemonsetAppsOpenshiftAzureTunnelYaml,
-		"DaemonSet.apps/openshift-azure/tunnel.yaml",
-	)
-}
-
-func daemonsetAppsOpenshiftAzureTunnelYaml() (*asset, error) {
-	bytes, err := daemonsetAppsOpenshiftAzureTunnelYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "DaemonSet.apps/openshift-azure/tunnel.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _daemonsetAppsOpenshiftMetricsPrometheusNodeExporterYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x53\xcd\x8e\xd3\x30\x10\xbe\xe7\x29\xe6\xb6\x52\xa4\xa8\x29\x88\x03\xbe\x55\x6a\x85\x90\xd8\x12\x01\xe2\x6e\xdc\x61\x63\xad\xed\x31\xe3\x49\x97\xbe\x3d\x72\x0b\xa9\x43\x42\xa9\x4f\xc9\x37\x33\xdf\xcf\xc4\xd1\xd1\x7e\x45\x4e\x96\x82\x02\x1d\x63\x5a\x1d\xd7\xd5\xb3\x0d\x07\x05\x5b\x8d\x9e\xc2\x67\x94\xca\xa3\xe8\x83\x16\xad\x2a\x00\xa7\xbf\xa1\x4b\xf9\x09\x72\xbf\x82\xc8\xe4\x51\x7a\x1c\x52\x13\xe8\x80\x0d\xfe\x8c\xc4\x82\x7c\xee\x60\x72\xa8\xc0\x53\xb0\x42\x6c\xc3\x53\x05\x10\xb4\xc7\x9b\x53\xb9\x21\x45\x6d\x50\x01\x45\x0c\xa9\xb7\xdf\xa5\xf1\x28\x6c\x4d\xaa\x52\x44\x93\xc5\x13\x3a\x34\x42\x7c\x31\xe2\xb5\x98\xfe\x43\xe1\xec\x1e\x6f\x8b\xee\x04\x7d\x74\x5a\xf0\x37\x6f\x11\x3c\x1f\x37\x91\xb8\x4f\x64\x51\x26\x9f\xd9\x22\x26\x83\x7f\x82\xe6\x63\x28\x88\xb6\x01\x79\x94\x6e\xc0\x7a\xfd\x84\x0a\x1e\xea\xba\x86\x77\xbb\xfd\xee\xd3\xe6\xcb\x6e\x0b\x75\x5d\x3f\x8c\xba\xe7\x96\x6e\x70\xae\x23\x67\xcd\x49\xc1\xc6\xbd\xe8\x53\x1a\xeb\x17\x03\xcb\x9e\xf3\x6b\x11\xb4\xb9\x7a\xe8\x88\x45\xc1\xdb\x75\xdb\x8e\x55\x80\x9e\x92\x2c\x16\x2e\x1a\xc9\xb0\x8e\x78\x5d\x08\x26\x1a\xd8\x60\x21\x00\xe0\xac\xb7\x32\x41\x00\x4c\x1c\x14\xbc\x6a\x5b\x3f\x41\x3d\x7a\xe2\x93\x82\x37\xed\xa3\x2d\x0a\x8c\x3f\x06\x4c\x8b\x14\xeb\x7f\x51\xbc\x2e\x29\x8e\xe4\x06\x8f\x8f\x34\x84\x69\x74\x9f\x91\x4e\x4b\xaf\x60\x95\x83\xae\x22\x93\x99\x65\xfc\x0b\x64\xd4\x87\x8f\xc1\x9d\x14\x08\x0f\x78\x8b\x2d\x15\x9f\x64\x5c\xd8\x04\x5b\xe4\xca\xb3\x7b\x94\x17\xe2\xe7\x19\xde\xbd\xdf\x4e\xb0\x84\x7c\xb4\x06\x37\xc6\x64\xf1\xfd\xff\xfe\xc0\xeb\x32\x8a\x0b\x77\xe6\xcd\xb6\x0b\x63\xf1\x12\x63\x12\x7d\xb6\x8d\x9b\xa3\x69\x76\x1f\x33\xf2\x2b\x00\x00\xff\xff\xfc\xf5\xd2\xd1\x95\x04\x00\x00")
 
 func daemonsetAppsOpenshiftMetricsPrometheusNodeExporterYamlBytes() ([]byte, error) {
@@ -6254,26 +6231,6 @@ func namespaceOpenshiftAnsibleServiceBrokerYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "Namespace/openshift-ansible-service-broker.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _namespaceOpenshiftAzureYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x54\xcc\xb1\x0e\x82\x50\x0c\x46\xe1\xfd\x3e\x45\xc3\x8e\xc6\xf5\x3e\x84\xa3\x7b\x85\x1f\x6d\x80\xf6\xa6\x2d\x0e\x3c\xbd\x81\xc5\x38\x9e\xe4\xe4\xe3\x26\x0f\x78\x88\x69\xa5\xcf\xad\xcc\xa2\x63\xa5\x3b\xaf\x88\xc6\x03\xca\x8a\xe4\x91\x93\x6b\x21\x62\x55\x4b\x4e\x31\x8d\x23\x89\xac\x41\xe3\x2d\x53\x5e\xc4\xae\x6a\x23\xfa\xc0\x82\x21\xcd\x2b\x75\x5d\x21\x52\x5e\x51\x7f\x5b\xcf\xfb\xe6\x28\xd1\x30\x1c\xc0\x24\xca\x8b\xec\xf0\x93\xeb\x69\xde\x9e\x70\x45\x22\xce\xfc\xd3\xcd\xe5\x25\x5a\xbe\x01\x00\x00\xff\xff\x30\x1a\xb9\x4f\xae\x00\x00\x00")
-
-func namespaceOpenshiftAzureYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_namespaceOpenshiftAzureYaml,
-		"Namespace/openshift-azure.yaml",
-	)
-}
-
-func namespaceOpenshiftAzureYaml() (*asset, error) {
-	bytes, err := namespaceOpenshiftAzureYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "Namespace/openshift-azure.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -7214,26 +7171,6 @@ func secretOpenshiftAnsibleServiceBrokerAsbClientYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "Secret/openshift-ansible-service-broker/asb-client.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _secretOpenshiftAzureTunnelYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xac\x90\xc1\x6a\xf3\x40\x0c\x84\xef\x7e\x0a\xdd\x02\x06\x7b\x9d\x04\xfe\x1f\xf6\x56\x92\x50\x7a\x29\x25\x29\xbd\x6f\xd6\xe3\x44\x24\xd6\x1a\xad\x1c\x68\xe9\xc3\x97\x3a\xa6\xc7\x9e\x7a\x9c\xd1\x37\x23\xa4\x30\xf0\x1b\x34\x73\x12\x4f\xb7\x65\x71\x61\x69\x3d\x1d\x10\x15\x56\xf4\xb0\xd0\x06\x0b\xbe\x20\x92\xd0\xc3\x93\x8d\x22\xb8\xce\x32\x0f\x21\xc2\x53\x1a\x20\xf9\xcc\x9d\x55\xe1\x63\x54\x14\xd9\x94\xe5\xb4\x9d\x73\xf7\x44\x1d\x93\x74\x9e\x3e\x0b\x22\xa2\xd0\xb6\x8a\x9c\x3d\x2d\xca\xb2\xa4\xc7\xdd\xf3\x6e\xff\xf0\xba\xdb\x52\x59\x96\x8b\x19\xb8\x41\x8d\x33\x36\x4f\xdb\x7d\xf6\x93\x57\x11\xec\xdc\xb8\xf5\x6a\x52\x31\x6c\xa0\xf6\x12\xec\xec\xc9\xc1\xa2\x4b\xca\x27\x16\x27\xa9\x85\x8b\xa1\x8e\x6a\x77\xee\x17\xea\x7b\x45\xc7\x31\x18\xb2\xbb\x8c\x47\x5c\x61\x55\xbc\x32\xc4\xaa\x38\xaa\x42\xac\x1e\xd0\x4f\x35\x2c\x06\xed\xa6\x6b\x7f\x3e\x40\x74\xc1\xfb\x1f\x74\xf7\xa9\x85\xa7\xfb\x70\x32\x32\xf4\xc6\x11\xf9\x30\x1e\x05\xe6\x69\xf9\x7f\x55\xaf\x9b\xba\xa9\x1b\xb7\xfc\x57\x7c\x05\x00\x00\xff\xff\x5b\x72\x1a\x69\xb0\x01\x00\x00")
-
-func secretOpenshiftAzureTunnelYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_secretOpenshiftAzureTunnelYaml,
-		"Secret/openshift-azure/tunnel.yaml",
-	)
-}
-
-func secretOpenshiftAzureTunnelYaml() (*asset, error) {
-	bytes, err := secretOpenshiftAzureTunnelYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "Secret/openshift-azure/tunnel.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -9884,7 +9821,6 @@ var _bindata = map[string]func() (*asset, error){
 	"CustomResourceDefinition.apiextensions.k8s.io/bundlebindings.automationbroker.io.yaml":                                              customresourcedefinitionApiextensionsK8sIoBundlebindingsAutomationbrokerIoYaml,
 	"CustomResourceDefinition.apiextensions.k8s.io/bundleinstances.automationbroker.io.yaml":                                             customresourcedefinitionApiextensionsK8sIoBundleinstancesAutomationbrokerIoYaml,
 	"CustomResourceDefinition.apiextensions.k8s.io/bundles.automationbroker.io.yaml":                                                     customresourcedefinitionApiextensionsK8sIoBundlesAutomationbrokerIoYaml,
-	"DaemonSet.apps/openshift-azure/tunnel.yaml":                                                                                         daemonsetAppsOpenshiftAzureTunnelYaml,
 	"DaemonSet.apps/openshift-metrics/prometheus-node-exporter.yaml":                                                                     daemonsetAppsOpenshiftMetricsPrometheusNodeExporterYaml,
 	"DaemonSet.apps/openshift-node/sync.yaml":                                                                                            daemonsetAppsOpenshiftNodeSyncYaml,
 	"DaemonSet.apps/openshift-sdn/ovs.yaml":                                                                                              daemonsetAppsOpenshiftSdnOvsYaml,
@@ -9917,7 +9853,6 @@ var _bindata = map[string]func() (*asset, error){
 	"Namespace/kube-service-catalog.yaml":                                                                                                namespaceKubeServiceCatalogYaml,
 	"Namespace/kube-system.yaml":                                                                                                         namespaceKubeSystemYaml,
 	"Namespace/openshift-ansible-service-broker.yaml":                                                                                    namespaceOpenshiftAnsibleServiceBrokerYaml,
-	"Namespace/openshift-azure.yaml":                                                                                                     namespaceOpenshiftAzureYaml,
 	"Namespace/openshift-infra.yaml":                                                                                                     namespaceOpenshiftInfraYaml,
 	"Namespace/openshift-metrics.yaml":                                                                                                   namespaceOpenshiftMetricsYaml,
 	"Namespace/openshift-node.yaml":                                                                                                      namespaceOpenshiftNodeYaml,
@@ -9965,7 +9900,6 @@ var _bindata = map[string]func() (*asset, error){
 	"Secret/default/router-certs.yaml":                                                                                                   secretDefaultRouterCertsYaml,
 	"Secret/kube-service-catalog/apiserver-ssl.yaml":                                                                                     secretKubeServiceCatalogApiserverSslYaml,
 	"Secret/openshift-ansible-service-broker/asb-client.yaml":                                                                            secretOpenshiftAnsibleServiceBrokerAsbClientYaml,
-	"Secret/openshift-azure/tunnel.yaml":                                                                                                 secretOpenshiftAzureTunnelYaml,
 	"Secret/openshift-metrics/alertmanager-proxy.yaml":                                                                                   secretOpenshiftMetricsAlertmanagerProxyYaml,
 	"Secret/openshift-metrics/alerts-proxy.yaml":                                                                                         secretOpenshiftMetricsAlertsProxyYaml,
 	"Secret/openshift-metrics/prometheus-proxy.yaml":                                                                                     secretOpenshiftMetricsPrometheusProxyYaml,
@@ -10407,9 +10341,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"bundles.automationbroker.io.yaml":         {customresourcedefinitionApiextensionsK8sIoBundlesAutomationbrokerIoYaml, map[string]*bintree{}},
 	}},
 	"DaemonSet.apps": {nil, map[string]*bintree{
-		"openshift-azure": {nil, map[string]*bintree{
-			"tunnel.yaml": {daemonsetAppsOpenshiftAzureTunnelYaml, map[string]*bintree{}},
-		}},
 		"openshift-metrics": {nil, map[string]*bintree{
 			"prometheus-node-exporter.yaml": {daemonsetAppsOpenshiftMetricsPrometheusNodeExporterYaml, map[string]*bintree{}},
 		}},
@@ -10466,7 +10397,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"kube-service-catalog.yaml":              {namespaceKubeServiceCatalogYaml, map[string]*bintree{}},
 		"kube-system.yaml":                       {namespaceKubeSystemYaml, map[string]*bintree{}},
 		"openshift-ansible-service-broker.yaml":  {namespaceOpenshiftAnsibleServiceBrokerYaml, map[string]*bintree{}},
-		"openshift-azure.yaml":                   {namespaceOpenshiftAzureYaml, map[string]*bintree{}},
 		"openshift-infra.yaml":                   {namespaceOpenshiftInfraYaml, map[string]*bintree{}},
 		"openshift-metrics.yaml":                 {namespaceOpenshiftMetricsYaml, map[string]*bintree{}},
 		"openshift-node.yaml":                    {namespaceOpenshiftNodeYaml, map[string]*bintree{}},
@@ -10561,9 +10491,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"openshift-ansible-service-broker": {nil, map[string]*bintree{
 			"asb-client.yaml": {secretOpenshiftAnsibleServiceBrokerAsbClientYaml, map[string]*bintree{}},
-		}},
-		"openshift-azure": {nil, map[string]*bintree{
-			"tunnel.yaml": {secretOpenshiftAzureTunnelYaml, map[string]*bintree{}},
 		}},
 		"openshift-metrics": {nil, map[string]*bintree{
 			"alertmanager-proxy.yaml": {secretOpenshiftMetricsAlertmanagerProxyYaml, map[string]*bintree{}},

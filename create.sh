@@ -82,7 +82,6 @@ done
 
 tools/dns.sh zone-create $RESOURCEGROUP
 tools/dns.sh a-create $RESOURCEGROUP openshift $HCPINGRESSIP
-tools/dns.sh a-create $RESOURCEGROUP openshift-tunnel $HCPINGRESSIP
 
 if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # will eventually run as an HCP pod, for development run it locally

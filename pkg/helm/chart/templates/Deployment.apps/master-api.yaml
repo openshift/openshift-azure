@@ -12,7 +12,6 @@ spec:
       annotations:
         checksum/secret-etc-origin-master: {{ include (print $.Template.BasePath "/Secret/etc-origin-master.yaml") . | sha256sum | quote }}
         checksum/secret-etc-origin-cloudprovider: {{ include (print $.Template.BasePath "/Secret/etc-origin-cloudprovider.yaml") . | sha256sum | quote }}
-        checksum/secret-tunnel: {{ include (print $.Template.BasePath "/Secret/tunnel.yaml") . | sha256sum | quote }}
       labels:
         openshift.io/component: api
     spec:
@@ -56,17 +55,6 @@ spec:
         - name: master-cloud-provider
           mountPath: /etc/origin/cloudprovider/
           readOnly: true
-      - name: tunnel
-        image: {{ .Values.TunnelImage | quote }}
-        imagePullPolicy: Always
-        args:
-        - /etc/tunnel/tunnel.conf
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - name: config
-          mountPath: /etc/tunnel
-          readOnly: true
       volumes:
       - name: master-config
         secret:
@@ -74,6 +62,3 @@ spec:
       - name: master-cloud-provider
         secret:
           secretName: etc-origin-cloudprovider
-      - name: config
-        secret:
-          secretName: tunnel

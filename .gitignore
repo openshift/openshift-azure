@@ -3,6 +3,4 @@
 /env
 /healthcheck
 /sync
-/tun
-/tunnel
 .vscode

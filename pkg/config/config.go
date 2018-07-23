@@ -37,7 +37,6 @@ type Config struct {
 	ControlPlaneImage           string
 	NodeImage                   string
 	ServiceCatalogImage         string
-	TunnelImage                 string
 	SyncImage                   string
 	TemplateServiceBrokerImage  string
 	PrometheusNodeExporterImage string
@@ -63,8 +62,6 @@ type Config struct {
 	// control plane certificates
 	MasterServerKey           *rsa.PrivateKey
 	MasterServerCert          *x509.Certificate
-	TunnelKey                 *rsa.PrivateKey
-	TunnelCert                *x509.Certificate
 	AdminKey                  *rsa.PrivateKey
 	AdminCert                 *x509.Certificate
 	AggregatorFrontProxyKey   *rsa.PrivateKey
@@ -104,7 +101,6 @@ type Config struct {
 	SessionSecretEnc  []byte
 	HtPasswd          []byte
 	ImageConfigFormat string
-	TunnelHostname    string
 
 	// misc node configurables
 	SSHKey *rsa.PrivateKey
