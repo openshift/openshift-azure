@@ -1,10 +1,5 @@
 #!/bin/bash -x
 
-if [[ ! -e aks/admin.kubeconfig ]]; then
-    echo error: aks/admin.kubeconfig must exist
-    exit 1
-fi
-
 if ! az account show >/dev/null; then
     exit 1
 fi

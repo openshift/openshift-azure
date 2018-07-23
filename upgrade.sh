@@ -1,10 +1,5 @@
 #!/bin/bash -ex
 
-if [[ ! -e aks/admin.kubeconfig ]]; then
-    echo error: aks/admin.kubeconfig must exist
-    exit 1
-fi
-
 if [[ -z "$AZURE_SUBSCRIPTION_ID" ]]; then
     echo error: must set AZURE_SUBSCRIPTION_ID
     exit 1
