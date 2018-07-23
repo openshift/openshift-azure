@@ -26,74 +26,97 @@ func selectNodeImage(cs *acsapi.ContainerService, c *Config) {
 
 	switch os.Getenv("DEPLOY_OS") {
 	case "":
-		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion, ".", "", -1)
+		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion[1:], ".", "", -1)
 	case "centos7":
-		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion, ".", "", -1)
+		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion[1:], ".", "", -1)
 	}
 
 	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
 	c.ImageResourceName = os.Getenv("IMAGE_RESOURCENAME")
 }
 
+func image(imageConfigFormat, component, version string) string {
+	image := strings.Replace(imageConfigFormat, "${component}", component, -1)
+	return strings.Replace(image, "${version}", version, -1)
+}
+
 func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
+	c.ImageConfigFormat = os.Getenv("OREG_URL")
+	if c.ImageConfigFormat == "" {
+		c.ImageConfigFormat = "docker.io/openshift/origin-${component}:${version}"
+	}
+
 	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
-	case "3.10":
+	case "v3.10":
+		v := "v3.10.0"
+		c.ControlPlaneImage = image(c.ImageConfigFormat, "control-plane", v)
+		c.NodeImage = image(c.ImageConfigFormat, "node", v)
+		c.ServiceCatalogImage = image(c.ImageConfigFormat, "service-catalog", v)
+		c.TemplateServiceBrokerImage = image(c.ImageConfigFormat, "template-service-broker", v)
+		c.RegistryImage = image(c.ImageConfigFormat, "docker-registry", v)
+		c.RouterImage = image(c.ImageConfigFormat, "haproxy-router", v)
+		c.WebConsoleImage = image(c.ImageConfigFormat, "web-console", v)
+
 		c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
-		c.MasterAPIImage = "docker.io/openshift/origin-control-plane:v3.10"
-		c.MasterControllersImage = "docker.io/openshift/origin-control-plane:v3.10"
-		c.NodeImage = "docker.io/openshift/origin-node:v3.10.0"
-		c.ServiceCatalogImage = "docker.io/openshift/origin-service-catalog:v3.10"
+
+		c.OAuthProxyImage = "docker.io/openshift/oauth-proxy:v1.0.0"
+		c.PrometheusImage = "docker.io/openshift/prometheus:v2.2.1"
+		c.PrometheusAlertBufferImage = "docker.io/openshift/prometheus-alert-buffer:v0.0.2"
+		c.PrometheusAlertManagerImage = "docker.io/openshift/prometheus-alertmanager:v0.14.0"
+		c.PrometheusNodeExporterImage = "docker.io/openshift/prometheus-node-exporter:v0.15.2"
+
+		c.AnsibleServiceBrokerImage = "docker.io/ansibleplaybookbundle/origin-ansible-service-broker:latest"
+
+		c.RegistryConsoleImage = "docker.io/cockpit/kubernetes:latest"
+
+		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
+
 		c.TunnelImage = "quay.io/openshift-on-azure/tunnel:latest"
 		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
-		c.TemplateServiceBrokerImage = "docker.io/openshift/origin-template-service-broker:v3.10"
-		c.PrometheusNodeExporterImage = "openshift/prometheus-node-exporter:v0.15.2"
-		c.RegistryImage = "openshift/origin-docker-registry:v3.10.0"
-		c.RouterImage = "openshift/origin-haproxy-router:v3.10.0"
-		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
-		c.RegistryConsoleImage = "cockpit/kubernetes:latest"
-		c.AnsibleServiceBrokerImage = "ansibleplaybookbundle/origin-ansible-service-broker:latest"
-		c.WebConsoleImage = "openshift/origin-web-console:v3.10.0"
-		c.OAuthProxyImage = "openshift/oauth-proxy:v1.0.0"
-		c.PrometheusImage = "openshift/prometheus:v2.2.1"
-		c.PrometheusAlertBufferImage = "openshift/prometheus-alert-buffer:v0.0.2"
-		c.PrometheusAlertManagerImage = "openshift/prometheus-alertmanager:v0.14.0"
 	}
 }
 
 func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
-	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
-	//TODO: confirm minor version after release
-	case "3.10":
-		c.MasterEtcdImage = "rhel7/etcd:v3.10.15-1"
-		c.MasterAPIImage = "openshift3/ose-control-plane:v3.10.15-1"
-		c.MasterControllersImage = "openshift3/ose-control-plane:v3.10.15-1"
-		c.NodeImage = "openshift3/ose-node:v3.10.15-1"
-		c.ServiceCatalogImage = "openshift3/ose-service-catalog:v3.10.15-1"
-		c.TemplateServiceBrokerImage = "openshift3/ose-template-service-broker:v3.10.15-1"
-		c.PrometheusNodeExporterImage = "openshift3/prometheus-node-exporter:v3.10.15-1"
-		c.RegistryImage = "openshift3/ose-docker-registry:v3.10.15-1"
-		c.RouterImage = "openshift3/ose-haproxy-router:v3.10.15-1"
-		c.RegistryConsoleImage = "openshift3/registry-console:v3.10.15-1"
-		c.AnsibleServiceBrokerImage = "openshift3/ose-ansible-service-broker:v3.10.15-1"
-		c.WebConsoleImage = "openshift3/ose-web-console:v3.10.15-1"
-		c.OAuthProxyImage = "openshift3/oauth-proxy:v3.10.15-1"
-		c.PrometheusImage = "openshift3/prometheus:v3.10.15-1"
-		c.PrometheusAlertBufferImage = "openshift3/prometheus-alert-buffer:v3.10.15-1"
-		c.PrometheusAlertManagerImage = "openshift3/prometheus-alertmanager:v3.10.15-1"
-		c.TunnelImage = "quay.io/openshift-on-azure/tunnel:latest"
-		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
-		c.AzureCLIImage = "docker.io/microsoft/azure-cli:2.0.41" //TODO: create mapping for OSA release to any other image we use
+	c.ImageConfigFormat = os.Getenv("OREG_URL")
+	if c.ImageConfigFormat == "" {
+		c.ImageConfigFormat = "registry.access.redhat.com/openshift3/ose-${component}:${version}"
 	}
 
+	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
+	//TODO: confirm minor version after release
+	case "v3.10":
+		v := "v3.10.15-1"
+		c.ControlPlaneImage = image(c.ImageConfigFormat, "control-plane", v)
+		c.NodeImage = image(c.ImageConfigFormat, "node", v)
+		c.ServiceCatalogImage = image(c.ImageConfigFormat, "service-catalog", v)
+		c.AnsibleServiceBrokerImage = image(c.ImageConfigFormat, "ansible-service-broker", v)
+		c.TemplateServiceBrokerImage = image(c.ImageConfigFormat, "template-service-broker", v)
+		c.RegistryImage = image(c.ImageConfigFormat, "docker-registry", v)
+		c.RouterImage = image(c.ImageConfigFormat, "haproxy-router", v)
+		c.WebConsoleImage = image(c.ImageConfigFormat, "web-console", v)
+
+		c.MasterEtcdImage = "registry.access.redhat.com/rhel7/etcd:" + v
+
+		c.OAuthProxyImage = "registry.access.redhat.com/openshift3/oauth-proxy:" + v
+		c.PrometheusImage = "registry.access.redhat.com/openshift3/prometheus:" + v
+		c.PrometheusAlertBufferImage = "registry.access.redhat.com/openshift3/prometheus-alert-buffer:" + v
+		c.PrometheusAlertManagerImage = "registry.access.redhat.com/openshift3/prometheus-alertmanager:" + v
+		c.PrometheusNodeExporterImage = "registry.access.redhat.com/openshift3/prometheus-node-exporter:" + v
+
+		c.RegistryConsoleImage = "registry.access.redhat.com/openshift3/registry-console:" + v
+
+		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest" //TODO: create mapping for OSA release to any other image we use
+
+		c.TunnelImage = "quay.io/openshift-on-azure/tunnel:latest"
+		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
+	}
 }
 
 func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 	switch os.Getenv("DEPLOY_OS") {
 	case "":
-		c.ImageConfigFormat = "openshift3/ose-${component}:${version}"
 		selectContainerImagesOSA(cs, c)
 	case "centos7":
-		c.ImageConfigFormat = "openshift/origin-${component}:${version}"
 		selectContainerImagesOrigin(cs, c)
 	}
 }

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: controllers
-        image: {{ .Values.MasterControllersImage | quote }}
+        image: {{ .Values.ControlPlaneImage | quote }}
         imagePullPolicy: Always
         command:
         - /bin/bash
