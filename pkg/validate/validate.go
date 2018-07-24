@@ -27,11 +27,12 @@ func Validate(cs, _ *acsapi.ContainerService) error {
 		return fmt.Errorf("invalid openShiftVersion %q", cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion)
 	}
 
-	if len(cs.Properties.AgentPoolProfiles) != 2 {
+	if len(cs.Properties.AgentPoolProfiles) != 3 {
 		return fmt.Errorf("invalid number of agentPoolProfiles")
 	}
 
-	if cs.Properties.AgentPoolProfiles[0].VnetSubnetID != cs.Properties.AgentPoolProfiles[1].VnetSubnetID {
+	if cs.Properties.AgentPoolProfiles[0].VnetSubnetID != cs.Properties.AgentPoolProfiles[1].VnetSubnetID ||
+		cs.Properties.AgentPoolProfiles[0].VnetSubnetID != cs.Properties.AgentPoolProfiles[2].VnetSubnetID {
 		return fmt.Errorf("non-identical vnetSubnetIDs")
 	}
 
@@ -51,17 +52,32 @@ func Validate(cs, _ *acsapi.ContainerService) error {
 		}
 	}
 
-	if pools["compute"] == nil {
-		return fmt.Errorf("missing compute agentPoolProfile")
+	if pools["master"] == nil {
+		return fmt.Errorf("missing master agentPoolProfile")
 	}
-	if pools["compute"].Role != acsapi.AgentPoolProfileRoleEmpty {
-		return fmt.Errorf("invalid compute agentPoolProfile role %q", pools["compute"].Role)
+	if pools["master"].Role != acsapi.AgentPoolProfileRoleMaster {
+		return fmt.Errorf("invalid master agentPoolProfile role %q", pools["master"].Role)
+	}
+	if pools["master"].Count != 3 {
+		return fmt.Errorf("invalid master agentPoolProfile count %q", pools["master"].Count)
 	}
 	if pools["infra"] == nil {
 		return fmt.Errorf("missing infra agentPoolProfile")
 	}
 	if pools["infra"].Role != acsapi.AgentPoolProfileRoleInfra {
 		return fmt.Errorf("invalid infra agentPoolProfile role %q", pools["infra"].Role)
+	}
+	if pools["infra"].Count == 0 {
+		return fmt.Errorf("invalid infra agentPoolProfile count %q", pools["infra"].Count)
+	}
+	if pools["compute"] == nil {
+		return fmt.Errorf("missing compute agentPoolProfile")
+	}
+	if pools["compute"].Role != acsapi.AgentPoolProfileRoleCompute {
+		return fmt.Errorf("invalid compute agentPoolProfile role %q", pools["compute"].Role)
+	}
+	if pools["compute"].Count == 0 {
+		return fmt.Errorf("invalid compute agentPoolProfile count %q", pools["compute"].Count)
 	}
 
 	return validateDevelopmentSwitches()

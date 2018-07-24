@@ -4,5 +4,8 @@ metadata:
   name: apiserver
   namespace: kube-service-catalog
 spec:
-  externalName: servicecatalog-api
-  type: ExternalName
+  selector:
+    app: apiserver
+  ports:
+  - port: 443
+    targetPort: 6443

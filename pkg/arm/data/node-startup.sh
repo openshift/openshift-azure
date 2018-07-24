@@ -8,19 +8,15 @@ if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
     SERVICE_TYPE=atomic-openshift
 fi
 
-systemctl stop docker.service
 umount /mnt/resource || true
-mkfs.xfs -f /dev/sdb1
-echo '/dev/sdb1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
+mkfs.xfs -f /dev/disk/azure/resource-part1
+echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
+systemctl stop docker.service
 mount /var/lib/docker
 restorecon -R /var/lib/docker
 systemctl start docker.service
 
-{{if eq .Extra.Role "infra"}}
-echo "BOOTSTRAP_CONFIG_NAME=node-config-infra" >>/etc/sysconfig/${SERVICE_TYPE}-node
-{{else}}
-echo "BOOTSTRAP_CONFIG_NAME=node-config-compute" >>/etc/sysconfig/${SERVICE_TYPE}-node
-{{end}}
+echo 'BOOTSTRAP_CONFIG_NAME=node-config-{{ .Extra.Role }}' >>/etc/sysconfig/${SERVICE_TYPE}-node
 
 sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-node
 
@@ -38,7 +34,7 @@ update-ca-trust
 echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
 mkdir -p /etc/origin/cloudprovider
 
-# TODO: this is duplicated in the helm charts for the master pods, and that's not ideal
+# TODO: this is duplicated, and that's not ideal
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
 tenantId: {{ .ContainerService.Properties.AzProfile.TenantID | quote }}
 subscriptionId: {{ .ContainerService.Properties.AzProfile.SubscriptionID | quote }}

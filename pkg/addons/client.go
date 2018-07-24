@@ -4,9 +4,12 @@ import (
 	"errors"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"reflect"
+	"syscall"
 	"time"
 
 	"github.com/go-test/deep"
@@ -14,6 +17,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
@@ -65,6 +69,10 @@ func newClient(dryRun bool) (*client, error) {
 		cli:        cli,
 	}
 
+	if err := c.waitForHealthz(); err != nil {
+		return nil, err
+	}
+
 	if err := c.updateDynamicClient(); err != nil {
 		return nil, err
 	}
@@ -107,21 +115,24 @@ func (c *client) waitForHealthz() error {
 		return err
 	}
 
-	for {
+	return wait.PollInfinite(time.Second, func() (bool, error) {
 		resp, err := cli.Do(req)
-		if err, ok := err.(*url.Error); ok && (err.Timeout() || err.Err == io.EOF || err.Err == io.ErrUnexpectedEOF) {
-			time.Sleep(time.Second)
-			continue
-		}
-		if err != nil {
-			return err
-		}
-		if resp.StatusCode == http.StatusOK {
-			return nil
+
+		if err, ok := err.(*url.Error); ok {
+			if err, ok := err.Err.(*net.OpError); ok {
+				if err, ok := err.Err.(*os.SyscallError); ok {
+					if err.Err == syscall.ENETUNREACH {
+						return false, nil
+					}
+				}
+			}
+			if err.Timeout() || err.Err == io.EOF || err.Err == io.ErrUnexpectedEOF {
+				return false, nil
+			}
 		}
 
-		time.Sleep(time.Second)
-	}
+		return resp.StatusCode == http.StatusOK, err
+	})
 }
 
 // createResources creates all resources in db that match the provided filter.

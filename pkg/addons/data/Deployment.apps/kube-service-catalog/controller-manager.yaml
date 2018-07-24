@@ -45,9 +45,4 @@ spec:
       volumes:
       - name: service-catalog-ssl
         secret:
-          items:
-          - key: tls.crt
-            path: apiserver.crt
-          - key: tls.key
-            path: apiserver.key
           secretName: apiserver-ssl

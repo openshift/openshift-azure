@@ -14,7 +14,6 @@ import (
 	"github.com/jim-minter/azure-helm/pkg/arm"
 	"github.com/jim-minter/azure-helm/pkg/config"
 	"github.com/jim-minter/azure-helm/pkg/healthcheck"
-	"github.com/jim-minter/azure-helm/pkg/helm"
 	"github.com/jim-minter/azure-helm/pkg/tls"
 	"github.com/jim-minter/azure-helm/pkg/validate"
 )
@@ -65,10 +64,6 @@ func (p *Plugin) GenerateConfig() ([]byte, error) {
 		return nil, err
 	}
 	return b, err
-}
-
-func (p *Plugin) GenerateHelm() ([]byte, error) {
-	return helm.Generate(p.cs, p.config)
 }
 
 func (p *Plugin) GenerateARM() ([]byte, error) {

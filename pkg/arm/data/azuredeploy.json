@@ -4,7 +4,7 @@
     "parameters": {},
     "variables": {},
     "resources": [
-{{ if not ( index .ContainerService.Properties.AgentPoolProfiles 0).VnetSubnetID }}              
+{{- if not (index .ContainerService.Properties.AgentPoolProfiles 0).VnetSubnetID }}
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2016-03-30",
@@ -26,7 +26,93 @@
                 ]
             }
         },
-{{ end }}
+{{- end }}
+{{/* TODO: we may be able to avoid the IP and LB here if we stop using */}}
+{{/* DaemonSets for SDN.  Then Master nodes should come up as Ready */}}
+{{/* automatically, and hence be entered into consideration for a */}}
+{{/* LoadBalancer Service fronting the API server */}}
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2016-03-30",
+            "location": "{{ .ContainerService.Location | js }}",
+            "name": "ip-apiserver",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 15,
+                "dnsSettings": {
+                    "domainNameLabel": "{{ .ContainerService.Properties.AzProfile.ResourceGroup }}"
+                }
+            },
+            "sku": {
+                "name": "Basic"
+            }
+        },
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "apiVersion": "2016-03-30",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-apiserver')]"
+            ],
+            "location": "{{ .ContainerService.Location | js }}",
+            "name": "lb-apiserver",
+            "properties": {
+                "backendAddressPools": [
+                    {
+                        "name": "backend"
+                    }
+                ],
+                "frontendIPConfigurations": [
+                    {
+                        "name": "frontend",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-apiserver')]"
+                            }
+                        }
+                    }
+                ],
+                "inboundNatPools": [],
+                "inboundNatRules": [],
+                "loadBalancingRules": [
+                    {
+                        "name": "port-443",
+                        "properties": {
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/backendAddressPools/backend')]"
+                            },
+                            "backendPort": 443,
+                            "enableFloatingIP": false,
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/frontendIPConfigurations/frontend')]"
+                            },
+                            "frontendPort": 443,
+                            "idleTimeoutInMinutes": 15,
+                            "loadDistribution": "Default",
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/probes/port-443')]"
+                            },
+                            "protocol": "Tcp"
+                        }
+                    }
+                ],
+                "outboundNatRules": [],
+                "probes": [
+                    {
+                        "name": "port-443",
+                        "properties": {
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "port": 443,
+                            "protocol": "Tcp"
+                        }
+                    }
+                ]
+            },
+            "sku": {
+                "name": "Basic"
+            }
+        },
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2015-06-15",
@@ -37,7 +123,7 @@
             }
         }
 {{- range $app := .ContainerService.Properties.AgentPoolProfiles }},
-       {
+        {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
             "location": "{{ $.ContainerService.Location }}",
@@ -56,50 +142,38 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*"
+                        }
                     }
-                }
-{{ if eq $app.Role `infra` }}  
-                    ,{
-                        "name": "allow_http",
+{{- if eq $app.Role "master" }},
+                    {
+                        "name": "allow_https",
                         "properties": {
                             "access": "Allow",
-                            "description": "Allow http traffic",
+                            "description": "Allow HTTPS traffic",
                             "destinationAddressPrefix": "*",
-                            "destinationPortRange": "80",
+                            "destinationPortRange": "443-443",
                             "direction": "Inbound",
                             "priority": 102,
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*"
                         }
-                    },
-                    {
-                        "name": "allow_https",
-                        "properties": {
-                            "access": "Allow",
-                            "description": "Allow https traffic",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "443",
-                            "direction": "Inbound",
-                            "priority": 103,
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*"
-                        }
                     }
-{{ end }}
+{{- end }}
                 ]
             }
         },
-
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2017-12-01",
             "location": "{{ $.ContainerService.Location | js }}",
             "dependsOn": [
-{{ if not $app.VnetSubnetID }}
+{{- if not $app.VnetSubnetID }}
                 "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
-{{ end }}
+{{- end }}
+{{- if eq $app.Role "master" }}
+                "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]",
+{{- end }}
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}')]"
             ],
             "name": "ss-{{ $app.Name }}",
@@ -154,6 +228,15 @@
                                 "storageAccountType": "Premium_LRS"
                             }
                         }
+{{- if eq $app.Role "master" }},
+                        "dataDisks": [
+                            {
+                                "diskSizeGB": 32,
+                                "createOption": "Empty",
+                                "lun": 0
+                            }
+                        ]
+{{- end }}
                     },
                     "networkProfile": {
                         "networkInterfaceConfigurations": [
@@ -171,11 +254,7 @@
                                             "properties": {
                                                 "primary": true,
                                                 "subnet": {
-{{ if $app.VnetSubnetID }}
-                                                    "id": "{{ $app.VnetSubnetID }}"
-{{ else }}
-                                                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/default')]"
-{{ end }}
+                                                    "id": "{{if $app.VnetSubnetID}}{{$app.VnetSubnetID}}{{else}}[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/default')]{{end}}"
                                                 },
                                                 "publicIpAddressConfiguration": {
                                                     "name": "ip",
@@ -183,6 +262,13 @@
                                                         "idleTimeoutInMinutes": 15
                                                     }
                                                 }
+{{- if eq $app.Role "master" }},
+                                                "loadBalancerBackendAddressPools": [
+                                                    {
+                                                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/backendAddressPools/backend')]"
+                                                    }
+                                                ]
+{{- end }}
                                             }
                                         }
                                     ]
@@ -197,7 +283,7 @@
                                 "properties": {
                                     "autoUpgradeMinorVersion": true,
                                     "protectedSettings": {
-                                        "script": "{{ Base64Encode (Startup $app.Name ) }}"
+                                        "script": "{{ Base64Encode (Startup $app.Role ) }}"
                                     },
                                     "publisher": "Microsoft.Azure.Extensions",
                                     "settings": {},
@@ -210,7 +296,7 @@
                 }
             }
         }
-{{ end }}
+{{- end }}
     ],
     "outputs": {}
 }

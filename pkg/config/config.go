@@ -90,7 +90,6 @@ type Config struct {
 	// kubeconfigs
 	AdminKubeconfig                 *v1.Config
 	MasterKubeconfig                *v1.Config
-	ServiceCatalogAPIKubeconfig     *v1.Config
 	BootstrapAutoapproverKubeconfig *v1.Config
 	NodeBootstrapKubeconfig         *v1.Config
 	SyncKubeconfig                  *v1.Config

@@ -3,8 +3,7 @@ kind: Namespace
 metadata:
   annotations:
     openshift.io/node-selector: ""
-  name: default
+  name: openshift-azure
 spec:
   finalizers:
   - kubernetes
-  - openshift.io/origin
