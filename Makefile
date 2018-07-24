@@ -22,7 +22,12 @@ sync-image: sync
 sync-push: sync-image
 	docker push quay.io/openshift-on-azure/sync:latest
 
-.PHONY: clean sync-image sync-push tunnel-image tunnel-push
+plugins: clean
+	go generate ./...
+	CGO_ENABLED=0 go build ./cmd/sync
+	CGO_ENABLED=0 go build ./cmd/tunnel
+
+.PHONY: plugins clean sync-image sync-push tunnel-image tunnel-push
 
 # docker pull quay.io/openshift-on-azure/sync:latest
 # docker run --dns=8.8.8.8 -i -v /root/.kube:/.kube:z -e KUBECONFIG=/.kube/config quay.io/openshift-on-azure/sync:latest
