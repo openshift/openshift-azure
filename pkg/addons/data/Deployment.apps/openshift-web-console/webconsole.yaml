@@ -32,7 +32,6 @@ spec:
         - -v=0
         - --config=/var/webconsole-config/webconsole-config.yaml
         image: '*** GENERATED ***'
-        imagePullPolicy: Always
         livenessProbe:
           exec:
             command:

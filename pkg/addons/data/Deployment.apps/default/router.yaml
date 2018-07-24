@@ -49,7 +49,6 @@ spec:
         - name: STATS_USERNAME
           value: admin
         image: '*** GENERATED ***'
-        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /healthz

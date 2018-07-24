@@ -14,12 +14,7 @@ spec:
         app: apiserver
     spec:
       containers:
-      - name: apiserver
-        image: '*** GENERATED ***'
-        imagePullPolicy: Always
-        command:
-        - /usr/bin/service-catalog
-        args:
+      - args:
         - apiserver
         - --storage-type
         - etcd
@@ -41,6 +36,10 @@ spec:
         - KubernetesNamespaceLifecycle,DefaultServicePlan,ServiceBindingsLifecycle,ServicePlanChangeValidator,BrokerAuthSarCheck
         - --feature-gates
         - OriginatingIdentity=true
+        command:
+        - /usr/bin/service-catalog
+        image: '*** GENERATED ***'
+        name: apiserver
         volumeMounts:
         - mountPath: /var/run/kubernetes-service-catalog
           name: apiserver-ssl

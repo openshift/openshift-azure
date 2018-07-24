@@ -26,7 +26,6 @@ spec:
         - --v=0
         - --config=/var/apiserver-config/apiserver-config.yaml
         image: '*** GENERATED ***'
-        imagePullPolicy: Always
         name: apiserver
         ports:
         - containerPort: 8443

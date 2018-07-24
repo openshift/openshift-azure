@@ -14,13 +14,7 @@ spec:
         app: bootstrap-autoapprover
     spec:
       containers:
-      - name: signer
-        image: '*** GENERATED ***'
-        imagePullPolicy: Always
-        command:
-        - /bin/bash
-        - -c
-        args:
+      - args:
         - |
           set -o errexit
           set -o nounset
@@ -66,9 +60,14 @@ spec:
 
           chmod u+x /tmp/signer
           exec oc observe csr --maximum-errors=1 --resync-period=10m -a '{.status.conditions[*].type}' -a '{.status.certificate}' -a '{.spec.username}' -- /tmp/signer
+        command:
+        - /bin/bash
+        - -c
+        image: '*** GENERATED ***'
+        name: signer
         volumeMounts:
-        - name: kubeconfig
-          mountPath: /tmp/kubeconfig
+        - mountPath: /tmp/kubeconfig
+          name: kubeconfig
           readOnly: true
       volumes:
       - name: kubeconfig

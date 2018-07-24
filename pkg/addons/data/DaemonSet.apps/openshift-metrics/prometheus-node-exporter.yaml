@@ -20,7 +20,6 @@ spec:
     spec:
       containers:
       - image: '*** GENERATED ***'
-        imagePullPolicy: Always
         name: node-exporter
         ports:
         - containerPort: 9100

@@ -32,7 +32,6 @@ spec:
         - name: REGISTRY_HOST
           value: '*** GENERATED ***'
         image: '*** GENERATED ***'
-        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /ping
@@ -49,3 +48,5 @@ spec:
             port: 9090
             scheme: HTTP
           timeoutSeconds: 5
+      nodeSelector:
+        region: infra

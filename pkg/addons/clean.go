@@ -153,11 +153,10 @@ func Clean(o unstructured.Unstructured) error {
 
 // handleSpecialObjects manages special object migration during upgrade state
 func handleSpecialObjects(existing, o unstructured.Unstructured) {
-
 	switch existing.GetKind() {
 	// Service type Loadbalancer
 	case "Service":
-		// copy existing clusterIP new object
+		// copy existing clusterIP to new object
 		if existing.Object["spec"].(map[string]interface{})["type"] == "LoadBalancer" {
 			o.Object["spec"].(map[string]interface{})["clusterIP"] = existing.Object["spec"].(map[string]interface{})["clusterIP"]
 			o.Object["spec"].(map[string]interface{})["externalTrafficPolicy"] = existing.Object["spec"].(map[string]interface{})["externalTrafficPolicy"]
