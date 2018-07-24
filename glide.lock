@@ -1,8 +1,8 @@
-hash: 3d65490d1b857e42f7bd5ed6d390551a9d41e8711dafd74809951b214341e56a
-updated: 2018-07-05T21:17:42.33508664-05:00
+hash: 8fedd3d5bc6df90116e8b1060b2718f6d1ea3e0b6cf89048b4c814313e9e538a
+updated: 2018-07-25T16:59:32.748990861-05:00
 imports:
 - name: github.com/Azure/acs-engine
-  version: 13e1c470a7e0fd7ee80f680bbe303a90eb6c4314
+  version: 04846236051c637d7a7935c19ce4a4ee5035a18c
   repo: https://github.com/jim-minter/acs-engine
   subpackages:
   - pkg/api
@@ -19,7 +19,6 @@ imports:
   - pkg/api/vlabs
   - pkg/helpers
   - pkg/i18n
-  - pkg/osa/vlabs
 - name: github.com/blang/semver
   version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/ghodss/yaml
@@ -58,7 +57,7 @@ imports:
 - name: github.com/howeyc/gopass
   version: bf9dde6d0d2c004a008c27aaee91170c786f6db8
 - name: github.com/imdario/mergo
-  version: 6633656539c1639d9d78127b7d47c622b5d7b6dc
+  version: 9316a62528ac99aaecb4e47eadd6dc8aa6533d58
 - name: github.com/json-iterator/go
   version: 13f86432b882000a51c6e610c620974462691a97
 - name: github.com/leonelquinteros/gotext
@@ -78,7 +77,7 @@ imports:
 - name: github.com/sirupsen/logrus
   version: f006c2ac4710855cf0f916dd6b77acf6b048dc6e
 - name: github.com/spf13/pflag
-  version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
+  version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
 - name: golang.org/x/crypto
   version: 81e90905daefcd6fd217b62423c0908922eadb30
   subpackages:
@@ -194,7 +193,7 @@ imports:
   - pkg/watch
   - third_party/forked/golang/reflect
 - name: k8s.io/client-go
-  version: 33f2870a2b83179c823ddc90e5513f9e5fe43b38
+  version: 23781f4d6632d88e869066eaebb743857aa1ef9b
   subpackages:
   - discovery
   - dynamic
@@ -218,7 +217,7 @@ imports:
   - util/integer
   - util/retry
 - name: k8s.io/kube-aggregator
-  version: 3cb52407dde996f0528b328aebbdbe32f506709f
+  version: 7342491a4046f4747dde15dd10d227e4613a73b0
   subpackages:
   - pkg/apis/apiregistration
   - pkg/apis/apiregistration/v1

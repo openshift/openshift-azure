@@ -138,6 +138,10 @@ const (
 const (
 	// AgentPoolProfileRoleEmpty is the empty role
 	AgentPoolProfileRoleEmpty AgentPoolProfileRole = ""
+	// AgentPoolProfileRoleCompute is the compute role
+	AgentPoolProfileRoleCompute AgentPoolProfileRole = "compute"
 	// AgentPoolProfileRoleInfra is the infra role
 	AgentPoolProfileRoleInfra AgentPoolProfileRole = "infra"
+	// AgentPoolProfileRoleMaster is the master role
+	AgentPoolProfileRoleMaster AgentPoolProfileRole = "master"
 )

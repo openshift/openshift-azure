@@ -87,7 +87,7 @@ func (app *AgentPoolProfile) Validate() error {
 	}
 
 	switch app.Role {
-	case AgentPoolProfileRoleEmpty, AgentPoolProfileRoleInfra:
+	case AgentPoolProfileRoleCompute, AgentPoolProfileRoleInfra, AgentPoolProfileRoleMaster:
 	default:
 		return fmt.Errorf("invalid role %q", app.Role)
 	}
