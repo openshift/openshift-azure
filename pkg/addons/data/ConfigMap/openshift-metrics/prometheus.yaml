@@ -48,35 +48,36 @@ data:
 
     # Scrape config for controllers.
     #
-    # Each master node exposes a /metrics endpoint on :8444 that contains operational metrics for
+    # Each master node exposes a /metrics endpoint on :444 that contains operational metrics for
     # the controllers.
     #
-    #- job_name: 'kubernetes-controllers'
-    #
-    #  scheme: https
-    #  tls_config:
-    #    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-    #
-    #  kubernetes_sd_configs:
-    #  - role: endpoints
-    #    namespaces:
-    #      names:
-    #      - default
-    #
-    #  # Keep only the default/kubernetes service endpoints for the https port, and then
-    #  # set the port to 8444. This is the default configuration for the controllers on OpenShift
-    #  # masters.
-    #  relabel_configs:
-    #  - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
-    #    action: keep
-    #    regex: kubernetes;https
-    #  - source_labels: [__address__]
-    #    action: replace
-    #    target_label: __address__
-    #    regex: (.+)(?::\d+)
-    #    replacement: $1:8444
-    #
+    - job_name: 'kubernetes-controllers'
+
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        server_name: kubernetes.default.svc
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+          - default
+
+      # Keep only the default/kubernetes service endpoints for the https port, and then
+      # set the port to 8444. This is the default configuration for the controllers on OpenShift
+      # masters.
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: kubernetes;https
+      - source_labels: [__address__]
+        action: replace
+        target_label: __address__
+        regex: (.+)(?::\d+)
+        replacement: $1:444
+
     # Scrape config for nodes.
     #
     # Each node exposes a /metrics endpoint that contains operational metrics for
