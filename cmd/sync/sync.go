@@ -8,10 +8,10 @@ import (
 
 	"github.com/Azure/acs-engine/pkg/api/osa/vlabs"
 	"github.com/ghodss/yaml"
+	"github.com/pkg/errors"
 
 	"github.com/jim-minter/azure-helm/pkg/addons"
 	"github.com/jim-minter/azure-helm/pkg/config"
-	"github.com/jim-minter/azure-helm/pkg/plugin"
 )
 
 var (
@@ -22,44 +22,34 @@ var (
 
 func sync() error {
 	log.Print("Sync process started!")
-	log.Print("Reading _data/manifest.yaml...")
+
 	b, err := ioutil.ReadFile("_data/manifest.yaml")
 	if err != nil {
-		return err
+		return errors.Wrap(err, "cannot read _data/manifest.yaml")
 	}
 
-	log.Print("Unmarshaling the incoming manifest...")
 	var ext *vlabs.OpenShiftCluster
 	if err := yaml.Unmarshal(b, &ext); err != nil {
-		return err
+		return errors.Wrap(err, "cannot unmarshal _data/manifest.yaml")
 	}
 
-	log.Print("Validating the incoming manifest...")
 	if err := ext.Validate(); err != nil {
-		return err
+		return errors.Wrap(err, "cannot validate _data/manifest.yaml")
 	}
 
-	cs := ext.AsContainerService()
-	log.Print("Enriching the incoming manifest...")
-	if err := plugin.Enrich(cs); err != nil {
-		return err
-	}
-
-	log.Print("Reading _data/config.yaml...")
 	b, err = ioutil.ReadFile("_data/config.yaml")
 	if err != nil {
-		return err
+		return errors.Wrap(err, "cannot read _data/config.yaml")
 	}
 
 	var c *config.Config
-	log.Print("Unmarshaling _data/config.yaml...")
 	if err = yaml.Unmarshal(b, &c); err != nil {
-		return err
+		return errors.Wrap(err, "cannot unmarshal _data/config.yaml")
 	}
 
-	log.Print("Syncing cluster config...")
+	cs := ext.AsContainerService()
 	if err := addons.Main(cs, c, *dryRun); err != nil {
-		return err
+		return errors.Wrap(err, "cannot sync cluster config")
 	}
 
 	log.Print("Sync process complete!")
