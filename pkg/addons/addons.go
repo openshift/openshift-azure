@@ -13,12 +13,9 @@ import (
 
 	acsapi "github.com/Azure/acs-engine/pkg/api"
 	"github.com/ghodss/yaml"
-	kerrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
-	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
@@ -163,7 +160,7 @@ var (
 // writeDB uses the discovery and dynamic clients to synchronise an API server's
 // objects with db.
 // TODO: need to implement deleting objects which we don't want any more.
-func writeDB(client *client, db map[string]unstructured.Unstructured) error {
+func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	// impose an order to improve debuggability.
 	var keys []string
 	for k := range db {
@@ -172,51 +169,35 @@ func writeDB(client *client, db map[string]unstructured.Unstructured) error {
 	sort.Strings(keys)
 
 	// namespaces must exist before namespaced objects.
-	if err := client.createResources(nsFilter, db, keys); err != nil {
+	if err := client.ApplyResources(nsFilter, db, keys); err != nil {
 		return err
 	}
 	// create serviceaccounts
-	if err := client.createResources(saFilter, db, keys); err != nil {
+	if err := client.ApplyResources(saFilter, db, keys); err != nil {
 		return err
 	}
 	// create all secrets and configmaps
-	if err := client.createResources(cfgFilter, db, keys); err != nil {
+	if err := client.ApplyResources(cfgFilter, db, keys); err != nil {
 		return err
 	}
 	// create all non-service catalog resources
-	if err := client.createResources(nonScFilter, db, keys); err != nil {
+	if err := client.ApplyResources(nonScFilter, db, keys); err != nil {
 		return err
 	}
 
 	// wait for the service catalog api extension to arrive. TODO: we should do
 	// this dynamically, and should not PollInfinite.
-	err := wait.PollInfinite(time.Second, func() (bool, error) {
-		svc, err := client.ac.ApiregistrationV1().APIServices().Get("v1beta1.servicecatalog.k8s.io", metav1.GetOptions{})
-		switch {
-		case kerrors.IsNotFound(err):
-			return false, nil
-		case err != nil:
-			return false, err
-		}
-		for _, cond := range svc.Status.Conditions {
-			if cond.Type == apiregistrationv1.Available &&
-				cond.Status == apiregistrationv1.ConditionTrue {
-				return true, nil
-			}
-		}
-		return false, nil
-	})
-	if err != nil {
+	if err := wait.PollInfinite(time.Second, client.ServiceCatalogExists); err != nil {
 		return err
 	}
 
 	// refresh dynamic client
-	if err := client.updateDynamicClient(); err != nil {
+	if err := client.UpdateDynamicClient(); err != nil {
 		return err
 	}
 
 	// now write the servicecatalog configurables.
-	return client.createResources(scFilter, db, keys)
+	return client.ApplyResources(scFilter, db, keys)
 }
 
 func Main(cs *acsapi.ContainerService, c *config.Config, dryRun bool) error {

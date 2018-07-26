@@ -20,8 +20,20 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/flowcontrol"
 	"k8s.io/client-go/util/retry"
+	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 )
+
+// Interface exposes the methods a client needs to implement
+// for the syncing process of the addons.
+type Interface interface {
+	ApplyResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error
+	UpdateDynamicClient() error
+	ServiceCatalogExists() (bool, error)
+}
+
+// client implements Interface
+var _ Interface = &client{}
 
 type client struct {
 	restconfig *rest.Config
@@ -36,7 +48,7 @@ type client struct {
 	dryRun bool
 }
 
-func newClient(dryRun bool) (*client, error) {
+func newClient(dryRun bool) (Interface, error) {
 	if dryRun {
 		return &client{dryRun: true}, nil
 	}
@@ -74,16 +86,16 @@ func newClient(dryRun bool) (*client, error) {
 		return nil, err
 	}
 
-	if err := c.updateDynamicClient(); err != nil {
+	if err := c.UpdateDynamicClient(); err != nil {
 		return nil, err
 	}
 
 	return c, nil
 }
 
-// updateDynamicClient updates the client's server API group resource
+// UpdateDynamicClient updates the client's server API group resource
 // information and dynamic client pool.
-func (c *client) updateDynamicClient() error {
+func (c *client) UpdateDynamicClient() error {
 	grs, err := discovery.GetAPIGroupResources(c.cli)
 	if err != nil {
 		return err
@@ -96,8 +108,8 @@ func (c *client) updateDynamicClient() error {
 	return nil
 }
 
-// createResources creates all resources in db that match the provided filter.
-func (c *client) createResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error {
+// ApplyResources creates or updates all resources in db that match the provided filter.
+func (c *client) ApplyResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error {
 	for _, k := range keys {
 		o := db[k]
 
@@ -198,4 +210,22 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 	})
 
 	return err
+}
+
+// ServiceCatalogExists returns whether the service catalog API exists.
+func (c *client) ServiceCatalogExists() (bool, error) {
+	svc, err := c.ac.ApiregistrationV1().APIServices().Get("v1beta1.servicecatalog.k8s.io", metav1.GetOptions{})
+	switch {
+	case kerrors.IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, err
+	}
+	for _, cond := range svc.Status.Conditions {
+		if cond.Type == apiregistrationv1.Available &&
+			cond.Status == apiregistrationv1.ConditionTrue {
+			return true, nil
+		}
+	}
+	return false, nil
 }
