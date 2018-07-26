@@ -21,9 +21,6 @@ spec:
       - env:
         - name: BROKER_CONFIG
           value: /etc/ansible-service-broker/config.yaml
-        - name: HTTP_PROXY
-        - name: HTTPS_PROXY
-        - name: NO_PROXY
         image: '*** GENERATED ***'
         livenessProbe:
           httpGet:

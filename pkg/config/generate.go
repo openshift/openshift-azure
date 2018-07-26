@@ -448,6 +448,19 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		}
 	}
 
+	if len(c.RegistryConsoleOAuthSecret) == 0 {
+		if pass, err := randomString(64); err != nil {
+			c.RegistryConsoleOAuthSecret = fmt.Sprintf("user%s", pass)
+			return nil
+		}
+	}
+
+	if len(c.RouterStatsPassword) == 0 {
+		if c.RouterStatsPassword, err = randomString(10); err != nil {
+			return
+		}
+	}
+
 	if uuid.Equal(c.ServiceCatalogClusterID, uuid.Nil) {
 		if c.ServiceCatalogClusterID, err = uuid.NewV4(); err != nil {
 			return
@@ -532,6 +545,21 @@ func randomStorageAccountName() (string, error) {
 	const letterBytes = "abcdefghijklmnopqrstuvwxyz0123456789"
 
 	b := make([]byte, 24)
+	for i := range b {
+		o, err := rand.Int(rand.Reader, big.NewInt(int64(len(letterBytes))))
+		if err != nil {
+			return "", err
+		}
+		b[i] = letterBytes[o.Int64()]
+	}
+
+	return string(b), nil
+}
+
+func randomString(length int) (string, error) {
+	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	b := make([]byte, length)
 	for i := range b {
 		o, err := rand.Int(rand.Reader, big.NewInt(int64(len(letterBytes))))
 		if err != nil {

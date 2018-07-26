@@ -105,13 +105,16 @@ type Config struct {
 	SSHKey *rsa.PrivateKey
 
 	// misc infra configurables
-	RegistryStorageAccount         string
 	RegistryHTTPSecret             []byte
 	AlertManagerProxySessionSecret []byte
 	AlertsProxySessionSecret       []byte
 	PrometheusProxySessionSecret   []byte
 	ServiceCatalogClusterID        uuid.UUID
 	RouterLBCName                  string
+	// random string based configurables
+	RegistryStorageAccount     string
+	RegistryConsoleOAuthSecret string
+	RouterStatsPassword        string
 
 	// used for development purposes only
 	RunSyncLocal string

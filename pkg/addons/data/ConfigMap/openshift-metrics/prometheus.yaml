@@ -35,6 +35,7 @@ data:
       scheme: https
       tls_config:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        server_name: kubernetes.default.svc
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
 
       # Keep only the default/kubernetes service endpoints for the https port. This
@@ -47,7 +48,7 @@ data:
 
     # Scrape config for controllers.
     #
-    # Each master node exposes a /metrics endpoint on :8444 that contains operational metrics for
+    # Each master node exposes a /metrics endpoint on :444 that contains operational metrics for
     # the controllers.
     #
     - job_name: 'kubernetes-controllers'
@@ -55,6 +56,7 @@ data:
       scheme: https
       tls_config:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        server_name: kubernetes.default.svc
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
 
       kubernetes_sd_configs:
@@ -74,7 +76,7 @@ data:
         action: replace
         target_label: __address__
         regex: (.+)(?::\d+)
-        replacement: $1:8444
+        replacement: $1:444
 
     # Scrape config for nodes.
     #
@@ -154,7 +156,7 @@ data:
         # drop infrastructure components managed by other scrape targets
         - source_labels: [__meta_kubernetes_service_name]
           action: drop
-          regex: 'prometheus-node-exporter'
+          regex: 'prometheus-node-exporter|router-stats'
         # only those that have requested scraping
         - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
           action: keep
@@ -245,9 +247,9 @@ data:
         action: keep
         regex: apiserver;https
 
-    # Scrape config for the router
+     # Scrape config for the router
     - job_name: 'openshift-router'
-      scheme: https
+      scheme: http
       tls_config:
         ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
         server_name: router-stats.default.svc
@@ -258,11 +260,11 @@ data:
         namespaces:
           names:
           - default
-
+    
       relabel_configs:
       - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
         action: keep
-        regex: router;1936-tcp
+        regex: router-stats;1936-tcp
 
     alerting:
       alertmanagers:

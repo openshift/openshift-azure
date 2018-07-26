@@ -43,7 +43,7 @@ spec:
         - name: ROUTER_SERVICE_NAMESPACE
           value: default
         - name: STATS_PASSWORD
-          value: 75XmZa2KNV
+          value: '*** GENERATED ***'
         - name: STATS_PORT
           value: "1936"
         - name: STATS_USERNAME

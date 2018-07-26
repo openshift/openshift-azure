@@ -205,6 +205,10 @@ var Translations = map[string][]struct {
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.RouterImage }}",
 		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='STATS_PASSWORD')].value"),
+			Template: "{{ .Config.RouterStatsPassword }}",
+		},
 	},
 	"Deployment.apps/kube-service-catalog/apiserver": {
 		{
@@ -246,6 +250,10 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.redirectURIs[0]"),
 			Template: "https://registry-console-default.{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.secret"),
+			Template: "{{ .Config.RegistryConsoleOAuthSecret }}",
 		},
 	},
 	"Route.route.openshift.io/default/docker-registry": {
@@ -398,6 +406,12 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.metadata.annotations['service.beta.kubernetes.io/azure-dns-label-name']"),
 			Template: "{{ .Config.RouterLBCName }}",
+		},
+	},
+	"Service/default/router-stats": {
+		{
+			Path:     jsonpath.MustCompile("$.metadata.annotations['prometheus.openshift.io/password']"),
+			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
 	"Secret/openshift-metrics/prometheus-proxy": {
