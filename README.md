@@ -1,4 +1,4 @@
-## azure-helm
+## openshift-azure
 
 ### Prerequisites
 
