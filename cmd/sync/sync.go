@@ -12,6 +12,7 @@ import (
 
 	"github.com/jim-minter/azure-helm/pkg/addons"
 	"github.com/jim-minter/azure-helm/pkg/config"
+	"github.com/jim-minter/azure-helm/pkg/plugin"
 )
 
 var (
@@ -37,6 +38,11 @@ func sync() error {
 		return errors.Wrap(err, "cannot validate _data/manifest.yaml")
 	}
 
+	cs := ext.AsContainerService()
+	if err := plugin.Enrich(cs); err != nil {
+		return errors.Wrap(err, "cannot enrich _data/manifest.yaml")
+	}
+
 	b, err = ioutil.ReadFile("_data/config.yaml")
 	if err != nil {
 		return errors.Wrap(err, "cannot read _data/config.yaml")
@@ -47,7 +53,6 @@ func sync() error {
 		return errors.Wrap(err, "cannot unmarshal _data/config.yaml")
 	}
 
-	cs := ext.AsContainerService()
 	if err := addons.Main(cs, c, *dryRun); err != nil {
 		return errors.Wrap(err, "cannot sync cluster config")
 	}
