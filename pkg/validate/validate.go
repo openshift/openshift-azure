@@ -15,12 +15,6 @@ func Validate(cs, _ *acsapi.ContainerService) error {
 		return fmt.Errorf("malformed manifest")
 	}
 
-	for _, app := range cs.Properties.AgentPoolProfiles {
-		if app == nil {
-			return fmt.Errorf("malformed manifest")
-		}
-	}
-
 	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
 	case "v3.10":
 	default:
