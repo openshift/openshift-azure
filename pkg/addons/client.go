@@ -41,16 +41,11 @@ type client struct {
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
 	grs        []*discovery.APIGroupResources
-
-	// TODO: Instead of plumbing dryRun use an interface
-	// and separate client implementations (one for prod
-	// one for dryRun, and potentially one for tests).
-	dryRun bool
 }
 
 func newClient(dryRun bool) (Interface, error) {
 	if dryRun {
-		return &client{dryRun: true}, nil
+		return &dryClient{}, nil
 	}
 
 	restconfig, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
@@ -229,3 +224,14 @@ func (c *client) ServiceCatalogExists() (bool, error) {
 	}
 	return false, nil
 }
+
+type dryClient struct{}
+
+// dryClient implements Interface
+var _ Interface = &dryClient{}
+
+func (c *dryClient) ApplyResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error {
+	return nil
+}
+func (c *dryClient) UpdateDynamicClient() error          { return nil }
+func (c *dryClient) ServiceCatalogExists() (bool, error) { return true, nil }
