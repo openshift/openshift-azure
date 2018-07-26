@@ -193,12 +193,14 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 			return
 		}
 		Default(*existing)
-		handleSpecialObjects(*existing, *o)
 
 		if reflect.DeepEqual(*existing, *o) {
 			log.Println("Skip " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 			return
 		}
+		// this part of code should be executed only for updates
+		// TODO: Split flows to separate functions
+		handleSpecialObjects(*existing, *o)
 
 		log.Println("Update " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 
