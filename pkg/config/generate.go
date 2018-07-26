@@ -71,7 +71,6 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
 
-		c.TunnelImage = "quay.io/openshift-on-azure/tunnel:latest"
 		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
 	}
 }
@@ -107,7 +106,6 @@ func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest" //TODO: create mapping for OSA release to any other image we use
 
-		c.TunnelImage = "quay.io/openshift-on-azure/tunnel:latest"
 		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
 	}
 }
@@ -121,9 +119,12 @@ func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 	}
 }
 
+func internalAPIServerHostname(cs *acsapi.ContainerService) string {
+	return cs.Properties.AzProfile.ResourceGroup + "." + cs.Location + ".cloudapp.azure.com"
+}
+
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
-	c.TunnelHostname = strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, "openshift", "openshift-tunnel", 1)
 
 	// TODO: Need unique name, potentially derivative from PublicHostname
 	c.RouterLBCName = fmt.Sprintf("router-%s", strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, ".")[1])
@@ -185,7 +186,8 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	}{
 		// Generate etcd certs
 		{
-			cn:          "master-etcd",
+			cn:          "etcd-server",
+			dnsNames:    []string{"master-000000", "master-000001", "master-000002"},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			signingKey:  c.EtcdCaKey,
 			signingCert: c.EtcdCaCert,
@@ -194,6 +196,7 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		},
 		{
 			cn:          "etcd-peer",
+			dnsNames:    []string{"master-000000", "master-000001", "master-000002"},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 			signingKey:  c.EtcdCaKey,
 			signingCert: c.EtcdCaCert,
@@ -240,8 +243,11 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		{
 			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
 			dnsNames: []string{
+				internalAPIServerHostname(cs),
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
-				"master-api",
+				"master-000000",
+				"master-000001",
+				"master-000002",
 				"kubernetes",
 				"kubernetes.default",
 				"kubernetes.default.svc",
@@ -251,12 +257,6 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.MasterServerKey,
 			cert:        &c.MasterServerCert,
-		},
-		{
-			cn:          c.TunnelHostname,
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			key:         &c.TunnelKey,
-			cert:        &c.TunnelCert,
 		},
 		{
 			cn:           "system:openshift-master",
@@ -378,22 +378,14 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		{
 			clientKey:  c.OpenShiftMasterKey,
 			clientCert: c.OpenShiftMasterCert,
-			endpoint:   "master-api",
+			endpoint:   internalAPIServerHostname(cs),
 			username:   "system:openshift-master",
 			kubeconfig: &c.MasterKubeconfig,
 		},
 		{
-			clientKey:  c.ServiceCatalogAPIClientKey,
-			clientCert: c.ServiceCatalogAPIClientCert,
-			endpoint:   "master-api",
-			username:   "system:serviceaccount:kube-service-catalog:service-catalog-apiserver",
-			namespace:  "kube-service-catalog",
-			kubeconfig: &c.ServiceCatalogAPIKubeconfig,
-		},
-		{
 			clientKey:  c.BootstrapAutoapproverKey,
 			clientCert: c.BootstrapAutoapproverCert,
-			endpoint:   "master-api",
+			endpoint:   internalAPIServerHostname(cs),
 			username:   "system:serviceaccount:openshift-infra:bootstrap-autoapprover",
 			namespace:  "openshift-infra",
 			kubeconfig: &c.BootstrapAutoapproverKubeconfig,
@@ -401,14 +393,14 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		{
 			clientKey:  c.AdminKey,
 			clientCert: c.AdminCert,
-			endpoint:   cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			endpoint:   internalAPIServerHostname(cs),
 			username:   "system:admin",
 			kubeconfig: &c.AdminKubeconfig,
 		},
 		{
 			clientKey:  c.NodeBootstrapKey,
 			clientCert: c.NodeBootstrapCert,
-			endpoint:   cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			endpoint:   internalAPIServerHostname(cs),
 			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
 			kubeconfig: &c.NodeBootstrapKubeconfig,
 		},
@@ -418,7 +410,7 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			// sync kubeconfig has the same capabilities as admin kubeconfig, only difference
 			// is the use of HCP internal DNS to avoid waiting for the Azure loadbalancer to
 			// come up in order to start creating cluster objects.
-			endpoint:   "master-api",
+			endpoint:   "master-000000",
 			username:   "system:admin",
 			kubeconfig: &c.SyncKubeconfig,
 		},

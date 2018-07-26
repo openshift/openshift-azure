@@ -5,12 +5,7 @@
 1. **Utilities**.  You'll need recent versions of
    [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli),
    [Golang](https://golang.org/dl),
-   [Helm client](https://github.com/kubernetes/helm/releases/latest) and
    [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl) installed.
-
-1. **AKS cluster**.  You'll need an AKS cluster running the kubenet network
-   plugin (currently [AKS#500](https://github.com/Azure/AKS/issues/500) prevents
-   use of the azure network plugin for this workload).
 
 1. **Azure CLI access**.  You'll need to be logged into Azure using the CLI.
 
@@ -58,20 +53,10 @@
 
 ### Deploy an OpenShift cluster
 
-1. If you have access to an AKS cluster, run `az aks get-credentials -g
-   $AKS_RESOURCEGROUP -n $AKS_NAME -f - >aks/admin.kubeconfig` or manually
-   place the admin kubeconfig in `aks/admin.kubeconfig`.
-
-   If you don't have access to an AKS cluster, run `aks/create.sh
-   $AKS_RESOURCEGROUP ~/.ssh/id_rsa.pub` to create a new AKS cluster.
-
 1. Copy the `env.example` file to `env` and edit according to your requirements.
    Source the `env` file: `. ./env`.
 
 1. Run `./create.sh $RESOURCEGROUP` to deploy a cluster.
-
-1. To inspect the OpenShift master pods, run `KUBECONFIG=aks/admin.kubeconfig oc
-   get pods -n $RESOURCEGROUP`.
 
 1. To inspect pods running on the OpenShift cluster, run
    `KUBECONFIG=_data/_out/admin.kubeconfig oc get pods -n $RESOURCEGROUP`.

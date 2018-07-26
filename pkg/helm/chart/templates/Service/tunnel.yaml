@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: tunnel
-spec:
-  selector:
-    openshift.io/component: api
-  ports:
-  - port: 444

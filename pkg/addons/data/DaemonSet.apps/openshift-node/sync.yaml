@@ -127,7 +127,6 @@ spec:
               apiVersion: v1
               fieldPath: spec.nodeName
         image: '*** GENERATED ***'
-        imagePullPolicy: Always
         name: sync
         securityContext:
           privileged: true

@@ -5,3 +5,4 @@ metadata:
 spec:
   finalizers:
   - kubernetes
+  - openshift.io/origin

@@ -1,0 +1,63 @@
+apiVersion: v1
+data:
+  node-config.yaml: |
+    allowDisabledDocker: false
+    apiVersion: v1
+    dnsBindAddress: 127.0.0.1:53
+    dnsDomain: cluster.local
+    dnsIP: 172.17.0.1
+    dnsRecursiveResolvConf: /etc/origin/node/resolv.conf
+    dockerConfig:
+      dockerShimRootDirectory: /var/lib/dockershim
+      dockerShimSocket: /var/run/dockershim.sock
+      execHandlerName: native
+    imageConfig:
+      format: '*** GENERATED ***'
+      latest: false
+    iptablesSyncPeriod: 30s
+    kind: NodeConfig
+    kubeletArguments:
+      bootstrap-kubeconfig:
+      - /etc/origin/node/bootstrap.kubeconfig
+      cert-dir:
+      - /etc/origin/node/certificates
+      cloud-config:
+      - /etc/origin/cloudprovider/azure.conf
+      cloud-provider:
+      - azure
+      enable-controller-attach-detach:
+      - "true"
+      feature-gates:
+      - RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true
+      node-labels:
+      - node-role.kubernetes.io/master=true
+      - openshift-infra=apiserver
+      pod-manifest-path:
+      - /etc/origin/node/pods
+      rotate-certificates:
+      - "true"
+    masterClientConnectionOverrides:
+      acceptContentTypes: application/vnd.kubernetes.protobuf,application/json
+      burst: 200
+      contentType: application/vnd.kubernetes.protobuf
+      qps: 100
+    masterKubeConfig: node.kubeconfig
+    networkConfig:
+      mtu: 1450
+      networkPluginName: redhat/openshift-ovs-subnet
+    podManifestConfig: null
+    proxyArguments:
+      proxy-mode:
+      - iptables
+    servingInfo:
+      bindAddress: 0.0.0.0:10250
+      bindNetwork: tcp4
+      clientCA: ca.crt
+    volumeConfig:
+      localQuota:
+        perFSGroup: null
+    volumeDirectory: /var/lib/origin/openshift.local.volumes
+kind: ConfigMap
+metadata:
+  name: node-config-master
+  namespace: openshift-node

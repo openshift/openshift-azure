@@ -31,7 +31,6 @@ spec:
         command:
         - /usr/bin/service-catalog
         image: '*** GENERATED ***'
-        imagePullPolicy: Always
         name: controller-manager
         ports:
         - containerPort: 8080
@@ -45,9 +44,4 @@ spec:
       volumes:
       - name: service-catalog-ssl
         secret:
-          items:
-          - key: tls.crt
-            path: apiserver.crt
-          - key: tls.key
-            path: apiserver.key
           secretName: apiserver-ssl

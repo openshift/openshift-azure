@@ -225,10 +225,6 @@ func Main(cs *acsapi.ContainerService, c *config.Config, dryRun bool) error {
 		return err
 	}
 
-	if err := client.waitForHealthz(); err != nil {
-		return err
-	}
-
 	db, err := readDB(cs, c)
 	if err != nil {
 		return err

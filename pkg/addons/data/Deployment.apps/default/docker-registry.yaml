@@ -34,7 +34,6 @@ spec:
         - name: REGISTRY_HTTP_TLS_CERTIFICATE
           value: /etc/secrets/registry.crt
         image: '*** GENERATED ***'
-        imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /healthz
@@ -83,7 +82,6 @@ spec:
         - name: REGISTRY_STORAGE_ACCOUNT_NAME
           value: '*** GENERATED ***'
         image: '*** GENERATED ***'
-        imagePullPolicy: Always
         name: storage-setup
         volumeMounts:
         - mountPath: /etc/origin/cloudprovider

@@ -125,6 +125,13 @@ var Translations = map[string][]struct {
 			Template:   "{{ .Config.ImageConfigFormat }}",
 		},
 	},
+	"ConfigMap/openshift-node/node-config-master": {
+		{
+			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
+			Template:   "{{ .Config.ImageConfigFormat }}",
+		},
+	},
 	"ConfigMap/openshift-web-console/webconsole-config": {
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
@@ -135,12 +142,6 @@ var Translations = map[string][]struct {
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.masterPublicURL"),
 			Template:   "https://{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname }}",
-		},
-	},
-	"DaemonSet.apps/openshift-azure/tunnel": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.TunnelImage }}",
 		},
 	},
 	"DaemonSet.apps/openshift-metrics/prometheus-node-exporter": {
@@ -205,6 +206,12 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.RouterImage }}",
 		},
 	},
+	"Deployment.apps/kube-service-catalog/apiserver": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.ServiceCatalogImage }}",
+		},
+	},
 	"Deployment.apps/kube-service-catalog/controller-manager": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
@@ -215,6 +222,12 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.AnsibleServiceBrokerImage }}",
+		},
+	},
+	"Deployment.apps/openshift-azure/bootstrap-autoapprover": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.NodeImage }}",
 		},
 	},
 	"Deployment.apps/openshift-template-service-broker/apiserver": {
@@ -343,19 +356,30 @@ var Translations = map[string][]struct {
 	},
 	"Secret/kube-service-catalog/apiserver-ssl": {
 		{
-			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),
+			Path:     jsonpath.MustCompile("$.stringData.'apiserver.crt'"),
 			Template: "{{ String (CertAsBytes .Config.ServiceCatalogServerCert) }}\n{{ String (CertAsBytes .Config.ServiceCatalogCaCert) }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.stringData.'tls.key'"),
+			Path:     jsonpath.MustCompile("$.stringData.'apiserver.key'"),
 			Template: "{{ String (PrivateKeyAsBytes .Config.ServiceCatalogServerKey) }}",
 		},
-	},
-	"Secret/openshift-azure/tunnel": {
 		{
-			Path:       jsonpath.MustCompile("$.stringData.'tunnel.conf'"),
-			NestedPath: jsonpath.MustCompile("$.address"),
-			Template:   "{{ .Config.TunnelHostname }}:443",
+			Path:     jsonpath.MustCompile("$.stringData.'etcd-ca.crt'"),
+			Template: "{{ String (CertAsBytes .Config.EtcdCaCert) }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'etcd-client.crt'"),
+			Template: "{{ String (CertAsBytes .Config.EtcdClientCert) }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'etcd-client.key'"),
+			Template: "{{ String (PrivateKeyAsBytes .Config.EtcdClientKey) }}",
+		},
+	},
+	"Secret/openshift-azure/bootstrap-autoapprover-kubeconfig": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'bootstrap-autoapprover.kubeconfig'"),
+			Template: "{{ String (YamlMarshal .Config.BootstrapAutoapproverKubeconfig) }}",
 		},
 	},
 	"Secret/openshift-metrics/alertmanager-proxy": {

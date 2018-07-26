@@ -37,7 +37,6 @@ type Config struct {
 	ControlPlaneImage           string
 	NodeImage                   string
 	ServiceCatalogImage         string
-	TunnelImage                 string
 	SyncImage                   string
 	TemplateServiceBrokerImage  string
 	PrometheusNodeExporterImage string
@@ -63,8 +62,6 @@ type Config struct {
 	// control plane certificates
 	MasterServerKey           *rsa.PrivateKey
 	MasterServerCert          *x509.Certificate
-	TunnelKey                 *rsa.PrivateKey
-	TunnelCert                *x509.Certificate
 	AdminKey                  *rsa.PrivateKey
 	AdminCert                 *x509.Certificate
 	AggregatorFrontProxyKey   *rsa.PrivateKey
@@ -93,7 +90,6 @@ type Config struct {
 	// kubeconfigs
 	AdminKubeconfig                 *v1.Config
 	MasterKubeconfig                *v1.Config
-	ServiceCatalogAPIKubeconfig     *v1.Config
 	BootstrapAutoapproverKubeconfig *v1.Config
 	NodeBootstrapKubeconfig         *v1.Config
 	SyncKubeconfig                  *v1.Config
@@ -104,7 +100,6 @@ type Config struct {
 	SessionSecretEnc  []byte
 	HtPasswd          []byte
 	ImageConfigFormat string
-	TunnelHostname    string
 
 	// misc node configurables
 	SSHKey *rsa.PrivateKey

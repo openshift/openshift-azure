@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apiserver
+  namespace: kube-service-catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apiserver
+  template:
+    metadata:
+      labels:
+        app: apiserver
+    spec:
+      containers:
+      - args:
+        - apiserver
+        - --storage-type
+        - etcd
+        - --secure-port
+        - "6443"
+        - --etcd-servers
+        - https://master-000000:2379
+        - https://master-000001:2379
+        - https://master-000002:2379
+        - --etcd-cafile
+        - /var/run/kubernetes-service-catalog/etcd-ca.crt
+        - --etcd-certfile
+        - /var/run/kubernetes-service-catalog/etcd-client.crt
+        - --etcd-keyfile
+        - /var/run/kubernetes-service-catalog/etcd-client.key
+        - -v
+        - "3"
+        - --enable-admission-plugins
+        - KubernetesNamespaceLifecycle,DefaultServicePlan,ServiceBindingsLifecycle,ServicePlanChangeValidator,BrokerAuthSarCheck
+        - --feature-gates
+        - OriginatingIdentity=true
+        command:
+        - /usr/bin/service-catalog
+        image: '*** GENERATED ***'
+        name: apiserver
+        volumeMounts:
+        - mountPath: /var/run/kubernetes-service-catalog
+          name: apiserver-ssl
+          readOnly: true
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
+      serviceAccountName: service-catalog-apiserver
+      volumes:
+      - name: apiserver-ssl
+        secret:
+          secretName: apiserver-ssl

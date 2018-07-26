@@ -68,15 +68,6 @@ func createOrUpdate() error {
 		return err
 	}
 
-	values, err := p.GenerateHelm()
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile("_data/_out/values.yaml", values, 0600)
-	if err != nil {
-		return err
-	}
-
 	azuredeploy, err := p.GenerateARM()
 	if err != nil {
 		return err

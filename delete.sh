@@ -1,10 +1,5 @@
 #!/bin/bash -x
 
-if [[ ! -e aks/admin.kubeconfig ]]; then
-    echo error: aks/admin.kubeconfig must exist
-    exit 1
-fi
-
 if ! az account show >/dev/null; then
     exit 1
 fi
@@ -31,16 +26,6 @@ fi
 
 RESOURCEGROUP=$1
 PUBLICHOSTNAME=$(awk '/^  publicHostname:/ { print $2 }' <_data/manifest.yaml)
-
-KUBECONFIG=aks/admin.kubeconfig helm delete --purge $RESOURCEGROUP >/dev/null
-
-# k8s 1.10.3 seems to be very slow about removing terminating pods when their
-# namespace is also terminating, so wait up.
-while [[ $(KUBECONFIG=aks/admin.kubeconfig kubectl get pods -n $RESOURCEGROUP -o template --template '{{ len .items }}') -ne 0 ]]; do
-    sleep 1
-done
-
-KUBECONFIG=aks/admin.kubeconfig kubectl delete namespace $RESOURCEGROUP
 
 tools/dns.sh zone-delete $RESOURCEGROUP
 

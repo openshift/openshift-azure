@@ -12,7 +12,6 @@ type NewPlugin func(cs, oldCs *acsapi.ContainerService, configBytes []byte) (Plu
 type Plugin interface {
 	Validate() error
 	GenerateConfig() ([]byte, error)
-	GenerateHelm() ([]byte, error)
 	GenerateARM() ([]byte, error)
 	HealthCheck(context.Context) error
 }

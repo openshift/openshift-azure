@@ -14,7 +14,12 @@ import (
 )
 
 func Generate(m *acsapi.ContainerService, c *config.Config) ([]byte, error) {
-	startup, err := Asset("startup.sh")
+	masterStartup, err := Asset("master-startup.sh")
+	if err != nil {
+		return nil, err
+	}
+
+	nodeStartup, err := Asset("node-startup.sh")
 	if err != nil {
 		return nil, err
 	}
@@ -24,8 +29,12 @@ func Generate(m *acsapi.ContainerService, c *config.Config) ([]byte, error) {
 		return nil, err
 	}
 	return util.Template(string(tmpl), template.FuncMap{
-		"Startup": func(role string) ([]byte, error) {
-			return util.Template(string(startup), nil, m, c, map[string]interface{}{"Role": role})
+		"Startup": func(role acsapi.AgentPoolProfileRole) ([]byte, error) {
+			if role == acsapi.AgentPoolProfileRoleMaster {
+				return util.Template(string(masterStartup), nil, m, c, map[string]interface{}{"Role": role})
+			} else {
+				return util.Template(string(nodeStartup), nil, m, c, map[string]interface{}{"Role": role})
+			}
 		},
 	}, m, c, nil)
 }
