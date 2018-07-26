@@ -10,9 +10,9 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 
-	"github.com/jim-minter/azure-helm/pkg/addons"
-	"github.com/jim-minter/azure-helm/pkg/config"
-	"github.com/jim-minter/azure-helm/pkg/plugin"
+	"github.com/openshift/openshift-azure/pkg/addons"
+	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/plugin"
 )
 
 var (

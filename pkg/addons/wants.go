@@ -7,7 +7,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"github.com/jim-minter/azure-helm/pkg/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/jsonpath"
 )
 
 // Wants determines if we want to handle the object.

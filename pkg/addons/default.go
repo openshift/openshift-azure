@@ -1,8 +1,9 @@
 package addons
 
 import (
-	"github.com/jim-minter/azure-helm/pkg/jsonpath"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+
+	"github.com/openshift/openshift-azure/pkg/jsonpath"
 )
 
 func defaultContainerSpec(obj map[string]interface{}) {

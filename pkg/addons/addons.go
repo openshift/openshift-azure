@@ -20,9 +20,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 
-	"github.com/jim-minter/azure-helm/pkg/config"
-	"github.com/jim-minter/azure-helm/pkg/jsonpath"
-	"github.com/jim-minter/azure-helm/pkg/util"
+	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/util"
 )
 
 // readDB reads previously exported objects into a map via go-bindata as well as

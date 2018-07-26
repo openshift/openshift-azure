@@ -10,12 +10,12 @@ import (
 	acsapi "github.com/Azure/acs-engine/pkg/api"
 	"github.com/ghodss/yaml"
 
-	"github.com/jim-minter/azure-helm/pkg/api"
-	"github.com/jim-minter/azure-helm/pkg/arm"
-	"github.com/jim-minter/azure-helm/pkg/config"
-	"github.com/jim-minter/azure-helm/pkg/healthcheck"
-	"github.com/jim-minter/azure-helm/pkg/tls"
-	"github.com/jim-minter/azure-helm/pkg/validate"
+	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/arm"
+	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/healthcheck"
+	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/validate"
 )
 
 type Plugin struct {

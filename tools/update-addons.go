@@ -17,7 +17,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/jim-minter/azure-helm/pkg/addons"
+	"github.com/openshift/openshift-azure/pkg/addons"
 )
 
 var (

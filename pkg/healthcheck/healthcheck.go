@@ -11,7 +11,7 @@ import (
 
 	acsapi "github.com/Azure/acs-engine/pkg/api"
 
-	"github.com/jim-minter/azure-helm/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/config"
 )
 
 func HealthCheck(ctx context.Context, cs *acsapi.ContainerService, c *config.Config) error {

@@ -9,8 +9,8 @@ import (
 
 	acsapi "github.com/Azure/acs-engine/pkg/api"
 
-	"github.com/jim-minter/azure-helm/pkg/config"
-	"github.com/jim-minter/azure-helm/pkg/util"
+	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/util"
 )
 
 func Generate(m *acsapi.ContainerService, c *config.Config) ([]byte, error) {

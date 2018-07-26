@@ -6,7 +6,7 @@ import (
 	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"github.com/jim-minter/azure-helm/pkg/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/jsonpath"
 )
 
 func KeyFunc(gk schema.GroupKind, namespace, name string) string {

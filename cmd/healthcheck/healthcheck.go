@@ -7,7 +7,7 @@ import (
 	"github.com/Azure/acs-engine/pkg/api/osa/vlabs"
 	"github.com/ghodss/yaml"
 
-	"github.com/jim-minter/azure-helm/pkg/plugin"
+	"github.com/openshift/openshift-azure/pkg/plugin"
 )
 
 func healthCheck() error {

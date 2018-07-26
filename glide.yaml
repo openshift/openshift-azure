@@ -1,4 +1,4 @@
-package: github.com/jim-minter/azure-helm
+package: github.com/openshift/openshift-azure
 import:
 - package: github.com/Azure/acs-engine
   version: osaapi

@@ -12,7 +12,7 @@ import (
 	"github.com/satori/uuid"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
-	"github.com/jim-minter/azure-helm/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
 func (c Config) MarshalJSON() ([]byte, error) {

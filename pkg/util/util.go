@@ -9,8 +9,8 @@ import (
 	acsapi "github.com/Azure/acs-engine/pkg/api"
 	"github.com/ghodss/yaml"
 
-	"github.com/jim-minter/azure-helm/pkg/config"
-	"github.com/jim-minter/azure-helm/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
 // TODO: util packages are an anti-pattern, don't do this
