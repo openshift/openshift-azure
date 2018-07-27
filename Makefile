@@ -12,4 +12,7 @@ sync-image: sync
 sync-push: sync-image
 	docker push quay.io/openshift-on-azure/sync:latest
 
-.PHONY: clean sync-image sync-push
+verify:
+	./hack/validate-generated.sh
+
+.PHONY: clean sync-image sync-push verify
