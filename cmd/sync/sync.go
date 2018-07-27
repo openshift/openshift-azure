@@ -6,13 +6,15 @@ import (
 	"log"
 	"time"
 
+	acsapi "github.com/Azure/acs-engine/pkg/api"
 	"github.com/Azure/acs-engine/pkg/api/osa/vlabs"
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
+	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/plugin"
+	"github.com/openshift/openshift-azure/pkg/validate"
 )
 
 var (
@@ -28,20 +30,14 @@ func sync() error {
 	if err != nil {
 		return errors.Wrap(err, "cannot read _data/manifest.yaml")
 	}
-
 	var ext *vlabs.OpenShiftCluster
 	if err := yaml.Unmarshal(b, &ext); err != nil {
 		return errors.Wrap(err, "cannot unmarshal _data/manifest.yaml")
 	}
-
-	if err := ext.Validate(); err != nil {
-		return errors.Wrap(err, "cannot validate _data/manifest.yaml")
+	if errs := validate.OpenShiftCluster(ext); len(errs) > 0 {
+		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
-
-	cs := ext.AsContainerService()
-	if err := plugin.Enrich(cs); err != nil {
-		return errors.Wrap(err, "cannot enrich _data/manifest.yaml")
-	}
+	cs := acsapi.ConvertVLabsOpenShiftClusterToContainerService(ext)
 
 	b, err = ioutil.ReadFile("_data/config.yaml")
 	if err != nil {

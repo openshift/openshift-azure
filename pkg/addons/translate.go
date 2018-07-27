@@ -193,7 +193,7 @@ var Translations = map[string][]struct {
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HOST')].value"),
-			Template: "docker-registry-default.{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain }}",
+			Template: "docker-registry-default.{{ (index .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles 0).PublicSubdomain }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
@@ -249,7 +249,7 @@ var Translations = map[string][]struct {
 	"OAuthClient.oauth.openshift.io/cockpit-oauth-client": {
 		{
 			Path:     jsonpath.MustCompile("$.redirectURIs[0]"),
-			Template: "https://registry-console-default.{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain }}",
+			Template: "https://registry-console-default.{{ (index .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles 0).PublicSubdomain }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.secret"),
@@ -259,43 +259,43 @@ var Translations = map[string][]struct {
 	"Route.route.openshift.io/default/docker-registry": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "docker-registry-default.{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain }}",
+			Template: "docker-registry-default.{{ (index .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/default/registry-console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "registry-console-default.{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain }}",
+			Template: "registry-console-default.{{ (index .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/kube-service-catalog/apiserver": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "apiserver-kube-service-catalog.{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain }}",
+			Template: "apiserver-kube-service-catalog.{{ (index .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/openshift-ansible-service-broker/asb-1338": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "asb-1338-openshift-ansible-service-broker.{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain }}",
+			Template: "asb-1338-openshift-ansible-service-broker.{{ (index .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/openshift-metrics/alertmanager": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "alertmanager-openshift-metrics.{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain }}",
+			Template: "alertmanager-openshift-metrics.{{ (index .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/openshift-metrics/alerts": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "alerts-openshift-metrics.{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain }}",
+			Template: "alerts-openshift-metrics.{{ (index .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/openshift-metrics/prometheus": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "prometheus-openshift-metrics.{{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain }}",
+			Template: "prometheus-openshift-metrics.{{ (index .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
 	"Secret/default/registry-certificates": {
@@ -319,12 +319,12 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
 			NestedPath: jsonpath.MustCompile("$.tenantId"),
-			Template:   "{{ .ContainerService.Properties.AzProfile.TenantID }}",
+			Template:   "{{ .Config.TenantID }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
 			NestedPath: jsonpath.MustCompile("$.subscriptionId"),
-			Template:   "{{ .ContainerService.Properties.AzProfile.SubscriptionID }}",
+			Template:   "{{ .Config.SubscriptionID }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
@@ -339,12 +339,12 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
 			NestedPath: jsonpath.MustCompile("$.aadTenantId"),
-			Template:   "{{ .ContainerService.Properties.AzProfile.TenantID }}",
+			Template:   "{{ .Config.TenantID }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
 			NestedPath: jsonpath.MustCompile("$.resourceGroup"),
-			Template:   "{{ .ContainerService.Properties.AzProfile.ResourceGroup }}",
+			Template:   "{{ .Config.ResourceGroup }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),

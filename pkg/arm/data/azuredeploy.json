@@ -40,7 +40,7 @@
                 "publicIPAllocationMethod": "Dynamic",
                 "idleTimeoutInMinutes": 15,
                 "dnsSettings": {
-                    "domainNameLabel": "{{ .ContainerService.Properties.AzProfile.ResourceGroup }}"
+                    "domainNameLabel": "{{ .Config.ResourceGroup }}"
                 }
             },
             "sku": {
