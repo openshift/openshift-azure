@@ -9,7 +9,7 @@ type OpenShiftCluster struct {
 	Plan       *ResourcePurchasePlan `json:"plan,omitempty"`
 	Tags       map[string]string     `json:"tags,omitempty"`
 	Type       string                `json:"type,omitempty"`
-	Properties Properties            `json:"properties,omitempty"`
+	Properties *Properties           `json:"properties,omitempty"`
 }
 
 // ResourcePurchasePlan defines the resource plan as required by ARM for billing
@@ -23,74 +23,106 @@ type ResourcePurchasePlan struct {
 
 // Properties represents the cluster definition.
 type Properties struct {
+	// ProvisioningState (out): current state of the OSA resource.
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
-	OpenShiftVersion  string            `json:"openShiftVersion,omitempty"`
-	// TODO: need to clarify external API for PublicHostname and decide what to
-	// implement when.  Allow users to specify a PublicHostname then have them
-	// create a CNAME to a FQDN we return?  Allow users to not specify and we
-	// return a FQDN?  In which case, how will the plugin know the FQDN?
+
+	// OpenShiftVersion (in): OpenShift version to be created/updated, e.g.
+	// `v3.10`.
+	OpenShiftVersion string `json:"openShiftVersion,omitempty"`
+
+	// PublicHostname (in,optional): Optional user-specified FQDN for OpenShift
+	// API server.  If specified, after OSA cluster creation, user must create a
+	// PublicHostname CNAME record forwarding to the returned FQDN value.
 	PublicHostname string `json:"publicHostname,omitempty"`
-	// FQDN string `json:"fqdn,omitempty"` // TODO: do we need to add this?
-	// TODO: need to clarify external API for RoutingConfigSubdomain.  Do we
-	// create one and return it if it's not provided?  Will this be transparent
-	// to the plugin?
-	RoutingConfigSubdomain string `json:"routingConfigSubdomain,omitempty"`
-	// TODO: need to clarify the external API for AgentPoolProfiles.  Will we
-	// allow users to specify an `infra` pool?
-	AgentPoolProfiles       AgentPoolProfiles       `json:"agentPoolProfiles,omitempty"`
+
+	// FQDN (out): Auto-allocated FQDN for OpenShift API server.
+	FQDN string `json:"fqdn,omitempty"`
+
+	// RouterProfiles (in,optional/out): Configuration for OpenShift router(s).
+	RouterProfiles []RouterProfile `json:"routerProfiles,omitempty"`
+
+	// AgentPoolProfiles (in): configuration of OpenShift cluster VMs.
+	AgentPoolProfiles []AgentPoolProfile `json:"agentPoolProfiles,omitempty"`
+
+	// TODO: is this compatible with MSI?
+	// ServicePrincipalProfile (in): Service principal for OpenShift cluster.
 	ServicePrincipalProfile ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
 }
 
-// ProvisioningState represents the current state of container service resource.
+// ProvisioningState represents the current state of the OSA resource.
 type ProvisioningState string
 
 const (
-	// Creating means ContainerService resource is being created.
+	// Creating means the OSA resource is being created.
 	Creating ProvisioningState = "Creating"
-	// Updating means an existing ContainerService resource is being updated.
+	// Updating means the existing OSA resource is being updated.
 	Updating ProvisioningState = "Updating"
-	// Failed means resource is in failed state.
+	// Failed means the OSA resource is in failed state.
 	Failed ProvisioningState = "Failed"
-	// Succeeded means last create/update succeeded.
+	// Succeeded means the last create/update succeeded.
 	Succeeded ProvisioningState = "Succeeded"
-	// Deleting means resource is in the process of being deleted.
+	// Deleting means the OSA resource is being deleted.
 	Deleting ProvisioningState = "Deleting"
-	// Migrating means resource is being migrated from one subscription or
-	// resource group to another.
+	// Migrating means the OSA resource is being migrated from one subscription
+	// or resource group to another.
 	Migrating ProvisioningState = "Migrating"
-	// Upgrading means an existing resource is being upgraded.
+	// Upgrading means the existing OAS resource is being upgraded.
 	Upgrading ProvisioningState = "Upgrading"
 )
 
-// AgentPoolProfiles represents all the AgentPoolProfiles.
-type AgentPoolProfiles []AgentPoolProfile
+// RouterProfile represents an OpenShift router.
+type RouterProfile struct {
+	Name string `json:"name,omitempty"`
 
-// AgentPoolProfile represents configuration of VMs running agent daemons that
-// register with the master and offer resources to host applications in
-// containers.
-type AgentPoolProfile struct {
-	Name         string               `json:"name,omitempty"`
-	Role         AgentPoolProfileRole `json:"role,omitempty"` // TODO: should we expose this?
-	Count        int                  `json:"count,omitempty"`
-	VMSize       string               `json:"vmSize,omitempty"`
-	VnetSubnetID string               `json:"vnetSubnetID,omitempty"`
-	// OSDiskSizeGB int `json:"osDiskSizeGB,omitempty"` // TODO: do we need to add this?
-	// AvailabilityProfile string `json:"availabilityProfile,omitempty"` // TODO: do we need to add this?
-	// StorageProfile string `json:"storageProfile,omitempty"` // TODO: do we need to add this?
-	// OSType OSType `json:"osType,omitempty"` // TODO: do we need to add this?
+	// PublicSubdomain (in,optional/out): DNS subdomain for OpenShift router. If
+	// specified, after OSA cluster creation, user must create a (wildcard)
+	// *.PublicSubdomain CNAME record forwarding to the returned FQDN value.  If
+	// not specified, OSA will auto-allocate and setup a PublicSubdomain and
+	// return it.  The OpenShift master is configured with the PublicSubdomain
+	// of the "default" RouterProfile.
+	PublicSubdomain string `json:"publicSubdomain,omitempty"`
+
+	// FQDN (out): Auto-allocated FQDN for the OpenShift router.
+	FQDN string `json:"fqdn,omitempty"`
 }
 
-// AgentPoolProfileRole representes the role of the AgentPoolProfile.
-// TODO: should we expose this?
+// AgentPoolProfile represents configuration of OpenShift cluster VMs.
+type AgentPoolProfile struct {
+	Name   string               `json:"name,omitempty"`
+	Role   AgentPoolProfileRole `json:"role,omitempty"`
+	Count  int                  `json:"count,omitempty"`
+	VMSize string               `json:"vmSize,omitempty"`
+
+	// VnetSubnetID is expected to be empty or match
+	// `^/subscriptions/[^/]+
+	//   /resourceGroups/[^/]+
+	//   /providers/Microsoft.Network
+	//   /virtualNetworks/[^/]+
+	//   /subnets/[^/]+$`
+	VnetSubnetID string `json:"vnetSubnetID,omitempty"`
+	OSType       OSType `json:"osType,omitempty"`
+}
+
+// AgentPoolProfileRole represents the role of the AgentPoolProfile.
 type AgentPoolProfileRole string
 
 const (
-	// AgentPoolProfileRoleCompute is the compute role
+	// AgentPoolProfileRoleCompute is the compute role.
 	AgentPoolProfileRoleCompute AgentPoolProfileRole = "compute"
-	// AgentPoolProfileRoleInfra is the infra role
+	// AgentPoolProfileRoleInfra is the infra role.
 	AgentPoolProfileRoleInfra AgentPoolProfileRole = "infra"
-	// AgentPoolProfileRoleMaster is the master role
+	// AgentPoolProfileRoleMaster is the master role.
 	AgentPoolProfileRoleMaster AgentPoolProfileRole = "master"
+)
+
+// OSType represents the OS type of VMs in an AgentPool.
+type OSType string
+
+const (
+	// OSTypeLinux is Linux.
+	OSTypeLinux OSType = "Linux"
+	// OSTypeWindows is Windows.
+	OSTypeWindows OSType = "Windows"
 )
 
 // ServicePrincipalProfile contains the client and secret used by the cluster

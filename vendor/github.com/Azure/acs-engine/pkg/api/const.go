@@ -87,10 +87,14 @@ const publicAgentPoolSuffix = "-public"
 const (
 	// DefaultTillerAddonEnabled determines the acs-engine provided default for enabling tiller addon
 	DefaultTillerAddonEnabled = true
+	// DefaultAADPodIdentityAddonEnabled determines the acs-engine provided default for enabling aad-pod-identity addon
+	DefaultAADPodIdentityAddonEnabled = false
 	// DefaultACIConnectorAddonEnabled determines the acs-engine provided default for enabling aci connector addon
 	DefaultACIConnectorAddonEnabled = false
 	// DefaultClusterAutoscalerAddonEnabled determines the acs-engine provided default for enabling cluster autoscaler addon
 	DefaultClusterAutoscalerAddonEnabled = false
+	// DefaultKeyVaultFlexVolumeAddonEnabled determines the acs-engine provided default for enabling key vault flexvolume addon
+	DefaultKeyVaultFlexVolumeAddonEnabled = false
 	// DefaultDashboardAddonEnabled determines the acs-engine provided default for enabling kubernetes-dashboard addon
 	DefaultDashboardAddonEnabled = true
 	// DefaultReschedulerAddonEnabled determines the acs-engine provided default for enabling kubernetes-rescheduler addon
@@ -107,12 +111,18 @@ const (
 	DefaultNVIDIADevicePluginAddonEnabled = false
 	// DefaultContainerMonitoringAddonEnabled determines the acs-engine provided default for enabling kubernetes container monitoring addon
 	DefaultContainerMonitoringAddonEnabled = false
+	// DefaultAzureCNINetworkMonitoringAddonEnabled Azure CNI networkmonitor addon default
+	DefaultAzureCNINetworkMonitoringAddonEnabled = false
 	// DefaultTillerAddonName is the name of the tiller addon deployment
 	DefaultTillerAddonName = "tiller"
-	// DefaultACIConnectorAddonName is the name of the tiller addon deployment
+	// DefaultAADPodIdentityAddonName is the name of the aad-pod-identity addon deployment
+	DefaultAADPodIdentityAddonName = "aad-pod-identity"
+	// DefaultACIConnectorAddonName is the name of the aci-connector addon deployment
 	DefaultACIConnectorAddonName = "aci-connector"
 	// DefaultClusterAutoscalerAddonName is the name of the cluster autoscaler addon deployment
 	DefaultClusterAutoscalerAddonName = "cluster-autoscaler"
+	// DefaultKeyVaultFlexVolumeAddonName is the name of the key vault flexvolume addon deployment
+	DefaultKeyVaultFlexVolumeAddonName = "keyvault-flexvolume"
 	// DefaultDashboardAddonName is the name of the kubernetes-dashboard addon deployment
 	DefaultDashboardAddonName = "kubernetes-dashboard"
 	// DefaultReschedulerAddonName is the name of the rescheduler addon deployment
@@ -136,7 +146,8 @@ const (
 )
 
 const (
-	// AgentPoolProfileRoleEmpty is the empty role
+	// AgentPoolProfileRoleEmpty is the empty role.  Deprecated; only used in
+	// acs-engine.
 	AgentPoolProfileRoleEmpty AgentPoolProfileRole = ""
 	// AgentPoolProfileRoleCompute is the compute role
 	AgentPoolProfileRoleCompute AgentPoolProfileRole = "compute"

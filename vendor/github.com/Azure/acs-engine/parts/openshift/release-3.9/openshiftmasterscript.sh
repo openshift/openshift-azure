@@ -47,14 +47,14 @@ sed -i -e "s#--loglevel=2#--loglevel=4#" /etc/sysconfig/${SERVICE_TYPE}-master-c
 
 rm -rf /etc/etcd/* /etc/origin/master/* /etc/origin/node/*
 
-MASTER_OREG_URL="$IMAGE_PREFIX/$IMAGE_TYPE"
+MASTER_OREG_URL="$IMAGE_PREFIX/$IMAGE_TYPE-\${component}:\${version}"
 if [[ -f /etc/origin/oreg_url ]]; then
 	MASTER_OREG_URL=$(cat /etc/origin/oreg_url)
 fi
 
 oc adm create-bootstrap-policy-file --filename=/etc/origin/master/policy.json
 
-( cd / && base64 -d <<< {{ .ConfigBundle }} | tar -xz)
+( cd / && base64 -d <<< {{ .ConfigBundle | shellQuote }} | tar -xz)
 
 cp /etc/origin/node/ca.crt /etc/pki/ca-trust/source/anchors/openshift-ca.crt
 update-ca-trust
@@ -76,7 +76,7 @@ set -x
 ###
 # retrieve the public ip via dns for the router public ip and sub it in for the routingConfig.subdomain
 ###
-routerLBHost="{{.RouterLBHostname}}"
+routerLBHost={{ .RouterLBHostname | shellQuote }}
 routerLBIP=$(dig +short $routerLBHost)
 
 # NOTE: The version of openshift-ansible for origin defaults the ansible var
@@ -131,7 +131,7 @@ metadata:
 provisioner: kubernetes.io/azure-disk
 parameters:
   skuName: Premium_LRS
-  location: {{ .Location }}
+  location: {{ .Location | quote }}
   kind: managed
 EOF
 
