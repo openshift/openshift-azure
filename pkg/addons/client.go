@@ -1,23 +1,18 @@
 package addons
 
 import (
+	"context"
 	"errors"
-	"io"
 	"log"
-	"net"
-	"net/http"
-	"net/url"
-	"os"
 	"reflect"
-	"syscall"
-	"time"
+
+	"github.com/openshift/openshift-azure/pkg/checks"
 
 	"github.com/go-test/deep"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
@@ -69,7 +64,12 @@ func newClient(dryRun bool) (*client, error) {
 		cli:        cli,
 	}
 
-	if err := c.waitForHealthz(); err != nil {
+	transport, err := rest.TransportFor(c.restconfig)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := checks.WaitForHTTPStatusOk(context.Background(), transport, c.restconfig.Host+"/healthz"); err != nil {
 		return nil, err
 	}
 
@@ -93,46 +93,6 @@ func (c *client) updateDynamicClient() error {
 	c.dyn = dynamic.NewClientPool(c.restconfig, rm, dynamic.LegacyAPIPathResolverFunc)
 
 	return nil
-}
-
-func (c *client) waitForHealthz() error {
-	if c.dryRun {
-		return nil
-	}
-
-	transport, err := rest.TransportFor(c.restconfig)
-	if err != nil {
-		return err
-	}
-
-	cli := &http.Client{
-		Transport: transport,
-		Timeout:   10 * time.Second,
-	}
-
-	req, err := http.NewRequest("GET", c.restconfig.Host+"/healthz", nil)
-	if err != nil {
-		return err
-	}
-
-	return wait.PollInfinite(time.Second, func() (bool, error) {
-		resp, err := cli.Do(req)
-
-		if err, ok := err.(*url.Error); ok {
-			if err, ok := err.Err.(*net.OpError); ok {
-				if err, ok := err.Err.(*os.SyscallError); ok {
-					if err.Err == syscall.ENETUNREACH {
-						return false, nil
-					}
-				}
-			}
-			if err.Timeout() || err.Err == io.EOF || err.Err == io.ErrUnexpectedEOF {
-				return false, nil
-			}
-		}
-
-		return resp.StatusCode == http.StatusOK, err
-	})
 }
 
 // createResources creates all resources in db that match the provided filter.

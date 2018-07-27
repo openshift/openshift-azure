@@ -10,11 +10,64 @@ import (
 	"time"
 
 	acsapi "github.com/Azure/acs-engine/pkg/api"
+	appsclient "k8s.io/client-go/kubernetes/typed/apps/v1"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
+	"k8s.io/client-go/tools/clientcmd/api/latest"
+	"k8s.io/client-go/tools/clientcmd/api/v1"
 
+	"github.com/openshift/openshift-azure/pkg/checks"
 	"github.com/openshift/openshift-azure/pkg/config"
 )
 
+// GetKubeconfigFromV1Config takes a v1 config and returns a kubeconfig
+func getKubeconfigFromV1Config(kc *v1.Config) (clientcmd.ClientConfig, error) {
+	var c api.Config
+	err := latest.Scheme.Convert(kc, &c, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	kubeconfig := clientcmd.NewDefaultClientConfig(c, &clientcmd.ConfigOverrides{})
+
+	return kubeconfig, nil
+}
+
+// HealthCheck function to verify cluster health
 func HealthCheck(ctx context.Context, cs *acsapi.ContainerService, c *config.Config) error {
+	kubeconfig, err := getKubeconfigFromV1Config(c.AdminKubeconfig)
+	if err != nil {
+		return err
+	}
+
+	restconfig, err := kubeconfig.ClientConfig()
+	if err != nil {
+		return err
+	}
+
+	t, err := rest.TransportFor(restconfig)
+	if err != nil {
+		return err
+	}
+
+	// Wait for the healthz to be 200 status
+	err = checks.WaitForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
+	if err != nil {
+		return err
+	}
+
+	appsclient, err := appsclient.NewForConfig(restconfig)
+	if err != nil {
+		return err
+	}
+	// Ensure that the pods in default are healthy
+	err = checks.WaitForInfraServices(ctx, appsclient)
+	if err != nil {
+		return err
+	}
+
+	// Wait for the console to be 200 status
 	return waitForConsole(ctx, cs, c)
 }
 
