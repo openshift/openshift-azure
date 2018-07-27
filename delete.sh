@@ -27,9 +27,9 @@ fi
 RESOURCEGROUP=$1
 PUBLICHOSTNAME=$(awk '/^  publicHostname:/ { print $2 }' <_data/manifest.yaml)
 
-tools/dns.sh zone-delete $RESOURCEGROUP
+hack/dns.sh zone-delete $RESOURCEGROUP
 
-tools/aad.sh app-delete $PUBLICHOSTNAME
+hack/aad.sh app-delete $PUBLICHOSTNAME
 
 rm -rf _data
 

@@ -46,7 +46,7 @@
       your AAD will need to have *Users can register applications* enabled.
 
    1. (Ask your Azure subscription administrator to) precreate a specific AAD
-      application and service principal with secret.  You can use `tools/aad.sh`
+      application and service principal with secret.  You can use `hack/aad.sh`
       to help with this process.  For AAD authentication to work, the public
       hostname of the OpenShift cluster must match the AAD application created.
       Record the service principal client ID and secret.
