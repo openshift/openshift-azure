@@ -22,6 +22,7 @@ cp -a "${DIR}/.." "${T}/"
 
 GENERATED_FILES=(
 	"pkg/addons/bindata.go"
+	"pkg/jsonpath/jsonpath.go"
 	"pkg/arm/bindata.go"
 )
 
