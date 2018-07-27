@@ -84,7 +84,7 @@ func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
 	//TODO: confirm minor version after release
 	case "v3.10":
-		v := "v3.10.15-1"
+		v := "v3.10"
 		c.ControlPlaneImage = image(c.ImageConfigFormat, "control-plane", v)
 		c.NodeImage = image(c.ImageConfigFormat, "node", v)
 		c.ServiceCatalogImage = image(c.ImageConfigFormat, "service-catalog", v)
@@ -94,7 +94,7 @@ func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 		c.RouterImage = image(c.ImageConfigFormat, "haproxy-router", v)
 		c.WebConsoleImage = image(c.ImageConfigFormat, "web-console", v)
 
-		c.MasterEtcdImage = "registry.access.redhat.com/rhel7/etcd:" + v
+		c.MasterEtcdImage = "registry.access.redhat.com/rhel7/etcd:3.2.22"
 
 		c.OAuthProxyImage = "registry.access.redhat.com/openshift3/oauth-proxy:" + v
 		c.PrometheusImage = "registry.access.redhat.com/openshift3/prometheus:" + v
