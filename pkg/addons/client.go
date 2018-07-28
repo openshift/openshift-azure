@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
@@ -151,6 +152,15 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		if kerrors.IsNotFound(err) {
 			log.Println("Create " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 			_, err = dc.Resource(res, o.GetNamespace()).Create(o)
+			if kerrors.IsAlreadyExists(err) {
+				// The "hot path" in write() is Get, check, then maybe Update.
+				// Optimising for this has the disadvantage that at cluster
+				// creation we can race with API server or controller
+				// initialisation. Between Get returning NotFound and us trying
+				// to Create, the object might be created.  In this case we
+				// return a synthetic Conflict to force a retry.
+				err = kerrors.NewConflict(schema.GroupResource{Group: res.Group, Resource: res.Name}, o.GetName(), errors.New("synthetic"))
+			}
 			return
 		}
 		if err != nil {
