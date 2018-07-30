@@ -255,7 +255,7 @@ oauthConfig:
       kind: HTPasswdPasswordIdentityProvider
   masterCA: ca.crt
   masterPublicURL: {{ print "https://" .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname | quote }}
-  masterURL: {{ print "https://" .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname | quote }}
+  masterURL: {{ print "https://" .ContainerService.Properties.MasterProfile.FQDN | quote }}
   sessionConfig:
     sessionMaxAgeSeconds: 3600
     sessionName: ssn

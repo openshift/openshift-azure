@@ -126,8 +126,7 @@ func internalAPIServerHostname(cs *acsapi.ContainerService) string {
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
 
-	// TODO: Need unique name, potentially derivative from PublicHostname
-	c.RouterLBCName = fmt.Sprintf("router-%s", strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, ".")[1])
+	c.RouterLBCName = cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN
 	selectNodeImage(cs, c)
 
 	selectContainerImages(cs, c)

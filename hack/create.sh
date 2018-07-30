@@ -49,10 +49,12 @@ name: openshift
 location: eastus
 properties:
   openShiftVersion: "$DEPLOY_VERSION"
+  FQDN: $RESOURCEGROUP.eastus.cloudapp.azure.com
   publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
   routerProfiles:
   - name: default
     publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
+    FQDN: router-$RESOURCEGROUP.eastus.cloudapp.azure.com
   agentPoolProfiles:
   - name: master
     role: master
@@ -79,8 +81,7 @@ go run cmd/createorupdate/createorupdate.go
 
 az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _data/_out/azuredeploy.json --no-wait
 
-# TODO(mjudeikis): after your DNS work these commands should move to the end of
-# this file.
+# This mimics RP dns record creation.
 hack/dns.sh zone-create $RESOURCEGROUP
 hack/dns.sh cname-create $RESOURCEGROUP openshift $RESOURCEGROUP.eastus.cloudapp.azure.com
 hack/dns.sh cname-create $RESOURCEGROUP '*' router-$RESOURCEGROUP.eastus.cloudapp.azure.com
