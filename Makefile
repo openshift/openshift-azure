@@ -1,6 +1,9 @@
 clean:
 	rm -f sync
 
+test:
+	go test ./...
+
 sync: clean
 	go generate ./...
 	CGO_ENABLED=0 go build ./cmd/sync

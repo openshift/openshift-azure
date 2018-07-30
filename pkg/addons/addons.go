@@ -22,6 +22,25 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util"
 )
 
+func unmarshal(b []byte) (unstructured.Unstructured, error) {
+	// can't use straight yaml.Unmarshal() because it universally mangles yaml
+	// integers into float64s, whereas the Kubernetes client library uses int64s
+	// wherever it can.  Such a difference can cause us to update objects when
+	// we don't actually need to.
+	json, err := yaml.YAMLToJSON(b)
+	if err != nil {
+		return unstructured.Unstructured{}, err
+	}
+
+	var o unstructured.Unstructured
+	_, _, err = unstructured.UnstructuredJSONScheme.Decode(json, nil, &o)
+	if err != nil {
+		return unstructured.Unstructured{}, err
+	}
+
+	return o, nil
+}
+
 // readDB reads previously exported objects into a map via go-bindata as well as
 // populating configuration items via Translate().
 func readDB(cs *acsapi.ContainerService, c *config.Config) (map[string]unstructured.Unstructured, error) {
@@ -33,16 +52,7 @@ func readDB(cs *acsapi.ContainerService, c *config.Config) (map[string]unstructu
 			return nil, err
 		}
 
-		// can't use straight yaml.Unmarshal() because it universally mangles
-		// yaml integers into float64s, whereas the Kubernetes client library
-		// uses int64s wherever it can.  Such a difference can cause us to
-		// update objects when we don't actually need to.
-		json, err := yaml.YAMLToJSON(b)
-		if err != nil {
-			return nil, err
-		}
-		var o unstructured.Unstructured
-		_, _, err = unstructured.UnstructuredJSONScheme.Decode(json, nil, &o)
+		o, err := unmarshal(b)
 		if err != nil {
 			return nil, err
 		}
