@@ -623,6 +623,15 @@
 {{end}}
 {{if EnableEncryptionWithExternalKms}}
      {
+       "type": "Microsoft.Storage/storageAccounts",
+       "name": "[variables('clusterKeyVaultName')]",
+       "apiVersion": "[variables('apiVersionStorage')]",
+       "location": "[variables('location')]",
+       "properties": {
+         "accountType": "Standard_LRS"
+       }
+     },
+     {
        "type": "Microsoft.KeyVault/vaults",
        "name": "[variables('clusterKeyVaultName')]",
        "apiVersion": "[variables('apiVersionKeyVault')]",
@@ -895,8 +904,9 @@
         {{end}}
         }
       }
-    },
-    {
+    }
+    {{if UseAksExtension}}
+    ,{
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(variables('masterVMNamePrefix'), copyIndex(variables('masterOffset')), '/computeAksLinuxBilling')]",
       "apiVersion": "[variables('apiVersionDefault')]",
@@ -916,4 +926,6 @@
         "settings": {
         }
       }
-    }{{WriteLinkedTemplatesForExtensions}}
+    }
+    {{end}}
+    {{WriteLinkedTemplatesForExtensions}}

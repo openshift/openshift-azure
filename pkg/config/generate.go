@@ -26,9 +26,9 @@ func selectNodeImage(cs *acsapi.ContainerService, c *Config) {
 
 	switch os.Getenv("DEPLOY_OS") {
 	case "":
-		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion[1:], ".", "", -1)
+		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OrchestratorProfile.OrchestratorVersion[1:], ".", "", -1)
 	case "centos7":
-		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion[1:], ".", "", -1)
+		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OrchestratorProfile.OrchestratorVersion[1:], ".", "", -1)
 	}
 
 	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
@@ -46,7 +46,7 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 		c.ImageConfigFormat = "docker.io/openshift/origin-${component}:${version}"
 	}
 
-	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
+	switch cs.Properties.OrchestratorProfile.OrchestratorVersion {
 	case "v3.10":
 		v := "v3.10.0"
 		c.ControlPlaneImage = image(c.ImageConfigFormat, "control-plane", v)
@@ -81,7 +81,7 @@ func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 		c.ImageConfigFormat = "registry.access.redhat.com/openshift3/ose-${component}:${version}"
 	}
 
-	switch cs.Properties.OrchestratorProfile.OpenShiftConfig.OpenShiftVersion {
+	switch cs.Properties.OrchestratorProfile.OrchestratorVersion {
 	//TODO: confirm minor version after release
 	case "v3.10":
 		v := "v3.10"
@@ -296,19 +296,19 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			cert:        &c.NodeBootstrapCert,
 		},
 		{
-			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain,
+			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
 			dnsNames: []string{
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain,
-				"*." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain,
+				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
+				"*." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
 			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.RouterKey,
 			cert:        &c.RouterCert,
 		},
 		{
-			cn: "docker-registry-default." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain,
+			cn: "docker-registry-default." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
 			dnsNames: []string{
-				"docker-registry-default." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RoutingConfigSubdomain,
+				"docker-registry-default." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
 				"docker-registry.default.svc",
 				"docker-registry.default.svc.cluster.local",
 			},
@@ -468,6 +468,11 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	}
 
 	c.RunSyncLocal = os.Getenv("RUN_SYNC_LOCAL")
+
+	c.TenantID = cs.Properties.AzProfile.TenantID
+	c.SubscriptionID = cs.Properties.AzProfile.SubscriptionID
+	c.ResourceGroup = cs.Properties.AzProfile.ResourceGroup
+
 	return
 }
 

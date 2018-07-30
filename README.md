@@ -74,17 +74,27 @@ Basic OpenShift configuration:
 name: openshift
 location: eastus
 properties:
-  openShiftVersion: "$DEPLOY_VERSION"
+  openShiftVersion: v3.10
   publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
-  routingConfigSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
+  routerProfiles:
+  - name: default
+    publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
   agentPoolProfiles:
-  - name: compute
-    count: 1
+  - name: master
+    role: master
+    count: 3
     vmSize: Standard_D2s_v3
+    osType: Linux
   - name: infra
     role: infra
     count: 1
     vmSize: Standard_D2s_v3
+    osType: Linux
+  - name: compute
+    role: compute
+    count: 1
+    vmSize: Standard_D2s_v3
+    osType: Linux
   servicePrincipalProfile:
     clientID: $AZURE_CLIENT_ID
     secret: $AZURE_CLIENT_SECRET
@@ -96,18 +106,29 @@ OpenShift with BYO VNET configuration:
 name: openshift
 location: eastus
 properties:
-  openShiftVersion: "$DEPLOY_VERSION"
+  openShiftVersion: v3.10
   publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
-  routingConfigSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
+  routerProfiles:
+  - name: default
+    publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
   agentPoolProfiles:
-  - name: compute
-    count: 1
+  - name: master
+    role: master
+    count: 3
     vmSize: Standard_D2s_v3
+    osType: Linux
     vnetSubnetID: /subscriptions/SUB_ID/resourceGroups/RG_NAME/providers/Microsoft.Network/virtualNetworks/VNET_NAME/subnets/SUBNET_NAME
   - name: infra
     role: infra
     count: 1
     vmSize: Standard_D2s_v3
+    osType: Linux
+    vnetSubnetID: /subscriptions/SUB_ID/resourceGroups/RG_NAME/providers/Microsoft.Network/virtualNetworks/VNET_NAME/subnets/SUBNET_NAME
+  - name: compute
+    role: compute
+    count: 1
+    vmSize: Standard_D2s_v3
+    osType: Linux
     vnetSubnetID: /subscriptions/SUB_ID/resourceGroups/RG_NAME/providers/Microsoft.Network/virtualNetworks/VNET_NAME/subnets/SUBNET_NAME
   servicePrincipalProfile:
     clientID: $AZURE_CLIENT_ID

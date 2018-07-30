@@ -118,4 +118,9 @@ type Config struct {
 
 	// used for development purposes only
 	RunSyncLocal string
+
+	// enriched values which are not present in the external API representation
+	TenantID       string
+	SubscriptionID string
+	ResourceGroup  string
 }

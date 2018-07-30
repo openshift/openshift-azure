@@ -36,12 +36,12 @@ mkdir -p /etc/origin/cloudprovider
 
 # TODO: this is duplicated, and that's not ideal
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
-tenantId: {{ .ContainerService.Properties.AzProfile.TenantID | quote }}
-subscriptionId: {{ .ContainerService.Properties.AzProfile.SubscriptionID | quote }}
+tenantId: {{ .Config.TenantID | quote }}
+subscriptionId: {{ .Config.SubscriptionID | quote }}
 aadClientId: {{ .ContainerService.Properties.ServicePrincipalProfile.ClientID | quote }}
 aadClientSecret: {{ .ContainerService.Properties.ServicePrincipalProfile.Secret | quote }}
-aadTenantId: {{ .ContainerService.Properties.AzProfile.TenantID | quote }}
-resourceGroup: {{ .ContainerService.Properties.AzProfile.ResourceGroup | quote }}
+aadTenantId: {{ .Config.TenantID | quote }}
+resourceGroup: {{ .Config.ResourceGroup | quote }}
 location: {{ .ContainerService.Location | quote }}
 securityGroupName: nsg-compute
 primaryScaleSetName: ss-compute
