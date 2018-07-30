@@ -45,7 +45,10 @@ func WaitForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urlto
 		if err == io.EOF {
 			return false, nil
 		}
-		return resp.StatusCode == http.StatusOK, err
+		if err != nil {
+			return false, err
+		}
+		return resp != nil && resp.StatusCode == http.StatusOK, nil
 	}, ctx.Done())
 }
 
