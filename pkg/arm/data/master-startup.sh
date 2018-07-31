@@ -562,6 +562,9 @@ EOF
 
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig
+# HACK: copy node.kubeconfig to bootstrap.kubeconfig so that openshift start node used in the sync
+# daemonset will not fail and set the master node labels correctly.
+cp /etc/origin/node/node.kubeconfig /etc/origin/node/bootstrap.kubeconfig
 
 # note: ${SERVICE_TYPE}-node crash loops until master is up
 systemctl enable ${SERVICE_TYPE}-node.service
