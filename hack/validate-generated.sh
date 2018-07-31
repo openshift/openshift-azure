@@ -26,7 +26,7 @@ GENERATED_FILES=(
 	"pkg/arm/bindata.go"
 )
 
-for file in $GENERATED_FILES; do
+for file in "${GENERATED_FILES[@]}"; do
 	if ! diff  -r "${DIR}/../${file}" "${T}/${file}" 2>&1 ; then
 		echo "go generate produced changes that were not already present"
 		exit 1
