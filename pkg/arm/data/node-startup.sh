@@ -27,6 +27,8 @@ base64 -d <<< {{ Base64Encode (CertAsBytes .Config.NodeBootstrapCert) }} >/etc/o
 base64 -d <<< {{ Base64Encode (PrivateKeyAsBytes .Config.NodeBootstrapKey) }} >/etc/origin/node/node-bootstrapper.key
 chmod 0600 /etc/origin/node/node-bootstrapper.key /etc/origin/node/bootstrap.kubeconfig
 
+
+
 base64 -d <<< {{ Base64Encode (CertAsBytes .Config.CaCert) }} >/etc/origin/node/ca.crt
 cp /etc/origin/node/ca.crt /etc/pki/ca-trust/source/anchors/openshift-ca.crt
 update-ca-trust
