@@ -50,7 +50,7 @@ base64 -d <<< {{ PrivateKeyAsBytes .Config.EtcdPeerKey | Base64Encode }} >/etc/e
 base64 -d <<< {{ YamlMarshal .Config.AdminKubeconfig | Base64Encode }} >/etc/origin/node/node.kubeconfig
 base64 -d <<< {{ CertAsBytes .Config.CaCert | Base64Encode }} >/etc/origin/node/ca.crt
 
-mkdir -p /etc/origin/master
+mkdir -p /etc/origin/master/named
 base64 -d <<< {{ CertAsBytes .Config.EtcdCaCert | Base64Encode }} >/etc/origin/master/master.etcd-ca.crt
 base64 -d <<< {{ CertAsBytes .Config.CaCert | Base64Encode }} >/etc/origin/master/ca.crt
 base64 -d <<< {{ PrivateKeyAsBytes .Config.CaKey | Base64Encode }} >/etc/origin/master/ca.key
@@ -67,6 +67,8 @@ base64 -d <<< {{ CertAsBytes .Config.MasterProxyClientCert | Base64Encode }} >/e
 base64 -d <<< {{ PrivateKeyAsBytes .Config.MasterProxyClientKey | Base64Encode }} >/etc/origin/master/master.proxy-client.key
 base64 -d <<< {{ CertAsBytes .Config.MasterServerCert | Base64Encode }} >/etc/origin/master/master.server.crt
 base64 -d <<< {{ PrivateKeyAsBytes .Config.MasterServerKey | Base64Encode }} >/etc/origin/master/master.server.key
+base64 -d <<< {{ CertAsBytes .Config.ConsoleServerCert | Base64Encode }} >/etc/origin/master/named/console.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.ConsoleServerKey | Base64Encode }} >/etc/origin/master/named/console.key
 base64 -d <<< {{ PublicKeyAsBytes .Config.ServiceAccountKey.PublicKey | Base64Encode }} >/etc/origin/master/serviceaccounts.public.key
 base64 -d <<< {{ PrivateKeyAsBytes .Config.ServiceAccountKey | Base64Encode }} >/etc/origin/master/serviceaccounts.private.key
 base64 -d <<< {{ .Config.HtPasswd | Base64Encode }} >/etc/origin/master/htpasswd
@@ -288,6 +290,11 @@ servingInfo:
   keyFile: master.server.key
   maxRequestsInFlight: 500
   requestTimeoutSeconds: 3600
+  namedCertificates:
+    - certFile: /etc/origin/master/named/console.crt
+      keyFile: /etc/origin/master/named/console.key
+      names:
+        - {{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname | quote }}
 volumeConfig:
   dynamicProvisioningEnabled: true
 EOF

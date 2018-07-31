@@ -25,6 +25,8 @@ type Config struct {
 	EtcdCaCert           *x509.Certificate
 	CaKey                *rsa.PrivateKey
 	CaCert               *x509.Certificate
+	ConsoleCaKey         *rsa.PrivateKey
+	ConsoleCaCert        *x509.Certificate
 	FrontProxyCaKey      *rsa.PrivateKey
 	FrontProxyCaCert     *x509.Certificate
 	ServiceSigningCaKey  *rsa.PrivateKey
@@ -62,6 +64,8 @@ type Config struct {
 	// control plane certificates
 	MasterServerKey           *rsa.PrivateKey
 	MasterServerCert          *x509.Certificate
+	ConsoleServerKey          *rsa.PrivateKey
+	ConsoleServerCert         *x509.Certificate
 	AdminKey                  *rsa.PrivateKey
 	AdminCert                 *x509.Certificate
 	AggregatorFrontProxyKey   *rsa.PrivateKey

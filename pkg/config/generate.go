@@ -119,11 +119,6 @@ func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 	}
 }
 
-// TODO: Replace/remove this after RP integration
-func internalAPIServerHostname(cs *acsapi.ContainerService) string {
-	return cs.Properties.AzProfile.ResourceGroup + "." + cs.Location + ".cloudapp.azure.com"
-}
-
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
 
@@ -147,6 +142,11 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			cn:   "openshift-signer",
 			key:  &c.CaKey,
 			cert: &c.CaCert,
+		},
+		{
+			cn:   "openshift-console",
+			key:  &c.ConsoleCaKey,
+			cert: &c.ConsoleCaCert,
 		},
 		{
 			cn:   "openshift-frontproxy-signer",
@@ -241,10 +241,9 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			cert:        &c.MasterProxyClientCert,
 		},
 		{
-			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			cn: cs.Properties.MasterProfile.FQDN,
 			dnsNames: []string{
-				internalAPIServerHostname(cs),
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+				cs.Properties.MasterProfile.FQDN,
 				"master-000000",
 				"master-000001",
 				"master-000002",
@@ -257,6 +256,17 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.MasterServerKey,
 			cert:        &c.MasterServerCert,
+		},
+		{
+			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			dnsNames: []string{
+				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			},
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			signingKey:  c.ConsoleCaKey,
+			signingCert: c.ConsoleCaCert,
+			key:         &c.ConsoleServerKey,
+			cert:        &c.ConsoleServerCert,
 		},
 		{
 			cn:           "system:openshift-master",
@@ -378,14 +388,14 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		{
 			clientKey:  c.OpenShiftMasterKey,
 			clientCert: c.OpenShiftMasterCert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:openshift-master",
 			kubeconfig: &c.MasterKubeconfig,
 		},
 		{
 			clientKey:  c.BootstrapAutoapproverKey,
 			clientCert: c.BootstrapAutoapproverCert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:serviceaccount:openshift-infra:bootstrap-autoapprover",
 			namespace:  "openshift-infra",
 			kubeconfig: &c.BootstrapAutoapproverKubeconfig,
@@ -393,14 +403,14 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		{
 			clientKey:  c.AdminKey,
 			clientCert: c.AdminCert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:admin",
 			kubeconfig: &c.AdminKubeconfig,
 		},
 		{
 			clientKey:  c.NodeBootstrapKey,
 			clientCert: c.NodeBootstrapCert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
 			kubeconfig: &c.NodeBootstrapKubeconfig,
 		},
