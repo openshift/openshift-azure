@@ -119,6 +119,7 @@ func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 	}
 }
 
+// TODO: Replace/remove this after RP integration
 func internalAPIServerHostname(cs *acsapi.ContainerService) string {
 	return cs.Properties.AzProfile.ResourceGroup + "." + cs.Location + ".cloudapp.azure.com"
 }

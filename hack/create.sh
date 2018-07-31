@@ -49,12 +49,10 @@ name: openshift
 location: eastus
 properties:
   openShiftVersion: "$DEPLOY_VERSION"
-  FQDN: $RESOURCEGROUP.eastus.cloudapp.azure.com
   publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
   routerProfiles:
   - name: default
     publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
-    FQDN: router-$RESOURCEGROUP.eastus.cloudapp.azure.com
   agentPoolProfiles:
   - name: master
     role: master
@@ -81,11 +79,6 @@ go run cmd/createorupdate/createorupdate.go
 
 az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _data/_out/azuredeploy.json --no-wait
 
-# This mimics RP dns record creation.
-hack/dns.sh zone-create $RESOURCEGROUP
-hack/dns.sh cname-create $RESOURCEGROUP openshift $RESOURCEGROUP.eastus.cloudapp.azure.com
-hack/dns.sh cname-create $RESOURCEGROUP '*' router-$RESOURCEGROUP.eastus.cloudapp.azure.com
-
 if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # will eventually run as an HCP pod, for development run it locally
     KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go -run-once=true
@@ -94,3 +87,8 @@ fi
 az group deployment wait -g $RESOURCEGROUP -n azuredeploy --created --interval 10
 
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go
+
+# This mimics RP dns record creation.
+hack/dns.sh zone-create $RESOURCEGROUP
+hack/dns.sh cname-create $RESOURCEGROUP openshift $RESOURCEGROUP.eastus.cloudapp.azure.com
+hack/dns.sh cname-create $RESOURCEGROUP '*' router-$RESOURCEGROUP.eastus.cloudapp.azure.com

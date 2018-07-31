@@ -120,6 +120,9 @@ func enrich(cs *acsapi.ContainerService) error {
 	}
 
 	// configure DNS names
+	cs.Properties.MasterProfile.FQDN = fmt.Sprintf("%s.eastus.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup)
+	cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = fmt.Sprintf("router-%s.eastus.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup)
+
 	if cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname == "" {
 		cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = cs.Properties.MasterProfile.FQDN
 	}
