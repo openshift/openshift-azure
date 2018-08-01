@@ -25,6 +25,11 @@ if [[ ! -e _data/manifest.yaml ]]; then
     exit 1
 fi
 
+if [[ ! -e _data/_out/admin.kubeconfig ]]; then
+    echo error: _data/_out/admin.kubeconfig must exist
+    exit 1
+fi
+
 if [[ $# -ne 1 ]]; then
     echo usage: $0 resourcegroup
     exit 1
@@ -35,7 +40,35 @@ export RESOURCEGROUP=$1
 go generate ./...
 go run cmd/createorupdate/createorupdate.go
 
-# TODO: need to apply ARM deployment changes
+export KUBECONFIG=_data/_out/admin.kubeconfig
+
+# TODO: not all ARM template changes are going to be applied with vmssrollout
+# upgrade master scale set
+go run cmd/vmssrollout/vmssrollout.go -subscription $AZURE_SUBSCRIPTION_ID \
+                                      -resource-group $RESOURCEGROUP \
+                                      -name ss-master \
+                                      -new-config _data/containerservice.yaml \
+                                      -old-config _data/containerservice_old.yaml \
+                                      -in-place \
+                                      -role master
+
+# upgrade infra scale set
+go run cmd/vmssrollout/vmssrollout.go -subscription $AZURE_SUBSCRIPTION_ID \
+                                      -resource-group $RESOURCEGROUP \
+                                      -name ss-infra \
+                                      -new-config _data/containerservice.yaml \
+                                      -old-config _data/containerservice_old.yaml \
+                                      -drain \
+                                      -role infra
+
+# upgrade compute scale set
+go run cmd/vmssrollout/vmssrollout.go -subscription $AZURE_SUBSCRIPTION_ID \
+                                      -resource-group $RESOURCEGROUP \
+                                      -name ss-compute \
+                                      -new-config _data/containerservice.yaml \
+                                      -old-config _data/containerservice_old.yaml \
+                                      -drain \
+                                      -role compute
 
 if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # will eventually run as an HCP pod, for development run it locally

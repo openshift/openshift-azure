@@ -51,6 +51,9 @@ func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.Op
 		if err := yaml.Unmarshal(oldCsBytes, &oldCs); err != nil {
 			return nil, err
 		}
+		if err := ioutil.WriteFile("_data/containerservice_old.yaml", oldCsBytes, 0600); err != nil {
+			return nil, err
+		}
 	}
 
 	// validate the internal API representation (with reference to the previous

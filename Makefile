@@ -30,4 +30,7 @@ verify:
 unit:
 	go test ./...
 
-.PHONY: clean sync-image sync-push verify unit
+vmss:
+	CGO_ENABLED=0 go build ./cmd/vmssrollout
+
+.PHONY: clean sync-image sync-push verify unit vmss
