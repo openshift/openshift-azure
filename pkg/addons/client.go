@@ -8,7 +8,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/checks"
 
-	"github.com/go-test/deep"
+	"k8s.io/apimachinery/pkg/api/equality"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -195,7 +195,7 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		// TODO: we should have tests that monitor these diffs:
 		// 1) when a cluster is created
 		// 2) when sync is run twice back-to-back on the same cluster
-		for _, diff := range deep.Equal(*existing, *o) {
+		for _, diff := range equality.Semantic.DeepEqual(*existing, *o) {
 			log.Println("- " + diff)
 		}
 

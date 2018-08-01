@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-test/deep"
+	"k8s.io/apimachinery/pkg/api/equality"
 )
 
 func TestClean(t *testing.T) {
@@ -37,7 +37,7 @@ func TestClean(t *testing.T) {
 
 		Clean(i)
 		if !reflect.DeepEqual(i, o) {
-			t.Errorf("%s:\n%s", match, strings.Join(deep.Equal(i, o), "\n"))
+			t.Errorf("%s:\n%s", match, strings.Join(equality.Semantic.DeepEqual(i, o), "\n"))
 		}
 	}
 }
