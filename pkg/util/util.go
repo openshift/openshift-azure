@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"strconv"
+	"strings"
 	"text/template"
 
 	"github.com/ghodss/yaml"
@@ -25,6 +26,10 @@ func Template(tmpl string, f template.FuncMap, cs *acsapi.ContainerService, c *c
 		"Base64Encode":         base64.StdEncoding.EncodeToString,
 		"String":               func(b []byte) string { return string(b) },
 		"quote":                strconv.Quote,
+		"escape": func(b string) string {
+			replacer := strings.NewReplacer("$", "\\$")
+			return replacer.Replace(b)
+		},
 	}).Funcs(f).Parse(tmpl)
 	if err != nil {
 		return nil, err
