@@ -23,10 +23,6 @@ const (
 
 // Availability profiles
 const (
-	// AvailabilitySet means that the vms are in an availability set
-	AvailabilitySet = "AvailabilitySet"
-	// VirtualMachineScaleSets means that the vms are in a virtual machine scaleset
-	VirtualMachineScaleSets = "VirtualMachineScaleSets"
 	// ScaleSetPriorityRegular is the default ScaleSet Priority
 	ScaleSetPriorityRegular = "Regular"
 	// ScaleSetPriorityLow means the ScaleSet will use Low-priority VMs
@@ -38,9 +34,6 @@ const (
 )
 
 const (
-	// AgentPoolProfileRoleEmpty is the empty role.  Deprecated; only used in
-	// acs-engine.
-	AgentPoolProfileRoleEmpty AgentPoolProfileRole = ""
 	// AgentPoolProfileRoleCompute is the compute role
 	AgentPoolProfileRoleCompute AgentPoolProfileRole = "compute"
 	// AgentPoolProfileRoleInfra is the infra role

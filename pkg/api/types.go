@@ -17,37 +17,13 @@ type OpenShiftCluster struct {
 }
 
 type Properties struct {
-	ProvisioningState       ProvisioningState        `json:"provisioningState,omitempty"`
-	OrchestratorProfile     *OrchestratorProfile     `json:"orchestratorProfile,omitempty"`
-	MasterProfile           *MasterProfile           `json:"masterProfile,omitempty"`
-	AgentPoolProfiles       []*AgentPoolProfile      `json:"agentPoolProfiles,omitempty"`
-	LinuxProfile            *LinuxProfile            `json:"linuxProfile,omitempty"`
-	ServicePrincipalProfile *ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
-	CertificateProfile      *CertificateProfile      `json:"certificateProfile,omitempty"`
-	AADProfile              *AADProfile              `json:"aadProfile,omitempty"`
-	AddonProfiles           map[string]AddonProfile  `json:"addonProfiles,omitempty"`
-	AzProfile               *AzProfile               `json:"azProfile,omitempty"`
-}
-
-// AddonProfile represents an addon for managed cluster
-type AddonProfile struct {
-	Enabled bool              `json:"enabled"`
-	Config  map[string]string `json:"config"`
-}
-
-// AzProfile holds the azure context for where the cluster resides
-type AzProfile struct {
-	TenantID       string `json:"tenantId,omitempty"`
-	SubscriptionID string `json:"subscriptionId,omitempty"`
-	ResourceGroup  string `json:"resourceGroup,omitempty"`
-	Location       string `json:"location,omitempty"`
-}
-
-// ServicePrincipalProfile contains the client and secret used by the cluster for Azure Resource CRUD
-type ServicePrincipalProfile struct {
-	ClientID string `json:"clientId"`
-	Secret   string `json:"secret,omitempty" conform:"redact"`
-	ObjectID string `json:"objectId,omitempty"`
+	ProvisioningState   ProvisioningState    `json:"provisioningState,omitempty"`
+	OrchestratorProfile *OrchestratorProfile `json:"orchestratorProfile,omitempty"`
+	MasterProfile       *MasterProfile       `json:"masterProfile,omitempty"`
+	AgentPoolProfiles   []*AgentPoolProfile  `json:"agentPoolProfiles,omitempty"`
+	LinuxProfile        *LinuxProfile        `json:"linuxProfile,omitempty"`
+	CertificateProfile  *CertificateProfile  `json:"certificateProfile,omitempty"`
+	AADProfile          *AADProfile          `json:"aadProfile,omitempty"`
 }
 
 // CertificateProfile represents the definition of the master cluster
@@ -150,21 +126,6 @@ func (a *KubernetesAddon) IsEnabled(ifNil bool) bool {
 	return *a.Enabled
 }
 
-// PrivateCluster defines the configuration for a private cluster
-type PrivateCluster struct {
-	Enabled        *bool                  `json:"enabled,omitempty"`
-	JumpboxProfile *PrivateJumpboxProfile `json:"jumpboxProfile,omitempty"`
-}
-
-// PrivateJumpboxProfile represents a jumpbox definition
-type PrivateJumpboxProfile struct {
-	Name         string `json:"name" validate:"required"`
-	VMSize       string `json:"vmSize" validate:"required"`
-	OSDiskSizeGB int    `json:"osDiskSizeGB,omitempty" validate:"min=0,max=1023"`
-	Username     string `json:"username,omitempty"`
-	PublicKey    string `json:"publicKey" validate:"required"`
-}
-
 // CloudProviderConfig contains the KubernetesConfig properties specific to the Cloud Provider
 // TODO use this when strict JSON checking accommodates struct embedding
 type CloudProviderConfig struct {
@@ -200,7 +161,6 @@ type KubernetesConfig struct {
 	EnableRbac                       *bool             `json:"enableRbac,omitempty"`
 	EnableSecureKubelet              *bool             `json:"enableSecureKubelet,omitempty"`
 	EnableAggregatedAPIs             bool              `json:"enableAggregatedAPIs,omitempty"`
-	PrivateCluster                   *PrivateCluster   `json:"privateCluster,omitempty"`
 	GCHighThreshold                  int               `json:"gchighthreshold,omitempty"`
 	GCLowThreshold                   int               `json:"gclowthreshold,omitempty"`
 	EtcdVersion                      string            `json:"etcdVersion,omitempty"`
@@ -282,7 +242,6 @@ type AgentPoolProfile struct {
 	OSDiskSizeGB                 int                  `json:"osDiskSizeGB,omitempty"`
 	OSType                       OSType               `json:"osType,omitempty"`
 	Ports                        []int                `json:"ports,omitempty"`
-	AvailabilityProfile          string               `json:"availabilityProfile"`
 	ScaleSetPriority             string               `json:"scaleSetPriority,omitempty"`
 	ScaleSetEvictionPolicy       string               `json:"scaleSetEvictionPolicy,omitempty"`
 	DiskSizesGB                  []int                `json:"diskSizesGB,omitempty"`
