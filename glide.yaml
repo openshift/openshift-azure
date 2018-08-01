@@ -10,3 +10,7 @@ import:
   version: ^1.1.0
   subpackages:
   - spew
+- package: github.com/Azure/azure-sdk-for-go
+  version: v19.1.0
+  subpackages:
+  - services/compute/mgmt/2018-06-01/compute
