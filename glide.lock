@@ -1,5 +1,5 @@
-hash: 8e07d7abde7338f535ed5825ebfa0a90570e48fbac2f525044ee88cf7e488903
-updated: 2018-07-27T18:54:13.590891308-05:00
+hash: 5bf32f570a1e781a1888e84299bb1beaddaae3cb34b795ff5d90f5494a341057
+updated: 2018-08-01T15:17:45.207733472+02:00
 imports:
 - name: github.com/Azure/acs-engine
   version: be63a04a61992b0fcd1697898f6b196cda2b1347
@@ -125,7 +125,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 670d4cfef0544295bc27a114dbac37980d83185a
 - name: k8s.io/api
-  version: 8b7507fac302640dd5f1efbf9643199952cc58db
+  version: 0f11257a8a25954878633ebdc9841c67d8f83bdb
   subpackages:
   - admissionregistration/v1alpha1
   - admissionregistration/v1beta1
@@ -195,7 +195,7 @@ imports:
   - pkg/watch
   - third_party/forked/golang/reflect
 - name: k8s.io/client-go
-  version: a312bfe35c401f70e5ea0add48b50da283031dc3
+  version: 483aada58add12af1546a0f55e7a50493e8026f3
   subpackages:
   - discovery
   - dynamic
@@ -220,7 +220,7 @@ imports:
   - util/integer
   - util/retry
 - name: k8s.io/kube-aggregator
-  version: 7342491a4046f4747dde15dd10d227e4613a73b0
+  version: e88bdebab831fbccbce7ef47d6f42d7b4cea2e96
   subpackages:
   - pkg/apis/apiregistration
   - pkg/apis/apiregistration/v1

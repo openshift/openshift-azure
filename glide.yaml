@@ -1,3 +1,10 @@
 package: github.com/openshift/openshift-azure
 import:
 - package: github.com/Azure/acs-engine
+  version: be63a04a61992b0fcd1697898f6b196cda2b1347
+- package: k8s.io/client-go
+  version: kubernetes-1.10.6
+- package: k8s.io/kube-aggregator
+  version: kubernetes-1.10.6
+- package: k8s.io/apimachinery
+  version: kubernetes-1.10.6
