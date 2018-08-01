@@ -5,19 +5,19 @@ import (
 	"io/ioutil"
 	"os"
 
-	acsapi "github.com/Azure/acs-engine/pkg/api"
-	"github.com/Azure/acs-engine/pkg/api/osa/vlabs"
 	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api/v1"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
 // createOrUpdate simulates the RP
-func createOrUpdate(oc *vlabs.OpenShiftCluster) (*vlabs.OpenShiftCluster, error) {
+func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 	// instantiate the plugin
 	var p api.Plugin = &plugin.Plugin{}
 
@@ -152,7 +152,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	var oc *vlabs.OpenShiftCluster
+	var oc *v1.OpenShiftCluster
 	err = yaml.Unmarshal(b, &oc)
 	if err != nil {
 		panic(err)

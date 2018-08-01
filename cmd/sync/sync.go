@@ -6,13 +6,13 @@ import (
 	"log"
 	"time"
 
-	acsapi "github.com/Azure/acs-engine/pkg/api"
-	"github.com/Azure/acs-engine/pkg/api/osa/vlabs"
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/addons"
+	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api/v1"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/validate"
 )
@@ -30,7 +30,7 @@ func sync() error {
 	if err != nil {
 		return errors.Wrap(err, "cannot read _data/manifest.yaml")
 	}
-	var ext *vlabs.OpenShiftCluster
+	var ext *v1.OpenShiftCluster
 	if err := yaml.Unmarshal(b, &ext); err != nil {
 		return errors.Wrap(err, "cannot unmarshal _data/manifest.yaml")
 	}

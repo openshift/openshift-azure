@@ -11,12 +11,12 @@ import (
 	"sort"
 	"time"
 
-	acsapi "github.com/Azure/acs-engine/pkg/api"
 	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 
+	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util"

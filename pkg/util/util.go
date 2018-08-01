@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"text/template"
 
-	acsapi "github.com/Azure/acs-engine/pkg/api"
 	"github.com/ghodss/yaml"
 
+	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
