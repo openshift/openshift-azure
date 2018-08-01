@@ -18,4 +18,7 @@ sync-push: sync-image
 verify:
 	./hack/validate-generated.sh
 
-.PHONY: clean sync-image sync-push verify
+unit:
+	go test ./...
+
+.PHONY: clean sync-image sync-push verify unit
