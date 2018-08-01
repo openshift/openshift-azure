@@ -12,5 +12,5 @@ import:
   - spew
 - package: github.com/Azure/azure-sdk-for-go
   version: v19.1.0
-  subpackages:
-  - services/compute/mgmt/2018-06-01/compute
+- package: github.com/Azure/go-autorest
+  version: 10.14.0
