@@ -1,5 +1,5 @@
-hash: 5bf32f570a1e781a1888e84299bb1beaddaae3cb34b795ff5d90f5494a341057
-updated: 2018-08-01T15:17:45.207733472+02:00
+hash: c7626b49ba337ae4d11db4372fb8e261a9a11511feec70f8fddaaa0d11babbdb
+updated: 2018-08-01T18:04:54.71947119+02:00
 imports:
 - name: github.com/Azure/acs-engine
   version: be63a04a61992b0fcd1697898f6b196cda2b1347
@@ -20,6 +20,10 @@ imports:
   - pkg/i18n
 - name: github.com/blang/semver
   version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
+- name: github.com/davecgh/go-spew
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  subpackages:
+  - spew
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/go-playground/locales
