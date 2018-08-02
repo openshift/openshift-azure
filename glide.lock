@@ -1,23 +1,6 @@
 hash: c7626b49ba337ae4d11db4372fb8e261a9a11511feec70f8fddaaa0d11babbdb
 updated: 2018-08-01T18:04:54.71947119+02:00
 imports:
-- name: github.com/Azure/acs-engine
-  version: be63a04a61992b0fcd1697898f6b196cda2b1347
-  subpackages:
-  - pkg/api
-  - pkg/api/agentPoolOnlyApi/v20170831
-  - pkg/api/agentPoolOnlyApi/v20180331
-  - pkg/api/agentPoolOnlyApi/vlabs
-  - pkg/api/common
-  - pkg/api/osa/vlabs
-  - pkg/api/v20160330
-  - pkg/api/v20160930
-  - pkg/api/v20170131
-  - pkg/api/v20170701
-  - pkg/api/v20170930
-  - pkg/api/vlabs
-  - pkg/helpers
-  - pkg/i18n
 - name: github.com/blang/semver
   version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/davecgh/go-spew

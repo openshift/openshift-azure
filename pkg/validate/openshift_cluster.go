@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/Azure/acs-engine/pkg/api/osa/vlabs"
+	"github.com/openshift/openshift-azure/pkg/api/v1"
 )
 
 var rxRfc1123 = regexp.MustCompile(`(?i)^` +
@@ -21,9 +21,9 @@ var rxAgentPoolProfileVNetSubnetID = regexp.MustCompile(`(?i)^` +
 	`$`)
 
 var validAgentPoolProfileNames = map[string]struct{}{
-	string(vlabs.AgentPoolProfileRoleCompute): struct{}{},
-	string(vlabs.AgentPoolProfileRoleInfra):   struct{}{},
-	string(vlabs.AgentPoolProfileRoleMaster):  struct{}{},
+	string(v1.AgentPoolProfileRoleCompute): struct{}{},
+	string(v1.AgentPoolProfileRoleInfra):   struct{}{},
+	string(v1.AgentPoolProfileRoleMaster):  struct{}{},
 }
 
 var validRouterProfileNames = map[string]struct{}{
@@ -35,7 +35,7 @@ func isValidHostname(h string) bool {
 }
 
 // OpenShiftCluster validates an OpenShiftCluster struct
-func OpenShiftCluster(oc *vlabs.OpenShiftCluster) (errs []error) {
+func OpenShiftCluster(oc *v1.OpenShiftCluster) (errs []error) {
 	if oc.Location == "" {
 		errs = append(errs, fmt.Errorf("invalid location %q", oc.Location))
 	}
@@ -51,16 +51,16 @@ func OpenShiftCluster(oc *vlabs.OpenShiftCluster) (errs []error) {
 	return
 }
 
-func validateProperties(p *vlabs.Properties) (errs []error) {
+func validateProperties(p *v1.Properties) (errs []error) {
 	switch p.ProvisioningState {
 	case "",
-		vlabs.Creating,
-		vlabs.Updating,
-		vlabs.Failed,
-		vlabs.Succeeded,
-		vlabs.Deleting,
-		vlabs.Migrating,
-		vlabs.Upgrading:
+		v1.Creating,
+		v1.Updating,
+		v1.Failed,
+		v1.Succeeded,
+		v1.Deleting,
+		v1.Migrating,
+		v1.Upgrading:
 	default:
 		errs = append(errs, fmt.Errorf("invalid properties.provisioningState %q", p.ProvisioningState))
 	}
@@ -88,8 +88,8 @@ func validateProperties(p *vlabs.Properties) (errs []error) {
 	return
 }
 
-func validateRouterProfiles(rps []vlabs.RouterProfile) (errs []error) {
-	rpmap := map[string]vlabs.RouterProfile{}
+func validateRouterProfiles(rps []v1.RouterProfile) (errs []error) {
+	rpmap := map[string]v1.RouterProfile{}
 
 	for _, rp := range rps {
 		if _, found := validRouterProfileNames[rp.Name]; !found {
@@ -113,7 +113,7 @@ func validateRouterProfiles(rps []vlabs.RouterProfile) (errs []error) {
 	return
 }
 
-func validateRouterProfile(rp vlabs.RouterProfile) (errs []error) {
+func validateRouterProfile(rp v1.RouterProfile) (errs []error) {
 	if rp.Name == "" {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
 	}
@@ -129,8 +129,8 @@ func validateRouterProfile(rp vlabs.RouterProfile) (errs []error) {
 	return
 }
 
-func validateAgentPoolProfiles(apps []vlabs.AgentPoolProfile) (errs []error) {
-	appmap := map[string]vlabs.AgentPoolProfile{}
+func validateAgentPoolProfiles(apps []v1.AgentPoolProfile) (errs []error) {
+	appmap := map[string]v1.AgentPoolProfile{}
 
 	for i, app := range apps {
 		if _, found := validAgentPoolProfileNames[app.Name]; !found {
@@ -158,19 +158,19 @@ func validateAgentPoolProfiles(apps []vlabs.AgentPoolProfile) (errs []error) {
 	return
 }
 
-func validateAgentPoolProfile(app *vlabs.AgentPoolProfile) (errs []error) {
+func validateAgentPoolProfile(app *v1.AgentPoolProfile) (errs []error) {
 	if app.Name != string(app.Role) {
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 	}
 
 	switch app.Role {
-	case vlabs.AgentPoolProfileRoleCompute,
-		vlabs.AgentPoolProfileRoleInfra:
+	case v1.AgentPoolProfileRoleCompute,
+		v1.AgentPoolProfileRoleInfra:
 		if app.Count < 1 || app.Count > 100 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %q", app.Name, app.Count))
 		}
 
-	case vlabs.AgentPoolProfileRoleMaster:
+	case v1.AgentPoolProfileRoleMaster:
 		if app.Count != 3 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %q", app.Name, app.Count))
 		}
@@ -191,7 +191,7 @@ func validateAgentPoolProfile(app *vlabs.AgentPoolProfile) (errs []error) {
 	}
 
 	switch app.OSType {
-	case vlabs.OSTypeLinux:
+	case v1.OSTypeLinux:
 	default:
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].osType %q", app.Name, app.OSType))
 	}
@@ -199,7 +199,7 @@ func validateAgentPoolProfile(app *vlabs.AgentPoolProfile) (errs []error) {
 	return
 }
 
-func validateServicePrincipalProfile(spp *vlabs.ServicePrincipalProfile) (errs []error) {
+func validateServicePrincipalProfile(spp *v1.ServicePrincipalProfile) (errs []error) {
 	if spp.ClientID == "" {
 		errs = append(errs, fmt.Errorf("invalid properties.servicePrincipalProfile.clientId %q", spp.ClientID))
 	}

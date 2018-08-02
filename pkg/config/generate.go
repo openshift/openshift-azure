@@ -11,11 +11,11 @@ import (
 	"os"
 	"strings"
 
-	acsapi "github.com/Azure/acs-engine/pkg/api"
 	"github.com/satori/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
+	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 

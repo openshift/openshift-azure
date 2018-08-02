@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"time"
 
-	acsapi "github.com/Azure/acs-engine/pkg/api"
 	appsclient "k8s.io/client-go/kubernetes/typed/apps/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -17,6 +16,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api/latest"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
+	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/checks"
 	"github.com/openshift/openshift-azure/pkg/config"
 )
