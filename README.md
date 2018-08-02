@@ -56,15 +56,15 @@
 1. Copy the `env.example` file to `env` and edit according to your requirements.
    Source the `env` file: `. ./env`.
 
-1. Run `./create.sh $RESOURCEGROUP` to deploy a cluster.
+1. Run `./hack/create.sh $RESOURCEGROUP` to deploy a cluster.
 
 1. To inspect pods running on the OpenShift cluster, run
    `KUBECONFIG=_data/_out/admin.kubeconfig oc get pods -n $RESOURCEGROUP`.
 
 1. To ssh into an OpenShift node (vm-infra-0 or vm-compute-0), run
-   `./ssh.sh hostname`.
+   `./hack/ssh.sh hostname`.
 
-1. Run `./delete.sh $RESOURCEGROUP` to delete the deployed cluster.
+1. Run `./hack/delete.sh $RESOURCEGROUP` to delete the deployed cluster.
 
 ### Examples
 
