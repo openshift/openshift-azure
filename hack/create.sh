@@ -86,9 +86,12 @@ fi
 
 az group deployment wait -g $RESOURCEGROUP -n azuredeploy --created --interval 10
 
+CONTROLPLANEFQDN=$(az group deployment show -g $RESOURCEGROUP -n azuredeploy --query properties.outputs.controlPlaneFQDN.value)
+ROUTERFQDN=$(az group deployment show -g $RESOURCEGROUP -n azuredeploy --query properties.outputs.routerFQDN.value)
+
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go
 
 # This mimics RP dns record creation.
 hack/dns.sh zone-create $RESOURCEGROUP
-hack/dns.sh cname-create $RESOURCEGROUP openshift $RESOURCEGROUP.eastus.cloudapp.azure.com
-hack/dns.sh cname-create $RESOURCEGROUP '*' router-$RESOURCEGROUP.eastus.cloudapp.azure.com
+hack/dns.sh cname-create $RESOURCEGROUP openshift ${CONTROLPLANEFQDN//\"}
+hack/dns.sh cname-create $RESOURCEGROUP '*' ${ROUTERFQDN//\"}

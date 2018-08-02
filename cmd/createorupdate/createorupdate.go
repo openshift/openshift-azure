@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/util/errors"
@@ -120,15 +119,6 @@ func enrich(cs *acsapi.ContainerService) error {
 		return fmt.Errorf("must set RESOURCEGROUP")
 	}
 
-	// configure DNS names
-	cs.Properties.MasterProfile.FQDN = fmt.Sprintf("%s.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location)
-	cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = fmt.Sprintf("router-%s.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location)
-	if cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname == "" || strings.HasSuffix(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, fmt.Sprintf("%s.cloudapp.azure.com", cs.Properties.AzProfile.Location)) {
-		cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = cs.Properties.MasterProfile.FQDN
-	}
-	if cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain == "" {
-		cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN
-	}
 	return nil
 }
 

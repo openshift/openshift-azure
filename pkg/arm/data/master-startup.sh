@@ -410,8 +410,8 @@ aadClientSecret: {{ .ContainerService.Properties.ServicePrincipalProfile.Secret 
 aadTenantId: {{ .Config.TenantID | quote }}
 resourceGroup: {{ .Config.ResourceGroup | quote }}
 location: {{ .ContainerService.Location | quote }}
-securityGroupName: nsg-compute
-primaryScaleSetName: ss-compute
+securityGroupName: osa-agentpool-{{ .Config.ClusterId }}-compute-nsg
+primaryScaleSetName: osa-agentpool-{{ .Config.ClusterId }}-ss-compute
 vmType: vmss
 EOF
 

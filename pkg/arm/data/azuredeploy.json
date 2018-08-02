@@ -9,7 +9,7 @@
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2016-03-30",
             "location": "{{ .ContainerService.Location | js }}",
-            "name": "vnet",
+            "name": "osa-vnet-{{ .Config.ClusterId }}",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -35,12 +35,12 @@
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2016-03-30",
             "location": "{{ .ContainerService.Location | js }}",
-            "name": "ip-apiserver",
+            "name": "osa-masterpool-{{ .Config.ClusterId }}-ip",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "idleTimeoutInMinutes": 15,
                 "dnsSettings": {
-                    "domainNameLabel": "{{ .Config.ResourceGroup }}"
+                    "domainNameLabel": "osa-masterpool-{{ .Config.ClusterId }}" 
                 }
             },
             "sku": {
@@ -51,10 +51,10 @@
             "type": "Microsoft.Network/loadBalancers",
             "apiVersion": "2016-03-30",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-apiserver')]"
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'osa-masterpool-{{ .Config.ClusterId }}-ip')]"
             ],
             "location": "{{ .ContainerService.Location | js }}",
-            "name": "lb-apiserver",
+            "name": "osa-masterpool-{{ .Config.ClusterId }}-lb",
             "properties": {
                 "backendAddressPools": [
                     {
@@ -67,7 +67,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-apiserver')]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'osa-masterpool-{{ .Config.ClusterId }}-ip')]"
                             }
                         }
                     }
@@ -79,18 +79,18 @@
                         "name": "port-443",
                         "properties": {
                             "backendAddressPool": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/backendAddressPools/backend')]"
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'osa-masterpool-{{ .Config.ClusterId }}-lb'), '/backendAddressPools/backend')]"
                             },
                             "backendPort": 443,
                             "enableFloatingIP": false,
                             "frontendIPConfiguration": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/frontendIPConfigurations/frontend')]"
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'osa-masterpool-{{ .Config.ClusterId }}-lb'), '/frontendIPConfigurations/frontend')]"
                             },
                             "frontendPort": 443,
                             "idleTimeoutInMinutes": 15,
                             "loadDistribution": "Default",
                             "probe": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/probes/port-443')]"
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'osa-masterpool-{{ .Config.ClusterId }}-lb'), '/probes/port-443')]"
                             },
                             "protocol": "Tcp"
                         }
@@ -127,7 +127,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
             "location": "{{ $.ContainerService.Location }}",
-            "name": "nsg-{{ $app.Name }}",
+            "name": "osa-agentpool-{{ $.Config.ClusterId }}-{{ $app.Name }}-nsg",
             "properties": {
                 "securityRules": [
                     {
@@ -169,14 +169,14 @@
             "location": "{{ $.ContainerService.Location | js }}",
             "dependsOn": [
 {{- if not $app.VnetSubnetID }}
-                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', 'osa-vnet-{{ $.Config.ClusterId }}')]",
 {{- end }}
 {{- if eq $app.Role "master" }}
-                "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]",
+                "[resourceId('Microsoft.Network/loadBalancers', 'osa-masterpool-{{ $.Config.ClusterId }}-lb')]",
 {{- end }}
-                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}')]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'osa-agentpool-{{ $.Config.ClusterId }}-{{ $app.Name }}-nsg')]"
             ],
-            "name": "ss-{{ $app.Name }}",
+            "name": "osa-agentpool-{{ $.Config.ClusterId }}-ss-{{ $app.Name }}",
             "sku": {
                 "tier": "Standard",
                 "capacity": "{{ $app.Count | js }}",
@@ -246,7 +246,7 @@
                                     "primary": true,
                                     "enableIPForwarding": true,
                                     "networkSecurityGroup": {
-                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}')]"
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'osa-agentpool-{{ $.Config.ClusterId }}-{{ $app.Name }}-nsg')]"
                                     },
                                     "ipConfigurations": [
                                         {
@@ -254,7 +254,7 @@
                                             "properties": {
                                                 "primary": true,
                                                 "subnet": {
-                                                    "id": "{{if $app.VnetSubnetID}}{{$app.VnetSubnetID}}{{else}}[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/default')]{{end}}"
+                                                    "id": "{{if $app.VnetSubnetID}}{{$app.VnetSubnetID}}{{else}}[concat(resourceId('Microsoft.Network/virtualNetworks', 'osa-vnet-{{ $.Config.ClusterId }}'), '/subnets/default')]{{end}}"
                                                 },
                                                 "publicIpAddressConfiguration": {
                                                     "name": "ip",
@@ -265,7 +265,7 @@
 {{- if eq $app.Role "master" }},
                                                 "loadBalancerBackendAddressPools": [
                                                     {
-                                                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/backendAddressPools/backend')]"
+                                                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'osa-masterpool-{{ $.Config.ClusterId }}-lb'), '/backendAddressPools/backend')]"
                                                     }
                                                 ]
 {{- end }}
@@ -298,5 +298,14 @@
         }
 {{- end }}
     ],
-    "outputs": {}
+    "outputs": {
+        "controlPlaneFQDN": {
+          "type": "string",
+          "value": "{{ .Config.ControlPlaneFQDN }}"
+        },
+        "routerFQDN": {
+            "type": "string",
+            "value": "{{ .Config.RouterFQDN }}"
+          }
+      }
 }

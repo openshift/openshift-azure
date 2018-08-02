@@ -122,8 +122,27 @@ func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
 
-	// TODO: replace me when RP DNS config will get clear
-	c.RouterLBCName = strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN, ".")[0]
+	//TODO: all this should not be here.
+	//Configure cluster dns
+	c.ClusterId, err = generateClusterID()
+	if err != nil {
+		return
+	}
+
+	c.RouterFQDN = fmt.Sprintf("osa-agentpool-%s-router.%s.cloudapp.azure.com", c.ClusterId, cs.Location)
+	c.RouterFQDNShort = fmt.Sprintf("osa-agentpool-%s-router", c.ClusterId)
+	c.ControlPlaneFQDN = fmt.Sprintf("osa-masterpool-%s.%s.cloudapp.azure.com", c.ClusterId, cs.Location)
+
+	cs.Properties.MasterProfile.FQDN = c.ControlPlaneFQDN
+	cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = c.RouterFQDN
+
+	if cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname == "" || strings.HasSuffix(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, fmt.Sprintf("%s.cloudapp.azure.com", cs.Location)) {
+		cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = cs.Properties.MasterProfile.FQDN
+	}
+	if cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain == "" {
+		cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN
+	}
+
 	selectNodeImage(cs, c)
 
 	selectContainerImages(cs, c)
@@ -579,5 +598,20 @@ func randomString(length int) (string, error) {
 		b[i] = letterBytes[o.Int64()]
 	}
 
+	return string(b), nil
+}
+
+// generateClusterID creates a unique 8 string cluster ID
+func generateClusterID() (string, error) {
+	const letterBytes = "0123456789"
+
+	b := make([]byte, 8)
+	for i := range b {
+		o, err := rand.Int(rand.Reader, big.NewInt(int64(len(letterBytes))))
+		if err != nil {
+			return "", err
+		}
+		b[i] = letterBytes[o.Int64()]
+	}
 	return string(b), nil
 }
