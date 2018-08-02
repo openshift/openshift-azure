@@ -122,7 +122,8 @@ func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
 
-	c.RouterLBCName = cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN
+	// TODO: replace me when RP DNS config will get clear
+	c.RouterLBCName = strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN, ".")[0]
 	selectNodeImage(cs, c)
 
 	selectContainerImages(cs, c)
@@ -142,11 +143,6 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			cn:   "openshift-signer",
 			key:  &c.CaKey,
 			cert: &c.CaCert,
-		},
-		{
-			cn:   "openshift-console",
-			key:  &c.ConsoleCaKey,
-			cert: &c.ConsoleCaCert,
 		},
 		{
 			cn:   "openshift-frontproxy-signer",
@@ -183,6 +179,7 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		signingCert  *x509.Certificate
 		key          **rsa.PrivateKey
 		cert         **x509.Certificate
+		selfSign     bool
 	}{
 		// Generate etcd certs
 		{
@@ -258,17 +255,6 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			cert:        &c.MasterServerCert,
 		},
 		{
-			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
-			dnsNames: []string{
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
-			},
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			signingKey:  c.ConsoleCaKey,
-			signingCert: c.ConsoleCaCert,
-			key:         &c.ConsoleServerKey,
-			cert:        &c.ConsoleServerCert,
-		},
-		{
 			cn:           "system:openshift-master",
 			organization: []string{"system:cluster-admins", "system:masters"},
 			extKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
@@ -326,6 +312,16 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			key:         &c.RegistryKey,
 			cert:        &c.RegistryCert,
 		},
+		{
+			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			dnsNames: []string{
+				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			},
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			key:         &c.ConsoleServerKey,
+			cert:        &c.ConsoleServerCert,
+			selfSign:    true,
+		},
 	}
 	for _, cert := range certs {
 		if cert.signingKey == nil && cert.signingCert == nil {
@@ -335,7 +331,7 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			(*cert.cert).CheckSignatureFrom(cert.signingCert) == nil {
 			continue
 		}
-		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert); err != nil {
+		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, cert.selfSign); err != nil {
 			return
 		}
 	}

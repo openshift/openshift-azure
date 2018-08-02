@@ -25,8 +25,6 @@ type Config struct {
 	EtcdCaCert           *x509.Certificate
 	CaKey                *rsa.PrivateKey
 	CaCert               *x509.Certificate
-	ConsoleCaKey         *rsa.PrivateKey
-	ConsoleCaCert        *x509.Certificate
 	FrontProxyCaKey      *rsa.PrivateKey
 	FrontProxyCaCert     *x509.Certificate
 	ServiceSigningCaKey  *rsa.PrivateKey
