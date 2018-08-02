@@ -64,7 +64,7 @@
 1. To ssh into an OpenShift node (vm-infra-0 or vm-compute-0), run
    `./ssh.sh hostname`.
 
-1. Run `./delete.sh` to delete the deployed cluster.
+1. Run `./delete.sh $RESOURCEGROUP` to delete the deployed cluster.
 
 ### Examples
 
