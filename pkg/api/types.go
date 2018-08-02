@@ -320,16 +320,6 @@ func (p *Properties) TotalNodes() int {
 	return totalNodes
 }
 
-// HasVirtualMachineScaleSets returns true if the cluster contains Virtual Machine Scale Sets
-func (p *Properties) HasVirtualMachineScaleSets() bool {
-	for _, agentPoolProfile := range p.AgentPoolProfiles {
-		if agentPoolProfile.AvailabilityProfile == VirtualMachineScaleSets {
-			return true
-		}
-	}
-	return false
-}
-
 // IsCustomVNET returns true if the customer brought their own VNET
 func (m *MasterProfile) IsCustomVNET() bool {
 	return len(m.VnetSubnetID) > 0
@@ -365,19 +355,9 @@ func (a *AgentPoolProfile) IsCoreOS() bool {
 	return a.OSType == Linux && a.Distro == CoreOS
 }
 
-// IsAvailabilitySets returns true if the customer specified disks
-func (a *AgentPoolProfile) IsAvailabilitySets() bool {
-	return a.AvailabilityProfile == AvailabilitySet
-}
-
-// IsVirtualMachineScaleSets returns true if the agent pool availability profile is VMSS
-func (a *AgentPoolProfile) IsVirtualMachineScaleSets() bool {
-	return a.AvailabilityProfile == VirtualMachineScaleSets
-}
-
 // IsLowPriorityScaleSet returns true if the VMSS is Low Priority
 func (a *AgentPoolProfile) IsLowPriorityScaleSet() bool {
-	return a.AvailabilityProfile == VirtualMachineScaleSets && a.ScaleSetPriority == ScaleSetPriorityLow
+	return a.ScaleSetPriority == ScaleSetPriorityLow
 }
 
 // HasDisks returns true if the customer specified disks
@@ -416,14 +396,6 @@ func isNSeriesSKU(p *Properties) bool {
 		if strings.Contains(profile.VMSize, "Standard_N") {
 			return true
 		}
-	}
-	return false
-}
-
-// PrivateJumpboxProvision checks if a private cluster has jumpbox auto-provisioning
-func (k *KubernetesConfig) PrivateJumpboxProvision() bool {
-	if k != nil && k.PrivateCluster != nil && *k.PrivateCluster.Enabled && k.PrivateCluster.JumpboxProfile != nil {
-		return true
 	}
 	return false
 }
