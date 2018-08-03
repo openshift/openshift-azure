@@ -127,6 +127,13 @@ const (
 // OSType represents OS types of agents
 type OSType string
 
+const (
+	// OSTypeLinux is Linux.
+	OSTypeLinux OSType = "Linux"
+	// OSTypeWindows is Windows.
+	OSTypeWindows OSType = "Windows"
+)
+
 // Distro represents Linux distro to use for Linux VMs
 type Distro string
 

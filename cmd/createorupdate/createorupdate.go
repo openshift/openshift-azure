@@ -22,14 +22,6 @@ func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 	// instantiate the plugin
 	var p api.Plugin = &plugin.Plugin{}
 
-	// validate the external API manifest
-	log.Info("validate external")
-	errs := p.ValidateExternal(oc)
-	if len(errs) > 0 {
-		return nil, errors.NewAggregate(errs)
-	}
-	log.Info("done")
-
 	// convert the external API manifest into the internal API representation
 	log.Info("convert to internal")
 	cs := acsapi.ConvertVLabsOpenShiftClusterToContainerService(oc)
@@ -68,7 +60,7 @@ func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 	// validate the internal API representation (with reference to the previous
 	// internal API representation)
 	log.Info("validate internal")
-	errs = p.ValidateInternal(cs, oldCs)
+	errs := p.ValidateInternal(cs, oldCs)
 	if len(errs) > 0 {
 		return nil, errors.NewAggregate(errs)
 	}

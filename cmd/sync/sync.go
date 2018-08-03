@@ -8,9 +8,11 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/addons"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/validate"
 )
 
 var (
@@ -30,6 +32,10 @@ func sync() error {
 	var cs *acsapi.ContainerService
 	if err := yaml.Unmarshal(b, &cs); err != nil {
 		return errors.Wrap(err, "cannot unmarshal _data/containerservice.yaml")
+	}
+
+	if errs := validate.ContainerService(cs, nil); len(errs) > 0 {
+		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 
 	if err := addons.Main(cs, *dryRun); err != nil {

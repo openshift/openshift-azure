@@ -7,6 +7,7 @@ import (
 
 	"github.com/ghodss/yaml"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/api/v1"
 )
 
@@ -108,7 +109,9 @@ func TestValidate(t *testing.T) {
 			test.f(oc)
 		}
 
-		errs := OpenShiftCluster(oc)
+		// TODO quick fix but means we're hoping conversion is correct.
+		cs := api.ConvertVLabsOpenShiftClusterToContainerService(oc)
+		errs := ContainerService(cs, nil)
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
 			t.Errorf("%v: OpenShiftCluster returned unexpected result", name)
 			for _, err := range errs {
