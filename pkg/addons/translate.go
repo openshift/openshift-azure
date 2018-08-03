@@ -80,19 +80,19 @@ var Translations = map[string][]struct {
 	"APIService.apiregistration.k8s.io/v1beta1.servicecatalog.k8s.io": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.caBundle"),
-			Template: "{{ Base64Encode (CertAsBytes .Config.ServiceCatalogCaCert) }}",
+			Template: "{{ Base64Encode (CertAsBytes .Config.Certificates.ServiceCatalogCa.Cert) }}",
 		},
 	},
 	"ClusterServiceBroker.servicecatalog.k8s.io/ansible-service-broker": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.caBundle"),
-			Template: "{{ Base64Encode (CertAsBytes .Config.ServiceSigningCaCert) }}",
+			Template: "{{ Base64Encode (CertAsBytes .Config.Certificates.ServiceSigningCa.Cert) }}",
 		},
 	},
 	"ClusterServiceBroker.servicecatalog.k8s.io/template-service-broker": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.caBundle"),
-			Template: "{{ Base64Encode (CertAsBytes .Config.ServiceSigningCaCert) }}",
+			Template: "{{ Base64Encode (CertAsBytes .Config.Certificates.ServiceSigningCa.Cert) }}",
 		},
 	},
 	"ConfigMap/kube-service-catalog/cluster-info": {
@@ -104,11 +104,11 @@ var Translations = map[string][]struct {
 	"ConfigMap/kube-system/extension-apiserver-authentication": {
 		{
 			Path:     jsonpath.MustCompile("$.data.'client-ca-file'"),
-			Template: "{{ String (CertAsBytes .Config.CaCert) }}",
+			Template: "{{ String (CertAsBytes .Config.Certificates.Ca.Cert) }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.data.'requestheader-client-ca-file'"),
-			Template: "{{ String (CertAsBytes .Config.FrontProxyCaCert) }}",
+			Template: "{{ String (CertAsBytes .Config.Certificates.FrontProxyCa.Cert) }}",
 		},
 	},
 	"ConfigMap/openshift-node/node-config-compute": {
@@ -301,11 +301,11 @@ var Translations = map[string][]struct {
 	"Secret/default/registry-certificates": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'registry.crt'"),
-			Template: "{{ String (CertAsBytes .Config.RegistryCert) }}\n{{ String (CertAsBytes .Config.CaCert) }}",
+			Template: "{{ String (CertAsBytes .Config.Certificates.Registry.Cert) }}\n{{ String (CertAsBytes .Config.Certificates.Ca.Cert) }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'registry.key'"),
-			Template: "{{ String (PrivateKeyAsBytes .Config.RegistryKey) }}",
+			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.Registry.Key) }}",
 		},
 	},
 	"Secret/default/registry-config": {
@@ -355,33 +355,33 @@ var Translations = map[string][]struct {
 	"Secret/default/router-certs": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),
-			Template: "{{ String (CertAsBytes .Config.RouterCert) }}\n{{ String (CertAsBytes .Config.CaCert) }}\n{{ String (PrivateKeyAsBytes .Config.RouterKey) }}",
+			Template: "{{ String (CertAsBytes .Config.Certificates.Router.Cert) }}\n{{ String (CertAsBytes .Config.Certificates.Ca.Cert) }}\n{{ String (PrivateKeyAsBytes .Config.Certificates.Router.Key) }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.key'"),
-			Template: "{{ String (PrivateKeyAsBytes .Config.RouterKey) }}",
+			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.Router.Key) }}",
 		},
 	},
 	"Secret/kube-service-catalog/apiserver-ssl": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'apiserver.crt'"),
-			Template: "{{ String (CertAsBytes .Config.ServiceCatalogServerCert) }}\n{{ String (CertAsBytes .Config.ServiceCatalogCaCert) }}",
+			Template: "{{ String (CertAsBytes .Config.Certificates.ServiceCatalogServer.Cert) }}\n{{ String (CertAsBytes .Config.Certificates.ServiceCatalogCa.Cert) }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'apiserver.key'"),
-			Template: "{{ String (PrivateKeyAsBytes .Config.ServiceCatalogServerKey) }}",
+			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.ServiceCatalogServer.Key) }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'etcd-ca.crt'"),
-			Template: "{{ String (CertAsBytes .Config.EtcdCaCert) }}",
+			Template: "{{ String (CertAsBytes .Config.Certificates.EtcdCa.Cert) }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'etcd-client.crt'"),
-			Template: "{{ String (CertAsBytes .Config.EtcdClientCert) }}",
+			Template: "{{ String (CertAsBytes .Config.Certificates.EtcdClient.Cert) }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'etcd-client.key'"),
-			Template: "{{ String (PrivateKeyAsBytes .Config.EtcdClientKey) }}",
+			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.EtcdClient.Key) }}",
 		},
 	},
 	"Secret/openshift-azure/bootstrap-autoapprover-kubeconfig": {

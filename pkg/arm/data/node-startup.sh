@@ -23,11 +23,11 @@ sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-
 rm -rf /etc/etcd/* /etc/origin/master/*
 
 base64 -d <<< {{ Base64Encode (YamlMarshal .Config.NodeBootstrapKubeconfig) }} >/etc/origin/node/bootstrap.kubeconfig
-base64 -d <<< {{ Base64Encode (CertAsBytes .Config.NodeBootstrapCert) }} >/etc/origin/node/node-bootstrapper.crt
-base64 -d <<< {{ Base64Encode (PrivateKeyAsBytes .Config.NodeBootstrapKey) }} >/etc/origin/node/node-bootstrapper.key
+base64 -d <<< {{ Base64Encode (CertAsBytes .Config.Certificates.NodeBootstrap.Cert) }} >/etc/origin/node/node-bootstrapper.crt
+base64 -d <<< {{ Base64Encode (PrivateKeyAsBytes .Config.Certificates.NodeBootstrap.Key) }} >/etc/origin/node/node-bootstrapper.key
 chmod 0600 /etc/origin/node/node-bootstrapper.key /etc/origin/node/bootstrap.kubeconfig
 
-base64 -d <<< {{ Base64Encode (CertAsBytes .Config.CaCert) }} >/etc/origin/node/ca.crt
+base64 -d <<< {{ Base64Encode (CertAsBytes .Config.Certificates.Ca.Cert) }} >/etc/origin/node/ca.crt
 cp /etc/origin/node/ca.crt /etc/pki/ca-trust/source/anchors/openshift-ca.crt
 update-ca-trust
 

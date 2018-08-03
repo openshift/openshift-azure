@@ -73,7 +73,7 @@ func HealthCheck(ctx context.Context, cs *acsapi.ContainerService, c *config.Con
 
 func waitForConsole(ctx context.Context, cs *acsapi.ContainerService, c *config.Config) error {
 	pool := x509.NewCertPool()
-	pool.AddCert(c.CaCert)
+	pool.AddCert(c.Certificates.Ca.Cert)
 
 	cli := &http.Client{
 		Transport: &http.Transport{
