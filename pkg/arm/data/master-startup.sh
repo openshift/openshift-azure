@@ -50,10 +50,12 @@ base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.EtcdPeer.Key | Base64Enc
 base64 -d <<< {{ YamlMarshal .Config.AdminKubeconfig | Base64Encode }} >/etc/origin/node/node.kubeconfig
 base64 -d <<< {{ CertAsBytes .Config.Certificates.Ca.Cert | Base64Encode }} >/etc/origin/node/ca.crt
 
-mkdir -p /etc/origin/master
+mkdir -p /etc/origin/master/named
 base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdCa.Cert | Base64Encode }} >/etc/origin/master/master.etcd-ca.crt
 base64 -d <<< {{ CertAsBytes .Config.Certificates.Ca.Cert | Base64Encode }} >/etc/origin/master/ca.crt
 base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.Ca.Key | Base64Encode }} >/etc/origin/master/ca.key
+base64 -d <<< {{ CertAsBytes .Config.Certificates.OpenshiftConsole.Cert | Base64Encode }} >/etc/origin/master/named/console.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.OpenshiftConsole.Key | Base64Encode }} >/etc/origin/master/named/console.key
 base64 -d <<< {{ CertAsBytes .Config.Certificates.FrontProxyCa.Cert | Base64Encode }} >/etc/origin/master/front-proxy-ca.crt
 base64 -d <<< {{ CertAsBytes .Config.Certificates.ServiceSigningCa.Cert | Base64Encode }} >/etc/origin/master/service-signer.crt
 base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.ServiceSigningCa.Key | Base64Encode }} >/etc/origin/master/service-signer.key
@@ -255,7 +257,7 @@ oauthConfig:
       kind: HTPasswdPasswordIdentityProvider
   masterCA: ca.crt
   masterPublicURL: {{ print "https://" .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname | quote }}
-  masterURL: {{ print "https://" .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname | quote }}
+  masterURL: {{ print "https://" .ContainerService.Properties.MasterProfile.FQDN | quote }}
   sessionConfig:
     sessionMaxAgeSeconds: 3600
     sessionName: ssn
@@ -288,6 +290,11 @@ servingInfo:
   keyFile: master.server.key
   maxRequestsInFlight: 500
   requestTimeoutSeconds: 3600
+  namedCertificates:
+   - certFile: /etc/origin/master/named/console.crt
+     keyFile: /etc/origin/master/named/console.key
+     names:
+      - {{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname | quote }}
 volumeConfig:
   dynamicProvisioningEnabled: true
 EOF

@@ -32,6 +32,9 @@ func WaitForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urlto
 		resp, err := cli.Do(req)
 		if err, ok := err.(*url.Error); ok {
 			if err, ok := err.Err.(*net.OpError); ok {
+				if _, ok := err.Err.(*net.DNSError); ok {
+					return false, nil
+				}
 				if err, ok := err.Err.(*os.SyscallError); ok {
 					if err.Err == syscall.ENETUNREACH {
 						return false, nil
