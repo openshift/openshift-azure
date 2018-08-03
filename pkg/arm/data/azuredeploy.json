@@ -299,9 +299,9 @@
 {{- end }}
     ],
     "outputs": {
-        "controlPlaneFQDN": {
-          "type": "string",
-          "value": "{{ .Config.ControlPlaneFQDN }}"
+          "controlPlaneFQDN": {
+            "type": "string",
+            "value": "[reference(concat('Microsoft.Network/publicIPAddresses/', 'osa-masterpool-{{ .Config.ClusterId }}-ip')).dnsSettings.fqdn]"
         },
         "routerFQDN": {
             "type": "string",

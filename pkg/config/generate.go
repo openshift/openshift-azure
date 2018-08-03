@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -10,6 +11,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/satori/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -122,25 +124,10 @@ func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
 
-	//TODO: all this should not be here.
 	//Configure cluster dns
-	c.ClusterId, err = generateClusterID()
+	err = selectClusterDNSWithTimeout(cs, c)
 	if err != nil {
 		return
-	}
-
-	c.RouterFQDN = fmt.Sprintf("osa-agentpool-%s-router.%s.cloudapp.azure.com", c.ClusterId, cs.Location)
-	c.RouterFQDNShort = fmt.Sprintf("osa-agentpool-%s-router", c.ClusterId)
-	c.ControlPlaneFQDN = fmt.Sprintf("osa-masterpool-%s.%s.cloudapp.azure.com", c.ClusterId, cs.Location)
-
-	cs.Properties.MasterProfile.FQDN = c.ControlPlaneFQDN
-	cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = c.RouterFQDN
-
-	if cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname == "" || strings.HasSuffix(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, fmt.Sprintf("%s.cloudapp.azure.com", cs.Location)) {
-		cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = cs.Properties.MasterProfile.FQDN
-	}
-	if cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain == "" {
-		cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN
 	}
 
 	selectNodeImage(cs, c)
@@ -614,4 +601,58 @@ func generateClusterID() (string, error) {
 		b[i] = letterBytes[o.Int64()]
 	}
 	return string(b), nil
+}
+
+func selectClusterDNSWithTimeout(cs *acsapi.ContainerService, c *Config) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel() // releases resources if selectClusterDNS succ before
+	ch := make(chan bool)
+	go selectClusterDNS(cs, c, ch)
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf("DNS reservation failed")
+	case <-ch:
+	}
+	return nil
+}
+
+func selectClusterDNS(cs *acsapi.ContainerService, c *Config, ch chan bool) error {
+
+	var err error
+	c.ClusterId, err = generateClusterID()
+	if err != nil {
+		return err
+	}
+	time.Sleep(time.Millisecond * 500)
+	c.RouterFQDN = fmt.Sprintf("osa-agentpool-%s-router.%s.cloudapp.azure.com", c.ClusterId, cs.Location)
+	c.RouterFQDNShort = fmt.Sprintf("osa-agentpool-%s-router", c.ClusterId)
+	c.ControlPlaneFQDN = fmt.Sprintf("osa-masterpool-%s.%s.cloudapp.azure.com", c.ClusterId, cs.Location)
+
+	if ok := checkDNSAvailability(c.RouterFQDN); !ok {
+		selectClusterDNS(cs, c, ch)
+	}
+
+	if ok := checkDNSAvailability(c.ControlPlaneFQDN); !ok {
+		selectClusterDNS(cs, c, ch)
+	}
+
+	cs.Properties.MasterProfile.FQDN = c.ControlPlaneFQDN
+	cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = c.RouterFQDN
+
+	if cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname == "" || strings.HasSuffix(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, fmt.Sprintf("%s.cloudapp.azure.com", cs.Location)) {
+		cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = cs.Properties.MasterProfile.FQDN
+	}
+	if cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain == "" {
+		cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN
+	}
+	ch <- true
+	return nil
+}
+
+func checkDNSAvailability(url string) bool {
+	_, err := net.LookupIP(url)
+	if err != nil {
+		return true
+	}
+	return false
 }
