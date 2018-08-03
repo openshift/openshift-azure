@@ -68,6 +68,7 @@ func NewCert(
 	extKeyUsage []x509.ExtKeyUsage,
 	signingkey *rsa.PrivateKey,
 	signingcert *x509.Certificate,
+	selfSign bool,
 ) (*rsa.PrivateKey, *x509.Certificate, error) {
 	now := time.Now()
 
@@ -92,8 +93,12 @@ func NewCert(
 	if err != nil {
 		return nil, nil, err
 	}
-
-	cert, err := newCert(key, template, signingkey, signingcert)
+	var cert *x509.Certificate
+	if selfSign {
+		cert, err = newCert(key, template, nil, nil)
+	} else {
+		cert, err = newCert(key, template, signingkey, signingcert)
+	}
 	if err != nil {
 		return nil, nil, err
 	}

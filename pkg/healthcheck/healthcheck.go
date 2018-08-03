@@ -36,7 +36,8 @@ func getKubeconfigFromV1Config(kc *v1.Config) (clientcmd.ClientConfig, error) {
 
 // HealthCheck function to verify cluster health
 func HealthCheck(ctx context.Context, cs *acsapi.ContainerService, c *config.Config) error {
-	kubeconfig, err := getKubeconfigFromV1Config(c.AdminKubeconfig)
+
+	kubeconfig, err := getKubeconfigFromV1Config(c.MasterKubeconfig)
 	if err != nil {
 		return err
 	}
@@ -84,7 +85,7 @@ func waitForConsole(ctx context.Context, cs *acsapi.ContainerService, c *config.
 		Timeout: 10 * time.Second,
 	}
 
-	req, err := http.NewRequest("HEAD", "https://"+cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname+"/console/", nil)
+	req, err := http.NewRequest("HEAD", "https://"+cs.Properties.MasterProfile.FQDN+"/console/", nil)
 	if err != nil {
 		return err
 	}

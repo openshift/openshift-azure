@@ -32,7 +32,6 @@ func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 
 	// the RP will enrich the internal API representation with data not included
 	// in the original request
-	// TODO(mjudeikis): choose DNS names here
 	err := enrich(cs)
 	if err != nil {
 		return nil, err

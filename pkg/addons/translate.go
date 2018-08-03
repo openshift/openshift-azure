@@ -405,7 +405,7 @@ var Translations = map[string][]struct {
 	"Service/default/router": {
 		{
 			Path:     jsonpath.MustCompile("$.metadata.annotations['service.beta.kubernetes.io/azure-dns-label-name']"),
-			Template: "{{ .Config.RouterLBCName }}",
+			Template: "{{ .Config.RouterFQDNShort }}",
 		},
 	},
 	"Service/default/router-stats": {

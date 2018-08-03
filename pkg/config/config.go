@@ -11,6 +11,11 @@ import (
 type Config struct {
 	Version int
 
+	ClusterId        string
+	ControlPlaneFQDN string
+	RouterFQDN       string
+	RouterFQDNShort  string
+
 	ImageOffer     string
 	ImagePublisher string
 	ImageSKU       string
@@ -62,6 +67,8 @@ type Config struct {
 	// control plane certificates
 	MasterServerKey           *rsa.PrivateKey
 	MasterServerCert          *x509.Certificate
+	ConsoleServerKey          *rsa.PrivateKey
+	ConsoleServerCert         *x509.Certificate
 	AdminKey                  *rsa.PrivateKey
 	AdminCert                 *x509.Certificate
 	AggregatorFrontProxyKey   *rsa.PrivateKey
@@ -110,7 +117,6 @@ type Config struct {
 	AlertsProxySessionSecret       []byte
 	PrometheusProxySessionSecret   []byte
 	ServiceCatalogClusterID        uuid.UUID
-	RouterLBCName                  string
 	// random string based configurables
 	RegistryStorageAccount     string
 	RegistryConsoleOAuthSecret string

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -10,6 +11,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/satori/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -119,15 +121,15 @@ func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 	}
 }
 
-func internalAPIServerHostname(cs *acsapi.ContainerService) string {
-	return cs.Properties.AzProfile.ResourceGroup + "." + cs.Location + ".cloudapp.azure.com"
-}
-
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
 
-	// TODO: Need unique name, potentially derivative from PublicHostname
-	c.RouterLBCName = fmt.Sprintf("router-%s", strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, ".")[1])
+	//Configure cluster dns
+	err = selectClusterDNSWithTimeout(cs, c)
+	if err != nil {
+		return
+	}
+
 	selectNodeImage(cs, c)
 
 	selectContainerImages(cs, c)
@@ -183,6 +185,7 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		signingCert  *x509.Certificate
 		key          **rsa.PrivateKey
 		cert         **x509.Certificate
+		selfSign     bool
 	}{
 		// Generate etcd certs
 		{
@@ -241,10 +244,9 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			cert:        &c.MasterProxyClientCert,
 		},
 		{
-			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			cn: cs.Properties.MasterProfile.FQDN,
 			dnsNames: []string{
-				internalAPIServerHostname(cs),
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+				cs.Properties.MasterProfile.FQDN,
 				"master-000000",
 				"master-000001",
 				"master-000002",
@@ -316,6 +318,16 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			key:         &c.RegistryKey,
 			cert:        &c.RegistryCert,
 		},
+		{
+			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			dnsNames: []string{
+				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			},
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			key:         &c.ConsoleServerKey,
+			cert:        &c.ConsoleServerCert,
+			selfSign:    true,
+		},
 	}
 	for _, cert := range certs {
 		if cert.signingKey == nil && cert.signingCert == nil {
@@ -325,7 +337,7 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			(*cert.cert).CheckSignatureFrom(cert.signingCert) == nil {
 			continue
 		}
-		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert); err != nil {
+		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, cert.selfSign); err != nil {
 			return
 		}
 	}
@@ -378,14 +390,14 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		{
 			clientKey:  c.OpenShiftMasterKey,
 			clientCert: c.OpenShiftMasterCert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:openshift-master",
 			kubeconfig: &c.MasterKubeconfig,
 		},
 		{
 			clientKey:  c.BootstrapAutoapproverKey,
 			clientCert: c.BootstrapAutoapproverCert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:serviceaccount:openshift-infra:bootstrap-autoapprover",
 			namespace:  "openshift-infra",
 			kubeconfig: &c.BootstrapAutoapproverKubeconfig,
@@ -393,14 +405,14 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		{
 			clientKey:  c.AdminKey,
 			clientCert: c.AdminCert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:admin",
 			kubeconfig: &c.AdminKubeconfig,
 		},
 		{
 			clientKey:  c.NodeBootstrapKey,
 			clientCert: c.NodeBootstrapCert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
 			kubeconfig: &c.NodeBootstrapKubeconfig,
 		},
@@ -574,4 +586,73 @@ func randomString(length int) (string, error) {
 	}
 
 	return string(b), nil
+}
+
+// generateClusterID creates a unique 8 string cluster ID
+func generateClusterID() (string, error) {
+	const letterBytes = "0123456789"
+
+	b := make([]byte, 8)
+	for i := range b {
+		o, err := rand.Int(rand.Reader, big.NewInt(int64(len(letterBytes))))
+		if err != nil {
+			return "", err
+		}
+		b[i] = letterBytes[o.Int64()]
+	}
+	return string(b), nil
+}
+
+func selectClusterDNSWithTimeout(cs *acsapi.ContainerService, c *Config) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel() // releases resources if selectClusterDNS succ before
+	ch := make(chan bool)
+	go selectClusterDNS(cs, c, ch)
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf("DNS reservation failed")
+	case <-ch:
+	}
+	return nil
+}
+
+func selectClusterDNS(cs *acsapi.ContainerService, c *Config, ch chan bool) error {
+
+	var err error
+	c.ClusterId, err = generateClusterID()
+	if err != nil {
+		return err
+	}
+	time.Sleep(time.Millisecond * 500)
+	c.RouterFQDN = fmt.Sprintf("osa-agentpool-%s-router.%s.cloudapp.azure.com", c.ClusterId, cs.Location)
+	c.RouterFQDNShort = fmt.Sprintf("osa-agentpool-%s-router", c.ClusterId)
+	c.ControlPlaneFQDN = fmt.Sprintf("osa-masterpool-%s.%s.cloudapp.azure.com", c.ClusterId, cs.Location)
+
+	if ok := checkDNSAvailability(c.RouterFQDN); !ok {
+		selectClusterDNS(cs, c, ch)
+	}
+
+	if ok := checkDNSAvailability(c.ControlPlaneFQDN); !ok {
+		selectClusterDNS(cs, c, ch)
+	}
+
+	cs.Properties.MasterProfile.FQDN = c.ControlPlaneFQDN
+	cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = c.RouterFQDN
+
+	if cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname == "" || strings.HasSuffix(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, fmt.Sprintf("%s.cloudapp.azure.com", cs.Location)) {
+		cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = cs.Properties.MasterProfile.FQDN
+	}
+	if cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain == "" {
+		cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN
+	}
+	ch <- true
+	return nil
+}
+
+func checkDNSAvailability(url string) bool {
+	_, err := net.LookupIP(url)
+	if err != nil {
+		return true
+	}
+	return false
 }
