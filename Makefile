@@ -1,3 +1,7 @@
+# build is the default target
+build:
+	go build ./...
+
 clean:
 	rm -f sync
 

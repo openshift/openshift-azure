@@ -99,13 +99,6 @@ type MasterProfile struct {
 	FQDN string `json:"fqdn,omitempty"`
 }
 
-// Extension represents an extension definition in the master or agentPoolProfile
-type Extension struct {
-	Name        string `json:"name"`
-	SingleOrAll string `json:"singleOrAll"`
-	Template    string `json:"template"`
-}
-
 // AgentPoolProfile represents an agent pool definition
 type AgentPoolProfile struct {
 	Name         string               `json:"name"`
