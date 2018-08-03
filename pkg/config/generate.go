@@ -140,28 +140,28 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	}{
 		{
 			cn:   "etcd-signer",
-			key:  &c.EtcdCaKey,
-			cert: &c.EtcdCaCert,
+			key:  &c.Certificates.EtcdCa.Key,
+			cert: &c.Certificates.EtcdCa.Cert,
 		},
 		{
 			cn:   "openshift-signer",
-			key:  &c.CaKey,
-			cert: &c.CaCert,
+			key:  &c.Certificates.Ca.Key,
+			cert: &c.Certificates.Ca.Cert,
 		},
 		{
 			cn:   "openshift-frontproxy-signer",
-			key:  &c.FrontProxyCaKey,
-			cert: &c.FrontProxyCaCert,
+			key:  &c.Certificates.FrontProxyCa.Key,
+			cert: &c.Certificates.FrontProxyCa.Cert,
 		},
 		{
 			cn:   "openshift-service-serving-signer",
-			key:  &c.ServiceSigningCaKey,
-			cert: &c.ServiceSigningCaCert,
+			key:  &c.Certificates.ServiceSigningCa.Key,
+			cert: &c.Certificates.ServiceSigningCa.Cert,
 		},
 		{
 			cn:   "service-catalog-signer",
-			key:  &c.ServiceCatalogCaKey,
-			cert: &c.ServiceCatalogCaCert,
+			key:  &c.Certificates.ServiceCatalogCa.Key,
+			cert: &c.Certificates.ServiceCatalogCa.Cert,
 		},
 	}
 	for _, ca := range cas {
@@ -189,56 +189,56 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			cn:          "etcd-server",
 			dnsNames:    []string{"master-000000", "master-000001", "master-000002"},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			signingKey:  c.EtcdCaKey,
-			signingCert: c.EtcdCaCert,
-			key:         &c.EtcdServerKey,
-			cert:        &c.EtcdServerCert,
+			signingKey:  c.Certificates.EtcdCa.Key,
+			signingCert: c.Certificates.EtcdCa.Cert,
+			key:         &c.Certificates.EtcdServer.Key,
+			cert:        &c.Certificates.EtcdServer.Cert,
 		},
 		{
 			cn:          "etcd-peer",
 			dnsNames:    []string{"master-000000", "master-000001", "master-000002"},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
-			signingKey:  c.EtcdCaKey,
-			signingCert: c.EtcdCaCert,
-			key:         &c.EtcdPeerKey,
-			cert:        &c.EtcdPeerCert,
+			signingKey:  c.Certificates.EtcdCa.Key,
+			signingCert: c.Certificates.EtcdCa.Cert,
+			key:         &c.Certificates.EtcdPeer.Key,
+			cert:        &c.Certificates.EtcdPeer.Cert,
 		},
 		{
 			cn:          "etcd-client",
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			signingKey:  c.EtcdCaKey,
-			signingCert: c.EtcdCaCert,
-			key:         &c.EtcdClientKey,
-			cert:        &c.EtcdClientCert,
+			signingKey:  c.Certificates.EtcdCa.Key,
+			signingCert: c.Certificates.EtcdCa.Cert,
+			key:         &c.Certificates.EtcdClient.Key,
+			cert:        &c.Certificates.EtcdClient.Cert,
 		},
 		// Generate openshift master certs
 		{
 			cn:           "system:admin",
 			organization: []string{"system:cluster-admins", "system:masters"},
 			extKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:          &c.AdminKey,
-			cert:         &c.AdminCert,
+			key:          &c.Certificates.Admin.Key,
+			cert:         &c.Certificates.Admin.Cert,
 		},
 		{
 			cn:          "aggregator-front-proxy",
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			signingKey:  c.FrontProxyCaKey,
-			signingCert: c.FrontProxyCaCert,
-			key:         &c.AggregatorFrontProxyKey,
-			cert:        &c.AggregatorFrontProxyCert,
+			signingKey:  c.Certificates.FrontProxyCa.Key,
+			signingCert: c.Certificates.FrontProxyCa.Cert,
+			key:         &c.Certificates.AggregatorFrontProxy.Key,
+			cert:        &c.Certificates.AggregatorFrontProxy.Cert,
 		},
 		{
 			cn:           "system:openshift-node-admin",
 			organization: []string{"system:node-admins"},
 			extKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:          &c.MasterKubeletClientKey,
-			cert:         &c.MasterKubeletClientCert,
+			key:          &c.Certificates.MasterKubeletClient.Key,
+			cert:         &c.Certificates.MasterKubeletClient.Cert,
 		},
 		{
 			cn:          "system:master-proxy",
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:         &c.MasterProxyClientKey,
-			cert:        &c.MasterProxyClientCert,
+			key:         &c.Certificates.MasterProxyClient.Key,
+			cert:        &c.Certificates.MasterProxyClient.Cert,
 		},
 		{
 			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
@@ -255,15 +255,15 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			},
 			ipAddresses: []net.IP{net.ParseIP("172.30.0.1")},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			key:         &c.MasterServerKey,
-			cert:        &c.MasterServerCert,
+			key:         &c.Certificates.MasterServer.Key,
+			cert:        &c.Certificates.MasterServer.Cert,
 		},
 		{
 			cn:           "system:openshift-master",
 			organization: []string{"system:cluster-admins", "system:masters"},
 			extKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:          &c.OpenShiftMasterKey,
-			cert:         &c.OpenShiftMasterCert,
+			key:          &c.Certificates.OpenShiftMaster.Key,
+			cert:         &c.Certificates.OpenShiftMaster.Cert,
 		},
 		{
 			cn: "servicecatalog-api",
@@ -272,28 +272,28 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 				"apiserver.kube-service-catalog.svc", // TODO: unclear how safe this is
 			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			signingKey:  c.ServiceCatalogCaKey,
-			signingCert: c.ServiceCatalogCaCert,
-			key:         &c.ServiceCatalogServerKey,
-			cert:        &c.ServiceCatalogServerCert,
+			signingKey:  c.Certificates.ServiceCatalogCa.Key,
+			signingCert: c.Certificates.ServiceCatalogCa.Cert,
+			key:         &c.Certificates.ServiceCatalogServer.Key,
+			cert:        &c.Certificates.ServiceCatalogServer.Cert,
 		},
 		{
 			cn:          "system:serviceaccount:kube-service-catalog:service-catalog-apiserver",
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:         &c.ServiceCatalogAPIClientKey,
-			cert:        &c.ServiceCatalogAPIClientCert,
+			key:         &c.Certificates.ServiceCatalogAPIClient.Key,
+			cert:        &c.Certificates.ServiceCatalogAPIClient.Cert,
 		},
 		{
 			cn:          "system:serviceaccount:openshift-infra:bootstrap-autoapprover",
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:         &c.BootstrapAutoapproverKey,
-			cert:        &c.BootstrapAutoapproverCert,
+			key:         &c.Certificates.BootstrapAutoapprover.Key,
+			cert:        &c.Certificates.BootstrapAutoapprover.Cert,
 		},
 		{
 			cn:          "system:serviceaccount:openshift-infra:node-bootstrapper",
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:         &c.NodeBootstrapKey,
-			cert:        &c.NodeBootstrapCert,
+			key:         &c.Certificates.NodeBootstrap.Key,
+			cert:        &c.Certificates.NodeBootstrap.Cert,
 		},
 		{
 			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
@@ -302,8 +302,8 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 				"*." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
 			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			key:         &c.RouterKey,
-			cert:        &c.RouterCert,
+			key:         &c.Certificates.Router.Key,
+			cert:        &c.Certificates.Router.Cert,
 		},
 		{
 			cn: "docker-registry-default." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
@@ -313,13 +313,13 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 				"docker-registry.default.svc.cluster.local",
 			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			key:         &c.RegistryKey,
-			cert:        &c.RegistryCert,
+			key:         &c.Certificates.Registry.Key,
+			cert:        &c.Certificates.Registry.Cert,
 		},
 	}
 	for _, cert := range certs {
 		if cert.signingKey == nil && cert.signingCert == nil {
-			cert.signingKey, cert.signingCert = c.CaKey, c.CaCert
+			cert.signingKey, cert.signingCert = c.Certificates.Ca.Key, c.Certificates.Ca.Cert
 		}
 		if *cert.key != nil && *cert.cert != nil &&
 			(*cert.cert).CheckSignatureFrom(cert.signingCert) == nil {
@@ -376,37 +376,37 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		kubeconfig **v1.Config
 	}{
 		{
-			clientKey:  c.OpenShiftMasterKey,
-			clientCert: c.OpenShiftMasterCert,
+			clientKey:  c.Certificates.OpenShiftMaster.Key,
+			clientCert: c.Certificates.OpenShiftMaster.Cert,
 			endpoint:   internalAPIServerHostname(cs),
 			username:   "system:openshift-master",
 			kubeconfig: &c.MasterKubeconfig,
 		},
 		{
-			clientKey:  c.BootstrapAutoapproverKey,
-			clientCert: c.BootstrapAutoapproverCert,
+			clientKey:  c.Certificates.BootstrapAutoapprover.Key,
+			clientCert: c.Certificates.BootstrapAutoapprover.Cert,
 			endpoint:   internalAPIServerHostname(cs),
 			username:   "system:serviceaccount:openshift-infra:bootstrap-autoapprover",
 			namespace:  "openshift-infra",
 			kubeconfig: &c.BootstrapAutoapproverKubeconfig,
 		},
 		{
-			clientKey:  c.AdminKey,
-			clientCert: c.AdminCert,
+			clientKey:  c.Certificates.Admin.Key,
+			clientCert: c.Certificates.Admin.Cert,
 			endpoint:   internalAPIServerHostname(cs),
 			username:   "system:admin",
 			kubeconfig: &c.AdminKubeconfig,
 		},
 		{
-			clientKey:  c.NodeBootstrapKey,
-			clientCert: c.NodeBootstrapCert,
+			clientKey:  c.Certificates.NodeBootstrap.Key,
+			clientCert: c.Certificates.NodeBootstrap.Cert,
 			endpoint:   internalAPIServerHostname(cs),
 			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
 			kubeconfig: &c.NodeBootstrapKubeconfig,
 		},
 		{
-			clientKey:  c.AdminKey,
-			clientCert: c.AdminCert,
+			clientKey:  c.Certificates.Admin.Key,
+			clientCert: c.Certificates.Admin.Cert,
 			// sync kubeconfig has the same capabilities as admin kubeconfig, only difference
 			// is the use of HCP internal DNS to avoid waiting for the Azure loadbalancer to
 			// come up in order to start creating cluster objects.
@@ -419,7 +419,7 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		if kc.namespace == "" {
 			kc.namespace = "default"
 		}
-		if *kc.kubeconfig, err = makeKubeConfig(kc.clientKey, kc.clientCert, c.CaCert, kc.endpoint, kc.username, kc.namespace); err != nil {
+		if *kc.kubeconfig, err = makeKubeConfig(kc.clientKey, kc.clientCert, c.Certificates.Ca.Cert, kc.endpoint, kc.username, kc.namespace); err != nil {
 			return
 		}
 	}

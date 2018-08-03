@@ -41,32 +41,32 @@ iptables-save >/etc/sysconfig/iptables
 
 rm -rf /etc/etcd/* /etc/origin/master/*
 
-base64 -d <<< {{ CertAsBytes .Config.EtcdCaCert | Base64Encode }} >/etc/etcd/ca.crt
-base64 -d <<< {{ CertAsBytes .Config.EtcdServerCert | Base64Encode }} >/etc/etcd/server.crt
-base64 -d <<< {{ PrivateKeyAsBytes .Config.EtcdServerKey | Base64Encode }} >/etc/etcd/server.key
-base64 -d <<< {{ CertAsBytes .Config.EtcdPeerCert | Base64Encode }} >/etc/etcd/peer.crt
-base64 -d <<< {{ PrivateKeyAsBytes .Config.EtcdPeerKey | Base64Encode }} >/etc/etcd/peer.key
+base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdCa.Cert | Base64Encode }} >/etc/etcd/ca.crt
+base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdServer.Cert | Base64Encode }} >/etc/etcd/server.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.EtcdServer.Key | Base64Encode }} >/etc/etcd/server.key
+base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdPeer.Cert | Base64Encode }} >/etc/etcd/peer.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.EtcdPeer.Key | Base64Encode }} >/etc/etcd/peer.key
 
 base64 -d <<< {{ YamlMarshal .Config.AdminKubeconfig | Base64Encode }} >/etc/origin/node/node.kubeconfig
-base64 -d <<< {{ CertAsBytes .Config.CaCert | Base64Encode }} >/etc/origin/node/ca.crt
+base64 -d <<< {{ CertAsBytes .Config.Certificates.Ca.Cert | Base64Encode }} >/etc/origin/node/ca.crt
 
 mkdir -p /etc/origin/master
-base64 -d <<< {{ CertAsBytes .Config.EtcdCaCert | Base64Encode }} >/etc/origin/master/master.etcd-ca.crt
-base64 -d <<< {{ CertAsBytes .Config.CaCert | Base64Encode }} >/etc/origin/master/ca.crt
-base64 -d <<< {{ PrivateKeyAsBytes .Config.CaKey | Base64Encode }} >/etc/origin/master/ca.key
-base64 -d <<< {{ CertAsBytes .Config.FrontProxyCaCert | Base64Encode }} >/etc/origin/master/front-proxy-ca.crt
-base64 -d <<< {{ CertAsBytes .Config.ServiceSigningCaCert | Base64Encode }} >/etc/origin/master/service-signer.crt
-base64 -d <<< {{ PrivateKeyAsBytes .Config.ServiceSigningCaKey | Base64Encode }} >/etc/origin/master/service-signer.key
-base64 -d <<< {{ CertAsBytes .Config.EtcdClientCert | Base64Encode }} >/etc/origin/master/master.etcd-client.crt
-base64 -d <<< {{ PrivateKeyAsBytes .Config.EtcdClientKey | Base64Encode }} >/etc/origin/master/master.etcd-client.key
-base64 -d <<< {{ CertAsBytes .Config.AggregatorFrontProxyCert | Base64Encode }} >/etc/origin/master/aggregator-front-proxy.crt
-base64 -d <<< {{ PrivateKeyAsBytes .Config.AggregatorFrontProxyKey | Base64Encode }} >/etc/origin/master/aggregator-front-proxy.key
-base64 -d <<< {{ CertAsBytes .Config.MasterKubeletClientCert | Base64Encode }} >/etc/origin/master/master.kubelet-client.crt
-base64 -d <<< {{ PrivateKeyAsBytes .Config.MasterKubeletClientKey | Base64Encode }} >/etc/origin/master/master.kubelet-client.key
-base64 -d <<< {{ CertAsBytes .Config.MasterProxyClientCert | Base64Encode }} >/etc/origin/master/master.proxy-client.crt
-base64 -d <<< {{ PrivateKeyAsBytes .Config.MasterProxyClientKey | Base64Encode }} >/etc/origin/master/master.proxy-client.key
-base64 -d <<< {{ CertAsBytes .Config.MasterServerCert | Base64Encode }} >/etc/origin/master/master.server.crt
-base64 -d <<< {{ PrivateKeyAsBytes .Config.MasterServerKey | Base64Encode }} >/etc/origin/master/master.server.key
+base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdCa.Cert | Base64Encode }} >/etc/origin/master/master.etcd-ca.crt
+base64 -d <<< {{ CertAsBytes .Config.Certificates.Ca.Cert | Base64Encode }} >/etc/origin/master/ca.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.Ca.Key | Base64Encode }} >/etc/origin/master/ca.key
+base64 -d <<< {{ CertAsBytes .Config.Certificates.FrontProxyCa.Cert | Base64Encode }} >/etc/origin/master/front-proxy-ca.crt
+base64 -d <<< {{ CertAsBytes .Config.Certificates.ServiceSigningCa.Cert | Base64Encode }} >/etc/origin/master/service-signer.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.ServiceSigningCa.Key | Base64Encode }} >/etc/origin/master/service-signer.key
+base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdClient.Cert | Base64Encode }} >/etc/origin/master/master.etcd-client.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.EtcdClient.Key | Base64Encode }} >/etc/origin/master/master.etcd-client.key
+base64 -d <<< {{ CertAsBytes .Config.Certificates.AggregatorFrontProxy.Cert | Base64Encode }} >/etc/origin/master/aggregator-front-proxy.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.AggregatorFrontProxy.Key | Base64Encode }} >/etc/origin/master/aggregator-front-proxy.key
+base64 -d <<< {{ CertAsBytes .Config.Certificates.MasterKubeletClient.Cert | Base64Encode }} >/etc/origin/master/master.kubelet-client.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.MasterKubeletClient.Key | Base64Encode }} >/etc/origin/master/master.kubelet-client.key
+base64 -d <<< {{ CertAsBytes .Config.Certificates.MasterProxyClient.Cert | Base64Encode }} >/etc/origin/master/master.proxy-client.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.MasterProxyClient.Key | Base64Encode }} >/etc/origin/master/master.proxy-client.key
+base64 -d <<< {{ CertAsBytes .Config.Certificates.MasterServer.Cert | Base64Encode }} >/etc/origin/master/master.server.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.MasterServer.Key | Base64Encode }} >/etc/origin/master/master.server.key
 base64 -d <<< {{ PublicKeyAsBytes .Config.ServiceAccountKey.PublicKey | Base64Encode }} >/etc/origin/master/serviceaccounts.public.key
 base64 -d <<< {{ PrivateKeyAsBytes .Config.ServiceAccountKey | Base64Encode }} >/etc/origin/master/serviceaccounts.private.key
 base64 -d <<< {{ .Config.HtPasswd | Base64Encode }} >/etc/origin/master/htpasswd

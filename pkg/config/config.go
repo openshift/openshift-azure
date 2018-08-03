@@ -20,17 +20,7 @@ type Config struct {
 	ImageResourceGroup string
 	ImageResourceName  string
 
-	// CAs
-	EtcdCaKey            *rsa.PrivateKey
-	EtcdCaCert           *x509.Certificate
-	CaKey                *rsa.PrivateKey
-	CaCert               *x509.Certificate
-	FrontProxyCaKey      *rsa.PrivateKey
-	FrontProxyCaCert     *x509.Certificate
-	ServiceSigningCaKey  *rsa.PrivateKey
-	ServiceSigningCaCert *x509.Certificate
-	ServiceCatalogCaKey  *rsa.PrivateKey
-	ServiceCatalogCaCert *x509.Certificate
+	Certificates CertificateConfig
 
 	// container images for pods
 	MasterEtcdImage             string
@@ -50,42 +40,6 @@ type Config struct {
 	PrometheusImage             string
 	PrometheusAlertBufferImage  string
 	PrometheusAlertManagerImage string
-
-	// etcd certificates
-	EtcdServerKey  *rsa.PrivateKey
-	EtcdServerCert *x509.Certificate
-	EtcdPeerKey    *rsa.PrivateKey
-	EtcdPeerCert   *x509.Certificate
-	EtcdClientKey  *rsa.PrivateKey
-	EtcdClientCert *x509.Certificate
-
-	// control plane certificates
-	MasterServerKey           *rsa.PrivateKey
-	MasterServerCert          *x509.Certificate
-	AdminKey                  *rsa.PrivateKey
-	AdminCert                 *x509.Certificate
-	AggregatorFrontProxyKey   *rsa.PrivateKey
-	AggregatorFrontProxyCert  *x509.Certificate
-	MasterKubeletClientKey    *rsa.PrivateKey
-	MasterKubeletClientCert   *x509.Certificate
-	MasterProxyClientKey      *rsa.PrivateKey
-	MasterProxyClientCert     *x509.Certificate
-	OpenShiftMasterKey        *rsa.PrivateKey
-	OpenShiftMasterCert       *x509.Certificate
-	BootstrapAutoapproverKey  *rsa.PrivateKey
-	BootstrapAutoapproverCert *x509.Certificate
-	NodeBootstrapKey          *rsa.PrivateKey
-	NodeBootstrapCert         *x509.Certificate
-
-	// infra certificates
-	RegistryKey                 *rsa.PrivateKey
-	RegistryCert                *x509.Certificate
-	RouterKey                   *rsa.PrivateKey
-	RouterCert                  *x509.Certificate
-	ServiceCatalogServerKey     *rsa.PrivateKey
-	ServiceCatalogServerCert    *x509.Certificate
-	ServiceCatalogAPIClientKey  *rsa.PrivateKey
-	ServiceCatalogAPIClientCert *x509.Certificate
 
 	// kubeconfigs
 	AdminKubeconfig                 *v1.Config
@@ -123,4 +77,41 @@ type Config struct {
 	TenantID       string
 	SubscriptionID string
 	ResourceGroup  string
+}
+
+// CertificateConfig contains all certificate configuration for the cluster.
+type CertificateConfig struct {
+	// CAs
+	EtcdCa           CertKeyPair
+	Ca               CertKeyPair
+	FrontProxyCa     CertKeyPair
+	ServiceSigningCa CertKeyPair
+	ServiceCatalogCa CertKeyPair
+
+	// etcd certificates
+	EtcdServer CertKeyPair
+	EtcdPeer   CertKeyPair
+	EtcdClient CertKeyPair
+
+	// control plane certificates
+	MasterServer          CertKeyPair
+	Admin                 CertKeyPair
+	AggregatorFrontProxy  CertKeyPair
+	MasterKubeletClient   CertKeyPair
+	MasterProxyClient     CertKeyPair
+	OpenShiftMaster       CertKeyPair
+	BootstrapAutoapprover CertKeyPair
+	NodeBootstrap         CertKeyPair
+
+	// infra certificates
+	Registry                CertKeyPair
+	Router                  CertKeyPair
+	ServiceCatalogServer    CertKeyPair
+	ServiceCatalogAPIClient CertKeyPair
+}
+
+// CertKeyPair is an rsa private key and x509 certificate pair.
+type CertKeyPair struct {
+	Key  *rsa.PrivateKey
+	Cert *x509.Certificate
 }
