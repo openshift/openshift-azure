@@ -1,14 +1,50 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "{{ .ContainerService.Location | js }}"
+        },
+        "domainNameLabel": {
+            "type": "string",
+            "defaultValue": "{{ .Config.ResourceGroup }}"
+        },
+        "registryStorageAccount": {
+            "type": "string",
+            "defaultValue": "{{ .Config.RegistryStorageAccount | js }}"
+        },
+{{- if eq $.Config.ImageResourceName "" }}
+        "imageOffer": {
+            "type": "string",
+            "defaultValue": "{{ .Config.ImageOffer | js }}"
+        },
+        "imagePublisher": {
+            "type": "string",
+            "defaultValue": "{{ .Config.ImagePublisher | js }}"
+        },
+        "imageSku": {
+            "type": "string",
+            "defaultValue": "{{ .Config.ImageSKU | js }}"
+        },
+        "imageVersion": {
+            "type": "string",
+            "defaultValue": "{{ .Config.ImageVersion | js }}"
+        },
+{{- else }}
+        "imageId": {
+            "type": "string",
+            "defaultValue": "[resourceId('{{ .Config.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ .Config.ImageResourceName | js }}')]"
+        }
+{{- end }}
+    },
     "variables": {},
     "resources": [
 {{- if not (index .ContainerService.Properties.AgentPoolProfiles 0).VnetSubnetID }}
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2016-03-30",
-            "location": "{{ .ContainerService.Location | js }}",
+            "location": "[parameters('location')]",
             "name": "vnet",
             "properties": {
                 "addressSpace": {
@@ -34,13 +70,13 @@
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2016-03-30",
-            "location": "{{ .ContainerService.Location | js }}",
+            "location": "[parameters('location')]",
             "name": "ip-apiserver",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "idleTimeoutInMinutes": 15,
                 "dnsSettings": {
-                    "domainNameLabel": "{{ .Config.ResourceGroup }}"
+                    "domainNameLabel": "[parameters('domainNameLabel')]"
                 }
             },
             "sku": {
@@ -53,7 +89,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-apiserver')]"
             ],
-            "location": "{{ .ContainerService.Location | js }}",
+            "location": "[parameters('location')]",
             "name": "lb-apiserver",
             "properties": {
                 "backendAddressPools": [
@@ -116,8 +152,8 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2015-06-15",
-            "location": "{{ .ContainerService.Location | js }}",
-            "name": "{{ .Config.RegistryStorageAccount | js }}",
+            "location": "[parameters('location')]",
+            "name": "[parameters('registryStorageAccount')]",
             "properties": {
                 "accountType": "Standard_LRS"
             }
@@ -166,7 +202,7 @@
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2017-12-01",
-            "location": "{{ $.ContainerService.Location | js }}",
+            "location": "[parameters('location')]",
             "dependsOn": [
 {{- if not $app.VnetSubnetID }}
                 "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
@@ -184,9 +220,9 @@
             },
 {{- if eq $.Config.ImageResourceName "" }}
             "plan": {
-                "name": "{{ $.Config.ImageSKU | js }}",
-                "publisher": "{{ $.Config.ImagePublisher | js }}",
-                "product": "{{ $.Config.ImageOffer | js }}"
+                "name": "[parameters('imageSku')]",
+                "publisher": "[parameters('imagePublisher')]",
+                "product": "[parameters('imageOffer')]"
             },
 {{- end }}
             "properties": {
@@ -213,12 +249,12 @@
                     "storageProfile": {
                         "imageReference": {
 {{- if eq $.Config.ImageResourceName "" }}
-                            "offer": "{{ $.Config.ImageOffer | js }}",
-                            "publisher": "{{ $.Config.ImagePublisher | js }}",
-                            "sku": "{{ $.Config.ImageSKU | js }}",
-                            "version": "{{ $.Config.ImageVersion | js }}"
+                            "offer": "[parameters('imageOffer')]",
+                            "publisher": "parameters('imagePublisher')]",
+                            "sku": "[parameters('imageSku')]",
+                            "version": "[parameters('imageVersion')]"
 {{- else }}
-                            "id": "[resourceId('{{ $.Config.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ $.Config.ImageResourceName | js }}')]"
+                            "id": "[parameters('imageId')]"
 {{- end }}
                         },
                         "osDisk": {
