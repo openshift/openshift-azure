@@ -79,12 +79,6 @@ go run cmd/createorupdate/createorupdate.go
 
 az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _data/_out/azuredeploy.json --no-wait
 
-# TODO(mjudeikis): after your DNS work these commands should move to the end of
-# this file.
-hack/dns.sh zone-create $RESOURCEGROUP
-hack/dns.sh cname-create $RESOURCEGROUP openshift $RESOURCEGROUP.eastus.cloudapp.azure.com
-hack/dns.sh cname-create $RESOURCEGROUP '*' $RESOURCEGROUP-router.eastus.cloudapp.azure.com
-
 if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # will eventually run as an HCP pod, for development run it locally
     KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go -run-once=true
@@ -93,3 +87,9 @@ fi
 az group deployment wait -g $RESOURCEGROUP -n azuredeploy --created --interval 10
 
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go
+
+# TODO: This should be configured by MS
+hack/dns.sh zone-create $RESOURCEGROUP
+hack/dns.sh cname-create $RESOURCEGROUP openshift $RESOURCEGROUP.eastus.cloudapp.azure.com
+hack/dns.sh cname-create $RESOURCEGROUP '*' $RESOURCEGROUP-router.eastus.cloudapp.azure.com
+
