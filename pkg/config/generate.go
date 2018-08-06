@@ -312,7 +312,9 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			key:         &c.Certificates.Registry.Key,
 			cert:        &c.Certificates.Registry.Cert,
 		},
-		// Openshift Console is BYO type of certificate. In a long run we should enable users to configure their own certificates. For this reason we decouple it from all OCP certs and make it self-sign
+		// Openshift Console is BYO type of certificate. In the long run we should
+		// enable users to configure their own certificates.
+		// For this reason we decouple it from all OCP certs and make it self-sign
 		{
 			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
 			dnsNames: []string{
