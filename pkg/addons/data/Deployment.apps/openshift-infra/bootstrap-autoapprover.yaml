@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: bootstrap-autoapprover
-  namespace: openshift-azure
+  namespace: openshift-infra
 spec:
   replicas: 1
   selector:
@@ -13,6 +13,7 @@ spec:
       labels:
         app: bootstrap-autoapprover
     spec:
+      serviceAccountName: bootstrap-autoapprover
       containers:
       - args:
         - |
@@ -20,7 +21,6 @@ spec:
           set -o nounset
           set -o pipefail
 
-          export KUBECONFIG=/tmp/kubeconfig/bootstrap-autoapprover.kubeconfig
           cat <<'SCRIPT' >/tmp/signer
           #!/bin/bash
           #
@@ -65,11 +65,3 @@ spec:
         - -c
         image: '*** GENERATED ***'
         name: signer
-        volumeMounts:
-        - mountPath: /tmp/kubeconfig
-          name: kubeconfig
-          readOnly: true
-      volumes:
-      - name: kubeconfig
-        secret:
-          secretName: bootstrap-autoapprover-kubeconfig

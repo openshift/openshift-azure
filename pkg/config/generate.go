@@ -280,12 +280,6 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			cert:        &c.Certificates.ServiceCatalogAPIClient.Cert,
 		},
 		{
-			cn:          "system:serviceaccount:openshift-infra:bootstrap-autoapprover",
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:         &c.Certificates.BootstrapAutoapprover.Key,
-			cert:        &c.Certificates.BootstrapAutoapprover.Cert,
-		},
-		{
 			cn:          "system:serviceaccount:openshift-infra:node-bootstrapper",
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 			key:         &c.Certificates.NodeBootstrap.Key,
@@ -390,14 +384,6 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:openshift-master",
 			kubeconfig: &c.MasterKubeconfig,
-		},
-		{
-			clientKey:  c.Certificates.BootstrapAutoapprover.Key,
-			clientCert: c.Certificates.BootstrapAutoapprover.Cert,
-			endpoint:   cs.Properties.MasterProfile.FQDN,
-			username:   "system:serviceaccount:openshift-infra:bootstrap-autoapprover",
-			namespace:  "openshift-infra",
-			kubeconfig: &c.BootstrapAutoapproverKubeconfig,
 		},
 		{
 			clientKey:  c.Certificates.Admin.Key,
