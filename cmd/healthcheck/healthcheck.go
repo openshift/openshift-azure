@@ -5,10 +5,11 @@ import (
 	"io/ioutil"
 
 	"github.com/ghodss/yaml"
+	"github.com/pkg/errors"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/plugin"
-	"github.com/pkg/errors"
 )
 
 // healthCheck should get rolled into the end of createorupdate once the sync
