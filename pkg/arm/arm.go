@@ -8,11 +8,10 @@ import (
 	"text/template"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util"
 )
 
-func Generate(m *acsapi.ContainerService, c *config.Config) ([]byte, error) {
+func Generate(m *acsapi.ContainerService) ([]byte, error) {
 	masterStartup, err := Asset("master-startup.sh")
 	if err != nil {
 		return nil, err
@@ -30,10 +29,10 @@ func Generate(m *acsapi.ContainerService, c *config.Config) ([]byte, error) {
 	return util.Template(string(tmpl), template.FuncMap{
 		"Startup": func(role acsapi.AgentPoolProfileRole) ([]byte, error) {
 			if role == acsapi.AgentPoolProfileRoleMaster {
-				return util.Template(string(masterStartup), nil, m, c, map[string]interface{}{"Role": role})
+				return util.Template(string(masterStartup), nil, m, map[string]interface{}{"Role": role})
 			} else {
-				return util.Template(string(nodeStartup), nil, m, c, map[string]interface{}{"Role": role})
+				return util.Template(string(nodeStartup), nil, m, map[string]interface{}{"Role": role})
 			}
 		},
-	}, m, c, nil)
+	}, m, nil)
 }

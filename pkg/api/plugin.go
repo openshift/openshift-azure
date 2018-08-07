@@ -19,9 +19,9 @@ type Plugin interface {
 	// ValidateInternal is called and that it makes sense to do this.
 	ValidateInternal(new, old *ContainerService) []error
 
-	GenerateConfig(cs *ContainerService, configBytes []byte) ([]byte, error)
+	GenerateConfig(cs *ContainerService) error
 
-	GenerateARM(cs *ContainerService, configBytes []byte) ([]byte, error)
+	GenerateARM(cs *ContainerService) ([]byte, error)
 
-	HealthCheck(ctx context.Context, cs *ContainerService, configBytes []byte) error
+	HealthCheck(ctx context.Context, cs *ContainerService) error
 }

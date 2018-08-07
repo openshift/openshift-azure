@@ -4,8 +4,6 @@ package plugin
 import (
 	"context"
 
-	"github.com/ghodss/yaml"
-
 	"github.com/openshift/openshift-azure/pkg/api"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/api/v1"
@@ -27,50 +25,28 @@ func (p *Plugin) ValidateInternal(new, old *acsapi.ContainerService) []error {
 	return validate.ContainerService(new, old)
 }
 
-func (p *Plugin) GenerateConfig(cs *acsapi.ContainerService, configBytes []byte) ([]byte, error) {
-	var c *config.Config
-	if len(configBytes) > 0 {
-		err := yaml.Unmarshal(configBytes, &c)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		c = &config.Config{}
+func (p *Plugin) GenerateConfig(cs *acsapi.ContainerService) error {
+	// TODO should we save off the original config here and if there are any errors we can restore it?
+	if cs.Config == nil {
+		cs.Config = &acsapi.Config{}
 	}
 
-	err := config.Upgrade(cs, c)
-	if err != nil {
-		return nil, err
-	}
-
-	err = config.Generate(cs, c)
-	if err != nil {
-		return nil, err
-	}
-
-	b, err := yaml.Marshal(c)
-	if err != nil {
-		return nil, err
-	}
-	return b, err
-}
-
-func (p *Plugin) GenerateARM(cs *acsapi.ContainerService, configBytes []byte) ([]byte, error) {
-	var c *config.Config
-	err := yaml.Unmarshal(configBytes, &c)
-	if err != nil {
-		return nil, err
-	}
-
-	return arm.Generate(cs, c)
-}
-
-func (p *Plugin) HealthCheck(ctx context.Context, cs *acsapi.ContainerService, configBytes []byte) error {
-	var c *config.Config
-	err := yaml.Unmarshal(configBytes, &c)
+	err := config.Upgrade(cs)
 	if err != nil {
 		return err
 	}
 
-	return healthcheck.HealthCheck(ctx, cs, c)
+	err = config.Generate(cs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *Plugin) GenerateARM(cs *acsapi.ContainerService) ([]byte, error) {
+	return arm.Generate(cs)
+}
+
+func (p *Plugin) HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error {
+	return healthcheck.HealthCheck(ctx, cs)
 }

@@ -19,7 +19,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
-func selectNodeImage(cs *acsapi.ContainerService, c *Config) {
+func selectNodeImage(cs *acsapi.ContainerService) {
+	c := cs.Config
 	c.ImagePublisher = "redhat"
 	c.ImageOffer = "osa-preview"
 	c.ImageVersion = "latest"
@@ -40,7 +41,8 @@ func image(imageConfigFormat, component, version string) string {
 	return strings.Replace(image, "${version}", version, -1)
 }
 
-func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
+func selectContainerImagesOrigin(cs *acsapi.ContainerService) {
+	c := cs.Config
 	c.ImageConfigFormat = os.Getenv("OREG_URL")
 	if c.ImageConfigFormat == "" {
 		c.ImageConfigFormat = "docker.io/openshift/origin-${component}:${version}"
@@ -75,7 +77,8 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService, c *Config) {
 	}
 }
 
-func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
+func selectContainerImagesOSA(cs *acsapi.ContainerService) {
+	c := cs.Config
 	c.ImageConfigFormat = os.Getenv("OREG_URL")
 	if c.ImageConfigFormat == "" {
 		c.ImageConfigFormat = "registry.access.redhat.com/openshift3/ose-${component}:${version}"
@@ -110,23 +113,24 @@ func selectContainerImagesOSA(cs *acsapi.ContainerService, c *Config) {
 	}
 }
 
-func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
+func selectContainerImages(cs *acsapi.ContainerService) {
 	switch os.Getenv("DEPLOY_OS") {
 	case "":
-		selectContainerImagesOSA(cs, c)
+		selectContainerImagesOSA(cs)
 	case "centos7":
-		selectContainerImagesOrigin(cs, c)
+		selectContainerImagesOrigin(cs)
 	}
 }
 
-func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
+func Generate(cs *acsapi.ContainerService) (err error) {
+	c := cs.Config
 	c.Version = versionLatest
 
 	// TODO: Need unique name, potentially derivative from PublicHostname
 	c.RouterLBCName = fmt.Sprintf("%s-router", strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, ".")[1])
-	selectNodeImage(cs, c)
+	selectNodeImage(cs)
 
-	selectContainerImages(cs, c)
+	selectContainerImages(cs)
 
 	// Generate CAs
 	cas := []struct {

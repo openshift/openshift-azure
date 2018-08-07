@@ -7,14 +7,9 @@ import (
 	"time"
 
 	"github.com/ghodss/yaml"
-	"github.com/pkg/errors"
-	kerrors "k8s.io/apimachinery/pkg/util/errors"
-
 	"github.com/openshift/openshift-azure/pkg/addons"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/api/v1"
-	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/validate"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -26,30 +21,17 @@ var (
 func sync() error {
 	log.Print("Sync process started!")
 
-	b, err := ioutil.ReadFile("_data/manifest.yaml")
+	b, err := ioutil.ReadFile("_data/containerservice.yaml")
 	if err != nil {
-		return errors.Wrap(err, "cannot read _data/manifest.yaml")
-	}
-	var ext *v1.OpenShiftCluster
-	if err := yaml.Unmarshal(b, &ext); err != nil {
-		return errors.Wrap(err, "cannot unmarshal _data/manifest.yaml")
-	}
-	if errs := validate.OpenShiftCluster(ext); len(errs) > 0 {
-		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
-	}
-	cs := acsapi.ConvertVLabsOpenShiftClusterToContainerService(ext)
-
-	b, err = ioutil.ReadFile("_data/config.yaml")
-	if err != nil {
-		return errors.Wrap(err, "cannot read _data/config.yaml")
+		return errors.Wrap(err, "cannot read _data/containerservice.yaml")
 	}
 
-	var c *config.Config
-	if err = yaml.Unmarshal(b, &c); err != nil {
-		return errors.Wrap(err, "cannot unmarshal _data/config.yaml")
+	var cs *acsapi.ContainerService
+	if err := yaml.Unmarshal(b, &cs); err != nil {
+		return errors.Wrap(err, "cannot unmarshal _data/containerservice.yaml")
 	}
 
-	if err := addons.Main(cs, c, *dryRun); err != nil {
+	if err := addons.Main(cs, *dryRun); err != nil {
 		return errors.Wrap(err, "cannot sync cluster config")
 	}
 
