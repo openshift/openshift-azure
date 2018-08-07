@@ -95,6 +95,7 @@ type CertificateConfig struct {
 
 	// control plane certificates
 	MasterServer          CertKeyPair
+	OpenshiftConsole      CertKeyPair
 	Admin                 CertKeyPair
 	AggregatorFrontProxy  CertKeyPair
 	MasterKubeletClient   CertKeyPair

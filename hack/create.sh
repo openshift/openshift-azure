@@ -83,7 +83,7 @@ az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _dat
 # this file.
 hack/dns.sh zone-create $RESOURCEGROUP
 hack/dns.sh cname-create $RESOURCEGROUP openshift $RESOURCEGROUP.eastus.cloudapp.azure.com
-hack/dns.sh cname-create $RESOURCEGROUP '*' router-$RESOURCEGROUP.eastus.cloudapp.azure.com
+hack/dns.sh cname-create $RESOURCEGROUP '*' $RESOURCEGROUP-router.eastus.cloudapp.azure.com
 
 if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # will eventually run as an HCP pod, for development run it locally

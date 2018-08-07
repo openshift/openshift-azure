@@ -119,15 +119,11 @@ func selectContainerImages(cs *acsapi.ContainerService, c *Config) {
 	}
 }
 
-func internalAPIServerHostname(cs *acsapi.ContainerService) string {
-	return cs.Properties.AzProfile.ResourceGroup + "." + cs.Location + ".cloudapp.azure.com"
-}
-
 func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 	c.Version = versionLatest
 
 	// TODO: Need unique name, potentially derivative from PublicHostname
-	c.RouterLBCName = fmt.Sprintf("router-%s", strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, ".")[1])
+	c.RouterLBCName = fmt.Sprintf("%s-router", strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, ".")[1])
 	selectNodeImage(cs, c)
 
 	selectContainerImages(cs, c)
@@ -183,6 +179,7 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		signingCert  *x509.Certificate
 		key          **rsa.PrivateKey
 		cert         **x509.Certificate
+		selfSign     bool
 	}{
 		// Generate etcd certs
 		{
@@ -241,10 +238,9 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			cert:        &c.Certificates.MasterProxyClient.Cert,
 		},
 		{
-			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			cn: cs.Properties.MasterProfile.FQDN,
 			dnsNames: []string{
-				internalAPIServerHostname(cs),
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+				cs.Properties.MasterProfile.FQDN,
 				"master-000000",
 				"master-000001",
 				"master-000002",
@@ -316,6 +312,19 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			key:         &c.Certificates.Registry.Key,
 			cert:        &c.Certificates.Registry.Cert,
 		},
+		// Openshift Console is BYO type of certificate. In the long run we should
+		// enable users to configure their own certificates.
+		// For this reason we decouple it from all OCP certs and make it self-sign
+		{
+			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			dnsNames: []string{
+				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			},
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			key:         &c.Certificates.OpenshiftConsole.Key,
+			cert:        &c.Certificates.OpenshiftConsole.Cert,
+			selfSign:    true,
+		},
 	}
 	for _, cert := range certs {
 		if cert.signingKey == nil && cert.signingCert == nil {
@@ -325,7 +334,7 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 			(*cert.cert).CheckSignatureFrom(cert.signingCert) == nil {
 			continue
 		}
-		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert); err != nil {
+		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, cert.selfSign); err != nil {
 			return
 		}
 	}
@@ -378,14 +387,14 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		{
 			clientKey:  c.Certificates.OpenShiftMaster.Key,
 			clientCert: c.Certificates.OpenShiftMaster.Cert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:openshift-master",
 			kubeconfig: &c.MasterKubeconfig,
 		},
 		{
 			clientKey:  c.Certificates.BootstrapAutoapprover.Key,
 			clientCert: c.Certificates.BootstrapAutoapprover.Cert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:serviceaccount:openshift-infra:bootstrap-autoapprover",
 			namespace:  "openshift-infra",
 			kubeconfig: &c.BootstrapAutoapproverKubeconfig,
@@ -393,14 +402,14 @@ func Generate(cs *acsapi.ContainerService, c *Config) (err error) {
 		{
 			clientKey:  c.Certificates.Admin.Key,
 			clientCert: c.Certificates.Admin.Cert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:admin",
 			kubeconfig: &c.AdminKubeconfig,
 		},
 		{
 			clientKey:  c.Certificates.NodeBootstrap.Key,
 			clientCert: c.Certificates.NodeBootstrap.Cert,
-			endpoint:   internalAPIServerHostname(cs),
+			endpoint:   cs.Properties.MasterProfile.FQDN,
 			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
 			kubeconfig: &c.NodeBootstrapKubeconfig,
 		},

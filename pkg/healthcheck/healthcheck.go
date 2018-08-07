@@ -84,7 +84,7 @@ func waitForConsole(ctx context.Context, cs *acsapi.ContainerService, c *config.
 		Timeout: 10 * time.Second,
 	}
 
-	req, err := http.NewRequest("HEAD", "https://"+cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname+"/console/", nil)
+	req, err := http.NewRequest("HEAD", "https://"+cs.Properties.MasterProfile.FQDN+"/console/", nil)
 	if err != nil {
 		return err
 	}
