@@ -5,8 +5,10 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"fmt"
+	"hash/fnv"
 	"io"
 	"math/big"
+	mathrand "math/rand"
 	"net"
 	"os"
 	"strings"
@@ -131,6 +133,11 @@ func Generate(cs *acsapi.ContainerService) (err error) {
 	selectNodeImage(cs)
 
 	selectContainerImages(cs)
+
+	// Generate ID for cluster
+	if cs.ID == "" {
+		cs.ID = generateClusterId(cs.Properties)
+	}
 
 	// Generate CAs
 	cas := []struct {
@@ -573,4 +580,15 @@ func randomString(length int) (string, error) {
 	}
 
 	return string(b), nil
+}
+
+// generateClusterId creates an 8 length id for the cluster based on a hash of the
+// masterprofile fqdn.
+func generateClusterId(properties *acsapi.Properties) string {
+	uniqueNameSuffixSize := 8
+	h := fnv.New64a()
+	// Note validation ensures master profile is not nil and that fqdn is set
+	h.Write([]byte(properties.MasterProfile.FQDN))
+	mathrand.Seed(int64(h.Sum64()))
+	return fmt.Sprintf("%08d", mathrand.Uint32())[:uniqueNameSuffixSize]
 }
