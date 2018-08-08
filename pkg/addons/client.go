@@ -6,7 +6,11 @@ import (
 	"log"
 	"reflect"
 
+	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
+
 	"github.com/openshift/openshift-azure/pkg/checks"
+	"github.com/openshift/openshift-azure/pkg/config"
 
 	"github.com/go-test/deep"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -41,6 +45,18 @@ type client struct {
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
 	grs        []*discovery.APIGroupResources
+	azs        storage.AccountsClient
+}
+
+func GetStorageAccountsClient(c *config.Config) (storage.AccountsClient, error) {
+	storageAccountsClient := storage.NewAccountsClient(c.SubscriptionID)
+	auth, err := auth.NewAuthorizerFromEnvironment()
+	if err != nil {
+		return storageAccountsClient, err
+	}
+	storageAccountsClient.Authorizer = auth
+
+	return storageAccountsClient, nil
 }
 
 func newClient(dryRun bool) (Interface, error) {

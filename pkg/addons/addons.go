@@ -5,6 +5,7 @@ package addons
 //go:generate gofmt -s -l -w bindata.go
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
@@ -21,6 +22,10 @@ import (
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util"
 )
+
+type extra struct {
+	StorageAccountKey string
+}
 
 func unmarshal(b []byte) (unstructured.Unstructured, error) {
 	// can't use straight yaml.Unmarshal() because it universally mangles yaml
@@ -57,9 +62,23 @@ func readDB(cs *acsapi.ContainerService, c *config.Config) (map[string]unstructu
 			return nil, err
 		}
 
+		azs, err := GetStorageAccountsClient(c)
+		if err != nil {
+			return nil, err
+		}
+
+		response, err := azs.ListKeys(context.Background(), c.ResourceGroup, c.RegistryStorageAccount)
+		if err != nil {
+			return nil, err
+		}
+
+		ex := &extra{
+			StorageAccountKey: *(((*response.Keys)[0]).Value),
+		}
+
 		ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
 		for _, tr := range ts {
-			b, err := util.Template(tr.Template, nil, cs, c, nil)
+			b, err := util.Template(tr.Template, nil, cs, c, ex)
 			if err != nil {
 				return nil, err
 			}

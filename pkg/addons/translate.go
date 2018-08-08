@@ -314,33 +314,13 @@ var Translations = map[string][]struct {
 			NestedPath: jsonpath.MustCompile("$.storage.azure.accountname"),
 			Template:   "{{ .Config.RegistryStorageAccount }}",
 		},
+		{
+			Path:       jsonpath.MustCompile("$.stringData.'config.yml'"),
+			NestedPath: jsonpath.MustCompile("$.storage.azure.accountkey"),
+			Template:   "{{ .Extra.StorageAccountKey }}",
+		},
 	},
 	"Secret/default/etc-origin-cloudprovider": {
-		{
-			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			NestedPath: jsonpath.MustCompile("$.tenantId"),
-			Template:   "{{ .Config.TenantID }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			NestedPath: jsonpath.MustCompile("$.subscriptionId"),
-			Template:   "{{ .Config.SubscriptionID }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			NestedPath: jsonpath.MustCompile("$.aadClientId"),
-			Template:   "{{ .ContainerService.Properties.ServicePrincipalProfile.ClientID }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			NestedPath: jsonpath.MustCompile("$.aadClientSecret"),
-			Template:   "{{ .ContainerService.Properties.ServicePrincipalProfile.Secret }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			NestedPath: jsonpath.MustCompile("$.aadTenantId"),
-			Template:   "{{ .Config.TenantID }}",
-		},
 		{
 			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
 			NestedPath: jsonpath.MustCompile("$.resourceGroup"),
