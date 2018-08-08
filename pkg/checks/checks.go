@@ -3,13 +3,8 @@ package checks
 import (
 	"context"
 	"fmt"
-	"io"
-	"net"
 	"net/http"
-	"net/url"
-	"os"
 	"strings"
-	"syscall"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,23 +25,9 @@ func WaitForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urlto
 	}
 	return wait.PollUntil(time.Second, func() (bool, error) {
 		resp, err := cli.Do(req)
-		if err, ok := err.(*url.Error); ok {
-			if err, ok := err.Err.(*net.OpError); ok {
-				if err, ok := err.Err.(*os.SyscallError); ok {
-					if err.Err == syscall.ENETUNREACH {
-						return false, nil
-					}
-				}
-			}
-			if err.Timeout() || err.Err == io.EOF || err.Err == io.ErrUnexpectedEOF {
-				return false, nil
-			}
-		}
-		if err == io.EOF {
-			return false, nil
-		}
 		if err != nil {
-			return false, err
+			fmt.Println(err)
+			return false, nil
 		}
 		return resp != nil && resp.StatusCode == http.StatusOK, nil
 	}, ctx.Done())
