@@ -228,7 +228,7 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.AnsibleServiceBrokerImage }}",
 		},
 	},
-	"Deployment.apps/openshift-azure/bootstrap-autoapprover": {
+	"Deployment.apps/openshift-infra/bootstrap-autoapprover": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.NodeImage }}",
@@ -382,12 +382,6 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'etcd-client.key'"),
 			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.EtcdClient.Key) }}",
-		},
-	},
-	"Secret/openshift-azure/bootstrap-autoapprover-kubeconfig": {
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'bootstrap-autoapprover.kubeconfig'"),
-			Template: "{{ String (YamlMarshal .Config.BootstrapAutoapproverKubeconfig) }}",
 		},
 	},
 	"Secret/openshift-metrics/alertmanager-proxy": {

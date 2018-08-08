@@ -42,11 +42,10 @@ type Config struct {
 	PrometheusAlertManagerImage string
 
 	// kubeconfigs
-	AdminKubeconfig                 *v1.Config
-	MasterKubeconfig                *v1.Config
-	BootstrapAutoapproverKubeconfig *v1.Config
-	NodeBootstrapKubeconfig         *v1.Config
-	SyncKubeconfig                  *v1.Config
+	AdminKubeconfig         *v1.Config
+	MasterKubeconfig        *v1.Config
+	NodeBootstrapKubeconfig *v1.Config
+	SyncKubeconfig          *v1.Config
 
 	// misc control plane configurables
 	ServiceAccountKey *rsa.PrivateKey
@@ -94,15 +93,14 @@ type CertificateConfig struct {
 	EtcdClient CertKeyPair
 
 	// control plane certificates
-	MasterServer          CertKeyPair
-	OpenshiftConsole      CertKeyPair
-	Admin                 CertKeyPair
-	AggregatorFrontProxy  CertKeyPair
-	MasterKubeletClient   CertKeyPair
-	MasterProxyClient     CertKeyPair
-	OpenShiftMaster       CertKeyPair
-	BootstrapAutoapprover CertKeyPair
-	NodeBootstrap         CertKeyPair
+	MasterServer         CertKeyPair
+	OpenshiftConsole     CertKeyPair
+	Admin                CertKeyPair
+	AggregatorFrontProxy CertKeyPair
+	MasterKubeletClient  CertKeyPair
+	MasterProxyClient    CertKeyPair
+	OpenShiftMaster      CertKeyPair
+	NodeBootstrap        CertKeyPair
 
 	// infra certificates
 	Registry                CertKeyPair
