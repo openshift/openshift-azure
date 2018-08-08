@@ -41,6 +41,9 @@ type Properties struct {
 	// RouterProfiles (in,optional/out): Configuration for OpenShift router(s).
 	RouterProfiles []RouterProfile `json:"routerProfiles,omitempty"`
 
+	// MasterPoolProfile (in): Configuration for OpenShift master VMs.
+	MasterPoolProfile MasterPoolProfile `json:"masterPoolProfile,omitempty"`
+
 	// AgentPoolProfiles (in): configuration of OpenShift cluster VMs.
 	AgentPoolProfiles []AgentPoolProfile `json:"agentPoolProfiles,omitempty"`
 
@@ -86,12 +89,23 @@ type RouterProfile struct {
 	FQDN string `json:"fqdn,omitempty"`
 }
 
+// MasterPoolProfile contains configuration for OpenShift master VMs.
+type MasterPoolProfile struct {
+	ProfileSpec
+}
+
 // AgentPoolProfile represents configuration of OpenShift cluster VMs.
 type AgentPoolProfile struct {
-	Name   string               `json:"name,omitempty"`
-	Role   AgentPoolProfileRole `json:"role,omitempty"`
-	Count  int                  `json:"count,omitempty"`
-	VMSize string               `json:"vmSize,omitempty"`
+	ProfileSpec
+	Role AgentPoolProfileRole `json:"role,omitempty"`
+}
+
+// ProfileSpec contains all shared fields that are used across MasterProfile
+// and AgentPoolProfile.  Items should only be added here if they are shared.
+type ProfileSpec struct {
+	Name   string `json:"name,omitempty"`
+	Count  int    `json:"count,omitempty"`
+	VMSize string `json:"vmSize,omitempty"`
 
 	// VnetSubnetID is expected to be empty or match
 	// `^/subscriptions/[^/]+
@@ -111,8 +125,6 @@ const (
 	AgentPoolProfileRoleCompute AgentPoolProfileRole = "compute"
 	// AgentPoolProfileRoleInfra is the infra role.
 	AgentPoolProfileRoleInfra AgentPoolProfileRole = "infra"
-	// AgentPoolProfileRoleMaster is the master role.
-	AgentPoolProfileRoleMaster AgentPoolProfileRole = "master"
 )
 
 // OSType represents the OS type of VMs in an AgentPool.

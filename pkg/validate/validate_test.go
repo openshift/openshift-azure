@@ -7,6 +7,7 @@ import (
 
 	"github.com/ghodss/yaml"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/api/v1"
 )
@@ -50,12 +51,12 @@ properties:
   routerProfiles:
   - name: default
     publicSubdomain: test.example.com
-  agentPoolProfiles:
-  - name: master
-    role: master
+  masterPoolProfile:
+    name: master
     count: 3
     vmSize: Standard_D2s_v3
     osType: Linux
+  agentPoolProfiles: 
   - name: infra
     role: infra
     count: 1
@@ -96,6 +97,10 @@ func TestValidate(t *testing.T) {
 			f:            func(oc *v1.OpenShiftCluster) { oc.Properties.ProvisioningState = "testing" },
 			expectedErrs: []error{errors.New("invalid properties.provisioningState \"testing\"")},
 		},
+		"test master count": {
+			f:            func(oc *v1.OpenShiftCluster) { oc.Properties.MasterPoolProfile.Count = 1 },
+			expectedErrs: []error{errors.New("invalid masterPoolProfile.count 1")},
+		},
 	}
 
 	for name, test := range tests {
@@ -113,10 +118,7 @@ func TestValidate(t *testing.T) {
 		cs := api.ConvertVLabsOpenShiftClusterToContainerService(oc)
 		errs := ContainerService(cs, nil)
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
-			t.Errorf("%v: OpenShiftCluster returned unexpected result", name)
-			for _, err := range errs {
-				t.Error(err)
-			}
+			t.Errorf("%s expected errors %#v but received %#v", name, spew.Sprint(test.expectedErrs), spew.Sprint(errs))
 		}
 
 	}

@@ -53,12 +53,12 @@ properties:
   routerProfiles:
   - name: default
     publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
-  agentPoolProfiles:
-  - name: master
-    role: master
+  masterPoolProfile:
+    name: master
     count: 3
     vmSize: Standard_D2s_v3
     osType: Linux
+  agentPoolProfiles:
   - name: infra
     role: infra
     count: 1

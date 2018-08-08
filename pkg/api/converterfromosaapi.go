@@ -51,7 +51,8 @@ func ConvertVLabsOpenShiftClusterToContainerService(oc *v1.OpenShiftCluster) *Co
 			}
 		}
 
-		cs.Properties.AgentPoolProfiles = make([]*AgentPoolProfile, len(oc.Properties.AgentPoolProfiles))
+		// +1 because master pool profile becomes agent pool profile
+		cs.Properties.AgentPoolProfiles = make([]*AgentPoolProfile, len(oc.Properties.AgentPoolProfiles)+1)
 		for i, app := range oc.Properties.AgentPoolProfiles {
 			cs.Properties.AgentPoolProfiles[i] = &AgentPoolProfile{
 				Name:         app.Name,
@@ -61,6 +62,15 @@ func ConvertVLabsOpenShiftClusterToContainerService(oc *v1.OpenShiftCluster) *Co
 				VnetSubnetID: app.VnetSubnetID,
 				Role:         AgentPoolProfileRole(app.Role),
 			}
+		}
+
+		cs.Properties.AgentPoolProfiles[len(oc.Properties.AgentPoolProfiles)] = &AgentPoolProfile{
+			Name:         oc.Properties.MasterPoolProfile.Name,
+			Count:        oc.Properties.MasterPoolProfile.Count,
+			VMSize:       oc.Properties.MasterPoolProfile.VMSize,
+			OSType:       OSType(oc.Properties.MasterPoolProfile.OSType),
+			VnetSubnetID: oc.Properties.MasterPoolProfile.VnetSubnetID,
+			Role:         AgentPoolProfileRoleMaster,
 		}
 	}
 
