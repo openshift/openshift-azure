@@ -6,7 +6,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/api/v1"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/healthcheck"
@@ -16,10 +15,6 @@ import (
 type Plugin struct{}
 
 var _ api.Plugin = &Plugin{}
-
-func (p *Plugin) ValidateExternal(oc *v1.OpenShiftCluster) []error {
-	return validate.OpenShiftCluster(oc)
-}
 
 func (p *Plugin) ValidateInternal(new, old *acsapi.ContainerService) []error {
 	return validate.ContainerService(new, old)

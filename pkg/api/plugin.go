@@ -3,13 +3,9 @@ package api
 
 import (
 	"context"
-
-	"github.com/openshift/openshift-azure/pkg/api/v1"
 )
 
 type Plugin interface {
-	ValidateExternal(oc *v1.OpenShiftCluster) []error
-
 	// ValidateInternal exists (a) to be able to place validation logic in a
 	// single place in the event of multiple external API versions, and (b) to
 	// be able to compare a new API manifest against a pre-existing API manifest
