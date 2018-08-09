@@ -6,7 +6,6 @@ package jsonpath
 import (
 	"bufio"
 	"bytes"
-	log "github.com/sirupsen/logrus"
 	"reflect"
 )
 
@@ -34,7 +33,7 @@ func Compile(s string) (Path, error) {
 func MustCompile(s string) Path {
 	p, err := Compile(s)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	return p
