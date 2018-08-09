@@ -18,7 +18,6 @@ import (
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/checks"
-	"github.com/openshift/openshift-azure/pkg/config"
 )
 
 // GetKubeconfigFromV1Config takes a v1 config and returns a kubeconfig
@@ -35,7 +34,8 @@ func getKubeconfigFromV1Config(kc *v1.Config) (clientcmd.ClientConfig, error) {
 }
 
 // HealthCheck function to verify cluster health
-func HealthCheck(ctx context.Context, cs *acsapi.ContainerService, c *config.Config) error {
+func HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error {
+	c := cs.Config
 	kubeconfig, err := getKubeconfigFromV1Config(c.AdminKubeconfig)
 	if err != nil {
 		return err
@@ -68,10 +68,11 @@ func HealthCheck(ctx context.Context, cs *acsapi.ContainerService, c *config.Con
 	}
 
 	// Wait for the console to be 200 status
-	return waitForConsole(ctx, cs, c)
+	return waitForConsole(ctx, cs)
 }
 
-func waitForConsole(ctx context.Context, cs *acsapi.ContainerService, c *config.Config) error {
+func waitForConsole(ctx context.Context, cs *acsapi.ContainerService) error {
+	c := cs.Config
 	pool := x509.NewCertPool()
 	pool.AddCert(c.Certificates.Ca.Cert)
 

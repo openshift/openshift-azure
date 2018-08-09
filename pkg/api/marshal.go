@@ -1,4 +1,4 @@
-package config
+package api
 
 import (
 	"bytes"
@@ -138,7 +138,7 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 			v.Field(i).Set(reflect.ValueOf(int(ii)))
 
-		case "config.CertificateConfig":
+		case "api.CertificateConfig":
 			// I don't know if this is the most efficient way to do this
 			data, err := yaml.Marshal(m[k])
 			if err != nil {

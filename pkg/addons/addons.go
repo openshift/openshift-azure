@@ -17,7 +17,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util"
 )
@@ -43,7 +42,7 @@ func unmarshal(b []byte) (unstructured.Unstructured, error) {
 
 // readDB reads previously exported objects into a map via go-bindata as well as
 // populating configuration items via Translate().
-func readDB(cs *acsapi.ContainerService, c *config.Config) (map[string]unstructured.Unstructured, error) {
+func readDB(cs *acsapi.ContainerService) (map[string]unstructured.Unstructured, error) {
 	db := map[string]unstructured.Unstructured{}
 
 	for _, asset := range AssetNames() {
@@ -59,7 +58,7 @@ func readDB(cs *acsapi.ContainerService, c *config.Config) (map[string]unstructu
 
 		ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
 		for _, tr := range ts {
-			b, err := util.Template(tr.Template, nil, cs, c, nil)
+			b, err := util.Template(tr.Template, nil, cs, nil)
 			if err != nil {
 				return nil, err
 			}
@@ -210,13 +209,13 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	return client.ApplyResources(scFilter, db, keys)
 }
 
-func Main(cs *acsapi.ContainerService, c *config.Config, dryRun bool) error {
+func Main(cs *acsapi.ContainerService, dryRun bool) error {
 	client, err := newClient(dryRun)
 	if err != nil {
 		return err
 	}
 
-	db, err := readDB(cs, c)
+	db, err := readDB(cs)
 	if err != nil {
 		return err
 	}

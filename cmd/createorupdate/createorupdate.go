@@ -12,7 +12,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/api/v1"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
@@ -40,19 +39,21 @@ func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 	}
 
 	// read in the OpenShift config blob if it exists (i.e. we're updating)
-	var configBytes []byte
-	if _, err := os.Stat("_data/config.yaml"); err == nil {
-		configBytes, err = ioutil.ReadFile("_data/config.yaml")
+	var oldCsBytes []byte
+	if _, err := os.Stat("_data/containerservice.yaml"); err == nil {
+		oldCsBytes, err = ioutil.ReadFile("_data/containerservice.yaml")
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	// in the update path, the RP should have access to the previous internal
-	// API representation for comparison.  Fake this for now
+	// API representation for comparison.
 	var oldCs *acsapi.ContainerService
-	if len(configBytes) > 0 {
-		oldCs = cs
+	if len(oldCsBytes) > 0 {
+		if err := yaml.Unmarshal(oldCsBytes, &oldCs); err != nil {
+			return nil, err
+		}
 	}
 
 	// validate the internal API representation (with reference to the previous
@@ -63,13 +64,17 @@ func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 	}
 
 	// generate or update the OpenShift config blob
-	configBytes, err = p.GenerateConfig(cs, configBytes)
+	err = p.GenerateConfig(cs)
 	if err != nil {
 		return nil, err
 	}
 
-	// persist the OpenShift config blob
-	err = ioutil.WriteFile("_data/config.yaml", configBytes, 0600)
+	// persist the OpenShift container service
+	bytes, err := yaml.Marshal(cs)
+	if err != nil {
+		return nil, err
+	}
+	err = ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +85,7 @@ func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 	}
 
 	// generate the ARM template
-	azuredeploy, err := p.GenerateARM(cs, configBytes)
+	azuredeploy, err := p.GenerateARM(cs)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +97,7 @@ func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 	}
 
 	// write out development files
-	err = writeHelpers(configBytes)
+	err = writeHelpers(cs.Config)
 	if err != nil {
 		return nil, err
 	}
@@ -134,13 +139,7 @@ func enrich(cs *acsapi.ContainerService) error {
 	return nil
 }
 
-func writeHelpers(configBytes []byte) error {
-	var c *config.Config
-	err := yaml.Unmarshal(configBytes, &c)
-	if err != nil {
-		return err
-	}
-
+func writeHelpers(c *acsapi.Config) error {
 	b, err := tls.PrivateKeyAsBytes(c.SSHKey)
 	if err != nil {
 		return err

@@ -26,6 +26,7 @@ type ContainerService struct {
 	Type     string                `json:"type"`
 
 	Properties *Properties `json:"properties,omitempty"`
+	Config     *Config     `json:config,omitempty`
 }
 
 // Properties represents the ACS cluster definition

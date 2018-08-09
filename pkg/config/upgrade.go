@@ -8,6 +8,6 @@ const (
 	versionLatest = 1
 )
 
-func Upgrade(cs *acsapi.ContainerService, c *Config) error {
+func Upgrade(cs *acsapi.ContainerService) error {
 	return nil
 }
