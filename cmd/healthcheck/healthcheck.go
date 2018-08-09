@@ -6,6 +6,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
@@ -31,6 +32,7 @@ func healthCheck() error {
 }
 
 func main() {
+	log.SetLevel(log.DebugLevel)
 	if err := healthCheck(); err != nil {
 		panic(err)
 	}

@@ -3,10 +3,10 @@ package addons
 import (
 	"context"
 	"errors"
-	"log"
 	"reflect"
 
 	"github.com/openshift/openshift-azure/pkg/checks"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/go-test/deep"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -157,7 +157,7 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		var existing *unstructured.Unstructured
 		existing, err = dc.Resource(res, o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
 		if kerrors.IsNotFound(err) {
-			log.Println("Create " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+			log.Infof("Create " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 			_, err = dc.Resource(res, o.GetNamespace()).Create(o)
 			if kerrors.IsAlreadyExists(err) {
 				// The "hot path" in write() is Get, check, then maybe Update.
@@ -183,20 +183,20 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		Default(*existing)
 
 		if reflect.DeepEqual(*existing, *o) {
-			log.Println("Skip " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+			log.Infof("Skip " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 			return
 		}
 		// this part of code should be executed only for updates
 		// TODO: Split flows to separate functions
 		handleSpecialObjects(*existing, *o)
 
-		log.Println("Update " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+		log.Infof("Update " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 
 		// TODO: we should have tests that monitor these diffs:
 		// 1) when a cluster is created
 		// 2) when sync is run twice back-to-back on the same cluster
 		for _, diff := range deep.Equal(*existing, *o) {
-			log.Println("- " + diff)
+			log.Infof("- " + diff)
 		}
 
 		o.SetResourceVersion(rv)

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
+	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -22,23 +23,30 @@ func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 	var p api.Plugin = &plugin.Plugin{}
 
 	// validate the external API manifest
+	log.Info("validate external")
 	errs := p.ValidateExternal(oc)
 	if len(errs) > 0 {
 		return nil, errors.NewAggregate(errs)
 	}
+	log.Info("done")
 
 	// convert the external API manifest into the internal API representation
+	log.Info("convert to internal")
 	cs := acsapi.ConvertVLabsOpenShiftClusterToContainerService(oc)
+	log.Info("done")
 
 	// the RP will enrich the internal API representation with data not included
 	// in the original request
 	// TODO(mjudeikis): choose DNS names here
+	log.Info("enrich")
 	err := enrich(cs)
 	if err != nil {
 		return nil, err
 	}
+	log.Info("done")
 
 	// read in the OpenShift config blob if it exists (i.e. we're updating)
+	log.Info("read old config")
 	var oldCsBytes []byte
 	if _, err := os.Stat("_data/containerservice.yaml"); err == nil {
 		oldCsBytes, err = ioutil.ReadFile("_data/containerservice.yaml")
@@ -55,21 +63,27 @@ func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 			return nil, err
 		}
 	}
+	log.Info("done")
 
 	// validate the internal API representation (with reference to the previous
 	// internal API representation)
+	log.Info("validate internal")
 	errs = p.ValidateInternal(cs, oldCs)
 	if len(errs) > 0 {
 		return nil, errors.NewAggregate(errs)
 	}
+	log.Info("done")
 
 	// generate or update the OpenShift config blob
+	log.Info("generate config")
 	err = p.GenerateConfig(cs)
 	if err != nil {
 		return nil, err
 	}
+	log.Info("done")
 
 	// persist the OpenShift container service
+	log.Info("persist config")
 	bytes, err := yaml.Marshal(cs)
 	if err != nil {
 		return nil, err
@@ -78,6 +92,7 @@ func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Info("done")
 
 	err = os.MkdirAll("_data/_out", 0777)
 	if err != nil {
@@ -85,22 +100,28 @@ func createOrUpdate(oc *v1.OpenShiftCluster) (*v1.OpenShiftCluster, error) {
 	}
 
 	// generate the ARM template
+	log.Info("generate arm")
 	azuredeploy, err := p.GenerateARM(cs)
 	if err != nil {
 		return nil, err
 	}
+	log.Info("done")
 
 	// persist the ARM template
+	log.Info("write arm")
 	err = ioutil.WriteFile("_data/_out/azuredeploy.json", azuredeploy, 0600)
 	if err != nil {
 		return nil, err
 	}
+	log.Info("done")
 
 	// write out development files
+	log.Info("write helpers")
 	err = writeHelpers(cs.Config)
 	if err != nil {
 		return nil, err
 	}
+	log.Info("done")
 
 	// convert our (probably changed) internal API representation back to the
 	// external API manifest to return it to the user
@@ -157,30 +178,32 @@ func writeHelpers(c *acsapi.Config) error {
 }
 
 func main() {
+	log.SetLevel(log.DebugLevel)
+
 	// read in the external API manifest.
 	b, err := ioutil.ReadFile("_data/manifest.yaml")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	var oc *v1.OpenShiftCluster
 	err = yaml.Unmarshal(b, &oc)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	// simulate the API call to the RP
 	oc, err = createOrUpdate(oc)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	// persist the returned (updated) external API manifest.
 	b, err = yaml.Marshal(oc)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	err = ioutil.WriteFile("_data/manifest.yaml", b, 0666)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }

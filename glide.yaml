@@ -14,3 +14,5 @@ import:
   version: v19.1.0
 - package: github.com/Azure/go-autorest
   version: 10.14.0
+- package: github.com/sirupsen/logrus
+  version: v1.0.6

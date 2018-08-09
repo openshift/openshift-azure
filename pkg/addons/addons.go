@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ghodss/yaml"
+	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -238,7 +239,7 @@ func Main(cs *acsapi.ContainerService, dryRun bool) error {
 				return err
 			}
 
-			fmt.Println(string(b))
+			log.Info(string(b))
 		}
 
 		return nil
