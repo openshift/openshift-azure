@@ -69,7 +69,7 @@ spec:
           set -o pipefail
 
           . <(sed -e 's/: */=/' /etc/origin/cloudprovider/azure.conf)
-          az login --service-principal -u "$aadClientId" -p "$aadClientSecret" --tenant "$aadTenantId" &>/dev/null
+          az login -i &>/dev/null
           REGISTRY_STORAGE_ACCOUNT_KEY=$(az storage account keys list -g "$resourceGroup" -n "$REGISTRY_STORAGE_ACCOUNT_NAME" --query "[?keyName == 'key1'].value" -o tsv)
           az logout
 

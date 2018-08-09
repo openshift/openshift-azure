@@ -319,31 +319,6 @@ var Translations = map[string][]struct {
 	"Secret/default/etc-origin-cloudprovider": {
 		{
 			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			NestedPath: jsonpath.MustCompile("$.tenantId"),
-			Template:   "{{ .Config.TenantID }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			NestedPath: jsonpath.MustCompile("$.subscriptionId"),
-			Template:   "{{ .Config.SubscriptionID }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			NestedPath: jsonpath.MustCompile("$.aadClientId"),
-			Template:   "{{ .ContainerService.Properties.ServicePrincipalProfile.ClientID }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			NestedPath: jsonpath.MustCompile("$.aadClientSecret"),
-			Template:   "{{ .ContainerService.Properties.ServicePrincipalProfile.Secret }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			NestedPath: jsonpath.MustCompile("$.aadTenantId"),
-			Template:   "{{ .Config.TenantID }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.stringData.'azure.conf'"),
 			NestedPath: jsonpath.MustCompile("$.resourceGroup"),
 			Template:   "{{ .Config.ResourceGroup }}",
 		},
