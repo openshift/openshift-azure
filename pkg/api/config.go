@@ -46,6 +46,7 @@ type Config struct {
 	MasterKubeconfig        *v1.Config
 	NodeBootstrapKubeconfig *v1.Config
 	SyncKubeconfig          *v1.Config
+	ClusterReaderKubeconfig *v1.Config
 
 	// misc control plane configurables
 	ServiceAccountKey *rsa.PrivateKey
@@ -110,6 +111,9 @@ type CertificateConfig struct {
 	Router                  CertKeyPair
 	ServiceCatalogServer    CertKeyPair
 	ServiceCatalogAPIClient CertKeyPair
+
+	// misc certificates
+	ClusterReader CertKeyPair
 }
 
 // CertKeyPair is an rsa private key and x509 certificate pair.

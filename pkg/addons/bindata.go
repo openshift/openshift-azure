@@ -393,6 +393,7 @@
 // data/ServiceAccount/openshift-infra/build-config-change-controller.yaml
 // data/ServiceAccount/openshift-infra/build-controller.yaml
 // data/ServiceAccount/openshift-infra/cluster-quota-reconciliation-controller.yaml
+// data/ServiceAccount/openshift-infra/cluster-reader.yaml
 // data/ServiceAccount/openshift-infra/default-rolebindings-controller.yaml
 // data/ServiceAccount/openshift-infra/deployer-controller.yaml
 // data/ServiceAccount/openshift-infra/deploymentconfig-controller.yaml
@@ -3438,7 +3439,7 @@ func clusterrolebindingRbacAuthorizationK8sIoClusterReader0Yaml() (*asset, error
 	return a, nil
 }
 
-var _clusterrolebindingRbacAuthorizationK8sIoClusterReaderYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\x8d\xb1\x8e\xc2\x30\x10\x44\x7b\x7f\xc5\xfe\x40\x72\xba\xee\xe4\xee\xa0\xa0\x0f\x12\xfd\xc6\xde\xc0\x12\xc7\x6b\xad\xd7\x29\xf8\x7a\x84\x88\x68\x10\x94\xa3\x99\x37\x0f\x0b\x9f\x48\x2b\x4b\xf6\xa0\x23\x86\x1e\x9b\x5d\x44\xf9\x86\xc6\x92\xfb\xf9\xaf\xf6\x2c\x3f\xeb\xaf\x9b\x39\x47\x0f\xfb\xd4\xaa\x91\x0e\x92\x68\xc7\x39\x72\x3e\xbb\x85\x0c\x23\x1a\x7a\x07\x90\x71\x21\x0f\xe1\x39\xea\x94\x30\x92\x3a\x95\x44\x03\x4d\x8f\x1e\x0b\x1f\x54\x5a\xf9\xe2\x72\x00\x6f\xaa\x4f\xcf\xb5\x8d\x57\x0a\x56\xbd\xeb\x36\xe8\x48\xba\x72\xa0\xff\x10\xa4\x65\x7b\x71\x2a\xcd\x48\xb7\x58\x0b\x06\xf2\x10\x69\xc2\x96\xcc\xdd\x03\x00\x00\xff\xff\x01\x2a\xc4\x06\x02\x01\x00\x00")
+var _clusterrolebindingRbacAuthorizationK8sIoClusterReaderYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x84\x8d\xb1\x4e\x43\x31\x0c\x45\xf7\x7c\x85\x7f\xe0\x3d\xc4\x86\xb2\x01\x03\x7b\x91\xd8\xdd\xe4\x3e\x6a\x9a\xda\x91\xe3\x74\xe0\xeb\x11\xa2\x42\x02\x04\x8c\x96\xef\x39\x87\xbb\x3c\xc1\x87\x98\x66\xf2\x3d\x97\x95\x67\x1c\xcc\xe5\x95\x43\x4c\xd7\xe3\xcd\x58\xc5\xae\xce\xd7\xe9\x28\x5a\x33\xdd\xb7\x39\x02\xbe\xb3\x86\x3b\xd1\x2a\xfa\x9c\x4e\x08\xae\x1c\x9c\x13\x91\xf2\x09\x99\xca\xc7\x68\x71\x70\x85\x27\xb7\x86\x1d\xb6\xf7\x3f\x77\x79\x70\x9b\xfd\x8f\x56\x22\xfa\x91\xfa\xcd\x3c\xe6\xfe\x05\x25\x46\x4e\xcb\x05\x7a\x84\x9f\xa5\xe0\xb6\x14\x9b\x1a\x9f\x9c\xdb\x0c\xf8\xe5\x1c\x9d\x0b\x32\x55\x6c\x3c\x5b\xfc\x87\x7e\x4b\x7e\x51\x58\x87\x8e\x83\x6c\xb1\x88\x6e\xce\xe9\x2d\x00\x00\xff\xff\xd0\x67\x91\x4b\x4d\x01\x00\x00")
 
 func clusterrolebindingRbacAuthorizationK8sIoClusterReaderYamlBytes() ([]byte, error) {
 	return bindataRead(
@@ -8378,6 +8379,26 @@ func serviceaccountOpenshiftInfraClusterQuotaReconciliationControllerYaml() (*as
 	return a, nil
 }
 
+var _serviceaccountOpenshiftInfraClusterReaderYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x2c\xc8\x31\x0e\xc2\x30\x0c\x05\xd0\x3d\xa7\xf0\x05\x3a\xb0\x7a\xe3\x0c\x48\xec\x5f\xce\xaf\xb0\xa0\x4e\xe4\xb8\x3d\x3f\x4b\xd7\x87\xe9\x6f\xe6\xf2\x11\x2a\xd7\xa3\x7d\x3d\xba\xca\x8b\x79\xb9\xf1\x69\x36\xce\xa8\x76\xb0\xd0\x51\xd0\x26\x12\x38\xa8\x62\xbf\x73\x15\x73\x4b\xa2\x33\x6f\x5e\x13\x46\x95\x31\x19\xeb\xe3\x7b\x6d\x1e\x7b\xa2\xfd\x03\x00\x00\xff\xff\x0f\x78\x9f\xcf\x62\x00\x00\x00")
+
+func serviceaccountOpenshiftInfraClusterReaderYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_serviceaccountOpenshiftInfraClusterReaderYaml,
+		"ServiceAccount/openshift-infra/cluster-reader.yaml",
+	)
+}
+
+func serviceaccountOpenshiftInfraClusterReaderYaml() (*asset, error) {
+	bytes, err := serviceaccountOpenshiftInfraClusterReaderYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ServiceAccount/openshift-infra/cluster-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _serviceaccountOpenshiftInfraDefaultRolebindingsControllerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x2c\xca\x31\x12\x02\x21\x0c\x05\xd0\x9e\x53\xe4\x02\x14\xb6\x74\x9e\xc1\x19\xfb\x18\x3e\x9a\x91\x4d\x98\x90\xdd\xf3\xdb\xd8\x3f\x5e\xfa\x44\x6c\x75\x6b\x74\xdd\xca\x57\xad\x37\x7a\x20\x2e\x15\xdc\x45\xfc\xb4\x2c\x07\x92\x3b\x27\xb7\x42\x64\x7c\xa0\x51\xc7\xe0\x73\x66\x0d\x9f\x78\xa9\x75\xb5\xf7\xae\xe2\x96\xe1\x73\x22\xfe\x6e\x2f\x16\x34\xf2\x05\xdb\x1f\x1d\x59\xd5\x46\x70\xf9\x05\x00\x00\xff\xff\x38\x13\xad\x27\x73\x00\x00\x00")
 
 func serviceaccountOpenshiftInfraDefaultRolebindingsControllerYamlBytes() ([]byte, error) {
@@ -10023,6 +10044,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ServiceAccount/openshift-infra/build-config-change-controller.yaml":                                                                 serviceaccountOpenshiftInfraBuildConfigChangeControllerYaml,
 	"ServiceAccount/openshift-infra/build-controller.yaml":                                                                               serviceaccountOpenshiftInfraBuildControllerYaml,
 	"ServiceAccount/openshift-infra/cluster-quota-reconciliation-controller.yaml":                                                        serviceaccountOpenshiftInfraClusterQuotaReconciliationControllerYaml,
+	"ServiceAccount/openshift-infra/cluster-reader.yaml":                                                                                 serviceaccountOpenshiftInfraClusterReaderYaml,
 	"ServiceAccount/openshift-infra/default-rolebindings-controller.yaml":                                                                serviceaccountOpenshiftInfraDefaultRolebindingsControllerYaml,
 	"ServiceAccount/openshift-infra/deployer-controller.yaml":                                                                            serviceaccountOpenshiftInfraDeployerControllerYaml,
 	"ServiceAccount/openshift-infra/deploymentconfig-controller.yaml":                                                                    serviceaccountOpenshiftInfraDeploymentconfigControllerYaml,
@@ -10651,6 +10673,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"build-config-change-controller.yaml":           {serviceaccountOpenshiftInfraBuildConfigChangeControllerYaml, map[string]*bintree{}},
 			"build-controller.yaml":                         {serviceaccountOpenshiftInfraBuildControllerYaml, map[string]*bintree{}},
 			"cluster-quota-reconciliation-controller.yaml":  {serviceaccountOpenshiftInfraClusterQuotaReconciliationControllerYaml, map[string]*bintree{}},
+			"cluster-reader.yaml":                           {serviceaccountOpenshiftInfraClusterReaderYaml, map[string]*bintree{}},
 			"default-rolebindings-controller.yaml":          {serviceaccountOpenshiftInfraDefaultRolebindingsControllerYaml, map[string]*bintree{}},
 			"deployer-controller.yaml":                      {serviceaccountOpenshiftInfraDeployerControllerYaml, map[string]*bintree{}},
 			"deploymentconfig-controller.yaml":              {serviceaccountOpenshiftInfraDeploymentconfigControllerYaml, map[string]*bintree{}},

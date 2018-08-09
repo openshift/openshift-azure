@@ -10,3 +10,6 @@ subjects:
 - kind: ServiceAccount
   name: router
   namespace: default
+- kind: ServiceAccount
+  name: cluster-reader
+  namespace: openshift-infra

@@ -290,6 +290,12 @@ func Generate(cs *acsapi.ContainerService) (err error) {
 			cert:        &c.Certificates.NodeBootstrap.Cert,
 		},
 		{
+			cn:          "system:serviceaccount:openshift-infra:cluster-reader",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			key:         &c.Certificates.ClusterReader.Key,
+			cert:        &c.Certificates.ClusterReader.Cert,
+		},
+		{
 			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
 			dnsNames: []string{
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
@@ -402,6 +408,7 @@ func Generate(cs *acsapi.ContainerService) (err error) {
 			endpoint:   cs.Properties.FQDN,
 			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
 			kubeconfig: &c.NodeBootstrapKubeconfig,
+			namespace:  "openshift-infra",
 		},
 		{
 			clientKey:  c.Certificates.Admin.Key,
@@ -412,6 +419,14 @@ func Generate(cs *acsapi.ContainerService) (err error) {
 			endpoint:   "master-000000",
 			username:   "system:admin",
 			kubeconfig: &c.SyncKubeconfig,
+		},
+		{
+			clientKey:  c.Certificates.ClusterReader.Key,
+			clientCert: c.Certificates.ClusterReader.Cert,
+			endpoint:   cs.Properties.MasterProfile.FQDN,
+			username:   "system:serviceaccount:openshift-infra:cluster-reader",
+			kubeconfig: &c.ClusterReaderKubeconfig,
+			namespace:  "openshift-infra",
 		},
 	}
 	for _, kc := range kubeconfigs {
