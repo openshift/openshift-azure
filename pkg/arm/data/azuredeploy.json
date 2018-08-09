@@ -165,7 +165,7 @@
         },
         {
             "apiVersion": "2014-10-01-preview",
-            "name": "[guid(concat('Microsoft.Compute/virtualMachineScaleSets/', 'ss-{{ $app.Name }}', 'vmidentity'))]",
+            "name": "[guid(concat('Microsoft.Compute/virtualMachineScaleSets/', 'ss-{{ $app.Name }}', 'vmidentity', '{{ $.Config.ResourceGroup }}'))]",
             "type": "Microsoft.Authorization/roleAssignments",
             "properties": {
 {{- if or (eq $app.Role "master") (eq $app.Role "infra") }}
