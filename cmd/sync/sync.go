@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"io/ioutil"
-	"log"
 	"time"
 
 	"github.com/ghodss/yaml"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/openshift/openshift-azure/pkg/addons"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -41,6 +42,7 @@ func sync() error {
 
 func main() {
 	flag.Parse()
+	log.SetLevel(log.DebugLevel)
 
 	for {
 		if err := sync(); err != nil {
