@@ -9,16 +9,14 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Azure/go-autorest/autorest/azure/auth"
+	log "github.com/sirupsen/logrus"
+
 	appsclient "k8s.io/client-go/kubernetes/typed/apps/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/tools/clientcmd/api/latest"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
-
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
-	"github.com/Azure/go-autorest/autorest"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/checks"
@@ -44,7 +42,7 @@ func HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error {
 		return err
 	}
 
-	rc, err := newAzureClient(ctx, cs)
+	anc, err := newAzureClients(ctx, cs)
 	if err != nil {
 		return err
 	}
@@ -56,7 +54,7 @@ func HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error {
 	}
 
 	// Check if FQDN's in the config matches what we got allocated in the cloud
-	err = checks.CheckDNS(ctx, rc, cs)
+	err = checks.CheckDNS(ctx, anc.eip, anc.lb, cs)
 	if err != nil {
 		return err
 	}
@@ -97,7 +95,7 @@ func waitForConsole(ctx context.Context, cs *acsapi.ContainerService) error {
 
 		switch resp.StatusCode {
 		case http.StatusOK:
-			fmt.Println("OK")
+			log.Info("OK")
 			return nil
 		case http.StatusBadGateway:
 			time.Sleep(10 * time.Second)
@@ -136,37 +134,4 @@ func newAppClient(ctx context.Context, config *v1.Config) (*appsclient.AppsV1Cli
 		return nil, err
 	}
 	return appsclient, nil
-}
-
-func newAzureClient(ctx context.Context, cs *acsapi.ContainerService) (*resources.Client, error) {
-
-	authorizer, err := auth.NewAuthorizerFromEnvironment()
-	if err != nil {
-		return nil, err
-	}
-	rc := resources.NewClient(cs.Properties.AzProfile.SubscriptionID)
-	rc.Authorizer = authorizer
-	rc.RequestInspector = setAzureAPIVersion("2018-05-01")
-
-	return &rc, nil
-}
-
-// setAzureAPIVersion returns a prepare decorator that changes the request's query for api-version
-// This can be set up as a client's RequestInspector.
-func setAzureAPIVersion(apiVersion string) autorest.PrepareDecorator {
-	return func(p autorest.Preparer) autorest.Preparer {
-		return autorest.PreparerFunc(func(r *http.Request) (*http.Request, error) {
-			r, err := p.Prepare(r)
-			if err == nil {
-				v := r.URL.Query()
-				d, err := url.QueryUnescape(apiVersion)
-				if err != nil {
-					return r, err
-				}
-				v.Set("api-version", d)
-				r.URL.RawQuery = v.Encode()
-			}
-			return r, err
-		})
-	}
 }

@@ -12,11 +12,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	appclient "k8s.io/client-go/kubernetes/typed/apps/v1"
+
+	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-05-01/network"
 )
 
 // WaitForHTTPStatusOk poll until URL returns 200
@@ -171,38 +172,35 @@ func WaitForInfraServices(ctx context.Context, appclient *appclient.AppsV1Client
 	return nil
 }
 
-func CheckDNS(ctx context.Context, rc *resources.Client, cs *acsapi.ContainerService) error {
+func CheckDNS(ctx context.Context, eipc network.PublicIPAddressesClient, lbc network.LoadBalancerFrontendIPConfigurationsClient, cs *acsapi.ContainerService) error {
 
-	//check master FQDN from ipAddress resource
-	rs, err := rc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network", "", "publicIPAddresses", "ip-apiserver")
-	if err != nil {
-		return err
-	}
-	fqdn := rs.Properties.(map[string]interface{})["dnsSettings"].(map[string]interface{})["fqdn"]
-	if fqdn != cs.Properties.MasterProfile.FQDN {
-		return fmt.Errorf("ip-address fqdn %s do not match configuration %s", fqdn, cs.Properties.MasterProfile.FQDN)
-	}
-
-	//check router FQDN by quering k8s LoadBalancer and ipAddress associated with it
-	rs, err = rc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network", "", "loadBalancers", "kubernetes")
+	// get master FQDN from ip-apiserver loadbalancer
+	ip, err := eipc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, "ip-apiserver", "")
 	if err != nil {
 		return err
 	}
 
-	// iterate over k8s LoadBalancers and check if we have a match. Match should always exist, so failed by default.
-	// TODO: With multiple router this need to check multiple conditions
+	if *ip.DNSSettings.Fqdn != cs.Properties.FQDN {
+		return fmt.Errorf("ip-address fqdn %s do not match configuration %s", *ip.DNSSettings.Fqdn, cs.Properties.FQDN)
+	}
+
+	// check router FQDN by quering k8s LoadBalancer and ipAddress associated with it
+	lbIPList, err := lbc.List(ctx, cs.Properties.AzProfile.ResourceGroup, "kubernetes")
+	if err != nil {
+		return err
+	}
+	// iterate over k8s LoadBalancer and check if we have a match. Match should always exist, so failed by default.
+	// TODO: With multiple routers this need to check multiple conditions
 	exist := false
-	for _, v := range rs.Properties.(map[string]interface{})["frontendIPConfigurations"].([]interface{}) {
-		// get each ipAdresses objects, assigned to this LoadBalancer
-		id := v.(map[string]interface{})["properties"].(map[string]interface{})["publicIPAddress"].(map[string]interface{})["id"].(string)
-		// get ipAddress object of each of those
-		ipAddressName := strings.Split(id, "/")[len(strings.Split(id, "/"))-1]
-		ip, err := rc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network", "", "publicIPAddresses", ipAddressName)
+	for _, v := range lbIPList.Values() {
+		parts := strings.Split(*v.PublicIPAddress.ID, "/")
+		ipAddressName := parts[len(parts)-1]
+		ip, err := eipc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, ipAddressName, "")
 		if err != nil {
 			return err
 		}
-		fqdn = ip.Properties.(map[string]interface{})["dnsSettings"].(map[string]interface{})["fqdn"]
-		if fqdn == cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN {
+
+		if *ip.DNSSettings.Fqdn == cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN {
 			exist = true
 		}
 	}

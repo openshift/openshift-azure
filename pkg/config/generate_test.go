@@ -16,8 +16,7 @@ name: test-cluster
 config:
   Version: 310
 properties:
-  masterProfile:
-    fqdn: "console-internal.example.com"
+  fqdn: "console-internal.example.com"
   orchestratorProfile:
     openshiftConfig:
       PublicHostname: ""
@@ -57,11 +56,11 @@ func TestSelectDNSNames(t *testing.T) {
 		"test master & router prefix configuration": {
 			f: func(cs *acsapi.ContainerService) {
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = "router-custom.test.com"
-				cs.Properties.MasterProfile.FQDN = "master-custom.test.com"
+				cs.Properties.FQDN = "master-custom.test.com"
 			},
 			expected: func(cs *acsapi.ContainerService) {
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = "router-custom.test.com"
-				cs.Properties.MasterProfile.FQDN = "master-custom.test.com"
+				cs.Properties.FQDN = "master-custom.test.com"
 				cs.Config.MasterLBCNamePrefix = "master-custom"
 				cs.Config.RouterLBCNamePrefix = "router-custom"
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = "router-custom.test.com"
