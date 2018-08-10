@@ -290,10 +290,10 @@ func Generate(cs *acsapi.ContainerService) (err error) {
 			cert:        &c.Certificates.NodeBootstrap.Cert,
 		},
 		{
-			cn:          "system:serviceaccount:openshift-infra:cluster-reader",
+			cn:          "system:serviceaccount:openshift-azure:azure-cluster-reader",
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:         &c.Certificates.ClusterReader.Key,
-			cert:        &c.Certificates.ClusterReader.Cert,
+			key:         &c.Certificates.AzureClusterReader.Key,
+			cert:        &c.Certificates.AzureClusterReader.Cert,
 		},
 		{
 			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
@@ -421,12 +421,12 @@ func Generate(cs *acsapi.ContainerService) (err error) {
 			kubeconfig: &c.SyncKubeconfig,
 		},
 		{
-			clientKey:  c.Certificates.ClusterReader.Key,
-			clientCert: c.Certificates.ClusterReader.Cert,
-			endpoint:   cs.Properties.MasterProfile.FQDN,
-			username:   "system:serviceaccount:openshift-infra:cluster-reader",
-			kubeconfig: &c.ClusterReaderKubeconfig,
-			namespace:  "openshift-infra",
+			clientKey:  c.Certificates.AzureClusterReader.Key,
+			clientCert: c.Certificates.AzureClusterReader.Cert,
+			endpoint:   cs.Properties.FQDN,
+			username:   "system:serviceaccount:openshift-azure:azure-cluster-reader",
+			kubeconfig: &c.AzureClusterReaderKubeconfig,
+			namespace:  "openshift-azure",
 		},
 	}
 	for _, kc := range kubeconfigs {
