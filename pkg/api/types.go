@@ -33,10 +33,13 @@ type ContainerService struct {
 type Properties struct {
 	ProvisioningState       ProvisioningState        `json:"provisioningState,omitempty"`
 	OrchestratorProfile     *OrchestratorProfile     `json:"orchestratorProfile,omitempty"`
-	MasterProfile           *MasterProfile           `json:"masterProfile,omitempty"`
 	AgentPoolProfiles       []*AgentPoolProfile      `json:"agentPoolProfiles,omitempty"`
 	ServicePrincipalProfile *ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
 	AzProfile               *AzProfile               `json:"azProfile,omitempty"`
+	// Master LB public endpoint/FQDN with port
+	// The format will be FQDN:2376
+	// Not used during PUT, returned as part of GET
+	FQDN string `json:"fqdn,omitempty"`
 }
 
 // AzProfile holds the azure context for where the cluster resides
@@ -90,14 +93,6 @@ type OpenShiftRouterProfile struct {
 	Name            string
 	PublicSubdomain string
 	FQDN            string
-}
-
-// MasterProfile represents the definition of the master cluster
-type MasterProfile struct {
-	// Master LB public endpoint/FQDN with port
-	// The format will be FQDN:2376
-	// Not used during PUT, returned as part of GET
-	FQDN string `json:"fqdn,omitempty"`
 }
 
 // AgentPoolProfile represents an agent pool definition

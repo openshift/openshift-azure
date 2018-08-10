@@ -85,7 +85,7 @@ func waitForConsole(ctx context.Context, cs *acsapi.ContainerService) error {
 		Timeout: 10 * time.Second,
 	}
 
-	req, err := http.NewRequest("HEAD", "https://"+cs.Properties.MasterProfile.FQDN+"/console/", nil)
+	req, err := http.NewRequest("HEAD", "https://"+cs.Properties.FQDN+"/console/", nil)
 	if err != nil {
 		return err
 	}

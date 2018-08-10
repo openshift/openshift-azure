@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/ghodss/yaml"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/api/v1"
 )

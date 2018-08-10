@@ -112,9 +112,7 @@ var testContainerService = &ContainerService{
 				},
 			},
 		},
-		MasterProfile: &MasterProfile{
-			FQDN: "properties.fqdn",
-		},
+		FQDN: "properties.fqdn",
 		AgentPoolProfiles: []*AgentPoolProfile{
 			{
 				Name:         "properties.agentPoolProfiles.0.name",

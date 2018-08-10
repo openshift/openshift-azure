@@ -46,9 +46,7 @@ func ConvertContainerServiceToVLabsOpenShiftCluster(cs *ContainerService) *v1.Op
 			}
 		}
 
-		if cs.Properties.MasterProfile != nil {
-			oc.Properties.FQDN = cs.Properties.MasterProfile.FQDN
-		}
+		oc.Properties.FQDN = cs.Properties.FQDN
 
 		if cs.Properties.ServicePrincipalProfile != nil {
 			oc.Properties.ServicePrincipalProfile = v1.ServicePrincipalProfile{

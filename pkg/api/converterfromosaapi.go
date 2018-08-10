@@ -33,9 +33,7 @@ func ConvertVLabsOpenShiftClusterToContainerService(oc *v1.OpenShiftCluster) *Co
 					PublicHostname: oc.Properties.PublicHostname,
 				},
 			},
-			MasterProfile: &MasterProfile{
-				FQDN: oc.Properties.FQDN,
-			},
+			FQDN: oc.Properties.FQDN,
 			ServicePrincipalProfile: &ServicePrincipalProfile{
 				ClientID: oc.Properties.ServicePrincipalProfile.ClientID,
 				Secret:   oc.Properties.ServicePrincipalProfile.Secret,
