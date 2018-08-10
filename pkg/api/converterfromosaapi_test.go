@@ -39,22 +39,35 @@ var testOpenShiftCluster = &v1.OpenShiftCluster{
 				FQDN:            "properties.routerProfiles.1.fqdn",
 			},
 		},
-		AgentPoolProfiles: []v1.AgentPoolProfile{
-			{
+		MasterPoolProfile: v1.MasterPoolProfile{
+			ProfileSpec: v1.ProfileSpec{
 				Name:         "properties.agentPoolProfiles.0.name",
-				Role:         "properties.agentPoolProfiles.0.role",
 				Count:        1,
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 				OSType:       "properties.agentPoolProfiles.0.osType",
 			},
+		},
+		AgentPoolProfiles: []v1.AgentPoolProfile{
 			{
-				Name:         "properties.agentPoolProfiles.0.name",
-				Role:         "properties.agentPoolProfiles.0.role",
-				Count:        2,
-				VMSize:       "properties.agentPoolProfiles.0.vmSize",
-				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-				OSType:       "properties.agentPoolProfiles.0.osType",
+				Role: "properties.agentPoolProfiles.0.role",
+				ProfileSpec: v1.ProfileSpec{
+					Name:         "properties.agentPoolProfiles.0.name",
+					Count:        1,
+					VMSize:       "properties.agentPoolProfiles.0.vmSize",
+					VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+					OSType:       "properties.agentPoolProfiles.0.osType",
+				},
+			},
+			{
+				Role: "properties.agentPoolProfiles.0.role",
+				ProfileSpec: v1.ProfileSpec{
+					Name:         "properties.agentPoolProfiles.0.name",
+					Count:        2,
+					VMSize:       "properties.agentPoolProfiles.0.vmSize",
+					VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+					OSType:       "properties.agentPoolProfiles.0.osType",
+				},
 			},
 		},
 		ServicePrincipalProfile: v1.ServicePrincipalProfile{
@@ -99,9 +112,7 @@ var testContainerService = &ContainerService{
 				},
 			},
 		},
-		MasterProfile: &MasterProfile{
-			FQDN: "properties.fqdn",
-		},
+		FQDN: "properties.fqdn",
 		AgentPoolProfiles: []*AgentPoolProfile{
 			{
 				Name:         "properties.agentPoolProfiles.0.name",
@@ -118,6 +129,14 @@ var testContainerService = &ContainerService{
 				OSType:       "properties.agentPoolProfiles.0.osType",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 				Role:         "properties.agentPoolProfiles.0.role",
+			},
+			{
+				Name:         "properties.agentPoolProfiles.0.name",
+				Count:        1,
+				VMSize:       "properties.agentPoolProfiles.0.vmSize",
+				OSType:       "properties.agentPoolProfiles.0.osType",
+				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+				Role:         "master",
 			},
 		},
 		ServicePrincipalProfile: &ServicePrincipalProfile{

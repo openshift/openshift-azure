@@ -62,7 +62,7 @@ func validateContainerService(c *api.ContainerService) (errs []error) {
 func validateProperties(p *api.Properties) (errs []error) {
 	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
 	errs = append(errs, validateOrchestratorProfile(p.OrchestratorProfile)...)
-	errs = append(errs, validateMasterProfile(p.MasterProfile)...)
+	errs = append(errs, validateFQDN(p)...)
 	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles)...)
 	errs = append(errs, validateServicePrincipalProfile(p.ServicePrincipalProfile)...)
 	return
@@ -132,7 +132,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 
 	case api.AgentPoolProfileRoleMaster:
 		if app.Count != 3 {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %q", app.Name, app.Count))
+			errs = append(errs, fmt.Errorf("invalid masterPoolProfile.count %d", app.Count))
 		}
 
 	default:
@@ -176,7 +176,7 @@ func validateOrchestratorProfile(p *api.OrchestratorProfile) (errs []error) {
 	return
 }
 
-func validateMasterProfile(p *api.MasterProfile) (errs []error) {
+func validateFQDN(p *api.Properties) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
 	}

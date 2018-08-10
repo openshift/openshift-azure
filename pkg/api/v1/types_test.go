@@ -39,22 +39,35 @@ var testOpenShiftCluster = &OpenShiftCluster{
 				FQDN:            "properties.routerProfiles.1.fqdn",
 			},
 		},
-		AgentPoolProfiles: []AgentPoolProfile{
-			{
+		MasterPoolProfile: MasterPoolProfile{
+			ProfileSpec: ProfileSpec{
 				Name:         "properties.agentPoolProfiles.0.name",
-				Role:         "properties.agentPoolProfiles.0.role",
 				Count:        1,
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 				OSType:       "properties.agentPoolProfiles.0.osType",
 			},
+		},
+		AgentPoolProfiles: []AgentPoolProfile{
 			{
-				Name:         "properties.agentPoolProfiles.0.name",
-				Role:         "properties.agentPoolProfiles.0.role",
-				Count:        2,
-				VMSize:       "properties.agentPoolProfiles.0.vmSize",
-				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-				OSType:       "properties.agentPoolProfiles.0.osType",
+				ProfileSpec: ProfileSpec{
+					Name:         "properties.agentPoolProfiles.0.name",
+					Count:        1,
+					VMSize:       "properties.agentPoolProfiles.0.vmSize",
+					VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+					OSType:       "properties.agentPoolProfiles.0.osType",
+				},
+				Role: "properties.agentPoolProfiles.0.role",
+			},
+			{
+				ProfileSpec: ProfileSpec{
+					Name:         "properties.agentPoolProfiles.0.name",
+					Count:        2,
+					VMSize:       "properties.agentPoolProfiles.0.vmSize",
+					VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+					OSType:       "properties.agentPoolProfiles.0.osType",
+				},
+				Role: "properties.agentPoolProfiles.0.role",
 			},
 		},
 		ServicePrincipalProfile: ServicePrincipalProfile{
@@ -96,22 +109,29 @@ var testOpenShiftClusterJSON = []byte(`{
 				"fqdn": "properties.routerProfiles.1.fqdn"
 			}
 		],
+		"masterPoolProfile": {
+			"name": "properties.agentPoolProfiles.0.name",
+			"count": 1,
+			"vmSize": "properties.agentPoolProfiles.0.vmSize",
+			"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
+			"osType": "properties.agentPoolProfiles.0.osType"
+		},
 		"agentPoolProfiles": [
 			{
 				"name": "properties.agentPoolProfiles.0.name",
-				"role": "properties.agentPoolProfiles.0.role",
 				"count": 1,
 				"vmSize": "properties.agentPoolProfiles.0.vmSize",
 				"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
-				"osType": "properties.agentPoolProfiles.0.osType"
+				"osType": "properties.agentPoolProfiles.0.osType",
+				"role": "properties.agentPoolProfiles.0.role"
 			},
 			{
 				"name": "properties.agentPoolProfiles.0.name",
-				"role": "properties.agentPoolProfiles.0.role",
 				"count": 2,
 				"vmSize": "properties.agentPoolProfiles.0.vmSize",
 				"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
-				"osType": "properties.agentPoolProfiles.0.osType"
+				"osType": "properties.agentPoolProfiles.0.osType",
+				"role": "properties.agentPoolProfiles.0.role"
 			}
 		],
 		"servicePrincipalProfile": {

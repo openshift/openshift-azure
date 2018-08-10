@@ -11,7 +11,6 @@ func TestTotalNodes(t *testing.T) {
 	}{
 		{
 			p: Properties{
-				MasterProfile: &MasterProfile{},
 				AgentPoolProfiles: []*AgentPoolProfile{
 					{
 						Count: 1,
@@ -50,7 +49,6 @@ func TestIsCustomVNET(t *testing.T) {
 	}{
 		{
 			p: Properties{
-				MasterProfile: &MasterProfile{},
 				AgentPoolProfiles: []*AgentPoolProfile{
 					{
 						VnetSubnetID: "testSubnet",
@@ -62,7 +60,6 @@ func TestIsCustomVNET(t *testing.T) {
 		},
 		{
 			p: Properties{
-				MasterProfile: &MasterProfile{},
 				AgentPoolProfiles: []*AgentPoolProfile{
 					{
 						Count: 1,

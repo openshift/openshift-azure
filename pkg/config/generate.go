@@ -242,9 +242,9 @@ func Generate(cs *acsapi.ContainerService) (err error) {
 			cert:        &c.Certificates.MasterProxyClient.Cert,
 		},
 		{
-			cn: cs.Properties.MasterProfile.FQDN,
+			cn: cs.Properties.FQDN,
 			dnsNames: []string{
-				cs.Properties.MasterProfile.FQDN,
+				cs.Properties.FQDN,
 				"master-000000",
 				"master-000001",
 				"master-000002",
@@ -385,21 +385,21 @@ func Generate(cs *acsapi.ContainerService) (err error) {
 		{
 			clientKey:  c.Certificates.OpenShiftMaster.Key,
 			clientCert: c.Certificates.OpenShiftMaster.Cert,
-			endpoint:   cs.Properties.MasterProfile.FQDN,
+			endpoint:   cs.Properties.FQDN,
 			username:   "system:openshift-master",
 			kubeconfig: &c.MasterKubeconfig,
 		},
 		{
 			clientKey:  c.Certificates.Admin.Key,
 			clientCert: c.Certificates.Admin.Cert,
-			endpoint:   cs.Properties.MasterProfile.FQDN,
+			endpoint:   cs.Properties.FQDN,
 			username:   "system:admin",
 			kubeconfig: &c.AdminKubeconfig,
 		},
 		{
 			clientKey:  c.Certificates.NodeBootstrap.Key,
 			clientCert: c.Certificates.NodeBootstrap.Cert,
-			endpoint:   cs.Properties.MasterProfile.FQDN,
+			endpoint:   cs.Properties.FQDN,
 			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
 			kubeconfig: &c.NodeBootstrapKubeconfig,
 		},

@@ -46,9 +46,7 @@ func ConvertContainerServiceToVLabsOpenShiftCluster(cs *ContainerService) *v1.Op
 			}
 		}
 
-		if cs.Properties.MasterProfile != nil {
-			oc.Properties.FQDN = cs.Properties.MasterProfile.FQDN
-		}
+		oc.Properties.FQDN = cs.Properties.FQDN
 
 		if cs.Properties.ServicePrincipalProfile != nil {
 			oc.Properties.ServicePrincipalProfile = v1.ServicePrincipalProfile{
@@ -57,15 +55,30 @@ func ConvertContainerServiceToVLabsOpenShiftCluster(cs *ContainerService) *v1.Op
 			}
 		}
 
-		oc.Properties.AgentPoolProfiles = make([]v1.AgentPoolProfile, len(cs.Properties.AgentPoolProfiles))
+		// -1 because master profile moves to its own field
+		oc.Properties.AgentPoolProfiles = make([]v1.AgentPoolProfile, len(cs.Properties.AgentPoolProfiles)-1)
 		for i, app := range cs.Properties.AgentPoolProfiles {
-			oc.Properties.AgentPoolProfiles[i] = v1.AgentPoolProfile{
-				Name:         app.Name,
-				Count:        app.Count,
-				VMSize:       app.VMSize,
-				OSType:       v1.OSType(app.OSType),
-				VnetSubnetID: app.VnetSubnetID,
-				Role:         v1.AgentPoolProfileRole(app.Role),
+			if app.Role == AgentPoolProfileRoleMaster {
+				oc.Properties.MasterPoolProfile = v1.MasterPoolProfile{
+					ProfileSpec: v1.ProfileSpec{
+						Name:         app.Name,
+						Count:        app.Count,
+						VMSize:       app.VMSize,
+						OSType:       v1.OSType(app.OSType),
+						VnetSubnetID: app.VnetSubnetID,
+					},
+				}
+			} else {
+				oc.Properties.AgentPoolProfiles[i] = v1.AgentPoolProfile{
+					ProfileSpec: v1.ProfileSpec{
+						Name:         app.Name,
+						Count:        app.Count,
+						VMSize:       app.VMSize,
+						OSType:       v1.OSType(app.OSType),
+						VnetSubnetID: app.VnetSubnetID,
+					},
+					Role: v1.AgentPoolProfileRole(app.Role),
+				}
 			}
 		}
 	}
