@@ -9,7 +9,7 @@
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2016-03-30",
             "location": "{{ .ContainerService.Location | js }}",
-            "name": "vnet",
+            "name": "vnet-{{ .ContainerService.ID }}",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -35,7 +35,7 @@
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2016-03-30",
             "location": "{{ .ContainerService.Location | js }}",
-            "name": "ip-apiserver",
+            "name": "ip-apiserver-{{ .ContainerService.ID }}",
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "idleTimeoutInMinutes": 15,
@@ -51,10 +51,10 @@
             "type": "Microsoft.Network/loadBalancers",
             "apiVersion": "2016-03-30",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-apiserver')]"
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-apiserver-{{ .ContainerService.ID }}')]"
             ],
             "location": "{{ .ContainerService.Location | js }}",
-            "name": "lb-apiserver",
+            "name": "lb-apiserver-{{ .ContainerService.ID }}",
             "properties": {
                 "backendAddressPools": [
                     {
@@ -67,7 +67,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-apiserver')]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'ip-apiserver-{{ .ContainerService.ID }}')]"
                             }
                         }
                     }
@@ -79,18 +79,18 @@
                         "name": "port-443",
                         "properties": {
                             "backendAddressPool": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/backendAddressPools/backend')]"
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver-{{ .ContainerService.ID }}'), '/backendAddressPools/backend')]"
                             },
                             "backendPort": 443,
                             "enableFloatingIP": false,
                             "frontendIPConfiguration": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/frontendIPConfigurations/frontend')]"
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver-{{ .ContainerService.ID }}'), '/frontendIPConfigurations/frontend')]"
                             },
                             "frontendPort": 443,
                             "idleTimeoutInMinutes": 15,
                             "loadDistribution": "Default",
                             "probe": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/probes/port-443')]"
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver-{{ .ContainerService.ID }}'), '/probes/port-443')]"
                             },
                             "protocol": "Tcp"
                         }
@@ -127,7 +127,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
             "location": "{{ $.ContainerService.Location }}",
-            "name": "nsg-{{ $app.Name }}",
+            "name": "nsg-{{ $app.Name }}-{{ $.ContainerService.ID }}",
             "properties": {
                 "securityRules": [
                     {
@@ -165,7 +165,7 @@
         },
         {
             "apiVersion": "2014-10-01-preview",
-            "name": "[guid(concat('Microsoft.Compute/virtualMachineScaleSets/', 'ss-{{ $app.Name }}', 'vmidentity', '{{ $.Config.ResourceGroup }}'))]",
+            "name": "[guid(concat('Microsoft.Compute/virtualMachineScaleSets/', 'ss-{{ $app.Name }}-{{ $.ContainerService.ID }}', 'vmidentity', '{{ $.Config.ResourceGroup }}'))]",
             "type": "Microsoft.Authorization/roleAssignments",
             "properties": {
 {{- if or (eq $app.Role "master") (eq $app.Role "infra") }}
@@ -174,7 +174,7 @@
               "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
 
 {{- end }}
-              "principalId": "[reference(concat('Microsoft.Compute/virtualMachineScaleSets/', 'ss-{{ $app.Name }}'), '2017-03-30', 'Full').identity.principalId]"
+              "principalId": "[reference(concat('Microsoft.Compute/virtualMachineScaleSets/', 'ss-{{ $app.Name }}-{{ $.ContainerService.ID }}'), '2017-03-30', 'Full').identity.principalId]"
             }
         },
         {
@@ -183,14 +183,14 @@
             "location": "{{ $.ContainerService.Location | js }}",
             "dependsOn": [
 {{- if not $app.VnetSubnetID }}
-                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-{{ $.ContainerService.ID }}')]",
 {{- end }}
 {{- if eq $app.Role "master" }}
-                "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]",
+                "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver-{{ $.ContainerService.ID }}')]",
 {{- end }}
-                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}')]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}-{{ $.ContainerService.ID }}')]"
             ],
-            "name": "ss-{{ $app.Name }}",
+            "name": "ss-{{ $app.Name }}-{{ $.ContainerService.ID }}",
             "identity": {
                 "type": "systemAssigned"
             },
@@ -263,7 +263,7 @@
                                     "primary": true,
                                     "enableIPForwarding": true,
                                     "networkSecurityGroup": {
-                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}')]"
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}-{{ $.ContainerService.ID }}')]"
                                     },
                                     "ipConfigurations": [
                                         {
@@ -271,7 +271,7 @@
                                             "properties": {
                                                 "primary": true,
                                                 "subnet": {
-                                                    "id": "{{if $app.VnetSubnetID}}{{$app.VnetSubnetID}}{{else}}[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/default')]{{end}}"
+                                                    "id": "{{if $app.VnetSubnetID}}{{$app.VnetSubnetID}}{{else}}[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet-{{ $.ContainerService.ID }}'), '/subnets/default')]{{end}}"
                                                 },
                                                 "publicIpAddressConfiguration": {
                                                     "name": "ip",
@@ -282,7 +282,7 @@
 {{- if eq $app.Role "master" }},
                                                 "loadBalancerBackendAddressPools": [
                                                     {
-                                                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/backendAddressPools/backend')]"
+                                                        "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver-{{ $.ContainerService.ID }}'), '/backendAddressPools/backend')]"
                                                     }
                                                 ]
 {{- end }}
