@@ -11,6 +11,8 @@ import:
   subpackages:
   - spew
 - package: github.com/Azure/azure-sdk-for-go
+  subpackages:
+  - services/network/mgmt/2018-05-01/network
   version: v19.1.0
 - package: github.com/Azure/go-autorest
   version: 10.14.0

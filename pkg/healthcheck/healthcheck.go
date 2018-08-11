@@ -9,6 +9,8 @@ import (
 	"net/url"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	appsclient "k8s.io/client-go/kubernetes/typed/apps/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -35,34 +37,24 @@ func getKubeconfigFromV1Config(kc *v1.Config) (clientcmd.ClientConfig, error) {
 
 // HealthCheck function to verify cluster health
 func HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error {
-	c := cs.Config
-	kubeconfig, err := getKubeconfigFromV1Config(c.AdminKubeconfig)
+	appsClient, err := newAppClient(ctx, cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}
 
-	restconfig, err := kubeconfig.ClientConfig()
+	anc, err := newAzureClients(ctx, cs)
 	if err != nil {
 		return err
 	}
 
-	t, err := rest.TransportFor(restconfig)
-	if err != nil {
-		return err
-	}
-
-	// Wait for the healthz to be 200 status
-	err = checks.WaitForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
-	if err != nil {
-		return err
-	}
-
-	appsclient, err := appsclient.NewForConfig(restconfig)
-	if err != nil {
-		return err
-	}
 	// Ensure that the pods in default are healthy
-	err = checks.WaitForInfraServices(ctx, appsclient)
+	err = checks.WaitForInfraServices(ctx, appsClient)
+	if err != nil {
+		return err
+	}
+
+	// Check if FQDN's in the config matches what we got allocated in the cloud
+	err = checks.CheckDNS(ctx, anc.eip, anc.lb, cs)
 	if err != nil {
 		return err
 	}
@@ -103,6 +95,7 @@ func waitForConsole(ctx context.Context, cs *acsapi.ContainerService) error {
 
 		switch resp.StatusCode {
 		case http.StatusOK:
+			log.Info("OK")
 			return nil
 		case http.StatusBadGateway:
 			time.Sleep(10 * time.Second)
@@ -110,4 +103,35 @@ func waitForConsole(ctx context.Context, cs *acsapi.ContainerService) error {
 			return fmt.Errorf("unexpected error code %d from console", resp.StatusCode)
 		}
 	}
+
+}
+
+func newAppClient(ctx context.Context, config *v1.Config) (*appsclient.AppsV1Client, error) {
+
+	kubeconfig, err := getKubeconfigFromV1Config(config)
+	if err != nil {
+		return nil, err
+	}
+
+	restconfig, err := kubeconfig.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	t, err := rest.TransportFor(restconfig)
+	if err != nil {
+		return nil, err
+	}
+
+	// Wait for the healthz to be 200 status
+	err = checks.WaitForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
+	if err != nil {
+		return nil, err
+	}
+
+	appsclient, err := appsclient.NewForConfig(restconfig)
+	if err != nil {
+		return nil, err
+	}
+	return appsclient, nil
 }

@@ -40,7 +40,7 @@
                 "publicIPAllocationMethod": "Dynamic",
                 "idleTimeoutInMinutes": 15,
                 "dnsSettings": {
-                    "domainNameLabel": "{{ .Config.ResourceGroup }}"
+                    "domainNameLabel": "{{ .Config.MasterLBCNamePrefix }}"
                 }
             },
             "sku": {

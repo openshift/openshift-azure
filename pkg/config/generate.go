@@ -126,11 +126,11 @@ func Generate(cs *acsapi.ContainerService) (err error) {
 	c := cs.Config
 	c.Version = versionLatest
 
-	// TODO: Need unique name, potentially derivative from PublicHostname
-	c.RouterLBCName = fmt.Sprintf("%s-router", strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname, ".")[1])
 	selectNodeImage(cs)
 
 	selectContainerImages(cs)
+
+	selectDNSNames(cs)
 
 	// Generate CAs
 	cas := []struct {
@@ -573,4 +573,19 @@ func randomString(length int) (string, error) {
 	}
 
 	return string(b), nil
+}
+
+func selectDNSNames(cs *acsapi.ContainerService) {
+
+	// Prefix values used to set arm and router k8s service dns annotations
+	cs.Config.RouterLBCNamePrefix = strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN, ".")[0]
+	cs.Config.MasterLBCNamePrefix = strings.Split(cs.Properties.FQDN, ".")[0]
+
+	// Set PublicHostname to FQDN values if not specified
+	if cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname == "" {
+		cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = cs.Properties.FQDN
+	}
+	if cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain == "" {
+		cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN
+	}
 }

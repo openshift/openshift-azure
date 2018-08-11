@@ -1,14 +1,30 @@
-hash: 0a4124f19e65dfb469d56161a1c7925ea8ab7a571b4c0e6c6729faab727c0382
-updated: 2018-08-09T09:09:52.410610914-04:00
+hash: 193b3a9df897002c7a8ff1b5d0cfa4b13bd56ada24f9ae623f21a611ab288794
+updated: 2018-08-10T09:33:15.076267396+01:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
+  subpackages:
+  - services/network/mgmt/2018-05-01/network
+  - version
 - name: github.com/Azure/go-autorest
   version: bca49d5b51a50dc5bb17bbf6204c711c6dbded06
+  subpackages:
+  - autorest
+  - autorest/adal
+  - autorest/azure
+  - autorest/azure/auth
+  - autorest/date
+  - autorest/to
+  - autorest/validation
+  - version
 - name: github.com/davecgh/go-spew
   version: 346938d642f2ec3594ed81d874461961cd0faa76
   subpackages:
   - spew
+- name: github.com/dgrijalva/jwt-go
+  version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
+- name: github.com/dimchansky/utfbom
+  version: 6c6132ff69f0f6c088739067407b5d32c52e1d0f
 - name: github.com/ghodss/yaml
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/go-test/deep
@@ -62,6 +78,8 @@ imports:
   - curve25519
   - ed25519
   - ed25519/internal/edwards25519
+  - pkcs12
+  - pkcs12/internal/rc2
   - ssh
   - ssh/terminal
 - name: golang.org/x/net

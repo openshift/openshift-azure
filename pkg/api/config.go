@@ -63,11 +63,14 @@ type Config struct {
 	AlertsProxySessionSecret       []byte
 	PrometheusProxySessionSecret   []byte
 	ServiceCatalogClusterID        uuid.UUID
-	RouterLBCName                  string
 	// random string based configurables
 	RegistryStorageAccount     string
 	RegistryConsoleOAuthSecret string
 	RouterStatsPassword        string
+
+	// DNS configurables
+	RouterLBCNamePrefix string
+	MasterLBCNamePrefix string
 
 	// used for development purposes only
 	RunSyncLocal string
