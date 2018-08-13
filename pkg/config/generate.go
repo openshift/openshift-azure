@@ -29,7 +29,7 @@ func selectNodeImage(cs *acsapi.ContainerService) {
 	case "":
 		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OrchestratorProfile.OrchestratorVersion[1:], ".", "", -1)
 	case "centos7":
-		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OrchestratorProfile.OrchestratorVersion[1:], ".", "", -1)
+		c.ImageSKU = "okd_" + strings.Replace(cs.Properties.OrchestratorProfile.OrchestratorVersion[1:], ".", "", -1)
 	}
 
 	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
