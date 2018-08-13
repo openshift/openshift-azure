@@ -42,10 +42,11 @@ type Config struct {
 	PrometheusAlertManagerImage string
 
 	// kubeconfigs
-	AdminKubeconfig         *v1.Config
-	MasterKubeconfig        *v1.Config
-	NodeBootstrapKubeconfig *v1.Config
-	SyncKubeconfig          *v1.Config
+	AdminKubeconfig              *v1.Config
+	MasterKubeconfig             *v1.Config
+	NodeBootstrapKubeconfig      *v1.Config
+	SyncKubeconfig               *v1.Config
+	AzureClusterReaderKubeconfig *v1.Config
 
 	// misc control plane configurables
 	ServiceAccountKey *rsa.PrivateKey
@@ -110,6 +111,9 @@ type CertificateConfig struct {
 	Router                  CertKeyPair
 	ServiceCatalogServer    CertKeyPair
 	ServiceCatalogAPIClient CertKeyPair
+
+	// misc certificates
+	AzureClusterReader CertKeyPair
 }
 
 // CertKeyPair is an rsa private key and x509 certificate pair.

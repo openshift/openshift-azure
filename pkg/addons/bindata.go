@@ -141,6 +141,7 @@
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/asb-access.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/asb-auth.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/auth-delegator-openshift-template-service-broker.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/azure-cluster-reader.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/basic-users.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/bootstrap-autoapprover.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-admin.yaml
@@ -289,6 +290,7 @@
 // data/Namespace/kube-service-catalog.yaml
 // data/Namespace/kube-system.yaml
 // data/Namespace/openshift-ansible-service-broker.yaml
+// data/Namespace/openshift-azure.yaml
 // data/Namespace/openshift-infra.yaml
 // data/Namespace/openshift-metrics.yaml
 // data/Namespace/openshift-node.yaml
@@ -389,6 +391,7 @@
 // data/ServiceAccount/kube-system/statefulset-controller.yaml
 // data/ServiceAccount/openshift-ansible-service-broker/asb-client.yaml
 // data/ServiceAccount/openshift-ansible-service-broker/asb.yaml
+// data/ServiceAccount/openshift-azure/azure-cluster-reader.yaml
 // data/ServiceAccount/openshift-infra/bootstrap-autoapprover.yaml
 // data/ServiceAccount/openshift-infra/build-config-change-controller.yaml
 // data/ServiceAccount/openshift-infra/build-controller.yaml
@@ -3334,6 +3337,26 @@ func clusterrolebindingRbacAuthorizationK8sIoAuthDelegatorOpenshiftTemplateServi
 	}
 
 	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/auth-delegator-openshift-template-service-broker.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _clusterrolebindingRbacAuthorizationK8sIoAzureClusterReaderYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\x8e\x31\x4e\xc6\x30\x0c\x46\xf7\x9c\xc2\x17\x48\x11\x1b\xca\x06\x0c\xec\x3f\x12\xbb\x9b\xb8\xd4\xb4\xb5\x23\xc7\xe9\xd0\xd3\x23\x28\x62\x00\xa9\xb3\x9f\xdf\xfb\xb0\xf2\x1b\x59\x63\x95\x04\x36\x62\x1e\xb0\xfb\xac\xc6\x07\x3a\xab\x0c\xcb\x43\x1b\x58\xef\xf6\xfb\xb0\xb0\x94\x04\xcf\x6b\x6f\x4e\x76\xd3\x95\x9e\x58\x0a\xcb\x7b\xd8\xc8\xb1\xa0\x63\x0a\x00\x82\x1b\x25\xc0\xa3\x1b\xc5\x7c\xa2\xd1\x08\x0b\x59\x30\x5d\xe9\x46\xd3\x17\x85\x95\x5f\x4c\x7b\xbd\x28\x06\x80\x7f\xc1\x5f\xff\x1f\x73\xeb\xe3\x07\x65\x6f\x29\xc4\x9f\xa7\x57\xb2\x9d\x33\x3d\xe6\xac\x5d\xfc\x7a\xd7\x79\x6c\x15\x33\x25\xd0\x4a\xd2\x66\x9e\x3c\x7e\xb3\xe1\x33\x00\x00\xff\xff\xee\xf9\x42\x8f\x1e\x01\x00\x00")
+
+func clusterrolebindingRbacAuthorizationK8sIoAzureClusterReaderYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_clusterrolebindingRbacAuthorizationK8sIoAzureClusterReaderYaml,
+		"ClusterRoleBinding.rbac.authorization.k8s.io/azure-cluster-reader.yaml",
+	)
+}
+
+func clusterrolebindingRbacAuthorizationK8sIoAzureClusterReaderYaml() (*asset, error) {
+	bytes, err := clusterrolebindingRbacAuthorizationK8sIoAzureClusterReaderYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/azure-cluster-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6298,6 +6321,26 @@ func namespaceOpenshiftAnsibleServiceBrokerYaml() (*asset, error) {
 	return a, nil
 }
 
+var _namespaceOpenshiftAzureYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x54\xcc\xb1\x0e\x82\x50\x0c\x46\xe1\xfd\x3e\x45\xc3\x8e\xc6\xf5\x3e\x84\xa3\x7b\x85\x1f\x6d\x80\xf6\xa6\x2d\x0e\x3c\xbd\x81\xc5\x38\x9e\xe4\xe4\xe3\x26\x0f\x78\x88\x69\xa5\xcf\xad\xcc\xa2\x63\xa5\x3b\xaf\x88\xc6\x03\xca\x8a\xe4\x91\x93\x6b\x21\x62\x55\x4b\x4e\x31\x8d\x23\x89\xac\x41\xe3\x2d\x53\x5e\xc4\xae\x6a\x23\xfa\xc0\x82\x21\xcd\x2b\x75\x5d\x21\x52\x5e\x51\x7f\x5b\xcf\xfb\xe6\x28\xd1\x30\x1c\xc0\x24\xca\x8b\xec\xf0\x93\xeb\x69\xde\x9e\x70\x45\x22\xce\xfc\xd3\xcd\xe5\x25\x5a\xbe\x01\x00\x00\xff\xff\x30\x1a\xb9\x4f\xae\x00\x00\x00")
+
+func namespaceOpenshiftAzureYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_namespaceOpenshiftAzureYaml,
+		"Namespace/openshift-azure.yaml",
+	)
+}
+
+func namespaceOpenshiftAzureYaml() (*asset, error) {
+	bytes, err := namespaceOpenshiftAzureYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Namespace/openshift-azure.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _namespaceOpenshiftInfraYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x14\xc9\x31\x0e\xc2\x30\x0c\x05\xd0\xdd\xa7\xf0\x05\x3a\xb0\xe6\x10\x8c\xec\x9f\xf6\x47\x58\x25\x6e\x64\x1b\x06\x4e\x8f\x32\x3e\x3d\x4c\x7b\x30\xd2\x2e\x6f\xfa\xbd\xc9\x69\x7e\x34\xbd\x63\x30\x27\x76\xca\x60\xe1\x40\xa1\x89\xaa\x63\xb0\xe9\x35\xe9\xf9\xb2\x5e\x9b\x79\x0f\x48\x4e\xee\x6b\xbb\x39\xde\xf6\x63\xe4\xd2\xa6\xe7\xe7\xc9\x70\x16\x53\xfe\x01\x00\x00\xff\xff\x30\x80\x9d\x4b\x64\x00\x00\x00")
 
 func namespaceOpenshiftInfraYamlBytes() ([]byte, error) {
@@ -8298,6 +8341,26 @@ func serviceaccountOpenshiftAnsibleServiceBrokerAsbYaml() (*asset, error) {
 	return a, nil
 }
 
+var _serviceaccountOpenshiftAzureAzureClusterReaderYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x2c\xca\x31\x0e\x42\x31\x08\x06\xe0\xbd\xa7\xe0\x02\x1d\x5c\xd9\x3c\x83\x89\x3b\xa1\xbf\x91\xe8\xa3\x0d\xd0\x37\x78\x7a\x13\xe3\xfc\x7d\xb2\xec\x8e\x48\x9b\xce\x74\x5e\xda\xcb\x7c\x30\xdd\x10\xa7\x29\xae\xaa\x73\x7b\xb5\x03\x25\x43\x4a\xb8\x11\xb9\x1c\x60\x92\xcf\x0e\x74\x7d\xef\x2c\x44\x0f\xc8\x40\xfc\x31\x97\x28\x98\xe6\x82\xe7\xd3\x1e\xd5\x7f\xb7\x7d\x03\x00\x00\xff\xff\xfa\xa3\x43\xcc\x68\x00\x00\x00")
+
+func serviceaccountOpenshiftAzureAzureClusterReaderYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_serviceaccountOpenshiftAzureAzureClusterReaderYaml,
+		"ServiceAccount/openshift-azure/azure-cluster-reader.yaml",
+	)
+}
+
+func serviceaccountOpenshiftAzureAzureClusterReaderYaml() (*asset, error) {
+	bytes, err := serviceaccountOpenshiftAzureAzureClusterReaderYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ServiceAccount/openshift-azure/azure-cluster-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _serviceaccountOpenshiftInfraBootstrapAutoapproverYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x2c\xc9\xb1\x0d\xc3\x40\x08\x05\xd0\xfe\xa6\x60\x01\x17\x69\xe9\x32\x43\xa4\xf4\x3f\x67\xac\xa0\xc8\x80\x00\xdf\xfc\x69\x5c\x3f\x84\xbe\x25\x4b\xdd\x98\xd6\x63\xfc\xd4\x76\xa6\x97\xe4\xd2\x29\xcf\x39\xfd\xb2\x1e\xa7\x34\x76\x34\x78\x10\x19\x4e\x61\xfa\xb8\x77\x75\x22\x36\x5c\xed\x88\x48\x5f\x92\x37\x57\x60\x0a\x93\x87\x58\x7d\xf5\xe8\x4d\xed\x48\x8c\x7f\x00\x00\x00\xff\xff\xf9\x58\xe3\x0b\x6a\x00\x00\x00")
 
 func serviceaccountOpenshiftInfraBootstrapAutoapproverYamlBytes() ([]byte, error) {
@@ -9771,6 +9834,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRoleBinding.rbac.authorization.k8s.io/asb-access.yaml":                                                                       clusterrolebindingRbacAuthorizationK8sIoAsbAccessYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/asb-auth.yaml":                                                                         clusterrolebindingRbacAuthorizationK8sIoAsbAuthYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/auth-delegator-openshift-template-service-broker.yaml":                                 clusterrolebindingRbacAuthorizationK8sIoAuthDelegatorOpenshiftTemplateServiceBrokerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/azure-cluster-reader.yaml":                                                             clusterrolebindingRbacAuthorizationK8sIoAzureClusterReaderYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/basic-users.yaml":                                                                      clusterrolebindingRbacAuthorizationK8sIoBasicUsersYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/bootstrap-autoapprover.yaml":                                                           clusterrolebindingRbacAuthorizationK8sIoBootstrapAutoapproverYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-admin.yaml":                                                                    clusterrolebindingRbacAuthorizationK8sIoClusterAdminYaml,
@@ -9919,6 +9983,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Namespace/kube-service-catalog.yaml":                                                                                                namespaceKubeServiceCatalogYaml,
 	"Namespace/kube-system.yaml":                                                                                                         namespaceKubeSystemYaml,
 	"Namespace/openshift-ansible-service-broker.yaml":                                                                                    namespaceOpenshiftAnsibleServiceBrokerYaml,
+	"Namespace/openshift-azure.yaml":                                                                                                     namespaceOpenshiftAzureYaml,
 	"Namespace/openshift-infra.yaml":                                                                                                     namespaceOpenshiftInfraYaml,
 	"Namespace/openshift-metrics.yaml":                                                                                                   namespaceOpenshiftMetricsYaml,
 	"Namespace/openshift-node.yaml":                                                                                                      namespaceOpenshiftNodeYaml,
@@ -10019,6 +10084,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ServiceAccount/kube-system/statefulset-controller.yaml":                                                                             serviceaccountKubeSystemStatefulsetControllerYaml,
 	"ServiceAccount/openshift-ansible-service-broker/asb-client.yaml":                                                                    serviceaccountOpenshiftAnsibleServiceBrokerAsbClientYaml,
 	"ServiceAccount/openshift-ansible-service-broker/asb.yaml":                                                                           serviceaccountOpenshiftAnsibleServiceBrokerAsbYaml,
+	"ServiceAccount/openshift-azure/azure-cluster-reader.yaml":                                                                           serviceaccountOpenshiftAzureAzureClusterReaderYaml,
 	"ServiceAccount/openshift-infra/bootstrap-autoapprover.yaml":                                                                         serviceaccountOpenshiftInfraBootstrapAutoapproverYaml,
 	"ServiceAccount/openshift-infra/build-config-change-controller.yaml":                                                                 serviceaccountOpenshiftInfraBuildConfigChangeControllerYaml,
 	"ServiceAccount/openshift-infra/build-controller.yaml":                                                                               serviceaccountOpenshiftInfraBuildControllerYaml,
@@ -10272,6 +10338,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"asb-access.yaml":                                                               {clusterrolebindingRbacAuthorizationK8sIoAsbAccessYaml, map[string]*bintree{}},
 		"asb-auth.yaml":                                                                 {clusterrolebindingRbacAuthorizationK8sIoAsbAuthYaml, map[string]*bintree{}},
 		"auth-delegator-openshift-template-service-broker.yaml":                         {clusterrolebindingRbacAuthorizationK8sIoAuthDelegatorOpenshiftTemplateServiceBrokerYaml, map[string]*bintree{}},
+		"azure-cluster-reader.yaml":                                                     {clusterrolebindingRbacAuthorizationK8sIoAzureClusterReaderYaml, map[string]*bintree{}},
 		"basic-users.yaml":                                                              {clusterrolebindingRbacAuthorizationK8sIoBasicUsersYaml, map[string]*bintree{}},
 		"bootstrap-autoapprover.yaml":                                                   {clusterrolebindingRbacAuthorizationK8sIoBootstrapAutoapproverYaml, map[string]*bintree{}},
 		"cluster-admin.yaml":                                                            {clusterrolebindingRbacAuthorizationK8sIoClusterAdminYaml, map[string]*bintree{}},
@@ -10468,6 +10535,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"kube-service-catalog.yaml":              {namespaceKubeServiceCatalogYaml, map[string]*bintree{}},
 		"kube-system.yaml":                       {namespaceKubeSystemYaml, map[string]*bintree{}},
 		"openshift-ansible-service-broker.yaml":  {namespaceOpenshiftAnsibleServiceBrokerYaml, map[string]*bintree{}},
+		"openshift-azure.yaml":                   {namespaceOpenshiftAzureYaml, map[string]*bintree{}},
 		"openshift-infra.yaml":                   {namespaceOpenshiftInfraYaml, map[string]*bintree{}},
 		"openshift-metrics.yaml":                 {namespaceOpenshiftMetricsYaml, map[string]*bintree{}},
 		"openshift-node.yaml":                    {namespaceOpenshiftNodeYaml, map[string]*bintree{}},
@@ -10645,6 +10713,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"openshift-ansible-service-broker": {nil, map[string]*bintree{
 			"asb-client.yaml": {serviceaccountOpenshiftAnsibleServiceBrokerAsbClientYaml, map[string]*bintree{}},
 			"asb.yaml":        {serviceaccountOpenshiftAnsibleServiceBrokerAsbYaml, map[string]*bintree{}},
+		}},
+		"openshift-azure": {nil, map[string]*bintree{
+			"azure-cluster-reader.yaml": {serviceaccountOpenshiftAzureAzureClusterReaderYaml, map[string]*bintree{}},
 		}},
 		"openshift-infra": {nil, map[string]*bintree{
 			"bootstrap-autoapprover.yaml":                   {serviceaccountOpenshiftInfraBootstrapAutoapproverYaml, map[string]*bintree{}},
