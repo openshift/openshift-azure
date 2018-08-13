@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	appsclient "k8s.io/client-go/kubernetes/typed/apps/v1"
 	"k8s.io/client-go/rest"
@@ -35,8 +35,24 @@ func getKubeconfigFromV1Config(kc *v1.Config) (clientcmd.ClientConfig, error) {
 	return kubeconfig, nil
 }
 
+type HealthChecker interface {
+	HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error
+}
+
+type simpleHealthChecker struct {
+	log *logrus.Entry
+}
+
+var _ HealthChecker = &simpleHealthChecker{}
+
+func NewSimpleHealthChecker(log *logrus.Entry) HealthChecker {
+	return &simpleHealthChecker{
+		log: log,
+	}
+}
+
 // HealthCheck function to verify cluster health
-func HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error {
+func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error {
 	appsClient, err := newAppClient(ctx, cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
@@ -60,10 +76,10 @@ func HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error {
 	}
 
 	// Wait for the console to be 200 status
-	return waitForConsole(ctx, cs)
+	return hc.waitForConsole(ctx, cs)
 }
 
-func waitForConsole(ctx context.Context, cs *acsapi.ContainerService) error {
+func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *acsapi.ContainerService) error {
 	c := cs.Config
 	pool := x509.NewCertPool()
 	pool.AddCert(c.Certificates.Ca.Cert)
@@ -95,7 +111,7 @@ func waitForConsole(ctx context.Context, cs *acsapi.ContainerService) error {
 
 		switch resp.StatusCode {
 		case http.StatusOK:
-			log.Info("OK")
+			hc.log.Info("OK")
 			return nil
 		case http.StatusBadGateway:
 			time.Sleep(10 * time.Second)

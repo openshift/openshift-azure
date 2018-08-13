@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 
 	"github.com/ghodss/yaml"
-	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
@@ -46,20 +45,20 @@ func Translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nest
 	var nestedObject interface{}
 	err = yaml.Unmarshal(nestedBytes, &nestedObject)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	nestedPath.Set(nestedObject, v)
 
 	nestedBytes, err = yaml.Marshal(nestedObject)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	if nestedFlags&NestedFlagsBase64 != 0 {
 		nestedBytes = []byte(base64.StdEncoding.EncodeToString(nestedBytes))
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 	}
 

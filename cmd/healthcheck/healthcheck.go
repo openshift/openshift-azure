@@ -6,10 +6,9 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/validate"
@@ -18,7 +17,12 @@ import (
 // healthCheck should get rolled into the end of createorupdate once the sync
 // pod runs in the cluster
 func healthCheck() error {
-	var p api.Plugin = &plugin.Plugin{}
+	logger := logrus.New()
+	logger.SetLevel(logrus.DebugLevel)
+	log := logrus.NewEntry(logger)
+
+	// instantiate the plugin
+	p := plugin.NewPlugin(log)
 
 	b, err := ioutil.ReadFile("_data/containerservice.yaml")
 	if err != nil {
@@ -38,7 +42,6 @@ func healthCheck() error {
 }
 
 func main() {
-	log.SetLevel(log.DebugLevel)
 	if err := healthCheck(); err != nil {
 		panic(err)
 	}

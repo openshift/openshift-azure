@@ -7,11 +7,29 @@ package arm
 import (
 	"text/template"
 
+	"github.com/sirupsen/logrus"
+
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util"
 )
 
-func Generate(m *acsapi.ContainerService) ([]byte, error) {
+type Generator interface {
+	Generate(m *acsapi.ContainerService) ([]byte, error)
+}
+
+type simpleGenerator struct {
+	log *logrus.Entry
+}
+
+var _ Generator = &simpleGenerator{}
+
+func NewSimpleGenerator(log *logrus.Entry) Generator {
+	return &simpleGenerator{
+		log: log,
+	}
+}
+
+func (*simpleGenerator) Generate(m *acsapi.ContainerService) ([]byte, error) {
 	masterStartup, err := Asset("master-startup.sh")
 	if err != nil {
 		return nil, err
