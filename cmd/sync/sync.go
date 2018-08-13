@@ -12,43 +12,55 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/addons"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/validate"
+	validation "github.com/openshift/openshift-azure/pkg/validate"
 )
 
 var (
 	dryRun   = flag.Bool("dry-run", false, "Print resources to be synced instead of mutating cluster state.")
 	once     = flag.Bool("run-once", false, "If true, run only once then quit.")
 	interval = flag.Duration("interval", 3*time.Minute, "How often the sync process going to be rerun.")
+	config   = flag.String("config", "", "Path to the config to use for syncing a cluster.")
 )
 
-func sync() error {
-	log.Print("Sync process started!")
+func validate() error {
+	if *config == "" {
+		return errors.New("--config is required")
+	}
+	return nil
+}
 
-	b, err := ioutil.ReadFile("_data/containerservice.yaml")
+func sync() error {
+	log.Print("Sync process started")
+
+	b, err := ioutil.ReadFile(*config)
 	if err != nil {
-		return errors.Wrap(err, "cannot read _data/containerservice.yaml")
+		return errors.Wrapf(err, "cannot read %s", *config)
 	}
 
 	var cs *acsapi.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(b, &cs); err != nil {
-		return errors.Wrap(err, "cannot unmarshal _data/containerservice.yaml")
+		return errors.Wrapf(err, "cannot unmarshal %s", *config)
 	}
 
-	if errs := validate.Validate(cs, nil, false); len(errs) > 0 {
-		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
+	if errs := validation.Validate(cs, nil, false); len(errs) > 0 {
+		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate user request")
 	}
 
 	if err := addons.Main(cs, *dryRun); err != nil {
 		return errors.Wrap(err, "cannot sync cluster config")
 	}
 
-	log.Print("Sync process complete!")
+	log.Print("Sync process complete")
 	return nil
 }
 
 func main() {
 	flag.Parse()
 	log.SetLevel(log.DebugLevel)
+
+	if err := validate(); err != nil {
+		log.Fatal(err)
+	}
 
 	for {
 		if err := sync(); err != nil {

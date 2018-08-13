@@ -73,7 +73,7 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
 
-		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
+		c.SyncImage = "quay.io/openshift-on-azure/sync:v3.10"
 	}
 }
 
