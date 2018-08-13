@@ -1,9 +1,10 @@
-hash: 193b3a9df897002c7a8ff1b5d0cfa4b13bd56ada24f9ae623f21a611ab288794
-updated: 2018-08-15T12:29:36.580996535+02:00
+hash: 08a0b55b910ea0067e4dd49a1491ab300f252829758bdb700e1344116cf8a8e0
+updated: 2018-08-15T12:58:58.136578882+02:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
   subpackages:
+  - services/compute/mgmt/2018-06-01/compute
   - services/network/mgmt/2018-05-01/network
   - version
 - name: github.com/Azure/go-autorest
@@ -148,6 +149,7 @@ imports:
 - name: k8s.io/apimachinery
   version: e386b2658ed20923da8cc9250e552f082899a1ee
   subpackages:
+  - pkg/api/equality
   - pkg/api/errors
   - pkg/api/meta
   - pkg/api/resource
