@@ -21,7 +21,7 @@ cd "${T}/"
 glide up -v
 
 
-if [[ -n "$(git status --porcelain)" ]]; then
+if [[ -n "$(git status --porcelain | sed  "/M glide.lock/d")" ]]; then
 	echo "glide update produced dependency changes that were not already present"
 	echo "Run \"glide up -v\" to update the dependencies locally"
 	exit 1
