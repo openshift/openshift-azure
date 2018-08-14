@@ -74,6 +74,9 @@ func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.Op
 		}
 	}
 
+	log.Info("merge old and new config")
+	p.MergeConfig(cs, oldCs)
+
 	// validate the internal API representation (with reference to the previous
 	// internal API representation)
 	// we set fqdn during enrichment which is slightly different than what the RP

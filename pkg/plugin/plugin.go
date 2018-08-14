@@ -33,6 +33,34 @@ func NewPlugin(entry *logrus.Entry) api.Plugin {
 	}
 }
 
+func (p *plugin) MergeConfig(cs, oldCs *acsapi.OpenShiftManagedCluster) {
+	if oldCs == nil {
+		return
+	}
+	log.Info("merging internal data models")
+
+	// generated config should be copied as is
+	cs.Config = oldCs.Config
+
+	// user request data
+	// need to merge partial requests
+	if len(cs.Properties.AgentPoolProfiles) == 0 {
+		cs.Properties.AgentPoolProfiles = oldCs.Properties.AgentPoolProfiles
+	}
+	if cs.Properties.OrchestratorProfile == nil {
+		cs.Properties.OrchestratorProfile = oldCs.Properties.OrchestratorProfile
+	}
+	if len(cs.Properties.OrchestratorProfile.OrchestratorVersion) == 0 {
+		cs.Properties.OrchestratorProfile.OrchestratorVersion = oldCs.Properties.OrchestratorProfile.OrchestratorVersion
+	}
+	if cs.Properties.OrchestratorProfile.OpenShiftConfig == nil {
+		cs.Properties.OrchestratorProfile.OpenShiftConfig = oldCs.Properties.OrchestratorProfile.OpenShiftConfig
+	}
+	if len(cs.Properties.FQDN) == 0 {
+		cs.Properties.FQDN = oldCs.Properties.FQDN
+	}
+}
+
 func (p *plugin) Validate(new, old *acsapi.OpenShiftManagedCluster, externalOnly bool) []error {
 	log.Info("validating internal data models")
 	return validate.Validate(new, old, externalOnly)
