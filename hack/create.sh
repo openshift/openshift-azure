@@ -83,7 +83,7 @@ if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # will eventually run as an HCP pod, for development run it locally
     # sleep until FQDN/healthz responds with OK. It takes up to 5 min for API server to respond. 
     FQDN=$(awk '/^  fqdn:/ { print $2 }' <_data/manifest.yaml)
-    while [[ "$(curl -s -k https://${FQDN}/healthz)" != "ok" ]]; do sleep 5; done
+    while [[ "$(curl -s -k https://${FQDN}/healthz/ready)" != "ok" ]]; do sleep 5; done
     KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go -run-once=true
 fi
 
