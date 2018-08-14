@@ -44,10 +44,9 @@ type VMSSUpgrader struct {
 	Plugin api.Upgrade
 
 	// upgrade parameters
-	Drain   bool
-	InPlace bool
-	// TODO: Need to apply more changes to a VMSS
-	// than just count and the image.
+	Drain    bool
+	InPlace  bool
+	Script   map[string]interface{}
 	Count    int64
 	ImageRef *compute.ImageReference
 
@@ -240,31 +239,40 @@ func (u *VMSSUpgrader) Upgrade() error {
 
 // updateVMSS is meant to update the VMSS to the desired state before
 // manually rolling the VMs.
-// TODO: For now, this only updates the images in a VMSS, in the future
-// we want to apply all azuredeploy.json changes to it.
 func (u *VMSSUpgrader) updateVMSS(vmss compute.VirtualMachineScaleSet) (compute.VirtualMachineScaleSet, error) {
 	if u.reimageOnly() {
 		return vmss, nil
 	}
 
-	imageRef := vmss.VirtualMachineScaleSetProperties.VirtualMachineProfile.StorageProfile.ImageReference
-	if u.ImageRef.ID != nil {
-		imageRef.ID = u.ImageRef.ID
-	} else {
-		imageRef.Sku = u.ImageRef.Sku
-		imageRef.Version = u.ImageRef.Version
+	if u.ImageRef != nil {
+		imageRef := vmss.VirtualMachineScaleSetProperties.VirtualMachineProfile.StorageProfile.ImageReference
+		if u.ImageRef.ID != nil {
+			imageRef.ID = u.ImageRef.ID
+		} else {
+			imageRef.Sku = u.ImageRef.Sku
+			imageRef.Version = u.ImageRef.Version
+		}
 	}
 
-	log.Infof("Updating image for VMSS %q ...", u.Name)
+	if u.Script != nil {
+		extensions := *vmss.VirtualMachineScaleSetProperties.VirtualMachineProfile.ExtensionProfile.Extensions
+		for i, ext := range extensions {
+			if ext.Name != nil && *ext.Name == "cse" {
+				extensions[i].ProtectedSettings = u.Script
+			}
+		}
+	}
+
+	log.Infof("Updating VMSS %q ...", u.Name)
 	res, err := u.ssc.CreateOrUpdate(context.Background(), u.ResourceGroup, u.Name, vmss)
 	if err != nil {
-		return vmss, fmt.Errorf("cannot update image for VMSS %q: %v", u.Name, err)
+		return vmss, fmt.Errorf("cannot update VMSS %q: %v", u.Name, err)
 	}
 	if err := res.WaitForCompletion(context.Background(), u.ssc.BaseClient.Client); err != nil {
-		return vmss, fmt.Errorf("cannot wait for VMSS %q image update: %v", u.Name, err)
+		return vmss, fmt.Errorf("cannot wait for VMSS %q update: %v", u.Name, err)
 	}
 	if vmss, err = res.Result(u.ssc); err != nil {
-		return vmss, fmt.Errorf("error during VMSS %q image update: %v", u.Name, err)
+		return vmss, fmt.Errorf("error during VMSS %q update: %v", u.Name, err)
 	}
 	return vmss, nil
 }
@@ -290,7 +298,7 @@ func (u *VMSSUpgrader) upgradable() ([]compute.VirtualMachineScaleSetVM, error) 
 // provided to the upgrade process so instead of an in-place update, a
 // reimage of all the VMs is triggered.
 func (u *VMSSUpgrader) reimageOnly() bool {
-	return u.ImageRef == nil
+	return u.ImageRef == nil && u.Script == nil
 }
 
 func (u *VMSSUpgrader) needsUpgrade(vm *compute.VirtualMachineScaleSetVM) bool {
@@ -306,6 +314,13 @@ func (u *VMSSUpgrader) needsUpgrade(vm *compute.VirtualMachineScaleSetVM) bool {
 	}
 
 	imageRef := vmProps.StorageProfile.ImageReference
+	return u.Script != nil || u.isImageUpdate(imageRef)
+}
+
+func (u *VMSSUpgrader) isImageUpdate(imageRef *compute.ImageReference) bool {
+	if u.ImageRef == nil {
+		return false
+	}
 	return ((imageRef.Version != nil && u.ImageRef.Version != nil && *imageRef.Version != *u.ImageRef.Version) ||
 		(imageRef.Sku != nil && u.ImageRef.Sku != nil && *imageRef.Sku != *u.ImageRef.Sku)) ||
 		(imageRef.ID != nil && u.ImageRef.ID != nil && *imageRef.ID != *u.ImageRef.ID)

@@ -47,8 +47,10 @@ export KUBECONFIG=_data/_out/admin.kubeconfig
 go run cmd/vmssrollout/vmssrollout.go -subscription $AZURE_SUBSCRIPTION_ID \
                                       -resource-group $RESOURCEGROUP \
                                       -name ss-master \
-                                      -new-config _data/containerservice.yaml \
+                                      -config _data/containerservice.yaml \
                                       -old-config _data/containerservice_old.yaml \
+                                      -template-file _data/_out/azuredeploy.json \
+                                      -old-template-file _data/_out/azuredeploy_old.json \
                                       -in-place \
                                       -role master
 
@@ -56,8 +58,10 @@ go run cmd/vmssrollout/vmssrollout.go -subscription $AZURE_SUBSCRIPTION_ID \
 go run cmd/vmssrollout/vmssrollout.go -subscription $AZURE_SUBSCRIPTION_ID \
                                       -resource-group $RESOURCEGROUP \
                                       -name ss-infra \
-                                      -new-config _data/containerservice.yaml \
+                                      -config _data/containerservice.yaml \
                                       -old-config _data/containerservice_old.yaml \
+                                      -template-file _data/_out/azuredeploy.json \
+                                      -old-template-file _data/_out/azuredeploy_old.json \
                                       -drain \
                                       -role infra
 
@@ -65,8 +69,10 @@ go run cmd/vmssrollout/vmssrollout.go -subscription $AZURE_SUBSCRIPTION_ID \
 go run cmd/vmssrollout/vmssrollout.go -subscription $AZURE_SUBSCRIPTION_ID \
                                       -resource-group $RESOURCEGROUP \
                                       -name ss-compute \
-                                      -new-config _data/containerservice.yaml \
+                                      -config _data/containerservice.yaml \
                                       -old-config _data/containerservice_old.yaml \
+                                      -template-file _data/_out/azuredeploy.json \
+                                      -old-template-file _data/_out/azuredeploy_old.json \
                                       -drain \
                                       -role compute
 

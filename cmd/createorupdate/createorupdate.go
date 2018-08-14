@@ -87,6 +87,19 @@ func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.Op
 		return nil, err
 	}
 
+	log.Info("read old ARM template")
+	var oldArmBytes []byte
+	if _, err := os.Stat("_data/_out/azuredeploy.json"); err == nil {
+		oldArmBytes, err = ioutil.ReadFile("_data/_out/azuredeploy.json")
+		if err != nil {
+			return nil, err
+		}
+		if err := ioutil.WriteFile("_data/_out/azuredeploy_old.json", oldArmBytes, 0600); err != nil {
+			return nil, err
+		}
+	}
+	log.Info("done")
+
 	// generate the ARM template
 	azuredeploy, err := p.GenerateARM(cs)
 	if err != nil {
