@@ -2,8 +2,6 @@ package config
 
 import (
 	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
 	"io"
 	"math/big"
 	"strings"
@@ -14,7 +12,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
-func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certificate, endpoint, username, namespace string) (*v1.Config, error) {
+func makeKubeConfig(clientKey *tls.PrivateKey, clientCert, caCert *tls.Certificate, endpoint, username, namespace string) (*v1.Config, error) {
 	clustername := strings.Replace(endpoint, ".", "-", -1)
 	authinfoname := username + "/" + clustername
 	contextname := namespace + "/" + clustername + "/" + username

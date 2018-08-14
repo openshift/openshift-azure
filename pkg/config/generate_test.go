@@ -97,7 +97,7 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(len(c.RouterStatsPassword) != 0, "router stats password")
 	assert(len(c.LoggingWorkspace) != 0, "logging workspace")
 
-	assert(c.ServiceCatalogClusterID != uuid.Nil, "service catalog cluster id")
+	assert(c.ServiceCatalogClusterID.UUID != uuid.Nil, "service catalog cluster id")
 
 	assert(c.TenantID != "", "tenant id")
 	assert(c.SubscriptionID != "", "subscription id")

@@ -70,7 +70,7 @@ func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *acsapi.Op
 	log.Info("checking console health")
 	c := cs.Config
 	pool := x509.NewCertPool()
-	pool.AddCert(c.Certificates.Ca.Cert)
+	pool.AddCert(&c.Certificates.Ca.Cert.Certificate)
 
 	cli := &http.Client{
 		Transport: &http.Transport{

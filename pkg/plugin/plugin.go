@@ -37,7 +37,8 @@ func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *acsapi.OpenShiftMan
 	log.Info("merging internal data models")
 
 	// generated config should be copied as is
-	cs.Config = oldCs.Config
+	cs.Config = &acsapi.Config{}
+	oldCs.Config.DeepCopyInto(cs.Config)
 
 	// user request data
 	// need to merge partial requests
