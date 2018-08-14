@@ -7,7 +7,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api/v1"
 )
 
-var testOpenShiftCluster = &v1.OpenShiftCluster{
+var testOpenShiftCluster = &v1.OpenShiftManagedCluster{
 	ID:       "id",
 	Location: "location",
 	Name:     "name",
@@ -77,7 +77,7 @@ var testOpenShiftCluster = &v1.OpenShiftCluster{
 	},
 }
 
-var testContainerService = &ContainerService{
+var testContainerService = &OpenShiftManagedCluster{
 	ID:       "id",
 	Location: "location",
 	Name:     "name",
@@ -146,9 +146,9 @@ var testContainerService = &ContainerService{
 	},
 }
 
-func TestConvertVLabsOpenShiftClusterToContainerService(t *testing.T) {
-	cs := ConvertVLabsOpenShiftClusterToContainerService(testOpenShiftCluster)
+func TestConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster(t *testing.T) {
+	cs := ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster(testOpenShiftCluster)
 	if !reflect.DeepEqual(cs, testContainerService) {
-		t.Errorf("ConvertVLabsOpenShiftClusterToContainerService returned unexpected result\n%#v\n", cs)
+		t.Errorf("ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster returned unexpected result\n%#v\n", cs)
 	}
 }

@@ -4,10 +4,10 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api/v1"
 )
 
-// ConvertContainerServiceToVLabsOpenShiftCluster converts from a
-// ContainerService to a v1.OpenShiftCluster.
-func ConvertContainerServiceToVLabsOpenShiftCluster(cs *ContainerService) *v1.OpenShiftCluster {
-	oc := &v1.OpenShiftCluster{
+// ConvertOpenShiftClusterToV1OpenShiftManagedCluster converts from na
+// OpenShiftManagedCluster to a v1.OpenShiftManagedCluster.
+func ConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster(cs *OpenShiftManagedCluster) *v1.OpenShiftManagedCluster {
+	oc := &v1.OpenShiftManagedCluster{
 		ID:       cs.ID,
 		Location: cs.Location,
 		Name:     cs.Name,

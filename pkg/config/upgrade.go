@@ -12,7 +12,7 @@ const (
 )
 
 type Upgrader interface {
-	Upgrade(cs *acsapi.ContainerService) error
+	Upgrade(cs *acsapi.OpenShiftManagedCluster) error
 }
 
 type simpleUpgrader struct {
@@ -26,6 +26,6 @@ func NewSimpleUpgrader(entry *logrus.Entry) Upgrader {
 	return &simpleUpgrader{}
 }
 
-func (u *simpleUpgrader) Upgrade(cs *acsapi.ContainerService) error {
+func (u *simpleUpgrader) Upgrade(cs *acsapi.OpenShiftManagedCluster) error {
 	return nil
 }

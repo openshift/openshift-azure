@@ -43,7 +43,7 @@ func unmarshal(b []byte) (unstructured.Unstructured, error) {
 
 // readDB reads previously exported objects into a map via go-bindata as well as
 // populating configuration items via Translate().
-func readDB(cs *acsapi.ContainerService) (map[string]unstructured.Unstructured, error) {
+func readDB(cs *acsapi.OpenShiftManagedCluster) (map[string]unstructured.Unstructured, error) {
 	db := map[string]unstructured.Unstructured{}
 
 	for _, asset := range AssetNames() {
@@ -210,7 +210,7 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	return client.ApplyResources(scFilter, db, keys)
 }
 
-func Main(cs *acsapi.ContainerService, dryRun bool) error {
+func Main(cs *acsapi.OpenShiftManagedCluster, dryRun bool) error {
 	client, err := newClient(dryRun)
 	if err != nil {
 		return err

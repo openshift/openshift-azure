@@ -19,7 +19,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
-func selectNodeImage(cs *acsapi.ContainerService) {
+func selectNodeImage(cs *acsapi.OpenShiftManagedCluster) {
 	c := cs.Config
 	c.ImagePublisher = "redhat"
 	c.ImageOffer = "osa-preview"
@@ -41,7 +41,7 @@ func image(imageConfigFormat, component, version string) string {
 	return strings.Replace(image, "${version}", version, -1)
 }
 
-func selectContainerImagesOrigin(cs *acsapi.ContainerService) {
+func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 	c := cs.Config
 	c.ImageConfigFormat = os.Getenv("OREG_URL")
 	if c.ImageConfigFormat == "" {
@@ -77,7 +77,7 @@ func selectContainerImagesOrigin(cs *acsapi.ContainerService) {
 	}
 }
 
-func selectContainerImagesOSA(cs *acsapi.ContainerService) {
+func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) {
 	c := cs.Config
 	c.ImageConfigFormat = os.Getenv("OREG_URL")
 	if c.ImageConfigFormat == "" {
@@ -113,7 +113,7 @@ func selectContainerImagesOSA(cs *acsapi.ContainerService) {
 	}
 }
 
-func selectContainerImages(cs *acsapi.ContainerService) {
+func selectContainerImages(cs *acsapi.OpenShiftManagedCluster) {
 	switch os.Getenv("DEPLOY_OS") {
 	case "":
 		selectContainerImagesOSA(cs)
@@ -122,7 +122,7 @@ func selectContainerImages(cs *acsapi.ContainerService) {
 	}
 }
 
-func Generate(cs *acsapi.ContainerService) (err error) {
+func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 	c := cs.Config
 	c.Version = versionLatest
 
@@ -590,7 +590,7 @@ func randomString(length int) (string, error) {
 	return string(b), nil
 }
 
-func selectDNSNames(cs *acsapi.ContainerService) {
+func selectDNSNames(cs *acsapi.OpenShiftManagedCluster) {
 
 	// Prefix values used to set arm and router k8s service dns annotations
 	cs.Config.RouterLBCNamePrefix = strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN, ".")[0]

@@ -15,7 +15,7 @@ import (
 
 // TODO: util packages are an anti-pattern, don't do this
 
-func Template(tmpl string, f template.FuncMap, cs *acsapi.ContainerService, extra interface{}) ([]byte, error) {
+func Template(tmpl string, f template.FuncMap, cs *acsapi.OpenShiftManagedCluster, extra interface{}) ([]byte, error) {
 	t, err := template.New("").Funcs(template.FuncMap{
 		"CertAsBytes":          tls.CertAsBytes,
 		"PrivateKeyAsBytes":    tls.PrivateKeyAsBytes,
@@ -37,7 +37,7 @@ func Template(tmpl string, f template.FuncMap, cs *acsapi.ContainerService, extr
 	b := &bytes.Buffer{}
 
 	err = t.Execute(b, struct {
-		ContainerService *acsapi.ContainerService
+		ContainerService *acsapi.OpenShiftManagedCluster
 		Config           *acsapi.Config
 		Extra            interface{}
 	}{ContainerService: cs, Config: cs.Config, Extra: extra})

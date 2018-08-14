@@ -31,7 +31,7 @@ func healthCheck() error {
 	if err != nil {
 		return err
 	}
-	var cs *acsapi.ContainerService
+	var cs *acsapi.OpenShiftManagedCluster
 	err = yaml.Unmarshal(b, &cs)
 	if err != nil {
 		return errors.Wrap(err, "cannot unmarshal _data/containerservice.yaml")

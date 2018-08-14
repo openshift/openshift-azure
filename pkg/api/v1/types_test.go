@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-var testOpenShiftCluster = &OpenShiftCluster{
+var testOpenShiftCluster = &OpenShiftManagedCluster{
 	ID:       "id",
 	Location: "location",
 	Name:     "name",
@@ -152,7 +152,7 @@ func TestMarshal(t *testing.T) {
 }
 
 func TestUnmarshal(t *testing.T) {
-	var oc *OpenShiftCluster
+	var oc *OpenShiftManagedCluster
 	err := json.Unmarshal(testOpenShiftClusterJSON, &oc)
 	if err != nil {
 		t.Fatal(err)

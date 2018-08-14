@@ -17,7 +17,7 @@ type ResourcePurchasePlan struct {
 
 // ContainerService complies with the ARM model of
 // resource definition in a JSON template.
-type ContainerService struct {
+type OpenShiftManagedCluster struct {
 	ID       string                `json:"id"`
 	Location string                `json:"location"`
 	Name     string                `json:"name"`

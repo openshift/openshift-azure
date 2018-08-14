@@ -17,13 +17,13 @@ import (
 )
 
 // createOrUpdate simulates the RP
-func createOrUpdate(oc *v1.OpenShiftCluster, entry *logrus.Entry) (*v1.OpenShiftCluster, error) {
+func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
 	p := plugin.NewPlugin(entry)
 
 	// convert the external API manifest into the internal API representation
 	log.Info("convert to internal")
-	cs := acsapi.ConvertVLabsOpenShiftClusterToContainerService(oc)
+	cs := acsapi.ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster(oc)
 
 	// the RP will enrich the internal API representation with data not included
 	// in the original request
@@ -46,7 +46,7 @@ func createOrUpdate(oc *v1.OpenShiftCluster, entry *logrus.Entry) (*v1.OpenShift
 
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
-	var oldCs *acsapi.ContainerService
+	var oldCs *acsapi.OpenShiftManagedCluster
 	if len(oldCsBytes) > 0 {
 		if err := yaml.Unmarshal(oldCsBytes, &oldCs); err != nil {
 			return nil, err
@@ -104,12 +104,12 @@ func createOrUpdate(oc *v1.OpenShiftCluster, entry *logrus.Entry) (*v1.OpenShift
 
 	// convert our (probably changed) internal API representation back to the
 	// external API manifest to return it to the user
-	oc = acsapi.ConvertContainerServiceToVLabsOpenShiftCluster(cs)
+	oc = acsapi.ConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster(cs)
 
 	return oc, nil
 }
 
-func enrich(cs *acsapi.ContainerService) error {
+func enrich(cs *acsapi.OpenShiftManagedCluster) error {
 	cs.Properties.AzProfile = &acsapi.AzProfile{
 		TenantID:       os.Getenv("AZURE_TENANT_ID"),
 		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
@@ -169,7 +169,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var oc *v1.OpenShiftCluster
+	var oc *v1.OpenShiftManagedCluster
 	err = yaml.Unmarshal(b, &oc)
 	if err != nil {
 		log.Fatal(err)
