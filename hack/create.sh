@@ -81,6 +81,10 @@ az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _dat
 
 if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # will eventually run as an HCP pod, for development run it locally
+    FQDN=$(awk '/^  fqdn:/ { print $2 }' <_data/manifest.yaml)
+    # sleep until FQDN name is registered in Azure DNS
+    # 6 coresponds to "Could not resolve host"
+    while [[ "$(curl -s -k https://${FQDN} ; echo $?)" == "6" ]]; do sleep 5; done
     KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go -run-once=true
 fi
 
