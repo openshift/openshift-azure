@@ -49,6 +49,7 @@ type Config struct {
 	AzureClusterReaderKubeconfig *v1.Config
 
 	// misc control plane configurables
+	EtcdConfig        string
 	ServiceAccountKey *rsa.PrivateKey
 	SessionSecretAuth []byte
 	SessionSecretEnc  []byte

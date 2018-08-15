@@ -131,7 +131,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 		}
 
 	case api.AgentPoolProfileRoleMaster:
-		if app.Count != 3 {
+		if app.Count < 3 {
 			errs = append(errs, fmt.Errorf("invalid masterPoolProfile.count %d", app.Count))
 		}
 
