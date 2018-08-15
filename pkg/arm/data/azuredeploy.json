@@ -164,20 +164,6 @@
             }
         },
         {
-            "apiVersion": "2014-10-01-preview",
-            "name": "[guid(concat('Microsoft.Compute/virtualMachineScaleSets/', 'ss-{{ $app.Name }}', 'vmidentity', '{{ $.Config.ResourceGroup }}'))]",
-            "type": "Microsoft.Authorization/roleAssignments",
-            "properties": {
-{{- if or (eq $app.Role "master") (eq $app.Role "infra") }}
-              "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-{{- else }}
-              "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
-
-{{- end }}
-              "principalId": "[reference(concat('Microsoft.Compute/virtualMachineScaleSets/', 'ss-{{ $app.Name }}'), '2017-03-30', 'Full').identity.principalId]"
-            }
-        },
-        {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2017-12-01",
             "location": "{{ $.ContainerService.Location | js }}",
@@ -191,9 +177,6 @@
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}')]"
             ],
             "name": "ss-{{ $app.Name }}",
-            "identity": {
-                "type": "systemAssigned"
-            },
             "sku": {
                 "tier": "Standard",
                 "capacity": "{{ $app.Count | js }}",
@@ -306,19 +289,6 @@
                                     "settings": {},
                                     "type": "CustomScript",
                                     "typeHandlerVersion": "2.0"
-                                }
-                            },
-                            {
-                                "name": "managedIdentityExtension",
-                                "properties": {
-                                    "publisher": "Microsoft.ManagedIdentity",
-                                    "type": "ManagedIdentityExtensionForLinux",
-                                    "typeHandlerVersion": "1.0",
-                                    "autoUpgradeMinorVersion": true,
-                                    "settings": {
-                                        "port": 50343
-                                    },
-                                    "protectedSettings": {}
                                 }
                             }
                         ]

@@ -403,9 +403,10 @@ mkdir -p /etc/origin/cloudprovider
 
 # TODO: this is duplicated, and that's not ideal
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
-useManagedIdentityExtension: true
 tenantId: {{ .Config.TenantID | quote }}
 subscriptionId: {{ .Config.SubscriptionID | quote }}
+aadClientId: {{ .ContainerService.Properties.ServicePrincipalProfile.ClientID | quote }}
+aadClientSecret: {{ .ContainerService.Properties.ServicePrincipalProfile.Secret | quote }}
 aadTenantId: {{ .Config.TenantID | quote }}
 resourceGroup: {{ .Config.ResourceGroup | quote }}
 location: {{ .ContainerService.Location | quote }}
@@ -556,9 +557,6 @@ spec:
     - mountPath: /etc/origin/cloudprovider
       name: master-cloud-provider
       readOnly: true
-    - mountPath: /var/lib/waagent/ManagedIdentity-Settings
-      name: master-msi
-      readOnly: true
   hostNetwork: true
   volumes:
   - hostPath:
@@ -567,10 +565,6 @@ spec:
   - hostPath:
       path: /etc/origin/cloudprovider
     name: master-cloud-provider
-  - hostPath:
-      path: /var/lib/waagent/ManagedIdentity-Settings
-    name: master-msi
-
 EOF
 
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
