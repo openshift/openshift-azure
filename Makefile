@@ -1,4 +1,6 @@
-# build is the default target
+# all is the default target to build everything
+all: clean build sync
+
 build:
 	go build ./...
 
@@ -8,8 +10,10 @@ clean:
 test:
 	go test ./...
 
-sync: clean
+generate:
 	go generate ./...
+
+sync: clean generate
 	CGO_ENABLED=0 go build ./cmd/sync
 
 sync-image: sync
