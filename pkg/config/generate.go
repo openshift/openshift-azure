@@ -335,7 +335,7 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 			cert.signingKey, cert.signingCert = c.Certificates.Ca.Key, c.Certificates.Ca.Cert
 		}
 		if *cert.key != nil && *cert.cert != nil &&
-			(*cert.cert).CheckSignatureFrom(cert.signingCert) == nil {
+			((*cert.cert).CheckSignatureFrom(cert.signingCert) == nil || cert.selfSign) {
 			continue
 		}
 		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, cert.selfSign); err != nil {
