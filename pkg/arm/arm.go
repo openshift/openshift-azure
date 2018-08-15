@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util"
 )
 
@@ -17,16 +18,13 @@ type Generator interface {
 	Generate(m *acsapi.ContainerService) ([]byte, error)
 }
 
-type simpleGenerator struct {
-	log *logrus.Entry
-}
+type simpleGenerator struct{}
 
 var _ Generator = &simpleGenerator{}
 
-func NewSimpleGenerator(log *logrus.Entry) Generator {
-	return &simpleGenerator{
-		log: log,
-	}
+func NewSimpleGenerator(entry *logrus.Entry) Generator {
+	log.New(entry)
+	return &simpleGenerator{}
 }
 
 func (*simpleGenerator) Generate(m *acsapi.ContainerService) ([]byte, error) {

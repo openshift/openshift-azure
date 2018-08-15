@@ -4,6 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/log"
 )
 
 const (
@@ -20,10 +21,9 @@ type simpleUpgrader struct {
 
 var _ Upgrader = &simpleUpgrader{}
 
-func NewSimpleUpgrader(log *logrus.Entry) Upgrader {
-	return &simpleUpgrader{
-		log: log,
-	}
+func NewSimpleUpgrader(entry *logrus.Entry) Upgrader {
+	log.New(entry)
+	return &simpleUpgrader{}
 }
 
 func (u *simpleUpgrader) Upgrade(cs *acsapi.ContainerService) error {
