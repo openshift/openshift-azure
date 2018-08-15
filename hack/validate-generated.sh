@@ -27,7 +27,7 @@ GENERATED_FILES=(
 )
 
 for file in "${GENERATED_FILES[@]}"; do
-	if ! diff  -r "${DIR}/../${file}" "${T}/${file}" 2>&1 ; then
+	if ! diff  -r "${DIR}/../${file}" "${T}/${file}" 2>&1 >/dev/null ; then
 		echo "go generate produced changes that were not already present"
 		exit 1
 	fi
