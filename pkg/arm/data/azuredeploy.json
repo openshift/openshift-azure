@@ -179,7 +179,7 @@
             "name": "ss-{{ $app.Name }}",
             "sku": {
                 "tier": "Standard",
-                "capacity": "{{ $app.Count | js }}",
+                "capacity": {{ $app.Count | js }},
                 "name": "{{ $app.VMSize | js }}"
             },
 {{- if eq $.Config.ImageResourceName "" }}
