@@ -102,6 +102,11 @@ update-ca-trust
 cat >/etc/origin/master/master-config.yaml <<EOF
 admissionConfig:
   pluginConfig:
+    AlwaysPullImages:
+      configuration:
+        kind: DefaultAdmissionConfig
+        apiVersion: v1
+        disable: false
     BuildDefaults:
       configuration:
         apiVersion: v1
