@@ -16,7 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/validate"
 )
 
-var logLevel = flag.String("log_level", "Debug", "valid values are Debug, Info, Warning, Error")
+var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
 
 // checks and sanitizes logLevel input
 func sanitizeLogLevel(lvl *string) logrus.Level {
@@ -39,7 +39,7 @@ func sanitizeLogLevel(lvl *string) logrus.Level {
 // pod runs in the cluster
 func healthCheck() error {
 	logger := logrus.New()
-	//logger.SetLevel(logrus.DebugLevel)
+	// sanitize input to only accept specific log levels and tolerate junk
 	logger.SetLevel(sanitizeLogLevel(logLevel))
 	log := logrus.NewEntry(logger)
 
