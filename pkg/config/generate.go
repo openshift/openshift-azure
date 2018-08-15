@@ -15,7 +15,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
-func Generate(cs *acsapi.ContainerService) (err error) {
+func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 	c := cs.Config
 	c.Version = versionLatest
 
@@ -24,6 +24,10 @@ func Generate(cs *acsapi.ContainerService) (err error) {
 	selectContainerImages(cs)
 
 	selectDNSNames(cs)
+
+	if err := generateEtcdConfig(cs); err != nil {
+		return err
+	}
 
 	// Generate CAs
 	cas := []struct {
@@ -431,52 +435,4 @@ func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certific
 		},
 		CurrentContext: contextname,
 	}, nil
-}
-
-type EtcdConfig struct {
-	AdertiseUrls              string
-	CertFile                  string
-	ClientCertAuth            bool
-	DataDir                   string
-	ElectionTimeout           int
-	HeartbeatInterval         int
-	InitialAdvertisePeersUrls string
-	InitialCluster            string
-	KeyFile                   string
-	ListenClientsUrls         string
-	ListenPeerUrls            string
-	Name                      string
-	PeerCertFile              string
-	PeerClientCertAuth        bool
-	PeerKeyFile               string
-	PeerTrustedCaFile         string
-	QuotaBackendBytes         int
-	TrustedCaFile             string
-}
-
-func generateEtcdConfig(cs *acsapi.ContainerService) {
-
-	etcdConfig := EtcdConfig{
-		AdertiseUrls:              "https://$(hostname):2379",
-		CertFile:                  "/etc/etcd/server.crt",
-		ClientCertAuth:            true,
-		DataDir:                   "/var/lib/etcd",
-		ElectionTimeout:           2500,
-		HeartbeatInterval:         500,
-		InitialAdvertisePeersUrls: "https://$(hostname):2380",
-		InitialCluster:            "master-000000=https://master-000000:2380,master-000001=https://master-000001:2380,master-000002=https://master-000002:2380",
-		KeyFile:                   "/etc/etcd/server.key",
-		ListenClientsUrls:         "https://0.0.0.0:2379",
-		ListenPeerUrls:            "https://0.0.0.0:2380",
-		Name:                      "$(hostname)",
-		PeerCertFile:              "/etc/etcd/peer.crt",
-		PeerClientCertAuth:        true,
-		PeerKeyFile:               "/etc/etcd/peer.key",
-		PeerTrustedCaFile:         "/etc/etcd/ca.crt",
-		QuotaBackendBytes:         4294967296,
-		TrustedCaFile:             "/etc/etcd/ca.crt",
-	}
-
-	cs.Config.EtcdConfig = etcdConfig
-
 }
