@@ -11,14 +11,15 @@ import (
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/api/v1"
+	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
 // createOrUpdate simulates the RP
-func createOrUpdate(oc *v1.OpenShiftCluster, log *logrus.Entry) (*v1.OpenShiftCluster, error) {
+func createOrUpdate(oc *v1.OpenShiftCluster, entry *logrus.Entry) (*v1.OpenShiftCluster, error) {
 	// instantiate the plugin
-	p := plugin.NewPlugin(log)
+	p := plugin.NewPlugin(entry)
 
 	// convert the external API manifest into the internal API representation
 	log.Info("convert to internal")
@@ -156,9 +157,12 @@ func writeHelpers(c *acsapi.Config) error {
 }
 
 func main() {
+	// mock logger configuration
 	logger := logrus.New()
 	logger.SetLevel(logrus.DebugLevel)
 	log := logrus.NewEntry(logger)
+	entry := logrus.NewEntry(logger)
+	entry = entry.WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
 
 	// read in the external API manifest.
 	b, err := ioutil.ReadFile("_data/manifest.yaml")
@@ -172,7 +176,7 @@ func main() {
 	}
 
 	// simulate the API call to the RP
-	oc, err = createOrUpdate(oc, log)
+	oc, err = createOrUpdate(oc, entry)
 	if err != nil {
 		log.Fatal(err)
 	}

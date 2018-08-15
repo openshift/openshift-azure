@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"io/ioutil"
+	"os"
 
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
@@ -17,12 +18,14 @@ import (
 // healthCheck should get rolled into the end of createorupdate once the sync
 // pod runs in the cluster
 func healthCheck() error {
+	// mock logger configuration
 	logger := logrus.New()
 	logger.SetLevel(logrus.DebugLevel)
-	log := logrus.NewEntry(logger)
+	entry := logrus.NewEntry(logger)
+	entry = entry.WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
 
 	// instantiate the plugin
-	p := plugin.NewPlugin(log)
+	p := plugin.NewPlugin(entry)
 
 	b, err := ioutil.ReadFile("_data/containerservice.yaml")
 	if err != nil {

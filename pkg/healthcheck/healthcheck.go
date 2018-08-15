@@ -20,6 +20,7 @@ import (
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/checks"
+	"github.com/openshift/openshift-azure/pkg/log"
 )
 
 // GetKubeconfigFromV1Config takes a v1 config and returns a kubeconfig
@@ -39,16 +40,13 @@ type HealthChecker interface {
 	HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error
 }
 
-type simpleHealthChecker struct {
-	log *logrus.Entry
-}
+type simpleHealthChecker struct{}
 
 var _ HealthChecker = &simpleHealthChecker{}
 
-func NewSimpleHealthChecker(log *logrus.Entry) HealthChecker {
-	return &simpleHealthChecker{
-		log: log,
-	}
+func NewSimpleHealthChecker(entry *logrus.Entry) HealthChecker {
+	log.New(entry)
+	return &simpleHealthChecker{}
 }
 
 // HealthCheck function to verify cluster health
@@ -111,7 +109,7 @@ func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *acsapi.Co
 
 		switch resp.StatusCode {
 		case http.StatusOK:
-			hc.log.Info("OK")
+			log.Info("OK")
 			return nil
 		case http.StatusBadGateway:
 			time.Sleep(10 * time.Second)

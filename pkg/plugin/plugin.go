@@ -16,40 +16,36 @@ import (
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/healthcheck"
+	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/validate"
 )
 
 type plugin struct {
-	log *logrus.Entry
+	entry *logrus.Entry
 }
 
 var _ api.Plugin = &plugin{}
 
-func NewPlugin(log *logrus.Entry) api.Plugin {
-	// always have a logger
-	if log == nil {
-		logger := logrus.New()
-		log = logrus.NewEntry(logger)
-	}
-
+func NewPlugin(entry *logrus.Entry) api.Plugin {
+	log.New(entry)
 	return &plugin{
-		log: log,
+		entry: entry,
 	}
 }
 
 func (p *plugin) ValidateInternal(new, old *acsapi.ContainerService) []error {
-	p.log.Info("validating internal data models")
+	log.Info("validating internal data models")
 	return validate.ContainerService(new, old)
 }
 
 func (p *plugin) GenerateConfig(cs *acsapi.ContainerService) error {
-	p.log.Info("generating configs")
+	log.Info("generating configs")
 	// TODO should we save off the original config here and if there are any errors we can restore it?
 	if cs.Config == nil {
 		cs.Config = &acsapi.Config{}
 	}
 
-	upgrader := config.NewSimpleUpgrader(p.log)
+	upgrader := config.NewSimpleUpgrader(p.entry)
 	err := upgrader.Upgrade(cs)
 	if err != nil {
 		return err
@@ -63,14 +59,14 @@ func (p *plugin) GenerateConfig(cs *acsapi.ContainerService) error {
 }
 
 func (p *plugin) GenerateARM(cs *acsapi.ContainerService) ([]byte, error) {
-	p.log.Info("generating arm templates")
-	generator := arm.NewSimpleGenerator(p.log)
+	log.Info("generating arm templates")
+	generator := arm.NewSimpleGenerator(p.entry)
 	return generator.Generate(cs)
 }
 
 func (p *plugin) HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error {
-	p.log.Info("starting health check")
-	healthChecker := healthcheck.NewSimpleHealthChecker(p.log)
+	log.Info("starting health check")
+	healthChecker := healthcheck.NewSimpleHealthChecker(p.entry)
 	return healthChecker.HealthCheck(ctx, cs)
 }
 
