@@ -55,7 +55,9 @@ func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.Op
 
 	// validate the internal API representation (with reference to the previous
 	// internal API representation)
-	errs := p.Validate(cs, oldCs)
+	// we set fqdn during enrichment which is slightly different than what the RP
+	// will do so we are only validating once.
+	errs := p.Validate(cs, oldCs, false)
 	if len(errs) > 0 {
 		return nil, errors.NewAggregate(errs)
 	}

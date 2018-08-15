@@ -10,7 +10,9 @@ type Plugin interface {
 	// single place in the event of multiple external API versions, and (b) to
 	// be able to compare a new API manifest against a pre-existing API manifest
 	// (for update, upgrade, etc.)
-	Validate(new, old *OpenShiftManagedCluster) []error
+	// externalOnly indicates that fields set by the RP (FQDN and routerProfile.FQDN)
+	// should be excluded.
+	Validate(new, old *OpenShiftManagedCluster, externalOnly bool) []error
 
 	GenerateConfig(cs *OpenShiftManagedCluster) error
 
