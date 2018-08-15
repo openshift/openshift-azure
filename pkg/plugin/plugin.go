@@ -33,12 +33,12 @@ func NewPlugin(entry *logrus.Entry) api.Plugin {
 	}
 }
 
-func (p *plugin) ValidateInternal(new, old *acsapi.ContainerService) []error {
+func (p *plugin) ValidateInternal(new, old *acsapi.OpenShiftManagedCluster) []error {
 	log.Info("validating internal data models")
 	return validate.ContainerService(new, old)
 }
 
-func (p *plugin) GenerateConfig(cs *acsapi.ContainerService) error {
+func (p *plugin) GenerateConfig(cs *acsapi.OpenShiftManagedCluster) error {
 	log.Info("generating configs")
 	// TODO should we save off the original config here and if there are any errors we can restore it?
 	if cs.Config == nil {
@@ -58,13 +58,13 @@ func (p *plugin) GenerateConfig(cs *acsapi.ContainerService) error {
 	return nil
 }
 
-func (p *plugin) GenerateARM(cs *acsapi.ContainerService) ([]byte, error) {
+func (p *plugin) GenerateARM(cs *acsapi.OpenShiftManagedCluster) ([]byte, error) {
 	log.Info("generating arm templates")
 	generator := arm.NewSimpleGenerator(p.entry)
 	return generator.Generate(cs)
 }
 
-func (p *plugin) HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error {
+func (p *plugin) HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
 	log.Info("starting health check")
 	healthChecker := healthcheck.NewSimpleHealthChecker(p.entry)
 	return healthChecker.HealthCheck(ctx, cs)

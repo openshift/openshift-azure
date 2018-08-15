@@ -8,9 +8,9 @@ import (
 // testContainerService and testOpenShiftCluster are defined in
 // converterfromosaapi_test.go.
 
-func TestConvertContainerServiceToVLabsOpenShiftCluster(t *testing.T) {
-	oc := ConvertContainerServiceToVLabsOpenShiftCluster(testContainerService)
+func TestConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster(t *testing.T) {
+	oc := ConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster(testContainerService)
 	if !reflect.DeepEqual(oc, testOpenShiftCluster) {
-		t.Errorf("ConvertContainerServiceToVLabsOpenShiftCluster returned unexpected result\n%#v\n", oc)
+		t.Errorf("ConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster returned unexpected result\n%#v\n", oc)
 	}
 }

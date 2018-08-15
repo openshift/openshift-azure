@@ -13,13 +13,13 @@ type Plugin interface {
 
 	// TODO: confirm with MSFT that they can pass in `old` at the time
 	// ValidateInternal is called and that it makes sense to do this.
-	ValidateInternal(new, old *ContainerService) []error
+	ValidateInternal(new, old *OpenShiftManagedCluster) []error
 
-	GenerateConfig(cs *ContainerService) error
+	GenerateConfig(cs *OpenShiftManagedCluster) error
 
-	GenerateARM(cs *ContainerService) ([]byte, error)
+	GenerateARM(cs *OpenShiftManagedCluster) ([]byte, error)
 
-	HealthCheck(ctx context.Context, cs *ContainerService) error
+	HealthCheck(ctx context.Context, cs *OpenShiftManagedCluster) error
 }
 
 type Upgrade interface {

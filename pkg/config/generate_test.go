@@ -29,13 +29,13 @@ properties:
 func TestSelectDNSNames(t *testing.T) {
 
 	tests := map[string]struct {
-		f        func(*acsapi.ContainerService)
-		expected func(*acsapi.ContainerService)
+		f        func(*acsapi.OpenShiftManagedCluster)
+		expected func(*acsapi.OpenShiftManagedCluster)
 	}{
 
 		"test no PublicHostname": {
-			f: func(cs *acsapi.ContainerService) {},
-			expected: func(cs *acsapi.ContainerService) {
+			f: func(cs *acsapi.OpenShiftManagedCluster) {},
+			expected: func(cs *acsapi.OpenShiftManagedCluster) {
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = "console-internal.example.com"
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = "router-internal.example.com"
 				cs.Config.RouterLBCNamePrefix = "router-internal"
@@ -43,10 +43,10 @@ func TestSelectDNSNames(t *testing.T) {
 			},
 		},
 		"test no PublicHostname for router": {
-			f: func(cs *acsapi.ContainerService) {
+			f: func(cs *acsapi.OpenShiftManagedCluster) {
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = "console.example.com"
 			},
-			expected: func(cs *acsapi.ContainerService) {
+			expected: func(cs *acsapi.OpenShiftManagedCluster) {
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = "router-internal.example.com"
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = "console.example.com"
 				cs.Config.MasterLBCNamePrefix = "console-internal"
@@ -54,11 +54,11 @@ func TestSelectDNSNames(t *testing.T) {
 			},
 		},
 		"test master & router prefix configuration": {
-			f: func(cs *acsapi.ContainerService) {
+			f: func(cs *acsapi.OpenShiftManagedCluster) {
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = "router-custom.test.com"
 				cs.Properties.FQDN = "master-custom.test.com"
 			},
-			expected: func(cs *acsapi.ContainerService) {
+			expected: func(cs *acsapi.OpenShiftManagedCluster) {
 				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = "router-custom.test.com"
 				cs.Properties.FQDN = "master-custom.test.com"
 				cs.Config.MasterLBCNamePrefix = "master-custom"
@@ -70,8 +70,8 @@ func TestSelectDNSNames(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		input := new(acsapi.ContainerService)
-		output := new(acsapi.ContainerService)
+		input := new(acsapi.OpenShiftManagedCluster)
+		output := new(acsapi.OpenShiftManagedCluster)
 		err := yaml.Unmarshal(testOpenShiftClusterYAML, &input)
 		if err != nil {
 			t.Fatal(err)

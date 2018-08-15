@@ -15,7 +15,7 @@ import (
 )
 
 type Generator interface {
-	Generate(m *acsapi.ContainerService) ([]byte, error)
+	Generate(m *acsapi.OpenShiftManagedCluster) ([]byte, error)
 }
 
 type simpleGenerator struct{}
@@ -27,7 +27,7 @@ func NewSimpleGenerator(entry *logrus.Entry) Generator {
 	return &simpleGenerator{}
 }
 
-func (*simpleGenerator) Generate(m *acsapi.ContainerService) ([]byte, error) {
+func (*simpleGenerator) Generate(m *acsapi.OpenShiftManagedCluster) ([]byte, error) {
 	masterStartup, err := Asset("master-startup.sh")
 	if err != nil {
 		return nil, err

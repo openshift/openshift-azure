@@ -1,8 +1,10 @@
 package v1
 
-// OpenShiftCluster complies with the ARM model of resource definition in a JSON
+// TODO publish v1 to a dated api as in Azure conventions
+
+// OpenShiftManagedCluster complies with the ARM model of resource definition in a JSON
 // template.
-type OpenShiftCluster struct {
+type OpenShiftManagedCluster struct {
 	ID         string                `json:"id,omitempty"`
 	Location   string                `json:"location,omitempty"`
 	Name       string                `json:"name,omitempty"`

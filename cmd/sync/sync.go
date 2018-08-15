@@ -29,7 +29,7 @@ func sync() error {
 		return errors.Wrap(err, "cannot read _data/containerservice.yaml")
 	}
 
-	var cs *acsapi.ContainerService
+	var cs *acsapi.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(b, &cs); err != nil {
 		return errors.Wrap(err, "cannot unmarshal _data/containerservice.yaml")
 	}

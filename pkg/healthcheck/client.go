@@ -14,7 +14,7 @@ type azureNetworkClient struct {
 	eip network.PublicIPAddressesClient
 }
 
-func newAzureClients(ctx context.Context, cs *acsapi.ContainerService) (*azureNetworkClient, error) {
+func newAzureClients(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) (*azureNetworkClient, error) {
 
 	authorizer, err := auth.NewAuthorizerFromEnvironment()
 	if err != nil {

@@ -172,7 +172,7 @@ func WaitForInfraServices(ctx context.Context, appclient *appclient.AppsV1Client
 	return nil
 }
 
-func CheckDNS(ctx context.Context, eipc network.PublicIPAddressesClient, lbc network.LoadBalancerFrontendIPConfigurationsClient, cs *acsapi.ContainerService) error {
+func CheckDNS(ctx context.Context, eipc network.PublicIPAddressesClient, lbc network.LoadBalancerFrontendIPConfigurationsClient, cs *acsapi.OpenShiftManagedCluster) error {
 
 	// get master FQDN from ip-apiserver loadbalancer
 	ip, err := eipc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, "ip-apiserver", "")

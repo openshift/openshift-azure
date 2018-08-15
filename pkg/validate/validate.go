@@ -35,13 +35,13 @@ func isValidHostname(h string) bool {
 }
 
 // ContainerService validates a ContainerService struct
-func ContainerService(new, old *api.ContainerService) (errs []error) {
+func ContainerService(new, old *api.OpenShiftManagedCluster) (errs []error) {
 	// TODO update validation
 	// TODO are these error messages confusing since they may not correspond with the external model?
 	return validateContainerService(new)
 }
 
-func validateContainerService(c *api.ContainerService) (errs []error) {
+func validateContainerService(c *api.OpenShiftManagedCluster) (errs []error) {
 	if c.Location == "" {
 		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
 	}

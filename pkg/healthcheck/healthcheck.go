@@ -37,7 +37,7 @@ func getKubeconfigFromV1Config(kc *v1.Config) (clientcmd.ClientConfig, error) {
 }
 
 type HealthChecker interface {
-	HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error
+	HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error
 }
 
 type simpleHealthChecker struct{}
@@ -50,7 +50,7 @@ func NewSimpleHealthChecker(entry *logrus.Entry) HealthChecker {
 }
 
 // HealthCheck function to verify cluster health
-func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.ContainerService) error {
+func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
 	appsClient, err := newAppClient(ctx, cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
@@ -77,7 +77,7 @@ func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.Conta
 	return hc.waitForConsole(ctx, cs)
 }
 
-func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *acsapi.ContainerService) error {
+func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
 	c := cs.Config
 	pool := x509.NewCertPool()
 	pool.AddCert(c.Certificates.Ca.Cert)
