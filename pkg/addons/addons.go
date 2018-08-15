@@ -197,9 +197,11 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 
 	// wait for the service catalog api extension to arrive. TODO: we should do
 	// this dynamically, and should not PollInfinite.
+	log.Debug("Waiting for the service catalog api to get aggregated")
 	if err := wait.PollInfinite(time.Second, client.ServiceCatalogExists); err != nil {
 		return err
 	}
+	log.Debug("Service catalog api is aggregated")
 
 	// refresh dynamic client
 	if err := client.UpdateDynamicClient(); err != nil {
