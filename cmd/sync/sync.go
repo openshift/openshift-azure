@@ -34,7 +34,7 @@ func sync() error {
 		return errors.Wrap(err, "cannot unmarshal _data/containerservice.yaml")
 	}
 
-	if errs := validate.ContainerService(cs, nil); len(errs) > 0 {
+	if errs := validate.Validate(cs, nil, false); len(errs) > 0 {
 		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 

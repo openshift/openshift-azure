@@ -35,13 +35,13 @@ func isValidHostname(h string) bool {
 }
 
 // ContainerService validates a ContainerService struct
-func ContainerService(new, old *api.OpenShiftManagedCluster) (errs []error) {
+func Validate(new, old *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	// TODO update validation
 	// TODO are these error messages confusing since they may not correspond with the external model?
-	return validateContainerService(new)
+	return validateContainerService(new, externalOnly)
 }
 
-func validateContainerService(c *api.OpenShiftManagedCluster) (errs []error) {
+func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	if c.Location == "" {
 		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
 	}
@@ -55,14 +55,16 @@ func validateContainerService(c *api.OpenShiftManagedCluster) (errs []error) {
 		return
 	}
 
-	errs = append(errs, validateProperties(c.Properties)...)
+	errs = append(errs, validateProperties(c.Properties, externalOnly)...)
 	return
 }
 
-func validateProperties(p *api.Properties) (errs []error) {
+func validateProperties(p *api.Properties, externalOnly bool) (errs []error) {
 	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
-	errs = append(errs, validateOrchestratorProfile(p.OrchestratorProfile)...)
-	errs = append(errs, validateFQDN(p)...)
+	errs = append(errs, validateOrchestratorProfile(p.OrchestratorProfile, externalOnly)...)
+	if !externalOnly {
+		errs = append(errs, validateFQDN(p)...)
+	}
 	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles)...)
 	errs = append(errs, validateServicePrincipalProfile(p.ServicePrincipalProfile)...)
 	return
@@ -159,7 +161,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 	return
 }
 
-func validateOrchestratorProfile(p *api.OrchestratorProfile) (errs []error) {
+func validateOrchestratorProfile(p *api.OrchestratorProfile, externalOnly bool) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("orchestratorProfile cannot be nil"))
 		return
@@ -171,7 +173,7 @@ func validateOrchestratorProfile(p *api.OrchestratorProfile) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid properties.openShiftVersion %q", p.OrchestratorVersion))
 	}
 
-	errs = append(errs, validateOpenShiftConfig(p.OpenShiftConfig)...)
+	errs = append(errs, validateOpenShiftConfig(p.OpenShiftConfig, externalOnly)...)
 
 	return
 }
@@ -180,13 +182,13 @@ func validateFQDN(p *api.Properties) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
 	}
-	if p.FQDN != "" && !isValidHostname(p.FQDN) {
+	if !isValidHostname(p.FQDN) {
 		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
 	}
 	return
 }
 
-func validateOpenShiftConfig(c *api.OpenShiftConfig) (errs []error) {
+func validateOpenShiftConfig(c *api.OpenShiftConfig, externalOnly bool) (errs []error) {
 	if c == nil {
 		errs = append(errs, fmt.Errorf("openshiftConfig cannot be nil"))
 		return
@@ -195,7 +197,9 @@ func validateOpenShiftConfig(c *api.OpenShiftConfig) (errs []error) {
 	if c.PublicHostname != "" && !isValidHostname(c.PublicHostname) {
 		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", c.PublicHostname))
 	}
-	errs = append(errs, validateRouterProfiles(c.RouterProfiles)...)
+	if !externalOnly {
+		errs = append(errs, validateRouterProfiles(c.RouterProfiles)...)
+	}
 
 	return
 }

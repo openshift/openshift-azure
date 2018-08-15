@@ -48,6 +48,7 @@ name: openshift
 properties:
   openShiftVersion: v3.10
   publicHostname: openshift.test.example.com
+  fqdn: "www.example.com"
   routerProfiles:
   - name: default
     publicSubdomain: test.example.com
@@ -77,6 +78,7 @@ func TestValidate(t *testing.T) {
 	tests := map[string]struct {
 		f            func(*v1.OpenShiftManagedCluster)
 		expectedErrs []error
+		externalOnly bool
 	}{
 		"test yaml parsing": { // test yaml parsing
 
@@ -101,6 +103,34 @@ func TestValidate(t *testing.T) {
 			f:            func(oc *v1.OpenShiftManagedCluster) { oc.Properties.MasterPoolProfile.Count = 1 },
 			expectedErrs: []error{errors.New("invalid masterPoolProfile.count 1")},
 		},
+		"test external only true - unset fqdn does not fail": {
+			f:            func(oc *v1.OpenShiftManagedCluster) { oc.Properties.FQDN = "" },
+			externalOnly: true,
+		},
+		"test external only false - unset fqdn fails": {
+			f:            func(oc *v1.OpenShiftManagedCluster) { oc.Properties.FQDN = "" },
+			expectedErrs: []error{errors.New("invalid properties.fqdn \"\"")},
+			externalOnly: false,
+		},
+		"test external only false - invalid fqdn fails": {
+			f:            func(oc *v1.OpenShiftManagedCluster) { oc.Properties.FQDN = "()" },
+			expectedErrs: []error{errors.New("invalid properties.fqdn \"()\"")},
+			externalOnly: false,
+		},
+		"test external only true - unset router profile does not fail": {
+			f:            func(oc *v1.OpenShiftManagedCluster) { oc.Properties.RouterProfiles = nil },
+			externalOnly: true,
+		},
+		"test external only false - unset router profile does fail": {
+			f:            func(oc *v1.OpenShiftManagedCluster) { oc.Properties.RouterProfiles = nil },
+			expectedErrs: []error{errors.New("invalid properties.routerProfiles[\"default\"]")},
+			externalOnly: false,
+		},
+		"test external only false - invalid router profile does fail": {
+			f:            func(oc *v1.OpenShiftManagedCluster) { oc.Properties.RouterProfiles[0].FQDN = "()" },
+			expectedErrs: []error{errors.New("invalid properties.routerProfiles[\"default\"].fqdn \"()\"")},
+			externalOnly: false,
+		},
 	}
 
 	for name, test := range tests {
@@ -116,7 +146,7 @@ func TestValidate(t *testing.T) {
 
 		// TODO quick fix but means we're hoping conversion is correct.
 		cs := api.ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster(oc)
-		errs := ContainerService(cs, nil)
+		errs := Validate(cs, nil, test.externalOnly)
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
 			t.Errorf("%s expected errors %#v but received %#v", name, spew.Sprint(test.expectedErrs), spew.Sprint(errs))
 		}
