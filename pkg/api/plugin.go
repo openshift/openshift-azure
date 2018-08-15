@@ -21,3 +21,7 @@ type Plugin interface {
 
 	HealthCheck(ctx context.Context, cs *ContainerService) error
 }
+
+type Upgrade interface {
+	IsReady(nodeName string) (bool, error)
+}
