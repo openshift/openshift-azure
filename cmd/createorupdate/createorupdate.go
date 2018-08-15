@@ -55,7 +55,7 @@ func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.Op
 
 	// validate the internal API representation (with reference to the previous
 	// internal API representation)
-	errs := p.ValidateInternal(cs, oldCs)
+	errs := p.Validate(cs, oldCs)
 	if len(errs) > 0 {
 		return nil, errors.NewAggregate(errs)
 	}

@@ -33,7 +33,7 @@ func NewPlugin(entry *logrus.Entry) api.Plugin {
 	}
 }
 
-func (p *plugin) ValidateInternal(new, old *acsapi.OpenShiftManagedCluster) []error {
+func (p *plugin) Validate(new, old *acsapi.OpenShiftManagedCluster) []error {
 	log.Info("validating internal data models")
 	return validate.ContainerService(new, old)
 }
