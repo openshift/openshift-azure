@@ -16,6 +16,10 @@ name: test-cluster
 config:
   Version: 310
 properties:
+  agentPoolProfiles:
+  - count: 5
+    name: master
+    role: master
   fqdn: "console-internal.example.com"
   orchestratorProfile:
     openshiftConfig:
@@ -95,5 +99,21 @@ func TestSelectDNSNames(t *testing.T) {
 			t.Errorf("%v: SelectDNSNames test returned unexpected result \n %#v != %#v", name, input, output)
 		}
 
+	}
+}
+
+func TestGetMasterDNSNames(t *testing.T) {
+
+	expected := []string{"master-000000", "master-000001", "master-000002", "master-000003", "master-000004"}
+
+	cs := new(acsapi.ContainerService)
+	err := yaml.Unmarshal(testOpenShiftClusterYAML, &cs)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dnsNames := getMasterDNSNames(cs)
+	if !reflect.DeepEqual(expected, dnsNames) {
+		t.Errorf("GetMasterDNSNames test returned unexpected result \n %#v != %#v", dnsNames, expected)
 	}
 }

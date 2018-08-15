@@ -21,6 +21,7 @@ type Config struct {
 	ImageResourceName  string
 
 	Certificates CertificateConfig
+	Etcd         EtcdConfig
 
 	// container images for pods
 	MasterEtcdImage             string
@@ -120,4 +121,29 @@ type CertificateConfig struct {
 type CertKeyPair struct {
 	Key  *rsa.PrivateKey
 	Cert *x509.Certificate
+}
+
+// EtcdConfig contains all configurables for etcd static pod config (/etc/etcd/etcd.conf)
+type EtcdConfig struct {
+	AdvertiseUrls             string
+	CertFile                  string
+	ClientCertAuth            bool
+	DataDir                   string
+	ElectionTimeout           int
+	HeartbeatInterval         int
+	InitialAdvertisePeersUrls string
+	InitialCluster            string
+	KeyFile                   string
+	ListenClientsUrls         string
+	ListenPeerUrls            string
+	Name                      string
+	PeerCertFile              string
+	PeerClientCertAuth        bool
+	PeerKeyFile               string
+	PeerTrustedCaFile         string
+	QuotaBackendBytes         int
+	TrustedCaFile             string
+
+	// Config field contains generated config to be injected into ARM
+	Config []byte
 }
