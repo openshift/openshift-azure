@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+  namespace: test-deployment
+  labels:
+    name: simple-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: simple-deployment
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: simple-deployment
+    spec:
+      containers:
+      - image: "docker.io/openshift/deployment-example:v1"
+        imagePullPolicy: IfNotPresent
+        name: myapp
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/node-selector: ""
+  name: test
+spec:
+  finalizers:
+  - kubernetes
+  - openshift.io/origin

@@ -7,8 +7,7 @@ build:
 clean:
 	rm -f sync
 
-test:
-	go test ./...
+test: unit e2e
 
 generate:
 	go generate ./...
@@ -29,5 +28,8 @@ verify:
 
 unit:
 	go test ./...
+
+e2e:
+	cd test/extended; go test
 
 .PHONY: clean sync-image sync-push verify unit
