@@ -105,7 +105,7 @@ func validateAgentPoolProfiles(apps []*api.AgentPoolProfile) (errs []error) {
 		appmap[app.Name] = app
 
 		if i > 0 && app.VnetSubnetID != apps[i-1].VnetSubnetID {
-			errs = append(errs, fmt.Errorf("duplicate properties.agentPoolProfiles.vnetSubnetID %q", app.VnetSubnetID))
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.vnetSubnetID %q: all subnets must match when using vnetSubnetID", app.VnetSubnetID))
 		}
 
 		errs = append(errs, validateAgentPoolProfile(app)...)
