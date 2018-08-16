@@ -24,6 +24,7 @@ GENERATED_FILES=(
 	"pkg/addons/bindata.go"
 	"pkg/jsonpath/jsonpath.go"
 	"pkg/arm/bindata.go"
+	"pkg/config/bindata.go"
 )
 
 for file in "${GENERATED_FILES[@]}"; do

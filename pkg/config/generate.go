@@ -132,6 +132,10 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 
 	selectDNSNames(cs)
 
+	if err := generateEtcdConfig(cs); err != nil {
+		return err
+	}
+
 	// Generate CAs
 	cas := []struct {
 		cn   string
