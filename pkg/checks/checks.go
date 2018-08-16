@@ -73,8 +73,7 @@ func checkNamespace(namespace string) bool {
 }
 
 // WaitForInfraServices verify daemonsets, statefulsets
-func WaitForInfraServices(ctx context.Context, appclient *appclient.AppsV1Client) error {
-
+func WaitForInfraServices(ctx context.Context, appclient appclient.AppsV1Interface) error {
 	// Daemonsets
 	dsList, err := appclient.DaemonSets("").List(metav1.ListOptions{})
 	if err != nil {

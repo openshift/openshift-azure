@@ -73,7 +73,7 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
 
-		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
+		c.SyncImage = "quay.io/openshift-on-azure/sync:v3.10"
 	}
 }
 
@@ -480,8 +480,6 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 			return
 		}
 	}
-
-	c.RunSyncLocal = os.Getenv("RUN_SYNC_LOCAL")
 
 	c.TenantID = cs.Properties.AzProfile.TenantID
 	c.SubscriptionID = cs.Properties.AzProfile.SubscriptionID
