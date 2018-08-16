@@ -1,9 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -15,6 +17,25 @@ import (
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
+
+var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
+
+// checks and sanitizes logLevel input
+func sanitizeLogLevel(lvl *string) logrus.Level {
+	switch strings.ToLower(*lvl) {
+	case "debug":
+		return logrus.DebugLevel
+	case "info":
+		return logrus.InfoLevel
+	case "warning":
+		return logrus.WarnLevel
+	case "error":
+		return logrus.ErrorLevel
+	default:
+		// silently default to info
+		return logrus.InfoLevel
+	}
+}
 
 // createOrUpdate simulates the RP
 func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.OpenShiftManagedCluster, error) {
@@ -159,9 +180,11 @@ func writeHelpers(c *acsapi.Config) error {
 }
 
 func main() {
+	flag.Parse()
 	// mock logger configuration
 	logger := logrus.New()
-	logger.SetLevel(logrus.DebugLevel)
+	// sanitize input to only accept specific log levels and tolerate junk
+	logger.SetLevel(sanitizeLogLevel(logLevel))
 	log := logrus.NewEntry(logger)
 	entry := logrus.NewEntry(logger)
 	entry = entry.WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})

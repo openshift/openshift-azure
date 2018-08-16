@@ -75,7 +75,7 @@ properties:
 EOF
 
 go generate ./...
-go run cmd/createorupdate/createorupdate.go
+go run cmd/createorupdate/createorupdate.go -loglevel=debug
 
 az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _data/_out/azuredeploy.json --no-wait
 
@@ -84,12 +84,12 @@ if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # sleep until FQDN/healthz responds with OK. It takes up to 5 min for API server to respond. 
     FQDN=$(awk '/^  fqdn:/ { print $2 }' <_data/manifest.yaml)
     while [[ "$(curl -s -k https://${FQDN}/healthz/ready)" != "ok" ]]; do sleep 5; done
-    KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go -run-once=true
+    KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go -run-once=true -loglevel=debug
 fi
 
 az group deployment wait -g $RESOURCEGROUP -n azuredeploy --created --interval 10
 
-KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go
+KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go -loglevel=debug
 
 # TODO: This should be configured by MS
 hack/dns.sh zone-create $RESOURCEGROUP

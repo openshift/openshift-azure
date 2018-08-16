@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"github.com/ghodss/yaml"
@@ -19,8 +20,25 @@ var (
 	dryRun   = flag.Bool("dry-run", false, "Print resources to be synced instead of mutating cluster state.")
 	once     = flag.Bool("run-once", false, "If true, run only once then quit.")
 	interval = flag.Duration("interval", 3*time.Minute, "How often the sync process going to be rerun.")
+	logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
 )
 
+// checks and sanitizes logLevel input
+func sanitizeLogLevel(lvl *string) log.Level {
+	switch strings.ToLower(*lvl) {
+	case "debug":
+		return log.DebugLevel
+	case "info":
+		return log.InfoLevel
+	case "warning":
+		return log.WarnLevel
+	case "error":
+		return log.ErrorLevel
+	default:
+		// silently default to info
+		return log.InfoLevel
+	}
+}
 func sync() error {
 	log.Print("Sync process started!")
 
@@ -48,7 +66,7 @@ func sync() error {
 
 func main() {
 	flag.Parse()
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(sanitizeLogLevel(logLevel))
 
 	for {
 		if err := sync(); err != nil {
