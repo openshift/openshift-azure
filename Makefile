@@ -26,7 +26,6 @@ sync-push: sync-image
 verify:
 	./hack/validate-generated.sh
 	./hack/validate-deps.sh
-	./hack/validate-vendor.sh
 
 unit:
 	go test ./...
