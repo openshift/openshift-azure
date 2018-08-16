@@ -63,6 +63,13 @@ func healthCheck() error {
 		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/containerservice.yaml")
 	}
 
+	if os.Getenv("RUN_SYNC_LOCAL") != "true" {
+		err = p.EnsureSyncPod(context.Background(), cs)
+		if err != nil {
+			return errors.Wrap(err, "cannot ensure sync pod")
+		}
+	}
+
 	return p.HealthCheck(context.Background(), cs)
 }
 

@@ -39,8 +39,8 @@ go run cmd/createorupdate/createorupdate.go -loglevel=debug
 
 if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # will eventually run as an HCP pod, for development run it locally
-    KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go -run-once=true \
-        -loglevel=debug
+    KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go \
+        -config=_data/containerservice.yaml -run-once=true -loglevel=debug
 fi
 
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go \

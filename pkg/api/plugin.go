@@ -18,6 +18,8 @@ type Plugin interface {
 
 	GenerateARM(cs *OpenShiftManagedCluster) ([]byte, error)
 
+	EnsureSyncPod(ctx context.Context, cs *OpenShiftManagedCluster) error
+
 	HealthCheck(ctx context.Context, cs *OpenShiftManagedCluster) error
 }
 

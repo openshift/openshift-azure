@@ -15,7 +15,6 @@ type azureNetworkClient struct {
 }
 
 func newAzureClients(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) (*azureNetworkClient, error) {
-
 	authorizer, err := auth.NewAuthorizerFromEnvironment()
 	if err != nil {
 		return nil, err

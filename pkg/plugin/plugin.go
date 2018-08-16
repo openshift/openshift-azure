@@ -11,6 +11,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/openshift/openshift-azure/pkg/addons/ensurer"
 	"github.com/openshift/openshift-azure/pkg/api"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
@@ -62,6 +63,12 @@ func (p *plugin) GenerateARM(cs *acsapi.OpenShiftManagedCluster) ([]byte, error)
 	log.Info("generating arm templates")
 	generator := arm.NewSimpleGenerator(p.entry)
 	return generator.Generate(cs)
+}
+
+func (p *plugin) EnsureSyncPod(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
+	log.Info("ensuring sync pod")
+	addonEnsurer := ensurer.NewSimpleSyncPodEnsurer(p.entry)
+	return addonEnsurer.EnsureSyncPod(ctx, cs)
 }
 
 func (p *plugin) HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {

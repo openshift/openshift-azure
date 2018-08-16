@@ -29,6 +29,9 @@ func Wants(o unstructured.Unstructured) bool {
 	// skip non-infrastructure namespaces.
 	switch ns {
 	case "", "default", "openshift":
+	case "openshift-sync":
+		// openshift-sync is owned by the RP, not the sync process.
+		return false
 	default:
 		if !strings.HasPrefix(ns, "kube-") && !strings.HasPrefix(ns, "openshift-") {
 			return false
