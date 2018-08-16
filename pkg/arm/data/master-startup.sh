@@ -584,3 +584,84 @@ systemctl start ${SERVICE_TYPE}-node.service &
 
 mkdir -p /root/.kube
 cp /etc/origin/master/openshift-master.kubeconfig /root/.kube/config
+
+while true; do
+    resp=$(oc get --raw {{ print "https://" .ContainerService.Properties.FQDN "/healthz/ready" }})
+    if [[ "$resp" == "ok" ]]; then
+        break
+    fi
+    sleep 1
+done
+
+cat >/etc/origin/sync_config.yaml <<'EOF'
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sync
+  namespace: openshift-infra
+data:
+  containerservice.yaml: {{ Base64Encode (YamlMarshal .ContainerService) }}
+EOF
+# TODO: Hash content and add as an annotation in the deployment template
+oc apply -f /etc/origin/sync_config.yaml
+
+cat >/etc/origin/sync_kubeconfig <<'EOF'
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sync-kubeconfig
+  namespace: openshift-infra
+data:
+  sync.kubeconfig: {{ Base64Encode (YamlMarshal .Config.SyncKubeconfig) }}
+EOF
+# TODO: Hash content and add as an annotation in the deployment template
+oc apply -f /etc/origin/sync_kubeconfig.yaml
+
+cat >/etc/origin/sync_deployment.yaml <<'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync
+  namespace: openshift-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sync
+  template:
+    metadata:
+      labels:
+        app: sync
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: sync
+        image: {{ .Config.SyncImage | quote }}
+        imagePullPolicy: Always
+        args:
+        - --config=/_data/containerservice.yaml
+        env:
+        - name: KUBECONFIG
+          value: /tmp/kubeconfig/sync.kubeconfig
+        - name: AZURE_TENANT_ID
+          value: {{ .Config.TenantID | quote }}
+        - name: AZURE_SUBSCRIPTION_ID
+          value: {{ .Config.SubscriptionID | quote }}
+        - name: RESOURCEGROUP
+          value: {{ .Config.ResourceGroup | quote }}
+        volumeMounts:
+        - name: config
+          mountPath: /_data
+          readOnly: true
+        - name: kubeconfig
+          mountPath: /tmp/kubeconfig
+          readOnly: true
+      volumes:
+      - name: config
+        secret:
+          secretName: sync
+      - name: kubeconfig
+        secret:
+          secretName: sync-kubeconfig
+EOF
+oc apply -f /etc/origin/sync_deployment.yaml
