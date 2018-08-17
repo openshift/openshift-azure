@@ -3,16 +3,16 @@ package main
 import (
 	"flag"
 	"io/ioutil"
-	"strings"
 	"time"
 
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/addons"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/validate"
 )
 
@@ -23,24 +23,8 @@ var (
 	logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
 )
 
-// checks and sanitizes logLevel input
-func sanitizeLogLevel(lvl *string) log.Level {
-	switch strings.ToLower(*lvl) {
-	case "debug":
-		return log.DebugLevel
-	case "info":
-		return log.InfoLevel
-	case "warning":
-		return log.WarnLevel
-	case "error":
-		return log.ErrorLevel
-	default:
-		// silently default to info
-		return log.InfoLevel
-	}
-}
 func sync() error {
-	log.Print("Sync process started!")
+	logrus.Print("Sync process started")
 
 	b, err := ioutil.ReadFile("_data/containerservice.yaml")
 	if err != nil {
@@ -60,17 +44,17 @@ func sync() error {
 		return errors.Wrap(err, "cannot sync cluster config")
 	}
 
-	log.Print("Sync process complete!")
+	logrus.Print("Sync process complete")
 	return nil
 }
 
 func main() {
 	flag.Parse()
-	log.SetLevel(sanitizeLogLevel(logLevel))
+	logrus.SetLevel(log.SanitizeLogLevel(*logLevel))
 
 	for {
 		if err := sync(); err != nil {
-			log.Printf("Error while syncing: %v", err)
+			logrus.Printf("Error while syncing: %v", err)
 		}
 		if *once {
 			return
