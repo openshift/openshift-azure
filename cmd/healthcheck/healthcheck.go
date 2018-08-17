@@ -5,7 +5,6 @@ import (
 	"flag"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
@@ -13,28 +12,12 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/validate"
 )
 
 var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
-
-// checks and sanitizes logLevel input
-func sanitizeLogLevel(lvl *string) logrus.Level {
-	switch strings.ToLower(*lvl) {
-	case "debug":
-		return logrus.DebugLevel
-	case "info":
-		return logrus.InfoLevel
-	case "warning":
-		return logrus.WarnLevel
-	case "error":
-		return logrus.ErrorLevel
-	default:
-		// silently default to info
-		return logrus.InfoLevel
-	}
-}
 
 // healthCheck should get rolled into the end of createorupdate once the sync
 // pod runs in the cluster
@@ -42,11 +25,10 @@ func healthCheck() error {
 	// mock logger configuration
 	logger := logrus.New()
 	// sanitize input to only accept specific log levels and tolerate junk
-	logger.SetLevel(sanitizeLogLevel(logLevel))
-	entry := logrus.NewEntry(logger)
-	entry = entry.WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
+	logger.SetLevel(log.SanitizeLogLevel(*logLevel))
 
 	// instantiate the plugin
+	entry := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
 	p := plugin.NewPlugin(entry)
 
 	b, err := ioutil.ReadFile("_data/containerservice.yaml")

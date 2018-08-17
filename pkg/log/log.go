@@ -1,12 +1,13 @@
 package log
 
 import (
+	"strings"
 	"sync"
 
 	"github.com/sirupsen/logrus"
 )
 
-// Wrapper wrapper logrus logger to enable global configuration
+// Wrapper wraps logrus logger to enable global configuration
 type wrapper struct {
 	log *logrus.Entry
 }
@@ -51,4 +52,21 @@ func WithFields(fields logrus.Fields) *logrus.Entry {
 // WithError adds a single error field to the Entry
 func WithError(err error) *logrus.Entry {
 	return logger.log.WithError(err)
+}
+
+// SanitizeLogLevel checks and sanitizes logLevel input.
+func SanitizeLogLevel(lvl string) logrus.Level {
+	switch strings.ToLower(lvl) {
+	case "debug":
+		return logrus.DebugLevel
+	case "info":
+		return logrus.InfoLevel
+	case "warning":
+		return logrus.WarnLevel
+	case "error":
+		return logrus.ErrorLevel
+	default:
+		// silently default to info
+		return logrus.InfoLevel
+	}
 }
