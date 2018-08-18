@@ -38,7 +38,13 @@ func isValidHostname(h string) bool {
 func Validate(new, old *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	// TODO update validation
 	// TODO are these error messages confusing since they may not correspond with the external model?
-	return validateContainerService(new, externalOnly)
+	if errs := validateContainerService(new, externalOnly); len(errs) > 0 {
+		return errs
+	}
+	if old != nil {
+		return validateUpdateContainerService(new, old, externalOnly)
+	}
+	return nil
 }
 
 func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
@@ -56,6 +62,26 @@ func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool)
 	}
 
 	errs = append(errs, validateProperties(c.Properties, externalOnly)...)
+	return
+}
+
+func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+	if cs.Location != oldCs.Location {
+		errs = append(errs, fmt.Errorf("invalid location %q, location updates are disallowed", cs.Location))
+	}
+	if cs.Properties != nil {
+		if !externalOnly && cs.Properties.FQDN != oldCs.Properties.FQDN {
+			errs = append(errs, fmt.Errorf("invalid fqdn %q, fqdn updates are disallowed", cs.Properties.FQDN))
+		}
+		if cs.Properties.ServicePrincipalProfile != nil {
+			if cs.Properties.ServicePrincipalProfile.ClientID != oldCs.Properties.ServicePrincipalProfile.ClientID {
+				errs = append(errs, fmt.Errorf("servicePrincipalProfile.clientID updates are disallowed "))
+			}
+			if cs.Properties.ServicePrincipalProfile.Secret != oldCs.Properties.ServicePrincipalProfile.Secret {
+				errs = append(errs, fmt.Errorf("servicePrincipalProfile.secret updates are disallowed "))
+			}
+		}
+	}
 	return
 }
 
