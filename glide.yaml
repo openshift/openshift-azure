@@ -18,3 +18,7 @@ import:
   version: 10.14.0
 - package: github.com/sirupsen/logrus
   version: v1.0.6
+- package: github.com/onsi/gomega
+  version: v1.4.1
+- package: github.com/onsi/ginkgo
+  repo:    https://github.com/openshift/onsi-ginkgo.git
