@@ -29,6 +29,21 @@ func ConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster(cs *OpenShiftMana
 			ProvisioningState: v1.ProvisioningState(cs.Properties.ProvisioningState),
 		}
 
+		oc.Properties.AuthProfile.IdentityProviders = make([]v1.IdentityProvider, len(cs.Properties.AuthProfile.IdentityProviders))
+		for i, ip := range cs.Properties.AuthProfile.IdentityProviders {
+			oc.Properties.AuthProfile.IdentityProviders[i].Name = ip.Name
+			switch provider := ip.Provider.(type) {
+			case (*AADIdentityProvider):
+				oc.Properties.AuthProfile.IdentityProviders[i].Provider = &v1.AADIdentityProvider{
+					ClientID: provider.ClientID,
+					Secret:   provider.Secret,
+					Kind:     provider.Kind,
+				}
+			default:
+				panic("authProfile.identityProviders conversion failed")
+			}
+		}
+
 		if cs.Properties.OrchestratorProfile != nil {
 			oc.Properties.OpenShiftVersion = cs.Properties.OrchestratorProfile.OrchestratorVersion
 

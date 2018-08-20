@@ -82,6 +82,26 @@ func validateProperties(p *api.Properties, externalOnly bool) (errs []error) {
 	}
 	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles)...)
 	errs = append(errs, validateServicePrincipalProfile(p.ServicePrincipalProfile)...)
+	errs = append(errs, validateAuthProfile(p.AuthProfile)...)
+	return
+}
+
+func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
+	if len(ap.IdentityProviders) != 1 {
+		errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders length"))
+	}
+	//check supported identity providers
+	for _, ip := range ap.IdentityProviders {
+		switch provider := ip.Provider.(type) {
+		case (*api.AADIdentityProvider):
+			if provider.Secret == "" {
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider clientId %q", provider.Secret))
+			}
+			if provider.ClientID == "" {
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider clientId %q", provider.ClientID))
+			}
+		}
+	}
 	return
 }
 

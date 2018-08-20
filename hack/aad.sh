@@ -15,13 +15,13 @@ case "$1" in
 app-create)
     if [[ "$#" -ne 3 ]]; then usage; fi
 
-    AZURE_CLIENT_SECRET=$(uuidgen)
-    AZURE_CLIENT_ID=$(az ad app create \
+    AZURE_AAD_CLIENT_SECRET=$(uuidgen)
+    AZURE_AAD_CLIENT_ID=$(az ad app create \
         --display-name "$2" \
         --homepage "https://$2/" \
         --identifier-uris "https://$2/" \
         --key-type password \
-        --password "$AZURE_CLIENT_SECRET" \
+        --password "$AZURE_AAD_CLIENT_SECRET" \
         --query appId \
         --reply-urls "https://$2/oauth2callback/Azure%20AD" \
         --required-resource-accesses @- <<'EOF' | tr -d '"'
@@ -39,11 +39,11 @@ app-create)
 EOF
 )
 
-    az ad sp create --id $AZURE_CLIENT_ID >/dev/null
+    az ad sp create --id $AZURE_AAD_CLIENT_ID >/dev/null
 
     success=
     for ((i=0; i<12; i++)); do
-        if az role assignment create -g $3 --assignee $AZURE_CLIENT_ID --role contributor &>/dev/null; then
+        if az role assignment create -g $3 --assignee $AZURE_AAD_CLIENT_ID --role contributor &>/dev/null; then
             success=true
             break
         fi
@@ -55,8 +55,8 @@ EOF
     fi
 
     cat <<EOF
-AZURE_CLIENT_ID=$AZURE_CLIENT_ID
-AZURE_CLIENT_SECRET=$AZURE_CLIENT_SECRET
+AZURE_AAD_CLIENT_ID=$AZURE_AAD_CLIENT_ID
+AZURE_AAD_CLIENT_SECRET=$AZURE_AAD_CLIENT_SECRET
 EOF
     ;;
 

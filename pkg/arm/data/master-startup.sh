@@ -139,6 +139,8 @@ admissionConfig:
           reject: true
           skipOnResolutionFailure: true
         kind: ImagePolicyConfig
+auditConfig:
+  enabled: true
 aggregatorConfig:
   proxyClientInfo:
     certFile: aggregator-front-proxy.crt
@@ -252,8 +254,8 @@ oauthConfig:
         - name
         preferredUsername:
         - unique_name
-      clientID: {{ .ContainerService.Properties.ServicePrincipalProfile.ClientID | quote }}
-      clientSecret: {{ .ContainerService.Properties.ServicePrincipalProfile.Secret | quote }}
+      clientID: {{ (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.ClientID | quote }}
+      clientSecret: {{ (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.Secret | quote }}
       kind: OpenIDIdentityProvider
       urls:
         authorize: {{ print "https://login.microsoftonline.com/" .Config.TenantID "/oauth2/authorize" | quote }}

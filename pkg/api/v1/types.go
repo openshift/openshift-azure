@@ -49,6 +49,9 @@ type Properties struct {
 	// AgentPoolProfiles (in): configuration of OpenShift cluster VMs.
 	AgentPoolProfiles []AgentPoolProfile `json:"agentPoolProfiles,omitempty"`
 
+	// AuthProfile (in): configures OpenShift authentication
+	AuthProfile AuthProfile `json:"authProfile,omitempty"`
+
 	// TODO: is this compatible with MSI?
 	// ServicePrincipalProfile (in): Service principal for OpenShift cluster.
 	ServicePrincipalProfile ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
@@ -142,6 +145,25 @@ const (
 // ServicePrincipalProfile contains the client and secret used by the cluster
 // for Azure Resource CRUD.
 type ServicePrincipalProfile struct {
+	ClientID string `json:"clientId,omitempty"`
+	Secret   string `json:"secret,omitempty"`
+}
+
+// AuthProfile defines all possible authentication profiles for OpenShift cluster
+type AuthProfile struct {
+	IdentityProviders []IdentityProvider `json:"identityProviders,omitempty"`
+}
+
+// IdentityProvider is heavily cut down equivalent to IdentityProvider in the upstream
+type IdentityProvider struct {
+	Name     string      `json:"name"`
+	Provider interface{} `json:"provider,omityempty"`
+}
+
+// AADIdentityProvider defines Identity provider for MS AAD.
+// it is based on OpenID IdentityProvider
+type AADIdentityProvider struct {
+	Kind     string `json:"kind,omitempty"`
 	ClientID string `json:"clientId,omitempty"`
 	Secret   string `json:"secret,omitempty"`
 }

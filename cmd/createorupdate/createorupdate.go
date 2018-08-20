@@ -31,7 +31,6 @@ func createOrUpdate(ctx context.Context, oc *v1.OpenShiftManagedCluster, entry *
 
 	// the RP will enrich the internal API representation with data not included
 	// in the original request
-	// TODO(mjudeikis): choose DNS names here
 	log.Info("enrich")
 	err := enrich(cs)
 	if err != nil {

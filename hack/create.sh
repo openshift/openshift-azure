@@ -36,6 +36,16 @@ if [[ -z "$DNS_RESOURCEGROUP" ]]; then
 fi
 set -x
 
+if [[ -z "$AZURE_CLIENT_ID" ]]; then
+    echo error: must set AZURE_CLIENT_ID
+    exit 1
+fi
+
+if [[ -z "$AZURE_CLIENT_SECRET" ]]; then
+    echo error: must set AZURE_CLIENT_SECRET
+    exit 1
+fi
+
 if [[ $# -ne 1 ]]; then
     echo usage: $0 resourcegroup
     exit 1
@@ -48,7 +58,7 @@ mkdir -p _data/_out
 
 az group create -n $RESOURCEGROUP -l eastus --tags now=$(date +%s) >/dev/null
 
-if [[ -z "$AZURE_CLIENT_ID" ]]; then
+if [[ -z "$AZURE_AAD_CLIENT_ID" ]]; then
     set +x
     . <(hack/aad.sh app-create openshift.$RESOURCEGROUP.$DNS_DOMAIN $RESOURCEGROUP)
     set -x
@@ -62,6 +72,13 @@ location: eastus
 properties:
   openShiftVersion: "$DEPLOY_VERSION"
   publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+  authProfile:
+    identityProviders:
+    - name: Azure AAD
+      provider:
+        kind: AADIdentityProvider
+        clientId: $AZURE_AAD_CLIENT_ID
+        secret: $AZURE_AAD_CLIENT_SECRET
   routerProfiles:
   - name: default
     publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
@@ -82,7 +99,7 @@ properties:
     vmSize: Standard_D2s_v3
     osType: Linux
   servicePrincipalProfile:
-    clientID: $AZURE_CLIENT_ID
+    clientId: $AZURE_CLIENT_ID
     secret: $AZURE_CLIENT_SECRET
 EOF
 
