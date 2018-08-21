@@ -11,9 +11,9 @@ import:
   subpackages:
   - spew
 - package: github.com/Azure/azure-sdk-for-go
+  version: v19.1.0
   subpackages:
   - services/network/mgmt/2018-05-01/network
-  version: v19.1.0
 - package: github.com/Azure/go-autorest
   version: 10.14.0
 - package: github.com/sirupsen/logrus
@@ -23,4 +23,6 @@ import:
 - package: github.com/go-test/deep
   version: v1.0.1
 - package: github.com/satori/go.uuid
-  version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3 # MS RP used version
+  version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
+- package: github.com/marstr/guid
+  version: ^1.1.0
