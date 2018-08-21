@@ -562,6 +562,34 @@ spec:
     name: master-cloud-provider
 EOF
 
+{{ if not (eq "true" .Config.RunSyncLocal) }}
+if [[ "$(hostname)" == "master-000000" ]]; then
+  cat >/etc/origin/node/pods/sync.yaml <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sync
+  namespace: kube-system
+spec:
+  containers:
+  - image: {{ .Config.SyncImage | quote }}
+    imagePullPolicy: Always
+    name: sync
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /_data/_out
+      name: master-cloud-provider
+      readOnly: true
+  hostNetwork: true
+  volumes:
+  - hostPath:
+      path: /etc/origin/cloudprovider
+    name: master-cloud-provider
+EOF
+fi
+{{ end }}
+
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig
 # HACK: copy node.kubeconfig to bootstrap.kubeconfig so that openshift start node used in the sync

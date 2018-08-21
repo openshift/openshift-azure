@@ -148,6 +148,11 @@ func enrich(cs *acsapi.OpenShiftManagedCluster) error {
 }
 
 func writeHelpers(c *acsapi.Config) error {
+	err := ioutil.WriteFile("_data/_out/azure.conf", c.CloudProviderConf, 0600)
+	if err != nil {
+		return err
+	}
+
 	b, err := tls.PrivateKeyAsBytes(c.SSHKey)
 	if err != nil {
 		return err

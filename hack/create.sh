@@ -86,7 +86,7 @@ if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # sleep until FQDN/healthz responds with OK. It takes up to 5 min for API server to respond. 
     FQDN=$(awk '/^  fqdn:/ { print $2 }' <_data/manifest.yaml)
     while [[ "$(curl -s -k https://${FQDN}/healthz/ready)" != "ok" ]]; do sleep 5; done
-    KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go -run-once=true -loglevel=debug
+    go run cmd/sync/sync.go -run-once=true -loglevel=debug
 fi
 
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go -loglevel=debug
