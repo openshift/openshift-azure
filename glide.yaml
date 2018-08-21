@@ -18,3 +18,9 @@ import:
   version: 10.14.0
 - package: github.com/sirupsen/logrus
   version: v1.0.6
+- package: github.com/ghodss/yaml
+  version: v1.0.0
+- package: github.com/go-test/deep
+  version: v1.0.1
+- package: github.com/satori/go.uuid
+  version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3 # MS RP used version

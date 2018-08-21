@@ -1,5 +1,5 @@
-hash: 193b3a9df897002c7a8ff1b5d0cfa4b13bd56ada24f9ae623f21a611ab288794
-updated: 2018-08-15T12:29:36.580996535+02:00
+hash: 03168df8f7d279a04d4fcaf88c922c7809d23d651bd817148e4cb3682154c50b
+updated: 2018-08-21T15:14:21.658241288+01:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
@@ -18,7 +18,7 @@ imports:
   - autorest/validation
   - version
 - name: github.com/davecgh/go-spew
-  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  version: 8991bc29aa16c548c550c7ff78260e27b9ab7c73
   subpackages:
   - spew
 - name: github.com/dgrijalva/jwt-go
@@ -26,9 +26,9 @@ imports:
 - name: github.com/dimchansky/utfbom
   version: 5448fe645cb1964ba70ac8f9f2ffe975e61a536c
 - name: github.com/ghodss/yaml
-  version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
+  version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-test/deep
-  version: 57af0be209c537ba1d9c2a4b285ab7aea0897e51
+  version: 6592d9cc0a499ad2d5f574fde80a2b5c5cc3b4f5
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:
@@ -64,6 +64,8 @@ imports:
   version: 05fbef0ca5da472bbf96c9322b84a53edc03c9fd
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/satori/go.uuid
+  version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/satori/uuid
   version: 36e9d2ebbde5e3f13ab2e25625fd453271d6522e
 - name: github.com/sirupsen/logrus
