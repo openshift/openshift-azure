@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/satori/uuid"
+	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
@@ -477,9 +477,7 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 	}
 
 	if uuid.Equal(c.ServiceCatalogClusterID, uuid.Nil) {
-		if c.ServiceCatalogClusterID, err = uuid.NewV4(); err != nil {
-			return
-		}
+		c.ServiceCatalogClusterID = uuid.NewV4()
 	}
 
 	c.RunSyncLocal = os.Getenv("RUN_SYNC_LOCAL")
