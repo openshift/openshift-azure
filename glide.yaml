@@ -7,7 +7,7 @@ import:
 - package: k8s.io/apimachinery
   version: kubernetes-1.10.6
 - package: github.com/davecgh/go-spew
-  version: v1.1.1
+  version: ^1.1.0
   subpackages:
   - spew
 - package: github.com/Azure/azure-sdk-for-go
@@ -19,12 +19,8 @@ import:
 - package: github.com/sirupsen/logrus
   version: v1.0.6
 - package: github.com/ghodss/yaml
-  version: e9ed3c6dfb39bb1a32197cb10d527906fe4da4b6 # master as per 2018-08-17
-  # ghodss/yaml uses this one and is not vendoring in their repo. 
-- package: gopkg.in/yaml.v2
-  repo: https://github.com/go-yaml/yaml.git
-  version: v2.2.1
+  version: v1.0.0
 - package: github.com/go-test/deep
   version: v1.0.1
 - package: github.com/satori/go.uuid
-  version: v1.2.0
+  version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3 # MS RP used version

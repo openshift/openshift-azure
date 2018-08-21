@@ -1,5 +1,5 @@
-hash: a5157b1b60e7de47ac290f6fdf49849ae01af050405c91edc1a4a4843a578e3c
-updated: 2018-08-17T13:34:35.496763154+01:00
+hash: 03168df8f7d279a04d4fcaf88c922c7809d23d651bd817148e4cb3682154c50b
+updated: 2018-08-21T15:14:21.658241288+01:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
@@ -26,7 +26,7 @@ imports:
 - name: github.com/dimchansky/utfbom
   version: 5448fe645cb1964ba70ac8f9f2ffe975e61a536c
 - name: github.com/ghodss/yaml
-  version: e9ed3c6dfb39bb1a32197cb10d527906fe4da4b6
+  version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-test/deep
   version: 6592d9cc0a499ad2d5f574fde80a2b5c5cc3b4f5
 - name: github.com/gogo/protobuf
@@ -63,7 +63,7 @@ imports:
 - name: github.com/modern-go/reflect2
   version: 05fbef0ca5da472bbf96c9322b84a53edc03c9fd
 - name: github.com/pkg/errors
-  version: 816c9085562cd7ee03e7f8188a1cfd942858cded
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/satori/uuid
@@ -114,8 +114,7 @@ imports:
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 5420a8b6744d3b0345ab293f6fcba19c978f1183
-  repo: https://github.com/go-yaml/yaml.git
+  version: 670d4cfef0544295bc27a114dbac37980d83185a
 - name: k8s.io/api
   version: 0f11257a8a25954878633ebdc9841c67d8f83bdb
   subpackages:
