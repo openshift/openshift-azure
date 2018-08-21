@@ -1,30 +1,16 @@
 hash: 03168df8f7d279a04d4fcaf88c922c7809d23d651bd817148e4cb3682154c50b
-updated: 2018-08-21T15:14:21.658241288+01:00
+updated: 2018-08-21T20:11:28.091031081+01:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
   subpackages:
   - services/network/mgmt/2018-05-01/network
-  - version
 - name: github.com/Azure/go-autorest
   version: bca49d5b51a50dc5bb17bbf6204c711c6dbded06
-  subpackages:
-  - autorest
-  - autorest/adal
-  - autorest/azure
-  - autorest/azure/auth
-  - autorest/date
-  - autorest/to
-  - autorest/validation
-  - version
 - name: github.com/davecgh/go-spew
   version: 8991bc29aa16c548c550c7ff78260e27b9ab7c73
   subpackages:
   - spew
-- name: github.com/dgrijalva/jwt-go
-  version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
-- name: github.com/dimchansky/utfbom
-  version: 5448fe645cb1964ba70ac8f9f2ffe975e61a536c
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/go-test/deep
@@ -66,8 +52,6 @@ imports:
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
-- name: github.com/satori/uuid
-  version: 36e9d2ebbde5e3f13ab2e25625fd453271d6522e
 - name: github.com/sirupsen/logrus
   version: 3e01752db0189b9157070a0e1668a620f9a85da2
 - name: github.com/spf13/pflag
@@ -80,8 +64,6 @@ imports:
   - curve25519
   - ed25519
   - ed25519/internal/edwards25519
-  - pkcs12
-  - pkcs12/internal/rc2
   - ssh
   - ssh/terminal
 - name: golang.org/x/net

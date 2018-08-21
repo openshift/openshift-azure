@@ -9,7 +9,7 @@ import (
 	"reflect"
 
 	"github.com/ghodss/yaml"
-	"github.com/satori/uuid"
+	"github.com/satori/go.uuid"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/tls"

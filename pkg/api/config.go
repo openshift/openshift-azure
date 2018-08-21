@@ -4,7 +4,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 
-	"github.com/satori/uuid"
+	"github.com/satori/go.uuid"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
