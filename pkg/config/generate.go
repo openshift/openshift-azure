@@ -26,7 +26,7 @@ func selectNodeImage(cs *acsapi.OpenShiftManagedCluster) {
 	c.ImageVersion = "latest"
 
 	switch os.Getenv("DEPLOY_OS") {
-	case "":
+	case "", "rhel7":
 		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OrchestratorProfile.OrchestratorVersion[1:], ".", "", -1)
 	case "centos7":
 		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OrchestratorProfile.OrchestratorVersion[1:], ".", "", -1)
@@ -115,7 +115,7 @@ func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) {
 
 func selectContainerImages(cs *acsapi.OpenShiftManagedCluster) {
 	switch os.Getenv("DEPLOY_OS") {
-	case "":
+	case "", "rhel7":
 		selectContainerImagesOSA(cs)
 	case "centos7":
 		selectContainerImagesOrigin(cs)
