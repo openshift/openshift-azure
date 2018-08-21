@@ -52,7 +52,7 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, dryRun bool) (Interface, erro
 	}
 
 	var kc api.Config
-	err := latest.Scheme.Convert(cs.Config.SyncKubeconfig, &kc, nil)
+	err := latest.Scheme.Convert(cs.Config.AdminKubeconfig, &kc, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -45,7 +45,6 @@ type Config struct {
 	AdminKubeconfig              *v1.Config
 	MasterKubeconfig             *v1.Config
 	NodeBootstrapKubeconfig      *v1.Config
-	SyncKubeconfig               *v1.Config
 	AzureClusterReaderKubeconfig *v1.Config
 
 	// misc control plane configurables

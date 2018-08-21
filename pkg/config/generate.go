@@ -412,16 +412,6 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 			namespace:  "openshift-infra",
 		},
 		{
-			clientKey:  c.Certificates.Admin.Key,
-			clientCert: c.Certificates.Admin.Cert,
-			// sync kubeconfig has the same capabilities as admin kubeconfig, only difference
-			// is the use of HCP internal DNS to avoid waiting for the Azure loadbalancer to
-			// come up in order to start creating cluster objects.
-			endpoint:   "master-000000",
-			username:   "system:admin",
-			kubeconfig: &c.SyncKubeconfig,
-		},
-		{
 			clientKey:  c.Certificates.AzureClusterReader.Key,
 			clientCert: c.Certificates.AzureClusterReader.Cert,
 			endpoint:   cs.Properties.FQDN,
