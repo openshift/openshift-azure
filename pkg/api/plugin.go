@@ -27,6 +27,8 @@ type Plugin interface {
 
 	GenerateARM(cs *OpenShiftManagedCluster) ([]byte, error)
 
+	InitializeCluster(ctx context.Context, cs *OpenShiftManagedCluster) error
+
 	HealthCheck(ctx context.Context, cs *OpenShiftManagedCluster) error
 }
 

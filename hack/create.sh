@@ -77,7 +77,9 @@ EOF
 go generate ./...
 go run cmd/createorupdate/createorupdate.go -loglevel=debug
 
-az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _data/_out/azuredeploy.json --no-wait
+az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _data/_out/azuredeploy.json
+
+KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/initialize/initialize.go -loglevel=debug
 
 if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # will eventually run as an HCP pod, for development run it locally
@@ -86,8 +88,6 @@ if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     while [[ "$(curl -s -k https://${FQDN}/healthz/ready)" != "ok" ]]; do sleep 5; done
     KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go -run-once=true -loglevel=debug
 fi
-
-az group deployment wait -g $RESOURCEGROUP -n azuredeploy --created --interval 10
 
 KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go -loglevel=debug
 

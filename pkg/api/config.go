@@ -80,6 +80,8 @@ type Config struct {
 	TenantID       string
 	SubscriptionID string
 	ResourceGroup  string
+
+	ConfigStorageAccount string
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.

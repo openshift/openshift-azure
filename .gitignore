@@ -2,6 +2,7 @@
 /createorupdate
 /env
 /healthcheck
+/initialize
 /sync
 .vscode
 .idea

@@ -121,6 +121,18 @@
             "properties": {
                 "accountType": "Standard_LRS"
             }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2015-06-15",
+            "location": "{{ .ContainerService.Location | js }}",
+            "name": "{{ .Config.ConfigStorageAccount | js }}",
+            "properties": {
+                "accountType": "Standard_LRS"
+            },
+            "tags": {
+                "type": "config"
+            }
         }
 {{- range $app := .ContainerService.Properties.AgentPoolProfiles }},
         {

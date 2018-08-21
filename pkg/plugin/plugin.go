@@ -16,6 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/healthcheck"
+	"github.com/openshift/openshift-azure/pkg/initialize"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/validate"
 )
@@ -90,6 +91,12 @@ func (p *plugin) GenerateARM(cs *acsapi.OpenShiftManagedCluster) ([]byte, error)
 	log.Info("generating arm templates")
 	generator := arm.NewSimpleGenerator(p.entry)
 	return generator.Generate(cs)
+}
+
+func (p *plugin) InitializeCluster(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
+	log.Info("initializing cluster")
+	initializer := initialize.NewSimpleInitializer(p.entry)
+	return initializer.InitializeCluster(ctx, cs)
 }
 
 func (p *plugin) HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
