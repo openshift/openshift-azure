@@ -464,8 +464,9 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 
 	if len(c.RegistryConsoleOAuthSecret) == 0 {
 		if pass, err := randomString(64); err != nil {
+			return err
+		} else {
 			c.RegistryConsoleOAuthSecret = fmt.Sprintf("user%s", pass)
-			return nil
 		}
 	}
 
