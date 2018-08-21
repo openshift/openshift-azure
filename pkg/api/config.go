@@ -81,6 +81,8 @@ type Config struct {
 	SubscriptionID string
 	ResourceGroup  string
 
+	CloudProviderConf []byte
+
 	ConfigStorageAccount string
 }
 

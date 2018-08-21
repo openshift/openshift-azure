@@ -34,18 +34,8 @@ update-ca-trust
 echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
 mkdir -p /etc/origin/cloudprovider
 
-# TODO: this is duplicated, and that's not ideal
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
-tenantId: {{ .Config.TenantID | quote }}
-subscriptionId: {{ .Config.SubscriptionID | quote }}
-aadClientId: {{ .ContainerService.Properties.ServicePrincipalProfile.ClientID | quote }}
-aadClientSecret: {{ .ContainerService.Properties.ServicePrincipalProfile.Secret | quote }}
-aadTenantId: {{ .Config.TenantID | quote }}
-resourceGroup: {{ .Config.ResourceGroup | quote }}
-location: {{ .ContainerService.Location | quote }}
-securityGroupName: nsg-compute
-primaryScaleSetName: ss-compute
-vmType: vmss
+{{ .Config.CloudProviderConf | String }}
 EOF
 
 # note: ${SERVICE_TYPE}-node crash loops until master is up
