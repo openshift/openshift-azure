@@ -22,119 +22,119 @@
 // data/ClusterRole.rbac.authorization.k8s.io/servicecatalog-serviceclass-viewer.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/storage-admin.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/sudoer.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-admin.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-edit.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-view.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:auth-delegator.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:aws-cloud-provider.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:basic-user.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:build-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:build-strategy-custom.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:build-strategy-docker.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:build-strategy-jenkinspipeline.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:build-strategy-source.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:certificate-signing-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:certificates.k8s.io:certificatesigningrequests:nodeclient.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:certificates.k8s.io:certificatesigningrequests:selfnodeclient.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:attachdetach-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:certificate-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:clusterrole-aggregation-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:cronjob-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:daemon-set-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:deployment-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:disruption-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:endpoint-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:generic-garbage-collector.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:horizontal-pod-autoscaler.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:job-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:namespace-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:node-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:persistent-volume-binder.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:pod-garbage-collector.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:pv-protection-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:pvc-protection-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:replicaset-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:replication-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:resourcequota-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:route-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:service-account-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:service-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:statefulset-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:controller:ttl-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:daemonset-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:deployer.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:deployment-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:deploymentconfig-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:discovery.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:disruption-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:endpoint-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:garbage-collector-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:gc-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:heapster.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:hpa-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:image-auditor.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:image-builder.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:image-pruner.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:image-puller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:image-pusher.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:image-signer.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:job-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:kube-aggregator.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:kube-controller-manager.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:kube-dns.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:kube-scheduler.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:kubelet-api-admin.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:master.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:namespace-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:node-admin.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:node-bootstrap-autoapprover.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:node-bootstrapper.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:node-problem-detector.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:node-proxier.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:node-reader.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:node.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:oauth-token-deleter.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-admin.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-edit.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-view.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:build-config-change-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:build-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:cluster-quota-reconciliation-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:default-rolebindings-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:deployer-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:deploymentconfig-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:horizontal-pod-autoscaler.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:image-import-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:image-trigger-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:ingress-to-route-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:namespace-security-allocation-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:origin-namespace-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:pv-recycler-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:resourcequota-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:sdn-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:service-ingress-ip-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:service-serving-cert-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-pull-secrets-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-service-broker.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:unidling-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:openshift:templateservicebroker-client.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:persistent-volume-provisioner.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:registry.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:replicaset-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:replication-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:router.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:scope-impersonation.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:sdn-manager.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:sdn-reader.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-admin.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-edit.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-view.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:statefulset-controller.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:volume-scheduler.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/system:webhook.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-admin.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-edit.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-view.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-auth-delegator.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-basic-user.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-build-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-build-strategy-custom.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-build-strategy-docker.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-build-strategy-source.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-certificate-signing-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-certificates.k8s.io-certificatesigningrequests-nodeclient.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-certificates.k8s.io-certificatesigningrequests-selfnodeclient.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-attachdetach-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-certificate-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-clusterrole-aggregation-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-cronjob-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-daemon-set-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-deployment-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-disruption-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-endpoint-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-generic-garbage-collector.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-horizontal-pod-autoscaler.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-job-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-namespace-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-node-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-persistent-volume-binder.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-pod-garbage-collector.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-pv-protection-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-pvc-protection-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-replicaset-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-replication-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-resourcequota-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-route-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-service-account-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-service-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-statefulset-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-controller-ttl-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-daemonset-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-deployer.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-deployment-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-deploymentconfig-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-discovery.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-disruption-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-endpoint-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-garbage-collector-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-gc-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-heapster.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-hpa-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-image-auditor.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-image-builder.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-image-pruner.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-image-puller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-image-pusher.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-image-signer.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-job-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-kube-aggregator.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-kube-controller-manager.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-kube-dns.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-kube-scheduler.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-kubelet-api-admin.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-master.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-namespace-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-node-admin.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-node-bootstrap-autoapprover.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-node-bootstrapper.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-node-problem-detector.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-node-proxier.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-node-reader.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-node.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-oauth-token-deleter.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-admin.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-edit.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-view.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-build-config-change-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-build-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-cluster-quota-reconciliation-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-default-rolebindings-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-deployer-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-deploymentconfig-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-horizontal-pod-autoscaler.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-image-import-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-image-trigger-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-ingress-to-route-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-namespace-security-allocation-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-origin-namespace-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-pv-recycler-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-resourcequota-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-sdn-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-service-ingress-ip-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-service-serving-cert-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-pull-secrets-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-service-broker.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-unidling-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-openshift-templateservicebroker-client.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-persistent-volume-provisioner.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-registry.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-replicaset-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-replication-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-router.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-scope-impersonation.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-sdn-manager.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-sdn-reader.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-admin.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-edit.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-view.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-statefulset-controller.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-volume-scheduler.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/system-webhook.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/view.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/admin-0.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/admin.yaml
@@ -161,83 +161,83 @@
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/service-catalog-namespace-viewer-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/service-catalog-sar-creator-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/servicecatalog-serviceclass-viewer-binding.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:auth-delegator-binding.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:aws-cloud-provider.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:basic-user.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-docker-binding.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-jenkinspipeline-binding.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-source-binding.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:attachdetach-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:certificate-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:clusterrole-aggregation-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:cronjob-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:daemon-set-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:deployment-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:disruption-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:endpoint-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:generic-garbage-collector.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:horizontal-pod-autoscaler.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:job-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:namespace-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:node-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:persistent-volume-binder.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pod-garbage-collector.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pv-protection-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pvc-protection-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:replicaset-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:replication-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:resourcequota-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:route-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:service-account-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:service-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:statefulset-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:ttl-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:deployer.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:discovery-binding.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:discovery.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:image-builder.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:image-puller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-controller-manager.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-dns.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-scheduler.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:masters.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:node-admins.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:node-bootstrapper.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:node-proxier.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:node-proxiers.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:node.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:nodes.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:oauth-token-deleters.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:build-config-change-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:build-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:cluster-quota-reconciliation-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:default-rolebindings-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:deployer-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:deploymentconfig-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:horizontal-pod-autoscaler.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:image-import-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:image-trigger-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:ingress-to-route-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:namespace-security-allocation-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:origin-namespace-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:pv-recycler-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:resourcequota-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:sdn-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:service-ingress-ip-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:service-serving-cert-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-pull-secrets-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller:admin.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller:admin.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-service-broker.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:unidling-controller.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:registry.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:scope-impersonation.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:sdn-readers.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:volume-scheduler.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/system:webhooks.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-auth-delegator-binding.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-docker-binding.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline-binding.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-source-binding.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-attachdetach-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-certificate-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-clusterrole-aggregation-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-cronjob-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-daemon-set-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-deployment-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-disruption-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-endpoint-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-generic-garbage-collector.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-horizontal-pod-autoscaler.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-job-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-namespace-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-node-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-persistent-volume-binder.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pod-garbage-collector.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pv-protection-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pvc-protection-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-replicaset-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-replication-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-resourcequota-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-route-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-service-account-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-service-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-statefulset-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-ttl-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-deployer.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-discovery-binding.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-discovery.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-image-builder.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-image-puller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-controller-manager.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-dns.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-scheduler.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-masters.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-node-admins.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-node-bootstrapper.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-node-proxier.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-node-proxiers.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-node.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-nodes.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-oauth-token-deleters.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-build-config-change-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-build-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-cluster-quota-reconciliation-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-default-rolebindings-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-deployer-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-deploymentconfig-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-horizontal-pod-autoscaler.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-image-import-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-image-trigger-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-ingress-to-route-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-namespace-security-allocation-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-origin-namespace-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-pv-recycler-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-resourcequota-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-sdn-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-service-ingress-ip-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-service-serving-cert-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-pull-secrets-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller-admin.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller-admin.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-service-broker.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-unidling-controller.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-registry.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-scope-impersonation.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-sdn-readers.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-volume-scheduler.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/system-webhooks.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/templateservicebroker-client.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/tsb-openshift-template-service-broker.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/view.yaml
@@ -299,31 +299,31 @@
 // data/Namespace/openshift-web-console.yaml
 // data/Namespace/openshift.yaml
 // data/OAuthClient.oauth.openshift.io/cockpit-oauth-client.yaml
-// data/Role.rbac.authorization.k8s.io/kube-public/system:controller:bootstrap-signer.yaml
+// data/Role.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml
 // data/Role.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap.yaml
 // data/Role.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor.yaml
 // data/Role.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader.yaml
-// data/Role.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-controller-manager.yaml
-// data/Role.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-scheduler.yaml
-// data/Role.rbac.authorization.k8s.io/kube-system/system:controller:bootstrap-signer.yaml
-// data/Role.rbac.authorization.k8s.io/kube-system/system:controller:cloud-provider.yaml
-// data/Role.rbac.authorization.k8s.io/kube-system/system:controller:token-cleaner.yaml
+// data/Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml
+// data/Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml
+// data/Role.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml
+// data/Role.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml
+// data/Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml
 // data/Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml
-// data/Role.rbac.authorization.k8s.io/openshift-node/system:node-config-reader.yaml
+// data/Role.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml
 // data/Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml
-// data/RoleBinding.rbac.authorization.k8s.io/kube-public/system:controller:bootstrap-signer.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap-binding.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor-binding.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader-binding.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader-openshift-template-service-broker.yaml
-// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-controller-manager.yaml
-// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-scheduler.yaml
-// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:bootstrap-signer.yaml
-// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:cloud-provider.yaml
-// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:token-cleaner.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-viewers.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-node/sync-node-config-reader-binding.yaml
-// data/RoleBinding.rbac.authorization.k8s.io/openshift-node/system:node-config-reader.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml
 // data/Route.route.openshift.io/default/docker-registry.yaml
 // data/Route.route.openshift.io/default/registry-console.yaml
@@ -966,7 +966,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemAggregateToAdminYaml = []byte("\x1f\
 func clusterroleRbacAuthorizationK8sIoSystemAggregateToAdminYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemAggregateToAdminYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-admin.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-admin.yaml",
 	)
 }
 
@@ -976,7 +976,7 @@ func clusterroleRbacAuthorizationK8sIoSystemAggregateToAdminYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -986,7 +986,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemAggregateToEditYaml = []byte("\x1f\x
 func clusterroleRbacAuthorizationK8sIoSystemAggregateToEditYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemAggregateToEditYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-edit.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-edit.yaml",
 	)
 }
 
@@ -996,7 +996,7 @@ func clusterroleRbacAuthorizationK8sIoSystemAggregateToEditYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-edit.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-edit.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1006,7 +1006,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemAggregateToViewYaml = []byte("\x1f\x
 func clusterroleRbacAuthorizationK8sIoSystemAggregateToViewYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemAggregateToViewYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-view.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-view.yaml",
 	)
 }
 
@@ -1016,7 +1016,7 @@ func clusterroleRbacAuthorizationK8sIoSystemAggregateToViewYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-view.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-view.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1026,7 +1026,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemAuthDelegatorYaml = []byte("\x1f\x8b
 func clusterroleRbacAuthorizationK8sIoSystemAuthDelegatorYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemAuthDelegatorYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:auth-delegator.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-auth-delegator.yaml",
 	)
 }
 
@@ -1036,7 +1036,7 @@ func clusterroleRbacAuthorizationK8sIoSystemAuthDelegatorYaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:auth-delegator.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-auth-delegator.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1046,7 +1046,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemAwsCloudProviderYaml = []byte("\x1f\
 func clusterroleRbacAuthorizationK8sIoSystemAwsCloudProviderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemAwsCloudProviderYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:aws-cloud-provider.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml",
 	)
 }
 
@@ -1056,7 +1056,7 @@ func clusterroleRbacAuthorizationK8sIoSystemAwsCloudProviderYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:aws-cloud-provider.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1066,7 +1066,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemBasicUserYaml = []byte("\x1f\x8b\x08
 func clusterroleRbacAuthorizationK8sIoSystemBasicUserYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemBasicUserYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:basic-user.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-basic-user.yaml",
 	)
 }
 
@@ -1076,7 +1076,7 @@ func clusterroleRbacAuthorizationK8sIoSystemBasicUserYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:basic-user.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-basic-user.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1086,7 +1086,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemBuildControllerYaml = []byte("\x1f\x
 func clusterroleRbacAuthorizationK8sIoSystemBuildControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemBuildControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:build-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-build-controller.yaml",
 	)
 }
 
@@ -1096,7 +1096,7 @@ func clusterroleRbacAuthorizationK8sIoSystemBuildControllerYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:build-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-build-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1106,7 +1106,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemBuildStrategyCustomYaml = []byte("\x
 func clusterroleRbacAuthorizationK8sIoSystemBuildStrategyCustomYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemBuildStrategyCustomYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:build-strategy-custom.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-build-strategy-custom.yaml",
 	)
 }
 
@@ -1116,7 +1116,7 @@ func clusterroleRbacAuthorizationK8sIoSystemBuildStrategyCustomYaml() (*asset, e
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:build-strategy-custom.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-build-strategy-custom.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1126,7 +1126,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemBuildStrategyDockerYaml = []byte("\x
 func clusterroleRbacAuthorizationK8sIoSystemBuildStrategyDockerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemBuildStrategyDockerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:build-strategy-docker.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-build-strategy-docker.yaml",
 	)
 }
 
@@ -1136,7 +1136,7 @@ func clusterroleRbacAuthorizationK8sIoSystemBuildStrategyDockerYaml() (*asset, e
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:build-strategy-docker.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-build-strategy-docker.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1146,7 +1146,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineYaml = [
 func clusterroleRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:build-strategy-jenkinspipeline.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline.yaml",
 	)
 }
 
@@ -1156,7 +1156,7 @@ func clusterroleRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineYaml() (
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:build-strategy-jenkinspipeline.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1166,7 +1166,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemBuildStrategySourceYaml = []byte("\x
 func clusterroleRbacAuthorizationK8sIoSystemBuildStrategySourceYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemBuildStrategySourceYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:build-strategy-source.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-build-strategy-source.yaml",
 	)
 }
 
@@ -1176,7 +1176,7 @@ func clusterroleRbacAuthorizationK8sIoSystemBuildStrategySourceYaml() (*asset, e
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:build-strategy-source.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-build-strategy-source.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1186,7 +1186,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemCertificateSigningControllerYaml = [
 func clusterroleRbacAuthorizationK8sIoSystemCertificateSigningControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemCertificateSigningControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:certificate-signing-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-certificate-signing-controller.yaml",
 	)
 }
 
@@ -1196,7 +1196,7 @@ func clusterroleRbacAuthorizationK8sIoSystemCertificateSigningControllerYaml() (
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:certificate-signing-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-certificate-signing-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1206,7 +1206,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningr
 func clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsNodeclientYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsNodeclientYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:certificates.k8s.io:certificatesigningrequests:nodeclient.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-certificates.k8s.io-certificatesigningrequests-nodeclient.yaml",
 	)
 }
 
@@ -1216,7 +1216,7 @@ func clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningr
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:certificates.k8s.io:certificatesigningrequests:nodeclient.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-certificates.k8s.io-certificatesigningrequests-nodeclient.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1226,7 +1226,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningr
 func clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsSelfnodeclientYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsSelfnodeclientYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:certificates.k8s.io:certificatesigningrequests:selfnodeclient.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-certificates.k8s.io-certificatesigningrequests-selfnodeclient.yaml",
 	)
 }
 
@@ -1236,7 +1236,7 @@ func clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningr
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:certificates.k8s.io:certificatesigningrequests:selfnodeclient.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-certificates.k8s.io-certificatesigningrequests-selfnodeclient.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1246,7 +1246,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml
 func clusterroleRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:attachdetach-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-attachdetach-controller.yaml",
 	)
 }
 
@@ -1256,7 +1256,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:attachdetach-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-attachdetach-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1266,7 +1266,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml 
 func clusterroleRbacAuthorizationK8sIoSystemControllerCertificateControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:certificate-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-certificate-controller.yaml",
 	)
 }
 
@@ -1276,7 +1276,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml(
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:certificate-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-certificate-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1286,7 +1286,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerClusterroleAggregationCont
 func clusterroleRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:clusterrole-aggregation-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-clusterrole-aggregation-controller.yaml",
 	)
 }
 
@@ -1296,7 +1296,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerClusterroleAggregationCont
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:clusterrole-aggregation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-clusterrole-aggregation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1306,7 +1306,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml = []
 func clusterroleRbacAuthorizationK8sIoSystemControllerCronjobControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:cronjob-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-cronjob-controller.yaml",
 	)
 }
 
@@ -1316,7 +1316,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml() (*
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:cronjob-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-cronjob-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1326,7 +1326,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml = 
 func clusterroleRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:daemon-set-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-daemon-set-controller.yaml",
 	)
 }
 
@@ -1336,7 +1336,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml() 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:daemon-set-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-daemon-set-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1346,7 +1346,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml =
 func clusterroleRbacAuthorizationK8sIoSystemControllerDeploymentControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:deployment-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-deployment-controller.yaml",
 	)
 }
 
@@ -1356,7 +1356,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml()
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:deployment-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-deployment-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1366,7 +1366,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml =
 func clusterroleRbacAuthorizationK8sIoSystemControllerDisruptionControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:disruption-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-disruption-controller.yaml",
 	)
 }
 
@@ -1376,7 +1376,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml()
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:disruption-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-disruption-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1386,7 +1386,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml = [
 func clusterroleRbacAuthorizationK8sIoSystemControllerEndpointControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:endpoint-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-endpoint-controller.yaml",
 	)
 }
 
@@ -1396,7 +1396,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml() (
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:endpoint-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-endpoint-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1406,7 +1406,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYam
 func clusterroleRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:generic-garbage-collector.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-generic-garbage-collector.yaml",
 	)
 }
 
@@ -1416,7 +1416,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYam
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:generic-garbage-collector.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-generic-garbage-collector.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1426,7 +1426,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYam
 func clusterroleRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:horizontal-pod-autoscaler.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-horizontal-pod-autoscaler.yaml",
 	)
 }
 
@@ -1436,7 +1436,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYam
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:horizontal-pod-autoscaler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-horizontal-pod-autoscaler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1446,7 +1446,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerJobControllerYaml = []byte
 func clusterroleRbacAuthorizationK8sIoSystemControllerJobControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerJobControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:job-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-job-controller.yaml",
 	)
 }
 
@@ -1456,7 +1456,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerJobControllerYaml() (*asse
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:job-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-job-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1466,7 +1466,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml = 
 func clusterroleRbacAuthorizationK8sIoSystemControllerNamespaceControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:namespace-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-namespace-controller.yaml",
 	)
 }
 
@@ -1476,7 +1476,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml() 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:namespace-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-namespace-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1486,7 +1486,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerNodeControllerYaml = []byt
 func clusterroleRbacAuthorizationK8sIoSystemControllerNodeControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerNodeControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:node-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-node-controller.yaml",
 	)
 }
 
@@ -1496,7 +1496,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerNodeControllerYaml() (*ass
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:node-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-node-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1506,7 +1506,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml
 func clusterroleRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:persistent-volume-binder.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-persistent-volume-binder.yaml",
 	)
 }
 
@@ -1516,7 +1516,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:persistent-volume-binder.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-persistent-volume-binder.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1526,7 +1526,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml = 
 func clusterroleRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:pod-garbage-collector.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-pod-garbage-collector.yaml",
 	)
 }
 
@@ -1536,7 +1536,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml() 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:pod-garbage-collector.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-pod-garbage-collector.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1546,7 +1546,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml
 func clusterroleRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:pv-protection-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-pv-protection-controller.yaml",
 	)
 }
 
@@ -1556,7 +1556,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:pv-protection-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-pv-protection-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1566,7 +1566,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYam
 func clusterroleRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:pvc-protection-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-pvc-protection-controller.yaml",
 	)
 }
 
@@ -1576,7 +1576,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYam
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:pvc-protection-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-pvc-protection-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1586,7 +1586,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml =
 func clusterroleRbacAuthorizationK8sIoSystemControllerReplicasetControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:replicaset-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-replicaset-controller.yaml",
 	)
 }
 
@@ -1596,7 +1596,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml()
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:replicaset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-replicaset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1606,7 +1606,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml 
 func clusterroleRbacAuthorizationK8sIoSystemControllerReplicationControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:replication-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-replication-controller.yaml",
 	)
 }
 
@@ -1616,7 +1616,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml(
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:replication-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-replication-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1626,7 +1626,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYam
 func clusterroleRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:resourcequota-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-resourcequota-controller.yaml",
 	)
 }
 
@@ -1636,7 +1636,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYam
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:resourcequota-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-resourcequota-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1646,7 +1646,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerRouteControllerYaml = []by
 func clusterroleRbacAuthorizationK8sIoSystemControllerRouteControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerRouteControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:route-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-route-controller.yaml",
 	)
 }
 
@@ -1656,7 +1656,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerRouteControllerYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:route-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-route-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1666,7 +1666,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYa
 func clusterroleRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:service-account-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-service-account-controller.yaml",
 	)
 }
 
@@ -1676,7 +1676,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYa
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:service-account-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-service-account-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1686,7 +1686,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerServiceControllerYaml = []
 func clusterroleRbacAuthorizationK8sIoSystemControllerServiceControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerServiceControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:service-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-service-controller.yaml",
 	)
 }
 
@@ -1696,7 +1696,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerServiceControllerYaml() (*
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:service-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-service-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1706,7 +1706,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml 
 func clusterroleRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:statefulset-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-statefulset-controller.yaml",
 	)
 }
 
@@ -1716,7 +1716,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml(
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:statefulset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-statefulset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1726,7 +1726,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemControllerTtlControllerYaml = []byte
 func clusterroleRbacAuthorizationK8sIoSystemControllerTtlControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemControllerTtlControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:controller:ttl-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-controller-ttl-controller.yaml",
 	)
 }
 
@@ -1736,7 +1736,7 @@ func clusterroleRbacAuthorizationK8sIoSystemControllerTtlControllerYaml() (*asse
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:controller:ttl-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-controller-ttl-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1746,7 +1746,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemDaemonsetControllerYaml = []byte("\x
 func clusterroleRbacAuthorizationK8sIoSystemDaemonsetControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemDaemonsetControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:daemonset-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-daemonset-controller.yaml",
 	)
 }
 
@@ -1756,7 +1756,7 @@ func clusterroleRbacAuthorizationK8sIoSystemDaemonsetControllerYaml() (*asset, e
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:daemonset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-daemonset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1766,7 +1766,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemDeployerYaml = []byte("\x1f\x8b\x08\
 func clusterroleRbacAuthorizationK8sIoSystemDeployerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemDeployerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:deployer.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-deployer.yaml",
 	)
 }
 
@@ -1776,7 +1776,7 @@ func clusterroleRbacAuthorizationK8sIoSystemDeployerYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:deployer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-deployer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1786,7 +1786,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemDeploymentControllerYaml = []byte("\
 func clusterroleRbacAuthorizationK8sIoSystemDeploymentControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemDeploymentControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:deployment-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-deployment-controller.yaml",
 	)
 }
 
@@ -1796,7 +1796,7 @@ func clusterroleRbacAuthorizationK8sIoSystemDeploymentControllerYaml() (*asset, 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:deployment-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-deployment-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1806,7 +1806,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemDeploymentconfigControllerYaml = []b
 func clusterroleRbacAuthorizationK8sIoSystemDeploymentconfigControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemDeploymentconfigControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:deploymentconfig-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-deploymentconfig-controller.yaml",
 	)
 }
 
@@ -1816,7 +1816,7 @@ func clusterroleRbacAuthorizationK8sIoSystemDeploymentconfigControllerYaml() (*a
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:deploymentconfig-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-deploymentconfig-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1826,7 +1826,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemDiscoveryYaml = []byte("\x1f\x8b\x08
 func clusterroleRbacAuthorizationK8sIoSystemDiscoveryYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemDiscoveryYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:discovery.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-discovery.yaml",
 	)
 }
 
@@ -1836,7 +1836,7 @@ func clusterroleRbacAuthorizationK8sIoSystemDiscoveryYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:discovery.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-discovery.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1846,7 +1846,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemDisruptionControllerYaml = []byte("\
 func clusterroleRbacAuthorizationK8sIoSystemDisruptionControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemDisruptionControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:disruption-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-disruption-controller.yaml",
 	)
 }
 
@@ -1856,7 +1856,7 @@ func clusterroleRbacAuthorizationK8sIoSystemDisruptionControllerYaml() (*asset, 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:disruption-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-disruption-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1866,7 +1866,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemEndpointControllerYaml = []byte("\x1
 func clusterroleRbacAuthorizationK8sIoSystemEndpointControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemEndpointControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:endpoint-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-endpoint-controller.yaml",
 	)
 }
 
@@ -1876,7 +1876,7 @@ func clusterroleRbacAuthorizationK8sIoSystemEndpointControllerYaml() (*asset, er
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:endpoint-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-endpoint-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1886,7 +1886,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemGarbageCollectorControllerYaml = []b
 func clusterroleRbacAuthorizationK8sIoSystemGarbageCollectorControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemGarbageCollectorControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:garbage-collector-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-garbage-collector-controller.yaml",
 	)
 }
 
@@ -1896,7 +1896,7 @@ func clusterroleRbacAuthorizationK8sIoSystemGarbageCollectorControllerYaml() (*a
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:garbage-collector-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-garbage-collector-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1906,7 +1906,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemGcControllerYaml = []byte("\x1f\x8b\
 func clusterroleRbacAuthorizationK8sIoSystemGcControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemGcControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:gc-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-gc-controller.yaml",
 	)
 }
 
@@ -1916,7 +1916,7 @@ func clusterroleRbacAuthorizationK8sIoSystemGcControllerYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:gc-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-gc-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1926,7 +1926,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemHeapsterYaml = []byte("\x1f\x8b\x08\
 func clusterroleRbacAuthorizationK8sIoSystemHeapsterYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemHeapsterYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:heapster.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-heapster.yaml",
 	)
 }
 
@@ -1936,7 +1936,7 @@ func clusterroleRbacAuthorizationK8sIoSystemHeapsterYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:heapster.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-heapster.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1946,7 +1946,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemHpaControllerYaml = []byte("\x1f\x8b
 func clusterroleRbacAuthorizationK8sIoSystemHpaControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemHpaControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:hpa-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-hpa-controller.yaml",
 	)
 }
 
@@ -1956,7 +1956,7 @@ func clusterroleRbacAuthorizationK8sIoSystemHpaControllerYaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:hpa-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-hpa-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1966,7 +1966,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemImageAuditorYaml = []byte("\x1f\x8b\
 func clusterroleRbacAuthorizationK8sIoSystemImageAuditorYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemImageAuditorYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:image-auditor.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-image-auditor.yaml",
 	)
 }
 
@@ -1976,7 +1976,7 @@ func clusterroleRbacAuthorizationK8sIoSystemImageAuditorYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:image-auditor.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-image-auditor.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1986,7 +1986,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemImageBuilderYaml = []byte("\x1f\x8b\
 func clusterroleRbacAuthorizationK8sIoSystemImageBuilderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemImageBuilderYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:image-builder.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-image-builder.yaml",
 	)
 }
 
@@ -1996,7 +1996,7 @@ func clusterroleRbacAuthorizationK8sIoSystemImageBuilderYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:image-builder.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-image-builder.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2006,7 +2006,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemImagePrunerYaml = []byte("\x1f\x8b\x
 func clusterroleRbacAuthorizationK8sIoSystemImagePrunerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemImagePrunerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:image-pruner.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-image-pruner.yaml",
 	)
 }
 
@@ -2016,7 +2016,7 @@ func clusterroleRbacAuthorizationK8sIoSystemImagePrunerYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:image-pruner.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-image-pruner.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2026,7 +2026,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemImagePullerYaml = []byte("\x1f\x8b\x
 func clusterroleRbacAuthorizationK8sIoSystemImagePullerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemImagePullerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:image-puller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-image-puller.yaml",
 	)
 }
 
@@ -2036,7 +2036,7 @@ func clusterroleRbacAuthorizationK8sIoSystemImagePullerYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:image-puller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-image-puller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2046,7 +2046,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemImagePusherYaml = []byte("\x1f\x8b\x
 func clusterroleRbacAuthorizationK8sIoSystemImagePusherYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemImagePusherYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:image-pusher.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-image-pusher.yaml",
 	)
 }
 
@@ -2056,7 +2056,7 @@ func clusterroleRbacAuthorizationK8sIoSystemImagePusherYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:image-pusher.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-image-pusher.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2066,7 +2066,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemImageSignerYaml = []byte("\x1f\x8b\x
 func clusterroleRbacAuthorizationK8sIoSystemImageSignerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemImageSignerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:image-signer.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-image-signer.yaml",
 	)
 }
 
@@ -2076,7 +2076,7 @@ func clusterroleRbacAuthorizationK8sIoSystemImageSignerYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:image-signer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-image-signer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2086,7 +2086,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemJobControllerYaml = []byte("\x1f\x8b
 func clusterroleRbacAuthorizationK8sIoSystemJobControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemJobControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:job-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-job-controller.yaml",
 	)
 }
 
@@ -2096,7 +2096,7 @@ func clusterroleRbacAuthorizationK8sIoSystemJobControllerYaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:job-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-job-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2106,7 +2106,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemKubeAggregatorYaml = []byte("\x1f\x8
 func clusterroleRbacAuthorizationK8sIoSystemKubeAggregatorYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemKubeAggregatorYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:kube-aggregator.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-kube-aggregator.yaml",
 	)
 }
 
@@ -2116,7 +2116,7 @@ func clusterroleRbacAuthorizationK8sIoSystemKubeAggregatorYaml() (*asset, error)
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:kube-aggregator.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-kube-aggregator.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2126,7 +2126,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemKubeControllerManagerYaml = []byte("
 func clusterroleRbacAuthorizationK8sIoSystemKubeControllerManagerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemKubeControllerManagerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:kube-controller-manager.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-kube-controller-manager.yaml",
 	)
 }
 
@@ -2136,7 +2136,7 @@ func clusterroleRbacAuthorizationK8sIoSystemKubeControllerManagerYaml() (*asset,
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2146,7 +2146,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemKubeDnsYaml = []byte("\x1f\x8b\x08\x
 func clusterroleRbacAuthorizationK8sIoSystemKubeDnsYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemKubeDnsYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:kube-dns.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-kube-dns.yaml",
 	)
 }
 
@@ -2156,7 +2156,7 @@ func clusterroleRbacAuthorizationK8sIoSystemKubeDnsYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:kube-dns.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-kube-dns.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2166,7 +2166,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemKubeSchedulerYaml = []byte("\x1f\x8b
 func clusterroleRbacAuthorizationK8sIoSystemKubeSchedulerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemKubeSchedulerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:kube-scheduler.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-kube-scheduler.yaml",
 	)
 }
 
@@ -2176,7 +2176,7 @@ func clusterroleRbacAuthorizationK8sIoSystemKubeSchedulerYaml() (*asset, error) 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2186,7 +2186,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemKubeletApiAdminYaml = []byte("\x1f\x
 func clusterroleRbacAuthorizationK8sIoSystemKubeletApiAdminYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemKubeletApiAdminYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:kubelet-api-admin.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-kubelet-api-admin.yaml",
 	)
 }
 
@@ -2196,7 +2196,7 @@ func clusterroleRbacAuthorizationK8sIoSystemKubeletApiAdminYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:kubelet-api-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-kubelet-api-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2206,7 +2206,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemMasterYaml = []byte("\x1f\x8b\x08\x0
 func clusterroleRbacAuthorizationK8sIoSystemMasterYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemMasterYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:master.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-master.yaml",
 	)
 }
 
@@ -2216,7 +2216,7 @@ func clusterroleRbacAuthorizationK8sIoSystemMasterYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:master.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-master.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2226,7 +2226,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemNamespaceControllerYaml = []byte("\x
 func clusterroleRbacAuthorizationK8sIoSystemNamespaceControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemNamespaceControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:namespace-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-namespace-controller.yaml",
 	)
 }
 
@@ -2236,7 +2236,7 @@ func clusterroleRbacAuthorizationK8sIoSystemNamespaceControllerYaml() (*asset, e
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:namespace-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-namespace-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2246,7 +2246,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemNodeAdminYaml = []byte("\x1f\x8b\x08
 func clusterroleRbacAuthorizationK8sIoSystemNodeAdminYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemNodeAdminYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:node-admin.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-node-admin.yaml",
 	)
 }
 
@@ -2256,7 +2256,7 @@ func clusterroleRbacAuthorizationK8sIoSystemNodeAdminYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:node-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-node-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2266,7 +2266,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapAutoapproverYaml = []by
 func clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapAutoapproverYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapAutoapproverYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:node-bootstrap-autoapprover.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-node-bootstrap-autoapprover.yaml",
 	)
 }
 
@@ -2276,7 +2276,7 @@ func clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapAutoapproverYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:node-bootstrap-autoapprover.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-node-bootstrap-autoapprover.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2286,7 +2286,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapperYaml = []byte("\x1f\
 func clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapperYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapperYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:node-bootstrapper.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-node-bootstrapper.yaml",
 	)
 }
 
@@ -2296,7 +2296,7 @@ func clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapperYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:node-bootstrapper.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-node-bootstrapper.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2306,7 +2306,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemNodeProblemDetectorYaml = []byte("\x
 func clusterroleRbacAuthorizationK8sIoSystemNodeProblemDetectorYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemNodeProblemDetectorYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:node-problem-detector.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-node-problem-detector.yaml",
 	)
 }
 
@@ -2316,7 +2316,7 @@ func clusterroleRbacAuthorizationK8sIoSystemNodeProblemDetectorYaml() (*asset, e
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:node-problem-detector.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-node-problem-detector.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2326,7 +2326,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemNodeProxierYaml = []byte("\x1f\x8b\x
 func clusterroleRbacAuthorizationK8sIoSystemNodeProxierYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemNodeProxierYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:node-proxier.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-node-proxier.yaml",
 	)
 }
 
@@ -2336,7 +2336,7 @@ func clusterroleRbacAuthorizationK8sIoSystemNodeProxierYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:node-proxier.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-node-proxier.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2346,7 +2346,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemNodeReaderYaml = []byte("\x1f\x8b\x0
 func clusterroleRbacAuthorizationK8sIoSystemNodeReaderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemNodeReaderYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:node-reader.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-node-reader.yaml",
 	)
 }
 
@@ -2356,7 +2356,7 @@ func clusterroleRbacAuthorizationK8sIoSystemNodeReaderYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:node-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-node-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2366,7 +2366,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemNodeYaml = []byte("\x1f\x8b\x08\x00\
 func clusterroleRbacAuthorizationK8sIoSystemNodeYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemNodeYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:node.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-node.yaml",
 	)
 }
 
@@ -2376,7 +2376,7 @@ func clusterroleRbacAuthorizationK8sIoSystemNodeYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:node.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-node.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2386,7 +2386,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOauthTokenDeleterYaml = []byte("\x1f
 func clusterroleRbacAuthorizationK8sIoSystemOauthTokenDeleterYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOauthTokenDeleterYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:oauth-token-deleter.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-oauth-token-deleter.yaml",
 	)
 }
 
@@ -2396,7 +2396,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOauthTokenDeleterYaml() (*asset, err
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:oauth-token-deleter.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-oauth-token-deleter.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2406,7 +2406,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToAdminYaml = []by
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToAdminYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToAdminYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-admin.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-admin.yaml",
 	)
 }
 
@@ -2416,7 +2416,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToAdminYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2426,7 +2426,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToEditYaml = []byt
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToEditYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToEditYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-edit.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-edit.yaml",
 	)
 }
 
@@ -2436,7 +2436,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToEditYaml() (*ass
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-edit.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-edit.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2446,7 +2446,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToViewYaml = []byt
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToViewYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToViewYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-view.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-view.yaml",
 	)
 }
 
@@ -2456,7 +2456,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToViewYaml() (*ass
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-view.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-view.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2466,7 +2466,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChange
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:build-config-change-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-build-config-change-controller.yaml",
 	)
 }
 
@@ -2476,7 +2476,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChange
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:build-config-change-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-build-config-change-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2486,7 +2486,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYa
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:build-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-build-controller.yaml",
 	)
 }
 
@@ -2496,7 +2496,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYa
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:build-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-build-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2506,7 +2506,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaRecon
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:cluster-quota-reconciliation-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-cluster-quota-reconciliation-controller.yaml",
 	)
 }
 
@@ -2516,7 +2516,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaRecon
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:cluster-quota-reconciliation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-cluster-quota-reconciliation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2526,7 +2526,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindin
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:default-rolebindings-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-default-rolebindings-controller.yaml",
 	)
 }
 
@@ -2536,7 +2536,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindin
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:default-rolebindings-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-default-rolebindings-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2546,7 +2546,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControlle
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:deployer-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-deployer-controller.yaml",
 	)
 }
 
@@ -2556,7 +2556,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControlle
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:deployer-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-deployer-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2566,7 +2566,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigC
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:deploymentconfig-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-deploymentconfig-controller.yaml",
 	)
 }
 
@@ -2576,7 +2576,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigC
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:deploymentconfig-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-deploymentconfig-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2586,7 +2586,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAuto
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:horizontal-pod-autoscaler.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-horizontal-pod-autoscaler.yaml",
 	)
 }
 
@@ -2596,7 +2596,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAuto
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:horizontal-pod-autoscaler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-horizontal-pod-autoscaler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2606,7 +2606,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportContro
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:image-import-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-image-import-controller.yaml",
 	)
 }
 
@@ -2616,7 +2616,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportContro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:image-import-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-image-import-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2626,7 +2626,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerContr
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:image-trigger-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-image-trigger-controller.yaml",
 	)
 }
 
@@ -2636,7 +2636,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerContr
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:image-trigger-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-image-trigger-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2646,7 +2646,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteCon
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:ingress-to-route-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-ingress-to-route-controller.yaml",
 	)
 }
 
@@ -2656,7 +2656,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteCon
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:ingress-to-route-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-ingress-to-route-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2666,7 +2666,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurity
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:namespace-security-allocation-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-namespace-security-allocation-controller.yaml",
 	)
 }
 
@@ -2676,7 +2676,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurity
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:namespace-security-allocation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-namespace-security-allocation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2686,7 +2686,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceCo
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:origin-namespace-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-origin-namespace-controller.yaml",
 	)
 }
 
@@ -2696,7 +2696,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceCo
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:origin-namespace-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-origin-namespace-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2706,7 +2706,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControl
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:pv-recycler-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-pv-recycler-controller.yaml",
 	)
 }
 
@@ -2716,7 +2716,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControl
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:pv-recycler-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-pv-recycler-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2726,7 +2726,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaCont
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:resourcequota-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-resourcequota-controller.yaml",
 	)
 }
 
@@ -2736,7 +2736,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaCont
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:resourcequota-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-resourcequota-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2746,7 +2746,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:sdn-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-sdn-controller.yaml",
 	)
 }
 
@@ -2756,7 +2756,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:sdn-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-sdn-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2766,7 +2766,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpC
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:service-ingress-ip-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-service-ingress-ip-controller.yaml",
 	)
 }
 
@@ -2776,7 +2776,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpC
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:service-ingress-ip-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-service-ingress-ip-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2786,7 +2786,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCer
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:service-serving-cert-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-service-serving-cert-controller.yaml",
 	)
 }
 
@@ -2796,7 +2796,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCer
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:service-serving-cert-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-service-serving-cert-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2806,7 +2806,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountCon
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-controller.yaml",
 	)
 }
 
@@ -2816,7 +2816,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountCon
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2826,7 +2826,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPul
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-pull-secrets-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-pull-secrets-controller.yaml",
 	)
 }
 
@@ -2836,7 +2836,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPul
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-pull-secrets-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-pull-secrets-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2846,7 +2846,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceC
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller.yaml",
 	)
 }
 
@@ -2856,7 +2856,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceC
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2866,7 +2866,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceF
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller.yaml",
 	)
 }
 
@@ -2876,7 +2876,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceF
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2886,7 +2886,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBr
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-service-broker.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-service-broker.yaml",
 	)
 }
 
@@ -2896,7 +2896,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBr
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-service-broker.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-service-broker.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2906,7 +2906,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControlle
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:unidling-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-unidling-controller.yaml",
 	)
 }
 
@@ -2916,7 +2916,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControlle
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:unidling-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-unidling-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2926,7 +2926,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemOpenshiftTemplateservicebrokerClient
 func clusterroleRbacAuthorizationK8sIoSystemOpenshiftTemplateservicebrokerClientYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemOpenshiftTemplateservicebrokerClientYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:openshift:templateservicebroker-client.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-openshift-templateservicebroker-client.yaml",
 	)
 }
 
@@ -2936,7 +2936,7 @@ func clusterroleRbacAuthorizationK8sIoSystemOpenshiftTemplateservicebrokerClient
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:openshift:templateservicebroker-client.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-openshift-templateservicebroker-client.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2946,7 +2946,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemPersistentVolumeProvisionerYaml = []
 func clusterroleRbacAuthorizationK8sIoSystemPersistentVolumeProvisionerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemPersistentVolumeProvisionerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:persistent-volume-provisioner.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-persistent-volume-provisioner.yaml",
 	)
 }
 
@@ -2956,7 +2956,7 @@ func clusterroleRbacAuthorizationK8sIoSystemPersistentVolumeProvisionerYaml() (*
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:persistent-volume-provisioner.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-persistent-volume-provisioner.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2966,7 +2966,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemRegistryYaml = []byte("\x1f\x8b\x08\
 func clusterroleRbacAuthorizationK8sIoSystemRegistryYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemRegistryYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:registry.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-registry.yaml",
 	)
 }
 
@@ -2976,7 +2976,7 @@ func clusterroleRbacAuthorizationK8sIoSystemRegistryYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:registry.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-registry.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -2986,7 +2986,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemReplicasetControllerYaml = []byte("\
 func clusterroleRbacAuthorizationK8sIoSystemReplicasetControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemReplicasetControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:replicaset-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-replicaset-controller.yaml",
 	)
 }
 
@@ -2996,7 +2996,7 @@ func clusterroleRbacAuthorizationK8sIoSystemReplicasetControllerYaml() (*asset, 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:replicaset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-replicaset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3006,7 +3006,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemReplicationControllerYaml = []byte("
 func clusterroleRbacAuthorizationK8sIoSystemReplicationControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemReplicationControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:replication-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-replication-controller.yaml",
 	)
 }
 
@@ -3016,7 +3016,7 @@ func clusterroleRbacAuthorizationK8sIoSystemReplicationControllerYaml() (*asset,
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:replication-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-replication-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3026,7 +3026,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemRouterYaml = []byte("\x1f\x8b\x08\x0
 func clusterroleRbacAuthorizationK8sIoSystemRouterYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemRouterYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:router.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-router.yaml",
 	)
 }
 
@@ -3036,7 +3036,7 @@ func clusterroleRbacAuthorizationK8sIoSystemRouterYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:router.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-router.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3046,7 +3046,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemScopeImpersonationYaml = []byte("\x1
 func clusterroleRbacAuthorizationK8sIoSystemScopeImpersonationYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemScopeImpersonationYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:scope-impersonation.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-scope-impersonation.yaml",
 	)
 }
 
@@ -3056,7 +3056,7 @@ func clusterroleRbacAuthorizationK8sIoSystemScopeImpersonationYaml() (*asset, er
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:scope-impersonation.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-scope-impersonation.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3066,7 +3066,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemSdnManagerYaml = []byte("\x1f\x8b\x0
 func clusterroleRbacAuthorizationK8sIoSystemSdnManagerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemSdnManagerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:sdn-manager.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-sdn-manager.yaml",
 	)
 }
 
@@ -3076,7 +3076,7 @@ func clusterroleRbacAuthorizationK8sIoSystemSdnManagerYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:sdn-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-sdn-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3086,7 +3086,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemSdnReaderYaml = []byte("\x1f\x8b\x08
 func clusterroleRbacAuthorizationK8sIoSystemSdnReaderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemSdnReaderYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:sdn-reader.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-sdn-reader.yaml",
 	)
 }
 
@@ -3096,7 +3096,7 @@ func clusterroleRbacAuthorizationK8sIoSystemSdnReaderYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:sdn-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-sdn-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3106,7 +3106,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToAdminYaml =
 func clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToAdminYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToAdminYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-admin.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-admin.yaml",
 	)
 }
 
@@ -3116,7 +3116,7 @@ func clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToAdminYaml()
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3126,7 +3126,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToEditYaml = 
 func clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToEditYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToEditYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-edit.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-edit.yaml",
 	)
 }
 
@@ -3136,7 +3136,7 @@ func clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToEditYaml() 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-edit.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-edit.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3146,7 +3146,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToViewYaml = 
 func clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToViewYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToViewYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-view.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-view.yaml",
 	)
 }
 
@@ -3156,7 +3156,7 @@ func clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToViewYaml() 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-view.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-view.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3166,7 +3166,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemStatefulsetControllerYaml = []byte("
 func clusterroleRbacAuthorizationK8sIoSystemStatefulsetControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemStatefulsetControllerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:statefulset-controller.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-statefulset-controller.yaml",
 	)
 }
 
@@ -3176,7 +3176,7 @@ func clusterroleRbacAuthorizationK8sIoSystemStatefulsetControllerYaml() (*asset,
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:statefulset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-statefulset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3186,7 +3186,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemVolumeSchedulerYaml = []byte("\x1f\x
 func clusterroleRbacAuthorizationK8sIoSystemVolumeSchedulerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemVolumeSchedulerYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:volume-scheduler.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-volume-scheduler.yaml",
 	)
 }
 
@@ -3196,7 +3196,7 @@ func clusterroleRbacAuthorizationK8sIoSystemVolumeSchedulerYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:volume-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-volume-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3206,7 +3206,7 @@ var _clusterroleRbacAuthorizationK8sIoSystemWebhookYaml = []byte("\x1f\x8b\x08\x
 func clusterroleRbacAuthorizationK8sIoSystemWebhookYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterroleRbacAuthorizationK8sIoSystemWebhookYaml,
-		"ClusterRole.rbac.authorization.k8s.io/system:webhook.yaml",
+		"ClusterRole.rbac.authorization.k8s.io/system-webhook.yaml",
 	)
 }
 
@@ -3216,7 +3216,7 @@ func clusterroleRbacAuthorizationK8sIoSystemWebhookYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system:webhook.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/system-webhook.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3746,7 +3746,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYaml = []
 func clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:auth-delegator-binding.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-auth-delegator-binding.yaml",
 	)
 }
 
@@ -3756,7 +3756,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYaml() (*
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:auth-delegator-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-auth-delegator-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3766,7 +3766,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml = []byte
 func clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:aws-cloud-provider.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml",
 	)
 }
 
@@ -3776,7 +3776,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml() (*asse
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:aws-cloud-provider.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3786,7 +3786,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYaml = []byte("\x1f\
 func clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:basic-user.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user.yaml",
 	)
 }
 
@@ -3796,7 +3796,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:basic-user.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3806,7 +3806,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYam
 func clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-docker-binding.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-docker-binding.yaml",
 	)
 }
 
@@ -3816,7 +3816,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYam
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-docker-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-docker-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3826,7 +3826,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineB
 func clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineBindingYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineBindingYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-jenkinspipeline-binding.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline-binding.yaml",
 	)
 }
 
@@ -3836,7 +3836,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineB
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-jenkinspipeline-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3846,7 +3846,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategySourceBindingYam
 func clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategySourceBindingYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategySourceBindingYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-source-binding.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-source-binding.yaml",
 	)
 }
 
@@ -3856,7 +3856,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategySourceBindingYam
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-source-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-source-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3866,7 +3866,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerAttachdetachControl
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:attachdetach-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-attachdetach-controller.yaml",
 	)
 }
 
@@ -3876,7 +3876,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerAttachdetachControl
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:attachdetach-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-attachdetach-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3886,7 +3886,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerCertificateControll
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerCertificateControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:certificate-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-certificate-controller.yaml",
 	)
 }
 
@@ -3896,7 +3896,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerCertificateControll
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:certificate-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-certificate-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3906,7 +3906,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerClusterroleAggregat
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:clusterrole-aggregation-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-clusterrole-aggregation-controller.yaml",
 	)
 }
 
@@ -3916,7 +3916,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerClusterroleAggregat
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:clusterrole-aggregation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-clusterrole-aggregation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3926,7 +3926,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerCronjobControllerYa
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerCronjobControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:cronjob-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-cronjob-controller.yaml",
 	)
 }
 
@@ -3936,7 +3936,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerCronjobControllerYa
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:cronjob-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-cronjob-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3946,7 +3946,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerDaemonSetController
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:daemon-set-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-daemon-set-controller.yaml",
 	)
 }
 
@@ -3956,7 +3956,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerDaemonSetController
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:daemon-set-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-daemon-set-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3966,7 +3966,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerDeploymentControlle
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerDeploymentControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:deployment-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-deployment-controller.yaml",
 	)
 }
 
@@ -3976,7 +3976,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerDeploymentControlle
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:deployment-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-deployment-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3986,7 +3986,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerDisruptionControlle
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerDisruptionControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:disruption-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-disruption-controller.yaml",
 	)
 }
 
@@ -3996,7 +3996,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerDisruptionControlle
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:disruption-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-disruption-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4006,7 +4006,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerEndpointControllerY
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerEndpointControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:endpoint-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-endpoint-controller.yaml",
 	)
 }
 
@@ -4016,7 +4016,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerEndpointControllerY
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:endpoint-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-endpoint-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4026,7 +4026,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerGenericGarbageColle
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:generic-garbage-collector.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-generic-garbage-collector.yaml",
 	)
 }
 
@@ -4036,7 +4036,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerGenericGarbageColle
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:generic-garbage-collector.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-generic-garbage-collector.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4046,7 +4046,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerHorizontalPodAutosc
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:horizontal-pod-autoscaler.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-horizontal-pod-autoscaler.yaml",
 	)
 }
 
@@ -4056,7 +4056,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerHorizontalPodAutosc
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:horizontal-pod-autoscaler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-horizontal-pod-autoscaler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4066,7 +4066,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerJobControllerYaml =
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerJobControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerJobControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:job-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-job-controller.yaml",
 	)
 }
 
@@ -4076,7 +4076,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerJobControllerYaml()
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:job-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-job-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4086,7 +4086,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerNamespaceController
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerNamespaceControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:namespace-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-namespace-controller.yaml",
 	)
 }
 
@@ -4096,7 +4096,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerNamespaceController
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:namespace-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-namespace-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4106,7 +4106,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerNodeControllerYaml 
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerNodeControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerNodeControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:node-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-node-controller.yaml",
 	)
 }
 
@@ -4116,7 +4116,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerNodeControllerYaml(
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:node-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-node-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4126,7 +4126,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerPersistentVolumeBin
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:persistent-volume-binder.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-persistent-volume-binder.yaml",
 	)
 }
 
@@ -4136,7 +4136,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerPersistentVolumeBin
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:persistent-volume-binder.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-persistent-volume-binder.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4146,7 +4146,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerPodGarbageCollector
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pod-garbage-collector.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pod-garbage-collector.yaml",
 	)
 }
 
@@ -4156,7 +4156,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerPodGarbageCollector
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pod-garbage-collector.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pod-garbage-collector.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4166,7 +4166,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvProtectionControl
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pv-protection-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pv-protection-controller.yaml",
 	)
 }
 
@@ -4176,7 +4176,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvProtectionControl
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pv-protection-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pv-protection-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4186,7 +4186,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvcProtectionContro
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pvc-protection-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pvc-protection-controller.yaml",
 	)
 }
 
@@ -4196,7 +4196,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvcProtectionContro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pvc-protection-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pvc-protection-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4206,7 +4206,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicasetControlle
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicasetControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:replicaset-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-replicaset-controller.yaml",
 	)
 }
 
@@ -4216,7 +4216,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicasetControlle
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:replicaset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-replicaset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4226,7 +4226,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicationControll
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicationControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:replication-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-replication-controller.yaml",
 	)
 }
 
@@ -4236,7 +4236,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicationControll
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:replication-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-replication-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4246,7 +4246,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerResourcequotaContro
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:resourcequota-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-resourcequota-controller.yaml",
 	)
 }
 
@@ -4256,7 +4256,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerResourcequotaContro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:resourcequota-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-resourcequota-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4266,7 +4266,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerRouteControllerYaml
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerRouteControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerRouteControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:route-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-route-controller.yaml",
 	)
 }
 
@@ -4276,7 +4276,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerRouteControllerYaml
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:route-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-route-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4286,7 +4286,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceAccountContr
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:service-account-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-service-account-controller.yaml",
 	)
 }
 
@@ -4296,7 +4296,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceAccountContr
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:service-account-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-service-account-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4306,7 +4306,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceControllerYa
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:service-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-service-controller.yaml",
 	)
 }
 
@@ -4316,7 +4316,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceControllerYa
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:service-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-service-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4326,7 +4326,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerStatefulsetControll
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:statefulset-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-statefulset-controller.yaml",
 	)
 }
 
@@ -4336,7 +4336,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerStatefulsetControll
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:statefulset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-statefulset-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4346,7 +4346,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemControllerTtlControllerYaml =
 func clusterrolebindingRbacAuthorizationK8sIoSystemControllerTtlControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemControllerTtlControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:ttl-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-ttl-controller.yaml",
 	)
 }
 
@@ -4356,7 +4356,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemControllerTtlControllerYaml()
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:ttl-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-ttl-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4366,7 +4366,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemDeployerYaml = []byte("\x1f\x
 func clusterrolebindingRbacAuthorizationK8sIoSystemDeployerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemDeployerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:deployer.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-deployer.yaml",
 	)
 }
 
@@ -4376,7 +4376,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemDeployerYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:deployer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-deployer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4386,7 +4386,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryBindingYaml = []byte
 func clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryBindingYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryBindingYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:discovery-binding.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-discovery-binding.yaml",
 	)
 }
 
@@ -4396,7 +4396,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryBindingYaml() (*asse
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:discovery-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-discovery-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4406,7 +4406,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryYaml = []byte("\x1f\
 func clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:discovery.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-discovery.yaml",
 	)
 }
 
@@ -4416,7 +4416,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:discovery.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-discovery.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4426,7 +4426,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemImageBuilderYaml = []byte("\x
 func clusterrolebindingRbacAuthorizationK8sIoSystemImageBuilderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemImageBuilderYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:image-builder.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-image-builder.yaml",
 	)
 }
 
@@ -4436,7 +4436,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemImageBuilderYaml() (*asset, e
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:image-builder.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-image-builder.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4446,7 +4446,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemImagePullerYaml = []byte("\x1
 func clusterrolebindingRbacAuthorizationK8sIoSystemImagePullerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemImagePullerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:image-puller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-image-puller.yaml",
 	)
 }
 
@@ -4456,7 +4456,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemImagePullerYaml() (*asset, er
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:image-puller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-image-puller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4466,7 +4466,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemKubeControllerManagerYaml = [
 func clusterrolebindingRbacAuthorizationK8sIoSystemKubeControllerManagerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemKubeControllerManagerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-controller-manager.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-controller-manager.yaml",
 	)
 }
 
@@ -4476,7 +4476,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemKubeControllerManagerYaml() (
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4486,7 +4486,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemKubeDnsYaml = []byte("\x1f\x8
 func clusterrolebindingRbacAuthorizationK8sIoSystemKubeDnsYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemKubeDnsYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-dns.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-dns.yaml",
 	)
 }
 
@@ -4496,7 +4496,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemKubeDnsYaml() (*asset, error)
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-dns.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-dns.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4506,7 +4506,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemKubeSchedulerYaml = []byte("\
 func clusterrolebindingRbacAuthorizationK8sIoSystemKubeSchedulerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemKubeSchedulerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-scheduler.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-scheduler.yaml",
 	)
 }
 
@@ -4516,7 +4516,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemKubeSchedulerYaml() (*asset, 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4526,7 +4526,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemMastersYaml = []byte("\x1f\x8
 func clusterrolebindingRbacAuthorizationK8sIoSystemMastersYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemMastersYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:masters.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-masters.yaml",
 	)
 }
 
@@ -4536,7 +4536,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemMastersYaml() (*asset, error)
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:masters.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-masters.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4546,7 +4546,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemNodeAdminsYaml = []byte("\x1f
 func clusterrolebindingRbacAuthorizationK8sIoSystemNodeAdminsYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemNodeAdminsYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:node-admins.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-node-admins.yaml",
 	)
 }
 
@@ -4556,7 +4556,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemNodeAdminsYaml() (*asset, err
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:node-admins.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-node-admins.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4566,7 +4566,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemNodeBootstrapperYaml = []byte
 func clusterrolebindingRbacAuthorizationK8sIoSystemNodeBootstrapperYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemNodeBootstrapperYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:node-bootstrapper.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-node-bootstrapper.yaml",
 	)
 }
 
@@ -4576,7 +4576,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemNodeBootstrapperYaml() (*asse
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:node-bootstrapper.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-node-bootstrapper.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4586,7 +4586,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxierYaml = []byte("\x1
 func clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxierYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxierYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:node-proxier.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-node-proxier.yaml",
 	)
 }
 
@@ -4596,7 +4596,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxierYaml() (*asset, er
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:node-proxier.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-node-proxier.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4606,7 +4606,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxiersYaml = []byte("\x
 func clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxiersYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxiersYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:node-proxiers.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-node-proxiers.yaml",
 	)
 }
 
@@ -4616,7 +4616,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxiersYaml() (*asset, e
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:node-proxiers.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-node-proxiers.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4626,7 +4626,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemNodeYaml = []byte("\x1f\x8b\x
 func clusterrolebindingRbacAuthorizationK8sIoSystemNodeYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemNodeYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:node.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-node.yaml",
 	)
 }
 
@@ -4636,7 +4636,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemNodeYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:node.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-node.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4646,7 +4646,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemNodesYaml = []byte("\x1f\x8b\
 func clusterrolebindingRbacAuthorizationK8sIoSystemNodesYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemNodesYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:nodes.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-nodes.yaml",
 	)
 }
 
@@ -4656,7 +4656,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemNodesYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:nodes.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-nodes.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4666,7 +4666,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOauthTokenDeletersYaml = []by
 func clusterrolebindingRbacAuthorizationK8sIoSystemOauthTokenDeletersYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOauthTokenDeletersYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:oauth-token-deleters.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-oauth-token-deleters.yaml",
 	)
 }
 
@@ -4676,7 +4676,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOauthTokenDeletersYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:oauth-token-deleters.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-oauth-token-deleters.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4686,7 +4686,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfi
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:build-config-change-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-build-config-change-controller.yaml",
 	)
 }
 
@@ -4696,7 +4696,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfi
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:build-config-change-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-build-config-change-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4706,7 +4706,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildContr
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:build-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-build-controller.yaml",
 	)
 }
 
@@ -4716,7 +4716,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildContr
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:build-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-build-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4726,7 +4726,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuo
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:cluster-quota-reconciliation-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-cluster-quota-reconciliation-controller.yaml",
 	)
 }
 
@@ -4736,7 +4736,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuo
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:cluster-quota-reconciliation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-cluster-quota-reconciliation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4746,7 +4746,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRol
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:default-rolebindings-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-default-rolebindings-controller.yaml",
 	)
 }
 
@@ -4756,7 +4756,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRol
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:default-rolebindings-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-default-rolebindings-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4766,7 +4766,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerCo
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:deployer-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-deployer-controller.yaml",
 	)
 }
 
@@ -4776,7 +4776,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerCo
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:deployer-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-deployer-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4786,7 +4786,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeployment
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:deploymentconfig-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-deploymentconfig-controller.yaml",
 	)
 }
 
@@ -4796,7 +4796,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeployment
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:deploymentconfig-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-deploymentconfig-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4806,7 +4806,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontal
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:horizontal-pod-autoscaler.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-horizontal-pod-autoscaler.yaml",
 	)
 }
 
@@ -4816,7 +4816,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontal
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:horizontal-pod-autoscaler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-horizontal-pod-autoscaler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4826,7 +4826,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageImpor
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:image-import-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-image-import-controller.yaml",
 	)
 }
 
@@ -4836,7 +4836,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageImpor
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:image-import-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-image-import-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4846,7 +4846,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageTrigg
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:image-trigger-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-image-trigger-controller.yaml",
 	)
 }
 
@@ -4856,7 +4856,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageTrigg
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:image-trigger-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-image-trigger-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4866,7 +4866,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToR
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:ingress-to-route-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-ingress-to-route-controller.yaml",
 	)
 }
 
@@ -4876,7 +4876,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToR
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:ingress-to-route-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-ingress-to-route-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4886,7 +4886,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceS
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:namespace-security-allocation-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-namespace-security-allocation-controller.yaml",
 	)
 }
 
@@ -4896,7 +4896,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceS
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:namespace-security-allocation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-namespace-security-allocation-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4906,7 +4906,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerOriginName
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:origin-namespace-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-origin-namespace-controller.yaml",
 	)
 }
 
@@ -4916,7 +4916,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerOriginName
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:origin-namespace-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-origin-namespace-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4926,7 +4926,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecycler
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:pv-recycler-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-pv-recycler-controller.yaml",
 	)
 }
 
@@ -4936,7 +4936,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecycler
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:pv-recycler-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-pv-recycler-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4946,7 +4946,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequ
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:resourcequota-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-resourcequota-controller.yaml",
 	)
 }
 
@@ -4956,7 +4956,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequ
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:resourcequota-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-resourcequota-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4966,7 +4966,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControl
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:sdn-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-sdn-controller.yaml",
 	)
 }
 
@@ -4976,7 +4976,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControl
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:sdn-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-sdn-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4986,7 +4986,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIng
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:service-ingress-ip-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-service-ingress-ip-controller.yaml",
 	)
 }
 
@@ -4996,7 +4996,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIng
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:service-ingress-ip-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-service-ingress-ip-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5006,7 +5006,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceSer
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:service-serving-cert-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-service-serving-cert-controller.yaml",
 	)
 }
 
@@ -5016,7 +5016,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceSer
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:service-serving-cert-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-service-serving-cert-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5026,7 +5026,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceacc
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-controller.yaml",
 	)
 }
 
@@ -5036,7 +5036,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceacc
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5046,7 +5046,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceacc
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-pull-secrets-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-pull-secrets-controller.yaml",
 	)
 }
 
@@ -5056,27 +5056,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceacc
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-pull-secrets-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xa4\x8f\xb1\x4e\xc3\x40\x0c\x86\xf7\x7b\x0a\xab\x7b\x82\xd8\xd0\x6d\xc0\xc0\x5e\x24\x76\xe7\xe2\x50\xd3\x8b\x7d\xb2\x7d\x95\xe0\xe9\x11\x01\x95\x01\xd4\xa5\xa3\x65\xfb\xfb\xbf\x1f\x1b\xbf\x90\x39\xab\x64\xb0\x09\xcb\x88\x3d\x0e\x6a\xfc\x81\xc1\x2a\xe3\xf1\xce\x47\xd6\x9b\xd3\x6d\x3a\xb2\xcc\x19\x1e\x6b\xf7\x20\xdb\x6b\xa5\x07\x96\x99\xe5\x35\xad\x14\x38\x63\x60\x4e\x00\x28\xa2\xb1\x7d\xfa\xd7\x08\xff\x22\xfb\x44\x26\x14\xb4\x91\xb1\x87\xf6\x36\x63\x50\x86\x5d\x58\xa7\x5d\x02\x10\x5c\x29\x83\xbf\x7b\xd0\x9a\xb5\x91\xf8\x81\x97\xc8\x45\x25\x4c\x6b\x25\xcb\x41\x6b\xab\x18\x34\xb0\x78\xa0\x14\x1a\x7e\x97\xc9\xb4\xd2\x9e\x96\x4d\xa8\xf1\x93\x69\x6f\x17\xca\x25\x80\x3f\xdd\xae\x77\xf0\x3e\xbd\x51\x09\xcf\x69\xf8\xc1\x3f\x93\x9d\xb8\xd0\x7d\x29\xda\x25\xce\x09\x17\x29\xdf\x47\xde\xb0\x50\x86\xb3\xc4\xc0\xb2\x18\xa6\xcf\x00\x00\x00\xff\xff\xee\x8c\xf2\xcb\xbb\x01\x00\x00")
-
-func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller.yaml",
-	)
-}
-
-func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml() (*asset, error) {
-	bytes, err := clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-pull-secrets-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5086,7 +5066,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateIn
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerAdminYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerAdminYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller:admin.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller-admin.yaml",
 	)
 }
 
@@ -5096,27 +5076,27 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateIn
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller:admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xac\x8f\xb1\x4e\x04\x31\x0c\x44\xfb\x7c\x45\x74\xfd\x2e\xa2\x43\xe9\x80\x82\xfe\x90\xe8\xbd\xd9\x59\xce\x5c\xd6\x8e\x1c\xe7\x24\xee\xeb\x11\x0b\x3a\x0a\x10\xa2\xa0\xb4\x34\x7e\xf3\x86\x2a\x3f\xc1\x1a\xab\xa4\x68\x13\xe5\x91\xba\x1f\xd4\xf8\x4c\xce\x2a\xe3\xf1\xa6\x8d\xac\x57\xa7\xeb\x70\x64\x99\x53\xbc\x2f\xbd\x39\x6c\xaf\x05\x77\x2c\x33\xcb\x73\x58\xe1\x34\x93\x53\x0a\x31\x92\x88\xfa\xf6\xd9\xde\xcf\xf8\x23\xb2\x4f\x30\x81\x63\x23\x53\x77\xed\x75\x26\x47\x8a\x3b\xb7\x8e\x5d\x88\x51\x68\x45\x8a\xed\xb5\x39\xd6\xa4\x15\xd2\x0e\xbc\x78\xca\x2a\x6e\x5a\x0a\x2c\x39\xd6\x5a\xc8\x31\xb0\x34\x27\xc9\x18\x16\x16\x2a\x7c\x86\x0d\x5f\xb1\x60\x5a\xb0\xc7\xb2\xa9\x55\x7e\x30\xed\xf5\x97\x99\x21\xc6\x6f\x2b\xff\xd3\xa6\xf5\xe9\x05\xd9\x5b\x0a\xc3\x67\xd1\x23\xec\xc4\x19\xb7\x39\x6b\x17\xbf\x74\xfd\x91\xf7\x11\x6f\x95\x32\x52\xbc\x88\x0d\x2c\x8b\x51\x78\x0b\x00\x00\xff\xff\x1f\xed\x7b\x6d\xd9\x01\x00\x00")
+var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xa4\x8f\xb1\x4e\xc3\x40\x0c\x86\xf7\x7b\x0a\xab\x7b\x82\xd8\xd0\x6d\xc0\xc0\x5e\x24\x76\xe7\xe2\x50\xd3\x8b\x7d\xb2\x7d\x95\xe0\xe9\x11\x01\x95\x01\xd4\xa5\xa3\x65\xfb\xfb\xbf\x1f\x1b\xbf\x90\x39\xab\x64\xb0\x09\xcb\x88\x3d\x0e\x6a\xfc\x81\xc1\x2a\xe3\xf1\xce\x47\xd6\x9b\xd3\x6d\x3a\xb2\xcc\x19\x1e\x6b\xf7\x20\xdb\x6b\xa5\x07\x96\x99\xe5\x35\xad\x14\x38\x63\x60\x4e\x00\x28\xa2\xb1\x7d\xfa\xd7\x08\xff\x22\xfb\x44\x26\x14\xb4\x91\xb1\x87\xf6\x36\x63\x50\x86\x5d\x58\xa7\x5d\x02\x10\x5c\x29\x83\xbf\x7b\xd0\x9a\xb5\x91\xf8\x81\x97\xc8\x45\x25\x4c\x6b\x25\xcb\x41\x6b\xab\x18\x34\xb0\x78\xa0\x14\x1a\x7e\x97\xc9\xb4\xd2\x9e\x96\x4d\xa8\xf1\x93\x69\x6f\x17\xca\x25\x80\x3f\xdd\xae\x77\xf0\x3e\xbd\x51\x09\xcf\x69\xf8\xc1\x3f\x93\x9d\xb8\xd0\x7d\x29\xda\x25\xce\x09\x17\x29\xdf\x47\xde\xb0\x50\x86\xb3\xc4\xc0\xb2\x18\xa6\xcf\x00\x00\x00\xff\xff\xee\x8c\xf2\xcb\xbb\x01\x00\x00")
 
-func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYamlBytes() ([]byte, error) {
+func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
-		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller.yaml",
+		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml,
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller.yaml",
 	)
 }
 
-func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml() (*asset, error) {
-	bytes, err := clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYamlBytes()
+func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml() (*asset, error) {
+	bytes, err := clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5126,7 +5106,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateIn
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerAdminYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerAdminYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller:admin.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller-admin.yaml",
 	)
 }
 
@@ -5136,7 +5116,27 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateIn
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller:admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xac\x8f\xb1\x4e\x04\x31\x0c\x44\xfb\x7c\x45\x74\xfd\x2e\xa2\x43\xe9\x80\x82\xfe\x90\xe8\xbd\xd9\x59\xce\x5c\xd6\x8e\x1c\xe7\x24\xee\xeb\x11\x0b\x3a\x0a\x10\xa2\xa0\xb4\x34\x7e\xf3\x86\x2a\x3f\xc1\x1a\xab\xa4\x68\x13\xe5\x91\xba\x1f\xd4\xf8\x4c\xce\x2a\xe3\xf1\xa6\x8d\xac\x57\xa7\xeb\x70\x64\x99\x53\xbc\x2f\xbd\x39\x6c\xaf\x05\x77\x2c\x33\xcb\x73\x58\xe1\x34\x93\x53\x0a\x31\x92\x88\xfa\xf6\xd9\xde\xcf\xf8\x23\xb2\x4f\x30\x81\x63\x23\x53\x77\xed\x75\x26\x47\x8a\x3b\xb7\x8e\x5d\x88\x51\x68\x45\x8a\xed\xb5\x39\xd6\xa4\x15\xd2\x0e\xbc\x78\xca\x2a\x6e\x5a\x0a\x2c\x39\xd6\x5a\xc8\x31\xb0\x34\x27\xc9\x18\x16\x16\x2a\x7c\x86\x0d\x5f\xb1\x60\x5a\xb0\xc7\xb2\xa9\x55\x7e\x30\xed\xf5\x97\x99\x21\xc6\x6f\x2b\xff\xd3\xa6\xf5\xe9\x05\xd9\x5b\x0a\xc3\x67\xd1\x23\xec\xc4\x19\xb7\x39\x6b\x17\xbf\x74\xfd\x91\xf7\x11\x6f\x95\x32\x52\xbc\x88\x0d\x2c\x8b\x51\x78\x0b\x00\x00\xff\xff\x1f\xed\x7b\x6d\xd9\x01\x00\x00")
+
+func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml,
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller.yaml",
+	)
+}
+
+func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml() (*asset, error) {
+	bytes, err := clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5146,7 +5146,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateSe
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-service-broker.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-service-broker.yaml",
 	)
 }
 
@@ -5156,7 +5156,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateSe
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-service-broker.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-service-broker.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5166,7 +5166,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingCo
 func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:unidling-controller.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-unidling-controller.yaml",
 	)
 }
 
@@ -5176,7 +5176,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingCo
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:unidling-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-unidling-controller.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5186,7 +5186,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemRegistryYaml = []byte("\x1f\x
 func clusterrolebindingRbacAuthorizationK8sIoSystemRegistryYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemRegistryYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:registry.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-registry.yaml",
 	)
 }
 
@@ -5196,7 +5196,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemRegistryYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:registry.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-registry.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5206,7 +5206,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemScopeImpersonationYaml = []by
 func clusterrolebindingRbacAuthorizationK8sIoSystemScopeImpersonationYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemScopeImpersonationYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:scope-impersonation.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-scope-impersonation.yaml",
 	)
 }
 
@@ -5216,7 +5216,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemScopeImpersonationYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:scope-impersonation.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-scope-impersonation.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5226,7 +5226,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemSdnReadersYaml = []byte("\x1f
 func clusterrolebindingRbacAuthorizationK8sIoSystemSdnReadersYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemSdnReadersYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:sdn-readers.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-sdn-readers.yaml",
 	)
 }
 
@@ -5236,7 +5236,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemSdnReadersYaml() (*asset, err
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:sdn-readers.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-sdn-readers.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5246,7 +5246,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemVolumeSchedulerYaml = []byte(
 func clusterrolebindingRbacAuthorizationK8sIoSystemVolumeSchedulerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemVolumeSchedulerYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:volume-scheduler.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-volume-scheduler.yaml",
 	)
 }
 
@@ -5256,7 +5256,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemVolumeSchedulerYaml() (*asset
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:volume-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-volume-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5266,7 +5266,7 @@ var _clusterrolebindingRbacAuthorizationK8sIoSystemWebhooksYaml = []byte("\x1f\x
 func clusterrolebindingRbacAuthorizationK8sIoSystemWebhooksYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_clusterrolebindingRbacAuthorizationK8sIoSystemWebhooksYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/system:webhooks.yaml",
+		"ClusterRoleBinding.rbac.authorization.k8s.io/system-webhooks.yaml",
 	)
 }
 
@@ -5276,7 +5276,7 @@ func clusterrolebindingRbacAuthorizationK8sIoSystemWebhooksYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system:webhooks.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/system-webhooks.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6506,7 +6506,7 @@ var _roleRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml = [
 func roleRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_roleRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
-		"Role.rbac.authorization.k8s.io/kube-public/system:controller:bootstrap-signer.yaml",
+		"Role.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml",
 	)
 }
 
@@ -6516,7 +6516,7 @@ func roleRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml() (
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-public/system:controller:bootstrap-signer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6586,7 +6586,7 @@ var _roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManage
 func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
-		"Role.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-controller-manager.yaml",
+		"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml",
 	)
 }
 
@@ -6596,7 +6596,7 @@ func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManage
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6606,7 +6606,7 @@ var _roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml = 
 func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
-		"Role.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-scheduler.yaml",
+		"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml",
 	)
 }
 
@@ -6616,7 +6616,7 @@ func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml() 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6626,7 +6626,7 @@ var _roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml = [
 func roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml,
-		"Role.rbac.authorization.k8s.io/kube-system/system:controller:bootstrap-signer.yaml",
+		"Role.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml",
 	)
 }
 
@@ -6636,7 +6636,7 @@ func roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml() (
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system:controller:bootstrap-signer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6646,7 +6646,7 @@ var _roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml = []b
 func roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml,
-		"Role.rbac.authorization.k8s.io/kube-system/system:controller:cloud-provider.yaml",
+		"Role.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml",
 	)
 }
 
@@ -6656,7 +6656,7 @@ func roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml() (*a
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system:controller:cloud-provider.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6666,7 +6666,7 @@ var _roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml = []by
 func roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
-		"Role.rbac.authorization.k8s.io/kube-system/system:controller:token-cleaner.yaml",
+		"Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml",
 	)
 }
 
@@ -6676,7 +6676,7 @@ func roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml() (*as
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system:controller:token-cleaner.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6706,7 +6706,7 @@ var _roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml = []byte(
 func roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml,
-		"Role.rbac.authorization.k8s.io/openshift-node/system:node-config-reader.yaml",
+		"Role.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml",
 	)
 }
 
@@ -6716,7 +6716,7 @@ func roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml() (*asset
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/openshift-node/system:node-config-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6746,7 +6746,7 @@ var _rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerY
 func rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
-		"RoleBinding.rbac.authorization.k8s.io/kube-public/system:controller:bootstrap-signer.yaml",
+		"RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml",
 	)
 }
 
@@ -6756,7 +6756,7 @@ func rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerY
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-public/system:controller:bootstrap-signer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6846,7 +6846,7 @@ var _rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControlle
 func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
-		"RoleBinding.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-controller-manager.yaml",
+		"RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml",
 	)
 }
 
@@ -6856,7 +6856,7 @@ func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControlle
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6866,7 +6866,7 @@ var _rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeScheduler
 func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
-		"RoleBinding.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-scheduler.yaml",
+		"RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml",
 	)
 }
 
@@ -6876,7 +6876,7 @@ func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeScheduler
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6886,7 +6886,7 @@ var _rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerY
 func rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml,
-		"RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:bootstrap-signer.yaml",
+		"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml",
 	)
 }
 
@@ -6896,7 +6896,7 @@ func rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerY
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:bootstrap-signer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6906,7 +6906,7 @@ var _rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYam
 func rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml,
-		"RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:cloud-provider.yaml",
+		"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml",
 	)
 }
 
@@ -6916,7 +6916,7 @@ func rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYam
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:cloud-provider.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6926,7 +6926,7 @@ var _rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml
 func rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
-		"RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:token-cleaner.yaml",
+		"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml",
 	)
 }
 
@@ -6936,7 +6936,7 @@ func rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:token-cleaner.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6986,7 +6986,7 @@ var _rolebindingRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml = 
 func rolebindingRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYamlBytes() ([]byte, error) {
 	return bindataRead(
 		_rolebindingRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml,
-		"RoleBinding.rbac.authorization.k8s.io/openshift-node/system:node-config-reader.yaml",
+		"RoleBinding.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml",
 	)
 }
 
@@ -6996,7 +6996,7 @@ func rolebindingRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml() 
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/openshift-node/system:node-config-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -9715,119 +9715,119 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRole.rbac.authorization.k8s.io/servicecatalog-serviceclass-viewer.yaml":                                                      clusterroleRbacAuthorizationK8sIoServicecatalogServiceclassViewerYaml,
 	"ClusterRole.rbac.authorization.k8s.io/storage-admin.yaml":                                                                           clusterroleRbacAuthorizationK8sIoStorageAdminYaml,
 	"ClusterRole.rbac.authorization.k8s.io/sudoer.yaml":                                                                                  clusterroleRbacAuthorizationK8sIoSudoerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-admin.yaml":                                                               clusterroleRbacAuthorizationK8sIoSystemAggregateToAdminYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-edit.yaml":                                                                clusterroleRbacAuthorizationK8sIoSystemAggregateToEditYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:aggregate-to-view.yaml":                                                                clusterroleRbacAuthorizationK8sIoSystemAggregateToViewYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:auth-delegator.yaml":                                                                   clusterroleRbacAuthorizationK8sIoSystemAuthDelegatorYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:aws-cloud-provider.yaml":                                                               clusterroleRbacAuthorizationK8sIoSystemAwsCloudProviderYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:basic-user.yaml":                                                                       clusterroleRbacAuthorizationK8sIoSystemBasicUserYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:build-controller.yaml":                                                                 clusterroleRbacAuthorizationK8sIoSystemBuildControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:build-strategy-custom.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemBuildStrategyCustomYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:build-strategy-docker.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemBuildStrategyDockerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:build-strategy-jenkinspipeline.yaml":                                                   clusterroleRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:build-strategy-source.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemBuildStrategySourceYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:certificate-signing-controller.yaml":                                                   clusterroleRbacAuthorizationK8sIoSystemCertificateSigningControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:certificates.k8s.io:certificatesigningrequests:nodeclient.yaml":                        clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsNodeclientYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:certificates.k8s.io:certificatesigningrequests:selfnodeclient.yaml":                    clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsSelfnodeclientYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:attachdetach-controller.yaml":                                               clusterroleRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:certificate-controller.yaml":                                                clusterroleRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:clusterrole-aggregation-controller.yaml":                                    clusterroleRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:cronjob-controller.yaml":                                                    clusterroleRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:daemon-set-controller.yaml":                                                 clusterroleRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:deployment-controller.yaml":                                                 clusterroleRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:disruption-controller.yaml":                                                 clusterroleRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:endpoint-controller.yaml":                                                   clusterroleRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:generic-garbage-collector.yaml":                                             clusterroleRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:horizontal-pod-autoscaler.yaml":                                             clusterroleRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:job-controller.yaml":                                                        clusterroleRbacAuthorizationK8sIoSystemControllerJobControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:namespace-controller.yaml":                                                  clusterroleRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:node-controller.yaml":                                                       clusterroleRbacAuthorizationK8sIoSystemControllerNodeControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:persistent-volume-binder.yaml":                                              clusterroleRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:pod-garbage-collector.yaml":                                                 clusterroleRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:pv-protection-controller.yaml":                                              clusterroleRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:pvc-protection-controller.yaml":                                             clusterroleRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:replicaset-controller.yaml":                                                 clusterroleRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:replication-controller.yaml":                                                clusterroleRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:resourcequota-controller.yaml":                                              clusterroleRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:route-controller.yaml":                                                      clusterroleRbacAuthorizationK8sIoSystemControllerRouteControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:service-account-controller.yaml":                                            clusterroleRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:service-controller.yaml":                                                    clusterroleRbacAuthorizationK8sIoSystemControllerServiceControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:statefulset-controller.yaml":                                                clusterroleRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:controller:ttl-controller.yaml":                                                        clusterroleRbacAuthorizationK8sIoSystemControllerTtlControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:daemonset-controller.yaml":                                                             clusterroleRbacAuthorizationK8sIoSystemDaemonsetControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:deployer.yaml":                                                                         clusterroleRbacAuthorizationK8sIoSystemDeployerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:deployment-controller.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemDeploymentControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:deploymentconfig-controller.yaml":                                                      clusterroleRbacAuthorizationK8sIoSystemDeploymentconfigControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:discovery.yaml":                                                                        clusterroleRbacAuthorizationK8sIoSystemDiscoveryYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:disruption-controller.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemDisruptionControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:endpoint-controller.yaml":                                                              clusterroleRbacAuthorizationK8sIoSystemEndpointControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:garbage-collector-controller.yaml":                                                     clusterroleRbacAuthorizationK8sIoSystemGarbageCollectorControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:gc-controller.yaml":                                                                    clusterroleRbacAuthorizationK8sIoSystemGcControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:heapster.yaml":                                                                         clusterroleRbacAuthorizationK8sIoSystemHeapsterYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:hpa-controller.yaml":                                                                   clusterroleRbacAuthorizationK8sIoSystemHpaControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:image-auditor.yaml":                                                                    clusterroleRbacAuthorizationK8sIoSystemImageAuditorYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:image-builder.yaml":                                                                    clusterroleRbacAuthorizationK8sIoSystemImageBuilderYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:image-pruner.yaml":                                                                     clusterroleRbacAuthorizationK8sIoSystemImagePrunerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:image-puller.yaml":                                                                     clusterroleRbacAuthorizationK8sIoSystemImagePullerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:image-pusher.yaml":                                                                     clusterroleRbacAuthorizationK8sIoSystemImagePusherYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:image-signer.yaml":                                                                     clusterroleRbacAuthorizationK8sIoSystemImageSignerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:job-controller.yaml":                                                                   clusterroleRbacAuthorizationK8sIoSystemJobControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:kube-aggregator.yaml":                                                                  clusterroleRbacAuthorizationK8sIoSystemKubeAggregatorYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:kube-controller-manager.yaml":                                                          clusterroleRbacAuthorizationK8sIoSystemKubeControllerManagerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:kube-dns.yaml":                                                                         clusterroleRbacAuthorizationK8sIoSystemKubeDnsYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:kube-scheduler.yaml":                                                                   clusterroleRbacAuthorizationK8sIoSystemKubeSchedulerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:kubelet-api-admin.yaml":                                                                clusterroleRbacAuthorizationK8sIoSystemKubeletApiAdminYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:master.yaml":                                                                           clusterroleRbacAuthorizationK8sIoSystemMasterYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:namespace-controller.yaml":                                                             clusterroleRbacAuthorizationK8sIoSystemNamespaceControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:node-admin.yaml":                                                                       clusterroleRbacAuthorizationK8sIoSystemNodeAdminYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:node-bootstrap-autoapprover.yaml":                                                      clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapAutoapproverYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:node-bootstrapper.yaml":                                                                clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapperYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:node-problem-detector.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemNodeProblemDetectorYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:node-proxier.yaml":                                                                     clusterroleRbacAuthorizationK8sIoSystemNodeProxierYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:node-reader.yaml":                                                                      clusterroleRbacAuthorizationK8sIoSystemNodeReaderYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:node.yaml":                                                                             clusterroleRbacAuthorizationK8sIoSystemNodeYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:oauth-token-deleter.yaml":                                                              clusterroleRbacAuthorizationK8sIoSystemOauthTokenDeleterYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-admin.yaml":                                                     clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToAdminYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-edit.yaml":                                                      clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToEditYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:aggregate-to-view.yaml":                                                      clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToViewYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:build-config-change-controller.yaml":                              clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:build-controller.yaml":                                            clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:cluster-quota-reconciliation-controller.yaml":                     clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:default-rolebindings-controller.yaml":                             clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:deployer-controller.yaml":                                         clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:deploymentconfig-controller.yaml":                                 clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:horizontal-pod-autoscaler.yaml":                                   clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:image-import-controller.yaml":                                     clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:image-trigger-controller.yaml":                                    clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:ingress-to-route-controller.yaml":                                 clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:namespace-security-allocation-controller.yaml":                    clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:origin-namespace-controller.yaml":                                 clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:pv-recycler-controller.yaml":                                      clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:resourcequota-controller.yaml":                                    clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:sdn-controller.yaml":                                              clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:service-ingress-ip-controller.yaml":                               clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:service-serving-cert-controller.yaml":                             clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-controller.yaml":                                   clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-pull-secrets-controller.yaml":                      clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller.yaml":                                clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller.yaml":                      clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:template-service-broker.yaml":                                     clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:controller:unidling-controller.yaml":                                         clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:openshift:templateservicebroker-client.yaml":                                           clusterroleRbacAuthorizationK8sIoSystemOpenshiftTemplateservicebrokerClientYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:persistent-volume-provisioner.yaml":                                                    clusterroleRbacAuthorizationK8sIoSystemPersistentVolumeProvisionerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:registry.yaml":                                                                         clusterroleRbacAuthorizationK8sIoSystemRegistryYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:replicaset-controller.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemReplicasetControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:replication-controller.yaml":                                                           clusterroleRbacAuthorizationK8sIoSystemReplicationControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:router.yaml":                                                                           clusterroleRbacAuthorizationK8sIoSystemRouterYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:scope-impersonation.yaml":                                                              clusterroleRbacAuthorizationK8sIoSystemScopeImpersonationYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:sdn-manager.yaml":                                                                      clusterroleRbacAuthorizationK8sIoSystemSdnManagerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:sdn-reader.yaml":                                                                       clusterroleRbacAuthorizationK8sIoSystemSdnReaderYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-admin.yaml":                                               clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToAdminYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-edit.yaml":                                                clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToEditYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:service-catalog:aggregate-to-view.yaml":                                                clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToViewYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:statefulset-controller.yaml":                                                           clusterroleRbacAuthorizationK8sIoSystemStatefulsetControllerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:volume-scheduler.yaml":                                                                 clusterroleRbacAuthorizationK8sIoSystemVolumeSchedulerYaml,
-	"ClusterRole.rbac.authorization.k8s.io/system:webhook.yaml":                                                                          clusterroleRbacAuthorizationK8sIoSystemWebhookYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-admin.yaml":                                                               clusterroleRbacAuthorizationK8sIoSystemAggregateToAdminYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-edit.yaml":                                                                clusterroleRbacAuthorizationK8sIoSystemAggregateToEditYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-aggregate-to-view.yaml":                                                                clusterroleRbacAuthorizationK8sIoSystemAggregateToViewYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-auth-delegator.yaml":                                                                   clusterroleRbacAuthorizationK8sIoSystemAuthDelegatorYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml":                                                               clusterroleRbacAuthorizationK8sIoSystemAwsCloudProviderYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-basic-user.yaml":                                                                       clusterroleRbacAuthorizationK8sIoSystemBasicUserYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-build-controller.yaml":                                                                 clusterroleRbacAuthorizationK8sIoSystemBuildControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-build-strategy-custom.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemBuildStrategyCustomYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-build-strategy-docker.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemBuildStrategyDockerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline.yaml":                                                   clusterroleRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-build-strategy-source.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemBuildStrategySourceYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-certificate-signing-controller.yaml":                                                   clusterroleRbacAuthorizationK8sIoSystemCertificateSigningControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-certificates.k8s.io-certificatesigningrequests-nodeclient.yaml":                        clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsNodeclientYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-certificates.k8s.io-certificatesigningrequests-selfnodeclient.yaml":                    clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsSelfnodeclientYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-attachdetach-controller.yaml":                                               clusterroleRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-certificate-controller.yaml":                                                clusterroleRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-clusterrole-aggregation-controller.yaml":                                    clusterroleRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-cronjob-controller.yaml":                                                    clusterroleRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-daemon-set-controller.yaml":                                                 clusterroleRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-deployment-controller.yaml":                                                 clusterroleRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-disruption-controller.yaml":                                                 clusterroleRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-endpoint-controller.yaml":                                                   clusterroleRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-generic-garbage-collector.yaml":                                             clusterroleRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-horizontal-pod-autoscaler.yaml":                                             clusterroleRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-job-controller.yaml":                                                        clusterroleRbacAuthorizationK8sIoSystemControllerJobControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-namespace-controller.yaml":                                                  clusterroleRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-node-controller.yaml":                                                       clusterroleRbacAuthorizationK8sIoSystemControllerNodeControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-persistent-volume-binder.yaml":                                              clusterroleRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-pod-garbage-collector.yaml":                                                 clusterroleRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-pv-protection-controller.yaml":                                              clusterroleRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-pvc-protection-controller.yaml":                                             clusterroleRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-replicaset-controller.yaml":                                                 clusterroleRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-replication-controller.yaml":                                                clusterroleRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-resourcequota-controller.yaml":                                              clusterroleRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-route-controller.yaml":                                                      clusterroleRbacAuthorizationK8sIoSystemControllerRouteControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-service-account-controller.yaml":                                            clusterroleRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-service-controller.yaml":                                                    clusterroleRbacAuthorizationK8sIoSystemControllerServiceControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-statefulset-controller.yaml":                                                clusterroleRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-controller-ttl-controller.yaml":                                                        clusterroleRbacAuthorizationK8sIoSystemControllerTtlControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-daemonset-controller.yaml":                                                             clusterroleRbacAuthorizationK8sIoSystemDaemonsetControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-deployer.yaml":                                                                         clusterroleRbacAuthorizationK8sIoSystemDeployerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-deployment-controller.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemDeploymentControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-deploymentconfig-controller.yaml":                                                      clusterroleRbacAuthorizationK8sIoSystemDeploymentconfigControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-discovery.yaml":                                                                        clusterroleRbacAuthorizationK8sIoSystemDiscoveryYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-disruption-controller.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemDisruptionControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-endpoint-controller.yaml":                                                              clusterroleRbacAuthorizationK8sIoSystemEndpointControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-garbage-collector-controller.yaml":                                                     clusterroleRbacAuthorizationK8sIoSystemGarbageCollectorControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-gc-controller.yaml":                                                                    clusterroleRbacAuthorizationK8sIoSystemGcControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-heapster.yaml":                                                                         clusterroleRbacAuthorizationK8sIoSystemHeapsterYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-hpa-controller.yaml":                                                                   clusterroleRbacAuthorizationK8sIoSystemHpaControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-image-auditor.yaml":                                                                    clusterroleRbacAuthorizationK8sIoSystemImageAuditorYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-image-builder.yaml":                                                                    clusterroleRbacAuthorizationK8sIoSystemImageBuilderYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-image-pruner.yaml":                                                                     clusterroleRbacAuthorizationK8sIoSystemImagePrunerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-image-puller.yaml":                                                                     clusterroleRbacAuthorizationK8sIoSystemImagePullerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-image-pusher.yaml":                                                                     clusterroleRbacAuthorizationK8sIoSystemImagePusherYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-image-signer.yaml":                                                                     clusterroleRbacAuthorizationK8sIoSystemImageSignerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-job-controller.yaml":                                                                   clusterroleRbacAuthorizationK8sIoSystemJobControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-kube-aggregator.yaml":                                                                  clusterroleRbacAuthorizationK8sIoSystemKubeAggregatorYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-kube-controller-manager.yaml":                                                          clusterroleRbacAuthorizationK8sIoSystemKubeControllerManagerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-kube-dns.yaml":                                                                         clusterroleRbacAuthorizationK8sIoSystemKubeDnsYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-kube-scheduler.yaml":                                                                   clusterroleRbacAuthorizationK8sIoSystemKubeSchedulerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-kubelet-api-admin.yaml":                                                                clusterroleRbacAuthorizationK8sIoSystemKubeletApiAdminYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-master.yaml":                                                                           clusterroleRbacAuthorizationK8sIoSystemMasterYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-namespace-controller.yaml":                                                             clusterroleRbacAuthorizationK8sIoSystemNamespaceControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-node-admin.yaml":                                                                       clusterroleRbacAuthorizationK8sIoSystemNodeAdminYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-node-bootstrap-autoapprover.yaml":                                                      clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapAutoapproverYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-node-bootstrapper.yaml":                                                                clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapperYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-node-problem-detector.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemNodeProblemDetectorYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-node-proxier.yaml":                                                                     clusterroleRbacAuthorizationK8sIoSystemNodeProxierYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-node-reader.yaml":                                                                      clusterroleRbacAuthorizationK8sIoSystemNodeReaderYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-node.yaml":                                                                             clusterroleRbacAuthorizationK8sIoSystemNodeYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-oauth-token-deleter.yaml":                                                              clusterroleRbacAuthorizationK8sIoSystemOauthTokenDeleterYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-admin.yaml":                                                     clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToAdminYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-edit.yaml":                                                      clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToEditYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-aggregate-to-view.yaml":                                                      clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToViewYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-build-config-change-controller.yaml":                              clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-build-controller.yaml":                                            clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-cluster-quota-reconciliation-controller.yaml":                     clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-default-rolebindings-controller.yaml":                             clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-deployer-controller.yaml":                                         clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-deploymentconfig-controller.yaml":                                 clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-horizontal-pod-autoscaler.yaml":                                   clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-image-import-controller.yaml":                                     clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-image-trigger-controller.yaml":                                    clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-ingress-to-route-controller.yaml":                                 clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-namespace-security-allocation-controller.yaml":                    clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-origin-namespace-controller.yaml":                                 clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-pv-recycler-controller.yaml":                                      clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-resourcequota-controller.yaml":                                    clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-sdn-controller.yaml":                                              clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-service-ingress-ip-controller.yaml":                               clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-service-serving-cert-controller.yaml":                             clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-controller.yaml":                                   clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-pull-secrets-controller.yaml":                      clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller.yaml":                                clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller.yaml":                      clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-template-service-broker.yaml":                                     clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-controller-unidling-controller.yaml":                                         clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-openshift-templateservicebroker-client.yaml":                                           clusterroleRbacAuthorizationK8sIoSystemOpenshiftTemplateservicebrokerClientYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-persistent-volume-provisioner.yaml":                                                    clusterroleRbacAuthorizationK8sIoSystemPersistentVolumeProvisionerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-registry.yaml":                                                                         clusterroleRbacAuthorizationK8sIoSystemRegistryYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-replicaset-controller.yaml":                                                            clusterroleRbacAuthorizationK8sIoSystemReplicasetControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-replication-controller.yaml":                                                           clusterroleRbacAuthorizationK8sIoSystemReplicationControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-router.yaml":                                                                           clusterroleRbacAuthorizationK8sIoSystemRouterYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-scope-impersonation.yaml":                                                              clusterroleRbacAuthorizationK8sIoSystemScopeImpersonationYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-sdn-manager.yaml":                                                                      clusterroleRbacAuthorizationK8sIoSystemSdnManagerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-sdn-reader.yaml":                                                                       clusterroleRbacAuthorizationK8sIoSystemSdnReaderYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-admin.yaml":                                               clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToAdminYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-edit.yaml":                                                clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToEditYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-service-catalog-aggregate-to-view.yaml":                                                clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToViewYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-statefulset-controller.yaml":                                                           clusterroleRbacAuthorizationK8sIoSystemStatefulsetControllerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-volume-scheduler.yaml":                                                                 clusterroleRbacAuthorizationK8sIoSystemVolumeSchedulerYaml,
+	"ClusterRole.rbac.authorization.k8s.io/system-webhook.yaml":                                                                          clusterroleRbacAuthorizationK8sIoSystemWebhookYaml,
 	"ClusterRole.rbac.authorization.k8s.io/view.yaml":                                                                                    clusterroleRbacAuthorizationK8sIoViewYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/admin-0.yaml":                                                                          clusterrolebindingRbacAuthorizationK8sIoAdmin0Yaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/admin.yaml":                                                                            clusterrolebindingRbacAuthorizationK8sIoAdminYaml,
@@ -9854,83 +9854,83 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRoleBinding.rbac.authorization.k8s.io/service-catalog-namespace-viewer-binding.yaml":                                         clusterrolebindingRbacAuthorizationK8sIoServiceCatalogNamespaceViewerBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/service-catalog-sar-creator-binding.yaml":                                              clusterrolebindingRbacAuthorizationK8sIoServiceCatalogSarCreatorBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/servicecatalog-serviceclass-viewer-binding.yaml":                                       clusterrolebindingRbacAuthorizationK8sIoServicecatalogServiceclassViewerBindingYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:auth-delegator-binding.yaml":                                                    clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:aws-cloud-provider.yaml":                                                        clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:basic-user.yaml":                                                                clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-docker-binding.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-jenkinspipeline-binding.yaml":                                    clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineBindingYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:build-strategy-source-binding.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategySourceBindingYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:attachdetach-controller.yaml":                                        clusterrolebindingRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:certificate-controller.yaml":                                         clusterrolebindingRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:clusterrole-aggregation-controller.yaml":                             clusterrolebindingRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:cronjob-controller.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:daemon-set-controller.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:deployment-controller.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:disruption-controller.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:endpoint-controller.yaml":                                            clusterrolebindingRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:generic-garbage-collector.yaml":                                      clusterrolebindingRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:horizontal-pod-autoscaler.yaml":                                      clusterrolebindingRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:job-controller.yaml":                                                 clusterrolebindingRbacAuthorizationK8sIoSystemControllerJobControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:namespace-controller.yaml":                                           clusterrolebindingRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:node-controller.yaml":                                                clusterrolebindingRbacAuthorizationK8sIoSystemControllerNodeControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:persistent-volume-binder.yaml":                                       clusterrolebindingRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pod-garbage-collector.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pv-protection-controller.yaml":                                       clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:pvc-protection-controller.yaml":                                      clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:replicaset-controller.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:replication-controller.yaml":                                         clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:resourcequota-controller.yaml":                                       clusterrolebindingRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:route-controller.yaml":                                               clusterrolebindingRbacAuthorizationK8sIoSystemControllerRouteControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:service-account-controller.yaml":                                     clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:service-controller.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:statefulset-controller.yaml":                                         clusterrolebindingRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:controller:ttl-controller.yaml":                                                 clusterrolebindingRbacAuthorizationK8sIoSystemControllerTtlControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:deployer.yaml":                                                                  clusterrolebindingRbacAuthorizationK8sIoSystemDeployerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:discovery-binding.yaml":                                                         clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryBindingYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:discovery.yaml":                                                                 clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:image-builder.yaml":                                                             clusterrolebindingRbacAuthorizationK8sIoSystemImageBuilderYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:image-puller.yaml":                                                              clusterrolebindingRbacAuthorizationK8sIoSystemImagePullerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-controller-manager.yaml":                                                   clusterrolebindingRbacAuthorizationK8sIoSystemKubeControllerManagerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-dns.yaml":                                                                  clusterrolebindingRbacAuthorizationK8sIoSystemKubeDnsYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:kube-scheduler.yaml":                                                            clusterrolebindingRbacAuthorizationK8sIoSystemKubeSchedulerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:masters.yaml":                                                                   clusterrolebindingRbacAuthorizationK8sIoSystemMastersYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:node-admins.yaml":                                                               clusterrolebindingRbacAuthorizationK8sIoSystemNodeAdminsYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:node-bootstrapper.yaml":                                                         clusterrolebindingRbacAuthorizationK8sIoSystemNodeBootstrapperYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:node-proxier.yaml":                                                              clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxierYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:node-proxiers.yaml":                                                             clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxiersYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:node.yaml":                                                                      clusterrolebindingRbacAuthorizationK8sIoSystemNodeYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:nodes.yaml":                                                                     clusterrolebindingRbacAuthorizationK8sIoSystemNodesYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:oauth-token-deleters.yaml":                                                      clusterrolebindingRbacAuthorizationK8sIoSystemOauthTokenDeletersYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:build-config-change-controller.yaml":                       clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:build-controller.yaml":                                     clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:cluster-quota-reconciliation-controller.yaml":              clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:default-rolebindings-controller.yaml":                      clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:deployer-controller.yaml":                                  clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:deploymentconfig-controller.yaml":                          clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:horizontal-pod-autoscaler.yaml":                            clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:image-import-controller.yaml":                              clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:image-trigger-controller.yaml":                             clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:ingress-to-route-controller.yaml":                          clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:namespace-security-allocation-controller.yaml":             clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:origin-namespace-controller.yaml":                          clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:pv-recycler-controller.yaml":                               clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:resourcequota-controller.yaml":                             clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:sdn-controller.yaml":                                       clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:service-ingress-ip-controller.yaml":                        clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:service-serving-cert-controller.yaml":                      clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-controller.yaml":                            clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:serviceaccount-pull-secrets-controller.yaml":               clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller.yaml":                         clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-controller:admin.yaml":                   clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerAdminYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller.yaml":               clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-instance-finalizer-controller:admin.yaml":         clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerAdminYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:template-service-broker.yaml":                              clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:openshift:controller:unidling-controller.yaml":                                  clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:registry.yaml":                                                                  clusterrolebindingRbacAuthorizationK8sIoSystemRegistryYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:scope-impersonation.yaml":                                                       clusterrolebindingRbacAuthorizationK8sIoSystemScopeImpersonationYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:sdn-readers.yaml":                                                               clusterrolebindingRbacAuthorizationK8sIoSystemSdnReadersYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:volume-scheduler.yaml":                                                          clusterrolebindingRbacAuthorizationK8sIoSystemVolumeSchedulerYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/system:webhooks.yaml":                                                                  clusterrolebindingRbacAuthorizationK8sIoSystemWebhooksYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-auth-delegator-binding.yaml":                                                    clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-aws-cloud-provider.yaml":                                                        clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-basic-user.yaml":                                                                clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-docker-binding.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-jenkinspipeline-binding.yaml":                                    clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineBindingYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-build-strategy-source-binding.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategySourceBindingYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-attachdetach-controller.yaml":                                        clusterrolebindingRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-certificate-controller.yaml":                                         clusterrolebindingRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-clusterrole-aggregation-controller.yaml":                             clusterrolebindingRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-cronjob-controller.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-daemon-set-controller.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-deployment-controller.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-disruption-controller.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-endpoint-controller.yaml":                                            clusterrolebindingRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-generic-garbage-collector.yaml":                                      clusterrolebindingRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-horizontal-pod-autoscaler.yaml":                                      clusterrolebindingRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-job-controller.yaml":                                                 clusterrolebindingRbacAuthorizationK8sIoSystemControllerJobControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-namespace-controller.yaml":                                           clusterrolebindingRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-node-controller.yaml":                                                clusterrolebindingRbacAuthorizationK8sIoSystemControllerNodeControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-persistent-volume-binder.yaml":                                       clusterrolebindingRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pod-garbage-collector.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pv-protection-controller.yaml":                                       clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-pvc-protection-controller.yaml":                                      clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-replicaset-controller.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-replication-controller.yaml":                                         clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-resourcequota-controller.yaml":                                       clusterrolebindingRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-route-controller.yaml":                                               clusterrolebindingRbacAuthorizationK8sIoSystemControllerRouteControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-service-account-controller.yaml":                                     clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-service-controller.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-statefulset-controller.yaml":                                         clusterrolebindingRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-controller-ttl-controller.yaml":                                                 clusterrolebindingRbacAuthorizationK8sIoSystemControllerTtlControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-deployer.yaml":                                                                  clusterrolebindingRbacAuthorizationK8sIoSystemDeployerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-discovery-binding.yaml":                                                         clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryBindingYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-discovery.yaml":                                                                 clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-image-builder.yaml":                                                             clusterrolebindingRbacAuthorizationK8sIoSystemImageBuilderYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-image-puller.yaml":                                                              clusterrolebindingRbacAuthorizationK8sIoSystemImagePullerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-controller-manager.yaml":                                                   clusterrolebindingRbacAuthorizationK8sIoSystemKubeControllerManagerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-dns.yaml":                                                                  clusterrolebindingRbacAuthorizationK8sIoSystemKubeDnsYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-kube-scheduler.yaml":                                                            clusterrolebindingRbacAuthorizationK8sIoSystemKubeSchedulerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-masters.yaml":                                                                   clusterrolebindingRbacAuthorizationK8sIoSystemMastersYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-node-admins.yaml":                                                               clusterrolebindingRbacAuthorizationK8sIoSystemNodeAdminsYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-node-bootstrapper.yaml":                                                         clusterrolebindingRbacAuthorizationK8sIoSystemNodeBootstrapperYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-node-proxier.yaml":                                                              clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxierYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-node-proxiers.yaml":                                                             clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxiersYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-node.yaml":                                                                      clusterrolebindingRbacAuthorizationK8sIoSystemNodeYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-nodes.yaml":                                                                     clusterrolebindingRbacAuthorizationK8sIoSystemNodesYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-oauth-token-deleters.yaml":                                                      clusterrolebindingRbacAuthorizationK8sIoSystemOauthTokenDeletersYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-build-config-change-controller.yaml":                       clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-build-controller.yaml":                                     clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-cluster-quota-reconciliation-controller.yaml":              clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-default-rolebindings-controller.yaml":                      clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-deployer-controller.yaml":                                  clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-deploymentconfig-controller.yaml":                          clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-horizontal-pod-autoscaler.yaml":                            clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-image-import-controller.yaml":                              clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-image-trigger-controller.yaml":                             clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-ingress-to-route-controller.yaml":                          clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-namespace-security-allocation-controller.yaml":             clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-origin-namespace-controller.yaml":                          clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-pv-recycler-controller.yaml":                               clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-resourcequota-controller.yaml":                             clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-sdn-controller.yaml":                                       clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-service-ingress-ip-controller.yaml":                        clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-service-serving-cert-controller.yaml":                      clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-controller.yaml":                            clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-serviceaccount-pull-secrets-controller.yaml":               clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller-admin.yaml":                   clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerAdminYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-controller.yaml":                         clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller-admin.yaml":         clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerAdminYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-instance-finalizer-controller.yaml":               clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-template-service-broker.yaml":                              clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-openshift-controller-unidling-controller.yaml":                                  clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-registry.yaml":                                                                  clusterrolebindingRbacAuthorizationK8sIoSystemRegistryYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-scope-impersonation.yaml":                                                       clusterrolebindingRbacAuthorizationK8sIoSystemScopeImpersonationYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-sdn-readers.yaml":                                                               clusterrolebindingRbacAuthorizationK8sIoSystemSdnReadersYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-volume-scheduler.yaml":                                                          clusterrolebindingRbacAuthorizationK8sIoSystemVolumeSchedulerYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/system-webhooks.yaml":                                                                  clusterrolebindingRbacAuthorizationK8sIoSystemWebhooksYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/templateservicebroker-client.yaml":                                                     clusterrolebindingRbacAuthorizationK8sIoTemplateservicebrokerClientYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/tsb-openshift-template-service-broker.yaml":                                            clusterrolebindingRbacAuthorizationK8sIoTsbOpenshiftTemplateServiceBrokerYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/view.yaml":                                                                             clusterrolebindingRbacAuthorizationK8sIoViewYaml,
@@ -9992,31 +9992,31 @@ var _bindata = map[string]func() (*asset, error){
 	"Namespace/openshift-web-console.yaml":                                                                                               namespaceOpenshiftWebConsoleYaml,
 	"Namespace/openshift.yaml":                                                                                                           namespaceOpenshiftYaml,
 	"OAuthClient.oauth.openshift.io/cockpit-oauth-client.yaml":                                                                           oauthclientOauthOpenshiftIoCockpitOauthClientYaml,
-	"Role.rbac.authorization.k8s.io/kube-public/system:controller:bootstrap-signer.yaml":                                                 roleRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
+	"Role.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml":                                                 roleRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
 	"Role.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap.yaml":                                                    roleRbacAuthorizationK8sIoKubeServiceCatalogClusterInfoConfigmapYaml,
 	"Role.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor.yaml":                                                        roleRbacAuthorizationK8sIoKubeServiceCatalogConfigmapAccessorYaml,
 	"Role.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader.yaml":                                          roleRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-controller-manager.yaml":                                     roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-scheduler.yaml":                                              roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system:controller:bootstrap-signer.yaml":                                                 roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system:controller:cloud-provider.yaml":                                                   roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system:controller:token-cleaner.yaml":                                                    roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml":                                     roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml":                                              roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml":                                                 roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml":                                                   roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                                                    roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
 	"Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml":                                                               roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml,
-	"Role.rbac.authorization.k8s.io/openshift-node/system:node-config-reader.yaml":                                                       roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml,
+	"Role.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml":                                                       roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml,
 	"Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                            roleRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-public/system:controller:bootstrap-signer.yaml":                                          rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml":                                          rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap-binding.yaml":                                     rolebindingRbacAuthorizationK8sIoKubeServiceCatalogClusterInfoConfigmapBindingYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor-binding.yaml":                                         rolebindingRbacAuthorizationK8sIoKubeServiceCatalogConfigmapAccessorBindingYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader-binding.yaml":                           rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderBindingYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader-openshift-template-service-broker.yaml": rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderOpenshiftTemplateServiceBrokerYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-controller-manager.yaml":                              rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-system/system::leader-locking-kube-scheduler.yaml":                                       rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:bootstrap-signer.yaml":                                          rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:cloud-provider.yaml":                                            rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-system/system:controller:token-cleaner.yaml":                                             rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml":                              rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml":                                       rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml":                                          rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml":                                            rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                                             rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-viewers.yaml":                                                       rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-node/sync-node-config-reader-binding.yaml":                                          rolebindingRbacAuthorizationK8sIoOpenshiftNodeSyncNodeConfigReaderBindingYaml,
-	"RoleBinding.rbac.authorization.k8s.io/openshift-node/system:node-config-reader.yaml":                                                rolebindingRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml,
+	"RoleBinding.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml":                                                rolebindingRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                     rolebindingRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
 	"Route.route.openshift.io/default/docker-registry.yaml":                                                                              routeRouteOpenshiftIoDefaultDockerRegistryYaml,
 	"Route.route.openshift.io/default/registry-console.yaml":                                                                             routeRouteOpenshiftIoDefaultRegistryConsoleYaml,
@@ -10217,119 +10217,119 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"servicecatalog-serviceclass-viewer.yaml":                                   {clusterroleRbacAuthorizationK8sIoServicecatalogServiceclassViewerYaml, map[string]*bintree{}},
 		"storage-admin.yaml":                                                        {clusterroleRbacAuthorizationK8sIoStorageAdminYaml, map[string]*bintree{}},
 		"sudoer.yaml":                                                               {clusterroleRbacAuthorizationK8sIoSudoerYaml, map[string]*bintree{}},
-		"system:aggregate-to-admin.yaml":                                            {clusterroleRbacAuthorizationK8sIoSystemAggregateToAdminYaml, map[string]*bintree{}},
-		"system:aggregate-to-edit.yaml":                                             {clusterroleRbacAuthorizationK8sIoSystemAggregateToEditYaml, map[string]*bintree{}},
-		"system:aggregate-to-view.yaml":                                             {clusterroleRbacAuthorizationK8sIoSystemAggregateToViewYaml, map[string]*bintree{}},
-		"system:auth-delegator.yaml":                                                {clusterroleRbacAuthorizationK8sIoSystemAuthDelegatorYaml, map[string]*bintree{}},
-		"system:aws-cloud-provider.yaml":                                            {clusterroleRbacAuthorizationK8sIoSystemAwsCloudProviderYaml, map[string]*bintree{}},
-		"system:basic-user.yaml":                                                    {clusterroleRbacAuthorizationK8sIoSystemBasicUserYaml, map[string]*bintree{}},
-		"system:build-controller.yaml":                                              {clusterroleRbacAuthorizationK8sIoSystemBuildControllerYaml, map[string]*bintree{}},
-		"system:build-strategy-custom.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemBuildStrategyCustomYaml, map[string]*bintree{}},
-		"system:build-strategy-docker.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemBuildStrategyDockerYaml, map[string]*bintree{}},
-		"system:build-strategy-jenkinspipeline.yaml":                                {clusterroleRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineYaml, map[string]*bintree{}},
-		"system:build-strategy-source.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemBuildStrategySourceYaml, map[string]*bintree{}},
-		"system:certificate-signing-controller.yaml":                                {clusterroleRbacAuthorizationK8sIoSystemCertificateSigningControllerYaml, map[string]*bintree{}},
-		"system:certificates.k8s.io:certificatesigningrequests:nodeclient.yaml":     {clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsNodeclientYaml, map[string]*bintree{}},
-		"system:certificates.k8s.io:certificatesigningrequests:selfnodeclient.yaml": {clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsSelfnodeclientYaml, map[string]*bintree{}},
-		"system:controller:attachdetach-controller.yaml":                            {clusterroleRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml, map[string]*bintree{}},
-		"system:controller:certificate-controller.yaml":                             {clusterroleRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml, map[string]*bintree{}},
-		"system:controller:clusterrole-aggregation-controller.yaml":                 {clusterroleRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYaml, map[string]*bintree{}},
-		"system:controller:cronjob-controller.yaml":                                 {clusterroleRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml, map[string]*bintree{}},
-		"system:controller:daemon-set-controller.yaml":                              {clusterroleRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml, map[string]*bintree{}},
-		"system:controller:deployment-controller.yaml":                              {clusterroleRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml, map[string]*bintree{}},
-		"system:controller:disruption-controller.yaml":                              {clusterroleRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml, map[string]*bintree{}},
-		"system:controller:endpoint-controller.yaml":                                {clusterroleRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml, map[string]*bintree{}},
-		"system:controller:generic-garbage-collector.yaml":                          {clusterroleRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYaml, map[string]*bintree{}},
-		"system:controller:horizontal-pod-autoscaler.yaml":                          {clusterroleRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYaml, map[string]*bintree{}},
-		"system:controller:job-controller.yaml":                                     {clusterroleRbacAuthorizationK8sIoSystemControllerJobControllerYaml, map[string]*bintree{}},
-		"system:controller:namespace-controller.yaml":                               {clusterroleRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml, map[string]*bintree{}},
-		"system:controller:node-controller.yaml":                                    {clusterroleRbacAuthorizationK8sIoSystemControllerNodeControllerYaml, map[string]*bintree{}},
-		"system:controller:persistent-volume-binder.yaml":                           {clusterroleRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml, map[string]*bintree{}},
-		"system:controller:pod-garbage-collector.yaml":                              {clusterroleRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml, map[string]*bintree{}},
-		"system:controller:pv-protection-controller.yaml":                           {clusterroleRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml, map[string]*bintree{}},
-		"system:controller:pvc-protection-controller.yaml":                          {clusterroleRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYaml, map[string]*bintree{}},
-		"system:controller:replicaset-controller.yaml":                              {clusterroleRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml, map[string]*bintree{}},
-		"system:controller:replication-controller.yaml":                             {clusterroleRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml, map[string]*bintree{}},
-		"system:controller:resourcequota-controller.yaml":                           {clusterroleRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYaml, map[string]*bintree{}},
-		"system:controller:route-controller.yaml":                                   {clusterroleRbacAuthorizationK8sIoSystemControllerRouteControllerYaml, map[string]*bintree{}},
-		"system:controller:service-account-controller.yaml":                         {clusterroleRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYaml, map[string]*bintree{}},
-		"system:controller:service-controller.yaml":                                 {clusterroleRbacAuthorizationK8sIoSystemControllerServiceControllerYaml, map[string]*bintree{}},
-		"system:controller:statefulset-controller.yaml":                             {clusterroleRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml, map[string]*bintree{}},
-		"system:controller:ttl-controller.yaml":                                     {clusterroleRbacAuthorizationK8sIoSystemControllerTtlControllerYaml, map[string]*bintree{}},
-		"system:daemonset-controller.yaml":                                          {clusterroleRbacAuthorizationK8sIoSystemDaemonsetControllerYaml, map[string]*bintree{}},
-		"system:deployer.yaml":                                                      {clusterroleRbacAuthorizationK8sIoSystemDeployerYaml, map[string]*bintree{}},
-		"system:deployment-controller.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemDeploymentControllerYaml, map[string]*bintree{}},
-		"system:deploymentconfig-controller.yaml":                                   {clusterroleRbacAuthorizationK8sIoSystemDeploymentconfigControllerYaml, map[string]*bintree{}},
-		"system:discovery.yaml":                                                     {clusterroleRbacAuthorizationK8sIoSystemDiscoveryYaml, map[string]*bintree{}},
-		"system:disruption-controller.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemDisruptionControllerYaml, map[string]*bintree{}},
-		"system:endpoint-controller.yaml":                                           {clusterroleRbacAuthorizationK8sIoSystemEndpointControllerYaml, map[string]*bintree{}},
-		"system:garbage-collector-controller.yaml":                                  {clusterroleRbacAuthorizationK8sIoSystemGarbageCollectorControllerYaml, map[string]*bintree{}},
-		"system:gc-controller.yaml":                                                 {clusterroleRbacAuthorizationK8sIoSystemGcControllerYaml, map[string]*bintree{}},
-		"system:heapster.yaml":                                                      {clusterroleRbacAuthorizationK8sIoSystemHeapsterYaml, map[string]*bintree{}},
-		"system:hpa-controller.yaml":                                                {clusterroleRbacAuthorizationK8sIoSystemHpaControllerYaml, map[string]*bintree{}},
-		"system:image-auditor.yaml":                                                 {clusterroleRbacAuthorizationK8sIoSystemImageAuditorYaml, map[string]*bintree{}},
-		"system:image-builder.yaml":                                                 {clusterroleRbacAuthorizationK8sIoSystemImageBuilderYaml, map[string]*bintree{}},
-		"system:image-pruner.yaml":                                                  {clusterroleRbacAuthorizationK8sIoSystemImagePrunerYaml, map[string]*bintree{}},
-		"system:image-puller.yaml":                                                  {clusterroleRbacAuthorizationK8sIoSystemImagePullerYaml, map[string]*bintree{}},
-		"system:image-pusher.yaml":                                                  {clusterroleRbacAuthorizationK8sIoSystemImagePusherYaml, map[string]*bintree{}},
-		"system:image-signer.yaml":                                                  {clusterroleRbacAuthorizationK8sIoSystemImageSignerYaml, map[string]*bintree{}},
-		"system:job-controller.yaml":                                                {clusterroleRbacAuthorizationK8sIoSystemJobControllerYaml, map[string]*bintree{}},
-		"system:kube-aggregator.yaml":                                               {clusterroleRbacAuthorizationK8sIoSystemKubeAggregatorYaml, map[string]*bintree{}},
-		"system:kube-controller-manager.yaml":                                       {clusterroleRbacAuthorizationK8sIoSystemKubeControllerManagerYaml, map[string]*bintree{}},
-		"system:kube-dns.yaml":                                                      {clusterroleRbacAuthorizationK8sIoSystemKubeDnsYaml, map[string]*bintree{}},
-		"system:kube-scheduler.yaml":                                                {clusterroleRbacAuthorizationK8sIoSystemKubeSchedulerYaml, map[string]*bintree{}},
-		"system:kubelet-api-admin.yaml":                                             {clusterroleRbacAuthorizationK8sIoSystemKubeletApiAdminYaml, map[string]*bintree{}},
-		"system:master.yaml":                                                        {clusterroleRbacAuthorizationK8sIoSystemMasterYaml, map[string]*bintree{}},
-		"system:namespace-controller.yaml":                                          {clusterroleRbacAuthorizationK8sIoSystemNamespaceControllerYaml, map[string]*bintree{}},
-		"system:node-admin.yaml":                                                    {clusterroleRbacAuthorizationK8sIoSystemNodeAdminYaml, map[string]*bintree{}},
-		"system:node-bootstrap-autoapprover.yaml":                                   {clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapAutoapproverYaml, map[string]*bintree{}},
-		"system:node-bootstrapper.yaml":                                             {clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapperYaml, map[string]*bintree{}},
-		"system:node-problem-detector.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemNodeProblemDetectorYaml, map[string]*bintree{}},
-		"system:node-proxier.yaml":                                                  {clusterroleRbacAuthorizationK8sIoSystemNodeProxierYaml, map[string]*bintree{}},
-		"system:node-reader.yaml":                                                   {clusterroleRbacAuthorizationK8sIoSystemNodeReaderYaml, map[string]*bintree{}},
-		"system:node.yaml":                                                          {clusterroleRbacAuthorizationK8sIoSystemNodeYaml, map[string]*bintree{}},
-		"system:oauth-token-deleter.yaml":                                           {clusterroleRbacAuthorizationK8sIoSystemOauthTokenDeleterYaml, map[string]*bintree{}},
-		"system:openshift:aggregate-to-admin.yaml":                                  {clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToAdminYaml, map[string]*bintree{}},
-		"system:openshift:aggregate-to-edit.yaml":                                   {clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToEditYaml, map[string]*bintree{}},
-		"system:openshift:aggregate-to-view.yaml":                                   {clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToViewYaml, map[string]*bintree{}},
-		"system:openshift:controller:build-config-change-controller.yaml":           {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:build-controller.yaml":                         {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:cluster-quota-reconciliation-controller.yaml":  {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:default-rolebindings-controller.yaml":          {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:deployer-controller.yaml":                      {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:deploymentconfig-controller.yaml":              {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:horizontal-pod-autoscaler.yaml":                {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYaml, map[string]*bintree{}},
-		"system:openshift:controller:image-import-controller.yaml":                  {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:image-trigger-controller.yaml":                 {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:ingress-to-route-controller.yaml":              {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:namespace-security-allocation-controller.yaml": {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:origin-namespace-controller.yaml":              {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:pv-recycler-controller.yaml":                   {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:resourcequota-controller.yaml":                 {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:sdn-controller.yaml":                           {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:service-ingress-ip-controller.yaml":            {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:service-serving-cert-controller.yaml":          {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:serviceaccount-controller.yaml":                {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:serviceaccount-pull-secrets-controller.yaml":   {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:template-instance-controller.yaml":             {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:template-instance-finalizer-controller.yaml":   {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:template-service-broker.yaml":                  {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYaml, map[string]*bintree{}},
-		"system:openshift:controller:unidling-controller.yaml":                      {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYaml, map[string]*bintree{}},
-		"system:openshift:templateservicebroker-client.yaml":                        {clusterroleRbacAuthorizationK8sIoSystemOpenshiftTemplateservicebrokerClientYaml, map[string]*bintree{}},
-		"system:persistent-volume-provisioner.yaml":                                 {clusterroleRbacAuthorizationK8sIoSystemPersistentVolumeProvisionerYaml, map[string]*bintree{}},
-		"system:registry.yaml":                                                      {clusterroleRbacAuthorizationK8sIoSystemRegistryYaml, map[string]*bintree{}},
-		"system:replicaset-controller.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemReplicasetControllerYaml, map[string]*bintree{}},
-		"system:replication-controller.yaml":                                        {clusterroleRbacAuthorizationK8sIoSystemReplicationControllerYaml, map[string]*bintree{}},
-		"system:router.yaml":                                                        {clusterroleRbacAuthorizationK8sIoSystemRouterYaml, map[string]*bintree{}},
-		"system:scope-impersonation.yaml":                                           {clusterroleRbacAuthorizationK8sIoSystemScopeImpersonationYaml, map[string]*bintree{}},
-		"system:sdn-manager.yaml":                                                   {clusterroleRbacAuthorizationK8sIoSystemSdnManagerYaml, map[string]*bintree{}},
-		"system:sdn-reader.yaml":                                                    {clusterroleRbacAuthorizationK8sIoSystemSdnReaderYaml, map[string]*bintree{}},
-		"system:service-catalog:aggregate-to-admin.yaml":                            {clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToAdminYaml, map[string]*bintree{}},
-		"system:service-catalog:aggregate-to-edit.yaml":                             {clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToEditYaml, map[string]*bintree{}},
-		"system:service-catalog:aggregate-to-view.yaml":                             {clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToViewYaml, map[string]*bintree{}},
-		"system:statefulset-controller.yaml":                                        {clusterroleRbacAuthorizationK8sIoSystemStatefulsetControllerYaml, map[string]*bintree{}},
-		"system:volume-scheduler.yaml":                                              {clusterroleRbacAuthorizationK8sIoSystemVolumeSchedulerYaml, map[string]*bintree{}},
-		"system:webhook.yaml":                                                       {clusterroleRbacAuthorizationK8sIoSystemWebhookYaml, map[string]*bintree{}},
+		"system-aggregate-to-admin.yaml":                                            {clusterroleRbacAuthorizationK8sIoSystemAggregateToAdminYaml, map[string]*bintree{}},
+		"system-aggregate-to-edit.yaml":                                             {clusterroleRbacAuthorizationK8sIoSystemAggregateToEditYaml, map[string]*bintree{}},
+		"system-aggregate-to-view.yaml":                                             {clusterroleRbacAuthorizationK8sIoSystemAggregateToViewYaml, map[string]*bintree{}},
+		"system-auth-delegator.yaml":                                                {clusterroleRbacAuthorizationK8sIoSystemAuthDelegatorYaml, map[string]*bintree{}},
+		"system-aws-cloud-provider.yaml":                                            {clusterroleRbacAuthorizationK8sIoSystemAwsCloudProviderYaml, map[string]*bintree{}},
+		"system-basic-user.yaml":                                                    {clusterroleRbacAuthorizationK8sIoSystemBasicUserYaml, map[string]*bintree{}},
+		"system-build-controller.yaml":                                              {clusterroleRbacAuthorizationK8sIoSystemBuildControllerYaml, map[string]*bintree{}},
+		"system-build-strategy-custom.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemBuildStrategyCustomYaml, map[string]*bintree{}},
+		"system-build-strategy-docker.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemBuildStrategyDockerYaml, map[string]*bintree{}},
+		"system-build-strategy-jenkinspipeline.yaml":                                {clusterroleRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineYaml, map[string]*bintree{}},
+		"system-build-strategy-source.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemBuildStrategySourceYaml, map[string]*bintree{}},
+		"system-certificate-signing-controller.yaml":                                {clusterroleRbacAuthorizationK8sIoSystemCertificateSigningControllerYaml, map[string]*bintree{}},
+		"system-certificates.k8s.io-certificatesigningrequests-nodeclient.yaml":     {clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsNodeclientYaml, map[string]*bintree{}},
+		"system-certificates.k8s.io-certificatesigningrequests-selfnodeclient.yaml": {clusterroleRbacAuthorizationK8sIoSystemCertificatesK8sIoCertificatesigningrequestsSelfnodeclientYaml, map[string]*bintree{}},
+		"system-controller-attachdetach-controller.yaml":                            {clusterroleRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml, map[string]*bintree{}},
+		"system-controller-certificate-controller.yaml":                             {clusterroleRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml, map[string]*bintree{}},
+		"system-controller-clusterrole-aggregation-controller.yaml":                 {clusterroleRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYaml, map[string]*bintree{}},
+		"system-controller-cronjob-controller.yaml":                                 {clusterroleRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml, map[string]*bintree{}},
+		"system-controller-daemon-set-controller.yaml":                              {clusterroleRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml, map[string]*bintree{}},
+		"system-controller-deployment-controller.yaml":                              {clusterroleRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml, map[string]*bintree{}},
+		"system-controller-disruption-controller.yaml":                              {clusterroleRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml, map[string]*bintree{}},
+		"system-controller-endpoint-controller.yaml":                                {clusterroleRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml, map[string]*bintree{}},
+		"system-controller-generic-garbage-collector.yaml":                          {clusterroleRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYaml, map[string]*bintree{}},
+		"system-controller-horizontal-pod-autoscaler.yaml":                          {clusterroleRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYaml, map[string]*bintree{}},
+		"system-controller-job-controller.yaml":                                     {clusterroleRbacAuthorizationK8sIoSystemControllerJobControllerYaml, map[string]*bintree{}},
+		"system-controller-namespace-controller.yaml":                               {clusterroleRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml, map[string]*bintree{}},
+		"system-controller-node-controller.yaml":                                    {clusterroleRbacAuthorizationK8sIoSystemControllerNodeControllerYaml, map[string]*bintree{}},
+		"system-controller-persistent-volume-binder.yaml":                           {clusterroleRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml, map[string]*bintree{}},
+		"system-controller-pod-garbage-collector.yaml":                              {clusterroleRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml, map[string]*bintree{}},
+		"system-controller-pv-protection-controller.yaml":                           {clusterroleRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml, map[string]*bintree{}},
+		"system-controller-pvc-protection-controller.yaml":                          {clusterroleRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYaml, map[string]*bintree{}},
+		"system-controller-replicaset-controller.yaml":                              {clusterroleRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml, map[string]*bintree{}},
+		"system-controller-replication-controller.yaml":                             {clusterroleRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml, map[string]*bintree{}},
+		"system-controller-resourcequota-controller.yaml":                           {clusterroleRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYaml, map[string]*bintree{}},
+		"system-controller-route-controller.yaml":                                   {clusterroleRbacAuthorizationK8sIoSystemControllerRouteControllerYaml, map[string]*bintree{}},
+		"system-controller-service-account-controller.yaml":                         {clusterroleRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYaml, map[string]*bintree{}},
+		"system-controller-service-controller.yaml":                                 {clusterroleRbacAuthorizationK8sIoSystemControllerServiceControllerYaml, map[string]*bintree{}},
+		"system-controller-statefulset-controller.yaml":                             {clusterroleRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml, map[string]*bintree{}},
+		"system-controller-ttl-controller.yaml":                                     {clusterroleRbacAuthorizationK8sIoSystemControllerTtlControllerYaml, map[string]*bintree{}},
+		"system-daemonset-controller.yaml":                                          {clusterroleRbacAuthorizationK8sIoSystemDaemonsetControllerYaml, map[string]*bintree{}},
+		"system-deployer.yaml":                                                      {clusterroleRbacAuthorizationK8sIoSystemDeployerYaml, map[string]*bintree{}},
+		"system-deployment-controller.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemDeploymentControllerYaml, map[string]*bintree{}},
+		"system-deploymentconfig-controller.yaml":                                   {clusterroleRbacAuthorizationK8sIoSystemDeploymentconfigControllerYaml, map[string]*bintree{}},
+		"system-discovery.yaml":                                                     {clusterroleRbacAuthorizationK8sIoSystemDiscoveryYaml, map[string]*bintree{}},
+		"system-disruption-controller.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemDisruptionControllerYaml, map[string]*bintree{}},
+		"system-endpoint-controller.yaml":                                           {clusterroleRbacAuthorizationK8sIoSystemEndpointControllerYaml, map[string]*bintree{}},
+		"system-garbage-collector-controller.yaml":                                  {clusterroleRbacAuthorizationK8sIoSystemGarbageCollectorControllerYaml, map[string]*bintree{}},
+		"system-gc-controller.yaml":                                                 {clusterroleRbacAuthorizationK8sIoSystemGcControllerYaml, map[string]*bintree{}},
+		"system-heapster.yaml":                                                      {clusterroleRbacAuthorizationK8sIoSystemHeapsterYaml, map[string]*bintree{}},
+		"system-hpa-controller.yaml":                                                {clusterroleRbacAuthorizationK8sIoSystemHpaControllerYaml, map[string]*bintree{}},
+		"system-image-auditor.yaml":                                                 {clusterroleRbacAuthorizationK8sIoSystemImageAuditorYaml, map[string]*bintree{}},
+		"system-image-builder.yaml":                                                 {clusterroleRbacAuthorizationK8sIoSystemImageBuilderYaml, map[string]*bintree{}},
+		"system-image-pruner.yaml":                                                  {clusterroleRbacAuthorizationK8sIoSystemImagePrunerYaml, map[string]*bintree{}},
+		"system-image-puller.yaml":                                                  {clusterroleRbacAuthorizationK8sIoSystemImagePullerYaml, map[string]*bintree{}},
+		"system-image-pusher.yaml":                                                  {clusterroleRbacAuthorizationK8sIoSystemImagePusherYaml, map[string]*bintree{}},
+		"system-image-signer.yaml":                                                  {clusterroleRbacAuthorizationK8sIoSystemImageSignerYaml, map[string]*bintree{}},
+		"system-job-controller.yaml":                                                {clusterroleRbacAuthorizationK8sIoSystemJobControllerYaml, map[string]*bintree{}},
+		"system-kube-aggregator.yaml":                                               {clusterroleRbacAuthorizationK8sIoSystemKubeAggregatorYaml, map[string]*bintree{}},
+		"system-kube-controller-manager.yaml":                                       {clusterroleRbacAuthorizationK8sIoSystemKubeControllerManagerYaml, map[string]*bintree{}},
+		"system-kube-dns.yaml":                                                      {clusterroleRbacAuthorizationK8sIoSystemKubeDnsYaml, map[string]*bintree{}},
+		"system-kube-scheduler.yaml":                                                {clusterroleRbacAuthorizationK8sIoSystemKubeSchedulerYaml, map[string]*bintree{}},
+		"system-kubelet-api-admin.yaml":                                             {clusterroleRbacAuthorizationK8sIoSystemKubeletApiAdminYaml, map[string]*bintree{}},
+		"system-master.yaml":                                                        {clusterroleRbacAuthorizationK8sIoSystemMasterYaml, map[string]*bintree{}},
+		"system-namespace-controller.yaml":                                          {clusterroleRbacAuthorizationK8sIoSystemNamespaceControllerYaml, map[string]*bintree{}},
+		"system-node-admin.yaml":                                                    {clusterroleRbacAuthorizationK8sIoSystemNodeAdminYaml, map[string]*bintree{}},
+		"system-node-bootstrap-autoapprover.yaml":                                   {clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapAutoapproverYaml, map[string]*bintree{}},
+		"system-node-bootstrapper.yaml":                                             {clusterroleRbacAuthorizationK8sIoSystemNodeBootstrapperYaml, map[string]*bintree{}},
+		"system-node-problem-detector.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemNodeProblemDetectorYaml, map[string]*bintree{}},
+		"system-node-proxier.yaml":                                                  {clusterroleRbacAuthorizationK8sIoSystemNodeProxierYaml, map[string]*bintree{}},
+		"system-node-reader.yaml":                                                   {clusterroleRbacAuthorizationK8sIoSystemNodeReaderYaml, map[string]*bintree{}},
+		"system-node.yaml":                                                          {clusterroleRbacAuthorizationK8sIoSystemNodeYaml, map[string]*bintree{}},
+		"system-oauth-token-deleter.yaml":                                           {clusterroleRbacAuthorizationK8sIoSystemOauthTokenDeleterYaml, map[string]*bintree{}},
+		"system-openshift-aggregate-to-admin.yaml":                                  {clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToAdminYaml, map[string]*bintree{}},
+		"system-openshift-aggregate-to-edit.yaml":                                   {clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToEditYaml, map[string]*bintree{}},
+		"system-openshift-aggregate-to-view.yaml":                                   {clusterroleRbacAuthorizationK8sIoSystemOpenshiftAggregateToViewYaml, map[string]*bintree{}},
+		"system-openshift-controller-build-config-change-controller.yaml":           {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-build-controller.yaml":                         {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-cluster-quota-reconciliation-controller.yaml":  {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-default-rolebindings-controller.yaml":          {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-deployer-controller.yaml":                      {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-deploymentconfig-controller.yaml":              {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-horizontal-pod-autoscaler.yaml":                {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYaml, map[string]*bintree{}},
+		"system-openshift-controller-image-import-controller.yaml":                  {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-image-trigger-controller.yaml":                 {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-ingress-to-route-controller.yaml":              {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-namespace-security-allocation-controller.yaml": {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-origin-namespace-controller.yaml":              {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-pv-recycler-controller.yaml":                   {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-resourcequota-controller.yaml":                 {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-sdn-controller.yaml":                           {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-service-ingress-ip-controller.yaml":            {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-service-serving-cert-controller.yaml":          {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-serviceaccount-controller.yaml":                {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-serviceaccount-pull-secrets-controller.yaml":   {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-template-instance-controller.yaml":             {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-template-instance-finalizer-controller.yaml":   {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-template-service-broker.yaml":                  {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYaml, map[string]*bintree{}},
+		"system-openshift-controller-unidling-controller.yaml":                      {clusterroleRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYaml, map[string]*bintree{}},
+		"system-openshift-templateservicebroker-client.yaml":                        {clusterroleRbacAuthorizationK8sIoSystemOpenshiftTemplateservicebrokerClientYaml, map[string]*bintree{}},
+		"system-persistent-volume-provisioner.yaml":                                 {clusterroleRbacAuthorizationK8sIoSystemPersistentVolumeProvisionerYaml, map[string]*bintree{}},
+		"system-registry.yaml":                                                      {clusterroleRbacAuthorizationK8sIoSystemRegistryYaml, map[string]*bintree{}},
+		"system-replicaset-controller.yaml":                                         {clusterroleRbacAuthorizationK8sIoSystemReplicasetControllerYaml, map[string]*bintree{}},
+		"system-replication-controller.yaml":                                        {clusterroleRbacAuthorizationK8sIoSystemReplicationControllerYaml, map[string]*bintree{}},
+		"system-router.yaml":                                                        {clusterroleRbacAuthorizationK8sIoSystemRouterYaml, map[string]*bintree{}},
+		"system-scope-impersonation.yaml":                                           {clusterroleRbacAuthorizationK8sIoSystemScopeImpersonationYaml, map[string]*bintree{}},
+		"system-sdn-manager.yaml":                                                   {clusterroleRbacAuthorizationK8sIoSystemSdnManagerYaml, map[string]*bintree{}},
+		"system-sdn-reader.yaml":                                                    {clusterroleRbacAuthorizationK8sIoSystemSdnReaderYaml, map[string]*bintree{}},
+		"system-service-catalog-aggregate-to-admin.yaml":                            {clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToAdminYaml, map[string]*bintree{}},
+		"system-service-catalog-aggregate-to-edit.yaml":                             {clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToEditYaml, map[string]*bintree{}},
+		"system-service-catalog-aggregate-to-view.yaml":                             {clusterroleRbacAuthorizationK8sIoSystemServiceCatalogAggregateToViewYaml, map[string]*bintree{}},
+		"system-statefulset-controller.yaml":                                        {clusterroleRbacAuthorizationK8sIoSystemStatefulsetControllerYaml, map[string]*bintree{}},
+		"system-volume-scheduler.yaml":                                              {clusterroleRbacAuthorizationK8sIoSystemVolumeSchedulerYaml, map[string]*bintree{}},
+		"system-webhook.yaml":                                                       {clusterroleRbacAuthorizationK8sIoSystemWebhookYaml, map[string]*bintree{}},
 		"view.yaml":                                                                 {clusterroleRbacAuthorizationK8sIoViewYaml, map[string]*bintree{}},
 	}},
 	"ClusterRoleBinding.rbac.authorization.k8s.io": {nil, map[string]*bintree{
@@ -10358,83 +10358,83 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"service-catalog-namespace-viewer-binding.yaml":                                 {clusterrolebindingRbacAuthorizationK8sIoServiceCatalogNamespaceViewerBindingYaml, map[string]*bintree{}},
 		"service-catalog-sar-creator-binding.yaml":                                      {clusterrolebindingRbacAuthorizationK8sIoServiceCatalogSarCreatorBindingYaml, map[string]*bintree{}},
 		"servicecatalog-serviceclass-viewer-binding.yaml":                               {clusterrolebindingRbacAuthorizationK8sIoServicecatalogServiceclassViewerBindingYaml, map[string]*bintree{}},
-		"system:auth-delegator-binding.yaml":                                            {clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYaml, map[string]*bintree{}},
-		"system:aws-cloud-provider.yaml":                                                {clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml, map[string]*bintree{}},
-		"system:basic-user.yaml":                                                        {clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYaml, map[string]*bintree{}},
-		"system:build-strategy-docker-binding.yaml":                                     {clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYaml, map[string]*bintree{}},
-		"system:build-strategy-jenkinspipeline-binding.yaml":                            {clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineBindingYaml, map[string]*bintree{}},
-		"system:build-strategy-source-binding.yaml":                                     {clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategySourceBindingYaml, map[string]*bintree{}},
-		"system:controller:attachdetach-controller.yaml":                                {clusterrolebindingRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml, map[string]*bintree{}},
-		"system:controller:certificate-controller.yaml":                                 {clusterrolebindingRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml, map[string]*bintree{}},
-		"system:controller:clusterrole-aggregation-controller.yaml":                     {clusterrolebindingRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYaml, map[string]*bintree{}},
-		"system:controller:cronjob-controller.yaml":                                     {clusterrolebindingRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml, map[string]*bintree{}},
-		"system:controller:daemon-set-controller.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml, map[string]*bintree{}},
-		"system:controller:deployment-controller.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml, map[string]*bintree{}},
-		"system:controller:disruption-controller.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml, map[string]*bintree{}},
-		"system:controller:endpoint-controller.yaml":                                    {clusterrolebindingRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml, map[string]*bintree{}},
-		"system:controller:generic-garbage-collector.yaml":                              {clusterrolebindingRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYaml, map[string]*bintree{}},
-		"system:controller:horizontal-pod-autoscaler.yaml":                              {clusterrolebindingRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYaml, map[string]*bintree{}},
-		"system:controller:job-controller.yaml":                                         {clusterrolebindingRbacAuthorizationK8sIoSystemControllerJobControllerYaml, map[string]*bintree{}},
-		"system:controller:namespace-controller.yaml":                                   {clusterrolebindingRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml, map[string]*bintree{}},
-		"system:controller:node-controller.yaml":                                        {clusterrolebindingRbacAuthorizationK8sIoSystemControllerNodeControllerYaml, map[string]*bintree{}},
-		"system:controller:persistent-volume-binder.yaml":                               {clusterrolebindingRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml, map[string]*bintree{}},
-		"system:controller:pod-garbage-collector.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml, map[string]*bintree{}},
-		"system:controller:pv-protection-controller.yaml":                               {clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml, map[string]*bintree{}},
-		"system:controller:pvc-protection-controller.yaml":                              {clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYaml, map[string]*bintree{}},
-		"system:controller:replicaset-controller.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml, map[string]*bintree{}},
-		"system:controller:replication-controller.yaml":                                 {clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml, map[string]*bintree{}},
-		"system:controller:resourcequota-controller.yaml":                               {clusterrolebindingRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYaml, map[string]*bintree{}},
-		"system:controller:route-controller.yaml":                                       {clusterrolebindingRbacAuthorizationK8sIoSystemControllerRouteControllerYaml, map[string]*bintree{}},
-		"system:controller:service-account-controller.yaml":                             {clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYaml, map[string]*bintree{}},
-		"system:controller:service-controller.yaml":                                     {clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceControllerYaml, map[string]*bintree{}},
-		"system:controller:statefulset-controller.yaml":                                 {clusterrolebindingRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml, map[string]*bintree{}},
-		"system:controller:ttl-controller.yaml":                                         {clusterrolebindingRbacAuthorizationK8sIoSystemControllerTtlControllerYaml, map[string]*bintree{}},
-		"system:deployer.yaml":                                                          {clusterrolebindingRbacAuthorizationK8sIoSystemDeployerYaml, map[string]*bintree{}},
-		"system:discovery-binding.yaml":                                                 {clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryBindingYaml, map[string]*bintree{}},
-		"system:discovery.yaml":                                                         {clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryYaml, map[string]*bintree{}},
-		"system:image-builder.yaml":                                                     {clusterrolebindingRbacAuthorizationK8sIoSystemImageBuilderYaml, map[string]*bintree{}},
-		"system:image-puller.yaml":                                                      {clusterrolebindingRbacAuthorizationK8sIoSystemImagePullerYaml, map[string]*bintree{}},
-		"system:kube-controller-manager.yaml":                                           {clusterrolebindingRbacAuthorizationK8sIoSystemKubeControllerManagerYaml, map[string]*bintree{}},
-		"system:kube-dns.yaml":                                                          {clusterrolebindingRbacAuthorizationK8sIoSystemKubeDnsYaml, map[string]*bintree{}},
-		"system:kube-scheduler.yaml":                                                    {clusterrolebindingRbacAuthorizationK8sIoSystemKubeSchedulerYaml, map[string]*bintree{}},
-		"system:masters.yaml":                                                           {clusterrolebindingRbacAuthorizationK8sIoSystemMastersYaml, map[string]*bintree{}},
-		"system:node-admins.yaml":                                                       {clusterrolebindingRbacAuthorizationK8sIoSystemNodeAdminsYaml, map[string]*bintree{}},
-		"system:node-bootstrapper.yaml":                                                 {clusterrolebindingRbacAuthorizationK8sIoSystemNodeBootstrapperYaml, map[string]*bintree{}},
-		"system:node-proxier.yaml":                                                      {clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxierYaml, map[string]*bintree{}},
-		"system:node-proxiers.yaml":                                                     {clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxiersYaml, map[string]*bintree{}},
-		"system:node.yaml":                                                              {clusterrolebindingRbacAuthorizationK8sIoSystemNodeYaml, map[string]*bintree{}},
-		"system:nodes.yaml":                                                             {clusterrolebindingRbacAuthorizationK8sIoSystemNodesYaml, map[string]*bintree{}},
-		"system:oauth-token-deleters.yaml":                                              {clusterrolebindingRbacAuthorizationK8sIoSystemOauthTokenDeletersYaml, map[string]*bintree{}},
-		"system:openshift:controller:build-config-change-controller.yaml":               {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:build-controller.yaml":                             {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:cluster-quota-reconciliation-controller.yaml":      {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:default-rolebindings-controller.yaml":              {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:deployer-controller.yaml":                          {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:deploymentconfig-controller.yaml":                  {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:horizontal-pod-autoscaler.yaml":                    {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYaml, map[string]*bintree{}},
-		"system:openshift:controller:image-import-controller.yaml":                      {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:image-trigger-controller.yaml":                     {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:ingress-to-route-controller.yaml":                  {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:namespace-security-allocation-controller.yaml":     {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:origin-namespace-controller.yaml":                  {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:pv-recycler-controller.yaml":                       {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:resourcequota-controller.yaml":                     {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:sdn-controller.yaml":                               {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:service-ingress-ip-controller.yaml":                {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:service-serving-cert-controller.yaml":              {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:serviceaccount-controller.yaml":                    {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:serviceaccount-pull-secrets-controller.yaml":       {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:template-instance-controller.yaml":                 {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:template-instance-controller:admin.yaml":           {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerAdminYaml, map[string]*bintree{}},
-		"system:openshift:controller:template-instance-finalizer-controller.yaml":       {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml, map[string]*bintree{}},
-		"system:openshift:controller:template-instance-finalizer-controller:admin.yaml": {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerAdminYaml, map[string]*bintree{}},
-		"system:openshift:controller:template-service-broker.yaml":                      {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYaml, map[string]*bintree{}},
-		"system:openshift:controller:unidling-controller.yaml":                          {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYaml, map[string]*bintree{}},
-		"system:registry.yaml":                                                          {clusterrolebindingRbacAuthorizationK8sIoSystemRegistryYaml, map[string]*bintree{}},
-		"system:scope-impersonation.yaml":                                               {clusterrolebindingRbacAuthorizationK8sIoSystemScopeImpersonationYaml, map[string]*bintree{}},
-		"system:sdn-readers.yaml":                                                       {clusterrolebindingRbacAuthorizationK8sIoSystemSdnReadersYaml, map[string]*bintree{}},
-		"system:volume-scheduler.yaml":                                                  {clusterrolebindingRbacAuthorizationK8sIoSystemVolumeSchedulerYaml, map[string]*bintree{}},
-		"system:webhooks.yaml":                                                          {clusterrolebindingRbacAuthorizationK8sIoSystemWebhooksYaml, map[string]*bintree{}},
+		"system-auth-delegator-binding.yaml":                                            {clusterrolebindingRbacAuthorizationK8sIoSystemAuthDelegatorBindingYaml, map[string]*bintree{}},
+		"system-aws-cloud-provider.yaml":                                                {clusterrolebindingRbacAuthorizationK8sIoSystemAwsCloudProviderYaml, map[string]*bintree{}},
+		"system-basic-user.yaml":                                                        {clusterrolebindingRbacAuthorizationK8sIoSystemBasicUserYaml, map[string]*bintree{}},
+		"system-build-strategy-docker-binding.yaml":                                     {clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyDockerBindingYaml, map[string]*bintree{}},
+		"system-build-strategy-jenkinspipeline-binding.yaml":                            {clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategyJenkinspipelineBindingYaml, map[string]*bintree{}},
+		"system-build-strategy-source-binding.yaml":                                     {clusterrolebindingRbacAuthorizationK8sIoSystemBuildStrategySourceBindingYaml, map[string]*bintree{}},
+		"system-controller-attachdetach-controller.yaml":                                {clusterrolebindingRbacAuthorizationK8sIoSystemControllerAttachdetachControllerYaml, map[string]*bintree{}},
+		"system-controller-certificate-controller.yaml":                                 {clusterrolebindingRbacAuthorizationK8sIoSystemControllerCertificateControllerYaml, map[string]*bintree{}},
+		"system-controller-clusterrole-aggregation-controller.yaml":                     {clusterrolebindingRbacAuthorizationK8sIoSystemControllerClusterroleAggregationControllerYaml, map[string]*bintree{}},
+		"system-controller-cronjob-controller.yaml":                                     {clusterrolebindingRbacAuthorizationK8sIoSystemControllerCronjobControllerYaml, map[string]*bintree{}},
+		"system-controller-daemon-set-controller.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoSystemControllerDaemonSetControllerYaml, map[string]*bintree{}},
+		"system-controller-deployment-controller.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoSystemControllerDeploymentControllerYaml, map[string]*bintree{}},
+		"system-controller-disruption-controller.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoSystemControllerDisruptionControllerYaml, map[string]*bintree{}},
+		"system-controller-endpoint-controller.yaml":                                    {clusterrolebindingRbacAuthorizationK8sIoSystemControllerEndpointControllerYaml, map[string]*bintree{}},
+		"system-controller-generic-garbage-collector.yaml":                              {clusterrolebindingRbacAuthorizationK8sIoSystemControllerGenericGarbageCollectorYaml, map[string]*bintree{}},
+		"system-controller-horizontal-pod-autoscaler.yaml":                              {clusterrolebindingRbacAuthorizationK8sIoSystemControllerHorizontalPodAutoscalerYaml, map[string]*bintree{}},
+		"system-controller-job-controller.yaml":                                         {clusterrolebindingRbacAuthorizationK8sIoSystemControllerJobControllerYaml, map[string]*bintree{}},
+		"system-controller-namespace-controller.yaml":                                   {clusterrolebindingRbacAuthorizationK8sIoSystemControllerNamespaceControllerYaml, map[string]*bintree{}},
+		"system-controller-node-controller.yaml":                                        {clusterrolebindingRbacAuthorizationK8sIoSystemControllerNodeControllerYaml, map[string]*bintree{}},
+		"system-controller-persistent-volume-binder.yaml":                               {clusterrolebindingRbacAuthorizationK8sIoSystemControllerPersistentVolumeBinderYaml, map[string]*bintree{}},
+		"system-controller-pod-garbage-collector.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoSystemControllerPodGarbageCollectorYaml, map[string]*bintree{}},
+		"system-controller-pv-protection-controller.yaml":                               {clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvProtectionControllerYaml, map[string]*bintree{}},
+		"system-controller-pvc-protection-controller.yaml":                              {clusterrolebindingRbacAuthorizationK8sIoSystemControllerPvcProtectionControllerYaml, map[string]*bintree{}},
+		"system-controller-replicaset-controller.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicasetControllerYaml, map[string]*bintree{}},
+		"system-controller-replication-controller.yaml":                                 {clusterrolebindingRbacAuthorizationK8sIoSystemControllerReplicationControllerYaml, map[string]*bintree{}},
+		"system-controller-resourcequota-controller.yaml":                               {clusterrolebindingRbacAuthorizationK8sIoSystemControllerResourcequotaControllerYaml, map[string]*bintree{}},
+		"system-controller-route-controller.yaml":                                       {clusterrolebindingRbacAuthorizationK8sIoSystemControllerRouteControllerYaml, map[string]*bintree{}},
+		"system-controller-service-account-controller.yaml":                             {clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceAccountControllerYaml, map[string]*bintree{}},
+		"system-controller-service-controller.yaml":                                     {clusterrolebindingRbacAuthorizationK8sIoSystemControllerServiceControllerYaml, map[string]*bintree{}},
+		"system-controller-statefulset-controller.yaml":                                 {clusterrolebindingRbacAuthorizationK8sIoSystemControllerStatefulsetControllerYaml, map[string]*bintree{}},
+		"system-controller-ttl-controller.yaml":                                         {clusterrolebindingRbacAuthorizationK8sIoSystemControllerTtlControllerYaml, map[string]*bintree{}},
+		"system-deployer.yaml":                                                          {clusterrolebindingRbacAuthorizationK8sIoSystemDeployerYaml, map[string]*bintree{}},
+		"system-discovery-binding.yaml":                                                 {clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryBindingYaml, map[string]*bintree{}},
+		"system-discovery.yaml":                                                         {clusterrolebindingRbacAuthorizationK8sIoSystemDiscoveryYaml, map[string]*bintree{}},
+		"system-image-builder.yaml":                                                     {clusterrolebindingRbacAuthorizationK8sIoSystemImageBuilderYaml, map[string]*bintree{}},
+		"system-image-puller.yaml":                                                      {clusterrolebindingRbacAuthorizationK8sIoSystemImagePullerYaml, map[string]*bintree{}},
+		"system-kube-controller-manager.yaml":                                           {clusterrolebindingRbacAuthorizationK8sIoSystemKubeControllerManagerYaml, map[string]*bintree{}},
+		"system-kube-dns.yaml":                                                          {clusterrolebindingRbacAuthorizationK8sIoSystemKubeDnsYaml, map[string]*bintree{}},
+		"system-kube-scheduler.yaml":                                                    {clusterrolebindingRbacAuthorizationK8sIoSystemKubeSchedulerYaml, map[string]*bintree{}},
+		"system-masters.yaml":                                                           {clusterrolebindingRbacAuthorizationK8sIoSystemMastersYaml, map[string]*bintree{}},
+		"system-node-admins.yaml":                                                       {clusterrolebindingRbacAuthorizationK8sIoSystemNodeAdminsYaml, map[string]*bintree{}},
+		"system-node-bootstrapper.yaml":                                                 {clusterrolebindingRbacAuthorizationK8sIoSystemNodeBootstrapperYaml, map[string]*bintree{}},
+		"system-node-proxier.yaml":                                                      {clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxierYaml, map[string]*bintree{}},
+		"system-node-proxiers.yaml":                                                     {clusterrolebindingRbacAuthorizationK8sIoSystemNodeProxiersYaml, map[string]*bintree{}},
+		"system-node.yaml":                                                              {clusterrolebindingRbacAuthorizationK8sIoSystemNodeYaml, map[string]*bintree{}},
+		"system-nodes.yaml":                                                             {clusterrolebindingRbacAuthorizationK8sIoSystemNodesYaml, map[string]*bintree{}},
+		"system-oauth-token-deleters.yaml":                                              {clusterrolebindingRbacAuthorizationK8sIoSystemOauthTokenDeletersYaml, map[string]*bintree{}},
+		"system-openshift-controller-build-config-change-controller.yaml":               {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildConfigChangeControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-build-controller.yaml":                             {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerBuildControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-cluster-quota-reconciliation-controller.yaml":      {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerClusterQuotaReconciliationControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-default-rolebindings-controller.yaml":              {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDefaultRolebindingsControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-deployer-controller.yaml":                          {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeployerControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-deploymentconfig-controller.yaml":                  {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerDeploymentconfigControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-horizontal-pod-autoscaler.yaml":                    {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerHorizontalPodAutoscalerYaml, map[string]*bintree{}},
+		"system-openshift-controller-image-import-controller.yaml":                      {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageImportControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-image-trigger-controller.yaml":                     {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerImageTriggerControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-ingress-to-route-controller.yaml":                  {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerIngressToRouteControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-namespace-security-allocation-controller.yaml":     {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerNamespaceSecurityAllocationControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-origin-namespace-controller.yaml":                  {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerOriginNamespaceControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-pv-recycler-controller.yaml":                       {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerPvRecyclerControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-resourcequota-controller.yaml":                     {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerResourcequotaControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-sdn-controller.yaml":                               {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerSdnControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-service-ingress-ip-controller.yaml":                {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceIngressIpControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-service-serving-cert-controller.yaml":              {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceServingCertControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-serviceaccount-controller.yaml":                    {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-serviceaccount-pull-secrets-controller.yaml":       {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerServiceaccountPullSecretsControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-template-instance-controller-admin.yaml":           {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerAdminYaml, map[string]*bintree{}},
+		"system-openshift-controller-template-instance-controller.yaml":                 {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-template-instance-finalizer-controller-admin.yaml": {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerAdminYaml, map[string]*bintree{}},
+		"system-openshift-controller-template-instance-finalizer-controller.yaml":       {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateInstanceFinalizerControllerYaml, map[string]*bintree{}},
+		"system-openshift-controller-template-service-broker.yaml":                      {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerTemplateServiceBrokerYaml, map[string]*bintree{}},
+		"system-openshift-controller-unidling-controller.yaml":                          {clusterrolebindingRbacAuthorizationK8sIoSystemOpenshiftControllerUnidlingControllerYaml, map[string]*bintree{}},
+		"system-registry.yaml":                                                          {clusterrolebindingRbacAuthorizationK8sIoSystemRegistryYaml, map[string]*bintree{}},
+		"system-scope-impersonation.yaml":                                               {clusterrolebindingRbacAuthorizationK8sIoSystemScopeImpersonationYaml, map[string]*bintree{}},
+		"system-sdn-readers.yaml":                                                       {clusterrolebindingRbacAuthorizationK8sIoSystemSdnReadersYaml, map[string]*bintree{}},
+		"system-volume-scheduler.yaml":                                                  {clusterrolebindingRbacAuthorizationK8sIoSystemVolumeSchedulerYaml, map[string]*bintree{}},
+		"system-webhooks.yaml":                                                          {clusterrolebindingRbacAuthorizationK8sIoSystemWebhooksYaml, map[string]*bintree{}},
 		"templateservicebroker-client.yaml":                                             {clusterrolebindingRbacAuthorizationK8sIoTemplateservicebrokerClientYaml, map[string]*bintree{}},
 		"tsb-openshift-template-service-broker.yaml":                                    {clusterrolebindingRbacAuthorizationK8sIoTsbOpenshiftTemplateServiceBrokerYaml, map[string]*bintree{}},
 		"view.yaml": {clusterrolebindingRbacAuthorizationK8sIoViewYaml, map[string]*bintree{}},
@@ -10549,7 +10549,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	}},
 	"Role.rbac.authorization.k8s.io": {nil, map[string]*bintree{
 		"kube-public": {nil, map[string]*bintree{
-			"system:controller:bootstrap-signer.yaml": {roleRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml, map[string]*bintree{}},
+			"system-controller-bootstrap-signer.yaml": {roleRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml, map[string]*bintree{}},
 		}},
 		"kube-service-catalog": {nil, map[string]*bintree{
 			"cluster-info-configmap.yaml": {roleRbacAuthorizationK8sIoKubeServiceCatalogClusterInfoConfigmapYaml, map[string]*bintree{}},
@@ -10557,17 +10557,17 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"kube-system": {nil, map[string]*bintree{
 			"extension-apiserver-authentication-reader.yaml":      {roleRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderYaml, map[string]*bintree{}},
-			"system::leader-locking-kube-controller-manager.yaml": {roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml, map[string]*bintree{}},
-			"system::leader-locking-kube-scheduler.yaml":          {roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml, map[string]*bintree{}},
-			"system:controller:bootstrap-signer.yaml":             {roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml, map[string]*bintree{}},
-			"system:controller:cloud-provider.yaml":               {roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml, map[string]*bintree{}},
-			"system:controller:token-cleaner.yaml":                {roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml, map[string]*bintree{}},
+			"system--leader-locking-kube-controller-manager.yaml": {roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml, map[string]*bintree{}},
+			"system--leader-locking-kube-scheduler.yaml":          {roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml, map[string]*bintree{}},
+			"system-controller-bootstrap-signer.yaml":             {roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml, map[string]*bintree{}},
+			"system-controller-cloud-provider.yaml":               {roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml, map[string]*bintree{}},
+			"system-controller-token-cleaner.yaml":                {roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml, map[string]*bintree{}},
 		}},
 		"openshift": {nil, map[string]*bintree{
 			"shared-resource-viewer.yaml": {roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml, map[string]*bintree{}},
 		}},
 		"openshift-node": {nil, map[string]*bintree{
-			"system:node-config-reader.yaml": {roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml, map[string]*bintree{}},
+			"system-node-config-reader.yaml": {roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml, map[string]*bintree{}},
 		}},
 		"openshift-template-service-broker": {nil, map[string]*bintree{
 			"templateservicebroker-auth-reader.yaml": {roleRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml, map[string]*bintree{}},
@@ -10575,7 +10575,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	}},
 	"RoleBinding.rbac.authorization.k8s.io": {nil, map[string]*bintree{
 		"kube-public": {nil, map[string]*bintree{
-			"system:controller:bootstrap-signer.yaml": {rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml, map[string]*bintree{}},
+			"system-controller-bootstrap-signer.yaml": {rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml, map[string]*bintree{}},
 		}},
 		"kube-service-catalog": {nil, map[string]*bintree{
 			"cluster-info-configmap-binding.yaml": {rolebindingRbacAuthorizationK8sIoKubeServiceCatalogClusterInfoConfigmapBindingYaml, map[string]*bintree{}},
@@ -10584,18 +10584,18 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"kube-system": {nil, map[string]*bintree{
 			"extension-apiserver-authentication-reader-binding.yaml":                           {rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderBindingYaml, map[string]*bintree{}},
 			"extension-apiserver-authentication-reader-openshift-template-service-broker.yaml": {rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderOpenshiftTemplateServiceBrokerYaml, map[string]*bintree{}},
-			"system::leader-locking-kube-controller-manager.yaml":                              {rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml, map[string]*bintree{}},
-			"system::leader-locking-kube-scheduler.yaml":                                       {rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml, map[string]*bintree{}},
-			"system:controller:bootstrap-signer.yaml":                                          {rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml, map[string]*bintree{}},
-			"system:controller:cloud-provider.yaml":                                            {rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml, map[string]*bintree{}},
-			"system:controller:token-cleaner.yaml":                                             {rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml, map[string]*bintree{}},
+			"system--leader-locking-kube-controller-manager.yaml":                              {rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml, map[string]*bintree{}},
+			"system--leader-locking-kube-scheduler.yaml":                                       {rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml, map[string]*bintree{}},
+			"system-controller-bootstrap-signer.yaml":                                          {rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml, map[string]*bintree{}},
+			"system-controller-cloud-provider.yaml":                                            {rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml, map[string]*bintree{}},
+			"system-controller-token-cleaner.yaml":                                             {rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml, map[string]*bintree{}},
 		}},
 		"openshift": {nil, map[string]*bintree{
 			"shared-resource-viewers.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYaml, map[string]*bintree{}},
 		}},
 		"openshift-node": {nil, map[string]*bintree{
 			"sync-node-config-reader-binding.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftNodeSyncNodeConfigReaderBindingYaml, map[string]*bintree{}},
-			"system:node-config-reader.yaml":       {rolebindingRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml, map[string]*bintree{}},
+			"system-node-config-reader.yaml":       {rolebindingRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml, map[string]*bintree{}},
 		}},
 		"openshift-template-service-broker": {nil, map[string]*bintree{
 			"templateservicebroker-auth-reader.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml, map[string]*bintree{}},
