@@ -56,19 +56,8 @@ func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.OpenS
 		return err
 	}
 
-	anc, err := newAzureClients(ctx, cs)
-	if err != nil {
-		return err
-	}
-
 	// Ensure that the pods in default are healthy
 	err = checks.WaitForInfraServices(ctx, appsClient)
-	if err != nil {
-		return err
-	}
-
-	// Check if FQDN's in the config matches what we got allocated in the cloud
-	err = checks.CheckDNS(ctx, anc.eip, anc.lb, cs)
 	if err != nil {
 		return err
 	}
