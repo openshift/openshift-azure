@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	appclient "k8s.io/client-go/kubernetes/typed/apps/v1"
@@ -71,6 +72,22 @@ func checkNamespace(namespace string) bool {
 
 // WaitForInfraServices verify daemonsets, statefulsets
 func WaitForInfraServices(ctx context.Context, appclient *appclient.AppsV1Client) error {
+out:
+	for {
+		_, err := appclient.Deployments("openshift-web-console").Get("webconsole", metav1.GetOptions{})
+		switch {
+		case err == nil:
+			break out
+		case kerrors.IsNotFound(err):
+		default:
+			return err
+		}
+		select {
+		case <-time.After(2 * time.Second):
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
 
 	// Daemonsets
 	dsList, err := appclient.DaemonSets("").List(metav1.ListOptions{})
