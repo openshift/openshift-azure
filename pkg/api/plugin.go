@@ -30,8 +30,8 @@ type Plugin interface {
 	InitializeCluster(ctx context.Context, cs *OpenShiftManagedCluster) error
 
 	HealthCheck(ctx context.Context, cs *OpenShiftManagedCluster) error
-}
 
-type Upgrade interface {
-	IsReady(nodeName string) (bool, error)
+	Drain(ctx context.Context, cs *OpenShiftManagedCluster, role AgentPoolProfileRole, nodeName string) error
+
+	WaitForReady(ctx context.Context, cs *OpenShiftManagedCluster, role AgentPoolProfileRole, nodeName string) error
 }

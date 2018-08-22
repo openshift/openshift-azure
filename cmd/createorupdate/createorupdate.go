@@ -38,26 +38,23 @@ func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.Op
 	}
 
 	// read in the OpenShift config blob if it exists (i.e. we're updating)
-	log.Info("read old config")
-	var oldCsBytes []byte
-	if _, err := os.Stat("_data/containerservice.yaml"); err == nil {
-		oldCsBytes, err = ioutil.ReadFile("_data/containerservice.yaml")
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
 	var oldCs *acsapi.OpenShiftManagedCluster
-	if len(oldCsBytes) > 0 {
-		if err := yaml.Unmarshal(oldCsBytes, &oldCs); err != nil {
+	if _, err := os.Stat("_data/containerservice.yaml"); err == nil {
+		log.Info("read old config")
+		b, err := ioutil.ReadFile("_data/containerservice.yaml")
+		if err != nil {
 			return nil, err
 		}
-	}
 
-	log.Info("merge old and new config")
-	p.MergeConfig(cs, oldCs)
+		if err := yaml.Unmarshal(b, &oldCs); err != nil {
+			return nil, err
+		}
+
+		log.Info("merge old and new config")
+		p.MergeConfig(cs, oldCs)
+	}
 
 	// validate the internal API representation (with reference to the previous
 	// internal API representation)
@@ -96,18 +93,23 @@ func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.Op
 		return nil, err
 	}
 
-	// persist the ARM template
-	log.Info("write arm")
-	err = ioutil.WriteFile("_data/_out/azuredeploy.json", azuredeploy, 0600)
+	// write out development files
+	log.Info("write helpers")
+	err = writeHelpers(cs.Config, azuredeploy)
 	if err != nil {
 		return nil, err
 	}
 
-	// write out development files
-	log.Info("write helpers")
-	err = writeHelpers(cs.Config)
+	err = deploy(cs, p, azuredeploy)
 	if err != nil {
 		return nil, err
+	}
+
+	if oldCs != nil {
+		err = update(cs, p)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// convert our (probably changed) internal API representation back to the
@@ -147,8 +149,13 @@ func enrich(cs *acsapi.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func writeHelpers(c *acsapi.Config) error {
+func writeHelpers(c *acsapi.Config, azuredeploy []byte) error {
 	err := ioutil.WriteFile("_data/_out/azure.conf", c.CloudProviderConf, 0600)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile("_data/_out/azuredeploy.json", azuredeploy, 0600)
 	if err != nil {
 		return err
 	}

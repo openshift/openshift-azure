@@ -75,15 +75,11 @@ properties:
 EOF
 
 go generate ./...
-go run cmd/createorupdate/createorupdate.go -loglevel=debug
-
-az group deployment create -g $RESOURCEGROUP -n azuredeploy --template-file _data/_out/azuredeploy.json
-
-KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/initialize/initialize.go -loglevel=debug
+go run cmd/createorupdate/*.go -loglevel=debug
 
 if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
     # will eventually run as an HCP pod, for development run it locally
-    # sleep until FQDN/healthz responds with OK. It takes up to 5 min for API server to respond. 
+    # sleep until FQDN/healthz responds with OK. It takes up to 5 min for API server to respond.
     FQDN=$(awk '/^  fqdn:/ { print $2 }' <_data/manifest.yaml)
     while [[ "$(curl -s -k https://${FQDN}/healthz/ready)" != "ok" ]]; do sleep 5; done
     go run cmd/sync/sync.go -run-once=true -loglevel=debug
