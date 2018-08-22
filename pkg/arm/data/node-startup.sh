@@ -8,13 +8,14 @@ if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
     SERVICE_TYPE=atomic-openshift
 fi
 
-umount /mnt/resource || true
-mkfs.xfs -f /dev/disk/azure/resource-part1
-echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
-systemctl stop docker.service
-mount /var/lib/docker
-restorecon -R /var/lib/docker
-systemctl start docker.service
+if ! grep /var/lib/docker /etc/fstab; then
+  mkfs.xfs -f /dev/disk/azure/resource-part1
+  echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
+  systemctl stop docker.service
+  mount /var/lib/docker
+  restorecon -R /var/lib/docker
+  systemctl start docker.service
+fi
 
 echo 'BOOTSTRAP_CONFIG_NAME=node-config-{{ .Extra.Role }}' >>/etc/sysconfig/${SERVICE_TYPE}-node
 

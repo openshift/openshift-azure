@@ -8,23 +8,24 @@ if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
     SERVICE_TYPE=atomic-openshift
 fi
 
-umount /mnt/resource || true
-mkfs.xfs -f /dev/disk/azure/resource-part1
-echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
-systemctl stop docker.service
-mount /var/lib/docker
-restorecon -R /var/lib/docker
-systemctl start docker.service
+if ! grep /var/lib/docker /etc/fstab; then
+  mkfs.xfs -f /dev/disk/azure/resource-part1
+  echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
+  systemctl stop docker.service
+  mount /var/lib/docker
+  restorecon -R /var/lib/docker
+  systemctl start docker.service
+fi
 
 # TODO: consider fact that /dev/disk/azure/scsi1/lun0 is currently hardcoded;
 # partition /dev/disk/azure/scsi1/lun0; consider future strategy for resizes if
 # needed
-# TODO: not currently intending for this script to be reentrant, but for safety
-# not specifying mkfs.xfs -f here
-mkfs.xfs /dev/disk/azure/scsi1/lun0 || true
-echo '/dev/disk/azure/scsi1/lun0  /var/lib/etcd  xfs  defaults  0 0' >>/etc/fstab
-mount /var/lib/etcd
-restorecon -R /var/lib/etcd
+if ! grep /var/lib/etcd /etc/fstab; then
+  mkfs.xfs /dev/disk/azure/scsi1/lun0 || true
+  echo '/dev/disk/azure/scsi1/lun0  /var/lib/etcd  xfs  defaults  0 0' >>/etc/fstab
+  mount /var/lib/etcd
+  restorecon -R /var/lib/etcd
+fi
 
 echo "BOOTSTRAP_CONFIG_NAME=node-config-master" >>/etc/sysconfig/${SERVICE_TYPE}-node
 
