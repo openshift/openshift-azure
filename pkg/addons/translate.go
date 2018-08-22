@@ -389,11 +389,19 @@ var Translations = map[string][]struct {
 			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),
 			Template: "{{ Base64Encode .Config.AlertManagerProxySessionSecret }}",
 		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'console-cert'"),
+			Template: "{{ String (CertAsBytes .Config.Certificates.OpenshiftConsole.Cert) }}",
+		},
 	},
 	"Secret/openshift-metrics/alerts-proxy": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),
 			Template: "{{ Base64Encode .Config.AlertsProxySessionSecret }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'console-cert'"),
+			Template: "{{ String (CertAsBytes .Config.Certificates.OpenshiftConsole.Cert) }}",
 		},
 	},
 	"Service/default/router": {
@@ -412,6 +420,10 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),
 			Template: "{{ Base64Encode .Config.PrometheusProxySessionSecret }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'console-cert'"),
+			Template: "{{ String (CertAsBytes .Config.Certificates.OpenshiftConsole.Cert) }}",
 		},
 	},
 	"StatefulSet.apps/openshift-metrics/prometheus": {
