@@ -35,6 +35,7 @@ spec:
         - -cookie-secret-file=/etc/proxy/secrets/session_secret
         - -openshift-ca=/etc/pki/tls/cert.pem
         - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - -openshift-ca=/etc/proxy/secrets/console-cert
         - -skip-auth-regex=^/metrics
         image: '*** GENERATED ***'
         name: prom-proxy
@@ -90,6 +91,7 @@ spec:
         - -cookie-secret-file=/etc/proxy/secrets/session_secret
         - -openshift-ca=/etc/pki/tls/cert.pem
         - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - -openshift-ca=/etc/proxy/secrets/console-cert
         - -skip-auth-regex=^/metrics
         image: '*** GENERATED ***'
         name: alerts-proxy
@@ -117,6 +119,7 @@ spec:
         - -client-id=system:serviceaccount:openshift-metrics:prometheus
         - -openshift-ca=/etc/pki/tls/cert.pem
         - -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - -openshift-ca=/etc/proxy/secrets/console-cert
         - '-openshift-sar={"resource": "namespaces", "verb": "get", "resourceName":
           "openshift-metrics", "namespace": "openshift-metrics"}'
         - '-openshift-delegate-urls={"/": {"resource": "namespaces", "verb": "get",
