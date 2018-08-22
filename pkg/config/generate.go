@@ -483,8 +483,6 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		c.ServiceCatalogClusterID = uuid.NewV4()
 	}
 
-	c.RunSyncLocal = os.Getenv("RUN_SYNC_LOCAL")
-
 	c.TenantID = cs.Properties.AzProfile.TenantID
 	c.SubscriptionID = cs.Properties.AzProfile.SubscriptionID
 	c.ResourceGroup = cs.Properties.AzProfile.ResourceGroup

@@ -563,7 +563,6 @@ spec:
     name: master-cloud-provider
 EOF
 
-{{ if not (eq "true" .Config.RunSyncLocal) }}
 if [[ "$(hostname)" == "master-000000" ]]; then
   cat >/etc/origin/node/pods/sync.yaml <<'EOF'
 apiVersion: v1
@@ -589,7 +588,6 @@ spec:
     name: master-cloud-provider
 EOF
 fi
-{{ end }}
 
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig

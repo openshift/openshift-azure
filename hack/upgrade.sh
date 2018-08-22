@@ -38,11 +38,3 @@ export RESOURCEGROUP=$1
 
 go generate ./...
 go run cmd/createorupdate/*.go -loglevel=debug
-
-if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
-    # will eventually run as an HCP pod, for development run it locally
-    go run cmd/sync/sync.go -run-once=true -loglevel=debug
-fi
-
-KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go \
-    -loglevel=debug

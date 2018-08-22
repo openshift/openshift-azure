@@ -1,7 +1,6 @@
 /_data
 /createorupdate
 /env
-/healthcheck
 /sync
 .vscode
 .idea

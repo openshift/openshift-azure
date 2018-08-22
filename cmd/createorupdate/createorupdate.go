@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -110,6 +111,11 @@ func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.Op
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	err = p.HealthCheck(context.Background(), cs)
+	if err != nil {
+		return nil, err
 	}
 
 	// convert our (probably changed) internal API representation back to the
