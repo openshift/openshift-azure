@@ -186,6 +186,7 @@ func main() {
 	flag.Parse()
 	// mock logger configuration
 	logger := logrus.New()
+	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
 	// sanitize input to only accept specific log levels and tolerate junk
 	logger.SetLevel(log.SanitizeLogLevel(*logLevel))
 	log := logrus.NewEntry(logger)
