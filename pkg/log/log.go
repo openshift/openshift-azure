@@ -34,14 +34,29 @@ func Info(args ...interface{}) {
 	logger.log.Info(args...)
 }
 
+// Infof logs at info level
+func Infof(format string, args ...interface{}) {
+	logger.log.Infof(format, args...)
+}
+
 // Debug logs at debug level
 func Debug(args ...interface{}) {
 	logger.log.Debug(args...)
 }
 
+// Debugf logs at debug level
+func Debugf(format string, args ...interface{}) {
+	logger.log.Debugf(format, args...)
+}
+
 // Fatal logs at fatal level
 func Fatal(args ...interface{}) {
 	logger.log.Fatal(args...)
+}
+
+// Fatalf logs at fatal level
+func Fatalf(format string, args ...interface{}) {
+	logger.log.Fatalf(format, args...)
 }
 
 // WithFields adds a map of fields to the Entry.
