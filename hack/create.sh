@@ -34,7 +34,7 @@ export RESOURCEGROUP=$1
 rm -rf _data
 mkdir -p _data/_out
 
-az group create -n $RESOURCEGROUP -l eastus >/dev/null
+az group create -n $RESOURCEGROUP -l eastus --tags now=$(date +%s) >/dev/null
 
 if [[ -z "$AZURE_CLIENT_ID" ]]; then
     set +x
