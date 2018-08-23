@@ -21,7 +21,7 @@ import (
 var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
 
 // createOrUpdate simulates the RP
-func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.OpenShiftManagedCluster, error) {
+func createOrUpdate(ctx context.Context, oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
 	p := plugin.NewPlugin(entry)
 
@@ -54,20 +54,20 @@ func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.Op
 		}
 
 		log.Info("merge old and new config")
-		p.MergeConfig(cs, oldCs)
+		p.MergeConfig(ctx, cs, oldCs)
 	}
 
 	// validate the internal API representation (with reference to the previous
 	// internal API representation)
 	// we set fqdn during enrichment which is slightly different than what the RP
 	// will do so we are only validating once.
-	errs := p.Validate(cs, oldCs, false)
+	errs := p.Validate(ctx, cs, oldCs, false)
 	if len(errs) > 0 {
 		return nil, errors.NewAggregate(errs)
 	}
 
 	// generate or update the OpenShift config blob
-	err = p.GenerateConfig(cs)
+	err = p.GenerateConfig(ctx, cs)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.Op
 	}
 
 	// generate the ARM template
-	azuredeploy, err := p.GenerateARM(cs)
+	azuredeploy, err := p.GenerateARM(ctx, cs)
 	if err != nil {
 		return nil, err
 	}
@@ -101,19 +101,19 @@ func createOrUpdate(oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.Op
 		return nil, err
 	}
 
-	err = deploy(cs, p, azuredeploy)
+	err = deploy(ctx, cs, p, azuredeploy)
 	if err != nil {
 		return nil, err
 	}
 
 	if oldCs != nil {
-		err = update(cs, p)
+		err = update(ctx, cs, p)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	err = p.HealthCheck(context.Background(), cs)
+	err = p.HealthCheck(ctx, cs)
 	if err != nil {
 		return nil, err
 	}
@@ -202,9 +202,17 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//simulate Context with property bag
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, acsapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
+	ctx = context.WithValue(ctx, acsapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
+	ctx = context.WithValue(ctx, acsapi.ContextKeyTennantID, os.Getenv("AZURE_TENANT_ID"))
+	ctx = context.WithValue(ctx, acsapi.ContextKeySubscriptionId, os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	ctx = context.WithValue(ctx, acsapi.ContextKeyResourceGroup, os.Getenv("RESOURCEGROUP"))
+
 	// simulate the API call to the RP
 	entry := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
-	oc, err = createOrUpdate(oc, entry)
+	oc, err = createOrUpdate(ctx, oc, entry)
 	if err != nil {
 		log.Fatal(err)
 	}

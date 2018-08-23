@@ -1,5 +1,16 @@
 package api
 
+// ContextKey is a type for context property bag payload keys
+type ContextKey string
+
+const (
+	ContextKeyClientID       ContextKey = "ClientID"
+	ContextKeyClientSecret   ContextKey = "ClientSecret"
+	ContextKeyTennantID      ContextKey = "TenantID"
+	ContextKeySubscriptionId ContextKey = "SubscriptionId"
+	ContextKeyResourceGroup  ContextKey = "ResourceGroup"
+)
+
 // TypeMeta describes an individual API model object
 type TypeMeta struct {
 	// APIVersion is on every object

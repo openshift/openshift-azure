@@ -11,7 +11,7 @@ type Plugin interface {
 	// partial user requests to allow reusing the same validation code during
 	// upgrades. This method should be the first one called by the RP, before
 	// validation and generation.
-	MergeConfig(new, old *OpenShiftManagedCluster)
+	MergeConfig(ctx context.Context, new, old *OpenShiftManagedCluster)
 
 	// Validate exists (a) to be able to place validation logic in a
 	// single place in the event of multiple external API versions, and (b) to
@@ -19,13 +19,13 @@ type Plugin interface {
 	// (for update, upgrade, etc.)
 	// externalOnly indicates that fields set by the RP (FQDN and routerProfile.FQDN)
 	// should be excluded.
-	Validate(new, old *OpenShiftManagedCluster, externalOnly bool) []error
+	Validate(ctx context.Context, new, old *OpenShiftManagedCluster, externalOnly bool) []error
 
 	// GenerateConfig ensures all the necessary in-cluster config is generated
 	// for an Openshift cluster.
-	GenerateConfig(cs *OpenShiftManagedCluster) error
+	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster) error
 
-	GenerateARM(cs *OpenShiftManagedCluster) ([]byte, error)
+	GenerateARM(ctx context.Context, cs *OpenShiftManagedCluster) ([]byte, error)
 
 	InitializeCluster(ctx context.Context, cs *OpenShiftManagedCluster) error
 

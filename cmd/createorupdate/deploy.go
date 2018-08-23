@@ -11,14 +11,15 @@ import (
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
-func deploy(cs *api.OpenShiftManagedCluster, p api.Plugin, azuredeploy []byte) error {
+func deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin, azuredeploy []byte) error {
 	var t map[string]interface{}
 	err := json.Unmarshal(azuredeploy, &t)
 	if err != nil {
 		return err
 	}
 
-	authorizer, err := auth.NewAuthorizerFromEnvironment()
+	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTennantID).(string))
+	authorizer, err := config.Authorizer()
 	if err != nil {
 		return err
 	}
@@ -27,7 +28,7 @@ func deploy(cs *api.OpenShiftManagedCluster, p api.Plugin, azuredeploy []byte) e
 	dcli.Authorizer = authorizer
 
 	log.Info("creating/updating deployment")
-	future, err := dcli.CreateOrUpdate(context.Background(), cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
+	future, err := dcli.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
 		Properties: &resources.DeploymentProperties{
 			Template: t,
 			Mode:     resources.Incremental,
@@ -38,11 +39,11 @@ func deploy(cs *api.OpenShiftManagedCluster, p api.Plugin, azuredeploy []byte) e
 	}
 
 	log.Info("waiting for deployment")
-	err = future.WaitForCompletion(context.Background(), dcli.Client)
+	err = future.WaitForCompletion(ctx, dcli.Client)
 	if err != nil {
 		return err
 	}
 
 	log.Info("saving cluster state to storage account")
-	return p.InitializeCluster(context.Background(), cs)
+	return p.InitializeCluster(ctx, cs)
 }
