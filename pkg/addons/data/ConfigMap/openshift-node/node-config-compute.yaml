@@ -36,6 +36,10 @@ data:
       - /etc/origin/node/pods
       rotate-certificates:
       - "true"
+      kube-reserved:
+      - "cpu=200m,memory=512Mi"
+      system-reserved:
+      - "cpu=200m,memory=512Mi"
     masterClientConnectionOverrides:
       acceptContentTypes: application/vnd.kubernetes.protobuf,application/json
       burst: 200
