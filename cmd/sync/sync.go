@@ -43,7 +43,7 @@ func newAzureClients(ctx context.Context, m map[string]string) (*azureStorageCli
 	clients.accounts = storage.NewAccountsClient(m["subscriptionId"])
 	clients.accounts.Authorizer = authorizer
 
-	accts, err := clients.accounts.List(ctx)
+	accts, err := clients.accounts.ListByResourceGroup(context.Background(), m["resourceGroup"])
 	if err != nil {
 		return nil, err
 	}
