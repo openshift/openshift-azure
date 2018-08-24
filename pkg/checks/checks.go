@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/openshift/openshift-azure/pkg/log"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -72,6 +73,7 @@ func checkNamespace(namespace string) bool {
 
 // WaitForInfraServices verify daemonsets, statefulsets
 func WaitForInfraServices(ctx context.Context, appclient *appclient.AppsV1Client) error {
+	log.Info("checking infrastructure service health")
 out:
 	for {
 		_, err := appclient.Deployments("openshift-web-console").Get("webconsole", metav1.GetOptions{})
@@ -99,6 +101,7 @@ out:
 		if !checkNamespace(ds.Namespace) {
 			continue
 		}
+		log.Info(fmt.Sprintf("checking %s %q", ds.Kind, ds.Name))
 		for {
 			ds, err := appclient.DaemonSets(ds.Namespace).Get(ds.Name, metav1.GetOptions{})
 			if err != nil {
@@ -132,6 +135,7 @@ out:
 		if !checkNamespace(ss.Namespace) {
 			continue
 		}
+		log.Info(fmt.Sprintf("checking %s %q", ss.Kind, ss.Name))
 		for {
 			ss, err := appclient.StatefulSets(ss.Namespace).Get(ss.Name, metav1.GetOptions{})
 			if err != nil {
@@ -162,6 +166,7 @@ out:
 		if !checkNamespace(d.Namespace) {
 			continue
 		}
+		log.Info(fmt.Sprintf("checking %s %q", d.Kind, d.Name))
 		for {
 			d, err := appclient.Deployments(d.Namespace).Get(d.Name, metav1.GetOptions{})
 			if err != nil {
@@ -183,5 +188,6 @@ out:
 		}
 	}
 
+	log.Info("done checking infrastructure service health")
 	return nil
 }

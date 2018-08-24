@@ -67,6 +67,7 @@ func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.OpenS
 }
 
 func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
+	log.Info("checking console health")
 	c := cs.Config
 	pool := x509.NewCertPool()
 	pool.AddCert(c.Certificates.Ca.Cert)
@@ -106,7 +107,6 @@ func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *acsapi.Op
 			return fmt.Errorf("unexpected error code %d from console", resp.StatusCode)
 		}
 	}
-
 }
 
 func newAppClient(ctx context.Context, config *v1.Config) (*appsclient.AppsV1Client, error) {
