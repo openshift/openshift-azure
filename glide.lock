@@ -1,10 +1,13 @@
-hash: d939691da31e6da95dc385607250258ead244c252276b5815ffb5e88cc85fca1
-updated: 2018-08-21T22:31:48.754215852-05:00
+hash: b8a1273d864e45415aa09291a783332e66042c8ecf2559f10b0f025798689bee
+updated: 2018-08-24T12:03:49.057987685-05:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
   subpackages:
+  - services/compute/mgmt/2018-06-01/compute
   - services/network/mgmt/2018-05-01/network
+  - services/preview/operationalinsights/mgmt/2015-11-01-preview/operationalinsights
+  - services/resources/mgmt/2018-05-01/resources
   - services/storage/mgmt/2018-02-01/storage
   - storage
   - version
@@ -16,8 +19,17 @@ imports:
   - autorest/azure
   - autorest/azure/auth
   - autorest/date
+  - autorest/to
   - autorest/validation
   - version
+- name: github.com/coreos/go-systemd
+  version: 39ca1b05acc7ad1220e09f133283b8859a8b71ab
+  subpackages:
+  - sdjournal
+- name: github.com/coreos/pkg
+  version: 97fdf19511ea361ae1c100dd393cc47f8dcfa1e1
+  subpackages:
+  - dlopen
 - name: github.com/davecgh/go-spew
   version: 8991bc29aa16c548c550c7ff78260e27b9ab7c73
   subpackages:
