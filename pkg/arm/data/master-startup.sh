@@ -8,23 +8,24 @@ if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
     SERVICE_TYPE=atomic-openshift
 fi
 
-umount /mnt/resource || true
-mkfs.xfs -f /dev/disk/azure/resource-part1
-echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
-systemctl stop docker.service
-mount /var/lib/docker
-restorecon -R /var/lib/docker
-systemctl start docker.service
+if ! grep /var/lib/docker /etc/fstab; then
+  mkfs.xfs -f /dev/disk/azure/resource-part1
+  echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
+  systemctl stop docker.service
+  mount /var/lib/docker
+  restorecon -R /var/lib/docker
+  systemctl start docker.service
+fi
 
 # TODO: consider fact that /dev/disk/azure/scsi1/lun0 is currently hardcoded;
 # partition /dev/disk/azure/scsi1/lun0; consider future strategy for resizes if
 # needed
-# TODO: not currently intending for this script to be reentrant, but for safety
-# not specifying mkfs.xfs -f here
-mkfs.xfs /dev/disk/azure/scsi1/lun0 || true
-echo '/dev/disk/azure/scsi1/lun0  /var/lib/etcd  xfs  defaults  0 0' >>/etc/fstab
-mount /var/lib/etcd
-restorecon -R /var/lib/etcd
+if ! grep /var/lib/etcd /etc/fstab; then
+  mkfs.xfs /dev/disk/azure/scsi1/lun0 || true
+  echo '/dev/disk/azure/scsi1/lun0  /var/lib/etcd  xfs  defaults  0 0' >>/etc/fstab
+  mount /var/lib/etcd
+  restorecon -R /var/lib/etcd
+fi
 
 echo "BOOTSTRAP_CONFIG_NAME=node-config-master" >>/etc/sysconfig/${SERVICE_TYPE}-node
 
@@ -406,18 +407,8 @@ EOF
 echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
 mkdir -p /etc/origin/cloudprovider
 
-# TODO: this is duplicated, and that's not ideal
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
-tenantId: {{ .Config.TenantID | quote }}
-subscriptionId: {{ .Config.SubscriptionID | quote }}
-aadClientId: {{ .ContainerService.Properties.ServicePrincipalProfile.ClientID | quote }}
-aadClientSecret: {{ .ContainerService.Properties.ServicePrincipalProfile.Secret | quote }}
-aadTenantId: {{ .Config.TenantID | quote }}
-resourceGroup: {{ .Config.ResourceGroup | quote }}
-location: {{ .ContainerService.Location | quote }}
-securityGroupName: nsg-compute
-primaryScaleSetName: ss-compute
-vmType: vmss
+{{ .Config.CloudProviderConf | String }}
 EOF
 
 # TODO: investigate the --manifest-url Kubelet parameter and see if it might
@@ -571,6 +562,32 @@ spec:
       path: /etc/origin/cloudprovider
     name: master-cloud-provider
 EOF
+
+if [[ "$(hostname)" == "master-000000" ]]; then
+  cat >/etc/origin/node/pods/sync.yaml <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sync
+  namespace: kube-system
+spec:
+  containers:
+  - image: {{ .Config.SyncImage | quote }}
+    imagePullPolicy: Always
+    name: sync
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /_data/_out
+      name: master-cloud-provider
+      readOnly: true
+  hostNetwork: true
+  volumes:
+  - hostPath:
+      path: /etc/origin/cloudprovider
+    name: master-cloud-provider
+EOF
+fi
 
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig

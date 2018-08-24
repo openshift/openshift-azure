@@ -45,7 +45,6 @@ type Config struct {
 	AdminKubeconfig              *v1.Config
 	MasterKubeconfig             *v1.Config
 	NodeBootstrapKubeconfig      *v1.Config
-	SyncKubeconfig               *v1.Config
 	AzureClusterReaderKubeconfig *v1.Config
 
 	// misc control plane configurables
@@ -73,13 +72,14 @@ type Config struct {
 	RouterLBCNamePrefix string
 	MasterLBCNamePrefix string
 
-	// used for development purposes only
-	RunSyncLocal string
-
 	// enriched values which are not present in the external API representation
 	TenantID       string
 	SubscriptionID string
 	ResourceGroup  string
+
+	CloudProviderConf []byte
+
+	ConfigStorageAccount string
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.

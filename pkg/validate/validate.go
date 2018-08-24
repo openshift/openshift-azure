@@ -2,8 +2,10 @@ package validate
 
 import (
 	"fmt"
+	"reflect"
 	"regexp"
 
+	"github.com/go-test/deep"
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
@@ -66,21 +68,8 @@ func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool)
 }
 
 func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
-	if cs.Location != oldCs.Location {
-		errs = append(errs, fmt.Errorf("invalid location %q, location updates are disallowed", cs.Location))
-	}
-	if cs.Properties != nil {
-		if !externalOnly && cs.Properties.FQDN != oldCs.Properties.FQDN {
-			errs = append(errs, fmt.Errorf("invalid fqdn %q, fqdn updates are disallowed", cs.Properties.FQDN))
-		}
-		if cs.Properties.ServicePrincipalProfile != nil {
-			if cs.Properties.ServicePrincipalProfile.ClientID != oldCs.Properties.ServicePrincipalProfile.ClientID {
-				errs = append(errs, fmt.Errorf("servicePrincipalProfile.clientID updates are disallowed "))
-			}
-			if cs.Properties.ServicePrincipalProfile.Secret != oldCs.Properties.ServicePrincipalProfile.Secret {
-				errs = append(errs, fmt.Errorf("servicePrincipalProfile.secret updates are disallowed "))
-			}
-		}
+	if !reflect.DeepEqual(cs, oldCs) {
+		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, oldCs)))
 	}
 	return
 }
@@ -152,9 +141,13 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 	}
 
 	switch app.Role {
-	case api.AgentPoolProfileRoleCompute,
-		api.AgentPoolProfileRoleInfra:
-		if app.Count < 1 || app.Count > 100 {
+	case api.AgentPoolProfileRoleCompute:
+		if app.Count < 1 || app.Count > 5 {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %q", app.Name, app.Count))
+		}
+
+	case api.AgentPoolProfileRoleInfra:
+		if app.Count != 1 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %q", app.Name, app.Count))
 		}
 

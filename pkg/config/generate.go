@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ghodss/yaml"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
@@ -73,7 +74,10 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
 
-		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
+		c.SyncImage = os.Getenv("SYNC_IMAGE")
+		if c.SyncImage == "" {
+			c.SyncImage = "quay.io/openshift-on-azure/sync:v3.10"
+		}
 	}
 }
 
@@ -109,7 +113,10 @@ func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) {
 
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest" //TODO: create mapping for OSA release to any other image we use
 
-		c.SyncImage = "quay.io/openshift-on-azure/sync:latest"
+		c.SyncImage = os.Getenv("SYNC_IMAGE")
+		if c.SyncImage == "" {
+			c.SyncImage = "quay.io/openshift-on-azure/sync:v3.10"
+		}
 	}
 }
 
@@ -411,16 +418,6 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 			namespace:  "openshift-infra",
 		},
 		{
-			clientKey:  c.Certificates.Admin.Key,
-			clientCert: c.Certificates.Admin.Cert,
-			// sync kubeconfig has the same capabilities as admin kubeconfig, only difference
-			// is the use of HCP internal DNS to avoid waiting for the Azure loadbalancer to
-			// come up in order to start creating cluster objects.
-			endpoint:   "master-000000",
-			username:   "system:admin",
-			kubeconfig: &c.SyncKubeconfig,
-		},
-		{
 			clientKey:  c.Certificates.AzureClusterReader.Key,
 			clientCert: c.Certificates.AzureClusterReader.Cert,
 			endpoint:   cs.Properties.FQDN,
@@ -462,6 +459,12 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		}
 	}
 
+	if len(c.ConfigStorageAccount) == 0 {
+		if c.ConfigStorageAccount, err = randomStorageAccountName(); err != nil {
+			return
+		}
+	}
+
 	if len(c.RegistryConsoleOAuthSecret) == 0 {
 		if pass, err := randomString(64); err != nil {
 			return err
@@ -480,11 +483,24 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		c.ServiceCatalogClusterID = uuid.NewV4()
 	}
 
-	c.RunSyncLocal = os.Getenv("RUN_SYNC_LOCAL")
-
 	c.TenantID = cs.Properties.AzProfile.TenantID
 	c.SubscriptionID = cs.Properties.AzProfile.SubscriptionID
 	c.ResourceGroup = cs.Properties.AzProfile.ResourceGroup
+
+	if c.CloudProviderConf, err = yaml.Marshal(map[string]string{
+		"tenantId":            cs.Config.TenantID,
+		"subscriptionId":      cs.Config.SubscriptionID,
+		"aadClientId":         cs.Properties.ServicePrincipalProfile.ClientID,
+		"aadClientSecret":     cs.Properties.ServicePrincipalProfile.Secret,
+		"aadTenantId":         cs.Config.TenantID,
+		"resourceGroup":       cs.Config.ResourceGroup,
+		"location":            cs.Location,
+		"securityGroupName":   "nsg-compute",
+		"primaryScaleSetName": "ss-compute",
+		"vmType":              "vmss",
+	}); err != nil {
+		return
+	}
 
 	return
 }

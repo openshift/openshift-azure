@@ -1,5 +1,9 @@
 #!/bin/bash -ex
 
+if ! az account show >/dev/null; then
+    exit 1
+fi
+
 if [[ -z "$AZURE_SUBSCRIPTION_ID" ]]; then
     echo error: must set AZURE_SUBSCRIPTION_ID
     exit 1
@@ -33,15 +37,4 @@ fi
 export RESOURCEGROUP=$1
 
 go generate ./...
-go run cmd/createorupdate/createorupdate.go -loglevel=debug
-
-# TODO: need to apply ARM deployment changes
-
-if [[ "$RUN_SYNC_LOCAL" == "true" ]]; then
-    # will eventually run as an HCP pod, for development run it locally
-    KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/sync/sync.go -run-once=true \
-        -loglevel=debug
-fi
-
-KUBECONFIG=_data/_out/admin.kubeconfig go run cmd/healthcheck/healthcheck.go \
-    -loglevel=debug
+go run cmd/createorupdate/*.go -loglevel=debug

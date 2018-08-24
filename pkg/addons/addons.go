@@ -213,7 +213,7 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 }
 
 func Main(cs *acsapi.OpenShiftManagedCluster, dryRun bool) error {
-	client, err := newClient(dryRun)
+	client, err := newClient(cs, dryRun)
 	if err != nil {
 		return err
 	}

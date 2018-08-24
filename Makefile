@@ -16,12 +16,14 @@ generate:
 sync: clean generate
 	CGO_ENABLED=0 go build ./cmd/sync
 
+SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:latest
+
 sync-image: sync
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-	imagebuilder -f Dockerfile.sync -t quay.io/openshift-on-azure/sync:latest .
+	imagebuilder -f Dockerfile.sync -t $(SYNC_IMAGE) .
 
 sync-push: sync-image
-	docker push quay.io/openshift-on-azure/sync:latest
+	docker push $(SYNC_IMAGE)
 
 verify:
 	./hack/validate-generated.sh

@@ -27,9 +27,11 @@ type Plugin interface {
 
 	GenerateARM(cs *OpenShiftManagedCluster) ([]byte, error)
 
-	HealthCheck(ctx context.Context, cs *OpenShiftManagedCluster) error
-}
+	InitializeCluster(ctx context.Context, cs *OpenShiftManagedCluster) error
 
-type Upgrade interface {
-	IsReady(nodeName string) (bool, error)
+	HealthCheck(ctx context.Context, cs *OpenShiftManagedCluster) error
+
+	Drain(ctx context.Context, cs *OpenShiftManagedCluster, role AgentPoolProfileRole, nodeName string) error
+
+	WaitForReady(ctx context.Context, cs *OpenShiftManagedCluster, role AgentPoolProfileRole, nodeName string) error
 }

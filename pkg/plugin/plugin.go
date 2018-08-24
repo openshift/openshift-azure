@@ -3,11 +3,6 @@ package plugin
 
 import (
 	"context"
-	"fmt"
-
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 
 	"github.com/sirupsen/logrus"
 
@@ -16,7 +11,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/healthcheck"
+	"github.com/openshift/openshift-azure/pkg/initialize"
 	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/upgrade"
 	"github.com/openshift/openshift-azure/pkg/validate"
 )
 
@@ -92,82 +89,24 @@ func (p *plugin) GenerateARM(cs *acsapi.OpenShiftManagedCluster) ([]byte, error)
 	return generator.Generate(cs)
 }
 
+func (p *plugin) InitializeCluster(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
+	log.Info("initializing cluster")
+	initializer := initialize.NewSimpleInitializer(p.entry)
+	return initializer.InitializeCluster(ctx, cs)
+}
+
 func (p *plugin) HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
 	log.Info("starting health check")
 	healthChecker := healthcheck.NewSimpleHealthChecker(p.entry)
 	return healthChecker.HealthCheck(ctx, cs)
 }
 
-type MasterUpgrade struct {
-	*kubernetes.Clientset
+func (p *plugin) Drain(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
+	upgrader := upgrade.NewSimpleUpgrader(p.entry)
+	return upgrader.Drain(ctx, cs, role, nodeName)
 }
 
-var _ api.Upgrade = &MasterUpgrade{}
-
-func (u *MasterUpgrade) IsReady(nodeName string) (bool, error) {
-	etcd := fmt.Sprintf("etcd-%s", nodeName)
-	etcdPod, err := u.Clientset.CoreV1().Pods("kube-system").Get(etcd, metav1.GetOptions{})
-	if err != nil {
-		return false, err
-	}
-
-	apiServer := fmt.Sprintf("api-%s", nodeName)
-	apiPod, err := u.Clientset.CoreV1().Pods("kube-system").Get(apiServer, metav1.GetOptions{})
-	if err != nil {
-		return false, err
-	}
-
-	controllerManager := fmt.Sprintf("controllers-%s", nodeName)
-	cmPod, err := u.Clientset.CoreV1().Pods("kube-system").Get(controllerManager, metav1.GetOptions{})
-	if err != nil {
-		return false, err
-	}
-
-	return isPodReady(etcdPod) && isPodReady(apiPod) && isPodReady(cmPod), nil
-}
-
-type InfraUpgrade struct {
-	*kubernetes.Clientset
-}
-
-var _ api.Upgrade = &InfraUpgrade{}
-
-func (u *InfraUpgrade) IsReady(nodeName string) (bool, error) {
-	node, err := u.Clientset.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
-	if err != nil {
-		return false, nil
-	}
-	return isNodeReady(node), nil
-}
-
-type ComputeUpgrade struct {
-	*kubernetes.Clientset
-}
-
-var _ api.Upgrade = &ComputeUpgrade{}
-
-func (u *ComputeUpgrade) IsReady(nodeName string) (bool, error) {
-	node, err := u.Clientset.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
-	if err != nil {
-		return false, nil
-	}
-	return isNodeReady(node), nil
-}
-
-func isPodReady(pod *corev1.Pod) bool {
-	for _, c := range pod.Status.Conditions {
-		if c.Type == corev1.PodReady {
-			return c.Status == corev1.ConditionTrue
-		}
-	}
-	return false
-}
-
-func isNodeReady(node *corev1.Node) bool {
-	for _, c := range node.Status.Conditions {
-		if c.Type == corev1.NodeReady {
-			return c.Status == corev1.ConditionTrue
-		}
-	}
-	return false
+func (p *plugin) WaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
+	upgrader := upgrade.NewSimpleUpgrader(p.entry)
+	return upgrader.WaitForReady(ctx, cs, role, nodeName)
 }

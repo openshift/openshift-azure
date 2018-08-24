@@ -8,13 +8,14 @@ if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
     SERVICE_TYPE=atomic-openshift
 fi
 
-umount /mnt/resource || true
-mkfs.xfs -f /dev/disk/azure/resource-part1
-echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
-systemctl stop docker.service
-mount /var/lib/docker
-restorecon -R /var/lib/docker
-systemctl start docker.service
+if ! grep /var/lib/docker /etc/fstab; then
+  mkfs.xfs -f /dev/disk/azure/resource-part1
+  echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
+  systemctl stop docker.service
+  mount /var/lib/docker
+  restorecon -R /var/lib/docker
+  systemctl start docker.service
+fi
 
 echo 'BOOTSTRAP_CONFIG_NAME=node-config-{{ .Extra.Role }}' >>/etc/sysconfig/${SERVICE_TYPE}-node
 
@@ -34,18 +35,8 @@ update-ca-trust
 echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
 mkdir -p /etc/origin/cloudprovider
 
-# TODO: this is duplicated, and that's not ideal
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
-tenantId: {{ .Config.TenantID | quote }}
-subscriptionId: {{ .Config.SubscriptionID | quote }}
-aadClientId: {{ .ContainerService.Properties.ServicePrincipalProfile.ClientID | quote }}
-aadClientSecret: {{ .ContainerService.Properties.ServicePrincipalProfile.Secret | quote }}
-aadTenantId: {{ .Config.TenantID | quote }}
-resourceGroup: {{ .Config.ResourceGroup | quote }}
-location: {{ .ContainerService.Location | quote }}
-securityGroupName: nsg-compute
-primaryScaleSetName: ss-compute
-vmType: vmss
+{{ .Config.CloudProviderConf | String }}
 EOF
 
 # note: ${SERVICE_TYPE}-node crash loops until master is up

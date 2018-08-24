@@ -5,10 +5,8 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/openshift/openshift-azure/pkg/checks"
-	log "github.com/sirupsen/logrus"
-
 	"github.com/go-test/deep"
+	log "github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -18,10 +16,15 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
+	"k8s.io/client-go/tools/clientcmd/api/latest"
 	"k8s.io/client-go/util/flowcontrol"
 	"k8s.io/client-go/util/retry"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
+
+	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/checks"
 )
 
 // Interface exposes the methods a client needs to implement
@@ -43,14 +46,20 @@ type client struct {
 	grs        []*discovery.APIGroupResources
 }
 
-func newClient(dryRun bool) (Interface, error) {
+func newClient(cs *acsapi.OpenShiftManagedCluster, dryRun bool) (Interface, error) {
 	if dryRun {
 		return &dryClient{}, nil
 	}
 
-	restconfig, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		clientcmd.NewDefaultClientConfigLoadingRules(),
-		&clientcmd.ConfigOverrides{}).ClientConfig()
+	var kc api.Config
+	err := latest.Scheme.Convert(cs.Config.AdminKubeconfig, &kc, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	kubeconfig := clientcmd.NewDefaultClientConfig(kc, &clientcmd.ConfigOverrides{})
+
+	restconfig, err := kubeconfig.ClientConfig()
 	if err != nil {
 		return nil, err
 	}

@@ -133,7 +133,6 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.MasterKubeconfig != nil, "MasterKubeconfig")
 	assert(c.AdminKubeconfig != nil, "AdminKubeconfig")
 	assert(c.NodeBootstrapKubeconfig != nil, "NodeBootstrapKubeconfig")
-	assert(c.SyncKubeconfig != nil, "SyncKubeconfig")
 	assert(c.AzureClusterReaderKubeconfig != nil, "AzureClusterReaderKubeconfig")
 }
 
