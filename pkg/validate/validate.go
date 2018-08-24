@@ -184,6 +184,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].role %q", app.Name, app.Role))
 	}
 
+	// must match generate.go limit geneartion code
 	switch app.VMSize {
 	case "Standard_D2s_v3",
 		"Standard_D4s_v3":

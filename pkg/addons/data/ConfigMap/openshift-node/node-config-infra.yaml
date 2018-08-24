@@ -37,9 +37,9 @@ data:
       rotate-certificates:
       - "true"
       kube-reserved:
-      - "cpu=200m,memory=512Mi"
+      - "*** GENERATED ***"
       system-reserved:
-      - "cpu=200m,memory=512Mi"
+      - "*** GENERATED ***"
     masterClientConnectionOverrides:
       acceptContentTypes: application/vnd.kubernetes.protobuf,application/json
       burst: 200
