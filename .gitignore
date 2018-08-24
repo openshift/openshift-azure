@@ -1,6 +1,7 @@
 /_data
 /createorupdate
 /env
+/logbridge
 /sync
 .vscode
 .idea

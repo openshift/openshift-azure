@@ -4,6 +4,20 @@
     "parameters": {},
     "variables": {},
     "resources": [
+        {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "name": "{{ .Config.LoggingWorkspace | js }}",
+            "apiVersion": "2017-03-15-preview",
+            "location": "{{ .ContainerService.Location | js }}",
+            "properties": {
+                "sku": {
+                    "Name": "PerGB2018"
+                },
+                "features": {
+                    "searchVersion": 1
+                }
+            }
+        },
 {{- if not (index .ContainerService.Properties.AgentPoolProfiles 0).VnetSubnetID }}
         {
             "type": "Microsoft.Network/virtualNetworks",

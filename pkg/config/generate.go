@@ -350,6 +350,12 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		}
 	}
 
+	if len(c.LoggingWorkspace) == 0 {
+		if c.LoggingWorkspace, err = randomStorageAccountName(); err != nil {
+			return
+		}
+	}
+
 	if len(c.RegistryConsoleOAuthSecret) == 0 {
 		if pass, err := randomString(64); err != nil {
 			return err

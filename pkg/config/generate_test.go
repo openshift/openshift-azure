@@ -83,6 +83,7 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.RegistryConsoleImage != "", "registry console image")
 	assert(c.AzureCLIImage != "", "azure cli image")
 	assert(c.SyncImage != "", "sync image")
+	assert(c.LogBridgeImage != "", "logbridge image")
 
 	assert(omc.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname != "", "public host name")
 	assert(omc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain != "", "router public subdomain")
@@ -94,6 +95,7 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(len(c.RegistryStorageAccount) != 0, "registry storage account")
 	assert(len(c.RegistryConsoleOAuthSecret) != 0, "registry console oauth secret")
 	assert(len(c.RouterStatsPassword) != 0, "router stats password")
+	assert(len(c.LoggingWorkspace) != 0, "logging workspace")
 
 	assert(c.ServiceCatalogClusterID != uuid.Nil, "service catalog cluster id")
 

@@ -14,6 +14,13 @@ if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker.service
   mount /var/lib/docker
   restorecon -R /var/lib/docker
+{{- if eq .Extra.Role "infra" }}
+  cat >/etc/docker/daemon.json <<'EOF'
+{
+  "log-driver": "journald"
+}
+EOF
+{{- end }}
   systemctl start docker.service
 fi
 
@@ -37,6 +44,48 @@ mkdir -p /etc/origin/cloudprovider
 
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
 {{ .Config.CloudProviderConf | String }}
+EOF
+
+mkdir -p /var/lib/logbridge
+cat >/etc/origin/node/pods/logbridge.yaml <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: logbridge
+  namespace: kube-system
+spec:
+  containers:
+  - image: {{ .Config.LogBridgeImage | quote }}
+    imagePullPolicy: Always
+    name: logbridge
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /state
+      name: state
+    - mountPath: /cloudprovider
+      name: master-cloud-provider
+      readOnly: true
+    - mountPath: /etc
+      name: etc
+      readOnly: true
+    - mountPath: /var/log
+      name: var-log
+      readOnly: true
+  hostNetwork: true
+  volumes:
+  - hostPath:
+      path: /var/lib/logbridge
+    name: state
+  - hostPath:
+      path: /etc/origin/cloudprovider
+    name: master-cloud-provider
+  - hostPath:
+      path: /etc
+    name: etc
+  - hostPath:
+      path: /var/log
+    name: var-log
 EOF
 
 # note: ${SERVICE_TYPE}-node crash loops until master is up

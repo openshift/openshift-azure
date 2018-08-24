@@ -14,6 +14,11 @@ if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker.service
   mount /var/lib/docker
   restorecon -R /var/lib/docker
+  cat >/etc/docker/daemon.json <<'EOF'
+{
+  "log-driver": "journald"
+}
+EOF
   systemctl start docker.service
 fi
 
@@ -588,6 +593,48 @@ spec:
     name: master-cloud-provider
 EOF
 fi
+
+mkdir -p /var/lib/logbridge
+cat >/etc/origin/node/pods/logbridge.yaml <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: logbridge
+  namespace: kube-system
+spec:
+  containers:
+  - image: {{ .Config.LogBridgeImage | quote }}
+    imagePullPolicy: Always
+    name: logbridge
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /state
+      name: state
+    - mountPath: /cloudprovider
+      name: master-cloud-provider
+      readOnly: true
+    - mountPath: /etc
+      name: etc
+      readOnly: true
+    - mountPath: /var/log
+      name: var-log
+      readOnly: true
+  hostNetwork: true
+  volumes:
+  - hostPath:
+      path: /var/lib/logbridge
+    name: state
+  - hostPath:
+      path: /etc/origin/cloudprovider
+    name: master-cloud-provider
+  - hostPath:
+      path: /etc
+    name: etc
+  - hostPath:
+      path: /var/log
+    name: var-log
+EOF
 
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig

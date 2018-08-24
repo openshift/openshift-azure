@@ -65,6 +65,8 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 		if c.SyncImage == "" {
 			c.SyncImage = "quay.io/openshift-on-azure/sync:v3.10"
 		}
+
+		c.LogBridgeImage = "quay.io/openshift-on-azure/logbridge:latest"
 	}
 }
 
@@ -104,6 +106,8 @@ func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) {
 		if c.SyncImage == "" {
 			c.SyncImage = "quay.io/openshift-on-azure/sync:v3.10"
 		}
+
+		c.LogBridgeImage = "quay.io/openshift-on-azure/logbridge:latest"
 	}
 }
 
