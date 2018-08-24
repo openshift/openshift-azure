@@ -14,6 +14,16 @@ if [[ -z "$AZURE_TENANT_ID" ]]; then
     exit 1
 fi
 
+if [[ -z "$AZURE_CLIENT_ID" ]]; then
+    echo error: must set AZURE_CLIENT_ID
+    exit 1
+fi
+
+if [[ -z "$AZURE_CLIENT_SECRET" ]]; then
+    echo error: must set AZURE_CLIENT_SECRET
+    exit 1
+fi
+
 if [[ -z "$DNS_DOMAIN" ]]; then
     echo error: must set DNS_DOMAIN
     exit 1
