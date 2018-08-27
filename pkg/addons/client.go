@@ -191,22 +191,8 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		}
 		Default(*existing)
 
-		// this part of code should be executed only for updates
-		// TODO: Split flows to separate functions
-		handleSpecialObjects(*existing, *o)
-
-		if reflect.DeepEqual(*existing, *o) {
-			log.Infof("Skip " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+		if !needsUpdate(existing, o) {
 			return
-		}
-
-		log.Infof("Update " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
-
-		// TODO: we should have tests that monitor these diffs:
-		// 1) when a cluster is created
-		// 2) when sync is run twice back-to-back on the same cluster
-		for _, diff := range deep.Equal(*existing, *o) {
-			log.Infof("- " + diff)
 		}
 
 		o.SetResourceVersion(rv)
@@ -215,6 +201,26 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 	})
 
 	return err
+}
+
+func needsUpdate(existing, o *unstructured.Unstructured) bool {
+	handleSpecialObjects(*existing, *o)
+
+	if reflect.DeepEqual(*existing, *o) {
+		log.Infof("Skip " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+		return false
+	}
+
+	log.Infof("Update " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+
+	// TODO: we should have tests that monitor these diffs:
+	// 1) when a cluster is created
+	// 2) when sync is run twice back-to-back on the same cluster
+	for _, diff := range deep.Equal(*existing, *o) {
+		log.Infof("- " + diff)
+	}
+
+	return true
 }
 
 // ServiceCatalogExists returns whether the service catalog API exists.
