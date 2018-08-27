@@ -13,6 +13,16 @@ test:
 generate:
 	go generate ./...
 
+logbridge: clean generate
+	go build ./cmd/logbridge
+
+logbridge-image: logbridge
+	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+	imagebuilder -f Dockerfile.logbridge -t quay.io/openshift-on-azure/logbridge:latest .
+
+logbridge-push: logbridge-image
+	docker push quay.io/openshift-on-azure/logbridge:latest
+
 sync: clean generate
 	CGO_ENABLED=0 go build ./cmd/sync
 

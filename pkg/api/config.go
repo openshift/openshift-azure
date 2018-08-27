@@ -40,6 +40,7 @@ type Config struct {
 	PrometheusImage             string
 	PrometheusAlertBufferImage  string
 	PrometheusAlertManagerImage string
+	LogBridgeImage              string
 
 	// kubeconfigs
 	AdminKubeconfig              *v1.Config
@@ -67,6 +68,7 @@ type Config struct {
 	RegistryStorageAccount     string
 	RegistryConsoleOAuthSecret string
 	RouterStatsPassword        string
+	LoggingWorkspace           string // workspace for Azure Log Analytics resource
 
 	// DNS configurables
 	RouterLBCNamePrefix string
