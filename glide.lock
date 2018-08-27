@@ -1,11 +1,10 @@
-hash: b8a1273d864e45415aa09291a783332e66042c8ecf2559f10b0f025798689bee
-updated: 2018-08-24T12:03:49.057987685-05:00
+hash: 210d501d362b7c99e9ae0c6bf8049014d1f683a0726aacd7d35ddbf9849abb07
+updated: 2018-08-27T18:53:45.860031632-05:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
   subpackages:
   - services/compute/mgmt/2018-06-01/compute
-  - services/network/mgmt/2018-05-01/network
   - services/preview/operationalinsights/mgmt/2015-11-01-preview/operationalinsights
   - services/resources/mgmt/2018-05-01/resources
   - services/storage/mgmt/2018-02-01/storage
