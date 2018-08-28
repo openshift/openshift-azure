@@ -16,6 +16,11 @@ The Docker daemon on master and infra nodes (but not on compute nodes) is
 configured to log to the systemd journal.  This makes logs for most non-customer
 containerised workload available via Log Analytics.
 
+### Build
+
+Make sure you have `systemd-devel` installed, then build the `logbridge` binary
+with `make logbridge`.
+
 #### Usage
 
 There are multiple consoles for querying stored logs.  An easy approach is to
