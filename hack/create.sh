@@ -94,3 +94,4 @@ hack/dns.sh zone-create $RESOURCEGROUP
 hack/dns.sh cname-create $RESOURCEGROUP openshift $RESOURCEGROUP.eastus.cloudapp.azure.com
 hack/dns.sh cname-create $RESOURCEGROUP '*' $RESOURCEGROUP-router.eastus.cloudapp.azure.com
 
+echo "Success"
