@@ -6,7 +6,7 @@ type ContextKey string
 const (
 	ContextKeyClientID       ContextKey = "ClientID"
 	ContextKeyClientSecret   ContextKey = "ClientSecret"
-	ContextKeyTennantID      ContextKey = "TenantID"
+	ContextKeyTenantID       ContextKey = "TenantID"
 	ContextKeySubscriptionId ContextKey = "SubscriptionId"
 	ContextKeyResourceGroup  ContextKey = "ResourceGroup"
 )
