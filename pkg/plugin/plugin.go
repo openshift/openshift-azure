@@ -30,7 +30,7 @@ func NewPlugin(entry *logrus.Entry) api.Plugin {
 	}
 }
 
-func (p *plugin) MergeConfig(cs, oldCs *acsapi.OpenShiftManagedCluster) {
+func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *acsapi.OpenShiftManagedCluster) {
 	if oldCs == nil {
 		return
 	}
@@ -58,12 +58,12 @@ func (p *plugin) MergeConfig(cs, oldCs *acsapi.OpenShiftManagedCluster) {
 	}
 }
 
-func (p *plugin) Validate(new, old *acsapi.OpenShiftManagedCluster, externalOnly bool) []error {
+func (p *plugin) Validate(ctx context.Context, new, old *acsapi.OpenShiftManagedCluster, externalOnly bool) []error {
 	log.Info("validating internal data models")
 	return validate.Validate(new, old, externalOnly)
 }
 
-func (p *plugin) GenerateConfig(cs *acsapi.OpenShiftManagedCluster) error {
+func (p *plugin) GenerateConfig(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
 	log.Info("generating configs")
 	// TODO should we save off the original config here and if there are any errors we can restore it?
 	if cs.Config == nil {
@@ -71,7 +71,7 @@ func (p *plugin) GenerateConfig(cs *acsapi.OpenShiftManagedCluster) error {
 	}
 
 	upgrader := config.NewSimpleUpgrader(p.entry)
-	err := upgrader.Upgrade(cs)
+	err := upgrader.Upgrade(ctx, cs)
 	if err != nil {
 		return err
 	}
@@ -83,10 +83,10 @@ func (p *plugin) GenerateConfig(cs *acsapi.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func (p *plugin) GenerateARM(cs *acsapi.OpenShiftManagedCluster) ([]byte, error) {
+func (p *plugin) GenerateARM(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) ([]byte, error) {
 	log.Info("generating arm templates")
 	generator := arm.NewSimpleGenerator(p.entry)
-	return generator.Generate(cs)
+	return generator.Generate(ctx, cs)
 }
 
 func (p *plugin) InitializeCluster(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {

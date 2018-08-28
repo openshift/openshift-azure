@@ -11,8 +11,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
-func update(cs *api.OpenShiftManagedCluster, p api.Plugin) error {
-	authorizer, err := auth.NewAuthorizerFromEnvironment()
+func update(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin) error {
+	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTennantID).(string))
+	authorizer, err := config.Authorizer()
 	if err != nil {
 		return err
 	}
@@ -21,8 +22,6 @@ func update(cs *api.OpenShiftManagedCluster, p api.Plugin) error {
 	ssc.Authorizer = authorizer
 	vmc := compute.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID)
 	vmc.Authorizer = authorizer
-
-	ctx := context.Background()
 
 	err = updateInPlace(ctx, cs, p, ssc, vmc, api.AgentPoolProfileRoleMaster)
 	if err != nil {

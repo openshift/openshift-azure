@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
@@ -25,7 +26,7 @@ func TestMerge(t *testing.T) {
 
 	// should fix all of the items removed above and we should
 	// be able to run through the entire plugin process.
-	p.MergeConfig(newCluster, oldCluster)
+	p.MergeConfig(context.Background(), newCluster, oldCluster)
 
 	if newCluster.Config == nil {
 		t.Errorf("new cluster config should be merged")
@@ -44,15 +45,15 @@ func TestMerge(t *testing.T) {
 }
 
 func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldCluster *api.OpenShiftManagedCluster, t *testing.T) {
-	if errs := p.Validate(newCluster, oldCluster, false); len(errs) != 0 {
+	if errs := p.Validate(context.Background(), newCluster, oldCluster, false); len(errs) != 0 {
 		t.Fatalf("error validating: %s", spew.Sdump(errs))
 	}
 
-	if err := p.GenerateConfig(newCluster); err != nil {
+	if err := p.GenerateConfig(context.Background(), newCluster); err != nil {
 		t.Fatalf("error generating config for arm generate test: %s", spew.Sdump(err))
 	}
 
-	bytes, err := p.GenerateARM(newCluster)
+	bytes, err := p.GenerateARM(context.Background(), newCluster)
 	if err != nil {
 		t.Fatalf("error generating arm: %s", spew.Sdump(err))
 	}
