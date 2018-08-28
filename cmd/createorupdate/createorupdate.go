@@ -100,13 +100,13 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
-	err = deploy(ctx, cs, p, azuredeploy)
-	if err != nil {
-		return nil, err
-	}
-
 	if oldCs != nil {
-		err = update(ctx, cs, p)
+		err = update(ctx, cs, oldCs, p, azuredeploy)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err = deploy(ctx, cs, p, azuredeploy)
 		if err != nil {
 			return nil, err
 		}

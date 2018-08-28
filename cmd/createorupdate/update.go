@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
@@ -11,17 +12,72 @@ import (
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
-func update(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin) error {
+func update(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster, p api.Plugin, azuredeploy []byte) error {
 	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
 	authorizer, err := config.Authorizer()
 	if err != nil {
 		return err
 	}
-
 	ssc := compute.NewVirtualMachineScaleSetsClient(cs.Properties.AzProfile.SubscriptionID)
 	ssc.Authorizer = authorizer
 	vmc := compute.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID)
 	vmc.Authorizer = authorizer
+
+	// Need to determine whether the current update is a scale operation before
+	// applying the ARM template. For scale up, we need to figure out which are
+	// the new VMs that were created and wait for them to turn ready. For scale
+	// down, we need to drain the correct VMs before applying the ARM template
+	// scales them down.
+	isScaleOp := isScaleUpdate(cs, oldCs)
+	vmsBefore := map[string]struct{}{}
+	if isScaleOp {
+		for _, agent := range cs.Properties.AgentPoolProfiles {
+			vms, err := listVMs(ctx, cs, vmc, agent.Role)
+			if err != nil {
+				return err
+			}
+
+			if len(vms) > agent.Count {
+				for _, vm := range vms[agent.Count:] {
+					if err := drain(ctx, cs, p, vmc, agent.Role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName); err != nil {
+						return err
+					}
+				}
+			} else {
+				for _, vm := range vms {
+					vmsBefore[*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName] = struct{}{}
+				}
+			}
+		}
+	}
+
+	// Apply the ARM template
+	if err := deploy(ctx, cs, p, azuredeploy); err != nil {
+		return err
+	}
+
+	if isScaleOp {
+		for _, agent := range cs.Properties.AgentPoolProfiles {
+			vms, err := listVMs(ctx, cs, vmc, agent.Role)
+			if err != nil {
+				return err
+			}
+
+			// wait for newly created VMs to reach readiness
+			for _, vm := range vms {
+				hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
+				if _, found := vmsBefore[hostname]; !found {
+					log.Infof("waiting for %s to be ready", hostname)
+					err = p.WaitForReady(ctx, cs, agent.Role, hostname)
+					if err != nil {
+						return err
+					}
+				}
+			}
+		}
+
+		return nil
+	}
 
 	err = updateInPlace(ctx, cs, p, ssc, vmc, api.AgentPoolProfileRoleMaster)
 	if err != nil {
@@ -41,6 +97,33 @@ func update(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin) 
 	}
 
 	return nil
+}
+
+// isScaleUpdate returns whether the update is a scale operation.
+func isScaleUpdate(cs, oldCs *api.OpenShiftManagedCluster) bool {
+	newCounts := make(map[string]int)
+	for _, new := range cs.Properties.AgentPoolProfiles {
+		newCounts[new.Name] = new.Count
+	}
+
+	var isScaleUpdate bool
+	for i, old := range oldCs.Properties.AgentPoolProfiles {
+		if newCounts[old.Name] != old.Count {
+			isScaleUpdate = true
+		}
+		oldCs.Properties.AgentPoolProfiles[i].Count = newCounts[old.Name]
+	}
+
+	// No scale operations.
+	if !isScaleUpdate {
+		return false
+	}
+	// Includes other non-scaling related updates
+	if !reflect.DeepEqual(cs, oldCs) {
+		return false
+	}
+
+	return true
 }
 
 func getCount(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) int {
@@ -126,20 +209,7 @@ func updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.P
 			}
 		}
 
-		// remove surplus VM
-		log.Infof("draining %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		err = p.Drain(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		if err != nil {
-			return err
-		}
-
-		log.Infof("deleting %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		delFuture, err := vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
-		if err != nil {
-			return err
-		}
-
-		if err := delFuture.WaitForCompletion(ctx, vmc.Client); err != nil {
+		if err := drain(ctx, cs, p, vmc, role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName); err != nil {
 			return err
 		}
 	}
@@ -223,4 +293,26 @@ func updateInPlace(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.P
 	}
 
 	return nil
+}
+
+func drain(
+	ctx context.Context,
+	cs *api.OpenShiftManagedCluster,
+	p api.Plugin,
+	vmc compute.VirtualMachineScaleSetVMsClient,
+	role api.AgentPoolProfileRole,
+	instanceID, nodeName string,
+) error {
+	log.Infof("draining %s", nodeName)
+	if err := p.Drain(ctx, cs, role, nodeName); err != nil {
+		return err
+	}
+
+	log.Infof("deleting %s", nodeName)
+	future, err := vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), instanceID)
+	if err != nil {
+		return err
+	}
+
+	return future.WaitForCompletion(ctx, vmc.Client)
 }
