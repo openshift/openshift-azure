@@ -206,7 +206,7 @@ func main() {
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, acsapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
 	ctx = context.WithValue(ctx, acsapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-	ctx = context.WithValue(ctx, acsapi.ContextKeyTennantID, os.Getenv("AZURE_TENANT_ID"))
+	ctx = context.WithValue(ctx, acsapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
 	ctx = context.WithValue(ctx, acsapi.ContextKeySubscriptionId, os.Getenv("AZURE_SUBSCRIPTION_ID"))
 	ctx = context.WithValue(ctx, acsapi.ContextKeyResourceGroup, os.Getenv("RESOURCEGROUP"))
 

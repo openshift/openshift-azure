@@ -18,7 +18,7 @@ func deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin, 
 		return err
 	}
 
-	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTennantID).(string))
+	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
 	authorizer, err := config.Authorizer()
 	if err != nil {
 		return err

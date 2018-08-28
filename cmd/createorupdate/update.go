@@ -12,7 +12,7 @@ import (
 )
 
 func update(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin) error {
-	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTennantID).(string))
+	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
 	authorizer, err := config.Authorizer()
 	if err != nil {
 		return err
