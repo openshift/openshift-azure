@@ -37,7 +37,7 @@ properties:
   agentPoolProfiles:
   - name: infra
     role: infra
-    count: 1
+    count: 2
     vmSize: Standard_D2s_v3
     osType: Linux
   - name: compute

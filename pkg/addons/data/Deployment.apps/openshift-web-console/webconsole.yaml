@@ -7,7 +7,7 @@ metadata:
   name: webconsole
   namespace: openshift-web-console
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 2
   selector:
     matchLabels:
@@ -25,6 +25,18 @@ spec:
         webconsole: "true"
       name: webconsole
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - openshift-web-console
+              topologyKey: "kubernetes.io/hostname"
       containers:
       - command:
         - /usr/bin/origin-web-console
