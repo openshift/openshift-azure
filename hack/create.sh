@@ -1,5 +1,6 @@
 #!/bin/bash -ex
 
+set +x
 if ! az account show >/dev/null; then
     exit 1
 fi
@@ -33,6 +34,7 @@ if [[ -z "$DNS_RESOURCEGROUP" ]]; then
     echo error: must set DNS_RESOURCEGROUP
     exit 1
 fi
+set -x
 
 if [[ $# -ne 1 ]]; then
     echo usage: $0 resourcegroup
