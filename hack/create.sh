@@ -48,11 +48,15 @@ mkdir -p _data/_out
 
 az group create -n $RESOURCEGROUP -l eastus --tags now=$(date +%s) >/dev/null
 
-if [[ -z "$AZURE_AAD_CLIENT_ID" ]]; then
-    set +x
-    . <(hack/aad.sh app-create openshift.$RESOURCEGROUP.$DNS_DOMAIN $RESOURCEGROUP)
-    set -x
+set +x
+if [[ "$AZURE_AAD_CLIENT_ID" ]]; then
+    . <(hack/aad.sh app-update $AZURE_AAD_CLIENT_ID https://openshift.${RESOURCEGROUP}.${DNS_DOMAIN}/oauth2callback/Azure%20AD)
+else
+    AZURE_AAD_CLIENT_ID=$AZURE_CLIENT_ID
+    AZURE_AAD_CLIENT_SECRET=$AZURE_CLIENT_SECRET
 fi
+
+set -x
 
 # TODO: if the user interrupts the process here, the AAD application will leak.
 

@@ -32,24 +32,19 @@
 
 1. **AAD Application / Service principal**.  The deployed OpenShift cluster
    needs a valid AAD application and service principal to call back into the
-   Azure API, and optionally in order to enable AAD authentication.  There are a
-   few options here:
+   Azure API, and optionally in order to enable AAD authentication. 
+   Application can be created using script `./hack/aad.sh app-create`.
 
-   1. (Ask your Azure subscription administrator to) precreate a generic AAD
-      application and service principal with secret and grant it *Contributor*
-      access to the subscription.  Record the service principal client ID and
-      secret.  Good enough to deploy OpenShift clusters, but AAD authentication
-      won't work.
+   AAD Flow:
+   1. Create an application.
+   2. Add `$AZURE_AAD_CLIENT_ID` variable with application ID to `env` file.
+   3. Create the cluster. `create.sh` script will update your application with 
+   required details. This can be done manually with `./hack/aad.sh app-update`
+   4. Get your application permissions approved by organization administrator.
+   Without approval cluster will start, just login will not work.
 
-   1. Automatically create an AAD application and service principal.  Your Azure
-      user will need *Contributor* and *User Access Administrator* roles, and
-      your AAD will need to have *Users can register applications* enabled.
-
-   1. (Ask your Azure subscription administrator to) precreate a specific AAD
-      application and service principal with secret.  You can use `hack/aad.sh`
-      to help with this process.  For AAD authentication to work, the public
-      hostname of the OpenShift cluster must match the AAD application created.
-      Record the service principal client ID and secret.
+  Once you have application with approved/granted permissions it can be re-used 
+  for all future clusters.  
 
 ### Deploy an OpenShift cluster
 
@@ -76,6 +71,13 @@ location: eastus
 properties:
   openShiftVersion: v3.10
   publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+  authProfile:
+    identityProviders:
+    - name: Azure AAD
+      provider:
+        kind: AADIdentityProvider
+        clientId: $AZURE_AAD_CLIENT_ID
+        secret: $AZURE_AAD_CLIENT_SECRET
   routerProfiles:
   - name: default
     publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
@@ -108,6 +110,13 @@ location: eastus
 properties:
   openShiftVersion: v3.10
   publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+  authProfile:
+    identityProviders:
+    - name: Azure AAD
+      provider:
+        kind: AADIdentityProvider
+        clientId: $AZURE_AAD_CLIENT_ID
+        secret: $AZURE_AAD_CLIENT_SECRET
   routerProfiles:
   - name: default
     publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
