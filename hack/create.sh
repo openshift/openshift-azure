@@ -36,16 +36,6 @@ if [[ -z "$DNS_RESOURCEGROUP" ]]; then
 fi
 set -x
 
-if [[ -z "$AZURE_CLIENT_ID" ]]; then
-    echo error: must set AZURE_CLIENT_ID
-    exit 1
-fi
-
-if [[ -z "$AZURE_CLIENT_SECRET" ]]; then
-    echo error: must set AZURE_CLIENT_SECRET
-    exit 1
-fi
-
 if [[ $# -ne 1 ]]; then
     echo usage: $0 resourcegroup
     exit 1
