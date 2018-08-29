@@ -1,4 +1,5 @@
 #!/bin/bash -ex
+shopt -s extglob
 
 set +x
 if ! az account show >/dev/null; then
@@ -96,7 +97,7 @@ properties:
 EOF
 
 go generate ./...
-go run cmd/createorupdate/*.go -loglevel=debug
+go run cmd/createorupdate/!(*_test.go) -loglevel=debug
 
 # TODO: This should be configured by MS
 hack/dns.sh zone-create $RESOURCEGROUP
