@@ -82,22 +82,14 @@ func readDB(cs *acsapi.OpenShiftManagedCluster) (map[string]unstructured.Unstruc
 // each configmap or secret.
 func syncWorkloadsConfig(db map[string]unstructured.Unstructured) error {
 	// map config resources to their hashed content
-	configToHash := make(map[string][]byte)
+	configToHash := make(map[string]string)
 	for _, o := range db {
 		if o.GroupVersionKind().Kind != "Secret" &&
 			o.GroupVersionKind().Kind != "ConfigMap" {
 			continue
 		}
 
-		h := sha256.New()
-		for _, v := range jsonpath.MustCompile("$.data").Get(o.Object) {
-			// NOTE: this relies on the fact that %#v on a map sorts by key
-			fmt.Fprintf(h, "%#v", v)
-		}
-		for _, v := range jsonpath.MustCompile("$.stringData").Get(o.Object) {
-			fmt.Fprintf(h, "%#v", v)
-		}
-		configToHash[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = h.Sum(nil)
+		configToHash[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = getHash(&o)
 	}
 
 	secretGk := schema.GroupKind{Kind: "Secret"}
@@ -120,7 +112,7 @@ func syncWorkloadsConfig(db map[string]unstructured.Unstructured) error {
 			key := fmt.Sprintf("checksum/secret-%s", secretName)
 			secretKey := KeyFunc(secretGk, o.GetNamespace(), secretName)
 			if hash, found := configToHash[secretKey]; found {
-				setPodTemplateAnnotation(key, base64.StdEncoding.EncodeToString(hash), o)
+				setPodTemplateAnnotation(key, hash, o)
 			}
 		}
 
@@ -129,12 +121,35 @@ func syncWorkloadsConfig(db map[string]unstructured.Unstructured) error {
 			key := fmt.Sprintf("checksum/configmap-%s", configMapName)
 			configMapKey := KeyFunc(configMapGk, o.GetNamespace(), configMapName)
 			if hash, found := configToHash[configMapKey]; found {
-				setPodTemplateAnnotation(key, base64.StdEncoding.EncodeToString(hash), o)
+				setPodTemplateAnnotation(key, hash, o)
 			}
 		}
 	}
 
 	return nil
+}
+
+func getHash(o *unstructured.Unstructured) string {
+	var content map[string]interface{}
+	for _, v := range jsonpath.MustCompile("$.data").Get(o.Object) {
+		content = v.(map[string]interface{})
+	}
+	for _, v := range jsonpath.MustCompile("$.stringData").Get(o.Object) {
+		content = v.(map[string]interface{})
+	}
+	// sort config content appropriately
+	var keys []string
+	for key := range content {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	h := sha256.New()
+	for _, key := range keys {
+		fmt.Fprintf(h, "%s: %#v", key, content[key])
+	}
+
+	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
 // setPodTemplateAnnotation sets the provided key-value pair as an annotation
