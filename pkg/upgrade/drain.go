@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
-	policy "k8s.io/api/policy/v1beta1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -60,7 +59,7 @@ func (u *simpleUpgrader) Drain(ctx context.Context, cs *api.OpenShiftManagedClus
 			return err
 		}
 
-		err = evictPods(ctx, kc, nodeName)
+		err = deletePods(ctx, kc, nodeName)
 		if err != nil {
 			return err
 		}
@@ -101,7 +100,7 @@ func max(i, j time.Duration) time.Duration {
 	return j
 }
 
-func evictPods(ctx context.Context, kc *kubernetes.Clientset, nodeName string) error {
+func deletePods(ctx context.Context, kc *kubernetes.Clientset, nodeName string) error {
 	podList, err := kc.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
 		FieldSelector: fields.SelectorFromSet(fields.Set{"spec.nodeName": nodeName}).String(),
 	})
@@ -121,12 +120,7 @@ func evictPods(ctx context.Context, kc *kubernetes.Clientset, nodeName string) e
 			continue
 		}
 
-		err = kc.CoreV1().Pods(pod.Namespace).Evict(&policy.Eviction{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      pod.Name,
-				Namespace: pod.Namespace,
-			},
-		})
+		err = kc.CoreV1().Pods(pod.Namespace).Delete(pod.Name, &metav1.DeleteOptions{})
 		switch {
 		case err == nil:
 			d := 30 * time.Second
