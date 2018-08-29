@@ -101,13 +101,6 @@ func TestNew(t *testing.T) {
 			Config:  &Config{},
 		},
 
-		"server name": {
-			TLS: true,
-			Config: &Config{TLS: TLSConfig{
-				ServerName: "foo",
-			}},
-		},
-
 		"ca transport": {
 			TLS: true,
 			Config: &Config{

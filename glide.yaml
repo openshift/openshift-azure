@@ -1,11 +1,11 @@
 package: github.com/openshift/openshift-azure
 import:
 - package: k8s.io/client-go
-  version: kubernetes-1.10.6
+  version: ~v7.0.0
 - package: k8s.io/kube-aggregator
-  version: kubernetes-1.10.6
+  version: kubernetes-1.10.2
 - package: k8s.io/apimachinery
-  version: kubernetes-1.10.6
+  version: kubernetes-1.10.2
 - package: github.com/davecgh/go-spew
   version: ^1.1.0
 - package: github.com/Azure/azure-sdk-for-go
