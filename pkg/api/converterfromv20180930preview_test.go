@@ -4,14 +4,14 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/openshift/openshift-azure/pkg/api/v1"
+	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
-var testOpenShiftCluster = &v1.OpenShiftManagedCluster{
+var testOpenShiftCluster = &v20180930preview.OpenShiftManagedCluster{
 	ID:       "id",
 	Location: "location",
 	Name:     "name",
-	Plan: &v1.ResourcePurchasePlan{
+	Plan: &v20180930preview.ResourcePurchasePlan{
 		Name:          "plan.name",
 		Product:       "plan.product",
 		PromotionCode: "plan.promotionCode",
@@ -22,16 +22,16 @@ var testOpenShiftCluster = &v1.OpenShiftManagedCluster{
 		"tags.k2": "v2",
 	},
 	Type: "type",
-	Properties: &v1.Properties{
+	Properties: &v20180930preview.Properties{
 		ProvisioningState: "properties.provisioningState",
 		OpenShiftVersion:  "properties.openShiftVersion",
 		PublicHostname:    "properties.publicHostname",
 		FQDN:              "properties.fqdn",
-		AuthProfile: v1.AuthProfile{
-			IdentityProviders: []v1.IdentityProvider{
+		AuthProfile: v20180930preview.AuthProfile{
+			IdentityProviders: []v20180930preview.IdentityProvider{
 				{
 					Name: "properties.authProfile.identityProviders.0.name",
-					Provider: &v1.AADIdentityProvider{
+					Provider: &v20180930preview.AADIdentityProvider{
 						Kind:     "AADIdentityProvider",
 						ClientID: "properties.authProfile.identityProviders.0.provider.clientId",
 						Secret:   "properties.authProfile.identityProviders.0.provider.secret",
@@ -39,7 +39,7 @@ var testOpenShiftCluster = &v1.OpenShiftManagedCluster{
 				},
 			},
 		},
-		RouterProfiles: []v1.RouterProfile{
+		RouterProfiles: []v20180930preview.RouterProfile{
 			{
 				Name:            "properties.routerProfiles.0.name",
 				PublicSubdomain: "properties.routerProfiles.0.publicSubdomain",
@@ -51,8 +51,8 @@ var testOpenShiftCluster = &v1.OpenShiftManagedCluster{
 				FQDN:            "properties.routerProfiles.1.fqdn",
 			},
 		},
-		MasterPoolProfile: v1.MasterPoolProfile{
-			ProfileSpec: v1.ProfileSpec{
+		MasterPoolProfile: v20180930preview.MasterPoolProfile{
+			ProfileSpec: v20180930preview.ProfileSpec{
 				Name:         "properties.agentPoolProfiles.0.name",
 				Count:        1,
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
@@ -60,10 +60,10 @@ var testOpenShiftCluster = &v1.OpenShiftManagedCluster{
 				OSType:       "properties.agentPoolProfiles.0.osType",
 			},
 		},
-		AgentPoolProfiles: []v1.AgentPoolProfile{
+		AgentPoolProfiles: []v20180930preview.AgentPoolProfile{
 			{
 				Role: "properties.agentPoolProfiles.0.role",
-				ProfileSpec: v1.ProfileSpec{
+				ProfileSpec: v20180930preview.ProfileSpec{
 					Name:         "properties.agentPoolProfiles.0.name",
 					Count:        1,
 					VMSize:       "properties.agentPoolProfiles.0.vmSize",
@@ -73,7 +73,7 @@ var testOpenShiftCluster = &v1.OpenShiftManagedCluster{
 			},
 			{
 				Role: "properties.agentPoolProfiles.0.role",
-				ProfileSpec: v1.ProfileSpec{
+				ProfileSpec: v20180930preview.ProfileSpec{
 					Name:         "properties.agentPoolProfiles.0.name",
 					Count:        2,
 					VMSize:       "properties.agentPoolProfiles.0.vmSize",
@@ -82,7 +82,7 @@ var testOpenShiftCluster = &v1.OpenShiftManagedCluster{
 				},
 			},
 		},
-		ServicePrincipalProfile: v1.ServicePrincipalProfile{
+		ServicePrincipalProfile: v20180930preview.ServicePrincipalProfile{
 			ClientID: "properties.servicePrincipalProfile.clientId",
 			Secret:   "properties.servicePrincipalProfile.secret",
 		},
@@ -170,9 +170,9 @@ var testContainerService = &OpenShiftManagedCluster{
 	},
 }
 
-func TestConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster(t *testing.T) {
-	cs := ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster(testOpenShiftCluster)
+func TestConvertFromV20180930preview(t *testing.T) {
+	cs := ConvertFromV20180930preview(testOpenShiftCluster)
 	if !reflect.DeepEqual(cs, testContainerService) {
-		t.Errorf("ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster returned unexpected result\n%#v\n", cs)
+		t.Errorf("ConvertFromV20180930preview returned unexpected result\n%#v\n", cs)
 	}
 }

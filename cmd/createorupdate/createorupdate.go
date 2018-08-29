@@ -12,7 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/errors"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/api/v1"
+	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
@@ -21,13 +21,13 @@ import (
 var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
 
 // createOrUpdate simulates the RP
-func createOrUpdate(ctx context.Context, oc *v1.OpenShiftManagedCluster, entry *logrus.Entry) (*v1.OpenShiftManagedCluster, error) {
+func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, entry *logrus.Entry) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
 	p := plugin.NewPlugin(entry)
 
 	// convert the external API manifest into the internal API representation
 	log.Info("convert to internal")
-	cs := acsapi.ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster(oc)
+	cs := acsapi.ConvertFromV20180930preview(oc)
 
 	// the RP will enrich the internal API representation with data not included
 	// in the original request
@@ -119,7 +119,7 @@ func createOrUpdate(ctx context.Context, oc *v1.OpenShiftManagedCluster, entry *
 
 	// convert our (probably changed) internal API representation back to the
 	// external API manifest to return it to the user
-	oc = acsapi.ConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster(cs)
+	oc = acsapi.ConvertToV20180930preview(cs)
 
 	return oc, nil
 }
@@ -195,7 +195,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var oc *v1.OpenShiftManagedCluster
+	var oc *v20180930preview.OpenShiftManagedCluster
 	err = yaml.Unmarshal(b, &oc)
 	if err != nil {
 		log.Fatal(err)
