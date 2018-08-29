@@ -23,6 +23,18 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 					},
 				},
 			},
+			AuthProfile: &api.AuthProfile{
+				IdentityProviders: []api.IdentityProvider{
+					{
+						Name: "properties.authProfile.identityProviders.0.name",
+						Provider: &api.AADIdentityProvider{
+							Kind:     "AADIdentityProvider",
+							ClientID: "properties.authProfile.identityProviders.0.provider.clientId",
+							Secret:   "properties.authProfile.identityProviders.0.provider.secret",
+						},
+					},
+				},
+			},
 			AgentPoolProfiles: []*api.AgentPoolProfile{
 				{
 					Name:   "master",

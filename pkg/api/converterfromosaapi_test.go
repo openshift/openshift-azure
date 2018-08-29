@@ -27,6 +27,18 @@ var testOpenShiftCluster = &v1.OpenShiftManagedCluster{
 		OpenShiftVersion:  "properties.openShiftVersion",
 		PublicHostname:    "properties.publicHostname",
 		FQDN:              "properties.fqdn",
+		AuthProfile: v1.AuthProfile{
+			IdentityProviders: []v1.IdentityProvider{
+				{
+					Name: "properties.authProfile.identityProviders.0.name",
+					Provider: &v1.AADIdentityProvider{
+						Kind:     "AADIdentityProvider",
+						ClientID: "properties.authProfile.identityProviders.0.provider.clientId",
+						Secret:   "properties.authProfile.identityProviders.0.provider.secret",
+					},
+				},
+			},
+		},
 		RouterProfiles: []v1.RouterProfile{
 			{
 				Name:            "properties.routerProfiles.0.name",
@@ -71,7 +83,7 @@ var testOpenShiftCluster = &v1.OpenShiftManagedCluster{
 			},
 		},
 		ServicePrincipalProfile: v1.ServicePrincipalProfile{
-			ClientID: "properties.servicePrincipalProfile.clientID",
+			ClientID: "properties.servicePrincipalProfile.clientId",
 			Secret:   "properties.servicePrincipalProfile.secret",
 		},
 	},
@@ -113,6 +125,18 @@ var testContainerService = &OpenShiftManagedCluster{
 			},
 		},
 		FQDN: "properties.fqdn",
+		AuthProfile: &AuthProfile{
+			IdentityProviders: []IdentityProvider{
+				{
+					Name: "properties.authProfile.identityProviders.0.name",
+					Provider: &AADIdentityProvider{
+						Kind:     "AADIdentityProvider",
+						ClientID: "properties.authProfile.identityProviders.0.provider.clientId",
+						Secret:   "properties.authProfile.identityProviders.0.provider.secret",
+					},
+				},
+			},
+		},
 		AgentPoolProfiles: []*AgentPoolProfile{
 			{
 				Name:         "properties.agentPoolProfiles.0.name",
@@ -140,7 +164,7 @@ var testContainerService = &OpenShiftManagedCluster{
 			},
 		},
 		ServicePrincipalProfile: &ServicePrincipalProfile{
-			ClientID: "properties.servicePrincipalProfile.clientID",
+			ClientID: "properties.servicePrincipalProfile.clientId",
 			Secret:   "properties.servicePrincipalProfile.secret",
 		},
 	},

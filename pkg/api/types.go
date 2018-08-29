@@ -47,6 +47,7 @@ type Properties struct {
 	AgentPoolProfiles       []*AgentPoolProfile      `json:"agentPoolProfiles,omitempty"`
 	ServicePrincipalProfile *ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
 	AzProfile               *AzProfile               `json:"azProfile,omitempty"`
+	AuthProfile             *AuthProfile             `json:"authProfile,omitempty"`
 	// Master LB public endpoint/FQDN with port
 	// The format will be FQDN:2376
 	// Not used during PUT, returned as part of GET
@@ -116,6 +117,25 @@ type AgentPoolProfile struct {
 	Ports        []int                `json:"ports,omitempty"`
 	VnetSubnetID string               `json:"vnetSubnetID,omitempty"`
 	Role         AgentPoolProfileRole `json:"role,omitempty"`
+}
+
+// AuthProfile defines all possible authentication profiles for OpenShift cluster
+type AuthProfile struct {
+	IdentityProviders []IdentityProvider `json:"identityProviders,omitempty"`
+}
+
+// IdentityProvider is heavily cut down equivalent to IdentityProvider in the upstream
+type IdentityProvider struct {
+	Name     string      `json:"name"`
+	Provider interface{} `json:"provider,omityempty"`
+}
+
+// AADIdentityProvider defines Identity provider for MS AAD
+// it is based on OpenID IdentityProvider
+type AADIdentityProvider struct {
+	Kind     string `json:"kind,omitempty"`
+	ClientID string `json:"clientId,omitempty"`
+	Secret   string `json:"secret,omitempty"`
 }
 
 // AgentPoolProfileRole represents an agent role

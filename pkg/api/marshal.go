@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"reflect"
 
 	"github.com/ghodss/yaml"
@@ -234,6 +235,38 @@ func (c *CertKeyPair) UnmarshalJSON(b []byte) error {
 		default:
 			v.Field(i).Set(reflect.ValueOf(m[k]))
 		}
+	}
+
+	return nil
+}
+
+func (ip *IdentityProvider) UnmarshalJSON(b []byte) error {
+	dummy := struct {
+		Name     string          `json:"name,omitempty"`
+		Provider json.RawMessage `json:"provider,omityempty"`
+	}{}
+	err := json.Unmarshal(b, &dummy)
+	if err != nil {
+		return err
+	}
+	// peek inside to find out type
+	m := map[string]interface{}{}
+	err = json.Unmarshal(dummy.Provider, &m)
+	if err != nil {
+		return err
+	}
+
+	switch m["kind"] {
+	case "AADIdentityProvider":
+		ip.Provider = &AADIdentityProvider{}
+		//unmarshal to the right type
+		err = json.Unmarshal(dummy.Provider, &ip.Provider)
+		if err != nil {
+			return err
+		}
+		ip.Name = dummy.Name
+	default:
+		return fmt.Errorf("unsupported identity provider kind %q", m["kind"])
 	}
 
 	return nil

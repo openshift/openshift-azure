@@ -27,6 +27,18 @@ var testOpenShiftCluster = &OpenShiftManagedCluster{
 		OpenShiftVersion:  "properties.openShiftVersion",
 		PublicHostname:    "properties.publicHostname",
 		FQDN:              "properties.fqdn",
+		AuthProfile: AuthProfile{
+			IdentityProviders: []IdentityProvider{
+				{
+					Name: "properties.authProfile.identityProvider.0.name",
+					Provider: &AADIdentityProvider{
+						Kind:     "AADIdentityProvider",
+						ClientID: "properties.authProfile.identityProviders.0.provider.clientId",
+						Secret:   "properties.authProfile.identityProviders.0.provider.secret",
+					},
+				},
+			},
+		},
 		RouterProfiles: []RouterProfile{
 			{
 				Name:            "properties.routerProfiles.0.name",
@@ -134,6 +146,18 @@ var testOpenShiftClusterJSON = []byte(`{
 				"role": "properties.agentPoolProfiles.0.role"
 			}
 		],
+		"authProfile": {
+			"identityProviders": [
+				{
+					"name": "properties.authProfile.identityProvider.0.name",
+					"provider": {
+						"kind": "AADIdentityProvider",
+						"clientId": "properties.authProfile.identityProviders.0.provider.clientId",
+						"secret": "properties.authProfile.identityProviders.0.provider.secret"
+					}
+				}
+			]
+		},
 		"servicePrincipalProfile": {
 			"clientId": "properties.servicePrincipalProfile.clientID",
 			"secret": "properties.servicePrincipalProfile.secret"

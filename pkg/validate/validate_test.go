@@ -12,36 +12,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api/v1"
 )
 
-/*
-name: openshift
-location: eastus
-properties:
-  openShiftVersion: "$DEPLOY_VERSION"
-  publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
-  routerProfiles:
-  - name: default
-    publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
-  agentPoolProfiles:
-  - name: master
-    role: master
-    count: 3
-    vmSize: Standard_D2s_v3
-    osType: Linux
-  - name: infra
-    role: infra
-    count: 1
-    vmSize: Standard_D2s_v3
-    osType: Linux
-  - name: compute
-    role: compute
-    count: 1
-    vmSize: Standard_D2s_v3
-    osType: Linux
-  servicePrincipalProfile:
-    clientID: $AZURE_CLIENT_ID
-    secret: $AZURE_CLIENT_SECRET
-*/
-
 var testOpenShiftClusterYAML = []byte(`---
 location: eastus
 name: openshift
@@ -49,6 +19,13 @@ properties:
   openShiftVersion: v3.10
   publicHostname: openshift.test.example.com
   fqdn: "www.example.com"
+  authProfile:
+    identityProviders:
+    - name: Azure AAD
+      provider:
+        kind: AADIdentityProvider
+        clientId: aadClientId
+        secret: aadClientSecret
   routerProfiles:
   - name: default
     publicSubdomain: test.example.com
@@ -291,6 +268,35 @@ func TestValidate(t *testing.T) {
 		"sp empty secret": {
 			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.ServicePrincipalProfile.Secret = "" },
 			expectedErrs: []error{errors.New(`invalid properties.servicePrincipalProfile.secret ""`)},
+		},
+		//we dont check authProfile because it is non pointer struct. Which is all zero values.
+		"authProfile.identityProviders empty": {
+			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.AuthProfile = &api.AuthProfile{} },
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders length`)},
+		},
+		"AADIdentityProvider secret empty": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				aadIdentityProvider := &api.AADIdentityProvider{
+					ClientID: "test",
+					Kind:     "AADIdentityProvider",
+					Secret:   "",
+				}
+				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
+				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider clientId ""`)},
+		},
+		"AADIdentityProvider clientId empty": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				aadIdentityProvider := &api.AADIdentityProvider{
+					ClientID: "",
+					Kind:     "AADIdentityProvider",
+					Secret:   "aadClientSecret",
+				}
+				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
+				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider clientId ""`)},
 		},
 	}
 

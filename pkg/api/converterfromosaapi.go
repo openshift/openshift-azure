@@ -70,6 +70,25 @@ func ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster(oc *v1.OpenShiftM
 			VnetSubnetID: oc.Properties.MasterPoolProfile.VnetSubnetID,
 			Role:         AgentPoolProfileRoleMaster,
 		}
+
+		// init internal AuthProfile structure for conversion
+		cs.Properties.AuthProfile = &AuthProfile{}
+		if len(oc.Properties.AuthProfile.IdentityProviders) > 0 {
+			cs.Properties.AuthProfile.IdentityProviders = make([]IdentityProvider, len(oc.Properties.AuthProfile.IdentityProviders))
+			for i, ip := range oc.Properties.AuthProfile.IdentityProviders {
+				cs.Properties.AuthProfile.IdentityProviders[i].Name = ip.Name
+				switch provider := ip.Provider.(type) {
+				case (*v1.AADIdentityProvider):
+					cs.Properties.AuthProfile.IdentityProviders[i].Provider = &AADIdentityProvider{
+						ClientID: provider.ClientID,
+						Secret:   provider.Secret,
+						Kind:     provider.Kind,
+					}
+				default:
+					panic("authProfile.identityProviders conversion failed")
+				}
+			}
+		}
 	}
 
 	return cs
