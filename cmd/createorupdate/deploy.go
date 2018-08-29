@@ -44,6 +44,5 @@ func deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin, 
 		return err
 	}
 
-	log.Info("saving cluster state to storage account")
 	return p.InitializeCluster(ctx, cs)
 }
