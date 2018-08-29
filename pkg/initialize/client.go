@@ -16,8 +16,8 @@ type azureStorageClient struct {
 }
 
 func newAzureClients(ctx context.Context, cs *api.OpenShiftManagedCluster) (*azureStorageClient, error) {
-	// TODO: needs to come from property bag
-	authorizer, err := auth.NewAuthorizerFromEnvironment()
+	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
+	authorizer, err := config.Authorizer()
 	if err != nil {
 		return nil, err
 	}
