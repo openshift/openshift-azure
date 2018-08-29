@@ -21,7 +21,7 @@ import (
 	"reflect"
 	"testing"
 
-	k8s_json "k8s.io/apimachinery/pkg/runtime/serializer/json"
+	jsoniter "github.com/json-iterator/go"
 )
 
 func TestVerbsUgorjiMarshalJSON(t *testing.T) {
@@ -45,7 +45,7 @@ func TestVerbsUgorjiMarshalJSON(t *testing.T) {
 	}
 }
 
-func TestVerbsJsonIterUnmarshalJSON(t *testing.T) {
+func TestVerbsUgorjiUnmarshalJSON(t *testing.T) {
 	cases := []struct {
 		input  string
 		result APIResource
@@ -56,10 +56,9 @@ func TestVerbsJsonIterUnmarshalJSON(t *testing.T) {
 		{`{"verbs":["delete"]}`, APIResource{Verbs: Verbs([]string{"delete"})}},
 	}
 
-	iter := k8s_json.CaseSensitiveJsonIterator()
 	for i, c := range cases {
 		var result APIResource
-		if err := iter.Unmarshal([]byte(c.input), &result); err != nil {
+		if err := jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal([]byte(c.input), &result); err != nil {
 			t.Errorf("[%d] Failed to unmarshal input '%v': %v", i, c.input, err)
 		}
 		if !reflect.DeepEqual(result, c.result) {
