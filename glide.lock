@@ -1,5 +1,5 @@
-hash: 210d501d362b7c99e9ae0c6bf8049014d1f683a0726aacd7d35ddbf9849abb07
-updated: 2018-08-27T18:53:45.860031632-05:00
+hash: b3ae56f0389abfcb63cc864867df69af3aaded7cc03859617ac3fafe46b11a3d
+updated: 2018-08-29T12:48:06.930293-07:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
@@ -128,7 +128,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 670d4cfef0544295bc27a114dbac37980d83185a
 - name: k8s.io/api
-  version: 0f11257a8a25954878633ebdc9841c67d8f83bdb
+  version: 73d903622b7391f3312dcbac6483fed484e185f8
   subpackages:
   - admissionregistration/v1alpha1
   - admissionregistration/v1beta1
@@ -148,7 +148,6 @@ imports:
   - core/v1
   - events/v1beta1
   - extensions/v1beta1
-  - imagepolicy/v1alpha1
   - networking/v1
   - policy/v1beta1
   - rbac/v1
