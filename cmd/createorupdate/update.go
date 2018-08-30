@@ -80,56 +80,55 @@ func updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.P
 	// store a list of all the VM instances now, so that if we end up creating
 	// new ones (in the crash recovery case, we might not), we can detect which
 	// they are
-	vms, err := listVMs(ctx, cs, vmc, role)
+	oldVMs, err := listVMs(ctx, cs, vmc, role)
 	if err != nil {
 		return err
 	}
 
+	// TODO: Filter out VMs that do not need to get upgraded. Should speed
+	// up retrying failed upgrades.
 	vmsBefore := map[string]struct{}{}
-	for _, vm := range vms {
+	for _, vm := range oldVMs {
 		vmsBefore[*vm.InstanceID] = struct{}{}
 	}
+	vmsUpgraded := map[string]struct{}{}
 
-	log.Infof("setting ss-%s capacity to %d", role, count+1)
-	future, err := ssc.Update(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), compute.VirtualMachineScaleSetUpdate{
-		Sku: &compute.Sku{
-			Capacity: to.Int64Ptr(int64(count) + 1),
-		},
-	})
-	if err != nil {
-		return err
-	}
+	for _, vm := range oldVMs {
+		log.Infof("setting ss-%s capacity to %d", role, count+1)
+		future, err := ssc.Update(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), compute.VirtualMachineScaleSetUpdate{
+			Sku: &compute.Sku{
+				Capacity: to.Int64Ptr(int64(count) + 1),
+			},
+		})
+		if err != nil {
+			return err
+		}
 
-	err = future.WaitForCompletion(ctx, ssc.Client)
-	if err != nil {
-		return err
-	}
+		if err := future.WaitForCompletion(ctx, ssc.Client); err != nil {
+			return err
+		}
 
-	vms, err = listVMs(ctx, cs, vmc, role)
-	if err != nil {
-		return err
-	}
+		updatedList, err := listVMs(ctx, cs, vmc, role)
+		if err != nil {
+			return err
+		}
 
-	// wait for newly created VMs to reach readiness (n.b. one alternative to
-	// this approach would be for the CSE to not return until the node is
-	// ready, but that is also problematic)
-	for _, vm := range vms {
-		if _, found := vmsBefore[*vm.InstanceID]; !found {
-			log.Infof("waiting for %s to be ready", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			err = p.WaitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			if err != nil {
-				return err
+		// wait for newly created VMs to reach readiness (n.b. one alternative to
+		// this approach would be for the CSE to not return until the node is
+		// ready, but that is also problematic)
+		for _, updated := range updatedList {
+			_, updatedFound := vmsUpgraded[*updated.InstanceID]
+			if _, oldFound := vmsBefore[*updated.InstanceID]; !oldFound && !updatedFound {
+				log.Infof("waiting for %s to be ready", *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+				err = p.WaitForReady(ctx, cs, role, *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+				if err != nil {
+					return err
+				}
+				vmsUpgraded[*updated.InstanceID] = struct{}{}
 			}
 		}
-	}
 
-	err = updateInPlace(ctx, cs, p, ssc, vmc, role)
-	if err != nil {
-		return err
-	}
-
-	// remove surplus VMs
-	for _, vm := range vms[count:] {
+		// remove surplus VM
 		log.Infof("draining %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		err = p.Drain(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		if err != nil {
@@ -137,13 +136,12 @@ func updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.P
 		}
 
 		log.Infof("deleting %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		future, err := vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
+		delFuture, err := vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
 		if err != nil {
 			return err
 		}
 
-		err = future.WaitForCompletion(ctx, vmc.Client)
-		if err != nil {
+		if err := delFuture.WaitForCompletion(ctx, vmc.Client); err != nil {
 			return err
 		}
 	}
