@@ -6,7 +6,7 @@ metadata:
   name: docker-registry
   namespace: default
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       docker-registry: default
@@ -15,6 +15,18 @@ spec:
       labels:
         docker-registry: default
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: docker-registry
+                  operator: In
+                  values:
+                  - default
+              topologyKey: "kubernetes.io/hostname"
       containers:
       - env:
         - name: REGISTRY_HTTP_ADDR

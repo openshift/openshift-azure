@@ -46,7 +46,7 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 				{
 					Name:   "infra",
 					Role:   api.AgentPoolProfileRoleInfra,
-					Count:  1,
+					Count:  2,
 					VMSize: "Standard_D2s_v3",
 					OSType: "Linux",
 				},
