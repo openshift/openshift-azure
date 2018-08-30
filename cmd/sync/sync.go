@@ -118,7 +118,7 @@ func sync() error {
 		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 
-	if err := addons.Main(cs, *dryRun); err != nil {
+	if err := addons.Main(cs, az.accounts, *dryRun); err != nil {
 		return errors.Wrap(err, "cannot sync cluster config")
 	}
 
