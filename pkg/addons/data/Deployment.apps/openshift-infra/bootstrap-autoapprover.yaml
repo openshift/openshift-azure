@@ -65,3 +65,5 @@ spec:
         - -c
         image: '*** GENERATED ***'
         name: signer
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
