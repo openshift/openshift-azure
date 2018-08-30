@@ -9,7 +9,7 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/api/v1"
+	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
 var testOpenShiftClusterYAML = []byte(`---
@@ -34,7 +34,7 @@ properties:
     count: 3
     vmSize: Standard_D2s_v3
     osType: Linux
-  agentPoolProfiles: 
+  agentPoolProfiles:
   - name: infra
     role: infra
     count: 1
@@ -301,14 +301,14 @@ func TestValidate(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		var oc *v1.OpenShiftManagedCluster
+		var oc *v20180930preview.OpenShiftManagedCluster
 		err := yaml.Unmarshal(testOpenShiftClusterYAML, &oc)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		// TODO we're hoping conversion is correct. Change this to a known valid config
-		cs := api.ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster(oc)
+		cs := api.ConvertFromV20180930preview(oc)
 		if test.f != nil {
 			test.f(cs)
 		}

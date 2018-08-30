@@ -1,6 +1,4 @@
-package v1
-
-// TODO publish v1 to a dated api as in Azure conventions
+package api
 
 // OpenShiftManagedCluster complies with the ARM model of resource definition in a JSON
 // template.

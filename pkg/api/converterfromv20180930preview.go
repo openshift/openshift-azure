@@ -1,12 +1,12 @@
 package api
 
 import (
-	"github.com/openshift/openshift-azure/pkg/api/v1"
+	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
-// ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster converts from a
-// v1.OpenShiftManagedCluster to an OpenShiftManagedCluster.
-func ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster(oc *v1.OpenShiftManagedCluster) *OpenShiftManagedCluster {
+// ConvertFromV20180930preview converts from a
+// v20180930preview.OpenShiftManagedCluster to an OpenShiftManagedCluster.
+func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 	cs := &OpenShiftManagedCluster{
 		ID:       oc.ID,
 		Location: oc.Location,
@@ -78,7 +78,7 @@ func ConvertV1OpenShiftManagedClusterToOpenShiftManagedCluster(oc *v1.OpenShiftM
 			for i, ip := range oc.Properties.AuthProfile.IdentityProviders {
 				cs.Properties.AuthProfile.IdentityProviders[i].Name = ip.Name
 				switch provider := ip.Provider.(type) {
-				case (*v1.AADIdentityProvider):
+				case (*v20180930preview.AADIdentityProvider):
 					cs.Properties.AuthProfile.IdentityProviders[i].Provider = &AADIdentityProvider{
 						ClientID: provider.ClientID,
 						Secret:   provider.Secret,

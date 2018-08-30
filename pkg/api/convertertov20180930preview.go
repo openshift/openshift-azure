@@ -1,13 +1,13 @@
 package api
 
 import (
-	"github.com/openshift/openshift-azure/pkg/api/v1"
+	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
-// ConvertOpenShiftClusterToV1OpenShiftManagedCluster converts from na
-// OpenShiftManagedCluster to a v1.OpenShiftManagedCluster.
-func ConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster(cs *OpenShiftManagedCluster) *v1.OpenShiftManagedCluster {
-	oc := &v1.OpenShiftManagedCluster{
+// ConvertToV20180930preview converts from an OpenShiftManagedCluster to a
+// v20180930preview.OpenShiftManagedCluster.
+func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.OpenShiftManagedCluster {
+	oc := &v20180930preview.OpenShiftManagedCluster{
 		ID:       cs.ID,
 		Location: cs.Location,
 		Name:     cs.Name,
@@ -16,7 +16,7 @@ func ConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster(cs *OpenShiftMana
 	}
 
 	if cs.Plan != nil {
-		oc.Plan = &v1.ResourcePurchasePlan{
+		oc.Plan = &v20180930preview.ResourcePurchasePlan{
 			Name:          cs.Plan.Name,
 			Product:       cs.Plan.Product,
 			PromotionCode: cs.Plan.PromotionCode,
@@ -25,16 +25,16 @@ func ConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster(cs *OpenShiftMana
 	}
 
 	if cs.Properties != nil {
-		oc.Properties = &v1.Properties{
-			ProvisioningState: v1.ProvisioningState(cs.Properties.ProvisioningState),
+		oc.Properties = &v20180930preview.Properties{
+			ProvisioningState: v20180930preview.ProvisioningState(cs.Properties.ProvisioningState),
 		}
 
-		oc.Properties.AuthProfile.IdentityProviders = make([]v1.IdentityProvider, len(cs.Properties.AuthProfile.IdentityProviders))
+		oc.Properties.AuthProfile.IdentityProviders = make([]v20180930preview.IdentityProvider, len(cs.Properties.AuthProfile.IdentityProviders))
 		for i, ip := range cs.Properties.AuthProfile.IdentityProviders {
 			oc.Properties.AuthProfile.IdentityProviders[i].Name = ip.Name
 			switch provider := ip.Provider.(type) {
 			case (*AADIdentityProvider):
-				oc.Properties.AuthProfile.IdentityProviders[i].Provider = &v1.AADIdentityProvider{
+				oc.Properties.AuthProfile.IdentityProviders[i].Provider = &v20180930preview.AADIdentityProvider{
 					ClientID: provider.ClientID,
 					Secret:   provider.Secret,
 					Kind:     provider.Kind,
@@ -50,9 +50,9 @@ func ConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster(cs *OpenShiftMana
 			if cs.Properties.OrchestratorProfile.OpenShiftConfig != nil {
 				oc.Properties.PublicHostname = cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname
 
-				oc.Properties.RouterProfiles = make([]v1.RouterProfile, len(cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles))
+				oc.Properties.RouterProfiles = make([]v20180930preview.RouterProfile, len(cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles))
 				for i, rp := range cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles {
-					oc.Properties.RouterProfiles[i] = v1.RouterProfile{
+					oc.Properties.RouterProfiles[i] = v20180930preview.RouterProfile{
 						Name:            rp.Name,
 						PublicSubdomain: rp.PublicSubdomain,
 						FQDN:            rp.FQDN,
@@ -64,35 +64,35 @@ func ConvertOpenShiftManagedClusterToV1OpenShiftManagedCluster(cs *OpenShiftMana
 		oc.Properties.FQDN = cs.Properties.FQDN
 
 		if cs.Properties.ServicePrincipalProfile != nil {
-			oc.Properties.ServicePrincipalProfile = v1.ServicePrincipalProfile{
+			oc.Properties.ServicePrincipalProfile = v20180930preview.ServicePrincipalProfile{
 				ClientID: cs.Properties.ServicePrincipalProfile.ClientID,
 				Secret:   cs.Properties.ServicePrincipalProfile.Secret,
 			}
 		}
 
 		// -1 because master profile moves to its own field
-		oc.Properties.AgentPoolProfiles = make([]v1.AgentPoolProfile, len(cs.Properties.AgentPoolProfiles)-1)
+		oc.Properties.AgentPoolProfiles = make([]v20180930preview.AgentPoolProfile, len(cs.Properties.AgentPoolProfiles)-1)
 		for i, app := range cs.Properties.AgentPoolProfiles {
 			if app.Role == AgentPoolProfileRoleMaster {
-				oc.Properties.MasterPoolProfile = v1.MasterPoolProfile{
-					ProfileSpec: v1.ProfileSpec{
+				oc.Properties.MasterPoolProfile = v20180930preview.MasterPoolProfile{
+					ProfileSpec: v20180930preview.ProfileSpec{
 						Name:         app.Name,
 						Count:        app.Count,
 						VMSize:       app.VMSize,
-						OSType:       v1.OSType(app.OSType),
+						OSType:       v20180930preview.OSType(app.OSType),
 						VnetSubnetID: app.VnetSubnetID,
 					},
 				}
 			} else {
-				oc.Properties.AgentPoolProfiles[i] = v1.AgentPoolProfile{
-					ProfileSpec: v1.ProfileSpec{
+				oc.Properties.AgentPoolProfiles[i] = v20180930preview.AgentPoolProfile{
+					ProfileSpec: v20180930preview.ProfileSpec{
 						Name:         app.Name,
 						Count:        app.Count,
 						VMSize:       app.VMSize,
-						OSType:       v1.OSType(app.OSType),
+						OSType:       v20180930preview.OSType(app.OSType),
 						VnetSubnetID: app.VnetSubnetID,
 					},
-					Role: v1.AgentPoolProfileRole(app.Role),
+					Role: v20180930preview.AgentPoolProfileRole(app.Role),
 				}
 			}
 		}
