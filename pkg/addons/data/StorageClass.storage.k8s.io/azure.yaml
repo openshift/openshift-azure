@@ -6,7 +6,7 @@ metadata:
   name: azure
 parameters:
   kind: managed
-  location: eastus
+  location: '*** GENERATED ***'
   skuName: Premium_LRS
 provisioner: kubernetes.io/azure-disk
 reclaimPolicy: Delete

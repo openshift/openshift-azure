@@ -421,4 +421,10 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.PrometheusAlertManagerImage }}",
 		},
 	},
+	"StorageClass.storage.k8s.io/azure": {
+		{
+			Path:     jsonpath.MustCompile("$.parameters.location"),
+			Template: "{{ .ContainerService.Location }}",
+		},
+	},
 }
