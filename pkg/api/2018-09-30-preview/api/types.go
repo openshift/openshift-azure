@@ -1,7 +1,7 @@
 package api
 
-// OpenShiftManagedCluster complies with the ARM model of resource definition in a JSON
-// template.
+// OpenShiftManagedCluster complies with the ARM model of resource definition in
+// a JSON template.
 type OpenShiftManagedCluster struct {
 	ID         string                `json:"id,omitempty"`
 	Location   string                `json:"location,omitempty"`
@@ -35,25 +35,24 @@ type Properties struct {
 	// PublicHostname CNAME record forwarding to the returned FQDN value.
 	PublicHostname string `json:"publicHostname,omitempty"`
 
-	// FQDN (in): FQDN for OpenShift API server. User-specified FQDN for OpenShift
-	// API server loadbalancer internal hostname.
+	// FQDN (in): FQDN for OpenShift API server.  User-specified FQDN for
+	// OpenShift API server loadbalancer internal hostname.
 	FQDN string `json:"fqdn,omitempty"`
 
 	// RouterProfiles (in,optional/out): Configuration for OpenShift router(s).
 	RouterProfiles []RouterProfile `json:"routerProfiles,omitempty"`
 
 	// MasterPoolProfile (in): Configuration for OpenShift master VMs.
-	MasterPoolProfile MasterPoolProfile `json:"masterPoolProfile,omitempty"`
+	MasterPoolProfile *MasterPoolProfile `json:"masterPoolProfile,omitempty"`
 
 	// AgentPoolProfiles (in): configuration of OpenShift cluster VMs.
 	AgentPoolProfiles []AgentPoolProfile `json:"agentPoolProfiles,omitempty"`
 
 	// AuthProfile (in): configures OpenShift authentication
-	AuthProfile AuthProfile `json:"authProfile,omitempty"`
+	AuthProfile *AuthProfile `json:"authProfile,omitempty"`
 
-	// TODO: is this compatible with MSI?
 	// ServicePrincipalProfile (in): Service principal for OpenShift cluster.
-	ServicePrincipalProfile ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
+	ServicePrincipalProfile *ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
 }
 
 // ProvisioningState represents the current state of the OSA resource.
@@ -95,18 +94,6 @@ type RouterProfile struct {
 
 // MasterPoolProfile contains configuration for OpenShift master VMs.
 type MasterPoolProfile struct {
-	ProfileSpec
-}
-
-// AgentPoolProfile represents configuration of OpenShift cluster VMs.
-type AgentPoolProfile struct {
-	ProfileSpec
-	Role AgentPoolProfileRole `json:"role,omitempty"`
-}
-
-// ProfileSpec contains all shared fields that are used across MasterProfile
-// and AgentPoolProfile.  Items should only be added here if they are shared.
-type ProfileSpec struct {
 	Name   string `json:"name,omitempty"`
 	Count  int    `json:"count,omitempty"`
 	VMSize string `json:"vmSize,omitempty"`
@@ -121,15 +108,23 @@ type ProfileSpec struct {
 	OSType       OSType `json:"osType,omitempty"`
 }
 
-// AgentPoolProfileRole represents the role of the AgentPoolProfile.
-type AgentPoolProfileRole string
+// AgentPoolProfile represents configuration of OpenShift cluster VMs.
+type AgentPoolProfile struct {
+	Name   string `json:"name,omitempty"`
+	Count  int    `json:"count,omitempty"`
+	VMSize string `json:"vmSize,omitempty"`
 
-const (
-	// AgentPoolProfileRoleCompute is the compute role.
-	AgentPoolProfileRoleCompute AgentPoolProfileRole = "compute"
-	// AgentPoolProfileRoleInfra is the infra role.
-	AgentPoolProfileRoleInfra AgentPoolProfileRole = "infra"
-)
+	// VnetSubnetID is expected to be empty or match
+	// `^/subscriptions/[^/]+
+	//   /resourceGroups/[^/]+
+	//   /providers/Microsoft.Network
+	//   /virtualNetworks/[^/]+
+	//   /subnets/[^/]+$`
+	VnetSubnetID string `json:"vnetSubnetID,omitempty"`
+	OSType       OSType `json:"osType,omitempty"`
+
+	Role AgentPoolProfileRole `json:"role,omitempty"`
+}
 
 // OSType represents the OS type of VMs in an AgentPool.
 type OSType string
@@ -141,28 +136,40 @@ const (
 	OSTypeWindows OSType = "Windows"
 )
 
-// ServicePrincipalProfile contains the client and secret used by the cluster
-// for Azure Resource CRUD.
-type ServicePrincipalProfile struct {
-	ClientID string `json:"clientId,omitempty"`
-	Secret   string `json:"secret,omitempty"`
-}
+// AgentPoolProfileRole represents the role of the AgentPoolProfile.
+type AgentPoolProfileRole string
 
-// AuthProfile defines all possible authentication profiles for OpenShift cluster
+const (
+	// AgentPoolProfileRoleCompute is the compute role.
+	AgentPoolProfileRoleCompute AgentPoolProfileRole = "compute"
+	// AgentPoolProfileRoleInfra is the infra role.
+	AgentPoolProfileRoleInfra AgentPoolProfileRole = "infra"
+)
+
+// AuthProfile defines all possible authentication profiles for the OpenShift
+// cluster.
 type AuthProfile struct {
 	IdentityProviders []IdentityProvider `json:"identityProviders,omitempty"`
 }
 
-// IdentityProvider is heavily cut down equivalent to IdentityProvider in the upstream
+// IdentityProvider is heavily cut down equivalent to IdentityProvider in the
+// upstream.
 type IdentityProvider struct {
-	Name     string      `json:"name"`
-	Provider interface{} `json:"provider,omityempty"`
+	Name     string      `json:"name,omitempty"`
+	Provider interface{} `json:"provider,omitempty"`
 }
 
-// AADIdentityProvider defines Identity provider for MS AAD.
-// it is based on OpenID IdentityProvider
+// AADIdentityProvider defines Identity provider for MS AAD.  It is based on
+// OpenID IdentityProvider.
 type AADIdentityProvider struct {
 	Kind     string `json:"kind,omitempty"`
+	ClientID string `json:"clientId,omitempty"`
+	Secret   string `json:"secret,omitempty"`
+}
+
+// ServicePrincipalProfile contains the client and secret used by the cluster
+// for Azure Resource CRUD.
+type ServicePrincipalProfile struct {
 	ClientID string `json:"clientId,omitempty"`
 	Secret   string `json:"secret,omitempty"`
 }

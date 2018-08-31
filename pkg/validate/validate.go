@@ -76,7 +76,18 @@ func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster, exte
 
 func validateProperties(p *api.Properties, externalOnly bool) (errs []error) {
 	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
-	errs = append(errs, validateOrchestratorProfile(p.OrchestratorProfile, externalOnly)...)
+	switch p.OpenShiftVersion {
+	case "v3.10":
+	default:
+		errs = append(errs, fmt.Errorf("invalid properties.openShiftVersion %q", p.OpenShiftVersion))
+	}
+
+	if p.PublicHostname != "" && !isValidHostname(p.PublicHostname) {
+		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
+	}
+	if !externalOnly {
+		errs = append(errs, validateRouterProfiles(p.RouterProfiles)...)
+	}
 	errs = append(errs, validateFQDN(p)...)
 	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles)...)
 	errs = append(errs, validateServicePrincipalProfile(p.ServicePrincipalProfile)...)
@@ -119,15 +130,10 @@ func validateServicePrincipalProfile(spp *api.ServicePrincipalProfile) (errs []e
 	return
 }
 
-func validateAgentPoolProfiles(apps []*api.AgentPoolProfile) (errs []error) {
-	appmap := map[string]*api.AgentPoolProfile{}
+func validateAgentPoolProfiles(apps []api.AgentPoolProfile) (errs []error) {
+	appmap := map[string]api.AgentPoolProfile{}
 
 	for i, app := range apps {
-		// TODO why is this a pointer?
-		if app == nil {
-			continue
-		}
-
 		if _, found := validAgentPoolProfileNames[app.Name]; !found {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q]", app.Name))
 		}
@@ -141,7 +147,7 @@ func validateAgentPoolProfiles(apps []*api.AgentPoolProfile) (errs []error) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.vnetSubnetID %q: all subnets must match when using vnetSubnetID", app.VnetSubnetID))
 		}
 
-		errs = append(errs, validateAgentPoolProfile(app)...)
+		errs = append(errs, validateAgentPoolProfile(&app)...)
 	}
 
 	for name := range validAgentPoolProfileNames {
@@ -198,23 +204,6 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 	return
 }
 
-func validateOrchestratorProfile(p *api.OrchestratorProfile, externalOnly bool) (errs []error) {
-	if p == nil {
-		errs = append(errs, fmt.Errorf("orchestratorProfile cannot be nil"))
-		return
-	}
-
-	switch p.OrchestratorVersion {
-	case "v3.10":
-	default:
-		errs = append(errs, fmt.Errorf("invalid properties.openShiftVersion %q", p.OrchestratorVersion))
-	}
-
-	errs = append(errs, validateOpenShiftConfig(p.OpenShiftConfig, externalOnly)...)
-
-	return
-}
-
 func validateFQDN(p *api.Properties) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
@@ -225,24 +214,8 @@ func validateFQDN(p *api.Properties) (errs []error) {
 	return
 }
 
-func validateOpenShiftConfig(c *api.OpenShiftConfig, externalOnly bool) (errs []error) {
-	if c == nil {
-		errs = append(errs, fmt.Errorf("openshiftConfig cannot be nil"))
-		return
-	}
-
-	if c.PublicHostname != "" && !isValidHostname(c.PublicHostname) {
-		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", c.PublicHostname))
-	}
-	if !externalOnly {
-		errs = append(errs, validateRouterProfiles(c.RouterProfiles)...)
-	}
-
-	return
-}
-
-func validateRouterProfiles(rps []api.OpenShiftRouterProfile) (errs []error) {
-	rpmap := map[string]api.OpenShiftRouterProfile{}
+func validateRouterProfiles(rps []api.RouterProfile) (errs []error) {
+	rpmap := map[string]api.RouterProfile{}
 
 	for _, rp := range rps {
 		if _, found := validRouterProfileNames[rp.Name]; !found {
@@ -266,7 +239,7 @@ func validateRouterProfiles(rps []api.OpenShiftRouterProfile) (errs []error) {
 	return
 }
 
-func validateRouterProfile(rp api.OpenShiftRouterProfile) (errs []error) {
+func validateRouterProfile(rp api.RouterProfile) (errs []error) {
 	if rp.Name == "" {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
 	}

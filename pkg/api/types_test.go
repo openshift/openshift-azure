@@ -1,83 +1,108 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
+	"reflect"
 	"testing"
 )
 
-func TestTotalNodes(t *testing.T) {
-	cases := []struct {
-		p        Properties
-		expected int
-	}{
-		{
-			p: Properties{
-				AgentPoolProfiles: []*AgentPoolProfile{
-					{
-						Count: 1,
-					},
-				},
-			},
-			expected: 1,
-		},
-		{
-			p: Properties{
-				AgentPoolProfiles: []*AgentPoolProfile{
-					{
-						Count: 3,
-					},
-					{
-						Count: 4,
-					},
-				},
-			},
-			expected: 7,
-		},
-	}
+// testContainerService is defined in converterfromv20180930preview_test.go.
 
-	for _, c := range cases {
-		if c.p.TotalNodes() != c.expected {
-			t.Fatalf("expected TotalNodes() to return %d but instead returned %d", c.expected, c.p.TotalNodes())
+var testContainerServiceJSON = []byte(`{
+	"id": "id",
+	"location": "location",
+	"name": "name",
+	"plan": {
+		"name": "plan.name",
+		"product": "plan.product",
+		"promotionCode": "plan.promotionCode",
+		"publisher": "plan.publisher"
+	},
+	"tags": {
+		"tags.k1": "v1",
+		"tags.k2": "v2"
+	},
+	"type": "type",
+	"properties": {
+		"provisioningState": "properties.provisioningState",
+		"openShiftVersion": "properties.openShiftVersion",
+		"publicHostname": "properties.publicHostname",
+		"fqdn": "properties.fqdn",
+		"routerProfiles": [
+			{
+				"name": "properties.routerProfiles.0.name",
+				"publicSubdomain": "properties.routerProfiles.0.publicSubdomain",
+				"fqdn": "properties.routerProfiles.0.fqdn"
+			},
+			{
+				"name": "properties.routerProfiles.1.name",
+				"publicSubdomain": "properties.routerProfiles.1.publicSubdomain",
+				"fqdn": "properties.routerProfiles.1.fqdn"
+			}
+		],
+		"agentPoolProfiles": [
+			{
+				"name": "properties.agentPoolProfiles.0.name",
+				"count": 1,
+				"vmSize": "properties.agentPoolProfiles.0.vmSize",
+				"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
+				"osType": "properties.agentPoolProfiles.0.osType",
+				"role": "properties.agentPoolProfiles.0.role"
+			},
+			{
+				"name": "properties.agentPoolProfiles.0.name",
+				"count": 2,
+				"vmSize": "properties.agentPoolProfiles.0.vmSize",
+				"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
+				"osType": "properties.agentPoolProfiles.0.osType",
+				"role": "properties.agentPoolProfiles.0.role"
+			},
+			{
+				"name": "properties.agentPoolProfiles.0.name",
+				"count": 1,
+				"vmSize": "properties.agentPoolProfiles.0.vmSize",
+				"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
+				"osType": "properties.agentPoolProfiles.0.osType",
+				"role": "master"
+			}
+		],
+		"authProfile": {
+			"identityProviders": [
+				{
+					"name": "properties.authProfile.identityProviders.0.name",
+					"provider": {
+						"kind": "AADIdentityProvider",
+						"clientId": "properties.authProfile.identityProviders.0.provider.clientId",
+						"secret": "properties.authProfile.identityProviders.0.provider.secret"
+					}
+				}
+			]
+		},
+		"servicePrincipalProfile": {
+			"clientId": "properties.servicePrincipalProfile.clientId",
+			"secret": "properties.servicePrincipalProfile.secret"
 		}
+	}
+}`)
+
+func TestMarshal(t *testing.T) {
+	b, err := json.MarshalIndent(testContainerService, "", "\t")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(b, testContainerServiceJSON) {
+		t.Errorf("json.MarshalIndent returned unexpected result\n%s\n", string(b))
 	}
 }
 
-func TestIsCustomVNET(t *testing.T) {
-	cases := []struct {
-		p              Properties
-		expectedMaster bool
-		expectedAgent  bool
-	}{
-		{
-			p: Properties{
-				AgentPoolProfiles: []*AgentPoolProfile{
-					{
-						VnetSubnetID: "testSubnet",
-					},
-				},
-			},
-			expectedMaster: true,
-			expectedAgent:  true,
-		},
-		{
-			p: Properties{
-				AgentPoolProfiles: []*AgentPoolProfile{
-					{
-						Count: 1,
-					},
-					{
-						Count: 1,
-					},
-				},
-			},
-			expectedMaster: false,
-			expectedAgent:  false,
-		},
+func TestUnmarshal(t *testing.T) {
+	var oc *OpenShiftManagedCluster
+	err := json.Unmarshal(testContainerServiceJSON, &oc)
+	if err != nil {
+		t.Fatal(err)
 	}
-
-	for _, c := range cases {
-		if c.p.AgentPoolProfiles[0].IsCustomVNET() != c.expectedAgent {
-			t.Fatalf("expected IsCustomVnet() to return %t but instead returned %t", c.expectedAgent, c.p.AgentPoolProfiles[0].IsCustomVNET())
-		}
+	if !reflect.DeepEqual(oc, testContainerService) {
+		t.Errorf("json.Unmarshal returned unexpected result\n%#v\n", oc)
 	}
-
 }

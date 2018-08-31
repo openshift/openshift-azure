@@ -227,7 +227,7 @@ masterClients:
     contentType: application/vnd.kubernetes.protobuf
     qps: 300
   openshiftLoopbackKubeConfig: openshift-master.kubeconfig
-masterPublicURL: {{ print "https://" .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname | quote }}
+masterPublicURL: {{ print "https://" .ContainerService.Properties.PublicHostname | quote }}
 networkConfig:
   clusterNetworks:
   - cidr: 10.128.0.0/14
@@ -237,7 +237,7 @@ networkConfig:
   networkPluginName: redhat/openshift-ovs-subnet
   serviceNetworkCIDR: 172.30.0.0/16
 oauthConfig:
-  assetPublicURL: {{ print "https://" .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname "/console/" | quote }}
+  assetPublicURL: {{ print "https://" .ContainerService.Properties.PublicHostname "/console/" | quote }}
   grantConfig:
     method: auto
   identityProviders:
@@ -270,7 +270,7 @@ oauthConfig:
       file: /etc/origin/master/htpasswd
       kind: HTPasswdPasswordIdentityProvider
   masterCA: ca.crt
-  masterPublicURL: {{ print "https://" .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname | quote }}
+  masterPublicURL: {{ print "https://" .ContainerService.Properties.PublicHostname | quote }}
   masterURL: {{ print "https://" .ContainerService.Properties.FQDN | quote }}
   sessionConfig:
     sessionMaxAgeSeconds: 3600
@@ -286,7 +286,7 @@ projectConfig:
     mcsLabelsPerProject: 5
     uidAllocatorRange: 1000000000-1999999999/10000
 routingConfig:
-  subdomain: {{ (index .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles 0).PublicSubdomain | quote }}
+  subdomain: {{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain | quote }}
 serviceAccountConfig:
   managedNames:
   - default
@@ -308,7 +308,7 @@ servingInfo:
    - certFile: /etc/origin/master/named/console.crt
      keyFile: /etc/origin/master/named/console.key
      names:
-      - {{ .ContainerService.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname | quote }}
+      - {{ .ContainerService.Properties.PublicHostname | quote }}
 volumeConfig:
   dynamicProvisioningEnabled: true
 EOF

@@ -1,144 +1,127 @@
 package api
 
-// ContextKey is a type for context property bag payload keys
-type ContextKey string
-
-const (
-	ContextKeyClientID       ContextKey = "ClientID"
-	ContextKeyClientSecret   ContextKey = "ClientSecret"
-	ContextKeyTenantID       ContextKey = "TenantID"
-	ContextKeySubscriptionId ContextKey = "SubscriptionId"
-	ContextKeyResourceGroup  ContextKey = "ResourceGroup"
-)
-
-// TypeMeta describes an individual API model object
-type TypeMeta struct {
-	// APIVersion is on every object
-	APIVersion string `json:"apiVersion"`
-}
-
-// ResourcePurchasePlan defines resource plan as required by ARM
-// for billing purposes.
-type ResourcePurchasePlan struct {
-	Name          string `json:"name"`
-	Product       string `json:"product"`
-	PromotionCode string `json:"promotionCode"`
-	Publisher     string `json:"publisher"`
-}
-
-// ContainerService complies with the ARM model of
-// resource definition in a JSON template.
+// OpenShiftManagedCluster complies with the ARM model of resource definition in
+// a JSON template.
 type OpenShiftManagedCluster struct {
-	ID       string                `json:"id"`
-	Location string                `json:"location"`
-	Name     string                `json:"name"`
-	Plan     *ResourcePurchasePlan `json:"plan,omitempty"`
-	Tags     map[string]string     `json:"tags"`
-	Type     string                `json:"type"`
+	ID         string                `json:"id,omitempty"`
+	Location   string                `json:"location,omitempty"`
+	Name       string                `json:"name,omitempty"`
+	Plan       *ResourcePurchasePlan `json:"plan,omitempty"`
+	Tags       map[string]string     `json:"tags,omitempty"`
+	Type       string                `json:"type,omitempty"`
+	Properties *Properties           `json:"properties,omitempty"`
 
-	Properties *Properties `json:"properties,omitempty"`
-	Config     *Config     `json:config,omitempty`
+	Config *Config `json:"config,omitempty"`
 }
 
-// Properties represents the ACS cluster definition
+// ResourcePurchasePlan defines the resource plan as required by ARM for billing
+// purposes.
+type ResourcePurchasePlan struct {
+	Name          string `json:"name,omitempty"`
+	Product       string `json:"product,omitempty"`
+	PromotionCode string `json:"promotionCode,omitempty"`
+	Publisher     string `json:"publisher,omitempty"`
+}
+
+// Properties represents the cluster definition.
 type Properties struct {
-	ProvisioningState       ProvisioningState        `json:"provisioningState,omitempty"`
-	OrchestratorProfile     *OrchestratorProfile     `json:"orchestratorProfile,omitempty"`
-	AgentPoolProfiles       []*AgentPoolProfile      `json:"agentPoolProfiles,omitempty"`
-	ServicePrincipalProfile *ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
-	AzProfile               *AzProfile               `json:"azProfile,omitempty"`
-	AuthProfile             *AuthProfile             `json:"authProfile,omitempty"`
-	// Master LB public endpoint/FQDN with port
-	// The format will be FQDN:2376
-	// Not used during PUT, returned as part of GET
+	// ProvisioningState (out): current state of the OSA resource.
+	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
+
+	// OpenShiftVersion (in): OpenShift version to be created/updated, e.g.
+	// `v3.10`.
+	OpenShiftVersion string `json:"openShiftVersion,omitempty"`
+
+	// PublicHostname (in,optional): Optional user-specified FQDN for OpenShift
+	// API server.  If specified, after OSA cluster creation, user must create a
+	// PublicHostname CNAME record forwarding to the returned FQDN value.
+	PublicHostname string `json:"publicHostname,omitempty"`
+
+	// FQDN (in): FQDN for OpenShift API server.  User-specified FQDN for
+	// OpenShift API server loadbalancer internal hostname.
 	FQDN string `json:"fqdn,omitempty"`
+
+	// RouterProfiles (in,optional/out): Configuration for OpenShift router(s).
+	RouterProfiles []RouterProfile `json:"routerProfiles,omitempty"`
+
+	// AgentPoolProfiles (in): configuration of OpenShift cluster VMs.
+	AgentPoolProfiles []AgentPoolProfile `json:"agentPoolProfiles,omitempty"`
+
+	// AuthProfile (in): configures OpenShift authentication
+	AuthProfile *AuthProfile `json:"authProfile,omitempty"`
+
+	// ServicePrincipalProfile (in): Service principal for OpenShift cluster.
+	ServicePrincipalProfile *ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
+
+	AzProfile *AzProfile `json:"azProfile,omitempty"`
 }
 
-// AzProfile holds the azure context for where the cluster resides
-type AzProfile struct {
-	TenantID       string `json:"tenantId,omitempty"`
-	SubscriptionID string `json:"subscriptionId,omitempty"`
-	ResourceGroup  string `json:"resourceGroup,omitempty"`
-}
-
-// ServicePrincipalProfile contains the client and secret used by the cluster for Azure Resource CRUD
-type ServicePrincipalProfile struct {
-	ClientID string `json:"clientId"`
-	Secret   string `json:"secret,omitempty" conform:"redact"`
-}
-
-// ProvisioningState represents the current state of container service resource.
+// ProvisioningState represents the current state of the OSA resource.
 type ProvisioningState string
 
 const (
-	// Creating means ContainerService resource is being created.
+	// Creating means the OSA resource is being created.
 	Creating ProvisioningState = "Creating"
-	// Updating means an existing ContainerService resource is being updated
+	// Updating means the existing OSA resource is being updated.
 	Updating ProvisioningState = "Updating"
-	// Failed means resource is in failed state
+	// Failed means the OSA resource is in failed state.
 	Failed ProvisioningState = "Failed"
-	// Succeeded means resource created succeeded during last create/update
+	// Succeeded means the last create/update succeeded.
 	Succeeded ProvisioningState = "Succeeded"
-	// Deleting means resource is in the process of being deleted
+	// Deleting means the OSA resource is being deleted.
 	Deleting ProvisioningState = "Deleting"
-	// Migrating means resource is being migrated from one subscription or
-	// resource group to another
+	// Migrating means the OSA resource is being migrated from one subscription
+	// or resource group to another.
 	Migrating ProvisioningState = "Migrating"
-	// Upgrading means an existing ContainerService resource is being upgraded
+	// Upgrading means the existing OAS resource is being upgraded.
 	Upgrading ProvisioningState = "Upgrading"
 )
 
-// OrchestratorProfile contains Orchestrator properties
-type OrchestratorProfile struct {
-	OrchestratorVersion string           `json:"orchestratorVersion"`
-	OpenShiftConfig     *OpenShiftConfig `json:"openshiftConfig,omitempty"`
+// RouterProfile represents an OpenShift router.
+type RouterProfile struct {
+	Name string `json:"name,omitempty"`
+
+	// PublicSubdomain (in,optional/out): DNS subdomain for OpenShift router. If
+	// specified, after OSA cluster creation, user must create a (wildcard)
+	// *.PublicSubdomain CNAME record forwarding to the returned FQDN value.  If
+	// not specified, OSA will auto-allocate and setup a PublicSubdomain and
+	// return it.  The OpenShift master is configured with the PublicSubdomain
+	// of the "default" RouterProfile.
+	PublicSubdomain string `json:"publicSubdomain,omitempty"`
+
+	// FQDN (out): Auto-allocated FQDN for the OpenShift router.
+	FQDN string `json:"fqdn,omitempty"`
 }
 
-// OpenShiftConfig holds configuration for OpenShift
-type OpenShiftConfig struct {
-	PublicHostname string
-	RouterProfiles []OpenShiftRouterProfile
-}
-
-// OpenShiftRouterProfile represents an OpenShift router.
-type OpenShiftRouterProfile struct {
-	Name            string
-	PublicSubdomain string
-	FQDN            string
-}
-
-// AgentPoolProfile represents an agent pool definition
+// AgentPoolProfile represents configuration of OpenShift cluster VMs.
 type AgentPoolProfile struct {
-	Name         string               `json:"name"`
-	Count        int                  `json:"count"`
-	VMSize       string               `json:"vmSize"`
-	DNSPrefix    string               `json:"dnsPrefix,omitempty"`
-	OSType       OSType               `json:"osType,omitempty"`
-	Ports        []int                `json:"ports,omitempty"`
-	VnetSubnetID string               `json:"vnetSubnetID,omitempty"`
-	Role         AgentPoolProfileRole `json:"role,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Count  int    `json:"count,omitempty"`
+	VMSize string `json:"vmSize,omitempty"`
+
+	// VnetSubnetID is expected to be empty or match
+	// `^/subscriptions/[^/]+
+	//   /resourceGroups/[^/]+
+	//   /providers/Microsoft.Network
+	//   /virtualNetworks/[^/]+
+	//   /subnets/[^/]+$`
+	VnetSubnetID string `json:"vnetSubnetID,omitempty"`
+	OSType       OSType `json:"osType,omitempty"`
+
+	Role AgentPoolProfileRole `json:"role,omitempty"`
 }
 
-// AuthProfile defines all possible authentication profiles for OpenShift cluster
-type AuthProfile struct {
-	IdentityProviders []IdentityProvider `json:"identityProviders,omitempty"`
-}
+// OSType represents the OS type of VMs in an AgentPool.
+type OSType string
 
-// IdentityProvider is heavily cut down equivalent to IdentityProvider in the upstream
-type IdentityProvider struct {
-	Name     string      `json:"name"`
-	Provider interface{} `json:"provider,omityempty"`
-}
+const (
+	// OSTypeLinux is Linux.
+	OSTypeLinux OSType = "Linux"
+	// OSTypeWindows is Windows.
+	OSTypeWindows OSType = "Windows"
+)
 
-// AADIdentityProvider defines Identity provider for MS AAD
-// it is based on OpenID IdentityProvider
-type AADIdentityProvider struct {
-	Kind     string `json:"kind,omitempty"`
-	ClientID string `json:"clientId,omitempty"`
-	Secret   string `json:"secret,omitempty"`
-}
-
-// AgentPoolProfileRole represents an agent role
+// AgentPoolProfileRole represents the role of the AgentPoolProfile.
 type AgentPoolProfileRole string
 
 const (
@@ -150,29 +133,37 @@ const (
 	AgentPoolProfileRoleMaster AgentPoolProfileRole = "master"
 )
 
-// OSType represents OS types of agents
-type OSType string
-
-const (
-	// OSTypeLinux is Linux.
-	OSTypeLinux OSType = "Linux"
-	// OSTypeWindows is Windows.
-	OSTypeWindows OSType = "Windows"
-)
-
-// Distro represents Linux distro to use for Linux VMs
-type Distro string
-
-// TotalNodes returns the total number of nodes in the cluster configuration
-func (p *Properties) TotalNodes() int {
-	var totalNodes int
-	for _, pool := range p.AgentPoolProfiles {
-		totalNodes = totalNodes + pool.Count
-	}
-	return totalNodes
+// AuthProfile defines all possible authentication profiles for the OpenShift
+// cluster.
+type AuthProfile struct {
+	IdentityProviders []IdentityProvider `json:"identityProviders,omitempty"`
 }
 
-// IsCustomVNET returns true if the customer brought their own VNET
-func (a *AgentPoolProfile) IsCustomVNET() bool {
-	return len(a.VnetSubnetID) > 0
+// IdentityProvider is heavily cut down equivalent to IdentityProvider in the
+// upstream.
+type IdentityProvider struct {
+	Name     string      `json:"name,omitempty"`
+	Provider interface{} `json:"provider,omitempty"`
+}
+
+// AADIdentityProvider defines Identity provider for MS AAD.  It is based on
+// OpenID IdentityProvider.
+type AADIdentityProvider struct {
+	Kind     string `json:"kind,omitempty"`
+	ClientID string `json:"clientId,omitempty"`
+	Secret   string `json:"secret,omitempty"`
+}
+
+// ServicePrincipalProfile contains the client and secret used by the cluster
+// for Azure Resource CRUD.
+type ServicePrincipalProfile struct {
+	ClientID string `json:"clientId,omitempty"`
+	Secret   string `json:"secret,omitempty"`
+}
+
+// AzProfile holds the azure context for where the cluster resides
+type AzProfile struct {
+	TenantID       string `json:"tenantId,omitempty"`
+	SubscriptionID string `json:"subscriptionId,omitempty"`
+	ResourceGroup  string `json:"resourceGroup,omitempty"`
 }

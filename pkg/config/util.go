@@ -115,16 +115,15 @@ func randomString(length int) (string, error) {
 }
 
 func selectDNSNames(cs *acsapi.OpenShiftManagedCluster) {
-
 	// Prefix values used to set arm and router k8s service dns annotations
-	cs.Config.RouterLBCNamePrefix = strings.Split(cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN, ".")[0]
+	cs.Config.RouterLBCNamePrefix = strings.Split(cs.Properties.RouterProfiles[0].FQDN, ".")[0]
 	cs.Config.MasterLBCNamePrefix = strings.Split(cs.Properties.FQDN, ".")[0]
 
 	// Set PublicHostname to FQDN values if not specified
-	if cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname == "" {
-		cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = cs.Properties.FQDN
+	if cs.Properties.PublicHostname == "" {
+		cs.Properties.PublicHostname = cs.Properties.FQDN
 	}
-	if cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain == "" {
-		cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN
+	if cs.Properties.RouterProfiles[0].PublicSubdomain == "" {
+		cs.Properties.RouterProfiles[0].PublicSubdomain = cs.Properties.RouterProfiles[0].FQDN
 	}
 }

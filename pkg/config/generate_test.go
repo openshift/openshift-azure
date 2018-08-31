@@ -16,16 +16,14 @@ id: openshift
 location: eastus
 name: test-cluster
 config:
-  Version: 310
+  version: 310
 properties:
   fqdn: "console-internal.example.com"
-  orchestratorProfile:
-    openshiftConfig:
-      PublicHostname: ""
-      RouterProfiles:
-      - FQDN: router-internal.example.com
-        Name: router
-        PublicSubdomain: ""
+  publicHostname: ""
+  routerProfiles:
+  - fqdn: router-internal.example.com
+    name: router
+    publicSubdomain: ""
 `)
 
 func TestGenerate(t *testing.T) {
@@ -85,8 +83,8 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.SyncImage != "", "sync image")
 	assert(c.LogBridgeImage != "", "logbridge image")
 
-	assert(omc.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname != "", "public host name")
-	assert(omc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain != "", "router public subdomain")
+	assert(omc.Properties.PublicHostname != "", "public host name")
+	assert(omc.Properties.RouterProfiles[0].PublicSubdomain != "", "router public subdomain")
 
 	assert(c.ServiceAccountKey != nil, "service account key")
 	assert(len(c.HtPasswd) != 0, "htpassword")
@@ -139,44 +137,42 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 }
 
 func TestSelectDNSNames(t *testing.T) {
-
 	tests := map[string]struct {
 		f        func(*api.OpenShiftManagedCluster)
 		expected func(*api.OpenShiftManagedCluster)
 	}{
-
 		"test no PublicHostname": {
 			f: func(cs *api.OpenShiftManagedCluster) {},
 			expected: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = "console-internal.example.com"
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = "router-internal.example.com"
+				cs.Properties.PublicHostname = "console-internal.example.com"
+				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-internal.example.com"
 				cs.Config.RouterLBCNamePrefix = "router-internal"
 				cs.Config.MasterLBCNamePrefix = "console-internal"
 			},
 		},
 		"test no PublicHostname for router": {
 			f: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = "console.example.com"
+				cs.Properties.PublicHostname = "console.example.com"
 			},
 			expected: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = "router-internal.example.com"
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = "console.example.com"
+				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-internal.example.com"
+				cs.Properties.PublicHostname = "console.example.com"
 				cs.Config.MasterLBCNamePrefix = "console-internal"
 				cs.Config.RouterLBCNamePrefix = "router-internal"
 			},
 		},
 		"test master & router prefix configuration": {
 			f: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = "router-custom.test.com"
+				cs.Properties.RouterProfiles[0].FQDN = "router-custom.test.com"
 				cs.Properties.FQDN = "master-custom.test.com"
 			},
 			expected: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = "router-custom.test.com"
+				cs.Properties.RouterProfiles[0].FQDN = "router-custom.test.com"
 				cs.Properties.FQDN = "master-custom.test.com"
 				cs.Config.MasterLBCNamePrefix = "master-custom"
 				cs.Config.RouterLBCNamePrefix = "router-custom"
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = "router-custom.test.com"
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = "master-custom.test.com"
+				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-custom.test.com"
+				cs.Properties.PublicHostname = "master-custom.test.com"
 			},
 		},
 	}

@@ -27,7 +27,7 @@ var testOpenShiftCluster = &OpenShiftManagedCluster{
 		OpenShiftVersion:  "properties.openShiftVersion",
 		PublicHostname:    "properties.publicHostname",
 		FQDN:              "properties.fqdn",
-		AuthProfile: AuthProfile{
+		AuthProfile: &AuthProfile{
 			IdentityProviders: []IdentityProvider{
 				{
 					Name: "properties.authProfile.identityProvider.0.name",
@@ -51,38 +51,32 @@ var testOpenShiftCluster = &OpenShiftManagedCluster{
 				FQDN:            "properties.routerProfiles.1.fqdn",
 			},
 		},
-		MasterPoolProfile: MasterPoolProfile{
-			ProfileSpec: ProfileSpec{
+		MasterPoolProfile: &MasterPoolProfile{
+			Name:         "properties.agentPoolProfiles.0.name",
+			Count:        1,
+			VMSize:       "properties.agentPoolProfiles.0.vmSize",
+			VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+			OSType:       "properties.agentPoolProfiles.0.osType",
+		},
+		AgentPoolProfiles: []AgentPoolProfile{
+			{
 				Name:         "properties.agentPoolProfiles.0.name",
 				Count:        1,
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 				OSType:       "properties.agentPoolProfiles.0.osType",
-			},
-		},
-		AgentPoolProfiles: []AgentPoolProfile{
-			{
-				ProfileSpec: ProfileSpec{
-					Name:         "properties.agentPoolProfiles.0.name",
-					Count:        1,
-					VMSize:       "properties.agentPoolProfiles.0.vmSize",
-					VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-					OSType:       "properties.agentPoolProfiles.0.osType",
-				},
-				Role: "properties.agentPoolProfiles.0.role",
+				Role:         "properties.agentPoolProfiles.0.role",
 			},
 			{
-				ProfileSpec: ProfileSpec{
-					Name:         "properties.agentPoolProfiles.0.name",
-					Count:        2,
-					VMSize:       "properties.agentPoolProfiles.0.vmSize",
-					VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-					OSType:       "properties.agentPoolProfiles.0.osType",
-				},
-				Role: "properties.agentPoolProfiles.0.role",
+				Name:         "properties.agentPoolProfiles.0.name",
+				Count:        2,
+				VMSize:       "properties.agentPoolProfiles.0.vmSize",
+				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+				OSType:       "properties.agentPoolProfiles.0.osType",
+				Role:         "properties.agentPoolProfiles.0.role",
 			},
 		},
-		ServicePrincipalProfile: ServicePrincipalProfile{
+		ServicePrincipalProfile: &ServicePrincipalProfile{
 			ClientID: "properties.servicePrincipalProfile.clientID",
 			Secret:   "properties.servicePrincipalProfile.secret",
 		},
@@ -183,5 +177,23 @@ func TestUnmarshal(t *testing.T) {
 	}
 	if !reflect.DeepEqual(oc, testOpenShiftCluster) {
 		t.Errorf("json.Unmarshal returned unexpected result\n%#v\n", oc)
+	}
+}
+
+func TestStructTypes(t *testing.T) {
+	// AgentPoolProfile and MasterPoolProfile types should be identical bar
+	// `Role AgentPoolProfileRole` in the former
+	app := reflect.TypeOf(AgentPoolProfile{})
+	mpp := reflect.TypeOf(MasterPoolProfile{})
+	if app.NumField() != mpp.NumField()+1 {
+		t.Fatalf("mismatch in number of fields: %d vs %d", mpp.NumField(), app.NumField())
+	}
+	for i := 0; i < mpp.NumField(); i++ {
+		if !reflect.DeepEqual(app.Field(i), mpp.Field(i)) {
+			t.Errorf("mismatch in field %d:\n%#v\n%#v", i, app.Field(i), mpp.Field(i))
+		}
+	}
+	if app.Field(app.NumField()-1).Name != "Role" {
+		t.Errorf("unexpected field name %s", app.Field(app.NumField()-1).Name)
 	}
 }

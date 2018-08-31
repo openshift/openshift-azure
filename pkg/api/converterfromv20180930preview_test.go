@@ -27,7 +27,7 @@ var testOpenShiftCluster = &v20180930preview.OpenShiftManagedCluster{
 		OpenShiftVersion:  "properties.openShiftVersion",
 		PublicHostname:    "properties.publicHostname",
 		FQDN:              "properties.fqdn",
-		AuthProfile: v20180930preview.AuthProfile{
+		AuthProfile: &v20180930preview.AuthProfile{
 			IdentityProviders: []v20180930preview.IdentityProvider{
 				{
 					Name: "properties.authProfile.identityProviders.0.name",
@@ -51,38 +51,32 @@ var testOpenShiftCluster = &v20180930preview.OpenShiftManagedCluster{
 				FQDN:            "properties.routerProfiles.1.fqdn",
 			},
 		},
-		MasterPoolProfile: v20180930preview.MasterPoolProfile{
-			ProfileSpec: v20180930preview.ProfileSpec{
+		MasterPoolProfile: &v20180930preview.MasterPoolProfile{
+			Name:         "properties.agentPoolProfiles.0.name",
+			Count:        1,
+			VMSize:       "properties.agentPoolProfiles.0.vmSize",
+			VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+			OSType:       "properties.agentPoolProfiles.0.osType",
+		},
+		AgentPoolProfiles: []v20180930preview.AgentPoolProfile{
+			{
+				Role:         "properties.agentPoolProfiles.0.role",
 				Name:         "properties.agentPoolProfiles.0.name",
 				Count:        1,
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 				OSType:       "properties.agentPoolProfiles.0.osType",
 			},
-		},
-		AgentPoolProfiles: []v20180930preview.AgentPoolProfile{
 			{
-				Role: "properties.agentPoolProfiles.0.role",
-				ProfileSpec: v20180930preview.ProfileSpec{
-					Name:         "properties.agentPoolProfiles.0.name",
-					Count:        1,
-					VMSize:       "properties.agentPoolProfiles.0.vmSize",
-					VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-					OSType:       "properties.agentPoolProfiles.0.osType",
-				},
-			},
-			{
-				Role: "properties.agentPoolProfiles.0.role",
-				ProfileSpec: v20180930preview.ProfileSpec{
-					Name:         "properties.agentPoolProfiles.0.name",
-					Count:        2,
-					VMSize:       "properties.agentPoolProfiles.0.vmSize",
-					VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-					OSType:       "properties.agentPoolProfiles.0.osType",
-				},
+				Role:         "properties.agentPoolProfiles.0.role",
+				Name:         "properties.agentPoolProfiles.0.name",
+				Count:        2,
+				VMSize:       "properties.agentPoolProfiles.0.vmSize",
+				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+				OSType:       "properties.agentPoolProfiles.0.osType",
 			},
 		},
-		ServicePrincipalProfile: v20180930preview.ServicePrincipalProfile{
+		ServicePrincipalProfile: &v20180930preview.ServicePrincipalProfile{
 			ClientID: "properties.servicePrincipalProfile.clientId",
 			Secret:   "properties.servicePrincipalProfile.secret",
 		},
@@ -106,22 +100,18 @@ var testContainerService = &OpenShiftManagedCluster{
 	Type: "type",
 	Properties: &Properties{
 		ProvisioningState: "properties.provisioningState",
-		OrchestratorProfile: &OrchestratorProfile{
-			OrchestratorVersion: "properties.openShiftVersion",
-			OpenShiftConfig: &OpenShiftConfig{
-				PublicHostname: "properties.publicHostname",
-				RouterProfiles: []OpenShiftRouterProfile{
-					{
-						Name:            "properties.routerProfiles.0.name",
-						PublicSubdomain: "properties.routerProfiles.0.publicSubdomain",
-						FQDN:            "properties.routerProfiles.0.fqdn",
-					},
-					{
-						Name:            "properties.routerProfiles.1.name",
-						PublicSubdomain: "properties.routerProfiles.1.publicSubdomain",
-						FQDN:            "properties.routerProfiles.1.fqdn",
-					},
-				},
+		OpenShiftVersion:  "properties.openShiftVersion",
+		PublicHostname:    "properties.publicHostname",
+		RouterProfiles: []RouterProfile{
+			{
+				Name:            "properties.routerProfiles.0.name",
+				PublicSubdomain: "properties.routerProfiles.0.publicSubdomain",
+				FQDN:            "properties.routerProfiles.0.fqdn",
+			},
+			{
+				Name:            "properties.routerProfiles.1.name",
+				PublicSubdomain: "properties.routerProfiles.1.publicSubdomain",
+				FQDN:            "properties.routerProfiles.1.fqdn",
 			},
 		},
 		FQDN: "properties.fqdn",
@@ -137,7 +127,7 @@ var testContainerService = &OpenShiftManagedCluster{
 				},
 			},
 		},
-		AgentPoolProfiles: []*AgentPoolProfile{
+		AgentPoolProfiles: []AgentPoolProfile{
 			{
 				Name:         "properties.agentPoolProfiles.0.name",
 				Count:        1,

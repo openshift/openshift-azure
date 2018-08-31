@@ -141,7 +141,7 @@ func enrich(cs *acsapi.OpenShiftManagedCluster) error {
 		return fmt.Errorf("must set RESOURCEGROUP")
 	}
 
-	cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = fmt.Sprintf("%s-router.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location)
+	cs.Properties.RouterProfiles[0].FQDN = fmt.Sprintf("%s-router.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location)
 
 	return nil
 }
@@ -198,7 +198,7 @@ func main() {
 	ctx = context.WithValue(ctx, acsapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
 	ctx = context.WithValue(ctx, acsapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
 	ctx = context.WithValue(ctx, acsapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
-	ctx = context.WithValue(ctx, acsapi.ContextKeySubscriptionId, os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	ctx = context.WithValue(ctx, acsapi.ContextKeySubscriptionID, os.Getenv("AZURE_SUBSCRIPTION_ID"))
 	ctx = context.WithValue(ctx, acsapi.ContextKeyResourceGroup, os.Getenv("RESOURCEGROUP"))
 
 	// simulate the API call to the RP

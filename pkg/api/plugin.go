@@ -5,6 +5,17 @@ import (
 	"context"
 )
 
+// ContextKey is a type for context property bag payload keys
+type ContextKey string
+
+const (
+	ContextKeyClientID       ContextKey = "ClientID"
+	ContextKeyClientSecret   ContextKey = "ClientSecret"
+	ContextKeyTenantID       ContextKey = "TenantID"
+	ContextKeySubscriptionID ContextKey = "SubscriptionID"
+	ContextKeyResourceGroup  ContextKey = "ResourceGroup"
+)
+
 type Plugin interface {
 	// MergeConfig merges new and old config so that no unnecessary config
 	// is going to get regenerated during generation. It also handles merging

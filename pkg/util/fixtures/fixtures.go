@@ -10,17 +10,13 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 		Name:     "openshfit",
 		Config:   &api.Config{},
 		Properties: &api.Properties{
-			FQDN: "www.example.com",
-			OrchestratorProfile: &api.OrchestratorProfile{
-				OrchestratorVersion: "v3.10",
-				OpenShiftConfig: &api.OpenShiftConfig{
-					PublicHostname: "openshift.test.example.com",
-					RouterProfiles: []api.OpenShiftRouterProfile{
-						{
-							Name:            "default",
-							PublicSubdomain: "test.example.com",
-						},
-					},
+			FQDN:             "www.example.com",
+			OpenShiftVersion: "v3.10",
+			PublicHostname:   "openshift.test.example.com",
+			RouterProfiles: []api.RouterProfile{
+				{
+					Name:            "default",
+					PublicSubdomain: "test.example.com",
 				},
 			},
 			AuthProfile: &api.AuthProfile{
@@ -35,7 +31,7 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 					},
 				},
 			},
-			AgentPoolProfiles: []*api.AgentPoolProfile{
+			AgentPoolProfiles: []api.AgentPoolProfile{
 				{
 					Name:   "master",
 					Role:   api.AgentPoolProfileRoleMaster,
