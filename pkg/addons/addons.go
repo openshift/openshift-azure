@@ -11,6 +11,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/ghodss/yaml"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -21,6 +22,10 @@ import (
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util"
 )
+
+type extra struct {
+	RegistryStorageAccountKey string
+}
 
 func unmarshal(b []byte) (unstructured.Unstructured, error) {
 	// can't use straight yaml.Unmarshal() because it universally mangles yaml
@@ -43,7 +48,7 @@ func unmarshal(b []byte) (unstructured.Unstructured, error) {
 
 // readDB reads previously exported objects into a map via go-bindata as well as
 // populating configuration items via Translate().
-func readDB(cs *acsapi.OpenShiftManagedCluster) (map[string]unstructured.Unstructured, error) {
+func readDB(cs *acsapi.OpenShiftManagedCluster, ext *extra) (map[string]unstructured.Unstructured, error) {
 	db := map[string]unstructured.Unstructured{}
 
 	for _, asset := range AssetNames() {
@@ -59,7 +64,7 @@ func readDB(cs *acsapi.OpenShiftManagedCluster) (map[string]unstructured.Unstruc
 
 		ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
 		for _, tr := range ts {
-			b, err := util.Template(tr.Template, nil, cs, nil)
+			b, err := util.Template(tr.Template, nil, cs, ext)
 			if err != nil {
 				return nil, err
 			}
@@ -227,13 +232,18 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	return client.ApplyResources(scFilter, db, keys)
 }
 
-func Main(cs *acsapi.OpenShiftManagedCluster, dryRun bool) error {
-	client, err := newClient(cs, dryRun)
+func Main(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, dryRun bool) error {
+	client, err := newClient(cs, azs, dryRun)
 	if err != nil {
 		return err
 	}
 
-	db, err := readDB(cs)
+	key, err := client.GetStorageAccountKey(cs.Config.ResourceGroup, cs.Config.RegistryStorageAccount)
+	if err != nil {
+		return err
+	}
+
+	db, err := readDB(cs, &extra{RegistryStorageAccountKey: key})
 	if err != nil {
 		return err
 	}

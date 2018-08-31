@@ -314,6 +314,11 @@ var Translations = map[string][]struct {
 			NestedPath: jsonpath.MustCompile("$.storage.azure.accountname"),
 			Template:   "{{ .Config.RegistryStorageAccount }}",
 		},
+		{
+			Path:       jsonpath.MustCompile("$.stringData.'config.yml'"),
+			NestedPath: jsonpath.MustCompile("$.storage.azure.accountkey"),
+			Template:   "{{ .Extra.RegistryStorageAccountKey }}",
+		},
 	},
 	"Secret/default/etc-origin-cloudprovider": {
 		{

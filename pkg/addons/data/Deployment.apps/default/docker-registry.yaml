@@ -60,38 +60,7 @@ spec:
         - mountPath: /etc/secrets
           name: registry-certificates
         - mountPath: /etc/registry
-          name: shared-config
-      initContainers:
-      - args:
-        - |
-          set -o errexit
-          set -o nounset
-          set -o pipefail
-
-          . <(sed -e 's/: */=/' /etc/origin/cloudprovider/azure.conf)
-          az login --service-principal -u "$aadClientId" -p "$aadClientSecret" --tenant "$aadTenantId" &>/dev/null
-          REGISTRY_STORAGE_ACCOUNT_KEY=$(az storage account keys list -g "$resourceGroup" -n "$REGISTRY_STORAGE_ACCOUNT_NAME" --query "[?keyName == 'key1'].value" -o tsv)
-          az logout
-
-          cp /etc/registry/config.yml /tmp/registry/config.yml
-          sed -i -e "s#REGISTRY_STORAGE_ACCOUNT_KEY#$REGISTRY_STORAGE_ACCOUNT_KEY#" /tmp/registry/config.yml
-        command:
-        - /bin/bash
-        - -c
-        env:
-        - name: REGISTRY_STORAGE_ACCOUNT_NAME
-          value: '*** GENERATED ***'
-        image: '*** GENERATED ***'
-        name: storage-setup
-        volumeMounts:
-        - mountPath: /etc/origin/cloudprovider
-          name: azure-config
-        - mountPath: /etc/registry
           name: docker-config
-        - mountPath: /tmp/registry
-          name: shared-config
-        - mountPath: /.azure
-          name: empty-dir
       nodeSelector:
         region: infra
       serviceAccountName: registry
@@ -99,15 +68,10 @@ spec:
       - emptyDir: {}
         name: registry-storage
       - emptyDir: {}
-        name: shared-config
-      - emptyDir: {}
         name: empty-dir
       - name: registry-certificates
         secret:
           secretName: registry-certificates
-      - name: azure-config
-        secret:
-          secretName: etc-origin-cloudprovider
       - name: docker-config
         secret:
           secretName: registry-config

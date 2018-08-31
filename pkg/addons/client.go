@@ -5,6 +5,7 @@ import (
 	"errors"
 	"reflect"
 
+	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/go-test/deep"
 	log "github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -33,6 +34,7 @@ type Interface interface {
 	ApplyResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error
 	UpdateDynamicClient() error
 	ServiceCatalogExists() (bool, error)
+	GetStorageAccountKey(resourceGroup, storageAccount string) (string, error)
 }
 
 // client implements Interface
@@ -44,9 +46,10 @@ type client struct {
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
 	grs        []*discovery.APIGroupResources
+	azs        storage.AccountsClient
 }
 
-func newClient(cs *acsapi.OpenShiftManagedCluster, dryRun bool) (Interface, error) {
+func newClient(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, dryRun bool) (Interface, error) {
 	if dryRun {
 		return &dryClient{}, nil
 	}
@@ -79,6 +82,7 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, dryRun bool) (Interface, erro
 		restconfig: restconfig,
 		ac:         ac,
 		cli:        cli,
+		azs:        azs,
 	}
 
 	transport, err := rest.TransportFor(c.restconfig)
@@ -95,6 +99,16 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, dryRun bool) (Interface, erro
 	}
 
 	return c, nil
+}
+
+func (c *client) GetStorageAccountKey(resourceGroup, storageAccount string) (string, error) {
+	response, err := c.azs.ListKeys(context.Background(), resourceGroup, storageAccount)
+	if err != nil {
+		return "", err
+	}
+	// TODO: Allow choosing between the two storage account keys to
+	// enable more convenient key rotation.
+	return *(((*response.Keys)[0]).Value), nil
 }
 
 // UpdateDynamicClient updates the client's server API group resource
@@ -251,3 +265,6 @@ func (c *dryClient) ApplyResources(filter func(unstructured.Unstructured) bool, 
 }
 func (c *dryClient) UpdateDynamicClient() error          { return nil }
 func (c *dryClient) ServiceCatalogExists() (bool, error) { return true, nil }
+func (c *dryClient) GetStorageAccountKey(resourceGroup, storageAccount string) (string, error) {
+	return "", nil
+}
