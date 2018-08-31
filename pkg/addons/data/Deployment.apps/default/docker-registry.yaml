@@ -15,18 +15,6 @@ spec:
       labels:
         docker-registry: default
     spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: docker-registry
-                  operator: In
-                  values:
-                  - default
-              topologyKey: "kubernetes.io/hostname"
       containers:
       - env:
         - name: REGISTRY_HTTP_ADDR

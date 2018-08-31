@@ -25,18 +25,6 @@ spec:
         webconsole: "true"
       name: webconsole
     spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - openshift-web-console
-              topologyKey: "kubernetes.io/hostname"
       containers:
       - command:
         - /usr/bin/origin-web-console

@@ -20,18 +20,6 @@ spec:
       labels:
         router: router
     spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: router
-                  operator: In
-                  values:
-                  - router
-              topologyKey: "kubernetes.io/hostname"
       containers:
       - env:
         - name: DEFAULT_CERTIFICATE_DIR
