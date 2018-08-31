@@ -41,32 +41,29 @@ var testContainerServiceJSON = []byte(`{
 				"fqdn": "properties.routerProfiles.1.fqdn"
 			}
 		],
-		"agentPoolProfiles": [
-			{
-				"name": "properties.agentPoolProfiles.0.name",
-				"count": 1,
-				"vmSize": "properties.agentPoolProfiles.0.vmSize",
-				"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
-				"osType": "properties.agentPoolProfiles.0.osType",
-				"role": "properties.agentPoolProfiles.0.role"
+		"agentPoolProfiles": {
+			"compute": {
+				"name": "properties.agentPoolProfiles.compute.name",
+				"count": 3,
+				"vmSize": "properties.agentPoolProfiles.compute.vmSize",
+				"vnetSubnetID": "properties.agentPoolProfiles.compute.vnetSubnetID",
+				"osType": "properties.agentPoolProfiles.compute.osType"
 			},
-			{
-				"name": "properties.agentPoolProfiles.0.name",
+			"infra": {
+				"name": "properties.agentPoolProfiles.infra.name",
 				"count": 2,
-				"vmSize": "properties.agentPoolProfiles.0.vmSize",
-				"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
-				"osType": "properties.agentPoolProfiles.0.osType",
-				"role": "properties.agentPoolProfiles.0.role"
+				"vmSize": "properties.agentPoolProfiles.infra.vmSize",
+				"vnetSubnetID": "properties.agentPoolProfiles.infra.vnetSubnetID",
+				"osType": "properties.agentPoolProfiles.infra.osType"
 			},
-			{
-				"name": "properties.agentPoolProfiles.0.name",
+			"master": {
+				"name": "properties.agentPoolProfiles.master.name",
 				"count": 1,
-				"vmSize": "properties.agentPoolProfiles.0.vmSize",
-				"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
-				"osType": "properties.agentPoolProfiles.0.osType",
-				"role": "master"
+				"vmSize": "properties.agentPoolProfiles.master.vmSize",
+				"vnetSubnetID": "properties.agentPoolProfiles.master.vnetSubnetID",
+				"osType": "properties.agentPoolProfiles.master.osType"
 			}
-		],
+		},
 		"authProfile": {
 			"identityProviders": [
 				{

@@ -31,24 +31,21 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 					},
 				},
 			},
-			AgentPoolProfiles: []api.AgentPoolProfile{
-				{
+			AgentPoolProfiles: map[api.AgentPoolProfileRole]api.AgentPoolProfile{
+				api.AgentPoolProfileRoleMaster: {
 					Name:   "master",
-					Role:   api.AgentPoolProfileRoleMaster,
 					Count:  3,
 					VMSize: "Standard_D2s_v3",
 					OSType: "Linux",
 				},
-				{
+				api.AgentPoolProfileRoleInfra: {
 					Name:   "infra",
-					Role:   api.AgentPoolProfileRoleInfra,
 					Count:  2,
 					VMSize: "Standard_D2s_v3",
 					OSType: "Linux",
 				},
-				{
+				api.AgentPoolProfileRoleCompute: {
 					Name:   "compute",
-					Role:   api.AgentPoolProfileRoleCompute,
 					Count:  1,
 					VMSize: "Standard_D2s_v3",
 					OSType: "Linux",
