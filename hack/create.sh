@@ -62,6 +62,7 @@ location: eastus
 properties:
   openShiftVersion: "$DEPLOY_VERSION"
   publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+  fqdn: $RESOURCEGROUP.eastus.cloudapp.azure.com
   authProfile:
     identityProviders:
     - name: Azure AAD

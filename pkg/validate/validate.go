@@ -77,9 +77,7 @@ func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster, exte
 func validateProperties(p *api.Properties, externalOnly bool) (errs []error) {
 	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
 	errs = append(errs, validateOrchestratorProfile(p.OrchestratorProfile, externalOnly)...)
-	if !externalOnly {
-		errs = append(errs, validateFQDN(p)...)
-	}
+	errs = append(errs, validateFQDN(p)...)
 	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles)...)
 	errs = append(errs, validateServicePrincipalProfile(p.ServicePrincipalProfile)...)
 	errs = append(errs, validateAuthProfile(p.AuthProfile)...)
@@ -221,7 +219,7 @@ func validateFQDN(p *api.Properties) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
 	}
-	if !isValidHostname(p.FQDN) {
+	if p.FQDN == "" || !isValidHostname(p.FQDN) {
 		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
 	}
 	return

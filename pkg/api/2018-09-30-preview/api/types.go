@@ -35,7 +35,8 @@ type Properties struct {
 	// PublicHostname CNAME record forwarding to the returned FQDN value.
 	PublicHostname string `json:"publicHostname,omitempty"`
 
-	// FQDN (out): Auto-allocated FQDN for OpenShift API server.
+	// FQDN (in): FQDN for OpenShift API server. User-specified FQDN for OpenShift
+	// API server loadbalancer internal hostname.
 	FQDN string `json:"fqdn,omitempty"`
 
 	// RouterProfiles (in,optional/out): Configuration for OpenShift router(s).
