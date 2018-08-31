@@ -78,6 +78,7 @@ base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.MasterServer.Key | Base6
 base64 -d <<< {{ PublicKeyAsBytes .Config.ServiceAccountKey.PublicKey | Base64Encode }} >/etc/origin/master/serviceaccounts.public.key
 base64 -d <<< {{ PrivateKeyAsBytes .Config.ServiceAccountKey | Base64Encode }} >/etc/origin/master/serviceaccounts.private.key
 base64 -d <<< {{ .Config.HtPasswd | Base64Encode }} >/etc/origin/master/htpasswd
+base64 -d <<< {{ YamlMarshal .Config.AdminKubeconfig | Base64Encode }} >/etc/origin/master/admin.kubeconfig
 base64 -d <<< {{ YamlMarshal .Config.MasterKubeconfig | Base64Encode }} >/etc/origin/master/openshift-master.kubeconfig
 
 cat >/etc/etcd/etcd.conf <<EOF
@@ -649,4 +650,4 @@ systemctl enable ${SERVICE_TYPE}-node.service
 systemctl start ${SERVICE_TYPE}-node.service &
 
 mkdir -p /root/.kube
-cp /etc/origin/master/openshift-master.kubeconfig /root/.kube/config
+cp /etc/origin/master/admin.kubeconfig /root/.kube/config
