@@ -71,14 +71,11 @@ func TestValidate(t *testing.T) {
 			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties = nil },
 			expectedErrs: []error{errors.New(`properties cannot be nil`)},
 		},
-		"test external only true - unset fqdn does not fail": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.FQDN = "" },
-			externalOnly: true,
-		},
-		"test external only false - unset fqdn fails": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.FQDN = "" },
+		"openshift config invalid api fqdn": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.FQDN = ""
+			},
 			expectedErrs: []error{errors.New(`invalid properties.fqdn ""`)},
-			externalOnly: false,
 		},
 		"test external only false - invalid fqdn fails": {
 			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.FQDN = "()" },

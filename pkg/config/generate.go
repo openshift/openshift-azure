@@ -211,6 +211,8 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		// Openshift Console is BYO type of certificate. In the long run we should
 		// enable users to configure their own certificates.
 		// For this reason we decouple it from all OCP certs and make it self-sign
+		// If FQDN matches PublicHostname certificate can't be self-sign
+		// https://github.com/openshift/openshift-azure/issues/307
 		{
 			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
 			dnsNames: []string{
@@ -219,7 +221,6 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.Certificates.OpenshiftConsole.Key,
 			cert:        &c.Certificates.OpenshiftConsole.Cert,
-			selfSign:    true,
 		},
 	}
 	for _, cert := range certs {

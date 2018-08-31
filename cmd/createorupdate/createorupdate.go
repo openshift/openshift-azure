@@ -141,14 +141,6 @@ func enrich(cs *acsapi.OpenShiftManagedCluster) error {
 		return fmt.Errorf("must set RESOURCEGROUP")
 	}
 
-	// TODO: MS to provide FQDN values for OCP cluster to use.
-	// cs.Properties.FQDN = random-cluster-master-prefix.eastus.cloudapp.azure.com
-	// cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = random-cluster-router-prefix.eastus.cloudapp.azure.com
-	// We will:
-	//    extract random-cluster-master-prefix and put it into ARM to use this for public-ip
-	//    extract random-cluster-router-prefix and put it into service annotation so cloud-plugin could claim DNS name when provisioning IP
-
-	cs.Properties.FQDN = fmt.Sprintf("%s.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location)
 	cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = fmt.Sprintf("%s-router.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location)
 
 	return nil
