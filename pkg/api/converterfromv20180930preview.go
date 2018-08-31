@@ -27,53 +27,46 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster) *
 	if oc.Properties != nil {
 		cs.Properties = &Properties{
 			ProvisioningState: ProvisioningState(oc.Properties.ProvisioningState),
-			OrchestratorProfile: &OrchestratorProfile{
-				OrchestratorVersion: oc.Properties.OpenShiftVersion,
-				OpenShiftConfig: &OpenShiftConfig{
-					PublicHostname: oc.Properties.PublicHostname,
-				},
-			},
-			FQDN: oc.Properties.FQDN,
-			ServicePrincipalProfile: &ServicePrincipalProfile{
-				ClientID: oc.Properties.ServicePrincipalProfile.ClientID,
-				Secret:   oc.Properties.ServicePrincipalProfile.Secret,
-			},
+			OpenShiftVersion:  oc.Properties.OpenShiftVersion,
+			PublicHostname:    oc.Properties.PublicHostname,
+			FQDN:              oc.Properties.FQDN,
 		}
 
-		cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles = make([]OpenShiftRouterProfile, len(oc.Properties.RouterProfiles))
+		cs.Properties.RouterProfiles = make([]RouterProfile, len(oc.Properties.RouterProfiles))
 		for i, rp := range oc.Properties.RouterProfiles {
-			cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[i] = OpenShiftRouterProfile{
+			cs.Properties.RouterProfiles[i] = RouterProfile{
 				Name:            rp.Name,
 				PublicSubdomain: rp.PublicSubdomain,
 				FQDN:            rp.FQDN,
 			}
 		}
 
-		// +1 because master pool profile becomes agent pool profile
-		cs.Properties.AgentPoolProfiles = make([]*AgentPoolProfile, len(oc.Properties.AgentPoolProfiles)+1)
-		for i, app := range oc.Properties.AgentPoolProfiles {
-			cs.Properties.AgentPoolProfiles[i] = &AgentPoolProfile{
+		cs.Properties.AgentPoolProfiles = make([]AgentPoolProfile, 0, len(oc.Properties.AgentPoolProfiles)+1)
+		for _, app := range oc.Properties.AgentPoolProfiles {
+			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, AgentPoolProfile{
 				Name:         app.Name,
 				Count:        app.Count,
 				VMSize:       app.VMSize,
 				OSType:       OSType(app.OSType),
 				VnetSubnetID: app.VnetSubnetID,
 				Role:         AgentPoolProfileRole(app.Role),
-			}
+			})
 		}
 
-		cs.Properties.AgentPoolProfiles[len(oc.Properties.AgentPoolProfiles)] = &AgentPoolProfile{
-			Name:         oc.Properties.MasterPoolProfile.Name,
-			Count:        oc.Properties.MasterPoolProfile.Count,
-			VMSize:       oc.Properties.MasterPoolProfile.VMSize,
-			OSType:       OSType(oc.Properties.MasterPoolProfile.OSType),
-			VnetSubnetID: oc.Properties.MasterPoolProfile.VnetSubnetID,
-			Role:         AgentPoolProfileRoleMaster,
+		if oc.Properties.MasterPoolProfile != nil {
+			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, AgentPoolProfile{
+				Name:         oc.Properties.MasterPoolProfile.Name,
+				Count:        oc.Properties.MasterPoolProfile.Count,
+				VMSize:       oc.Properties.MasterPoolProfile.VMSize,
+				OSType:       OSType(oc.Properties.MasterPoolProfile.OSType),
+				VnetSubnetID: oc.Properties.MasterPoolProfile.VnetSubnetID,
+				Role:         AgentPoolProfileRoleMaster,
+			})
 		}
 
-		// init internal AuthProfile structure for conversion
-		cs.Properties.AuthProfile = &AuthProfile{}
-		if len(oc.Properties.AuthProfile.IdentityProviders) > 0 {
+		if oc.Properties.AuthProfile != nil {
+			cs.Properties.AuthProfile = &AuthProfile{}
+
 			cs.Properties.AuthProfile.IdentityProviders = make([]IdentityProvider, len(oc.Properties.AuthProfile.IdentityProviders))
 			for i, ip := range oc.Properties.AuthProfile.IdentityProviders {
 				cs.Properties.AuthProfile.IdentityProviders[i].Name = ip.Name
@@ -84,9 +77,17 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster) *
 						Secret:   provider.Secret,
 						Kind:     provider.Kind,
 					}
+
 				default:
 					panic("authProfile.identityProviders conversion failed")
 				}
+			}
+		}
+
+		if oc.Properties.ServicePrincipalProfile != nil {
+			cs.Properties.ServicePrincipalProfile = &ServicePrincipalProfile{
+				ClientID: oc.Properties.ServicePrincipalProfile.ClientID,
+				Secret:   oc.Properties.ServicePrincipalProfile.Secret,
 			}
 		}
 	}

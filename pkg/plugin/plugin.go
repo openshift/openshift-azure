@@ -44,14 +44,17 @@ func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *acsapi.OpenShiftMan
 	if len(cs.Properties.AgentPoolProfiles) == 0 {
 		cs.Properties.AgentPoolProfiles = oldCs.Properties.AgentPoolProfiles
 	}
-	if cs.Properties.OrchestratorProfile == nil {
-		cs.Properties.OrchestratorProfile = oldCs.Properties.OrchestratorProfile
+	if len(cs.Properties.OpenShiftVersion) == 0 {
+		cs.Properties.OpenShiftVersion = oldCs.Properties.OpenShiftVersion
 	}
-	if len(cs.Properties.OrchestratorProfile.OrchestratorVersion) == 0 {
-		cs.Properties.OrchestratorProfile.OrchestratorVersion = oldCs.Properties.OrchestratorProfile.OrchestratorVersion
+	if len(cs.Properties.PublicHostname) == 0 {
+		cs.Properties.PublicHostname = oldCs.Properties.PublicHostname
 	}
-	if cs.Properties.OrchestratorProfile.OpenShiftConfig == nil {
-		cs.Properties.OrchestratorProfile.OpenShiftConfig = oldCs.Properties.OrchestratorProfile.OpenShiftConfig
+	if len(cs.Properties.RouterProfiles) == 0 {
+		cs.Properties.RouterProfiles = oldCs.Properties.RouterProfiles
+	}
+	if cs.Properties.ServicePrincipalProfile == nil {
+		cs.Properties.ServicePrincipalProfile = oldCs.Properties.ServicePrincipalProfile
 	}
 	if len(cs.Properties.FQDN) == 0 {
 		cs.Properties.FQDN = oldCs.Properties.FQDN

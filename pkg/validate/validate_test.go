@@ -110,48 +110,40 @@ func TestValidate(t *testing.T) {
 		"provisioning state empty": {
 			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "" },
 		},
-		"orchestrator profile nil": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.OrchestratorProfile = nil },
-			expectedErrs: []error{errors.New(`orchestratorProfile cannot be nil`)},
+		"openshift version good": {
+			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.OpenShiftVersion = "v3.10" },
 		},
-		"orchestrator version good": {
-			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.OrchestratorProfile.OrchestratorVersion = "v3.10" },
-		},
-		"orchestrator version bad": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.OrchestratorProfile.OrchestratorVersion = "" },
+		"openshift version bad": {
+			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.OpenShiftVersion = "" },
 			expectedErrs: []error{errors.New(`invalid properties.openShiftVersion ""`)},
-		},
-		"openshift config nil": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.OrchestratorProfile.OpenShiftConfig = nil },
-			expectedErrs: []error{errors.New(`openshiftConfig cannot be nil`)},
 		},
 		"openshift config empty public hostname": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = ""
+				oc.Properties.PublicHostname = ""
 			},
 		},
 		"openshift config valid public hostname": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = "www.example.com"
+				oc.Properties.PublicHostname = "www.example.com"
 			},
 		},
 		"openshift config invalid public hostname": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname = "()"
+				oc.Properties.PublicHostname = "()"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.publicHostname "()"`)},
 		},
 		"router profile duplicate names": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles =
-					append(oc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles,
-						oc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0])
+				oc.Properties.RouterProfiles =
+					append(oc.Properties.RouterProfiles,
+						oc.Properties.RouterProfiles[0])
 			},
 			expectedErrs: []error{errors.New(`duplicate properties.routerProfiles "default"`)},
 		},
 		"router profile invalid name": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].Name = "foo"
+				oc.Properties.RouterProfiles[0].Name = "foo"
 			},
 			// two errors expected here because we require the default profile
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["foo"]`),
@@ -159,7 +151,7 @@ func TestValidate(t *testing.T) {
 		},
 		"router profile empty name": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].Name = ""
+				oc.Properties.RouterProfiles[0].Name = ""
 			},
 			// same as above with 2 errors but additional validate on the individual profile yeilds a third
 			// this is not very user friendly but testing as is for now
@@ -170,36 +162,36 @@ func TestValidate(t *testing.T) {
 		},
 		"router empty public subdomain": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = ""
+				oc.Properties.RouterProfiles[0].PublicSubdomain = ""
 			},
 		},
 		"router invalid public subdomain": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = "()"
+				oc.Properties.RouterProfiles[0].PublicSubdomain = "()"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].publicSubdomain "()"`)},
 		},
 		"router valid public subdomain": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain = "example.com"
+				oc.Properties.RouterProfiles[0].PublicSubdomain = "example.com"
 			},
 		},
 		"test external only true - unset router profile does not fail": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles = nil
+				oc.Properties.RouterProfiles = nil
 			},
 			externalOnly: true,
 		},
 		"test external only false - unset router profile does fail": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles = nil
+				oc.Properties.RouterProfiles = nil
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"]`)},
 			externalOnly: false,
 		},
 		"test external only false - invalid router profile does fail": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].FQDN = "()"
+				oc.Properties.RouterProfiles[0].FQDN = "()"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].fqdn "()"`)},
 			externalOnly: false,
@@ -214,12 +206,9 @@ func TestValidate(t *testing.T) {
 		},
 		"agent pool profile invalid name": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				pool := oc.Properties.AgentPoolProfiles[0]
-				poolCopy := *pool
-				oc.Properties.AgentPoolProfiles = append(
-					oc.Properties.AgentPoolProfiles,
-					&poolCopy)
-				oc.Properties.AgentPoolProfiles[len(oc.Properties.AgentPoolProfiles)-1].Name = "foo"
+				poolCopy := oc.Properties.AgentPoolProfiles[0]
+				poolCopy.Name = "foo"
+				oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, poolCopy)
 			},
 			expectedErrs: []error{
 				errors.New(`invalid properties.agentPoolProfiles["foo"]`),
@@ -246,9 +235,9 @@ func TestValidate(t *testing.T) {
 		},
 		"agent pool bad master count": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				for _, app := range oc.Properties.AgentPoolProfiles {
+				for i, app := range oc.Properties.AgentPoolProfiles {
 					if app.Role == api.AgentPoolProfileRoleMaster {
-						app.Count = 1
+						oc.Properties.AgentPoolProfiles[i].Count = 1
 					}
 				}
 			},

@@ -15,9 +15,9 @@ func selectNodeImage(cs *acsapi.OpenShiftManagedCluster) {
 
 	switch os.Getenv("DEPLOY_OS") {
 	case "", "rhel7":
-		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OrchestratorProfile.OrchestratorVersion[1:], ".", "", -1)
+		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OpenShiftVersion[1:], ".", "", -1)
 	case "centos7":
-		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OrchestratorProfile.OrchestratorVersion[1:], ".", "", -1)
+		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OpenShiftVersion[1:], ".", "", -1)
 	}
 
 	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
@@ -36,7 +36,7 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 		c.ImageConfigFormat = "docker.io/openshift/origin-${component}:${version}"
 	}
 
-	switch cs.Properties.OrchestratorProfile.OrchestratorVersion {
+	switch cs.Properties.OpenShiftVersion {
 	case "v3.10":
 		v := "v3.10.0"
 		c.ControlPlaneImage = image(c.ImageConfigFormat, "control-plane", v)
@@ -77,7 +77,7 @@ func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) {
 		c.ImageConfigFormat = "registry.access.redhat.com/openshift3/ose-${component}:${version}"
 	}
 
-	switch cs.Properties.OrchestratorProfile.OrchestratorVersion {
+	switch cs.Properties.OpenShiftVersion {
 	//TODO: confirm minor version after release
 	case "v3.10":
 		v := "v3.10"

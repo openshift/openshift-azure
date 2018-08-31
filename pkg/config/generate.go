@@ -188,19 +188,19 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 			cert:        &c.Certificates.AzureClusterReader.Cert,
 		},
 		{
-			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
+			cn: cs.Properties.RouterProfiles[0].PublicSubdomain,
 			dnsNames: []string{
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
-				"*." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
+				cs.Properties.RouterProfiles[0].PublicSubdomain,
+				"*." + cs.Properties.RouterProfiles[0].PublicSubdomain,
 			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.Certificates.Router.Key,
 			cert:        &c.Certificates.Router.Cert,
 		},
 		{
-			cn: "docker-registry-default." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
+			cn: "docker-registry-default." + cs.Properties.RouterProfiles[0].PublicSubdomain,
 			dnsNames: []string{
-				"docker-registry-default." + cs.Properties.OrchestratorProfile.OpenShiftConfig.RouterProfiles[0].PublicSubdomain,
+				"docker-registry-default." + cs.Properties.RouterProfiles[0].PublicSubdomain,
 				"docker-registry.default.svc",
 				"docker-registry.default.svc.cluster.local",
 			},
@@ -214,9 +214,9 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		// If FQDN matches PublicHostname certificate can't be self-sign
 		// https://github.com/openshift/openshift-azure/issues/307
 		{
-			cn: cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+			cn: cs.Properties.PublicHostname,
 			dnsNames: []string{
-				cs.Properties.OrchestratorProfile.OpenShiftConfig.PublicHostname,
+				cs.Properties.PublicHostname,
 			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.Certificates.OpenshiftConsole.Key,
