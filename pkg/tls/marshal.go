@@ -11,10 +11,10 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func CertAsBytes(cert *x509.Certificate) ([]byte, error) {
+func CertAsBytes(cert *Certificate) ([]byte, error) {
 	buf := &bytes.Buffer{}
 
-	err := pem.Encode(buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
+	err := pem.Encode(buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Certificate.Raw})
 	if err != nil {
 		return nil, err
 	}
@@ -22,10 +22,10 @@ func CertAsBytes(cert *x509.Certificate) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func PrivateKeyAsBytes(key *rsa.PrivateKey) ([]byte, error) {
+func PrivateKeyAsBytes(key *PrivateKey) ([]byte, error) {
 	buf := &bytes.Buffer{}
 
-	err := pem.Encode(buf, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
+	err := pem.Encode(buf, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(&key.PrivateKey)})
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func ParseCert(b []byte) (*x509.Certificate, error) {
 	return cert, err
 }
 
-func ParsePrivateKey(b []byte) (*rsa.PrivateKey, error) {
+func ParsePrivateKey(b []byte) (*PrivateKey, error) {
 	block, rest := pem.Decode(b)
 	if len(rest) > 0 {
 		return nil, errors.New("extra data after decoding PEM block")
@@ -83,5 +83,5 @@ func ParsePrivateKey(b []byte) (*rsa.PrivateKey, error) {
 		return nil, err
 	}
 
-	return key, nil
+	return &PrivateKey{*key}, nil
 }

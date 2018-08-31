@@ -4,27 +4,35 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"io/ioutil"
+	"math/big"
 	"net"
 	"os"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/go-test/deep"
 )
 
 const (
 	updateSSLVar = "UPDATE_KNOWN_SSL_CERT"
 )
 
-func readCert(path string) (*x509.Certificate, error) {
+func readCert(path string) (*Certificate, error) {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	return ParseCert(b)
+	cert, err := ParseCert(b)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Certificate{*cert}, nil
 }
 
-func writeCert(path string, cert *x509.Certificate) error {
+func writeCert(path string, cert *Certificate) error {
 	b, err := CertAsBytes(cert)
 	if err != nil {
 		return err
@@ -43,6 +51,21 @@ func TestNewPrivateKey(t *testing.T) {
 	}
 	if key.N.BitLen() < 2048 {
 		t.Errorf("insecure key length detected: %d", key.N.BitLen())
+	}
+}
+
+func TestDeepCopyPrivateKey(t *testing.T) {
+	key, err := NewPrivateKey()
+	if err != nil {
+		t.Error(err)
+	}
+	copy := key.DeepCopy()
+	if !reflect.DeepEqual(key, copy) {
+		t.Errorf("expected a failthful deep copy: %v", deep.Equal(key, copy))
+	}
+	copy.D = big.NewInt(1)
+	if reflect.DeepEqual(key, copy) {
+		t.Error("expected a diff between the keys but got none")
 	}
 }
 
@@ -68,7 +91,7 @@ func TestNewCA(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, c := range []*x509.Certificate{cert, goodCert} {
+	for _, c := range []*Certificate{cert, goodCert} {
 		c.NotBefore = time.Time{}
 		c.NotAfter = time.Time{}
 		c.PublicKey.(*rsa.PublicKey).N = nil
@@ -110,7 +133,7 @@ func TestNewCert(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, c := range []*x509.Certificate{cert, goodCert} {
+	for _, c := range []*Certificate{cert, goodCert} {
 		c.NotBefore = time.Time{}
 		c.NotAfter = time.Time{}
 		c.PublicKey.(*rsa.PublicKey).N = nil
@@ -139,7 +162,7 @@ func TestSignedCertificate(t *testing.T) {
 		t.Error(err)
 	}
 	roots := x509.NewCertPool()
-	roots.AddCert(signingCA)
+	roots.AddCert(&signingCA.Certificate)
 	keyUsages := []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth | x509.ExtKeyUsageClientAuth}
 	opts := x509.VerifyOptions{
 		DNSName:   cn,

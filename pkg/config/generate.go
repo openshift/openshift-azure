@@ -1,7 +1,6 @@
 package config
 
 import (
-	"crypto/rsa"
 	"crypto/x509"
 	"fmt"
 	"net"
@@ -27,8 +26,8 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 	// Generate CAs
 	cas := []struct {
 		cn   string
-		key  **rsa.PrivateKey
-		cert **x509.Certificate
+		key  **tls.PrivateKey
+		cert **tls.Certificate
 	}{
 		{
 			cn:   "etcd-signer",
@@ -71,10 +70,10 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		dnsNames     []string
 		ipAddresses  []net.IP
 		extKeyUsage  []x509.ExtKeyUsage
-		signingKey   *rsa.PrivateKey
-		signingCert  *x509.Certificate
-		key          **rsa.PrivateKey
-		cert         **x509.Certificate
+		signingKey   *tls.PrivateKey
+		signingCert  *tls.Certificate
+		key          **tls.PrivateKey
+		cert         **tls.Certificate
 		selfSign     bool
 	}{
 		// Generate etcd certs
@@ -228,7 +227,7 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 			cert.signingKey, cert.signingCert = c.Certificates.Ca.Key, c.Certificates.Ca.Cert
 		}
 		if *cert.key != nil && *cert.cert != nil &&
-			((*cert.cert).CheckSignatureFrom(cert.signingCert) == nil || cert.selfSign) {
+			((*cert.cert).CheckSignatureFrom(&cert.signingCert.Certificate) == nil || cert.selfSign) {
 			continue
 		}
 		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, cert.selfSign); err != nil {
@@ -274,8 +273,8 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 	}
 
 	kubeconfigs := []struct {
-		clientKey  *rsa.PrivateKey
-		clientCert *x509.Certificate
+		clientKey  *tls.PrivateKey
+		clientCert *tls.Certificate
 		endpoint   string
 		username   string
 		namespace  string
@@ -371,8 +370,8 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		}
 	}
 
-	if uuid.Equal(c.ServiceCatalogClusterID, uuid.Nil) {
-		c.ServiceCatalogClusterID = uuid.NewV4()
+	if uuid.Equal(c.ServiceCatalogClusterID.UUID, uuid.Nil) {
+		c.ServiceCatalogClusterID.UUID = uuid.NewV4()
 	}
 
 	c.TenantID = cs.Properties.AzProfile.TenantID

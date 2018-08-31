@@ -2,8 +2,6 @@ package api
 
 import (
 	"bytes"
-	"crypto/rsa"
-	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -23,14 +21,14 @@ func (c Config) MarshalJSON() ([]byte, error) {
 		k := v.Type().Field(i).Name
 
 		switch v := v.Field(i).Interface().(type) {
-		case *x509.Certificate:
+		case *tls.Certificate:
 			b, err := tls.CertAsBytes(v)
 			if err != nil {
 				return nil, err
 			}
 			m[k] = base64.StdEncoding.EncodeToString(b)
 
-		case *rsa.PrivateKey:
+		case *tls.PrivateKey:
 			b, err := tls.PrivateKeyAsBytes(v)
 			if err != nil {
 				return nil, err
@@ -78,7 +76,7 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 		}
 
 		switch v.Field(i).Type().String() {
-		case "*rsa.PrivateKey":
+		case "*tls.PrivateKey":
 			b, err := base64.StdEncoding.DecodeString(m[k].(string))
 			if err != nil {
 				return err
@@ -90,12 +88,12 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 			}
 			v.Field(i).Set(reflect.ValueOf(key))
 
-		case "uuid.UUID":
+		case "api.UUID":
 			u, err := uuid.FromString(m[k].(string))
 			if err != nil {
 				return err
 			}
-			v.Field(i).Set(reflect.ValueOf(u))
+			v.Field(i).Set(reflect.ValueOf(UUID{u}))
 
 		case "*v1.Config":
 			b, err := base64.StdEncoding.DecodeString(m[k].(string))
@@ -111,7 +109,7 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 			v.Field(i).Set(reflect.ValueOf(&c))
 
-		case "*x509.Certificate":
+		case "*tls.Certificate":
 			b, err := base64.StdEncoding.DecodeString(m[k].(string))
 			if err != nil {
 				return err
@@ -148,7 +146,6 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 
 			var c CertificateConfig
 			err = yaml.Unmarshal(data, &c)
-
 			if err != nil {
 				return err
 			}
@@ -169,14 +166,14 @@ func (c CertKeyPair) MarshalJSON() ([]byte, error) {
 		k := v.Type().Field(i).Name
 
 		switch v := v.Field(i).Interface().(type) {
-		case *x509.Certificate:
+		case *tls.Certificate:
 			b, err := tls.CertAsBytes(v)
 			if err != nil {
 				return nil, err
 			}
 			m[k] = base64.StdEncoding.EncodeToString(b)
 
-		case *rsa.PrivateKey:
+		case *tls.PrivateKey:
 			b, err := tls.PrivateKeyAsBytes(v)
 			if err != nil {
 				return nil, err
@@ -208,7 +205,7 @@ func (c *CertKeyPair) UnmarshalJSON(b []byte) error {
 		}
 
 		switch v.Field(i).Type().String() {
-		case "*rsa.PrivateKey":
+		case "*tls.PrivateKey":
 			b, err := base64.StdEncoding.DecodeString(m[k].(string))
 			if err != nil {
 				return err
@@ -220,7 +217,7 @@ func (c *CertKeyPair) UnmarshalJSON(b []byte) error {
 			}
 			v.Field(i).Set(reflect.ValueOf(key))
 
-		case "*x509.Certificate":
+		case "*tls.Certificate":
 			b, err := base64.StdEncoding.DecodeString(m[k].(string))
 			if err != nil {
 				return err

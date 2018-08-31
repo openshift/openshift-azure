@@ -1,13 +1,16 @@
 package api
 
 import (
-	"crypto/rsa"
-	"crypto/x509"
-
 	"github.com/satori/go.uuid"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
+
+	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
+//go:generate go get k8s.io/gengo/...
+//go:generate deepcopy-gen --input-dirs . -O zz_generated.deepcopy
+
+// +k8s:deepcopy-gen=true
 type Config struct {
 	Version int
 
@@ -49,21 +52,21 @@ type Config struct {
 	AzureClusterReaderKubeconfig *v1.Config
 
 	// misc control plane configurables
-	ServiceAccountKey *rsa.PrivateKey
+	ServiceAccountKey *tls.PrivateKey
 	SessionSecretAuth []byte
 	SessionSecretEnc  []byte
 	HtPasswd          []byte
 	ImageConfigFormat string
 
 	// misc node configurables
-	SSHKey *rsa.PrivateKey
+	SSHKey *tls.PrivateKey
 
 	// misc infra configurables
 	RegistryHTTPSecret             []byte
 	AlertManagerProxySessionSecret []byte
 	AlertsProxySessionSecret       []byte
 	PrometheusProxySessionSecret   []byte
-	ServiceCatalogClusterID        uuid.UUID
+	ServiceCatalogClusterID        UUID
 	// random string based configurables
 	RegistryStorageAccount     string
 	RegistryConsoleOAuthSecret string
@@ -85,6 +88,7 @@ type Config struct {
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.
+// +k8s:deepcopy-gen=true
 type CertificateConfig struct {
 	// CAs
 	EtcdCa           CertKeyPair
@@ -120,6 +124,26 @@ type CertificateConfig struct {
 
 // CertKeyPair is an rsa private key and x509 certificate pair.
 type CertKeyPair struct {
-	Key  *rsa.PrivateKey
-	Cert *x509.Certificate
+	Key  *tls.PrivateKey
+	Cert *tls.Certificate
+}
+
+func (in *CertKeyPair) DeepCopyInto(out *CertKeyPair) {
+	if out == nil {
+		out = new(CertKeyPair)
+	}
+	if in.Key != nil {
+		out.Key = in.Key.DeepCopy()
+	}
+	if in.Cert != nil {
+		out.Cert = in.Cert.DeepCopy()
+	}
+}
+
+type UUID struct {
+	uuid.UUID
+}
+
+func (in *UUID) DeepCopyInto(out *UUID) {
+	*out = *in
 }
