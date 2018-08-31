@@ -54,7 +54,7 @@
                 "publicIPAllocationMethod": "Dynamic",
                 "idleTimeoutInMinutes": 15,
                 "dnsSettings": {
-                    "domainNameLabel": "{{ .Config.MasterLBCNamePrefix }}"
+                    "domainNameLabel": "{{ .Config.MasterLBCNamePrefix | js }}"
                 }
             },
             "sku": {
@@ -152,7 +152,7 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
-            "location": "{{ $.ContainerService.Location }}",
+            "location": "{{ $.ContainerService.Location | js }}",
             "name": "nsg-{{ $app.Name }}",
             "properties": {
                 "securityRules": [
@@ -200,9 +200,9 @@
 {{- if eq $app.Role "master" }}
                 "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]",
 {{- end }}
-                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}')]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name | js }}')]"
             ],
-            "name": "ss-{{ $app.Name }}",
+            "name": "ss-{{ $app.Name | js }}",
             "sku": {
                 "tier": "Standard",
                 "capacity": {{ $app.Count | js }},
@@ -223,13 +223,13 @@
                 "virtualMachineProfile": {
                     "osProfile": {
                         "adminUsername": "cloud-user",
-                        "computerNamePrefix": "{{ $app.Name }}-",
+                        "computerNamePrefix": "{{ $app.Name | js }}-",
                         "linuxConfiguration": {
                             "disablePasswordAuthentication": true,
                             "ssh": {
                                 "publicKeys": [
                                     {
-                                        "keyData": "{{ SSHPublicKeyAsString $.Config.SSHKey.PublicKey }}",
+                                        "keyData": "{{ SSHPublicKeyAsString $.Config.SSHKey.PublicKey | js }}",
                                         "path": "/home/cloud-user/.ssh/authorized_keys"
                                     }
                                 ]
@@ -280,7 +280,7 @@
                                             "properties": {
                                                 "primary": true,
                                                 "subnet": {
-                                                    "id": "{{if $app.VnetSubnetID}}{{$app.VnetSubnetID}}{{else}}[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/default')]{{end}}"
+                                                    "id": "{{if $app.VnetSubnetID}}{{$app.VnetSubnetID | js }}{{else}}[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/default')]{{end}}"
                                                 },
                                                 "publicIpAddressConfiguration": {
                                                     "name": "ip",
@@ -309,7 +309,7 @@
                                 "properties": {
                                     "autoUpgradeMinorVersion": true,
                                     "protectedSettings": {
-                                        "script": "{{ Base64Encode (Startup $app.Role ) }}"
+                                        "script": "{{ Base64Encode (Startup $app.Role ) | js }}"
                                     },
                                     "publisher": "Microsoft.Azure.Extensions",
                                     "settings": {},
