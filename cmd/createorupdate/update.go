@@ -91,7 +91,6 @@ func updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.P
 	for _, vm := range oldVMs {
 		vmsBefore[*vm.InstanceID] = struct{}{}
 	}
-	vmsUpgraded := map[string]struct{}{}
 
 	for _, vm := range oldVMs {
 		log.Infof("setting ss-%s capacity to %d", role, count+1)
@@ -117,14 +116,13 @@ func updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.P
 		// this approach would be for the CSE to not return until the node is
 		// ready, but that is also problematic)
 		for _, updated := range updatedList {
-			_, updatedFound := vmsUpgraded[*updated.InstanceID]
-			if _, oldFound := vmsBefore[*updated.InstanceID]; !oldFound && !updatedFound {
+			if _, found := vmsBefore[*updated.InstanceID]; !found {
 				log.Infof("waiting for %s to be ready", *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 				err = p.WaitForReady(ctx, cs, role, *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 				if err != nil {
 					return err
 				}
-				vmsUpgraded[*updated.InstanceID] = struct{}{}
+				vmsBefore[*updated.InstanceID] = struct{}{}
 			}
 		}
 
