@@ -129,7 +129,7 @@ func sync() error {
 func main() {
 	flag.Parse()
 	logrus.SetLevel(log.SanitizeLogLevel(*logLevel))
-
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 	for {
 		if err := sync(); err != nil {
 			logrus.Printf("Error while syncing: %v", err)
