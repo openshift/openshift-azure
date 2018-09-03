@@ -24,6 +24,10 @@ func New(entry *logrus.Entry) {
 	})
 }
 
+func init() {
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+}
+
 // WithField adds a single field to the Entry
 func WithField(key string, value interface{}) *logrus.Entry {
 	return logger.log.WithField(key, value)
