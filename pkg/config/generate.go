@@ -8,6 +8,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/satori/go.uuid"
+	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
@@ -327,9 +328,16 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		}
 	}
 
-	if len(c.HtPasswd) == 0 {
-		if c.HtPasswd, err = makeHtPasswd("demo", "demo"); err != nil {
-			return
+	// TODO: Remove these password operations before GA
+	if len(c.AdminPasswd) == 0 {
+		if c.AdminPasswd, err = randomString(10); err != nil {
+			return err
+		}
+	}
+	if len(c.HtPasswd) == 0 || bcrypt.CompareHashAndPassword(getHashFromHtPasswd(c.HtPasswd), []byte(c.AdminPasswd)) != nil {
+		c.HtPasswd, err = makeHtPasswd("osadmin", c.AdminPasswd)
+		if err != nil {
+			return err
 		}
 	}
 

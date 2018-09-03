@@ -76,6 +76,10 @@ func makeHtPasswd(username, password string) ([]byte, error) {
 	return append([]byte(username+":"), b...), nil
 }
 
+func getHashFromHtPasswd(record []byte) []byte {
+	return []byte(strings.Split(string(record), ":")[1])
+}
+
 func randomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 	if _, err := io.ReadAtLeast(rand.Reader, b, n); err != nil {
