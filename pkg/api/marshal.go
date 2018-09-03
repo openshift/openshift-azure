@@ -24,6 +24,10 @@ func (c Config) MarshalJSON() ([]byte, error) {
 
 		switch v := v.Field(i).Interface().(type) {
 		case *x509.Certificate:
+			if v == nil {
+				continue
+			}
+
 			b, err := tls.CertAsBytes(v)
 			if err != nil {
 				return nil, err
@@ -31,6 +35,10 @@ func (c Config) MarshalJSON() ([]byte, error) {
 			m[k] = base64.StdEncoding.EncodeToString(b)
 
 		case *rsa.PrivateKey:
+			if v == nil {
+				continue
+			}
+
 			b, err := tls.PrivateKeyAsBytes(v)
 			if err != nil {
 				return nil, err
@@ -38,6 +46,10 @@ func (c Config) MarshalJSON() ([]byte, error) {
 			m[k] = base64.StdEncoding.EncodeToString(b)
 
 		case *v1.Config:
+			if v == nil {
+				continue
+			}
+
 			b, err := yaml.Marshal(v)
 			if err != nil {
 				return nil, err
@@ -45,14 +57,28 @@ func (c Config) MarshalJSON() ([]byte, error) {
 			m[k] = base64.StdEncoding.EncodeToString(b)
 
 		case []byte:
+			if v == nil {
+				continue
+			}
+
 			m[k] = base64.StdEncoding.EncodeToString(v)
+
 		case *CertificateConfig:
+			if v == nil {
+				continue
+			}
+
 			bytes, err := yaml.Marshal(v)
 			if err != nil {
 				return nil, err
 			}
 			m[k] = bytes
+
 		default:
+			if v == nil {
+				continue
+			}
+
 			m[k] = v
 		}
 	}
@@ -170,6 +196,10 @@ func (c CertKeyPair) MarshalJSON() ([]byte, error) {
 
 		switch v := v.Field(i).Interface().(type) {
 		case *x509.Certificate:
+			if v == nil {
+				continue
+			}
+
 			b, err := tls.CertAsBytes(v)
 			if err != nil {
 				return nil, err
@@ -177,12 +207,21 @@ func (c CertKeyPair) MarshalJSON() ([]byte, error) {
 			m[k] = base64.StdEncoding.EncodeToString(b)
 
 		case *rsa.PrivateKey:
+			if v == nil {
+				continue
+			}
+
 			b, err := tls.PrivateKeyAsBytes(v)
 			if err != nil {
 				return nil, err
 			}
 			m[k] = base64.StdEncoding.EncodeToString(b)
+
 		default:
+			if v == nil {
+				continue
+			}
+
 			m[k] = v
 		}
 	}
