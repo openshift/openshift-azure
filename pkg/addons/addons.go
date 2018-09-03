@@ -61,14 +61,13 @@ func readDB(cs *acsapi.OpenShiftManagedCluster, ext *extra) (map[string]unstruct
 			return nil, err
 		}
 
-		o, err = translateAsset(o, cs)
+		o, err = translateAsset(o, cs, ext)
 		if err != nil {
 			return nil, err
 		}
 
 		db[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = o
 	}
-
 	return db, nil
 }
 

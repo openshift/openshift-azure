@@ -132,7 +132,6 @@ func TestSelectDNSNames(t *testing.T) {
 			},
 			expected: func(cs *api.OpenShiftManagedCluster) {
 				cs.Config.MasterLBCNamePrefix = "www"
-				cs.Config.RouterLBCNamePrefix = "router-fqdn"
 
 				cs.Properties.PublicHostname = "www.example.com"
 				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-fqdn.example.com"
@@ -145,7 +144,6 @@ func TestSelectDNSNames(t *testing.T) {
 			},
 			expected: func(cs *api.OpenShiftManagedCluster) {
 				cs.Config.MasterLBCNamePrefix = "www"
-				cs.Config.RouterLBCNamePrefix = "router-fqdn"
 
 				cs.Properties.PublicHostname = "console.example.com"
 				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-fqdn.example.com"
@@ -164,7 +162,6 @@ func TestSelectDNSNames(t *testing.T) {
 				cs.Properties.RouterProfiles[0].FQDN = "router-custom.test.com"
 
 				cs.Config.MasterLBCNamePrefix = "master-custom"
-				cs.Config.RouterLBCNamePrefix = "router-custom"
 
 				cs.Properties.PublicHostname = "master-custom.test.com"
 				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-custom.test.com"

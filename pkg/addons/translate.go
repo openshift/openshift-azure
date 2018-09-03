@@ -29,15 +29,14 @@ const (
 	NestedFlagsBase64 NestedFlags = (1 << iota)
 )
 
-func translateAsset(o unstructured.Unstructured, cs *acsapi.OpenShiftManagedCluster) (unstructured.Unstructured, error) {
-
+func translateAsset(o unstructured.Unstructured, cs *acsapi.OpenShiftManagedCluster, ext *extra) (unstructured.Unstructured, error) {
 	ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
 	for _, tr := range ts {
 		var s string
 		if tr.F != nil {
 			s = tr.F(cs)
 		} else {
-			b, err := util.Template(tr.Template, nil, cs, nil)
+			b, err := util.Template(tr.Template, nil, cs, ext)
 			s = string(b)
 			if err != nil {
 				return unstructured.Unstructured{}, err
@@ -50,7 +49,6 @@ func translateAsset(o unstructured.Unstructured, cs *acsapi.OpenShiftManagedClus
 		}
 	}
 	return o, nil
-
 }
 
 func Translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nestedFlags NestedFlags, v string) error {
@@ -150,14 +148,14 @@ var Translations = map[string][]struct {
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
 			F: func(cs *acsapi.OpenShiftManagedCluster) string {
-				return config.ReturnDerivedKubeArguments(cs, acsapi.AgentPoolProfileRoleCompute, acsapi.KubeletArgumentsKubeReserved)
+				return config.DerivedKubeReserved(cs, acsapi.AgentPoolProfileRoleCompute)
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
 			F: func(cs *acsapi.OpenShiftManagedCluster) string {
-				return config.ReturnDerivedKubeArguments(cs, acsapi.AgentPoolProfileRoleCompute, acsapi.KubeletArgumentsSystemReserved)
+				return config.DerivedSystemReserved(cs, acsapi.AgentPoolProfileRoleCompute)
 			},
 		},
 	},
@@ -171,14 +169,14 @@ var Translations = map[string][]struct {
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
 			F: func(cs *acsapi.OpenShiftManagedCluster) string {
-				return config.ReturnDerivedKubeArguments(cs, acsapi.AgentPoolProfileRoleInfra, acsapi.KubeletArgumentsKubeReserved)
+				return config.DerivedKubeReserved(cs, acsapi.AgentPoolProfileRoleInfra)
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
 			F: func(cs *acsapi.OpenShiftManagedCluster) string {
-				return config.ReturnDerivedKubeArguments(cs, acsapi.AgentPoolProfileRoleInfra, acsapi.KubeletArgumentsSystemReserved)
+				return config.DerivedSystemReserved(cs, acsapi.AgentPoolProfileRoleInfra)
 			},
 		},
 	},
@@ -439,7 +437,7 @@ var Translations = map[string][]struct {
 		{
 			Path: jsonpath.MustCompile("$.metadata.annotations['service.beta.kubernetes.io/azure-dns-label-name']"),
 			F: func(cs *acsapi.OpenShiftManagedCluster) string {
-				return config.ReturnDerivedRouterLBCNamePrefix(cs)
+				return config.DerivedRouterLBCNamePrefix(cs)
 			},
 		},
 	},

@@ -46,7 +46,7 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster) *
 			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, AgentPoolProfile{
 				Name:         app.Name,
 				Count:        app.Count,
-				VMSize:       app.VMSize,
+				VMSize:       VMSize(app.VMSize),
 				OSType:       OSType(app.OSType),
 				VnetSubnetID: app.VnetSubnetID,
 				Role:         AgentPoolProfileRole(app.Role),
@@ -57,7 +57,7 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster) *
 			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, AgentPoolProfile{
 				Name:         oc.Properties.MasterPoolProfile.Name,
 				Count:        oc.Properties.MasterPoolProfile.Count,
-				VMSize:       oc.Properties.MasterPoolProfile.VMSize,
+				VMSize:       VMSize(oc.Properties.MasterPoolProfile.VMSize),
 				OSType:       OSType(oc.Properties.MasterPoolProfile.OSType),
 				VnetSubnetID: oc.Properties.MasterPoolProfile.VnetSubnetID,
 				Role:         AgentPoolProfileRoleMaster,

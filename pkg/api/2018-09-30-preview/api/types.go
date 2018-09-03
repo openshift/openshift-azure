@@ -96,7 +96,7 @@ type RouterProfile struct {
 type MasterPoolProfile struct {
 	Name   string `json:"name,omitempty"`
 	Count  int    `json:"count,omitempty"`
-	VMSize string `json:"vmSize,omitempty"`
+	VMSize VMSize `json:"vmSize,omitempty"`
 
 	// VnetSubnetID is expected to be empty or match
 	// `^/subscriptions/[^/]+
@@ -112,7 +112,7 @@ type MasterPoolProfile struct {
 type AgentPoolProfile struct {
 	Name   string `json:"name,omitempty"`
 	Count  int    `json:"count,omitempty"`
-	VMSize string `json:"vmSize,omitempty"`
+	VMSize VMSize `json:"vmSize,omitempty"`
 
 	// VnetSubnetID is expected to be empty or match
 	// `^/subscriptions/[^/]+
@@ -144,6 +144,16 @@ const (
 	AgentPoolProfileRoleCompute AgentPoolProfileRole = "compute"
 	// AgentPoolProfileRoleInfra is the infra role.
 	AgentPoolProfileRoleInfra AgentPoolProfileRole = "infra"
+)
+
+// VMSize represents supported VMSizes
+type VMSize string
+
+const (
+	// StandardD2sV3 represents Standard_D2s_v3
+	StandardD2sV3 VMSize = "Standard_D2s_v3"
+	// StandardD4sV3 represents Standard_D2s_v3
+	StandardD4sV3 VMSize = "Standard_D4s_v3"
 )
 
 // AuthProfile defines all possible authentication profiles for the OpenShift

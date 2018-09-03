@@ -215,6 +215,14 @@ func TestValidate(t *testing.T) {
 				errors.New(`invalid properties.agentPoolProfiles["foo"].name "foo"`),
 			},
 		},
+		"agent pool profile invalid vm size": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[0].VMSize = api.VMSize("SuperBigVM")
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["infra"].vmSize "SuperBigVM"`),
+			},
+		},
 		"agent pool unmatched vnet subnet id": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.AgentPoolProfiles[0].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
