@@ -281,14 +281,14 @@
                                                 "primary": true,
                                                 "subnet": {
                                                     "id": "{{if $app.VnetSubnetID}}{{$app.VnetSubnetID | js }}{{else}}[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/default')]{{end}}"
-                                                },
+                                                }
+{{- if eq $app.Role "master" }},
                                                 "publicIpAddressConfiguration": {
                                                     "name": "ip",
                                                     "properties": {
                                                         "idleTimeoutInMinutes": 15
                                                     }
-                                                }
-{{- if eq $app.Role "master" }},
+                                                },
                                                 "loadBalancerBackendAddressPools": [
                                                     {
                                                         "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/backendAddressPools/backend')]"
