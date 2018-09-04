@@ -29,6 +29,9 @@ func Template(tmpl string, f template.FuncMap, cs *acsapi.OpenShiftManagedCluste
 			replacer := strings.NewReplacer("$", "\\$")
 			return replacer.Replace(b)
 		},
+		"AgentPoolProfile": func(role string) acsapi.AgentPoolProfile {
+			return cs.Properties.AgentPoolProfiles[acsapi.AgentPoolProfileRole(role)]
+		},
 	}).Funcs(f).Parse(tmpl)
 	if err != nil {
 		return nil, err

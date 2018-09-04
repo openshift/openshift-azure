@@ -43,16 +43,6 @@ func update(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin) 
 	return nil
 }
 
-func getCount(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) int {
-	for _, app := range cs.Properties.AgentPoolProfiles {
-		if app.Role == role {
-			return app.Count
-		}
-	}
-
-	panic("invalid role")
-}
-
 func listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc compute.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole) ([]compute.VirtualMachineScaleSetVM, error) {
 	vmPages, err := vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), "", "", "")
 	if err != nil {
@@ -75,7 +65,7 @@ func listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc compute.V
 // updatePlusOne creates an extra VM, then runs updateInPlace, then removes the
 // extra VM.
 func updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole) error {
-	count := getCount(cs, role)
+	count := cs.Properties.AgentPoolProfiles[role].Count
 
 	// store a list of all the VM instances now, so that if we end up creating
 	// new ones (in the crash recovery case, we might not), we can detect which

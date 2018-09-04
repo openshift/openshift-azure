@@ -196,37 +196,42 @@ func TestValidate(t *testing.T) {
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].fqdn "()"`)},
 			externalOnly: false,
 		},
-		"agent pool profile duplicate name": {
-			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.AgentPoolProfiles = append(
-					oc.Properties.AgentPoolProfiles,
-					oc.Properties.AgentPoolProfiles[0])
-			},
-			expectedErrs: []error{errors.New(`duplicate properties.agentPoolProfiles "infra"`)},
-		},
 		"agent pool profile invalid name": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				poolCopy := oc.Properties.AgentPoolProfiles[0]
-				poolCopy.Name = "foo"
-				oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, poolCopy)
+				app := oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleMaster]
+				app.Name = "foo"
+				oc.Properties.AgentPoolProfiles["foo"] = app
 			},
 			expectedErrs: []error{
 				errors.New(`invalid properties.agentPoolProfiles["foo"]`),
-				errors.New(`invalid properties.agentPoolProfiles["foo"].name "foo"`),
+				errors.New(`invalid properties.agentPoolProfiles["foo"].role "foo"`),
 			},
 		},
 		"agent pool unmatched vnet subnet id": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.AgentPoolProfiles[0].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
-				oc.Properties.AgentPoolProfiles[1].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
+				app := oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleMaster]
+				app.VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
+				oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleMaster] = app
+
+				app = oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleInfra]
+				app.VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
+				oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleInfra] = app
 			},
 			expectedErrs: []error{errors.New(`invalid properties.agentPoolProfiles.vnetSubnetID "": all subnets must match when using vnetSubnetID`)},
 		},
 		"agent pool bad vnet subnet id": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.AgentPoolProfiles[0].VnetSubnetID = "foo"
-				oc.Properties.AgentPoolProfiles[1].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
-				oc.Properties.AgentPoolProfiles[2].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
+				app := oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleMaster]
+				app.VnetSubnetID = "foo"
+				oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleMaster] = app
+
+				app = oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleInfra]
+				app.VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
+				oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleInfra] = app
+
+				app = oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleCompute]
+				app.VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
+				oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleCompute] = app
 			},
 			expectedErrs: []error{
 				errors.New(`invalid properties.agentPoolProfiles["infra"].vnetSubnetID "foo"`),
@@ -235,11 +240,9 @@ func TestValidate(t *testing.T) {
 		},
 		"agent pool bad master count": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				for i, app := range oc.Properties.AgentPoolProfiles {
-					if app.Role == api.AgentPoolProfileRoleMaster {
-						oc.Properties.AgentPoolProfiles[i].Count = 1
-					}
-				}
+				app := oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleMaster]
+				app.Count = 1
+				oc.Properties.AgentPoolProfiles[api.AgentPoolProfileRoleMaster] = app
 			},
 			expectedErrs: []error{errors.New(`invalid masterPoolProfile.count 1`)},
 		},
@@ -300,8 +303,7 @@ func TestValidate(t *testing.T) {
 		}
 		errs := Validate(cs, nil, test.externalOnly)
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
-			t.Errorf("%s expected errors %#v but received %#v", name, spew.Sprint(test.expectedErrs), spew.Sprint(errs))
+			t.Errorf("%q: expected errors\n%s\nbut received\n%s", name, spew.Sprint(test.expectedErrs), spew.Sprint(errs))
 		}
-
 	}
 }

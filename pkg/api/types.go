@@ -45,7 +45,7 @@ type Properties struct {
 	RouterProfiles []RouterProfile `json:"routerProfiles,omitempty"`
 
 	// AgentPoolProfiles (in): configuration of OpenShift cluster VMs.
-	AgentPoolProfiles []AgentPoolProfile `json:"agentPoolProfiles,omitempty"`
+	AgentPoolProfiles map[AgentPoolProfileRole]AgentPoolProfile `json:"agentPoolProfiles,omitempty"`
 
 	// AuthProfile (in): configures OpenShift authentication
 	AuthProfile *AuthProfile `json:"authProfile,omitempty"`
@@ -107,8 +107,6 @@ type AgentPoolProfile struct {
 	//   /subnets/[^/]+$`
 	VnetSubnetID string `json:"vnetSubnetID,omitempty"`
 	OSType       OSType `json:"osType,omitempty"`
-
-	Role AgentPoolProfileRole `json:"role,omitempty"`
 }
 
 // OSType represents the OS type of VMs in an AgentPool.

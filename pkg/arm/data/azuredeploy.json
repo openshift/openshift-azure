@@ -18,7 +18,7 @@
                 }
             }
         },
-{{- if not (index .ContainerService.Properties.AgentPoolProfiles 0).VnetSubnetID }}
+{{- if not (AgentPoolProfile "master").VnetSubnetID }}
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2016-03-30",
@@ -148,7 +148,7 @@
                 "type": "config"
             }
         }
-{{- range $app := .ContainerService.Properties.AgentPoolProfiles }},
+{{- range $role, $app := .ContainerService.Properties.AgentPoolProfiles }},
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
@@ -170,7 +170,7 @@
                             "sourcePortRange": "*"
                         }
                     }
-{{- if eq $app.Role "master" }},
+{{- if eq $role "master" }},
                     {
                         "name": "allow_https",
                         "properties": {
@@ -197,7 +197,7 @@
 {{- if not $app.VnetSubnetID }}
                 "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
 {{- end }}
-{{- if eq $app.Role "master" }}
+{{- if eq $role "master" }}
                 "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]",
 {{- end }}
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name | js }}')]"
@@ -254,7 +254,7 @@
                                 "storageAccountType": "Premium_LRS"
                             }
                         }
-{{- if eq $app.Role "master" }},
+{{- if eq $role "master" }},
                         "dataDisks": [
                             {
                                 "diskSizeGB": 32,
@@ -288,7 +288,7 @@
                                                         "idleTimeoutInMinutes": 15
                                                     }
                                                 }
-{{- if eq $app.Role "master" }},
+{{- if eq $role "master" }},
                                                 "loadBalancerBackendAddressPools": [
                                                     {
                                                         "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver'), '/backendAddressPools/backend')]"
@@ -309,7 +309,7 @@
                                 "properties": {
                                     "autoUpgradeMinorVersion": true,
                                     "protectedSettings": {
-                                        "script": "{{ Base64Encode (Startup $app.Role ) | js }}"
+                                        "script": "{{ Base64Encode (Startup $role ) | js }}"
                                     },
                                     "publisher": "Microsoft.Azure.Extensions",
                                     "settings": {},

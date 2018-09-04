@@ -41,27 +41,25 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster) *
 			}
 		}
 
-		cs.Properties.AgentPoolProfiles = make([]AgentPoolProfile, 0, len(oc.Properties.AgentPoolProfiles)+1)
+		cs.Properties.AgentPoolProfiles = make(map[AgentPoolProfileRole]AgentPoolProfile, len(oc.Properties.AgentPoolProfiles)+1)
 		for _, app := range oc.Properties.AgentPoolProfiles {
-			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, AgentPoolProfile{
+			cs.Properties.AgentPoolProfiles[AgentPoolProfileRole(app.Role)] = AgentPoolProfile{
 				Name:         app.Name,
 				Count:        app.Count,
 				VMSize:       app.VMSize,
 				OSType:       OSType(app.OSType),
 				VnetSubnetID: app.VnetSubnetID,
-				Role:         AgentPoolProfileRole(app.Role),
-			})
+			}
 		}
 
 		if oc.Properties.MasterPoolProfile != nil {
-			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, AgentPoolProfile{
+			cs.Properties.AgentPoolProfiles[AgentPoolProfileRoleMaster] = AgentPoolProfile{
 				Name:         oc.Properties.MasterPoolProfile.Name,
 				Count:        oc.Properties.MasterPoolProfile.Count,
 				VMSize:       oc.Properties.MasterPoolProfile.VMSize,
 				OSType:       OSType(oc.Properties.MasterPoolProfile.OSType),
 				VnetSubnetID: oc.Properties.MasterPoolProfile.VnetSubnetID,
-				Role:         AgentPoolProfileRoleMaster,
-			})
+			}
 		}
 
 		if oc.Properties.AuthProfile != nil {

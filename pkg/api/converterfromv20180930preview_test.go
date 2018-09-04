@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
@@ -52,28 +53,28 @@ var testOpenShiftCluster = &v20180930preview.OpenShiftManagedCluster{
 			},
 		},
 		MasterPoolProfile: &v20180930preview.MasterPoolProfile{
-			Name:         "properties.agentPoolProfiles.0.name",
+			Name:         "properties.agentPoolProfiles.master.name",
 			Count:        1,
-			VMSize:       "properties.agentPoolProfiles.0.vmSize",
-			VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-			OSType:       "properties.agentPoolProfiles.0.osType",
+			VMSize:       "properties.agentPoolProfiles.master.vmSize",
+			VnetSubnetID: "properties.agentPoolProfiles.master.vnetSubnetID",
+			OSType:       "properties.agentPoolProfiles.master.osType",
 		},
 		AgentPoolProfiles: []v20180930preview.AgentPoolProfile{
 			{
-				Role:         "properties.agentPoolProfiles.0.role",
-				Name:         "properties.agentPoolProfiles.0.name",
-				Count:        1,
-				VMSize:       "properties.agentPoolProfiles.0.vmSize",
-				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-				OSType:       "properties.agentPoolProfiles.0.osType",
+				Role:         "infra",
+				Name:         "properties.agentPoolProfiles.infra.name",
+				Count:        2,
+				VMSize:       "properties.agentPoolProfiles.infra.vmSize",
+				VnetSubnetID: "properties.agentPoolProfiles.infra.vnetSubnetID",
+				OSType:       "properties.agentPoolProfiles.infra.osType",
 			},
 			{
-				Role:         "properties.agentPoolProfiles.0.role",
-				Name:         "properties.agentPoolProfiles.0.name",
-				Count:        2,
-				VMSize:       "properties.agentPoolProfiles.0.vmSize",
-				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-				OSType:       "properties.agentPoolProfiles.0.osType",
+				Role:         "compute",
+				Name:         "properties.agentPoolProfiles.compute.name",
+				Count:        3,
+				VMSize:       "properties.agentPoolProfiles.compute.vmSize",
+				VnetSubnetID: "properties.agentPoolProfiles.compute.vnetSubnetID",
+				OSType:       "properties.agentPoolProfiles.compute.osType",
 			},
 		},
 		ServicePrincipalProfile: &v20180930preview.ServicePrincipalProfile{
@@ -127,30 +128,27 @@ var testContainerService = &OpenShiftManagedCluster{
 				},
 			},
 		},
-		AgentPoolProfiles: []AgentPoolProfile{
-			{
-				Name:         "properties.agentPoolProfiles.0.name",
+		AgentPoolProfiles: map[AgentPoolProfileRole]AgentPoolProfile{
+			AgentPoolProfileRoleMaster: {
+				Name:         "properties.agentPoolProfiles.master.name",
 				Count:        1,
-				VMSize:       "properties.agentPoolProfiles.0.vmSize",
-				OSType:       "properties.agentPoolProfiles.0.osType",
-				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-				Role:         "properties.agentPoolProfiles.0.role",
+				VMSize:       "properties.agentPoolProfiles.master.vmSize",
+				OSType:       "properties.agentPoolProfiles.master.osType",
+				VnetSubnetID: "properties.agentPoolProfiles.master.vnetSubnetID",
 			},
-			{
-				Name:         "properties.agentPoolProfiles.0.name",
+			AgentPoolProfileRoleInfra: {
+				Name:         "properties.agentPoolProfiles.infra.name",
 				Count:        2,
-				VMSize:       "properties.agentPoolProfiles.0.vmSize",
-				OSType:       "properties.agentPoolProfiles.0.osType",
-				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-				Role:         "properties.agentPoolProfiles.0.role",
+				VMSize:       "properties.agentPoolProfiles.infra.vmSize",
+				OSType:       "properties.agentPoolProfiles.infra.osType",
+				VnetSubnetID: "properties.agentPoolProfiles.infra.vnetSubnetID",
 			},
-			{
-				Name:         "properties.agentPoolProfiles.0.name",
-				Count:        1,
-				VMSize:       "properties.agentPoolProfiles.0.vmSize",
-				OSType:       "properties.agentPoolProfiles.0.osType",
-				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-				Role:         "master",
+			AgentPoolProfileRoleCompute: {
+				Name:         "properties.agentPoolProfiles.compute.name",
+				Count:        3,
+				VMSize:       "properties.agentPoolProfiles.compute.vmSize",
+				OSType:       "properties.agentPoolProfiles.compute.osType",
+				VnetSubnetID: "properties.agentPoolProfiles.compute.vnetSubnetID",
 			},
 		},
 		ServicePrincipalProfile: &ServicePrincipalProfile{
@@ -163,6 +161,6 @@ var testContainerService = &OpenShiftManagedCluster{
 func TestConvertFromV20180930preview(t *testing.T) {
 	cs := ConvertFromV20180930preview(testOpenShiftCluster)
 	if !reflect.DeepEqual(cs, testContainerService) {
-		t.Errorf("ConvertFromV20180930preview returned unexpected result\n%#v\n", cs)
+		t.Errorf("ConvertFromV20180930preview returned unexpected result\n%s\n", spew.Sdump(cs))
 	}
 }
