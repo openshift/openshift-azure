@@ -55,10 +55,7 @@ else
     AZURE_AAD_CLIENT_ID=$AZURE_CLIENT_ID
     AZURE_AAD_CLIENT_SECRET=$AZURE_CLIENT_SECRET
 fi
-
 set -x
-
-# TODO: if the user interrupts the process here, the AAD application will leak.
 
 cat >_data/manifest.yaml <<EOF
 name: openshift

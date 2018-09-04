@@ -32,16 +32,37 @@
 
 1. **AAD Application / Service principal**.  The deployed OpenShift cluster
    needs a valid AAD application and service principal to call back into the
-   Azure API, and optionally in order to enable AAD authentication. 
-   Application can be created using script `./hack/aad.sh app-create`.
+   Azure API, and optionally in order to enable AAD authentication.  There are a
+   few options here:
 
-   AAD Flow:
-   1. Create an application.
-   2. Add `$AZURE_AAD_CLIENT_ID` variable with application ID to `env` file.
-   3. Create the cluster. `create.sh` script will update your application with 
-   required details. This can be done manually with `./hack/aad.sh app-update`
-   4. Get your application permissions approved by organization administrator.
-   Without approval cluster will start, just login will not work.
+   1. (Ask your Azure subscription administrator to) precreate a generic AAD
+      application and service principal with secret and grant it *Contributor*
+      access to the subscription.  Record the service principal client ID and
+      secret.  Good enough to deploy OpenShift clusters, but AAD authentication
+      won't work.
+
+   1. Automatically create an AAD application and service principal.  Your Azure
+      user will need *Contributor* and *User Access Administrator* roles, and
+      your AAD will need to have *Users can register applications* enabled.
+
+   1. (Ask your Azure subscription administrator to) precreate a specific AAD
+      application and service principal with secret.  You can use `hack/aad.sh`
+      to help with this process.  For AAD authentication to work, the public
+      hostname of the OpenShift cluster must match the AAD application created.
+      Record the service principal client ID and secret.
+
+   2. (optional) For AAD Web-UI sign-in integration to work we will need to have second AAD
+      Web-App created, with callback url to OpenShift and right permissions enabled.
+      `hack/aad.sh` can help you to do so.
+
+      AAD WebApp Flow:
+      1. Create an application (you can use `hack/aad.sh` to create app with
+      right permissions)
+      2. Add `$AZURE_AAD_CLIENT_ID` variable with application ID to `env` file.
+      3. Create the cluster. `create.sh` script will update your application with 
+      required details. This can be done manually with `./hack/aad.sh app-update`
+      4. Get your application permissions approved by organization administrator.
+      Without approval cluster will start, just login will not work.
 
   Once you have application with approved/granted permissions it can be re-used 
   for all future clusters.  

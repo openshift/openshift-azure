@@ -68,10 +68,11 @@ EOF
 )
 
     cat <<EOF
-AZURE_AAD_APP_NAME=$2
 AZURE_AAD_CLIENT_ID=$AZURE_AAD_CLIENT_ID
-AZURE_AAD_CLIENT_SECRET=$AZURE_AAD_CLIENT_SECRET
 
+EOF
+
+cat >&2 <<EOF 
 Note: For the application to work, an Organization Administrator needs to grant permissions first. 
       Once it is approved, it can be reused for other clusters using app-update functionality
       
