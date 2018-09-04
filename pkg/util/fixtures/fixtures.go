@@ -7,7 +7,7 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 	return &api.OpenShiftManagedCluster{
 		ID:       "test",
 		Location: "eastus",
-		Name:     "openshfit",
+		Name:     "openshift",
 		Config:   &api.Config{},
 		Properties: &api.Properties{
 			FQDN:             "www.example.com",
