@@ -167,12 +167,12 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 	switch app.Role {
 	case api.AgentPoolProfileRoleCompute:
 		if app.Count < 1 || app.Count > 5 {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %q", app.Name, app.Count))
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
 
 	case api.AgentPoolProfileRoleInfra:
 		if app.Count != 2 {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %q", app.Name, app.Count))
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
 
 	case api.AgentPoolProfileRoleMaster:
