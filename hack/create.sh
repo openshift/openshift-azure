@@ -70,9 +70,6 @@ properties:
         kind: AADIdentityProvider
         clientId: $AZURE_AAD_CLIENT_ID
         secret: $AZURE_AAD_CLIENT_SECRET
-  routerProfiles:
-  - name: default
-    publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
   masterPoolProfile:
     name: master
     count: 3

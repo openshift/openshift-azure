@@ -394,5 +394,8 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		return
 	}
 
+	//first router profile by default is named default
+	cs.Properties.RouterProfiles[0].Name = "default"
+
 	return
 }

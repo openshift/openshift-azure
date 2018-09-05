@@ -218,10 +218,6 @@ func validateRouterProfiles(rps []api.RouterProfile) (errs []error) {
 	rpmap := map[string]api.RouterProfile{}
 
 	for _, rp := range rps {
-		if _, found := validRouterProfileNames[rp.Name]; !found {
-			errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q]", rp.Name))
-		}
-
 		if _, found := rpmap[rp.Name]; found {
 			errs = append(errs, fmt.Errorf("duplicate properties.routerProfiles %q", rp.Name))
 		}
@@ -229,21 +225,10 @@ func validateRouterProfiles(rps []api.RouterProfile) (errs []error) {
 
 		errs = append(errs, validateRouterProfile(rp)...)
 	}
-
-	for name := range validRouterProfileNames {
-		if _, found := rpmap[name]; !found {
-			errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q]", name))
-		}
-	}
-
 	return
 }
 
 func validateRouterProfile(rp api.RouterProfile) (errs []error) {
-	if rp.Name == "" {
-		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
-	}
-
 	if rp.PublicSubdomain != "" && !isValidHostname(rp.PublicSubdomain) {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].publicSubdomain %q", rp.Name, rp.PublicSubdomain))
 	}

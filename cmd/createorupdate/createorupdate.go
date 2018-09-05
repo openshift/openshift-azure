@@ -141,6 +141,7 @@ func enrich(cs *acsapi.OpenShiftManagedCluster) error {
 		return fmt.Errorf("must set RESOURCEGROUP")
 	}
 
+	cs.Properties.RouterProfiles = make([]acsapi.RouterProfile, 1)
 	cs.Properties.RouterProfiles[0].FQDN = fmt.Sprintf("%s-router.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location)
 
 	return nil
