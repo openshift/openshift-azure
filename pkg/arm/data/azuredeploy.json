@@ -149,6 +149,7 @@
             }
         }
 {{- range $app := .ContainerService.Properties.AgentPoolProfiles }},
+{{- if not IsUpgrade}}
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
@@ -189,6 +190,7 @@
                 ]
             }
         },
+{{- end }}
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2017-12-01",

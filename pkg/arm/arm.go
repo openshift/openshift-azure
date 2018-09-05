@@ -16,7 +16,7 @@ import (
 )
 
 type Generator interface {
-	Generate(ctx context.Context, m *acsapi.OpenShiftManagedCluster) ([]byte, error)
+	Generate(ctx context.Context, cs, oldCs *acsapi.OpenShiftManagedCluster) ([]byte, error)
 }
 
 type simpleGenerator struct{}
@@ -28,7 +28,7 @@ func NewSimpleGenerator(entry *logrus.Entry) Generator {
 	return &simpleGenerator{}
 }
 
-func (*simpleGenerator) Generate(ctx context.Context, m *acsapi.OpenShiftManagedCluster) ([]byte, error) {
+func (*simpleGenerator) Generate(ctx context.Context, cs, oldCs *acsapi.OpenShiftManagedCluster) ([]byte, error) {
 	masterStartup, err := Asset("master-startup.sh")
 	if err != nil {
 		return nil, err
@@ -46,10 +46,13 @@ func (*simpleGenerator) Generate(ctx context.Context, m *acsapi.OpenShiftManaged
 	return util.Template(string(tmpl), template.FuncMap{
 		"Startup": func(role acsapi.AgentPoolProfileRole) ([]byte, error) {
 			if role == acsapi.AgentPoolProfileRoleMaster {
-				return util.Template(string(masterStartup), nil, m, map[string]interface{}{"Role": role})
+				return util.Template(string(masterStartup), nil, cs, map[string]interface{}{"Role": role})
 			} else {
-				return util.Template(string(nodeStartup), nil, m, map[string]interface{}{"Role": role})
+				return util.Template(string(nodeStartup), nil, cs, map[string]interface{}{"Role": role})
 			}
 		},
-	}, m, nil)
+		"IsUpgrade": func() bool {
+			return oldCs != nil
+		},
+	}, cs, nil)
 }

@@ -36,7 +36,7 @@ type Plugin interface {
 	// for an Openshift cluster.
 	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster) error
 
-	GenerateARM(ctx context.Context, cs *OpenShiftManagedCluster) ([]byte, error)
+	GenerateARM(ctx context.Context, cs, oldCs *OpenShiftManagedCluster) ([]byte, error)
 
 	InitializeCluster(ctx context.Context, cs *OpenShiftManagedCluster) error
 
