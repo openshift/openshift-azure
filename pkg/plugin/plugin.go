@@ -87,10 +87,10 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *acsapi.OpenShiftManaged
 	return nil
 }
 
-func (p *plugin) GenerateARM(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) ([]byte, error) {
+func (p *plugin) GenerateARM(ctx context.Context, cs, oldCs *acsapi.OpenShiftManagedCluster) ([]byte, error) {
 	log.Info("generating arm templates")
 	generator := arm.NewSimpleGenerator(p.entry)
-	return generator.Generate(ctx, cs)
+	return generator.Generate(ctx, cs, oldCs)
 }
 
 func (p *plugin) InitializeCluster(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {

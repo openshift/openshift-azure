@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
@@ -24,7 +25,10 @@ func TestMerge(t *testing.T) {
 	newCluster.Properties.FQDN = ""
 
 	// make old cluster go through plugin first
-	testPluginRun(p, oldCluster, nil, t)
+	armTemplate := testPluginRun(p, oldCluster, nil, t)
+	if !strings.Contains(string(armTemplate), "\"type\": \"Microsoft.Network/networkSecurityGroups\"") {
+		t.Fatalf("networkSecurityGroups should be applied during cluster creation")
+	}
 
 	// should fix all of the items removed above and we should
 	// be able to run through the entire plugin process.
@@ -49,10 +53,13 @@ func TestMerge(t *testing.T) {
 		t.Errorf("new cluster fqdn should be merged")
 	}
 
-	testPluginRun(p, newCluster, oldCluster, t)
+	armTemplate = testPluginRun(p, newCluster, oldCluster, t)
+	if strings.Contains(string(armTemplate), "\"type\": \"Microsoft.Network/networkSecurityGroups\"") {
+		t.Fatalf("networkSecurityGroups should not be applied during cluster upgrade")
+	}
 }
 
-func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldCluster *api.OpenShiftManagedCluster, t *testing.T) {
+func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldCluster *api.OpenShiftManagedCluster, t *testing.T) (armTemplate []byte) {
 	if errs := p.Validate(context.Background(), newCluster, oldCluster, false); len(errs) != 0 {
 		t.Fatalf("error validating: %s", spew.Sdump(errs))
 	}
@@ -61,11 +68,12 @@ func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldClu
 		t.Fatalf("error generating config for arm generate test: %s", spew.Sdump(err))
 	}
 
-	bytes, err := p.GenerateARM(context.Background(), newCluster)
+	bytes, err := p.GenerateARM(context.Background(), newCluster, oldCluster)
 	if err != nil {
 		t.Fatalf("error generating arm: %s", spew.Sdump(err))
 	}
 	if len(bytes) == 0 {
 		t.Errorf("no arm was generated")
 	}
+	return bytes
 }
