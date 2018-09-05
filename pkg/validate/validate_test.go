@@ -141,6 +141,25 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{errors.New(`duplicate properties.routerProfiles "default"`)},
 		},
+		"router profile invalid name": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RouterProfiles[0].Name = "foo"
+			},
+			// two errors expected here because we require the default profile
+			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["foo"]`),
+				errors.New(`invalid properties.routerProfiles["default"]`)},
+		},
+		"router profile empty name": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RouterProfiles[0].Name = ""
+			},
+			// same as above with 2 errors but additional validate on the individual profile yeilds a third
+			// this is not very user friendly but testing as is for now
+			// TODO fix
+			expectedErrs: []error{errors.New(`invalid properties.routerProfiles[""]`),
+				errors.New(`invalid properties.routerProfiles[""].name ""`),
+				errors.New(`invalid properties.routerProfiles["default"]`)},
+		},
 		"router empty public subdomain": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].PublicSubdomain = ""
@@ -162,6 +181,13 @@ func TestValidate(t *testing.T) {
 				oc.Properties.RouterProfiles = nil
 			},
 			externalOnly: true,
+		},
+		"test external only false - unset router profile does fail": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RouterProfiles = nil
+			},
+			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"]`)},
+			externalOnly: false,
 		},
 		"test external only false - invalid router profile does fail": {
 			f: func(oc *api.OpenShiftManagedCluster) {
