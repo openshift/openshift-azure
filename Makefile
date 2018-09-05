@@ -26,7 +26,8 @@ logbridge-push: logbridge-image
 sync: clean generate
 	CGO_ENABLED=0 go build ./cmd/sync
 
-SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:latest
+TAG ?= $(shell git rev-parse --short HEAD)
+SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 
 sync-image: sync
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
