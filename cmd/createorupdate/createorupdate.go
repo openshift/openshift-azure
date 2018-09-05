@@ -23,7 +23,7 @@ var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, W
 // createOrUpdate simulates the RP
 func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, entry *logrus.Entry) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
-	p := plugin.NewPlugin(entry)
+	p := plugin.NewPlugin(entry, os.Getenv("SYNC_IMAGE"))
 
 	// convert the external API manifest into the internal API representation
 	log.Info("convert to internal")
