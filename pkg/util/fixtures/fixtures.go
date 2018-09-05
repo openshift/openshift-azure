@@ -28,6 +28,7 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 							Kind:     "AADIdentityProvider",
 							ClientID: "properties.authProfile.identityProviders.0.provider.clientId",
 							Secret:   "properties.authProfile.identityProviders.0.provider.secret",
+							TenantID: "properties.authProfile.identityProviders.0.provider.tenantId",
 						},
 					},
 				},

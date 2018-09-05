@@ -172,4 +172,5 @@ type AADIdentityProvider struct {
 	Kind     string `json:"kind,omitempty"`
 	ClientID string `json:"clientId,omitempty"`
 	Secret   string `json:"secret,omitempty"`
+	TenantID string `json:"tenantId,omitempty"`
 }

@@ -127,6 +127,9 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 			if provider.ClientID == "" {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider clientId %q", provider.ClientID))
 			}
+			if provider.TenantID == "" {
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider tenantId %q", provider.TenantID))
+			}
 		}
 	}
 	return

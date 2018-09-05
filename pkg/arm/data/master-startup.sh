@@ -259,8 +259,8 @@ oauthConfig:
       clientSecret: {{ (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.Secret | quote }}
       kind: OpenIDIdentityProvider
       urls:
-        authorize: {{ print "https://login.microsoftonline.com/" .Config.TenantID "/oauth2/authorize" | quote }}
-        token: {{ print "https://login.microsoftonline.com/" .Config.TenantID "/oauth2/token" | quote }}
+        authorize: {{ print "https://login.microsoftonline.com/" (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.TenantID "/oauth2/authorize" | quote }}
+        token: {{ print "https://login.microsoftonline.com/" (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.TenantID "/oauth2/token" | quote }}
   - challenge: true
     login: true
     mappingMethod: claim
