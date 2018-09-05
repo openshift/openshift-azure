@@ -89,9 +89,6 @@ properties:
     count: 1
     vmSize: Standard_D2s_v3
     osType: Linux
-  servicePrincipalProfile:
-    clientId: $AZURE_CLIENT_ID
-    secret: $AZURE_CLIENT_SECRET
 EOF
 
 go generate ./...
