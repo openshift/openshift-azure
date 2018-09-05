@@ -197,12 +197,14 @@
             "location": "{{ $.ContainerService.Location | js }}",
             "dependsOn": [
 {{- if not $app.VnetSubnetID }}
-                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]"
 {{- end }}
-{{- if eq $app.Role "master" }}
-                "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]",
+{{- if eq $app.Role "master" }}{{- if not $app.VnetSubnetID }},{{- end }}
+                "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]"
 {{- end }}
+{{- if not IsUpgrade}}{{- if or (eq $app.Role "master") (not $app.VnetSubnetID) }},{{- end }}
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name | js }}')]"
+{{- end }}
             ],
             "name": "ss-{{ $app.Name | js }}",
             "sku": {
