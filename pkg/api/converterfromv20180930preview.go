@@ -73,9 +73,10 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster) *
 				switch provider := ip.Provider.(type) {
 				case (*v20180930preview.AADIdentityProvider):
 					cs.Properties.AuthProfile.IdentityProviders[i].Provider = &AADIdentityProvider{
+						Kind:     provider.Kind,
 						ClientID: provider.ClientID,
 						Secret:   provider.Secret,
-						Kind:     provider.Kind,
+						TenantID: provider.TenantID,
 					}
 
 				default:

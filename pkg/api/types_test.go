@@ -47,6 +47,7 @@ var unmarshalled = &OpenShiftManagedCluster{
 						Kind:     "AADIdentityProvider",
 						ClientID: "properties.authProfile.identityProviders.0.provider.clientId",
 						Secret:   "properties.authProfile.identityProviders.0.provider.secret",
+						TenantID: "properties.authProfile.identityProviders.0.provider.tenantId",
 					},
 				},
 			},
@@ -149,7 +150,8 @@ var marshalled = []byte(`{
 					"provider": {
 						"kind": "AADIdentityProvider",
 						"clientId": "properties.authProfile.identityProviders.0.provider.clientId",
-						"secret": "properties.authProfile.identityProviders.0.provider.secret"
+						"secret": "properties.authProfile.identityProviders.0.provider.secret",
+						"tenantId": "properties.authProfile.identityProviders.0.provider.tenantId"
 					}
 				}
 			]

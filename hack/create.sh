@@ -71,6 +71,7 @@ properties:
         kind: AADIdentityProvider
         clientId: $AZURE_AAD_CLIENT_ID
         secret: $AZURE_AAD_CLIENT_SECRET
+        tenantId: $AZURE_TENANT_ID
   routerProfiles:
   - name: default
     publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN

@@ -26,6 +26,7 @@ properties:
         kind: AADIdentityProvider
         clientId: aadClientId
         secret: aadClientSecret
+        tenantId: aadTenantId
   routerProfiles:
   - name: default
     publicSubdomain: test.example.com
@@ -256,9 +257,10 @@ func TestValidate(t *testing.T) {
 		"AADIdentityProvider secret empty": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				aadIdentityProvider := &api.AADIdentityProvider{
-					ClientID: "clientID",
 					Kind:     "AADIdentityProvider",
+					ClientID: "clientId",
 					Secret:   "",
+					TenantID: "tenantId",
 				}
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
@@ -268,14 +270,28 @@ func TestValidate(t *testing.T) {
 		"AADIdentityProvider clientId empty": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				aadIdentityProvider := &api.AADIdentityProvider{
-					ClientID: "",
 					Kind:     "AADIdentityProvider",
+					ClientID: "",
 					Secret:   "aadClientSecret",
+					TenantID: "tenantId",
 				}
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider clientId ""`)},
+		},
+		"AADIdentityProvider tenantId empty": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				aadIdentityProvider := &api.AADIdentityProvider{
+					Kind:     "AADIdentityProvider",
+					ClientID: "test",
+					Secret:   "aadClientSecret",
+					TenantID: "",
+				}
+				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
+				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider tenantId ""`)},
 		},
 	}
 
