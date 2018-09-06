@@ -1,5 +1,4 @@
 #!/bin/bash -ex
-shopt -s extglob
 
 set +x
 if ! az account show >/dev/null; then
@@ -50,4 +49,4 @@ fi
 export RESOURCEGROUP=$1
 
 go generate ./...
-go run cmd/createorupdate/!(*_test.go) -loglevel=debug
+go run cmd/createorupdate/createorupdate.go -loglevel=debug
