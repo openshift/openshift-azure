@@ -21,7 +21,7 @@ properties:
   fqdn: www.example.com
   authProfile:
     identityProviders:
-    - name: Azure AAD
+    - name: Azure AD
       provider:
         kind: AADIdentityProvider
         clientId: aadClientId
@@ -256,7 +256,7 @@ func TestValidate(t *testing.T) {
 		"AADIdentityProvider secret empty": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				aadIdentityProvider := &api.AADIdentityProvider{
-					ClientID: "test",
+					ClientID: "clientID",
 					Kind:     "AADIdentityProvider",
 					Secret:   "",
 				}
