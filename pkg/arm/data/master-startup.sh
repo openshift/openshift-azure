@@ -243,7 +243,7 @@ oauthConfig:
   identityProviders:
   - login: true
     mappingMethod: claim
-    name: Azure AD
+    name: {{ (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Name | quote }}
     provider:
       apiVersion: v1
       claims:

@@ -23,7 +23,7 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 			AuthProfile: &api.AuthProfile{
 				IdentityProviders: []api.IdentityProvider{
 					{
-						Name: "properties.authProfile.identityProviders.0.name",
+						Name: "Azure AD",
 						Provider: &api.AADIdentityProvider{
 							Kind:     "AADIdentityProvider",
 							ClientID: "properties.authProfile.identityProviders.0.provider.clientId",

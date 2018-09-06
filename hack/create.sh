@@ -66,7 +66,7 @@ properties:
   fqdn: $RESOURCEGROUP.eastus.cloudapp.azure.com
   authProfile:
     identityProviders:
-    - name: Azure AAD
+    - name: Azure AD
       provider:
         kind: AADIdentityProvider
         clientId: $AZURE_AAD_CLIENT_ID

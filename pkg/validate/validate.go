@@ -118,6 +118,9 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 	for _, ip := range ap.IdentityProviders {
 		switch provider := ip.Provider.(type) {
 		case (*api.AADIdentityProvider):
+			if ip.Name != "Azure AD" {
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders name"))
+			}
 			if provider.Secret == "" {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider clientId %q", provider.Secret))
 			}
