@@ -1,4 +1,4 @@
-package main
+package upgrade
 
 import (
 	"context"
@@ -8,10 +8,11 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/initialize"
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
-func deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin, azuredeploy []byte) error {
+func Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, i initialize.Initializer, azuredeploy []byte) error {
 	var t map[string]interface{}
 	err := json.Unmarshal(azuredeploy, &t)
 	if err != nil {
@@ -44,5 +45,5 @@ func deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin, 
 		return err
 	}
 
-	return p.InitializeCluster(ctx, cs)
+	return i.InitializeCluster(ctx, cs)
 }

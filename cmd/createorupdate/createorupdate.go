@@ -16,6 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/upgrade"
 )
 
 var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
@@ -101,12 +102,12 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	}
 
 	if oldCs != nil {
-		err = update(ctx, cs, oldCs, p, azuredeploy)
+		err = p.Update(ctx, cs, oldCs, azuredeploy)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		err = deploy(ctx, cs, p, azuredeploy)
+		err = upgrade.Deploy(ctx, cs, p, azuredeploy)
 		if err != nil {
 			return nil, err
 		}
