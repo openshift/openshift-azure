@@ -32,6 +32,12 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster) *
 			FQDN:              oc.Properties.FQDN,
 		}
 
+		// if router profile is not set on the external api, default to minimum
+		if len(oc.Properties.RouterProfiles) == 0 {
+			oc.Properties.RouterProfiles = make([]v20180930preview.RouterProfile, 1)
+			oc.Properties.RouterProfiles[0].Name = "default"
+		}
+
 		cs.Properties.RouterProfiles = make([]RouterProfile, len(oc.Properties.RouterProfiles))
 		for i, rp := range oc.Properties.RouterProfiles {
 			cs.Properties.RouterProfiles[i] = RouterProfile{
