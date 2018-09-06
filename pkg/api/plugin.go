@@ -42,7 +42,5 @@ type Plugin interface {
 
 	HealthCheck(ctx context.Context, cs *OpenShiftManagedCluster) error
 
-	Drain(ctx context.Context, cs *OpenShiftManagedCluster, role AgentPoolProfileRole, nodeName string) error
-
-	WaitForReady(ctx context.Context, cs *OpenShiftManagedCluster, role AgentPoolProfileRole, nodeName string) error
+	Update(ctx context.Context, cs, oldCs *OpenShiftManagedCluster, azuredeploy []byte) error
 }

@@ -1,4 +1,4 @@
-package main
+package upgrade
 
 import (
 	"context"
@@ -8,10 +8,11 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/initialize"
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
-func deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin, azuredeploy []byte) error {
+func Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, i initialize.Initializer, azuredeploy []byte) error {
 	var t map[string]interface{}
 	err := json.Unmarshal(azuredeploy, &t)
 	if err != nil {
@@ -27,7 +28,7 @@ func deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin, 
 	dcli := resources.NewDeploymentsClient(cs.Properties.AzProfile.SubscriptionID)
 	dcli.Authorizer = authorizer
 
-	log.Info("creating/updating deployment")
+	log.Info("applying arm template deployment")
 	future, err := dcli.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
 		Properties: &resources.DeploymentProperties{
 			Template: t,
@@ -38,11 +39,11 @@ func deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, p api.Plugin, 
 		return err
 	}
 
-	log.Info("waiting for deployment")
+	log.Info("waiting for arm template deployment to complete")
 	err = future.WaitForCompletion(ctx, dcli.Client)
 	if err != nil {
 		return err
 	}
 
-	return p.InitializeCluster(ctx, cs)
+	return i.InitializeCluster(ctx, cs)
 }

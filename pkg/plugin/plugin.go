@@ -109,12 +109,8 @@ func (p *plugin) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluste
 	return healthChecker.HealthCheck(ctx, cs)
 }
 
-func (p *plugin) Drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
+func (p *plugin) Update(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
+	log.Info("starting update")
 	upgrader := upgrade.NewSimpleUpgrader(p.entry)
-	return upgrader.Drain(ctx, cs, role, nodeName)
-}
-
-func (p *plugin) WaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
-	upgrader := upgrade.NewSimpleUpgrader(p.entry)
-	return upgrader.WaitForReady(ctx, cs, role, nodeName)
+	return upgrader.Update(ctx, cs, oldCs, azuredeploy)
 }
