@@ -7,7 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/healthcheck"
@@ -30,7 +29,7 @@ func NewPlugin(entry *logrus.Entry) api.Plugin {
 	}
 }
 
-func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *acsapi.OpenShiftManagedCluster) {
+func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster) {
 	if oldCs == nil {
 		return
 	}
@@ -62,16 +61,16 @@ func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *acsapi.OpenShiftMan
 	}
 }
 
-func (p *plugin) Validate(ctx context.Context, new, old *acsapi.OpenShiftManagedCluster, externalOnly bool) []error {
+func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) []error {
 	log.Info("validating internal data models")
 	return validate.Validate(new, old, externalOnly)
 }
 
-func (p *plugin) GenerateConfig(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
+func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	log.Info("generating configs")
 	// TODO should we save off the original config here and if there are any errors we can restore it?
 	if cs.Config == nil {
-		cs.Config = &acsapi.Config{}
+		cs.Config = &api.Config{}
 	}
 
 	upgrader := config.NewSimpleUpgrader(p.entry)
@@ -87,30 +86,30 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *acsapi.OpenShiftManaged
 	return nil
 }
 
-func (p *plugin) GenerateARM(ctx context.Context, cs, oldCs *acsapi.OpenShiftManagedCluster) ([]byte, error) {
+func (p *plugin) GenerateARM(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster) ([]byte, error) {
 	log.Info("generating arm templates")
 	generator := arm.NewSimpleGenerator(p.entry)
 	return generator.Generate(ctx, cs, oldCs)
 }
 
-func (p *plugin) InitializeCluster(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
+func (p *plugin) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	log.Info("initializing cluster")
 	initializer := initialize.NewSimpleInitializer(p.entry)
 	return initializer.InitializeCluster(ctx, cs)
 }
 
-func (p *plugin) HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
+func (p *plugin) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	log.Info("starting health check")
 	healthChecker := healthcheck.NewSimpleHealthChecker(p.entry)
 	return healthChecker.HealthCheck(ctx, cs)
 }
 
-func (p *plugin) Drain(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
+func (p *plugin) Drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
 	upgrader := upgrade.NewSimpleUpgrader(p.entry)
 	return upgrader.Drain(ctx, cs, role, nodeName)
 }
 
-func (p *plugin) WaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
+func (p *plugin) WaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
 	upgrader := upgrade.NewSimpleUpgrader(p.entry)
 	return upgrader.WaitForReady(ctx, cs, role, nodeName)
 }

@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"github.com/go-test/deep"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
@@ -38,7 +39,6 @@ func isValidHostname(h string) bool {
 
 // ContainerService validates a ContainerService struct
 func Validate(new, old *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
-	// TODO update validation
 	// TODO are these error messages confusing since they may not correspond with the external model?
 	if errs := validateContainerService(new, externalOnly); len(errs) > 0 {
 		return errs
@@ -68,8 +68,24 @@ func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool)
 }
 
 func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
-	if !reflect.DeepEqual(cs, oldCs) {
-		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, oldCs)))
+	newAgents := make(map[string]*api.AgentPoolProfile)
+	for i := range cs.Properties.AgentPoolProfiles {
+		newAgent := cs.Properties.AgentPoolProfiles[i]
+		newAgents[newAgent.Name] = &newAgent
+	}
+	old := oldCs.DeepCopy()
+
+	for i, o := range old.Properties.AgentPoolProfiles {
+		new, ok := newAgents[o.Name]
+		if !ok {
+			continue
+		}
+		old.Properties.AgentPoolProfiles[i].Count = new.Count
+	}
+	old.Properties.OpenShiftVersion = cs.Properties.OpenShiftVersion
+
+	if !reflect.DeepEqual(cs, old) {
+		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
 	}
 	return
 }
