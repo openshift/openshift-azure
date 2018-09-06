@@ -20,7 +20,6 @@ import (
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
-	"github.com/openshift/openshift-azure/pkg/util"
 )
 
 type extra struct {
@@ -62,22 +61,13 @@ func readDB(cs *acsapi.OpenShiftManagedCluster, ext *extra) (map[string]unstruct
 			return nil, err
 		}
 
-		ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
-		for _, tr := range ts {
-			b, err := util.Template(tr.Template, nil, cs, ext)
-			if err != nil {
-				return nil, err
-			}
-
-			err = Translate(o.Object, tr.Path, tr.NestedPath, tr.NestedFlags, string(b))
-			if err != nil {
-				return nil, err
-			}
+		o, err = translateAsset(o, cs, ext)
+		if err != nil {
+			return nil, err
 		}
 
 		db[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = o
 	}
-
 	return db, nil
 }
 

@@ -71,7 +71,6 @@ type Config struct {
 	LoggingWorkspace           string // workspace for Azure Log Analytics resource
 
 	// DNS configurables
-	RouterLBCNamePrefix string
 	MasterLBCNamePrefix string
 
 	// enriched values which are not present in the external API representation
