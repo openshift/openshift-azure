@@ -91,7 +91,6 @@ type RouterProfile struct {
 
 // MasterPoolProfile contains configuration for OpenShift master VMs.
 type MasterPoolProfile struct {
-	Name   string `json:"name,omitempty"`
 	Count  int    `json:"count,omitempty"`
 	VMSize VMSize `json:"vmSize,omitempty"`
 
@@ -102,7 +101,6 @@ type MasterPoolProfile struct {
 	//   /virtualNetworks/[^/]+
 	//   /subnets/[^/]+$`
 	VnetSubnetID string `json:"vnetSubnetID,omitempty"`
-	OSType       OSType `json:"osType,omitempty"`
 }
 
 // AgentPoolProfile represents configuration of OpenShift cluster VMs.

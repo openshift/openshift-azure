@@ -55,10 +55,10 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster) *
 
 		if oc.Properties.MasterPoolProfile != nil {
 			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, AgentPoolProfile{
-				Name:         oc.Properties.MasterPoolProfile.Name,
+				Name:         "master",
 				Count:        oc.Properties.MasterPoolProfile.Count,
 				VMSize:       VMSize(oc.Properties.MasterPoolProfile.VMSize),
-				OSType:       OSType(oc.Properties.MasterPoolProfile.OSType),
+				OSType:       OSTypeLinux,
 				VnetSubnetID: oc.Properties.MasterPoolProfile.VnetSubnetID,
 				Role:         AgentPoolProfileRoleMaster,
 			})

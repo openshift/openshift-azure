@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strings"
 
 	"github.com/go-test/deep"
 
@@ -168,7 +169,12 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile) (errs []error) {
 }
 
 func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
-	if app.Name != string(app.Role) {
+	if app.Name == string(api.AgentPoolProfileRoleCompute) {
+		// compute can be anything except "infra" or "master"
+		if strings.HasPrefix(app.Name, string(api.AgentPoolProfileRoleMaster)) || strings.HasPrefix(app.Name, string(api.AgentPoolProfileRoleInfra)) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
+		}
+	} else if app.Name != string(app.Role) {
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 	}
 
