@@ -51,6 +51,22 @@
       hostname of the OpenShift cluster must match the AAD application created.
       Record the service principal client ID and secret.
 
+   2. (optional) For AAD Web-UI sign-in integration to work we will need to have second AAD
+      Web-App created, with callback url to OpenShift and right permissions enabled.
+      `hack/aad.sh` can help you to do so.
+
+      AAD WebApp Flow:
+      1. Create an application (you can use `hack/aad.sh` to create app with
+      right permissions)
+      2. Add `$AZURE_AAD_CLIENT_ID` variable with application ID to `env` file.
+      3. Create the cluster. `create.sh` script will update your application with 
+      required details. This can be done manually with `./hack/aad.sh app-update`
+      4. Get your application permissions approved by organization administrator.
+      Without approval cluster will start, just login will not work.
+
+  Once you have application with approved/granted permissions it can be re-used 
+  for all future clusters.  
+
 ### Deploy an OpenShift cluster
 
 1. Copy the `env.example` file to `env` and edit according to your requirements.
@@ -76,6 +92,13 @@ location: eastus
 properties:
   openShiftVersion: v3.10
   publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+  authProfile:
+    identityProviders:
+    - name: Azure AAD
+      provider:
+        kind: AADIdentityProvider
+        clientId: $AZURE_AAD_CLIENT_ID
+        secret: $AZURE_AAD_CLIENT_SECRET
   routerProfiles:
   - name: default
     publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
@@ -108,6 +131,13 @@ location: eastus
 properties:
   openShiftVersion: v3.10
   publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+  authProfile:
+    identityProviders:
+    - name: Azure AAD
+      provider:
+        kind: AADIdentityProvider
+        clientId: $AZURE_AAD_CLIENT_ID
+        secret: $AZURE_AAD_CLIENT_SECRET
   routerProfiles:
   - name: default
     publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
