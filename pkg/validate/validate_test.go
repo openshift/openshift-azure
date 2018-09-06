@@ -18,7 +18,7 @@ name: openshift
 properties:
   openShiftVersion: v3.10
   publicHostname: openshift.test.example.com
-  fqdn: "www.example.com"
+  fqdn: www.example.com
   authProfile:
     identityProviders:
     - name: Azure AAD
@@ -45,9 +45,6 @@ properties:
     count: 1
     vmSize: Standard_D2s_v3
     osType: Linux
-  servicePrincipalProfile:
-    clientID: client_id
-    secret: client_secret
 `)
 
 func TestValidate(t *testing.T) {
@@ -242,18 +239,6 @@ func TestValidate(t *testing.T) {
 				}
 			},
 			expectedErrs: []error{errors.New(`invalid masterPoolProfile.count 1`)},
-		},
-		"sp nil": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.ServicePrincipalProfile = nil },
-			expectedErrs: []error{errors.New(`servicePrincipalProfile cannot be nil`)},
-		},
-		"sp empty client id": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.ServicePrincipalProfile.ClientID = "" },
-			expectedErrs: []error{errors.New(`invalid properties.servicePrincipalProfile.clientId ""`)},
-		},
-		"sp empty secret": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.ServicePrincipalProfile.Secret = "" },
-			expectedErrs: []error{errors.New(`invalid properties.servicePrincipalProfile.secret ""`)},
 		},
 		//we dont check authProfile because it is non pointer struct. Which is all zero values.
 		"authProfile.identityProviders empty": {

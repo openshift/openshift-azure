@@ -83,13 +83,6 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster) *
 				}
 			}
 		}
-
-		if oc.Properties.ServicePrincipalProfile != nil {
-			cs.Properties.ServicePrincipalProfile = &ServicePrincipalProfile{
-				ClientID: oc.Properties.ServicePrincipalProfile.ClientID,
-				Secret:   oc.Properties.ServicePrincipalProfile.Secret,
-			}
-		}
 	}
 
 	return cs
