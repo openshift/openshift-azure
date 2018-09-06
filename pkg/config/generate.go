@@ -384,7 +384,6 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		"subscriptionId":      cs.Config.SubscriptionID,
 		"aadClientId":         cs.Properties.ServicePrincipalProfile.ClientID,
 		"aadClientSecret":     cs.Properties.ServicePrincipalProfile.Secret,
-		"aadTenantId":         cs.Config.TenantID,
 		"resourceGroup":       cs.Config.ResourceGroup,
 		"location":            cs.Location,
 		"securityGroupName":   "nsg-compute",
