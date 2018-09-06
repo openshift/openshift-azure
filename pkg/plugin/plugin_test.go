@@ -13,7 +13,7 @@ import (
 )
 
 func TestMerge(t *testing.T) {
-	p := NewPlugin(logrus.NewEntry(logrus.New()))
+	p := NewPlugin(logrus.NewEntry(logrus.New()), "sync:latest")
 	newCluster := fixtures.NewTestOpenShiftCluster()
 	oldCluster := fixtures.NewTestOpenShiftCluster()
 

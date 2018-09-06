@@ -61,7 +61,6 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest"
 
-		c.SyncImage = os.Getenv("SYNC_IMAGE")
 		if c.SyncImage == "" {
 			c.SyncImage = "quay.io/openshift-on-azure/sync:v3.10"
 		}
@@ -102,7 +101,6 @@ func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) {
 
 		c.AzureCLIImage = "docker.io/microsoft/azure-cli:latest" //TODO: create mapping for OSA release to any other image we use
 
-		c.SyncImage = os.Getenv("SYNC_IMAGE")
 		if c.SyncImage == "" {
 			c.SyncImage = "quay.io/openshift-on-azure/sync:v3.10"
 		}
