@@ -118,9 +118,6 @@ properties:
     count: 1
     vmSize: Standard_D2s_v3
     osType: Linux
-  servicePrincipalProfile:
-    clientID: $AZURE_CLIENT_ID
-    secret: $AZURE_CLIENT_SECRET
 ```
 
 OpenShift with BYO VNET configuration:
@@ -160,9 +157,6 @@ properties:
     vmSize: Standard_D2s_v3
     osType: Linux
     vnetSubnetID: /subscriptions/SUB_ID/resourceGroups/RG_NAME/providers/Microsoft.Network/virtualNetworks/VNET_NAME/subnets/SUBNET_NAME
-  servicePrincipalProfile:
-    clientID: $AZURE_CLIENT_ID
-    secret: $AZURE_CLIENT_SECRET
 ```
 
 You can create BYO VNET and subnet with commands:

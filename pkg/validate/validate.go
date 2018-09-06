@@ -106,7 +106,6 @@ func validateProperties(p *api.Properties, externalOnly bool) (errs []error) {
 	}
 	errs = append(errs, validateFQDN(p)...)
 	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles)...)
-	errs = append(errs, validateServicePrincipalProfile(p.ServicePrincipalProfile)...)
 	errs = append(errs, validateAuthProfile(p.AuthProfile)...)
 	return
 }
@@ -127,22 +126,6 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 			}
 		}
 	}
-	return
-}
-
-func validateServicePrincipalProfile(spp *api.ServicePrincipalProfile) (errs []error) {
-	if spp == nil {
-		errs = append(errs, fmt.Errorf("servicePrincipalProfile cannot be nil"))
-		return
-	}
-	if spp.ClientID == "" {
-		errs = append(errs, fmt.Errorf("invalid properties.servicePrincipalProfile.clientId %q", spp.ClientID))
-	}
-
-	if spp.Secret == "" {
-		errs = append(errs, fmt.Errorf("invalid properties.servicePrincipalProfile.secret %q", spp.Secret))
-	}
-
 	return
 }
 

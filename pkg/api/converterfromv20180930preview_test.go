@@ -7,7 +7,7 @@ import (
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
-var testOpenShiftCluster = &v20180930preview.OpenShiftManagedCluster{
+var v20180930previewManagedCluster = &v20180930preview.OpenShiftManagedCluster{
 	ID:       "id",
 	Location: "location",
 	Name:     "name",
@@ -76,14 +76,10 @@ var testOpenShiftCluster = &v20180930preview.OpenShiftManagedCluster{
 				OSType:       "properties.agentPoolProfiles.0.osType",
 			},
 		},
-		ServicePrincipalProfile: &v20180930preview.ServicePrincipalProfile{
-			ClientID: "properties.servicePrincipalProfile.clientId",
-			Secret:   "properties.servicePrincipalProfile.secret",
-		},
 	},
 }
 
-var testContainerService = &OpenShiftManagedCluster{
+var internalManagedCluster = &OpenShiftManagedCluster{
 	ID:       "id",
 	Location: "location",
 	Name:     "name",
@@ -153,16 +149,12 @@ var testContainerService = &OpenShiftManagedCluster{
 				Role:         "master",
 			},
 		},
-		ServicePrincipalProfile: &ServicePrincipalProfile{
-			ClientID: "properties.servicePrincipalProfile.clientId",
-			Secret:   "properties.servicePrincipalProfile.secret",
-		},
 	},
 }
 
 func TestConvertFromV20180930preview(t *testing.T) {
-	cs := ConvertFromV20180930preview(testOpenShiftCluster)
-	if !reflect.DeepEqual(cs, testContainerService) {
+	cs := ConvertFromV20180930preview(v20180930previewManagedCluster)
+	if !reflect.DeepEqual(cs, internalManagedCluster) {
 		t.Errorf("ConvertFromV20180930preview returned unexpected result\n%#v\n", cs)
 	}
 }

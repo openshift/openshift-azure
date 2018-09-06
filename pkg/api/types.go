@@ -50,7 +50,6 @@ type Properties struct {
 	// AuthProfile (in): configures OpenShift authentication
 	AuthProfile *AuthProfile `json:"authProfile,omitempty"`
 
-	// ServicePrincipalProfile (in): Service principal for OpenShift cluster.
 	ServicePrincipalProfile *ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
 
 	AzProfile *AzProfile `json:"azProfile,omitempty"`

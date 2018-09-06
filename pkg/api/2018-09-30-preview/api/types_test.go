@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-var testOpenShiftCluster = &OpenShiftManagedCluster{
+var unmarshalled = &OpenShiftManagedCluster{
 	ID:       "id",
 	Location: "location",
 	Name:     "name",
@@ -76,14 +76,10 @@ var testOpenShiftCluster = &OpenShiftManagedCluster{
 				Role:         "properties.agentPoolProfiles.0.role",
 			},
 		},
-		ServicePrincipalProfile: &ServicePrincipalProfile{
-			ClientID: "properties.servicePrincipalProfile.clientID",
-			Secret:   "properties.servicePrincipalProfile.secret",
-		},
 	},
 }
 
-var testOpenShiftClusterJSON = []byte(`{
+var marshalled = []byte(`{
 	"id": "id",
 	"location": "location",
 	"name": "name",
@@ -151,31 +147,27 @@ var testOpenShiftClusterJSON = []byte(`{
 					}
 				}
 			]
-		},
-		"servicePrincipalProfile": {
-			"clientId": "properties.servicePrincipalProfile.clientID",
-			"secret": "properties.servicePrincipalProfile.secret"
 		}
 	}
 }`)
 
 func TestMarshal(t *testing.T) {
-	b, err := json.MarshalIndent(testOpenShiftCluster, "", "\t")
+	b, err := json.MarshalIndent(unmarshalled, "", "\t")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !bytes.Equal(b, testOpenShiftClusterJSON) {
+	if !bytes.Equal(b, marshalled) {
 		t.Errorf("json.MarshalIndent returned unexpected result\n%s\n", string(b))
 	}
 }
 
 func TestUnmarshal(t *testing.T) {
 	var oc *OpenShiftManagedCluster
-	err := json.Unmarshal(testOpenShiftClusterJSON, &oc)
+	err := json.Unmarshal(marshalled, &oc)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(oc, testOpenShiftCluster) {
+	if !reflect.DeepEqual(oc, unmarshalled) {
 		t.Errorf("json.Unmarshal returned unexpected result\n%#v\n", oc)
 	}
 }

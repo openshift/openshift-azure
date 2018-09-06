@@ -143,6 +143,18 @@ func enrich(cs *acsapi.OpenShiftManagedCluster) error {
 
 	cs.Properties.RouterProfiles[0].FQDN = fmt.Sprintf("%s-router.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location)
 
+	cs.Properties.ServicePrincipalProfile = &acsapi.ServicePrincipalProfile{
+		ClientID: os.Getenv("AZURE_CLIENT_ID"),
+		Secret:   os.Getenv("AZURE_CLIENT_SECRET"),
+	}
+
+	if cs.Properties.ServicePrincipalProfile.ClientID == "" {
+		return fmt.Errorf("must set AZURE_CLIENT_ID")
+	}
+	if cs.Properties.ServicePrincipalProfile.Secret == "" {
+		return fmt.Errorf("must set AZURE_CLIENT_SECRET")
+	}
+
 	return nil
 }
 

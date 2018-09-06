@@ -7,9 +7,84 @@ import (
 	"testing"
 )
 
-// testContainerService is defined in converterfromv20180930preview_test.go.
+var unmarshalled = &OpenShiftManagedCluster{
+	ID:       "id",
+	Location: "location",
+	Name:     "name",
+	Plan: &ResourcePurchasePlan{
+		Name:          "plan.name",
+		Product:       "plan.product",
+		PromotionCode: "plan.promotionCode",
+		Publisher:     "plan.publisher",
+	},
+	Tags: map[string]string{
+		"tags.k1": "v1",
+		"tags.k2": "v2",
+	},
+	Type: "type",
+	Properties: &Properties{
+		ProvisioningState: "properties.provisioningState",
+		OpenShiftVersion:  "properties.openShiftVersion",
+		PublicHostname:    "properties.publicHostname",
+		RouterProfiles: []RouterProfile{
+			{
+				Name:            "properties.routerProfiles.0.name",
+				PublicSubdomain: "properties.routerProfiles.0.publicSubdomain",
+				FQDN:            "properties.routerProfiles.0.fqdn",
+			},
+			{
+				Name:            "properties.routerProfiles.1.name",
+				PublicSubdomain: "properties.routerProfiles.1.publicSubdomain",
+				FQDN:            "properties.routerProfiles.1.fqdn",
+			},
+		},
+		FQDN: "properties.fqdn",
+		AuthProfile: &AuthProfile{
+			IdentityProviders: []IdentityProvider{
+				{
+					Name: "properties.authProfile.identityProviders.0.name",
+					Provider: &AADIdentityProvider{
+						Kind:     "AADIdentityProvider",
+						ClientID: "properties.authProfile.identityProviders.0.provider.clientId",
+						Secret:   "properties.authProfile.identityProviders.0.provider.secret",
+					},
+				},
+			},
+		},
+		AgentPoolProfiles: []AgentPoolProfile{
+			{
+				Name:         "properties.agentPoolProfiles.0.name",
+				Count:        1,
+				VMSize:       "properties.agentPoolProfiles.0.vmSize",
+				OSType:       "properties.agentPoolProfiles.0.osType",
+				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+				Role:         "properties.agentPoolProfiles.0.role",
+			},
+			{
+				Name:         "properties.agentPoolProfiles.0.name",
+				Count:        2,
+				VMSize:       "properties.agentPoolProfiles.0.vmSize",
+				OSType:       "properties.agentPoolProfiles.0.osType",
+				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+				Role:         "properties.agentPoolProfiles.0.role",
+			},
+			{
+				Name:         "properties.agentPoolProfiles.0.name",
+				Count:        1,
+				VMSize:       "properties.agentPoolProfiles.0.vmSize",
+				OSType:       "properties.agentPoolProfiles.0.osType",
+				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+				Role:         "master",
+			},
+		},
+		ServicePrincipalProfile: &ServicePrincipalProfile{
+			ClientID: "properties.servicePrincipalProfile.clientId",
+			Secret:   "properties.servicePrincipalProfile.secret",
+		},
+	},
+}
 
-var testContainerServiceJSON = []byte(`{
+var marshalled = []byte(`{
 	"id": "id",
 	"location": "location",
 	"name": "name",
@@ -87,22 +162,22 @@ var testContainerServiceJSON = []byte(`{
 }`)
 
 func TestMarshal(t *testing.T) {
-	b, err := json.MarshalIndent(testContainerService, "", "\t")
+	b, err := json.MarshalIndent(unmarshalled, "", "\t")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !bytes.Equal(b, testContainerServiceJSON) {
+	if !bytes.Equal(b, marshalled) {
 		t.Errorf("json.MarshalIndent returned unexpected result\n%s\n", string(b))
 	}
 }
 
 func TestUnmarshal(t *testing.T) {
 	var oc *OpenShiftManagedCluster
-	err := json.Unmarshal(testContainerServiceJSON, &oc)
+	err := json.Unmarshal(marshalled, &oc)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(oc, testContainerService) {
+	if !reflect.DeepEqual(oc, unmarshalled) {
 		t.Errorf("json.Unmarshal returned unexpected result\n%#v\n", oc)
 	}
 }
