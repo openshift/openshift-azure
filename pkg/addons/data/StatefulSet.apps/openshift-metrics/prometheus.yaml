@@ -185,13 +185,13 @@ spec:
       name: alertmanager-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      resources:  
+      resources:
         requests:
-          storage: 10Gi
+          storage: 32Gi
   - metadata:
       name: prometheus-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Gi
+          storage: 128Gi
