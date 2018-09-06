@@ -161,8 +161,6 @@ spec:
       - name: prometheus-tls-secret
         secret:
           secretName: prometheus-tls
-      - emptyDir: {}
-        name: prometheus-data
       - configMap:
           name: alertmanager
         name: alertmanager-config
@@ -179,8 +177,21 @@ spec:
         secret:
           secretName: alerts-proxy
       - emptyDir: {}
-        name: alertmanager-data
-      - emptyDir: {}
         name: alerts-data
   updateStrategy:
     type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: alertmanager-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:  
+        requests:
+          storage: 10Gi
+  - metadata:
+      name: prometheus-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Gi
