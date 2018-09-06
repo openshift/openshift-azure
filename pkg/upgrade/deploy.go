@@ -28,7 +28,7 @@ func Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, i initialize.I
 	dcli := resources.NewDeploymentsClient(cs.Properties.AzProfile.SubscriptionID)
 	dcli.Authorizer = authorizer
 
-	log.Info("creating/updating deployment")
+	log.Info("applying arm template deployment")
 	future, err := dcli.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
 		Properties: &resources.DeploymentProperties{
 			Template: t,
@@ -39,7 +39,7 @@ func Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, i initialize.I
 		return err
 	}
 
-	log.Info("waiting for deployment")
+	log.Info("waiting for arm template deployment to complete")
 	err = future.WaitForCompletion(ctx, dcli.Client)
 	if err != nil {
 		return err
