@@ -2,10 +2,9 @@
 
 ### Prerequisites
 
-1. **Utilities**.  You'll need recent versions of
-   [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli),
-   [Golang](https://golang.org/dl),
-   [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl) installed.
+1. **Utilities**.  You'll need recent versions of [Azure
+   CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) and
+   [Golang](https://golang.org/dl) installed.
 
 1. **Azure CLI access**.  You'll need to be logged into Azure using the CLI.
 
@@ -59,13 +58,13 @@
       1. Create an application (you can use `hack/aad.sh` to create app with
       right permissions)
       2. Add `$AZURE_AAD_CLIENT_ID` variable with application ID to `env` file.
-      3. Create the cluster. `create.sh` script will update your application with 
+      3. Create the cluster. `create.sh` script will update your application with
       required details. This can be done manually with `./hack/aad.sh app-update`
       4. Get your application permissions approved by organization administrator.
       Without approval cluster will start, just login will not work.
 
-  Once you have application with approved/granted permissions it can be re-used 
-  for all future clusters.  
+  Once you have application with approved/granted permissions it can be re-used
+  for all future clusters.
 
 ### Deploy an OpenShift cluster
 
