@@ -6,6 +6,18 @@
    CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) and
    [Golang](https://golang.org/dl) installed.
 
+1. Check out the codebase
+   1. If running Linux, ensure you have the systemd-devel RPM installed: `sudo
+      dnf -y install systemd-devel`.
+
+   1. Ensure that $GOPATH/bin is in your path: `export
+      PATH=$PATH:${GOPATH:-$HOME/go}/bin`.
+
+   1. Check out the codebase: `go get github.com/openshift/openshift-azure/...`.
+
+   1. Navigate to the codebase directory: `cd
+      ${GOPATH:-$HOME/go}/src/github.com/openshift/openshift-azure`.
+
 1. **Azure CLI access**.  You'll need to be logged into Azure using the CLI.
 
 1. **Subscription and Tenant ID**.  You'll need to know the subscription and
@@ -50,9 +62,9 @@
       hostname of the OpenShift cluster must match the AAD application created.
       Record the service principal client ID and secret.
 
-   2. (optional) For AAD Web-UI sign-in integration to work we will need to have second AAD
-      Web-App created, with callback url to OpenShift and right permissions enabled.
-      `hack/aad.sh` can help you to do so.
+   1. (optional) For AAD Web-UI sign-in integration to work we will need to have
+      second AAD Web-App created, with callback url to OpenShift and right
+      permissions enabled. `hack/aad.sh` can help you to do so.
 
       AAD WebApp Flow:
       1. Create an application (you can use `hack/aad.sh` to create app with
