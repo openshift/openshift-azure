@@ -1,5 +1,5 @@
-hash: 210d501d362b7c99e9ae0c6bf8049014d1f683a0726aacd7d35ddbf9849abb07
-updated: 2018-08-27T18:53:45.860031632-05:00
+hash: e90fa95b57fe33a21cd09a7fdf8589b36c5e16296ebdc1b538dabb48a2609a39
+updated: 2018-09-07T12:40:07.876275703-07:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
@@ -159,6 +159,14 @@ imports:
   - storage/v1
   - storage/v1alpha1
   - storage/v1beta1
+- name: k8s.io/apiextensions-apiserver
+  version: 93388cb0d0453a627cbfddabd1b800e60b47753d
+  subpackages:
+  - pkg/apis/apiextensions
+  - pkg/apis/apiextensions/v1beta1
+  - pkg/client/clientset/clientset
+  - pkg/client/clientset/clientset/scheme
+  - pkg/client/clientset/clientset/typed/apiextensions/v1beta1
 - name: k8s.io/apimachinery
   version: e386b2658ed20923da8cc9250e552f082899a1ee
   subpackages:
