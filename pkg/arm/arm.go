@@ -16,7 +16,7 @@ import (
 )
 
 type Generator interface {
-	Generate(ctx context.Context, cs, oldCs *acsapi.OpenShiftManagedCluster) ([]byte, error)
+	Generate(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, isUpdate bool) ([]byte, error)
 }
 
 type simpleGenerator struct{}
@@ -28,7 +28,7 @@ func NewSimpleGenerator(entry *logrus.Entry) Generator {
 	return &simpleGenerator{}
 }
 
-func (*simpleGenerator) Generate(ctx context.Context, cs, oldCs *acsapi.OpenShiftManagedCluster) ([]byte, error) {
+func (*simpleGenerator) Generate(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, isUpdate bool) ([]byte, error) {
 	masterStartup, err := Asset("master-startup.sh")
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (*simpleGenerator) Generate(ctx context.Context, cs, oldCs *acsapi.OpenShif
 			}
 		},
 		"IsUpgrade": func() bool {
-			return oldCs != nil
+			return isUpdate
 		},
 	}, cs, nil)
 }

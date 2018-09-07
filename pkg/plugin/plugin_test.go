@@ -68,7 +68,7 @@ func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldClu
 		t.Fatalf("error generating config for arm generate test: %s", spew.Sdump(err))
 	}
 
-	bytes, err := p.GenerateARM(context.Background(), newCluster, oldCluster)
+	bytes, err := p.GenerateARM(context.Background(), newCluster, oldCluster != nil)
 	if err != nil {
 		t.Fatalf("error generating arm: %s", spew.Sdump(err))
 	}

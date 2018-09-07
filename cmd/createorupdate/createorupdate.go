@@ -89,7 +89,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	}
 
 	// generate the ARM template
-	azuredeploy, err := p.GenerateARM(ctx, cs, oldCs)
+	azuredeploy, err := p.GenerateARM(ctx, cs, oldCs != nil)
 	if err != nil {
 		return nil, err
 	}
