@@ -215,6 +215,11 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	}
 	log.Debug("Etcd CRD is ready")
 
+	// refresh dynamic client
+	if err := client.UpdateDynamicClient(); err != nil {
+		return err
+	}
+
 	// create all non-service catalog resources
 	if err := client.ApplyResources(nonScFilter, db, keys); err != nil {
 		return err
