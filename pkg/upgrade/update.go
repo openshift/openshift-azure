@@ -2,6 +2,7 @@ package upgrade
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
@@ -224,9 +225,14 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		return err
 	}
 
-	for _, vm := range vms {
+	sorted, err := sortMasterVMsByHealth(vms, cs)
+	if err != nil {
+		return err
+	}
+
+	for _, vm := range sorted {
 		log.Infof("draining %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		err = u.Drain(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		err = u.drain(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		if err != nil {
 			return err
 		}
@@ -295,9 +301,42 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 	return nil
 }
 
+func sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenShiftManagedCluster) ([]compute.VirtualMachineScaleSetVM, error) {
+	kc, err := newClientset(cs)
+	if err != nil {
+		return nil, err
+	}
+
+	var sorted []compute.VirtualMachineScaleSetVM
+	for i, vm := range vms {
+		nodeName := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
+		ready, err := masterIsReady(kc, nodeName)
+		if err != nil {
+			return nil, fmt.Errorf("cannot get health for %q: %v", nodeName, err)
+		}
+		if !ready {
+			sorted = append(sorted, vm)
+		} else {
+			if vms[i].Tags == nil {
+				vms[i].Tags = make(map[string]*string)
+			}
+			t := "true"
+			vms[i].Tags["ready"] = &t
+		}
+	}
+
+	for _, vm := range vms {
+		if vm.Tags["ready"] != nil && *vm.Tags["ready"] == "true" {
+			sorted = append(sorted, vm)
+		}
+	}
+
+	return sorted, nil
+}
+
 func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc compute.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole, instanceID, nodeName string) error {
 	log.Infof("draining %s", nodeName)
-	if err := u.Drain(ctx, cs, role, nodeName); err != nil {
+	if err := u.drain(ctx, cs, role, nodeName); err != nil {
 		return err
 	}
 

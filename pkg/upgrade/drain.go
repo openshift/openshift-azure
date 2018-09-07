@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -16,29 +15,10 @@ import (
 	"k8s.io/client-go/util/retry"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/initialize"
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
-type Upgrader interface {
-	initialize.Initializer
-	Update(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster, azuredeploy []byte) error
-}
-
-type simpleUpgrader struct {
-	initialize.Initializer
-}
-
-var _ Upgrader = &simpleUpgrader{}
-
-func NewSimpleUpgrader(entry *logrus.Entry) Upgrader {
-	log.New(entry)
-	return &simpleUpgrader{
-		Initializer: initialize.NewSimpleInitializer(entry),
-	}
-}
-
-func (u *simpleUpgrader) Drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
+func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
 	kc, err := newClientset(cs)
 	if err != nil {
 		return err

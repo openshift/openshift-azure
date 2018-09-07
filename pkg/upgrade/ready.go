@@ -53,35 +53,39 @@ func masterWaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster,
 	}
 
 	return wait.PollUntil(time.Second, func() (bool, error) {
-		etcdPod, err := kc.CoreV1().Pods("kube-system").Get("etcd-"+nodeName, metav1.GetOptions{})
-		switch {
-		case err == nil:
-		case kerrors.IsNotFound(err):
-			return false, nil
-		default:
-			return false, err
-		}
-
-		apiPod, err := kc.CoreV1().Pods("kube-system").Get("api-"+nodeName, metav1.GetOptions{})
-		switch {
-		case err == nil:
-		case kerrors.IsNotFound(err):
-			return false, nil
-		default:
-			return false, err
-		}
-
-		cmPod, err := kc.CoreV1().Pods("kube-system").Get("controllers-"+nodeName, metav1.GetOptions{})
-		switch {
-		case err == nil:
-		case kerrors.IsNotFound(err):
-			return false, nil
-		default:
-			return false, err
-		}
-
-		return isPodReady(etcdPod) && isPodReady(apiPod) && isPodReady(cmPod), nil
+		return masterIsReady(kc, nodeName)
 	}, ctx.Done())
+}
+
+func masterIsReady(kc *kubernetes.Clientset, nodeName string) (bool, error) {
+	etcdPod, err := kc.CoreV1().Pods("kube-system").Get("etcd-"+nodeName, metav1.GetOptions{})
+	switch {
+	case err == nil:
+	case kerrors.IsNotFound(err):
+		return false, nil
+	default:
+		return false, err
+	}
+
+	apiPod, err := kc.CoreV1().Pods("kube-system").Get("api-"+nodeName, metav1.GetOptions{})
+	switch {
+	case err == nil:
+	case kerrors.IsNotFound(err):
+		return false, nil
+	default:
+		return false, err
+	}
+
+	cmPod, err := kc.CoreV1().Pods("kube-system").Get("controllers-"+nodeName, metav1.GetOptions{})
+	switch {
+	case err == nil:
+	case kerrors.IsNotFound(err):
+		return false, nil
+	default:
+		return false, err
+	}
+
+	return isPodReady(etcdPod) && isPodReady(apiPod) && isPodReady(cmPod), nil
 }
 
 func nodeWaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, nodeName string) error {
@@ -91,22 +95,26 @@ func nodeWaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, n
 	}
 
 	err = wait.PollUntil(time.Second, func() (bool, error) {
-		node, err := kc.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
-		switch {
-		case err == nil:
-		case kerrors.IsNotFound(err):
-			return false, nil
-		default:
-			return false, err
-		}
-
-		return isNodeReady(node), nil
+		return nodeIsReady(kc, nodeName)
 	}, ctx.Done())
 	if err != nil {
 		return err
 	}
 
 	return setUnschedulable(ctx, kc, nodeName, false)
+}
+
+func nodeIsReady(kc *kubernetes.Clientset, nodeName string) (bool, error) {
+	node, err := kc.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
+	switch {
+	case err == nil:
+	case kerrors.IsNotFound(err):
+		return false, nil
+	default:
+		return false, err
+	}
+
+	return isNodeReady(node), nil
 }
 
 func isPodReady(pod *corev1.Pod) bool {
