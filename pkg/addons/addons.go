@@ -209,7 +209,11 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 		return err
 	}
 
-	//TODO: validate if CRD and SC is available here.
+	log.Debug("Waiting for the Etcd CRD to be ready")
+	if err := wait.PollInfinite(time.Second, client.EtcdCRDReady); err != nil {
+		return err
+	}
+	log.Debug("Etcd CRD is ready")
 
 	// create all non-service catalog resources
 	if err := client.ApplyResources(nonScFilter, db, keys); err != nil {

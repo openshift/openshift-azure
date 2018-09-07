@@ -8,6 +8,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/go-test/deep"
 	log "github.com/sirupsen/logrus"
+	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	kapiextensions "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,6 +36,7 @@ type Interface interface {
 	ApplyResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error
 	UpdateDynamicClient() error
 	ServiceCatalogExists() (bool, error)
+	EtcdCRDReady() (bool, error)
 	GetStorageAccountKey(resourceGroup, storageAccount string) (string, error)
 }
 
@@ -43,6 +46,7 @@ var _ Interface = &client{}
 type client struct {
 	restconfig *rest.Config
 	ac         *kaggregator.Clientset
+	ae         *kapiextensions.Clientset
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
 	grs        []*discovery.APIGroupResources
@@ -73,6 +77,11 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, d
 		return nil, err
 	}
 
+	ae, err := kapiextensions.NewForConfig(restconfig)
+	if err != nil {
+		return nil, err
+	}
+
 	cli, err := discovery.NewDiscoveryClientForConfig(restconfig)
 	if err != nil {
 		return nil, err
@@ -81,6 +90,7 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, d
 	c := &client{
 		restconfig: restconfig,
 		ac:         ac,
+		ae:         ae,
 		cli:        cli,
 		azs:        azs,
 	}
@@ -255,6 +265,24 @@ func (c *client) ServiceCatalogExists() (bool, error) {
 	return false, nil
 }
 
+// EtcdCRDReady returns whether the etcd CRD is ready.
+func (c *client) EtcdCRDReady() (bool, error) {
+	crd, err := c.ae.ApiextensionsV1beta1().CustomResourceDefinitions().Get("etcdbackups.etcd.database.coreos.com", metav1.GetOptions{})
+	switch {
+	case kerrors.IsNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, err
+	}
+	for _, cond := range crd.Status.Conditions {
+		if cond.Type == apiextensionsv1beta1.Established &&
+			cond.Status == apiextensionsv1beta1.ConditionTrue {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 type dryClient struct{}
 
 // dryClient implements Interface
@@ -265,6 +293,7 @@ func (c *dryClient) ApplyResources(filter func(unstructured.Unstructured) bool, 
 }
 func (c *dryClient) UpdateDynamicClient() error          { return nil }
 func (c *dryClient) ServiceCatalogExists() (bool, error) { return true, nil }
+func (c *dryClient) EtcdCRDReady() (bool, error)         { return true, nil }
 func (c *dryClient) GetStorageAccountKey(resourceGroup, storageAccount string) (string, error) {
 	return "", nil
 }
