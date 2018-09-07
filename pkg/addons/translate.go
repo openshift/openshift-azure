@@ -156,18 +156,6 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.NodeImage }}",
 		},
 	},
-	"DaemonSet.apps/openshift-sdn/ovs": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.NodeImage }}",
-		},
-	},
-	"DaemonSet.apps/openshift-sdn/sdn": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.NodeImage }}",
-		},
-	},
 	"Deployment.apps/default/docker-registry": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HTTP_SECRET')].value"),

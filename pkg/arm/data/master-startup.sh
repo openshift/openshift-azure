@@ -851,6 +851,7 @@ spec:
     hostPath:
       path: /var/lib/cni/networks/openshift-sdn
 EOF
+
 if [[ "$(hostname)" == "master-000000" ]]; then
   cat >/etc/origin/node/pods/sync.yaml <<'EOF'
 apiVersion: v1

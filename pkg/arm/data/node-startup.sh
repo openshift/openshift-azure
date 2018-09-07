@@ -145,6 +145,7 @@ spec:
       hostPath:
         path: /etc/origin/openvswitch
 EOF
+
 cat >/etc/origin/node/pods/sdn.yaml <<'EOF'
 apiVersion: v1
 kind: Pod
