@@ -53,6 +53,8 @@ type Config struct {
 	SessionSecretAuth []byte
 	SessionSecretEnc  []byte
 	HtPasswd          []byte
+	//TODO: Remove me before GA!
+	AdminPasswd       string
 	ImageConfigFormat string
 
 	// misc node configurables
