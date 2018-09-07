@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etcd-operator
+  namespace: openshift-etcd
+  labels:
+    name: etcd-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: etcd-operator
+  template:
+    metadata:
+      labels:
+        name: etcd-operator
+    spec:
+      serviceAccountName: etcd-operator
+      containers:
+      - name: backup
+        image: '*** GENERATED ***'
+        command:
+        - etcd-backup-operator
+        - --create-crd=false
+        env:
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name

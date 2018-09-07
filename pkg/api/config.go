@@ -41,6 +41,7 @@ type Config struct {
 	PrometheusAlertBufferImage  string
 	PrometheusAlertManagerImage string
 	LogBridgeImage              string
+	EtcdOperatorImage           string
 
 	// kubeconfigs
 	AdminKubeconfig              *v1.Config

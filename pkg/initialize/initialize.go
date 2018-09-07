@@ -32,8 +32,15 @@ func (*simpleInitializer) InitializeCluster(ctx context.Context, cs *api.OpenShi
 
 	bsc := az.storage.GetBlobService()
 
-	c := bsc.GetContainerReference("config")
+	// etcd data container
+	c := bsc.GetContainerReference("etcd")
+	_, err = c.CreateIfNotExists(nil)
+	if err != nil {
+		return err
+	}
 
+	// cluster config container
+	c = bsc.GetContainerReference("config")
 	_, err = c.CreateIfNotExists(nil)
 	if err != nil {
 		return err
