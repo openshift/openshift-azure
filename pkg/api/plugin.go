@@ -40,5 +40,5 @@ type Plugin interface {
 
 	HealthCheck(ctx context.Context, cs *OpenShiftManagedCluster) error
 
-	Update(ctx context.Context, cs, oldCs *OpenShiftManagedCluster, azuredeploy []byte) error
+	Update(ctx context.Context, cs *OpenShiftManagedCluster, azuredeploy []byte) error
 }

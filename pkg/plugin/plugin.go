@@ -109,8 +109,8 @@ func (p *plugin) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluste
 	return healthChecker.HealthCheck(ctx, cs)
 }
 
-func (p *plugin) Update(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
+func (p *plugin) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
 	log.Info("starting update")
 	upgrader := upgrade.NewSimpleUpgrader(p.entry)
-	return upgrader.Update(ctx, cs, oldCs, azuredeploy)
+	return upgrader.Update(ctx, cs, azuredeploy)
 }

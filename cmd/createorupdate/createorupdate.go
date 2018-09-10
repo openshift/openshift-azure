@@ -102,7 +102,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	}
 
 	if oldCs != nil {
-		err = p.Update(ctx, cs, oldCs, azuredeploy)
+		err = p.Update(ctx, cs, azuredeploy)
 		if err != nil {
 			return nil, err
 		}
