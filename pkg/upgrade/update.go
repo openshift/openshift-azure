@@ -2,6 +2,7 @@ package upgrade
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
@@ -224,9 +225,14 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		return err
 	}
 
-	for _, vm := range vms {
+	sorted, err := sortMasterVMsByHealth(vms, cs)
+	if err != nil {
+		return err
+	}
+
+	for _, vm := range sorted {
 		log.Infof("draining %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		err = u.Drain(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		err = u.drain(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		if err != nil {
 			return err
 		}
@@ -295,9 +301,32 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 	return nil
 }
 
+func sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenShiftManagedCluster) ([]compute.VirtualMachineScaleSetVM, error) {
+	kc, err := newClientset(cs)
+	if err != nil {
+		return nil, err
+	}
+
+	var ready, unready []compute.VirtualMachineScaleSetVM
+	for _, vm := range vms {
+		nodeName := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
+		isReady, err := masterIsReady(kc, nodeName)
+		if err != nil {
+			return nil, fmt.Errorf("cannot get health for %q: %v", nodeName, err)
+		}
+		if isReady {
+			ready = append(ready, vm)
+		} else {
+			unready = append(unready, vm)
+		}
+	}
+
+	return append(unready, ready...), nil
+}
+
 func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc compute.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole, instanceID, nodeName string) error {
 	log.Infof("draining %s", nodeName)
-	if err := u.Drain(ctx, cs, role, nodeName); err != nil {
+	if err := u.drain(ctx, cs, role, nodeName); err != nil {
 		return err
 	}
 
