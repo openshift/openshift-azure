@@ -307,31 +307,21 @@ func sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenS
 		return nil, err
 	}
 
-	var sorted []compute.VirtualMachineScaleSetVM
-	for i, vm := range vms {
+	var ready, unready []compute.VirtualMachineScaleSetVM
+	for _, vm := range vms {
 		nodeName := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
-		ready, err := masterIsReady(kc, nodeName)
+		isReady, err := masterIsReady(kc, nodeName)
 		if err != nil {
 			return nil, fmt.Errorf("cannot get health for %q: %v", nodeName, err)
 		}
-		if !ready {
-			sorted = append(sorted, vm)
+		if isReady {
+			ready = append(ready, vm)
 		} else {
-			if vms[i].Tags == nil {
-				vms[i].Tags = make(map[string]*string)
-			}
-			t := "true"
-			vms[i].Tags["ready"] = &t
+			unready = append(unready, vm)
 		}
 	}
 
-	for _, vm := range vms {
-		if vm.Tags["ready"] != nil && *vm.Tags["ready"] == "true" {
-			sorted = append(sorted, vm)
-		}
-	}
-
-	return sorted, nil
+	return append(unready, ready...), nil
 }
 
 func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc compute.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole, instanceID, nodeName string) error {
