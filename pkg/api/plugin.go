@@ -9,11 +9,9 @@ import (
 type ContextKey string
 
 const (
-	ContextKeyClientID       ContextKey = "ClientID"
-	ContextKeyClientSecret   ContextKey = "ClientSecret"
-	ContextKeyTenantID       ContextKey = "TenantID"
-	ContextKeySubscriptionID ContextKey = "SubscriptionID"
-	ContextKeyResourceGroup  ContextKey = "ResourceGroup"
+	ContextKeyClientID     ContextKey = "ClientID"
+	ContextKeyClientSecret ContextKey = "ClientSecret"
+	ContextKeyTenantID     ContextKey = "TenantID"
 )
 
 type Plugin interface {

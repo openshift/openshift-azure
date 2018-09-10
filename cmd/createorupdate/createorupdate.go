@@ -211,8 +211,6 @@ func main() {
 	ctx = context.WithValue(ctx, acsapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
 	ctx = context.WithValue(ctx, acsapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
 	ctx = context.WithValue(ctx, acsapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
-	ctx = context.WithValue(ctx, acsapi.ContextKeySubscriptionID, os.Getenv("AZURE_SUBSCRIPTION_ID"))
-	ctx = context.WithValue(ctx, acsapi.ContextKeyResourceGroup, os.Getenv("RESOURCEGROUP"))
 
 	// simulate the API call to the RP
 	entry := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
