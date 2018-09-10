@@ -17,7 +17,6 @@ import (
 
 func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 	c := cs.Config
-	c.Version = versionLatest
 
 	selectNodeImage(cs)
 

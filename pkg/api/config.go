@@ -9,8 +9,6 @@ import (
 )
 
 type Config struct {
-	Version int
-
 	ImageOffer     string
 	ImagePublisher string
 	ImageSKU       string

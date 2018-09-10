@@ -9,10 +9,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
-const (
-	versionLatest = 1
-)
-
 type Upgrader interface {
 	Upgrade(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error
 }
