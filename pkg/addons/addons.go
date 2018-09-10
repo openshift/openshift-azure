@@ -24,6 +24,7 @@ import (
 
 type extra struct {
 	RegistryStorageAccountKey string
+	ConfigStorageAccountKey   string
 }
 
 func unmarshal(b []byte) (unstructured.Unstructured, error) {
@@ -175,6 +176,9 @@ var (
 	scFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().Group == "servicecatalog.k8s.io"
 	}
+	crdFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().Kind == "CustomResourceDefinition"
+	}
 )
 
 // writeDB uses the discovery and dynamic clients to synchronise an API server's
@@ -188,6 +192,10 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	}
 	sort.Strings(keys)
 
+	// crd needs to land early to get initialized
+	if err := client.ApplyResources(crdFilter, db, keys); err != nil {
+		return err
+	}
 	// namespaces must exist before namespaced objects.
 	if err := client.ApplyResources(nsFilter, db, keys); err != nil {
 		return err
@@ -200,6 +208,18 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	if err := client.ApplyResources(cfgFilter, db, keys); err != nil {
 		return err
 	}
+
+	log.Debug("Waiting for the Etcd CRD to be ready")
+	if err := wait.PollInfinite(time.Second, client.EtcdCRDReady); err != nil {
+		return err
+	}
+	log.Debug("Etcd CRD is ready")
+
+	// refresh dynamic client
+	if err := client.UpdateDynamicClient(); err != nil {
+		return err
+	}
+
 	// create all non-service catalog resources
 	if err := client.ApplyResources(nonScFilter, db, keys); err != nil {
 		return err
@@ -228,12 +248,19 @@ func Main(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, dryRun
 		return err
 	}
 
-	key, err := client.GetStorageAccountKey(cs.Config.ResourceGroup, cs.Config.RegistryStorageAccount)
+	keyRegistry, err := client.GetStorageAccountKey(cs.Config.ResourceGroup, cs.Config.RegistryStorageAccount)
+	if err != nil {
+		return err
+	}
+	keyConfig, err := client.GetStorageAccountKey(cs.Config.ResourceGroup, cs.Config.ConfigStorageAccount)
 	if err != nil {
 		return err
 	}
 
-	db, err := readDB(cs, &extra{RegistryStorageAccountKey: key})
+	db, err := readDB(cs, &extra{
+		RegistryStorageAccountKey: keyRegistry,
+		ConfigStorageAccountKey:   keyConfig,
+	})
 	if err != nil {
 		return err
 	}

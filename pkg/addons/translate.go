@@ -283,6 +283,12 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.AnsibleServiceBrokerImage }}",
 		},
 	},
+	"Deployment.apps/openshift-etcd/etcd-operator": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.EtcdOperatorImage }}",
+		},
+	},
 	"Deployment.apps/openshift-infra/bootstrap-autoapprover": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
@@ -402,6 +408,30 @@ var Translations = map[string][]struct {
 		},
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'etcd-ca.crt'"),
+			Template: "{{ String (CertAsBytes .Config.Certificates.EtcdCa.Cert) }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'etcd-client.crt'"),
+			Template: "{{ String (CertAsBytes .Config.Certificates.EtcdClient.Cert) }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'etcd-client.key'"),
+			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.EtcdClient.Key) }}",
+		},
+	},
+	"Secret/openshift-etcd/etcd-backup-abs-credentials": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'storage-account'"),
+			Template: "{{ .Config.ConfigStorageAccount }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'storage-key'"),
+			Template: "{{ .Extra.ConfigStorageAccountKey }}",
+		},
+	},
+	"Secret/openshift-etcd/etcd-client-tls": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'etcd-client-ca.crt'"),
 			Template: "{{ String (CertAsBytes .Config.Certificates.EtcdCa.Cert) }}",
 		},
 		{

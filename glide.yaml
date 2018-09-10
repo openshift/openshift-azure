@@ -4,6 +4,8 @@ import:
   version: kubernetes-1.10.6
 - package: k8s.io/kube-aggregator
   version: kubernetes-1.10.6
+- package: k8s.io/apiextensions-apiserver
+  version: kubernetes-1.10.6
 - package: k8s.io/apimachinery
   version: kubernetes-1.10.6
 - package: github.com/davecgh/go-spew

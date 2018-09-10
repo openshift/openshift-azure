@@ -48,6 +48,7 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 		c.WebConsoleImage = image(c.ImageConfigFormat, "web-console", v)
 
 		c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
+		c.EtcdOperatorImage = "quay.io/coreos/etcd-operator:v0.9.2"
 
 		c.OAuthProxyImage = "docker.io/openshift/oauth-proxy:v1.0.0"
 		c.PrometheusImage = "docker.io/openshift/prometheus:v2.2.1"
@@ -90,6 +91,7 @@ func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) {
 		c.WebConsoleImage = image(c.ImageConfigFormat, "web-console", v)
 
 		c.MasterEtcdImage = "registry.access.redhat.com/rhel7/etcd:3.2.22"
+		c.EtcdOperatorImage = "quay.io/coreos/etcd-operator:v0.9.2"
 
 		c.OAuthProxyImage = "registry.access.redhat.com/openshift3/oauth-proxy:" + v
 		c.PrometheusImage = "registry.access.redhat.com/openshift3/prometheus:" + v
