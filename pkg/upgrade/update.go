@@ -11,6 +11,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 func (u *simpleUpgrader) Update(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
@@ -302,7 +303,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 }
 
 func sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenShiftManagedCluster) ([]compute.VirtualMachineScaleSetVM, error) {
-	kc, err := newClientset(cs)
+	kc, err := managedcluster.ClientsetFromConfig(cs)
 	if err != nil {
 		return nil, err
 	}

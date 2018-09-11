@@ -10,30 +10,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/tools/clientcmd/api"
-	"k8s.io/client-go/tools/clientcmd/api/latest"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
-
-// newClientset returns a new Kubernetes typed client.
-func newClientset(cs *acsapi.OpenShiftManagedCluster) (*kubernetes.Clientset, error) {
-	var kc api.Config
-	err := latest.Scheme.Convert(cs.Config.AdminKubeconfig, &kc, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	kubeconfig := clientcmd.NewDefaultClientConfig(kc, &clientcmd.ConfigOverrides{})
-
-	restconfig, err := kubeconfig.ClientConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	return kubernetes.NewForConfig(restconfig)
-}
 
 func (u *simpleUpgrader) WaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, role acsapi.AgentPoolProfileRole, nodeName string) error {
 	switch role {
@@ -47,7 +27,7 @@ func (u *simpleUpgrader) WaitForReady(ctx context.Context, cs *acsapi.OpenShiftM
 }
 
 func masterWaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, nodeName string) error {
-	kc, err := newClientset(cs)
+	kc, err := managedcluster.ClientsetFromConfig(cs)
 	if err != nil {
 		return err
 	}
@@ -89,7 +69,7 @@ func masterIsReady(kc *kubernetes.Clientset, nodeName string) (bool, error) {
 }
 
 func nodeWaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, nodeName string) error {
-	kc, err := newClientset(cs)
+	kc, err := managedcluster.ClientsetFromConfig(cs)
 	if err != nil {
 		return err
 	}

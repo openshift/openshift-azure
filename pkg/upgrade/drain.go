@@ -16,10 +16,11 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
-	kc, err := newClientset(cs)
+	kc, err := managedcluster.ClientsetFromConfig(cs)
 	if err != nil {
 		return err
 	}

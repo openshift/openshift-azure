@@ -17,6 +17,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/upgrade"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
@@ -44,12 +45,8 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	var oldCs *acsapi.OpenShiftManagedCluster
 	if _, err := os.Stat("_data/containerservice.yaml"); err == nil {
 		log.Info("read old config")
-		b, err := ioutil.ReadFile("_data/containerservice.yaml")
+		oldCs, err = managedcluster.ReadConfig("_data/containerservice.yaml")
 		if err != nil {
-			return nil, err
-		}
-
-		if err := yaml.Unmarshal(b, &oldCs); err != nil {
 			return nil, err
 		}
 
