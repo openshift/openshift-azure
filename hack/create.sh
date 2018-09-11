@@ -48,8 +48,9 @@ mkdir -p _data/_out
 
 az group create -n $RESOURCEGROUP -l eastus --tags now=$(date +%s) >/dev/null
 
+# if AZURE_CLIENT_ID is used as AZURE_AAD_CLIENT_ID, script will reset global team account!
 set +x
-if [[ "$AZURE_AAD_CLIENT_ID" ]]; then
+if [[ "$AZURE_AAD_CLIENT_ID" && "$AZURE_AAD_CLIENT_ID" != "$AZURE_CLIENT_ID" ]]; then
     . <(hack/aad.sh app-update $AZURE_AAD_CLIENT_ID https://openshift.${RESOURCEGROUP}.${DNS_DOMAIN}/oauth2callback/Azure%20AD)
 else
     AZURE_AAD_CLIENT_ID=$AZURE_CLIENT_ID

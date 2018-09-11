@@ -21,4 +21,4 @@ eval "$(ssh-agent)"
 ssh-add _data/_out/id_rsa 2>/dev/null
 
 ssh -A -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    -o LogLevel=QUIET "$@" cloud-user@$IP
+    "$@" cloud-user@$IP
