@@ -18,7 +18,7 @@ type Config struct {
 	ImageResourceGroup string `json:"imageResourceGroup,omitempty"`
 	ImageResourceName  string `json:"imageResourceName,omitempty"`
 
-	Certificates CertificateConfig
+	Certificates CertificateConfig `json:"certificates,omitempty"`
 
 	// container images for pods
 	MasterEtcdImage             string `json:"masterEtcdImage,omitempty"`
