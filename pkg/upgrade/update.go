@@ -3,7 +3,7 @@ package upgrade
 import (
 	"context"
 	"fmt"
-	"reflect"
+	"os"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
@@ -14,7 +14,10 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
-func (u *simpleUpgrader) Update(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
+func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
+	// TODO: probably need to break this function into two pieces, pre-Deploy
+	// and post-Deploy, so that MSFT can use custom ARM deployment logic.
+
 	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
 	authorizer, err := config.Authorizer()
 	if err != nil {
@@ -25,29 +28,27 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs, oldCs *api.OpenShiftMan
 	vmc := compute.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID)
 	vmc.Authorizer = authorizer
 
-	// Need to determine whether the current update is a scale operation before
-	// applying the ARM template. For scale up, we need to figure out which are
-	// the new VMs that were created and wait for them to turn ready. For scale
-	// down, we need to drain the correct VMs before applying the ARM template
-	// scales them down.
-	isScaleOp := isScaleUpdate(cs, oldCs)
-	vmsBefore := map[string]struct{}{}
-	if isScaleOp {
-		for _, agent := range cs.Properties.AgentPoolProfiles {
-			vms, err := listVMs(ctx, cs, vmc, agent.Role)
-			if err != nil {
-				return err
-			}
+	// Deploy() may change the number of VMs.  If we can see that any VMs are
+	// about to be deleted, drain them first.  Record which VMs are visible now
+	// so that we can detect newly created VMs and wait for them to become
+	// ready.
 
-			if len(vms) > agent.Count {
-				for _, vm := range vms[agent.Count:] {
-					if err := u.delete(ctx, cs, vmc, agent.Role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName); err != nil {
-						return err
-					}
-				}
+	vmsBefore := map[string]struct{}{}
+
+	for _, agent := range cs.Properties.AgentPoolProfiles {
+		vms, err := listVMs(ctx, cs, vmc, agent.Role)
+		if err != nil {
+			return err
+		}
+
+		for i, vm := range vms {
+			if i < agent.Count {
+				vmsBefore[*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName] = struct{}{}
+
 			} else {
-				for _, vm := range vms {
-					vmsBefore[*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName] = struct{}{}
+				err = u.delete(ctx, cs, vmc, agent.Role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+				if err != nil {
+					return err
 				}
 			}
 		}
@@ -58,74 +59,48 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs, oldCs *api.OpenShiftMan
 		return err
 	}
 
-	if isScaleOp {
-		for _, agent := range cs.Properties.AgentPoolProfiles {
-			vms, err := listVMs(ctx, cs, vmc, agent.Role)
-			if err != nil {
-				return err
-			}
+	for _, agent := range cs.Properties.AgentPoolProfiles {
+		vms, err := listVMs(ctx, cs, vmc, agent.Role)
+		if err != nil {
+			return err
+		}
 
-			// wait for newly created VMs to reach readiness
-			for _, vm := range vms {
-				hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
-				if _, found := vmsBefore[hostname]; !found {
-					log.Infof("waiting for %s to be ready", hostname)
-					err = u.WaitForReady(ctx, cs, agent.Role, hostname)
-					if err != nil {
-						return err
-					}
+		// wait for newly created VMs to reach readiness
+		for _, vm := range vms {
+			hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
+			if _, found := vmsBefore[hostname]; !found {
+				log.Infof("waiting for %s to be ready", hostname)
+				err = u.WaitForReady(ctx, cs, agent.Role, hostname)
+				if err != nil {
+					return err
 				}
 			}
 		}
-
-		return nil
 	}
 
-	err = u.updateInPlace(ctx, cs, ssc, vmc, api.AgentPoolProfileRoleMaster)
-	if err != nil {
-		return err
-	}
+	// For PP day 1, scale is permitted but not any other sort of update.  When
+	// we enable configuration changes and/or upgrades, uncomment this code.  At
+	// the same time, current thinking is that we will add a hash-based
+	// mechanism to avoid unnecessary VM rotations as well.
 
-	// TODO: updatePlusOne isn't good enough to avoid interruption on our infra
-	// nodes.
-	err = u.updatePlusOne(ctx, cs, ssc, vmc, api.AgentPoolProfileRoleInfra)
-	if err != nil {
-		return err
-	}
+	if os.Getenv("DEVELOPMENT_ALWAYS_ROTATE") != "" {
+		err = u.updateInPlace(ctx, cs, ssc, vmc, api.AgentPoolProfileRoleMaster)
+		if err != nil {
+			return err
+		}
 
-	err = u.updatePlusOne(ctx, cs, ssc, vmc, api.AgentPoolProfileRoleCompute)
-	if err != nil {
-		return err
+		err = u.updatePlusOne(ctx, cs, ssc, vmc, api.AgentPoolProfileRoleInfra)
+		if err != nil {
+			return err
+		}
+
+		err = u.updatePlusOne(ctx, cs, ssc, vmc, api.AgentPoolProfileRoleCompute)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
-}
-
-// isScaleUpdate returns whether the update is a scale operation.
-func isScaleUpdate(cs, oldCs *api.OpenShiftManagedCluster) bool {
-	newCounts := make(map[string]int)
-	for _, new := range cs.Properties.AgentPoolProfiles {
-		newCounts[new.Name] = new.Count
-	}
-
-	var isScaleUpdate bool
-	for i, old := range oldCs.Properties.AgentPoolProfiles {
-		if newCounts[old.Name] != old.Count {
-			isScaleUpdate = true
-		}
-		oldCs.Properties.AgentPoolProfiles[i].Count = newCounts[old.Name]
-	}
-
-	// No scale operations.
-	if !isScaleUpdate {
-		return false
-	}
-	// Includes other non-scaling related updates
-	if !reflect.DeepEqual(cs, oldCs) {
-		return false
-	}
-
-	return true
 }
 
 func getCount(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) int {

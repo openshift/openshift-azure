@@ -9,11 +9,9 @@ import (
 type ContextKey string
 
 const (
-	ContextKeyClientID       ContextKey = "ClientID"
-	ContextKeyClientSecret   ContextKey = "ClientSecret"
-	ContextKeyTenantID       ContextKey = "TenantID"
-	ContextKeySubscriptionID ContextKey = "SubscriptionID"
-	ContextKeyResourceGroup  ContextKey = "ResourceGroup"
+	ContextKeyClientID     ContextKey = "ClientID"
+	ContextKeyClientSecret ContextKey = "ClientSecret"
+	ContextKeyTenantID     ContextKey = "TenantID"
 )
 
 type Plugin interface {
@@ -42,5 +40,5 @@ type Plugin interface {
 
 	HealthCheck(ctx context.Context, cs *OpenShiftManagedCluster) error
 
-	Update(ctx context.Context, cs, oldCs *OpenShiftManagedCluster, azuredeploy []byte) error
+	Update(ctx context.Context, cs *OpenShiftManagedCluster, azuredeploy []byte) error
 }

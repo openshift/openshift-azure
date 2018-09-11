@@ -37,7 +37,7 @@ func isValidHostname(h string) bool {
 	return len(h) <= 255 && rxRfc1123.MatchString(h)
 }
 
-// ContainerService validates a ContainerService struct
+// Validate validates a OpenShiftManagedCluster struct
 func Validate(new, old *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	// TODO are these error messages confusing since they may not correspond with the external model?
 	if errs := validateContainerService(new, externalOnly); len(errs) > 0 {
@@ -68,25 +68,28 @@ func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool)
 }
 
 func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+	// TODO: function needs unit testing.
+
 	newAgents := make(map[string]*api.AgentPoolProfile)
 	for i := range cs.Properties.AgentPoolProfiles {
 		newAgent := cs.Properties.AgentPoolProfiles[i]
 		newAgents[newAgent.Name] = &newAgent
 	}
+
 	old := oldCs.DeepCopy()
 
 	for i, o := range old.Properties.AgentPoolProfiles {
 		new, ok := newAgents[o.Name]
 		if !ok {
-			continue
+			continue // we know we are going to fail the DeepEqual test below.
 		}
 		old.Properties.AgentPoolProfiles[i].Count = new.Count
 	}
-	old.Properties.OpenShiftVersion = cs.Properties.OpenShiftVersion
 
 	if !reflect.DeepEqual(cs, old) {
 		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
 	}
+
 	return
 }
 

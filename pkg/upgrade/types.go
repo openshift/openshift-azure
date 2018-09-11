@@ -12,7 +12,7 @@ import (
 
 type Upgrader interface {
 	initialize.Initializer
-	Update(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster, azuredeploy []byte) error
+	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error
 }
 
 type simpleUpgrader struct {
