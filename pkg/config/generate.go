@@ -188,6 +188,18 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 			cert:        &c.Certificates.AzureClusterReader.Cert,
 		},
 		{
+			cn:          "system:serviceaccount:kube-system:ovs",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			key:         &c.Certificates.Ovs.Key,
+			cert:        &c.Certificates.Ovs.Cert,
+		},
+		{
+			cn:          "system:serviceaccount:kube-system:sdn",
+			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			key:         &c.Certificates.Sdn.Key,
+			cert:        &c.Certificates.Sdn.Cert,
+		},
+		{
 			cn: cs.Properties.RouterProfiles[0].PublicSubdomain,
 			dnsNames: []string{
 				cs.Properties.RouterProfiles[0].PublicSubdomain,
@@ -310,6 +322,22 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 			username:   "system:serviceaccount:openshift-azure:azure-cluster-reader",
 			kubeconfig: &c.AzureClusterReaderKubeconfig,
 			namespace:  "openshift-azure",
+		},
+		{
+			clientKey:  c.Certificate.Ovs.Key,
+			clientCert: c.Certificates.Ovs.Cert,
+			endpoint:   cs.Properties.FQDN,
+			username:   "system:serviceaccount:kube-system:ovs",
+			kubeconfig: &c.OvsKubeconfig,
+			namespace:  "kube-system",
+		},
+		{
+			clientKey:  c.Certificate.Sdn.Key,
+			clientCert: c.Certificates.Sdn.Cert,
+			endpoint:   cs.Properties.FQDN,
+			username:   "system:serviceaccount:kube-system:sdn",
+			kubeconfig: &c.SdnKubeconfig,
+			namespace:  "kube-system",
 		},
 	}
 	for _, kc := range kubeconfigs {

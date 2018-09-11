@@ -632,7 +632,7 @@ spec:
               ovs-vsctl set Open_vSwitch . other_config:n-handler-threads=10
           fi
           while true; do sleep 5; done
-        image: '*** GENERATED ***'
+        image: {{ .Config.NodeImage | quote }}
         resources:
          limits:
            cpu: 200m
@@ -777,7 +777,7 @@ spec:
     env:
     - name: OPENSHIFT_DNS_DOMAIN
       value: cluster.local
-    image: '*** GENERATED ***'
+    image: {{ .Config.NodeImage | quote }}
     name: sdn
     ports:
     - containerPort: 10256
