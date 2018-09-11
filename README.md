@@ -93,6 +93,13 @@
 
 1. Run `./hack/delete.sh $RESOURCEGROUP` to delete the deployed cluster.
 
+##### Access the cluster
+ Cluster can be accessed via `UI` and `CLI`. If cluster was created using AAD
+integration (Pre-requisites 7.4), you can login using Azure AD. Second option, 
+which will be deprecated later, is `htpasswd`. Username for it is `osadmin`, 
+password - random generated. To get random generated password execute: 
+`./hack/config.sh get-config $RESOURCEGROUP | jq -r .config.AdminPasswd`
+
 ### Examples
 
 Basic OpenShift configuration:
