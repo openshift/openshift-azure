@@ -22,6 +22,8 @@ func TestMerge(t *testing.T) {
 	newCluster.Properties.PublicHostname = ""
 	newCluster.Properties.RouterProfiles = nil
 	newCluster.Properties.ServicePrincipalProfile = nil
+	newCluster.Properties.AzProfile = nil
+	newCluster.Properties.AuthProfile = nil
 	newCluster.Properties.FQDN = ""
 
 	// make old cluster go through plugin first
@@ -48,6 +50,12 @@ func TestMerge(t *testing.T) {
 	}
 	if newCluster.Properties.ServicePrincipalProfile == nil {
 		t.Errorf("new cluster service principal profile should be merged")
+	}
+	if newCluster.Properties.AzProfile == nil {
+		t.Errorf("new cluster az profile should be merged")
+	}
+	if newCluster.Properties.AuthProfile == nil {
+		t.Errorf("new cluster auth profile should be merged")
 	}
 	if newCluster.Properties.FQDN == "" {
 		t.Errorf("new cluster fqdn should be merged")
