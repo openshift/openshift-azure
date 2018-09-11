@@ -2,7 +2,6 @@ package checks
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -11,109 +10,18 @@ import (
 	"syscall"
 	"time"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/upgrade"
 
-	"k8s.io/api/core/v1"
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 )
 
-// WaitForHTTPStatusOk poll until URL returns 200
-func WaitForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urltocheck string) error {
-	cli := &http.Client{
-		Transport: transport,
-		Timeout:   10 * time.Second,
-	}
-
-	req, err := http.NewRequest("GET", urltocheck, nil)
-	if err != nil {
-		return err
-	}
-	return wait.PollUntil(time.Second, func() (bool, error) {
-		resp, err := cli.Do(req)
-		if err, ok := err.(*url.Error); ok {
-			if err, ok := err.Err.(*net.OpError); ok {
-				if err, ok := err.Err.(*os.SyscallError); ok {
-					if err.Err == syscall.ENETUNREACH {
-						return false, nil
-					}
-				}
-			}
-			if err.Timeout() || err.Err == io.EOF || err.Err == io.ErrUnexpectedEOF {
-				return false, nil
-			}
-		}
-		if err == io.EOF {
-			return false, nil
-		}
-		if err != nil {
-			return false, err
-		}
-		return resp != nil && resp.StatusCode == http.StatusOK, nil
-	}, ctx.Done())
-}
-
-type Node struct {
-	Ready bool
-	Name  string
-}
-
-func GenerateNodeMap(cs *acsapi.OpenShiftManagedCluster) map[string][]Node {
-	nodes := make(map[string][]Node)
-	for _, app := range cs.Properties.AgentPoolProfiles {
-		nodes[string(app.Role)] = []Node{}
-		for i := 0; i < app.Count; i++ {
-			n := Node{Name: fmt.Sprintf("%s-%06d", app.Role, i)}
-			nodes[string(app.Role)] = append(nodes[string(app.Role)], n)
-		}
-	}
-	return nodes
-}
-
-func isNodeReady(nodeName string, kc *kubernetes.Clientset) (bool, error) {
-	n, err := kc.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
-	if err == nil {
-		for _, cond := range n.Status.Conditions {
-			if cond.Type == v1.NodeReady {
-				return true, nil
-			}
-		}
-	}
-	if err != nil && !kerrors.IsNotFound(err) && !kerrors.IsTimeout(err) {
-		return false, err
-	}
-
-	return false, nil
-}
-
-func WaitForNodeReady(ctx context.Context, nodes map[string][]Node, kc *kubernetes.Clientset) error {
-	for nodeType, ntNodes := range nodes { // walk node types, e.g. master, compute, infra
-		for idx, node := range ntNodes { // walk each node in type, e.g. master00000[1,2,3]
-			for {
-				ready, err := isNodeReady(node.Name, kc)
-				if err != nil {
-					return err
-				}
-				if ready {
-					nodes[nodeType][idx].Ready = true
-					break
-				}
-				// check NodeReady for each node to ensure readiness
-				select {
-				case <-time.After(2 * time.Second):
-				case <-ctx.Done():
-					return ctx.Err()
-				}
-			}
-		}
-	}
-	return nil
-}
-
-// map to hold the namespace and the deployments, statefulsets, daemonset
 var deploymentWhitelist = []struct {
 	Name      string
 	Namespace string
@@ -159,36 +67,7 @@ var deploymentWhitelist = []struct {
 		Namespace: "openshift-web-console",
 	},
 }
-var staticWhitelist = []struct {
-	Name      string
-	Namespace string
-	NodeType  string
-}{
-	{
-		Name:      "api",
-		Namespace: "kube-system",
-		NodeType:  "master",
-	},
-	{
-		Name:      "controllers",
-		Namespace: "kube-system",
-		NodeType:  "master",
-	},
-	{
-		Name:      "etcd",
-		Namespace: "kube-system",
-		NodeType:  "master",
-	},
-	{
-		Name:      "logbridge",
-		Namespace: "kube-system",
-		NodeType:  "all",
-	},
-	{
-		Name:      "sync-master-000000",
-		Namespace: "kube-system",
-	},
-}
+
 var daemonsetWhitelist = []struct {
 	Name      string
 	Namespace string
@@ -210,6 +89,7 @@ var daemonsetWhitelist = []struct {
 		Namespace: "openshift-sdn",
 	},
 }
+
 var statefulsetWhitelist = []struct {
 	Name      string
 	Namespace string
@@ -220,123 +100,143 @@ var statefulsetWhitelist = []struct {
 	},
 }
 
-// WaitForInfraServices verify daemonsets, statefulsets
-func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset, nodes map[string][]Node) error {
-	log.Info("checking infrastructure service health")
+// WaitForHTTPStatusOk poll until URL returns 200
+func WaitForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urltocheck string) error {
+	cli := &http.Client{
+		Transport: transport,
+		Timeout:   10 * time.Second,
+	}
 
-	for idx, app := range daemonsetWhitelist {
-		log.Info(fmt.Sprintf("checking   daemonset[%d]: [%s] %s", idx, app.Namespace, app.Name))
-		for {
-			ds, err := kc.AppsV1().DaemonSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
-			// wait for the ds to come online
-			if err == nil {
-				if ds.Status.NumberMisscheduled > 0 {
-					return fmt.Errorf("Daemonset[%v] in Namespace[%v] has missscheduled[%v]", ds.Name, ds.Namespace, ds.Status.NumberMisscheduled)
+	req, err := http.NewRequest("GET", urltocheck, nil)
+	if err != nil {
+		return err
+	}
+	return wait.PollUntil(time.Second, func() (bool, error) {
+		resp, err := cli.Do(req)
+		if err, ok := err.(*url.Error); ok {
+			if err, ok := err.Err.(*net.OpError); ok {
+				if err, ok := err.Err.(*os.SyscallError); ok {
+					if err.Err == syscall.ENETUNREACH {
+						return false, nil
+					}
 				}
+			}
+			if err.Timeout() || err.Err == io.EOF || err.Err == io.ErrUnexpectedEOF {
+				return false, nil
+			}
+		}
+		if err == io.EOF {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		return resp != nil && resp.StatusCode == http.StatusOK, nil
+	}, ctx.Done())
+}
 
-				if ds.Status.DesiredNumberScheduled == ds.Status.CurrentNumberScheduled &&
+func WaitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, kc *kubernetes.Clientset) error {
+	// TODO: this function should not be here.  It is a layering violation.
+	// Remove after PP day 1, see issue #390.  There should be a plugin
+	// CreateOrUpdate() method and it should ensure readiness on all nodes
+	// before returning.  Currently plugin Update() does this and there is no
+	// plugin Create().  This code should not run in the healthcheck.  With this
+	// code here, on create we wait for readiness, and on upgrade we wait for
+	// readiness twice.
+
+	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
+	authorizer, err := config.Authorizer()
+	if err != nil {
+		return err
+	}
+	vmc := compute.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID)
+	vmc.Authorizer = authorizer
+
+	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute} {
+		vms, err := upgrade.ListVMs(ctx, cs, vmc, role)
+		if err != nil {
+			return err
+		}
+		for _, vm := range vms {
+			log.Infof("waiting for %s to be ready", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+			err = upgrade.WaitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// WaitForInfraServices verifies daemonsets, statefulsets
+func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
+	for _, app := range daemonsetWhitelist {
+		log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
+
+		wait.PollUntil(2*time.Second, func() (bool, error) {
+			ds, err := kc.AppsV1().DaemonSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
+			switch {
+			case kerrors.IsNotFound(err):
+				return false, nil
+			case err == nil:
+				return ds.Status.DesiredNumberScheduled == ds.Status.CurrentNumberScheduled &&
 					ds.Status.DesiredNumberScheduled == ds.Status.NumberReady &&
 					ds.Status.DesiredNumberScheduled == ds.Status.UpdatedNumberScheduled &&
-					ds.Generation == ds.Status.ObservedGeneration {
-					break
-				}
+					ds.Generation == ds.Status.ObservedGeneration, nil
+			default:
+				return false, err
 			}
-			if err != nil && !kerrors.IsNotFound(err) {
-				return err
-			}
-			select {
-			case <-time.After(2 * time.Second):
-			case <-ctx.Done():
-				return ctx.Err()
-			}
-		}
+		}, ctx.Done())
 	}
 
-	// Statefulsets
-	for idx, app := range statefulsetWhitelist {
-		log.Infof("checking statefulset[%d]: [%s] %s", idx, app.Namespace, app.Name)
-		for {
+	for _, app := range statefulsetWhitelist {
+		log.Infof("checking statefulset %s/%s", app.Namespace, app.Name)
+
+		wait.PollUntil(2*time.Second, func() (bool, error) {
 			ss, err := kc.AppsV1().StatefulSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
-			if err != nil {
-				return err
-			}
-			if ss.Status.Replicas == ss.Status.ReadyReplicas &&
-				ss.Status.ReadyReplicas == ss.Status.CurrentReplicas &&
-				ss.Spec.Replicas != nil &&
-				*ss.Spec.Replicas == ss.Status.Replicas &&
-				ss.Generation == ss.Status.ObservedGeneration {
-				break
-			}
-			select {
-			case <-time.After(2 * time.Second):
-			case <-ctx.Done():
-				return ctx.Err()
-			}
-		}
-	}
-
-	// Deployments
-	for idx, app := range deploymentWhitelist {
-		log.Infof("checking  deployment[%d]: [%s] %s", idx, app.Namespace, app.Name)
-		for {
-			d, err := kc.AppsV1().Deployments(app.Namespace).Get(app.Name, metav1.GetOptions{})
-			if err != nil {
-				return err
-			}
-			if d.Status.Replicas == d.Status.ReadyReplicas &&
-				d.Status.ReadyReplicas == d.Status.AvailableReplicas &&
-				d.Spec.Replicas != nil &&
-				*d.Spec.Replicas == d.Status.Replicas &&
-				d.Status.Replicas == d.Status.UpdatedReplicas &&
-				d.Generation == d.Status.ObservedGeneration {
-				break
-			}
-			select {
-			case <-time.After(2 * time.Second):
-			case <-ctx.Done():
-				return ctx.Err()
-			}
-		}
-	}
-
-	// generate a list of the expected static pods
-	pods := make(map[string]struct{ Namespace string })
-	for _, app := range staticWhitelist {
-		switch app.NodeType {
-		case "all":
-			for _, nodes := range nodes {
-				for _, node := range nodes {
-					pods[fmt.Sprintf("%s-%s", app.Name, node.Name)] = struct{ Namespace string }{Namespace: app.Namespace}
+			switch {
+			case kerrors.IsNotFound(err):
+				return false, nil
+			case err == nil:
+				specReplicas := int32(1)
+				if ss.Spec.Replicas != nil {
+					specReplicas = *ss.Spec.Replicas
 				}
+				return specReplicas == ss.Status.Replicas &&
+					specReplicas == ss.Status.ReadyReplicas &&
+					specReplicas == ss.Status.CurrentReplicas &&
+					ss.Generation == ss.Status.ObservedGeneration, nil
+			default:
+				return false, err
 			}
-		default:
-			for _, node := range nodes[app.NodeType] {
-				pods[fmt.Sprintf("%s-%s", app.Name, node.Name)] = struct{ Namespace string }{Namespace: app.Namespace}
-			}
-		}
+		}, ctx.Done())
 	}
 
-	// static pods
-	for podname, podinfo := range pods {
-		log.Infof("checking         static: [%s] %s", podname, podinfo.Namespace)
-		for {
-			// get a list of all pods, in the namespace in which we want the static pod to show up.
-			pod, err := kc.CoreV1().Pods(podinfo.Namespace).Get(podname, metav1.GetOptions{})
-			if err != nil {
-				return err
-			}
-			if len(pod.Status.ContainerStatuses) > 0 && pod.Status.ContainerStatuses[0].Ready {
-				break
-			}
+	for _, app := range deploymentWhitelist {
+		log.Infof("checking deployment %s/%s", app.Namespace, app.Name)
 
-			select {
-			case <-time.After(2 * time.Second):
-			case <-ctx.Done():
-				return ctx.Err()
+		wait.PollUntil(2*time.Second, func() (bool, error) {
+			d, err := kc.AppsV1().Deployments(app.Namespace).Get(app.Name, metav1.GetOptions{})
+			switch {
+			case kerrors.IsNotFound(err):
+				return false, nil
+			case err == nil:
+				specReplicas := int32(1)
+				if d.Spec.Replicas != nil {
+					specReplicas = *d.Spec.Replicas
+				}
+
+				return specReplicas == d.Status.Replicas &&
+					specReplicas == d.Status.ReadyReplicas &&
+					specReplicas == d.Status.AvailableReplicas &&
+					specReplicas == d.Status.UpdatedReplicas &&
+					d.Generation == d.Status.ObservedGeneration, nil
+			default:
+				return false, err
 			}
-		}
+		}, ctx.Done())
 	}
 
-	log.Info("done checking infrastructure service health")
 	return nil
 }

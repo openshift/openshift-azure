@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -56,17 +55,14 @@ func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.OpenS
 		return err
 	}
 
-	// get a node map of type and node names
-	nodes := checks.GenerateNodeMap(cs)
-
 	// ensure that all nodes are ready
-	err = checks.WaitForNodeReady(ctx, nodes, kc)
+	err = checks.WaitForNodes(ctx, cs, kc)
 	if err != nil {
 		return err
 	}
 
-	// Ensure that the pods in default are healthy
-	err = checks.WaitForInfraServices(ctx, kc, nodes)
+	// Wait for infrastructure services to be healthy
+	err = checks.WaitForInfraServices(ctx, kc)
 	if err != nil {
 		return err
 	}
@@ -119,7 +115,6 @@ func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *acsapi.Op
 }
 
 func newClientSet(ctx context.Context, config *v1.Config) (*kubernetes.Clientset, error) {
-
 	kubeconfig, err := getKubeconfigFromV1Config(config)
 	if err != nil {
 		return nil, err
