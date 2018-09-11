@@ -58,6 +58,12 @@ func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *api.OpenShiftManage
 	if cs.Properties.ServicePrincipalProfile == nil {
 		cs.Properties.ServicePrincipalProfile = oldCs.Properties.ServicePrincipalProfile
 	}
+	if cs.Properties.AzProfile == nil {
+		cs.Properties.AzProfile = oldCs.Properties.AzProfile
+	}
+	if cs.Properties.AuthProfile == nil {
+		cs.Properties.AuthProfile = oldCs.Properties.AuthProfile
+	}
 	if len(cs.Properties.FQDN) == 0 {
 		cs.Properties.FQDN = oldCs.Properties.FQDN
 	}
