@@ -7,17 +7,26 @@ import (
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 )
 
-func selectNodeImage(cs *acsapi.OpenShiftManagedCluster) {
+func selectNodeImage(cs *acsapi.OpenShiftManagedCluster, deployOS string) {
 	c := cs.Config
 	c.ImagePublisher = "redhat"
-	c.ImageOffer = "osa-preview"
-	c.ImageVersion = "latest"
+	c.ImageOffer = os.Getenv("IMAGE_OFFER")
+	if c.ImageOffer == "" {
+		c.ImageOffer = "osa"
+	}
 
-	switch os.Getenv("DEPLOY_OS") {
+	c.ImageVersion = os.Getenv("IMAGE_VERSION")
+	switch deployOS {
 	case "", "rhel7":
 		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OpenShiftVersion[1:], ".", "", -1)
+		if c.ImageVersion == "" {
+			c.ImageVersion = "310.34.20180913"
+		}
 	case "centos7":
 		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OpenShiftVersion[1:], ".", "", -1)
+		if c.ImageVersion == "" {
+			c.ImageVersion = "310.0.20180913"
+		}
 	}
 
 	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
@@ -38,7 +47,7 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 
 	switch cs.Properties.OpenShiftVersion {
 	case "v3.10":
-		v := "v3.10.0"
+		v := "v3.10.0" // TODO: perhaps we should calculate this from c.ImageVersion
 		c.ControlPlaneImage = image(c.ImageConfigFormat, "control-plane", v)
 		c.NodeImage = image(c.ImageConfigFormat, "node", v)
 		c.ServiceCatalogImage = image(c.ImageConfigFormat, "service-catalog", v)
@@ -80,7 +89,7 @@ func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) {
 	switch cs.Properties.OpenShiftVersion {
 	//TODO: confirm minor version after release
 	case "v3.10":
-		v := "v3.10"
+		v := "v3.10.14" // TODO: perhaps we should calculate this from c.ImageVersion
 		c.ControlPlaneImage = image(c.ImageConfigFormat, "control-plane", v)
 		c.NodeImage = image(c.ImageConfigFormat, "node", v)
 		c.ServiceCatalogImage = image(c.ImageConfigFormat, "service-catalog", v)
