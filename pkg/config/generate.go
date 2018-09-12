@@ -382,16 +382,12 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		c.ServiceCatalogClusterID = uuid.NewV4()
 	}
 
-	c.TenantID = cs.Properties.AzProfile.TenantID
-	c.SubscriptionID = cs.Properties.AzProfile.SubscriptionID
-	c.ResourceGroup = cs.Properties.AzProfile.ResourceGroup
-
 	if c.CloudProviderConf, err = yaml.Marshal(map[string]string{
-		"tenantId":            cs.Config.TenantID,
-		"subscriptionId":      cs.Config.SubscriptionID,
+		"tenantId":            cs.Properties.AzProfile.TenantID,
+		"subscriptionId":      cs.Properties.AzProfile.SubscriptionID,
 		"aadClientId":         cs.Properties.ServicePrincipalProfile.ClientID,
 		"aadClientSecret":     cs.Properties.ServicePrincipalProfile.Secret,
-		"resourceGroup":       cs.Config.ResourceGroup,
+		"resourceGroup":       cs.Properties.AzProfile.ResourceGroup,
 		"location":            cs.Location,
 		"securityGroupName":   "nsg-compute",
 		"primaryScaleSetName": "ss-compute",

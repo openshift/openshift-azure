@@ -74,11 +74,6 @@ type Config struct {
 	// DNS configurables
 	MasterLBCNamePrefix string `json:"masterLbCNamePrefix,omitempty"`
 
-	// enriched values which are not present in the external API representation
-	TenantID       string `json:"tenantId,omitempty"`
-	SubscriptionID string `json:"subscriptionId,omitempty"`
-	ResourceGroup  string `json:"resourceGroup,omitempty"`
-
 	CloudProviderConf []byte `json:"cloudProviderConf,omitempty"`
 
 	ConfigStorageAccount string `json:"configStorageAccount,omitempty"`
