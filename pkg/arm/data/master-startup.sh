@@ -182,7 +182,7 @@ etcdStorageConfig:
   openShiftStoragePrefix: openshift.io
   openShiftStorageVersion: v1
 imageConfig:
-  format: {{ .Config.ImageConfigFormat | escape }}
+  format: {{ .Derived.ImageConfigFormat .ContainerService | escape }}
 imagePolicyConfig:
   internalRegistryHostname: docker-registry.default.svc:5000
 kind: MasterConfig
@@ -414,7 +414,7 @@ echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
 mkdir -p /etc/origin/cloudprovider
 
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
-{{ .Config.CloudProviderConf | String }}
+{{ .Derived.CloudProviderConf .ContainerService | String }}
 EOF
 
 # TODO: investigate the --manifest-url Kubelet parameter and see if it might
@@ -595,7 +595,7 @@ spec:
 EOF
 fi
 
-{{- if not RunningUnderTest }}
+{{- if not .Derived.RunningUnderTest }}
 mkdir -p /var/lib/logbridge
 cat >/etc/origin/node/pods/logbridge.yaml <<'EOF'
 apiVersion: v1

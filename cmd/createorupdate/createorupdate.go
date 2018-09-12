@@ -13,6 +13,7 @@ import (
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
@@ -93,7 +94,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 
 	// write out development files
 	log.Info("write helpers")
-	err = writeHelpers(cs.Config, azuredeploy)
+	err = writeHelpers(cs, azuredeploy)
 	if err != nil {
 		return nil, err
 	}
@@ -156,8 +157,13 @@ func enrich(cs *acsapi.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func writeHelpers(c *acsapi.Config, azuredeploy []byte) error {
-	err := ioutil.WriteFile("_data/_out/azure.conf", c.CloudProviderConf, 0600)
+func writeHelpers(c *acsapi.OpenShiftManagedCluster, azuredeploy []byte) error {
+	b, err := config.Derived.CloudProviderConf(c)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile("_data/_out/azure.conf", b, 0600)
 	if err != nil {
 		return err
 	}
@@ -167,7 +173,7 @@ func writeHelpers(c *acsapi.Config, azuredeploy []byte) error {
 		return err
 	}
 
-	b, err := tls.PrivateKeyAsBytes(c.SSHKey)
+	b, err = tls.PrivateKeyAsBytes(c.Config.SSHKey)
 	if err != nil {
 		return err
 	}
@@ -176,7 +182,7 @@ func writeHelpers(c *acsapi.Config, azuredeploy []byte) error {
 		return err
 	}
 
-	b, err = yaml.Marshal(c.AdminKubeconfig)
+	b, err = yaml.Marshal(c.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}

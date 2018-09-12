@@ -46,7 +46,6 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.ImagePublisher != "", "image publisher")
 	assert(c.ImageOffer != "", "image offer")
 	assert(c.ImageVersion != "", "image version")
-	assert(c.ImageConfigFormat != "", "image config format")
 
 	assert(c.ControlPlaneImage != "", "control plane image")
 	assert(c.NodeImage != "", "node image")
@@ -128,8 +127,6 @@ func TestSelectDNSNames(t *testing.T) {
 				cs.Properties.RouterProfiles[0].PublicSubdomain = ""
 			},
 			expected: func(cs *api.OpenShiftManagedCluster) {
-				cs.Config.MasterLBCNamePrefix = "www"
-
 				cs.Properties.PublicHostname = "www.example.com"
 				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-fqdn.example.com"
 			},
@@ -140,8 +137,6 @@ func TestSelectDNSNames(t *testing.T) {
 				cs.Properties.RouterProfiles[0].PublicSubdomain = ""
 			},
 			expected: func(cs *api.OpenShiftManagedCluster) {
-				cs.Config.MasterLBCNamePrefix = "www"
-
 				cs.Properties.PublicHostname = "console.example.com"
 				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-fqdn.example.com"
 			},
@@ -158,11 +153,8 @@ func TestSelectDNSNames(t *testing.T) {
 				cs.Properties.FQDN = "master-custom.test.com"
 				cs.Properties.RouterProfiles[0].FQDN = "router-custom.test.com"
 
-				cs.Config.MasterLBCNamePrefix = "master-custom"
-
 				cs.Properties.PublicHostname = "master-custom.test.com"
 				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-custom.test.com"
-
 			},
 		},
 	}

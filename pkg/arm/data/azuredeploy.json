@@ -4,7 +4,7 @@
     "parameters": {},
     "variables": {},
     "resources": [
-{{- if not RunningUnderTest }}
+{{- if not .Derived.RunningUnderTest }}
         {
             "type": "Microsoft.OperationalInsights/workspaces",
             "name": "{{ .Config.LoggingWorkspace | js }}",
@@ -56,7 +56,7 @@
                 "publicIPAllocationMethod": "Dynamic",
                 "idleTimeoutInMinutes": 15,
                 "dnsSettings": {
-                    "domainNameLabel": "{{ .Config.MasterLBCNamePrefix | js }}"
+                    "domainNameLabel": "{{ .Derived.MasterLBCNamePrefix .ContainerService | js }}"
                 }
             },
             "sku": {
@@ -214,7 +214,7 @@
                 "capacity": {{ $app.Count | js }},
                 "name": "{{ $app.VMSize | js }}"
             },
-{{- if eq $.Config.ImageResourceName "" }}
+{{- if eq $.Derived.ImageResourceName "" }}
             "plan": {
                 "name": "{{ $.Config.ImageSKU | js }}",
                 "publisher": "{{ $.Config.ImagePublisher | js }}",
@@ -244,13 +244,13 @@
                     },
                     "storageProfile": {
                         "imageReference": {
-{{- if eq $.Config.ImageResourceName "" }}
+{{- if eq $.Derived.ImageResourceName "" }}
                             "offer": "{{ $.Config.ImageOffer | js }}",
                             "publisher": "{{ $.Config.ImagePublisher | js }}",
                             "sku": "{{ $.Config.ImageSKU | js }}",
                             "version": "{{ $.Config.ImageVersion | js }}"
 {{- else }}
-                            "id": "[resourceId('{{ $.Config.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ $.Config.ImageResourceName | js }}')]"
+                            "id": "[resourceId('{{ $.Derived.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ $.Derived.ImageResourceName | js }}')]"
 {{- end }}
                         },
                         "osDisk": {

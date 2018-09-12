@@ -28,33 +28,26 @@ func selectNodeImage(cs *acsapi.OpenShiftManagedCluster, deployOS string) {
 			c.ImageVersion = "310.0.20180913"
 		}
 	}
-
-	c.ImageResourceGroup = os.Getenv("IMAGE_RESOURCEGROUP")
-	c.ImageResourceName = os.Getenv("IMAGE_RESOURCENAME")
 }
 
-func image(imageConfigFormat, component, version string) string {
-	image := strings.Replace(imageConfigFormat, "${component}", component, -1)
+func image(cs *acsapi.OpenShiftManagedCluster, component, version string) string {
+	image := strings.Replace(Derived.ImageConfigFormat(cs), "${component}", component, -1)
 	return strings.Replace(image, "${version}", version, -1)
 }
 
 func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 	c := cs.Config
-	c.ImageConfigFormat = os.Getenv("OREG_URL")
-	if c.ImageConfigFormat == "" {
-		c.ImageConfigFormat = "docker.io/openshift/origin-${component}:${version}"
-	}
 
 	switch cs.Properties.OpenShiftVersion {
 	case "v3.10":
 		v := "v3.10.0" // TODO: perhaps we should calculate this from c.ImageVersion
-		c.ControlPlaneImage = image(c.ImageConfigFormat, "control-plane", v)
-		c.NodeImage = image(c.ImageConfigFormat, "node", v)
-		c.ServiceCatalogImage = image(c.ImageConfigFormat, "service-catalog", v)
-		c.TemplateServiceBrokerImage = image(c.ImageConfigFormat, "template-service-broker", v)
-		c.RegistryImage = image(c.ImageConfigFormat, "docker-registry", v)
-		c.RouterImage = image(c.ImageConfigFormat, "haproxy-router", v)
-		c.WebConsoleImage = image(c.ImageConfigFormat, "web-console", v)
+		c.ControlPlaneImage = image(cs, "control-plane", v)
+		c.NodeImage = image(cs, "node", v)
+		c.ServiceCatalogImage = image(cs, "service-catalog", v)
+		c.TemplateServiceBrokerImage = image(cs, "template-service-broker", v)
+		c.RegistryImage = image(cs, "docker-registry", v)
+		c.RouterImage = image(cs, "haproxy-router", v)
+		c.WebConsoleImage = image(cs, "web-console", v)
 
 		c.MasterEtcdImage = "quay.io/coreos/etcd:v3.2.15"
 		c.EtcdOperatorImage = "quay.io/coreos/etcd-operator:v0.9.2"
@@ -81,23 +74,19 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 
 func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) {
 	c := cs.Config
-	c.ImageConfigFormat = os.Getenv("OREG_URL")
-	if c.ImageConfigFormat == "" {
-		c.ImageConfigFormat = "registry.access.redhat.com/openshift3/ose-${component}:${version}"
-	}
 
 	switch cs.Properties.OpenShiftVersion {
 	//TODO: confirm minor version after release
 	case "v3.10":
 		v := "v3.10.14" // TODO: perhaps we should calculate this from c.ImageVersion
-		c.ControlPlaneImage = image(c.ImageConfigFormat, "control-plane", v)
-		c.NodeImage = image(c.ImageConfigFormat, "node", v)
-		c.ServiceCatalogImage = image(c.ImageConfigFormat, "service-catalog", v)
-		c.AnsibleServiceBrokerImage = image(c.ImageConfigFormat, "ansible-service-broker", v)
-		c.TemplateServiceBrokerImage = image(c.ImageConfigFormat, "template-service-broker", v)
-		c.RegistryImage = image(c.ImageConfigFormat, "docker-registry", v)
-		c.RouterImage = image(c.ImageConfigFormat, "haproxy-router", v)
-		c.WebConsoleImage = image(c.ImageConfigFormat, "web-console", v)
+		c.ControlPlaneImage = image(cs, "control-plane", v)
+		c.NodeImage = image(cs, "node", v)
+		c.ServiceCatalogImage = image(cs, "service-catalog", v)
+		c.AnsibleServiceBrokerImage = image(cs, "ansible-service-broker", v)
+		c.TemplateServiceBrokerImage = image(cs, "template-service-broker", v)
+		c.RegistryImage = image(cs, "docker-registry", v)
+		c.RouterImage = image(cs, "haproxy-router", v)
+		c.WebConsoleImage = image(cs, "web-console", v)
 
 		c.MasterEtcdImage = "registry.access.redhat.com/rhel7/etcd:3.2.22"
 		c.EtcdOperatorImage = "quay.io/coreos/etcd-operator:v0.9.2"

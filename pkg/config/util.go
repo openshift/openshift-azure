@@ -119,10 +119,6 @@ func randomString(length int) (string, error) {
 }
 
 func selectDNSNames(cs *acsapi.OpenShiftManagedCluster) {
-
-	//TODO: Move this to derive
-	cs.Config.MasterLBCNamePrefix = strings.Split(cs.Properties.FQDN, ".")[0]
-
 	// Set PublicHostname to FQDN values if not specified
 	if cs.Properties.PublicHostname == "" {
 		cs.Properties.PublicHostname = cs.Properties.FQDN

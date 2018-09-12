@@ -7,7 +7,6 @@ import (
 	"net"
 	"os"
 
-	"github.com/ghodss/yaml"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
@@ -381,20 +380,6 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 
 	if uuid.Equal(c.ServiceCatalogClusterID, uuid.Nil) {
 		c.ServiceCatalogClusterID = uuid.NewV4()
-	}
-
-	if c.CloudProviderConf, err = yaml.Marshal(map[string]string{
-		"tenantId":            cs.Properties.AzProfile.TenantID,
-		"subscriptionId":      cs.Properties.AzProfile.SubscriptionID,
-		"aadClientId":         cs.Properties.ServicePrincipalProfile.ClientID,
-		"aadClientSecret":     cs.Properties.ServicePrincipalProfile.Secret,
-		"resourceGroup":       cs.Properties.AzProfile.ResourceGroup,
-		"location":            cs.Location,
-		"securityGroupName":   "nsg-compute",
-		"primaryScaleSetName": "ss-compute",
-		"vmType":              "vmss",
-	}); err != nil {
-		return
 	}
 
 	return

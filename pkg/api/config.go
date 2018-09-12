@@ -9,14 +9,18 @@ import (
 )
 
 type Config struct {
+	// configuration of VMs in ARM template
 	ImageOffer     string `json:"imageOffer,omitempty"`
 	ImagePublisher string `json:"imagePublisher,omitempty"`
 	ImageSKU       string `json:"imageSku,omitempty"`
 	ImageVersion   string `json:"imageVersion,omitempty"`
 
-	// for development
-	ImageResourceGroup string `json:"imageResourceGroup,omitempty"`
-	ImageResourceName  string `json:"imageResourceName,omitempty"`
+	SSHKey *rsa.PrivateKey `json:"sshKey,omitempty"`
+
+	// configuration of other ARM resources
+	ConfigStorageAccount   string `json:"configStorageAccount,omitempty"`
+	RegistryStorageAccount string `json:"registryStorageAccount,omitempty"`
+	LoggingWorkspace       string `json:"loggingWorkspace,omitempty"` // workspace for Azure Log Analytics resource
 
 	Certificates CertificateConfig `json:"certificates,omitempty"`
 
@@ -52,31 +56,16 @@ type Config struct {
 	SessionSecretAuth []byte          `json:"sessionSecretAuth,omitempty"`
 	SessionSecretEnc  []byte          `json:"sessionSecretEnc,omitempty"`
 	HtPasswd          []byte          `json:"htPasswd,omitempty"`
-	//TODO: Remove me before GA!
-	AdminPasswd       string `json:"adminPasswd,omitempty"`
-	ImageConfigFormat string `json:"imageConfigFormat,omitempty"`
-
-	// misc node configurables
-	SSHKey *rsa.PrivateKey `json:"sshKey,omitempty"`
+	AdminPasswd       string          `json:"adminPasswd,omitempty"` //TODO: Remove me before GA!
 
 	// misc infra configurables
 	RegistryHTTPSecret             []byte    `json:"registryHttpSecret,omitempty"`
+	PrometheusProxySessionSecret   []byte    `json:"prometheusProxySessionSecret,omitempty"`
 	AlertManagerProxySessionSecret []byte    `json:"alertManagerProxySessionSecret,omitempty"`
 	AlertsProxySessionSecret       []byte    `json:"alertsProxySessionSecret,omitempty"`
-	PrometheusProxySessionSecret   []byte    `json:"prometheusProxySessionSecret,omitempty"`
+	RegistryConsoleOAuthSecret     string    `json:"registryConsoleOAuthSecret,omitempty"`
+	RouterStatsPassword            string    `json:"routerStatsPassword,omitempty"`
 	ServiceCatalogClusterID        uuid.UUID `json:"serviceCatalogClusterId,omitempty"`
-	// random string based configurables
-	RegistryStorageAccount     string `json:"registryStorageAccount,omitempty"`
-	RegistryConsoleOAuthSecret string `json:"registryConsoleOAuthSecret,omitempty"`
-	RouterStatsPassword        string `json:"routerStatsPassword,omitempty"`
-	LoggingWorkspace           string `json:"loggingWorkspace,omitempty"` // workspace for Azure Log Analytics resource
-
-	// DNS configurables
-	MasterLBCNamePrefix string `json:"masterLbCNamePrefix,omitempty"`
-
-	CloudProviderConf []byte `json:"cloudProviderConf,omitempty"`
-
-	ConfigStorageAccount string `json:"configStorageAccount,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.
