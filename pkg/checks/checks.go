@@ -2,22 +2,103 @@ package checks
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 	"syscall"
 	"time"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/upgrade"
+
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
-	appclient "k8s.io/client-go/kubernetes/typed/apps/v1"
+	"k8s.io/client-go/kubernetes"
 )
+
+var deploymentWhitelist = []struct {
+	Name      string
+	Namespace string
+}{
+	{
+		Name:      "docker-registry",
+		Namespace: "default",
+	},
+	{
+		Name:      "router",
+		Namespace: "default",
+	},
+	{
+		Name:      "registry-console",
+		Namespace: "default",
+	},
+	{
+		Name:      "apiserver",
+		Namespace: "kube-service-catalog",
+	},
+	{
+		Name:      "controller-manager",
+		Namespace: "kube-service-catalog",
+	},
+	{
+		Name:      "bootstrap-autoapprover",
+		Namespace: "openshift-infra",
+	},
+	{
+		Name:      "asb",
+		Namespace: "openshift-ansible-service-broker",
+	},
+	{
+		Name:      "apiserver",
+		Namespace: "openshift-template-service-broker",
+	},
+	{
+		Name:      "bootstrap-autoapprover",
+		Namespace: "openshift-infra",
+	},
+	{
+		Name:      "webconsole",
+		Namespace: "openshift-web-console",
+	},
+}
+
+var daemonsetWhitelist = []struct {
+	Name      string
+	Namespace string
+}{
+	{
+		Name:      "prometheus-node-exporter",
+		Namespace: "openshift-metrics",
+	},
+	{
+		Name:      "sync",
+		Namespace: "openshift-node",
+	},
+	{
+		Name:      "ovs",
+		Namespace: "openshift-sdn",
+	},
+	{
+		Name:      "sdn",
+		Namespace: "openshift-sdn",
+	},
+}
+
+var statefulsetWhitelist = []struct {
+	Name      string
+	Namespace string
+}{
+	{
+		Name:      "prometheus",
+		Namespace: "openshift-metrics",
+	},
+}
 
 // WaitForHTTPStatusOk poll until URL returns 200
 func WaitForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urltocheck string) error {
@@ -54,140 +135,108 @@ func WaitForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urlto
 	}, ctx.Done())
 }
 
-func checkNamespace(namespace string) bool {
-	if namespace == "default" {
-		return true
-	}
+func WaitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, kc *kubernetes.Clientset) error {
+	// TODO: this function should not be here.  It is a layering violation.
+	// Remove after PP day 1, see issue #390.  There should be a plugin
+	// CreateOrUpdate() method and it should ensure readiness on all nodes
+	// before returning.  Currently plugin Update() does this and there is no
+	// plugin Create().  This code should not run in the healthcheck.  With this
+	// code here, on create we wait for readiness, and on upgrade we wait for
+	// readiness twice.
 
-	whitelistedNamespaces := []string{
-		"openshift-",
-		"kube-",
+	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
+	authorizer, err := config.Authorizer()
+	if err != nil {
+		return err
 	}
-	for _, ns := range whitelistedNamespaces {
-		if strings.HasPrefix(namespace, ns) {
-			return true
-		}
-	}
-	return false
-}
+	vmc := compute.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID)
+	vmc.Authorizer = authorizer
 
-// WaitForInfraServices verify daemonsets, statefulsets
-func WaitForInfraServices(ctx context.Context, appclient *appclient.AppsV1Client) error {
-	log.Info("checking infrastructure service health")
-out:
-	for {
-		_, err := appclient.Deployments("openshift-web-console").Get("webconsole", metav1.GetOptions{})
-		switch {
-		case err == nil:
-			break out
-		case kerrors.IsNotFound(err):
-		default:
+	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute} {
+		vms, err := upgrade.ListVMs(ctx, cs, vmc, role)
+		if err != nil {
 			return err
 		}
-		select {
-		case <-time.After(2 * time.Second):
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-	}
-
-	// Daemonsets
-	dsList, err := appclient.DaemonSets("").List(metav1.ListOptions{})
-	if err != nil {
-		return err
-	}
-
-	for _, ds := range dsList.Items {
-		if !checkNamespace(ds.Namespace) {
-			continue
-		}
-		log.Info(fmt.Sprintf("checking %s %q", ds.Kind, ds.Name))
-		for {
-			ds, err := appclient.DaemonSets(ds.Namespace).Get(ds.Name, metav1.GetOptions{})
+		for _, vm := range vms {
+			log.Infof("waiting for %s to be ready", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+			err = upgrade.WaitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 			if err != nil {
 				return err
 			}
-			if ds.Status.NumberMisscheduled > 0 {
-				return fmt.Errorf("Daemonset[%v] in Namespace[%v] has missscheduled[%v]", ds.Name, ds.Namespace, ds.Status.NumberMisscheduled)
-			}
-
-			if ds.Status.DesiredNumberScheduled == ds.Status.CurrentNumberScheduled &&
-				ds.Status.DesiredNumberScheduled == ds.Status.NumberReady &&
-				ds.Status.DesiredNumberScheduled == ds.Status.UpdatedNumberScheduled &&
-				ds.Generation == ds.Status.ObservedGeneration {
-				break
-			}
-			select {
-			case <-time.After(2 * time.Second):
-			case <-ctx.Done():
-				return ctx.Err()
-			}
 		}
 	}
 
-	// Statefulsets
-	ssList, err := appclient.StatefulSets("").List(metav1.ListOptions{})
-	if err != nil {
-		return err
+	return nil
+}
+
+// WaitForInfraServices verifies daemonsets, statefulsets
+func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
+	for _, app := range daemonsetWhitelist {
+		log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
+
+		wait.PollUntil(2*time.Second, func() (bool, error) {
+			ds, err := kc.AppsV1().DaemonSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
+			switch {
+			case kerrors.IsNotFound(err):
+				return false, nil
+			case err == nil:
+				return ds.Status.DesiredNumberScheduled == ds.Status.CurrentNumberScheduled &&
+					ds.Status.DesiredNumberScheduled == ds.Status.NumberReady &&
+					ds.Status.DesiredNumberScheduled == ds.Status.UpdatedNumberScheduled &&
+					ds.Generation == ds.Status.ObservedGeneration, nil
+			default:
+				return false, err
+			}
+		}, ctx.Done())
 	}
 
-	for _, ss := range ssList.Items {
-		if !checkNamespace(ss.Namespace) {
-			continue
-		}
-		log.Info(fmt.Sprintf("checking %s %q", ss.Kind, ss.Name))
-		for {
-			ss, err := appclient.StatefulSets(ss.Namespace).Get(ss.Name, metav1.GetOptions{})
-			if err != nil {
-				return err
+	for _, app := range statefulsetWhitelist {
+		log.Infof("checking statefulset %s/%s", app.Namespace, app.Name)
+
+		wait.PollUntil(2*time.Second, func() (bool, error) {
+			ss, err := kc.AppsV1().StatefulSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
+			switch {
+			case kerrors.IsNotFound(err):
+				return false, nil
+			case err == nil:
+				specReplicas := int32(1)
+				if ss.Spec.Replicas != nil {
+					specReplicas = *ss.Spec.Replicas
+				}
+				return specReplicas == ss.Status.Replicas &&
+					specReplicas == ss.Status.ReadyReplicas &&
+					specReplicas == ss.Status.CurrentReplicas &&
+					ss.Generation == ss.Status.ObservedGeneration, nil
+			default:
+				return false, err
 			}
-			if ss.Status.Replicas == ss.Status.ReadyReplicas &&
-				ss.Status.ReadyReplicas == ss.Status.CurrentReplicas &&
-				ss.Spec.Replicas != nil &&
-				*ss.Spec.Replicas == ss.Status.Replicas &&
-				ss.Generation == ss.Status.ObservedGeneration {
-				break
-			}
-			select {
-			case <-time.After(2 * time.Second):
-			case <-ctx.Done():
-				return ctx.Err()
-			}
-		}
+		}, ctx.Done())
 	}
 
-	// Deployments
-	dList, err := appclient.Deployments("").List(metav1.ListOptions{})
-	if err != nil {
-		return err
+	for _, app := range deploymentWhitelist {
+		log.Infof("checking deployment %s/%s", app.Namespace, app.Name)
+
+		wait.PollUntil(2*time.Second, func() (bool, error) {
+			d, err := kc.AppsV1().Deployments(app.Namespace).Get(app.Name, metav1.GetOptions{})
+			switch {
+			case kerrors.IsNotFound(err):
+				return false, nil
+			case err == nil:
+				specReplicas := int32(1)
+				if d.Spec.Replicas != nil {
+					specReplicas = *d.Spec.Replicas
+				}
+
+				return specReplicas == d.Status.Replicas &&
+					specReplicas == d.Status.ReadyReplicas &&
+					specReplicas == d.Status.AvailableReplicas &&
+					specReplicas == d.Status.UpdatedReplicas &&
+					d.Generation == d.Status.ObservedGeneration, nil
+			default:
+				return false, err
+			}
+		}, ctx.Done())
 	}
 
-	for _, d := range dList.Items {
-		if !checkNamespace(d.Namespace) {
-			continue
-		}
-		log.Info(fmt.Sprintf("checking %s %q", d.Kind, d.Name))
-		for {
-			d, err := appclient.Deployments(d.Namespace).Get(d.Name, metav1.GetOptions{})
-			if err != nil {
-				return err
-			}
-			if d.Status.Replicas == d.Status.ReadyReplicas &&
-				d.Status.ReadyReplicas == d.Status.AvailableReplicas &&
-				d.Spec.Replicas != nil &&
-				*d.Spec.Replicas == d.Status.Replicas &&
-				d.Status.Replicas == d.Status.UpdatedReplicas &&
-				d.Generation == d.Status.ObservedGeneration {
-				break
-			}
-			select {
-			case <-time.After(2 * time.Second):
-			case <-ctx.Done():
-				return ctx.Err()
-			}
-		}
-	}
-
-	log.Info("done checking infrastructure service health")
 	return nil
 }

@@ -10,8 +10,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-
-	appsclient "k8s.io/client-go/kubernetes/typed/apps/v1"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
@@ -51,13 +50,19 @@ func NewSimpleHealthChecker(entry *logrus.Entry) HealthChecker {
 
 // HealthCheck function to verify cluster health
 func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
-	appsClient, err := newAppClient(ctx, cs.Config.AdminKubeconfig)
+	kc, err := newClientSet(ctx, cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}
 
-	// Ensure that the pods in default are healthy
-	err = checks.WaitForInfraServices(ctx, appsClient)
+	// ensure that all nodes are ready
+	err = checks.WaitForNodes(ctx, cs, kc)
+	if err != nil {
+		return err
+	}
+
+	// Wait for infrastructure services to be healthy
+	err = checks.WaitForInfraServices(ctx, kc)
 	if err != nil {
 		return err
 	}
@@ -109,8 +114,7 @@ func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *acsapi.Op
 	}
 }
 
-func newAppClient(ctx context.Context, config *v1.Config) (*appsclient.AppsV1Client, error) {
-
+func newClientSet(ctx context.Context, config *v1.Config) (*kubernetes.Clientset, error) {
 	kubeconfig, err := getKubeconfigFromV1Config(config)
 	if err != nil {
 		return nil, err
@@ -132,9 +136,10 @@ func newAppClient(ctx context.Context, config *v1.Config) (*appsclient.AppsV1Cli
 		return nil, err
 	}
 
-	appsclient, err := appsclient.NewForConfig(restconfig)
+	kc, err := kubernetes.NewForConfig(restconfig)
 	if err != nil {
 		return nil, err
 	}
-	return appsclient, nil
+
+	return kc, nil
 }
