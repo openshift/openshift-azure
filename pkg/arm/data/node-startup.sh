@@ -46,6 +46,7 @@ cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
 {{ .Config.CloudProviderConf | String }}
 EOF
 
+{{- if not RunningUnderTest }}
 mkdir -p /var/lib/logbridge
 cat >/etc/origin/node/pods/logbridge.yaml <<'EOF'
 apiVersion: v1
@@ -87,6 +88,7 @@ spec:
       path: /var/log
     name: var-log
 EOF
+{{- end }}
 
 # note: ${SERVICE_TYPE}-node crash loops until master is up
 systemctl enable ${SERVICE_TYPE}-node.service

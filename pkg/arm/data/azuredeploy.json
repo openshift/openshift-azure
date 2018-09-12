@@ -4,6 +4,7 @@
     "parameters": {},
     "variables": {},
     "resources": [
+{{- if not RunningUnderTest }}
         {
             "type": "Microsoft.OperationalInsights/workspaces",
             "name": "{{ .Config.LoggingWorkspace | js }}",
@@ -18,6 +19,7 @@
                 }
             }
         },
+{{- end }}
 {{- if not (index .ContainerService.Properties.AgentPoolProfiles 0).VnetSubnetID }}
         {
             "type": "Microsoft.Network/virtualNetworks",

@@ -83,7 +83,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	// the same time, current thinking is that we will add a hash-based
 	// mechanism to avoid unnecessary VM rotations as well.
 
-	if os.Getenv("DEVELOPMENT_ALWAYS_ROTATE") != "" {
+	if os.Getenv("RUNNING_UNDER_TEST") != "" {
 		err = u.updateInPlace(ctx, cs, ssc, vmc, api.AgentPoolProfileRoleMaster)
 		if err != nil {
 			return err
