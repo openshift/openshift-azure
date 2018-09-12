@@ -85,7 +85,8 @@ func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster, exte
 		}
 		old.Properties.AgentPoolProfiles[i].Count = new.Count
 	}
-
+	// allows secret rotation for SP
+	old.Properties.ServicePrincipalProfile.Secret = cs.Properties.ServicePrincipalProfile.Secret
 	if !reflect.DeepEqual(cs, old) {
 		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
 	}
