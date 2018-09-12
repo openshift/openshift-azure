@@ -595,6 +595,7 @@ spec:
 EOF
 fi
 
+{{- if not RunningUnderTest }}
 mkdir -p /var/lib/logbridge
 cat >/etc/origin/node/pods/logbridge.yaml <<'EOF'
 apiVersion: v1
@@ -636,6 +637,7 @@ spec:
       path: /var/log
     name: var-log
 EOF
+{{- end }}
 
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig

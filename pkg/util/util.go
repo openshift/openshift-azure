@@ -3,6 +3,7 @@ package util
 import (
 	"bytes"
 	"encoding/base64"
+	"os"
 	"strconv"
 	"strings"
 	"text/template"
@@ -28,6 +29,9 @@ func Template(tmpl string, f template.FuncMap, cs *acsapi.OpenShiftManagedCluste
 		"escape": func(b string) string {
 			replacer := strings.NewReplacer("$", "\\$")
 			return replacer.Replace(b)
+		},
+		"RunningUnderTest": func() bool {
+			return os.Getenv("RUNNING_UNDER_TEST") != ""
 		},
 	}).Funcs(f).Parse(tmpl)
 	if err != nil {
