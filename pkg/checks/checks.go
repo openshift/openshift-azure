@@ -90,16 +90,6 @@ var daemonsetWhitelist = []struct {
 	},
 }
 
-var statefulsetWhitelist = []struct {
-	Name      string
-	Namespace string
-}{
-	{
-		Name:      "prometheus",
-		Namespace: "openshift-metrics",
-	},
-}
-
 // WaitForHTTPStatusOk poll until URL returns 200
 func WaitForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urltocheck string) error {
 	cli := &http.Client{
@@ -174,7 +164,7 @@ func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
 	for _, app := range daemonsetWhitelist {
 		log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
 
-		wait.PollUntil(2*time.Second, func() (bool, error) {
+		err := wait.PollUntil(2*time.Second, func() (bool, error) {
 			ds, err := kc.AppsV1().DaemonSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
 			switch {
 			case kerrors.IsNotFound(err):
@@ -188,35 +178,15 @@ func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
 				return false, err
 			}
 		}, ctx.Done())
-	}
-
-	for _, app := range statefulsetWhitelist {
-		log.Infof("checking statefulset %s/%s", app.Namespace, app.Name)
-
-		wait.PollUntil(2*time.Second, func() (bool, error) {
-			ss, err := kc.AppsV1().StatefulSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
-			switch {
-			case kerrors.IsNotFound(err):
-				return false, nil
-			case err == nil:
-				specReplicas := int32(1)
-				if ss.Spec.Replicas != nil {
-					specReplicas = *ss.Spec.Replicas
-				}
-				return specReplicas == ss.Status.Replicas &&
-					specReplicas == ss.Status.ReadyReplicas &&
-					specReplicas == ss.Status.CurrentReplicas &&
-					ss.Generation == ss.Status.ObservedGeneration, nil
-			default:
-				return false, err
-			}
-		}, ctx.Done())
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, app := range deploymentWhitelist {
 		log.Infof("checking deployment %s/%s", app.Namespace, app.Name)
 
-		wait.PollUntil(2*time.Second, func() (bool, error) {
+		err := wait.PollUntil(2*time.Second, func() (bool, error) {
 			d, err := kc.AppsV1().Deployments(app.Namespace).Get(app.Name, metav1.GetOptions{})
 			switch {
 			case kerrors.IsNotFound(err):
@@ -236,6 +206,9 @@ func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
 				return false, err
 			}
 		}, ctx.Done())
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
