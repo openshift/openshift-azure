@@ -36,7 +36,7 @@ found in [OpenShift Release repository](https://github.com/openshift/release/)
 If you want just to run conformance test locally, you can use docker image to do so.
 ```
 # run and attach to test the container
-docker run -v $(pwd)/_data:/tmp/_data  -it openshift/origin-tests:v3.10  sh
+docker run -v $(pwd)/_data:/tmp/_data  -it openshift/origin-tests:v3.10 sh
 # export kubeconfig
 export KUBECONFIG=/tmp/_data/_out/admin.kubeconfig
 # filter tests
@@ -47,6 +47,13 @@ export KUBECONFIG=/tmp/_data/_out/admin.kubeconfig
 -- -ginkgo.focus="Suite:openshift/conformance/parallel" -e2e-output-dir /tmp/ \
 -report-dir /tmp/_data/junit -test.timeout=2h  -ginkgo.focus="${TEST_FOCUS}" \
 -ginkgo.skip="${TEST_SKIP}"
+```
+
+Example:
+```
+/usr/libexec/origin/ginkgo /usr/libexec/origin/extended.test -v -noColor \
+-nodes=30 extended.test -- -ginkgo.focus="Suite:openshift/conformance/parallel" \
+ -test.timeout=2h  -ginkgo.focus=".*should report failed soon after an annotated objects has failed*."
 ```
 
 If you need to update `conformance` tests:
