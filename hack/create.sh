@@ -5,6 +5,17 @@ if ! az account show >/dev/null; then
     exit 1
 fi
 
+ENVIRONMENT_CONFIG=$(dirname $(dirname $0))/env
+
+# check if the environment config file exists
+if [[ ! -f ${ENVIRONMENT_CONFIG} ]]; then
+	echo error: must setup an env config file in project root
+	exit 1
+fi
+
+# source the environment config file
+. ${ENVIRONMENT_CONFIG}
+
 if [[ -z "$AZURE_SUBSCRIPTION_ID" ]]; then
     echo error: must set AZURE_SUBSCRIPTION_ID
     exit 1
