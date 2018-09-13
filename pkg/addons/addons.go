@@ -248,11 +248,11 @@ func Main(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, dryRun
 		return err
 	}
 
-	keyRegistry, err := client.GetStorageAccountKey(cs.Config.ResourceGroup, cs.Config.RegistryStorageAccount)
+	keyRegistry, err := client.GetStorageAccountKey(cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
 	if err != nil {
 		return err
 	}
-	keyConfig, err := client.GetStorageAccountKey(cs.Config.ResourceGroup, cs.Config.ConfigStorageAccount)
+	keyConfig, err := client.GetStorageAccountKey(cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
 	if err != nil {
 		return err
 	}

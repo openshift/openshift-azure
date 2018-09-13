@@ -82,10 +82,6 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 
 	assert(c.ServiceCatalogClusterID != uuid.Nil, "service catalog cluster id")
 
-	assert(c.TenantID != "", "tenant id")
-	assert(c.SubscriptionID != "", "subscription id")
-	assert(c.ResourceGroup != "", "resource group")
-
 	assertCert(c.Certificates.EtcdCa, "EtcdCa")
 	assertCert(c.Certificates.Ca, "Ca")
 	assertCert(c.Certificates.FrontProxyCa, "FrontProxyCa")
