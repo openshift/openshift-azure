@@ -10,6 +10,7 @@
 // data/ClusterRole.rbac.authorization.k8s.io/cluster-reader.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/cluster-status.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/edit.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/kube-state-metrics.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/namespace-viewer.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/registry-admin.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/registry-editor.yaml
@@ -269,6 +270,7 @@
 // data/Deployment.apps/openshift-ansible-service-broker/asb.yaml
 // data/Deployment.apps/openshift-etcd/etcd-operator.yaml
 // data/Deployment.apps/openshift-infra/bootstrap-autoapprover.yaml
+// data/Deployment.apps/openshift-metrics/kube-state-metrics.yaml
 // data/Deployment.apps/openshift-template-service-broker/apiserver.yaml
 // data/Deployment.apps/openshift-web-console/webconsole.yaml
 // data/EtcdBackup.etcd.database.coreos.com/openshift-etcd/etcd-backup.yaml
@@ -314,6 +316,7 @@
 // data/Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml
 // data/Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml
 // data/Role.rbac.authorization.k8s.io/openshift-etcd/etcd-operator.yaml
+// data/Role.rbac.authorization.k8s.io/openshift-metrics/kube-state-metrics-resizer.yaml
 // data/Role.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml
 // data/Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml
@@ -328,6 +331,7 @@
 // data/RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-viewers.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-etcd/etcd-operator.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/openshift-metrics/kube-state-metrics.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-node/sync-node-config-reader-binding.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml
@@ -366,6 +370,7 @@
 // data/Service/openshift-ansible-service-broker/asb.yaml
 // data/Service/openshift-metrics/alertmanager.yaml
 // data/Service/openshift-metrics/alerts.yaml
+// data/Service/openshift-metrics/kube-state-metrics.yaml
 // data/Service/openshift-metrics/prometheus-node-exporter.yaml
 // data/Service/openshift-metrics/prometheus.yaml
 // data/Service/openshift-template-service-broker/apiserver.yaml
@@ -424,6 +429,7 @@
 // data/ServiceAccount/openshift-infra/template-instance-controller.yaml
 // data/ServiceAccount/openshift-infra/template-instance-finalizer-controller.yaml
 // data/ServiceAccount/openshift-infra/unidling-controller.yaml
+// data/ServiceAccount/openshift-metrics/kube-state-metrics.yaml
 // data/ServiceAccount/openshift-metrics/prometheus-node-exporter.yaml
 // data/ServiceAccount/openshift-metrics/prometheus-reader.yaml
 // data/ServiceAccount/openshift-metrics/prometheus.yaml
@@ -726,6 +732,26 @@ func clusterroleRbacAuthorizationK8sIoEditYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/edit.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _clusterroleRbacAuthorizationK8sIoKubeStateMetricsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x94\x52\xbb\xae\xdb\x30\x0c\xdd\xfd\x15\x82\xe7\x3a\x45\xb7\xc2\x6b\x87\xee\x1d\xba\x14\x19\x68\x89\x49\xd8\x48\xa4\x4a\x52\xee\xe3\xeb\x8b\xf8\x31\xb4\xd7\x17\xc8\xdd\x68\x1e\xe3\x3c\x78\x04\x95\xbe\xa2\x1a\x09\x8f\x41\x27\x88\x27\x68\x7e\x13\xa5\x3f\xe0\x24\x7c\xba\x7f\xb4\x13\xc9\xfb\xf9\x43\x77\x27\x4e\x63\xf8\x94\x9b\x39\xea\x17\xc9\xd8\x15\x74\x48\xe0\x30\x76\x21\x30\x14\x1c\xc3\xbd\x4d\x38\x98\x83\xe3\x50\xd0\x95\xa2\x75\xda\x32\xda\xd8\x0d\x01\x2a\x7d\x56\x69\xd5\xc6\xf0\xad\xef\xcf\x5d\x08\x8a\x26\x4d\xe3\x03\x0e\x61\x08\x51\xf8\x42\xd7\x02\xd5\x96\x4f\xc3\xa8\xe8\xeb\xcc\x92\x70\x9d\xaa\xa4\x1d\xd6\x99\xe2\xb6\xdd\x99\x7e\x34\x71\xd8\x57\x35\x53\x5c\x42\x44\x61\x57\xc9\x19\x75\x85\x32\x15\x72\x05\xbe\xee\x9c\x8f\xfc\xe6\xc8\x3e\x4b\x6e\x05\x63\x06\x2a\xc7\xd0\x66\x07\x0a\x5a\x85\x5d\x1d\x39\x55\x21\x5e\xbc\xce\xa8\xd3\x92\x30\x93\x79\xff\x2e\xf4\x3f\xc1\xe3\xad\x3f\xff\x7f\x00\xfc\xe5\xc8\x8f\xab\xdb\xd1\x29\x12\x60\x11\xb6\x3d\x7e\xc2\x9a\xe5\x77\x41\xf6\x7f\xb2\x6d\xf8\xb3\x92\x50\xeb\xa1\xd8\xd2\xd7\xa5\xe5\x37\xd2\x4d\xdb\xfa\x65\x8f\x2a\xfc\x5d\xa6\xd5\xea\x36\x3c\xed\xb1\xb9\x58\x84\x4c\x7c\x3d\xa2\x5e\x1e\xa6\xb0\x43\xae\x92\xf6\x7f\xd7\x5a\x5f\x55\xf8\x1b\x00\x00\xff\xff\xcb\xc0\x32\xbf\xe1\x02\x00\x00")
+
+func clusterroleRbacAuthorizationK8sIoKubeStateMetricsYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_clusterroleRbacAuthorizationK8sIoKubeStateMetricsYaml,
+		"ClusterRole.rbac.authorization.k8s.io/kube-state-metrics.yaml",
+	)
+}
+
+func clusterroleRbacAuthorizationK8sIoKubeStateMetricsYaml() (*asset, error) {
+	bytes, err := clusterroleRbacAuthorizationK8sIoKubeStateMetricsYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/kube-state-metrics.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -5910,6 +5936,26 @@ func deploymentAppsOpenshiftInfraBootstrapAutoapproverYaml() (*asset, error) {
 	return a, nil
 }
 
+var _deploymentAppsOpenshiftMetricsKubeStateMetricsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xb4\x54\x4d\x6b\xdb\x40\x10\xbd\xfb\x57\xcc\x2d\x20\x50\x63\xb7\x04\xc2\x42\x0e\xa6\x76\x73\x69\x52\x93\x94\x42\x4f\x61\xb2\x7a\xae\x16\xef\x57\x77\x47\xa6\xce\xaf\x2f\xf2\x87\x2a\xd9\x8d\x4b\x29\xdd\x93\x98\x37\xef\xcd\x9b\x19\xed\x72\x34\x5f\x90\xb2\x09\x5e\x11\xc7\x98\x2f\xd7\x93\xd1\xca\xf8\x4a\xd1\x0c\xd1\x86\x8d\x83\x97\x91\x83\x70\xc5\xc2\x6a\x44\xe4\xd9\x41\xd1\xaa\x79\x46\x99\x85\x05\xa5\x83\x24\xa3\xf3\x1e\xca\x91\x35\x14\x85\x08\x9f\x6b\xb3\x94\x0e\xce\x11\xba\xe5\x67\x58\x68\x09\xa9\xfd\x26\x72\x2c\xba\xfe\xc8\xcf\xb0\x79\x17\x20\x5a\x5d\xe7\x92\x63\x7c\xa5\x46\x42\xb4\x46\x73\x56\x34\x19\x11\x09\x5c\xb4\x2c\xd8\x8b\xf5\x6c\xb6\xc7\x0e\x74\xff\xa4\x4c\x74\xb0\xb8\xfd\x46\x5a\x1b\x8d\xa9\xd6\xa1\xf1\x72\xff\x7a\xd3\xed\xd1\xc1\x0b\x1b\x8f\xd4\x15\x2b\xcf\xcd\x69\x77\x8c\xe3\x6f\x50\x74\x51\x14\x05\xdd\xce\xef\xe7\x0f\xd3\xcf\xf3\x19\x15\x45\x71\xd1\xa5\xc4\x90\xa4\xe7\xff\x20\x5a\x8b\xc4\x13\xb9\x9e\x8b\x45\x48\xa2\xe8\x7a\x7c\x3d\x3e\xa1\x0a\x2c\x5a\xe6\xe6\x2c\x6f\xd2\xa1\x09\x5c\x19\x8f\x9c\x17\x29\x3c\x43\xf5\x58\xad\x89\x5b\x48\x3f\x44\x14\x59\x6a\x45\x97\x35\xd8\x4a\xfd\x32\x84\x4e\x4d\x11\x19\x6f\xc4\xb0\x9d\xc1\xf2\xe6\x11\x3a\xf8\x2a\x2b\xba\xea\x25\x88\x71\x08\x8d\x9c\x60\x87\x7e\xb8\xaa\x82\x2f\x13\xb2\x79\x41\xfa\x9b\xd1\x26\xe4\xd0\x24\x8d\xdc\x6f\xc0\x1a\x67\x24\x0f\x5b\xd2\xb1\x51\x34\x19\x8f\xdd\x20\xea\xe0\x42\xda\x28\x7a\x37\xbe\x33\x3d\x20\xe1\x7b\x83\xfc\x0f\x12\xf0\xeb\x3e\xf7\xd0\xe6\xdd\xd7\xa7\xc5\xa7\xd9\xd3\xfd\xf4\x6e\x3e\xd0\x58\xb3\x6d\xf0\x21\x05\x37\x2c\x48\xb4\x34\xb0\xd5\x03\x96\xc7\xf1\x3d\xb2\xd8\xee\xe9\x70\x5f\xde\xb4\x45\xce\x57\x7d\x5c\x4c\xdf\xff\xb7\xd2\xdb\x37\xa3\xcb\xd6\xc1\x39\xf6\xd5\x70\x0c\x97\x31\x54\x4f\x9e\xbd\xdf\x0c\xc2\x65\xd9\xfd\xbc\x37\x67\xae\xda\x3e\x35\x36\x37\x47\x5b\x68\xc3\xf8\x21\x89\x77\xe0\x31\xb4\x5b\x51\x4b\x1a\x6c\xf9\x17\x6b\x9f\xf0\xf6\x04\x96\x3a\x21\xd7\xc1\x56\x37\x57\x47\x48\xd5\x3d\xab\xbf\x73\xfc\x33\x00\x00\xff\xff\xc0\x23\xca\xa4\x8f\x05\x00\x00")
+
+func deploymentAppsOpenshiftMetricsKubeStateMetricsYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_deploymentAppsOpenshiftMetricsKubeStateMetricsYaml,
+		"Deployment.apps/openshift-metrics/kube-state-metrics.yaml",
+	)
+}
+
+func deploymentAppsOpenshiftMetricsKubeStateMetricsYaml() (*asset, error) {
+	bytes, err := deploymentAppsOpenshiftMetricsKubeStateMetricsYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Deployment.apps/openshift-metrics/kube-state-metrics.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _deploymentAppsOpenshiftTemplateServiceBrokerApiserverYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x54\x4f\x6b\xe3\x4e\x0c\xbd\xfb\x53\x88\x5e\x0a\x86\xa9\x7f\xe5\xd7\xc3\x62\xc8\xa1\xd0\xd0\x3d\x6c\x4b\xd8\x86\xbd\x2b\x63\xc5\x1e\x32\xff\x98\x91\x0d\xd9\x4f\xbf\x4c\x9c\x3a\x9e\xfc\xe9\xae\x6e\x7e\xd2\x7b\x92\x9e\x6c\xa3\x57\xbf\x28\x44\xe5\x6c\x0d\xe8\x7d\xac\x86\xc7\x62\xa7\x6c\x53\xc3\x0b\x79\xed\xf6\x86\x2c\x17\x86\x18\x1b\x64\xac\x0b\x00\x8b\x86\x52\xa9\x8a\x14\x06\x0a\x47\x24\x7a\x94\x54\x83\xf3\x64\x63\xa7\xb6\x2c\x98\x8c\xd7\xc8\x24\x52\x99\x92\x24\x36\xc1\xed\x28\x14\xd1\x93\x4c\x32\x81\xbc\x56\x12\x63\x0d\x8f\x05\x40\x24\x4d\x92\x5d\x48\x19\x00\x83\x2c\xbb\x1f\xb8\x21\x1d\x47\x00\x4e\xfd\x6a\xb8\xe3\xd0\xd3\x5d\x01\xf0\xd9\xe2\x48\x9a\xcd\x98\x42\x67\xfc\xeb\x0a\x29\x2e\xf7\x01\xf8\x1c\x32\x85\x74\x96\x51\x59\x0a\x93\x96\x00\xe9\x8c\x41\xdb\x9c\xc4\x05\x54\x7d\x0c\xd5\x46\xd9\xea\xd6\xe2\xa7\xd2\xc8\x18\x78\xf6\xfc\x77\x86\x10\x91\x64\x1f\x48\x78\x17\x78\xf1\xed\xe9\xe9\xff\x2c\x89\x7d\xa3\x58\x68\xd7\x0a\x8f\xdc\x2d\x44\x96\x64\x1d\x85\xa4\xc0\x62\xab\x34\x2d\xaa\x01\x43\x75\xe8\x63\xdb\x03\x5c\xb1\x8e\x0f\x32\x9b\x67\xe4\xf8\xa0\x86\x34\xd4\x8e\xf6\x5f\x51\x77\xb4\xcf\xa8\xc3\xe2\xbf\xec\x59\x3a\xbb\x55\xed\x48\x9e\x4c\x3e\xa2\x17\xc0\xc3\x1e\x8d\x9e\xe8\xca\x60\x4b\x35\xdc\x97\x65\x09\xaf\xcb\xf7\xe5\xcf\xe7\xf5\xf2\x05\xca\xb2\xbc\x9f\x4a\xae\x1d\x2f\x45\xf2\x29\xce\xcf\x33\x5d\x71\xe5\x02\xd7\x90\x59\x18\x08\x1b\x65\x29\xc6\x55\x70\x1b\x3a\xb1\x00\x3a\x66\xff\x4a\x3c\x87\x00\x92\xc7\x35\x54\x1d\xa1\xe6\xee\x77\x9e\xba\x14\x3f\xbc\x4e\xb2\xa3\x34\xe7\xf7\xf5\x7a\xf5\x31\x65\x06\xa7\x7b\x43\x6f\xae\xb7\xf9\xa8\x26\x21\xab\xb1\xc9\xb9\xe5\x33\xd9\x71\xf5\xab\xc9\x4b\x8d\x73\xa3\x2f\x74\x6e\x14\x58\xd7\xd0\x47\xf6\x6d\x8e\x86\xb5\x87\xff\x85\xb2\xdb\x80\x47\xf4\xf8\xee\x3e\x4b\x99\x5a\xbf\x5f\xbd\xcb\xb8\xf1\xec\x3b\xfa\x62\x87\x48\x32\xe4\xce\x8f\xc8\x99\xb2\xb8\x42\x3e\x5c\x7b\xab\xda\x37\xf4\xf5\xbf\x2e\x7a\x33\xfd\x27\x00\x00\xff\xff\xb3\xe5\xbf\x80\x20\x05\x00\x00")
 
 func deploymentAppsOpenshiftTemplateServiceBrokerApiserverYamlBytes() ([]byte, error) {
@@ -6810,6 +6856,26 @@ func roleRbacAuthorizationK8sIoOpenshiftEtcdEtcdOperatorYaml() (*asset, error) {
 	return a, nil
 }
 
+var _roleRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsResizerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x8f\xbd\x4e\xec\x40\x0c\x85\xfb\x79\x0a\x2b\xf5\x4d\xae\xe8\xd0\xbc\x00\x1d\x05\x05\x0d\x4a\xe1\x24\x07\xd6\x4a\x32\x1e\xd9\x9e\x15\xec\xd3\xa3\xac\x40\xe2\xaf\xfe\x7c\x3e\x9f\xc3\x55\x1e\x61\x2e\x5a\x32\xd9\xc4\xf3\xc0\x2d\x4e\x6a\x72\xe1\x10\x2d\xc3\x7a\xeb\x83\xe8\xff\xf3\x4d\x5a\xa5\x2c\x99\x1e\x74\x43\xda\x11\xbc\x70\x70\x4e\x44\x85\x77\x78\xe5\x19\x99\xb4\xa2\xf8\x49\x9e\xa3\xdf\x11\x26\xb3\x7f\xe0\x4c\x6b\x9b\xd0\x7b\x70\xe0\x13\xf5\x06\x97\x0b\x2c\x59\xdb\xe0\x39\xf5\xc4\x55\xee\x4c\x5b\xf5\x4c\x4f\x5d\x37\x26\x22\x83\x6b\xb3\xf9\xc0\x44\x3d\x55\x5d\x0e\xe3\x19\x36\x5d\x6f\x5e\x10\xdd\xf8\x33\x88\xd7\x40\x39\xd6\xf8\x5f\x8a\x05\x75\xd3\xb7\x1d\x25\xfc\x0b\xbc\x3f\x26\x1c\xe1\xdf\x35\xaf\x92\x6f\x1f\xff\x51\xd7\xea\xc2\x81\x6e\x4c\xef\x01\x00\x00\xff\xff\x87\x39\x5e\x45\x3c\x01\x00\x00")
+
+func roleRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsResizerYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_roleRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsResizerYaml,
+		"Role.rbac.authorization.k8s.io/openshift-metrics/kube-state-metrics-resizer.yaml",
+	)
+}
+
+func roleRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsResizerYaml() (*asset, error) {
+	bytes, err := roleRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsResizerYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/openshift-metrics/kube-state-metrics-resizer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\xce\x31\x6e\xc3\x30\x0c\x85\xe1\x5d\xa7\x20\xbc\xcb\x45\xb7\x42\x17\xe8\xde\xa1\x3b\x6d\xbd\x24\x42\x62\x52\x20\xa9\x00\xed\xe9\x0b\xbb\x1e\x33\xf2\xe1\xc7\x07\x72\x6f\xdf\x30\x6f\x2a\x85\x6c\xe1\x75\xe6\x11\x37\xb5\xf6\xcb\xd1\x54\xe6\xfb\x87\xcf\x4d\xdf\x9e\xef\xe9\xde\xa4\x16\xfa\xd2\x07\xd2\x86\xe0\xca\xc1\x25\x11\xb1\x88\xc6\xd1\xfa\x7e\xd2\x4b\x64\x2c\x30\x41\xe0\xb0\x78\x84\x8e\x5e\x39\x50\x68\x0a\x1b\x98\x12\x91\xf0\x86\x42\xfe\xe3\x81\xad\x88\x56\xe4\x55\xe5\xd2\xae\xd9\xc0\x15\x76\x16\xde\x79\x45\x21\xed\x10\xbf\xb5\x4b\xe4\xbd\x4c\x36\x1e\xf0\x92\x32\x71\x6f\x9f\xa6\xa3\x1f\x9f\x64\x9a\x76\xd8\xe0\x3a\x6c\xc5\xb9\xfd\xab\x1b\x77\x4f\x44\x4f\xd8\x72\xee\x57\x44\xfa\x0b\x00\x00\xff\xff\x31\x34\xd1\x56\x0b\x01\x00\x00")
 
 func roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYamlBytes() ([]byte, error) {
@@ -7086,6 +7152,26 @@ func rolebindingRbacAuthorizationK8sIoOpenshiftEtcdEtcdOperatorYaml() (*asset, e
 	}
 
 	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/openshift-etcd/etcd-operator.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _rolebindingRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\x8d\x31\x4e\xc4\x40\x0c\x45\xfb\x39\x85\x2f\x90\x20\x3a\x34\x1d\x50\xd0\x07\x89\xde\x99\x38\xc4\x24\xb1\x47\xb6\x27\x05\xa7\x5f\xad\x76\xb5\xcd\x4a\xa9\xdf\x7f\xff\x61\xe5\x1f\x32\x67\x95\x0c\x36\x62\xe9\xb1\xc5\xa2\xc6\xff\x18\xac\xd2\xaf\x6f\xde\xb3\xbe\x1c\xaf\x90\x56\x96\x29\xc3\xe7\xd6\x3c\xc8\x06\xdd\xe8\x83\x65\x62\xf9\x4d\x3b\x05\x4e\x18\x98\x13\x80\xe0\x4e\x19\xd6\x36\x52\xe7\x81\x41\xdd\x4e\x61\x5c\x3c\x99\x6e\x34\xd0\x7c\xdd\x60\xe5\x2f\xd3\x56\x4f\x82\x09\xe0\x29\x77\xf6\xee\x6d\xfc\xa3\x12\x9e\x53\x77\x17\xbf\xc9\x0e\x2e\xf4\x5e\x8a\x36\x89\x33\xf7\x86\xbc\x62\xa1\x0c\x5a\x49\x7c\xe1\x39\x1e\xf8\x12\x00\x00\xff\xff\xe0\xf2\x2e\x5a\x21\x01\x00\x00")
+
+func rolebindingRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_rolebindingRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsYaml,
+		"RoleBinding.rbac.authorization.k8s.io/openshift-metrics/kube-state-metrics.yaml",
+	)
+}
+
+func rolebindingRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsYaml() (*asset, error) {
+	bytes, err := rolebindingRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/openshift-metrics/kube-state-metrics.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -7846,6 +7932,26 @@ func serviceOpenshiftMetricsAlertsYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "Service/openshift-metrics/alerts.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _serviceOpenshiftMetricsKubeStateMetricsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x84\xd0\xb1\x4e\xc3\x30\x10\xc6\xf1\x3d\x4f\x71\x5b\xa7\x40\xbb\x45\x5e\x79\x81\x4a\x20\xf6\xab\xfb\x41\xac\x24\xbe\xd3\xdd\xa5\x12\x6f\x8f\x12\x32\x84\x56\x88\xd1\xfe\xfe\xfa\xc9\x32\x6b\x79\x87\x79\x91\x9a\xe8\x76\x6a\x86\x52\xaf\x89\x5e\x61\xb7\x92\xd1\x4c\x08\xbe\x72\x70\x6a\x88\x2a\x4f\x48\x34\xcc\x17\xb4\x1e\x1c\x68\x27\x84\x95\xec\xdb\xe4\xca\x19\x89\x44\x51\xbd\x2f\x1f\xb1\x9b\x47\xbe\x60\xf4\xc5\x20\x1a\x3a\x6f\x59\xf5\x0f\x88\x6b\x95\xe0\x28\x52\xb7\x5c\x4d\x26\x44\x8f\xd9\x9f\x8a\x3c\x7b\x36\x56\x24\x3a\x84\xcd\x38\x34\xae\xc8\x4b\xa6\x62\xb1\xf6\xed\xf6\xc8\x3e\x42\x77\xea\x4f\x91\xa8\x3b\x76\xc7\xf5\x18\x6c\x9f\x88\xf3\x7a\xf9\xd8\x9a\x84\x64\x19\x13\xbd\xbd\x9c\x77\x68\x60\xc4\xd2\x7d\xfd\x16\x4f\x0f\xe2\x5d\x78\xc7\x39\x46\xe4\x10\xfb\xff\x3b\x9a\xef\x00\x00\x00\xff\xff\xc4\x37\x36\x01\x9b\x01\x00\x00")
+
+func serviceOpenshiftMetricsKubeStateMetricsYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_serviceOpenshiftMetricsKubeStateMetricsYaml,
+		"Service/openshift-metrics/kube-state-metrics.yaml",
+	)
+}
+
+func serviceOpenshiftMetricsKubeStateMetricsYaml() (*asset, error) {
+	bytes, err := serviceOpenshiftMetricsKubeStateMetricsYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Service/openshift-metrics/kube-state-metrics.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -9010,6 +9116,26 @@ func serviceaccountOpenshiftInfraUnidlingControllerYaml() (*asset, error) {
 	return a, nil
 }
 
+var _serviceaccountOpenshiftMetricsKubeStateMetricsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x3c\xc9\x31\x0e\x42\x21\x0c\x06\xe0\x9d\x53\xf4\x02\x6f\x70\xed\xe6\x19\x4c\xdc\x6b\xf9\x8d\x0d\xa1\x10\x5a\x38\xbf\x8b\x71\xfe\x64\xda\x13\x2b\x6c\x38\xd3\xb9\x95\x66\x5e\x99\x1e\x58\xc7\x14\x77\xd5\xb1\x3d\x4b\x47\x4a\x95\x14\x2e\x44\x2e\x1d\x4c\x6d\xbf\x70\x45\x4a\xe2\xea\xc8\x65\x1a\x3f\x8a\x29\x0a\xa6\x31\xe1\xf1\xb1\x77\xfe\xf9\x1b\x00\x00\xff\xff\x65\xfc\xa6\x13\x68\x00\x00\x00")
+
+func serviceaccountOpenshiftMetricsKubeStateMetricsYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_serviceaccountOpenshiftMetricsKubeStateMetricsYaml,
+		"ServiceAccount/openshift-metrics/kube-state-metrics.yaml",
+	)
+}
+
+func serviceaccountOpenshiftMetricsKubeStateMetricsYaml() (*asset, error) {
+	bytes, err := serviceaccountOpenshiftMetricsKubeStateMetricsYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ServiceAccount/openshift-metrics/kube-state-metrics.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _serviceaccountOpenshiftMetricsPrometheusNodeExporterYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x2c\xca\xb1\x0d\x03\x31\x08\x05\xd0\xde\x53\xb0\x80\x8b\xb4\xee\x32\x43\xa4\xf4\xc8\xfe\xd1\xa1\xc8\x80\x80\x3b\x65\xfc\x34\xd7\x3f\x76\x79\x23\x52\x4c\x07\x5d\x8f\xf6\x15\x5d\x83\x5e\x88\x4b\x26\x9e\x73\xda\xa9\xd5\x36\x8a\x17\x17\x8f\x46\xa4\xbc\x31\xc8\xc3\x36\xea\xc0\x99\x5d\x6d\xa1\xe3\xe7\x16\x85\xb8\x41\x3a\x4f\x0c\x32\x87\xe6\x21\x9f\xea\x1b\x15\x32\xb3\xfd\x03\x00\x00\xff\xff\x92\xbd\xe3\x1f\x6e\x00\x00\x00")
 
 func serviceaccountOpenshiftMetricsPrometheusNodeExporterYamlBytes() ([]byte, error) {
@@ -9892,6 +10018,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRole.rbac.authorization.k8s.io/cluster-reader.yaml":                                                                          clusterroleRbacAuthorizationK8sIoClusterReaderYaml,
 	"ClusterRole.rbac.authorization.k8s.io/cluster-status.yaml":                                                                          clusterroleRbacAuthorizationK8sIoClusterStatusYaml,
 	"ClusterRole.rbac.authorization.k8s.io/edit.yaml":                                                                                    clusterroleRbacAuthorizationK8sIoEditYaml,
+	"ClusterRole.rbac.authorization.k8s.io/kube-state-metrics.yaml":                                                                      clusterroleRbacAuthorizationK8sIoKubeStateMetricsYaml,
 	"ClusterRole.rbac.authorization.k8s.io/namespace-viewer.yaml":                                                                        clusterroleRbacAuthorizationK8sIoNamespaceViewerYaml,
 	"ClusterRole.rbac.authorization.k8s.io/registry-admin.yaml":                                                                          clusterroleRbacAuthorizationK8sIoRegistryAdminYaml,
 	"ClusterRole.rbac.authorization.k8s.io/registry-editor.yaml":                                                                         clusterroleRbacAuthorizationK8sIoRegistryEditorYaml,
@@ -10151,6 +10278,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Deployment.apps/openshift-ansible-service-broker/asb.yaml":                                                                          deploymentAppsOpenshiftAnsibleServiceBrokerAsbYaml,
 	"Deployment.apps/openshift-etcd/etcd-operator.yaml":                                                                                  deploymentAppsOpenshiftEtcdEtcdOperatorYaml,
 	"Deployment.apps/openshift-infra/bootstrap-autoapprover.yaml":                                                                        deploymentAppsOpenshiftInfraBootstrapAutoapproverYaml,
+	"Deployment.apps/openshift-metrics/kube-state-metrics.yaml":                                                                          deploymentAppsOpenshiftMetricsKubeStateMetricsYaml,
 	"Deployment.apps/openshift-template-service-broker/apiserver.yaml":                                                                   deploymentAppsOpenshiftTemplateServiceBrokerApiserverYaml,
 	"Deployment.apps/openshift-web-console/webconsole.yaml":                                                                              deploymentAppsOpenshiftWebConsoleWebconsoleYaml,
 	"EtcdBackup.etcd.database.coreos.com/openshift-etcd/etcd-backup.yaml":                                                                etcdbackupEtcdDatabaseCoreosComOpenshiftEtcdEtcdBackupYaml,
@@ -10196,6 +10324,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                                                    roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
 	"Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml":                                                               roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml,
 	"Role.rbac.authorization.k8s.io/openshift-etcd/etcd-operator.yaml":                                                                   roleRbacAuthorizationK8sIoOpenshiftEtcdEtcdOperatorYaml,
+	"Role.rbac.authorization.k8s.io/openshift-metrics/kube-state-metrics-resizer.yaml":                                                   roleRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsResizerYaml,
 	"Role.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml":                                                       roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml,
 	"Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                            roleRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml":                                          rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
@@ -10210,6 +10339,7 @@ var _bindata = map[string]func() (*asset, error){
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                                             rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-viewers.yaml":                                                       rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-etcd/etcd-operator.yaml":                                                            rolebindingRbacAuthorizationK8sIoOpenshiftEtcdEtcdOperatorYaml,
+	"RoleBinding.rbac.authorization.k8s.io/openshift-metrics/kube-state-metrics.yaml":                                                    rolebindingRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-node/sync-node-config-reader-binding.yaml":                                          rolebindingRbacAuthorizationK8sIoOpenshiftNodeSyncNodeConfigReaderBindingYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-node/system-node-config-reader.yaml":                                                rolebindingRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                     rolebindingRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
@@ -10248,6 +10378,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Service/openshift-ansible-service-broker/asb.yaml":                                                                                  serviceOpenshiftAnsibleServiceBrokerAsbYaml,
 	"Service/openshift-metrics/alertmanager.yaml":                                                                                        serviceOpenshiftMetricsAlertmanagerYaml,
 	"Service/openshift-metrics/alerts.yaml":                                                                                              serviceOpenshiftMetricsAlertsYaml,
+	"Service/openshift-metrics/kube-state-metrics.yaml":                                                                                  serviceOpenshiftMetricsKubeStateMetricsYaml,
 	"Service/openshift-metrics/prometheus-node-exporter.yaml":                                                                            serviceOpenshiftMetricsPrometheusNodeExporterYaml,
 	"Service/openshift-metrics/prometheus.yaml":                                                                                          serviceOpenshiftMetricsPrometheusYaml,
 	"Service/openshift-template-service-broker/apiserver.yaml":                                                                           serviceOpenshiftTemplateServiceBrokerApiserverYaml,
@@ -10306,6 +10437,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ServiceAccount/openshift-infra/template-instance-controller.yaml":                                                                   serviceaccountOpenshiftInfraTemplateInstanceControllerYaml,
 	"ServiceAccount/openshift-infra/template-instance-finalizer-controller.yaml":                                                         serviceaccountOpenshiftInfraTemplateInstanceFinalizerControllerYaml,
 	"ServiceAccount/openshift-infra/unidling-controller.yaml":                                                                            serviceaccountOpenshiftInfraUnidlingControllerYaml,
+	"ServiceAccount/openshift-metrics/kube-state-metrics.yaml":                                                                           serviceaccountOpenshiftMetricsKubeStateMetricsYaml,
 	"ServiceAccount/openshift-metrics/prometheus-node-exporter.yaml":                                                                     serviceaccountOpenshiftMetricsPrometheusNodeExporterYaml,
 	"ServiceAccount/openshift-metrics/prometheus-reader.yaml":                                                                            serviceaccountOpenshiftMetricsPrometheusReaderYaml,
 	"ServiceAccount/openshift-metrics/prometheus.yaml":                                                                                   serviceaccountOpenshiftMetricsPrometheusYaml,
@@ -10403,6 +10535,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"cluster-reader.yaml":                                                       {clusterroleRbacAuthorizationK8sIoClusterReaderYaml, map[string]*bintree{}},
 		"cluster-status.yaml":                                                       {clusterroleRbacAuthorizationK8sIoClusterStatusYaml, map[string]*bintree{}},
 		"edit.yaml":                                                                 {clusterroleRbacAuthorizationK8sIoEditYaml, map[string]*bintree{}},
+		"kube-state-metrics.yaml":                                                   {clusterroleRbacAuthorizationK8sIoKubeStateMetricsYaml, map[string]*bintree{}},
 		"namespace-viewer.yaml":                                                     {clusterroleRbacAuthorizationK8sIoNamespaceViewerYaml, map[string]*bintree{}},
 		"registry-admin.yaml":                                                       {clusterroleRbacAuthorizationK8sIoRegistryAdminYaml, map[string]*bintree{}},
 		"registry-editor.yaml":                                                      {clusterroleRbacAuthorizationK8sIoRegistryEditorYaml, map[string]*bintree{}},
@@ -10704,6 +10837,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"openshift-infra": {nil, map[string]*bintree{
 			"bootstrap-autoapprover.yaml": {deploymentAppsOpenshiftInfraBootstrapAutoapproverYaml, map[string]*bintree{}},
 		}},
+		"openshift-metrics": {nil, map[string]*bintree{
+			"kube-state-metrics.yaml": {deploymentAppsOpenshiftMetricsKubeStateMetricsYaml, map[string]*bintree{}},
+		}},
 		"openshift-template-service-broker": {nil, map[string]*bintree{
 			"apiserver.yaml": {deploymentAppsOpenshiftTemplateServiceBrokerApiserverYaml, map[string]*bintree{}},
 		}},
@@ -10777,6 +10913,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"openshift-etcd": {nil, map[string]*bintree{
 			"etcd-operator.yaml": {roleRbacAuthorizationK8sIoOpenshiftEtcdEtcdOperatorYaml, map[string]*bintree{}},
 		}},
+		"openshift-metrics": {nil, map[string]*bintree{
+			"kube-state-metrics-resizer.yaml": {roleRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsResizerYaml, map[string]*bintree{}},
+		}},
 		"openshift-node": {nil, map[string]*bintree{
 			"system-node-config-reader.yaml": {roleRbacAuthorizationK8sIoOpenshiftNodeSystemNodeConfigReaderYaml, map[string]*bintree{}},
 		}},
@@ -10806,6 +10945,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"openshift-etcd": {nil, map[string]*bintree{
 			"etcd-operator.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftEtcdEtcdOperatorYaml, map[string]*bintree{}},
+		}},
+		"openshift-metrics": {nil, map[string]*bintree{
+			"kube-state-metrics.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsYaml, map[string]*bintree{}},
 		}},
 		"openshift-node": {nil, map[string]*bintree{
 			"sync-node-config-reader-binding.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftNodeSyncNodeConfigReaderBindingYaml, map[string]*bintree{}},
@@ -10884,6 +11026,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"openshift-metrics": {nil, map[string]*bintree{
 			"alertmanager.yaml":             {serviceOpenshiftMetricsAlertmanagerYaml, map[string]*bintree{}},
 			"alerts.yaml":                   {serviceOpenshiftMetricsAlertsYaml, map[string]*bintree{}},
+			"kube-state-metrics.yaml":       {serviceOpenshiftMetricsKubeStateMetricsYaml, map[string]*bintree{}},
 			"prometheus-node-exporter.yaml": {serviceOpenshiftMetricsPrometheusNodeExporterYaml, map[string]*bintree{}},
 			"prometheus.yaml":               {serviceOpenshiftMetricsPrometheusYaml, map[string]*bintree{}},
 		}},
@@ -10964,6 +11107,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"unidling-controller.yaml":                      {serviceaccountOpenshiftInfraUnidlingControllerYaml, map[string]*bintree{}},
 		}},
 		"openshift-metrics": {nil, map[string]*bintree{
+			"kube-state-metrics.yaml":       {serviceaccountOpenshiftMetricsKubeStateMetricsYaml, map[string]*bintree{}},
 			"prometheus-node-exporter.yaml": {serviceaccountOpenshiftMetricsPrometheusNodeExporterYaml, map[string]*bintree{}},
 			"prometheus-reader.yaml":        {serviceaccountOpenshiftMetricsPrometheusReaderYaml, map[string]*bintree{}},
 			"prometheus.yaml":               {serviceaccountOpenshiftMetricsPrometheusYaml, map[string]*bintree{}},
