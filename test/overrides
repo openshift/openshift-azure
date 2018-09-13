@@ -1,0 +1,3 @@
+# placeholder file to overwrite ci-operator variables for tests
+# example: 
+# export TEST_FOCUS="my-awesome-test-I-want-to-run"
