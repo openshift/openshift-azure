@@ -3,7 +3,9 @@
 usage() {
     cat <<EOF >&2
 usage:
+
 $0 get-config resourcegroup
+
 EOF
     exit 1
 }
