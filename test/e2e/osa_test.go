@@ -3,13 +3,15 @@
 package e2e
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -24,17 +26,12 @@ type testClient struct {
 var c testClient
 
 var _ = BeforeSuite(func() {
-	cwd, _ := os.Getwd()
-	// The current working dir of these tests is down a few levels from the root of the project.
-	// We should traverse up that path so we can find the _data dir
-	configPath := filepath.Join(cwd, "../../_data/containerservice.yaml")
-	cs, err := managedcluster.ReadConfig(configPath)
+	var err error
+	c.cs, err = managedcluster.ReadConfig("../../_data/containerservice.yaml")
 	Expect(err).NotTo(HaveOccurred())
-	c.cs = cs
 
-	kc, err := managedcluster.ClientsetFromConfig(cs)
+	c.kc, err = managedcluster.ClientsetFromConfig(c.cs)
 	Expect(err).NotTo(HaveOccurred())
-	c.kc = kc
 })
 
 var _ = Describe("Openshift on Azure e2e tests", func() {
@@ -53,7 +50,7 @@ var _ = Describe("Openshift on Azure e2e tests", func() {
 				"region":                        "infra",
 			},
 		}
-		list, err := c.kc.Core().Nodes().List(metav1.ListOptions{})
+		list, err := c.kc.CoreV1().Nodes().List(metav1.ListOptions{})
 		Expect(err).NotTo(HaveOccurred())
 
 		for _, node := range list.Items {
@@ -63,5 +60,27 @@ var _ = Describe("Openshift on Azure e2e tests", func() {
 				Expect(node.Labels).To(HaveKeyWithValue(k, v))
 			}
 		}
+	})
+
+	It("should start prometheus correctly", func() {
+		err := wait.Poll(2*time.Second, 20*time.Minute, func() (bool, error) {
+			ss, err := c.kc.AppsV1().StatefulSets("openshift-metrics").Get("prometheus", metav1.GetOptions{})
+			switch {
+			case kerrors.IsNotFound(err):
+				return false, nil
+			case err == nil:
+				specReplicas := int32(1)
+				if ss.Spec.Replicas != nil {
+					specReplicas = *ss.Spec.Replicas
+				}
+				return specReplicas == ss.Status.Replicas &&
+					specReplicas == ss.Status.ReadyReplicas &&
+					specReplicas == ss.Status.CurrentReplicas &&
+					ss.Generation == ss.Status.ObservedGeneration, nil
+			default:
+				return false, err
+			}
+		})
+		Expect(err).ToNot(HaveOccurred())
 	})
 })
