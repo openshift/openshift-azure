@@ -162,13 +162,14 @@ func setPodTemplateAnnotation(key, value string, o unstructured.Unstructured) {
 // resource filters
 var (
 	nsFilter = func(o unstructured.Unstructured) bool {
-		return o.GroupVersionKind().Kind == "Namespace"
+		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "Namespace"}
 	}
 	saFilter = func(o unstructured.Unstructured) bool {
-		return o.GroupVersionKind().Kind == "ServiceAccount"
+		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "ServiceAccount"}
 	}
 	cfgFilter = func(o unstructured.Unstructured) bool {
-		return o.GroupVersionKind().Kind == "Secret" || o.GroupVersionKind().Kind == "ConfigMap"
+		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "Secret"} ||
+			o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "ConfigMap"}
 	}
 	nonScFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().Group != "servicecatalog.k8s.io"
@@ -177,7 +178,10 @@ var (
 		return o.GroupVersionKind().Group == "servicecatalog.k8s.io"
 	}
 	crdFilter = func(o unstructured.Unstructured) bool {
-		return o.GroupVersionKind().Kind == "CustomResourceDefinition"
+		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "apiextensions.k8s.io", Kind: "CustomResourceDefinition"}
+	}
+	storageClassFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "storage.k8s.io", Kind: "StorageClass"}
 	}
 )
 
@@ -206,6 +210,10 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	}
 	// create all secrets and configmaps
 	if err := client.ApplyResources(cfgFilter, db, keys); err != nil {
+		return err
+	}
+	// default storage class must be created before PVCs as the admission controller is edge-triggered
+	if err := client.ApplyResources(storageClassFilter, db, keys); err != nil {
 		return err
 	}
 
