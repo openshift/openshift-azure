@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"flag"
+	"io"
 	"io/ioutil"
+	"net/http"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
@@ -13,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/addons"
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
@@ -99,11 +102,22 @@ func sync() error {
 
 	blob := c.GetBlobReference("config")
 
-	rc, err := blob.Get(nil)
+	logrus.Print("reading config blob")
+	var rc io.ReadCloser
+	err = wait.PollImmediateInfinite(time.Second, func() (bool, error) {
+		rc, err = blob.Get(nil)
+
+		if err, ok := err.(azstorage.AzureStorageServiceError); ok && err.StatusCode == http.StatusNotFound {
+			return false, nil
+		}
+
+		return err == nil, err
+	})
 	if err != nil {
 		return err
 	}
 	defer rc.Close()
+	logrus.Print("read config blob")
 
 	b, err = ioutil.ReadAll(rc)
 	if err != nil {

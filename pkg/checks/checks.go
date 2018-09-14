@@ -13,12 +13,12 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/upgrade"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -101,7 +101,7 @@ func WaitForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urlto
 	if err != nil {
 		return err
 	}
-	return wait.PollUntil(time.Second, func() (bool, error) {
+	return wait.PollImmediateUntil(time.Second, func() (bool, error) {
 		resp, err := cli.Do(req)
 		if err, ok := err.(*url.Error); ok {
 			if err, ok := err.Err.(*net.OpError); ok {
@@ -164,7 +164,7 @@ func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
 	for _, app := range daemonsetWhitelist {
 		log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
 
-		err := wait.PollUntil(2*time.Second, func() (bool, error) {
+		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
 			ds, err := kc.AppsV1().DaemonSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
 			switch {
 			case kerrors.IsNotFound(err):
@@ -186,7 +186,7 @@ func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
 	for _, app := range deploymentWhitelist {
 		log.Infof("checking deployment %s/%s", app.Namespace, app.Name)
 
-		err := wait.PollUntil(2*time.Second, func() (bool, error) {
+		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
 			d, err := kc.AppsV1().Deployments(app.Namespace).Get(app.Name, metav1.GetOptions{})
 			switch {
 			case kerrors.IsNotFound(err):

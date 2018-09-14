@@ -218,7 +218,7 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	}
 
 	log.Debug("Waiting for the Etcd CRD to be ready")
-	if err := wait.PollInfinite(time.Second, client.EtcdCRDReady); err != nil {
+	if err := wait.PollImmediateInfinite(time.Second, client.EtcdCRDReady); err != nil {
 		return err
 	}
 	log.Debug("Etcd CRD is ready")
@@ -236,7 +236,7 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	// wait for the service catalog api extension to arrive. TODO: we should do
 	// this dynamically, and should not PollInfinite.
 	log.Debug("Waiting for the service catalog api to get aggregated")
-	if err := wait.PollInfinite(time.Second, client.ServiceCatalogExists); err != nil {
+	if err := wait.PollImmediateInfinite(time.Second, client.ServiceCatalogExists); err != nil {
 		return err
 	}
 	log.Debug("Service catalog api is aggregated")
