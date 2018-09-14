@@ -68,7 +68,6 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.LogBridgeImage != "", "logbridge image")
 
 	assert(omc.Properties.PublicHostname != "", "public host name")
-	assert(omc.Properties.RouterProfiles[0].PublicSubdomain != "", "router public subdomain")
 
 	assert(c.ServiceAccountKey != nil, "service account key")
 	assert(len(c.HtPasswd) != 0, "htpassword")
@@ -124,14 +123,14 @@ func TestSelectDNSNames(t *testing.T) {
 	}{
 		"test no PublicHostname": {
 			f: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.PublicHostname = ""
+				cs.Properties.PublicHostname = "www.example.com"
 				cs.Properties.RouterProfiles[0].PublicSubdomain = ""
 			},
 			expected: func(cs *api.OpenShiftManagedCluster) {
 				cs.Config.MasterLBCNamePrefix = "www"
 
 				cs.Properties.PublicHostname = "www.example.com"
-				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-fqdn.example.com"
+				cs.Properties.RouterProfiles[0].PublicSubdomain = ""
 			},
 		},
 		"test no PublicSubdomain for router": {
@@ -143,7 +142,7 @@ func TestSelectDNSNames(t *testing.T) {
 				cs.Config.MasterLBCNamePrefix = "www"
 
 				cs.Properties.PublicHostname = "console.example.com"
-				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-fqdn.example.com"
+				cs.Properties.RouterProfiles[0].PublicSubdomain = ""
 			},
 		},
 		"test master & router prefix configuration": {

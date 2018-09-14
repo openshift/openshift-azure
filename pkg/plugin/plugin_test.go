@@ -57,8 +57,8 @@ func TestMerge(t *testing.T) {
 	if newCluster.Properties.AuthProfile == nil {
 		t.Errorf("new cluster auth profile should be merged")
 	}
-	if newCluster.Properties.FQDN == "" {
-		t.Errorf("new cluster fqdn should be merged")
+	if newCluster.Properties.FQDN != "" {
+		t.Errorf("new cluster fqdn should not be merged")
 	}
 
 	armTemplate = testPluginRun(p, newCluster, oldCluster, t)
