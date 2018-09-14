@@ -21,10 +21,11 @@ import (
 )
 
 var (
-	dryRun   = flag.Bool("dry-run", false, "Print resources to be synced instead of mutating cluster state.")
-	once     = flag.Bool("run-once", false, "If true, run only once then quit.")
-	interval = flag.Duration("interval", 3*time.Minute, "How often the sync process going to be rerun.")
-	logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
+	dryRun    = flag.Bool("dry-run", false, "Print resources to be synced instead of mutating cluster state.")
+	once      = flag.Bool("run-once", false, "If true, run only once then quit.")
+	interval  = flag.Duration("interval", 3*time.Minute, "How often the sync process going to be rerun.")
+	logLevel  = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
+	gitCommit = "unknown"
 )
 
 type azureStorageClient struct {
@@ -130,6 +131,7 @@ func main() {
 	flag.Parse()
 	logrus.SetLevel(log.SanitizeLogLevel(*logLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+	logrus.Printf("sync pod starting, git commit %s", gitCommit)
 	for {
 		if err := sync(); err != nil {
 			logrus.Printf("Error while syncing: %v", err)
