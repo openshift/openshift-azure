@@ -5,7 +5,7 @@ build:
 	go build ./...
 
 clean:
-	rm -f sync
+	rm -f sync COMMIT_ID
 
 test: unit e2e
 
@@ -23,6 +23,7 @@ logbridge-push: logbridge-image
 	docker push quay.io/openshift-on-azure/logbridge:latest
 
 sync: clean generate
+	(git rev-parse --short HEAD) > COMMIT_ID
 	CGO_ENABLED=0 go build ./cmd/sync
 
 TAG ?= $(shell git rev-parse --short HEAD)
