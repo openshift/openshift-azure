@@ -31,7 +31,7 @@ done
 
 shift $((OPTIND-1))
 RESOURCEGROUP=$1
-shift
+shift || true
 
 trap cleanup EXIT
 
