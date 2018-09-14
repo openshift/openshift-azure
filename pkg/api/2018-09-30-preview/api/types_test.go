@@ -53,11 +53,9 @@ var unmarshalled = &OpenShiftManagedCluster{
 			},
 		},
 		MasterPoolProfile: &MasterPoolProfile{
-			Name:         "properties.agentPoolProfiles.0.name",
 			Count:        1,
 			VMSize:       "properties.agentPoolProfiles.0.vmSize",
 			VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-			OSType:       "properties.agentPoolProfiles.0.osType",
 		},
 		AgentPoolProfiles: []AgentPoolProfile{
 			{
@@ -113,11 +111,9 @@ var marshalled = []byte(`{
 			}
 		],
 		"masterPoolProfile": {
-			"name": "properties.agentPoolProfiles.0.name",
 			"count": 1,
 			"vmSize": "properties.agentPoolProfiles.0.vmSize",
-			"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
-			"osType": "properties.agentPoolProfiles.0.osType"
+			"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID"
 		},
 		"agentPoolProfiles": [
 			{
@@ -177,14 +173,21 @@ func TestUnmarshal(t *testing.T) {
 func TestStructTypes(t *testing.T) {
 	// AgentPoolProfile and MasterPoolProfile types should be identical bar
 	// `Role AgentPoolProfileRole` in the former
+	// MasterPoolProfile has removed OsType, Name
 	app := reflect.TypeOf(AgentPoolProfile{})
 	mpp := reflect.TypeOf(MasterPoolProfile{})
-	if app.NumField() != mpp.NumField()+1 {
+	// Add 3 for Role,OsType,Name which are missing from MasterPoolProfile
+	if app.NumField() != mpp.NumField()+3 {
 		t.Fatalf("mismatch in number of fields: %d vs %d", mpp.NumField(), app.NumField())
 	}
 	for i := 0; i < mpp.NumField(); i++ {
-		if !reflect.DeepEqual(app.Field(i), mpp.Field(i)) {
-			t.Errorf("mismatch in field %d:\n%#v\n%#v", i, app.Field(i), mpp.Field(i))
+		mf := mpp.Field(i)
+		af, found := app.FieldByName(mf.Name)
+		if !found {
+			t.Errorf("field not found in agentpoolprofile: %s", mf.Name)
+		}
+		if !(mf.Type == af.Type || mf.Tag == af.Tag) {
+			t.Errorf("mismatch in field %d:\n%#v\n%#v", i, af, mf)
 		}
 	}
 	if app.Field(app.NumField()-1).Name != "Role" {
