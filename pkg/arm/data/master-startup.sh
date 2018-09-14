@@ -36,7 +36,7 @@ echo "BOOTSTRAP_CONFIG_NAME=node-config-master" >>/etc/sysconfig/${SERVICE_TYPE}
 
 #sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-node
 
-for dst in tcp,2380; do
+for dst in tcp,2380 tcp,444; do
 #for dst in tcp,2379 tcp,2380 tcp,8443 tcp,8444 tcp,8053 udp,8053 tcp,9090; do
 	proto=${dst%%,*}
 	port=${dst##*,}
