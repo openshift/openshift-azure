@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"net"
+	"os"
 
 	"github.com/ghodss/yaml"
 	"github.com/satori/go.uuid"
@@ -18,7 +19,7 @@ import (
 func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 	c := cs.Config
 
-	selectNodeImage(cs)
+	selectNodeImage(cs, os.Getenv("DEPLOY_OS"))
 
 	selectContainerImages(cs)
 
