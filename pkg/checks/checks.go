@@ -80,14 +80,6 @@ var daemonsetWhitelist = []struct {
 		Name:      "sync",
 		Namespace: "openshift-node",
 	},
-	{
-		Name:      "ovs",
-		Namespace: "openshift-sdn",
-	},
-	{
-		Name:      "sdn",
-		Namespace: "openshift-sdn",
-	},
 }
 
 // WaitForHTTPStatusOk poll until URL returns 200
