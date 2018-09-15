@@ -4,7 +4,7 @@ usage() {
     cat <<EOF >&2
 usage:
 
-$0 [ resourcegroup ] [ -n {0,1,2} ]
+$0 [ -n {0,1,2} ] [ resourcegroup ]
 
 EOF
     exit 1
@@ -31,7 +31,6 @@ done
 
 shift $((OPTIND-1))
 RESOURCEGROUP=$1
-shift || true
 
 trap cleanup EXIT
 
@@ -50,5 +49,4 @@ IP=$(az vmss list-instance-public-ips -g $RESOURCEGROUP -n ss-master --query "[$
 eval "$(ssh-agent)"
 ssh-add $ID_RSA 2>/dev/null
 
-ssh -A -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    -i $ID_RSA "$@" cloud-user@$IP
+ssh -A -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no cloud-user@$IP
