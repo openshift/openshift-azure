@@ -38,6 +38,11 @@ func masterWaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster,
 }
 
 func masterIsReady(kc *kubernetes.Clientset, nodeName string) (bool, error) {
+	ready, err := nodeIsReady(kc, nodeName)
+	if !ready || err != nil {
+		return ready, err
+	}
+
 	etcdPod, err := kc.CoreV1().Pods("kube-system").Get("etcd-"+nodeName, metav1.GetOptions{})
 	switch {
 	case err == nil:
