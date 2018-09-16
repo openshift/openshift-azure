@@ -40,7 +40,7 @@ func Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, i initialize.I
 	}
 
 	log.Info("waiting for arm template deployment to complete")
-	err = future.WaitForCompletion(ctx, dcli.Client)
+	err = future.WaitForCompletionRef(ctx, dcli.Client)
 	if err != nil {
 		return err
 	}

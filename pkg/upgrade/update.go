@@ -163,7 +163,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			return err
 		}
 
-		if err := future.WaitForCompletion(ctx, ssc.Client); err != nil {
+		if err := future.WaitForCompletionRef(ctx, ssc.Client); err != nil {
 			return err
 		}
 
@@ -220,7 +220,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 				return err
 			}
 
-			err = future.WaitForCompletion(ctx, vmc.Client)
+			err = future.WaitForCompletionRef(ctx, vmc.Client)
 			if err != nil {
 				return err
 			}
@@ -235,7 +235,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 				return err
 			}
 
-			err = future.WaitForCompletion(ctx, ssc.Client)
+			err = future.WaitForCompletionRef(ctx, ssc.Client)
 			if err != nil {
 				return err
 			}
@@ -248,7 +248,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 				return err
 			}
 
-			err = future.WaitForCompletion(ctx, vmc.Client)
+			err = future.WaitForCompletionRef(ctx, vmc.Client)
 			if err != nil {
 				return err
 			}
@@ -261,7 +261,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 				return err
 			}
 
-			err = future.WaitForCompletion(ctx, vmc.Client)
+			err = future.WaitForCompletionRef(ctx, vmc.Client)
 			if err != nil {
 				return err
 			}
@@ -312,5 +312,5 @@ func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedClu
 		return err
 	}
 
-	return future.WaitForCompletion(ctx, vmc.Client)
+	return future.WaitForCompletionRef(ctx, vmc.Client)
 }
