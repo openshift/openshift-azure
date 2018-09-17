@@ -44,6 +44,8 @@ type Config struct {
 	PrometheusAlertManagerImage string `json:"prometheusAlertManagerImage,omitempty"`
 	LogBridgeImage              string `json:"logBridgeImage,omitempty"`
 	EtcdOperatorImage           string `json:"etcdOperatorImage,omitempty"`
+	KubeStateMetricsImage       string `json:"kubeStateMetricsImage,omitempty"`
+	AddonsResizerImage          string `json:"addonsResizerImage,omitempty"`
 
 	// kubeconfigs
 	AdminKubeconfig              *v1.Config `json:"adminKubeconfig,omitempty"`

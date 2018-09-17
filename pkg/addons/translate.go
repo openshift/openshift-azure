@@ -311,6 +311,16 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.TemplateServiceBrokerImage }}",
 		},
 	},
+	"Deployment.apps/openshift-metrics/kube-state-metrics": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='kube-state-metrics')].image"),
+			Template: "{{ .Config.KubeStateMetricsImage }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='addon-resizer')].image"),
+			Template: "{{ .Config.AddonsResizerImage }}",
+		},
+	},
 	"Deployment.apps/openshift-web-console/webconsole": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
