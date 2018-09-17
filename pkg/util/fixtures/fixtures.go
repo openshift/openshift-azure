@@ -1,6 +1,9 @@
 package fixtures
 
-import "github.com/openshift/openshift-azure/pkg/api"
+import (
+	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/openshift/openshift-azure/pkg/api"
+)
 
 // NewTestOpenShiftCluster is a test cluster definition that can be use in unit testing plugin methods.
 func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
@@ -37,21 +40,21 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 				{
 					Name:   "master",
 					Role:   api.AgentPoolProfileRoleMaster,
-					Count:  3,
+					Count:  to.IntPtr(3),
 					VMSize: "Standard_D2s_v3",
 					OSType: "Linux",
 				},
 				{
 					Name:   "infra",
 					Role:   api.AgentPoolProfileRoleInfra,
-					Count:  2,
+					Count:  to.IntPtr(2),
 					VMSize: "Standard_D2s_v3",
 					OSType: "Linux",
 				},
 				{
 					Name:   "compute",
 					Role:   api.AgentPoolProfileRoleCompute,
-					Count:  1,
+					Count:  to.IntPtr(1),
 					VMSize: "Standard_D2s_v3",
 					OSType: "Linux",
 				},

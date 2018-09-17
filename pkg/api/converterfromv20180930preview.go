@@ -1,6 +1,8 @@
 package api
 
 import (
+	"github.com/Azure/go-autorest/autorest/to"
+
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
@@ -43,25 +45,31 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster) *
 
 		cs.Properties.AgentPoolProfiles = make([]AgentPoolProfile, 0, len(oc.Properties.AgentPoolProfiles)+1)
 		for _, app := range oc.Properties.AgentPoolProfiles {
-			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, AgentPoolProfile{
+			newApp := AgentPoolProfile{
 				Name:         app.Name,
-				Count:        app.Count,
 				VMSize:       VMSize(app.VMSize),
 				OSType:       OSType(app.OSType),
 				VnetSubnetID: app.VnetSubnetID,
 				Role:         AgentPoolProfileRole(app.Role),
-			})
+			}
+			if app.Count != nil {
+				newApp.Count = to.IntPtr(*app.Count)
+			}
+			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, newApp)
 		}
 
 		if oc.Properties.MasterPoolProfile != nil {
-			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, AgentPoolProfile{
+			newApp := AgentPoolProfile{
 				Name:         string(AgentPoolProfileRoleMaster),
-				Count:        oc.Properties.MasterPoolProfile.Count,
 				VMSize:       VMSize(oc.Properties.MasterPoolProfile.VMSize),
 				OSType:       OSTypeLinux,
 				VnetSubnetID: oc.Properties.MasterPoolProfile.VnetSubnetID,
 				Role:         AgentPoolProfileRoleMaster,
-			})
+			}
+			if oc.Properties.MasterPoolProfile.Count != nil {
+				newApp.Count = to.IntPtr(*oc.Properties.MasterPoolProfile.Count)
+			}
+			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, newApp)
 		}
 
 		if oc.Properties.AuthProfile != nil {

@@ -1,6 +1,8 @@
 package api
 
 import (
+	"github.com/Azure/go-autorest/autorest/to"
+
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
@@ -45,20 +47,27 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 		for _, app := range cs.Properties.AgentPoolProfiles {
 			if app.Role == AgentPoolProfileRoleMaster {
 				oc.Properties.MasterPoolProfile = &v20180930preview.MasterPoolProfile{
-					Count:        app.Count,
 					VMSize:       v20180930preview.VMSize(app.VMSize),
 					VnetSubnetID: app.VnetSubnetID,
 				}
+				if app.Count != nil {
+					oc.Properties.MasterPoolProfile.Count = to.IntPtr(*app.Count)
+				}
 
 			} else {
-				oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, v20180930preview.AgentPoolProfile{
+				newApp := v20180930preview.AgentPoolProfile{
 					Name:         app.Name,
 					Count:        app.Count,
 					VMSize:       v20180930preview.VMSize(app.VMSize),
 					OSType:       v20180930preview.OSType(app.OSType),
 					VnetSubnetID: app.VnetSubnetID,
 					Role:         v20180930preview.AgentPoolProfileRole(app.Role),
-				})
+				}
+				if app.Count != nil {
+					newApp.Count = to.IntPtr(*app.Count)
+				}
+
+				oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, newApp)
 			}
 		}
 

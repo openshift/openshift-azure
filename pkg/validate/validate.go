@@ -181,21 +181,21 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 		if !rxAgentPoolProfileName.MatchString(app.Name) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 		}
-		if app.Count < 1 || app.Count > 5 {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
+		if app.Count == nil || *app.Count < 1 || *app.Count > 5 {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count", app.Name))
 		}
 
 	case api.AgentPoolProfileRoleInfra:
 		if app.Name != string(app.Role) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 		}
-		if app.Count != 2 {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
+		if app.Count == nil || *app.Count != 2 {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count", app.Name))
 		}
 
 	case api.AgentPoolProfileRoleMaster:
-		if app.Count != 3 {
-			errs = append(errs, fmt.Errorf("invalid masterPoolProfile.count %d", app.Count))
+		if app.Count == nil || *app.Count != 3 {
+			errs = append(errs, fmt.Errorf("invalid masterPoolProfile.count"))
 		}
 	}
 

@@ -42,7 +42,10 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 		}
 
 		for i, vm := range vms {
-			if i < agent.Count {
+			if agent.Count == nil {
+				return fmt.Errorf("agent.Count was nil")
+			}
+			if i < *agent.Count {
 				vmsBefore[*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName] = struct{}{}
 
 			} else {
@@ -103,14 +106,17 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	return nil
 }
 
-func getCount(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) int {
+func getCount(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) (int, error) {
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		if app.Role == role {
-			return app.Count
+			if app.Count == nil {
+				return 0, fmt.Errorf("app.Count was nil")
+			}
+			return *app.Count, nil
 		}
 	}
 
-	panic("invalid role")
+	return 0, fmt.Errorf("invalid role")
 }
 
 func ListVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc compute.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole) ([]compute.VirtualMachineScaleSetVM, error) {
@@ -135,7 +141,10 @@ func ListVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc compute.V
 // updatePlusOne creates an extra VM, then runs updateInPlace, then removes the
 // extra VM.
 func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole) error {
-	count := getCount(cs, role)
+	count, err := getCount(cs, role)
+	if err != nil {
+		return err
+	}
 
 	// store a list of all the VM instances now, so that if we end up creating
 	// new ones (in the crash recovery case, we might not), we can detect which

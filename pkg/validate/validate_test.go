@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ghodss/yaml"
 
@@ -254,11 +255,11 @@ func TestValidate(t *testing.T) {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				for i, app := range oc.Properties.AgentPoolProfiles {
 					if app.Role == api.AgentPoolProfileRoleMaster {
-						oc.Properties.AgentPoolProfiles[i].Count = 1
+						oc.Properties.AgentPoolProfiles[i].Count = to.IntPtr(1)
 					}
 				}
 			},
-			expectedErrs: []error{errors.New(`invalid masterPoolProfile.count 1`)},
+			expectedErrs: []error{errors.New(`invalid masterPoolProfile.count`)},
 		},
 		//we dont check authProfile because it is non pointer struct. Which is all zero values.
 		"authProfile.identityProviders empty": {

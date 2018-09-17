@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+
+	"github.com/Azure/go-autorest/autorest/to"
 )
 
 var unmarshalled = &OpenShiftManagedCluster{
@@ -53,14 +55,14 @@ var unmarshalled = &OpenShiftManagedCluster{
 			},
 		},
 		MasterPoolProfile: &MasterPoolProfile{
-			Count:        1,
+			Count:        to.IntPtr(1),
 			VMSize:       "properties.agentPoolProfiles.0.vmSize",
 			VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 		},
 		AgentPoolProfiles: []AgentPoolProfile{
 			{
 				Name:         "properties.agentPoolProfiles.0.name",
-				Count:        1,
+				Count:        to.IntPtr(1),
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 				OSType:       "properties.agentPoolProfiles.0.osType",
@@ -68,7 +70,7 @@ var unmarshalled = &OpenShiftManagedCluster{
 			},
 			{
 				Name:         "properties.agentPoolProfiles.0.name",
-				Count:        2,
+				Count:        to.IntPtr(2),
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 				OSType:       "properties.agentPoolProfiles.0.osType",

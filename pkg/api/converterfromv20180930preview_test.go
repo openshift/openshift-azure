@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Azure/go-autorest/autorest/to"
+
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
@@ -53,7 +55,7 @@ var v20180930previewManagedCluster = &v20180930preview.OpenShiftManagedCluster{
 			},
 		},
 		MasterPoolProfile: &v20180930preview.MasterPoolProfile{
-			Count:        1,
+			Count:        to.IntPtr(1),
 			VMSize:       "properties.agentPoolProfiles.0.vmSize",
 			VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 		},
@@ -61,7 +63,7 @@ var v20180930previewManagedCluster = &v20180930preview.OpenShiftManagedCluster{
 			{
 				Role:         "properties.agentPoolProfiles.0.role",
 				Name:         "properties.agentPoolProfiles.0.name",
-				Count:        1,
+				Count:        to.IntPtr(1),
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 				OSType:       "properties.agentPoolProfiles.0.osType",
@@ -69,7 +71,7 @@ var v20180930previewManagedCluster = &v20180930preview.OpenShiftManagedCluster{
 			{
 				Role:         "properties.agentPoolProfiles.0.role",
 				Name:         "properties.agentPoolProfiles.0.name",
-				Count:        2,
+				Count:        to.IntPtr(2),
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 				OSType:       "properties.agentPoolProfiles.0.osType",
@@ -126,7 +128,7 @@ var internalManagedCluster = &OpenShiftManagedCluster{
 		AgentPoolProfiles: []AgentPoolProfile{
 			{
 				Name:         "properties.agentPoolProfiles.0.name",
-				Count:        1,
+				Count:        to.IntPtr(1),
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
 				OSType:       "properties.agentPoolProfiles.0.osType",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
@@ -134,7 +136,7 @@ var internalManagedCluster = &OpenShiftManagedCluster{
 			},
 			{
 				Name:         "properties.agentPoolProfiles.0.name",
-				Count:        2,
+				Count:        to.IntPtr(2),
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
 				OSType:       "properties.agentPoolProfiles.0.osType",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
@@ -142,7 +144,7 @@ var internalManagedCluster = &OpenShiftManagedCluster{
 			},
 			{
 				Name:         string(AgentPoolProfileRoleMaster),
-				Count:        1,
+				Count:        to.IntPtr(1),
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
 				OSType:       OSTypeLinux,
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
