@@ -17,7 +17,6 @@ location: eastus
 name: openshift
 properties:
   openShiftVersion: v3.10
-  publicHostname: openshift.test.example.com
   fqdn: www.example.com
   authProfile:
     identityProviders:
@@ -30,6 +29,7 @@ properties:
   routerProfiles:
   - name: default
     publicSubdomain: test.example.com
+    fqdn: www.example.com
   masterPoolProfile:
     count: 3
     vmSize: Standard_D2s_v3
@@ -118,16 +118,11 @@ func TestValidate(t *testing.T) {
 				oc.Properties.PublicHostname = ""
 			},
 		},
-		"openshift config valid public hostname": {
+		"openshift config invalid public hostname": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.PublicHostname = "www.example.com"
 			},
-		},
-		"openshift config invalid public hostname": {
-			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.PublicHostname = "()"
-			},
-			expectedErrs: []error{errors.New(`invalid properties.publicHostname "()"`)},
+			expectedErrs: []error{errors.New(`invalid properties.publicHostname "www.example.com"`)},
 		},
 		"router profile duplicate names": {
 			f: func(oc *api.OpenShiftManagedCluster) {
@@ -166,11 +161,6 @@ func TestValidate(t *testing.T) {
 				oc.Properties.RouterProfiles[0].PublicSubdomain = "()"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].publicSubdomain "()"`)},
-		},
-		"router valid public subdomain": {
-			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.RouterProfiles[0].PublicSubdomain = "example.com"
-			},
 		},
 		"test external only true - unset router profile does not fail": {
 			f: func(oc *api.OpenShiftManagedCluster) {

@@ -22,8 +22,6 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 
 	selectContainerImages(cs)
 
-	selectDNSNames(cs)
-
 	// Generate CAs
 	cas := []struct {
 		cn   string
@@ -214,9 +212,9 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		// If FQDN matches PublicHostname certificate can't be self-sign
 		// https://github.com/openshift/openshift-azure/issues/307
 		{
-			cn: cs.Properties.PublicHostname,
+			cn: Derived.PublicHostname(cs),
 			dnsNames: []string{
-				cs.Properties.PublicHostname,
+				Derived.PublicHostname(cs),
 			},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			key:         &c.Certificates.OpenshiftConsole.Key,

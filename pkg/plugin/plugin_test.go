@@ -19,7 +19,6 @@ func TestMerge(t *testing.T) {
 
 	newCluster.Config = nil
 	newCluster.Properties.AgentPoolProfiles = nil
-	newCluster.Properties.PublicHostname = ""
 	newCluster.Properties.RouterProfiles = nil
 	newCluster.Properties.ServicePrincipalProfile = nil
 	newCluster.Properties.AzProfile = nil
@@ -41,9 +40,6 @@ func TestMerge(t *testing.T) {
 	}
 	if len(newCluster.Properties.AgentPoolProfiles) == 0 {
 		t.Errorf("new cluster agent pool profiles should be merged")
-	}
-	if newCluster.Properties.PublicHostname == "" {
-		t.Errorf("new cluster public hostname should be merged")
 	}
 	if len(newCluster.Properties.RouterProfiles) == 0 {
 		t.Errorf("new cluster router profiles should be merged")

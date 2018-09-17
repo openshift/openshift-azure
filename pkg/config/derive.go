@@ -33,6 +33,13 @@ func (derived) KubeReserved(cs *acsapi.OpenShiftManagedCluster, role acsapi.Agen
 	return ""
 }
 
+func (derived) PublicHostname(cs *acsapi.OpenShiftManagedCluster) string {
+	if cs.Properties.PublicHostname != "" {
+		return cs.Properties.PublicHostname
+	}
+	return cs.Properties.FQDN
+}
+
 func (derived) RouterLBCNamePrefix(cs *acsapi.OpenShiftManagedCluster) string {
 	return strings.Split(cs.Properties.RouterProfiles[0].FQDN, ".")[0]
 }

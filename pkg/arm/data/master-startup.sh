@@ -225,7 +225,7 @@ masterClients:
     contentType: application/vnd.kubernetes.protobuf
     qps: 300
   openshiftLoopbackKubeConfig: openshift-master.kubeconfig
-masterPublicURL: {{ print "https://" .ContainerService.Properties.PublicHostname | quote }}
+masterPublicURL: {{ print "https://" (.Derived.PublicHostname .ContainerService) | quote }}
 networkConfig:
   clusterNetworks:
   - cidr: 10.128.0.0/14
@@ -235,7 +235,7 @@ networkConfig:
   networkPluginName: redhat/openshift-ovs-subnet
   serviceNetworkCIDR: 172.30.0.0/16
 oauthConfig:
-  assetPublicURL: {{ print "https://" .ContainerService.Properties.PublicHostname "/console/" | quote }}
+  assetPublicURL: {{ print "https://" (.Derived.PublicHostname .ContainerService) "/console/" | quote }}
   grantConfig:
     method: auto
   identityProviders:
@@ -268,7 +268,7 @@ oauthConfig:
       file: /etc/origin/master/htpasswd
       kind: HTPasswdPasswordIdentityProvider
   masterCA: ca.crt
-  masterPublicURL: {{ print "https://" .ContainerService.Properties.PublicHostname | quote }}
+  masterPublicURL: {{ print "https://" (.Derived.PublicHostname .ContainerService) | quote }}
   masterURL: {{ print "https://" .ContainerService.Properties.FQDN | quote }}
   sessionConfig:
     sessionMaxAgeSeconds: 3600
@@ -306,7 +306,7 @@ servingInfo:
    - certFile: /etc/origin/master/named/console.crt
      keyFile: /etc/origin/master/named/console.key
      names:
-      - {{ .ContainerService.Properties.PublicHostname | quote }}
+      - {{ .Derived.PublicHostname .ContainerService | quote }}
 volumeConfig:
   dynamicProvisioningEnabled: true
 EOF

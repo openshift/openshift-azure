@@ -124,34 +124,36 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 }
 
 func enrich(cs *acsapi.OpenShiftManagedCluster) error {
+	for _, env := range []string{
+		"AZURE_CLIENT_ID",
+		"AZURE_CLIENT_SECRET",
+		"AZURE_SUBSCRIPTION_ID",
+		"AZURE_TENANT_ID",
+		"DNS_DOMAIN",
+		"RESOURCEGROUP",
+	} {
+		if os.Getenv(env) == "" {
+			return fmt.Errorf("must set %s", env)
+		}
+	}
+
 	cs.Properties.AzProfile = &acsapi.AzProfile{
 		TenantID:       os.Getenv("AZURE_TENANT_ID"),
 		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
 		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
 	}
 
-	if cs.Properties.AzProfile.TenantID == "" {
-		return fmt.Errorf("must set AZURE_TENANT_ID")
+	cs.Properties.RouterProfiles = []acsapi.RouterProfile{
+		{
+			Name:            "default",
+			PublicSubdomain: fmt.Sprintf("%s.%s", os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_DOMAIN")),
+			FQDN:            fmt.Sprintf("%s-router.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location),
+		},
 	}
-	if cs.Properties.AzProfile.SubscriptionID == "" {
-		return fmt.Errorf("must set AZURE_SUBSCRIPTION_ID")
-	}
-	if cs.Properties.AzProfile.ResourceGroup == "" {
-		return fmt.Errorf("must set RESOURCEGROUP")
-	}
-
-	cs.Properties.RouterProfiles[0].FQDN = fmt.Sprintf("%s-router.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location)
 
 	cs.Properties.ServicePrincipalProfile = &acsapi.ServicePrincipalProfile{
 		ClientID: os.Getenv("AZURE_CLIENT_ID"),
 		Secret:   os.Getenv("AZURE_CLIENT_SECRET"),
-	}
-
-	if cs.Properties.ServicePrincipalProfile.ClientID == "" {
-		return fmt.Errorf("must set AZURE_CLIENT_ID")
-	}
-	if cs.Properties.ServicePrincipalProfile.Secret == "" {
-		return fmt.Errorf("must set AZURE_CLIENT_SECRET")
 	}
 
 	return nil
