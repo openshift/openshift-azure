@@ -45,10 +45,8 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 		for _, app := range cs.Properties.AgentPoolProfiles {
 			if app.Role == AgentPoolProfileRoleMaster {
 				oc.Properties.MasterPoolProfile = &v20180930preview.MasterPoolProfile{
-					Name:         app.Name,
 					Count:        app.Count,
 					VMSize:       v20180930preview.VMSize(app.VMSize),
-					OSType:       v20180930preview.OSType(app.OSType),
 					VnetSubnetID: app.VnetSubnetID,
 				}
 

@@ -53,11 +53,9 @@ var v20180930previewManagedCluster = &v20180930preview.OpenShiftManagedCluster{
 			},
 		},
 		MasterPoolProfile: &v20180930preview.MasterPoolProfile{
-			Name:         "properties.agentPoolProfiles.0.name",
 			Count:        1,
 			VMSize:       "properties.agentPoolProfiles.0.vmSize",
 			VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-			OSType:       "properties.agentPoolProfiles.0.osType",
 		},
 		AgentPoolProfiles: []v20180930preview.AgentPoolProfile{
 			{
@@ -143,12 +141,12 @@ var internalManagedCluster = &OpenShiftManagedCluster{
 				Role:         "properties.agentPoolProfiles.0.role",
 			},
 			{
-				Name:         "properties.agentPoolProfiles.0.name",
+				Name:         string(AgentPoolProfileRoleMaster),
 				Count:        1,
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
-				OSType:       "properties.agentPoolProfiles.0.osType",
+				OSType:       OSTypeLinux,
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-				Role:         "master",
+				Role:         AgentPoolProfileRoleMaster,
 			},
 		},
 	},

@@ -54,10 +54,8 @@ var unmarshalled = &OpenShiftManagedCluster{
 		},
 		AgentPoolProfiles: []AgentPoolProfile{
 			{
-				Name:         "properties.agentPoolProfiles.0.name",
 				Count:        1,
 				VMSize:       "properties.agentPoolProfiles.0.vmSize",
-				OSType:       "properties.agentPoolProfiles.0.osType",
 				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
 				Role:         "properties.agentPoolProfiles.0.role",
 			},
@@ -119,11 +117,9 @@ var marshalled = []byte(`{
 		],
 		"agentPoolProfiles": [
 			{
-				"name": "properties.agentPoolProfiles.0.name",
 				"count": 1,
 				"vmSize": "properties.agentPoolProfiles.0.vmSize",
 				"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
-				"osType": "properties.agentPoolProfiles.0.osType",
 				"role": "properties.agentPoolProfiles.0.role"
 			},
 			{

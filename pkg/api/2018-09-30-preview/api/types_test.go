@@ -53,11 +53,9 @@ var unmarshalled = &OpenShiftManagedCluster{
 			},
 		},
 		MasterPoolProfile: &MasterPoolProfile{
-			Name:         "properties.agentPoolProfiles.0.name",
 			Count:        1,
 			VMSize:       "properties.agentPoolProfiles.0.vmSize",
 			VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-			OSType:       "properties.agentPoolProfiles.0.osType",
 		},
 		AgentPoolProfiles: []AgentPoolProfile{
 			{
@@ -113,11 +111,9 @@ var marshalled = []byte(`{
 			}
 		],
 		"masterPoolProfile": {
-			"name": "properties.agentPoolProfiles.0.name",
 			"count": 1,
 			"vmSize": "properties.agentPoolProfiles.0.vmSize",
-			"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
-			"osType": "properties.agentPoolProfiles.0.osType"
+			"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID"
 		},
 		"agentPoolProfiles": [
 			{
@@ -175,19 +171,41 @@ func TestUnmarshal(t *testing.T) {
 }
 
 func TestStructTypes(t *testing.T) {
-	// AgentPoolProfile and MasterPoolProfile types should be identical bar
-	// `Role AgentPoolProfileRole` in the former
-	app := reflect.TypeOf(AgentPoolProfile{})
-	mpp := reflect.TypeOf(MasterPoolProfile{})
-	if app.NumField() != mpp.NumField()+1 {
-		t.Fatalf("mismatch in number of fields: %d vs %d", mpp.NumField(), app.NumField())
+	populateFields := func(t reflect.Type) map[string]reflect.StructField {
+		m := map[string]reflect.StructField{}
+
+		for i := 0; i < t.NumField(); i++ {
+			f := t.Field(i)
+			f.Index = nil
+			f.Offset = 0
+
+			m[f.Name] = f
+		}
+
+		return m
 	}
-	for i := 0; i < mpp.NumField(); i++ {
-		if !reflect.DeepEqual(app.Field(i), mpp.Field(i)) {
-			t.Errorf("mismatch in field %d:\n%#v\n%#v", i, app.Field(i), mpp.Field(i))
+
+	appFields := populateFields(reflect.TypeOf(AgentPoolProfile{}))
+	mppFields := populateFields(reflect.TypeOf(MasterPoolProfile{}))
+
+	// every field (except Name, OSType, Role) in AgentPoolProfile should be
+	// identical in MasterPoolProfile
+	for name := range appFields {
+		switch name {
+		case "Name", "OSType", "Role":
+			continue
+		}
+
+		if !reflect.DeepEqual(appFields[name], mppFields[name]) {
+			t.Errorf("mismatch in field %s:\n%#v\n%#v", name, appFields[name], mppFields[name])
 		}
 	}
-	if app.Field(app.NumField()-1).Name != "Role" {
-		t.Errorf("unexpected field name %s", app.Field(app.NumField()-1).Name)
+
+	// every field in MasterPoolProfile should be identical in
+	// AgentPoolProfile
+	for name := range mppFields {
+		if !reflect.DeepEqual(appFields[name], mppFields[name]) {
+			t.Errorf("mismatch in field %s:\n%#v\n%#v", name, appFields[name], mppFields[name])
+		}
 	}
 }

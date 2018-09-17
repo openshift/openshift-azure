@@ -10,27 +10,31 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-var rxRfc1123 = regexp.MustCompile(`(?i)^` +
-	`([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9])` +
-	`(\.([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9]))*` +
-	`$`)
+var (
+	rxRfc1123 = regexp.MustCompile(`(?i)^` +
+		`([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9])` +
+		`(\.([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9]))*` +
+		`$`)
 
-var rxAgentPoolProfileVNetSubnetID = regexp.MustCompile(`(?i)^` +
-	`/subscriptions/[^/]+` +
-	`/resourceGroups/[^/]+` +
-	`/providers/Microsoft\.Network` +
-	`/virtualNetworks/[^/]+` +
-	`/subnets/[^/]+` +
-	`$`)
+	rxAgentPoolProfileVNetSubnetID = regexp.MustCompile(`(?i)^` +
+		`/subscriptions/[^/]+` +
+		`/resourceGroups/[^/]+` +
+		`/providers/Microsoft\.Network` +
+		`/virtualNetworks/[^/]+` +
+		`/subnets/[^/]+` +
+		`$`)
 
-var validAgentPoolProfileNames = map[string]struct{}{
-	string(api.AgentPoolProfileRoleCompute): struct{}{},
-	string(api.AgentPoolProfileRoleInfra):   struct{}{},
-	string(api.AgentPoolProfileRoleMaster):  struct{}{},
+	rxAgentPoolProfileName = regexp.MustCompile(`(?i)^[a-z0-9]{1,12}$`)
+)
+
+var validAgentPoolProfileRoles = map[api.AgentPoolProfileRole]struct{}{
+	api.AgentPoolProfileRoleCompute: {},
+	api.AgentPoolProfileRoleInfra:   {},
+	api.AgentPoolProfileRoleMaster:  {},
 }
 
 var validRouterProfileNames = map[string]struct{}{
-	"default": struct{}{},
+	"default": {},
 }
 
 func isValidHostname(h string) bool {
@@ -139,17 +143,17 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 }
 
 func validateAgentPoolProfiles(apps []api.AgentPoolProfile) (errs []error) {
-	appmap := map[string]api.AgentPoolProfile{}
+	appmap := map[api.AgentPoolProfileRole]struct{}{}
 
 	for i, app := range apps {
-		if _, found := validAgentPoolProfileNames[app.Name]; !found {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q]", app.Name))
+		if _, found := validAgentPoolProfileRoles[app.Role]; !found {
+			errs = append(errs, fmt.Errorf("invalid role %q in properties.agentPoolProfiles[%q]", app.Role, app.Name))
 		}
 
-		if _, found := appmap[app.Name]; found {
-			errs = append(errs, fmt.Errorf("duplicate properties.agentPoolProfiles %q", app.Name))
+		if _, found := appmap[app.Role]; found {
+			errs = append(errs, fmt.Errorf("duplicate role %q in properties.agentPoolProfiles[%q]", app.Role, app.Name))
 		}
-		appmap[app.Name] = app
+		appmap[app.Role] = struct{}{}
 
 		if i > 0 && app.VnetSubnetID != apps[i-1].VnetSubnetID {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.vnetSubnetID %q: all subnets must match when using vnetSubnetID", app.VnetSubnetID))
@@ -158,9 +162,9 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile) (errs []error) {
 		errs = append(errs, validateAgentPoolProfile(&app)...)
 	}
 
-	for name := range validAgentPoolProfileNames {
-		if _, found := appmap[name]; !found {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q]", name))
+	for role := range validAgentPoolProfileRoles {
+		if _, found := appmap[role]; !found {
+			errs = append(errs, fmt.Errorf("missing role %q in properties.agentPoolProfiles", role))
 		}
 	}
 
@@ -168,17 +172,23 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile) (errs []error) {
 }
 
 func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
-	if app.Name != string(app.Role) {
-		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
-	}
-
 	switch app.Role {
 	case api.AgentPoolProfileRoleCompute:
+		switch app.Name {
+		case string(api.AgentPoolProfileRoleMaster), string(api.AgentPoolProfileRoleInfra):
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
+		}
+		if !rxAgentPoolProfileName.MatchString(app.Name) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
+		}
 		if app.Count < 1 || app.Count > 5 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
 
 	case api.AgentPoolProfileRoleInfra:
+		if app.Name != string(app.Role) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
+		}
 		if app.Count != 2 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
@@ -187,9 +197,6 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 		if app.Count != 3 {
 			errs = append(errs, fmt.Errorf("invalid masterPoolProfile.count %d", app.Count))
 		}
-
-	default:
-		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].role %q", app.Name, app.Role))
 	}
 
 	if _, found := api.DefaultVMSizeKubeArguments[app.VMSize]; !found {
