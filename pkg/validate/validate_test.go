@@ -18,7 +18,7 @@ name: openshift
 properties:
   openShiftVersion: v3.10
   publicHostname: openshift.test.example.com
-  fqdn: www.example.com
+  #fqdn: www.example.com
   authProfile:
     identityProviders:
     - name: Azure AD
@@ -29,7 +29,7 @@ properties:
         tenantId: aadTenantId
   routerProfiles:
   - name: default
-    publicSubdomain: test.example.com
+    #publicSubdomain: test.example.com
   masterPoolProfile:
     name: master
     count: 3
@@ -71,13 +71,13 @@ func TestValidate(t *testing.T) {
 		},
 		"openshift config invalid api fqdn": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.FQDN = ""
+				oc.Properties.FQDN = "example.com"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.fqdn ""`)},
+			expectedErrs: []error{errors.New(`invalid properties.fqdn "example.com"`)},
 		},
 		"test external only false - invalid fqdn fails": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.FQDN = "()" },
-			expectedErrs: []error{errors.New(`invalid properties.fqdn "()"`)},
+			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.FQDN = "example.com" },
+			expectedErrs: []error{errors.New(`invalid properties.fqdn "example.com"`)},
 			externalOnly: false,
 		},
 		"provisioning state bad": {
@@ -165,13 +165,13 @@ func TestValidate(t *testing.T) {
 		},
 		"router invalid public subdomain": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.RouterProfiles[0].PublicSubdomain = "()"
+				oc.Properties.RouterProfiles[0].PublicSubdomain = "example.com"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].publicSubdomain "()"`)},
+			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].publicSubdomain "example.com"`)},
 		},
 		"router valid public subdomain": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.RouterProfiles[0].PublicSubdomain = "example.com"
+				oc.Properties.RouterProfiles[0].PublicSubdomain = ""
 			},
 		},
 		"test external only true - unset router profile does not fail": {

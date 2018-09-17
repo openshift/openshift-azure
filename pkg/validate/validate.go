@@ -213,7 +213,7 @@ func validateFQDN(p *api.Properties) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
 	}
-	if p.FQDN == "" || !isValidHostname(p.FQDN) {
+	if p.FQDN != "" {
 		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
 	}
 	return
@@ -249,11 +249,11 @@ func validateRouterProfile(rp api.RouterProfile) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
 	}
 
-	if rp.PublicSubdomain != "" && !isValidHostname(rp.PublicSubdomain) {
+	if rp.PublicSubdomain != "" {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].publicSubdomain %q", rp.Name, rp.PublicSubdomain))
 	}
 
-	if rp.FQDN != "" && !isValidHostname(rp.FQDN) {
+	if rp.FQDN != "" {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].fqdn %q", rp.Name, rp.FQDN))
 	}
 
