@@ -171,26 +171,41 @@ func TestUnmarshal(t *testing.T) {
 }
 
 func TestStructTypes(t *testing.T) {
-	// AgentPoolProfile and MasterPoolProfile types should be identical bar
-	// `Role AgentPoolProfileRole` in the former
-	// MasterPoolProfile has removed OsType, Name
-	app := reflect.TypeOf(AgentPoolProfile{})
-	mpp := reflect.TypeOf(MasterPoolProfile{})
-	// Add 3 for Role,OsType,Name which are missing from MasterPoolProfile
-	if app.NumField() != mpp.NumField()+3 {
-		t.Fatalf("mismatch in number of fields: %d vs %d", mpp.NumField(), app.NumField())
-	}
-	for i := 0; i < mpp.NumField(); i++ {
-		mf := mpp.Field(i)
-		af, found := app.FieldByName(mf.Name)
-		if !found {
-			t.Errorf("field not found in agentpoolprofile: %s", mf.Name)
+	populateFields := func(t reflect.Type) map[string]reflect.StructField {
+		m := map[string]reflect.StructField{}
+
+		for i := 0; i < t.NumField(); i++ {
+			f := t.Field(i)
+			f.Index = nil
+			f.Offset = 0
+
+			m[f.Name] = f
 		}
-		if !(mf.Type == af.Type || mf.Tag == af.Tag) {
-			t.Errorf("mismatch in field %d:\n%#v\n%#v", i, af, mf)
+
+		return m
+	}
+
+	appFields := populateFields(reflect.TypeOf(AgentPoolProfile{}))
+	mppFields := populateFields(reflect.TypeOf(MasterPoolProfile{}))
+
+	// every field (except Name, OSType, Role) in AgentPoolProfile should be
+	// identical in MasterPoolProfile
+	for name := range appFields {
+		switch name {
+		case "Name", "OSType", "Role":
+			continue
+		}
+
+		if !reflect.DeepEqual(appFields[name], mppFields[name]) {
+			t.Errorf("mismatch in field %s:\n%#v\n%#v", name, appFields[name], mppFields[name])
 		}
 	}
-	if app.Field(app.NumField()-1).Name != "Role" {
-		t.Errorf("unexpected field name %s", app.Field(app.NumField()-1).Name)
+
+	// every field in MasterPoolProfile should be identical in
+	// AgentPoolProfile
+	for name := range mppFields {
+		if !reflect.DeepEqual(appFields[name], mppFields[name]) {
+			t.Errorf("mismatch in field %s:\n%#v\n%#v", name, appFields[name], mppFields[name])
+		}
 	}
 }
