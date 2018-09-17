@@ -10,13 +10,13 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/util/retry"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
@@ -127,7 +127,7 @@ func deletePods(ctx context.Context, kc *kubernetes.Clientset, nodeName string) 
 
 	t := time.NewTimer(duration)
 	defer t.Stop()
-	return wait.PollUntil(time.Second, func() (bool, error) {
+	return wait.PollImmediateUntil(time.Second, func() (bool, error) {
 		for pod := range pods {
 			p, err := kc.CoreV1().Pods(pod.Namespace).Get(pod.Name, metav1.GetOptions{})
 			switch {

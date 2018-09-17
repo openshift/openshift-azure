@@ -8,11 +8,11 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 func WaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, role acsapi.AgentPoolProfileRole, nodeName string) error {
@@ -32,7 +32,7 @@ func masterWaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster,
 		return err
 	}
 
-	return wait.PollUntil(time.Second, func() (bool, error) {
+	return wait.PollImmediateUntil(time.Second, func() (bool, error) {
 		return masterIsReady(kc, nodeName)
 	}, ctx.Done())
 }
@@ -79,7 +79,7 @@ func nodeWaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, n
 		return err
 	}
 
-	err = wait.PollUntil(time.Second, func() (bool, error) {
+	err = wait.PollImmediateUntil(time.Second, func() (bool, error) {
 		return nodeIsReady(kc, nodeName)
 	}, ctx.Done())
 	if err != nil {
