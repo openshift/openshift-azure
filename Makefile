@@ -41,10 +41,10 @@ verify:
 vet:
 	go vet ./...
 
-unit:
+unit: generate
 	go test ./...
 
-e2e:
+e2e: generate
 	go test ./test/e2e -tags e2e
 
 .PHONY: clean sync-image sync-push verify unit e2e vet

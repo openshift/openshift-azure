@@ -212,25 +212,25 @@ var Translations = map[string][]struct {
 	"DaemonSet.apps/openshift-metrics/prometheus-node-exporter": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.PrometheusNodeExporterImage }}",
+			Template: "{{ .Config.Images.PrometheusNodeExporter }}",
 		},
 	},
 	"DaemonSet.apps/openshift-node/sync": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.NodeImage }}",
+			Template: "{{ .Config.Images.Node }}",
 		},
 	},
 	"DaemonSet.apps/openshift-sdn/ovs": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.NodeImage }}",
+			Template: "{{ .Config.Images.Node }}",
 		},
 	},
 	"DaemonSet.apps/openshift-sdn/sdn": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.NodeImage }}",
+			Template: "{{ .Config.Images.Node }}",
 		},
 	},
 	"Deployment.apps/default/docker-registry": {
@@ -240,15 +240,11 @@ var Translations = map[string][]struct {
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.RegistryImage }}",
+			Template: "{{ .Config.Images.Registry }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.initContainers[0].env[?(@.name='REGISTRY_STORAGE_ACCOUNT_NAME')].value"),
 			Template: "{{ .Config.RegistryStorageAccount }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.initContainers[0].image"),
-			Template: "{{ .Config.AzureCLIImage }}",
 		},
 	},
 	"Deployment.apps/default/registry-console": {
@@ -262,13 +258,13 @@ var Translations = map[string][]struct {
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.RegistryConsoleImage }}",
+			Template: "{{ .Config.Images.RegistryConsole }}",
 		},
 	},
 	"Deployment.apps/default/router": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.RouterImage }}",
+			Template: "{{ .Config.Images.Router }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='STATS_PASSWORD')].value"),
@@ -278,53 +274,53 @@ var Translations = map[string][]struct {
 	"Deployment.apps/kube-service-catalog/apiserver": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.ServiceCatalogImage }}",
+			Template: "{{ .Config.Images.ServiceCatalog }}",
 		},
 	},
 	"Deployment.apps/kube-service-catalog/controller-manager": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.ServiceCatalogImage }}",
+			Template: "{{ .Config.Images.ServiceCatalog }}",
 		},
 	},
 	"Deployment.apps/openshift-ansible-service-broker/asb": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.AnsibleServiceBrokerImage }}",
+			Template: "{{ .Config.Images.AnsibleServiceBroker }}",
 		},
 	},
 	"Deployment.apps/openshift-etcd/etcd-operator": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.EtcdOperatorImage }}",
+			Template: "{{ .Config.Images.EtcdOperator }}",
 		},
 	},
 	"Deployment.apps/openshift-infra/bootstrap-autoapprover": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.NodeImage }}",
+			Template: "{{ .Config.Images.Node }}",
 		},
 	},
 	"Deployment.apps/openshift-template-service-broker/apiserver": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.TemplateServiceBrokerImage }}",
+			Template: "{{ .Config.Images.TemplateServiceBroker }}",
 		},
 	},
 	"Deployment.apps/openshift-metrics/kube-state-metrics": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='kube-state-metrics')].image"),
-			Template: "{{ .Config.KubeStateMetricsImage }}",
+			Template: "{{ .Config.Images.KubeStateMetrics }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='addon-resizer')].image"),
-			Template: "{{ .Config.AddonsResizerImage }}",
+			Template: "{{ .Config.Images.AddonsResizer }}",
 		},
 	},
 	"Deployment.apps/openshift-web-console/webconsole": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.WebConsoleImage }}",
+			Template: "{{ .Config.Images.WebConsole }}",
 		},
 	},
 	"OAuthClient.oauth.openshift.io/cockpit-oauth-client": {
@@ -513,27 +509,27 @@ var Translations = map[string][]struct {
 	"StatefulSet.apps/openshift-metrics/prometheus": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='prom-proxy')].image"),
-			Template: "{{ .Config.OAuthProxyImage }}",
+			Template: "{{ .Config.Images.OAuthProxy }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='prometheus')].image"),
-			Template: "{{ .Config.PrometheusImage }}",
+			Template: "{{ .Config.Images.Prometheus }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alerts-proxy')].image"),
-			Template: "{{ .Config.OAuthProxyImage }}",
+			Template: "{{ .Config.Images.OAuthProxy }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alert-buffer')].image"),
-			Template: "{{ .Config.PrometheusAlertBufferImage }}",
+			Template: "{{ .Config.Images.PrometheusAlertBuffer }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alertmanager-proxy')].image"),
-			Template: "{{ .Config.OAuthProxyImage }}",
+			Template: "{{ .Config.Images.OAuthProxy }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alertmanager')].image"),
-			Template: "{{ .Config.PrometheusAlertManagerImage }}",
+			Template: "{{ .Config.Images.PrometheusAlertManager }}",
 		},
 	},
 	"StorageClass.storage.k8s.io/azure": {
