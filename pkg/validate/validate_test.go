@@ -39,7 +39,7 @@ properties:
     count: 2
     vmSize: Standard_D2s_v3
     osType: Linux
-  - name: compute
+  - name: myCompute
     role: compute
     count: 1
     vmSize: Standard_D2s_v3
@@ -198,17 +198,30 @@ func TestValidate(t *testing.T) {
 					oc.Properties.AgentPoolProfiles,
 					oc.Properties.AgentPoolProfiles[0])
 			},
-			expectedErrs: []error{errors.New(`duplicate properties.agentPoolProfiles "infra"`)},
+			expectedErrs: []error{errors.New(`duplicate role "infra" in properties.agentPoolProfiles["infra"]`)},
 		},
-		"agent pool profile invalid name": {
+		"agent pool profile invalid infra name": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				poolCopy := oc.Properties.AgentPoolProfiles[0]
-				poolCopy.Name = "foo"
-				oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, poolCopy)
+				for i, app := range oc.Properties.AgentPoolProfiles {
+					if app.Role == api.AgentPoolProfileRoleInfra {
+						oc.Properties.AgentPoolProfiles[i].Name = "foo"
+					}
+				}
 			},
 			expectedErrs: []error{
-				errors.New(`invalid properties.agentPoolProfiles["foo"]`),
 				errors.New(`invalid properties.agentPoolProfiles["foo"].name "foo"`),
+			},
+		},
+		"agent pool profile invalid compute name": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				for i, app := range oc.Properties.AgentPoolProfiles {
+					if app.Role == api.AgentPoolProfileRoleCompute {
+						oc.Properties.AgentPoolProfiles[i].Name = "$"
+					}
+				}
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["$"].name "$"`),
 			},
 		},
 		"agent pool profile invalid vm size": {
@@ -309,6 +322,5 @@ func TestValidate(t *testing.T) {
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
 			t.Errorf("%s expected errors %#v but received %#v", name, spew.Sprint(test.expectedErrs), spew.Sprint(errs))
 		}
-
 	}
 }
