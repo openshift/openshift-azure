@@ -163,6 +163,21 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 			}
 
 			v.Field(i).Set(reflect.ValueOf(c))
+
+		case "api.ImageConfig":
+			data, err := yaml.Marshal(m[k])
+			if err != nil {
+				return err
+			}
+
+			var c ImageConfig
+			err = yaml.Unmarshal(data, &c)
+
+			if err != nil {
+				return err
+			}
+
+			v.Field(i).Set(reflect.ValueOf(c))
 		default:
 			v.Field(i).Set(reflect.ValueOf(m[k]))
 		}

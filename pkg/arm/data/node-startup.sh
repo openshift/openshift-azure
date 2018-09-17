@@ -56,7 +56,7 @@ metadata:
   namespace: kube-system
 spec:
   containers:
-  - image: {{ .Config.LogBridgeImage | quote }}
+  - image: {{ .Config.Images.LogBridge | quote }}
     imagePullPolicy: Always
     name: logbridge
     securityContext:

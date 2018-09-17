@@ -23,29 +23,7 @@ type Config struct {
 	LoggingWorkspace       string `json:"loggingWorkspace,omitempty"` // workspace for Azure Log Analytics resource
 
 	Certificates CertificateConfig `json:"certificates,omitempty"`
-
-	// container images for pods
-	MasterEtcdImage             string `json:"masterEtcdImage,omitempty"`
-	ControlPlaneImage           string `json:"controlPlaneImage,omitempty"`
-	NodeImage                   string `json:"nodeImage,omitempty"`
-	ServiceCatalogImage         string `json:"serviceCatalogImage,omitempty"`
-	SyncImage                   string `json:"syncImage,omitempty"`
-	TemplateServiceBrokerImage  string `json:"templateServiceBrokerImage,omitempty"`
-	PrometheusNodeExporterImage string `json:"prometheusNodeExporterImage,omitempty"`
-	RegistryImage               string `json:"registryImage,omitempty"`
-	RouterImage                 string `json:"routerImage,omitempty"`
-	AzureCLIImage               string `json:"azureCliImage,omitempty"`
-	RegistryConsoleImage        string `json:"registryConsoleImage,omitempty"`
-	AnsibleServiceBrokerImage   string `json:"ansibleServiceBrokerImage,omitempty"`
-	WebConsoleImage             string `json:"webConsoleImage,omitempty"`
-	OAuthProxyImage             string `json:"oAuthProxyImage,omitempty"`
-	PrometheusImage             string `json:"prometheusImage,omitempty"`
-	PrometheusAlertBufferImage  string `json:"prometheusAlertBufferImage,omitempty"`
-	PrometheusAlertManagerImage string `json:"prometheusAlertManagerImage,omitempty"`
-	LogBridgeImage              string `json:"logBridgeImage,omitempty"`
-	EtcdOperatorImage           string `json:"etcdOperatorImage,omitempty"`
-	KubeStateMetricsImage       string `json:"kubeStateMetricsImage,omitempty"`
-	AddonsResizerImage          string `json:"addonsResizerImage,omitempty"`
+	Images       ImageConfig       `json:"images,omitempty"`
 
 	// kubeconfigs
 	AdminKubeconfig              *v1.Config `json:"adminKubeconfig,omitempty"`
@@ -68,6 +46,30 @@ type Config struct {
 	RegistryConsoleOAuthSecret     string    `json:"registryConsoleOAuthSecret,omitempty"`
 	RouterStatsPassword            string    `json:"routerStatsPassword,omitempty"`
 	ServiceCatalogClusterID        uuid.UUID `json:"serviceCatalogClusterId,omitempty"`
+}
+
+// ImageConfig contains all images for the pods
+type ImageConfig struct {
+	MasterEtcd             string `json:"masterEtcd,omitempty"`
+	ControlPlane           string `json:"controlPlane,omitempty"`
+	Node                   string `json:"node,omitempty"`
+	ServiceCatalog         string `json:"serviceCatalog,omitempty"`
+	Sync                   string `json:"sync,omitempty"`
+	TemplateServiceBroker  string `json:"templateServiceBroker,omitempty"`
+	PrometheusNodeExporter string `json:"prometheusNodeExporter,omitempty"`
+	Registry               string `json:"registry,omitempty"`
+	Router                 string `json:"router,omitempty"`
+	RegistryConsole        string `json:"registryConsole,omitempty"`
+	AnsibleServiceBroker   string `json:"ansibleServiceBroker,omitempty"`
+	WebConsole             string `json:"webConsole,omitempty"`
+	OAuthProxy             string `json:"oAuthProxy,omitempty"`
+	Prometheus             string `json:"prometheus,omitempty"`
+	PrometheusAlertBuffer  string `json:"prometheusAlertBuffer,omitempty"`
+	PrometheusAlertManager string `json:"prometheusAlertManager,omitempty"`
+	LogBridge              string `json:"logBridge,omitempty"`
+	EtcdOperator           string `json:"etcdOperator,omitempty"`
+	KubeStateMetrics       string `json:"kubeStateMetrics,omitempty"`
+	AddonsResizer          string `json:"addonsResizer,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.

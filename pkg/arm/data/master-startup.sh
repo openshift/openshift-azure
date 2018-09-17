@@ -435,7 +435,7 @@ spec:
     command:
     - /bin/sh
     - -c
-    image: {{ .Config.MasterEtcdImage | quote }}
+    image: {{ .Config.Images.MasterEtcd | quote }}
     imagePullPolicy: Always
     livenessProbe:
       exec:
@@ -489,7 +489,7 @@ spec:
     - --loglevel=2
     command:
     - openshift
-    image: {{ .Config.ControlPlaneImage | quote }}
+    image: {{ .Config.Images.ControlPlane | quote }}
     imagePullPolicy: Always
     livenessProbe:
       httpGet:
@@ -542,7 +542,7 @@ spec:
     - --loglevel=2
     command:
     - openshift
-    image: {{ .Config.ControlPlaneImage | quote }}
+    image: {{ .Config.Images.ControlPlane | quote }}
     imagePullPolicy: Always
     livenessProbe:
       httpGet:
@@ -578,7 +578,7 @@ metadata:
   namespace: kube-system
 spec:
   containers:
-  - image: {{ .Config.SyncImage | quote }}
+  - image: {{ .Config.Images.Sync | quote }}
     imagePullPolicy: Always
     name: sync
     securityContext:
@@ -605,7 +605,7 @@ metadata:
   namespace: kube-system
 spec:
   containers:
-  - image: {{ .Config.LogBridgeImage | quote }}
+  - image: {{ .Config.Images.LogBridge | quote }}
     imagePullPolicy: Always
     name: logbridge
     securityContext:

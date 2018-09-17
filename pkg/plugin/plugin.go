@@ -92,7 +92,7 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 		return err
 	}
 	if p.syncImage != "" {
-		cs.Config.SyncImage = p.syncImage
+		cs.Config.Images.Sync = p.syncImage
 	}
 	return nil
 }
