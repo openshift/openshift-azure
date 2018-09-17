@@ -83,13 +83,13 @@ data:
           sum(node_memory_MemFree{job="kubernetes-nodes-exporter"} + node_memory_Cached{job="kubernetes-nodes-exporter"} + node_memory_Buffers{job="kubernetes-nodes-exporter"})
           /
           sum(node_memory_MemTotal{job="kubernetes-nodes-exporter"})
-        record: ':node_memory_utilisation:'
+        record: 'node:node_memory_utilisation:'
       - expr: |
           sum(node_memory_MemFree{job="kubernetes-nodes-exporter"} + node_memory_Cached{job="kubernetes-nodes-exporter"} + node_memory_Buffers{job="kubernetes-nodes-exporter"})
-        record: :node_memory_MemFreeCachedBuffers:sum
+        record: node:node_memory_MemFreeCachedBuffers:sum
       - expr: |
           sum(node_memory_MemTotal{job="kubernetes-nodes-exporter"})
-        record: :node_memory_MemTotal:sum
+        record: node:node_memory_MemTotal:sum
       - expr: |
           sum by (node) (
             (node_memory_MemFree{job="kubernetes-nodes-exporter"} + node_memory_Cached{job="kubernetes-nodes-exporter"} + node_memory_Buffers{job="kubernetes-nodes-exporter"})
