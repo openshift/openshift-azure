@@ -38,10 +38,13 @@ sync-push: sync-image
 verify:
 	./hack/validate-generated.sh
 
+vet:
+	go vet ./...
+
 unit:
 	go test ./...
 
 e2e:
 	go test ./test/e2e -tags e2e
 
-.PHONY: clean sync-image sync-push verify unit e2e
+.PHONY: clean sync-image sync-push verify unit e2e vet
