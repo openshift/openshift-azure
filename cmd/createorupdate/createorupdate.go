@@ -7,6 +7,9 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/Azure/azure-sdk-for-go/services/marketplaceordering/mgmt/2015-06-01/marketplaceordering"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/errors"
@@ -99,6 +102,11 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
+	err = acceptMarketplaceAgreement(ctx, cs)
+	if err != nil {
+		return nil, err
+	}
+
 	if oldCs != nil {
 		err = p.Update(ctx, cs, azuredeploy)
 		if err != nil {
@@ -121,6 +129,38 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	oc = acsapi.ConvertToV20180930preview(cs)
 
 	return oc, nil
+}
+
+func acceptMarketplaceAgreement(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
+	if config.Derived.ImageResourceName() != "" ||
+		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
+		return nil
+	}
+
+	config := auth.NewClientCredentialsConfig(ctx.Value(acsapi.ContextKeyClientID).(string), ctx.Value(acsapi.ContextKeyClientSecret).(string), ctx.Value(acsapi.ContextKeyTenantID).(string))
+	authorizer, err := config.Authorizer()
+	if err != nil {
+		return err
+	}
+
+	mpo := marketplaceordering.NewMarketplaceAgreementsClient(cs.Properties.AzProfile.SubscriptionID)
+	mpo.Authorizer = authorizer
+
+	log.Info("checking marketplace agreement")
+	terms, err := mpo.Get(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU)
+	if err != nil {
+		return err
+	}
+
+	if *terms.AgreementProperties.Accepted {
+		return nil
+	}
+
+	terms.AgreementProperties.Accepted = to.BoolPtr(true)
+
+	log.Info("accepting marketplace agreement")
+	_, err = mpo.Create(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU, terms)
+	return err
 }
 
 func enrich(cs *acsapi.OpenShiftManagedCluster) error {
