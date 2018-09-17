@@ -77,10 +77,8 @@ properties:
   - name: default
     publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
   masterPoolProfile:
-    name: master
     count: 3
     vmSize: Standard_D2s_v3
-    osType: Linux
   agentPoolProfiles:
   - name: infra
     role: infra
