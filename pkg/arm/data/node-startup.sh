@@ -43,10 +43,10 @@ echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
 mkdir -p /etc/origin/cloudprovider
 
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
-{{ .Config.CloudProviderConf | String }}
+{{ .Derived.CloudProviderConf .ContainerService | String }}
 EOF
 
-{{- if not RunningUnderTest }}
+{{- if not .Derived.RunningUnderTest }}
 mkdir -p /var/lib/logbridge
 cat >/etc/origin/node/pods/logbridge.yaml <<'EOF'
 apiVersion: v1

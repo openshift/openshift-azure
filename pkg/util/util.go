@@ -3,7 +3,6 @@ package util
 import (
 	"bytes"
 	"encoding/base64"
-	"os"
 	"strconv"
 	"strings"
 	"text/template"
@@ -11,6 +10,7 @@ import (
 	"github.com/ghodss/yaml"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
@@ -30,9 +30,6 @@ func Template(tmpl string, f template.FuncMap, cs *acsapi.OpenShiftManagedCluste
 			replacer := strings.NewReplacer("$", "\\$")
 			return replacer.Replace(b)
 		},
-		"RunningUnderTest": func() bool {
-			return os.Getenv("RUNNING_UNDER_TEST") != ""
-		},
 	}).Funcs(f).Parse(tmpl)
 	if err != nil {
 		return nil, err
@@ -43,8 +40,9 @@ func Template(tmpl string, f template.FuncMap, cs *acsapi.OpenShiftManagedCluste
 	err = t.Execute(b, struct {
 		ContainerService *acsapi.OpenShiftManagedCluster
 		Config           *acsapi.Config
+		Derived          interface{}
 		Extra            interface{}
-	}{ContainerService: cs, Config: cs.Config, Extra: extra})
+	}{ContainerService: cs, Config: cs.Config, Derived: config.Derived, Extra: extra})
 	if err != nil {
 		return nil, err
 	}
