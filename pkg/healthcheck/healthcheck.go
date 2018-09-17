@@ -18,7 +18,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/checks"
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
@@ -56,13 +55,13 @@ func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.OpenS
 	}
 
 	// ensure that all nodes are ready
-	err = checks.WaitForNodes(ctx, cs, kc)
+	err = WaitForNodes(ctx, cs, kc)
 	if err != nil {
 		return err
 	}
 
 	// Wait for infrastructure services to be healthy
-	err = checks.WaitForInfraServices(ctx, kc)
+	err = WaitForInfraServices(ctx, kc)
 	if err != nil {
 		return err
 	}
@@ -131,7 +130,7 @@ func newClientSet(ctx context.Context, config *v1.Config) (*kubernetes.Clientset
 	}
 
 	// Wait for the healthz to be 200 status
-	err = checks.WaitForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
+	err = WaitForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
 	if err != nil {
 		return nil, err
 	}
