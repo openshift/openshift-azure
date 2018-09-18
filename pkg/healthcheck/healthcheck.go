@@ -19,6 +19,7 @@ import (
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/checks"
+	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
@@ -50,7 +51,12 @@ func NewSimpleHealthChecker(entry *logrus.Entry) HealthChecker {
 
 // HealthCheck function to verify cluster health
 func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
-	kc, err := newClientSet(ctx, cs.Config.AdminKubeconfig)
+	v1kc, err := config.Derived.AdminKubeconfig(cs)
+	if err != nil {
+		return err
+	}
+
+	kc, err := newClientSet(ctx, v1kc)
 	if err != nil {
 		return err
 	}

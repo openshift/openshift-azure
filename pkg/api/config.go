@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 
 	"github.com/satori/go.uuid"
-	"k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
 type Config struct {
@@ -24,12 +23,6 @@ type Config struct {
 
 	Certificates CertificateConfig `json:"certificates,omitempty"`
 	Images       ImageConfig       `json:"images,omitempty"`
-
-	// kubeconfigs
-	AdminKubeconfig              *v1.Config `json:"adminKubeconfig,omitempty"`
-	MasterKubeconfig             *v1.Config `json:"masterKubeconfig,omitempty"`
-	NodeBootstrapKubeconfig      *v1.Config `json:"nodeBootstrapKubeconfig,omitempty"`
-	AzureClusterReaderKubeconfig *v1.Config `json:"azureClusterReaderKubeconfig,omitempty"`
 
 	// misc control plane configurables
 	ServiceAccountKey *rsa.PrivateKey `json:"serviceAccountKey,omitempty"`

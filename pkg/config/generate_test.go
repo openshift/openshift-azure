@@ -108,11 +108,6 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(len(c.AlertManagerProxySessionSecret) != 0, "AlertManagerProxySessionSecret")
 	assert(len(c.AlertsProxySessionSecret) != 0, "AlertsProxySessionSecret")
 	assert(len(c.PrometheusProxySessionSecret) != 0, "PrometheusProxySessionSecret")
-
-	assert(c.MasterKubeconfig != nil, "MasterKubeconfig")
-	assert(c.AdminKubeconfig != nil, "AdminKubeconfig")
-	assert(c.NodeBootstrapKubeconfig != nil, "NodeBootstrapKubeconfig")
-	assert(c.AzureClusterReaderKubeconfig != nil, "AzureClusterReaderKubeconfig")
 }
 
 func TestSelectDNSNames(t *testing.T) {

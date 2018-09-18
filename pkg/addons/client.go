@@ -28,6 +28,7 @@ import (
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/checks"
+	"github.com/openshift/openshift-azure/pkg/config"
 )
 
 // Interface exposes the methods a client needs to implement
@@ -58,8 +59,13 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, d
 		return &dryClient{}, nil
 	}
 
+	v1kc, err := config.Derived.AdminKubeconfig(cs)
+	if err != nil {
+		return nil, err
+	}
+
 	var kc api.Config
-	err := latest.Scheme.Convert(cs.Config.AdminKubeconfig, &kc, nil)
+	err = latest.Scheme.Convert(v1kc, &kc, nil)
 	if err != nil {
 		return nil, err
 	}

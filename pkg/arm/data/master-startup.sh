@@ -53,7 +53,7 @@ base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.EtcdServer.Key | Base64E
 base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdPeer.Cert | Base64Encode }} >/etc/etcd/peer.crt
 base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.EtcdPeer.Key | Base64Encode }} >/etc/etcd/peer.key
 
-base64 -d <<< {{ YamlMarshal .Config.AdminKubeconfig | Base64Encode }} >/etc/origin/node/node.kubeconfig
+base64 -d <<< {{ YamlMarshal (.Derived.AdminKubeconfig .ContainerService) | Base64Encode }} >/etc/origin/node/node.kubeconfig
 base64 -d <<< {{ CertAsBytes .Config.Certificates.Ca.Cert | Base64Encode }} >/etc/origin/node/ca.crt
 
 mkdir -p /etc/origin/master/named
@@ -78,8 +78,8 @@ base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.MasterServer.Key | Base6
 base64 -d <<< {{ PublicKeyAsBytes .Config.ServiceAccountKey.PublicKey | Base64Encode }} >/etc/origin/master/serviceaccounts.public.key
 base64 -d <<< {{ PrivateKeyAsBytes .Config.ServiceAccountKey | Base64Encode }} >/etc/origin/master/serviceaccounts.private.key
 base64 -d <<< {{ .Config.HtPasswd | Base64Encode }} >/etc/origin/master/htpasswd
-base64 -d <<< {{ YamlMarshal .Config.AdminKubeconfig | Base64Encode }} >/etc/origin/master/admin.kubeconfig
-base64 -d <<< {{ YamlMarshal .Config.MasterKubeconfig | Base64Encode }} >/etc/origin/master/openshift-master.kubeconfig
+base64 -d <<< {{ YamlMarshal (.Derived.AdminKubeconfig .ContainerService) | Base64Encode }} >/etc/origin/master/admin.kubeconfig
+base64 -d <<< {{ YamlMarshal (.Derived.MasterKubeconfig .ContainerService) | Base64Encode }} >/etc/origin/master/openshift-master.kubeconfig
 
 cat >/etc/etcd/etcd.conf <<EOF
 ETCD_ADVERTISE_CLIENT_URLS=https://$(hostname):2379

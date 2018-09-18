@@ -182,7 +182,12 @@ func writeHelpers(c *acsapi.OpenShiftManagedCluster, azuredeploy []byte) error {
 		return err
 	}
 
-	b, err = yaml.Marshal(c.Config.AdminKubeconfig)
+	v1kc, err := config.Derived.AdminKubeconfig(c)
+	if err != nil {
+		return err
+	}
+
+	b, err = yaml.Marshal(v1kc)
 	if err != nil {
 		return err
 	}

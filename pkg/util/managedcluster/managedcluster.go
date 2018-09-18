@@ -10,6 +10,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api/latest"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/config"
 )
 
 func ReadConfig(path string) (*api.OpenShiftManagedCluster, error) {
@@ -27,8 +28,13 @@ func ReadConfig(path string) (*api.OpenShiftManagedCluster, error) {
 }
 
 func ClientsetFromConfig(cs *api.OpenShiftManagedCluster) (*kubernetes.Clientset, error) {
+	v1kc, err := config.Derived.AdminKubeconfig(cs)
+	if err != nil {
+		return nil, err
+	}
+
 	var kc kapi.Config
-	err := latest.Scheme.Convert(cs.Config.AdminKubeconfig, &kc, nil)
+	err = latest.Scheme.Convert(v1kc, &kc, nil)
 	if err != nil {
 		return nil, err
 	}

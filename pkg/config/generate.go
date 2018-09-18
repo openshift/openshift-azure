@@ -9,7 +9,6 @@ import (
 
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
-	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/tls"
@@ -269,54 +268,6 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 			s.n = 32
 		}
 		if *s.secret, err = randomBytes(s.n); err != nil {
-			return
-		}
-	}
-
-	kubeconfigs := []struct {
-		clientKey  *rsa.PrivateKey
-		clientCert *x509.Certificate
-		endpoint   string
-		username   string
-		namespace  string
-		kubeconfig **v1.Config
-	}{
-		{
-			clientKey:  c.Certificates.OpenShiftMaster.Key,
-			clientCert: c.Certificates.OpenShiftMaster.Cert,
-			endpoint:   cs.Properties.FQDN,
-			username:   "system:openshift-master",
-			kubeconfig: &c.MasterKubeconfig,
-		},
-		{
-			clientKey:  c.Certificates.Admin.Key,
-			clientCert: c.Certificates.Admin.Cert,
-			endpoint:   cs.Properties.FQDN,
-			username:   "system:admin",
-			kubeconfig: &c.AdminKubeconfig,
-		},
-		{
-			clientKey:  c.Certificates.NodeBootstrap.Key,
-			clientCert: c.Certificates.NodeBootstrap.Cert,
-			endpoint:   cs.Properties.FQDN,
-			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
-			kubeconfig: &c.NodeBootstrapKubeconfig,
-			namespace:  "openshift-infra",
-		},
-		{
-			clientKey:  c.Certificates.AzureClusterReader.Key,
-			clientCert: c.Certificates.AzureClusterReader.Cert,
-			endpoint:   cs.Properties.FQDN,
-			username:   "system:serviceaccount:openshift-azure:azure-cluster-reader",
-			kubeconfig: &c.AzureClusterReaderKubeconfig,
-			namespace:  "openshift-azure",
-		},
-	}
-	for _, kc := range kubeconfigs {
-		if kc.namespace == "" {
-			kc.namespace = "default"
-		}
-		if *kc.kubeconfig, err = makeKubeConfig(kc.clientKey, kc.clientCert, c.Certificates.Ca.Cert, kc.endpoint, kc.username, kc.namespace); err != nil {
 			return
 		}
 	}

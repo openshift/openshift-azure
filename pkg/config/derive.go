@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/ghodss/yaml"
 )
@@ -69,6 +70,50 @@ func (derived) ImageConfigFormat(cs *acsapi.OpenShiftManagedCluster) string {
 	}
 
 	return imageConfigFormat
+}
+
+func (derived) AdminKubeconfig(cs *acsapi.OpenShiftManagedCluster) (*v1.Config, error) {
+	return makeKubeConfig(
+		cs.Config.Certificates.Admin.Key,
+		cs.Config.Certificates.Admin.Cert,
+		cs.Config.Certificates.Ca.Cert,
+		cs.Properties.FQDN,
+		"system:admin",
+		"default",
+	)
+}
+
+func (derived) MasterKubeconfig(cs *acsapi.OpenShiftManagedCluster) (*v1.Config, error) {
+	return makeKubeConfig(
+		cs.Config.Certificates.OpenShiftMaster.Key,
+		cs.Config.Certificates.OpenShiftMaster.Cert,
+		cs.Config.Certificates.Ca.Cert,
+		cs.Properties.FQDN,
+		"system:openshift-master",
+		"default",
+	)
+}
+
+func (derived) NodeBootstrapKubeconfig(cs *acsapi.OpenShiftManagedCluster) (*v1.Config, error) {
+	return makeKubeConfig(
+		cs.Config.Certificates.NodeBootstrap.Key,
+		cs.Config.Certificates.NodeBootstrap.Cert,
+		cs.Config.Certificates.Ca.Cert,
+		cs.Properties.FQDN,
+		"system:serviceaccount:openshift-infra:node-bootstrapper",
+		"openshift-infra",
+	)
+}
+
+func (derived) AzureClusterReaderKubeconfig(cs *acsapi.OpenShiftManagedCluster) (*v1.Config, error) {
+	return makeKubeConfig(
+		cs.Config.Certificates.AzureClusterReader.Key,
+		cs.Config.Certificates.AzureClusterReader.Cert,
+		cs.Config.Certificates.Ca.Cert,
+		cs.Properties.FQDN,
+		"system:serviceaccount:openshift-azure:azure-cluster-reader",
+		"openshift-azure",
+	)
 }
 
 func (derived) RunningUnderTest() bool {

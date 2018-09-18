@@ -11,7 +11,6 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/satori/go.uuid"
-	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
@@ -39,13 +38,6 @@ func (c Config) MarshalJSON() ([]byte, error) {
 
 		case *rsa.PrivateKey:
 			b, err := tls.PrivateKeyAsBytes(v)
-			if err != nil {
-				return nil, err
-			}
-			m[k] = base64.StdEncoding.EncodeToString(b)
-
-		case *v1.Config:
-			b, err := yaml.Marshal(v)
 			if err != nil {
 				return nil, err
 			}
@@ -105,20 +97,6 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 				return err
 			}
 			v.Field(i).Set(reflect.ValueOf(u))
-
-		case "*v1.Config":
-			b, err := base64.StdEncoding.DecodeString(m[k].(string))
-			if err != nil {
-				return err
-			}
-
-			var c v1.Config
-			err = yaml.Unmarshal(b, &c)
-			if err != nil {
-				return err
-			}
-
-			v.Field(i).Set(reflect.ValueOf(&c))
 
 		case "*x509.Certificate":
 			b, err := base64.StdEncoding.DecodeString(m[k].(string))
