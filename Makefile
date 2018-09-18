@@ -37,8 +37,6 @@ sync-push: sync-image
 
 verify:
 	./hack/validate-generated.sh
-
-vet:
 	go vet ./...
 
 unit: generate
@@ -47,4 +45,4 @@ unit: generate
 e2e: generate
 	go test ./test/e2e -tags e2e
 
-.PHONY: clean sync-image sync-push verify unit e2e vet
+.PHONY: clean sync-image sync-push verify unit e2e
