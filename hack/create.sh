@@ -63,7 +63,6 @@ name: openshift
 location: eastus
 properties:
   openShiftVersion: "$DEPLOY_VERSION"
-  publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
   fqdn: $RESOURCEGROUP.eastus.cloudapp.azure.com
   authProfile:
     identityProviders:
@@ -75,7 +74,6 @@ properties:
         tenantId: $AZURE_TENANT_ID
   routerProfiles:
   - name: default
-    publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
   masterPoolProfile:
     count: 3
     vmSize: Standard_D2s_v3
@@ -97,6 +95,4 @@ go run cmd/createorupdate/createorupdate.go -loglevel=debug
 
 # TODO: This should be configured by MS
 hack/dns.sh zone-create $RESOURCEGROUP
-hack/dns.sh cname-create $RESOURCEGROUP openshift $RESOURCEGROUP.eastus.cloudapp.azure.com
 hack/dns.sh cname-create $RESOURCEGROUP '*' $RESOURCEGROUP-router.eastus.cloudapp.azure.com
-

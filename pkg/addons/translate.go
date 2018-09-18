@@ -201,12 +201,12 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.consolePublicURL"),
-			Template:   "https://{{ .ContainerService.Properties.PublicHostname }}/console/",
+			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}/console/",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.masterPublicURL"),
-			Template:   "https://{{ .ContainerService.Properties.PublicHostname }}",
+			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}",
 		},
 	},
 	"DaemonSet.apps/openshift-metrics/prometheus-node-exporter": {
@@ -250,7 +250,7 @@ var Translations = map[string][]struct {
 	"Deployment.apps/default/registry-console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='OPENSHIFT_OAUTH_PROVIDER_URL')].value"),
-			Template: "https://{{ .ContainerService.Properties.PublicHostname }}",
+			Template: "https://{{ .Derived.PublicHostname .ContainerService }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HOST')].value"),

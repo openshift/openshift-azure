@@ -105,7 +105,7 @@ func validateProperties(p *api.Properties, externalOnly bool) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid properties.openShiftVersion %q", p.OpenShiftVersion))
 	}
 
-	if p.PublicHostname != "" && !isValidHostname(p.PublicHostname) {
+	if p.PublicHostname != "" { // TODO: relax after private preview (&& !isValidHostname(p.PublicHostname))
 		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
 	}
 	if !externalOnly {
@@ -256,6 +256,8 @@ func validateRouterProfile(rp api.RouterProfile) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
 	}
 
+	// TODO: consider ensuring that PublicSubdomain is of the form
+	// <string>.<location>.azmosa.io
 	if rp.PublicSubdomain != "" && !isValidHostname(rp.PublicSubdomain) {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].publicSubdomain %q", rp.Name, rp.PublicSubdomain))
 	}

@@ -8,7 +8,6 @@ import (
 	"math/big"
 	"strings"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/tls"
 	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
@@ -116,14 +115,4 @@ func randomString(length int) (string, error) {
 	}
 
 	return string(b), nil
-}
-
-func selectDNSNames(cs *acsapi.OpenShiftManagedCluster) {
-	// Set PublicHostname to FQDN values if not specified
-	if cs.Properties.PublicHostname == "" {
-		cs.Properties.PublicHostname = cs.Properties.FQDN
-	}
-	if cs.Properties.RouterProfiles[0].PublicSubdomain == "" {
-		cs.Properties.RouterProfiles[0].PublicSubdomain = cs.Properties.RouterProfiles[0].FQDN
-	}
 }

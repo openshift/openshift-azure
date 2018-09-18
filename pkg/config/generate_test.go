@@ -1,7 +1,6 @@
 package config
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/satori/go.uuid"
@@ -65,9 +64,6 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.Images.Sync != "", "sync image")
 	assert(c.Images.LogBridge != "", "logbridge image")
 
-	assert(omc.Properties.PublicHostname != "", "public host name")
-	assert(omc.Properties.RouterProfiles[0].PublicSubdomain != "", "router public subdomain")
-
 	assert(c.ServiceAccountKey != nil, "service account key")
 	assert(len(c.HtPasswd) != 0, "htpassword")
 	assert(len(c.AdminPasswd) != 0, "admin password")
@@ -113,62 +109,4 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.AdminKubeconfig != nil, "AdminKubeconfig")
 	assert(c.NodeBootstrapKubeconfig != nil, "NodeBootstrapKubeconfig")
 	assert(c.AzureClusterReaderKubeconfig != nil, "AzureClusterReaderKubeconfig")
-}
-
-func TestSelectDNSNames(t *testing.T) {
-	tests := map[string]struct {
-		f        func(*api.OpenShiftManagedCluster)
-		expected func(*api.OpenShiftManagedCluster)
-	}{
-		"test no PublicHostname": {
-			f: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.PublicHostname = ""
-				cs.Properties.RouterProfiles[0].PublicSubdomain = ""
-			},
-			expected: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.PublicHostname = "www.example.com"
-				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-fqdn.example.com"
-			},
-		},
-		"test no PublicSubdomain for router": {
-			f: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.PublicHostname = "console.example.com"
-				cs.Properties.RouterProfiles[0].PublicSubdomain = ""
-			},
-			expected: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.PublicHostname = "console.example.com"
-				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-fqdn.example.com"
-			},
-		},
-		"test master & router prefix configuration": {
-			f: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.PublicHostname = ""
-				cs.Properties.RouterProfiles[0].PublicSubdomain = ""
-
-				cs.Properties.FQDN = "master-custom.test.com"
-				cs.Properties.RouterProfiles[0].FQDN = "router-custom.test.com"
-			},
-			expected: func(cs *api.OpenShiftManagedCluster) {
-				cs.Properties.FQDN = "master-custom.test.com"
-				cs.Properties.RouterProfiles[0].FQDN = "router-custom.test.com"
-
-				cs.Properties.PublicHostname = "master-custom.test.com"
-				cs.Properties.RouterProfiles[0].PublicSubdomain = "router-custom.test.com"
-			},
-		},
-	}
-
-	for name, test := range tests {
-		input := fixtures.NewTestOpenShiftCluster()
-		output := input.DeepCopy()
-
-		test.f(input)
-		test.expected(output)
-
-		selectDNSNames(input)
-
-		if !reflect.DeepEqual(input, output) {
-			t.Errorf("%v: SelectDNSNames test returned unexpected result \n %#v != %#v", name, input, output)
-		}
-	}
 }
