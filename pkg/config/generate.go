@@ -20,7 +20,9 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 
 	selectNodeImage(cs, os.Getenv("DEPLOY_OS"))
 
-	selectContainerImages(cs)
+	if err = selectContainerImages(cs); err != nil {
+		return err
+	}
 
 	selectDNSNames(cs)
 

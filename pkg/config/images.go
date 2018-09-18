@@ -1,11 +1,23 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 )
+
+// openshiftVersion converts a VM image version (e.g. 310.14.20180101) to an
+// openshift container image version (e.g. v3.10.14)
+func openShiftVersion(imageVersion string) (string, error) {
+	parts := strings.Split(imageVersion, ".")
+	if len(parts) != 3 || len(parts[0]) < 2 {
+		return "", fmt.Errorf("invalid imageVersion %q", imageVersion)
+	}
+
+	return fmt.Sprintf("v%s.%s.%s", parts[0][:1], parts[0][1:], parts[1]), nil
+}
 
 func selectNodeImage(cs *acsapi.OpenShiftManagedCluster, deployOS string) {
 	c := cs.Config
@@ -35,12 +47,15 @@ func image(cs *acsapi.OpenShiftManagedCluster, component, version string) string
 	return strings.Replace(image, "${version}", version, -1)
 }
 
-func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
+func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) error {
 	c := cs.Config
+	v, err := openShiftVersion(c.ImageVersion)
+	if err != nil {
+		return err
+	}
 
 	switch cs.Properties.OpenShiftVersion {
 	case "v3.10":
-		v := "v3.10.0" // TODO: perhaps we should calculate this from ImageVersion
 		c.Images.ControlPlane = image(cs, "control-plane", v)
 		c.Images.Node = image(cs, "node", v)
 		c.Images.ServiceCatalog = image(cs, "service-catalog", v)
@@ -70,15 +85,20 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) {
 
 		c.Images.LogBridge = "quay.io/openshift-on-azure/logbridge:latest"
 	}
+
+	return nil
 }
 
-func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) {
+func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) error {
 	c := cs.Config
+	v, err := openShiftVersion(c.ImageVersion)
+	if err != nil {
+		return err
+	}
 
 	switch cs.Properties.OpenShiftVersion {
 	//TODO: confirm minor version after release
 	case "v3.10":
-		v := "v3.10.14" // TODO: perhaps we should calculate this from c.Images.ImageVersion
 		c.Images.ControlPlane = image(cs, "control-plane", v)
 		c.Images.Node = image(cs, "node", v)
 		c.Images.ServiceCatalog = image(cs, "service-catalog", v)
@@ -107,13 +127,17 @@ func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) {
 
 		c.Images.LogBridge = "quay.io/openshift-on-azure/logbridge:latest"
 	}
+
+	return nil
 }
 
-func selectContainerImages(cs *acsapi.OpenShiftManagedCluster) {
+func selectContainerImages(cs *acsapi.OpenShiftManagedCluster) error {
 	switch os.Getenv("DEPLOY_OS") {
 	case "", "rhel7":
-		selectContainerImagesOSA(cs)
+		return selectContainerImagesOSA(cs)
 	case "centos7":
-		selectContainerImagesOrigin(cs)
+		return selectContainerImagesOrigin(cs)
 	}
+
+	return fmt.Errorf("unrecognised DEPLOY_OS value")
 }
