@@ -151,6 +151,7 @@
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-reader.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-readers.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-status-binding.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/kube-state-metrics-cluster-role-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/router-metrics.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/router-router-role.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/sdn-cluster-reader.yaml
@@ -3552,6 +3553,26 @@ func clusterrolebindingRbacAuthorizationK8sIoClusterStatusBindingYaml() (*asset,
 	}
 
 	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/cluster-status-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _clusterrolebindingRbacAuthorizationK8sIoKubeStateMetricsClusterRoleBindingYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\x8d\x31\x4e\xc4\x40\x0c\x45\xfb\x39\x85\x2f\x90\x20\x3a\x34\x1d\x50\xd0\x07\x89\xde\x99\x38\xc4\x24\xb1\x47\xb6\x27\x05\xa7\x5f\xad\x76\xb5\xcd\x4a\xa9\xdf\x7f\xff\x61\xe5\x1f\x32\x67\x95\x0c\x36\x62\xe9\xb1\xc5\xa2\xc6\xff\x18\xac\xd2\xaf\x6f\xde\xb3\xbe\x1c\xaf\x90\x56\x96\x29\xc3\xe7\xd6\x3c\xc8\x06\xdd\xe8\x83\x65\x62\xf9\x4d\x3b\x05\x4e\x18\x98\x13\x80\xe0\x4e\x19\xd6\x36\x52\xe7\x81\x41\xdd\x4e\x61\x5c\x3c\x99\x6e\x34\xd0\x7c\xdd\x60\xe5\x2f\xd3\x56\x4f\x82\x09\xe0\x29\x77\xf6\xee\x6d\xfc\xa3\x12\x9e\x53\x77\x17\xbf\xc9\x0e\x2e\xf4\x5e\x8a\x36\x89\x33\xf7\x86\xbc\x62\xa1\x0c\x5a\x49\x7c\xe1\x39\x1e\xf8\x12\x00\x00\xff\xff\xe0\xf2\x2e\x5a\x21\x01\x00\x00")
+
+func clusterrolebindingRbacAuthorizationK8sIoKubeStateMetricsClusterRoleBindingYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_clusterrolebindingRbacAuthorizationK8sIoKubeStateMetricsClusterRoleBindingYaml,
+		"ClusterRoleBinding.rbac.authorization.k8s.io/kube-state-metrics-cluster-role-binding.yaml",
+	)
+}
+
+func clusterrolebindingRbacAuthorizationK8sIoKubeStateMetricsClusterRoleBindingYaml() (*asset, error) {
+	bytes, err := clusterrolebindingRbacAuthorizationK8sIoKubeStateMetricsClusterRoleBindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/kube-state-metrics-cluster-role-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -7156,7 +7177,7 @@ func rolebindingRbacAuthorizationK8sIoOpenshiftEtcdEtcdOperatorYaml() (*asset, e
 	return a, nil
 }
 
-var _rolebindingRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\x8d\x31\x4e\xc4\x40\x0c\x45\xfb\x39\x85\x2f\x90\x20\x3a\x34\x1d\x50\xd0\x07\x89\xde\x99\x38\xc4\x24\xb1\x47\xb6\x27\x05\xa7\x5f\xad\x76\xb5\xcd\x4a\xa9\xdf\x7f\xff\x61\xe5\x1f\x32\x67\x95\x0c\x36\x62\xe9\xb1\xc5\xa2\xc6\xff\x18\xac\xd2\xaf\x6f\xde\xb3\xbe\x1c\xaf\x90\x56\x96\x29\xc3\xe7\xd6\x3c\xc8\x06\xdd\xe8\x83\x65\x62\xf9\x4d\x3b\x05\x4e\x18\x98\x13\x80\xe0\x4e\x19\xd6\x36\x52\xe7\x81\x41\xdd\x4e\x61\x5c\x3c\x99\x6e\x34\xd0\x7c\xdd\x60\xe5\x2f\xd3\x56\x4f\x82\x09\xe0\x29\x77\xf6\xee\x6d\xfc\xa3\x12\x9e\x53\x77\x17\xbf\xc9\x0e\x2e\xf4\x5e\x8a\x36\x89\x33\xf7\x86\xbc\x62\xa1\x0c\x5a\x49\x7c\xe1\x39\x1e\xf8\x12\x00\x00\xff\xff\xe0\xf2\x2e\x5a\x21\x01\x00\x00")
+var _rolebindingRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xa4\xce\x31\x4e\x03\x41\x0c\x85\xe1\x7e\x4e\xe1\x0b\xec\x22\x3a\x34\x1d\x34\xf4\x41\xa2\xf7\xce\xbe\x10\xb3\x59\x7b\x64\x7b\x52\xe4\xf4\x08\x29\x82\x2e\x4d\xea\x5f\xf6\xfb\xb8\xcb\x27\x3c\xc4\xb4\x92\x2f\xdc\x66\x1e\x79\x32\x97\x2b\xa7\x98\xce\xdb\x4b\xcc\x62\x4f\x97\xe7\xb2\x89\xae\x95\x0e\x76\xc6\x9b\xe8\x2a\xfa\x55\x76\x24\xaf\x9c\x5c\x0b\x91\xf2\x8e\x4a\xdb\x58\x30\x45\x72\x62\xda\x91\x2e\x2d\x6e\x29\x3a\x37\x54\xb2\x0e\x8d\x93\x1c\xf3\x2f\xbb\x9d\x71\xc0\xf1\xf7\x05\x77\x79\x77\x1b\xfd\x8e\xa3\x10\xfd\x33\xee\xac\x4e\x8e\x90\x2b\xbc\xc4\x58\xbe\xd1\x32\x6a\x99\x6e\x97\x1f\xf0\x8b\x34\xbc\xb6\x66\x43\xf3\x01\xf9\x4f\x00\x00\x00\xff\xff\x15\x73\x38\x62\x39\x01\x00\x00")
 
 func rolebindingRbacAuthorizationK8sIoOpenshiftMetricsKubeStateMetricsYamlBytes() ([]byte, error) {
 	return bindataRead(
@@ -10159,6 +10180,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-reader.yaml":                                                                   clusterrolebindingRbacAuthorizationK8sIoClusterReaderYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-readers.yaml":                                                                  clusterrolebindingRbacAuthorizationK8sIoClusterReadersYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-status-binding.yaml":                                                           clusterrolebindingRbacAuthorizationK8sIoClusterStatusBindingYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/kube-state-metrics-cluster-role-binding.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoKubeStateMetricsClusterRoleBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/router-metrics.yaml":                                                                   clusterrolebindingRbacAuthorizationK8sIoRouterMetricsYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/router-router-role.yaml":                                                               clusterrolebindingRbacAuthorizationK8sIoRouterRouterRoleYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/sdn-cluster-reader.yaml":                                                               clusterrolebindingRbacAuthorizationK8sIoSdnClusterReaderYaml,
@@ -10678,6 +10700,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"cluster-reader.yaml":                                                           {clusterrolebindingRbacAuthorizationK8sIoClusterReaderYaml, map[string]*bintree{}},
 		"cluster-readers.yaml":                                                          {clusterrolebindingRbacAuthorizationK8sIoClusterReadersYaml, map[string]*bintree{}},
 		"cluster-status-binding.yaml":                                                   {clusterrolebindingRbacAuthorizationK8sIoClusterStatusBindingYaml, map[string]*bintree{}},
+		"kube-state-metrics-cluster-role-binding.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoKubeStateMetricsClusterRoleBindingYaml, map[string]*bintree{}},
 		"router-metrics.yaml":                                                           {clusterrolebindingRbacAuthorizationK8sIoRouterMetricsYaml, map[string]*bintree{}},
 		"router-router-role.yaml":                                                       {clusterrolebindingRbacAuthorizationK8sIoRouterRouterRoleYaml, map[string]*bintree{}},
 		"sdn-cluster-reader.yaml":                                                       {clusterrolebindingRbacAuthorizationK8sIoSdnClusterReaderYaml, map[string]*bintree{}},
