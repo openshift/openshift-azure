@@ -5,3 +5,10 @@
 #
 # example: 
 # export TEST_FOCUS="my-awesome-test-I-want-to-run"
+# TEST_FOCUS="Suite:openshift/conformance/parallel"
+# TEST_SKIP=".*((The HAProxy router should set Forwarded headers appropriately)|(oc new-app should succeed with a --name of 58 characters)|(process valueFrom in build strategy environment variables should successfully resolve valueFrom in docker build environment variables)|(prune builds based on settings in the buildconfig should prune failed builds based on the failedBuildsHistoryLimit setting)|(Prometheus when installed to the cluster should start and expose a secured proxy and unsecured metrics)|(Prometheus when installed to the cluster should start and expose a secured proxy and verify build metrics)|(templateservicebroker)|(deploymentconfigs with multiple image change triggers \[Conformance\] should run a successful deployment with multiple triggers)|(templateinstance readiness test should report failed soon after an annotated objects has failed)|(s2i build with a root user image should create a root build and pass with a privileged SCC)|(Image policy should update standard Kube object image fields when local names are on)|(deploymentconfigs with minimum ready seconds set \[Conformance\] should not transition the deployment to Complete before satisfied)|(prune builds based on settings in the buildconfig \[Conformance\] buildconfigs should have a default history limit set when created via the group api)).*"
+# ginkgo -v -noColor -nodes=30 $( which extended.test ) -- \
+#             -ginkgo.focus="${TEST_FOCUS}" -ginkgo.skip="${TEST_SKIP}" \
+#             -e2e-output-dir /tmp/artifacts -report-dir /tmp/artifacts/junit \
+#             -test.timeout=2h || rc=$?
+# exit $rc
