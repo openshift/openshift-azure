@@ -52,7 +52,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		}
 
 		log.Info("merge old and new config")
-		p.MergeConfig(ctx, cs, oldCs)
+		cs = p.MergeConfig(ctx, cs, oldCs)
 	}
 
 	// validate the internal API representation (with reference to the previous

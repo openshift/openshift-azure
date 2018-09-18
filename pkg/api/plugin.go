@@ -20,7 +20,7 @@ type Plugin interface {
 	// partial user requests to allow reusing the same validation code during
 	// upgrades. This method should be the first one called by the RP, before
 	// validation and generation.
-	MergeConfig(ctx context.Context, new, old *OpenShiftManagedCluster)
+	MergeConfig(ctx context.Context, new, old *OpenShiftManagedCluster) *OpenShiftManagedCluster
 
 	// Validate exists (a) to be able to place validation logic in a
 	// single place in the event of multiple external API versions, and (b) to

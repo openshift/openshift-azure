@@ -31,42 +31,12 @@ func NewPlugin(entry *logrus.Entry, syncImage string) api.Plugin {
 	}
 }
 
-func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster) {
+func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster) *api.OpenShiftManagedCluster {
 	if oldCs == nil {
-		return
+		return cs
 	}
 	log.Info("merging internal data models")
-
-	// generated config should be copied as is
-	old := oldCs.DeepCopy()
-	cs.Config = old.Config
-
-	// user request data
-	// need to merge partial requests
-	if len(cs.Properties.AgentPoolProfiles) == 0 {
-		cs.Properties.AgentPoolProfiles = oldCs.Properties.AgentPoolProfiles
-	}
-	if len(cs.Properties.OpenShiftVersion) == 0 {
-		cs.Properties.OpenShiftVersion = oldCs.Properties.OpenShiftVersion
-	}
-	if len(cs.Properties.PublicHostname) == 0 {
-		cs.Properties.PublicHostname = oldCs.Properties.PublicHostname
-	}
-	if len(cs.Properties.RouterProfiles) == 0 {
-		cs.Properties.RouterProfiles = oldCs.Properties.RouterProfiles
-	}
-	if cs.Properties.ServicePrincipalProfile == nil {
-		cs.Properties.ServicePrincipalProfile = oldCs.Properties.ServicePrincipalProfile
-	}
-	if cs.Properties.AzProfile == nil {
-		cs.Properties.AzProfile = oldCs.Properties.AzProfile
-	}
-	if cs.Properties.AuthProfile == nil {
-		cs.Properties.AuthProfile = oldCs.Properties.AuthProfile
-	}
-	if len(cs.Properties.FQDN) == 0 {
-		cs.Properties.FQDN = oldCs.Properties.FQDN
-	}
+	return api.Merge(oldCs, cs)
 }
 
 func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) []error {

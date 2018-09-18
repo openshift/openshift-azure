@@ -34,7 +34,7 @@ func TestMerge(t *testing.T) {
 
 	// should fix all of the items removed above and we should
 	// be able to run through the entire plugin process.
-	p.MergeConfig(context.Background(), newCluster, oldCluster)
+	newCluster = p.MergeConfig(context.Background(), newCluster, oldCluster)
 
 	if newCluster.Config == nil {
 		t.Errorf("new cluster config should be merged")
