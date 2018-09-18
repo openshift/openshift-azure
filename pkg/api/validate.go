@@ -77,8 +77,6 @@ func validateContainerService(c *OpenShiftManagedCluster, externalOnly bool) (er
 }
 
 func validateUpdateContainerService(cs, oldCs *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
-	// TODO: function needs unit testing.
-
 	newAgents := make(map[string]*AgentPoolProfile)
 	for i := range cs.Properties.AgentPoolProfiles {
 		newAgent := cs.Properties.AgentPoolProfiles[i]
