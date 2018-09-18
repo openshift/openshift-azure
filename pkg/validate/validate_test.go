@@ -17,7 +17,7 @@ location: eastus
 name: openshift
 properties:
   openShiftVersion: v3.10
-  fqdn: www.example.com
+  fqdn: example.eastus.cloudapp.azure.com
   authProfile:
     identityProviders:
     - name: Azure AD
@@ -29,7 +29,7 @@ properties:
   routerProfiles:
   - name: default
     publicSubdomain: test.example.com
-    fqdn: www.example.com
+    fqdn: router-fqdn.eastus.cloudapp.azure.com
   masterPoolProfile:
     count: 3
     vmSize: Standard_D2s_v3
@@ -312,5 +312,18 @@ func TestValidate(t *testing.T) {
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
 			t.Errorf("%s expected errors %#v but received %#v", name, spew.Sprint(test.expectedErrs), spew.Sprint(errs))
 		}
+	}
+}
+
+func TestIsAzureZone(t *testing.T) {
+	invalidFqdns := []string{"invalid.random.domain", "too.long.domain.cloudapp.azure.com"}
+	for _, invalidFqdn := range invalidFqdns {
+		if isAzureZone(invalidFqdn) {
+			t.Errorf("invalid FQDN passed test: %s", invalidFqdn)
+		}
+	}
+	validFqdn := "example.westus2.cloudapp.azure.com"
+	if !isAzureZone(validFqdn) {
+		t.Errorf("Valid FQDN failed to pass test: %s", validFqdn)
 	}
 }

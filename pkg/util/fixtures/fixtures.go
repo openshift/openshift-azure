@@ -10,12 +10,12 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 		Name:     "openshift",
 		Config:   &api.Config{},
 		Properties: &api.Properties{
-			FQDN:             "www.example.com",
+			FQDN:             "example.eastus.cloudapp.azure.com",
 			OpenShiftVersion: "v3.10",
 			RouterProfiles: []api.RouterProfile{
 				{
 					Name:            "default",
-					FQDN:            "router-fqdn.example.com",
+					FQDN:            "router-fqdn.eastus.cloudapp.azure.com",
 					PublicSubdomain: "test.example.com",
 				},
 			},
