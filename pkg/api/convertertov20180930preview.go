@@ -41,7 +41,7 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 			}
 		}
 
-		oc.Properties.AgentPoolProfiles = make([]v20180930preview.AgentPoolProfile, 0, len(cs.Properties.AgentPoolProfiles)-1)
+		oc.Properties.AgentPoolProfiles = make([]v20180930preview.AgentPoolProfile, 0, len(cs.Properties.AgentPoolProfiles))
 		for _, app := range cs.Properties.AgentPoolProfiles {
 			if app.Role == AgentPoolProfileRoleMaster {
 				oc.Properties.MasterPoolProfile = &v20180930preview.MasterPoolProfile{
