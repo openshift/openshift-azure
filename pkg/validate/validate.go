@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strings"
 
 	"github.com/go-test/deep"
 
@@ -39,6 +40,10 @@ var validRouterProfileNames = map[string]struct{}{
 
 func isValidHostname(h string) bool {
 	return len(h) <= 255 && rxRfc1123.MatchString(h)
+}
+
+func isAzureZone(fqdn string) bool {
+	return strings.HasSuffix(fqdn, ".cloudapp.azure.com") && len(strings.Split(fqdn, ".")) == 5
 }
 
 // Validate validates a OpenShiftManagedCluster struct
@@ -220,7 +225,7 @@ func validateFQDN(p *api.Properties) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
 	}
-	if p.FQDN == "" || !isValidHostname(p.FQDN) {
+	if p.FQDN == "" || !isValidHostname(p.FQDN) || !isAzureZone(p.FQDN) {
 		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
 	}
 	return
@@ -262,7 +267,7 @@ func validateRouterProfile(rp api.RouterProfile) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].publicSubdomain %q", rp.Name, rp.PublicSubdomain))
 	}
 
-	if rp.FQDN != "" && !isValidHostname(rp.FQDN) {
+	if rp.FQDN != "" && !isValidHostname(rp.FQDN) && !isAzureZone(rp.FQDN) {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].fqdn %q", rp.Name, rp.FQDN))
 	}
 
