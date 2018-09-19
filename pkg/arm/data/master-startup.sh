@@ -34,7 +34,9 @@ fi
 
 echo "BOOTSTRAP_CONFIG_NAME=node-config-master" >>/etc/sysconfig/${SERVICE_TYPE}-node
 
-#sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-node
+{{- if .Derived.RunningUnderTest }}
+sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-node
+{{- end }}
 
 for dst in tcp,2380 tcp,444; do
 #for dst in tcp,2379 tcp,2380 tcp,8443 tcp,8444 tcp,8053 udp,8053 tcp,9090; do
@@ -486,7 +488,11 @@ spec:
     - master
     - api
     - --config=/etc/origin/master/master-config.yaml
+{{- if .Derived.RunningUnderTest }}
+    - --loglevel=4
+{{- else }}
     - --loglevel=2
+{{- end }}
     command:
     - openshift
     image: {{ .Config.Images.ControlPlane | quote }}
@@ -539,7 +545,11 @@ spec:
     - controllers
     - --config=/etc/origin/master/master-config.yaml
     - --listen=https://0.0.0.0:444
+{{- if .Derived.RunningUnderTest }}
+    - --loglevel=4
+{{- else }}
     - --loglevel=2
+{{- end }}
     command:
     - openshift
     image: {{ .Config.Images.ControlPlane | quote }}
