@@ -8,7 +8,7 @@ data:
     apiVersion: etcd.database.coreos.com/v1beta2
     kind: EtcdBackup
     metadata:
-      name: etcd-backup
+      generateName: etcd-backup-
       namespace: openshift-etcd
     spec:
       etcdEndpoints:

@@ -210,9 +210,15 @@ var Translations = map[string][]struct {
 			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}",
 		},
 	},
-	"CronJob/openshift-etcd/etcd-backup": {
+	"CronJob.batch/openshift-etcd/etcd-backup": {
 		{
-			Path:     jsonpath.MustCompile("$.spec.jobTemplate.spec.template.containers[0].image"),
+			Path:     jsonpath.MustCompile("$.spec.jobTemplate.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.Cli }}",
+		},
+	},
+	"CronJob.batch/openshift-etcd/etcd-backup-cleaner": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.jobTemplate.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.Cli }}",
 		},
 	},

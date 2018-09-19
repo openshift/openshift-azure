@@ -1,0 +1,24 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: etcd-backup-cleaner
+  namespace: openshift-etcd
+spec:
+  # todo: move to 1 day after testing
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: etcd-operator
+          containers:
+          - name: etcd-backup-cleaner
+            image: '### GENERATED ###'
+            command:
+            - /bin/sh
+            - "-ec"
+            - |
+              # todo: change to yesterday after testing
+              kubectl get etcdbackup -o go-template --template '{{range .items}}{{.metadata.name}} {{.metadata.creationTimestamp}}{{"\n"}}{{end}}' | \
+              awk '$2 <= "'$(date '+%Y-%m-%dT%H:%M:%SZ' -d 'now -1 hours')'" { print $1 }' | xargs --no-run-if-empty kubectl delete etcdbackup
+          restartPolicy: OnFailure

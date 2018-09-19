@@ -4,11 +4,13 @@ metadata:
   name: etcd-backup
   namespace: openshift-etcd
 spec:
-  schedule: "*/30 * * * *"
+  # todo: move to 1 hour after testing
+  schedule: "*/10 * * * *"
   jobTemplate:
     spec:
       template:
         spec:
+          serviceAccountName: etcd-operator
           containers:
           - name: etcd-backup
             image: '### GENERATED ###'
