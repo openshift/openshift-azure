@@ -94,11 +94,17 @@
 1. Run `./hack/delete.sh $RESOURCEGROUP` to delete the deployed cluster.
 
 ##### Access the cluster
- Cluster can be accessed via `UI` and `CLI`. If cluster was created using AAD
-integration (Pre-requisites 7.4), you can login using Azure AD. Second option, 
-which will be deprecated later, is `htpasswd`. Username for it is `osadmin`, 
-password - random generated. To get random generated password execute: 
-`./hack/config.sh get-config $RESOURCEGROUP | jq -r .config.AdminPasswd`
+A cluster can be accessed via the `UI` or `CLI`. If it was created using AAD
+integration ([Pre-requisites](#prerequisites) 7.iv), you can login using Azure AD. Another option,
+which will be deprecated in the future, is `htpasswd`. The username that is used
+is `osadmin` and the password is randomly generated. To get the password execute:
+```console
+./hack/config.sh get-config $RESOURCEGROUP | jq -r .config.adminPasswd
+```
+You can also get the admin kubeconfig with:
+```console
+./hack/config.sh get-config $RESOURCEGROUP | jq -r .config.adminKubeconfig
+```
 
 ### Examples
 
