@@ -48,6 +48,7 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 
 	assert(c.Images.ControlPlane != "", "control plane image")
 	assert(c.Images.Node != "", "node image")
+	assert(c.Images.Cli != "", "cli image")
 	assert(c.Images.ServiceCatalog != "", "service catalog image")
 	assert(c.Images.AnsibleServiceBroker != "", "ansible service broker image")
 	assert(c.Images.TemplateServiceBroker != "", "template service broker image")

@@ -53,6 +53,7 @@ type ImageConfig struct {
 	MasterEtcd             string `json:"masterEtcd,omitempty"`
 	ControlPlane           string `json:"controlPlane,omitempty"`
 	Node                   string `json:"node,omitempty"`
+	Cli                    string `json:"cli,omitempty"`
 	ServiceCatalog         string `json:"serviceCatalog,omitempty"`
 	Sync                   string `json:"sync,omitempty"`
 	TemplateServiceBroker  string `json:"templateServiceBroker,omitempty"`

@@ -58,6 +58,7 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) error {
 	case "v3.10":
 		c.Images.ControlPlane = image(cs, "control-plane", v)
 		c.Images.Node = image(cs, "node", v)
+		c.Images.Cli = image(cs, "cli", v)
 		c.Images.ServiceCatalog = image(cs, "service-catalog", v)
 		c.Images.TemplateServiceBroker = image(cs, "template-service-broker", v)
 		c.Images.Registry = image(cs, "docker-registry", v)
@@ -101,6 +102,7 @@ func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) error {
 	case "v3.10":
 		c.Images.ControlPlane = image(cs, "control-plane", v)
 		c.Images.Node = image(cs, "node", v)
+		c.Images.Cli = image(cs, "cli", v)
 		c.Images.ServiceCatalog = image(cs, "service-catalog", v)
 		c.Images.AnsibleServiceBroker = image(cs, "ansible-service-broker", v)
 		c.Images.TemplateServiceBroker = image(cs, "template-service-broker", v)

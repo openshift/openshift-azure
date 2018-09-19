@@ -209,6 +209,12 @@ var Translations = map[string][]struct {
 			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}",
 		},
 	},
+	"CronJob/openshift-etcd/etcd-backup": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.jobTemplate.spec.template.containers[0].image"),
+			Template: "{{ .Config.Images.Cli }}",
+		},
+	},
 	"DaemonSet.apps/openshift-metrics/prometheus-node-exporter": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
