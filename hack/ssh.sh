@@ -41,7 +41,7 @@ if [[ -z "$RESOURCEGROUP" ]]; then
     RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
     cat _data/_out/id_rsa >$ID_RSA
 else
-    hack/config.sh get-config $RESOURCEGROUP | jq -r .config.SSHKey | base64 -d >$ID_RSA
+    hack/config.sh get-config $RESOURCEGROUP | jq -r .config.sshKey | base64 -d >$ID_RSA
 fi
 
 IP=$(az vmss list-instance-public-ips -g $RESOURCEGROUP -n ss-master --query "[$ID].ipAddress" | tr -d '"')
