@@ -76,6 +76,7 @@ func (g *simpleGenerator) selectContainerImagesOrigin(cs *api.OpenShiftManagedCl
 		c.Images.ControlPlane = g.image("control-plane", v)
 		c.Images.Node = g.image("node", v)
 		c.Images.ServiceCatalog = g.image("service-catalog", v)
+		c.Images.Cli = g.image("cli", v)
 		c.Images.TemplateServiceBroker = g.image("template-service-broker", v)
 		c.Images.Registry = g.image("docker-registry", v)
 		c.Images.Router = g.image("haproxy-router", v)
@@ -114,6 +115,7 @@ func (g *simpleGenerator) selectContainerImagesOSA(cs *api.OpenShiftManagedClust
 	case "v3.10":
 		c.Images.ControlPlane = g.image("control-plane", v)
 		c.Images.Node = g.image("node", v)
+		c.Images.Cli = g.image("cli", v)
 		c.Images.ServiceCatalog = g.image("service-catalog", v)
 		c.Images.AnsibleServiceBroker = g.image("ansible-service-broker", v)
 		c.Images.TemplateServiceBroker = g.image("template-service-broker", v)
