@@ -39,7 +39,7 @@ for region in "${valid_regions[@]}"; do
 done
 if [[ $match = 0 ]]; then
     echo "Error invalid region: must be one of ${valid_regions[@]}"
-    exist 1
+    exit 1
 fi
 
 if [[ -z "$DNS_DOMAIN" ]]; then
