@@ -15,12 +15,12 @@ import (
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
-func Generate(cs *api.OpenShiftManagedCluster) (err error) {
+func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (err error) {
 	c := cs.Config
 
 	selectNodeImage(cs, os.Getenv("DEPLOY_OS"))
 
-	if err = selectContainerImages(cs); err != nil {
+	if err = selectContainerImages(cs, pluginConfig); err != nil {
 		return err
 	}
 

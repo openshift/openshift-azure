@@ -6,27 +6,22 @@ import (
 	"os"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
-func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
+func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, config api.PluginConfig) error {
 	// TODO: probably need to break this function into two pieces, pre-Deploy
 	// and post-Deploy, so that MSFT can use custom ARM deployment logic.
 
-	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
-	authorizer, err := config.Authorizer()
+	clients, err := azureclient.NewAzureClients(ctx, cs, config)
 	if err != nil {
 		return err
 	}
-	ssc := compute.NewVirtualMachineScaleSetsClient(cs.Properties.AzProfile.SubscriptionID)
-	ssc.Authorizer = authorizer
-	vmc := compute.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID)
-	vmc.Authorizer = authorizer
 
 	// Deploy() may change the number of VMs.  If we can see that any VMs are
 	// about to be deleted, drain them first.  Record which VMs are visible now
@@ -36,7 +31,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	vmsBefore := map[string]struct{}{}
 
 	for _, agent := range cs.Properties.AgentPoolProfiles {
-		vms, err := ListVMs(ctx, cs, vmc, agent.Role)
+		vms, err := ListVMs(ctx, cs, clients.VirtualMachineScaleSetVMs, agent.Role)
 		if err != nil {
 			return err
 		}
@@ -46,7 +41,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 				vmsBefore[*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName] = struct{}{}
 
 			} else {
-				err = u.delete(ctx, cs, vmc, agent.Role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+				err = u.delete(ctx, cs, clients.VirtualMachineScaleSetVMs, agent.Role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 				if err != nil {
 					return err
 				}
@@ -55,12 +50,12 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	// Apply the ARM template
-	if err := Deploy(ctx, cs, u.Initializer, azuredeploy); err != nil {
+	if err := Deploy(ctx, cs, u.Initializer, azuredeploy, config); err != nil {
 		return err
 	}
 
 	for _, agent := range cs.Properties.AgentPoolProfiles {
-		vms, err := ListVMs(ctx, cs, vmc, agent.Role)
+		vms, err := ListVMs(ctx, cs, clients.VirtualMachineScaleSetVMs, agent.Role)
 		if err != nil {
 			return err
 		}
@@ -84,17 +79,17 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	// mechanism to avoid unnecessary VM rotations as well.
 
 	if os.Getenv("RUNNING_UNDER_TEST") != "" {
-		err = u.updateInPlace(ctx, cs, ssc, vmc, api.AgentPoolProfileRoleMaster)
+		err = u.updateInPlace(ctx, cs, clients.VirtualMachineScaleSets, clients.VirtualMachineScaleSetVMs, api.AgentPoolProfileRoleMaster)
 		if err != nil {
 			return err
 		}
 
-		err = u.updatePlusOne(ctx, cs, ssc, vmc, api.AgentPoolProfileRoleInfra)
+		err = u.updatePlusOne(ctx, cs, clients.VirtualMachineScaleSets, clients.VirtualMachineScaleSetVMs, api.AgentPoolProfileRoleInfra)
 		if err != nil {
 			return err
 		}
 
-		err = u.updatePlusOne(ctx, cs, ssc, vmc, api.AgentPoolProfileRoleCompute)
+		err = u.updatePlusOne(ctx, cs, clients.VirtualMachineScaleSets, clients.VirtualMachineScaleSetVMs, api.AgentPoolProfileRoleCompute)
 		if err != nil {
 			return err
 		}

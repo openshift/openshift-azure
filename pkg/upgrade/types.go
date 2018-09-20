@@ -12,7 +12,7 @@ import (
 
 type Upgrader interface {
 	initialize.Initializer
-	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error
+	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, config api.PluginConfig) error
 }
 
 type simpleUpgrader struct {
@@ -21,9 +21,9 @@ type simpleUpgrader struct {
 
 var _ Upgrader = &simpleUpgrader{}
 
-func NewSimpleUpgrader(entry *logrus.Entry) Upgrader {
+func NewSimpleUpgrader(entry *logrus.Entry, pluginConfig api.PluginConfig) Upgrader {
 	log.New(entry)
 	return &simpleUpgrader{
-		Initializer: initialize.NewSimpleInitializer(entry),
+		Initializer: initialize.NewSimpleInitializer(entry, pluginConfig),
 	}
 }

@@ -38,13 +38,16 @@ type HealthChecker interface {
 	HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error
 }
 
-type simpleHealthChecker struct{}
+type simpleHealthChecker struct {
+	pluginConfig acsapi.PluginConfig
+}
 
 var _ HealthChecker = &simpleHealthChecker{}
 
-func NewSimpleHealthChecker(entry *logrus.Entry) HealthChecker {
+// NewSimpleHealthChecker create a new HealthChecker
+func NewSimpleHealthChecker(entry *logrus.Entry, pluginConfig acsapi.PluginConfig) HealthChecker {
 	log.New(entry)
-	return &simpleHealthChecker{}
+	return &simpleHealthChecker{pluginConfig: pluginConfig}
 }
 
 // HealthCheck function to verify cluster health
