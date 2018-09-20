@@ -42,6 +42,10 @@ verify:
 unit: generate
 	go test ./...
 
+cover:
+	go test ./... -coverprofile=coverage.out
+	go tool cover -html=coverage.out
+
 e2e: generate
 	go test ./test/e2e -tags e2e
 
