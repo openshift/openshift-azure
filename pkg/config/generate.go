@@ -1,5 +1,9 @@
 package config
 
+//go:generate go get github.com/go-bindata/go-bindata/go-bindata
+//go:generate go-bindata -nometadata -pkg $GOPACKAGE -prefix data data/...
+//go:generate gofmt -s -l -w bindata.go
+
 import (
 	"crypto/rsa"
 	"crypto/x509"
@@ -19,6 +23,8 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 	c := cs.Config
 
 	selectNodeImage(cs, os.Getenv("DEPLOY_OS"))
+
+	generateControlPlaceConfig(cs)
 
 	if err = selectContainerImages(cs); err != nil {
 		return err

@@ -106,6 +106,12 @@ type CertificateConfig struct {
 	AzureClusterReader CertKeyPair `json:"azureClusterReader,omitempty"`
 }
 
+// ControlPlaneConfig contains all control plane configuration
+type ControlPlaneConfig struct {
+	MasterConfig string
+	EtcdConfig   string
+}
+
 // CertKeyPair is an rsa private key and x509 certificate pair.
 type CertKeyPair struct {
 	Key  *rsa.PrivateKey   `json:"key,omitempty"`

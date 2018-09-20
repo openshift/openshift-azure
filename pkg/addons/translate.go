@@ -1,15 +1,13 @@
 package addons
 
 import (
-	"encoding/base64"
-
-	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/translate"
 	"github.com/openshift/openshift-azure/pkg/util"
 )
 
@@ -22,12 +20,6 @@ func KeyFunc(gk schema.GroupKind, namespace, name string) string {
 
 	return s
 }
-
-type NestedFlags int
-
-const (
-	NestedFlagsBase64 NestedFlags = (1 << iota)
-)
 
 func translateAsset(o unstructured.Unstructured, cs *acsapi.OpenShiftManagedCluster, ext *extra) (unstructured.Unstructured, error) {
 	ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
@@ -47,7 +39,7 @@ func translateAsset(o unstructured.Unstructured, cs *acsapi.OpenShiftManagedClus
 			}
 		}
 
-		err := Translate(o.Object, tr.Path, tr.NestedPath, tr.NestedFlags, s)
+		err := translate.Translate(o.Object, tr.Path, tr.NestedPath, tr.NestedFlags, s)
 		if err != nil {
 			return unstructured.Unstructured{}, err
 		}
@@ -55,55 +47,7 @@ func translateAsset(o unstructured.Unstructured, cs *acsapi.OpenShiftManagedClus
 	return o, nil
 }
 
-func Translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nestedFlags NestedFlags, v string) error {
-	var err error
-
-	if nestedPath == nil {
-		path.Set(o, v)
-		return nil
-	}
-
-	nestedBytes := []byte(path.MustGetString(o))
-
-	if nestedFlags&NestedFlagsBase64 != 0 {
-		nestedBytes, err = base64.StdEncoding.DecodeString(string(nestedBytes))
-		if err != nil {
-			return err
-		}
-	}
-
-	var nestedObject interface{}
-	err = yaml.Unmarshal(nestedBytes, &nestedObject)
-	if err != nil {
-		panic(err)
-	}
-
-	nestedPath.Set(nestedObject, v)
-
-	nestedBytes, err = yaml.Marshal(nestedObject)
-	if err != nil {
-		panic(err)
-	}
-
-	if nestedFlags&NestedFlagsBase64 != 0 {
-		nestedBytes = []byte(base64.StdEncoding.EncodeToString(nestedBytes))
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	path.Set(o, string(nestedBytes))
-
-	return nil
-}
-
-var Translations = map[string][]struct {
-	Path        jsonpath.Path
-	NestedPath  jsonpath.Path
-	NestedFlags NestedFlags
-	Template    string
-	F           func(*acsapi.OpenShiftManagedCluster) (string, error)
-}{
+var Translations = map[string][]translate.Translation{
 	// IMPORTANT: Translations must NOT use the quote function (i.e., write
 	// "{{ .Config.Foo }}", NOT "{{ .Config.Foo | quote }}").  This is because
 	// the translations operate on in-memory objects, not on serialised YAML.

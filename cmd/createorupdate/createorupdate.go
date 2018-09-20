@@ -95,6 +95,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
+	os.Exit(1)
 	// write out development files
 	log.Info("write helpers")
 	err = writeHelpers(cs, azuredeploy)
