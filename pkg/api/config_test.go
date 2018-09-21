@@ -21,11 +21,11 @@ func TestPadNumbers(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{input: "single123number", expected: "single 123 number",},
-		{input: "single123numbers345spread", expected: "single 123 numbers 345 spread",},
-		{input: "number_at_end234", expected: "number_at_end 234 ",},
-		{input: "123number_at_start", expected: " 123 number_at_start",},
-		{input: "123number_at_start", expected: " 123 number_at_start",},
+		{input: "single123number", expected: "single 123 number"},
+		{input: "single123numbers345spread", expected: "single 123 numbers 345 spread"},
+		{input: "number_at_end234", expected: "number_at_end 234 "},
+		{input: "123number_at_start", expected: " 123 number_at_start"},
+		{input: "123number_at_start", expected: " 123 number_at_start"},
 	}
 
 	for _, test := range testcases {
@@ -42,16 +42,13 @@ func lowerCamelCase(s string) string {
 		return s
 	}
 
-	prep := s
-	start, rest := s[0], s[1:]
+	prep := strings.TrimSpace(s)
+	start, rest := prep[0], prep[1:]
 	if start >= 'A' && start <= 'Z' {
 		prep = strings.ToLower(string(start)) + rest
 	}
 	//  pad all numbers within the string with spaces
 	prep = padNumbers(prep)
-
-	// trim spaces at the edges of the string
-	prep = strings.Trim(prep, " ")
 
 	res := ""
 	cap := false
@@ -87,16 +84,18 @@ func TestLowerCamelCase(t *testing.T) {
 		input    string
 		expected string
 	}{
-		{input: "", expected: "",},
-		{input: "A", expected: "a",},
-		{input: "ABUG", expected: "aBUG",},
-		{input: "with_underscore", expected: "withUnderscore",},
-		{input: "with-hyphen", expected: "withHyphen",},
-		{input: "with some-space", expected: "withSomeSpace",},
-		{input: "StandardTestCase", expected: "standardTestCase",},
-		{input: "ABigDay", expected: "aBigDay",},
-		{input: "Some-Numbers_123now", expected: "someNumbers123Now",},
-		{input: "Numbers 123with_ spaces", expected: "numbers123WithSpaces",},
+		{input: "", expected: ""},
+		{input: "A", expected: "a"},
+		{input: "ABUG", expected: "aBUG"},
+		{input: "with_underscore", expected: "withUnderscore"},
+		{input: "with-hyphen", expected: "withHyphen"},
+		{input: "with some-space", expected: "withSomeSpace"},
+		{input: "StandardTestCase", expected: "standardTestCase"},
+		{input: "ABigDay", expected: "aBigDay"},
+		{input: "Some-Numbers_123now", expected: "someNumbers123Now"},
+		{input: "Numbers 123with_ spaces", expected: "numbers123WithSpaces"},
+		{input: " Spaces at the edges ", expected: "spacesAtTheEdges"},
+		{input: " 123 numbers at edges 345 ", expected: "123NumbersAtEdges345"},
 	}
 
 	for _, test := range testcases {
