@@ -220,6 +220,15 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 			},
 		},
 		jstctest{
+			name:  "input is a struct with all json tags correctly specified in lower camel case but without extra qualifiers",
+			check: lowerCamelCase,
+			input: struct {
+				name  string `json:"name"`
+				value string `json:"value"`
+			}{},
+			expected: []error{},
+		},
+		jstctest{
 			name:  "input is a struct with all json tags correctly specified in lower camel case",
 			check: lowerCamelCase,
 			input: struct {
@@ -307,8 +316,14 @@ func jstCheck(o interface{}, check func(s string) string) []error {
 			continue
 		}
 
+		jtag := ""
+
 		// tags contain the tag name and other qualifiers separated by a comma
-		jtag := tag[0:strings.Index(tag, ",")]
+		if strings.Contains(tag, ",") {
+			jtag = tag[0:strings.Index(tag, ",")]
+		} else {
+			jtag = tag
+		}
 
 		// compute the correct tag name
 		ctag := check(field.Name)
