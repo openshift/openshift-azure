@@ -95,3 +95,7 @@ EOF
 # note: ${SERVICE_TYPE}-node crash loops until master is up
 systemctl enable ${SERVICE_TYPE}-node.service
 systemctl start ${SERVICE_TYPE}-node.service &
+
+# disabling rsyslog since we manage everything through journald
+systemctl disable rsyslog.service
+systemctl stop rsyslog.service

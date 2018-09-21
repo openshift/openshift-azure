@@ -25,6 +25,23 @@ if [[ -z "$AZURE_CLIENT_SECRET" ]]; then
     exit 1
 fi
 
+if [[ -z "$AZURE_REGION" ]]; then
+    echo error: must set AZURE_REGION
+    exit 1
+fi
+valid_regions=(eastus westeurope australiasoutheast)
+match=0
+for region in "${valid_regions[@]}"; do
+    if [[ $region = "$valid_regions" ]]; then
+        match=1
+        break
+    fi
+done
+if [[ $match = 0 ]]; then
+    echo "Error invalid region: must be one of ${valid_regions[@]}"
+    exit 1
+fi
+
 if [[ -z "$DNS_DOMAIN" ]]; then
     echo error: must set DNS_DOMAIN
     exit 1
@@ -50,12 +67,12 @@ ttl=76h
 if [[ -n $RESOURCEGROUP_TTL ]]; then
   ttl=$RESOURCEGROUP_TTL
 fi
-az group create -n $RESOURCEGROUP -l eastus --tags now=$(date +%s) ttl=$ttl >/dev/null
+az group create -n $RESOURCEGROUP -l $AZURE_REGION --tags now=$(date +%s) ttl=$ttl >/dev/null
 
 # if AZURE_CLIENT_ID is used as AZURE_AAD_CLIENT_ID, script will reset global team account!
 set +x
 if [[ "$AZURE_AAD_CLIENT_ID" && "$AZURE_AAD_CLIENT_ID" != "$AZURE_CLIENT_ID" ]]; then
-    . <(hack/aad.sh app-update $AZURE_AAD_CLIENT_ID https://$RESOURCEGROUP.eastus.cloudapp.azure.com/oauth2callback/Azure%20AD)
+    . <(hack/aad.sh app-update $AZURE_AAD_CLIENT_ID https://$RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com/oauth2callback/Azure%20AD)
 else
     AZURE_AAD_CLIENT_ID=$AZURE_CLIENT_ID
     AZURE_AAD_CLIENT_SECRET=$AZURE_CLIENT_SECRET
@@ -64,10 +81,10 @@ set -x
 
 cat >_data/manifest.yaml <<EOF
 name: openshift
-location: eastus
+location: $AZURE_REGION
 properties:
   openShiftVersion: "$DEPLOY_VERSION"
-  fqdn: $RESOURCEGROUP.eastus.cloudapp.azure.com
+  fqdn: $RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com
   authProfile:
     identityProviders:
     - name: Azure AD
@@ -99,4 +116,4 @@ go run cmd/createorupdate/createorupdate.go -loglevel=debug
 
 # TODO: This should be configured by MS
 hack/dns.sh zone-create $RESOURCEGROUP
-hack/dns.sh cname-create $RESOURCEGROUP '*' $RESOURCEGROUP-router.eastus.cloudapp.azure.com
+hack/dns.sh cname-create $RESOURCEGROUP '*' $RESOURCEGROUP-router.$AZURE_REGION.cloudapp.azure.com

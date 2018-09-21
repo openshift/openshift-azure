@@ -14,3 +14,5 @@ reviewers:
 - pweil-
 - thanasisk
 - thekad
+labels:
+- sig/azure
