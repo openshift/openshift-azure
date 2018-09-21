@@ -197,11 +197,11 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 			name:  "input is a struct but doesn't specify some json tags",
 			check: lowerCamelCase,
 			input: struct {
-				name  string `json:"name,omitempty"`
-				value string
+				Name  string `json:"name,omitempty"`
+				Value string
 			}{
-				name:  "name",
-				value: "value",
+				Name:  "name",
+				Value: "value",
 			},
 			expected: []error{
 				errors.New(fmt.Sprintf(`field "value" does not have a json tag`)),
@@ -211,8 +211,8 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 			name:  "input is a struct but doesn't specify any json tags",
 			check: lowerCamelCase,
 			input: struct {
-				name  string
-				value string
+				Name  string
+				Value string
 			}{},
 			expected: []error{
 				errors.New(fmt.Sprintf(`field "name" does not have a json tag`)),
@@ -223,8 +223,8 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 			name:  "input is a struct with all json tags correctly specified in lower camel case but without extra qualifiers",
 			check: lowerCamelCase,
 			input: struct {
-				name  string `json:"name"`
-				value string `json:"value"`
+				Name  string `json:"name"`
+				Value string `json:"value"`
 			}{},
 			expected: []error{},
 		},
