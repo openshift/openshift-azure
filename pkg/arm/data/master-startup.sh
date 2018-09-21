@@ -659,5 +659,9 @@ cp /etc/origin/node/node.kubeconfig /etc/origin/node/bootstrap.kubeconfig
 systemctl enable ${SERVICE_TYPE}-node.service
 systemctl start ${SERVICE_TYPE}-node.service &
 
+# disabling rsyslog since we manage everything through journald
+systemctl disable rsyslog.service
+systemctl stop rsyslog.service
+
 mkdir -p /root/.kube
 cp /etc/origin/master/admin.kubeconfig /root/.kube/config
