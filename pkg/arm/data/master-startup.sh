@@ -184,7 +184,7 @@ etcdStorageConfig:
   openShiftStoragePrefix: openshift.io
   openShiftStorageVersion: v1
 imageConfig:
-  format: {{ .Derived.ImageConfigFormat .ContainerService | escape }}
+  format: {{ .Config.Images.Format | escape }}
 imagePolicyConfig:
   internalRegistryHostname: docker-registry.default.svc:5000
 kind: MasterConfig

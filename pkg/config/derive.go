@@ -62,22 +62,6 @@ func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error
 	})
 }
 
-func (derived) ImageConfigFormat(cs *api.OpenShiftManagedCluster) string {
-	imageConfigFormat := os.Getenv("OREG_URL")
-	if imageConfigFormat != "" {
-		return imageConfigFormat
-	}
-
-	switch os.Getenv("DEPLOY_OS") {
-	case "", "rhel7":
-		imageConfigFormat = "registry.access.redhat.com/openshift3/ose-${component}:${version}"
-	case "centos7":
-		imageConfigFormat = "docker.io/openshift/origin-${component}:${version}"
-	}
-
-	return imageConfigFormat
-}
-
 func (derived) RunningUnderTest() bool {
 	return os.Getenv("RUNNING_UNDER_TEST") != ""
 }
