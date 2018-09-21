@@ -18,7 +18,7 @@ func (derived) SystemReserved(cs *api.OpenShiftManagedCluster, role api.AgentPoo
 		if pool.Role != role {
 			continue
 		}
-		return api.DefaultVMSizeKubeArguments[pool.VMSize]["system-reserved"]
+		return api.DefaultVMSizeKubeArguments[pool.VMSize][role][api.SystemReserved]
 	}
 	return ""
 }
@@ -28,7 +28,7 @@ func (derived) KubeReserved(cs *api.OpenShiftManagedCluster, role api.AgentPoolP
 		if pool.Role != role {
 			continue
 		}
-		return api.DefaultVMSizeKubeArguments[pool.VMSize]["kube-reserved"]
+		return api.DefaultVMSizeKubeArguments[pool.VMSize][role][api.KubeReserved]
 	}
 	return ""
 }

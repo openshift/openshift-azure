@@ -120,6 +120,16 @@ const (
 	OSTypeWindows OSType = "Windows"
 )
 
+// ReservedResources represents the type of reserved resource
+type ReservedResource string
+
+const (
+	// SystemReserved is for reserved system resources
+	SystemReserved ReservedResource = "system-reserved"
+	// KubeReserved is for reserved kubelet resources
+	KubeReserved ReservedResource = "kube-reserved"
+)
+
 // AgentPoolProfileRole represents the role of the AgentPoolProfile.
 type AgentPoolProfileRole string
 
