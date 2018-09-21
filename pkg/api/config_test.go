@@ -204,7 +204,7 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 				Value: "value",
 			},
 			expected: []error{
-				errors.New(fmt.Sprintf(`field "value" does not have a json tag`)),
+				errors.New(fmt.Sprintf(`field "Value" does not have a json tag`)),
 			},
 		},
 		jstctest{
@@ -215,8 +215,8 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 				Value string
 			}{},
 			expected: []error{
-				errors.New(fmt.Sprintf(`field "name" does not have a json tag`)),
-				errors.New(fmt.Sprintf(`field "value" does not have a json tag`)),
+				errors.New(fmt.Sprintf(`field "Name" does not have a json tag`)),
+				errors.New(fmt.Sprintf(`field "Value" does not have a json tag`)),
 			},
 		},
 		jstctest{
