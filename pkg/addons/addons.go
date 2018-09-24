@@ -5,13 +5,13 @@ package addons
 //go:generate gofmt -s -l -w bindata.go
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
 	"sort"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/ghodss/yaml"
 	log "github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -19,6 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/azure"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 )
 
@@ -250,17 +251,17 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	return client.ApplyResources(scFilter, db, keys)
 }
 
-func Main(cs *api.OpenShiftManagedCluster, azs storage.AccountsClient, dryRun bool) error {
-	client, err := newClient(cs, azs, dryRun)
+func Main(ctx context.Context, cs *api.OpenShiftManagedCluster, saClient azure.AccountStorageClient, dryRun bool) error {
+	client, err := newClient(cs, dryRun)
 	if err != nil {
 		return err
 	}
 
-	keyRegistry, err := client.GetStorageAccountKey(cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
+	keyRegistry, err := saClient.GetStorageAccountKey(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
 	if err != nil {
 		return err
 	}
-	keyConfig, err := client.GetStorageAccountKey(cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+	keyConfig, err := saClient.GetStorageAccountKey(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
 	if err != nil {
 		return err
 	}
