@@ -25,4 +25,4 @@ hack/dns.sh zone-delete $RESOURCEGROUP
 
 rm -rf _data
 
-az group delete -n $RESOURCEGROUP -y
+az group delete -n $RESOURCEGROUP -y --no-wait
