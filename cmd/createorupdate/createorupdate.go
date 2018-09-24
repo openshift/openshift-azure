@@ -14,7 +14,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/errors"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/log"
@@ -33,7 +33,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 
 	// convert the external API manifest into the internal API representation
 	log.Info("convert to internal")
-	cs := acsapi.ConvertFromV20180930preview(oc)
+	cs := api.ConvertFromV20180930preview(oc)
 
 	// the RP will enrich the internal API representation with data not included
 	// in the original request
@@ -46,7 +46,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	// read in the OpenShift config blob if it exists (i.e. we're updating)
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
-	var oldCs *acsapi.OpenShiftManagedCluster
+	var oldCs *api.OpenShiftManagedCluster
 	if _, err := os.Stat("_data/containerservice.yaml"); err == nil {
 		log.Info("read old config")
 		oldCs, err = managedcluster.ReadConfig("_data/containerservice.yaml")
@@ -126,18 +126,18 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 
 	// convert our (probably changed) internal API representation back to the
 	// external API manifest to return it to the user
-	oc = acsapi.ConvertToV20180930preview(cs)
+	oc = api.ConvertToV20180930preview(cs)
 
 	return oc, nil
 }
 
-func acceptMarketplaceAgreement(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
+func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	if config.Derived.ImageResourceName() != "" ||
 		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
 		return nil
 	}
 
-	config := auth.NewClientCredentialsConfig(ctx.Value(acsapi.ContextKeyClientID).(string), ctx.Value(acsapi.ContextKeyClientSecret).(string), ctx.Value(acsapi.ContextKeyTenantID).(string))
+	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
 	authorizer, err := config.Authorizer()
 	if err != nil {
 		return err
@@ -163,7 +163,7 @@ func acceptMarketplaceAgreement(ctx context.Context, cs *acsapi.OpenShiftManaged
 	return err
 }
 
-func enrich(cs *acsapi.OpenShiftManagedCluster) error {
+func enrich(cs *api.OpenShiftManagedCluster) error {
 	for _, env := range []string{
 		"AZURE_CLIENT_ID",
 		"AZURE_CLIENT_SECRET",
@@ -177,13 +177,13 @@ func enrich(cs *acsapi.OpenShiftManagedCluster) error {
 		}
 	}
 
-	cs.Properties.AzProfile = &acsapi.AzProfile{
+	cs.Properties.AzProfile = &api.AzProfile{
 		TenantID:       os.Getenv("AZURE_TENANT_ID"),
 		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
 		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
 	}
 
-	cs.Properties.RouterProfiles = []acsapi.RouterProfile{
+	cs.Properties.RouterProfiles = []api.RouterProfile{
 		{
 			Name:            "default",
 			PublicSubdomain: fmt.Sprintf("%s.%s", os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_DOMAIN")),
@@ -191,7 +191,7 @@ func enrich(cs *acsapi.OpenShiftManagedCluster) error {
 		},
 	}
 
-	cs.Properties.ServicePrincipalProfile = &acsapi.ServicePrincipalProfile{
+	cs.Properties.ServicePrincipalProfile = &api.ServicePrincipalProfile{
 		ClientID: os.Getenv("AZURE_CLIENT_ID"),
 		Secret:   os.Getenv("AZURE_CLIENT_SECRET"),
 	}
@@ -199,7 +199,7 @@ func enrich(cs *acsapi.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func writeHelpers(c *acsapi.OpenShiftManagedCluster, azuredeploy []byte) error {
+func writeHelpers(c *api.OpenShiftManagedCluster, azuredeploy []byte) error {
 	b, err := config.Derived.CloudProviderConf(c)
 	if err != nil {
 		return err
@@ -253,9 +253,9 @@ func main() {
 
 	//simulate Context with property bag
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, acsapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
-	ctx = context.WithValue(ctx, acsapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-	ctx = context.WithValue(ctx, acsapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
+	ctx = context.WithValue(ctx, api.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
+	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
+	ctx = context.WithValue(ctx, api.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
 
 	// simulate the API call to the RP
 	entry := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})

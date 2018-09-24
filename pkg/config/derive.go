@@ -4,51 +4,51 @@ import (
 	"os"
 	"strings"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
-
 	"github.com/ghodss/yaml"
+
+	"github.com/openshift/openshift-azure/pkg/api"
 )
 
 type derived struct{}
 
 var Derived derived
 
-func (derived) SystemReserved(cs *acsapi.OpenShiftManagedCluster, role acsapi.AgentPoolProfileRole) string {
+func (derived) SystemReserved(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) string {
 	for _, pool := range cs.Properties.AgentPoolProfiles {
 		if pool.Role != role {
 			continue
 		}
-		return acsapi.DefaultVMSizeKubeArguments[pool.VMSize]["system-reserved"]
+		return api.DefaultVMSizeKubeArguments[pool.VMSize]["system-reserved"]
 	}
 	return ""
 }
 
-func (derived) KubeReserved(cs *acsapi.OpenShiftManagedCluster, role acsapi.AgentPoolProfileRole) string {
+func (derived) KubeReserved(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) string {
 	for _, pool := range cs.Properties.AgentPoolProfiles {
 		if pool.Role != role {
 			continue
 		}
-		return acsapi.DefaultVMSizeKubeArguments[pool.VMSize]["kube-reserved"]
+		return api.DefaultVMSizeKubeArguments[pool.VMSize]["kube-reserved"]
 	}
 	return ""
 }
 
-func (derived) PublicHostname(cs *acsapi.OpenShiftManagedCluster) string {
+func (derived) PublicHostname(cs *api.OpenShiftManagedCluster) string {
 	if cs.Properties.PublicHostname != "" {
 		return cs.Properties.PublicHostname
 	}
 	return cs.Properties.FQDN
 }
 
-func (derived) RouterLBCNamePrefix(cs *acsapi.OpenShiftManagedCluster) string {
+func (derived) RouterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
 	return strings.Split(cs.Properties.RouterProfiles[0].FQDN, ".")[0]
 }
 
-func (derived) MasterLBCNamePrefix(cs *acsapi.OpenShiftManagedCluster) string {
+func (derived) MasterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
 	return strings.Split(cs.Properties.FQDN, ".")[0]
 }
 
-func (derived) CloudProviderConf(cs *acsapi.OpenShiftManagedCluster) ([]byte, error) {
+func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
 	return yaml.Marshal(map[string]string{
 		"tenantId":            cs.Properties.AzProfile.TenantID,
 		"subscriptionId":      cs.Properties.AzProfile.SubscriptionID,
@@ -62,7 +62,7 @@ func (derived) CloudProviderConf(cs *acsapi.OpenShiftManagedCluster) ([]byte, er
 	})
 }
 
-func (derived) ImageConfigFormat(cs *acsapi.OpenShiftManagedCluster) string {
+func (derived) ImageConfigFormat(cs *api.OpenShiftManagedCluster) string {
 	imageConfigFormat := os.Getenv("OREG_URL")
 	if imageConfigFormat != "" {
 		return imageConfigFormat

@@ -9,14 +9,14 @@ import (
 
 	"github.com/ghodss/yaml"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
 // TODO: util packages are an anti-pattern, don't do this
 
-func Template(tmpl string, f template.FuncMap, cs *acsapi.OpenShiftManagedCluster, extra interface{}) ([]byte, error) {
+func Template(tmpl string, f template.FuncMap, cs *api.OpenShiftManagedCluster, extra interface{}) ([]byte, error) {
 	t, err := template.New("").Funcs(template.FuncMap{
 		"CertAsBytes":          tls.CertAsBytes,
 		"PrivateKeyAsBytes":    tls.PrivateKeyAsBytes,
@@ -38,8 +38,8 @@ func Template(tmpl string, f template.FuncMap, cs *acsapi.OpenShiftManagedCluste
 	b := &bytes.Buffer{}
 
 	err = t.Execute(b, struct {
-		ContainerService *acsapi.OpenShiftManagedCluster
-		Config           *acsapi.Config
+		ContainerService *api.OpenShiftManagedCluster
+		Config           *api.Config
 		Derived          interface{}
 		Extra            interface{}
 	}{ContainerService: cs, Config: cs.Config, Derived: config.Derived, Extra: extra})

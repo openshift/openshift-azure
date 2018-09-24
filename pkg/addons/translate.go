@@ -7,7 +7,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util"
@@ -29,7 +29,7 @@ const (
 	NestedFlagsBase64 NestedFlags = (1 << iota)
 )
 
-func translateAsset(o unstructured.Unstructured, cs *acsapi.OpenShiftManagedCluster, ext *extra) (unstructured.Unstructured, error) {
+func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster, ext *extra) (unstructured.Unstructured, error) {
 	ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
 	for _, tr := range ts {
 		var s string
@@ -102,7 +102,7 @@ var Translations = map[string][]struct {
 	NestedPath  jsonpath.Path
 	NestedFlags NestedFlags
 	Template    string
-	F           func(*acsapi.OpenShiftManagedCluster) (string, error)
+	F           func(*api.OpenShiftManagedCluster) (string, error)
 }{
 	// IMPORTANT: Translations must NOT use the quote function (i.e., write
 	// "{{ .Config.Foo }}", NOT "{{ .Config.Foo | quote }}").  This is because
@@ -146,22 +146,22 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
-			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
 				return config.Derived.ImageConfigFormat(cs), nil
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
-			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
-				return config.Derived.KubeReserved(cs, acsapi.AgentPoolProfileRoleCompute), nil
+			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+				return config.Derived.KubeReserved(cs, api.AgentPoolProfileRoleCompute), nil
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
-			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
-				return config.Derived.SystemReserved(cs, acsapi.AgentPoolProfileRoleCompute), nil
+			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleCompute), nil
 			},
 		},
 	},
@@ -169,22 +169,22 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
-			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
 				return config.Derived.ImageConfigFormat(cs), nil
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
-			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
-				return config.Derived.KubeReserved(cs, acsapi.AgentPoolProfileRoleInfra), nil
+			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+				return config.Derived.KubeReserved(cs, api.AgentPoolProfileRoleInfra), nil
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
-			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
-				return config.Derived.SystemReserved(cs, acsapi.AgentPoolProfileRoleInfra), nil
+			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleInfra), nil
 			},
 		},
 	},
@@ -192,7 +192,7 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
-			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
 				return config.Derived.ImageConfigFormat(cs), nil
 			},
 		},
@@ -400,7 +400,7 @@ var Translations = map[string][]struct {
 	"Secret/default/etc-origin-cloudprovider": {
 		{
 			Path: jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
 				b, err := config.Derived.CloudProviderConf(cs)
 				return string(b), err
 			},
@@ -485,7 +485,7 @@ var Translations = map[string][]struct {
 	"Service/default/router": {
 		{
 			Path: jsonpath.MustCompile("$.metadata.annotations['service.beta.kubernetes.io/azure-dns-label-name']"),
-			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
 				return config.Derived.RouterLBCNamePrefix(cs), nil
 			},
 		},

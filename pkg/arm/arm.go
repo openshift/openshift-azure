@@ -10,13 +10,13 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util"
 )
 
 type Generator interface {
-	Generate(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, isUpdate bool) ([]byte, error)
+	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) ([]byte, error)
 }
 
 type simpleGenerator struct{}
@@ -28,7 +28,7 @@ func NewSimpleGenerator(entry *logrus.Entry) Generator {
 	return &simpleGenerator{}
 }
 
-func (*simpleGenerator) Generate(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, isUpdate bool) ([]byte, error) {
+func (*simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) ([]byte, error) {
 	masterStartup, err := Asset("master-startup.sh")
 	if err != nil {
 		return nil, err
@@ -44,8 +44,8 @@ func (*simpleGenerator) Generate(ctx context.Context, cs *acsapi.OpenShiftManage
 		return nil, err
 	}
 	return util.Template(string(tmpl), template.FuncMap{
-		"Startup": func(role acsapi.AgentPoolProfileRole) ([]byte, error) {
-			if role == acsapi.AgentPoolProfileRoleMaster {
+		"Startup": func(role api.AgentPoolProfileRole) ([]byte, error) {
+			if role == api.AgentPoolProfileRoleMaster {
 				return util.Template(string(masterStartup), nil, cs, map[string]interface{}{"Role": role})
 			} else {
 				return util.Template(string(nodeStartup), nil, cs, map[string]interface{}{"Role": role})

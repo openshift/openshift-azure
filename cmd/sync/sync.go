@@ -18,7 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/addons"
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/validate"
 )
@@ -124,7 +124,7 @@ func sync() error {
 		return err
 	}
 
-	var cs *acsapi.OpenShiftManagedCluster
+	var cs *api.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(b, &cs); err != nil {
 		return err
 	}
