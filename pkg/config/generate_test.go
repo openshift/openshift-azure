@@ -11,26 +11,26 @@ import (
 
 func TestGenerate(t *testing.T) {
 	tests := map[string]struct {
-		omc *api.OpenShiftManagedCluster
+		cs *api.OpenShiftManagedCluster
 	}{
 		"test generate new": {
-			omc: fixtures.NewTestOpenShiftCluster(),
+			cs: fixtures.NewTestOpenShiftCluster(),
 		},
 		//TODO "test generate doesn't overwrite": {},
 	}
 
 	for name, test := range tests {
-		err := Generate(test.omc)
+		err := Generate(test.cs)
 		if err != nil {
 			t.Errorf("%s received generation error %v", name, err)
 			continue
 		}
-		testRequiredFields(test.omc, t)
+		testRequiredFields(test.cs, t)
 		// check mutation
 	}
 }
 
-func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
+func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert := func(c bool, name string) {
 		if !c {
 			t.Errorf("missing %s", name)
@@ -41,7 +41,7 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 		assert(c.Cert != nil, name+" cert")
 	}
 
-	c := omc.Config
+	c := cs.Config
 	assert(c.ImagePublisher != "", "image publisher")
 	assert(c.ImageOffer != "", "image offer")
 	assert(c.ImageVersion != "", "image version")
