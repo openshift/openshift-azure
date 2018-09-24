@@ -1,11 +1,12 @@
 # all is the default target to build everything
-all: clean build sync
+all: clean build sync e2e-bin
 
 build:
 	go build ./...
 
 clean:
 	rm -f sync
+	rm -f e2e.test
 
 test: unit e2e
 
@@ -49,4 +50,7 @@ cover:
 e2e: generate
 	go test ./test/e2e -tags e2e
 
-.PHONY: clean sync-image sync-push verify unit e2e
+e2e-bin: clean generate
+	go test -tags e2e -ldflags "-X github.com/openshift/openshift-azure/test/e2e.gitCommit=$(shell git rev-parse --short HEAD)" -i -c -o e2e.test ./test/e2e
+
+.PHONY: clean sync-image sync-push verify unit e2e e2e-bin
