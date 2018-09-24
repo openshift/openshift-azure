@@ -10,23 +10,23 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-func WaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, role acsapi.AgentPoolProfileRole, nodeName string) error {
+func WaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
 	switch role {
-	case acsapi.AgentPoolProfileRoleMaster:
+	case api.AgentPoolProfileRoleMaster:
 		return masterWaitForReady(ctx, cs, nodeName)
-	case acsapi.AgentPoolProfileRoleInfra, acsapi.AgentPoolProfileRoleCompute:
+	case api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute:
 		return nodeWaitForReady(ctx, cs, nodeName)
 	default:
 		return errors.New("unrecognised role")
 	}
 }
 
-func masterWaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, nodeName string) error {
+func masterWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string) error {
 	kc, err := managedcluster.ClientsetFromConfig(cs)
 	if err != nil {
 		return err
@@ -73,7 +73,7 @@ func masterIsReady(kc *kubernetes.Clientset, nodeName string) (bool, error) {
 	return isPodReady(etcdPod) && isPodReady(apiPod) && isPodReady(cmPod), nil
 }
 
-func nodeWaitForReady(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, nodeName string) error {
+func nodeWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string) error {
 	kc, err := managedcluster.ClientsetFromConfig(cs)
 	if err != nil {
 		return err

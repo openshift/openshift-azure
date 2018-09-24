@@ -11,11 +11,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	api "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
-func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
+func Generate(cs *api.OpenShiftManagedCluster) (err error) {
 	c := cs.Config
 
 	selectNodeImage(cs, os.Getenv("DEPLOY_OS"))

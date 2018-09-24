@@ -5,12 +5,12 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
 type Upgrader interface {
-	Upgrade(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error
+	Upgrade(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 }
 
 type simpleUpgrader struct{}
@@ -22,6 +22,6 @@ func NewSimpleUpgrader(entry *logrus.Entry) Upgrader {
 	return &simpleUpgrader{}
 }
 
-func (u *simpleUpgrader) Upgrade(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
+func (u *simpleUpgrader) Upgrade(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	return nil
 }

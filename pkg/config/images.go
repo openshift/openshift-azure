@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	api "github.com/openshift/openshift-azure/pkg/api"
 )
 
 // openshiftVersion converts a VM image version (e.g. 310.14.20180101) to an
@@ -19,7 +19,7 @@ func openShiftVersion(imageVersion string) (string, error) {
 	return fmt.Sprintf("v%s.%s.%s", parts[0][:1], parts[0][1:], parts[1]), nil
 }
 
-func selectNodeImage(cs *acsapi.OpenShiftManagedCluster, deployOS string) {
+func selectNodeImage(cs *api.OpenShiftManagedCluster, deployOS string) {
 	c := cs.Config
 	c.ImagePublisher = "redhat"
 	c.ImageOffer = os.Getenv("IMAGE_OFFER")
@@ -42,12 +42,12 @@ func selectNodeImage(cs *acsapi.OpenShiftManagedCluster, deployOS string) {
 	}
 }
 
-func image(cs *acsapi.OpenShiftManagedCluster, component, version string) string {
+func image(cs *api.OpenShiftManagedCluster, component, version string) string {
 	image := strings.Replace(Derived.ImageConfigFormat(cs), "${component}", component, -1)
 	return strings.Replace(image, "${version}", version, -1)
 }
 
-func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) error {
+func selectContainerImagesOrigin(cs *api.OpenShiftManagedCluster) error {
 	c := cs.Config
 	v, err := openShiftVersion(c.ImageVersion)
 	if err != nil {
@@ -89,7 +89,7 @@ func selectContainerImagesOrigin(cs *acsapi.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) error {
+func selectContainerImagesOSA(cs *api.OpenShiftManagedCluster) error {
 	c := cs.Config
 	v, err := openShiftVersion(c.ImageVersion)
 	if err != nil {
@@ -131,7 +131,7 @@ func selectContainerImagesOSA(cs *acsapi.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func selectContainerImages(cs *acsapi.OpenShiftManagedCluster) error {
+func selectContainerImages(cs *api.OpenShiftManagedCluster) error {
 	switch os.Getenv("DEPLOY_OS") {
 	case "", "rhel7":
 		return selectContainerImagesOSA(cs)
