@@ -14,7 +14,7 @@ if [[ -z "$DNS_RESOURCEGROUP" ]]; then
     exit 1
 fi
 
-NO_WAIT=${NO_WAIT:"false"}
+NO_WAIT=${NO_WAIT:false}
 
 if [[ "$NO_WAIT" == "true" ]]
 then
