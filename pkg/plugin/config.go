@@ -5,6 +5,6 @@ type Config struct {
 	// The sync image to use
 	SyncImage string `json:"syncImage,omitempty"`
 
-	// The node image to use
-	NodeImage string `json:"nodeImage,omitempty"`
+	// The VM image to use
+	VmImage string `json:"vmImage,omitempty"`
 }

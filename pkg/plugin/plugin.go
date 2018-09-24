@@ -94,8 +94,8 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	if p.config.SyncImage != "" {
 		cs.Config.Images.Sync = p.config.SyncImage
 	}
-	if p.config.NodeImage != "" {
-		cs.Config.Images.Node = p.config.NodeImage
+	if p.config.VmImage != "" {
+		cs.Config.Images.Node = p.config.VmImage
 	}
 	return nil
 }
