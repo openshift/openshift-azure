@@ -1,10 +1,11 @@
-hash: 9a10906a24553a17f67b4710549760a47037f09b1800dce3d1bb002230fbb3a0
-updated: 2018-09-11T13:32:57.890776496+02:00
+hash: 9da8dcd1df78e3140bbb490c04a4af1667e7080fbe98a81f784860aa6ca9487e
+updated: 2018-09-25T10:13:01.806726268-05:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
   subpackages:
   - services/compute/mgmt/2018-06-01/compute
+  - services/marketplaceordering/mgmt/2015-06-01/marketplaceordering
   - services/preview/operationalinsights/mgmt/2015-11-01-preview/operationalinsights
   - services/resources/mgmt/2018-05-01/resources
   - services/storage/mgmt/2018-02-01/storage
@@ -21,6 +22,8 @@ imports:
   - autorest/to
   - autorest/validation
   - version
+- name: github.com/caarlos0/env
+  version: 7f73d6597823c7a0c39edd46e1998f90692b2add
 - name: github.com/coreos/go-systemd
   version: 39ca1b05acc7ad1220e09f133283b8859a8b71ab
   subpackages:
@@ -141,7 +144,6 @@ imports:
   - http2/hpack
   - idna
   - lex/httplex
-  - websocket
 - name: golang.org/x/sys
   version: 95c6576299259db960f6c5b9b69ea52422860fce
   subpackages:
@@ -197,7 +199,6 @@ imports:
   - core/v1
   - events/v1beta1
   - extensions/v1beta1
-  - imagepolicy/v1alpha1
   - networking/v1
   - policy/v1beta1
   - rbac/v1
