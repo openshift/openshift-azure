@@ -1,6 +1,7 @@
 /_data
 /createorupdate
 /env
+/e2e.test
 /logbridge
 /sync
 .vscode
