@@ -3,6 +3,7 @@
 package e2e
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -85,12 +86,10 @@ var _ = Describe("Openshift on Azure e2e tests", func() {
 	})
 
 	It("should run the correct image", func() {
-		var prefix string
-		if strings.HasPrefix(c.cs.Config.ImageSKU, "osa_") {
-			prefix = "registry.access.redhat.com/openshift3"
-		} else {
-			prefix = "docker.io/openshift"
-		}
+		// image format is either:
+		// docker.io/openshift || registry.access.redhat.com/openshift3
+		format := strings.Split(c.cs.Config.Images.Format, "/")
+		prefix := fmt.Sprintf("%v/%v", format[0], format[1])
 
 		// these pods should have the same prefix
 		podsToCheck := map[string]struct{}{
