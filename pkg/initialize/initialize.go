@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/azure"
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
@@ -25,22 +26,28 @@ func NewSimpleInitializer(entry *logrus.Entry) Initializer {
 }
 
 func (*simpleInitializer) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	az, err := newAzureClients(ctx, cs)
+	saClient, err := azure.NewAccountStorageClient(ctx, ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string), cs.Properties.AzProfile.SubscriptionID)
+	if err != nil {
+		return err
+	}
+	storageAcc, err := saClient.GetStorageAccount(ctx, cs.Properties.AzProfile.ResourceGroup, "config")
+	if err != nil {
+		return err
+	}
+	sClient, err := azure.NewStorageClient(ctx, storageAcc["key"], storageAcc["name"])
 	if err != nil {
 		return err
 	}
 
-	bsc := az.storage.GetBlobService()
-
 	// etcd data container
-	c := bsc.GetContainerReference("etcd")
+	c := sClient.GetContainerReference("etcd")
 	_, err = c.CreateIfNotExists(nil)
 	if err != nil {
 		return err
 	}
 
 	// cluster config container
-	c = bsc.GetContainerReference("config")
+	c = sClient.GetContainerReference("config")
 	_, err = c.CreateIfNotExists(nil)
 	if err != nil {
 		return err
