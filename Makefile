@@ -6,6 +6,7 @@ build:
 
 clean:
 	rm -f sync
+	rm -f logbridge
 	rm -f e2e.test
 
 test: unit e2e
@@ -13,7 +14,7 @@ test: unit e2e
 generate:
 	go generate ./...
 
-logbridge: clean generate
+logbridge: generate
 	go build ./cmd/logbridge
 
 logbridge-image: logbridge
@@ -23,11 +24,12 @@ logbridge-image: logbridge
 logbridge-push: logbridge-image
 	docker push quay.io/openshift-on-azure/logbridge:latest
 
-sync: clean generate
+sync: generate
 	go build -ldflags "-X main.gitCommit=$(shell git rev-parse --short HEAD)" ./cmd/sync
 
 TAG ?= $(shell git rev-parse --short HEAD)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
+E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
 
 sync-image: sync
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
@@ -51,7 +53,14 @@ cover:
 e2e: generate
 	go test ./test/e2e -tags e2e
 
-e2e-bin: clean generate
+e2e-bin: generate
 	go test -tags e2e -ldflags "-X github.com/openshift/openshift-azure/test/e2e.gitCommit=$(shell git rev-parse --short HEAD)" -i -c -o e2e.test ./test/e2e
+
+e2e-image: e2e-bin
+	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+	imagebuilder -f Dockerfile.e2e -t $(E2E_IMAGE) .
+
+e2e-push: e2e-image
+	docker push $(E2E_IMAGE)
 
 .PHONY: clean sync-image sync-push verify unit e2e e2e-bin
