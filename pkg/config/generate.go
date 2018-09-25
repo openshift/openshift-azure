@@ -364,6 +364,10 @@ func Generate(cs *acsapi.OpenShiftManagedCluster) (err error) {
 		}
 	}
 
+	if len(c.LoggingLocation) == 0 {
+		c.LoggingLocation = acsapi.AzureLocations[cs.Location]
+	}
+
 	if len(c.RegistryConsoleOAuthSecret) == 0 {
 		if pass, err := randomString(64); err != nil {
 			return err

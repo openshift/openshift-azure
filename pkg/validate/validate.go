@@ -61,6 +61,8 @@ func Validate(new, old *api.OpenShiftManagedCluster, externalOnly bool) (errs []
 func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	if c.Location == "" {
 		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
+	} else if _, found := api.AzureLocations[c.Location]; !found {
+		errs = append(errs, fmt.Errorf("unsupported location %q", c.Location))
 	}
 
 	if c.Name == "" {

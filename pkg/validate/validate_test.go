@@ -55,9 +55,13 @@ func TestValidate(t *testing.T) {
 		"test yaml parsing": { // test yaml parsing
 
 		},
-		"location": {
+		"empty location": {
 			f:            func(oc *api.OpenShiftManagedCluster) { oc.Location = "" },
 			expectedErrs: []error{errors.New(`invalid location ""`)},
+		},
+		"unsupported location": {
+			f:            func(oc *api.OpenShiftManagedCluster) { oc.Location = "themoon" },
+			expectedErrs: []error{errors.New(`unsupported location "themoon"`)},
 		},
 		"name": {
 			f:            func(oc *api.OpenShiftManagedCluster) { oc.Name = "" },

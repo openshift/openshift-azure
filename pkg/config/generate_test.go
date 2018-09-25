@@ -73,6 +73,7 @@ func testRequiredFields(omc *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(len(c.RegistryConsoleOAuthSecret) != 0, "registry console oauth secret")
 	assert(len(c.RouterStatsPassword) != 0, "router stats password")
 	assert(len(c.LoggingWorkspace) != 0, "logging workspace")
+	assert(len(c.LoggingLocation) != 0, "logging location")
 
 	assert(c.ServiceCatalogClusterID != uuid.Nil, "service catalog cluster id")
 
