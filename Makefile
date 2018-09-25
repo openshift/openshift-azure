@@ -39,6 +39,7 @@ sync-push: sync-image
 verify:
 	./hack/validate-generated.sh
 	go vet ./...
+	./hack/verify-code-format.sh
 
 unit: generate
 	go test ./...
