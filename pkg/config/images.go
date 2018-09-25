@@ -78,11 +78,7 @@ func selectContainerImagesOrigin(cs *api.OpenShiftManagedCluster) error {
 		c.Images.AnsibleServiceBroker = "docker.io/ansibleplaybookbundle/origin-ansible-service-broker:latest"
 
 		c.Images.RegistryConsole = "docker.io/cockpit/kubernetes:latest"
-
-		if c.Images.Sync == "" {
-			c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.10"
-		}
-
+		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.10"
 		c.Images.LogBridge = "quay.io/openshift-on-azure/logbridge:latest"
 	}
 
@@ -120,27 +116,33 @@ func selectContainerImagesOSA(cs *api.OpenShiftManagedCluster) error {
 		c.Images.PrometheusNodeExporter = "registry.access.redhat.com/openshift3/prometheus-node-exporter:" + v
 
 		c.Images.RegistryConsole = "registry.access.redhat.com/openshift3/registry-console:" + v
-
-		if c.Images.Sync == "" {
-			c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.10"
-		}
-
+		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.10"
 		c.Images.LogBridge = "quay.io/openshift-on-azure/logbridge:latest"
 	}
 
 	return nil
 }
 
-func selectContainerImages(cs *api.OpenShiftManagedCluster) error {
+func selectContainerImages(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) error {
+	var err error
 	cs.Config.Images.Format = imageConfigFormat()
 	switch os.Getenv("DEPLOY_OS") {
 	case "", "rhel7":
-		return selectContainerImagesOSA(cs)
+		err = selectContainerImagesOSA(cs)
 	case "centos7":
-		return selectContainerImagesOrigin(cs)
+		err = selectContainerImagesOrigin(cs)
+	default:
+		err = fmt.Errorf("unrecognised DEPLOY_OS value")
+	}
+	if err != nil {
+		return err
 	}
 
-	return fmt.Errorf("unrecognised DEPLOY_OS value")
+	if pluginConfig.SyncImage != "" {
+		cs.Config.Images.Sync = pluginConfig.SyncImage
+	}
+
+	return nil
 }
 
 func imageConfigFormat() string {

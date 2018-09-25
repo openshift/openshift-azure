@@ -23,6 +23,7 @@ type simpleGenerator struct{}
 
 var _ Generator = &simpleGenerator{}
 
+// NewSimpleGenerator create a new SimpleGenerator
 func NewSimpleGenerator(entry *logrus.Entry) Generator {
 	log.New(entry)
 	return &simpleGenerator{}

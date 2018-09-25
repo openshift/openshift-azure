@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/Azure/azure-sdk-for-go/services/marketplaceordering/mgmt/2015-06-01/marketplaceordering"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -21,15 +19,16 @@ import (
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/upgrade"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
 
 // createOrUpdate simulates the RP
-func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, entry *logrus.Entry) (*v20180930preview.OpenShiftManagedCluster, error) {
+func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, entry *logrus.Entry, config api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
-	p := plugin.NewPlugin(entry, os.Getenv("SYNC_IMAGE"))
+	p := plugin.NewPlugin(entry, config)
 
 	// convert the external API manifest into the internal API representation
 	log.Info("convert to internal")
@@ -102,7 +101,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
-	err = acceptMarketplaceAgreement(ctx, cs)
+	err = acceptMarketplaceAgreement(ctx, cs, config)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +112,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 			return nil, err
 		}
 	} else {
-		err = upgrade.Deploy(ctx, cs, p, azuredeploy)
+		err = upgrade.Deploy(ctx, cs, p, azuredeploy, config)
 		if err != nil {
 			return nil, err
 		}
@@ -131,23 +130,19 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	return oc, nil
 }
 
-func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) error {
 	if config.Derived.ImageResourceName() != "" ||
 		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
 		return nil
 	}
 
-	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
-	authorizer, err := config.Authorizer()
+	var clients, err = azureclient.NewAzureClients(ctx, cs, pluginConfig)
 	if err != nil {
 		return err
 	}
 
-	mpo := marketplaceordering.NewMarketplaceAgreementsClient(cs.Properties.AzProfile.SubscriptionID)
-	mpo.Authorizer = authorizer
-
 	log.Info("checking marketplace agreement")
-	terms, err := mpo.Get(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU)
+	terms, err := clients.MarketPlaceAgreements.Get(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU)
 	if err != nil {
 		return err
 	}
@@ -159,7 +154,7 @@ func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedClu
 	terms.AgreementProperties.Accepted = to.BoolPtr(true)
 
 	log.Info("accepting marketplace agreement")
-	_, err = mpo.Create(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU, terms)
+	_, err = clients.MarketPlaceAgreements.Create(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU, terms)
 	return err
 }
 
@@ -259,7 +254,9 @@ func main() {
 
 	// simulate the API call to the RP
 	entry := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
-	oc, err = createOrUpdate(ctx, oc, entry)
+	var config = api.PluginConfig{SyncImage: os.Getenv("SYNC_IMAGE"),
+		AcceptLanguages: []string{"en-us"}}
+	oc, err = createOrUpdate(ctx, oc, entry, config)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -5,32 +5,48 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/Azure/azure-sdk-for-go/storage"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 type Initializer interface {
 	InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 }
 
-type simpleInitializer struct{}
+type simpleInitializer struct {
+	pluginConfig api.PluginConfig
+}
 
 var _ Initializer = &simpleInitializer{}
 
-func NewSimpleInitializer(entry *logrus.Entry) Initializer {
+// NewSimpleInitializer create a new Initilizer
+func NewSimpleInitializer(entry *logrus.Entry, pluginConfig api.PluginConfig) Initializer {
 	log.New(entry)
-	return &simpleInitializer{}
+	return &simpleInitializer{pluginConfig: pluginConfig}
 }
 
-func (*simpleInitializer) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	az, err := newAzureClients(ctx, cs)
+func (si *simpleInitializer) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	az, err := azureclient.NewAzureClients(ctx, cs, si.pluginConfig)
 	if err != nil {
 		return err
 	}
 
-	bsc := az.storage.GetBlobService()
+	keys, err := az.Accounts.ListKeys(context.Background(), cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+	if err != nil {
+		return err
+	}
+
+	var storageClient storage.Client
+	storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, *(*keys.Keys)[0].Value, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
+	if err != nil {
+		return err
+	}
+
+	bsc := storageClient.GetBlobService()
 
 	// etcd data container
 	c := bsc.GetContainerReference("etcd")

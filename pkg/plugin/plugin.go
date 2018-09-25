@@ -16,17 +16,18 @@ import (
 )
 
 type plugin struct {
-	entry     *logrus.Entry
-	syncImage string
+	entry  *logrus.Entry
+	config api.PluginConfig
 }
 
 var _ api.Plugin = &plugin{}
 
-func NewPlugin(entry *logrus.Entry, syncImage string) api.Plugin {
+// NewPlugin creates a new plugin instance
+func NewPlugin(entry *logrus.Entry, pluginConfig api.PluginConfig) api.Plugin {
 	log.New(entry)
 	return &plugin{
-		entry:     entry,
-		syncImage: syncImage,
+		entry:  entry,
+		config: pluginConfig,
 	}
 }
 
@@ -86,12 +87,9 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 		return err
 	}
 
-	err = config.Generate(cs)
+	err = config.Generate(cs, p.config)
 	if err != nil {
 		return err
-	}
-	if p.syncImage != "" {
-		cs.Config.Images.Sync = p.syncImage
 	}
 	return nil
 }
@@ -104,18 +102,18 @@ func (p *plugin) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluste
 
 func (p *plugin) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	log.Info("initializing cluster")
-	initializer := initialize.NewSimpleInitializer(p.entry)
+	initializer := initialize.NewSimpleInitializer(p.entry, p.config)
 	return initializer.InitializeCluster(ctx, cs)
 }
 
 func (p *plugin) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	log.Info("starting health check")
-	healthChecker := healthcheck.NewSimpleHealthChecker(p.entry)
+	healthChecker := healthcheck.NewSimpleHealthChecker(p.entry, p.config)
 	return healthChecker.HealthCheck(ctx, cs)
 }
 
 func (p *plugin) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
 	log.Info("starting update")
-	upgrader := upgrade.NewSimpleUpgrader(p.entry)
-	return upgrader.Update(ctx, cs, azuredeploy)
+	upgrader := upgrade.NewSimpleUpgrader(p.entry, p.config)
+	return upgrader.Update(ctx, cs, azuredeploy, p.config)
 }

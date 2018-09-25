@@ -14,6 +14,12 @@ const (
 	ContextKeyTenantID     ContextKey = "TenantID"
 )
 
+// PluginConfig is passed into NewPlugin
+type PluginConfig struct {
+	SyncImage       string
+	AcceptLanguages []string
+}
+
 type Plugin interface {
 	// MergeConfig merges new and old config so that no unnecessary config
 	// is going to get regenerated during generation. It also handles merging

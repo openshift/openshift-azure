@@ -13,7 +13,9 @@ import (
 )
 
 func TestMerge(t *testing.T) {
-	p := NewPlugin(logrus.NewEntry(logrus.New()), "sync:latest")
+	var config = api.PluginConfig{SyncImage: "sync:latest",
+		AcceptLanguages: []string{"en-us"}}
+	p := NewPlugin(logrus.NewEntry(logrus.New()), config)
 	newCluster := fixtures.NewTestOpenShiftCluster()
 	oldCluster := fixtures.NewTestOpenShiftCluster()
 
