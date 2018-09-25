@@ -30,3 +30,5 @@ import:
   version: v1.4.1
 - package: github.com/onsi/ginkgo
   version: v1.6.0
+- package: github.com/caarlos0/env
+  version: v3.4.0
