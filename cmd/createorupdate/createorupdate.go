@@ -29,7 +29,8 @@ var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, W
 // createOrUpdate simulates the RP
 func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, entry *logrus.Entry) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
-	p := plugin.NewPlugin(entry, os.Getenv("SYNC_IMAGE"))
+	ec := plugin.NewEnvConfig()
+	p := plugin.NewPlugin(entry)
 
 	// convert the external API manifest into the internal API representation
 	log.Info("convert to internal")
@@ -38,7 +39,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	// the RP will enrich the internal API representation with data not included
 	// in the original request
 	log.Info("enrich")
-	err := enrich(cs)
+	err := enrich(cs, p, ec)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +69,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	}
 
 	// generate or update the OpenShift config blob
-	err = p.GenerateConfig(ctx, cs)
+	err = p.GenerateConfig(ctx, cs, ec)
 	if err != nil {
 		return nil, err
 	}
@@ -163,30 +164,17 @@ func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedClu
 	return err
 }
 
-func enrich(cs *api.OpenShiftManagedCluster) error {
-	for _, env := range []string{
-		"AZURE_CLIENT_ID",
-		"AZURE_CLIENT_SECRET",
-		"AZURE_SUBSCRIPTION_ID",
-		"AZURE_TENANT_ID",
-		"DNS_DOMAIN",
-		"RESOURCEGROUP",
-	} {
-		if os.Getenv(env) == "" {
-			return fmt.Errorf("must set %s", env)
-		}
-	}
-
+func enrich(cs *api.OpenShiftManagedCluster, p api.Plugin, ec *api.EnvConfig) error {
 	cs.Properties.AzProfile = &api.AzProfile{
-		TenantID:       os.Getenv("AZURE_TENANT_ID"),
-		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
-		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
+		TenantID:       ec.AzTenantID,
+		SubscriptionID: ec.AzSubscriptionID,
+		ResourceGroup:  ec.AzResourceGroup,
 	}
 
 	cs.Properties.RouterProfiles = []api.RouterProfile{
 		{
 			Name:            "default",
-			PublicSubdomain: fmt.Sprintf("%s.%s", os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_DOMAIN")),
+			PublicSubdomain: fmt.Sprintf("%s.%s", ec.AzResourceGroup, ec.DNSDomain),
 			FQDN:            fmt.Sprintf("%s-router.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location),
 		},
 	}

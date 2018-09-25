@@ -4,6 +4,7 @@ package plugin
 import (
 	"context"
 
+	"github.com/caarlos0/env"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -16,17 +17,23 @@ import (
 )
 
 type plugin struct {
-	entry     *logrus.Entry
-	syncImage string
+	entry *logrus.Entry
 }
 
 var _ api.Plugin = &plugin{}
 
-func NewPlugin(entry *logrus.Entry, syncImage string) api.Plugin {
+// NewEnvConfig returns a new configuration built from OS env
+// TODO: how to better receive parameters? The idea is to use OS vars and override with params
+func NewEnvConfig() *api.EnvConfig {
+	ec := api.EnvConfig{}
+	env.Parse(&ec)
+	return &ec
+}
+
+func NewPlugin(entry *logrus.Entry) api.Plugin {
 	log.New(entry)
 	return &plugin{
-		entry:     entry,
-		syncImage: syncImage,
+		entry: entry,
 	}
 }
 
@@ -73,7 +80,7 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 	return api.Validate(new, old, externalOnly)
 }
 
-func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster, ec *api.EnvConfig) error {
 	log.Info("generating configs")
 	// TODO should we save off the original config here and if there are any errors we can restore it?
 	if cs.Config == nil {
@@ -90,8 +97,8 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return err
 	}
-	if p.syncImage != "" {
-		cs.Config.Images.Sync = p.syncImage
+	if ec.SyncImage != "" {
+		cs.Config.Images.Sync = ec.SyncImage
 	}
 	return nil
 }

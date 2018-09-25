@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -13,7 +14,9 @@ import (
 )
 
 func TestMerge(t *testing.T) {
-	p := NewPlugin(logrus.NewEntry(logrus.New()), "sync:latest")
+	ec := NewEnvConfig()
+	p := NewPlugin(logrus.NewEntry(logrus.New()))
+	fmt.Println(p)
 	newCluster := fixtures.NewTestOpenShiftCluster()
 	oldCluster := fixtures.NewTestOpenShiftCluster()
 
@@ -26,7 +29,7 @@ func TestMerge(t *testing.T) {
 	newCluster.Properties.FQDN = ""
 
 	// make old cluster go through plugin first
-	armTemplate := testPluginRun(p, oldCluster, nil, t)
+	armTemplate := testPluginRun(p, oldCluster, nil, t, ec)
 	if !strings.Contains(string(armTemplate), "\"type\": \"Microsoft.Network/networkSecurityGroups\"") {
 		t.Fatalf("networkSecurityGroups should be applied during cluster creation")
 	}
@@ -57,18 +60,18 @@ func TestMerge(t *testing.T) {
 		t.Errorf("new cluster fqdn should be merged")
 	}
 
-	armTemplate = testPluginRun(p, newCluster, oldCluster, t)
+	armTemplate = testPluginRun(p, newCluster, oldCluster, t, ec)
 	if strings.Contains(string(armTemplate), "\"type\": \"Microsoft.Network/networkSecurityGroups\"") {
 		t.Fatalf("networkSecurityGroups should not be applied during cluster upgrade")
 	}
 }
 
-func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldCluster *api.OpenShiftManagedCluster, t *testing.T) (armTemplate []byte) {
+func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldCluster *api.OpenShiftManagedCluster, t *testing.T, ec *api.EnvConfig) (armTemplate []byte) {
 	if errs := p.Validate(context.Background(), newCluster, oldCluster, false); len(errs) != 0 {
 		t.Fatalf("error validating: %s", spew.Sdump(errs))
 	}
 
-	if err := p.GenerateConfig(context.Background(), newCluster); err != nil {
+	if err := p.GenerateConfig(context.Background(), newCluster, ec); err != nil {
 		t.Fatalf("error generating config for arm generate test: %s", spew.Sdump(err))
 	}
 
