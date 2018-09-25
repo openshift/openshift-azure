@@ -30,7 +30,7 @@ type Config struct {
 
 type plugin struct {
 	entry  *logrus.Entry
-	config *Config
+	Config *Config
 }
 
 var _ api.Plugin = &plugin{}
@@ -47,7 +47,7 @@ func NewPlugin(entry *logrus.Entry, config *Config) api.Plugin {
 	log.New(entry)
 	return &plugin{
 		entry:  entry,
-		config: config,
+		Config: config,
 	}
 }
 
@@ -111,8 +111,8 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return err
 	}
-	if p.config.syncImage != "" {
-		cs.Config.Images.Sync = p.config.syncImage
+	if p.Config.syncImage != "" {
+		cs.Config.Images.Sync = p.Config.syncImage
 	}
 	return nil
 }

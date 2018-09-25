@@ -166,15 +166,15 @@ func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedClu
 
 func enrich(cs *api.OpenShiftManagedCluster, p api.Plugin) error {
 	cs.Properties.AzProfile = &api.AzProfile{
-		TenantID:       p.config.azTenantId,
-		SubscriptionID: p.config.azSubscriptionId,
-		ResourceGroup:  p.config.azResourceGroup,
+		TenantID:       p.Config.azTenantId,
+		SubscriptionID: p.Config.azSubscriptionId,
+		ResourceGroup:  p.Config.azResourceGroup,
 	}
 
 	cs.Properties.RouterProfiles = []api.RouterProfile{
 		{
 			Name:            "default",
-			PublicSubdomain: fmt.Sprintf("%s.%s", p.config.azResourceGroup, p.config.dnsDomain),
+			PublicSubdomain: fmt.Sprintf("%s.%s", p.Config.azResourceGroup, p.Config.dnsDomain),
 			FQDN:            fmt.Sprintf("%s-router.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location),
 		},
 	}
