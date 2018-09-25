@@ -46,6 +46,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.ImageOffer != "", "image offer")
 	assert(c.ImageVersion != "", "image version")
 
+	assert(c.Images.Format != "", "image config format")
 	assert(c.Images.ControlPlane != "", "control plane image")
 	assert(c.Images.Node != "", "node image")
 	assert(c.Images.ServiceCatalog != "", "service catalog image")
