@@ -1,4 +1,4 @@
-package validate
+package api
 
 import (
 	"errors"
@@ -8,7 +8,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ghodss/yaml"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
@@ -48,7 +47,7 @@ properties:
 
 func TestValidate(t *testing.T) {
 	tests := map[string]struct {
-		f            func(*api.OpenShiftManagedCluster)
+		f            func(*OpenShiftManagedCluster)
 		expectedErrs []error
 		externalOnly bool
 	}{
@@ -56,76 +55,76 @@ func TestValidate(t *testing.T) {
 
 		},
 		"location": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Location = "" },
+			f:            func(oc *OpenShiftManagedCluster) { oc.Location = "" },
 			expectedErrs: []error{errors.New(`invalid location ""`)},
 		},
 		"name": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Name = "" },
+			f:            func(oc *OpenShiftManagedCluster) { oc.Name = "" },
 			expectedErrs: []error{errors.New(`invalid name ""`)},
 		},
 		"nil properties": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties = nil },
+			f:            func(oc *OpenShiftManagedCluster) { oc.Properties = nil },
 			expectedErrs: []error{errors.New(`properties cannot be nil`)},
 		},
 		"openshift config invalid api fqdn": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.FQDN = ""
 			},
 			expectedErrs: []error{errors.New(`invalid properties.fqdn ""`)},
 		},
 		"test external only false - invalid fqdn fails": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.FQDN = "()" },
+			f:            func(oc *OpenShiftManagedCluster) { oc.Properties.FQDN = "()" },
 			expectedErrs: []error{errors.New(`invalid properties.fqdn "()"`)},
 			externalOnly: false,
 		},
 		"provisioning state bad": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "bad" },
+			f:            func(oc *OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "bad" },
 			expectedErrs: []error{errors.New(`invalid properties.provisioningState "bad"`)},
 		},
 		"provisioning state Creating": {
-			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Creating" },
+			f: func(oc *OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Creating" },
 		},
 		"provisioning state Failed": {
-			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Failed" },
+			f: func(oc *OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Failed" },
 		},
 		"provisioning state Updating": {
-			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Updating" },
+			f: func(oc *OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Updating" },
 		},
 		"provisioning state Succeeded": {
-			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Succeeded" },
+			f: func(oc *OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Succeeded" },
 		},
 		"provisioning state Deleting": {
-			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Deleting" },
+			f: func(oc *OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Deleting" },
 		},
 		"provisioning state Migrating": {
-			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Migrating" },
+			f: func(oc *OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Migrating" },
 		},
 		"provisioning state Upgrading": {
-			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Upgrading" },
+			f: func(oc *OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "Upgrading" },
 		},
 		"provisioning state empty": {
-			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "" },
+			f: func(oc *OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "" },
 		},
 		"openshift version good": {
-			f: func(oc *api.OpenShiftManagedCluster) { oc.Properties.OpenShiftVersion = "v3.10" },
+			f: func(oc *OpenShiftManagedCluster) { oc.Properties.OpenShiftVersion = "v3.10" },
 		},
 		"openshift version bad": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.OpenShiftVersion = "" },
+			f:            func(oc *OpenShiftManagedCluster) { oc.Properties.OpenShiftVersion = "" },
 			expectedErrs: []error{errors.New(`invalid properties.openShiftVersion ""`)},
 		},
 		"openshift config empty public hostname": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.PublicHostname = ""
 			},
 		},
 		"openshift config invalid public hostname": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.PublicHostname = "www.example.com"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.publicHostname "www.example.com"`)},
 		},
 		"router profile duplicate names": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles =
 					append(oc.Properties.RouterProfiles,
 						oc.Properties.RouterProfiles[0])
@@ -133,7 +132,7 @@ func TestValidate(t *testing.T) {
 			expectedErrs: []error{errors.New(`duplicate properties.routerProfiles "default"`)},
 		},
 		"router profile invalid name": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].Name = "foo"
 			},
 			// two errors expected here because we require the default profile
@@ -141,7 +140,7 @@ func TestValidate(t *testing.T) {
 				errors.New(`invalid properties.routerProfiles["default"]`)},
 		},
 		"router profile empty name": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].Name = ""
 			},
 			// same as above with 2 errors but additional validate on the individual profile yeilds a third
@@ -152,38 +151,38 @@ func TestValidate(t *testing.T) {
 				errors.New(`invalid properties.routerProfiles["default"]`)},
 		},
 		"router empty public subdomain": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].PublicSubdomain = ""
 			},
 		},
 		"router invalid public subdomain": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].PublicSubdomain = "()"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].publicSubdomain "()"`)},
 		},
 		"test external only true - unset router profile does not fail": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles = nil
 			},
 			externalOnly: true,
 		},
 		"test external only false - unset router profile does fail": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles = nil
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"]`)},
 			externalOnly: false,
 		},
 		"test external only false - invalid router profile does fail": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].FQDN = "()"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].fqdn "()"`)},
 			externalOnly: false,
 		},
 		"agent pool profile duplicate name": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.AgentPoolProfiles = append(
 					oc.Properties.AgentPoolProfiles,
 					oc.Properties.AgentPoolProfiles[0])
@@ -191,9 +190,9 @@ func TestValidate(t *testing.T) {
 			expectedErrs: []error{errors.New(`duplicate role "infra" in properties.agentPoolProfiles["infra"]`)},
 		},
 		"agent pool profile invalid infra name": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				for i, app := range oc.Properties.AgentPoolProfiles {
-					if app.Role == api.AgentPoolProfileRoleInfra {
+					if app.Role == AgentPoolProfileRoleInfra {
 						oc.Properties.AgentPoolProfiles[i].Name = "foo"
 					}
 				}
@@ -203,9 +202,9 @@ func TestValidate(t *testing.T) {
 			},
 		},
 		"agent pool profile invalid compute name": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				for i, app := range oc.Properties.AgentPoolProfiles {
-					if app.Role == api.AgentPoolProfileRoleCompute {
+					if app.Role == AgentPoolProfileRoleCompute {
 						oc.Properties.AgentPoolProfiles[i].Name = "$"
 					}
 				}
@@ -215,22 +214,22 @@ func TestValidate(t *testing.T) {
 			},
 		},
 		"agent pool profile invalid vm size": {
-			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.AgentPoolProfiles[0].VMSize = api.VMSize("SuperBigVM")
+			f: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[0].VMSize = VMSize("SuperBigVM")
 			},
 			expectedErrs: []error{
 				errors.New(`invalid properties.agentPoolProfiles["infra"].vmSize "SuperBigVM"`),
 			},
 		},
 		"agent pool unmatched vnet subnet id": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.AgentPoolProfiles[0].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
 				oc.Properties.AgentPoolProfiles[1].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.agentPoolProfiles.vnetSubnetID "": all subnets must match when using vnetSubnetID`)},
 		},
 		"agent pool bad vnet subnet id": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.AgentPoolProfiles[0].VnetSubnetID = "foo"
 				oc.Properties.AgentPoolProfiles[1].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
 				oc.Properties.AgentPoolProfiles[2].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
@@ -241,9 +240,9 @@ func TestValidate(t *testing.T) {
 			},
 		},
 		"agent pool bad master count": {
-			f: func(oc *api.OpenShiftManagedCluster) {
+			f: func(oc *OpenShiftManagedCluster) {
 				for i, app := range oc.Properties.AgentPoolProfiles {
-					if app.Role == api.AgentPoolProfileRoleMaster {
+					if app.Role == AgentPoolProfileRoleMaster {
 						oc.Properties.AgentPoolProfiles[i].Count = 1
 					}
 				}
@@ -252,12 +251,12 @@ func TestValidate(t *testing.T) {
 		},
 		//we dont check authProfile because it is non pointer struct. Which is all zero values.
 		"authProfile.identityProviders empty": {
-			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.AuthProfile = &api.AuthProfile{} },
+			f:            func(oc *OpenShiftManagedCluster) { oc.Properties.AuthProfile = &AuthProfile{} },
 			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders length`)},
 		},
 		"AADIdentityProvider secret empty": {
-			f: func(oc *api.OpenShiftManagedCluster) {
-				aadIdentityProvider := &api.AADIdentityProvider{
+			f: func(oc *OpenShiftManagedCluster) {
+				aadIdentityProvider := &AADIdentityProvider{
 					Kind:     "AADIdentityProvider",
 					ClientID: "clientId",
 					Secret:   "",
@@ -269,8 +268,8 @@ func TestValidate(t *testing.T) {
 			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider clientId ""`)},
 		},
 		"AADIdentityProvider clientId empty": {
-			f: func(oc *api.OpenShiftManagedCluster) {
-				aadIdentityProvider := &api.AADIdentityProvider{
+			f: func(oc *OpenShiftManagedCluster) {
+				aadIdentityProvider := &AADIdentityProvider{
 					Kind:     "AADIdentityProvider",
 					ClientID: "",
 					Secret:   "aadClientSecret",
@@ -282,8 +281,8 @@ func TestValidate(t *testing.T) {
 			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider clientId ""`)},
 		},
 		"AADIdentityProvider tenantId empty": {
-			f: func(oc *api.OpenShiftManagedCluster) {
-				aadIdentityProvider := &api.AADIdentityProvider{
+			f: func(oc *OpenShiftManagedCluster) {
+				aadIdentityProvider := &AADIdentityProvider{
 					Kind:     "AADIdentityProvider",
 					ClientID: "test",
 					Secret:   "aadClientSecret",
@@ -304,7 +303,7 @@ func TestValidate(t *testing.T) {
 		}
 
 		// TODO we're hoping conversion is correct. Change this to a known valid config
-		cs := api.ConvertFromV20180930preview(oc)
+		cs := ConvertFromV20180930preview(oc)
 		if test.f != nil {
 			test.f(cs)
 		}

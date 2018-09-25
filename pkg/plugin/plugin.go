@@ -13,7 +13,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/initialize"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/upgrade"
-	"github.com/openshift/openshift-azure/pkg/validate"
 )
 
 type plugin struct {
@@ -71,7 +70,7 @@ func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *api.OpenShiftManage
 
 func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) []error {
 	log.Info("validating internal data models")
-	return validate.Validate(new, old, externalOnly)
+	return api.Validate(new, old, externalOnly)
 }
 
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {

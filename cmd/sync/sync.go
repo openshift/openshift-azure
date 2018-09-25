@@ -20,7 +20,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
-	"github.com/openshift/openshift-azure/pkg/validate"
 )
 
 var (
@@ -129,7 +128,7 @@ func sync() error {
 		return err
 	}
 
-	if errs := validate.Validate(cs, nil, false); len(errs) > 0 {
+	if errs := api.Validate(cs, nil, false); len(errs) > 0 {
 		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 
