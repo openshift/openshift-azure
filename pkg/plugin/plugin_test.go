@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -13,7 +14,9 @@ import (
 )
 
 func TestMerge(t *testing.T) {
-	p := NewPlugin(logrus.NewEntry(logrus.New()), "sync:latest")
+	cfg := NewConfig()
+	p := NewPlugin(logrus.NewEntry(logrus.New()), &cfg)
+	fmt.Println(p)
 	newCluster := fixtures.NewTestOpenShiftCluster()
 	oldCluster := fixtures.NewTestOpenShiftCluster()
 
