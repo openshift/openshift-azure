@@ -14,6 +14,18 @@ const (
 	ContextKeyTenantID     ContextKey = "TenantID"
 )
 
+// EnvConfig generates configuration from OS vars
+type EnvConfig struct {
+	AzClientID          string `env:"AZURE_CLIENT_ID"`
+	AzClientSecret      string `env:"AZURE_CLIENT_SECRET"`
+	AzSubscriptionID    string `env:"AZURE_SUBSCRIPTION_ID"`
+	AzTenantID          string `env:"AZURE_TENANT_ID"`
+	AzResourceGroup     string `env:"RESOURCEGROUP"`
+	SyncImage           string `env:"SYNC_IMAGE" envDefault:"sync:latest"`
+	DNSDomain           string `env:"DNS_DOMAIN" envDefault:"osadev.cloud"`
+	AutoAcceptAgreement string `env:"AUTOACCEPT_MARKETPLACE_AGREEMENT" envDefault:"yes"`
+}
+
 type Plugin interface {
 	// MergeConfig merges new and old config so that no unnecessary config
 	// is going to get regenerated during generation. It also handles merging
@@ -32,7 +44,7 @@ type Plugin interface {
 
 	// GenerateConfig ensures all the necessary in-cluster config is generated
 	// for an Openshift cluster.
-	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster) error
+	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster, ec *EnvConfig) error
 
 	GenerateARM(ctx context.Context, cs *OpenShiftManagedCluster, isUpdate bool) ([]byte, error)
 

@@ -16,37 +16,24 @@ import (
 	"github.com/openshift/openshift-azure/pkg/upgrade"
 )
 
-type Config struct {
-	azClientId          string `env:"AZURE_CLIENT_ID"`
-	azClientSecret      string `env:"AZURE_CLIENT_SECRET"`
-	azSubscriptionId    string `env:"AZURE_SUBSCRIPTION_ID"`
-	azTenantId          string `env:"AZURE_TENANT_ID"`
-	azResourceGroup     string `env:"RESOURCEGROUP"`
-	syncImage           string `env:"SYNC_IMAGE" envDefault:"sync:latest"`
-	dnsDomain           string `env:"DNS_DOMAIN" envDefault:"osadev.cloud"`
-	autoAcceptAgreement string `env:"AUTOACCEPT_MARKETPLACE_AGREEMENT" envDefault:"yes"`
-}
-
 type plugin struct {
-	entry  *logrus.Entry
-	Config *Config
+	entry *logrus.Entry
 }
 
 var _ api.Plugin = &plugin{}
 
-// build configuration
+// NewEnvConfig returns a new configuration built from OS env
 // TODO: how to better receive parameters? The idea is to use OS vars and override with params
-func NewConfig() Config {
-	cfg := Config{}
-	env.Parse(&cfg)
-	return cfg
+func NewEnvConfig() *api.EnvConfig {
+	ec := api.EnvConfig{}
+	env.Parse(&ec)
+	return &ec
 }
 
-func NewPlugin(entry *logrus.Entry, config *Config) api.Plugin {
+func NewPlugin(entry *logrus.Entry) api.Plugin {
 	log.New(entry)
 	return &plugin{
-		entry:  entry,
-		Config: config,
+		entry: entry,
 	}
 }
 
@@ -93,7 +80,7 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 	return api.Validate(new, old, externalOnly)
 }
 
-func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster, ec *api.EnvConfig) error {
 	log.Info("generating configs")
 	// TODO should we save off the original config here and if there are any errors we can restore it?
 	if cs.Config == nil {
@@ -110,8 +97,8 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return err
 	}
-	if p.Config.syncImage != "" {
-		cs.Config.Images.Sync = p.Config.syncImage
+	if ec.SyncImage != "" {
+		cs.Config.Images.Sync = ec.SyncImage
 	}
 	return nil
 }
