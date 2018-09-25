@@ -83,4 +83,45 @@ var _ = Describe("Openshift on Azure e2e tests", func() {
 		})
 		Expect(err).ToNot(HaveOccurred())
 	})
+
+	It("should run the correct image", func() {
+		var prefix string
+		if strings.HasPrefix(c.cs.Config.ImageSKU, "osa_") {
+			prefix = "registry.access.redhat.com/openshift3"
+		} else {
+			prefix = "docker.io/openshift"
+		}
+
+		// these pods should have the same prefix
+		podsToCheck := map[string]struct{}{
+			"oauth-proxy":                    {},
+			"origin-control-plane":           {},
+			"origin-docker-registry":         {},
+			"origin-haproxy-router":          {},
+			"origin-node":                    {},
+			"origin-service-catalog":         {},
+			"origin-template-service-broker": {},
+			"origin-web-console":             {},
+			"prometheus-alert-buffer":        {},
+			"prometheus-alertmanager":        {},
+			"prometheus-node-exporter":       {},
+			"prometheus":                     {},
+		}
+
+		pods, err := c.kc.CoreV1().Pods("").List(metav1.ListOptions{})
+		Expect(err).ToNot(HaveOccurred())
+		for _, pod := range pods.Items {
+			// e2e check should ensure that no reg-aws images are running on box
+			Expect(strings.Contains(pod.Status.ContainerStatuses[0].Image, "registry.reg-aws")).ToNot(BeTrue())
+			parts := strings.Split(pod.Status.ContainerStatuses[0].Image, "/")
+
+			if len(parts) < 3 {
+				continue // skip unexpected image formats
+			}
+			if _, ok := podsToCheck[parts[2]]; ok {
+				// also that centos boxes are running origin images, and rhel OCP images
+				Expect(strings.HasPrefix(pod.Status.ContainerStatuses[0].Image, prefix)).To(BeTrue())
+			}
+		}
+	})
 })
