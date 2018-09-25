@@ -27,9 +27,9 @@ import (
 var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
 
 // createOrUpdate simulates the RP
-func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, entry *logrus.Entry) (*v20180930preview.OpenShiftManagedCluster, error) {
+func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, entry *logrus.Entry, pc *plugin.Config) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
-	p := plugin.NewPlugin(entry, os.Getenv("SYNC_IMAGE"))
+	p := plugin.NewPlugin(entry, pc)
 
 	// convert the external API manifest into the internal API representation
 	log.Info("convert to internal")
@@ -251,6 +251,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// initialize a new plugin config
+	pc := &plugin.Config{
+		VmImage:   os.Getenv("VM_IMAGE"),
+		SyncImage: os.Getenv("SYNC_IMAGE"),
+	}
+
 	//simulate Context with property bag
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, api.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
@@ -259,7 +265,7 @@ func main() {
 
 	// simulate the API call to the RP
 	entry := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
-	oc, err = createOrUpdate(ctx, oc, entry)
+	oc, err = createOrUpdate(ctx, oc, entry, pc)
 	if err != nil {
 		log.Fatal(err)
 	}

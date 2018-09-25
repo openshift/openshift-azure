@@ -16,17 +16,17 @@ import (
 )
 
 type plugin struct {
-	entry     *logrus.Entry
-	syncImage string
+	entry  *logrus.Entry
+	config *Config
 }
 
 var _ api.Plugin = &plugin{}
 
-func NewPlugin(entry *logrus.Entry, syncImage string) api.Plugin {
+func NewPlugin(entry *logrus.Entry, config *Config) api.Plugin {
 	log.New(entry)
 	return &plugin{
-		entry:     entry,
-		syncImage: syncImage,
+		entry:  entry,
+		config: config,
 	}
 }
 
@@ -90,8 +90,11 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return err
 	}
-	if p.syncImage != "" {
-		cs.Config.Images.Sync = p.syncImage
+	if p.config.SyncImage != "" {
+		cs.Config.Images.Sync = p.config.SyncImage
+	}
+	if p.config.VmImage != "" {
+		cs.Config.Images.Node = p.config.VmImage
 	}
 	return nil
 }
