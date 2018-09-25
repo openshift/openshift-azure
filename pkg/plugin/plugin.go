@@ -4,6 +4,7 @@ package plugin
 import (
 	"context"
 
+	"github.com/caarlos0/env"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -15,18 +16,37 @@ import (
 	"github.com/openshift/openshift-azure/pkg/upgrade"
 )
 
+type Config struct {
+	syncImage           string `env:"SYNC_IMAGE"`
+	azClientId          string `env:"AZURE_CLIENT_ID"`
+	azClientSecret      string `env:"AZURE_CLIENT_SECRET"`
+	azSubscriptionId    string `env:"AZURE_SUBSCRIPTION_ID"`
+	azTenantId          string `env:"AZURE_TENANT_ID"`
+	azResourceGroup     string `env:"RESOURCEGROUP"`
+	dnsDomain           string `env:"DNS_DOMAIN" envDefault:"osadev.cloud"`
+	autoAcceptAgreement string `env:"AUTOACCEPT_MARKETPLACE_AGREEMENT" envDefault:"yes"`
+}
+
 type plugin struct {
-	entry     *logrus.Entry
-	syncImage string
+	entry  *logrus.Entry
+	config *Config
 }
 
 var _ api.Plugin = &plugin{}
 
-func NewPlugin(entry *logrus.Entry, syncImage string) api.Plugin {
+// build configuration
+// TODO: how to better receive parameters? The idea is to use OS vars and override with params
+func NewConfig() Config {
+	cfg := Config{}
+	env.Parse(&cfg)
+	return cfg
+}
+
+func NewPlugin(entry *logrus.Entry, config *Config) api.Plugin {
 	log.New(entry)
 	return &plugin{
-		entry:     entry,
-		syncImage: syncImage,
+		entry:  entry,
+		config: config,
 	}
 }
 
@@ -90,8 +110,8 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return err
 	}
-	if p.syncImage != "" {
-		cs.Config.Images.Sync = p.syncImage
+	if p.config.syncImage != "" {
+		cs.Config.Images.Sync = p.config.syncImage
 	}
 	return nil
 }
