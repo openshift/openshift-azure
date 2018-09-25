@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"reflect"
 
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -14,6 +15,18 @@ import (
 	api "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
+
+type certificate struct {
+	cn           string
+	organization []string
+	dnsNames     []string
+	ipAddresses  []net.IP
+	extKeyUsage  []x509.ExtKeyUsage
+	signingKey   *rsa.PrivateKey
+	signingCert  *x509.Certificate
+	key          **rsa.PrivateKey
+	cert         **x509.Certificate
+}
 
 func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (err error) {
 	c := cs.Config
@@ -65,20 +78,9 @@ func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (e
 		}
 	}
 
-	certs := []struct {
-		cn           string
-		organization []string
-		dnsNames     []string
-		ipAddresses  []net.IP
-		extKeyUsage  []x509.ExtKeyUsage
-		signingKey   *rsa.PrivateKey
-		signingCert  *x509.Certificate
-		key          **rsa.PrivateKey
-		cert         **x509.Certificate
-		selfSign     bool
-	}{
-		// Generate etcd certs
+	certs := []certificate{
 		{
+			// Generate etcd certs
 			cn:          "etcd-server",
 			dnsNames:    []string{"master-000000", "master-000001", "master-000002"},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
@@ -227,12 +229,17 @@ func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (e
 		if cert.signingKey == nil && cert.signingCert == nil {
 			cert.signingKey, cert.signingCert = c.Certificates.Ca.Key, c.Certificates.Ca.Cert
 		}
-		if *cert.key != nil && *cert.cert != nil &&
-			((*cert.cert).CheckSignatureFrom(cert.signingCert) == nil || cert.selfSign) {
-			continue
-		}
-		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, cert.selfSign); err != nil {
+		var k *rsa.PrivateKey
+		var c *x509.Certificate
+		if k, c, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, false); err != nil {
 			return
+		}
+		// compare certificate and replace if update is needed
+		// if at any point we start using self-sign certificates again
+		// (see console certificate comment), logic inside certEqual needs
+		// to be updated for this.
+		if !certEqual(c, *cert.cert) {
+			*cert.key, *cert.cert = k, c
 		}
 	}
 
@@ -387,4 +394,18 @@ func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (e
 	}
 
 	return
+}
+
+func certEqual(certNew, certOld *x509.Certificate) bool {
+	if certOld == nil {
+		return false
+	}
+	if !reflect.DeepEqual(certNew.Subject, certOld.Subject) ||
+		!reflect.DeepEqual(certNew.DNSNames, certOld.DNSNames) ||
+		!reflect.DeepEqual(certNew.ExtKeyUsage, certOld.ExtKeyUsage) ||
+		!reflect.DeepEqual(certNew.IPAddresses, certOld.IPAddresses) ||
+		!reflect.DeepEqual(certNew.Issuer, certOld.Issuer) {
+		return false
+	}
+	return true
 }

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/satori/go.uuid"
@@ -111,4 +112,55 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.AdminKubeconfig != nil, "AdminKubeconfig")
 	assert(c.NodeBootstrapKubeconfig != nil, "NodeBootstrapKubeconfig")
 	assert(c.AzureClusterReaderKubeconfig != nil, "AzureClusterReaderKubeconfig")
+}
+
+func TestGenerateUpdateCertRegen(t *testing.T) {
+	var pluginConfig api.PluginConfig
+	var cs, oldCs *api.OpenShiftManagedCluster
+	cs = fixtures.NewTestOpenShiftCluster()
+	cs.Properties.FQDN = "example-new.eastus.cloudapp.azure.com"
+	cs.Properties.RouterProfiles[0].FQDN = "router-fqdn-new.eastus.cloudapp.azure.com"
+	cs.Properties.RouterProfiles[0].PublicSubdomain = "test-new.example.com"
+
+	oldCs = fixtures.NewTestOpenShiftCluster()
+	// old cluster should be pre-populated
+	err := Generate(oldCs, pluginConfig)
+	if err != nil {
+		t.Errorf("received generation error %v", err)
+	}
+
+	// copy config and regenerate everything else
+	old := oldCs.DeepCopy()
+	cs.Config = old.Config
+
+	err = Generate(cs, pluginConfig)
+	if err != nil {
+		t.Errorf("received generation error %v", err)
+	}
+
+	// certificates should not match
+	if reflect.DeepEqual(cs.Config.Certificates.MasterServer.Cert, oldCs.Config.Certificates.MasterServer.Cert) {
+		t.Error("masterServer certificates matches, check test for details")
+	}
+	if reflect.DeepEqual(cs.Config.Certificates.Router.Cert, oldCs.Config.Certificates.Router.Cert) {
+		t.Error("router certificates matches, check test for details")
+	}
+	if reflect.DeepEqual(cs.Config.Certificates.Registry.Cert, oldCs.Config.Certificates.Registry.Cert) {
+		t.Error("registry certificates matches, check test for details")
+	}
+	if reflect.DeepEqual(cs.Config.Certificates.OpenshiftConsole.Cert, oldCs.Config.Certificates.OpenshiftConsole.Cert) {
+		t.Error("openshiftConsole certificates matches, check test for details")
+	}
+
+	//certificates should match
+	if reflect.DeepEqual(cs.Config.Certificates.Registry.Cert, oldCs.Config.Certificates.Registry.Cert) {
+		t.Error("registry certificates matches, check test for details")
+	}
+	if !reflect.DeepEqual(cs.Config.Certificates.ServiceCatalogAPIClient.Cert, oldCs.Config.Certificates.ServiceCatalogAPIClient.Cert) {
+		t.Error("serviceCatalogAPIClient certificates do not match, check test for details")
+	}
+	if !reflect.DeepEqual(cs.Config.Certificates.Admin.Cert, oldCs.Config.Certificates.Admin.Cert) {
+		t.Error("admin certificates do not match, check test for details")
+	}
+
 }
