@@ -190,6 +190,13 @@ var Translations = map[string][]struct {
 			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
 			Template:   "{{ .Config.Images.Format }}",
 		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
+			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleMaster), nil
+			},
+		},
 	},
 	"ConfigMap/openshift-web-console/webconsole-config": {
 		{

@@ -204,7 +204,7 @@ func validateAgentPoolProfile(app *AgentPoolProfile) (errs []error) {
 		}
 	}
 
-	if _, found := DefaultVMSizeKubeArguments[app.VMSize]; !found {
+	if _, found := DefaultVMSizeKubeArguments[app.VMSize][app.Role]; !found {
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
 	}
 

@@ -36,6 +36,8 @@ data:
       - /etc/origin/node/pods
       rotate-certificates:
       - "true"
+      system-reserved:
+      - '*** GENERATED ***'
     masterClientConnectionOverrides:
       acceptContentTypes: application/vnd.kubernetes.protobuf,application/json
       burst: 200
