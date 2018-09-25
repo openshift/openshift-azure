@@ -18,12 +18,12 @@ import (
 )
 
 type Config struct {
-	syncImage           string `env:"SYNC_IMAGE"`
 	azClientId          string `env:"AZURE_CLIENT_ID"`
 	azClientSecret      string `env:"AZURE_CLIENT_SECRET"`
 	azSubscriptionId    string `env:"AZURE_SUBSCRIPTION_ID"`
 	azTenantId          string `env:"AZURE_TENANT_ID"`
 	azResourceGroup     string `env:"RESOURCEGROUP"`
+	syncImage           string `env:"SYNC_IMAGE" envDefault:"sync:latest"`
 	dnsDomain           string `env:"DNS_DOMAIN" envDefault:"osadev.cloud"`
 	autoAcceptAgreement string `env:"AUTOACCEPT_MARKETPLACE_AGREEMENT" envDefault:"yes"`
 }
