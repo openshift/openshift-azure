@@ -21,6 +21,7 @@ type Config struct {
 	ConfigStorageAccount   string `json:"configStorageAccount,omitempty"`
 	RegistryStorageAccount string `json:"registryStorageAccount,omitempty"`
 	LoggingWorkspace       string `json:"loggingWorkspace,omitempty"` // workspace for Azure Log Analytics resource
+	LoggingLocation        string `json:"loggingLocation,omitempty"`  // location for Azure Log Analytics resource
 
 	Certificates CertificateConfig `json:"certificates,omitempty"`
 	Images       ImageConfig       `json:"images,omitempty"`

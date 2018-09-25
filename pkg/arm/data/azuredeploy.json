@@ -9,7 +9,7 @@
             "type": "Microsoft.OperationalInsights/workspaces",
             "name": "{{ .Config.LoggingWorkspace | js }}",
             "apiVersion": "2017-03-15-preview",
-            "location": "{{ .ContainerService.Location | js }}",
+            "location": "{{ .Config.LoggingLocation | js }}",
             "properties": {
                 "sku": {
                     "Name": "PerGB2018"
