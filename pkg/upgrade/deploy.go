@@ -5,21 +5,20 @@ import (
 	"encoding/json"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/initialize"
 	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-func Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, i initialize.Initializer, azuredeploy []byte, config api.PluginConfig) error {
+func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
 	var t map[string]interface{}
 	err := json.Unmarshal(azuredeploy, &t)
 	if err != nil {
 		return err
 	}
 
-	clients, err := azureclient.NewAzureClients(ctx, cs, config)
+	clients, err := azureclient.NewAzureClients(ctx, cs, u.pluginConfig)
 	if err != nil {
 		return err
 	}
@@ -41,5 +40,5 @@ func Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, i initialize.I
 		return err
 	}
 
-	return i.InitializeCluster(ctx, cs)
+	return u.InitializeCluster(ctx, cs)
 }
