@@ -236,6 +236,7 @@ func main() {
 
 	// load the plugin configuration from environment vars
 	var config api.PluginConfig
+	log.Info("loading plugin config from environment")
 	config, err = plugin.NewPluginConfigFromEnv()
 	if err != nil {
 		log.Fatal(err)
