@@ -16,8 +16,15 @@ const (
 
 // PluginConfig is passed into NewPlugin
 type PluginConfig struct {
-	SyncImage       string
-	AcceptLanguages []string
+	AcceptLanguages            []string
+	SyncImage                  string
+	AzTenantID                 string
+	AzSubscriptionID           string
+	AzClientID                 string
+	AzClientSecret             string
+	AcceptMarketplaceAgreement bool
+	DNSDomain                  string
+	ResourceGroup              string
 }
 
 type Plugin interface {
