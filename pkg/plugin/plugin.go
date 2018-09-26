@@ -3,6 +3,7 @@ package plugin
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 
@@ -27,30 +28,58 @@ var _ api.Plugin = &plugin{}
 func getEnv(name string, defaultValue ...string) string {
 	value := os.Getenv(name)
 	if len(value) == 0 {
-		return defaultValue[0]
+		if len(defaultValue) > 0 {
+			return defaultValue[0]
+		}
+		return ""
 	}
 	return value
 }
 
+// GetRequiredConfigEnvVars exposes the required variables to build a plugin config
+func GetRequiredConfigEnvVars() []string {
+	return []string{
+		"AZURE_TENANT_ID",
+		"AZURE_SUBSCRIPTION_ID",
+		"AZURE_CLIENT_ID",
+		"AZURE_CLIENT_SECRET",
+		"RESOURCEGROUP",
+	}
+}
+
 // NewPluginConfigFromEnv loads all config items from os env vars
 func NewPluginConfigFromEnv() (api.PluginConfig, error) {
+	//log.Info("building plugin config from environment variables")
+
+	pc := api.PluginConfig{}
+	required := GetRequiredConfigEnvVars()
+
+	var missing []string
+	for i := range required {
+		value := os.Getenv(required[i])
+		if len(value) == 0 {
+			missing = append(missing, required[i])
+		}
+	}
+
+	if len(missing) > 0 {
+		return pc, fmt.Errorf("can't build plugin config from env, missing: %s", missing)
+	}
+
+	// fill out the config struct
 	acceptAgreement := false
 	if getEnv("AUTOACCEPT_MARKETPLACE_AGREEMENT", "yes") == "yes" {
 		acceptAgreement = true
 	}
-	pc := api.PluginConfig{
-		AcceptLanguages:            strings.Split(getEnv("ACCEPT_LANGUAGES", "en-us"), ","),
-		SyncImage:                  getEnv("SYNC_IMAGE", "sync:latest"),
-		AzTenantID:                 getEnv("AZURE_TENANT_ID"),
-		AzSubscriptionID:           getEnv("AZURE_SUBSCRIPTION_ID"),
-		AzClientID:                 getEnv("AZURE_CLIENT_ID"),
-		AzClientSecret:             getEnv("AZURE_CLIENT_SECRET"),
-		ResourceGroup:              getEnv("RESOURCE_GROUP"),
-		AcceptMarketplaceAgreement: acceptAgreement,
-		DNSDomain:                  getEnv("DNS_DOMAIN", "osadev.cloud"),
-	}
-
-	// TODO: validate there are no empty fields in the struct
+	pc.AcceptLanguages = strings.Split(getEnv("ACCEPT_LANGUAGES", "en-us"), ",")
+	pc.SyncImage = getEnv("SYNC_IMAGE", "sync:latest")
+	pc.AzTenantID = getEnv("AZURE_TENANT_ID")
+	pc.AzSubscriptionID = getEnv("AZURE_SUBSCRIPTION_ID")
+	pc.AzClientID = getEnv("AZURE_CLIENT_ID")
+	pc.AzClientSecret = getEnv("AZURE_CLIENT_SECRET")
+	pc.ResourceGroup = getEnv("RESOURCEGROUP")
+	pc.AcceptMarketplaceAgreement = acceptAgreement
+	pc.DNSDomain = getEnv("DNS_DOMAIN", "osadev.cloud")
 
 	return pc, nil
 }
