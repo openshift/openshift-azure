@@ -3,6 +3,8 @@ package plugin
 
 import (
 	"context"
+	"os"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 
@@ -21,6 +23,37 @@ type plugin struct {
 }
 
 var _ api.Plugin = &plugin{}
+
+func getEnv(name string, defaultValue ...string) string {
+	value := os.Getenv(name)
+	if len(value) == 0 {
+		return defaultValue[0]
+	}
+	return value
+}
+
+// NewPluginConfigFromEnv loads all config items from os env vars
+func NewPluginConfigFromEnv() (api.PluginConfig, error) {
+	acceptAgreement := false
+	if getEnv("AUTOACCEPT_MARKETPLACE_AGREEMENT", "yes") == "yes" {
+		acceptAgreement = true
+	}
+	pc := api.PluginConfig{
+		AcceptLanguages:            strings.Split(getEnv("ACCEPT_LANGUAGES", "en-us"), ","),
+		SyncImage:                  getEnv("SYNC_IMAGE", "sync:latest"),
+		AzTenantID:                 getEnv("AZURE_TENANT_ID"),
+		AzSubscriptionID:           getEnv("AZURE_SUBSCRIPTION_ID"),
+		AzClientID:                 getEnv("AZURE_CLIENT_ID"),
+		AzClientSecret:             getEnv("AZURE_CLIENT_SECRET"),
+		ResourceGroup:              getEnv("RESOURCE_GROUP"),
+		AcceptMarketplaceAgreement: acceptAgreement,
+		DNSDomain:                  getEnv("DNS_DOMAIN", "osadev.cloud"),
+	}
+
+	// TODO: validate there are no empty fields in the struct
+
+	return pc, nil
+}
 
 // NewPlugin creates a new plugin instance
 func NewPlugin(entry *logrus.Entry, pluginConfig api.PluginConfig) api.Plugin {
