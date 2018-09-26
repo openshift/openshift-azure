@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 
@@ -26,6 +27,8 @@ func TestMerge(t *testing.T) {
 	newCluster.Properties.AzProfile = nil
 	newCluster.Properties.AuthProfile = nil
 	newCluster.Properties.FQDN = ""
+
+	testPluginWithEnv(t)
 
 	// make old cluster go through plugin first
 	armTemplate := testPluginRun(p, oldCluster, nil, t)
@@ -82,4 +85,43 @@ func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldClu
 		t.Errorf("no arm was generated")
 	}
 	return bytes
+}
+
+// Putting this in here to avoid polluting the environment in other tests
+func testPluginWithEnv(t *testing.T) {
+	required := GetRequiredConfigEnvVars()
+	// environment placeholders
+	placeholders := map[string]string{}
+	// blank env vars, only store those env vars that already exist (and their values)
+	for i := range required {
+		value, found := os.LookupEnv(required[i])
+		if found {
+			placeholders[required[i]] = value
+		}
+		os.Unsetenv(required[i])
+	}
+
+	pluginConfig, err := NewPluginConfigFromEnv()
+
+	// creating a plugin config from an incomplete env should fail!
+	if err == nil {
+		t.Errorf("a plugin config should require a complete set of env vars: %s", spew.Sdump(pluginConfig))
+	}
+
+	// creating a plugin config with a complete env should succeed
+	for i := range required {
+		os.Setenv(required[i], "non-empty")
+	}
+	pluginConfig, err = NewPluginConfigFromEnv()
+	if err != nil {
+		t.Errorf("plugin config from env failed: %s", spew.Sdump(pluginConfig))
+	}
+
+	// restore environment variables as they were
+	for i := range required {
+		os.Unsetenv(required[i])
+	}
+	for k, v := range placeholders {
+		os.Setenv(k, v)
+	}
 }
