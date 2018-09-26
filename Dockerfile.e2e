@@ -1,0 +1,4 @@
+FROM centos:7
+RUN yum -y update
+COPY e2e.test .
+ENTRYPOINT [ "/e2e.test" ]

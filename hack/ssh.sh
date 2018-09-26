@@ -4,7 +4,7 @@ usage() {
     cat <<EOF >&2
 usage:
 
-$0 [ -n {0,1,2} ] [ resourcegroup ]
+$0 [ -n {0,1,2} ] [ -c command ] [ resourcegroup ]
 
 EOF
     exit 1
@@ -17,11 +17,14 @@ cleanup() {
 
 ID=0
 
-while getopts :n: o; do
+while getopts :n:c: o; do
     case $o in
         n)
             ID=$OPTARG
             if [[ $ID != 0 && $ID != 1 && $ID != 2 ]]; then usage; fi
+            ;;
+        c)
+            COMMAND=$OPTARG
             ;;
         *)
             usage
@@ -49,4 +52,4 @@ IP=$(az vmss list-instance-public-ips -g $RESOURCEGROUP -n ss-master --query "[$
 eval "$(ssh-agent)"
 ssh-add $ID_RSA 2>/dev/null
 
-ssh -A -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no cloud-user@$IP
+ssh -A -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no cloud-user@$IP $COMMAND

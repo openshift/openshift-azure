@@ -43,7 +43,7 @@ func selectNodeImage(cs *api.OpenShiftManagedCluster, deployOS string) {
 }
 
 func image(cs *api.OpenShiftManagedCluster, component, version string) string {
-	image := strings.Replace(Derived.ImageConfigFormat(cs), "${component}", component, -1)
+	image := strings.Replace(imageConfigFormat(), "${component}", component, -1)
 	return strings.Replace(image, "${version}", version, -1)
 }
 
@@ -132,6 +132,7 @@ func selectContainerImagesOSA(cs *api.OpenShiftManagedCluster) error {
 }
 
 func selectContainerImages(cs *api.OpenShiftManagedCluster) error {
+	cs.Config.Images.Format = imageConfigFormat()
 	switch os.Getenv("DEPLOY_OS") {
 	case "", "rhel7":
 		return selectContainerImagesOSA(cs)
@@ -140,4 +141,20 @@ func selectContainerImages(cs *api.OpenShiftManagedCluster) error {
 	}
 
 	return fmt.Errorf("unrecognised DEPLOY_OS value")
+}
+
+func imageConfigFormat() string {
+	imageConfigFormat := os.Getenv("OREG_URL")
+	if imageConfigFormat != "" {
+		return imageConfigFormat
+	}
+
+	switch os.Getenv("DEPLOY_OS") {
+	case "", "rhel7":
+		imageConfigFormat = "registry.access.redhat.com/openshift3/ose-${component}:${version}"
+	case "centos7":
+		imageConfigFormat = "docker.io/openshift/origin-${component}:${version}"
+	}
+
+	return imageConfigFormat
 }

@@ -47,9 +47,8 @@ func (*simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCl
 		"Startup": func(role api.AgentPoolProfileRole) ([]byte, error) {
 			if role == api.AgentPoolProfileRoleMaster {
 				return util.Template(string(masterStartup), nil, cs, map[string]interface{}{"Role": role})
-			} else {
-				return util.Template(string(nodeStartup), nil, cs, map[string]interface{}{"Role": role})
 			}
+			return util.Template(string(nodeStartup), nil, cs, map[string]interface{}{"Role": role})
 		},
 		"IsUpgrade": func() bool {
 			return isUpdate

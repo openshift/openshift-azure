@@ -1,4 +1,4 @@
-package validate
+package api
 
 import (
 	"fmt"
@@ -7,8 +7,6 @@ import (
 	"strings"
 
 	"github.com/go-test/deep"
-
-	"github.com/openshift/openshift-azure/pkg/api"
 )
 
 var (
@@ -28,10 +26,10 @@ var (
 	rxAgentPoolProfileName = regexp.MustCompile(`(?i)^[a-z0-9]{1,12}$`)
 )
 
-var validAgentPoolProfileRoles = map[api.AgentPoolProfileRole]struct{}{
-	api.AgentPoolProfileRoleCompute: {},
-	api.AgentPoolProfileRoleInfra:   {},
-	api.AgentPoolProfileRoleMaster:  {},
+var validAgentPoolProfileRoles = map[AgentPoolProfileRole]struct{}{
+	AgentPoolProfileRoleCompute: {},
+	AgentPoolProfileRoleInfra:   {},
+	AgentPoolProfileRoleMaster:  {},
 }
 
 var validRouterProfileNames = map[string]struct{}{
@@ -47,7 +45,7 @@ func isAzureZone(fqdn string) bool {
 }
 
 // Validate validates a OpenShiftManagedCluster struct
-func Validate(new, old *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+func Validate(new, old *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	// TODO are these error messages confusing since they may not correspond with the external model?
 	if errs := validateContainerService(new, externalOnly); len(errs) > 0 {
 		return errs
@@ -58,7 +56,7 @@ func Validate(new, old *api.OpenShiftManagedCluster, externalOnly bool) (errs []
 	return nil
 }
 
-func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+func validateContainerService(c *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	if c.Location == "" {
 		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
 	}
@@ -76,10 +74,10 @@ func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool)
 	return
 }
 
-func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+func validateUpdateContainerService(cs, oldCs *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	// TODO: function needs unit testing.
 
-	newAgents := make(map[string]*api.AgentPoolProfile)
+	newAgents := make(map[string]*AgentPoolProfile)
 	for i := range cs.Properties.AgentPoolProfiles {
 		newAgent := cs.Properties.AgentPoolProfiles[i]
 		newAgents[newAgent.Name] = &newAgent
@@ -102,7 +100,7 @@ func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster, exte
 	return
 }
 
-func validateProperties(p *api.Properties, externalOnly bool) (errs []error) {
+func validateProperties(p *Properties, externalOnly bool) (errs []error) {
 	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
 	switch p.OpenShiftVersion {
 	case "v3.10":
@@ -122,14 +120,14 @@ func validateProperties(p *api.Properties, externalOnly bool) (errs []error) {
 	return
 }
 
-func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
+func validateAuthProfile(ap *AuthProfile) (errs []error) {
 	if len(ap.IdentityProviders) != 1 {
 		errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders length"))
 	}
 	//check supported identity providers
 	for _, ip := range ap.IdentityProviders {
 		switch provider := ip.Provider.(type) {
-		case (*api.AADIdentityProvider):
+		case (*AADIdentityProvider):
 			if ip.Name != "Azure AD" {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders name"))
 			}
@@ -147,8 +145,8 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 	return
 }
 
-func validateAgentPoolProfiles(apps []api.AgentPoolProfile) (errs []error) {
-	appmap := map[api.AgentPoolProfileRole]struct{}{}
+func validateAgentPoolProfiles(apps []AgentPoolProfile) (errs []error) {
+	appmap := map[AgentPoolProfileRole]struct{}{}
 
 	for i, app := range apps {
 		if _, found := validAgentPoolProfileRoles[app.Role]; !found {
@@ -176,11 +174,11 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile) (errs []error) {
 	return
 }
 
-func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
+func validateAgentPoolProfile(app *AgentPoolProfile) (errs []error) {
 	switch app.Role {
-	case api.AgentPoolProfileRoleCompute:
+	case AgentPoolProfileRoleCompute:
 		switch app.Name {
-		case string(api.AgentPoolProfileRoleMaster), string(api.AgentPoolProfileRoleInfra):
+		case string(AgentPoolProfileRoleMaster), string(AgentPoolProfileRoleInfra):
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 		}
 		if !rxAgentPoolProfileName.MatchString(app.Name) {
@@ -190,7 +188,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
 
-	case api.AgentPoolProfileRoleInfra:
+	case AgentPoolProfileRoleInfra:
 		if app.Name != string(app.Role) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 		}
@@ -198,13 +196,13 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
 
-	case api.AgentPoolProfileRoleMaster:
+	case AgentPoolProfileRoleMaster:
 		if app.Count != 3 {
 			errs = append(errs, fmt.Errorf("invalid masterPoolProfile.count %d", app.Count))
 		}
 	}
 
-	if _, found := api.DefaultVMSizeKubeArguments[app.VMSize]; !found {
+	if _, found := DefaultVMSizeKubeArguments[app.VMSize]; !found {
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
 	}
 
@@ -213,7 +211,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 	}
 
 	switch app.OSType {
-	case api.OSTypeLinux:
+	case OSTypeLinux:
 	default:
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].osType %q", app.Name, app.OSType))
 	}
@@ -221,7 +219,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile) (errs []error) {
 	return
 }
 
-func validateFQDN(p *api.Properties) (errs []error) {
+func validateFQDN(p *Properties) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
 	}
@@ -231,8 +229,8 @@ func validateFQDN(p *api.Properties) (errs []error) {
 	return
 }
 
-func validateRouterProfiles(rps []api.RouterProfile) (errs []error) {
-	rpmap := map[string]api.RouterProfile{}
+func validateRouterProfiles(rps []RouterProfile) (errs []error) {
+	rpmap := map[string]RouterProfile{}
 
 	for _, rp := range rps {
 		if _, found := validRouterProfileNames[rp.Name]; !found {
@@ -256,7 +254,7 @@ func validateRouterProfiles(rps []api.RouterProfile) (errs []error) {
 	return
 }
 
-func validateRouterProfile(rp api.RouterProfile) (errs []error) {
+func validateRouterProfile(rp RouterProfile) (errs []error) {
 	if rp.Name == "" {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
 	}
@@ -274,16 +272,16 @@ func validateRouterProfile(rp api.RouterProfile) (errs []error) {
 	return
 }
 
-func validateProvisioningState(ps api.ProvisioningState) (errs []error) {
+func validateProvisioningState(ps ProvisioningState) (errs []error) {
 	switch ps {
 	case "",
-		api.Creating,
-		api.Updating,
-		api.Failed,
-		api.Succeeded,
-		api.Deleting,
-		api.Migrating,
-		api.Upgrading:
+		Creating,
+		Updating,
+		Failed,
+		Succeeded,
+		Deleting,
+		Migrating,
+		Upgrading:
 	default:
 		errs = append(errs, fmt.Errorf("invalid properties.provisioningState %q", ps))
 	}

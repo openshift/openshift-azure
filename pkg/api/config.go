@@ -50,6 +50,10 @@ type Config struct {
 
 // ImageConfig contains all images for the pods
 type ImageConfig struct {
+	// Format of the pull spec that is going to be
+	// used in the cluster.
+	Format string `json:"format,omitempty"`
+
 	MasterEtcd             string `json:"masterEtcd,omitempty"`
 	ControlPlane           string `json:"controlPlane,omitempty"`
 	Node                   string `json:"node,omitempty"`

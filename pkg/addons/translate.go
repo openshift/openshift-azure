@@ -146,9 +146,7 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
-			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
-				return config.Derived.ImageConfigFormat(cs), nil
-			},
+			Template:   "{{ .Config.Images.Format }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
@@ -169,9 +167,7 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
-			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
-				return config.Derived.ImageConfigFormat(cs), nil
-			},
+			Template:   "{{ .Config.Images.Format }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
@@ -192,9 +188,7 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
-			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
-				return config.Derived.ImageConfigFormat(cs), nil
-			},
+			Template:   "{{ .Config.Images.Format }}",
 		},
 	},
 	"ConfigMap/openshift-web-console/webconsole-config": {

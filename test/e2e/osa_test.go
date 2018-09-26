@@ -27,7 +27,7 @@ var c testClient
 
 var _ = BeforeSuite(func() {
 	var err error
-	c.cs, err = managedcluster.ReadConfig("../../_data/containerservice.yaml")
+	c.cs, err = managedcluster.ReadConfig(*config)
 	Expect(err).NotTo(HaveOccurred())
 
 	c.kc, err = managedcluster.ClientsetFromConfig(c.cs)
