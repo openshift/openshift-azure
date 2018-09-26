@@ -3,11 +3,12 @@ package api_test
 import (
 	"errors"
 	"fmt"
-	"github.com/openshift/openshift-azure/pkg/api"
 	"reflect"
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/openshift/openshift-azure/pkg/api"
 )
 
 var searchPattern = regexp.MustCompile(`(\d+)`)
@@ -88,7 +89,7 @@ func lowerCamelCase(s string) string {
 	prep = padNumbers(prep)
 
 	res := ""
-	cap := false
+	upper := false
 	for _, char := range prep {
 		if char >= '0' && char <= '9' {
 			res += string(char)
@@ -97,7 +98,7 @@ func lowerCamelCase(s string) string {
 			res += string(char)
 		}
 		if char >= 'a' && char <= 'z' {
-			if cap {
+			if upper {
 				res += strings.ToUpper(string(char))
 			} else {
 				res += string(char)
@@ -106,9 +107,9 @@ func lowerCamelCase(s string) string {
 		// if the current character is special then the
 		// next letter encountered should be uppercased
 		if char == ' ' || char == '_' || char == '-' {
-			cap = true
+			upper = true
 		} else {
-			cap = false
+			upper = false
 		}
 	}
 
@@ -153,7 +154,7 @@ type jstctest struct {
 
 func TestJstLowerCamelCaseCheck(t *testing.T) {
 	testcases := []jstctest{
-		jstctest{
+		{
 			name:  "input is nil",
 			check: lowerCamelCase,
 			input: nil,
@@ -161,7 +162,7 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 				errors.New(`cannot perform json struct tags check on "nil"`),
 			},
 		},
-		jstctest{
+		{
 			name:  "input is a string",
 			check: lowerCamelCase,
 			input: "test",
@@ -169,7 +170,7 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 				errors.New(`cannot perform json struct tags check on "string" type`),
 			},
 		},
-		jstctest{
+		{
 			name:  "input is a number",
 			check: lowerCamelCase,
 			input: 2,
@@ -177,7 +178,7 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 				errors.New(`cannot perform json struct tags check on "int" type`),
 			},
 		},
-		jstctest{
+		{
 			name:  "input is a slice",
 			check: lowerCamelCase,
 			input: []string{"input", "is", "an", "array"},
@@ -185,7 +186,7 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 				errors.New(`cannot perform json struct tags check on "[]string" type`),
 			},
 		},
-		jstctest{
+		{
 			name:  "input is a map",
 			check: lowerCamelCase,
 			input: make(map[string]string),
@@ -193,7 +194,7 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 				errors.New(`cannot perform json struct tags check on "map[string]string" type`),
 			},
 		},
-		jstctest{
+		{
 			name:  "input is a struct but doesn't specify some json tags",
 			check: lowerCamelCase,
 			input: struct {
@@ -207,7 +208,7 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 				errors.New(fmt.Sprintf(`field "Value" does not have a json tag`)),
 			},
 		},
-		jstctest{
+		{
 			name:  "input is a struct but doesn't specify any json tags",
 			check: lowerCamelCase,
 			input: struct {
@@ -219,7 +220,7 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 				errors.New(fmt.Sprintf(`field "Value" does not have a json tag`)),
 			},
 		},
-		jstctest{
+		{
 			name:  "input is a struct with all json tags correctly specified in lower camel case but without extra qualifiers",
 			check: lowerCamelCase,
 			input: struct {
@@ -228,53 +229,50 @@ func TestJstLowerCamelCaseCheck(t *testing.T) {
 			}{},
 			expected: []error{},
 		},
-		jstctest{
+		{
 			name:  "input is a struct with all json tags correctly specified in lower camel case",
 			check: lowerCamelCase,
 			input: struct {
 				Name        string `json:"name,omitempty"`
 				Value       string `json:"value,omitempty"`
 				N           string `json:"n,omitempty"`
-				Foo_bar     string `json:"fooBar,omitempty"`
 				AnotherCase string `json:"anotherCase,omitempty"`
 				Rfc123check string `json:"rfc123Check,omitempty"`
 			}{},
 			expected: []error{},
 		},
-		jstctest{
+		{
 			name:  "input is a struct with some json tags not correctly specified in lower camel case",
 			check: lowerCamelCase,
 			input: struct {
 				Name        string `json:"name,omitempty"`
 				Value       string `json:"Value,omitempty"`
 				N           string `json:"n,omitempty"`
-				Foo_bar     string `json:"FooBar,omitempty"`
 				AnotherCase string `json:"anotherCase,omitempty"`
 			}{},
 			expected: []error{
 				errors.New(fmt.Sprintf(`field "Value" specifies an incorrect json tag "Value". it should be "value"`)),
-				errors.New(fmt.Sprintf(`field "Foo_bar" specifies an incorrect json tag "FooBar". it should be "fooBar"`)),
 			},
 		},
-		jstctest{
+		{
 			name:     "input is the api.CertKeyPair struct",
 			check:    lowerCamelCase,
 			input:    api.CertKeyPair{},
 			expected: []error{},
 		},
-		jstctest{
+		{
 			name:     "input is the api.CertificateConfig struct",
 			check:    lowerCamelCase,
 			input:    api.CertificateConfig{},
 			expected: []error{},
 		},
-		jstctest{
+		{
 			name:     "input is the api.ImageConfig struct",
 			check:    lowerCamelCase,
 			input:    api.ImageConfig{},
 			expected: []error{},
 		},
-		jstctest{
+		{
 			name:     "input is the api.Config struct",
 			check:    lowerCamelCase,
 			input:    api.Config{},
