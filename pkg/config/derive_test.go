@@ -42,7 +42,7 @@ vmType: vmss
 	for _, tt := range tests {
 		got, err := Derived.CloudProviderConf(&tt.cs)
 		if err != nil {
-			t.Error(err)
+			t.Fatal(err)
 			return
 		}
 		if !reflect.DeepEqual(got, tt.want) {
@@ -61,30 +61,17 @@ func TestDerivedMasterLBCNamePrefix(t *testing.T) {
 }
 
 func TestDerivedRouterLBCNamePrefix(t *testing.T) {
-	tests := []struct {
-		cs   api.OpenShiftManagedCluster
-		want string
-	}{
-		{
-			cs: api.OpenShiftManagedCluster{
-				Properties: &api.Properties{
-					RouterProfiles: []api.RouterProfile{
-						{
-							FQDN: "one.two.three",
-						},
-						{
-							FQDN: "not.this",
-						},
-					},
+	cs := api.OpenShiftManagedCluster{
+		Properties: &api.Properties{
+			RouterProfiles: []api.RouterProfile{
+				{
+					FQDN: "one.two.three",
 				},
 			},
-			want: "one",
 		},
 	}
-	for _, tt := range tests {
-		if got := Derived.RouterLBCNamePrefix(&tt.cs); got != tt.want {
-			t.Errorf("derived.RouterLBCNamePrefix() = %v, want %v", got, tt.want)
-		}
+	if got := Derived.RouterLBCNamePrefix(&cs); got != "one" {
+		t.Errorf("derived.RouterLBCNamePrefix() = %v, want %v", got, "one")
 	}
 }
 
@@ -126,12 +113,12 @@ func TestDerivedKubeAndSystemReserved(t *testing.T) {
 						{
 							Name:   "1",
 							Role:   api.AgentPoolProfileRoleCompute,
-							VMSize: "Standard_D2s_v3",
+							VMSize: "Standard_D4s_v3",
 						},
 					},
 				},
 			},
-			want: "cpu=200m,memory=512Mi",
+			want: "cpu=500m,memory=512Mi",
 			role: api.AgentPoolProfileRoleCompute,
 		},
 		{
@@ -141,7 +128,7 @@ func TestDerivedKubeAndSystemReserved(t *testing.T) {
 						{
 							Name:   "1",
 							Role:   api.AgentPoolProfileRoleCompute,
-							VMSize: "Standard_D2s_v3",
+							VMSize: "Standard_D4s_v3",
 						},
 						{
 							Name:   "2",
