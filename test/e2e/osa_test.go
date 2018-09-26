@@ -3,7 +3,6 @@
 package e2e
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -86,41 +85,22 @@ var _ = Describe("Openshift on Azure e2e tests", func() {
 	})
 
 	It("should run the correct image", func() {
-		// image format is either:
-		// docker.io/openshift || registry.access.redhat.com/openshift3
-		format := strings.Split(c.cs.Config.Images.Format, "/")
-		prefix := fmt.Sprintf("%v/%v", format[0], format[1])
-
-		// these pods should have the same prefix
-		podsToCheck := map[string]struct{}{
-			"oauth-proxy":                    {},
-			"origin-control-plane":           {},
-			"origin-docker-registry":         {},
-			"origin-haproxy-router":          {},
-			"origin-node":                    {},
-			"origin-service-catalog":         {},
-			"origin-template-service-broker": {},
-			"origin-web-console":             {},
-			"prometheus-alert-buffer":        {},
-			"prometheus-alertmanager":        {},
-			"prometheus-node-exporter":       {},
-			"prometheus":                     {},
-		}
-
 		pods, err := c.kc.CoreV1().Pods("").List(metav1.ListOptions{})
 		Expect(err).ToNot(HaveOccurred())
+		// e2e check should ensure that no reg-aws images are running on box
 		for _, pod := range pods.Items {
-			// e2e check should ensure that no reg-aws images are running on box
-			Expect(strings.Contains(pod.Status.ContainerStatuses[0].Image, "registry.reg-aws")).ToNot(BeTrue())
-			parts := strings.Split(pod.Status.ContainerStatuses[0].Image, "/")
-
-			if len(parts) < 3 {
-				continue // skip unexpected image formats
-			}
-			if _, ok := podsToCheck[parts[2]]; ok {
-				// also that centos boxes are running origin images, and rhel OCP images
-				Expect(strings.HasPrefix(pod.Status.ContainerStatuses[0].Image, prefix)).To(BeTrue())
+			for _, cntr := range pod.Spec.Containers {
+				Expect(strings.Contains(cntr.Image, "registry.reg-aws")).ToNot(BeTrue())
 			}
 		}
+
+		// Check all Configmaps for image format matches distribution
+		// format: registry.access.redhat.com/openshift3/ose-${component}:${version}
+		maps, err := c.kc.CoreV1().ConfigMaps("openshift-node").List(metav1.ListOptions{})
+		Expect(err).ToNot(HaveOccurred())
+		for _, cm := range maps.Items {
+			Expect(strings.Contains(cm.Data["node-config.yaml"], "format: "+c.cs.Config.Images.Format)).To(BeTrue())
+		}
 	})
+
 })
