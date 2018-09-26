@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ghodss/yaml"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -14,6 +16,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+
+	"github.com/openshift/openshift-azure/pkg/jsonpath"
 )
 
 type testClient struct {
@@ -90,7 +94,7 @@ var _ = Describe("Openshift on Azure e2e tests", func() {
 		// e2e check should ensure that no reg-aws images are running on box
 		for _, pod := range pods.Items {
 			for _, cntr := range pod.Spec.Containers {
-				Expect(strings.HasPrefix(cntr.Image, "registry.reg-aws")).ToNot(BeTrue())
+				Expect(strings.HasPrefix(cntr.Image, "registry.reg-aws.openshift.com/")).ToNot(BeTrue())
 			}
 		}
 		// fetch master-000000 and determine the OS type
@@ -100,18 +104,20 @@ var _ = Describe("Openshift on Azure e2e tests", func() {
 		// set registryPrefix to appropriate string based upon master's OS type
 		var registryPrefix string
 		if strings.HasPrefix(master0.Status.NodeInfo.OSImage, "Red Hat Enterprise") {
-			registryPrefix = "registry.access.redhat.com/openshift3"
+			registryPrefix = "registry.access.redhat.com/openshift3/ose-"
 		} else {
-			registryPrefix = "docker.io/openshift"
+			registryPrefix = "docker.io/openshift/origin-"
 		}
 
 		// Check all Configmaps for image format matches master's OS type
 		// format: registry.access.redhat.com/openshift3/ose-${component}:${version}
 		maps, err := c.kc.CoreV1().ConfigMaps("openshift-node").List(metav1.ListOptions{})
 		Expect(err).ToNot(HaveOccurred())
+		var nodeConfig map[string]interface{}
 		for _, cm := range maps.Items {
-			Expect(strings.Contains(cm.Data["node-config.yaml"], "format: "+registryPrefix)).To(BeTrue())
+			err = yaml.Unmarshal([]byte(cm.Data["node-config.yaml"]), &nodeConfig)
+			format := jsonpath.MustCompile("$.imageConfig.format").MustGetString(nodeConfig)
+			Expect(strings.HasPrefix(format, registryPrefix)).To(BeTrue())
 		}
 	})
-
 })
