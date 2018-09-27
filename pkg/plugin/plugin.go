@@ -49,8 +49,6 @@ func GetRequiredConfigEnvVars() []string {
 
 // NewPluginConfigFromEnv loads all config items from os env vars
 func NewPluginConfigFromEnv() (api.PluginConfig, error) {
-	//log.Info("building plugin config from environment variables")
-
 	pc := api.PluginConfig{}
 	required := GetRequiredConfigEnvVars()
 
