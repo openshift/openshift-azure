@@ -114,18 +114,18 @@ func (p *plugin) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluste
 	return healthChecker.HealthCheck(ctx, cs)
 }
 
-func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, isUpdate bool) error {
+func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, isUpdate bool, deployFn api.DeployFn) error {
 	var err error
 	upgrader := upgrade.NewSimpleUpgrader(p.entry, p.config)
 	if isUpdate {
 		log.Info("starting update")
-		err = upgrader.Update(ctx, cs, azuredeploy)
+		err = upgrader.Update(ctx, cs, azuredeploy, deployFn)
 		if err != nil {
 			return err
 		}
 	} else {
 		log.Info("starting deploy")
-		err := upgrader.Deploy(ctx, cs, azuredeploy)
+		err := upgrader.Deploy(ctx, cs, azuredeploy, deployFn)
 		if err != nil {
 			return err
 		}

@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
 
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -105,7 +107,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
-	err = p.CreateOrUpdate(ctx, cs, azuredeploy, oldCs != nil)
+	err = p.CreateOrUpdate(ctx, cs, azuredeploy, oldCs != nil, defaultDeployer)
 	if err != nil {
 		return nil, err
 	}
@@ -120,6 +122,39 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	oc = api.ConvertToV20180930preview(cs)
 
 	return oc, nil
+}
+
+func defaultDeployer(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
+	var t map[string]interface{}
+	err := json.Unmarshal(azuredeploy, &t)
+	if err != nil {
+		return err
+	}
+
+	// Given that this function will only be used for development this should be fine.
+	// in prod MSFT will implemenent this function, and they will be passing PluginConfig
+	// into the plugin anyways.
+	pc := api.PluginConfig{
+		AcceptLanguages: []string{"en-us"},
+	}
+	clients, err := azureclient.NewAzureClients(ctx, cs, pc)
+	if err != nil {
+		return err
+	}
+
+	log.Info("applying arm template deployment")
+	future, err := clients.Deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
+		Properties: &resources.DeploymentProperties{
+			Template: t,
+			Mode:     resources.Incremental,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	log.Info("waiting for arm template deployment to complete")
+	return future.WaitForCompletionRef(ctx, clients.Deployments.Client)
 }
 
 func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) error {

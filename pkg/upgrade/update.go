@@ -14,10 +14,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
-func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
-	// TODO: probably need to break this function into two pieces, pre-Deploy
-	// and post-Deploy, so that MSFT can use custom ARM deployment logic.
-
+func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, deployFn api.DeployFn) error {
 	clients, err := azureclient.NewAzureClients(ctx, cs, u.pluginConfig)
 	if err != nil {
 		return err
@@ -49,8 +46,13 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 		}
 	}
 
-	// Apply the ARM template
-	if err := u.Deploy(ctx, cs, azuredeploy); err != nil {
+	err = deployFn(ctx, cs, azuredeploy)
+	if err != nil {
+		return err
+	}
+
+	err = u.InitializeCluster(ctx, cs)
+	if err != nil {
 		return err
 	}
 

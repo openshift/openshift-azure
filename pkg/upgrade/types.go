@@ -11,8 +11,8 @@ import (
 
 type Upgrader interface {
 	InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error
-	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error
+	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, deployFn api.DeployFn) error
+	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, deployFn api.DeployFn) error
 }
 
 type simpleUpgrader struct {
