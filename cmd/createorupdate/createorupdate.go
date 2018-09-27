@@ -18,7 +18,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
-	"github.com/openshift/openshift-azure/pkg/upgrade"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
@@ -106,16 +105,9 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
-	if oldCs != nil {
-		err = p.Update(ctx, cs, azuredeploy)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		err = upgrade.Deploy(ctx, cs, p, azuredeploy, config)
-		if err != nil {
-			return nil, err
-		}
+	err = p.CreateOrUpdate(ctx, cs, azuredeploy, oldCs != nil)
+	if err != nil {
+		return nil, err
 	}
 
 	err = p.HealthCheck(ctx, cs)
