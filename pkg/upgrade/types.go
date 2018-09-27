@@ -23,6 +23,9 @@ var _ Upgrader = &simpleUpgrader{}
 
 func NewSimpleUpgrader(entry *logrus.Entry, pluginConfig api.PluginConfig) Upgrader {
 	log.New(entry)
+	if pluginConfig.Deployer == nil {
+		pluginConfig.Deployer = defaultDeployer
+	}
 	return &simpleUpgrader{
 		pluginConfig: pluginConfig,
 	}

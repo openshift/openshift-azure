@@ -11,14 +11,14 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
+func defaultDeployer(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, pluginConfig api.PluginConfig) error {
 	var t map[string]interface{}
 	err := json.Unmarshal(azuredeploy, &t)
 	if err != nil {
 		return err
 	}
 
-	clients, err := azureclient.NewAzureClients(ctx, cs, u.pluginConfig)
+	clients, err := azureclient.NewAzureClients(ctx, cs, pluginConfig)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,11 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	log.Info("waiting for arm template deployment to complete")
-	err = future.WaitForCompletionRef(ctx, clients.Deployments.Client)
+	return future.WaitForCompletionRef(ctx, clients.Deployments.Client)
+}
+
+func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
+	err := u.pluginConfig.Deployer(ctx, cs, azuredeploy, u.pluginConfig)
 	if err != nil {
 		return err
 	}
