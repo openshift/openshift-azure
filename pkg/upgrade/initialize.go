@@ -8,11 +8,10 @@ import (
 	"github.com/Azure/azure-sdk-for-go/storage"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 func (si *simpleUpgrader) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	az, err := azureclient.NewAzureClients(ctx, cs, si.pluginConfig)
+	az, err := si.getClients(ctx, cs)
 	if err != nil {
 		return err
 	}

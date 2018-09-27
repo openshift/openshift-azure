@@ -44,5 +44,10 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 		return err
 	}
 
-	return u.InitializeCluster(ctx, cs)
+	err = u.InitializeCluster(ctx, cs)
+	if err != nil {
+		return err
+	}
+
+	return u.postDeployWaitForAll(ctx, cs, map[string]struct{}{})
 }

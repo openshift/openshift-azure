@@ -7,6 +7,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 type Upgrader interface {
@@ -17,6 +18,7 @@ type Upgrader interface {
 
 type simpleUpgrader struct {
 	pluginConfig api.PluginConfig
+	clients      *azureclient.AzureClients
 }
 
 var _ Upgrader = &simpleUpgrader{}
