@@ -11,9 +11,36 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
+
+func (u *simpleUpgrader) postDeployWaitForAll(ctx context.Context, cs *api.OpenShiftManagedCluster, vmsBefore map[string]struct{}) error {
+	clients, err := u.getClients(ctx, cs)
+	if err != nil {
+		return err
+	}
+	for _, agent := range cs.Properties.AgentPoolProfiles {
+		vms, err := ListVMs(ctx, cs, clients.VirtualMachineScaleSetVMs, agent.Role)
+		if err != nil {
+			return err
+		}
+
+		// wait for newly created VMs to reach readiness
+		for _, vm := range vms {
+			hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
+			if _, found := vmsBefore[hostname]; !found {
+				log.Infof("waiting for %s to be ready", hostname)
+				err = WaitForReady(ctx, cs, agent.Role, hostname)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
 
 func WaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
 	switch role {

@@ -10,15 +10,11 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
-func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, config api.PluginConfig) error {
-	// TODO: probably need to break this function into two pieces, pre-Deploy
-	// and post-Deploy, so that MSFT can use custom ARM deployment logic.
-
-	clients, err := azureclient.NewAzureClients(ctx, cs, config)
+func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
+	clients, err := u.getClients(ctx, cs)
 	if err != nil {
 		return err
 	}
@@ -49,28 +45,19 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 		}
 	}
 
-	// Apply the ARM template
-	if err := Deploy(ctx, cs, u.Initializer, azuredeploy, config); err != nil {
+	err = u.pluginConfig.Deployer(ctx, cs, azuredeploy, u.pluginConfig)
+	if err != nil {
 		return err
 	}
 
-	for _, agent := range cs.Properties.AgentPoolProfiles {
-		vms, err := ListVMs(ctx, cs, clients.VirtualMachineScaleSetVMs, agent.Role)
-		if err != nil {
-			return err
-		}
+	err = u.InitializeCluster(ctx, cs)
+	if err != nil {
+		return err
+	}
 
-		// wait for newly created VMs to reach readiness
-		for _, vm := range vms {
-			hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
-			if _, found := vmsBefore[hostname]; !found {
-				log.Infof("waiting for %s to be ready", hostname)
-				err = WaitForReady(ctx, cs, agent.Role, hostname)
-				if err != nil {
-					return err
-				}
-			}
-		}
+	err = u.postDeployWaitForAll(ctx, cs, vmsBefore)
+	if err != nil {
+		return err
 	}
 
 	// For PP day 1, scale is permitted but not any other sort of update.  When

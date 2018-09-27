@@ -10,7 +10,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/healthcheck"
-	"github.com/openshift/openshift-azure/pkg/initialize"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/upgrade"
 )
@@ -102,8 +101,8 @@ func (p *plugin) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluste
 
 func (p *plugin) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	log.Info("initializing cluster")
-	initializer := initialize.NewSimpleInitializer(p.entry, p.config)
-	return initializer.InitializeCluster(ctx, cs)
+	upgrader := upgrade.NewSimpleUpgrader(p.entry, p.config)
+	return upgrader.InitializeCluster(ctx, cs)
 }
 
 func (p *plugin) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
@@ -112,8 +111,21 @@ func (p *plugin) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluste
 	return healthChecker.HealthCheck(ctx, cs)
 }
 
-func (p *plugin) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
-	log.Info("starting update")
+func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, isUpdate bool) error {
+	var err error
 	upgrader := upgrade.NewSimpleUpgrader(p.entry, p.config)
-	return upgrader.Update(ctx, cs, azuredeploy, p.config)
+	if isUpdate {
+		log.Info("starting update")
+		err = upgrader.Update(ctx, cs, azuredeploy)
+		if err != nil {
+			return err
+		}
+	} else {
+		log.Info("starting deploy")
+		err := upgrader.Deploy(ctx, cs, azuredeploy)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

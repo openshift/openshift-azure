@@ -1,4 +1,4 @@
-package initialize
+package upgrade
 
 import (
 	"bytes"
@@ -6,31 +6,12 @@ import (
 	"encoding/json"
 
 	"github.com/Azure/azure-sdk-for-go/storage"
-	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-type Initializer interface {
-	InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-}
-
-type simpleInitializer struct {
-	pluginConfig api.PluginConfig
-}
-
-var _ Initializer = &simpleInitializer{}
-
-// NewSimpleInitializer create a new Initilizer
-func NewSimpleInitializer(entry *logrus.Entry, pluginConfig api.PluginConfig) Initializer {
-	log.New(entry)
-	return &simpleInitializer{pluginConfig: pluginConfig}
-}
-
-func (si *simpleInitializer) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	az, err := azureclient.NewAzureClients(ctx, cs, si.pluginConfig)
+func (si *simpleUpgrader) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	az, err := si.getClients(ctx, cs)
 	if err != nil {
 		return err
 	}
