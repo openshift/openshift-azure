@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	gitCommit = "unknown"
-	config    = flag.String("config", "../../_data/containerservice.yaml", "Location of the config")
+	gitCommit  = "unknown"
+	kubeconfig = flag.String("kubeconfig", "../../_data/_out/admin.kubeconfig", "Location of the kubeconfig")
 )
 
 func TestExtended(t *testing.T) {
