@@ -13,25 +13,25 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
-
-	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 type testClient struct {
 	kc *kubernetes.Clientset
-	cs *api.OpenShiftManagedCluster
 }
 
 var c testClient
 
 var _ = BeforeSuite(func() {
-	var err error
-	c.cs, err = managedcluster.ReadConfig(*config)
+
+	// use the current context in kubeconfig
+	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	Expect(err).NotTo(HaveOccurred())
 
-	c.kc, err = managedcluster.ClientsetFromConfig(c.cs)
+	// create the clientset
+	clientset, err := kubernetes.NewForConfig(config)
 	Expect(err).NotTo(HaveOccurred())
+	c.kc = clientset
 })
 
 var _ = Describe("Openshift on Azure e2e tests", func() {
