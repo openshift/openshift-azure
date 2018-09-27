@@ -54,7 +54,7 @@ func NewPluginConfigFromEnv() (api.PluginConfig, error) {
 
 	var missing []string
 	for i := range required {
-		value := os.Getenv(required[i])
+		value := getEnv(required[i])
 		if len(value) == 0 {
 			missing = append(missing, required[i])
 		}
