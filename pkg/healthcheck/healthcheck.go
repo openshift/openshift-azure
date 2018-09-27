@@ -9,30 +9,14 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/openshift/openshift-azure/pkg/upgrade"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
+
 	"github.com/sirupsen/logrus"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/tools/clientcmd/api"
-	"k8s.io/client-go/tools/clientcmd/api/latest"
-	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
 )
-
-// GetKubeconfigFromV1Config takes a v1 config and returns a kubeconfig
-func getKubeconfigFromV1Config(kc *v1.Config) (clientcmd.ClientConfig, error) {
-	var c api.Config
-	err := latest.Scheme.Convert(kc, &c, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	kubeconfig := clientcmd.NewDefaultClientConfig(c, &clientcmd.ConfigOverrides{})
-
-	return kubeconfig, nil
-}
 
 type HealthChecker interface {
 	HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error
@@ -52,19 +36,19 @@ func NewSimpleHealthChecker(entry *logrus.Entry, pluginConfig acsapi.PluginConfi
 
 // HealthCheck function to verify cluster health
 func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
-	kc, err := newClientSet(ctx, cs.Config.AdminKubeconfig)
+	kc, err := managedcluster.ClientSetFromV1Config(ctx, cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}
 
 	// ensure that all nodes are ready
-	err = WaitForNodes(ctx, cs, kc)
+	err = upgrade.WaitForNodes(ctx, cs, kc)
 	if err != nil {
 		return err
 	}
 
 	// Wait for infrastructure services to be healthy
-	err = WaitForInfraServices(ctx, kc)
+	err = upgrade.WaitForInfraServices(ctx, kc)
 	if err != nil {
 		return err
 	}
@@ -114,34 +98,4 @@ func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *acsapi.Op
 			return fmt.Errorf("unexpected error code %d from console", resp.StatusCode)
 		}
 	}
-}
-
-func newClientSet(ctx context.Context, config *v1.Config) (*kubernetes.Clientset, error) {
-	kubeconfig, err := getKubeconfigFromV1Config(config)
-	if err != nil {
-		return nil, err
-	}
-
-	restconfig, err := kubeconfig.ClientConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	t, err := rest.TransportFor(restconfig)
-	if err != nil {
-		return nil, err
-	}
-
-	// Wait for the healthz to be 200 status
-	err = WaitForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
-	if err != nil {
-		return nil, err
-	}
-
-	kc, err := kubernetes.NewForConfig(restconfig)
-	if err != nil {
-		return nil, err
-	}
-
-	return kc, nil
 }
