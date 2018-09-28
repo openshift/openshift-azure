@@ -273,6 +273,31 @@ func TestValidate(t *testing.T) {
 				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "foo"`),
 			},
 		},
+		"agent pool subnet cidr clash cluster": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				for i := range oc.Properties.AgentPoolProfiles {
+					oc.Properties.AgentPoolProfiles[i].SubnetCIDR = "10.128.0.0/24"
+				}
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
+				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
+				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
+			},
+		},
+		"agent pool subnet cidr clash service": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.VnetCIDR = "172.0.0.0/8"
+				for i := range oc.Properties.AgentPoolProfiles {
+					oc.Properties.AgentPoolProfiles[i].SubnetCIDR = "172.30.0.0/16"
+				}
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
+				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
+				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
+			},
+		},
 		"agent pool bad master count": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				for i, app := range oc.Properties.AgentPoolProfiles {
