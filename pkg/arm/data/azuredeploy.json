@@ -20,7 +20,6 @@
             }
         },
 {{- end }}
-{{- if not (index .ContainerService.Properties.AgentPoolProfiles 0).VnetSubnetID }}
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2016-03-30",
@@ -29,20 +28,19 @@
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "10.0.0.0/8"
+                        "{{ .ContainerService.Properties.NetworkProfile.VnetCIDR | js }}"
                     ]
                 },
                 "subnets": [
                     {
                         "name": "default",
                         "properties": {
-                            "addressPrefix": "10.0.0.0/24"
+                            "addressPrefix": "{{ (index .ContainerService.Properties.AgentPoolProfiles 0).SubnetCIDR | js }}"
                         }
                     }
                 ]
             }
         },
-{{- end }}
 {{- /* TODO: we may be able to avoid the IP and LB here if we stop using */}}
 {{- /* DaemonSets for SDN.  Then Master nodes should come up as Ready */}}
 {{- /* automatically, and hence be entered into consideration for a */}}
@@ -198,13 +196,11 @@
             "apiVersion": "2017-12-01",
             "location": "{{ $.ContainerService.Location | js }}",
             "dependsOn": [
-{{- if not $app.VnetSubnetID }}
                 "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]"
-{{- end }}
-{{- if eq $app.Role "master" }}{{- if not $app.VnetSubnetID }},{{- end }}
+{{- if eq $app.Role "master" }},
                 "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]"
 {{- end }}
-{{- if not IsUpgrade}}{{- if or (eq $app.Role "master") (not $app.VnetSubnetID) }},{{- end }}
+{{- if not IsUpgrade}},
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name | js }}')]"
 {{- end }}
             ],
@@ -286,7 +282,7 @@
                                             "properties": {
                                                 "primary": true,
                                                 "subnet": {
-                                                    "id": "{{if $app.VnetSubnetID}}{{$app.VnetSubnetID | js }}{{else}}[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/default')]{{end}}"
+                                                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'vnet'), '/subnets/default')]"
                                                 }
 {{- if eq $app.Role "master" }},
                                                 "publicIpAddressConfiguration": {

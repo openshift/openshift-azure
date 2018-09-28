@@ -123,6 +123,8 @@ properties:
         kind: AADIdentityProvider
         clientId: $AZURE_AAD_CLIENT_ID
         secret: $AZURE_AAD_CLIENT_SECRET
+  networkProfile:
+    vnetCidr: 10.0.0.0/8
   routerProfiles:
   - name: default
     publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
@@ -132,60 +134,17 @@ properties:
     count: 3
     vmSize: Standard_D2s_v3
     osType: Linux
+    subnetCidr: 10.0.0.0/24
   - name: infra
     role: infra
     count: 1
     vmSize: Standard_D2s_v3
+    subnetCidr: 10.0.0.0/24
     osType: Linux
   - name: compute
     role: compute
     count: 1
     vmSize: Standard_D2s_v3
+    subnetCidr: 10.0.0.0/24
     osType: Linux
-```
-
-OpenShift with BYO VNET configuration:
-
-```yaml
-name: openshift
-location: eastus
-properties:
-  openShiftVersion: v3.10
-  publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
-  authProfile:
-    identityProviders:
-    - name: Azure AAD
-      provider:
-        kind: AADIdentityProvider
-        clientId: $AZURE_AAD_CLIENT_ID
-        secret: $AZURE_AAD_CLIENT_SECRET
-  routerProfiles:
-  - name: default
-    publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
-  agentPoolProfiles:
-  - name: master
-    role: master
-    count: 3
-    vmSize: Standard_D2s_v3
-    osType: Linux
-    vnetSubnetID: /subscriptions/SUB_ID/resourceGroups/RG_NAME/providers/Microsoft.Network/virtualNetworks/VNET_NAME/subnets/SUBNET_NAME
-  - name: infra
-    role: infra
-    count: 1
-    vmSize: Standard_D2s_v3
-    osType: Linux
-    vnetSubnetID: /subscriptions/SUB_ID/resourceGroups/RG_NAME/providers/Microsoft.Network/virtualNetworks/VNET_NAME/subnets/SUBNET_NAME
-  - name: compute
-    role: compute
-    count: 1
-    vmSize: Standard_D2s_v3
-    osType: Linux
-    vnetSubnetID: /subscriptions/SUB_ID/resourceGroups/RG_NAME/providers/Microsoft.Network/virtualNetworks/VNET_NAME/subnets/SUBNET_NAME
-```
-
-You can create BYO VNET and subnet with commands:
-
-```bash
-az network vnet create -n $VNET_NAME -l $LOCATION -g $RESOURCEGROUP
-az network vnet subnet create -n $SUBNET_NAME -g $RESOURCEGROUP --vnet-name $VNET_NAME --address-prefix 10.0.0.0/24
 ```
