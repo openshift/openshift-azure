@@ -26,6 +26,26 @@ var (
 	rxAgentPoolProfileName = regexp.MustCompile(`(?i)^[a-z0-9]{1,12}$`)
 )
 
+var (
+	clusterNetworkCIDR *net.IPNet
+	serviceNetworkCIDR *net.IPNet
+)
+
+func init() {
+	var err error
+
+	// TODO: we probably need to bite the bullet and make these configurable.
+	_, clusterNetworkCIDR, err = net.ParseCIDR("10.128.0.0/14")
+	if err != nil {
+		panic(err)
+	}
+
+	_, serviceNetworkCIDR, err = net.ParseCIDR("172.30.0.0/16")
+	if err != nil {
+		panic(err)
+	}
+}
+
 var validAgentPoolProfileRoles = map[AgentPoolProfileRole]struct{}{
 	AgentPoolProfileRoleCompute: {},
 	AgentPoolProfileRoleInfra:   {},
@@ -267,6 +287,12 @@ func validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPNet) (errs []err
 
 		if !vnetContainsSubnet(vnet, subnet) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q: not contained in properties.networkProfile.vnetCidr %q", app.Name, app.SubnetCIDR, vnet.String()))
+		}
+		if vnetContainsSubnet(serviceNetworkCIDR, subnet) || vnetContainsSubnet(subnet, serviceNetworkCIDR) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q: overlaps with service network %q", app.Name, app.SubnetCIDR, serviceNetworkCIDR.String()))
+		}
+		if vnetContainsSubnet(clusterNetworkCIDR, subnet) || vnetContainsSubnet(subnet, clusterNetworkCIDR) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q: overlaps with cluster network %q", app.Name, app.SubnetCIDR, clusterNetworkCIDR.String()))
 		}
 	}
 
