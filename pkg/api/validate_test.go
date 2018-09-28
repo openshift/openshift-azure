@@ -55,12 +55,20 @@ func TestValidate(t *testing.T) {
 
 		},
 		"empty location": {
-			f:            func(oc *OpenShiftManagedCluster) { oc.Location = "" },
-			expectedErrs: []error{errors.New(`invalid location ""`)},
+			f: func(oc *OpenShiftManagedCluster) { oc.Location = "" },
+			expectedErrs: []error{
+				errors.New(`invalid location ""`),
+				errors.New(`invalid properties.routerProfiles["default"].fqdn "router-fqdn.eastus.cloudapp.azure.com"`),
+				errors.New(`invalid properties.fqdn "example.eastus.cloudapp.azure.com"`),
+			},
 		},
 		"unsupported location": {
-			f:            func(oc *OpenShiftManagedCluster) { oc.Location = "themoon" },
-			expectedErrs: []error{errors.New(`unsupported location "themoon"`)},
+			f: func(oc *OpenShiftManagedCluster) { oc.Location = "themoon" },
+			expectedErrs: []error{
+				errors.New(`unsupported location "themoon"`),
+				errors.New(`invalid properties.routerProfiles["default"].fqdn "router-fqdn.eastus.cloudapp.azure.com"`),
+				errors.New(`invalid properties.fqdn "example.eastus.cloudapp.azure.com"`),
+			},
 		},
 		"name": {
 			f:            func(oc *OpenShiftManagedCluster) { oc.Name = "" },
@@ -318,15 +326,20 @@ func TestValidate(t *testing.T) {
 	}
 }
 
-func TestIsAzureZone(t *testing.T) {
-	invalidFqdns := []string{"invalid.random.domain", "too.long.domain.cloudapp.azure.com"}
+func TestIsValidCloudAppHostname(t *testing.T) {
+	invalidFqdns := []string{
+		"invalid.random.domain",
+		"too.long.domain.cloudapp.azure.com",
+		"invalid#characters#domain.westus2.cloudapp.azure.com",
+		"wronglocation.eastus.cloudapp.azure.com",
+	}
 	for _, invalidFqdn := range invalidFqdns {
-		if isAzureZone(invalidFqdn) {
+		if isValidCloudAppHostname(invalidFqdn, "westus2") {
 			t.Errorf("invalid FQDN passed test: %s", invalidFqdn)
 		}
 	}
 	validFqdn := "example.westus2.cloudapp.azure.com"
-	if !isAzureZone(validFqdn) {
+	if !isValidCloudAppHostname(validFqdn, "westus2") {
 		t.Errorf("Valid FQDN failed to pass test: %s", validFqdn)
 	}
 }
