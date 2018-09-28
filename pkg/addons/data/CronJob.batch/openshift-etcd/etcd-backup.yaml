@@ -1,0 +1,29 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: etcd-backup
+  namespace: openshift-etcd
+spec:
+  # todo: move to 1 hour after testing
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: etcd-operator
+          containers:
+          - name: etcd-backup
+            image: '### GENERATED ###'
+            command:
+            - /bin/sh
+            - "-ec"
+            - |
+              sed -e "s|<NOW>|$(date '+%Y-%m-%d_%H:%M:%S')|g" /var/etcd_backup/backup_cr.yaml | kubectl create -f -
+            volumeMounts:
+            - name: backup-config
+              mountPath: /var/etcd_backup
+          restartPolicy: OnFailure
+          volumes:
+          - name: backup-config
+            configMap:
+              name: backup-config

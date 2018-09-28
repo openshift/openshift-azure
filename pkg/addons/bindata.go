@@ -248,6 +248,7 @@
 // data/ConfigMap/kube-service-catalog/cluster-info.yaml
 // data/ConfigMap/kube-system/extension-apiserver-authentication.yaml
 // data/ConfigMap/openshift-ansible-service-broker/broker-config.yaml
+// data/ConfigMap/openshift-etcd/backup-config.yaml
 // data/ConfigMap/openshift-metrics/alertmanager.yaml
 // data/ConfigMap/openshift-metrics/prometheus.yaml
 // data/ConfigMap/openshift-node/node-config-compute.yaml
@@ -255,6 +256,8 @@
 // data/ConfigMap/openshift-node/node-config-master.yaml
 // data/ConfigMap/openshift-template-service-broker/apiserver-config.yaml
 // data/ConfigMap/openshift-web-console/webconsole-config.yaml
+// data/CronJob.batch/openshift-etcd/etcd-backup-cleaner.yaml
+// data/CronJob.batch/openshift-etcd/etcd-backup.yaml
 // data/CustomResourceDefinition.apiextensions.k8s.io/bundlebindings.automationbroker.io.yaml
 // data/CustomResourceDefinition.apiextensions.k8s.io/bundleinstances.automationbroker.io.yaml
 // data/CustomResourceDefinition.apiextensions.k8s.io/bundles.automationbroker.io.yaml
@@ -274,7 +277,6 @@
 // data/Deployment.apps/openshift-metrics/kube-state-metrics.yaml
 // data/Deployment.apps/openshift-template-service-broker/apiserver.yaml
 // data/Deployment.apps/openshift-web-console/webconsole.yaml
-// data/EtcdBackup.etcd.database.coreos.com/openshift-etcd/etcd-backup.yaml
 // data/ImageStream.image.openshift.io/openshift/dotnet-runtime.yaml
 // data/ImageStream.image.openshift.io/openshift/dotnet.yaml
 // data/ImageStream.image.openshift.io/openshift/httpd.yaml
@@ -5497,6 +5499,26 @@ func configmapOpenshiftAnsibleServiceBrokerBrokerConfigYaml() (*asset, error) {
 	return a, nil
 }
 
+var _configmapOpenshiftEtcdBackupConfigYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x91\x4f\x6b\xe3\x30\x10\xc5\xef\xfe\x14\x43\x2e\x39\xd9\xce\x1f\xd8\x65\xc5\xb2\xb0\x29\x39\x14\xda\xb4\xe0\xd0\x1e\xcb\x78\x3c\x49\x44\x6c\x49\x48\x93\x40\xa0\x1f\xbe\x48\x76\xd2\xe4\xd0\x52\xdd\xfc\xfc\x7b\xcf\x3f\x23\x74\xfa\x85\x7d\xd0\xd6\x28\x38\x4e\xb3\xbd\x36\x8d\x82\x3b\x6b\x36\x7a\xfb\x88\x2e\xeb\x58\xb0\x41\x41\x95\x01\x18\xec\x58\x41\x8d\xb4\x3f\xb8\x9c\x12\x32\xa4\xc1\x21\xb1\x02\xeb\xd8\x84\x9d\xde\x48\xce\x42\x4d\x76\xee\xf5\x8d\x37\xf2\xc5\x09\xbb\x56\xc1\x7b\x06\x00\x70\xfd\xe1\x88\x17\x11\xaf\x31\x70\x41\xd6\xb3\x0d\x05\xd9\xae\x3c\x4e\x6b\x16\x9c\xa5\x42\xaf\xb6\x14\x6a\x16\x69\x30\x85\xd7\x7e\xf1\x6c\xd9\xb0\x47\xe1\x55\x72\x8d\xbb\xf9\x20\x3c\x00\x5f\xeb\xc6\xb7\xc1\x31\x9d\xa7\x62\xb8\x34\x8d\xb3\xda\x48\x38\x87\x39\x8c\x76\x22\x2e\xa8\xb2\xec\x30\x08\xfb\x7c\x92\x8e\x9a\xcd\x7f\xff\x19\x7d\x0f\x4d\x7f\x02\xcd\x6e\xa0\x20\xd6\xe3\x96\xd7\x27\xc7\x0a\xfe\x2f\xaa\x21\xc6\xfa\x22\x94\x1e\x2a\x26\xcf\x72\xfb\xbf\x58\x87\x9c\x3c\x37\x6c\x44\x63\x1b\x2e\xb8\x43\xd9\x29\x18\x47\xb4\xec\xd1\xe2\xef\xea\xe9\xf5\xdf\x78\x20\xa8\xd5\x6c\x64\xfd\x50\xdd\x8c\xf6\x69\x2e\x97\xa1\xbe\xfa\x6c\x5b\x4d\xa7\x4f\x97\xb5\xee\xd8\x1e\xe4\xde\x54\x4c\x36\x5e\xd7\xfc\xd7\x64\x92\x7d\x04\x00\x00\xff\xff\xb6\x2e\x53\xd6\x64\x02\x00\x00")
+
+func configmapOpenshiftEtcdBackupConfigYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_configmapOpenshiftEtcdBackupConfigYaml,
+		"ConfigMap/openshift-etcd/backup-config.yaml",
+	)
+}
+
+func configmapOpenshiftEtcdBackupConfigYaml() (*asset, error) {
+	bytes, err := configmapOpenshiftEtcdBackupConfigYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ConfigMap/openshift-etcd/backup-config.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _configmapOpenshiftMetricsAlertmanagerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x64\x92\x4f\x8b\x14\x41\x0c\xc5\xef\xfd\x29\x1e\x78\x75\x66\xf4\x38\x05\x7b\x58\x14\xf1\xa0\xec\x45\xbc\x88\x2c\xa9\xea\x74\x57\xd8\xea\x4a\x53\x95\x9e\x71\xc0\x0f\x2f\xfd\x6f\x56\xf1\xd6\x7f\x92\x5f\xde\x7b\x09\x8d\xf2\x9d\x4b\x15\xcd\x0e\x97\xf7\x4d\x4b\x46\xae\x01\x28\x71\xb1\x81\x32\xf5\x5c\x8e\xb7\x21\x39\xfc\x6e\x00\xa0\x4f\xea\x29\xb9\x66\x79\x79\x83\x6f\x91\x51\x54\x0d\x45\x27\x63\x68\xc6\x35\x4a\x88\x60\x0a\x11\x92\x83\x0e\x92\xfb\x15\x06\xce\xc6\xa5\x1e\x97\xce\xa5\xdc\x2d\x8f\x33\xa6\xe5\x8e\xa6\xb4\x53\xa4\x43\xd6\xcc\x18\xc8\x42\xdc\x6a\x0a\x07\x96\x0b\x17\xb7\xc2\x0e\x7e\xea\x3a\x2e\x87\x6b\x6c\xee\x90\x59\x4b\x22\xcf\xa9\xc2\xdf\x36\x1d\xff\x4a\xa8\xa0\xc2\xe8\x8b\x4e\x23\xb7\x30\xed\xd9\x22\x97\x23\x3e\x69\x01\xff\xa2\x61\x4c\xfc\xf6\x8e\x1b\xa6\x64\x32\x26\xde\x5b\x37\x90\x64\x74\x5a\x10\xd2\x54\x8d\xcb\xc3\x23\x28\xb7\x6b\x49\xa6\x81\x1f\xbe\x90\x71\x0e\xb7\xcf\xd2\x47\x5c\x75\x4a\xed\x9d\xe7\x19\x7e\x36\xc4\x2d\x24\x9b\x82\x50\x25\xf7\x69\xd3\x73\x7c\xb5\xf1\xf4\xf1\x69\x4f\x66\xf9\xf5\xec\x6f\x0e\x3f\x7e\xbe\x1a\x7d\x4c\x09\x16\x19\xe4\xf5\xc2\x20\xb3\x22\x7e\x32\x5e\xdd\x49\x8e\x5c\xc4\xb8\x9d\x43\xa0\x94\x10\xa2\xa4\x76\x4d\xb6\x2e\x62\x03\xe5\x3b\x4a\x2f\x5c\xae\x45\xcc\x38\xcf\xcb\x9b\xd7\x76\x5c\x07\xed\x81\xd7\x55\xcb\x01\xb3\xbd\xff\xd3\x5f\x41\x57\xf6\x51\xf5\xe5\x39\x68\xee\xa4\xaf\xbb\xfc\x03\xa6\x92\x1c\xa2\xd9\xe8\x4e\xa7\xa4\x81\x52\xd4\x6a\xee\xfc\xee\x7c\x3e\x99\x8e\x12\xea\x69\x4d\xb7\x79\x91\xdc\x3a\x7c\x58\xfa\xbf\xd2\xd8\x0c\x6c\xb4\xdf\xe2\x5f\x93\xb7\x8b\xdc\x3e\xd6\x91\x02\x3b\xe8\xc8\xb9\x46\xe9\xec\x30\xb0\x15\x09\xb5\xf9\x13\x00\x00\xff\xff\x40\x96\x6c\x66\xd5\x02\x00\x00")
 
 func configmapOpenshiftMetricsAlertmanagerYamlBytes() ([]byte, error) {
@@ -5633,6 +5655,46 @@ func configmapOpenshiftWebConsoleWebconsoleConfigYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "ConfigMap/openshift-web-console/webconsole-config.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _cronjobBatchOpenshiftEtcdEtcdBackupCleanerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\x52\x41\x8f\xd3\x4c\x0c\xbd\xe7\x57\x58\x49\xa3\x7c\x1f\x68\x5a\xca\x71\x04\x87\x15\x14\x10\x12\x0b\x82\x0a\x09\xb4\x17\x67\xc6\x4d\x86\x66\x66\xa2\x19\xa7\x4b\x95\xcd\x7f\x47\xc9\x52\x9a\x56\x08\xe7\x90\xf8\xd9\x7e\xf6\x7b\x0a\xb6\xe6\x2b\x85\x68\xbc\x93\x50\x22\xab\x7a\x75\x58\x97\xc4\xb8\x4e\xf6\xc6\x69\x09\xaf\x82\x77\xef\x7d\x99\x58\x62\xd4\xc8\x28\x13\x00\x87\x96\x24\x10\x2b\x2d\x4a\x54\xfb\xae\x15\xaa\x21\x74\x14\x7e\xd7\x62\x8b\x8a\x24\xf8\x96\x5c\xac\xcd\x8e\xc5\xd8\x9a\xc4\x96\xd4\x38\x9d\x01\x7b\xed\x25\x58\x7f\x20\x60\x0f\x6b\xd0\x78\x04\xdc\x31\x05\x60\x8a\x6c\x5c\x95\x00\x44\x55\x93\xee\x1a\x92\x90\x3e\x83\x27\x8f\x4f\x9a\x00\xfc\xf0\xe5\x96\x6c\xdb\x20\xd3\x48\x06\x70\xa2\x1d\x83\x2f\x2a\xd7\xd5\x29\xa7\x70\x30\x8a\x6e\x94\xf2\x9d\xe3\xdb\xb3\x10\xdf\x52\x40\xf6\x61\xd6\xab\xbc\x63\x34\x8e\x42\x9c\x33\x88\x7f\xca\x3f\x87\xb1\x58\x91\x84\x22\xcb\x32\x78\xbb\xb9\xdd\x7c\xbe\xd9\x6e\x5e\x43\x96\x65\xc5\x45\x9b\xf2\xd6\xa2\xd3\xf2\x02\x14\xb0\x2a\x8d\x5b\xc5\xfa\x0a\x4d\x05\xa9\xf4\x0a\x7b\xb8\xc8\xcf\xf6\xaa\x1a\x5d\x35\x19\x7c\xa4\xc8\x14\xfe\x66\xf2\x3c\xf6\x5d\x49\x8a\x1b\xa8\x88\x27\x6d\x8f\xd2\x40\x78\xa8\xbc\x38\x19\x0b\xe2\xfc\x59\xf4\x7d\x98\x56\x2c\x0d\x93\x8d\xc3\xd0\xf7\xcb\xd3\x5f\xb2\x1c\x3d\x1a\x06\x98\x43\x2a\x10\xb2\xf1\x6e\x6b\x2c\x45\x46\xdb\x8e\x13\xe9\x9d\x4b\xc7\x37\x39\x3d\x0c\x05\x3c\xc0\xdd\xd5\x59\x78\xbf\x87\x62\xf1\x1c\x5e\xbc\x84\xb4\x58\xfc\xa7\xa7\xcd\x4f\xf3\x6f\x22\xb7\x22\xd7\xdb\xfc\x9d\xcc\x3f\xc8\xfc\xcb\xf7\x02\x84\x86\xc2\xf9\x7b\x10\x6b\xa8\x7d\x17\x62\xf1\x7f\x91\x42\x0f\x6d\x30\x8e\x61\xb1\x86\x89\xfe\x27\x86\x2a\x82\x10\xce\x8b\xd0\x39\x61\x76\x82\x6c\xcb\xc7\x3f\xea\x35\x35\xc4\x34\x33\x60\x76\x4e\x18\xcf\x0e\xfc\xc9\x37\x46\x1d\x25\x7c\x74\x6f\xd0\x34\x5d\xa0\xe4\x57\x00\x00\x00\xff\xff\x3d\x64\xd9\xa8\x44\x03\x00\x00")
+
+func cronjobBatchOpenshiftEtcdEtcdBackupCleanerYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_cronjobBatchOpenshiftEtcdEtcdBackupCleanerYaml,
+		"CronJob.batch/openshift-etcd/etcd-backup-cleaner.yaml",
+	)
+}
+
+func cronjobBatchOpenshiftEtcdEtcdBackupCleanerYaml() (*asset, error) {
+	bytes, err := cronjobBatchOpenshiftEtcdEtcdBackupCleanerYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "CronJob.batch/openshift-etcd/etcd-backup-cleaner.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _cronjobBatchOpenshiftEtcdEtcdBackupYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x74\x51\x61\x8b\xd3\x40\x10\xfd\x9e\x5f\x31\x24\x86\xea\xc9\x1a\xfb\x75\x11\xe1\xd0\xaa\x08\xed\x1d\x7a\x28\x7e\x2a\x93\xcd\xb4\x59\x9b\xdd\x09\xbb\x93\xc2\x41\x7e\xbc\xac\x51\xae\x89\x75\xf3\x21\xec\x9b\x37\x6f\xde\x9b\xc5\xde\x7e\xa3\x10\x2d\x7b\x0d\x35\x8a\x69\xab\xf3\xba\x26\xc1\x75\x76\xb2\xbe\xd1\xf0\x2e\xb0\xff\xcc\x75\xe6\x48\xb0\x41\x41\x9d\x01\x78\x74\xa4\x81\xc4\x34\xaa\x46\x73\x1a\xfa\x3f\x58\xec\xd1\x90\x06\xee\xc9\xc7\xd6\x1e\x44\x25\x4a\x16\x7b\x32\xa9\xab\x00\xe1\x86\x35\x38\x3e\x13\x08\xc3\x1a\x5a\x1e\x02\xe0\x41\x28\x80\x50\x14\xeb\x8f\x19\x40\x34\x2d\x35\x43\x47\x1a\xf2\x9b\x6a\xfd\x1a\x6e\xa6\x2f\xcf\x00\x7e\x72\xfd\x40\xae\xef\x50\x28\x09\x02\xfc\x95\x4e\x47\x66\x95\x65\xf5\xf7\x9d\xc2\xd9\x1a\xba\x35\x86\x07\x2f\xbb\xa7\x10\xdc\x53\x40\xe1\x70\xc1\x35\xec\x05\xad\xa7\x10\x2f\x15\xd4\xd5\xe8\x4f\xc7\x3a\x3c\x92\x86\x55\x51\x14\xf0\x71\xb3\xdb\x7c\xb9\x7d\xd8\xbc\x87\xa2\x28\x56\x33\x9a\x61\xe7\xd0\x37\x7a\x06\x2a\xa8\x6a\xeb\xab\xd8\x2e\xd0\x5c\x91\xc9\x17\xd8\x38\xbb\xa7\x64\x0d\x28\x82\x3c\x8e\x6f\x76\x77\xdf\xdf\x8e\xcf\x9e\x37\x28\x04\xab\x97\xe5\x0f\x55\x3a\x55\x36\xfb\xf2\x93\x2e\xb7\xba\xfc\xba\x7a\x31\x1e\x73\xa8\xce\x18\xaa\x14\x62\x3f\x85\xa8\xa6\xdf\xde\x84\x57\x8f\xe8\x3a\x18\xe1\x34\xd4\x64\xa4\x03\x13\x28\x29\xa9\x03\xa8\xd9\xcc\x33\x77\x83\xa3\x6d\x5a\x64\x5c\xe6\x98\x76\x34\x49\x2a\xc3\xfe\x60\x8f\x0b\xbf\x2e\xf5\xdd\xa3\xb4\xfa\x1f\x2b\x17\xcc\x40\x51\x30\xc8\x3d\x77\xd6\x3c\x6a\xb8\xf3\x1f\xd0\x76\x43\xa0\x6c\x69\xe3\xea\x1b\xfd\x7f\xfe\x04\x6d\xb1\xd7\x0b\x5b\xd7\x1a\x7f\x05\x00\x00\xff\xff\xac\x85\xe3\x78\x20\x03\x00\x00")
+
+func cronjobBatchOpenshiftEtcdEtcdBackupYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_cronjobBatchOpenshiftEtcdEtcdBackupYaml,
+		"CronJob.batch/openshift-etcd/etcd-backup.yaml",
+	)
+}
+
+func cronjobBatchOpenshiftEtcdEtcdBackupYaml() (*asset, error) {
+	bytes, err := cronjobBatchOpenshiftEtcdEtcdBackupYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "CronJob.batch/openshift-etcd/etcd-backup.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -6013,26 +6075,6 @@ func deploymentAppsOpenshiftWebConsoleWebconsoleYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "Deployment.apps/openshift-web-console/webconsole.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _etcdbackupEtcdDatabaseCoreosComOpenshiftEtcdEtcdBackupYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x84\x90\xbf\x6a\x33\x31\x10\xc4\x7b\x3d\xc5\xe2\xc6\x95\x7c\xfe\x03\xdf\x47\xd4\xc5\xe0\x22\x90\x22\x70\x47\xfa\xbd\xd5\x26\x27\x7c\x27\x09\xed\x3a\xe0\xb7\x0f\x3a\x41\xc0\x45\x88\x2a\x69\xf4\x9b\x19\x76\x31\x87\x77\x2e\x12\x52\x74\xc0\x4a\x7e\xe7\x51\x71\x44\xe1\x1d\xa5\xc2\x49\x76\x94\x96\xee\xeb\x30\xb2\xe2\xd1\x5c\x43\xf4\x0e\x2e\x4a\xfe\x8c\x74\xbd\x65\xb3\xb0\x62\x35\x38\x03\x10\x71\xe1\x96\x61\xc7\xf6\xdb\x34\xc9\x48\xec\x20\x65\x8e\x32\x85\x0f\xb5\x15\x31\x92\x99\xaa\xab\x3e\x2e\xd1\xe7\x14\xa2\x4a\x15\x2c\x6c\x26\xd5\x2c\xae\xeb\x16\x14\xe5\x62\xf7\xeb\x71\xc7\xd3\xff\xa7\xcd\xef\xc0\xe1\x2f\xe0\xf8\x03\x88\xa6\x82\x9f\x3c\xdc\x33\x3b\x78\x3e\xf7\x06\x00\xc7\xb5\x7c\xbd\xf4\x4c\x85\xf5\x61\x14\x8b\xa3\x58\x2a\xec\x39\x6a\xc0\x59\x56\x34\xa3\x4e\x0e\xb6\x15\xeb\x1a\xb6\x35\x00\x34\x07\x8e\x3a\xbc\xf6\x0f\x31\x4d\xb5\xba\x5a\x1b\xfc\x96\xe6\x40\xf7\xd6\x3a\x84\x85\xd3\x4d\x5f\x62\xcf\x94\xea\x8e\x4f\xff\xf6\x7b\xf3\x1d\x00\x00\xff\xff\xf5\x3f\x33\x44\x9c\x01\x00\x00")
-
-func etcdbackupEtcdDatabaseCoreosComOpenshiftEtcdEtcdBackupYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_etcdbackupEtcdDatabaseCoreosComOpenshiftEtcdEtcdBackupYaml,
-		"EtcdBackup.etcd.database.coreos.com/openshift-etcd/etcd-backup.yaml",
-	)
-}
-
-func etcdbackupEtcdDatabaseCoreosComOpenshiftEtcdEtcdBackupYaml() (*asset, error) {
-	bytes, err := etcdbackupEtcdDatabaseCoreosComOpenshiftEtcdEtcdBackupYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "EtcdBackup.etcd.database.coreos.com/openshift-etcd/etcd-backup.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -10277,6 +10319,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ConfigMap/kube-service-catalog/cluster-info.yaml":                                                                                   configmapKubeServiceCatalogClusterInfoYaml,
 	"ConfigMap/kube-system/extension-apiserver-authentication.yaml":                                                                      configmapKubeSystemExtensionApiserverAuthenticationYaml,
 	"ConfigMap/openshift-ansible-service-broker/broker-config.yaml":                                                                      configmapOpenshiftAnsibleServiceBrokerBrokerConfigYaml,
+	"ConfigMap/openshift-etcd/backup-config.yaml":                                                                                        configmapOpenshiftEtcdBackupConfigYaml,
 	"ConfigMap/openshift-metrics/alertmanager.yaml":                                                                                      configmapOpenshiftMetricsAlertmanagerYaml,
 	"ConfigMap/openshift-metrics/prometheus.yaml":                                                                                        configmapOpenshiftMetricsPrometheusYaml,
 	"ConfigMap/openshift-node/node-config-compute.yaml":                                                                                  configmapOpenshiftNodeNodeConfigComputeYaml,
@@ -10284,6 +10327,8 @@ var _bindata = map[string]func() (*asset, error){
 	"ConfigMap/openshift-node/node-config-master.yaml":                                                                                   configmapOpenshiftNodeNodeConfigMasterYaml,
 	"ConfigMap/openshift-template-service-broker/apiserver-config.yaml":                                                                  configmapOpenshiftTemplateServiceBrokerApiserverConfigYaml,
 	"ConfigMap/openshift-web-console/webconsole-config.yaml":                                                                             configmapOpenshiftWebConsoleWebconsoleConfigYaml,
+	"CronJob.batch/openshift-etcd/etcd-backup-cleaner.yaml":                                                                              cronjobBatchOpenshiftEtcdEtcdBackupCleanerYaml,
+	"CronJob.batch/openshift-etcd/etcd-backup.yaml":                                                                                      cronjobBatchOpenshiftEtcdEtcdBackupYaml,
 	"CustomResourceDefinition.apiextensions.k8s.io/bundlebindings.automationbroker.io.yaml":                                              customresourcedefinitionApiextensionsK8sIoBundlebindingsAutomationbrokerIoYaml,
 	"CustomResourceDefinition.apiextensions.k8s.io/bundleinstances.automationbroker.io.yaml":                                             customresourcedefinitionApiextensionsK8sIoBundleinstancesAutomationbrokerIoYaml,
 	"CustomResourceDefinition.apiextensions.k8s.io/bundles.automationbroker.io.yaml":                                                     customresourcedefinitionApiextensionsK8sIoBundlesAutomationbrokerIoYaml,
@@ -10303,7 +10348,6 @@ var _bindata = map[string]func() (*asset, error){
 	"Deployment.apps/openshift-metrics/kube-state-metrics.yaml":                                                                          deploymentAppsOpenshiftMetricsKubeStateMetricsYaml,
 	"Deployment.apps/openshift-template-service-broker/apiserver.yaml":                                                                   deploymentAppsOpenshiftTemplateServiceBrokerApiserverYaml,
 	"Deployment.apps/openshift-web-console/webconsole.yaml":                                                                              deploymentAppsOpenshiftWebConsoleWebconsoleYaml,
-	"EtcdBackup.etcd.database.coreos.com/openshift-etcd/etcd-backup.yaml":                                                                etcdbackupEtcdDatabaseCoreosComOpenshiftEtcdEtcdBackupYaml,
 	"ImageStream.image.openshift.io/openshift/dotnet-runtime.yaml":                                                                       imagestreamImageOpenshiftIoOpenshiftDotnetRuntimeYaml,
 	"ImageStream.image.openshift.io/openshift/dotnet.yaml":                                                                               imagestreamImageOpenshiftIoOpenshiftDotnetYaml,
 	"ImageStream.image.openshift.io/openshift/httpd.yaml":                                                                                imagestreamImageOpenshiftIoOpenshiftHttpdYaml,
@@ -10807,6 +10851,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"openshift-ansible-service-broker": {nil, map[string]*bintree{
 			"broker-config.yaml": {configmapOpenshiftAnsibleServiceBrokerBrokerConfigYaml, map[string]*bintree{}},
 		}},
+		"openshift-etcd": {nil, map[string]*bintree{
+			"backup-config.yaml": {configmapOpenshiftEtcdBackupConfigYaml, map[string]*bintree{}},
+		}},
 		"openshift-metrics": {nil, map[string]*bintree{
 			"alertmanager.yaml": {configmapOpenshiftMetricsAlertmanagerYaml, map[string]*bintree{}},
 			"prometheus.yaml":   {configmapOpenshiftMetricsPrometheusYaml, map[string]*bintree{}},
@@ -10821,6 +10868,12 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"openshift-web-console": {nil, map[string]*bintree{
 			"webconsole-config.yaml": {configmapOpenshiftWebConsoleWebconsoleConfigYaml, map[string]*bintree{}},
+		}},
+	}},
+	"CronJob.batch": {nil, map[string]*bintree{
+		"openshift-etcd": {nil, map[string]*bintree{
+			"etcd-backup-cleaner.yaml": {cronjobBatchOpenshiftEtcdEtcdBackupCleanerYaml, map[string]*bintree{}},
+			"etcd-backup.yaml":         {cronjobBatchOpenshiftEtcdEtcdBackupYaml, map[string]*bintree{}},
 		}},
 	}},
 	"CustomResourceDefinition.apiextensions.k8s.io": {nil, map[string]*bintree{
@@ -10868,11 +10921,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"openshift-web-console": {nil, map[string]*bintree{
 			"webconsole.yaml": {deploymentAppsOpenshiftWebConsoleWebconsoleYaml, map[string]*bintree{}},
-		}},
-	}},
-	"EtcdBackup.etcd.database.coreos.com": {nil, map[string]*bintree{
-		"openshift-etcd": {nil, map[string]*bintree{
-			"etcd-backup.yaml": {etcdbackupEtcdDatabaseCoreosComOpenshiftEtcdEtcdBackupYaml, map[string]*bintree{}},
 		}},
 	}},
 	"ImageStream.image.openshift.io": {nil, map[string]*bintree{

@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-config
+  namespace: openshift-etcd
+data:
+  backup_cr.yaml: |
+    apiVersion: etcd.database.coreos.com/v1beta2
+    kind: EtcdBackup
+    metadata:
+      generateName: etcd-backup-
+      namespace: openshift-etcd
+    spec:
+      etcdEndpoints:
+      - "https://master-000000:2379"
+      - "https://master-000001:2379"
+      - "https://master-000002:2379"
+      storageType: ABS
+      abs:
+        absSecret: etcd-backup-abs-credentials
+        path: 'etcd/backup.<NOW>'
+      clientTLSSecret: etcd-client-tls
+      backupPolicy:
+        TimeoutInSecond: 3600
