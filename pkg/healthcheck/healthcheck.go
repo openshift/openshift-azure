@@ -9,55 +9,35 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/openshift/openshift-azure/pkg/upgrade"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
-
 	"github.com/sirupsen/logrus"
 
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
 )
 
 type HealthChecker interface {
-	HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error
+	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 }
 
 type simpleHealthChecker struct {
-	pluginConfig acsapi.PluginConfig
+	pluginConfig api.PluginConfig
 }
 
 var _ HealthChecker = &simpleHealthChecker{}
 
 // NewSimpleHealthChecker create a new HealthChecker
-func NewSimpleHealthChecker(entry *logrus.Entry, pluginConfig acsapi.PluginConfig) HealthChecker {
+func NewSimpleHealthChecker(entry *logrus.Entry, pluginConfig api.PluginConfig) HealthChecker {
 	log.New(entry)
 	return &simpleHealthChecker{pluginConfig: pluginConfig}
 }
 
 // HealthCheck function to verify cluster health
-func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
-	kc, err := managedcluster.ClientSetFromV1Config(ctx, cs.Config.AdminKubeconfig)
-	if err != nil {
-		return err
-	}
-
-	// ensure that all nodes are ready
-	err = upgrade.WaitForNodes(ctx, cs, kc)
-	if err != nil {
-		return err
-	}
-
-	// Wait for infrastructure services to be healthy
-	err = upgrade.WaitForInfraServices(ctx, kc)
-	if err != nil {
-		return err
-	}
-
+func (hc *simpleHealthChecker) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	// Wait for the console to be 200 status
 	return hc.waitForConsole(ctx, cs)
 }
 
-func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *acsapi.OpenShiftManagedCluster) error {
+func (hc *simpleHealthChecker) waitForConsole(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	log.Info("checking console health")
 	c := cs.Config
 	pool := x509.NewCertPool()
