@@ -60,6 +60,11 @@ func Validate(new, old *OpenShiftManagedCluster, externalOnly bool) (errs []erro
 }
 
 func validateContainerService(c *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+	if c == nil {
+		errs = append(errs, fmt.Errorf("openShiftManagedCluster cannot be nil"))
+		return
+	}
+
 	if c.Location == "" {
 		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
 	} else if _, found := AzureLocations[c.Location]; !found {
@@ -70,16 +75,16 @@ func validateContainerService(c *OpenShiftManagedCluster, externalOnly bool) (er
 		errs = append(errs, fmt.Errorf("invalid name %q", c.Name))
 	}
 
-	if c.Properties == nil {
-		errs = append(errs, fmt.Errorf("properties cannot be nil"))
-		return
-	}
-
 	errs = append(errs, validateProperties(c.Properties, c.Location, externalOnly)...)
 	return
 }
 
 func validateUpdateContainerService(cs, oldCs *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+	if cs == nil || oldCs == nil {
+		errs = append(errs, fmt.Errorf("openShiftManagedCluster cannot be nil"))
+		return
+	}
+
 	newAgents := make(map[string]*AgentPoolProfile)
 	for i := range cs.Properties.AgentPoolProfiles {
 		newAgent := cs.Properties.AgentPoolProfiles[i]
@@ -104,6 +109,11 @@ func validateUpdateContainerService(cs, oldCs *OpenShiftManagedCluster, external
 }
 
 func validateProperties(p *Properties, location string, externalOnly bool) (errs []error) {
+	if p == nil {
+		errs = append(errs, fmt.Errorf("properties cannot be nil"))
+		return
+	}
+
 	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
 	switch p.OpenShiftVersion {
 	case "v3.10":
@@ -124,6 +134,11 @@ func validateProperties(p *Properties, location string, externalOnly bool) (errs
 }
 
 func validateAuthProfile(ap *AuthProfile) (errs []error) {
+	if ap == nil {
+		errs = append(errs, fmt.Errorf("properties.authProfile cannot be nil"))
+		return
+	}
+
 	if len(ap.IdentityProviders) != 1 {
 		errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders length"))
 	}
@@ -165,7 +180,7 @@ func validateAgentPoolProfiles(apps []AgentPoolProfile) (errs []error) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.vnetSubnetID %q: all subnets must match when using vnetSubnetID", app.VnetSubnetID))
 		}
 
-		errs = append(errs, validateAgentPoolProfile(&app)...)
+		errs = append(errs, validateAgentPoolProfile(app)...)
 	}
 
 	for role := range validAgentPoolProfileRoles {
@@ -177,7 +192,7 @@ func validateAgentPoolProfiles(apps []AgentPoolProfile) (errs []error) {
 	return
 }
 
-func validateAgentPoolProfile(app *AgentPoolProfile) (errs []error) {
+func validateAgentPoolProfile(app AgentPoolProfile) (errs []error) {
 	switch app.Role {
 	case AgentPoolProfileRoleCompute:
 		switch app.Name {
@@ -225,6 +240,7 @@ func validateAgentPoolProfile(app *AgentPoolProfile) (errs []error) {
 func validateFQDN(p *Properties, location string) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
+		return
 	}
 	if p.FQDN == "" || !isValidCloudAppHostname(p.FQDN, location) {
 		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
