@@ -24,6 +24,9 @@ var (
 		`$`)
 
 	rxAgentPoolProfileName = regexp.MustCompile(`(?i)^[a-z0-9]{1,12}$`)
+
+	// This regexp is to guard against InvalidDomainNameLabel for hostname validation
+	rxCloudDomainLabel = regexp.MustCompile(`^[a-z][a-z0-9-]{1,61}[a-z0-9]\.`)
 )
 
 var (
@@ -61,7 +64,7 @@ func isValidHostname(h string) bool {
 }
 
 func isValidCloudAppHostname(h, location string) bool {
-	if !isValidHostname(h) {
+	if !rxCloudDomainLabel.MatchString(h) {
 		return false
 	}
 	return strings.HasSuffix(h, "."+location+".cloudapp.azure.com") && strings.Count(h, ".") == 4

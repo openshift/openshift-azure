@@ -550,3 +550,69 @@ properties:
 		}
 	}
 }
+func TestValidHostnames(t *testing.T) {
+	// adding tests to validate isValidCloudAppHostname
+	// ^[a-z][a-z0-9-]{1,61}[a-z0-9]$" + "."+location+".cloudapp.azure.com
+	tests := map[string]struct {
+		hostname string
+		valid    bool
+	}{
+		"good": {
+			hostname: "test",
+			valid:    true,
+		},
+		"good-2-longer-name": {
+			hostname: "test",
+			valid:    true,
+		},
+		"good-with-dashes": {
+			hostname: "this-is",
+			valid:    true,
+		},
+		"good-with-dashes-numbers": {
+			hostname: "this-is",
+			valid:    true,
+		},
+		"good-length-61": {
+			hostname: "abcdefghijklmnopqrstuvwxzyabcdefghijklmnopqrstuvwxzy",
+			valid:    true,
+		},
+		// bad start here
+		"bad-periods": {
+			hostname: "this.",
+			valid:    false,
+		},
+		"bad-start-with-numbers": {
+			hostname: "123",
+			valid:    false,
+		},
+		"bad-start-with-dashes": {
+			hostname: "-abc",
+			valid:    false,
+		},
+		"bad-length-64": {
+			hostname: "abcdefghijklmnopqrstuvwxzyabcdefghijklmnopqrstuvwxzyabcdefghijkl",
+			valid:    false,
+		},
+		"bad-char-slash": {
+			hostname: "a/b/c",
+			valid:    false,
+		},
+		"bad-0-length-first": {
+			hostname: "",
+			valid:    false,
+		},
+		"bad-capital": {
+			hostname: "Thisisatest",
+			valid:    false,
+		},
+	}
+
+	location := "eastus"
+	for name, tc := range tests {
+		hn := tc.hostname + "." + location + ".cloudapp.azure.com"
+		if isValidCloudAppHostname(hn, location) != tc.valid {
+			t.Errorf("%s failed for [%s]", name, tc.hostname)
+		}
+	}
+}
