@@ -2,6 +2,7 @@ package validate
 
 import (
 	"fmt"
+	"net"
 	"reflect"
 	"regexp"
 	"strings"
@@ -17,12 +18,11 @@ var (
 		`(\.([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9]))*` +
 		`$`)
 
-	rxAgentPoolProfileVNetSubnetID = regexp.MustCompile(`(?i)^` +
+	rxVNetID = regexp.MustCompile(`(?i)^` +
 		`/subscriptions/[^/]+` +
 		`/resourceGroups/[^/]+` +
 		`/providers/Microsoft\.Network` +
 		`/virtualNetworks/[^/]+` +
-		`/subnets/[^/]+` +
 		`$`)
 
 	rxAgentPoolProfileName = regexp.MustCompile(`(?i)^[a-z0-9]{1,12}$`)
@@ -44,6 +44,31 @@ func isValidHostname(h string) bool {
 
 func isAzureZone(fqdn string) bool {
 	return strings.HasSuffix(fqdn, ".cloudapp.azure.com") && len(strings.Split(fqdn, ".")) == 5
+}
+
+func isValidIPV4CIDR(cidr string) bool {
+	ip, net, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return false
+	}
+	if ip.To4() == nil {
+		return false
+	}
+	if net == nil || !ip.Equal(net.IP) {
+		return false
+	}
+	return true
+}
+
+func vnetContainsSubnet(vnet, subnet *net.IPNet) bool {
+	vnetbits, _ := vnet.Mask.Size()
+	subnetbits, _ := subnet.Mask.Size()
+	if vnetbits > subnetbits {
+		// e.g., vnet is a /24, subnet is a /16: vnet cannot contain subnet.
+		return false
+	}
+
+	return vnet.IP.Equal(subnet.IP.Mask(vnet.Mask))
 }
 
 // Validate validates a OpenShiftManagedCluster struct
@@ -125,11 +150,19 @@ func validateProperties(p *api.Properties, externalOnly bool) (errs []error) {
 	if p.PublicHostname != "" { // TODO: relax after private preview (&& !isValidHostname(p.PublicHostname))
 		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
 	}
+	errs = append(errs, validateNetworkProfile(p.NetworkProfile)...)
 	if !externalOnly {
 		errs = append(errs, validateRouterProfiles(p.RouterProfiles)...)
 	}
 	errs = append(errs, validateFQDN(p)...)
-	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles)...)
+	var vnet *net.IPNet
+	if p.NetworkProfile != nil {
+		// we can disregard any error below because we are already going to fail
+		// validation if VnetCIDR does not parse correctly.
+
+		_, vnet, _ = net.ParseCIDR(p.NetworkProfile.VnetCIDR)
+	}
+	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
 	errs = append(errs, validateAuthProfile(p.AuthProfile)...)
 	return
 }
@@ -164,7 +197,7 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 	return
 }
 
-func validateAgentPoolProfiles(apps []api.AgentPoolProfile) (errs []error) {
+func validateAgentPoolProfiles(apps []api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {
 	appmap := map[api.AgentPoolProfileRole]struct{}{}
 
 	for i, app := range apps {
@@ -177,11 +210,11 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile) (errs []error) {
 		}
 		appmap[app.Role] = struct{}{}
 
-		if i > 0 && app.VnetSubnetID != apps[i-1].VnetSubnetID {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.vnetSubnetID %q: all subnets must match when using vnetSubnetID", app.VnetSubnetID))
+		if i > 0 && app.SubnetCIDR != apps[i-1].SubnetCIDR { // TODO: in the future, test that these are disjoint
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.subnetCidr %q: all subnetCidrs must match", app.SubnetCIDR))
 		}
 
-		errs = append(errs, validateAgentPoolProfile(app)...)
+		errs = append(errs, validateAgentPoolProfile(app, vnet)...)
 	}
 
 	for role := range validAgentPoolProfileRoles {
@@ -193,7 +226,7 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile) (errs []error) {
 	return
 }
 
-func validateAgentPoolProfile(app api.AgentPoolProfile) (errs []error) {
+func validateAgentPoolProfile(app api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {
 	switch app.Role {
 	case api.AgentPoolProfileRoleCompute:
 		switch app.Name {
@@ -225,8 +258,17 @@ func validateAgentPoolProfile(app api.AgentPoolProfile) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
 	}
 
-	if app.VnetSubnetID != "" && !rxAgentPoolProfileVNetSubnetID.MatchString(app.VnetSubnetID) {
-		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vnetSubnetID %q", app.Name, app.VnetSubnetID))
+	if !isValidIPV4CIDR(app.SubnetCIDR) {
+		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q", app.Name, app.SubnetCIDR))
+	}
+
+	_, subnet, _ := net.ParseCIDR(app.SubnetCIDR)
+	if vnet != nil && subnet != nil {
+		// we are already going to fail validation if one of these is nil.
+
+		if !vnetContainsSubnet(vnet, subnet) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q: not contained in properties.networkProfile.vnetCidr %q", app.Name, app.SubnetCIDR, vnet.String()))
+		}
 	}
 
 	switch app.OSType {
@@ -245,6 +287,20 @@ func validateFQDN(p *api.Properties) (errs []error) {
 	}
 	if p.FQDN == "" || !isValidHostname(p.FQDN) || !isAzureZone(p.FQDN) {
 		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
+	}
+	return
+}
+
+func validateNetworkProfile(np *api.NetworkProfile) (errs []error) {
+	if np == nil {
+		errs = append(errs, fmt.Errorf("networkProfile cannot be nil"))
+		return
+	}
+	if !isValidIPV4CIDR(np.VnetCIDR) {
+		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetCidr %q", np.VnetCIDR))
+	}
+	if np.PeerVnetID != "" && !rxVNetID.MatchString(np.PeerVnetID) {
+		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.peerVnetId %q", np.PeerVnetID))
 	}
 	return
 }
