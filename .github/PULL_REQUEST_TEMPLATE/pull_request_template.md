@@ -2,7 +2,7 @@ Fixes #.
 (if your pull request doesn't have an issue attached, remove)
 
 **Rationale for this pull request**
-Why is this pull request needed? (could be as easy as "fixes bug #.")
+Why is this pull request needed? (could be as short as "see attached bug #.")
 
 **Changes in this pull request**
 
