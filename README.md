@@ -112,32 +112,30 @@ Basic OpenShift configuration:
 
 ```yaml
 name: openshift
-location: eastus
+location: $AZURE_REGION
 properties:
   openShiftVersion: v3.10
-  publicHostname: openshift.$RESOURCEGROUP.$DNS_DOMAIN
+  fqdn: $RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com
   authProfile:
     identityProviders:
-    - name: Azure AAD
+    - name: Azure AD
       provider:
         kind: AADIdentityProvider
         clientId: $AZURE_AAD_CLIENT_ID
         secret: $AZURE_AAD_CLIENT_SECRET
+        tenantId: $AZURE_TENANT_ID
   networkProfile:
     vnetCidr: 10.0.0.0/8
   routerProfiles:
   - name: default
-    publicSubdomain: $RESOURCEGROUP.$DNS_DOMAIN
-  agentPoolProfiles:
-  - name: master
-    role: master
+  masterPoolProfile:
     count: 3
     vmSize: Standard_D2s_v3
-    osType: Linux
     subnetCidr: 10.0.0.0/24
+  agentPoolProfiles:
   - name: infra
     role: infra
-    count: 1
+    count: 2
     vmSize: Standard_D2s_v3
     subnetCidr: 10.0.0.0/24
     osType: Linux
