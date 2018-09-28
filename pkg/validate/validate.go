@@ -62,8 +62,11 @@ func isValidHostname(h string) bool {
 	return len(h) <= 255 && rxRfc1123.MatchString(h)
 }
 
-func isAzureZone(fqdn string) bool {
-	return strings.HasSuffix(fqdn, ".cloudapp.azure.com") && len(strings.Split(fqdn, ".")) == 5
+func isValidCloudAppHostname(h, location string) bool {
+	if !isValidHostname(h) {
+		return false
+	}
+	return strings.HasSuffix(h, "."+location+".cloudapp.azure.com") && strings.Count(h, ".") == 4
 }
 
 func isValidIPV4CIDR(cidr string) bool {
@@ -119,7 +122,7 @@ func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool)
 		errs = append(errs, fmt.Errorf("invalid name %q", c.Name))
 	}
 
-	errs = append(errs, validateProperties(c.Properties, externalOnly)...)
+	errs = append(errs, validateProperties(c.Properties, c.Location, externalOnly)...)
 	return
 }
 
@@ -154,7 +157,7 @@ func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster, exte
 	return
 }
 
-func validateProperties(p *api.Properties, externalOnly bool) (errs []error) {
+func validateProperties(p *api.Properties, location string, externalOnly bool) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("properties cannot be nil"))
 		return
@@ -172,9 +175,9 @@ func validateProperties(p *api.Properties, externalOnly bool) (errs []error) {
 	}
 	errs = append(errs, validateNetworkProfile(p.NetworkProfile)...)
 	if !externalOnly {
-		errs = append(errs, validateRouterProfiles(p.RouterProfiles)...)
+		errs = append(errs, validateRouterProfiles(p.RouterProfiles, location)...)
 	}
-	errs = append(errs, validateFQDN(p)...)
+	errs = append(errs, validateFQDN(p, location)...)
 	var vnet *net.IPNet
 	if p.NetworkProfile != nil {
 		// we can disregard any error below because we are already going to fail
@@ -306,12 +309,12 @@ func validateAgentPoolProfile(app api.AgentPoolProfile, vnet *net.IPNet) (errs [
 	return
 }
 
-func validateFQDN(p *api.Properties) (errs []error) {
+func validateFQDN(p *api.Properties, location string) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
 		return
 	}
-	if p.FQDN == "" || !isValidHostname(p.FQDN) || !isAzureZone(p.FQDN) {
+	if p.FQDN == "" || !isValidCloudAppHostname(p.FQDN, location) {
 		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
 	}
 	return
@@ -331,7 +334,7 @@ func validateNetworkProfile(np *api.NetworkProfile) (errs []error) {
 	return
 }
 
-func validateRouterProfiles(rps []api.RouterProfile) (errs []error) {
+func validateRouterProfiles(rps []api.RouterProfile, location string) (errs []error) {
 	rpmap := map[string]api.RouterProfile{}
 
 	for _, rp := range rps {
@@ -344,7 +347,7 @@ func validateRouterProfiles(rps []api.RouterProfile) (errs []error) {
 		}
 		rpmap[rp.Name] = rp
 
-		errs = append(errs, validateRouterProfile(rp)...)
+		errs = append(errs, validateRouterProfile(rp, location)...)
 	}
 
 	for name := range validRouterProfileNames {
@@ -356,7 +359,7 @@ func validateRouterProfiles(rps []api.RouterProfile) (errs []error) {
 	return
 }
 
-func validateRouterProfile(rp api.RouterProfile) (errs []error) {
+func validateRouterProfile(rp api.RouterProfile, location string) (errs []error) {
 	if rp.Name == "" {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
 	}
@@ -367,7 +370,7 @@ func validateRouterProfile(rp api.RouterProfile) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].publicSubdomain %q", rp.Name, rp.PublicSubdomain))
 	}
 
-	if rp.FQDN != "" && !isValidHostname(rp.FQDN) && !isAzureZone(rp.FQDN) {
+	if rp.FQDN != "" && !isValidCloudAppHostname(rp.FQDN, location) {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].fqdn %q", rp.Name, rp.FQDN))
 	}
 
