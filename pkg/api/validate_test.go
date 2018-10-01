@@ -2,10 +2,10 @@ package api
 
 import (
 	"errors"
+	"net"
 	"reflect"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/ghodss/yaml"
 
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
@@ -29,20 +29,25 @@ properties:
   - name: default
     publicSubdomain: test.example.com
     fqdn: router-fqdn.eastus.cloudapp.azure.com
+  networkProfile:
+    vnetCidr: 10.0.0.0/8
   masterPoolProfile:
     count: 3
     vmSize: Standard_D2s_v3
+    subnetCidr: 10.0.0.0/24
   agentPoolProfiles:
   - name: infra
     role: infra
     count: 2
     vmSize: Standard_D2s_v3
     osType: Linux
+    subnetCidr: 10.0.0.0/24
   - name: myCompute
     role: compute
     count: 1
     vmSize: Standard_D2s_v3
     osType: Linux
+    subnetCidr: 10.0.0.0/24
 `)
 
 func TestValidate(t *testing.T) {
@@ -134,6 +139,33 @@ func TestValidate(t *testing.T) {
 				oc.Properties.PublicHostname = "www.example.com"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.publicHostname "www.example.com"`)},
+		},
+		"network profile bad vnetCidr": {
+			f: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.VnetCIDR = "foo"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.networkProfile.vnetCidr "foo"`)},
+		},
+		"network profile invalid vnetCidr": {
+			f: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.VnetCIDR = "192.168.0.0/16"
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
+				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
+				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
+			},
+		},
+		"network profile valid peerVnetId": {
+			f: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.PeerVnetID = "/subscriptions/b07e8fae-2f3f-4769-8fa8-8570b426ba13/resourceGroups/test/providers/Microsoft.Network/virtualNetworks/vnet"
+			},
+		},
+		"network profile invalid peerVnetId": {
+			f: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.PeerVnetID = "foo"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.networkProfile.peerVnetId "foo"`)},
 		},
 		"router profile duplicate names": {
 			f: func(oc *OpenShiftManagedCluster) {
@@ -233,22 +265,44 @@ func TestValidate(t *testing.T) {
 				errors.New(`invalid properties.agentPoolProfiles["infra"].vmSize "SuperBigVM"`),
 			},
 		},
-		"agent pool unmatched vnet subnet id": {
+		"agent pool unmatched subnet cidr": {
 			f: func(oc *OpenShiftManagedCluster) {
-				oc.Properties.AgentPoolProfiles[0].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
-				oc.Properties.AgentPoolProfiles[1].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
+				oc.Properties.AgentPoolProfiles[2].SubnetCIDR = "10.0.1.0/24"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.agentPoolProfiles.vnetSubnetID "": all subnets must match when using vnetSubnetID`)},
+			expectedErrs: []error{errors.New(`invalid properties.agentPoolProfiles.subnetCidr "10.0.1.0/24": all subnetCidrs must match`)},
 		},
-		"agent pool bad vnet subnet id": {
+		"agent pool bad subnet cidr": {
 			f: func(oc *OpenShiftManagedCluster) {
-				oc.Properties.AgentPoolProfiles[0].VnetSubnetID = "foo"
-				oc.Properties.AgentPoolProfiles[1].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
-				oc.Properties.AgentPoolProfiles[2].VnetSubnetID = "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a"
+				oc.Properties.AgentPoolProfiles[2].SubnetCIDR = "foo"
 			},
 			expectedErrs: []error{
-				errors.New(`invalid properties.agentPoolProfiles["infra"].vnetSubnetID "foo"`),
-				errors.New(`invalid properties.agentPoolProfiles.vnetSubnetID "/subscriptions/a/resourceGroups/a/providers/Microsoft.Network/virtualNetworks/a/subnets/a": all subnets must match when using vnetSubnetID`),
+				errors.New(`invalid properties.agentPoolProfiles.subnetCidr "foo": all subnetCidrs must match`),
+				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "foo"`),
+			},
+		},
+		"agent pool subnet cidr clash cluster": {
+			f: func(oc *OpenShiftManagedCluster) {
+				for i := range oc.Properties.AgentPoolProfiles {
+					oc.Properties.AgentPoolProfiles[i].SubnetCIDR = "10.128.0.0/24"
+				}
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
+				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
+				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
+			},
+		},
+		"agent pool subnet cidr clash service": {
+			f: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.VnetCIDR = "172.0.0.0/8"
+				for i := range oc.Properties.AgentPoolProfiles {
+					oc.Properties.AgentPoolProfiles[i].SubnetCIDR = "172.30.0.0/16"
+				}
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
+				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
+				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
 			},
 		},
 		"agent pool bad master count": {
@@ -321,7 +375,14 @@ func TestValidate(t *testing.T) {
 		}
 		errs := Validate(cs, nil, test.externalOnly)
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
-			t.Errorf("%s expected errors %#v but received %#v", name, spew.Sprint(test.expectedErrs), spew.Sprint(errs))
+			t.Errorf("%s expected errors:", name)
+			for _, err := range test.expectedErrs {
+				t.Errorf("\t%v", err)
+			}
+			t.Error("received errors:")
+			for _, err := range errs {
+				t.Errorf("\t%v", err)
+			}
 		}
 	}
 }
@@ -341,6 +402,81 @@ func TestIsValidCloudAppHostname(t *testing.T) {
 	validFqdn := "example.westus2.cloudapp.azure.com"
 	if !isValidCloudAppHostname(validFqdn, "westus2") {
 		t.Errorf("Valid FQDN failed to pass test: %s", validFqdn)
+	}
+}
+
+func TestIsValidIPV4CIDR(t *testing.T) {
+	for _, test := range []struct {
+		cidr  string
+		valid bool
+	}{
+		{
+			cidr: "",
+		},
+		{
+			cidr: "foo",
+		},
+		{
+			cidr: "::/0",
+		},
+		{
+			cidr: "192.168.0.1/24",
+		},
+		{
+			cidr:  "192.168.0.0/24",
+			valid: true,
+		},
+	} {
+		valid := isValidIPV4CIDR(test.cidr)
+		if valid != test.valid {
+			t.Errorf("%s: unexpected result %v", test.cidr, valid)
+		}
+	}
+}
+
+func TestVnetContainsSubnet(t *testing.T) {
+	for i, test := range []struct {
+		vnetCidr   string
+		subnetCidr string
+		valid      bool
+	}{
+		{
+			vnetCidr:   "10.0.0.0/16",
+			subnetCidr: "192.168.0.0/16",
+		},
+		{
+			vnetCidr:   "10.0.0.0/16",
+			subnetCidr: "10.0.0.0/8",
+		},
+		{
+			vnetCidr:   "10.0.0.0/16",
+			subnetCidr: "10.0.128.0/15",
+		},
+		{
+			vnetCidr:   "10.0.0.0/8",
+			subnetCidr: "10.0.0.0/16",
+			valid:      true,
+		},
+		{
+			vnetCidr:   "10.0.0.0/8",
+			subnetCidr: "10.0.0.0/8",
+			valid:      true,
+		},
+	} {
+		_, vnet, err := net.ParseCIDR(test.vnetCidr)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		_, subnet, err := net.ParseCIDR(test.subnetCidr)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		valid := vnetContainsSubnet(vnet, subnet)
+		if valid != test.valid {
+			t.Errorf("%d: unexpected result %v", i, valid)
+		}
 	}
 }
 

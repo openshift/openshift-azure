@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net"
 	"reflect"
 	"regexp"
 	"strings"
@@ -15,16 +16,35 @@ var (
 		`(\.([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9]))*` +
 		`$`)
 
-	rxAgentPoolProfileVNetSubnetID = regexp.MustCompile(`(?i)^` +
+	rxVNetID = regexp.MustCompile(`(?i)^` +
 		`/subscriptions/[^/]+` +
 		`/resourceGroups/[^/]+` +
 		`/providers/Microsoft\.Network` +
 		`/virtualNetworks/[^/]+` +
-		`/subnets/[^/]+` +
 		`$`)
 
 	rxAgentPoolProfileName = regexp.MustCompile(`(?i)^[a-z0-9]{1,12}$`)
 )
+
+var (
+	clusterNetworkCIDR *net.IPNet
+	serviceNetworkCIDR *net.IPNet
+)
+
+func init() {
+	var err error
+
+	// TODO: we probably need to bite the bullet and make these configurable.
+	_, clusterNetworkCIDR, err = net.ParseCIDR("10.128.0.0/14")
+	if err != nil {
+		panic(err)
+	}
+
+	_, serviceNetworkCIDR, err = net.ParseCIDR("172.30.0.0/16")
+	if err != nil {
+		panic(err)
+	}
+}
 
 var validAgentPoolProfileRoles = map[AgentPoolProfileRole]struct{}{
 	AgentPoolProfileRoleCompute: {},
@@ -47,6 +67,31 @@ func isValidCloudAppHostname(h, location string) bool {
 	return strings.HasSuffix(h, "."+location+".cloudapp.azure.com") && strings.Count(h, ".") == 4
 }
 
+func isValidIPV4CIDR(cidr string) bool {
+	ip, net, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return false
+	}
+	if ip.To4() == nil {
+		return false
+	}
+	if net == nil || !ip.Equal(net.IP) {
+		return false
+	}
+	return true
+}
+
+func vnetContainsSubnet(vnet, subnet *net.IPNet) bool {
+	vnetbits, _ := vnet.Mask.Size()
+	subnetbits, _ := subnet.Mask.Size()
+	if vnetbits > subnetbits {
+		// e.g., vnet is a /24, subnet is a /16: vnet cannot contain subnet.
+		return false
+	}
+
+	return vnet.IP.Equal(subnet.IP.Mask(vnet.Mask))
+}
+
 // Validate validates a OpenShiftManagedCluster struct
 func Validate(new, old *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	// TODO are these error messages confusing since they may not correspond with the external model?
@@ -60,6 +105,11 @@ func Validate(new, old *OpenShiftManagedCluster, externalOnly bool) (errs []erro
 }
 
 func validateContainerService(c *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+	if c == nil {
+		errs = append(errs, fmt.Errorf("openShiftManagedCluster cannot be nil"))
+		return
+	}
+
 	if c.Location == "" {
 		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
 	} else if _, found := AzureLocations[c.Location]; !found {
@@ -70,16 +120,16 @@ func validateContainerService(c *OpenShiftManagedCluster, externalOnly bool) (er
 		errs = append(errs, fmt.Errorf("invalid name %q", c.Name))
 	}
 
-	if c.Properties == nil {
-		errs = append(errs, fmt.Errorf("properties cannot be nil"))
-		return
-	}
-
 	errs = append(errs, validateProperties(c.Properties, c.Location, externalOnly)...)
 	return
 }
 
 func validateUpdateContainerService(cs, oldCs *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+	if cs == nil || oldCs == nil {
+		errs = append(errs, fmt.Errorf("openShiftManagedCluster cannot be nil"))
+		return
+	}
+
 	newAgents := make(map[string]*AgentPoolProfile)
 	for i := range cs.Properties.AgentPoolProfiles {
 		newAgent := cs.Properties.AgentPoolProfiles[i]
@@ -104,6 +154,11 @@ func validateUpdateContainerService(cs, oldCs *OpenShiftManagedCluster, external
 }
 
 func validateProperties(p *Properties, location string, externalOnly bool) (errs []error) {
+	if p == nil {
+		errs = append(errs, fmt.Errorf("properties cannot be nil"))
+		return
+	}
+
 	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
 	switch p.OpenShiftVersion {
 	case "v3.10":
@@ -114,16 +169,29 @@ func validateProperties(p *Properties, location string, externalOnly bool) (errs
 	if p.PublicHostname != "" { // TODO: relax after private preview (&& !isValidHostname(p.PublicHostname))
 		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
 	}
+	errs = append(errs, validateNetworkProfile(p.NetworkProfile)...)
 	if !externalOnly {
 		errs = append(errs, validateRouterProfiles(p.RouterProfiles, location)...)
 	}
 	errs = append(errs, validateFQDN(p, location)...)
-	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles)...)
+	var vnet *net.IPNet
+	if p.NetworkProfile != nil {
+		// we can disregard any error below because we are already going to fail
+		// validation if VnetCIDR does not parse correctly.
+
+		_, vnet, _ = net.ParseCIDR(p.NetworkProfile.VnetCIDR)
+	}
+	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
 	errs = append(errs, validateAuthProfile(p.AuthProfile)...)
 	return
 }
 
 func validateAuthProfile(ap *AuthProfile) (errs []error) {
+	if ap == nil {
+		errs = append(errs, fmt.Errorf("properties.authProfile cannot be nil"))
+		return
+	}
+
 	if len(ap.IdentityProviders) != 1 {
 		errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders length"))
 	}
@@ -148,7 +216,7 @@ func validateAuthProfile(ap *AuthProfile) (errs []error) {
 	return
 }
 
-func validateAgentPoolProfiles(apps []AgentPoolProfile) (errs []error) {
+func validateAgentPoolProfiles(apps []AgentPoolProfile, vnet *net.IPNet) (errs []error) {
 	appmap := map[AgentPoolProfileRole]struct{}{}
 
 	for i, app := range apps {
@@ -161,11 +229,11 @@ func validateAgentPoolProfiles(apps []AgentPoolProfile) (errs []error) {
 		}
 		appmap[app.Role] = struct{}{}
 
-		if i > 0 && app.VnetSubnetID != apps[i-1].VnetSubnetID {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.vnetSubnetID %q: all subnets must match when using vnetSubnetID", app.VnetSubnetID))
+		if i > 0 && app.SubnetCIDR != apps[i-1].SubnetCIDR { // TODO: in the future, test that these are disjoint
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.subnetCidr %q: all subnetCidrs must match", app.SubnetCIDR))
 		}
 
-		errs = append(errs, validateAgentPoolProfile(&app)...)
+		errs = append(errs, validateAgentPoolProfile(app, vnet)...)
 	}
 
 	for role := range validAgentPoolProfileRoles {
@@ -177,7 +245,7 @@ func validateAgentPoolProfiles(apps []AgentPoolProfile) (errs []error) {
 	return
 }
 
-func validateAgentPoolProfile(app *AgentPoolProfile) (errs []error) {
+func validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPNet) (errs []error) {
 	switch app.Role {
 	case AgentPoolProfileRoleCompute:
 		switch app.Name {
@@ -209,8 +277,23 @@ func validateAgentPoolProfile(app *AgentPoolProfile) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
 	}
 
-	if app.VnetSubnetID != "" && !rxAgentPoolProfileVNetSubnetID.MatchString(app.VnetSubnetID) {
-		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vnetSubnetID %q", app.Name, app.VnetSubnetID))
+	if !isValidIPV4CIDR(app.SubnetCIDR) {
+		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q", app.Name, app.SubnetCIDR))
+	}
+
+	_, subnet, _ := net.ParseCIDR(app.SubnetCIDR)
+	if vnet != nil && subnet != nil {
+		// we are already going to fail validation if one of these is nil.
+
+		if !vnetContainsSubnet(vnet, subnet) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q: not contained in properties.networkProfile.vnetCidr %q", app.Name, app.SubnetCIDR, vnet.String()))
+		}
+		if vnetContainsSubnet(serviceNetworkCIDR, subnet) || vnetContainsSubnet(subnet, serviceNetworkCIDR) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q: overlaps with service network %q", app.Name, app.SubnetCIDR, serviceNetworkCIDR.String()))
+		}
+		if vnetContainsSubnet(clusterNetworkCIDR, subnet) || vnetContainsSubnet(subnet, clusterNetworkCIDR) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q: overlaps with cluster network %q", app.Name, app.SubnetCIDR, clusterNetworkCIDR.String()))
+		}
 	}
 
 	switch app.OSType {
@@ -225,9 +308,24 @@ func validateAgentPoolProfile(app *AgentPoolProfile) (errs []error) {
 func validateFQDN(p *Properties, location string) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
+		return
 	}
 	if p.FQDN == "" || !isValidCloudAppHostname(p.FQDN, location) {
 		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
+	}
+	return
+}
+
+func validateNetworkProfile(np *NetworkProfile) (errs []error) {
+	if np == nil {
+		errs = append(errs, fmt.Errorf("networkProfile cannot be nil"))
+		return
+	}
+	if !isValidIPV4CIDR(np.VnetCIDR) {
+		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetCidr %q", np.VnetCIDR))
+	}
+	if np.PeerVnetID != "" && !rxVNetID.MatchString(np.PeerVnetID) {
+		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.peerVnetId %q", np.PeerVnetID))
 	}
 	return
 }
