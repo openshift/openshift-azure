@@ -6,7 +6,7 @@
 # example: 
 # export TEST_FOCUS="my-awesome-test-I-want-to-run"
 TEST_FOCUS="Suite:openshift/conformance/parallel"
-TEST_SKIP=".*((The HAProxy router should set Forwarded headers appropriately)|(\[Conformance\]\[templates\] templateservicebroker)|(\[Feature:Prometheus\]\[Conformance\] Prometheus when installed to the cluster should start)).*"
+TEST_SKIP=".*((The HAProxy router should set Forwarded headers appropriately)|(\[Conformance\]\[templates\] templateservicebroker)|(\[Feature:Prometheus\]\[Conformance\] Prometheus when installed to the cluster should start)|(\[Feature:Prometheus\]\[Feature:Builds\] Prometheus when installed to the cluster should start and expose a secured proxy and verify build metrics)).*"
 ginkgo -v -noColor -nodes=30 $( which extended.test ) -- \
             -ginkgo.focus="${TEST_FOCUS}" -ginkgo.skip="${TEST_SKIP}" \
             -e2e-output-dir /tmp/artifacts -report-dir /tmp/artifacts/junit \
