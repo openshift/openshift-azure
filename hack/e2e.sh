@@ -8,12 +8,11 @@ echo "Running end user e2e tests"
 # Login as osadmin to simulate a regural user
 password=$(hack/config.sh get-config $RESOURCEGROUP | jq -r .config.adminPasswd)
 fqdn=$(hack/config.sh get-config $RESOURCEGROUP | jq -r .properties.fqdn)
+export KUBECONFIG=_data/_out/osadmin.kubeconfig
+# oc login is going to create the osadmin.kubeconfig for us
 oc login $fqdn --username osadmin --password $password --insecure-skip-tls-verify=true
 oc new-project e2e-end-user-test-root
-# TODO: Run the e2e image inside a job. Figure out whether we run as part of ci-operator
-# or it's just a local run.
-
-# TODO: Wait for the job to finish, report results
+go test ./test/e2e -ginkgo.focus="\[EndUser\]" -tags e2e -kubeconfig ../../_data/_out/osadmin.kubeconfig
 oc delete project e2e-end-user-test-root
 oc logout
 
