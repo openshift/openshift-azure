@@ -7,38 +7,22 @@ import (
 	"time"
 
 	"github.com/ghodss/yaml"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 )
 
-type testClient struct {
-	kc *kubernetes.Clientset
-}
-
-var c testClient
-
 var _ = BeforeSuite(func() {
-
-	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	Expect(err).NotTo(HaveOccurred())
-
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(config)
-	Expect(err).NotTo(HaveOccurred())
-	c.kc = clientset
+	c = newTestClient(*kubeconfig)
 })
 
-var _ = Describe("Openshift on Azure e2e tests", func() {
+var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader]", func() {
+	defer GinkgoRecover()
+
 	It("should label nodes correctly", func() {
 		labels := map[string]map[string]string{
 			"master": {
