@@ -5,7 +5,6 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/go-test/deep"
 	log "github.com/sirupsen/logrus"
 	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
@@ -37,7 +36,6 @@ type Interface interface {
 	UpdateDynamicClient() error
 	ServiceCatalogExists() (bool, error)
 	EtcdCRDReady() (bool, error)
-	GetStorageAccountKey(resourceGroup, storageAccount string) (string, error)
 }
 
 // client implements Interface
@@ -50,10 +48,9 @@ type client struct {
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
 	grs        []*discovery.APIGroupResources
-	azs        storage.AccountsClient
 }
 
-func newClient(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, dryRun bool) (Interface, error) {
+func newClient(cs *acsapi.OpenShiftManagedCluster, dryRun bool) (Interface, error) {
 	if dryRun {
 		return &dryClient{}, nil
 	}
@@ -92,7 +89,6 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, d
 		ac:         ac,
 		ae:         ae,
 		cli:        cli,
-		azs:        azs,
 	}
 
 	transport, err := rest.TransportFor(c.restconfig)
@@ -109,16 +105,6 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, d
 	}
 
 	return c, nil
-}
-
-func (c *client) GetStorageAccountKey(resourceGroup, storageAccount string) (string, error) {
-	response, err := c.azs.ListKeys(context.Background(), resourceGroup, storageAccount)
-	if err != nil {
-		return "", err
-	}
-	// TODO: Allow choosing between the two storage account keys to
-	// enable more convenient key rotation.
-	return *(((*response.Keys)[0]).Value), nil
 }
 
 // UpdateDynamicClient updates the client's server API group resource
@@ -294,6 +280,3 @@ func (c *dryClient) ApplyResources(filter func(unstructured.Unstructured) bool, 
 func (c *dryClient) UpdateDynamicClient() error          { return nil }
 func (c *dryClient) ServiceCatalogExists() (bool, error) { return true, nil }
 func (c *dryClient) EtcdCRDReady() (bool, error)         { return true, nil }
-func (c *dryClient) GetStorageAccountKey(resourceGroup, storageAccount string) (string, error) {
-	return "", nil
-}

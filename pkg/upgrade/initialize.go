@@ -5,25 +5,23 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/Azure/azure-sdk-for-go/storage"
-
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 func (si *simpleUpgrader) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	az, err := azureclient.NewAzureClients(ctx, cs, si.pluginConfig)
+	authorizer, err := azureclient.NewAuthorizerFromCtx(ctx)
 	if err != nil {
 		return err
 	}
 
-	keys, err := az.Accounts.ListKeys(context.Background(), cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+	accountClient := azureclient.NewAccountsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, si.pluginConfig)
+	keys, err := accountClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
 	if err != nil {
 		return err
 	}
 
-	var storageClient storage.Client
-	storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, *(*keys.Keys)[0].Value, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
+	storageClient, err := azureclient.NewStorageClient(cs.Config.ConfigStorageAccount, *(*keys.Keys)[0].Value)
 	if err != nil {
 		return err
 	}

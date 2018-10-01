@@ -101,28 +101,25 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
-	clients, err := azureclient.NewAzureClients(ctx, cs, config)
+	err = acceptMarketplaceAgreement(ctx, cs, config)
 	if err != nil {
 		return nil, err
 	}
-	err = acceptMarketplaceAgreement(ctx, cs, clients)
+	authorizer, err := azureclient.NewAuthorizerFromCtx(ctx)
 	if err != nil {
 		return nil, err
 	}
+	depc := azureclient.NewDeploymentsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, config)
 
 	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
 		log.Info("applying arm template deployment")
-		future, err := clients.Deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
+		_, err := depc.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
 			Properties: &resources.DeploymentProperties{
 				Template: azuretemplate,
 				Mode:     resources.Incremental,
 			},
 		})
-		if err != nil {
-			return err
-		}
-		log.Info("waiting for arm template deployment to complete")
-		return future.WaitForCompletionRef(ctx, clients.Deployments.Client)
+		return err
 	}
 
 	err = p.CreateOrUpdate(ctx, cs, azuredeploy, oldCs != nil, deployer)
@@ -137,14 +134,20 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	return oc, nil
 }
 
-func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, clients *azureclient.AzureClients) error {
+func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) error {
 	if config.Derived.ImageResourceName() != "" ||
 		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
 		return nil
 	}
 
+	authorizer, err := azureclient.NewAuthorizerFromCtx(ctx)
+	if err != nil {
+		return err
+	}
+
+	mpc := azureclient.NewMarketPlaceAgreementsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, pluginConfig)
 	log.Info("checking marketplace agreement")
-	terms, err := clients.MarketPlaceAgreements.Get(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU)
+	terms, err := mpc.Get(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU)
 	if err != nil {
 		return err
 	}
@@ -156,7 +159,7 @@ func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedClu
 	terms.AgreementProperties.Accepted = to.BoolPtr(true)
 
 	log.Info("accepting marketplace agreement")
-	_, err = clients.MarketPlaceAgreements.Create(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU, terms)
+	_, err = mpc.Create(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU, terms)
 	return err
 }
 

@@ -9,52 +9,87 @@ import (
 	azmarketplaceordering "github.com/Azure/azure-sdk-for-go/services/marketplaceordering/mgmt/2015-06-01/marketplaceordering"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
+	azstorage "github.com/Azure/azure-sdk-for-go/storage"
 
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// AzureClients holds all the used clients used by openshift-azure
-type AzureClients struct {
-	Accounts                  storage.AccountsClient
-	MarketPlaceAgreements     azmarketplaceordering.MarketplaceAgreementsClient
-	Deployments               resources.DeploymentsClient
-	VirtualMachineScaleSets   compute.VirtualMachineScaleSetsClient
-	VirtualMachineScaleSetVMs compute.VirtualMachineScaleSetVMsClient
+// DeploymentClient is minimal interface for azure DeploymentClient
+type DeploymentClient interface {
+	CreateOrUpdate(ctx context.Context, resourceGroupName string, deploymentName string, parameters resources.Deployment) (result resources.DeploymentsCreateOrUpdateFuture, err error)
 }
 
-// NewAzureClients create all the clients we need (not to be called by the sync pod)
-func NewAzureClients(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (*AzureClients, error) {
-	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
-	authorizer, err := config.Authorizer()
-	if err != nil {
-		return nil, err
-	}
+// azDeploymentClient implements DeploymentClient.
+type azDeploymentClient struct {
+	client resources.DeploymentsClient
+}
 
-	clients := &AzureClients{}
+// AccountsClient is minimal interface for azure AccountsClient
+type AccountsClient interface {
+	// mirrored methods
+	ListKeys(context context.Context, resourceGroup, accountName string) (storage.AccountListKeysResult, error)
+	ListByResourceGroup(context context.Context, resourceGroup string) (storage.AccountListResult, error)
+	// custom methods
+	GetStorageAccount(ctx context.Context, resourceGroup, typeTag string) (map[string]string, error)
+	GetStorageAccountKey(ctx context.Context, resourceGroup, accountName string) (string, error)
+}
 
-	clients.Deployments = resources.NewDeploymentsClient(cs.Properties.AzProfile.SubscriptionID)
-	clients.Deployments.Authorizer = authorizer
-	clients.Deployments.Client.RequestInspector = addAcceptLanguages(pluginConfig.AcceptLanguages)
+// azAccountsClient implements AccountsClient.
+type azAccountsClient struct {
+	client storage.AccountsClient
+}
 
-	clients.MarketPlaceAgreements = marketplaceordering.NewMarketplaceAgreementsClient(cs.Properties.AzProfile.SubscriptionID)
-	clients.MarketPlaceAgreements.Authorizer = authorizer
-	clients.MarketPlaceAgreements.Client.RequestInspector = addAcceptLanguages(pluginConfig.AcceptLanguages)
+// StorageClient is minimal inferface for azure StorageClient
+type StorageClient interface {
+	// mirrored methods
+	GetContainerReference(name string) *azstorage.Container
+	GetBlobService() azstorage.BlobStorageClient
+}
 
-	clients.VirtualMachineScaleSets = compute.NewVirtualMachineScaleSetsClient(cs.Properties.AzProfile.SubscriptionID)
-	clients.VirtualMachineScaleSets.Authorizer = authorizer
-	clients.VirtualMachineScaleSets.Client.RequestInspector = addAcceptLanguages(pluginConfig.AcceptLanguages)
+// azDeploymentClient implements DeploymentClient.
+type azStorageClient struct {
+	azs azstorage.Client
+	bs  azstorage.BlobStorageClient
+}
 
-	clients.VirtualMachineScaleSetVMs = compute.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID)
-	clients.VirtualMachineScaleSetVMs.Authorizer = authorizer
-	clients.VirtualMachineScaleSetVMs.Client.RequestInspector = addAcceptLanguages(pluginConfig.AcceptLanguages)
+// MarketPlaceAgreementsClient is minimal interface for azure MarketPlaceAgreementsClient
+type MarketPlaceAgreementsClient interface {
+	Get(ctx context.Context, publisherID string, offerID string, planID string) (marketplaceordering.AgreementTerms, error)
+	Create(ctx context.Context, publisherID string, offerID string, planID string, parameters marketplaceordering.AgreementTerms) (marketplaceordering.AgreementTerms, error)
+}
 
-	clients.Accounts = storage.NewAccountsClient(cs.Properties.AzProfile.SubscriptionID)
-	clients.Accounts.Authorizer = authorizer
-	clients.Accounts.Client.RequestInspector = addAcceptLanguages(pluginConfig.AcceptLanguages)
+// azMarketPlaceAgreementsClient implements MarketPlaceAgreementsClient.
+type azMarketPlaceAgreementsClient struct {
+	client azmarketplaceordering.MarketplaceAgreementsClient
+}
 
-	return clients, nil
+// VirtualMachineScaleSetsClient is minimal interface for azure VirtualMachineScaleSetsClient
+type VirtualMachineScaleSetsClient interface {
+	// mirrored methods
+	Update(ctx context.Context, resourceGroupName string, VMScaleSetName string, parameters compute.VirtualMachineScaleSetUpdate) (compute.VirtualMachineScaleSetsUpdateFuture, error)
+	UpdateInstances(ctx context.Context, resourceGroupName string, VMScaleSetName string, VMInstanceIDs compute.VirtualMachineScaleSetVMInstanceRequiredIDs) (compute.VirtualMachineScaleSetsUpdateInstancesFuture, error)
+}
+
+// azMarketPlaceAgreementsClient implements MarketPlaceAgreementsClient.
+type azVirtualMachineScaleSetsClient struct {
+	client compute.VirtualMachineScaleSetsClient
+}
+
+// VirtualMachineScaleSetVMsClient is minimal interface for azure VirtualMachineScaleSetVMsClient
+type VirtualMachineScaleSetVMsClient interface {
+	//mirrored methods
+	List(ctx context.Context, resourceGroupName string, virtualMachineScaleSetName string, filter string, selectParameter string, expand string) (compute.VirtualMachineScaleSetVMListResultPage, error)
+	Delete(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (compute.VirtualMachineScaleSetVMsDeleteFuture, error)
+	Deallocate(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (compute.VirtualMachineScaleSetVMsDeallocateFuture, error)
+	Reimage(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (compute.VirtualMachineScaleSetVMsReimageFuture, error)
+	Start(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (compute.VirtualMachineScaleSetVMsStartFuture, error)
+}
+
+// azMarketPlaceAgreementsClient implements MarketPlaceAgreementsClient.
+type azVirtualMachineScaleSetVMsClient struct {
+	client compute.VirtualMachineScaleSetVMsClient
 }
 
 func addAcceptLanguages(acceptLanguages []string) autorest.PrepareDecorator {
@@ -72,4 +107,14 @@ func addAcceptLanguages(acceptLanguages []string) autorest.PrepareDecorator {
 			return r, nil
 		})
 	}
+}
+
+func NewAuthorizerFromCtx(ctx context.Context) (autorest.Authorizer, error) {
+	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
+	return config.Authorizer()
+}
+
+func NewAuthorizer(clientID, clientSecret, tenantID, subscriptionID string) (autorest.Authorizer, error) {
+	config := auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID)
+	return config.Authorizer()
 }
