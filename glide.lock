@@ -1,10 +1,12 @@
-hash: 9a10906a24553a17f67b4710549760a47037f09b1800dce3d1bb002230fbb3a0
-updated: 2018-09-11T13:32:57.890776496+02:00
+hash: 947e6b875160ac37563b1235ef1e9589fb33715a07fe77ffadcecd38fac8ee72
+updated: 2018-10-01T17:15:23.603305275+02:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
   subpackages:
+  - profiles/latest/marketplaceordering/mgmt/marketplaceordering
   - services/compute/mgmt/2018-06-01/compute
+  - services/marketplaceordering/mgmt/2015-06-01/marketplaceordering
   - services/preview/operationalinsights/mgmt/2015-11-01-preview/operationalinsights
   - services/resources/mgmt/2018-05-01/resources
   - services/storage/mgmt/2018-02-01/storage
@@ -110,6 +112,8 @@ imports:
   - matchers/support/goraph/node
   - matchers/support/goraph/util
   - types
+- name: github.com/openshift/client-go
+  version: 6a9817e0a0720dd8e837d1d18cd2938342ef6e54
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/satori/go.uuid
