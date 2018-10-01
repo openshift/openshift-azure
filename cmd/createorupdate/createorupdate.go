@@ -159,7 +159,6 @@ func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedClu
 }
 
 func enrich(cs *api.OpenShiftManagedCluster, config *api.PluginConfig) error {
-
 	cs.Properties.AzProfile = &api.AzProfile{
 		TenantID:       config.AzTenantID,
 		SubscriptionID: config.AzSubscriptionID,
