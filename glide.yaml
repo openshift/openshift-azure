@@ -1,7 +1,11 @@
 package: github.com/openshift/openshift-azure
 import:
+- package: github.com/openshift/api
+  version: release-3.10
 - package: github.com/openshift/client-go
   version: release-3.10
+- package: k8s.io/api
+  version: kubernetes-1.10.6
 - package: k8s.io/client-go
   version: kubernetes-1.10.6
 - package: k8s.io/kube-aggregator

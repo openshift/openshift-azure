@@ -1,5 +1,5 @@
-hash: 947e6b875160ac37563b1235ef1e9589fb33715a07fe77ffadcecd38fac8ee72
-updated: 2018-10-01T17:15:23.603305275+02:00
+hash: 7f890454ff19ea6b9d0b042a2c782d97e8c5e395a06ce113057be733404a4cb0
+updated: 2018-10-02T13:01:15.888346549+02:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
@@ -112,6 +112,8 @@ imports:
   - matchers/support/goraph/node
   - matchers/support/goraph/util
   - types
+- name: github.com/openshift/api
+  version: 7eef55a5dc24306c455777b9897ddc3cbeaf8b59
 - name: github.com/openshift/client-go
   version: 6a9817e0a0720dd8e837d1d18cd2938342ef6e54
 - name: github.com/pkg/errors
@@ -201,7 +203,6 @@ imports:
   - core/v1
   - events/v1beta1
   - extensions/v1beta1
-  - imagepolicy/v1alpha1
   - networking/v1
   - policy/v1beta1
   - rbac/v1
