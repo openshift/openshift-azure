@@ -93,21 +93,26 @@ properties:
         clientId: $AZURE_AAD_CLIENT_ID
         secret: $AZURE_AAD_CLIENT_SECRET
         tenantId: $AZURE_TENANT_ID
+  networkProfile:
+    vnetCidr: 10.0.0.0/8
   routerProfiles:
   - name: default
   masterPoolProfile:
     count: 3
     vmSize: Standard_D2s_v3
+    subnetCidr: 10.0.0.0/24
   agentPoolProfiles:
   - name: infra
     role: infra
     count: 2
     vmSize: Standard_D2s_v3
+    subnetCidr: 10.0.0.0/24
     osType: Linux
   - name: compute
     role: compute
     count: 1
     vmSize: Standard_D2s_v3
+    subnetCidr: 10.0.0.0/24
     osType: Linux
 EOF
 

@@ -14,6 +14,10 @@ if [[ -z "$DNS_RESOURCEGROUP" ]]; then
     exit 1
 fi
 
+if [[ "$NO_WAIT" == "true" ]]; then
+	NO_WAIT_FLAG="--no-wait"
+fi
+
 if [[ ! -e _data/containerservice.yaml ]]; then
     echo error: _data/containerservice.yaml must exist
     exit 1
@@ -25,4 +29,4 @@ hack/dns.sh zone-delete $RESOURCEGROUP
 
 rm -rf _data
 
-az group delete -n $RESOURCEGROUP -y
+az group delete -n $RESOURCEGROUP -y ${NO_WAIT_FLAG}

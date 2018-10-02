@@ -52,27 +52,31 @@ var unmarshalled = &OpenShiftManagedCluster{
 				FQDN:            "properties.routerProfiles.1.fqdn",
 			},
 		},
+		NetworkProfile: &NetworkProfile{
+			VnetCIDR:   "properties.networkProfile.vnetCidr",
+			PeerVnetID: "properties.networkProfile.peerVnetId",
+		},
 		MasterPoolProfile: &MasterPoolProfile{
-			Count:        1,
-			VMSize:       "properties.agentPoolProfiles.0.vmSize",
-			VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
+			Count:      1,
+			VMSize:     "properties.agentPoolProfiles.0.vmSize",
+			SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
 		},
 		AgentPoolProfiles: []AgentPoolProfile{
 			{
-				Name:         "properties.agentPoolProfiles.0.name",
-				Count:        1,
-				VMSize:       "properties.agentPoolProfiles.0.vmSize",
-				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-				OSType:       "properties.agentPoolProfiles.0.osType",
-				Role:         "properties.agentPoolProfiles.0.role",
+				Name:       "properties.agentPoolProfiles.0.name",
+				Count:      1,
+				VMSize:     "properties.agentPoolProfiles.0.vmSize",
+				SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
+				OSType:     "properties.agentPoolProfiles.0.osType",
+				Role:       "properties.agentPoolProfiles.0.role",
 			},
 			{
-				Name:         "properties.agentPoolProfiles.0.name",
-				Count:        2,
-				VMSize:       "properties.agentPoolProfiles.0.vmSize",
-				VnetSubnetID: "properties.agentPoolProfiles.0.vnetSubnetID",
-				OSType:       "properties.agentPoolProfiles.0.osType",
-				Role:         "properties.agentPoolProfiles.0.role",
+				Name:       "properties.agentPoolProfiles.0.name",
+				Count:      2,
+				VMSize:     "properties.agentPoolProfiles.0.vmSize",
+				SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
+				OSType:     "properties.agentPoolProfiles.0.osType",
+				Role:       "properties.agentPoolProfiles.0.role",
 			},
 		},
 	},
@@ -98,6 +102,10 @@ var marshalled = []byte(`{
 		"openShiftVersion": "properties.openShiftVersion",
 		"publicHostname": "properties.publicHostname",
 		"fqdn": "properties.fqdn",
+		"networkProfile": {
+			"vnetCidr": "properties.networkProfile.vnetCidr",
+			"peerVnetId": "properties.networkProfile.peerVnetId"
+		},
 		"routerProfiles": [
 			{
 				"name": "properties.routerProfiles.0.name",
@@ -113,14 +121,14 @@ var marshalled = []byte(`{
 		"masterPoolProfile": {
 			"count": 1,
 			"vmSize": "properties.agentPoolProfiles.0.vmSize",
-			"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID"
+			"subnetCidr": "properties.agentPoolProfiles.0.subnetCidr"
 		},
 		"agentPoolProfiles": [
 			{
 				"name": "properties.agentPoolProfiles.0.name",
 				"count": 1,
 				"vmSize": "properties.agentPoolProfiles.0.vmSize",
-				"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
+				"subnetCidr": "properties.agentPoolProfiles.0.subnetCidr",
 				"osType": "properties.agentPoolProfiles.0.osType",
 				"role": "properties.agentPoolProfiles.0.role"
 			},
@@ -128,7 +136,7 @@ var marshalled = []byte(`{
 				"name": "properties.agentPoolProfiles.0.name",
 				"count": 2,
 				"vmSize": "properties.agentPoolProfiles.0.vmSize",
-				"vnetSubnetID": "properties.agentPoolProfiles.0.vnetSubnetID",
+				"subnetCidr": "properties.agentPoolProfiles.0.subnetCidr",
 				"osType": "properties.agentPoolProfiles.0.osType",
 				"role": "properties.agentPoolProfiles.0.role"
 			}

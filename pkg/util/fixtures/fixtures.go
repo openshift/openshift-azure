@@ -12,6 +12,9 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 		Properties: &api.Properties{
 			FQDN:             "example.eastus.cloudapp.azure.com",
 			OpenShiftVersion: "v3.10",
+			NetworkProfile: &api.NetworkProfile{
+				VnetCIDR: "10.0.0.0/8",
+			},
 			RouterProfiles: []api.RouterProfile{
 				{
 					Name:            "default",
@@ -34,25 +37,28 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 			},
 			AgentPoolProfiles: []api.AgentPoolProfile{
 				{
-					Name:   "master",
-					Role:   api.AgentPoolProfileRoleMaster,
-					Count:  3,
-					VMSize: "Standard_D2s_v3",
-					OSType: "Linux",
+					Name:       "master",
+					Role:       api.AgentPoolProfileRoleMaster,
+					Count:      3,
+					VMSize:     "Standard_D2s_v3",
+					SubnetCIDR: "10.0.0.0/24",
+					OSType:     "Linux",
 				},
 				{
-					Name:   "infra",
-					Role:   api.AgentPoolProfileRoleInfra,
-					Count:  2,
-					VMSize: "Standard_D2s_v3",
-					OSType: "Linux",
+					Name:       "infra",
+					Role:       api.AgentPoolProfileRoleInfra,
+					Count:      2,
+					VMSize:     "Standard_D2s_v3",
+					SubnetCIDR: "10.0.0.0/24",
+					OSType:     "Linux",
 				},
 				{
-					Name:   "compute",
-					Role:   api.AgentPoolProfileRoleCompute,
-					Count:  1,
-					VMSize: "Standard_D2s_v3",
-					OSType: "Linux",
+					Name:       "compute",
+					Role:       api.AgentPoolProfileRoleCompute,
+					Count:      1,
+					VMSize:     "Standard_D2s_v3",
+					SubnetCIDR: "10.0.0.0/24",
+					OSType:     "Linux",
 				},
 			},
 			ServicePrincipalProfile: &api.ServicePrincipalProfile{

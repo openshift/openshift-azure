@@ -39,6 +39,9 @@ type Properties struct {
 	// OpenShift API server loadbalancer internal hostname.
 	FQDN string `json:"fqdn,omitempty"`
 
+	// NetworkProfile (in): Configuration for OpenShift networking.
+	NetworkProfile *NetworkProfile `json:"networkProfile,omitempty"`
+
 	// RouterProfiles (in,optional/out): Configuration for OpenShift router(s).
 	RouterProfiles []RouterProfile `json:"routerProfiles,omitempty"`
 
@@ -73,6 +76,18 @@ const (
 	Upgrading ProvisioningState = "Upgrading"
 )
 
+// NetworkProfile contains configuration for OpenShift networking.
+type NetworkProfile struct {
+	VnetCIDR string `json:"vnetCidr,omitempty"`
+
+	// PeerVnetID is expected to be empty or match
+	// `^/subscriptions/[^/]+
+	//   /resourceGroups/[^/]+
+	//   /providers/Microsoft.Network
+	//   /virtualNetworks/[^/]+$`
+	PeerVnetID string `json:"peerVnetId,omitempty"`
+}
+
 // RouterProfile represents an OpenShift router.
 type RouterProfile struct {
 	Name string `json:"name,omitempty"`
@@ -91,32 +106,18 @@ type RouterProfile struct {
 
 // MasterPoolProfile contains configuration for OpenShift master VMs.
 type MasterPoolProfile struct {
-	Count  int    `json:"count,omitempty"`
-	VMSize VMSize `json:"vmSize,omitempty"`
-
-	// VnetSubnetID is expected to be empty or match
-	// `^/subscriptions/[^/]+
-	//   /resourceGroups/[^/]+
-	//   /providers/Microsoft.Network
-	//   /virtualNetworks/[^/]+
-	//   /subnets/[^/]+$`
-	VnetSubnetID string `json:"vnetSubnetID,omitempty"`
+	Count      int    `json:"count,omitempty"`
+	VMSize     VMSize `json:"vmSize,omitempty"`
+	SubnetCIDR string `json:"subnetCidr,omitempty"`
 }
 
 // AgentPoolProfile represents configuration of OpenShift cluster VMs.
 type AgentPoolProfile struct {
-	Name   string `json:"name,omitempty"`
-	Count  int    `json:"count,omitempty"`
-	VMSize VMSize `json:"vmSize,omitempty"`
-
-	// VnetSubnetID is expected to be empty or match
-	// `^/subscriptions/[^/]+
-	//   /resourceGroups/[^/]+
-	//   /providers/Microsoft.Network
-	//   /virtualNetworks/[^/]+
-	//   /subnets/[^/]+$`
-	VnetSubnetID string `json:"vnetSubnetID,omitempty"`
-	OSType       OSType `json:"osType,omitempty"`
+	Name       string `json:"name,omitempty"`
+	Count      int    `json:"count,omitempty"`
+	VMSize     VMSize `json:"vmSize,omitempty"`
+	SubnetCIDR string `json:"subnetCidr,omitempty"`
+	OSType     OSType `json:"osType,omitempty"`
 
 	Role AgentPoolProfileRole `json:"role,omitempty"`
 }

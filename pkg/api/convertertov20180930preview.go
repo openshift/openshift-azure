@@ -32,6 +32,13 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 			FQDN:              cs.Properties.FQDN,
 		}
 
+		if cs.Properties.NetworkProfile != nil {
+			oc.Properties.NetworkProfile = &v20180930preview.NetworkProfile{
+				VnetCIDR:   cs.Properties.NetworkProfile.VnetCIDR,
+				PeerVnetID: cs.Properties.NetworkProfile.PeerVnetID,
+			}
+		}
+
 		oc.Properties.RouterProfiles = make([]v20180930preview.RouterProfile, len(cs.Properties.RouterProfiles))
 		for i, rp := range cs.Properties.RouterProfiles {
 			oc.Properties.RouterProfiles[i] = v20180930preview.RouterProfile{
@@ -45,19 +52,19 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 		for _, app := range cs.Properties.AgentPoolProfiles {
 			if app.Role == AgentPoolProfileRoleMaster {
 				oc.Properties.MasterPoolProfile = &v20180930preview.MasterPoolProfile{
-					Count:        app.Count,
-					VMSize:       v20180930preview.VMSize(app.VMSize),
-					VnetSubnetID: app.VnetSubnetID,
+					Count:      app.Count,
+					VMSize:     v20180930preview.VMSize(app.VMSize),
+					SubnetCIDR: app.SubnetCIDR,
 				}
 
 			} else {
 				oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, v20180930preview.AgentPoolProfile{
-					Name:         app.Name,
-					Count:        app.Count,
-					VMSize:       v20180930preview.VMSize(app.VMSize),
-					OSType:       v20180930preview.OSType(app.OSType),
-					VnetSubnetID: app.VnetSubnetID,
-					Role:         v20180930preview.AgentPoolProfileRole(app.Role),
+					Name:       app.Name,
+					Count:      app.Count,
+					VMSize:     v20180930preview.VMSize(app.VMSize),
+					SubnetCIDR: app.SubnetCIDR,
+					OSType:     v20180930preview.OSType(app.OSType),
+					Role:       v20180930preview.AgentPoolProfileRole(app.Role),
 				})
 			}
 		}

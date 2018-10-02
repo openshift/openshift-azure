@@ -46,6 +46,9 @@ func TestMerge(t *testing.T) {
 	if len(newCluster.Properties.AgentPoolProfiles) == 0 {
 		t.Errorf("new cluster agent pool profiles should be merged")
 	}
+	if newCluster.Properties.NetworkProfile == nil {
+		t.Errorf("new cluster network profile should be merged")
+	}
 	if len(newCluster.Properties.RouterProfiles) == 0 {
 		t.Errorf("new cluster router profiles should be merged")
 	}

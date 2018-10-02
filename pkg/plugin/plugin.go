@@ -112,6 +112,9 @@ func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *api.OpenShiftManage
 	if len(cs.Properties.PublicHostname) == 0 {
 		cs.Properties.PublicHostname = oldCs.Properties.PublicHostname
 	}
+	if cs.Properties.NetworkProfile == nil {
+		cs.Properties.NetworkProfile = oldCs.Properties.NetworkProfile
+	}
 	if len(cs.Properties.RouterProfiles) == 0 {
 		cs.Properties.RouterProfiles = oldCs.Properties.RouterProfiles
 	}
