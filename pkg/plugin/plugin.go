@@ -78,6 +78,10 @@ func NewPluginConfigFromEnv() (api.PluginConfig, error) {
 	pc.ResourceGroup = getEnv("RESOURCEGROUP")
 	pc.AcceptMarketplaceAgreement = acceptAgreement
 	pc.DNSDomain = getEnv("DNS_DOMAIN", "osadev.cloud")
+	pc.DeployOS = getEnv("DEPLOY_OS", "rhel7")
+	pc.ImageOffer = getEnv("IMAGE_OFFER", "osa")
+	pc.ImageVersion = getEnv("IMAGE_VERSION", "latest")
+	pc.ORegURL = getEnv("OREG_URL")
 
 	return pc, nil
 }

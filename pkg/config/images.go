@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
@@ -19,16 +18,16 @@ func openShiftVersion(imageVersion string) (string, error) {
 	return fmt.Sprintf("v%s.%s.%s", parts[0][:1], parts[0][1:], parts[1]), nil
 }
 
-func selectNodeImage(cs *api.OpenShiftManagedCluster, deployOS string) {
+func selectNodeImage(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) {
 	c := cs.Config
 	c.ImagePublisher = "redhat"
-	c.ImageOffer = os.Getenv("IMAGE_OFFER")
+	c.ImageOffer = pluginConfig.ImageOffer
 	if c.ImageOffer == "" {
 		c.ImageOffer = "osa"
 	}
 
-	c.ImageVersion = os.Getenv("IMAGE_VERSION")
-	switch deployOS {
+	c.ImageVersion = pluginConfig.ImageVersion
+	switch pluginConfig.DeployOS {
 	case "", "rhel7":
 		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OpenShiftVersion[1:], ".", "", -1)
 		if c.ImageVersion == "" {
@@ -42,12 +41,12 @@ func selectNodeImage(cs *api.OpenShiftManagedCluster, deployOS string) {
 	}
 }
 
-func image(cs *api.OpenShiftManagedCluster, component, version string) string {
-	image := strings.Replace(imageConfigFormat(), "${component}", component, -1)
+func image(cs *api.OpenShiftManagedCluster, component, version string, pluginConfig api.PluginConfig) string {
+	image := strings.Replace(imageConfigFormat(pluginConfig), "${component}", component, -1)
 	return strings.Replace(image, "${version}", version, -1)
 }
 
-func selectContainerImagesOrigin(cs *api.OpenShiftManagedCluster) error {
+func selectContainerImagesOrigin(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) error {
 	c := cs.Config
 	v, err := openShiftVersion(c.ImageVersion)
 	if err != nil {
@@ -56,13 +55,13 @@ func selectContainerImagesOrigin(cs *api.OpenShiftManagedCluster) error {
 
 	switch cs.Properties.OpenShiftVersion {
 	case "v3.10":
-		c.Images.ControlPlane = image(cs, "control-plane", v)
-		c.Images.Node = image(cs, "node", v)
-		c.Images.ServiceCatalog = image(cs, "service-catalog", v)
-		c.Images.TemplateServiceBroker = image(cs, "template-service-broker", v)
-		c.Images.Registry = image(cs, "docker-registry", v)
-		c.Images.Router = image(cs, "haproxy-router", v)
-		c.Images.WebConsole = image(cs, "web-console", v)
+		c.Images.ControlPlane = image(cs, "control-plane", v, pluginConfig)
+		c.Images.Node = image(cs, "node", v, pluginConfig)
+		c.Images.ServiceCatalog = image(cs, "service-catalog", v, pluginConfig)
+		c.Images.TemplateServiceBroker = image(cs, "template-service-broker", v, pluginConfig)
+		c.Images.Registry = image(cs, "docker-registry", v, pluginConfig)
+		c.Images.Router = image(cs, "haproxy-router", v, pluginConfig)
+		c.Images.WebConsole = image(cs, "web-console", v, pluginConfig)
 
 		c.Images.MasterEtcd = "quay.io/coreos/etcd:v3.2.15"
 		c.Images.EtcdOperator = "quay.io/coreos/etcd-operator:v0.9.2"
@@ -85,7 +84,7 @@ func selectContainerImagesOrigin(cs *api.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func selectContainerImagesOSA(cs *api.OpenShiftManagedCluster) error {
+func selectContainerImagesOSA(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) error {
 	c := cs.Config
 	v, err := openShiftVersion(c.ImageVersion)
 	if err != nil {
@@ -95,14 +94,14 @@ func selectContainerImagesOSA(cs *api.OpenShiftManagedCluster) error {
 	switch cs.Properties.OpenShiftVersion {
 	//TODO: confirm minor version after release
 	case "v3.10":
-		c.Images.ControlPlane = image(cs, "control-plane", v)
-		c.Images.Node = image(cs, "node", v)
-		c.Images.ServiceCatalog = image(cs, "service-catalog", v)
-		c.Images.AnsibleServiceBroker = image(cs, "ansible-service-broker", v)
-		c.Images.TemplateServiceBroker = image(cs, "template-service-broker", v)
-		c.Images.Registry = image(cs, "docker-registry", v)
-		c.Images.Router = image(cs, "haproxy-router", v)
-		c.Images.WebConsole = image(cs, "web-console", v)
+		c.Images.ControlPlane = image(cs, "control-plane", v, pluginConfig)
+		c.Images.Node = image(cs, "node", v, pluginConfig)
+		c.Images.ServiceCatalog = image(cs, "service-catalog", v, pluginConfig)
+		c.Images.AnsibleServiceBroker = image(cs, "ansible-service-broker", v, pluginConfig)
+		c.Images.TemplateServiceBroker = image(cs, "template-service-broker", v, pluginConfig)
+		c.Images.Registry = image(cs, "docker-registry", v, pluginConfig)
+		c.Images.Router = image(cs, "haproxy-router", v, pluginConfig)
+		c.Images.WebConsole = image(cs, "web-console", v, pluginConfig)
 
 		c.Images.MasterEtcd = "registry.access.redhat.com/rhel7/etcd:3.2.22"
 		c.Images.EtcdOperator = "quay.io/coreos/etcd-operator:v0.9.2"
@@ -125,12 +124,12 @@ func selectContainerImagesOSA(cs *api.OpenShiftManagedCluster) error {
 
 func selectContainerImages(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) error {
 	var err error
-	cs.Config.Images.Format = imageConfigFormat()
-	switch os.Getenv("DEPLOY_OS") {
+	cs.Config.Images.Format = imageConfigFormat(pluginConfig)
+	switch pluginConfig.DeployOS {
 	case "", "rhel7":
-		err = selectContainerImagesOSA(cs)
+		err = selectContainerImagesOSA(cs, pluginConfig)
 	case "centos7":
-		err = selectContainerImagesOrigin(cs)
+		err = selectContainerImagesOrigin(cs, pluginConfig)
 	default:
 		err = fmt.Errorf("unrecognised DEPLOY_OS value")
 	}
@@ -145,13 +144,13 @@ func selectContainerImages(cs *api.OpenShiftManagedCluster, pluginConfig api.Plu
 	return nil
 }
 
-func imageConfigFormat() string {
-	imageConfigFormat := os.Getenv("OREG_URL")
+func imageConfigFormat(pluginConfig api.PluginConfig) string {
+	imageConfigFormat := pluginConfig.ORegURL
 	if imageConfigFormat != "" {
 		return imageConfigFormat
 	}
 
-	switch os.Getenv("DEPLOY_OS") {
+	switch pluginConfig.DeployOS {
 	case "", "rhel7":
 		imageConfigFormat = "registry.access.redhat.com/openshift3/ose-${component}:${version}"
 	case "centos7":

@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"net"
-	"os"
 
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -18,7 +17,7 @@ import (
 func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (err error) {
 	c := cs.Config
 
-	selectNodeImage(cs, os.Getenv("DEPLOY_OS"))
+	selectNodeImage(cs, pluginConfig)
 
 	if err = selectContainerImages(cs, pluginConfig); err != nil {
 		return err

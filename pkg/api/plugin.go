@@ -25,6 +25,10 @@ type PluginConfig struct {
 	AcceptMarketplaceAgreement bool
 	DNSDomain                  string
 	ResourceGroup              string
+	DeployOS                   string
+	ImageOffer                 string
+	ImageVersion               string
+	ORegURL                    string
 }
 
 type Plugin interface {
