@@ -1,5 +1,5 @@
-hash: cefa7e2f0ffe7c5025133281b1638a0e918ac54044f792427b9c24d116af1939
-updated: 2018-10-02T12:49:46.115989077+02:00
+hash: 7f890454ff19ea6b9d0b042a2c782d97e8c5e395a06ce113057be733404a4cb0
+updated: 2018-10-02T13:01:15.888346549+02:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
@@ -203,7 +203,6 @@ imports:
   - core/v1
   - events/v1beta1
   - extensions/v1beta1
-  - imagepolicy/v1alpha1
   - networking/v1
   - policy/v1beta1
   - rbac/v1
