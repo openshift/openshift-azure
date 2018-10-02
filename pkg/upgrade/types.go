@@ -1,5 +1,11 @@
 package upgrade
 
+//go:generate go get github.com/golang/mock/gomock
+//go:generate go install github.com/golang/mock/mockgen
+//go:generate mockgen -destination=../util/mocks/mock_upgrade/types.go -package=mock_upgrade -source types.go
+//go:generate gofmt -s -l -w ../util/mocks/mock_upgrade/types.go
+//go:generate goimports -e -w ../util/mocks/mock_upgrade/types.go
+
 import (
 	"context"
 

@@ -2,13 +2,20 @@ package plugin
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/fixtures"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_upgrade"
 )
 
 func TestMerge(t *testing.T) {
@@ -95,4 +102,80 @@ func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldClu
 		t.Errorf("no arm was generated")
 	}
 	return azuretemplate
+}
+
+func TestGenerateARM(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	var testData map[string]interface{}
+	err := json.Unmarshal([]byte("{\"test\": \"data\"}"), &testData)
+	if err != nil {
+		t.Fatalf("Unmarshal failed %v", err)
+	}
+	mockGen := mock_arm.NewMockGenerator(mockCtrl)
+	mockGen.EXPECT().Generate(nil, nil, true).Return(testData, nil)
+	p := &plugin{
+		armGenerator: mockGen,
+	}
+	log.New(logrus.NewEntry(logrus.New()))
+
+	got, err := p.GenerateARM(nil, nil, true)
+	if err != nil {
+		t.Errorf("plugin.GenerateARM() error = %v", err)
+		return
+	}
+	if !reflect.DeepEqual(got, testData) {
+		t.Errorf("plugin.GenerateARM() = %v, want %v", got, testData)
+	}
+}
+
+func TestCreateOrUpdate(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUp := mock_upgrade.NewMockUpgrader(mockCtrl)
+	tests := []struct {
+		name     string
+		isUpdate bool
+		wantErr  bool
+	}{
+		{
+			name:     "deploy",
+			isUpdate: false,
+			wantErr:  false,
+		},
+		{
+			name:     "update",
+			isUpdate: true,
+			wantErr:  false,
+		},
+		{
+			name:     "error",
+			isUpdate: true,
+			wantErr:  true,
+		},
+	}
+	for _, tt := range tests {
+		var err error
+		if tt.wantErr {
+			err = fmt.Errorf("test error")
+		}
+		if tt.isUpdate {
+			mockUp.EXPECT().Update(nil, nil, nil, nil).Return(err)
+		} else {
+			mockUp.EXPECT().Deploy(nil, nil, nil, nil).Return(err)
+		}
+		if !tt.wantErr {
+			mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
+			mockUp.EXPECT().HealthCheck(nil, nil).Return(nil)
+		}
+		p := &plugin{
+			clusterUpgrader: mockUp,
+		}
+		log.New(logrus.NewEntry(logrus.New()))
+		if err := p.CreateOrUpdate(nil, nil, nil, tt.isUpdate, nil); (err != nil) != tt.wantErr {
+			t.Errorf("plugin.CreateOrUpdate(%s) error = %v, wantErr %v", tt.name, err, tt.wantErr)
+		}
+	}
 }

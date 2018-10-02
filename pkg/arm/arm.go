@@ -3,6 +3,11 @@ package arm
 //go:generate go get github.com/go-bindata/go-bindata/go-bindata
 //go:generate go-bindata -nometadata -pkg $GOPACKAGE -prefix data data/...
 //go:generate gofmt -s -l -w bindata.go
+//go:generate go get github.com/golang/mock/gomock
+//go:generate go install github.com/golang/mock/mockgen
+//go:generate mockgen -destination=../util/mocks/mock_arm/arm.go -package=mock_arm -source arm.go
+//go:generate gofmt -s -l -w ../util/mocks/mock_arm/arm.go
+//go:generate goimports -e -w ../util/mocks/mock_arm/arm.go
 
 import (
 	"context"
