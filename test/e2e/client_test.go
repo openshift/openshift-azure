@@ -5,6 +5,9 @@ package e2e
 import (
 	"time"
 
+	project "github.com/openshift/api/project/v1"
+	projectclient "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -14,6 +17,7 @@ var c *testClient
 
 type testClient struct {
 	kc        *kubernetes.Clientset
+	pc        *projectclient.ProjectV1Client
 	namespace string
 }
 
@@ -40,21 +44,38 @@ func newTestClient(kubeconfig string) *testClient {
 		panic(err)
 	}
 
+	pc, err := projectclient.NewForConfig(config)
+	if err != nil {
+		panic(err)
+	}
+
 	return &testClient{
 		kc: kc,
+		pc: pc,
 	}
 }
 
-func (t *testClient) createNamespace(namespace string) {
-	// TODO: Create a project request
+func (t *testClient) createNamespace(namespace string) error {
+	if _, err := t.pc.ProjectRequests().Create(&project.ProjectRequest{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: namespace,
+		}}); err != nil {
+		return err
+	}
 	t.namespace = namespace
 	// TODO: Wait for a successful SAR check
+	return nil
 }
 
-func (t *testClient) cleanupNamespace(timeout time.Duration) {
+func (t *testClient) cleanupNamespace(timeout time.Duration) error {
 	if t.namespace == "" {
-		return
+		return nil
 	}
 
-	// TODO: Do a project delete and wait for the namespace to cleanup
+	if err := t.pc.Projects().Delete(t.namespace, &metav1.DeleteOptions{}); err != nil {
+		return err
+	}
+
+	// TODO: Wait for the namespace to cleanup
+	return nil
 }

@@ -18,7 +18,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 
 	BeforeEach(func() {
 		// TODO: Use a generator here
-		namespace := "e2e-end-user-test-root"
+		namespace := "generateme"
 		// TODO: The namespace is cached in the client so this will not
 		// work with parallel tests.
 		c.createNamespace(namespace)
