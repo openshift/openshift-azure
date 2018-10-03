@@ -17,8 +17,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 	defer GinkgoRecover()
 
 	BeforeEach(func() {
-		// TODO: Use a generator here
-		namespace := "generateme"
+		namespace := nameGen.generate("e2e-test-")
 		// TODO: The namespace is cached in the client so this will not
 		// work with parallel tests.
 		c.createProject(namespace)
