@@ -32,7 +32,7 @@ const (
 func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster, ext *extra) (unstructured.Unstructured, error) {
 	ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
 	for _, tr := range ts {
-		var s string
+		var s interface{}
 		if tr.F != nil {
 			var err error
 			s, err = tr.F(cs)
@@ -55,7 +55,7 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 	return o, nil
 }
 
-func Translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nestedFlags NestedFlags, v string) error {
+func Translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nestedFlags NestedFlags, v interface{}) error {
 	var err error
 
 	if nestedPath == nil {
@@ -102,7 +102,7 @@ var Translations = map[string][]struct {
 	NestedPath  jsonpath.Path
 	NestedFlags NestedFlags
 	Template    string
-	F           func(*api.OpenShiftManagedCluster) (string, error)
+	F           func(*api.OpenShiftManagedCluster) (interface{}, error)
 }{
 	// IMPORTANT: Translations must NOT use the quote function (i.e., write
 	// "{{ .Config.Foo }}", NOT "{{ .Config.Foo | quote }}").  This is because
@@ -151,14 +151,14 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
-			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
 				return config.Derived.KubeReserved(cs, api.AgentPoolProfileRoleCompute), nil
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
-			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
 				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleCompute), nil
 			},
 		},
@@ -172,14 +172,14 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
-			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
 				return config.Derived.KubeReserved(cs, api.AgentPoolProfileRoleInfra), nil
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
-			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
 				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleInfra), nil
 			},
 		},
@@ -193,7 +193,7 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
-			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
 				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleMaster), nil
 			},
 		},
@@ -324,6 +324,28 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.WebConsole }}",
 		},
 	},
+	"Group.user.openshift.io/customer-admins": {
+		{
+			Path: jsonpath.MustCompile("$.users"),
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+				if cs.Config.CustomerAdminPasswd != "" {
+					return []interface{}{"customer-cluster-admin"}, nil
+				}
+				return []interface{}{}, nil
+			},
+		},
+	},
+	"Group.user.openshift.io/customer-readers": {
+		{
+			Path: jsonpath.MustCompile("$.users"),
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+				if cs.Config.CustomerReaderPasswd != "" {
+					return []interface{}{"customer-cluster-reader"}, nil
+				}
+				return []interface{}{}, nil
+			},
+		},
+	},
 	"OAuthClient.oauth.openshift.io/cockpit-oauth-client": {
 		{
 			Path:     jsonpath.MustCompile("$.redirectURIs[0]"),
@@ -401,7 +423,7 @@ var Translations = map[string][]struct {
 	"Secret/default/etc-origin-cloudprovider": {
 		{
 			Path: jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
 				b, err := config.Derived.CloudProviderConf(cs)
 				return string(b), err
 			},
@@ -486,7 +508,7 @@ var Translations = map[string][]struct {
 	"Service/default/router": {
 		{
 			Path: jsonpath.MustCompile("$.metadata.annotations['service.beta.kubernetes.io/azure-dns-label-name']"),
-			F: func(cs *api.OpenShiftManagedCluster) (string, error) {
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
 				return config.Derived.RouterLBCNamePrefix(cs), nil
 			},
 		},

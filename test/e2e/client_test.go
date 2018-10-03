@@ -14,6 +14,7 @@ import (
 	projectclient "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
+	userv1client "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
 	"github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -22,13 +23,14 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-var c *testClient
+var c, cadmin, creader *testClient
 
 type testClient struct {
 	kc        *kubernetes.Clientset
 	pc        *projectclient.ProjectV1Client
 	rc        *routev1client.RouteV1Client
 	tc        *templatev1client.TemplateV1Client
+	uc        *userv1client.UserV1Client
 	namespace string
 
 	artifactDir string
@@ -75,12 +77,18 @@ func newTestClient(kubeconfig, artifactDir string) *testClient {
 		panic(err)
 	}
 
-	return &testClient{
-		kc: kc,
-		pc: pc,
-		rc: rc,
-		tc: tc,
+	// create a route client
+	uc, err := userv1client.NewForConfig(config)
+	if err != nil {
+		panic(err)
+	}
 
+	return &testClient{
+		kc:          kc,
+		pc:          pc,
+		rc:          rc,
+		tc:          tc,
+		uc:          uc,
 		artifactDir: artifactDir,
 	}
 }

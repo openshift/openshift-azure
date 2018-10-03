@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-admin-reconciler
+  namespace: openshift-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: customer-admin-reconciler
+  template:
+    metadata:
+      labels:
+        app: customer-admin-reconciler
+    spec:
+      serviceAccountName: customer-admin-reconciler
+      containers:
+      - args:
+        - |
+          set -o errexit
+          set -o nounset
+          set -o pipefail
+
+          cat <<'SCRIPT' >/tmp/reconcile
+          #!/bin/bash -x
+          set -o errexit
+          set -o nounset
+          set -o pipefail
+
+          project=$1
+          echo "Project: ${project}"
+
+          # do nothing for whitelisted projects
+          for ns in '^openshift-.*' '^openshift$' '^kube-.*' '^kube$' '^kubernetes$' '^kubernetes-.*' '^default$';
+          do
+            if [[ "${project}" =~ $ns ]]; then
+              exit 0
+            fi
+          done
+
+          oc auth reconcile -f /tmp/rolebindings -n "${project}"
+
+          ##### END HERE #######
+          SCRIPT
+          chmod u+x /tmp/reconcile
+
+          exec oc observe namespace --maximum-errors=1 --resync-period=15m -- /tmp/reconcile
+        command:
+        - /bin/bash
+        - -c
+        image: openshift/observe
+        name: reconciler
+        volumeMounts:
+        - name: reconciler-rolebindings
+          mountPath: /tmp/rolebindings
+      volumes:
+      - configMap:
+          defaultMode: 0660
+          name: reconciler-rolebindings
+        name: reconciler-rolebindings
