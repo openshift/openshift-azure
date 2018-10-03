@@ -9,7 +9,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/healthcheck"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/upgrade"
 )
@@ -19,7 +18,6 @@ type plugin struct {
 	config          api.PluginConfig
 	configUpgrader  config.Upgrader
 	clusterUpgrader upgrade.Upgrader
-	healthChecker   healthcheck.HealthChecker
 	armGenerator    arm.Generator
 }
 
@@ -33,7 +31,6 @@ func NewPlugin(entry *logrus.Entry, pluginConfig api.PluginConfig) api.Plugin {
 		config:          pluginConfig,
 		configUpgrader:  config.NewSimpleUpgrader(entry),
 		clusterUpgrader: upgrade.NewSimpleUpgrader(entry, pluginConfig),
-		healthChecker:   healthcheck.NewSimpleHealthChecker(entry, pluginConfig),
 		armGenerator:    arm.NewSimpleGenerator(entry),
 	}
 }
@@ -115,7 +112,7 @@ func (p *plugin) InitializeCluster(ctx context.Context, cs *api.OpenShiftManaged
 
 func (p *plugin) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	log.Info("starting health check")
-	return p.healthChecker.HealthCheck(ctx, cs)
+	return p.clusterUpgrader.HealthCheck(ctx, cs)
 }
 
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, isUpdate bool, deployFn api.DeployFn) error {
@@ -123,15 +120,19 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	if isUpdate {
 		log.Info("starting update")
 		err = p.clusterUpgrader.Update(ctx, cs, azuredeploy, deployFn)
-		if err != nil {
-			return err
-		}
 	} else {
 		log.Info("starting deploy")
-		err := p.clusterUpgrader.Deploy(ctx, cs, azuredeploy, deployFn)
-		if err != nil {
-			return err
-		}
+		err = p.clusterUpgrader.Deploy(ctx, cs, azuredeploy, deployFn)
 	}
-	return nil
+	if err != nil {
+		return err
+	}
+
+	// Wait for infrastructure services to be healthy
+	err = p.clusterUpgrader.WaitForInfraServices(ctx, cs)
+	if err != nil {
+		return err
+	}
+
+	return p.HealthCheck(ctx, cs)
 }

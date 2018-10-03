@@ -2,13 +2,19 @@ package upgrade
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, deployFn api.DeployFn) error {
-	err := deployFn(ctx, cs, azuredeploy)
+	var azuretemplate map[string]interface{}
+	err := json.Unmarshal(azuredeploy, &azuretemplate)
+	if err != nil {
+		return err
+	}
+	err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return err
 	}
@@ -17,17 +23,11 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return err
 	}
-	kc, err := managedcluster.ClientSetFromV1Config(ctx, cs.Config.AdminKubeconfig)
+	kc, err := managedcluster.ClientsetFromV1ConfigAndWait(ctx, cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}
 
 	// ensure that all nodes are ready
-	err = WaitForNodes(ctx, cs, kc)
-	if err != nil {
-		return err
-	}
-
-	// Wait for infrastructure services to be healthy
-	return WaitForInfraServices(ctx, kc)
+	return WaitForNodes(ctx, cs, kc)
 }

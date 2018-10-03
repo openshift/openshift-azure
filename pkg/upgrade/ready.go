@@ -179,7 +179,7 @@ func WaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api
 }
 
 func masterWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string) error {
-	kc, err := managedcluster.ClientsetFromConfig(cs)
+	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}
@@ -226,7 +226,7 @@ func masterIsReady(kc *kubernetes.Clientset, nodeName string) (bool, error) {
 }
 
 func nodeWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string) error {
-	kc, err := managedcluster.ClientsetFromConfig(cs)
+	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}

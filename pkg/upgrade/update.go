@@ -2,6 +2,7 @@ package upgrade
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -46,7 +47,12 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 		}
 	}
 
-	err = deployFn(ctx, cs, azuredeploy)
+	var azuretemplate map[string]interface{}
+	err = json.Unmarshal(azuredeploy, &azuretemplate)
+	if err != nil {
+		return err
+	}
+	err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return err
 	}
@@ -275,7 +281,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 }
 
 func sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenShiftManagedCluster) ([]compute.VirtualMachineScaleSetVM, error) {
-	kc, err := managedcluster.ClientsetFromConfig(cs)
+	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return nil, err
 	}

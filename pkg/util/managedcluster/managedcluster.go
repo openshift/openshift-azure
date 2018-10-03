@@ -30,25 +30,8 @@ func ReadConfig(path string) (*api.OpenShiftManagedCluster, error) {
 	return cs, nil
 }
 
-func ClientsetFromConfig(cs *api.OpenShiftManagedCluster) (*kubernetes.Clientset, error) {
-	var kc kapi.Config
-	err := latest.Scheme.Convert(cs.Config.AdminKubeconfig, &kc, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	kubeconfig := clientcmd.NewDefaultClientConfig(kc, &clientcmd.ConfigOverrides{})
-
-	restconfig, err := kubeconfig.ClientConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	return kubernetes.NewForConfig(restconfig)
-}
-
 // getKubeconfigFromV1Config takes a v1 config and returns a kubeconfig
-func getKubeconfigFromV1Config(kc *v1.Config) (clientcmd.ClientConfig, error) {
+func getRestConfigFromV1Config(kc *v1.Config) (*rest.Config, error) {
 	var c kapi.Config
 	err := latest.Scheme.Convert(kc, &c, nil)
 	if err != nil {
@@ -56,18 +39,23 @@ func getKubeconfigFromV1Config(kc *v1.Config) (clientcmd.ClientConfig, error) {
 	}
 
 	kubeconfig := clientcmd.NewDefaultClientConfig(c, &clientcmd.ConfigOverrides{})
-
-	return kubeconfig, nil
+	return kubeconfig.ClientConfig()
 }
 
-// ClientSetFromV1Config takes a v1 config and returns a Clientset
-func ClientSetFromV1Config(ctx context.Context, config *v1.Config) (*kubernetes.Clientset, error) {
-	kubeconfig, err := getKubeconfigFromV1Config(config)
+// ClientsetFromV1Config takes a v1 config and returns a Clientset
+func ClientsetFromV1Config(config *v1.Config) (*kubernetes.Clientset, error) {
+	restconfig, err := getRestConfigFromV1Config(config)
 	if err != nil {
 		return nil, err
 	}
 
-	restconfig, err := kubeconfig.ClientConfig()
+	return kubernetes.NewForConfig(restconfig)
+}
+
+// ClientsetFromV1ConfigAndWait takes a context, v1 config and returns a Clientset
+// It waits for the cluster to respond to healthz requests.
+func ClientsetFromV1ConfigAndWait(ctx context.Context, config *v1.Config) (*kubernetes.Clientset, error) {
+	restconfig, err := getRestConfigFromV1Config(config)
 	if err != nil {
 		return nil, err
 	}

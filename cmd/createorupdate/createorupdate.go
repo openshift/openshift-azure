@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -102,17 +101,31 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
-	err = acceptMarketplaceAgreement(ctx, cs, config)
+	clients, err := azureclient.NewAzureClients(ctx, cs, config)
+	if err != nil {
+		return nil, err
+	}
+	err = acceptMarketplaceAgreement(ctx, cs, clients)
 	if err != nil {
 		return nil, err
 	}
 
-	err = p.CreateOrUpdate(ctx, cs, azuredeploy, oldCs != nil, defaultDeployer)
-	if err != nil {
-		return nil, err
+	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
+		log.Info("applying arm template deployment")
+		future, err := clients.Deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
+			Properties: &resources.DeploymentProperties{
+				Template: azuretemplate,
+				Mode:     resources.Incremental,
+			},
+		})
+		if err != nil {
+			return err
+		}
+		log.Info("waiting for arm template deployment to complete")
+		return future.WaitForCompletionRef(ctx, clients.Deployments.Client)
 	}
 
-	err = p.HealthCheck(ctx, cs)
+	err = p.CreateOrUpdate(ctx, cs, azuredeploy, oldCs != nil, deployer)
 	if err != nil {
 		return nil, err
 	}
@@ -124,48 +137,10 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	return oc, nil
 }
 
-func defaultDeployer(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
-	var t map[string]interface{}
-	err := json.Unmarshal(azuredeploy, &t)
-	if err != nil {
-		return err
-	}
-
-	// Given that this function will only be used for development this should be fine.
-	// in prod MSFT will implemenent this function, and they will be passing PluginConfig
-	// into the plugin anyways.
-	pc := api.PluginConfig{
-		AcceptLanguages: []string{"en-us"},
-	}
-	clients, err := azureclient.NewAzureClients(ctx, cs, pc)
-	if err != nil {
-		return err
-	}
-
-	log.Info("applying arm template deployment")
-	future, err := clients.Deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
-		Properties: &resources.DeploymentProperties{
-			Template: t,
-			Mode:     resources.Incremental,
-		},
-	})
-	if err != nil {
-		return err
-	}
-
-	log.Info("waiting for arm template deployment to complete")
-	return future.WaitForCompletionRef(ctx, clients.Deployments.Client)
-}
-
-func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) error {
+func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, clients *azureclient.AzureClients) error {
 	if config.Derived.ImageResourceName() != "" ||
 		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
 		return nil
-	}
-
-	var clients, err = azureclient.NewAzureClients(ctx, cs, pluginConfig)
-	if err != nil {
-		return err
 	}
 
 	log.Info("checking marketplace agreement")
