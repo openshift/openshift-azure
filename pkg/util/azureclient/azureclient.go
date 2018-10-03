@@ -10,14 +10,20 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	azstorage "github.com/Azure/azure-sdk-for-go/storage"
-
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
+// ClientWaitForCompletion base interface to return the client used in WaitForCompletionRef
+type ClientWaitForCompletion interface {
+	GetClient() autorest.Client
+}
+
 // DeploymentClient is minimal interface for azure DeploymentClient
 type DeploymentClient interface {
+	ClientWaitForCompletion
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, deploymentName string, parameters resources.Deployment) (result resources.DeploymentsCreateOrUpdateFuture, err error)
 }
 
@@ -67,6 +73,7 @@ type azMarketPlaceAgreementsClient struct {
 
 // VirtualMachineScaleSetsClient is minimal interface for azure VirtualMachineScaleSetsClient
 type VirtualMachineScaleSetsClient interface {
+	ClientWaitForCompletion
 	// mirrored methods
 	Update(ctx context.Context, resourceGroupName string, VMScaleSetName string, parameters compute.VirtualMachineScaleSetUpdate) (compute.VirtualMachineScaleSetsUpdateFuture, error)
 	UpdateInstances(ctx context.Context, resourceGroupName string, VMScaleSetName string, VMInstanceIDs compute.VirtualMachineScaleSetVMInstanceRequiredIDs) (compute.VirtualMachineScaleSetsUpdateInstancesFuture, error)
@@ -79,7 +86,8 @@ type azVirtualMachineScaleSetsClient struct {
 
 // VirtualMachineScaleSetVMsClient is minimal interface for azure VirtualMachineScaleSetVMsClient
 type VirtualMachineScaleSetVMsClient interface {
-	//mirrored methods
+	ClientWaitForCompletion
+	// mirrored methods
 	List(ctx context.Context, resourceGroupName string, virtualMachineScaleSetName string, filter string, selectParameter string, expand string) (compute.VirtualMachineScaleSetVMListResultPage, error)
 	Delete(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (compute.VirtualMachineScaleSetVMsDeleteFuture, error)
 	Deallocate(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (compute.VirtualMachineScaleSetVMsDeallocateFuture, error)

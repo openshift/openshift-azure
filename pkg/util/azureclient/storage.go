@@ -7,6 +7,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	azstorage "github.com/Azure/azure-sdk-for-go/storage"
 	"github.com/Azure/go-autorest/autorest"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
@@ -76,6 +77,7 @@ func (az azAccountsClient) GetStorageAccount(ctx context.Context, resourceGroup,
 	}
 	return result, nil
 }
+
 func (az azAccountsClient) GetStorageAccountKey(ctx context.Context, resourceGroup, accountName string) (string, error) {
 	response, err := az.client.ListKeys(context.Background(), resourceGroup, accountName)
 	if err != nil {
@@ -85,6 +87,7 @@ func (az azAccountsClient) GetStorageAccountKey(ctx context.Context, resourceGro
 	// enable more convenient key rotation.
 	return *(((*response.Keys)[0]).Value), nil
 }
+
 func (az azAccountsClient) ListByResourceGroup(ctx context.Context, resourceGroup string) (storage.AccountListResult, error) {
 	return az.client.ListByResourceGroup(ctx, resourceGroup)
 }

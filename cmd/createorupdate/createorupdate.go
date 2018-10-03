@@ -113,13 +113,17 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 
 	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
 		log.Info("applying arm template deployment")
-		_, err := depc.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
+		future, err := depc.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
 			Properties: &resources.DeploymentProperties{
 				Template: azuretemplate,
 				Mode:     resources.Incremental,
 			},
 		})
-		return err
+		if err != nil {
+			return err
+		}
+		log.Info("waiting for arm template deployment to complete")
+		return future.WaitForCompletionRef(ctx, depc.GetClient())
 	}
 
 	err = p.CreateOrUpdate(ctx, cs, azuredeploy, oldCs != nil, deployer)
