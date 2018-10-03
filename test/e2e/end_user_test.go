@@ -21,14 +21,14 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		namespace := "generateme"
 		// TODO: The namespace is cached in the client so this will not
 		// work with parallel tests.
-		c.createNamespace(namespace)
+		c.createProject(namespace)
 	})
 
 	AfterEach(func() {
 		if CurrentGinkgoTestDescription().Failed {
 			// TODO: Dump info from namespace
 		}
-		c.cleanupNamespace(10 * time.Minute)
+		c.cleanupProject(10 * time.Minute)
 	})
 
 	It("should disallow PDB mutations", func() {

@@ -3,11 +3,13 @@
 package e2e
 
 import (
+	"fmt"
 	"time"
 
 	project "github.com/openshift/api/project/v1"
 	projectclient "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -44,6 +46,7 @@ func newTestClient(kubeconfig string) *testClient {
 		panic(err)
 	}
 
+	// create a project client for creating and tearing down namespaces
 	pc, err := projectclient.NewForConfig(config)
 	if err != nil {
 		panic(err)
@@ -55,7 +58,7 @@ func newTestClient(kubeconfig string) *testClient {
 	}
 }
 
-func (t *testClient) createNamespace(namespace string) error {
+func (t *testClient) createProject(namespace string) error {
 	if _, err := t.pc.ProjectRequests().Create(&project.ProjectRequest{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: namespace,
@@ -63,19 +66,25 @@ func (t *testClient) createNamespace(namespace string) error {
 		return err
 	}
 	t.namespace = namespace
-	// TODO: Wait for a successful SAR check
+
+	if err := wait.PollImmediate(2*time.Second, time.Minute, t.selfSarSuccess); err != nil {
+		return fmt.Errorf("failed to wait for self-sar success: %v", err)
+	}
+	if err := wait.PollImmediate(2*time.Second, time.Minute, t.defaultServiceAccountIsReady); err != nil {
+		return fmt.Errorf("failed to wait for the default service account provision: %v", err)
+	}
 	return nil
 }
 
-func (t *testClient) cleanupNamespace(timeout time.Duration) error {
+func (t *testClient) cleanupProject(timeout time.Duration) error {
 	if t.namespace == "" {
 		return nil
 	}
-
 	if err := t.pc.Projects().Delete(t.namespace, &metav1.DeleteOptions{}); err != nil {
 		return err
 	}
-
-	// TODO: Wait for the namespace to cleanup
+	if err := wait.PollImmediate(2*time.Second, timeout, t.projectIsCleanedUp); err != nil {
+		return fmt.Errorf("failed to wait for project cleanup: %v", err)
+	}
 	return nil
 }
