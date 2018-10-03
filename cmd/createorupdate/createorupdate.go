@@ -37,7 +37,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	// the RP will enrich the internal API representation with data not included
 	// in the original request
 	log.Info("enrich")
-	err := enrich(cs)
+	err := enrich(cs, &config)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 
 func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) error {
 	if config.Derived.ImageResourceName() != "" ||
-		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
+		!pluginConfig.AcceptMarketplaceAgreement {
 		return nil
 	}
 
@@ -158,37 +158,24 @@ func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedClu
 	return err
 }
 
-func enrich(cs *api.OpenShiftManagedCluster) error {
-	for _, env := range []string{
-		"AZURE_CLIENT_ID",
-		"AZURE_CLIENT_SECRET",
-		"AZURE_SUBSCRIPTION_ID",
-		"AZURE_TENANT_ID",
-		"DNS_DOMAIN",
-		"RESOURCEGROUP",
-	} {
-		if os.Getenv(env) == "" {
-			return fmt.Errorf("must set %s", env)
-		}
-	}
-
+func enrich(cs *api.OpenShiftManagedCluster, config *api.PluginConfig) error {
 	cs.Properties.AzProfile = &api.AzProfile{
-		TenantID:       os.Getenv("AZURE_TENANT_ID"),
-		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
-		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
+		TenantID:       config.AzTenantID,
+		SubscriptionID: config.AzSubscriptionID,
+		ResourceGroup:  config.ResourceGroup,
 	}
 
 	cs.Properties.RouterProfiles = []api.RouterProfile{
 		{
 			Name:            "default",
-			PublicSubdomain: fmt.Sprintf("%s.%s", os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_DOMAIN")),
+			PublicSubdomain: fmt.Sprintf("%s.%s", config.ResourceGroup, config.DNSDomain),
 			FQDN:            fmt.Sprintf("%s-router.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location),
 		},
 	}
 
 	cs.Properties.ServicePrincipalProfile = &api.ServicePrincipalProfile{
-		ClientID: os.Getenv("AZURE_CLIENT_ID"),
-		Secret:   os.Getenv("AZURE_CLIENT_SECRET"),
+		ClientID: config.AzClientID,
+		Secret:   config.AzClientSecret,
 	}
 
 	return nil
@@ -246,16 +233,22 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// load the plugin configuration from environment vars
+	var config api.PluginConfig
+	log.Info("loading plugin config from environment")
+	config, err = plugin.NewPluginConfigFromEnv()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	//simulate Context with property bag
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, api.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
-	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-	ctx = context.WithValue(ctx, api.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
+	ctx = context.WithValue(ctx, api.ContextKeyClientID, config.AzClientID)
+	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, config.AzClientSecret)
+	ctx = context.WithValue(ctx, api.ContextKeyTenantID, config.AzTenantID)
 
 	// simulate the API call to the RP
-	entry := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
-	var config = api.PluginConfig{SyncImage: os.Getenv("SYNC_IMAGE"),
-		AcceptLanguages: []string{"en-us"}}
+	entry := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": config.ResourceGroup})
 	oc, err = createOrUpdate(ctx, oc, entry, config)
 	if err != nil {
 		log.Fatal(err)

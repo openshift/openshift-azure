@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"testing"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -41,14 +42,18 @@ func TestOpenShiftVersion(t *testing.T) {
 }
 
 func TestNodeImageVersion(t *testing.T) {
+	pluginConfig := api.PluginConfig{}
+	cs := api.OpenShiftManagedCluster{
+		Properties: &api.Properties{
+			OpenShiftVersion: "v3.10",
+		},
+		Config: &api.Config{},
+	}
 	for _, deployOS := range []string{"", "rhel7", "centos7"} {
-		cs := api.OpenShiftManagedCluster{
-			Properties: &api.Properties{
-				OpenShiftVersion: "v3.10",
-			},
-			Config: &api.Config{},
-		}
-		selectNodeImage(&cs, deployOS)
+		pluginConfig.DeployOS = deployOS
+		log.Printf("Deploy OS is '%s'", pluginConfig.DeployOS)
+		selectNodeImage(&cs, pluginConfig)
+		log.Printf("Image Version is '%s'", cs.Config.ImageVersion)
 		if cs.Config.ImageVersion == "latest" {
 			t.Errorf("cs.Config.ImageVersion should not equal latest")
 		}
