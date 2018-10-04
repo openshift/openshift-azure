@@ -229,17 +229,10 @@ func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (e
 		if cert.signingKey == nil && cert.signingCert == nil {
 			cert.signingKey, cert.signingCert = c.Certificates.Ca.Key, c.Certificates.Ca.Cert
 		}
-		var k *rsa.PrivateKey
-		var c *x509.Certificate
-		if k, c, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, false); err != nil {
-			return
-		}
-		// compare certificate and replace if update is needed
-		// if at any point we start using self-sign certificates again
-		// (see console certificate comment), logic inside certEqual needs
-		// to be updated for this.
-		if !certEqual(c, *cert.cert) {
-			*cert.key, *cert.cert = k, c
+		if !regenerate(cert) {
+			if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, false); err != nil {
+				return
+			}
 		}
 	}
 
@@ -396,15 +389,16 @@ func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (e
 	return
 }
 
-func certEqual(certNew, certOld *x509.Certificate) bool {
-	if certOld == nil {
+func regenerate(cert certificate) bool {
+	crt := *cert.cert
+	if crt == nil {
 		return false
 	}
-	if !reflect.DeepEqual(certNew.Subject, certOld.Subject) ||
-		!reflect.DeepEqual(certNew.DNSNames, certOld.DNSNames) ||
-		!reflect.DeepEqual(certNew.ExtKeyUsage, certOld.ExtKeyUsage) ||
-		!reflect.DeepEqual(certNew.IPAddresses, certOld.IPAddresses) ||
-		!reflect.DeepEqual(certNew.Issuer, certOld.Issuer) {
+
+	if !reflect.DeepEqual(cert.dnsNames, crt.DNSNames) ||
+		!reflect.DeepEqual(cert.extKeyUsage, crt.ExtKeyUsage) ||
+		!reflect.DeepEqual(cert.cn, crt.Subject.CommonName) ||
+		!reflect.DeepEqual(cert.ipAddresses, crt.IPAddresses) {
 		return false
 	}
 	return true

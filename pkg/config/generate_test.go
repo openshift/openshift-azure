@@ -117,25 +117,25 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 func TestGenerateUpdateCertRegen(t *testing.T) {
 	var pluginConfig api.PluginConfig
 	var cs, oldCs *api.OpenShiftManagedCluster
-	cs = fixtures.NewTestOpenShiftCluster()
-	cs.Properties.FQDN = "example-new.eastus.cloudapp.azure.com"
-	cs.Properties.RouterProfiles[0].FQDN = "router-fqdn-new.eastus.cloudapp.azure.com"
-	cs.Properties.RouterProfiles[0].PublicSubdomain = "test-new.example.com"
 
 	oldCs = fixtures.NewTestOpenShiftCluster()
 	// old cluster should be pre-populated
 	err := Generate(oldCs, pluginConfig)
 	if err != nil {
-		t.Errorf("received generation error %v", err)
+		t.Errorf("old config generation error: %v", err)
 	}
+
+	cs = fixtures.NewTestOpenShiftCluster()
+	cs.Properties.FQDN = "example-new.eastus.cloudapp.azure.com"
+	cs.Properties.RouterProfiles[0].FQDN = "router-fqdn-new.eastus.cloudapp.azure.com"
+	cs.Properties.RouterProfiles[0].PublicSubdomain = "test-new.example.com"
 
 	// copy config and regenerate everything else
 	old := oldCs.DeepCopy()
 	cs.Config = old.Config
-
 	err = Generate(cs, pluginConfig)
 	if err != nil {
-		t.Errorf("received generation error %v", err)
+		t.Errorf("new config generation error %v", err)
 	}
 
 	// certificates should not match
@@ -153,14 +153,10 @@ func TestGenerateUpdateCertRegen(t *testing.T) {
 	}
 
 	//certificates should match
-	if reflect.DeepEqual(cs.Config.Certificates.Registry.Cert, oldCs.Config.Certificates.Registry.Cert) {
-		t.Error("registry certificates matches, check test for details")
-	}
 	if !reflect.DeepEqual(cs.Config.Certificates.ServiceCatalogAPIClient.Cert, oldCs.Config.Certificates.ServiceCatalogAPIClient.Cert) {
 		t.Error("serviceCatalogAPIClient certificates do not match, check test for details")
 	}
 	if !reflect.DeepEqual(cs.Config.Certificates.Admin.Cert, oldCs.Config.Certificates.Admin.Cert) {
 		t.Error("admin certificates do not match, check test for details")
 	}
-
 }
