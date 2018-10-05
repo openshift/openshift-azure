@@ -1,11 +1,15 @@
 package config
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
+	"net"
 	"testing"
 
 	"github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/fixtures"
 )
 
@@ -111,4 +115,110 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.AdminKubeconfig != nil, "AdminKubeconfig")
 	assert(c.NodeBootstrapKubeconfig != nil, "NodeBootstrapKubeconfig")
 	assert(c.AzureClusterReaderKubeconfig != nil, "AzureClusterReaderKubeconfig")
+}
+
+func TestNeedsGenerate(t *testing.T) {
+	var certPlaceholder *x509.Certificate
+	var keyPlaceholder *rsa.PrivateKey
+	// generate signing cert for certificate
+	signingKey, signingCert, err := tls.NewCA("test-ca")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// construct certificate test object
+	cert := certificate{
+		cn:           "test-cn",
+		organization: []string{"test-corp"},
+		dnsNames: []string{
+			"hostname1",
+			"hostname2",
+		},
+		ipAddresses: []net.IP{net.ParseIP("192.168.0.1")},
+		extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+		signingKey:  signingKey,
+		signingCert: signingCert,
+		cert:        &certPlaceholder,
+		key:         &keyPlaceholder,
+	}
+
+	// finish certificate test object with generated cert values.
+	*cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// not to contaminate cert
+	tests := map[string]struct {
+		f              func(certificate) certificate
+		expectedResult bool
+	}{
+		"no changes": {
+			f: func(cert certificate) certificate {
+				return cert
+			},
+			expectedResult: false,
+		},
+		"cn changes": {
+			f: func(cert certificate) certificate {
+				cert.cn = "new-test-cn"
+				return cert
+			},
+			expectedResult: true,
+		},
+		"dnsNames changes": {
+			f: func(cert certificate) certificate {
+				cert.dnsNames = []string{
+					"hostname1",
+					"hostname2",
+					"hostname3",
+				}
+				return cert
+			},
+			expectedResult: true,
+		},
+		"organization changes": {
+			f: func(cert certificate) certificate {
+				cert.organization = []string{"new-corp"}
+				return cert
+			},
+			expectedResult: true,
+		},
+		"ExtKeyUsage changes": {
+			f: func(cert certificate) certificate {
+				cert.extKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}
+				return cert
+			},
+			expectedResult: true,
+		},
+		"ipAddress changes": {
+			f: func(cert certificate) certificate {
+				cert.ipAddresses = []net.IP{net.ParseIP("192.168.0.2")}
+				return cert
+			},
+			expectedResult: true,
+		},
+		"signinKey changes": {
+			f: func(cert certificate) certificate {
+				signingKey, signingCert, err := tls.NewCA("new-test-ca")
+				if err != nil {
+					t.Fatal(err)
+				}
+				cert.signingCert = signingCert
+				cert.signingKey = signingKey
+				return cert
+			},
+			expectedResult: true,
+		},
+	}
+
+	for name, test := range tests {
+		var c certificate
+		if test.f != nil {
+			c = test.f(cert)
+		}
+		if needsGenerate(c) != test.expectedResult {
+			t.Fatalf("test %s failed", name)
+		}
+	}
 }

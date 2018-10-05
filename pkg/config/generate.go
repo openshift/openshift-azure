@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"reflect"
 
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -14,6 +15,19 @@ import (
 	api "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
+
+type certificate struct {
+	cn           string
+	organization []string
+	dnsNames     []string
+	ipAddresses  []net.IP
+	extKeyUsage  []x509.ExtKeyUsage
+	signingKey   *rsa.PrivateKey
+	signingCert  *x509.Certificate
+	key          **rsa.PrivateKey
+	cert         **x509.Certificate
+	selfSign     bool
+}
 
 func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (err error) {
 	c := cs.Config
@@ -65,20 +79,9 @@ func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (e
 		}
 	}
 
-	certs := []struct {
-		cn           string
-		organization []string
-		dnsNames     []string
-		ipAddresses  []net.IP
-		extKeyUsage  []x509.ExtKeyUsage
-		signingKey   *rsa.PrivateKey
-		signingCert  *x509.Certificate
-		key          **rsa.PrivateKey
-		cert         **x509.Certificate
-		selfSign     bool
-	}{
-		// Generate etcd certs
+	certs := []certificate{
 		{
+			// Generate etcd certs
 			cn:          "etcd-server",
 			dnsNames:    []string{"master-000000", "master-000001", "master-000002"},
 			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
@@ -227,12 +230,12 @@ func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (e
 		if cert.signingKey == nil && cert.signingCert == nil {
 			cert.signingKey, cert.signingCert = c.Certificates.Ca.Key, c.Certificates.Ca.Cert
 		}
-		if *cert.key != nil && *cert.cert != nil &&
-			((*cert.cert).CheckSignatureFrom(cert.signingCert) == nil || cert.selfSign) {
-			continue
-		}
-		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, cert.selfSign); err != nil {
-			return
+		// if we start using self-singed certificates agaig (see console certificate comment)
+		// logic in this function needs to be updated
+		if needsGenerate(cert) {
+			if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, false); err != nil {
+				return
+			}
 		}
 	}
 
@@ -387,4 +390,44 @@ func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (e
 	}
 
 	return
+}
+
+func needsGenerate(cert certificate) bool {
+	crt := *cert.cert
+	// it it is 1st run crt will be empty - generate
+	if crt == nil {
+		return true
+	}
+
+	// if it is n+1 run, and if signingCert signature don't matche - generate
+	if crt.CheckSignatureFrom(cert.signingCert) != nil {
+		return true
+	}
+
+	// if main attributes do not match - regenerate
+	// net.IP does not comply with definition of deep equality.
+	// we use native Equal method within net package
+	if !reflect.DeepEqual(cert.dnsNames, crt.DNSNames) ||
+		!reflect.DeepEqual(cert.extKeyUsage, crt.ExtKeyUsage) ||
+		!reflect.DeepEqual(cert.cn, crt.Subject.CommonName) ||
+		!reflect.DeepEqual(cert.organization, crt.Subject.Organization) ||
+		!ipAddressEqual(cert.ipAddresses, crt.IPAddresses) {
+		return true
+	}
+	return false
+}
+
+func ipAddressEqual(ip1, ip2 []net.IP) bool {
+	eq := false
+	if len(ip1) != len(ip2) {
+		return false
+	}
+	for _, ip1v := range ip1 {
+		for _, ip2v := range ip2 {
+			if ip1v.Equal(ip2v) {
+				eq = true
+			}
+		}
+	}
+	return eq
 }
