@@ -393,15 +393,28 @@ func TestIsValidCloudAppHostname(t *testing.T) {
 		"too.long.domain.cloudapp.azure.com",
 		"invalid#characters#domain.westus2.cloudapp.azure.com",
 		"wronglocation.eastus.cloudapp.azure.com",
+		"123.eastus.cloudapp.azure.com",
+		"-abc.eastus.cloudapp.azure.com",
+		"abcdefghijklmnopqrstuvwxzyabcdefghijklmnopqrstuvwxzyabcdefghijkl.eastus.cloudapp.azure.com",
+		"a/b/c.eastus.cloudapp.azure.com",
+		".eastus.cloudapp.azure.com",
+		"Thisisatest.eastus.cloudapp.azure.com",
 	}
 	for _, invalidFqdn := range invalidFqdns {
 		if isValidCloudAppHostname(invalidFqdn, "westus2") {
 			t.Errorf("invalid FQDN passed test: %s", invalidFqdn)
 		}
 	}
-	validFqdn := "example.westus2.cloudapp.azure.com"
-	if !isValidCloudAppHostname(validFqdn, "westus2") {
-		t.Errorf("Valid FQDN failed to pass test: %s", validFqdn)
+	validFqdns := []string{
+		"example.westus2.cloudapp.azure.com",
+		"test-dashes.westus2.cloudapp.azure.com",
+		"test123.westus2.cloudapp.azure.com",
+		"test-123.westus2.cloudapp.azure.com",
+	}
+	for _, validFqdn := range validFqdns {
+		if !isValidCloudAppHostname(validFqdn, "westus2") {
+			t.Errorf("Valid FQDN failed to pass test: %s", validFqdn)
+		}
 	}
 }
 
