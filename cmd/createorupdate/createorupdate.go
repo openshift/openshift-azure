@@ -26,7 +26,7 @@ import (
 var logLevel = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
 
 // createOrUpdate simulates the RP
-func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, entry *logrus.Entry, config api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
+func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, entry *logrus.Entry, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
 	p := plugin.NewPlugin(entry, config)
 
@@ -105,15 +105,16 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	if err != nil {
 		return nil, err
 	}
-	authorizer, err := azureclient.NewAuthorizerFromCtx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	depc := azureclient.NewDeploymentsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, config)
 
 	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
 		log.Info("applying arm template deployment")
-		future, err := depc.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
+		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+		if err != nil {
+			return err
+		}
+
+		deployments := azureclient.NewDeploymentsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, config.AcceptLanguages)
+		future, err := deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
 			Properties: &resources.DeploymentProperties{
 				Template: azuretemplate,
 				Mode:     resources.Incremental,
@@ -122,8 +123,9 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		if err != nil {
 			return err
 		}
+
 		log.Info("waiting for arm template deployment to complete")
-		return future.WaitForCompletionRef(ctx, depc.GetClient())
+		return future.WaitForCompletionRef(ctx, deployments.Client())
 	}
 
 	err = p.CreateOrUpdate(ctx, cs, azuredeploy, oldCs != nil, deployer)
@@ -138,20 +140,20 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	return oc, nil
 }
 
-func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) error {
+func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig *api.PluginConfig) error {
 	if config.Derived.ImageResourceName() != "" ||
 		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
 		return nil
 	}
 
-	authorizer, err := azureclient.NewAuthorizerFromCtx(ctx)
+	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
 	}
 
-	mpc := azureclient.NewMarketPlaceAgreementsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, pluginConfig)
+	marketPlaceAgreements := azureclient.NewMarketPlaceAgreementsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, pluginConfig.AcceptLanguages)
 	log.Info("checking marketplace agreement")
-	terms, err := mpc.Get(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU)
+	terms, err := marketPlaceAgreements.Get(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU)
 	if err != nil {
 		return err
 	}
@@ -163,7 +165,7 @@ func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedClu
 	terms.AgreementProperties.Accepted = to.BoolPtr(true)
 
 	log.Info("accepting marketplace agreement")
-	_, err = mpc.Create(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU, terms)
+	_, err = marketPlaceAgreements.Create(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU, terms)
 	return err
 }
 
@@ -263,8 +265,10 @@ func main() {
 
 	// simulate the API call to the RP
 	entry := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
-	var config = api.PluginConfig{SyncImage: os.Getenv("SYNC_IMAGE"),
-		AcceptLanguages: []string{"en-us"}}
+	config := &api.PluginConfig{
+		SyncImage:       os.Getenv("SYNC_IMAGE"),
+		AcceptLanguages: []string{"en-us"},
+	}
 	oc, err = createOrUpdate(ctx, oc, entry, config)
 	if err != nil {
 		log.Fatal(err)

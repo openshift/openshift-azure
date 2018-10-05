@@ -26,6 +26,7 @@ import (
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
@@ -36,6 +37,7 @@ type Interface interface {
 	UpdateDynamicClient() error
 	ServiceCatalogExists() (bool, error)
 	EtcdCRDReady() (bool, error)
+	GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error)
 }
 
 // client implements Interface
@@ -48,9 +50,10 @@ type client struct {
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
 	grs        []*discovery.APIGroupResources
+	azs        azureclient.AccountsClient
 }
 
-func newClient(cs *acsapi.OpenShiftManagedCluster, dryRun bool) (Interface, error) {
+func newClient(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) (Interface, error) {
 	if dryRun {
 		return &dryClient{}, nil
 	}
@@ -89,6 +92,7 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, dryRun bool) (Interface, erro
 		ac:         ac,
 		ae:         ae,
 		cli:        cli,
+		azs:        azs,
 	}
 
 	transport, err := rest.TransportFor(c.restconfig)
@@ -96,7 +100,7 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, dryRun bool) (Interface, erro
 		return nil, err
 	}
 
-	if err := wait.ForHTTPStatusOk(context.Background(), transport, c.restconfig.Host+"/healthz"); err != nil {
+	if err := wait.ForHTTPStatusOk(ctx, transport, c.restconfig.Host+"/healthz"); err != nil {
 		return nil, err
 	}
 
@@ -105,6 +109,16 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, dryRun bool) (Interface, erro
 	}
 
 	return c, nil
+}
+
+func (c *client) GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error) {
+	response, err := c.azs.ListKeys(ctx, resourceGroup, storageAccount)
+	if err != nil {
+		return "", err
+	}
+	// TODO: Allow choosing between the two storage account keys to
+	// enable more convenient key rotation.
+	return *(((*response.Keys)[0]).Value), nil
 }
 
 // UpdateDynamicClient updates the client's server API group resource
@@ -280,3 +294,6 @@ func (c *dryClient) ApplyResources(filter func(unstructured.Unstructured) bool, 
 func (c *dryClient) UpdateDynamicClient() error          { return nil }
 func (c *dryClient) ServiceCatalogExists() (bool, error) { return true, nil }
 func (c *dryClient) EtcdCRDReady() (bool, error)         { return true, nil }
+func (c *dryClient) GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error) {
+	return "", nil
+}

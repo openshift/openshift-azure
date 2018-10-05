@@ -251,17 +251,16 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	return client.ApplyResources(scFilter, db, keys)
 }
 
-func Main(cs *api.OpenShiftManagedCluster, azac azureclient.AccountsClient, dryRun bool) error {
-	ctx := context.Background()
-	client, err := newClient(cs, dryRun)
+func Main(ctx context.Context, cs *api.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) error {
+	client, err := newClient(ctx, cs, azs, dryRun)
 	if err != nil {
 		return err
 	}
-	keyRegistry, err := azac.GetStorageAccountKey(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
+	keyRegistry, err := client.GetStorageAccountKey(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
 	if err != nil {
 		return err
 	}
-	keyConfig, err := azac.GetStorageAccountKey(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+	keyConfig, err := client.GetStorageAccountKey(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
 	if err != nil {
 		return err
 	}

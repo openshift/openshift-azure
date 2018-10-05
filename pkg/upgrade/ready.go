@@ -2,6 +2,7 @@ package upgrade
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -14,7 +15,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
-	"github.com/pkg/errors"
 )
 
 var deploymentWhitelist = []struct {
@@ -87,11 +87,11 @@ var daemonsetWhitelist = []struct {
 
 func WaitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, kc *kubernetes.Clientset) error {
 	config := api.PluginConfig{AcceptLanguages: []string{"en-us"}}
-	authorizer, err := azureclient.NewAuthorizerFromCtx(ctx)
+	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
 	}
-	vmc := azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, config)
+	vmc := azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, config.AcceptLanguages)
 
 	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute} {
 		vms, err := ListVMs(ctx, cs, vmc, role)
