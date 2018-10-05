@@ -2,6 +2,7 @@ package upgrade
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -14,11 +15,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
-func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, config api.PluginConfig) error {
-	// TODO: probably need to break this function into two pieces, pre-Deploy
-	// and post-Deploy, so that MSFT can use custom ARM deployment logic.
-
-	clients, err := azureclient.NewAzureClients(ctx, cs, config)
+func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, deployFn api.DeployFn) error {
+	clients, err := azureclient.NewAzureClients(ctx, cs, u.pluginConfig)
 	if err != nil {
 		return err
 	}
@@ -49,8 +47,18 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 		}
 	}
 
-	// Apply the ARM template
-	if err := Deploy(ctx, cs, u.Initializer, azuredeploy, config); err != nil {
+	var azuretemplate map[string]interface{}
+	err = json.Unmarshal(azuredeploy, &azuretemplate)
+	if err != nil {
+		return err
+	}
+	err = deployFn(ctx, azuretemplate)
+	if err != nil {
+		return err
+	}
+
+	err = u.InitializeCluster(ctx, cs)
+	if err != nil {
 		return err
 	}
 
@@ -273,7 +281,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 }
 
 func sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenShiftManagedCluster) ([]compute.VirtualMachineScaleSetVM, error) {
-	kc, err := managedcluster.ClientsetFromConfig(cs)
+	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return nil, err
 	}

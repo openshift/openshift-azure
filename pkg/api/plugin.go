@@ -14,12 +14,18 @@ const (
 	ContextKeyTenantID     ContextKey = "TenantID"
 )
 
+// DeployFn makes it possible to plug in different logic to the deploy.
+// The implementor must initiate a deployment of the given template using
+// mode resources.Incremental and wait for it to complete.
+type DeployFn func(context.Context, map[string]interface{}) error
+
 // PluginConfig is passed into NewPlugin
 type PluginConfig struct {
 	SyncImage       string
 	AcceptLanguages []string
 }
 
+// Plugin is the main interface to openshift-azure
 type Plugin interface {
 	// MergeConfig merges new and old config so that no unnecessary config
 	// is going to get regenerated during generation. It also handles merging
@@ -46,5 +52,7 @@ type Plugin interface {
 
 	HealthCheck(ctx context.Context, cs *OpenShiftManagedCluster) error
 
-	Update(ctx context.Context, cs *OpenShiftManagedCluster, azuredeploy []byte) error
+	// CreateOrUpdate either deploys or runs the update depending on the isUpdate argument
+	// this will call the deployer.
+	CreateOrUpdate(ctx context.Context, cs *OpenShiftManagedCluster, azuredeploy []byte, isUpdate bool, deployer DeployFn) error
 }

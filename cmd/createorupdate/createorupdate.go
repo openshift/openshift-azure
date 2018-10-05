@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -18,7 +19,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
-	"github.com/openshift/openshift-azure/pkg/upgrade"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
@@ -101,24 +101,31 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
-	err = acceptMarketplaceAgreement(ctx, cs, config)
+	clients, err := azureclient.NewAzureClients(ctx, cs, config)
+	if err != nil {
+		return nil, err
+	}
+	err = acceptMarketplaceAgreement(ctx, cs, clients)
 	if err != nil {
 		return nil, err
 	}
 
-	if oldCs != nil {
-		err = p.Update(ctx, cs, azuredeploy)
+	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
+		log.Info("applying arm template deployment")
+		future, err := clients.Deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
+			Properties: &resources.DeploymentProperties{
+				Template: azuretemplate,
+				Mode:     resources.Incremental,
+			},
+		})
 		if err != nil {
-			return nil, err
+			return err
 		}
-	} else {
-		err = upgrade.Deploy(ctx, cs, p, azuredeploy, config)
-		if err != nil {
-			return nil, err
-		}
+		log.Info("waiting for arm template deployment to complete")
+		return future.WaitForCompletionRef(ctx, clients.Deployments.Client)
 	}
 
-	err = p.HealthCheck(ctx, cs)
+	err = p.CreateOrUpdate(ctx, cs, azuredeploy, oldCs != nil, deployer)
 	if err != nil {
 		return nil, err
 	}
@@ -130,15 +137,10 @@ func createOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	return oc, nil
 }
 
-func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) error {
+func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, clients *azureclient.AzureClients) error {
 	if config.Derived.ImageResourceName() != "" ||
 		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
 		return nil
-	}
-
-	var clients, err = azureclient.NewAzureClients(ctx, cs, pluginConfig)
-	if err != nil {
-		return err
 	}
 
 	log.Info("checking marketplace agreement")

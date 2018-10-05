@@ -5,15 +5,167 @@ import (
 	"errors"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
 	corev1 "k8s.io/api/core/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
+
+var deploymentWhitelist = []struct {
+	Name      string
+	Namespace string
+}{
+	{
+		Name:      "docker-registry",
+		Namespace: "default",
+	},
+	{
+		Name:      "router",
+		Namespace: "default",
+	},
+	{
+		Name:      "registry-console",
+		Namespace: "default",
+	},
+	{
+		Name:      "apiserver",
+		Namespace: "kube-service-catalog",
+	},
+	{
+		Name:      "controller-manager",
+		Namespace: "kube-service-catalog",
+	},
+	{
+		Name:      "bootstrap-autoapprover",
+		Namespace: "openshift-infra",
+	},
+	{
+		Name:      "asb",
+		Namespace: "openshift-ansible-service-broker",
+	},
+	{
+		Name:      "apiserver",
+		Namespace: "openshift-template-service-broker",
+	},
+	{
+		Name:      "bootstrap-autoapprover",
+		Namespace: "openshift-infra",
+	},
+	{
+		Name:      "webconsole",
+		Namespace: "openshift-web-console",
+	},
+}
+
+var daemonsetWhitelist = []struct {
+	Name      string
+	Namespace string
+}{
+	{
+		Name:      "prometheus-node-exporter",
+		Namespace: "openshift-metrics",
+	},
+	{
+		Name:      "sync",
+		Namespace: "openshift-node",
+	},
+	{
+		Name:      "ovs",
+		Namespace: "openshift-sdn",
+	},
+	{
+		Name:      "sdn",
+		Namespace: "openshift-sdn",
+	},
+}
+
+func WaitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, kc *kubernetes.Clientset) error {
+	config := auth.NewClientCredentialsConfig(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
+	authorizer, err := config.Authorizer()
+	if err != nil {
+		return err
+	}
+	vmc := compute.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID)
+	vmc.Authorizer = authorizer
+
+	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute} {
+		vms, err := ListVMs(ctx, cs, vmc, role)
+		if err != nil {
+			return err
+		}
+		for _, vm := range vms {
+			log.Infof("waiting for %s to be ready", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+			err = WaitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// WaitForInfraServices verifies daemonsets, statefulsets
+func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
+	for _, app := range daemonsetWhitelist {
+		log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
+
+		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
+			ds, err := kc.AppsV1().DaemonSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
+			switch {
+			case kerrors.IsNotFound(err):
+				return false, nil
+			case err == nil:
+				return ds.Status.DesiredNumberScheduled == ds.Status.CurrentNumberScheduled &&
+					ds.Status.DesiredNumberScheduled == ds.Status.NumberReady &&
+					ds.Status.DesiredNumberScheduled == ds.Status.UpdatedNumberScheduled &&
+					ds.Generation == ds.Status.ObservedGeneration, nil
+			default:
+				return false, err
+			}
+		}, ctx.Done())
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, app := range deploymentWhitelist {
+		log.Infof("checking deployment %s/%s", app.Namespace, app.Name)
+
+		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
+			d, err := kc.AppsV1().Deployments(app.Namespace).Get(app.Name, metav1.GetOptions{})
+			switch {
+			case kerrors.IsNotFound(err):
+				return false, nil
+			case err == nil:
+				specReplicas := int32(1)
+				if d.Spec.Replicas != nil {
+					specReplicas = *d.Spec.Replicas
+				}
+
+				return specReplicas == d.Status.Replicas &&
+					specReplicas == d.Status.ReadyReplicas &&
+					specReplicas == d.Status.AvailableReplicas &&
+					specReplicas == d.Status.UpdatedReplicas &&
+					d.Generation == d.Status.ObservedGeneration, nil
+			default:
+				return false, err
+			}
+		}, ctx.Done())
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 func WaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
 	switch role {
@@ -27,7 +179,7 @@ func WaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api
 }
 
 func masterWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string) error {
-	kc, err := managedcluster.ClientsetFromConfig(cs)
+	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}
@@ -74,7 +226,7 @@ func masterIsReady(kc *kubernetes.Clientset, nodeName string) (bool, error) {
 }
 
 func nodeWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string) error {
-	kc, err := managedcluster.ClientsetFromConfig(cs)
+	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}

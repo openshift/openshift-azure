@@ -27,7 +27,7 @@ import (
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/healthcheck"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 // Interface exposes the methods a client needs to implement
@@ -100,7 +100,7 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, d
 		return nil, err
 	}
 
-	if err := healthcheck.WaitForHTTPStatusOk(context.Background(), transport, c.restconfig.Host+"/healthz"); err != nil {
+	if err := wait.ForHTTPStatusOk(context.Background(), transport, c.restconfig.Host+"/healthz"); err != nil {
 		return nil, err
 	}
 

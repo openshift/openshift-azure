@@ -9,15 +9,16 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/healthcheck"
-	"github.com/openshift/openshift-azure/pkg/initialize"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/upgrade"
 )
 
 type plugin struct {
-	entry  *logrus.Entry
-	config api.PluginConfig
+	entry           *logrus.Entry
+	config          api.PluginConfig
+	configUpgrader  config.Upgrader
+	clusterUpgrader upgrade.Upgrader
+	armGenerator    arm.Generator
 }
 
 var _ api.Plugin = &plugin{}
@@ -26,8 +27,11 @@ var _ api.Plugin = &plugin{}
 func NewPlugin(entry *logrus.Entry, pluginConfig api.PluginConfig) api.Plugin {
 	log.New(entry)
 	return &plugin{
-		entry:  entry,
-		config: pluginConfig,
+		entry:           entry,
+		config:          pluginConfig,
+		configUpgrader:  config.NewSimpleUpgrader(entry),
+		clusterUpgrader: upgrade.NewSimpleUpgrader(entry, pluginConfig),
+		armGenerator:    arm.NewSimpleGenerator(entry),
 	}
 }
 
@@ -84,8 +88,7 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 		cs.Config = &api.Config{}
 	}
 
-	upgrader := config.NewSimpleUpgrader(p.entry)
-	err := upgrader.Upgrade(ctx, cs)
+	err := p.configUpgrader.Upgrade(ctx, cs)
 	if err != nil {
 		return err
 	}
@@ -99,24 +102,37 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 
 func (p *plugin) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) ([]byte, error) {
 	log.Info("generating arm templates")
-	generator := arm.NewSimpleGenerator(p.entry)
-	return generator.Generate(ctx, cs, isUpdate)
+	return p.armGenerator.Generate(ctx, cs, isUpdate)
 }
 
 func (p *plugin) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	log.Info("initializing cluster")
-	initializer := initialize.NewSimpleInitializer(p.entry, p.config)
-	return initializer.InitializeCluster(ctx, cs)
+	return p.clusterUpgrader.InitializeCluster(ctx, cs)
 }
 
 func (p *plugin) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	log.Info("starting health check")
-	healthChecker := healthcheck.NewSimpleHealthChecker(p.entry, p.config)
-	return healthChecker.HealthCheck(ctx, cs)
+	return p.clusterUpgrader.HealthCheck(ctx, cs)
 }
 
-func (p *plugin) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte) error {
-	log.Info("starting update")
-	upgrader := upgrade.NewSimpleUpgrader(p.entry, p.config)
-	return upgrader.Update(ctx, cs, azuredeploy, p.config)
+func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, isUpdate bool, deployFn api.DeployFn) error {
+	var err error
+	if isUpdate {
+		log.Info("starting update")
+		err = p.clusterUpgrader.Update(ctx, cs, azuredeploy, deployFn)
+	} else {
+		log.Info("starting deploy")
+		err = p.clusterUpgrader.Deploy(ctx, cs, azuredeploy, deployFn)
+	}
+	if err != nil {
+		return err
+	}
+
+	// Wait for infrastructure services to be healthy
+	err = p.clusterUpgrader.WaitForInfraServices(ctx, cs)
+	if err != nil {
+		return err
+	}
+
+	return p.HealthCheck(ctx, cs)
 }

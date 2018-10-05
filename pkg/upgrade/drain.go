@@ -20,7 +20,7 @@ import (
 )
 
 func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
-	kc, err := managedcluster.ClientsetFromConfig(cs)
+	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}
