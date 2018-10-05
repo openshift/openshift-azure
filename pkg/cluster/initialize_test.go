@@ -16,7 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 )
 
-func TestInitializeCluster(t *testing.T) {
+func TestInitialize(t *testing.T) {
 	gmc := gomock.NewController(t)
 	accountsClient := mock_azureclient.NewMockAccountsClient(gmc)
 	storageClient := mock_storage.NewMockClient(gmc)
@@ -48,7 +48,7 @@ func TestInitializeCluster(t *testing.T) {
 	configBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader(csj), nil).Return(finalError)
 
 	log.New(logrus.NewEntry(logrus.New()))
-	if err := si.InitializeCluster(context.Background(), cs); err != finalError {
-		t.Errorf("simpleInitializer.InitializeCluster() error = %v", err)
+	if err := si.Initialize(context.Background(), cs); err != finalError {
+		t.Errorf("simpleUpgrader.Initialize() error = %v", err)
 	}
 }

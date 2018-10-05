@@ -21,7 +21,7 @@ import (
 
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
-	InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error
+	Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error
 	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error
 	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error

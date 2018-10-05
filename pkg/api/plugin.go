@@ -18,7 +18,7 @@ type PluginStep string
 
 const (
 	PluginStepDeploy                     PluginStep = "Deploy"
-	PluginStepInitialize                 PluginStep = "InitializeCluster"
+	PluginStepInitialize                 PluginStep = "Initialize"
 	PluginStepClientCreation             PluginStep = "ClientCreation"
 	PluginStepDrain                      PluginStep = "Drain"
 	PluginStepUpdateMasterVMRotation     PluginStep = "UpdateMasterVMRotation"
