@@ -393,15 +393,28 @@ func TestIsValidCloudAppHostname(t *testing.T) {
 		"too.long.domain.cloudapp.azure.com",
 		"invalid#characters#domain.westus2.cloudapp.azure.com",
 		"wronglocation.eastus.cloudapp.azure.com",
+		"123.eastus.cloudapp.azure.com",
+		"-abc.eastus.cloudapp.azure.com",
+		"abcdefghijklmnopqrstuvwxzyabcdefghijklmnopqrstuvwxzyabcdefghijkl.eastus.cloudapp.azure.com",
+		"a/b/c.eastus.cloudapp.azure.com",
+		".eastus.cloudapp.azure.com",
+		"Thisisatest.eastus.cloudapp.azure.com",
 	}
 	for _, invalidFqdn := range invalidFqdns {
 		if isValidCloudAppHostname(invalidFqdn, "westus2") {
 			t.Errorf("invalid FQDN passed test: %s", invalidFqdn)
 		}
 	}
-	validFqdn := "example.westus2.cloudapp.azure.com"
-	if !isValidCloudAppHostname(validFqdn, "westus2") {
-		t.Errorf("Valid FQDN failed to pass test: %s", validFqdn)
+	validFqdns := []string{
+		"example.westus2.cloudapp.azure.com",
+		"test-dashes.westus2.cloudapp.azure.com",
+		"test123.westus2.cloudapp.azure.com",
+		"test-123.westus2.cloudapp.azure.com",
+	}
+	for _, validFqdn := range validFqdns {
+		if !isValidCloudAppHostname(validFqdn, "westus2") {
+			t.Errorf("Valid FQDN failed to pass test: %s", validFqdn)
+		}
 	}
 }
 
@@ -547,72 +560,6 @@ properties:
 		gotErrs := validateUpdateContainerService(newCs, oldCs, false)
 		if !reflect.DeepEqual(gotErrs, tt.wantErrs) {
 			t.Errorf("validateUpdateContainerService:%s() = %v, want %v", name, gotErrs, tt.wantErrs)
-		}
-	}
-}
-func TestValidHostnames(t *testing.T) {
-	// adding tests to validate isValidCloudAppHostname
-	// ^[a-z][a-z0-9-]{1,61}[a-z0-9]$" + "."+location+".cloudapp.azure.com
-	tests := map[string]struct {
-		hostname string
-		valid    bool
-	}{
-		"good": {
-			hostname: "test",
-			valid:    true,
-		},
-		"good-2-longer-name": {
-			hostname: "test",
-			valid:    true,
-		},
-		"good-with-dashes": {
-			hostname: "this-is",
-			valid:    true,
-		},
-		"good-with-dashes-numbers": {
-			hostname: "this-is",
-			valid:    true,
-		},
-		"good-length-61": {
-			hostname: "abcdefghijklmnopqrstuvwxzyabcdefghijklmnopqrstuvwxzy",
-			valid:    true,
-		},
-		// bad start here
-		"bad-periods": {
-			hostname: "this.",
-			valid:    false,
-		},
-		"bad-start-with-numbers": {
-			hostname: "123",
-			valid:    false,
-		},
-		"bad-start-with-dashes": {
-			hostname: "-abc",
-			valid:    false,
-		},
-		"bad-length-64": {
-			hostname: "abcdefghijklmnopqrstuvwxzyabcdefghijklmnopqrstuvwxzyabcdefghijkl",
-			valid:    false,
-		},
-		"bad-char-slash": {
-			hostname: "a/b/c",
-			valid:    false,
-		},
-		"bad-0-length-first": {
-			hostname: "",
-			valid:    false,
-		},
-		"bad-capital": {
-			hostname: "Thisisatest",
-			valid:    false,
-		},
-	}
-
-	location := "eastus"
-	for name, tc := range tests {
-		hn := tc.hostname + "." + location + ".cloudapp.azure.com"
-		if isValidCloudAppHostname(hn, location) != tc.valid {
-			t.Errorf("%s failed for [%s]", name, tc.hostname)
 		}
 	}
 }
