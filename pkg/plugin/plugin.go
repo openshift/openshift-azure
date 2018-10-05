@@ -8,15 +8,15 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
+	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/log"
-	"github.com/openshift/openshift-azure/pkg/upgrade"
 )
 
 type plugin struct {
 	entry           *logrus.Entry
 	config          api.PluginConfig
-	clusterUpgrader upgrade.Upgrader
+	clusterUpgrader cluster.Upgrader
 	armGenerator    arm.Generator
 	configGenerator config.Generator
 }
@@ -29,7 +29,7 @@ func NewPlugin(entry *logrus.Entry, pluginConfig *api.PluginConfig) api.Plugin {
 	return &plugin{
 		entry:           entry,
 		config:          *pluginConfig,
-		clusterUpgrader: upgrade.NewSimpleUpgrader(entry, pluginConfig),
+		clusterUpgrader: cluster.NewSimpleUpgrader(entry, pluginConfig),
 		armGenerator:    arm.NewSimpleGenerator(entry, pluginConfig),
 		configGenerator: config.NewSimpleGenerator(pluginConfig),
 	}

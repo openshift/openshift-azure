@@ -1,4 +1,4 @@
-package upgrade
+package cluster
 
 //go:generate go get github.com/golang/mock/gomock
 //go:generate go install github.com/golang/mock/mockgen

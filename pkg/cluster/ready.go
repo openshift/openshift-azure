@@ -1,4 +1,4 @@
-package upgrade
+package cluster
 
 import (
 	"context"

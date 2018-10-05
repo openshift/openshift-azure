@@ -16,7 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/fixtures"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_upgrade"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 )
 
 func NewPluginWithFakeUpgrader(ctrl *gomock.Controller, entry *logrus.Entry, pluginConfig *api.PluginConfig) api.Plugin {
@@ -24,7 +24,7 @@ func NewPluginWithFakeUpgrader(ctrl *gomock.Controller, entry *logrus.Entry, plu
 	return &plugin{
 		entry:           entry,
 		config:          *pluginConfig,
-		clusterUpgrader: mock_upgrade.NewMockUpgrader(ctrl),
+		clusterUpgrader: mock_cluster.NewMockUpgrader(ctrl),
 		configGenerator: config.NewSimpleGenerator(pluginConfig),
 		armGenerator:    arm.NewSimpleGenerator(entry, pluginConfig),
 	}
@@ -145,7 +145,7 @@ func TestCreateOrUpdate(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUp := mock_upgrade.NewMockUpgrader(mockCtrl)
+	mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
 	tests := []struct {
 		name     string
 		isUpdate bool
