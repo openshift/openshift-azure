@@ -3,6 +3,7 @@ package config
 import (
 	"crypto/rsa"
 	"crypto/x509"
+	"crypto/x509/pkix"
 	"fmt"
 	"net"
 	"os"
@@ -66,173 +67,224 @@ func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (e
 	}
 
 	certs := []struct {
-		cn           string
-		organization []string
-		dnsNames     []string
-		ipAddresses  []net.IP
-		extKeyUsage  []x509.ExtKeyUsage
-		signingKey   *rsa.PrivateKey
-		signingCert  *x509.Certificate
-		key          **rsa.PrivateKey
-		cert         **x509.Certificate
-		selfSign     bool
+		params tls.CertParams
+		key    **rsa.PrivateKey
+		cert   **x509.Certificate
 	}{
 		// Generate etcd certs
 		{
-			cn:          "etcd-server",
-			dnsNames:    []string{"master-000000", "master-000001", "master-000002"},
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			signingKey:  c.Certificates.EtcdCa.Key,
-			signingCert: c.Certificates.EtcdCa.Cert,
-			key:         &c.Certificates.EtcdServer.Key,
-			cert:        &c.Certificates.EtcdServer.Cert,
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "etcd-server",
+				},
+				DNSNames:    []string{"master-000000", "master-000001", "master-000002"},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+				SigningKey:  c.Certificates.EtcdCa.Key,
+				SigningCert: c.Certificates.EtcdCa.Cert,
+			},
+			key:  &c.Certificates.EtcdServer.Key,
+			cert: &c.Certificates.EtcdServer.Cert,
 		},
 		{
-			cn:          "etcd-peer",
-			dnsNames:    []string{"master-000000", "master-000001", "master-000002"},
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
-			signingKey:  c.Certificates.EtcdCa.Key,
-			signingCert: c.Certificates.EtcdCa.Cert,
-			key:         &c.Certificates.EtcdPeer.Key,
-			cert:        &c.Certificates.EtcdPeer.Cert,
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "etcd-peer",
+				},
+				DNSNames:    []string{"master-000000", "master-000001", "master-000002"},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
+				SigningKey:  c.Certificates.EtcdCa.Key,
+				SigningCert: c.Certificates.EtcdCa.Cert,
+			},
+			key:  &c.Certificates.EtcdPeer.Key,
+			cert: &c.Certificates.EtcdPeer.Cert,
 		},
 		{
-			cn:          "etcd-client",
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			signingKey:  c.Certificates.EtcdCa.Key,
-			signingCert: c.Certificates.EtcdCa.Cert,
-			key:         &c.Certificates.EtcdClient.Key,
-			cert:        &c.Certificates.EtcdClient.Cert,
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "etcd-client",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+				SigningKey:  c.Certificates.EtcdCa.Key,
+				SigningCert: c.Certificates.EtcdCa.Cert,
+			},
+			key:  &c.Certificates.EtcdClient.Key,
+			cert: &c.Certificates.EtcdClient.Cert,
 		},
 		// Generate openshift master certs
 		{
-			cn:           "system:admin",
-			organization: []string{"system:cluster-admins", "system:masters"},
-			extKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:          &c.Certificates.Admin.Key,
-			cert:         &c.Certificates.Admin.Cert,
-		},
-		{
-			cn:          "aggregator-front-proxy",
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			signingKey:  c.Certificates.FrontProxyCa.Key,
-			signingCert: c.Certificates.FrontProxyCa.Cert,
-			key:         &c.Certificates.AggregatorFrontProxy.Key,
-			cert:        &c.Certificates.AggregatorFrontProxy.Cert,
-		},
-		{
-			cn:           "system:openshift-node-admin",
-			organization: []string{"system:node-admins"},
-			extKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:          &c.Certificates.MasterKubeletClient.Key,
-			cert:         &c.Certificates.MasterKubeletClient.Cert,
-		},
-		{
-			cn:          "system:master-proxy",
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:         &c.Certificates.MasterProxyClient.Key,
-			cert:        &c.Certificates.MasterProxyClient.Cert,
-		},
-		{
-			cn: cs.Properties.FQDN,
-			dnsNames: []string{
-				cs.Properties.FQDN,
-				"master-000000",
-				"master-000001",
-				"master-000002",
-				"kubernetes",
-				"kubernetes.default",
-				"kubernetes.default.svc",
-				"kubernetes.default.svc.cluster.local",
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName:   "system:admin",
+					Organization: []string{"system:cluster-admins", "system:masters"},
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 			},
-			ipAddresses: []net.IP{net.ParseIP("172.30.0.1")},
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			key:         &c.Certificates.MasterServer.Key,
-			cert:        &c.Certificates.MasterServer.Cert,
+			key:  &c.Certificates.Admin.Key,
+			cert: &c.Certificates.Admin.Cert,
 		},
 		{
-			cn:           "system:openshift-master",
-			organization: []string{"system:cluster-admins", "system:masters"},
-			extKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:          &c.Certificates.OpenShiftMaster.Key,
-			cert:         &c.Certificates.OpenShiftMaster.Cert,
-		},
-		{
-			cn: "servicecatalog-api",
-			dnsNames: []string{
-				"servicecatalog-api",
-				"apiserver.kube-service-catalog.svc", // TODO: unclear how safe this is
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "aggregator-front-proxy",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+				SigningKey:  c.Certificates.FrontProxyCa.Key,
+				SigningCert: c.Certificates.FrontProxyCa.Cert,
 			},
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			signingKey:  c.Certificates.ServiceCatalogCa.Key,
-			signingCert: c.Certificates.ServiceCatalogCa.Cert,
-			key:         &c.Certificates.ServiceCatalogServer.Key,
-			cert:        &c.Certificates.ServiceCatalogServer.Cert,
+			key:  &c.Certificates.AggregatorFrontProxy.Key,
+			cert: &c.Certificates.AggregatorFrontProxy.Cert,
 		},
 		{
-			cn:          "system:serviceaccount:kube-service-catalog:service-catalog-apiserver",
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:         &c.Certificates.ServiceCatalogAPIClient.Key,
-			cert:        &c.Certificates.ServiceCatalogAPIClient.Cert,
-		},
-		{
-			cn:          "system:serviceaccount:openshift-infra:node-bootstrapper",
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:         &c.Certificates.NodeBootstrap.Key,
-			cert:        &c.Certificates.NodeBootstrap.Cert,
-		},
-		{
-			cn:          "system:serviceaccount:openshift-azure:azure-cluster-reader",
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			key:         &c.Certificates.AzureClusterReader.Key,
-			cert:        &c.Certificates.AzureClusterReader.Cert,
-		},
-		{
-			cn: cs.Properties.RouterProfiles[0].PublicSubdomain,
-			dnsNames: []string{
-				cs.Properties.RouterProfiles[0].PublicSubdomain,
-				"*." + cs.Properties.RouterProfiles[0].PublicSubdomain,
+			params: tls.CertParams{
+				Subject: pkix.Name{CommonName: "system:openshift-node-admin",
+					Organization: []string{"system:node-admins"},
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 			},
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			key:         &c.Certificates.Router.Key,
-			cert:        &c.Certificates.Router.Cert,
+			key:  &c.Certificates.MasterKubeletClient.Key,
+			cert: &c.Certificates.MasterKubeletClient.Cert,
 		},
 		{
-			cn: "docker-registry-default." + cs.Properties.RouterProfiles[0].PublicSubdomain,
-			dnsNames: []string{
-				"docker-registry-default." + cs.Properties.RouterProfiles[0].PublicSubdomain,
-				"docker-registry.default.svc",
-				"docker-registry.default.svc.cluster.local",
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "system:master-proxy",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 			},
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			key:         &c.Certificates.Registry.Key,
-			cert:        &c.Certificates.Registry.Cert,
+			key:  &c.Certificates.MasterProxyClient.Key,
+			cert: &c.Certificates.MasterProxyClient.Cert,
 		},
-		// Openshift Console is BYO type of certificate. In the long run we should
-		// enable users to configure their own certificates.
-		// For this reason we decouple it from all OCP certs and make it self-sign
-		// If FQDN matches PublicHostname certificate can't be self-sign
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: cs.Properties.FQDN,
+				},
+				DNSNames: []string{
+					cs.Properties.FQDN,
+					"master-000000",
+					"master-000001",
+					"master-000002",
+					"kubernetes",
+					"kubernetes.default",
+					"kubernetes.default.svc",
+					"kubernetes.default.svc.cluster.local",
+				},
+				IPAddresses: []net.IP{net.ParseIP("172.30.0.1")},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			},
+			key:  &c.Certificates.MasterServer.Key,
+			cert: &c.Certificates.MasterServer.Cert,
+		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{CommonName: "system:openshift-master",
+					Organization: []string{"system:cluster-admins", "system:masters"},
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			},
+			key:  &c.Certificates.OpenShiftMaster.Key,
+			cert: &c.Certificates.OpenShiftMaster.Cert,
+		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "servicecatalog-api",
+				},
+				DNSNames: []string{
+					"servicecatalog-api",
+					"apiserver.kube-service-catalog.svc", // TODO: unclear how safe this is
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+				SigningKey:  c.Certificates.ServiceCatalogCa.Key,
+				SigningCert: c.Certificates.ServiceCatalogCa.Cert,
+			},
+			key:  &c.Certificates.ServiceCatalogServer.Key,
+			cert: &c.Certificates.ServiceCatalogServer.Cert,
+		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "system:serviceaccount:kube-service-catalog:service-catalog-apiserver",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			},
+			key:  &c.Certificates.ServiceCatalogAPIClient.Key,
+			cert: &c.Certificates.ServiceCatalogAPIClient.Cert,
+		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "system:serviceaccount:openshift-infra:node-bootstrapper",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			},
+			key:  &c.Certificates.NodeBootstrap.Key,
+			cert: &c.Certificates.NodeBootstrap.Cert,
+		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "system:serviceaccount:openshift-azure:azure-cluster-reader",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			},
+			key:  &c.Certificates.AzureClusterReader.Key,
+			cert: &c.Certificates.AzureClusterReader.Cert,
+		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: cs.Properties.RouterProfiles[0].PublicSubdomain,
+				},
+				DNSNames: []string{
+					cs.Properties.RouterProfiles[0].PublicSubdomain,
+					"*." + cs.Properties.RouterProfiles[0].PublicSubdomain,
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			},
+			key:  &c.Certificates.Router.Key,
+			cert: &c.Certificates.Router.Cert,
+		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "docker-registry-default." + cs.Properties.RouterProfiles[0].PublicSubdomain,
+				},
+				DNSNames: []string{
+					"docker-registry-default." + cs.Properties.RouterProfiles[0].PublicSubdomain,
+					"docker-registry.default.svc",
+					"docker-registry.default.svc.cluster.local",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			},
+			key:  &c.Certificates.Registry.Key,
+			cert: &c.Certificates.Registry.Cert,
+		},
+		// Do not attempt to make the OpenShift console certificate self-signed
+		// if cs.Properties == cs.FQDN:
 		// https://github.com/openshift/openshift-azure/issues/307
 		{
-			cn: Derived.PublicHostname(cs),
-			dnsNames: []string{
-				Derived.PublicHostname(cs),
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: Derived.PublicHostname(cs),
+				},
+				DNSNames: []string{
+					Derived.PublicHostname(cs),
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			},
-			extKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			key:         &c.Certificates.OpenshiftConsole.Key,
-			cert:        &c.Certificates.OpenshiftConsole.Cert,
+			key:  &c.Certificates.OpenshiftConsole.Key,
+			cert: &c.Certificates.OpenshiftConsole.Cert,
 		},
 	}
 	for _, cert := range certs {
-		if cert.signingKey == nil && cert.signingCert == nil {
-			cert.signingKey, cert.signingCert = c.Certificates.Ca.Key, c.Certificates.Ca.Cert
+		if cert.params.SigningKey == nil && cert.params.SigningCert == nil {
+			cert.params.SigningKey, cert.params.SigningCert = c.Certificates.Ca.Key, c.Certificates.Ca.Cert
 		}
-		if *cert.key != nil && *cert.cert != nil &&
-			((*cert.cert).CheckSignatureFrom(cert.signingCert) == nil || cert.selfSign) {
-			continue
-		}
-		if *cert.key, *cert.cert, err = tls.NewCert(cert.cn, cert.organization, cert.dnsNames, cert.ipAddresses, cert.extKeyUsage, cert.signingKey, cert.signingCert, cert.selfSign); err != nil {
-			return
+		if !tls.CertMatchesParams(*cert.key, *cert.cert, &cert.params) {
+			if *cert.key, *cert.cert, err = tls.NewCert(&cert.params); err != nil {
+				return
+			}
 		}
 	}
 
