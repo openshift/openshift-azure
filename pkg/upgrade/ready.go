@@ -189,7 +189,7 @@ func masterWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, no
 	}, ctx.Done())
 }
 
-func masterIsReady(kc *kubernetes.Clientset, nodeName string) (bool, error) {
+func masterIsReady(kc kubernetes.Interface, nodeName string) (bool, error) {
 	ready, err := nodeIsReady(kc, nodeName)
 	if !ready || err != nil {
 		return ready, err
@@ -225,6 +225,15 @@ func masterIsReady(kc *kubernetes.Clientset, nodeName string) (bool, error) {
 	return isPodReady(etcdPod) && isPodReady(apiPod) && isPodReady(cmPod), nil
 }
 
+func isPodReady(pod *corev1.Pod) bool {
+	for _, c := range pod.Status.Conditions {
+		if c.Type == corev1.PodReady {
+			return c.Status == corev1.ConditionTrue
+		}
+	}
+	return false
+}
+
 func nodeWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string) error {
 	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
@@ -241,7 +250,7 @@ func nodeWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, node
 	return setUnschedulable(ctx, kc, nodeName, false)
 }
 
-func nodeIsReady(kc *kubernetes.Clientset, nodeName string) (bool, error) {
+func nodeIsReady(kc kubernetes.Interface, nodeName string) (bool, error) {
 	node, err := kc.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
 	switch {
 	case err == nil:
@@ -251,23 +260,10 @@ func nodeIsReady(kc *kubernetes.Clientset, nodeName string) (bool, error) {
 		return false, err
 	}
 
-	return isNodeReady(node), nil
-}
-
-func isPodReady(pod *corev1.Pod) bool {
-	for _, c := range pod.Status.Conditions {
-		if c.Type == corev1.PodReady {
-			return c.Status == corev1.ConditionTrue
-		}
-	}
-	return false
-}
-
-func isNodeReady(node *corev1.Node) bool {
 	for _, c := range node.Status.Conditions {
 		if c.Type == corev1.NodeReady {
-			return c.Status == corev1.ConditionTrue
+			return c.Status == corev1.ConditionTrue, nil
 		}
 	}
-	return false
+	return false, nil
 }
