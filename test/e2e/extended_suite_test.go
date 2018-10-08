@@ -17,13 +17,13 @@ var (
 	kubeconfig = flag.String("kubeconfig", "../../_data/_out/admin.kubeconfig", "Location of the kubeconfig")
 )
 
-var _ = BeforeSuite(func() {
+var _ = BeforeEach(func() {
 	c = newTestClient(*kubeconfig)
 	namespace := nameGen.generate("e2e-test-")
 	c.createProject(namespace)
 })
 
-var _ = AfterSuite(func() {
+var _ = AfterEach(func() {
 	c.cleanupProject(10 * time.Minute)
 })
 
