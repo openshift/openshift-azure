@@ -21,6 +21,7 @@ type testClient struct {
 	kc        *kubernetes.Clientset
 	pc        *projectclient.ProjectV1Client
 	namespace string
+	config    *rest.Config
 }
 
 func newTestClient(kubeconfig string) *testClient {
@@ -53,8 +54,9 @@ func newTestClient(kubeconfig string) *testClient {
 	}
 
 	return &testClient{
-		kc: kc,
-		pc: pc,
+		kc:     kc,
+		pc:     pc,
+		config: config,
 	}
 }
 

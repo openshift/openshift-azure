@@ -16,10 +16,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 )
 
-var _ = BeforeSuite(func() {
-	c = newTestClient(*kubeconfig)
-})
-
 var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader]", func() {
 	defer GinkgoRecover()
 

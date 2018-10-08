@@ -4,7 +4,6 @@ package e2e
 
 import (
 	"fmt"
-	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,20 +15,6 @@ import (
 
 var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 	defer GinkgoRecover()
-
-	BeforeEach(func() {
-		namespace := nameGen.generate("e2e-test-")
-		// TODO: The namespace is cached in the client so this will not
-		// work with parallel tests.
-		c.createProject(namespace)
-	})
-
-	AfterEach(func() {
-		if CurrentGinkgoTestDescription().Failed {
-			// TODO: Dump info from namespace
-		}
-		c.cleanupProject(10 * time.Minute)
-	})
 
 	It("should disallow PDB mutations", func() {
 		maxUnavailable := intstr.FromInt(1)
