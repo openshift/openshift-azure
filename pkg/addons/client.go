@@ -5,7 +5,6 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/go-test/deep"
 	log "github.com/sirupsen/logrus"
 	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
@@ -27,6 +26,7 @@ import (
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
@@ -37,7 +37,7 @@ type Interface interface {
 	UpdateDynamicClient() error
 	ServiceCatalogExists() (bool, error)
 	EtcdCRDReady() (bool, error)
-	GetStorageAccountKey(resourceGroup, storageAccount string) (string, error)
+	GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error)
 }
 
 // client implements Interface
@@ -50,10 +50,10 @@ type client struct {
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
 	grs        []*discovery.APIGroupResources
-	azs        storage.AccountsClient
+	azs        azureclient.AccountsClient
 }
 
-func newClient(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, dryRun bool) (Interface, error) {
+func newClient(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) (Interface, error) {
 	if dryRun {
 		return &dryClient{}, nil
 	}
@@ -100,7 +100,7 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, d
 		return nil, err
 	}
 
-	if err := wait.ForHTTPStatusOk(context.Background(), transport, c.restconfig.Host+"/healthz"); err != nil {
+	if err := wait.ForHTTPStatusOk(ctx, transport, c.restconfig.Host+"/healthz"); err != nil {
 		return nil, err
 	}
 
@@ -111,8 +111,8 @@ func newClient(cs *acsapi.OpenShiftManagedCluster, azs storage.AccountsClient, d
 	return c, nil
 }
 
-func (c *client) GetStorageAccountKey(resourceGroup, storageAccount string) (string, error) {
-	response, err := c.azs.ListKeys(context.Background(), resourceGroup, storageAccount)
+func (c *client) GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error) {
+	response, err := c.azs.ListKeys(ctx, resourceGroup, storageAccount)
 	if err != nil {
 		return "", err
 	}
@@ -294,6 +294,6 @@ func (c *dryClient) ApplyResources(filter func(unstructured.Unstructured) bool, 
 func (c *dryClient) UpdateDynamicClient() error          { return nil }
 func (c *dryClient) ServiceCatalogExists() (bool, error) { return true, nil }
 func (c *dryClient) EtcdCRDReady() (bool, error)         { return true, nil }
-func (c *dryClient) GetStorageAccountKey(resourceGroup, storageAccount string) (string, error) {
+func (c *dryClient) GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error) {
 	return "", nil
 }

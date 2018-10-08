@@ -24,11 +24,11 @@ type plugin struct {
 var _ api.Plugin = &plugin{}
 
 // NewPlugin creates a new plugin instance
-func NewPlugin(entry *logrus.Entry, pluginConfig api.PluginConfig) api.Plugin {
+func NewPlugin(entry *logrus.Entry, pluginConfig *api.PluginConfig) api.Plugin {
 	log.New(entry)
 	return &plugin{
 		entry:           entry,
-		config:          pluginConfig,
+		config:          *pluginConfig,
 		configUpgrader:  config.NewSimpleUpgrader(entry),
 		clusterUpgrader: upgrade.NewSimpleUpgrader(entry, pluginConfig),
 		armGenerator:    arm.NewSimpleGenerator(entry),

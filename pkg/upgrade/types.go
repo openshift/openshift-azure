@@ -23,9 +23,9 @@ type simpleUpgrader struct {
 
 var _ Upgrader = &simpleUpgrader{}
 
-func NewSimpleUpgrader(entry *logrus.Entry, pluginConfig api.PluginConfig) Upgrader {
+func NewSimpleUpgrader(entry *logrus.Entry, pluginConfig *api.PluginConfig) Upgrader {
 	log.New(entry)
 	return &simpleUpgrader{
-		pluginConfig: pluginConfig,
+		pluginConfig: *pluginConfig,
 	}
 }
