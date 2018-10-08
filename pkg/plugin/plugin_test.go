@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"context"
-	"strings"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
@@ -31,7 +30,7 @@ func TestMerge(t *testing.T) {
 
 	// make old cluster go through plugin first
 	armTemplate := testPluginRun(p, oldCluster, nil, t)
-	if !strings.Contains(string(armTemplate), "\"type\": \"Microsoft.Network/networkSecurityGroups\"") {
+	if !hasResourceType(armTemplate, "Microsoft.Network/networkSecurityGroups") {
 		t.Fatalf("networkSecurityGroups should be applied during cluster creation")
 	}
 
@@ -65,12 +64,21 @@ func TestMerge(t *testing.T) {
 	}
 
 	armTemplate = testPluginRun(p, newCluster, oldCluster, t)
-	if strings.Contains(string(armTemplate), "\"type\": \"Microsoft.Network/networkSecurityGroups\"") {
+	if hasResourceType(armTemplate, "Microsoft.Network/networkSecurityGroups") {
 		t.Fatalf("networkSecurityGroups should not be applied during cluster upgrade")
 	}
 }
 
-func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldCluster *api.OpenShiftManagedCluster, t *testing.T) (armTemplate []byte) {
+func hasResourceType(armTemplate map[string]interface{}, resType string) bool {
+	for _, res := range armTemplate["resources"].([]interface{}) {
+		if res.(map[string]interface{})["type"] == resType {
+			return true
+		}
+	}
+	return false
+}
+
+func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldCluster *api.OpenShiftManagedCluster, t *testing.T) (armTemplate map[string]interface{}) {
 	if errs := p.Validate(context.Background(), newCluster, oldCluster, false); len(errs) != 0 {
 		t.Fatalf("error validating: %s", spew.Sdump(errs))
 	}
@@ -79,12 +87,12 @@ func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldClu
 		t.Fatalf("error generating config for arm generate test: %s", spew.Sdump(err))
 	}
 
-	bytes, err := p.GenerateARM(context.Background(), newCluster, oldCluster != nil)
+	azuretemplate, err := p.GenerateARM(context.Background(), newCluster, oldCluster != nil)
 	if err != nil {
 		t.Fatalf("error generating arm: %s", spew.Sdump(err))
 	}
-	if len(bytes) == 0 {
+	if len(azuretemplate) == 0 {
 		t.Errorf("no arm was generated")
 	}
-	return bytes
+	return azuretemplate
 }

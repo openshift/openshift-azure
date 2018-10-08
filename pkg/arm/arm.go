@@ -6,6 +6,7 @@ package arm
 
 import (
 	"context"
+	"encoding/json"
 	"text/template"
 
 	"github.com/sirupsen/logrus"
@@ -16,7 +17,7 @@ import (
 )
 
 type Generator interface {
-	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) ([]byte, error)
+	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error)
 }
 
 type simpleGenerator struct{}
@@ -29,7 +30,7 @@ func NewSimpleGenerator(entry *logrus.Entry) Generator {
 	return &simpleGenerator{}
 }
 
-func (*simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) ([]byte, error) {
+func (*simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error) {
 	masterStartup, err := Asset("master-startup.sh")
 	if err != nil {
 		return nil, err
@@ -44,7 +45,7 @@ func (*simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCl
 	if err != nil {
 		return nil, err
 	}
-	return util.Template(string(tmpl), template.FuncMap{
+	azuredeploy, err := util.Template(string(tmpl), template.FuncMap{
 		"Startup": func(role api.AgentPoolProfileRole) ([]byte, error) {
 			if role == api.AgentPoolProfileRoleMaster {
 				return util.Template(string(masterStartup), nil, cs, map[string]interface{}{"Role": role})
@@ -55,4 +56,14 @@ func (*simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCl
 			return isUpdate
 		},
 	}, cs, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var azuretemplate map[string]interface{}
+	err = json.Unmarshal(azuredeploy, &azuretemplate)
+	if err != nil {
+		return nil, err
+	}
+	return azuretemplate, nil
 }

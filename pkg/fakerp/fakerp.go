@@ -2,6 +2,7 @@ package fakerp
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -86,14 +87,14 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	}
 
 	// generate the ARM template
-	azuredeploy, err := p.GenerateARM(ctx, cs, oldCs != nil)
+	azuretemplate, err := p.GenerateARM(ctx, cs, oldCs != nil)
 	if err != nil {
 		return nil, err
 	}
 
 	// write out development files
 	log.Info("write helpers")
-	err = writeHelpers(cs, azuredeploy)
+	err = writeHelpers(cs, azuretemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +126,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return future.WaitForCompletionRef(ctx, deployments.Client())
 	}
 
-	err = p.CreateOrUpdate(ctx, cs, azuredeploy, oldCs != nil, deployer)
+	err = p.CreateOrUpdate(ctx, cs, azuretemplate, oldCs != nil, deployer)
 	if err != nil {
 		return nil, err
 	}
@@ -202,13 +203,18 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func writeHelpers(c *api.OpenShiftManagedCluster, azuredeploy []byte) error {
+func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}) error {
 	b, err := config.Derived.CloudProviderConf(c)
 	if err != nil {
 		return err
 	}
 
 	err = ioutil.WriteFile("_data/_out/azure.conf", b, 0600)
+	if err != nil {
+		return err
+	}
+
+	azuredeploy, err := json.Marshal(azuretemplate)
 	if err != nil {
 		return err
 	}
