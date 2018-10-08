@@ -1,5 +1,10 @@
 package api
 
+const (
+	// APIVersion is the version of this API
+	APIVersion = "internal"
+)
+
 // OpenShiftManagedCluster complies with the ARM model of resource definition in
 // a JSON template.
 type OpenShiftManagedCluster struct {
