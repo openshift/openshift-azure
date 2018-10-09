@@ -16,7 +16,6 @@ import (
 type plugin struct {
 	entry           *logrus.Entry
 	config          api.PluginConfig
-	configUpgrader  config.Upgrader
 	clusterUpgrader upgrade.Upgrader
 	armGenerator    arm.Generator
 }
@@ -29,7 +28,6 @@ func NewPlugin(entry *logrus.Entry, pluginConfig *api.PluginConfig) api.Plugin {
 	return &plugin{
 		entry:           entry,
 		config:          *pluginConfig,
-		configUpgrader:  config.NewSimpleUpgrader(entry),
 		clusterUpgrader: upgrade.NewSimpleUpgrader(entry, pluginConfig),
 		armGenerator:    arm.NewSimpleGenerator(entry),
 	}
@@ -88,12 +86,7 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 		cs.Config = &api.Config{}
 	}
 
-	err := p.configUpgrader.Upgrade(ctx, cs)
-	if err != nil {
-		return err
-	}
-
-	err = config.Generate(cs, p.config)
+	err := config.Generate(cs, p.config)
 	if err != nil {
 		return err
 	}
