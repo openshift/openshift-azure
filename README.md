@@ -81,7 +81,8 @@
 ### Deploy an OpenShift cluster
 
 1. Copy the `env.example` file to `env` and edit according to your requirements.
-   Source the `env` file: `. ./env`.
+   Source the `env` file: `. ./env`. Make sure the env file is placed in the root
+   directory of the project.
 
 1. Run `./hack/create.sh $RESOURCEGROUP` to deploy a cluster.
 

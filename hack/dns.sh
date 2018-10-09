@@ -1,5 +1,16 @@
 #!/bin/bash -e
 
+ENVIRONMENT_CONFIG=$(dirname $(dirname $0))/env
+
+# check if the environment config file exists
+if [[ ! -f ${ENVIRONMENT_CONFIG} ]]; then
+	echo error: must setup an env config file in project root
+	exit 1
+fi
+
+# source the environment config file
+. ${ENVIRONMENT_CONFIG}
+
 if [[ -z "$DNS_DOMAIN" ]]; then
     echo error: must set DNS_DOMAIN
     exit 1
