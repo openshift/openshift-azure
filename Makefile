@@ -51,7 +51,7 @@ cover:
 	go tool cover -html=coverage.out
 
 e2e: generate
-	./hack/e2e.sh "${SUITE}"
+	./hack/e2e.sh
 
 e2e-bin: generate
 	go test -tags e2e -ldflags "-X github.com/openshift/openshift-azure/test/e2e.gitCommit=$(shell git rev-parse --short HEAD)" -i -c -o e2e.test ./test/e2e

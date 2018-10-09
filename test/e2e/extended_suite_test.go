@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"testing"
-	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,14 +16,8 @@ var (
 	kubeconfig = flag.String("kubeconfig", "../../_data/_out/admin.kubeconfig", "Location of the kubeconfig")
 )
 
-var _ = BeforeEach(func() {
+var _ = BeforeSuite(func() {
 	c = newTestClient(*kubeconfig)
-	namespace := nameGen.generate("e2e-test-")
-	c.createProject(namespace)
-})
-
-var _ = AfterEach(func() {
-	c.cleanupProject(10 * time.Minute)
 })
 
 func TestExtended(t *testing.T) {

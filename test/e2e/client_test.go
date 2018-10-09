@@ -13,7 +13,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
-	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -21,7 +20,6 @@ import (
 var c *testClient
 
 type testClient struct {
-	cc        *corev1client.CoreV1Client
 	kc        *kubernetes.Clientset
 	pc        *projectclient.ProjectV1Client
 	rc        *routev1client.RouteV1Client
@@ -44,12 +42,6 @@ func newTestClient(kubeconfig string) *testClient {
 		if err != nil {
 			panic(err.Error())
 		}
-	}
-
-	// create the core client
-	cc, err := corev1client.NewForConfig(config)
-	if err != nil {
-		panic(err)
 	}
 
 	// create the clientset
@@ -78,7 +70,6 @@ func newTestClient(kubeconfig string) *testClient {
 	}
 
 	return &testClient{
-		cc: cc,
 		kc: kc,
 		pc: pc,
 		rc: rc,

@@ -1,14 +1,12 @@
 #!/bin/bash -e
 
-SUITE="$1"
-
-if [ -z "$RESOURCEGROUP" ]; then
+if [[ -z "$RESOURCEGROUP" ]]; then
     RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
 fi
 
 if [ -z "$SUITE" ] || [ "$SUITE" == "enduser" ]; then
   echo "Running end user e2e tests"
-  # Login as osadmin to simulate a regural user
+  # Login as osadmin to simulate a regular user
   password=$(hack/config.sh get-config $RESOURCEGROUP | jq -r .config.adminPasswd)
   fqdn=$(hack/config.sh get-config $RESOURCEGROUP | jq -r .properties.fqdn)
   export KUBECONFIG=_data/_out/osadmin.kubeconfig
