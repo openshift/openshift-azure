@@ -2,9 +2,9 @@ package upgrade
 
 //go:generate go get github.com/golang/mock/gomock
 //go:generate go install github.com/golang/mock/mockgen
-//go:generate mockgen -destination=../util/mocks/mock_upgrade/types.go -package=mock_upgrade -source types.go
-//go:generate gofmt -s -l -w ../util/mocks/mock_upgrade/types.go
-//go:generate goimports -e -w ../util/mocks/mock_upgrade/types.go
+//go:generate mockgen -destination=../util/mocks/mock_$GOPACKAGE/types.go -package=mock_$GOPACKAGE -source types.go
+//go:generate gofmt -s -l -w ../util/mocks/mock_$GOPACKAGE/types.go
+//go:generate goimports -e -w ../util/mocks/mock_$GOPACKAGE/types.go
 
 import (
 	"context"
@@ -13,6 +13,8 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
 type Upgrader interface {
@@ -24,7 +26,9 @@ type Upgrader interface {
 }
 
 type simpleUpgrader struct {
-	pluginConfig api.PluginConfig
+	pluginConfig   api.PluginConfig
+	accountsClient azureclient.AccountsClient
+	storageClient  storage.Client
 }
 
 var _ Upgrader = &simpleUpgrader{}

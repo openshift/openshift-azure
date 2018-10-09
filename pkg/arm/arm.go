@@ -5,9 +5,9 @@ package arm
 //go:generate gofmt -s -l -w bindata.go
 //go:generate go get github.com/golang/mock/gomock
 //go:generate go install github.com/golang/mock/mockgen
-//go:generate mockgen -destination=../util/mocks/mock_arm/arm.go -package=mock_arm -source arm.go
-//go:generate gofmt -s -l -w ../util/mocks/mock_arm/arm.go
-//go:generate goimports -e -w ../util/mocks/mock_arm/arm.go
+//go:generate mockgen -destination=../util/mocks/mock_$GOPACKAGE/arm.go -package=mock_$GOPACKAGE -source arm.go
+//go:generate gofmt -s -l -w ../util/mocks/mock_$GOPACKAGE/arm.go
+//go:generate goimports -e -w ../util/mocks/mock_$GOPACKAGE/arm.go
 
 import (
 	"context"

@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"testing"
@@ -108,11 +107,7 @@ func TestGenerateARM(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	var testData map[string]interface{}
-	err := json.Unmarshal([]byte("{\"test\": \"data\"}"), &testData)
-	if err != nil {
-		t.Fatalf("Unmarshal failed %v", err)
-	}
+	testData := map[string]interface{}{"test": "data"}
 	mockGen := mock_arm.NewMockGenerator(mockCtrl)
 	mockGen.EXPECT().Generate(nil, nil, true).Return(testData, nil)
 	p := &plugin{
