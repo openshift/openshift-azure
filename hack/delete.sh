@@ -23,7 +23,11 @@ if [[ ! -e _data/containerservice.yaml ]]; then
     exit 1
 fi
 
-RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
+if [[ $# -eq 1 ]]; then
+    export RESOURCEGROUP=$1
+else
+    RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
+fi
 
 hack/dns.sh zone-delete $RESOURCEGROUP
 
