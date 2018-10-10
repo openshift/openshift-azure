@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	policy "k8s.io/api/policy/v1beta1"
-	_ "k8s.io/apimachinery/pkg/api/errors"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
@@ -47,8 +47,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		}
 
 		_, err = c.kc.Policy().PodDisruptionBudgets(c.namespace).Create(pdb)
-		// TODO: Reenable
-		// Expect(kerrors.IsForbidden(err)).To(Equal(true))
 		fmt.Printf("PDB create error: %v\n", err)
+		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 	})
 })
