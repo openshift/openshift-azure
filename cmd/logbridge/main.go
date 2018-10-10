@@ -25,6 +25,7 @@ import (
 
 var (
 	cursorSyncInterval = flag.Duration("cursorSyncInterval", 10*time.Second, "interval after which the current journald cursor is synced to disk")
+	gitCommit          = "unknown"
 )
 
 func getWorkspaceInfo() (string, []byte, error) {
@@ -75,6 +76,11 @@ func readCursor() (string, error) {
 }
 
 func writeCursor(cursor string) error {
+	if cursor == "" {
+		log.Print("tried to write empty cursor, ignoring")
+		return nil
+	}
+
 	f, err := os.Create("state/cursor.new")
 	if err != nil {
 		return err
@@ -119,17 +125,22 @@ func startReader(ch chan<- []map[string]interface{}) error {
 
 	cursor, err := readCursor()
 	if err == nil {
-		err = j.SeekCursor(cursor)
-		if err != nil {
-			return err
-		}
+		if cursor == "" {
+			log.Print("read empty cursor, ignoring")
 
-		// normally we should hit the last entry we logged, in which case
-		// advance the cursor by one.  If that entry no longer exists, we may
-		// have lost logs.  In this case, SeekCursor should put us on the very
-		// next entry it finds, in which case don't further advance the cursor
-		if j.TestCursor(cursor) == nil {
-			j.Next()
+		} else {
+			err = j.SeekCursor(cursor)
+			if err != nil {
+				return err
+			}
+
+			// normally we should hit the last entry we logged, in which case
+			// advance the cursor by one.  If that entry no longer exists, we may
+			// have lost logs.  In this case, SeekCursor should put us on the very
+			// next entry it finds, in which case don't further advance the cursor
+			if j.TestCursor(cursor) == nil {
+				j.Next()
+			}
 		}
 	}
 
@@ -166,6 +177,10 @@ func startReader(ch chan<- []map[string]interface{}) error {
 				e[k] = v
 			}
 
+			if entry.Cursor == "" {
+				log.Printf("entry.Cursor was empty: %#v", entry)
+			}
+
 			// https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html
 			e["__CURSOR"] = entry.Cursor
 			e["__REALTIME_TIMESTAMP"] = entry.RealtimeTimestamp
@@ -185,6 +200,8 @@ func startReader(ch chan<- []map[string]interface{}) error {
 }
 
 func run() error {
+	log.Printf("logbridge starting, git commit %s", gitCommit)
+
 	customerID, key, err := getWorkspaceInfo()
 	if err != nil {
 		return err
@@ -252,6 +269,6 @@ func run() error {
 
 func main() {
 	if err := run(); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
