@@ -44,4 +44,4 @@ fi
 export RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
 
 go generate ./...
-go run cmd/createorupdate/createorupdate.go -loglevel=debug
+go run cmd/createorupdate/createorupdate.go
