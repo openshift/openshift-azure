@@ -71,8 +71,10 @@ func makeHtPasswd(username, password string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	htpasswd := append([]byte(username+":"), b...)
+	htpasswd = append(htpasswd, []byte("\n")...)
 
-	return append([]byte(username+":"), b...), nil
+	return htpasswd, nil
 }
 
 func getHashFromHtPasswd(record []byte) []byte {
