@@ -63,11 +63,14 @@ export RESOURCEGROUP=$1
 rm -rf _data
 mkdir -p _data/_out
 
-ttl=76h
-if [[ -n $RESOURCEGROUP_TTL ]]; then
-  ttl=$RESOURCEGROUP_TTL
+if [[ -z "$NOGROUPTAGS" ]]; then
+  ttl=76h
+  if [[ -n "$RESOURCEGROUP_TTL" ]]; then
+    ttl=$RESOURCEGROUP_TTL
+  fi
+  GROUPTAGS=--tags now=$(date +%s) ttl=$ttl
 fi
-az group create -n $RESOURCEGROUP -l $AZURE_REGION --tags now=$(date +%s) ttl=$ttl >/dev/null
+az group create -n $RESOURCEGROUP -l $AZURE_REGION $GROUPTAGS >/dev/null
 
 # if AZURE_CLIENT_ID is used as AZURE_AAD_CLIENT_ID, script will reset global team account!
 set +x
