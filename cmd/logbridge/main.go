@@ -116,8 +116,23 @@ func startReader(ch chan<- []map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-
-	cursor, err := readCursor()
+	var cursor string
+	cursor, err = readCursor()
+	if err != nil {
+		return err
+	}
+	// check if cursor file is valid
+	// https://godoc.org/github.com/coreos/go-systemd/sdjournal#Journal.GetCursor
+	if len(cursor) == 0 {
+		_, err := j.Next()
+		if err != nil {
+			return err
+		}
+		cursor, err = j.GetCursor()
+		if err != nil {
+			return err
+		}
+	}
 	if err == nil {
 		err = j.SeekCursor(cursor)
 		if err != nil {
