@@ -117,7 +117,7 @@ properties:
 EOF
 
 go generate ./...
-go run cmd/createorupdate/createorupdate.go -loglevel=debug
+go run cmd/createorupdate/createorupdate.go
 
 # TODO: This should be configured by MS
 hack/dns.sh zone-create $RESOURCEGROUP
