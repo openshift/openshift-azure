@@ -2,19 +2,13 @@ package upgrade
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
-func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, deployFn api.DeployFn) error {
-	var azuretemplate map[string]interface{}
-	err := json.Unmarshal(azuredeploy, &azuretemplate)
-	if err != nil {
-		return err
-	}
-	err = deployFn(ctx, azuretemplate)
+func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error {
+	err := deployFn(ctx, azuretemplate)
 	if err != nil {
 		return err
 	}

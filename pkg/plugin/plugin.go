@@ -93,7 +93,7 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	return nil
 }
 
-func (p *plugin) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) ([]byte, error) {
+func (p *plugin) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error) {
 	log.Info("generating arm templates")
 	return p.armGenerator.Generate(ctx, cs, isUpdate)
 }
@@ -108,14 +108,14 @@ func (p *plugin) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluste
 	return p.clusterUpgrader.HealthCheck(ctx, cs)
 }
 
-func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, isUpdate bool, deployFn api.DeployFn) error {
+func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployFn api.DeployFn) error {
 	var err error
 	if isUpdate {
 		log.Info("starting update")
-		err = p.clusterUpgrader.Update(ctx, cs, azuredeploy, deployFn)
+		err = p.clusterUpgrader.Update(ctx, cs, azuretemplate, deployFn)
 	} else {
 		log.Info("starting deploy")
-		err = p.clusterUpgrader.Deploy(ctx, cs, azuredeploy, deployFn)
+		err = p.clusterUpgrader.Deploy(ctx, cs, azuretemplate, deployFn)
 	}
 	if err != nil {
 		return err

@@ -2,7 +2,6 @@ package upgrade
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -15,7 +14,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
-func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuredeploy []byte, deployFn api.DeployFn) error {
+func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error {
 	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
@@ -50,11 +49,6 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 		}
 	}
 
-	var azuretemplate map[string]interface{}
-	err = json.Unmarshal(azuredeploy, &azuretemplate)
-	if err != nil {
-		return err
-	}
 	err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return err
