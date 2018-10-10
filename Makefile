@@ -1,5 +1,5 @@
 # all is the default target to build everything
-all: clean build sync e2e-bin
+all: clean build sync e2e-bin logbridge
 
 build:
 	go build ./...
