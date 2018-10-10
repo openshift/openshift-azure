@@ -1,3 +1,5 @@
+COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain --ignored) = "" ]] && echo -clean || echo -dirty)
+
 # all is the default target to build everything
 all: clean build sync e2e-bin logbridge
 
@@ -15,7 +17,7 @@ generate:
 	go generate ./...
 
 logbridge: generate
-	go build ./cmd/logbridge
+	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/logbridge
 
 logbridge-image: logbridge
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
@@ -25,7 +27,7 @@ logbridge-push: logbridge-image
 	docker push quay.io/openshift-on-azure/logbridge:latest
 
 sync: generate
-	go build -ldflags "-X main.gitCommit=$(shell git rev-parse --short HEAD)" ./cmd/sync
+	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/sync
 
 TAG ?= $(shell git rev-parse --short HEAD)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
