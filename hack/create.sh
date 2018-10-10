@@ -70,7 +70,7 @@ if [[ -z "$NOGROUPTAGS" ]]; then
   fi
   GROUPTAGS=--tags now=$(date +%s) ttl=$ttl
 fi
-az group create -n $RESOURCEGROUP -l $AZURE_REGION $GROUPTAGS >/dev/null
+az group create --subscription $AZURE_SUBSCRIPTION_ID -n $RESOURCEGROUP -l $AZURE_REGION $GROUPTAGS >/dev/null
 
 # if AZURE_CLIENT_ID is used as AZURE_AAD_CLIENT_ID, script will reset global team account!
 set +x
