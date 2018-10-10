@@ -23,6 +23,10 @@ if [[ ! -e _data/containerservice.yaml ]]; then
     exit 1
 fi
 
+if [[ -z "$AZURE_SUBSCRIPTION_ID" ]]; then
+    AZURE_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
+fi
+
 if [[ $# -eq 1 ]]; then
     export RESOURCEGROUP=$1
 else
@@ -33,4 +37,4 @@ hack/dns.sh zone-delete $RESOURCEGROUP
 
 rm -rf _data
 
-az group delete -n $RESOURCEGROUP -y ${NO_WAIT_FLAG}
+az group delete --subscription $AZURE_SUBSCRIPTION_ID -n $RESOURCEGROUP -y ${NO_WAIT_FLAG}

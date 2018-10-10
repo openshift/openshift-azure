@@ -35,6 +35,10 @@ while getopts :n:s:d: o; do
     esac
 done
 
+if [[ -z "$AZURE_SUBSCRIPTION_ID" ]]; then
+    AZURE_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
+fi
+
 shift $((OPTIND-1))
 RESOURCEGROUP=$1
 
@@ -50,7 +54,7 @@ else
     hack/config.sh get-config $RESOURCEGROUP | jq -r .config.sshKey | base64 -d >$ID_RSA
 fi
 
-IP=$(az vmss list-instance-public-ips -g $RESOURCEGROUP -n ss-master --query "[$ID].ipAddress" | tr -d '"')
+IP=$(az vmss list-instance-public-ips --subscription $AZURE_SUBSCRIPTION_ID -g $RESOURCEGROUP -n ss-master --query "[$ID].ipAddress" | tr -d '"')
 
 eval "$(ssh-agent)"
 ssh-add $ID_RSA 2>/dev/null

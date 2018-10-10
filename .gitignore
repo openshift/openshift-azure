@@ -1,6 +1,8 @@
 /_data
 /createorupdate
 /env
+/env.*
+!/env.example
 /e2e.test
 /logbridge
 /sync
