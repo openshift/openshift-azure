@@ -1636,8 +1636,8 @@ type OpenShiftManagedClusterAgentPoolProfile struct {
 	Count *int32 `json:"count,omitempty"`
 	// VMSize - Size of agent VMs. Possible values include: 'StandardD2sV3', 'StandardD4sV3'
 	VMSize OpenShiftContainerServiceVMSize `json:"vmSize,omitempty"`
-	// VnetSubnetID - VNet SubnetID specifies the vnet's subnet identifier.
-	VnetSubnetID *string `json:"vnetSubnetID,omitempty"`
+	// SubnetCIDR - subnet CIDR of the agent
+	SubnetCIDR string `json:"subnetCidr,omitempty"`
 	// OsType - OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux. Possible values include: 'Linux', 'Windows'
 	OsType OSType `json:"osType,omitempty"`
 	// Role - Define the role of the AgentPoolProfile. Possible values include: 'Compute', 'Infra'
@@ -1668,8 +1668,8 @@ type OpenShiftManagedClusterMasterPoolProfile struct {
 	Count *int32 `json:"count,omitempty"`
 	// VMSize - Size of agent VMs. Possible values include: 'StandardD2sV3', 'StandardD4sV3'
 	VMSize OpenShiftContainerServiceVMSize `json:"vmSize,omitempty"`
-	// VnetSubnetID - VNet SubnetID specifies the vnet's subnet identifier.
-	VnetSubnetID *string `json:"vnetSubnetID,omitempty"`
+	// SubnetCIDR - subnet CIDR of the masters
+	SubnetCIDR string `json:"subnetCidr,omitempty"`
 	// OsType - OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux. Possible values include: 'Linux', 'Windows'
 	OsType OSType `json:"osType,omitempty"`
 }
@@ -1684,6 +1684,8 @@ type OpenShiftManagedClusterProperties struct {
 	PublicHostname *string `json:"publicHostname,omitempty"`
 	// Fqdn - User-specified FQDN for OpenShift API server loadbalancer internal hostname.
 	Fqdn *string `json:"fqdn,omitempty"`
+	// NetworkProfile - Configuration for OpenShift networking.
+	NetworkProfile *OpenShiftNetworkProfile `json:"networkProfile,omitempty"`
 	// RouterProfiles - Configuration for OpenShift router(s).
 	RouterProfiles *[]OpenShiftRouterProfile `json:"routerProfiles,omitempty"`
 	// MasterPoolProfile - Configuration for OpenShift master VMs.
@@ -1785,6 +1787,18 @@ func (future *OpenShiftManagedClustersUpdateTagsFuture) Result(client OpenShiftM
 		}
 	}
 	return
+}
+
+// OpenShiftNetworkProfile contains configuration for OpenShift networking.
+type OpenShiftNetworkProfile struct {
+	VnetCIDR string `json:"vnetCidr,omitempty"`
+
+	// PeerVnetID is expected to be empty or match
+	// `^/subscriptions/[^/]+
+	//   /resourceGroups/[^/]+
+	//   /providers/Microsoft.Network
+	//   /virtualNetworks/[^/]+$`
+	PeerVnetID string `json:"peerVnetId,omitempty"`
 }
 
 // OpenShiftRouterProfile represents an OpenShift router
