@@ -7,9 +7,7 @@ build:
 	go build ./...
 
 clean:
-	rm -f sync
-	rm -f logbridge
-	rm -f e2e.test
+	rm -f azure-reader.log coverage.out end-user.log e2e.test logbridge sync
 
 test: unit e2e
 
@@ -46,10 +44,13 @@ verify:
 	./hack/verify-code-format.sh
 
 unit: generate
-	go test ./...
-
-cover:
 	go test ./... -coverprofile=coverage.out
+ifneq ($(ARTIFACT_DIR),)
+	mkdir -p $(ARTIFACT_DIR)
+	cp coverage.out $(ARTIFACT_DIR)
+endif
+
+cover: unit
 	go tool cover -html=coverage.out
 
 e2e: generate
