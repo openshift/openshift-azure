@@ -8,6 +8,8 @@ import (
 
 	project "github.com/openshift/api/project/v1"
 	projectclient "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
+	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
+	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
@@ -20,6 +22,8 @@ var c *testClient
 type testClient struct {
 	kc        *kubernetes.Clientset
 	pc        *projectclient.ProjectV1Client
+	rc        *routev1client.RouteV1Client
+	tc        *templatev1client.TemplateV1Client
 	namespace string
 }
 
@@ -52,9 +56,24 @@ func newTestClient(kubeconfig string) *testClient {
 		panic(err)
 	}
 
+	// create a template client
+	tc, err := templatev1client.NewForConfig(config)
+	if err != nil {
+		panic(err)
+	}
+
+	// create a route client
+
+	rc, err := routev1client.NewForConfig(config)
+	if err != nil {
+		panic(err)
+	}
+
 	return &testClient{
 		kc: kc,
 		pc: pc,
+		rc: rc,
+		tc: tc,
 	}
 }
 

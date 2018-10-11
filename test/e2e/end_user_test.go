@@ -4,14 +4,20 @@ package e2e
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"regexp"
+	"strconv"
 	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	templatev1 "github.com/openshift/api/template/v1"
 	policy "k8s.io/api/policy/v1beta1"
 	_ "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
@@ -19,15 +25,10 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 
 	BeforeEach(func() {
 		namespace := nameGen.generate("e2e-test-")
-		// TODO: The namespace is cached in the client so this will not
-		// work with parallel tests.
 		c.createProject(namespace)
 	})
 
 	AfterEach(func() {
-		if CurrentGinkgoTestDescription().Failed {
-			// TODO: Dump info from namespace
-		}
 		c.cleanupProject(10 * time.Minute)
 	})
 
@@ -50,5 +51,60 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		// TODO: Reenable
 		// Expect(kerrors.IsForbidden(err)).To(Equal(true))
 		fmt.Printf("PDB create error: %v\n", err)
+	})
+
+	It("should deploy a template and check the visit counter increments", func() {
+		const TPL = "nodejs-mongodb-example"
+		var regex = regexp.MustCompile(`id="count-value">(\d+)<`)
+
+		// Create the template
+		template, err := c.tc.Templates("openshift").Get(
+			TPL, metav1.GetOptions{})
+		Expect(err).NotTo(HaveOccurred())
+
+		// Instantiate the template
+		_, err = c.tc.TemplateInstances(c.namespace).Create(
+			&templatev1.TemplateInstance{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: c.namespace,
+				},
+				Spec: templatev1.TemplateInstanceSpec{
+					Template: *template,
+				},
+			})
+		Expect(err).NotTo(HaveOccurred())
+
+		// Poll for the deployment status
+		err = wait.PollImmediate(2*time.Second, 5*time.Minute, c.templateInstanceIsReady)
+		Expect(err).NotTo(HaveOccurred())
+
+		// Pull the route ingress from the namespace
+		route, err := c.rc.Routes(c.namespace).Get(TPL, metav1.GetOptions{})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(len(route.Status.Ingress)).To(Equal(1))
+		host := route.Status.Ingress[0].Host
+		url := fmt.Sprintf("http://%s", host)
+
+		prevCounter := 0
+		currCounter := 0
+		httpc := &http.Client{
+			Timeout: 10 * time.Second,
+		}
+		// Hit the ingress 3 times, each time the hit counter should increment
+		for i := 0; i < 3; i++ {
+			resp, err := httpc.Get(url)
+			Expect(err).NotTo(HaveOccurred())
+			defer resp.Body.Close()
+			Expect(resp.StatusCode).Should(Equal(200))
+			contents, err := ioutil.ReadAll(resp.Body)
+			Expect(err).NotTo(HaveOccurred())
+			matches := regex.FindStringSubmatch(string(contents))
+			Expect(matches).NotTo(BeNil())
+			currCounter, err = strconv.Atoi(matches[1])
+			Expect(err).NotTo(HaveOccurred())
+			Expect(currCounter).Should(BeNumerically(">", prevCounter))
+			prevCounter = currCounter
+			time.Sleep(time.Second)
+		}
 	})
 })
