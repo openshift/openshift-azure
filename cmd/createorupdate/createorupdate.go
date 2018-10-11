@@ -1,11 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"context"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -13,13 +14,20 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	sdk "github.com/openshift/openshift-azure/pkg/util/azureclient/osa-go-sdk/services/containerservice/mgmt/2018-09-30-preview/containerservice"
 )
 
 type server struct {
 	// the server will not process more than a single
-	// request at all times.
+	// PUT request at all times.
 	inProgress chan struct{}
-	log        *logrus.Entry
+
+	sync.RWMutex
+	state v20180930preview.ProvisioningState
+	oc    *v20180930preview.OpenShiftManagedCluster
+
+	log *logrus.Entry
 }
 
 func newServer(resourceGroup string) *server {
@@ -45,10 +53,50 @@ func (s *server) ListenAndServe() {
 func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	defer req.Body.Close()
 
+	// validate the request
 	ok := s.validate(w, req)
 	if !ok {
 		return
 	}
+
+	// process the request
+	switch req.Method {
+	case http.MethodGet:
+		s.handleGet(w, req)
+	case http.MethodPut:
+		s.handlePut(w, req)
+	}
+}
+
+func (s *server) validate(w http.ResponseWriter, r *http.Request) bool {
+	// TODO: Support DELETE
+	if r.Method != http.MethodPut && r.Method != http.MethodGet {
+		resp := "405 Method not allowed"
+		s.log.Debugf("%s: %s", r.Method, resp)
+		http.Error(w, resp, http.StatusMethodNotAllowed)
+		return false
+	}
+
+	if r.Method == http.MethodPut {
+		select {
+		case s.inProgress <- struct{}{}:
+			// continue
+		default:
+			// did not get the lock
+			resp := "423 Locked: Processing another in-flight request"
+			s.log.Debug(resp)
+			http.Error(w, resp, http.StatusLocked)
+			return false
+		}
+	}
+	return true
+}
+
+func (s *server) handleGet(w http.ResponseWriter, req *http.Request) {
+	s.reply(w, req)
+}
+
+func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	defer func() {
 		// drain once we are done processing this request
 		<-s.inProgress
@@ -69,6 +117,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, resp, http.StatusBadRequest)
 		return
 	}
+	s.write(oc)
 
 	// simulate Context with property bag
 	ctx := context.Background()
@@ -82,15 +131,52 @@ func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		AcceptLanguages: []string{"en-us"},
 	}
 
-	oc, err = fakerp.CreateOrUpdate(ctx, oc, s.log, config)
-	if err != nil {
+	if currentState := s.readState(); string(currentState) == "" {
+		s.writeState(v20180930preview.Creating)
+	} else {
+		// TODO: Need to separate between updates and upgrades
+		s.writeState(v20180930preview.Updating)
+	}
+
+	if _, err := fakerp.CreateOrUpdate(ctx, oc, s.log, config); err != nil {
+		s.writeState(v20180930preview.Failed)
 		resp := "400 Bad Request: Failed to apply request"
 		s.log.Debug(resp, err)
 		http.Error(w, resp, http.StatusBadRequest)
 		return
 	}
+	s.writeState(v20180930preview.Succeeded)
+	s.reply(w, req)
+}
 
-	res, err := yaml.Marshal(oc)
+func (s *server) write(oc *v20180930preview.OpenShiftManagedCluster) {
+	s.Lock()
+	defer s.Unlock()
+	s.oc = oc
+}
+
+func (s *server) read() *v20180930preview.OpenShiftManagedCluster {
+	s.RLock()
+	defer s.RUnlock()
+	return s.oc
+}
+
+func (s *server) writeState(state v20180930preview.ProvisioningState) {
+	s.Lock()
+	defer s.Unlock()
+	s.state = state
+}
+
+func (s *server) readState() v20180930preview.ProvisioningState {
+	s.RLock()
+	defer s.RUnlock()
+	return s.state
+}
+
+func (s *server) reply(w http.ResponseWriter, req *http.Request) {
+	oc := s.read()
+	oc.Properties.ProvisioningState = s.readState()
+	res, err := json.Marshal(azureclient.ExternalToSdk(oc))
 	if err != nil {
 		resp := "500 Internal Server Error: Failed to marshal response"
 		s.log.Debug(resp, err)
@@ -98,29 +184,6 @@ func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	w.Write(res)
-}
-
-func (s *server) validate(w http.ResponseWriter, r *http.Request) bool {
-	// TODO: Support DELETE and GET
-	if r.Method != http.MethodPut {
-		resp := "405 Method not allowed"
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusMethodNotAllowed)
-		return false
-	}
-
-	select {
-	case s.inProgress <- struct{}{}:
-		// continue
-	default:
-		// did not get the lock
-		resp := "423 Locked: Processing another in-flight request"
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusLocked)
-		return false
-	}
-
-	return true
 }
 
 func main() {
@@ -133,21 +196,23 @@ func main() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	req, err := http.NewRequest(http.MethodPut, "http://localhost:8080", bytes.NewReader(in))
+	var oc sdk.OpenShiftManagedCluster
+	if err := yaml.Unmarshal(in, &oc); err != nil {
+		logrus.Fatal(err)
+	}
+	rpc := sdk.NewOpenShiftManagedClustersClientWithBaseURI("http://localhost:8080", os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	future, err := rpc.CreateOrUpdate(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), oc)
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	c := &http.Client{}
-	resp, err := c.Do(req)
+	if err := future.WaitForCompletionRef(context.Background(), rpc.Client); err != nil {
+		logrus.Fatal(err)
+	}
+	resp, err := future.Result(rpc)
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		logrus.Fatalf("unexpected status: %s", resp.Status)
-	}
-
-	out, err := ioutil.ReadAll(resp.Body)
+	out, err := yaml.Marshal(resp)
 	if err != nil {
 		logrus.Fatal(err)
 	}
