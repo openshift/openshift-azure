@@ -6,6 +6,9 @@ usage:
 
 $0 get-config resourcegroup
 
+Examples:
+$0 get-config resourcegroup | jq -r .config.adminKubeconfig | base64 -d
+
 EOF
     exit 1
 }
