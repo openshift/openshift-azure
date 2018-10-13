@@ -4,6 +4,7 @@
 /env.*
 !/env.example
 /e2e.test
+/kubeconfig*
 /logbridge
 /sync
 .vscode

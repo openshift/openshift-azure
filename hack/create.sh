@@ -125,3 +125,7 @@ go run cmd/createorupdate/createorupdate.go
 # TODO: This should be configured by MS
 hack/dns.sh zone-create $RESOURCEGROUP
 hack/dns.sh cname-create $RESOURCEGROUP '*' $RESOURCEGROUP-router.$AZURE_REGION.cloudapp.azure.com
+
+echo
+echo  Cluster available at https://$RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com/
+echo
