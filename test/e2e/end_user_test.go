@@ -58,6 +58,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		var regex = regexp.MustCompile(`id="count-value">(\d+)<`)
 
 		// Create the template
+		By(fmt.Sprintf("creating the template (%v)", time.Now()))
 		template, err := c.tc.Templates("openshift").Get(
 			TPL, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
@@ -75,10 +76,12 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		// Poll for the deployment status
+		By(fmt.Sprintf("waiting for the template instance to turn ready (%v)", time.Now()))
 		err = wait.PollImmediate(2*time.Second, 5*time.Minute, c.templateInstanceIsReady)
 		Expect(err).NotTo(HaveOccurred())
 
 		// Pull the route ingress from the namespace
+		By(fmt.Sprintf("getting the route (%v)", time.Now()))
 		route, err := c.rc.Routes(c.namespace).Get(TPL, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(len(route.Status.Ingress)).To(Equal(1))
@@ -90,6 +93,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		httpc := &http.Client{
 			Timeout: 10 * time.Second,
 		}
+		By(fmt.Sprintf("hitting the route 3 times to check the counter (%v)", time.Now()))
 		// Hit the ingress 3 times, each time the hit counter should increment
 		for i := 0; i < 3; i++ {
 			resp, err := httpc.Get(url)

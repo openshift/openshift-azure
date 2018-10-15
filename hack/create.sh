@@ -68,7 +68,7 @@ if [[ -z "$NOGROUPTAGS" ]]; then
   if [[ -n "$RESOURCEGROUP_TTL" ]]; then
     ttl=$RESOURCEGROUP_TTL
   fi
-  GROUPTAGS=--tags now=$(date +%s) ttl=$ttl
+  GROUPTAGS="--tags now=$(date +%s) ttl=$ttl"
 fi
 az group create --subscription $AZURE_SUBSCRIPTION_ID -n $RESOURCEGROUP -l $AZURE_REGION $GROUPTAGS >/dev/null
 
