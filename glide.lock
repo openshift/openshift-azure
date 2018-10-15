@@ -1,5 +1,5 @@
-hash: 7f890454ff19ea6b9d0b042a2c782d97e8c5e395a06ce113057be733404a4cb0
-updated: 2018-10-02T13:01:15.888346549+02:00
+hash: 78d6dd4de27b3e25ad321163c56760197cf189d55bed2d57cca13cd9fb64cb2f
+updated: 2018-10-04T10:34:33.901872053+10:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
@@ -50,6 +50,10 @@ imports:
   - sortkeys
 - name: github.com/golang/glog
   version: 44145f04b68cf362d9c4df2182967c2275eaefed
+- name: github.com/golang/mock
+  version: c34cdb4725f4c3844d095133c6e40e448b86589b
+  subpackages:
+  - gomock
 - name: github.com/golang/protobuf
   version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
   subpackages:
@@ -147,7 +151,6 @@ imports:
   - http2/hpack
   - idna
   - lex/httplex
-  - websocket
 - name: golang.org/x/sys
   version: 95c6576299259db960f6c5b9b69ea52422860fce
   subpackages:
