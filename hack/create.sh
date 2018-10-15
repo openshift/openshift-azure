@@ -83,7 +83,7 @@ fi
 set -x
 
 cat >_data/manifest.yaml <<EOF
-name: openshift
+name: $RESOURCEGROUP
 location: $AZURE_REGION
 properties:
   openShiftVersion: "$DEPLOY_VERSION"
