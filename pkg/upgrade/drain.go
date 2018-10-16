@@ -19,6 +19,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
+var errUnrecognisedRole = errors.New("unrecognised role")
+
 func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
 	var err error
 	if u.kubeclient == nil {
@@ -53,7 +55,7 @@ func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedClus
 		}
 
 	default:
-		return errors.New("unrecognised role")
+		return errUnrecognisedRole
 	}
 
 	return u.kubeclient.CoreV1().Nodes().Delete(nodeName, &metav1.DeleteOptions{})
