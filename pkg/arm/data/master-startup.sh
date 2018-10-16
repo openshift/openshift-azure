@@ -167,7 +167,7 @@ controllerConfig:
     signer:
       certFile: service-signer.crt
       keyFile: service-signer.key
-controllers: "*"
+controllers: "*,-disruption"
 corsAllowedOrigins:
 dnsConfig:
   bindAddress: 0.0.0.0:8053
@@ -200,6 +200,7 @@ kubernetesMasterConfig:
     cloud-provider:
     - azure
     runtime-config:
+    - policy/v1beta1=false
     - settings.k8s.io/v1alpha1=true
     storage-backend:
     - etcd3

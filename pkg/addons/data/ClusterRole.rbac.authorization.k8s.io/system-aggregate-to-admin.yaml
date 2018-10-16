@@ -150,8 +150,13 @@ rules:
   resources:
   - poddisruptionbudgets
   verbs:
+  - create
+  - delete
+  - deletecollection
   - get
   - list
+  - patch
+  - update
   - watch
 - apiGroups:
   - networking.k8s.io
