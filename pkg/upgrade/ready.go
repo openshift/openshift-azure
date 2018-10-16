@@ -85,22 +85,31 @@ var daemonsetWhitelist = []struct {
 	},
 }
 
-func WaitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, kc *kubernetes.Clientset) error {
-	config := api.PluginConfig{AcceptLanguages: []string{"en-us"}}
-	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
-	if err != nil {
-		return err
+func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	var err error
+	if u.kubeclient == nil {
+		u.kubeclient, err = managedcluster.ClientsetFromV1ConfigAndWait(ctx, cs.Config.AdminKubeconfig)
+		if err != nil {
+			return err
+		}
 	}
-	vmc := azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, config.AcceptLanguages)
+
+	if u.virtualMachineScaleSetVMsClient == nil {
+		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+		if err != nil {
+			return err
+		}
+		u.virtualMachineScaleSetVMsClient = azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
+	}
 
 	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute} {
-		vms, err := ListVMs(ctx, cs, vmc, role)
+		vms, err := ListVMs(ctx, cs, u.virtualMachineScaleSetVMsClient, role)
 		if err != nil {
 			return err
 		}
 		for _, vm := range vms {
 			log.Infof("waiting for %s to be ready", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			err = WaitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+			err = WaitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
 			if err != nil {
 				return err
 			}
@@ -165,23 +174,18 @@ func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
 	return nil
 }
 
-func WaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
+func WaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string, kc kubernetes.Interface) error {
 	switch role {
 	case api.AgentPoolProfileRoleMaster:
-		return masterWaitForReady(ctx, cs, nodeName)
+		return masterWaitForReady(ctx, cs, nodeName, kc)
 	case api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute:
-		return nodeWaitForReady(ctx, cs, nodeName)
+		return nodeWaitForReady(ctx, cs, nodeName, kc)
 	default:
 		return errors.New("unrecognised role")
 	}
 }
 
-func masterWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string) error {
-	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
-	if err != nil {
-		return err
-	}
-
+func masterWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string, kc kubernetes.Interface) error {
 	return wait.PollImmediateUntil(time.Second, func() (bool, error) {
 		return masterIsReady(kc, nodeName)
 	}, ctx.Done())
@@ -232,13 +236,8 @@ func isPodReady(pod *corev1.Pod) bool {
 	return false
 }
 
-func nodeWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string) error {
-	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
-	if err != nil {
-		return err
-	}
-
-	err = wait.PollImmediateUntil(time.Second, func() (bool, error) {
+func nodeWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string, kc kubernetes.Interface) error {
+	err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
 		return nodeIsReady(kc, nodeName)
 	}, ctx.Done())
 	if err != nil {
