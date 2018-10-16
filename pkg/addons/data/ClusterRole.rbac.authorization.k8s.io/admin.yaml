@@ -8,7 +8,7 @@ metadata:
   annotations:
     openshift.io/description: A user that has edit rights within the project and can
       change the project's membership.
-    rbac.authorization.kubernetes.io/autoupdate: "true"
+    rbac.authorization.kubernetes.io/autoupdate: "false"
   labels:
     kubernetes.io/bootstrapping: rbac-defaults
   name: admin
