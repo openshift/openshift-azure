@@ -14,22 +14,23 @@ test: unit e2e
 generate:
 	go generate ./...
 
+TAG ?= $(shell git rev-parse --short HEAD)
+SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
+LOGBRIDGE_IMAGE ?= quay.io/openshift-on-azure/logbridge:$(TAG)
+E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
+
 logbridge: generate
 	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/logbridge
 
 logbridge-image: logbridge
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-	imagebuilder -f Dockerfile.logbridge -t quay.io/openshift-on-azure/logbridge:latest .
+	imagebuilder -f Dockerfile.logbridge -t $(LOGBRIDGE_IMAGE) .
 
 logbridge-push: logbridge-image
-	docker push quay.io/openshift-on-azure/logbridge:latest
+	docker push $(LOGBRIDGE_IMAGE)
 
 sync: generate
 	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/sync
-
-TAG ?= $(shell git rev-parse --short HEAD)
-SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
-E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
 
 sync-image: sync
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder

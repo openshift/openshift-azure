@@ -141,6 +141,9 @@ func selectContainerImages(cs *api.OpenShiftManagedCluster, pluginConfig api.Plu
 	if pluginConfig.SyncImage != "" {
 		cs.Config.Images.Sync = pluginConfig.SyncImage
 	}
+	if pluginConfig.LogBridgeImage != "" {
+		cs.Config.Images.LogBridge = pluginConfig.LogBridgeImage
+	}
 
 	return nil
 }

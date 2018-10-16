@@ -22,6 +22,7 @@ type DeployFn func(context.Context, map[string]interface{}) error
 // PluginConfig is passed into NewPlugin
 type PluginConfig struct {
 	SyncImage       string
+	LogBridgeImage  string
 	AcceptLanguages []string
 }
 
