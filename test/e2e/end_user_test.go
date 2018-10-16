@@ -14,7 +14,7 @@ import (
 	. "github.com/onsi/gomega"
 	templatev1 "github.com/openshift/api/template/v1"
 	policy "k8s.io/api/policy/v1beta1"
-	_ "k8s.io/apimachinery/pkg/api/errors"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -48,9 +48,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		}
 
 		_, err = c.kc.Policy().PodDisruptionBudgets(c.namespace).Create(pdb)
-		// TODO: Reenable
-		// Expect(kerrors.IsForbidden(err)).To(Equal(true))
-		fmt.Printf("PDB create error: %v\n", err)
+		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 	})
 
 	It("should deploy a template and check the visit counter increments", func() {
