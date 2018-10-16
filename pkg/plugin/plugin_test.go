@@ -20,6 +20,7 @@ import (
 func TestMerge(t *testing.T) {
 	var config = api.PluginConfig{
 		SyncImage:       "sync:latest",
+		LogBridgeImage:  "logbridge:latest",
 		AcceptLanguages: []string{"en-us"},
 	}
 	p := NewPlugin(logrus.NewEntry(logrus.New()), &config)
