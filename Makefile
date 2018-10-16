@@ -58,7 +58,7 @@ e2e: generate
 	./hack/e2e.sh
 
 e2e-bin: generate
-	go test -tags e2e -ldflags "-X github.com/openshift/openshift-azure/test/e2e.gitCommit=$(shell git rev-parse --short HEAD)" -i -c -o e2e.test ./test/e2e
+	go test -tags e2e -ldflags "-X github.com/openshift/openshift-azure/test/e2e.gitCommit=$(COMMIT)" -i -c -o e2e.test ./test/e2e
 
 e2e-image: e2e-bin
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder

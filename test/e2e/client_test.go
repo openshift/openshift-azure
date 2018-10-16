@@ -63,7 +63,6 @@ func newTestClient(kubeconfig string) *testClient {
 	}
 
 	// create a route client
-
 	rc, err := routev1client.NewForConfig(config)
 	if err != nil {
 		panic(err)

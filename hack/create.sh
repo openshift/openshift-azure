@@ -120,11 +120,14 @@ properties:
 EOF
 
 go generate ./...
-go run cmd/createorupdate/createorupdate.go
+if [[ -n "$TEST_IN_PRODUCTION" ]]; then
+  go test ./test/e2erp -tags e2erp -test.v -ginkgo.v -ginkgo.randomizeAllSpecs -ginkgo.focus=Real -timeout 4h
+else
+  go run cmd/createorupdate/createorupdate.go
 
-# TODO: This should be configured by MS
-hack/dns.sh zone-create $RESOURCEGROUP
-hack/dns.sh cname-create $RESOURCEGROUP '*' $RESOURCEGROUP-router.$AZURE_REGION.cloudapp.azure.com
+  hack/dns.sh zone-create $RESOURCEGROUP
+  hack/dns.sh cname-create $RESOURCEGROUP '*' $RESOURCEGROUP-router.$AZURE_REGION.cloudapp.azure.com
+fi
 
 echo
 echo  Cluster available at https://$RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com/
