@@ -20,12 +20,14 @@ import (
 )
 
 func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
-	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
-	if err != nil {
-		return err
+	var err error
+	if u.kubeclient == nil {
+		u.kubeclient, err = managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
+		if err != nil {
+			return err
+		}
 	}
-
-	_, err = kc.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
+	_, err = u.kubeclient.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
@@ -40,12 +42,12 @@ func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedClus
 		// no-op for now
 
 	case api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute:
-		err := setUnschedulable(ctx, kc, nodeName, true)
+		err := setUnschedulable(ctx, u.kubeclient, nodeName, true)
 		if err != nil {
 			return err
 		}
 
-		err = deletePods(ctx, kc, nodeName)
+		err = deletePods(ctx, u.kubeclient, nodeName)
 		if err != nil {
 			return err
 		}
@@ -54,10 +56,10 @@ func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedClus
 		return errors.New("unrecognised role")
 	}
 
-	return kc.CoreV1().Nodes().Delete(nodeName, &metav1.DeleteOptions{})
+	return u.kubeclient.CoreV1().Nodes().Delete(nodeName, &metav1.DeleteOptions{})
 }
 
-func setUnschedulable(ctx context.Context, kc *kubernetes.Clientset, nodeName string, unschedulable bool) error {
+func setUnschedulable(ctx context.Context, kc kubernetes.Interface, nodeName string, unschedulable bool) error {
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		node, err := kc.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
 		if err != nil {
@@ -86,7 +88,7 @@ func max(i, j time.Duration) time.Duration {
 	return j
 }
 
-func deletePods(ctx context.Context, kc *kubernetes.Clientset, nodeName string) error {
+func deletePods(ctx context.Context, kc kubernetes.Interface, nodeName string) error {
 	podList, err := kc.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
 		FieldSelector: fields.SelectorFromSet(fields.Set{"spec.nodeName": nodeName}).String(),
 	})
