@@ -83,20 +83,12 @@ var unmarshalled = &OpenShiftManagedCluster{
 }
 
 var marshalled = []byte(`{
-	"id": "id",
-	"location": "location",
-	"name": "name",
 	"plan": {
 		"name": "plan.name",
 		"product": "plan.product",
 		"promotionCode": "plan.promotionCode",
 		"publisher": "plan.publisher"
 	},
-	"tags": {
-		"tags.k1": "v1",
-		"tags.k2": "v2"
-	},
-	"type": "type",
 	"properties": {
 		"provisioningState": "properties.provisioningState",
 		"openShiftVersion": "properties.openShiftVersion",
@@ -154,6 +146,14 @@ var marshalled = []byte(`{
 				}
 			]
 		}
+	},
+	"id": "id",
+	"name": "name",
+	"type": "type",
+	"location": "location",
+	"tags": {
+		"tags.k1": "v1",
+		"tags.k2": "v2"
 	}
 }`)
 

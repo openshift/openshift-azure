@@ -1,5 +1,9 @@
 package api
 
+import (
+	"github.com/Azure/go-autorest/autorest"
+)
+
 const (
 	// APIVersion is the version of this API
 	APIVersion = "2018-09-30-preview"
@@ -8,13 +12,15 @@ const (
 // OpenShiftManagedCluster complies with the ARM model of resource definition in
 // a JSON template.
 type OpenShiftManagedCluster struct {
-	ID         string                `json:"id,omitempty"`
-	Location   string                `json:"location,omitempty"`
-	Name       string                `json:"name,omitempty"`
+	autorest.Response `json:"-"`
+
 	Plan       *ResourcePurchasePlan `json:"plan,omitempty"`
-	Tags       map[string]string     `json:"tags,omitempty"`
-	Type       string                `json:"type,omitempty"`
 	Properties *Properties           `json:"properties,omitempty"`
+	ID         string                `json:"id,omitempty"`
+	Name       string                `json:"name,omitempty"`
+	Type       string                `json:"type,omitempty"`
+	Location   string                `json:"location,omitempty"`
+	Tags       map[string]string     `json:"tags"`
 }
 
 // ResourcePurchasePlan defines the resource plan as required by ARM for billing
