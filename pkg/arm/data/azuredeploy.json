@@ -4,7 +4,7 @@
     "parameters": {},
     "variables": {},
     "resources": [
-{{- if not .Derived.RunningUnderTest }}
+{{- if not $.Extra.TestConfig.RunningUnderTest }}
         {
             "type": "Microsoft.OperationalInsights/workspaces",
             "name": "{{ .Config.LoggingWorkspace | js }}",
@@ -210,7 +210,7 @@
                 "capacity": {{ $app.Count | js }},
                 "name": "{{ $app.VMSize | js }}"
             },
-{{- if eq $.Derived.ImageResourceName "" }}
+{{- if eq $.Extra.TestConfig.ImageResourceName "" }}
             "plan": {
                 "name": "{{ $.Config.ImageSKU | js }}",
                 "publisher": "{{ $.Config.ImagePublisher | js }}",
@@ -240,13 +240,13 @@
                     },
                     "storageProfile": {
                         "imageReference": {
-{{- if eq $.Derived.ImageResourceName "" }}
+{{- if eq $.Extra.TestConfig.ImageResourceName "" }}
                             "offer": "{{ $.Config.ImageOffer | js }}",
                             "publisher": "{{ $.Config.ImagePublisher | js }}",
                             "sku": "{{ $.Config.ImageSKU | js }}",
                             "version": "{{ $.Config.ImageVersion | js }}"
 {{- else }}
-                            "id": "[resourceId('{{ $.Derived.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ $.Derived.ImageResourceName | js }}')]"
+                            "id": "[resourceId('{{ $.Extra.TestConfig.ImageResourceGroup | js }}', 'Microsoft.Compute/images', '{{ $.Extra.TestConfig.ImageResourceName | js }}')]"
 {{- end }}
                         },
                         "osDisk": {

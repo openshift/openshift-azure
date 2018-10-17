@@ -26,7 +26,7 @@ fi
 
 echo 'BOOTSTRAP_CONFIG_NAME=node-config-{{ .Extra.Role }}' >>/etc/sysconfig/${SERVICE_TYPE}-node
 
-{{- if .Derived.RunningUnderTest }}
+{{- if $.Extra.TestConfig.RunningUnderTest }}
 sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-node
 {{- end }}
 
@@ -48,7 +48,7 @@ cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
 {{ .Derived.CloudProviderConf .ContainerService | String }}
 EOF
 
-{{- if not .Derived.RunningUnderTest }}
+{{- if not $.Extra.TestConfig.RunningUnderTest }}
 mkdir -p /var/lib/logbridge
 cat >/etc/origin/node/pods/logbridge.yaml <<'EOF'
 apiVersion: v1

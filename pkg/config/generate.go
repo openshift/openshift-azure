@@ -6,7 +6,6 @@ import (
 	"crypto/x509/pkix"
 	"fmt"
 	"net"
-	"os"
 
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -16,12 +15,12 @@ import (
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
-func Generate(cs *api.OpenShiftManagedCluster, pluginConfig api.PluginConfig) (err error) {
+func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) {
 	c := cs.Config
 
-	selectNodeImage(cs, os.Getenv("DEPLOY_OS"))
+	g.selectNodeImage(cs)
 
-	if err = selectContainerImages(cs, pluginConfig); err != nil {
+	if err = g.selectContainerImages(cs); err != nil {
 		return err
 	}
 

@@ -34,7 +34,7 @@ fi
 
 echo "BOOTSTRAP_CONFIG_NAME=node-config-master" >>/etc/sysconfig/${SERVICE_TYPE}-node
 
-{{- if .Derived.RunningUnderTest }}
+{{- if $.Extra.TestConfig.RunningUnderTest }}
 sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-node
 {{- end }}
 
@@ -488,7 +488,7 @@ spec:
     - master
     - api
     - --config=/etc/origin/master/master-config.yaml
-{{- if .Derived.RunningUnderTest }}
+{{- if $.Extra.TestConfig.RunningUnderTest }}
     - --loglevel=4
 {{- else }}
     - --loglevel=2
@@ -545,7 +545,7 @@ spec:
     - controllers
     - --config=/etc/origin/master/master-config.yaml
     - --listen=https://0.0.0.0:444
-{{- if .Derived.RunningUnderTest }}
+{{- if $.Extra.TestConfig.RunningUnderTest }}
     - --loglevel=4
 {{- else }}
     - --loglevel=2
@@ -605,7 +605,7 @@ spec:
 EOF
 fi
 
-{{- if not .Derived.RunningUnderTest }}
+{{- if not $.Extra.TestConfig.RunningUnderTest }}
 mkdir -p /var/lib/logbridge
 cat >/etc/origin/node/pods/logbridge.yaml <<'EOF'
 apiVersion: v1
