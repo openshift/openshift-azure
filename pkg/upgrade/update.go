@@ -7,36 +7,18 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error {
-	var err error
-	if u.kubeclient == nil {
-		u.kubeclient, err = managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
-		if err != nil {
-			return err
-		}
+	err := u.createClients(ctx, cs)
+	if err != nil {
+		return err
 	}
-	if u.vmc == nil {
-		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
-		if err != nil {
-			return err
-		}
-		u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
-	}
-	if u.ssc == nil {
-		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
-		if err != nil {
-			return err
-		}
-		u.ssc = azureclient.NewVirtualMachineScaleSetsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
-	}
-
 	// Deploy() may change the number of VMs.  If we can see that any VMs are
 	// about to be deleted, drain them first.  Record which VMs are visible now
 	// so that we can detect newly created VMs and wait for them to become
@@ -45,7 +27,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	vmsBefore := map[string]struct{}{}
 
 	for _, agent := range cs.Properties.AgentPoolProfiles {
-		vms, err := ListVMs(ctx, cs, u.vmc, agent.Role)
+		vms, err := listVMs(ctx, cs, u.vmc, agent.Role)
 		if err != nil {
 			return err
 		}
@@ -74,7 +56,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	for _, agent := range cs.Properties.AgentPoolProfiles {
-		vms, err := ListVMs(ctx, cs, u.vmc, agent.Role)
+		vms, err := listVMs(ctx, cs, u.vmc, agent.Role)
 		if err != nil {
 			return err
 		}
@@ -84,7 +66,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 			hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
 			if _, found := vmsBefore[hostname]; !found {
 				log.Infof("waiting for %s to be ready", hostname)
-				err = WaitForReady(ctx, cs, agent.Role, hostname, u.kubeclient)
+				err = waitForReady(ctx, cs, agent.Role, hostname, u.kubeclient)
 				if err != nil {
 					return err
 				}
@@ -127,7 +109,7 @@ func getCount(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) in
 	panic("invalid role")
 }
 
-func ListVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc azureclient.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole) ([]compute.VirtualMachineScaleSetVM, error) {
+func listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc azureclient.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole) ([]compute.VirtualMachineScaleSetVM, error) {
 	vmPages, err := vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), "", "", "")
 	if err != nil {
 		return nil, err
@@ -154,7 +136,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 	// store a list of all the VM instances now, so that if we end up creating
 	// new ones (in the crash recovery case, we might not), we can detect which
 	// they are
-	oldVMs, err := ListVMs(ctx, cs, u.vmc, role)
+	oldVMs, err := listVMs(ctx, cs, u.vmc, role)
 	if err != nil {
 		return err
 	}
@@ -181,7 +163,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			return err
 		}
 
-		updatedList, err := ListVMs(ctx, cs, u.vmc, role)
+		updatedList, err := listVMs(ctx, cs, u.vmc, role)
 		if err != nil {
 			return err
 		}
@@ -192,7 +174,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 		for _, updated := range updatedList {
 			if _, found := vmsBefore[*updated.InstanceID]; !found {
 				log.Infof("waiting for %s to be ready", *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-				err = WaitForReady(ctx, cs, role, *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
+				err = waitForReady(ctx, cs, role, *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
 				if err != nil {
 					return err
 				}
@@ -210,12 +192,12 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 
 // updateInPlace updates one by one all the VMs of a scale set, in place.
 func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) error {
-	vms, err := ListVMs(ctx, cs, u.vmc, role)
+	vms, err := listVMs(ctx, cs, u.vmc, role)
 	if err != nil {
 		return err
 	}
 
-	sorted, err := sortMasterVMsByHealth(vms, cs)
+	sorted, err := sortMasterVMsByHealth(vms, cs, u.kubeclient)
 	if err != nil {
 		return err
 	}
@@ -282,7 +264,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		}
 
 		log.Infof("waiting for %s to be ready", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		err = WaitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
+		err = waitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
 		if err != nil {
 			return err
 		}
@@ -291,12 +273,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 	return nil
 }
 
-func sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenShiftManagedCluster) ([]compute.VirtualMachineScaleSetVM, error) {
-	kc, err := managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
-	if err != nil {
-		return nil, err
-	}
-
+func sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenShiftManagedCluster, kc kubernetes.Interface) ([]compute.VirtualMachineScaleSetVM, error) {
 	var ready, unready []compute.VirtualMachineScaleSetVM
 	for _, vm := range vms {
 		nodeName := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName

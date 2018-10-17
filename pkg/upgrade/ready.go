@@ -12,7 +12,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
@@ -86,30 +85,14 @@ var daemonsetWhitelist = []struct {
 }
 
 func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	var err error
-	if u.kubeclient == nil {
-		u.kubeclient, err = managedcluster.ClientsetFromV1ConfigAndWait(ctx, cs.Config.AdminKubeconfig)
-		if err != nil {
-			return err
-		}
-	}
-
-	if u.vmc == nil {
-		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
-		if err != nil {
-			return err
-		}
-		u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
-	}
-
 	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute} {
-		vms, err := ListVMs(ctx, cs, u.vmc, role)
+		vms, err := listVMs(ctx, cs, u.vmc, role)
 		if err != nil {
 			return err
 		}
 		for _, vm := range vms {
 			log.Infof("waiting for %s to be ready", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			err = WaitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
+			err = waitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
 			if err != nil {
 				return err
 			}
@@ -119,13 +102,16 @@ func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftMana
 	return nil
 }
 
-// WaitForInfraServices verifies daemonsets, statefulsets
-func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
+func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	err := managedcluster.WaitForHealthz(ctx, cs.Config.AdminKubeconfig)
+	if err != nil {
+		return err
+	}
 	for _, app := range daemonsetWhitelist {
 		log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
 
 		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
-			ds, err := kc.AppsV1().DaemonSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
+			ds, err := u.kubeclient.AppsV1().DaemonSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
 			switch {
 			case kerrors.IsNotFound(err):
 				return false, nil
@@ -147,7 +133,7 @@ func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
 		log.Infof("checking deployment %s/%s", app.Namespace, app.Name)
 
 		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
-			d, err := kc.AppsV1().Deployments(app.Namespace).Get(app.Name, metav1.GetOptions{})
+			d, err := u.kubeclient.AppsV1().Deployments(app.Namespace).Get(app.Name, metav1.GetOptions{})
 			switch {
 			case kerrors.IsNotFound(err):
 				return false, nil
@@ -174,7 +160,7 @@ func WaitForInfraServices(ctx context.Context, kc *kubernetes.Clientset) error {
 	return nil
 }
 
-func WaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string, kc kubernetes.Interface) error {
+func waitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string, kc kubernetes.Interface) error {
 	switch role {
 	case api.AgentPoolProfileRoleMaster:
 		return masterWaitForReady(ctx, cs, nodeName, kc)

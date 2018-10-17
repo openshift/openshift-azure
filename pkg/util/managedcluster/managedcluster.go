@@ -52,29 +52,19 @@ func ClientsetFromV1Config(config *v1.Config) (*kubernetes.Clientset, error) {
 	return kubernetes.NewForConfig(restconfig)
 }
 
-// ClientsetFromV1ConfigAndWait takes a context, v1 config and returns a Clientset
+// WaitForHealthz takes a context, v1 config.
 // It waits for the cluster to respond to healthz requests.
-func ClientsetFromV1ConfigAndWait(ctx context.Context, config *v1.Config) (*kubernetes.Clientset, error) {
+func WaitForHealthz(ctx context.Context, config *v1.Config) error {
 	restconfig, err := getRestConfigFromV1Config(config)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	t, err := rest.TransportFor(restconfig)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// Wait for the healthz to be 200 status
-	err = wait.ForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
-	if err != nil {
-		return nil, err
-	}
-
-	kc, err := kubernetes.NewForConfig(restconfig)
-	if err != nil {
-		return nil, err
-	}
-
-	return kc, nil
+	return wait.ForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
 }
