@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"reflect"
+	"strings"
 
 	"github.com/go-test/deep"
 	log "github.com/sirupsen/logrus"
@@ -240,8 +241,13 @@ func needsUpdate(existing, o *unstructured.Unstructured) bool {
 	// TODO: we should have tests that monitor these diffs:
 	// 1) when a cluster is created
 	// 2) when sync is run twice back-to-back on the same cluster
-	for _, diff := range deep.Equal(*existing, *o) {
-		log.Infof("- " + diff)
+
+	// Don't show a diff if kind is Secret
+	oGroupKind := o.GroupVersionKind().GroupKind()
+	if strings.ToLower(oGroupKind.String()) != "secret" {
+		for _, diff := range deep.Equal(*existing, *o) {
+			log.Infof("- " + diff)
+		}
 	}
 
 	return true

@@ -25,6 +25,12 @@ func TestNeedsUpdate(t *testing.T) {
 			updated:  getObjectFromFile("testdata/service3.yaml"),
 			exp:      true,
 		},
+		{
+			name:     "secret diff omitted",
+			existing: getObjectFromFile("testdata/secret2.yaml"),
+			updated:  getObjectFromFile("testdata/secret3.yaml"),
+			exp:      true,
+		},
 	}
 
 	for _, test := range tests {
