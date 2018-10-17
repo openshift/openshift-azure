@@ -76,11 +76,13 @@ func newAzureClients(ctx context.Context, m map[string]string) (*azureStorageCli
 	return clients, nil
 }
 
-func sync() error {
-	logrus.Print("Sync process started")
+type sync struct {
+	stc *azureStorageClient
 
-	ctx := context.Background()
+	blob azureclientstorage.Blob
+}
 
+func (s *sync) init(ctx context.Context) error {
 	b, err := ioutil.ReadFile("_data/_out/azure.conf")
 	if err != nil {
 		return errors.Wrap(err, "cannot read _data/_out/azure.conf")
@@ -91,21 +93,24 @@ func sync() error {
 		return errors.Wrap(err, "cannot unmarshal _data/_out/azure.conf")
 	}
 
-	az, err := newAzureClients(ctx, m)
+	s.stc, err = newAzureClients(ctx, m)
 	if err != nil {
 		return err
 	}
 
-	bsc := az.storage.GetBlobService()
-
+	bsc := s.stc.storage.GetBlobService()
 	c := bsc.GetContainerReference("config")
+	s.blob = c.GetBlobReference("config")
+	return nil
+}
 
-	blob := c.GetBlobReference("config")
-
+func (s *sync) getBlob() (*api.OpenShiftManagedCluster, error) {
 	logrus.Print("reading config blob")
+
 	var rc io.ReadCloser
+	var err error
 	err = wait.PollImmediateInfinite(time.Second, func() (bool, error) {
-		rc, err = blob.Get(nil)
+		rc, err = s.blob.Get(nil)
 
 		if err, ok := err.(azstorage.AzureStorageServiceError); ok && err.StatusCode == http.StatusNotFound {
 			return false, nil
@@ -114,31 +119,44 @@ func sync() error {
 		return err == nil, err
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer rc.Close()
 	logrus.Print("read config blob")
 
-	b, err = ioutil.ReadAll(rc)
+	b, err := ioutil.ReadAll(rc)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var cs *api.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(b, &cs); err != nil {
-		return err
+		return nil, err
+	}
+	return cs, nil
+}
+
+// sync syncs the current state of the cluster with the
+// desired state that is kept in a blob in an Azure storage
+// account. It returns whether it managed to access the
+// config blob or not and any error that occured.
+func (s *sync) sync(ctx context.Context) (bool, error) {
+	logrus.Print("Sync process started")
+	cs, err := s.getBlob()
+	if err != nil {
+		return false, err
 	}
 
 	if errs := api.Validate(cs, nil, false); len(errs) > 0 {
-		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
+		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 
-	if err := addons.Main(ctx, cs, az.accounts, *dryRun); err != nil {
-		return errors.Wrap(err, "cannot sync cluster config")
+	if err := addons.Main(ctx, cs, s.stc.accounts, *dryRun); err != nil {
+		return true, errors.Wrap(err, "cannot sync cluster config")
 	}
 
 	logrus.Print("Sync process complete")
-	return nil
+	return true, nil
 }
 
 func main() {
@@ -146,8 +164,22 @@ func main() {
 	logrus.SetLevel(log.SanitizeLogLevel(*logLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 	logrus.Printf("sync pod starting, git commit %s", gitCommit)
+
+	s := new(sync)
+	ctx := context.Background()
+
+	if err := s.init(ctx); err != nil {
+		logrus.Fatalf("Cannot initialize sync: %v", err)
+	}
+
 	for {
-		if err := sync(); err != nil {
+		gotBlob, err := s.sync(ctx)
+		if !gotBlob {
+			// If we didn't manage to access the blob, error out and start
+			// again.
+			logrus.Fatalf("Error while accessing config blob: %v", err)
+		}
+		if err != nil {
 			logrus.Printf("Error while syncing: %v", err)
 		}
 		if *once {
