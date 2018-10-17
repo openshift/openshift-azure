@@ -54,6 +54,13 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 
 		log.Info("merge old and new config")
 		p.MergeConfig(ctx, cs, oldCs)
+	} else {
+		// If containerservice.yaml does not exist - it is Create call
+		// create DNS records only on first call
+		err = CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"), config, oc)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// validate the internal API representation (with reference to the previous

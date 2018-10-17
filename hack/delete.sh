@@ -15,11 +15,4 @@ else
     export RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
 fi
 
-USE_PROD_FLAG="-use-prod=true"
-if [[ -z "$TEST_IN_PRODUCTION" ]]; then
-    hack/dns.sh zone-delete $RESOURCEGROUP
-    rm -rf _data
-    USE_PROD_FLAG="-use-prod=false"
-fi
-
 go run cmd/createorupdate/createorupdate.go -request=DELETE $USE_PROD_FLAG

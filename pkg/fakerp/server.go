@@ -101,6 +101,19 @@ func (s *Server) validate(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
+
+	config := &api.PluginConfig{
+		AcceptLanguages: []string{"en-us"},
+	}
+
+	// simulate Context with property bag
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
+	defer cancel()
+	// TODO: Get the azure credentials from the request headers
+	ctx = context.WithValue(ctx, api.ContextKeyClientID, s.conf.ClientID)
+	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, s.conf.ClientSecret)
+	ctx = context.WithValue(ctx, api.ContextKeyTenantID, s.conf.TenantID)
+
 	// TODO: Get the azure credentials from the request headers
 	authorizer, err := azureclient.NewAuthorizer(s.conf.ClientID, s.conf.ClientSecret, s.conf.TenantID)
 	if err != nil {
@@ -109,13 +122,18 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
+
+	// delete dns records
+	err = DeleteOCPDNS(ctx, s.conf.SubscriptionID, s.conf.ResourceGroup, s.conf.DnsResourceGroup, s.conf.DnsDomain, config)
+	if err != nil {
+		s.log.Fatal(err)
+	}
+
 	// TODO: Determine subscription ID from the request path
 	gc := resources.NewGroupsClient(s.conf.SubscriptionID)
 	gc.Authorizer = authorizer
 
 	resourceGroup := filepath.Base(req.URL.Path)
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-	defer cancel()
 	s.log.Infof("deleting resource group %s", resourceGroup)
 
 	future, err := gc.Delete(ctx, resourceGroup)
