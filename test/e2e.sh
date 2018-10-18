@@ -51,16 +51,6 @@ export RESOURCEGROUP=$1
 rm -rf _data
 mkdir -p _data/_out
 
-# if AZURE_CLIENT_ID is used as AZURE_AAD_CLIENT_ID, script will reset global team account!
-set +x
-if [[ "$AZURE_AAD_CLIENT_ID" && "$AZURE_AAD_CLIENT_ID" != "$AZURE_CLIENT_ID" ]]; then
-    . <(hack/aad.sh app-update $AZURE_AAD_CLIENT_ID https://$RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com/oauth2callback/Azure%20AD)
-else
-    AZURE_AAD_CLIENT_ID=$AZURE_CLIENT_ID
-    AZURE_AAD_CLIENT_SECRET=$AZURE_CLIENT_SECRET
-fi
-export AZURE_AAD_CLIENT_ID
-export AZURE_AAD_CLIENT_SECRET
 set -x
 
 # TEST_IN_PRODUCTION: (optional) whether to run using the prod RP or the fake RP
@@ -69,11 +59,6 @@ set -x
 # UPDATE: (optional) manifest to apply once the cluster is created and EXEC is done
 # UPDATE_EXEC: (optional) command to execute once the cluster is updated
 # ARTIFACT_DIR: (optional) directory to save cluster artifacts before the cluster gets cleaned up
-
-if [[ -z "$MANIFEST" ]]; then
-    MANIFEST="test/manifests/normal/create.yaml"
-fi
-cat $MANIFEST | envsubst > _data/manifest.yaml
 
 go generate ./...
 
@@ -90,8 +75,7 @@ fi
 UPDATE_FLAG=""
 UPDATE_EXEC_FLAG=""
 if [[ -n "$UPDATE_MANIFEST" ]]; then
-    cat $UPDATE_MANIFEST | envsubst > _data/update.yaml
-    UPDATE_FLAG="-update=_data/update.yaml"
+    UPDATE_FLAG="-update=$UPDATE_MANIFEST"
     UPDATE_EXEC_FLAG="-update-exec=$UPDATE_EXEC"
 fi
 

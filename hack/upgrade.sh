@@ -20,10 +20,5 @@ if [[ -n "$TEST_IN_PRODUCTION" ]]; then
     USE_PROD_FLAG="-use-prod=true"
 fi
 
-if [[ -n "$MANIFEST" ]]; then
-    cat $MANIFEST | envsubst > _data/manifest.yaml
-fi
-
-sed -i '/provisioningState/d' _data/manifest.yaml
 go generate ./...
 go run cmd/createorupdate/createorupdate.go -timeout 1h $USE_PROD_FLAG

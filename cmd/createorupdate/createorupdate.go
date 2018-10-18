@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 	"syscall"
 	"time"
@@ -29,11 +30,10 @@ import (
 )
 
 var (
-	method   = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
-	useProd  = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
-	manifest = flag.String("manifest", "_data/manifest.yaml", "Manifest to use for the initial request.")
-	update   = flag.String("update", "", "If provided, use this manifest to make a follow-up request after the initial request succeeds.")
-	cleanup  = flag.Bool("rm", false, "Delete the cluster once all other requests have completed successfully.")
+	method  = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
+	useProd = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
+	update  = flag.String("update", "", "If provided, use this manifest to make a follow-up request after the initial request succeeds.")
+	cleanup = flag.Bool("rm", false, "Delete the cluster once all other requests have completed successfully.")
 
 	// timeouts
 	rmTimeout     = flag.Duration("rm-timeout", 20*time.Minute, "Timeout of the cleanup request")
@@ -46,6 +46,10 @@ var (
 
 	artifactDir        = flag.String("artifact-dir", "", "Directory to place artifacts before a cluster is deleted.")
 	artifactKubeconfig = flag.String("artifact-kubeconfig", "", "Path to kubeconfig to use for gathering artifacts.")
+)
+
+const (
+	outputDirectory = "_data"
 )
 
 func validate() error {
@@ -92,17 +96,13 @@ func delete(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClus
 	return nil
 }
 
-func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, resourceGroup, manifest string) error {
+func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, resourceGroup, manifestTemplate, manifestFile string) error {
 	log.Info("creating/updating cluster")
-	in, err := ioutil.ReadFile(manifest)
+	oc, err := fakerp.GenerateManifest(manifestTemplate)
 	if err != nil {
 		return err
 	}
-	var oc sdk.OpenShiftManagedCluster
-	if err := yaml.Unmarshal(in, &oc); err != nil {
-		return err
-	}
-	future, err := rpc.CreateOrUpdate(ctx, resourceGroup, resourceGroup, oc)
+	future, err := rpc.CreateOrUpdate(ctx, resourceGroup, resourceGroup, *oc)
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftMan
 		return err
 	}
 	log.Info("created/updated cluster")
-	return ioutil.WriteFile(manifest, out, 0666)
+	return ioutil.WriteFile(manifestFile, out, 0666)
 }
 
 func execCommand(c string) error {
@@ -169,8 +169,9 @@ func createResourceGroup(conf *fakerp.Config) (bool, error) {
 
 func execute(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, conf *fakerp.Config) error {
 	// simulate the API call to the RP
+	manifestFile := path.Join(outputDirectory, "manifest.yaml")
 	if err := wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
-		if err := createOrUpdate(ctx, log, rpc, conf.ResourceGroup, *manifest); err != nil {
+		if err := createOrUpdate(ctx, log, rpc, conf.ResourceGroup, conf.Manifest, manifestFile); err != nil {
 			if autoRestErr, ok := err.(autorest.DetailedError); ok {
 				if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
 					if netErr, ok := urlErr.Err.(*net.OpError); ok {
@@ -199,7 +200,8 @@ func execute(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClu
 	if *update != "" {
 		updateCtx, updateCancel := context.WithTimeout(context.Background(), *updateTimeout)
 		defer updateCancel()
-		if err := createOrUpdate(updateCtx, log, rpc, conf.ResourceGroup, *update); err != nil {
+		updateManifestFile := path.Join(outputDirectory, "update.yaml")
+		if err := createOrUpdate(updateCtx, log, rpc, conf.ResourceGroup, *update, updateManifestFile); err != nil {
 			return err
 		}
 	}
@@ -219,6 +221,31 @@ func execute(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClu
 	return nil
 }
 
+func updateAadApplictation(ctx context.Context, log *logrus.Entry, conf *fakerp.Config) error {
+	if len(conf.AADClientID) > 0 && conf.AADClientID != conf.ClientID {
+		log.Info("updating the aad application")
+		if len(conf.Username) == 0 || len(conf.Password) == 0 {
+			log.Fatal("AZURE_USERNAME and AZURE_PASSWORD are required to when updating the aad application")
+		}
+		authorizer, err := azureclient.NewAadAuthorizer(conf.Username, conf.Password, conf.TenantID)
+		if err != nil {
+			return err
+		}
+		aadClient := azureclient.NewRBACApplicationsClient(conf.TenantID, authorizer, []string{"en-us"})
+		callbackURL := fmt.Sprintf("https://%s.%s.cloudapp.azure.com/oauth2callback/Azure%%20AD", conf.ResourceGroup, conf.Region)
+		conf.AADClientSecret, err = fakerp.UpdateAADAppSecret(ctx, aadClient, conf.AADClientID, callbackURL)
+		if err != nil {
+			return err
+		}
+	} else {
+		conf.AADClientID = conf.ClientID
+	}
+	// set env variable so enrich() still works
+	os.Setenv("AZURE_AAD_CLIENT_ID", conf.AADClientID)
+	os.Setenv("AZURE_AAD_CLIENT_SECRET", conf.AADClientSecret)
+	return nil
+}
+
 func main() {
 	flag.Parse()
 	if err := validate(); err != nil {
@@ -234,11 +261,13 @@ func main() {
 	}
 	log = logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": conf.ResourceGroup})
 
+	isCreate := true
 	if strings.ToUpper(*method) != http.MethodDelete {
 		log.Infof("creating resource group %s", conf.ResourceGroup)
 		if created, err := createResourceGroup(conf); err != nil {
 			log.Fatal(err)
 		} else if !created {
+			isCreate = false
 			log.Infof("reusing existing resource group %s", conf.ResourceGroup)
 		}
 	}
@@ -270,6 +299,12 @@ func main() {
 			log.Fatal(err)
 		}
 		return
+	}
+
+	if isCreate {
+		if err := updateAadApplictation(ctx, log, conf); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	err = execute(ctx, log, rpc, conf)
