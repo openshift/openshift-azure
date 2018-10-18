@@ -10,6 +10,7 @@ import (
 	"context"
 
 	"github.com/sirupsen/logrus"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
@@ -29,6 +30,7 @@ type simpleUpgrader struct {
 	pluginConfig   api.PluginConfig
 	accountsClient azureclient.AccountsClient
 	storageClient  storage.Client
+	kubeclient     kubernetes.Interface
 }
 
 var _ Upgrader = &simpleUpgrader{}
