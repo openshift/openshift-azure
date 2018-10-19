@@ -8,9 +8,10 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/openshift/openshift-azure/pkg/tls"
 	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
+
+	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
 func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certificate, endpoint, username, namespace string) (*v1.Config, error) {
