@@ -8,13 +8,13 @@ const (
 // OpenShiftManagedCluster complies with the ARM model of resource definition in
 // a JSON template.
 type OpenShiftManagedCluster struct {
-	ID         string                `json:"id,omitempty"`
-	Location   string                `json:"location,omitempty"`
-	Name       string                `json:"name,omitempty"`
 	Plan       *ResourcePurchasePlan `json:"plan,omitempty"`
-	Tags       map[string]string     `json:"tags,omitempty"`
-	Type       string                `json:"type,omitempty"`
 	Properties *Properties           `json:"properties,omitempty"`
+	ID         string                `json:"id,omitempty"`
+	Name       string                `json:"name,omitempty"`
+	Type       string                `json:"type,omitempty"`
+	Location   string                `json:"location,omitempty"`
+	Tags       map[string]string     `json:"tags"`
 
 	Config *Config `json:"config,omitempty"`
 }
