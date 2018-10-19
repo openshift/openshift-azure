@@ -10,6 +10,7 @@ import (
 
 	storage "github.com/Azure/azure-sdk-for-go/storage"
 	gomock "github.com/golang/mock/gomock"
+
 	storage0 "github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
