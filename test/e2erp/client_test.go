@@ -25,8 +25,11 @@ var (
 )
 
 type testClient struct {
-	gc  resources.GroupsClient
-	rpc sdk.OpenShiftManagedClustersClient
+	gc    resources.GroupsClient
+	rpc   sdk.OpenShiftManagedClustersClient
+	ssc   azureclient.VirtualMachineScaleSetsClient
+	ssvmc azureclient.VirtualMachineScaleSetVMsClient
+	ssec  azureclient.VirtualMachineScaleSetExtensionsClient
 
 	resourceGroup string
 	location      string
@@ -55,10 +58,16 @@ func newTestClient(resourceGroup string) *testClient {
 		panic(fmt.Sprintf("invalid focus %q - need to -ginkgo.focus=\\[Fake\\] or -ginkgo.focus=\\[Real\\]", config.GinkgoConfig.FocusString))
 	}
 	rpc.Authorizer = authorizer
+	ssc := azureclient.NewVirtualMachineScaleSetsClient(subID, authorizer, []string{"en-us"})
+	ssvmc := azureclient.NewVirtualMachineScaleSetVMsClient(subID, authorizer, []string{"en-us"})
+	ssec := azureclient.NewVirtualMachineScaleSetExtensionsClient(subID, authorizer, []string{"en-us"})
 
 	return &testClient{
 		gc:            gc,
 		rpc:           rpc,
+		ssc:           ssc,
+		ssvmc:         ssvmc,
+		ssec:          ssec,
 		resourceGroup: resourceGroup,
 		location:      os.Getenv("AZURE_REGION"),
 	}
