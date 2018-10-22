@@ -33,8 +33,11 @@ else
     RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
 fi
 
-hack/dns.sh zone-delete $RESOURCEGROUP
+USE_PROD_FLAG="-use-prod=true"
+if [[ -z "$TEST_IN_PRODUCTION" ]]; then
+    hack/dns.sh zone-delete $RESOURCEGROUP
+    rm -rf _data
+    USE_PROD_FLAG="-use-prod=false"
+fi
 
-rm -rf _data
-
-go run cmd/createorupdate/createorupdate.go -request DELETE
+go run cmd/createorupdate/createorupdate.go -request=DELETE $USE_PROD_FLAG

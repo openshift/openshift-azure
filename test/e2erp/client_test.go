@@ -3,16 +3,11 @@
 package e2erp
 
 import (
-	"context"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"regexp"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
-	"github.com/ghodss/yaml"
 	"github.com/onsi/ginkgo/config"
 
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
@@ -71,57 +66,4 @@ func newTestClient(resourceGroup string) *testClient {
 		resourceGroup: resourceGroup,
 		location:      os.Getenv("AZURE_REGION"),
 	}
-}
-
-func (t *testClient) setup(manifest string) error {
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Minute)
-	// TODO: tags: now=$(date +%s) ttl=$ttl
-	if _, err := t.gc.CreateOrUpdate(ctx, t.resourceGroup, resources.Group{Location: &t.location}); err != nil {
-		return err
-	}
-
-	in, err := ioutil.ReadFile(manifest)
-	if err != nil {
-		return err
-	}
-	var oc sdk.OpenShiftManagedCluster
-	if err := yaml.Unmarshal(in, &oc); err != nil {
-		return err
-	}
-
-	future, err := t.rpc.CreateOrUpdate(ctx, t.resourceGroup, t.resourceGroup, oc)
-	if err != nil {
-		return err
-	}
-	if err := future.WaitForCompletionRef(ctx, t.rpc.Client); err != nil {
-		return err
-	}
-	oc, err = future.Result(t.rpc)
-	if err != nil {
-		return err
-	}
-	if *oc.OpenShiftManagedClusterProperties.ProvisioningState != "Succeeded" {
-		return fmt.Errorf("failed to provision cluster: %s", *oc.OpenShiftManagedClusterProperties.ProvisioningState)
-	}
-	return nil
-}
-
-func (t *testClient) teardown() error {
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Minute)
-	future, err := t.rpc.Delete(ctx, t.resourceGroup, t.resourceGroup)
-	if err != nil {
-		return err
-	}
-	if err := future.WaitForCompletionRef(ctx, t.rpc.Client); err != nil {
-		return err
-	}
-	resp, err := future.Result(t.rpc)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("unexpected status: %s", resp.Status)
-	}
-	_, err = t.gc.Delete(ctx, t.resourceGroup)
-	return err
 }
