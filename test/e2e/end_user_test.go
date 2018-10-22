@@ -52,7 +52,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 	})
 
 	It("should deploy a template and check the visit counter increments", func() {
-		const TPL = "nodejs-mongodb-example"
+		const TPL = "cakephp-mysql-example"
 		var regex = regexp.MustCompile(`id="count-value">(\d+)<`)
 
 		// Create the template
