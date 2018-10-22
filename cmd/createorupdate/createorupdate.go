@@ -3,11 +3,16 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 
@@ -18,10 +23,14 @@ import (
 	sdk "github.com/openshift/openshift-azure/pkg/util/azureclient/osa-go-sdk/services/containerservice/mgmt/2018-09-30-preview/containerservice"
 )
 
+const fakeRpAddr = "localhost:8080"
+
 type server struct {
 	// the server will not process more than a single
 	// PUT request at all times.
 	inProgress chan struct{}
+
+	gc resources.GroupsClient
 
 	sync.RWMutex
 	state v20180930preview.ProvisioningState
@@ -44,8 +53,8 @@ func newServer(resourceGroup string) *server {
 func (s *server) ListenAndServe() {
 	// TODO: match the request path the real RP would use
 	http.Handle("/", s)
-	httpServer := &http.Server{Addr: "localhost:8080"}
-	s.log.Info("starting server on localhost:8080")
+	httpServer := &http.Server{Addr: fakeRpAddr}
+	s.log.Infof("starting server on %s", fakeRpAddr)
 	s.log.WithError(httpServer.ListenAndServe()).Warn("Server exited.")
 }
 
@@ -61,6 +70,8 @@ func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	// process the request
 	switch req.Method {
+	case http.MethodDelete:
+		s.handleDelete(w, req)
 	case http.MethodGet:
 		s.handleGet(w, req)
 	case http.MethodPut:
@@ -69,8 +80,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *server) validate(w http.ResponseWriter, r *http.Request) bool {
-	// TODO: Support DELETE
-	if r.Method != http.MethodPut && r.Method != http.MethodGet {
+	if r.Method != http.MethodPut && r.Method != http.MethodGet && r.Method != http.MethodDelete {
 		resp := "405 Method not allowed"
 		s.log.Debugf("%s: %s", r.Method, resp)
 		http.Error(w, resp, http.StatusMethodNotAllowed)
@@ -90,6 +100,45 @@ func (s *server) validate(w http.ResponseWriter, r *http.Request) bool {
 		}
 	}
 	return true
+}
+
+func (s *server) handleDelete(w http.ResponseWriter, req *http.Request) {
+	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
+	if err != nil {
+		resp := "500 Internal Error: Failed to determine request credentials"
+		s.log.Debug(resp, err)
+		http.Error(w, resp, http.StatusInternalServerError)
+		return
+	}
+	subID := os.Getenv("AZURE_SUBSCRIPTION_ID")
+	gc := resources.NewGroupsClient(subID)
+	gc.Authorizer = authorizer
+
+	resourceGroup := filepath.Base(req.URL.Path)
+	s.log.Infof("deleting resource group %s", resourceGroup)
+
+	future, err := gc.Delete(context.Background(), resourceGroup)
+	if err != nil {
+		resp := "500 Internal Error: Failed to delete resource group"
+		s.log.Debug(resp, err)
+		http.Error(w, resp, http.StatusInternalServerError)
+		return
+	}
+	if err := future.WaitForCompletionRef(context.Background(), gc.Client); err != nil {
+		resp := "500 Internal Error: Failed to wait for resource group deletion"
+		s.log.Debug(resp, err)
+		http.Error(w, resp, http.StatusInternalServerError)
+		return
+	}
+	resp, err := future.Result(gc)
+	if err != nil {
+		resp := "500 Internal Error: Failed to get resource group deletion response"
+		s.log.Debug(resp, err)
+		http.Error(w, resp, http.StatusInternalServerError)
+		return
+	}
+	s.log.Infof("deleted resource group %s", resourceGroup)
+	w.WriteHeader(resp.StatusCode)
 }
 
 func (s *server) handleGet(w http.ResponseWriter, req *http.Request) {
@@ -175,6 +224,11 @@ func (s *server) readState() v20180930preview.ProvisioningState {
 
 func (s *server) reply(w http.ResponseWriter, req *http.Request) {
 	oc := s.read()
+	if oc == nil {
+		// This is a delete (trust me)
+		// TODO: Need to model this better.
+		return
+	}
 	oc.Properties.ProvisioningState = s.readState()
 	res, err := json.Marshal(azureclient.ExternalToSdk(oc))
 	if err != nil {
@@ -186,10 +240,56 @@ func (s *server) reply(w http.ResponseWriter, req *http.Request) {
 	w.Write(res)
 }
 
+var (
+	method  = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
+	useProd = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
+)
+
+func validate() error {
+	switch strings.ToUpper(*method) {
+	case http.MethodPut, http.MethodDelete:
+	default:
+		return fmt.Errorf("invalid request: %s, Supported methods are PUT and DELETE", strings.ToUpper(*method))
+	}
+	return nil
+}
+
 func main() {
+	flag.Parse()
+	if err := validate(); err != nil {
+		logrus.Fatal(err)
+	}
+
 	// simulate the RP
-	s := newServer(os.Getenv("RESOURCEGROUP"))
-	go s.ListenAndServe()
+	if !*useProd {
+		s := newServer(os.Getenv("RESOURCEGROUP"))
+		go s.ListenAndServe()
+	}
+
+	// setup the osa client
+	rpURL := fmt.Sprintf("http://%s", fakeRpAddr)
+	if *useProd {
+		rpURL = sdk.DefaultBaseURI
+	}
+	rpc := sdk.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, os.Getenv("AZURE_SUBSCRIPTION_ID"))
+
+	if strings.ToUpper(*method) == http.MethodDelete {
+		future, err := rpc.Delete(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		if err != nil {
+			logrus.Fatal(err)
+		}
+		if err := future.WaitForCompletionRef(context.Background(), rpc.Client); err != nil {
+			logrus.Fatal(err)
+		}
+		resp, err := future.Result(rpc)
+		if err != nil {
+			logrus.Fatal(err)
+		}
+		if resp.StatusCode != http.StatusOK {
+			logrus.Fatalf("unexpected status: %s, expected 200 OK", resp.Status)
+		}
+		return
+	}
 
 	// simulate the API call to the RP
 	in, err := ioutil.ReadFile("_data/manifest.yaml")
@@ -200,7 +300,6 @@ func main() {
 	if err := yaml.Unmarshal(in, &oc); err != nil {
 		logrus.Fatal(err)
 	}
-	rpc := sdk.NewOpenShiftManagedClustersClientWithBaseURI("http://localhost:8080", os.Getenv("AZURE_SUBSCRIPTION_ID"))
 	future, err := rpc.CreateOrUpdate(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), oc)
 	if err != nil {
 		logrus.Fatal(err)
