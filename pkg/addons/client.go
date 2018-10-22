@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"reflect"
+	"strings"
 
 	"github.com/go-test/deep"
 	log "github.com/sirupsen/logrus"
@@ -218,6 +219,7 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		if !needsUpdate(existing, o) {
 			return
 		}
+		printDiff(existing, o)
 
 		o.SetResourceVersion(rv)
 		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
@@ -237,14 +239,24 @@ func needsUpdate(existing, o *unstructured.Unstructured) bool {
 
 	log.Infof("Update " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 
+	return true
+}
+
+func printDiff(existing, o *unstructured.Unstructured) bool {
 	// TODO: we should have tests that monitor these diffs:
 	// 1) when a cluster is created
 	// 2) when sync is run twice back-to-back on the same cluster
-	for _, diff := range deep.Equal(*existing, *o) {
-		log.Infof("- " + diff)
-	}
 
-	return true
+	// Don't show a diff if kind is Secret
+	oGroupKind := o.GroupVersionKind().GroupKind()
+	diffShown := false
+	if strings.ToLower(oGroupKind.String()) != "secret" {
+		for _, diff := range deep.Equal(*existing, *o) {
+			log.Infof("- " + diff)
+			diffShown = true
+		}
+	}
+	return diffShown
 }
 
 // ServiceCatalogExists returns whether the service catalog API exists.
