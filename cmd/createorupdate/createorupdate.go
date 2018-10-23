@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -11,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/ghodss/yaml"
@@ -115,16 +117,18 @@ func (s *server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	gc.Authorizer = authorizer
 
 	resourceGroup := filepath.Base(req.URL.Path)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	defer cancel()
 	s.log.Infof("deleting resource group %s", resourceGroup)
 
-	future, err := gc.Delete(context.Background(), resourceGroup)
+	future, err := gc.Delete(ctx, resourceGroup)
 	if err != nil {
 		resp := "500 Internal Error: Failed to delete resource group"
 		s.log.Debug(resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
-	if err := future.WaitForCompletionRef(context.Background(), gc.Client); err != nil {
+	if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
 		resp := "500 Internal Error: Failed to wait for resource group deletion"
 		s.log.Debug(resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
@@ -169,7 +173,8 @@ func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	s.write(oc)
 
 	// simulate Context with property bag
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	defer cancel()
 	ctx = context.WithValue(ctx, api.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
 	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
 	ctx = context.WithValue(ctx, api.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
@@ -241,8 +246,12 @@ func (s *server) reply(w http.ResponseWriter, req *http.Request) {
 }
 
 var (
-	method  = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
-	useProd = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
+	method   = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
+	useProd  = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
+	manifest = flag.String("manifest", "_data/manifest.yaml", "Manifest to use for the initial request.")
+	update   = flag.String("update", "", "If provided, use this manifest to make a follow-up request after the initial request succeeds.")
+	cleanup  = flag.Bool("rm", false, "Delete the cluster once all other requests have completed successfully.")
+	// TODO: Flag for gathering artifacts from the cluster
 )
 
 func validate() error {
@@ -251,17 +260,79 @@ func validate() error {
 	default:
 		return fmt.Errorf("invalid request: %s, Supported methods are PUT and DELETE", strings.ToUpper(*method))
 	}
+	if *method == http.MethodDelete && *update != "" {
+		return errors.New("cannot do an update when a DELETE is the initial request")
+	}
+	if *method == http.MethodDelete && *cleanup {
+		return errors.New("cannot request a DELETE and -rm at the same time - use one of the two")
+	}
 	return nil
 }
 
+func delete(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient) error {
+	log.Info("deleting cluster")
+	future, err := rpc.Delete(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+	if err != nil {
+		return err
+	}
+	if err := future.WaitForCompletionRef(ctx, rpc.Client); err != nil {
+		return err
+	}
+	resp, err := future.Result(rpc)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status: %s, expected 200 OK", resp.Status)
+	}
+	log.Info("deleted cluster")
+	return nil
+}
+
+func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, manifest string) error {
+	log.Info("creating/updating cluster")
+	in, err := ioutil.ReadFile(manifest)
+	if err != nil {
+		return err
+	}
+	var oc sdk.OpenShiftManagedCluster
+	if err := yaml.Unmarshal(in, &oc); err != nil {
+		return err
+	}
+	future, err := rpc.CreateOrUpdate(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), oc)
+	if err != nil {
+		return err
+	}
+	if err := future.WaitForCompletionRef(ctx, rpc.Client); err != nil {
+		return err
+	}
+	resp, err := future.Result(rpc)
+	if err != nil {
+		return err
+	}
+	out, err := yaml.Marshal(resp)
+	if err != nil {
+		return err
+	}
+	log.Info("created/updated cluster")
+	return ioutil.WriteFile(manifest, out, 0666)
+}
+
 func main() {
+	logger := logrus.New()
+	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
+	log := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	defer cancel()
+
 	flag.Parse()
 	if err := validate(); err != nil {
-		logrus.Fatal(err)
+		log.Fatal(err)
 	}
 
 	// simulate the RP
 	if !*useProd {
+		log.Info("starting the fake resource provider")
 		s := newServer(os.Getenv("RESOURCEGROUP"))
 		go s.ListenAndServe()
 	}
@@ -272,50 +343,35 @@ func main() {
 		rpURL = sdk.DefaultBaseURI
 	}
 	rpc := sdk.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	rpc.Authorizer = authorizer
 
 	if strings.ToUpper(*method) == http.MethodDelete {
-		future, err := rpc.Delete(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
-		if err != nil {
-			logrus.Fatal(err)
-		}
-		if err := future.WaitForCompletionRef(context.Background(), rpc.Client); err != nil {
-			logrus.Fatal(err)
-		}
-		resp, err := future.Result(rpc)
-		if err != nil {
-			logrus.Fatal(err)
-		}
-		if resp.StatusCode != http.StatusOK {
-			logrus.Fatalf("unexpected status: %s, expected 200 OK", resp.Status)
+		if err := delete(ctx, log, rpc); err != nil {
+			log.Fatal(err)
 		}
 		return
 	}
 
 	// simulate the API call to the RP
-	in, err := ioutil.ReadFile("_data/manifest.yaml")
-	if err != nil {
-		logrus.Fatal(err)
+	if err := createOrUpdate(ctx, log, rpc, *manifest); err != nil {
+		log.Fatal(err)
 	}
-	var oc sdk.OpenShiftManagedCluster
-	if err := yaml.Unmarshal(in, &oc); err != nil {
-		logrus.Fatal(err)
+
+	// if an update is requested, do it
+	if *update != "" {
+		if err := createOrUpdate(ctx, log, rpc, *update); err != nil {
+			log.Fatal(err)
+		}
 	}
-	future, err := rpc.CreateOrUpdate(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), oc)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	if err := future.WaitForCompletionRef(context.Background(), rpc.Client); err != nil {
-		logrus.Fatal(err)
-	}
-	resp, err := future.Result(rpc)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	out, err := yaml.Marshal(resp)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	if err := ioutil.WriteFile("_data/manifest.yaml", out, 0666); err != nil {
-		logrus.Fatal(err)
+
+	// if a cleanup is requested, do that too
+	if *cleanup {
+		if err := delete(ctx, log, rpc); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
