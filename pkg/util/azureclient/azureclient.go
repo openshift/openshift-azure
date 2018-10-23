@@ -4,10 +4,10 @@ package azureclient
 //go:generate go install github.com/golang/mock/mockgen
 //go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/azureclient.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE Client,VirtualMachineScaleSetsClient,VirtualMachineScaleSetVMsClient,VirtualMachineScaleSetExtensionsClient,ApplicationsClient,MarketPlaceAgreementsClient,DeploymentsClient,AccountsClient
 //go:generate gofmt -s -l -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
-//go:generate goimports -e -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
+//go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
 //go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE/storage Client,BlobStorageClient,Container,Blob
 //go:generate gofmt -s -l -w ../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go
-//go:generate goimports -e -w ../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go
+//go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go
 
 import (
 	"context"
