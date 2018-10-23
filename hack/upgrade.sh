@@ -41,7 +41,11 @@ if [[ ! -e _data/containerservice.yaml ]]; then
     exit 1
 fi
 
-export RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
+if [[ $# -eq 1 ]]; then
+    export RESOURCEGROUP=$1
+else
+    export RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
+fi
 
 go generate ./...
 go run cmd/createorupdate/createorupdate.go

@@ -30,7 +30,7 @@ fi
 if [[ $# -eq 1 ]]; then
     export RESOURCEGROUP=$1
 else
-    RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
+    export RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
 fi
 
 hack/dns.sh zone-delete $RESOURCEGROUP
