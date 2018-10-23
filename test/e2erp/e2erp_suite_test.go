@@ -20,15 +20,6 @@ var (
 
 var _ = BeforeSuite(func() {
 	c = newTestClient(os.Getenv("RESOURCEGROUP"))
-	if err := c.setup(*manifest); err != nil {
-		panic(err)
-	}
-})
-
-var _ = AfterSuite(func() {
-	if err := c.teardown(); err != nil {
-		panic(err)
-	}
 })
 
 func TestE2eRP(t *testing.T) {

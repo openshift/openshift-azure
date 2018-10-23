@@ -57,6 +57,9 @@ cover: unit
 e2e: generate
 	./hack/e2e.sh
 
+e2e-prod:
+	go test ./test/e2erp -tags e2erp -test.v -ginkgo.v -ginkgo.randomizeAllSpecs -ginkgo.noColor -ginkgo.focus=Real -timeout 4h
+
 e2e-bin: generate
 	go test -tags e2e -ldflags "-X github.com/openshift/openshift-azure/test/e2e.gitCommit=$(COMMIT)" -i -c -o e2e.test ./test/e2e
 
@@ -67,4 +70,4 @@ e2e-image: e2e-bin
 e2e-push: e2e-image
 	docker push $(E2E_IMAGE)
 
-.PHONY: clean sync-image sync-push verify unit e2e e2e-bin
+.PHONY: clean sync-image sync-push verify unit e2e e2e-bin e2e-prod

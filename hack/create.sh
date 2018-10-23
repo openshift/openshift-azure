@@ -121,7 +121,7 @@ EOF
 
 go generate ./...
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
-  go test ./test/e2erp -tags e2erp -test.v -ginkgo.v -ginkgo.randomizeAllSpecs -ginkgo.focus=Real -timeout 4h
+  go run cmd/createorupdate/createorupdate.go -use-prod=true
 else
   go run cmd/createorupdate/createorupdate.go
 
