@@ -356,6 +356,15 @@ func main() {
 		return
 	}
 
+	// if a cleanup is requested, do it unconditionally at the end
+	if *cleanup {
+		defer func() {
+			if err := delete(ctx, log, rpc); err != nil {
+				log.Fatal(err)
+			}
+		}()
+	}
+
 	// simulate the API call to the RP
 	if err := createOrUpdate(ctx, log, rpc, *manifest); err != nil {
 		log.Fatal(err)
@@ -364,13 +373,6 @@ func main() {
 	// if an update is requested, do it
 	if *update != "" {
 		if err := createOrUpdate(ctx, log, rpc, *update); err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	// if a cleanup is requested, do that too
-	if *cleanup {
-		if err := delete(ctx, log, rpc); err != nil {
 			log.Fatal(err)
 		}
 	}
