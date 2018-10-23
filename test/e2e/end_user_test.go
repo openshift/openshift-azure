@@ -13,6 +13,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	templatev1 "github.com/openshift/api/template/v1"
+	"github.com/sirupsen/logrus"
 	policy "k8s.io/api/policy/v1beta1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -29,6 +30,11 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 	})
 
 	AfterEach(func() {
+		if CurrentGinkgoTestDescription().Failed {
+			if err := c.dumpInfo(); err != nil {
+				logrus.Warn(err)
+			}
+		}
 		c.cleanupProject(10 * time.Minute)
 	})
 

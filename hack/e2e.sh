@@ -6,6 +6,10 @@ if [[ -z "$RESOURCEGROUP" ]]; then
     RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
 fi
 
+if [[ -n "$ARTIFACT_DIR" ]]; then
+  ARTIFACT_FLAG="-artifact-dir=$ARTIFACT_DIR"
+fi
+
 if [[ -z "$SUITE" || "$SUITE" == "enduser" ]]; then
   echo "Running end user e2e tests"
   # Login as osadmin to simulate a regular user
@@ -14,7 +18,7 @@ if [[ -z "$SUITE" || "$SUITE" == "enduser" ]]; then
   export KUBECONFIG=_data/_out/osadmin.kubeconfig
   # oc login is going to create the osadmin.kubeconfig for us
   oc login $fqdn --username osadmin --password $password --insecure-skip-tls-verify=true
-  go test ./test/e2e -test.v -ginkgo.v -ginkgo.focus="\[EndUser\]" -ginkgo.noColor -ginkgo.randomizeAllSpecs -tags e2e -kubeconfig ../../_data/_out/osadmin.kubeconfig
+  go test ./test/e2e -test.v -ginkgo.v -ginkgo.focus="\[EndUser\]" -ginkgo.noColor -ginkgo.randomizeAllSpecs -tags e2e -kubeconfig ../../_data/_out/osadmin.kubeconfig "${ARTIFACT_FLAG:-}"
   oc logout
 fi
 
