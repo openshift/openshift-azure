@@ -3,7 +3,6 @@ package e2erp
 import (
 	"context"
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 
@@ -39,14 +38,8 @@ func ApplicationResourceGroup(resourceGroup, applicationName, location string) s
 
 // ManagedResourceGroup returns the name of the resource group holding all resources required by an OpenShift on Azure
 // managed application instance
-func ManagedResourceGroup(ctx context.Context, applicationResourceGroup string) (string, error) {
-	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	appsClient := azureclient.NewApplicationsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer, []string{"en-us"})
-	apps, err := appsClient.ListByResourceGroup(ctx, applicationResourceGroup)
+func ManagedResourceGroup(ctx context.Context, appsc azureclient.ApplicationsClient, applicationResourceGroup string) (string, error) {
+	apps, err := appsc.ListByResourceGroup(ctx, applicationResourceGroup)
 	if err != nil {
 		return "", err
 	}

@@ -1,14 +1,15 @@
-hash: 78d6dd4de27b3e25ad321163c56760197cf189d55bed2d57cca13cd9fb64cb2f
-updated: 2018-10-04T10:34:33.901872053+10:00
+hash: b32fedcaf76833c37e396ac4f3daf860a84a0a320942c7445f47fea7ff94d83f
+updated: 2018-10-24T13:16:45.475837252+02:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
   subpackages:
-  - profiles/latest/marketplaceordering/mgmt/marketplaceordering
+  - profiles/preview/resources/mgmt/managedapplications
   - services/compute/mgmt/2018-06-01/compute
   - services/marketplaceordering/mgmt/2015-06-01/marketplaceordering
   - services/preview/operationalinsights/mgmt/2015-11-01-preview/operationalinsights
   - services/resources/mgmt/2018-05-01/resources
+  - services/resources/mgmt/2018-06-01/managedapplications
   - services/storage/mgmt/2018-02-01/storage
   - storage
   - version
@@ -76,6 +77,8 @@ imports:
   version: 6633656539c1639d9d78127b7d47c622b5d7b6dc
 - name: github.com/json-iterator/go
   version: f2b4162afba35581b6d4a50d3b8f34e33c144682
+- name: github.com/kelseyhightower/envconfig
+  version: f611eb38b3875cc3bd991ca91c51d06446afa14c
 - name: github.com/marstr/guid
   version: 8bd9a64bf37eb297b492a4101fb28e80ac0b290f
 - name: github.com/modern-go/concurrent
@@ -118,8 +121,20 @@ imports:
   - types
 - name: github.com/openshift/api
   version: 7eef55a5dc24306c455777b9897ddc3cbeaf8b59
+  subpackages:
+  - pkg/serialization
+  - project/v1
+  - route/v1
+  - template/v1
 - name: github.com/openshift/client-go
   version: 6a9817e0a0720dd8e837d1d18cd2938342ef6e54
+  subpackages:
+  - project/clientset/versioned/scheme
+  - project/clientset/versioned/typed/project/v1
+  - route/clientset/versioned/scheme
+  - route/clientset/versioned/typed/route/v1
+  - template/clientset/versioned/scheme
+  - template/clientset/versioned/typed/template/v1
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/satori/go.uuid
@@ -151,6 +166,7 @@ imports:
   - http2/hpack
   - idna
   - lex/httplex
+  - websocket
 - name: golang.org/x/sys
   version: 95c6576299259db960f6c5b9b69ea52422860fce
   subpackages:
@@ -253,6 +269,7 @@ imports:
   - pkg/util/intstr
   - pkg/util/json
   - pkg/util/net
+  - pkg/util/rand
   - pkg/util/runtime
   - pkg/util/sets
   - pkg/util/validation
@@ -266,43 +283,74 @@ imports:
   version: 483aada58add12af1546a0f55e7a50493e8026f3
   subpackages:
   - discovery
+  - discovery/fake
   - dynamic
   - kubernetes
+  - kubernetes/fake
   - kubernetes/scheme
   - kubernetes/typed/admissionregistration/v1alpha1
+  - kubernetes/typed/admissionregistration/v1alpha1/fake
   - kubernetes/typed/admissionregistration/v1beta1
+  - kubernetes/typed/admissionregistration/v1beta1/fake
   - kubernetes/typed/apps/v1
+  - kubernetes/typed/apps/v1/fake
   - kubernetes/typed/apps/v1beta1
+  - kubernetes/typed/apps/v1beta1/fake
   - kubernetes/typed/apps/v1beta2
+  - kubernetes/typed/apps/v1beta2/fake
   - kubernetes/typed/authentication/v1
+  - kubernetes/typed/authentication/v1/fake
   - kubernetes/typed/authentication/v1beta1
+  - kubernetes/typed/authentication/v1beta1/fake
   - kubernetes/typed/authorization/v1
+  - kubernetes/typed/authorization/v1/fake
   - kubernetes/typed/authorization/v1beta1
+  - kubernetes/typed/authorization/v1beta1/fake
   - kubernetes/typed/autoscaling/v1
+  - kubernetes/typed/autoscaling/v1/fake
   - kubernetes/typed/autoscaling/v2beta1
+  - kubernetes/typed/autoscaling/v2beta1/fake
   - kubernetes/typed/batch/v1
+  - kubernetes/typed/batch/v1/fake
   - kubernetes/typed/batch/v1beta1
+  - kubernetes/typed/batch/v1beta1/fake
   - kubernetes/typed/batch/v2alpha1
+  - kubernetes/typed/batch/v2alpha1/fake
   - kubernetes/typed/certificates/v1beta1
+  - kubernetes/typed/certificates/v1beta1/fake
   - kubernetes/typed/core/v1
+  - kubernetes/typed/core/v1/fake
   - kubernetes/typed/events/v1beta1
+  - kubernetes/typed/events/v1beta1/fake
   - kubernetes/typed/extensions/v1beta1
+  - kubernetes/typed/extensions/v1beta1/fake
   - kubernetes/typed/networking/v1
+  - kubernetes/typed/networking/v1/fake
   - kubernetes/typed/policy/v1beta1
+  - kubernetes/typed/policy/v1beta1/fake
   - kubernetes/typed/rbac/v1
+  - kubernetes/typed/rbac/v1/fake
   - kubernetes/typed/rbac/v1alpha1
+  - kubernetes/typed/rbac/v1alpha1/fake
   - kubernetes/typed/rbac/v1beta1
+  - kubernetes/typed/rbac/v1beta1/fake
   - kubernetes/typed/scheduling/v1alpha1
+  - kubernetes/typed/scheduling/v1alpha1/fake
   - kubernetes/typed/settings/v1alpha1
+  - kubernetes/typed/settings/v1alpha1/fake
   - kubernetes/typed/storage/v1
+  - kubernetes/typed/storage/v1/fake
   - kubernetes/typed/storage/v1alpha1
+  - kubernetes/typed/storage/v1alpha1/fake
   - kubernetes/typed/storage/v1beta1
+  - kubernetes/typed/storage/v1beta1/fake
   - pkg/apis/clientauthentication
   - pkg/apis/clientauthentication/v1alpha1
   - pkg/version
   - plugin/pkg/client/auth/exec
   - rest
   - rest/watch
+  - testing
   - tools/auth
   - tools/clientcmd
   - tools/clientcmd/api

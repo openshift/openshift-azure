@@ -4,7 +4,6 @@ package e2erp
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
@@ -19,23 +18,34 @@ var (
 	realRe = regexp.MustCompile("Real")
 )
 
+type AzureConfig struct {
+	SubscriptionID  string   `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
+	TenantID        string   `envconfig:"AZURE_TENANT_ID" required:"true"`
+	Region          string   `envconfig:"AZURE_REGION" required:"true"`
+	ClientID        string   `envconfig:"AZURE_CLIENT_ID" required:"true"`
+	ClientSecret    string   `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
+	ResourceGroup   string   `envconfig:"RESOURCEGROUP" required:"true"`
+	AcceptLanguages []string `envconfig:"ACCEPT_LANGUAGES" default:"en-us"`
+}
+
 type testClient struct {
 	gc    resources.GroupsClient
 	rpc   sdk.OpenShiftManagedClustersClient
 	ssc   azureclient.VirtualMachineScaleSetsClient
 	ssvmc azureclient.VirtualMachineScaleSetVMsClient
 	ssec  azureclient.VirtualMachineScaleSetExtensionsClient
+	appsc azureclient.ApplicationsClient
 
 	resourceGroup string
 	location      string
 }
 
-func newTestClient(resourceGroup string) *testClient {
-	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
+func newTestClient(conf AzureConfig) *testClient {
+	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
 	if err != nil {
 		panic(err)
 	}
-	subID := os.Getenv("AZURE_SUBSCRIPTION_ID")
+	subID := conf.SubscriptionID
 	gc := resources.NewGroupsClient(subID)
 	gc.Authorizer = authorizer
 
@@ -53,9 +63,10 @@ func newTestClient(resourceGroup string) *testClient {
 		panic(fmt.Sprintf("invalid focus %q - need to -ginkgo.focus=\\[Fake\\] or -ginkgo.focus=\\[Real\\]", config.GinkgoConfig.FocusString))
 	}
 	rpc.Authorizer = authorizer
-	ssc := azureclient.NewVirtualMachineScaleSetsClient(subID, authorizer, []string{"en-us"})
-	ssvmc := azureclient.NewVirtualMachineScaleSetVMsClient(subID, authorizer, []string{"en-us"})
-	ssec := azureclient.NewVirtualMachineScaleSetExtensionsClient(subID, authorizer, []string{"en-us"})
+	ssc := azureclient.NewVirtualMachineScaleSetsClient(subID, authorizer, conf.AcceptLanguages)
+	ssvmc := azureclient.NewVirtualMachineScaleSetVMsClient(subID, authorizer, conf.AcceptLanguages)
+	ssec := azureclient.NewVirtualMachineScaleSetExtensionsClient(subID, authorizer, conf.AcceptLanguages)
+	appsc := azureclient.NewApplicationsClient(subID, authorizer, conf.AcceptLanguages)
 
 	return &testClient{
 		gc:            gc,
@@ -63,7 +74,8 @@ func newTestClient(resourceGroup string) *testClient {
 		ssc:           ssc,
 		ssvmc:         ssvmc,
 		ssec:          ssec,
-		resourceGroup: resourceGroup,
-		location:      os.Getenv("AZURE_REGION"),
+		appsc:         appsc,
+		resourceGroup: conf.ResourceGroup,
+		location:      conf.Region,
 	}
 }

@@ -4,7 +4,6 @@ package e2erp
 
 import (
 	"context"
-	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,9 +18,9 @@ var _ = Describe("Resource provider e2e tests [Real]", func() {
 
 	It("should not be possible for customer to mutate an osa scale set", func() {
 		ctx := context.Background()
-		ctx = context.WithValue(ctx, api.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
-		ctx = context.WithValue(ctx, api.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-		ctx = context.WithValue(ctx, api.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
+		ctx = context.WithValue(ctx, api.ContextKeyClientID, azureConf.ClientID)
+		ctx = context.WithValue(ctx, api.ContextKeyClientSecret, azureConf.ClientSecret)
+		ctx = context.WithValue(ctx, api.ContextKeyTenantID, azureConf.TenantID)
 
 		logrus.SetLevel(log.SanitizeLogLevel("Debug"))
 		logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
@@ -34,7 +33,7 @@ var _ = Describe("Resource provider e2e tests [Real]", func() {
 		// update the logger to use the application resource group
 		logger = logrus.WithFields(logrus.Fields{"location": c.location, "resourceGroup": appRg})
 
-		managedRg, err := ManagedResourceGroup(ctx, appRg)
+		managedRg, err := ManagedResourceGroup(ctx, c.appsc, appRg)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(appRg).NotTo(And(BeNil(), BeEmpty()))
 		logger.Infof("managed resource group is %s", managedRg)
