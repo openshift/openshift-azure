@@ -4,7 +4,7 @@ package wait
 //go:generate go install github.com/golang/mock/mockgen
 //go:generate mockgen -destination=../mocks/mock_$GOPACKAGE/wait.go -package=mock_$GOPACKAGE -source wait.go
 //go:generate gofmt -s -l -w ../mocks/mock_$GOPACKAGE/wait.go
-//go:generate goimports -e -w ../mocks/mock_$GOPACKAGE/wait.go
+//go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../mocks/mock_$GOPACKAGE/wait.go
 
 import (
 	"context"

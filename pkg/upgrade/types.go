@@ -4,7 +4,7 @@ package upgrade
 //go:generate go install github.com/golang/mock/mockgen
 //go:generate mockgen -destination=../util/mocks/mock_$GOPACKAGE/types.go -package=mock_$GOPACKAGE -source types.go
 //go:generate gofmt -s -l -w ../util/mocks/mock_$GOPACKAGE/types.go
-//go:generate goimports -e -w ../util/mocks/mock_$GOPACKAGE/types.go
+//go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../util/mocks/mock_$GOPACKAGE/types.go
 
 import (
 	"context"
