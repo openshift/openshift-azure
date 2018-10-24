@@ -3,6 +3,7 @@ package fakerp
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -11,7 +12,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
-	"k8s.io/apimachinery/pkg/util/errors"
+	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
@@ -61,7 +62,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	// will do so we are only validating once.
 	errs := p.Validate(ctx, cs, oldCs, false)
 	if len(errs) > 0 {
-		return nil, errors.NewAggregate(errs)
+		return nil, kerrors.NewAggregate(errs)
 	}
 
 	// generate or update the OpenShift config blob
@@ -123,7 +124,25 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		}
 
 		log.Info("waiting for arm template deployment to complete")
-		return future.WaitForCompletionRef(ctx, deployments.Client())
+		if err := future.WaitForCompletionRef(ctx, deployments.Client()); err != nil {
+			return err
+		}
+		resp, err := future.Result(deployments.DeploymentClient())
+		if err != nil {
+			return err
+		}
+		if *resp.Properties.ProvisioningState != "Succeeded" {
+			returnErr := fmt.Sprintf("arm deployment failed (correlation id: %s)", *resp.Properties.CorrelationID)
+			dopc := resources.NewDeploymentOperationsClient(cs.Properties.AzProfile.SubscriptionID)
+			dopc.Authorizer = authorizer
+			if op, err := dopc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, *resp.Name, *resp.Properties.CorrelationID); err != nil {
+				log.Warn(err.Error())
+			} else {
+				returnErr = fmt.Sprintf("%s - %v", returnErr, op.Properties.StatusMessage)
+			}
+			return errors.New(returnErr)
+		}
+		return nil
 	}
 
 	err = p.CreateOrUpdate(ctx, cs, azuretemplate, oldCs != nil, deployer)
