@@ -5,21 +5,26 @@ package e2erp
 import (
 	"flag"
 	"fmt"
-	"os"
 	"testing"
 
+	"github.com/kelseyhightower/envconfig"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var (
 	c         *testClient
+	azureConf AzureConfig
 	gitCommit = "unknown"
 	manifest  = flag.String("manifest", "../../_data/manifest.yaml", "Path to the manifest to send to the RP")
 )
 
 var _ = BeforeSuite(func() {
-	c = newTestClient(os.Getenv("RESOURCEGROUP"))
+	err := envconfig.Process("", &azureConf)
+	if err != nil {
+		panic(err)
+	}
+	c = newTestClient(azureConf)
 })
 
 func TestE2eRP(t *testing.T) {
