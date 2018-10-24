@@ -179,10 +179,21 @@ func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
 	ctx = context.WithValue(ctx, api.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
 
+	tc := api.TestConfig{
+		RunningUnderTest:   os.Getenv("RUNNING_UNDER_TEST") != "",
+		ImageResourceGroup: os.Getenv("IMAGE_RESOURCEGROUP"),
+		ImageResourceName:  os.Getenv("IMAGE_RESOURCENAME"),
+		DeployOS:           os.Getenv("DEPLOY_OS"),
+		ImageOffer:         os.Getenv("IMAGE_OFFER"),
+		ImageVersion:       os.Getenv("IMAGE_VERSION"),
+		ORegURL:            os.Getenv("OREG_URL"),
+	}
+
 	config := &api.PluginConfig{
 		SyncImage:       os.Getenv("SYNC_IMAGE"),
 		LogBridgeImage:  os.Getenv("LOGBRIDGE_IMAGE"),
 		AcceptLanguages: []string{"en-us"},
+		TestConfig:      tc,
 	}
 
 	if currentState := s.readState(); string(currentState) == "" {

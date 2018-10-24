@@ -1,7 +1,6 @@
 package config
 
 import (
-	"os"
 	"strings"
 
 	"github.com/ghodss/yaml"
@@ -60,16 +59,4 @@ func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error
 		"primaryScaleSetName": "ss-compute",
 		"vmType":              "vmss",
 	})
-}
-
-func (derived) RunningUnderTest() bool {
-	return os.Getenv("RUNNING_UNDER_TEST") != ""
-}
-
-func (derived) ImageResourceGroup() string {
-	return os.Getenv("IMAGE_RESOURCEGROUP")
-}
-
-func (derived) ImageResourceName() string {
-	return os.Getenv("IMAGE_RESOURCENAME")
 }

@@ -18,9 +18,9 @@ func TestGenerate(t *testing.T) {
 		},
 		//TODO "test generate doesn't overwrite": {},
 	}
-	var pluginConfig api.PluginConfig
+	var cg simpleGenerator
 	for name, test := range tests {
-		err := Generate(test.cs, pluginConfig)
+		err := cg.Generate(test.cs)
 		if err != nil {
 			t.Errorf("%s received generation error %v", name, err)
 			continue

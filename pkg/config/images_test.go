@@ -42,13 +42,20 @@ func TestOpenShiftVersion(t *testing.T) {
 
 func TestNodeImageVersion(t *testing.T) {
 	for _, deployOS := range []string{"", "rhel7", "centos7"} {
-		cs := api.OpenShiftManagedCluster{
+		cs := &api.OpenShiftManagedCluster{
 			Properties: &api.Properties{
 				OpenShiftVersion: "v3.10",
 			},
 			Config: &api.Config{},
 		}
-		selectNodeImage(&cs, deployOS)
+		cg := simpleGenerator{
+			pluginConfig: api.PluginConfig{
+				TestConfig: api.TestConfig{
+					DeployOS: deployOS,
+				},
+			},
+		}
+		cg.selectNodeImage(cs)
 		if cs.Config.ImageVersion == "latest" {
 			t.Errorf("cs.Config.ImageVersion should not equal latest")
 		}

@@ -25,17 +25,21 @@ type Generator interface {
 	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error)
 }
 
-type simpleGenerator struct{}
+type simpleGenerator struct {
+	pluginConfig api.PluginConfig
+}
 
 var _ Generator = &simpleGenerator{}
 
 // NewSimpleGenerator create a new SimpleGenerator
-func NewSimpleGenerator(entry *logrus.Entry) Generator {
+func NewSimpleGenerator(entry *logrus.Entry, pluginConfig *api.PluginConfig) Generator {
 	log.New(entry)
-	return &simpleGenerator{}
+	return &simpleGenerator{
+		pluginConfig: *pluginConfig,
+	}
 }
 
-func (*simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error) {
+func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error) {
 	masterStartup, err := Asset("master-startup.sh")
 	if err != nil {
 		return nil, err
@@ -53,14 +57,22 @@ func (*simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCl
 	azuredeploy, err := util.Template(string(tmpl), template.FuncMap{
 		"Startup": func(role api.AgentPoolProfileRole) ([]byte, error) {
 			if role == api.AgentPoolProfileRoleMaster {
-				return util.Template(string(masterStartup), nil, cs, map[string]interface{}{"Role": role})
+				return util.Template(string(masterStartup), nil, cs, map[string]interface{}{
+					"Role":       role,
+					"TestConfig": g.pluginConfig.TestConfig,
+				})
 			}
-			return util.Template(string(nodeStartup), nil, cs, map[string]interface{}{"Role": role})
+			return util.Template(string(nodeStartup), nil, cs, map[string]interface{}{
+				"Role":       role,
+				"TestConfig": g.pluginConfig.TestConfig,
+			})
 		},
 		"IsUpgrade": func() bool {
 			return isUpdate
 		},
-	}, cs, nil)
+	}, cs, map[string]interface{}{
+		"TestConfig": g.pluginConfig.TestConfig,
+	})
 	if err != nil {
 		return nil, err
 	}

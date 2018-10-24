@@ -139,7 +139,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 }
 
 func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig *api.PluginConfig) error {
-	if config.Derived.ImageResourceName() != "" ||
+	if pluginConfig.TestConfig.ImageResourceName != "" ||
 		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
 		return nil
 	}
