@@ -12,12 +12,13 @@ import (
 )
 
 var (
-	gitCommit  = "unknown"
-	kubeconfig = flag.String("kubeconfig", "../../_data/_out/admin.kubeconfig", "Location of the kubeconfig")
+	gitCommit   = "unknown"
+	kubeconfig  = flag.String("kubeconfig", "../../_data/_out/admin.kubeconfig", "Location of the kubeconfig")
+	artifactDir = flag.String("artifact-dir", "", "Directory to place artifacts when a test fails")
 )
 
 var _ = BeforeSuite(func() {
-	c = newTestClient(*kubeconfig)
+	c = newTestClient(*kubeconfig, *artifactDir)
 })
 
 func TestExtended(t *testing.T) {
