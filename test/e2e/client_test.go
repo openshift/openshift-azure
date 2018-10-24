@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/ghodss/yaml"
@@ -21,7 +22,16 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
 )
+
+type Config struct {
+	// Directory to place artifacts when a test fails
+	ArtifactDir string `envconfig:"ARTIFACT_DIR"`
+
+	// Location of the kubeconfig
+	KubeConfig string `envconfig:"KUBECONFIG" required:"true"`
+}
 
 var c, cadmin, creader *testClient
 
@@ -33,63 +43,73 @@ type testClient struct {
 	uc        *userv1client.UserV1Client
 	namespace string
 
-	artifactDir string
+	artifactDir       string
+	kubeConfigContext string
 }
 
-func newTestClient(kubeconfig, artifactDir string) *testClient {
+func newTestClient(kubeconfig, kubeConfigContext, artifactDir string) *testClient {
 	var err error
-	var config *rest.Config
+	var restConfig *rest.Config
 
 	if kubeconfig != "" {
-		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		configOptions := clientcmd.NewDefaultPathOptions()
+		mergedConfig, err := mergedKubeConfig(configOptions)
+		if err != nil {
+			panic(err)
+		}
+		configOverride := &clientcmd.ConfigOverrides{
+			CurrentContext: kubeConfigContext,
+		}
+		restConfig, err = clientcmd.NewDefaultClientConfig(*mergedConfig, configOverride).ClientConfig()
 		if err != nil {
 			panic(err)
 		}
 	} else {
 		// use in-cluster config if no kubeconfig has been specified
-		config, err = rest.InClusterConfig()
+		restConfig, err = rest.InClusterConfig()
 		if err != nil {
 			panic(err.Error())
 		}
 	}
 
 	// create the clientset
-	kc, err := kubernetes.NewForConfig(config)
+	kc, err := kubernetes.NewForConfig(restConfig)
 	if err != nil {
 		panic(err)
 	}
 
 	// create a project client for creating and tearing down namespaces
-	pc, err := projectclient.NewForConfig(config)
+	pc, err := projectclient.NewForConfig(restConfig)
 	if err != nil {
 		panic(err)
 	}
 
 	// create a template client
-	tc, err := templatev1client.NewForConfig(config)
+	tc, err := templatev1client.NewForConfig(restConfig)
 	if err != nil {
 		panic(err)
 	}
 
 	// create a route client
-	rc, err := routev1client.NewForConfig(config)
+	rc, err := routev1client.NewForConfig(restConfig)
 	if err != nil {
 		panic(err)
 	}
 
 	// create a route client
-	uc, err := userv1client.NewForConfig(config)
+	uc, err := userv1client.NewForConfig(restConfig)
 	if err != nil {
 		panic(err)
 	}
 
 	return &testClient{
-		kc:          kc,
-		pc:          pc,
-		rc:          rc,
-		tc:          tc,
-		uc:          uc,
-		artifactDir: artifactDir,
+		kc:                kc,
+		pc:                pc,
+		rc:                rc,
+		tc:                tc,
+		uc:                uc,
+		artifactDir:       artifactDir,
+		kubeConfigContext: kubeConfigContext,
 	}
 }
 
@@ -177,4 +197,29 @@ func (t *testClient) dumpInfo() error {
 		fmt.Println(podBuf.String())
 	}
 	return nil
+}
+
+// inFocus checks if the supplied focus is part of the test suite description
+func inFocus(suiteDescription, focus string) bool {
+	modfocus := fmt.Sprintf("\\[%s\\]", focus)
+	return strings.Contains(suiteDescription, modfocus)
+}
+
+// mergedKubeConfig returns the merged kube config taking into account the cases of single files and a list of files
+// provided in the format KUBECONFIG=file-a:file-b:file-c. This is the same functionality used to merged kube configs
+// in (kubectl | oc) config view
+func mergedKubeConfig(configOptions clientcmd.ConfigAccess) (*api.Config, error) {
+	if configOptions.IsExplicitFile() {
+		conf, err := clientcmd.LoadFromFile(configOptions.GetExplicitFile())
+		if err != nil {
+			return nil, err
+		}
+		return conf, nil
+	} else {
+		conf, err := configOptions.GetStartingConfig()
+		if err != nil {
+			return nil, err
+		}
+		return conf, nil
+	}
 }

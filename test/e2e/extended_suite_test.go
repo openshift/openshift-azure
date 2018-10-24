@@ -5,10 +5,9 @@ package e2e
 import (
 	"flag"
 	"fmt"
-	"os"
-	"strings"
 	"testing"
 
+	"github.com/kelseyhightower/envconfig"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
@@ -16,26 +15,29 @@ import (
 
 var (
 	gitCommit   = "unknown"
-	kubeconfig  = flag.String("kubeconfig", "../../_data/_out/admin.kubeconfig", "Location of the kubeconfig")
+	testConfig  Config
 	artifactDir = flag.String("artifact-dir", "", "Directory to place artifacts when a test fails")
 )
 
 var _ = BeforeSuite(func() {
-	c = newTestClient(*kubeconfig, *artifactDir)
-
-	focus := []byte(config.GinkgoConfig.FocusString)
-	if strings.Contains(string(focus), "\\[CustomerAdmin\\]") {
-		_, err := os.Stat("../../_data/_out/customer-cluster-admin.kubeconfig")
-		if err != nil {
-			panic(err)
-		}
-		_, err = os.Stat("../../_data/_out/customer-cluster-reader.kubeconfig")
-		if err != nil {
-			panic(err)
-		}
-		creader = newTestClient("../../_data/_out/customer-cluster-reader.kubeconfig", *artifactDir)
-		cadmin = newTestClient("../../_data/_out/customer-cluster-admin.kubeconfig", *artifactDir)
+	err := envconfig.Process("", &testConfig)
+	if err != nil {
+		panic(err)
 	}
+	testConfig.ArtifactDir = *artifactDir
+
+	suiteSummary := config.GinkgoConfig.FocusString
+	if inFocus(suiteSummary, "CustomerAdmin") {
+		c = newTestClient(testConfig.KubeConfig, "enduser", testConfig.ArtifactDir)
+		creader = newTestClient(testConfig.KubeConfig, "customer-cluster-reader", testConfig.ArtifactDir)
+		cadmin = newTestClient(testConfig.KubeConfig, "customer-cluster-admin", testConfig.ArtifactDir)
+		return
+	}
+	if inFocus(suiteSummary, "AzureClusterReader") {
+		c = newTestClient(testConfig.KubeConfig, "", testConfig.ArtifactDir)
+		return
+	}
+	c = newTestClient(testConfig.KubeConfig, "", testConfig.ArtifactDir)
 })
 
 func TestExtended(t *testing.T) {
