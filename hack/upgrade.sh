@@ -49,4 +49,4 @@ fi
 sed -i '/provisioningState/d' _data/manifest.yaml
 
 go generate ./...
-go run cmd/createorupdate/createorupdate.go
+go run cmd/createorupdate/createorupdate.go -timeout 1h
