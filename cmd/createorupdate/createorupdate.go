@@ -173,7 +173,7 @@ func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	s.write(oc)
 
 	// simulate Context with property bag
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
 	defer cancel()
 	ctx = context.WithValue(ctx, api.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
 	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
