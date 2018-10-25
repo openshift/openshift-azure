@@ -14,7 +14,9 @@ import (
 	. "github.com/onsi/gomega"
 	templatev1 "github.com/openshift/api/template/v1"
 	"github.com/sirupsen/logrus"
+	"k8s.io/api/core/v1"
 	policy "k8s.io/api/policy/v1beta1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -114,5 +116,51 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 			prevCounter = currCounter
 			time.Sleep(time.Second)
 		}
+	})
+
+	It("should not crud infra resources", func() {
+		// attempt to read secrets
+		_, err := c.kc.CoreV1().Secrets("default").List(metav1.ListOptions{})
+		Expect(kerrors.IsForbidden(err)).To(Equal(true))
+
+		// attempt to list pods
+		_, err = c.kc.CoreV1().Pods("default").List(metav1.ListOptions{})
+		Expect(kerrors.IsForbidden(err)).To(Equal(true))
+
+		// attempt to fetch pod by name
+		_, err = c.kc.CoreV1().Pods("kube-system").Get("api-master-000000", metav1.GetOptions{})
+		Expect(kerrors.IsForbidden(err)).To(Equal(true))
+
+		// attempt to escalate privileges
+		_, err = c.kc.RbacV1().ClusterRoleBindings().Create(&rbacv1.ClusterRoleBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "test-escalate-cluster-admin",
+			},
+			Subjects: []rbacv1.Subject{
+				{
+					Kind: "User",
+					Name: "enduser",
+				},
+			},
+			RoleRef: rbacv1.RoleRef{
+				Name: "cluster-admin",
+				Kind: "ClusterRole",
+			},
+		})
+		Expect(kerrors.IsForbidden(err)).To(Equal(true))
+
+		// attempt to delete clusterrolebindings
+		err = c.kc.RbacV1().ClusterRoleBindings().Delete("cluster-admin", &metav1.DeleteOptions{})
+		Expect(kerrors.IsForbidden(err)).To(Equal(true))
+
+		// attempt to delete clusterrole
+		err = c.kc.RbacV1().ClusterRoles().Delete("cluster-admin", &metav1.DeleteOptions{})
+		Expect(kerrors.IsForbidden(err)).To(Equal(true))
+
+		// attempt to fetch pod logs
+		req := c.kc.CoreV1().Pods("kube-system").GetLogs("sync-master-000000", &v1.PodLogOptions{})
+		result := req.Do()
+		fmt.Println(result.Error().Error())
+		Expect(result.Error().Error()).To(ContainSubstring("pods \"sync-master-000000\" is forbidden: User \"enduser\" cannot get pods/log in the namespace \"kube-system\""))
 	})
 })

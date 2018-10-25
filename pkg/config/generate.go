@@ -15,6 +15,23 @@ import (
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
+func createUserHtPassEntry(name string, passwd *string, htPasswd []byte) ([]byte, error) {
+	var err error
+	var htPassEntry []byte
+	if len(*passwd) == 0 {
+		if *passwd, err = randomString(10); err != nil {
+			return nil, err
+		}
+	}
+	if len(htPasswd) == 0 || bcrypt.CompareHashAndPassword(getHashFromHtPasswd(htPasswd), []byte(*passwd)) != nil {
+		htPassEntry, err = makeHtPasswd(name, *passwd)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return htPassEntry, nil
+}
+
 func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) {
 	c := cs.Config
 
@@ -378,16 +395,39 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) 
 		}
 	}
 
-	// TODO: Remove these password operations before GA
-	if len(c.AdminPasswd) == 0 {
-		if c.AdminPasswd, err = randomString(10); err != nil {
-			return err
+	// set the user passwords when testing
+	if g.pluginConfig.TestConfig.RunningUnderTest {
+		users := []struct {
+			username string
+			passwd   *string
+		}{
+			{
+				username: "customer-cluster-admin",
+				passwd:   &c.CustomerAdminPasswd,
+			},
+			{
+				username: "customer-cluster-reader",
+				passwd:   &c.CustomerReaderPasswd,
+			},
+			{
+				username: "enduser",
+				passwd:   &c.EndUserPasswd,
+			},
 		}
-	}
-	if len(c.HtPasswd) == 0 || bcrypt.CompareHashAndPassword(getHashFromHtPasswd(c.HtPasswd), []byte(c.AdminPasswd)) != nil {
-		c.HtPasswd, err = makeHtPasswd("osadmin", c.AdminPasswd)
-		if err != nil {
-			return err
+
+		for _, user := range users {
+			htPassEntry, err := createUserHtPassEntry(user.username, user.passwd, c.HtPasswd)
+			if err != nil {
+				return err
+			}
+			if len(htPassEntry) == 0 {
+				continue
+			}
+			if len(c.HtPasswd) == 0 {
+				c.HtPasswd = htPassEntry
+			} else {
+				c.HtPasswd = append(c.HtPasswd, htPassEntry...)
+			}
 		}
 	}
 

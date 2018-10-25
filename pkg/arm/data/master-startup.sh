@@ -79,9 +79,13 @@ base64 -d <<< {{ CertAsBytes .Config.Certificates.MasterServer.Cert | Base64Enco
 base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.MasterServer.Key | Base64Encode }} >/etc/origin/master/master.server.key
 base64 -d <<< {{ PublicKeyAsBytes .Config.ServiceAccountKey.PublicKey | Base64Encode }} >/etc/origin/master/serviceaccounts.public.key
 base64 -d <<< {{ PrivateKeyAsBytes .Config.ServiceAccountKey | Base64Encode }} >/etc/origin/master/serviceaccounts.private.key
-base64 -d <<< {{ .Config.HtPasswd | Base64Encode }} >/etc/origin/master/htpasswd
 base64 -d <<< {{ YamlMarshal .Config.AdminKubeconfig | Base64Encode }} >/etc/origin/master/admin.kubeconfig
 base64 -d <<< {{ YamlMarshal .Config.MasterKubeconfig | Base64Encode }} >/etc/origin/master/openshift-master.kubeconfig
+
+{{- if $.Extra.TestConfig.RunningUnderTest }}
+base64 -d <<< {{ .Config.HtPasswd | Base64Encode }} >/etc/origin/master/htpasswd
+{{- end }}
+
 
 cat >/etc/etcd/etcd.conf <<EOF
 ETCD_ADVERTISE_CLIENT_URLS=https://$(hostname):2379
