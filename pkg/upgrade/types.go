@@ -27,12 +27,12 @@ type Upgrader interface {
 }
 
 type simpleUpgrader struct {
-	pluginConfig                    api.PluginConfig
-	accountsClient                  azureclient.AccountsClient
-	storageClient                   storage.Client
-	virtualMachineScaleSetVMsClient azureclient.VirtualMachineScaleSetVMsClient
-	virtualMachineScaleSetsClient   azureclient.VirtualMachineScaleSetsClient
-	kubeclient                      kubernetes.Interface
+	pluginConfig   api.PluginConfig
+	accountsClient azureclient.AccountsClient
+	storageClient  storage.Client
+	vmc            azureclient.VirtualMachineScaleSetVMsClient
+	ssc            azureclient.VirtualMachineScaleSetsClient
+	kubeclient     kubernetes.Interface
 }
 
 var _ Upgrader = &simpleUpgrader{}

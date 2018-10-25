@@ -11,8 +11,10 @@ import (
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
+	clienttesting "k8s.io/client-go/testing"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
@@ -250,14 +252,20 @@ func TestMasterIsReady(t *testing.T) {
 }
 
 func TestUpgraderWaitForNodes(t *testing.T) {
+	vmListErr := fmt.Errorf("vm list failed")
+	nodeGetErr := fmt.Errorf("node get failed")
 	testRg := "myrg"
 	tests := []struct {
 		name        string
-		kubeclient  kubernetes.Interface
+		kubeclient  *fake.Clientset
 		cs          *api.OpenShiftManagedCluster
 		expect      map[string][]compute.VirtualMachineScaleSetVM
 		wantErr     bool
 		expectedErr error
+		reactors    []struct {
+			verb     string
+			reaction clienttesting.ReactionFunc
+		}
 	}{
 		{
 			name:       "nothing to wait for",
@@ -278,7 +286,61 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 				},
 			},
 			wantErr:     true,
-			expectedErr: fmt.Errorf("something bad happened"),
+			expectedErr: vmListErr,
+		},
+		{
+			name:       "node get error",
+			kubeclient: fake.NewSimpleClientset(),
+			cs: &api.OpenShiftManagedCluster{
+				Properties: &api.Properties{
+					AzProfile: &api.AzProfile{ResourceGroup: testRg},
+				},
+			},
+			wantErr:     true,
+			expectedErr: nodeGetErr,
+			reactors: []struct {
+				verb     string
+				reaction clienttesting.ReactionFunc
+			}{
+				{
+					verb: "get",
+					reaction: func(action clienttesting.Action) (handled bool, ret runtime.Object, err error) {
+						return true, nil, nodeGetErr
+					},
+				},
+			},
+			expect: map[string][]compute.VirtualMachineScaleSetVM{
+				"master": {
+					{
+						Name: to.StringPtr("ss-master"),
+						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+							OsProfile: &compute.OSProfile{
+								ComputerName: to.StringPtr("master-000000"),
+							},
+						},
+					},
+				},
+				"infra": {
+					{
+						Name: to.StringPtr("ss-infra"),
+						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+							OsProfile: &compute.OSProfile{
+								ComputerName: to.StringPtr("infra-000000"),
+							},
+						},
+					},
+				},
+				"compute": {
+					{
+						Name: to.StringPtr("ss-compute"),
+						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+							OsProfile: &compute.OSProfile{
+								ComputerName: to.StringPtr("compute-000000"),
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "all ready",
@@ -429,6 +491,10 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			iPage := mock_azureclient.NewMockVirtualMachineScaleSetVMListResultPage(gmc)
 			cPage := mock_azureclient.NewMockVirtualMachineScaleSetVMListResultPage(gmc)
 
+			for _, react := range tt.reactors {
+				tt.kubeclient.PrependReactor(react.verb, "nodes", react.reaction)
+			}
+
 			if len(tt.expect) > 0 {
 				mPage.EXPECT().Values().Return(tt.expect["master"])
 				mPage.EXPECT().Next()
@@ -439,8 +505,10 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			}
 			callTimes := func(vms []compute.VirtualMachineScaleSetVM) int {
 				if len(vms) > 0 {
+					// NotDone gets called twice once for yes, there is data, and once more for no data
 					return 2
 				}
+				// NotDone gets called once for there is no data
 				return 1
 			}
 			mNotDone := len(tt.expect["master"]) > 0
@@ -462,7 +530,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 				return ret
 			})
 
-			if tt.wantErr {
+			if tt.wantErr && len(tt.reactors) == 0 {
 				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, "ss-master", "", "", "").Return(nil, tt.expectedErr)
 			} else {
 				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, "ss-master", "", "", "").Return(mPage, nil)
@@ -470,38 +538,16 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, "ss-compute", "", "", "").Return(cPage, nil)
 			}
 			u := &simpleUpgrader{
-				virtualMachineScaleSetVMsClient: virtualMachineScaleSetVMsClient,
-				virtualMachineScaleSetsClient:   virtualMachineScaleSetsClient,
-				kubeclient:                      tt.kubeclient,
+				vmc:        virtualMachineScaleSetVMsClient,
+				ssc:        virtualMachineScaleSetsClient,
+				kubeclient: tt.kubeclient,
 			}
-			if err := u.waitForNodes(context.Background(), tt.cs); err != nil {
-				if tt.wantErr && tt.expectedErr != err {
-					t.Errorf("simpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
-				}
-				if !tt.wantErr {
-					t.Errorf("simpleUpgrader.waitForNodes() unexpected error = %v", err)
-				}
+			err := u.waitForNodes(context.Background(), tt.cs)
+			if tt.wantErr && tt.expectedErr != err {
+				t.Errorf("simpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
 			}
-		})
-	}
-}
-
-func TestWaitForInfraServices(t *testing.T) {
-	type args struct {
-		ctx context.Context
-		kc  *kubernetes.Clientset
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := WaitForInfraServices(tt.args.ctx, tt.args.kc); (err != nil) != tt.wantErr {
-				t.Errorf("WaitForInfraServices() error = %v, wantErr %v", err, tt.wantErr)
+			if !tt.wantErr && err != nil {
+				t.Errorf("simpleUpgrader.waitForNodes() unexpected error = %v", err)
 			}
 		})
 	}

@@ -94,16 +94,16 @@ func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftMana
 		}
 	}
 
-	if u.virtualMachineScaleSetVMsClient == nil {
+	if u.vmc == nil {
 		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
 		if err != nil {
 			return err
 		}
-		u.virtualMachineScaleSetVMsClient = azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
+		u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
 	}
 
 	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute} {
-		vms, err := ListVMs(ctx, cs, u.virtualMachineScaleSetVMsClient, role)
+		vms, err := ListVMs(ctx, cs, u.vmc, role)
 		if err != nil {
 			return err
 		}
