@@ -659,6 +659,16 @@ sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubec
 # daemonset will not fail and set the master node labels correctly.
 cp /etc/origin/node/node.kubeconfig /etc/origin/node/bootstrap.kubeconfig
 
+{{- if $.Extra.IsRecovery }}
+tempBackDir=$(mktemp -d -t etcd-backup)
+docker run -v /etc/origin/cloudprovider/:/_data/_out -v $tempBackDir:/out:z {{ .Config.Images.GetBackup }} --blobname=$.Extra.BackupBlobName --destination=/out/backup.db
+ETCDCTL_API=3 etcdctl snapshot restore $tempBackDir/backup.db \
+  --name $(hostname) \
+  --initial-cluster master-000000=https://master-000000:2379,master-000001=https://master-000001:2379,master-000002=https://master-000002:2379 \
+  --initial-cluster-token etcd-cluster-1 \
+  --initial-advertise-peer-urls http://$(hostname):2380
+{{- end }}
+
 # note: ${SERVICE_TYPE}-node crash loops until master is up
 systemctl enable ${SERVICE_TYPE}-node.service
 systemctl start ${SERVICE_TYPE}-node.service &

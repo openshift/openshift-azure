@@ -120,6 +120,19 @@ func (mr *MockContainerMockRecorder) CreateIfNotExists(arg0 interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIfNotExists", reflect.TypeOf((*MockContainer)(nil).CreateIfNotExists), arg0)
 }
 
+// Exists mocks base method
+func (m *MockContainer) Exists() (bool, error) {
+	ret := m.ctrl.Call(m, "Exists")
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Exists indicates an expected call of Exists
+func (mr *MockContainerMockRecorder) Exists() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exists", reflect.TypeOf((*MockContainer)(nil).Exists))
+}
+
 // GetBlobReference mocks base method
 func (m *MockContainer) GetBlobReference(arg0 string) storage0.Blob {
 	ret := m.ctrl.Call(m, "GetBlobReference", arg0)

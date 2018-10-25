@@ -36,6 +36,7 @@ func TestMerge(t *testing.T) {
 	var config = api.PluginConfig{
 		SyncImage:       "sync:latest",
 		LogBridgeImage:  "logbridge:latest",
+		GetBackupImage:  "getbackup:latest",
 		AcceptLanguages: []string{"en-us"},
 	}
 	newCluster := fixtures.NewTestOpenShiftCluster()

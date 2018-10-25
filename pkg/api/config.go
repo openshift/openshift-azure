@@ -80,6 +80,7 @@ type ImageConfig struct {
 	PrometheusAlertBuffer  string `json:"prometheusAlertBuffer,omitempty"`
 	PrometheusAlertManager string `json:"prometheusAlertManager,omitempty"`
 	LogBridge              string `json:"logBridge,omitempty"`
+	GetBackup              string `json:"getBackup,omitempty"`
 	EtcdOperator           string `json:"etcdOperator,omitempty"`
 	KubeStateMetrics       string `json:"kubeStateMetrics,omitempty"`
 	AddonsResizer          string `json:"addonsResizer,omitempty"`

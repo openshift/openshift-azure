@@ -197,10 +197,12 @@ func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	}
 
 	config := &api.PluginConfig{
-		SyncImage:       os.Getenv("SYNC_IMAGE"),
-		LogBridgeImage:  os.Getenv("LOGBRIDGE_IMAGE"),
-		AcceptLanguages: []string{"en-us"},
-		TestConfig:      tc,
+		SyncImage:             os.Getenv("SYNC_IMAGE"),
+		LogBridgeImage:        os.Getenv("LOGBRIDGE_IMAGE"),
+		GetBackupImage:        os.Getenv("GETBACKUP_IMAGE"),
+		AcceptLanguages:       []string{"en-us"},
+		RecoverEtcdFromBackup: os.Getenv("RECOVER_ETCD_FROM_BACKUP"),
+		TestConfig:            tc,
 	}
 
 	if currentState := s.readState(); string(currentState) == "" {

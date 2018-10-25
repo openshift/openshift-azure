@@ -62,6 +62,7 @@ func (c *blobStorageClient) GetContainerReference(name string) Container {
 type Container interface {
 	CreateIfNotExists(options *storage.CreateContainerOptions) (bool, error)
 	GetBlobReference(name string) Blob
+	Exists() (bool, error)
 }
 
 type container struct {

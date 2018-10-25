@@ -98,6 +98,7 @@ func (g *simpleGenerator) selectContainerImagesOrigin(cs *api.OpenShiftManagedCl
 		c.Images.RegistryConsole = "docker.io/cockpit/kubernetes:latest"
 		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.10"
 		c.Images.LogBridge = "quay.io/openshift-on-azure/logbridge:latest"
+		c.Images.GetBackup = "quay.io/openshift-on-azure/getbackup:latest"
 	}
 
 	return nil

@@ -1,0 +1,6 @@
+FROM centos:7
+RUN yum -y update
+COPY getbackup .
+ENTRYPOINT [ "/getbackup" ]
+# example:
+# docker run -it -v /etc/origin/cloudprovider/:/_data/_out -v /var/lib/etcd:/out:z quay.io/asalkeld/getbackup:dbbeeaaa --blobname=etcd/backup --destination=/out/backup

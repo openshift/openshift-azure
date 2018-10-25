@@ -54,12 +54,15 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 	if err != nil {
 		return nil, err
 	}
+	log.Infof("*** IsRecovery: %v, BackupBlobName: %v", len(g.pluginConfig.RecoverEtcdFromBackup) > 0, g.pluginConfig.RecoverEtcdFromBackup)
 	azuredeploy, err := util.Template(string(tmpl), template.FuncMap{
 		"Startup": func(role api.AgentPoolProfileRole) ([]byte, error) {
 			if role == api.AgentPoolProfileRoleMaster {
 				return util.Template(string(masterStartup), nil, cs, map[string]interface{}{
-					"Role":       role,
-					"TestConfig": g.pluginConfig.TestConfig,
+					"IsRecovery":     len(g.pluginConfig.RecoverEtcdFromBackup) > 0,
+					"BackupBlobName": g.pluginConfig.RecoverEtcdFromBackup,
+					"Role":           role,
+					"TestConfig":     g.pluginConfig.TestConfig,
 				})
 			}
 			return util.Template(string(nodeStartup), nil, cs, map[string]interface{}{
