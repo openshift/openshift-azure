@@ -262,7 +262,15 @@ var (
 	manifest = flag.String("manifest", "_data/manifest.yaml", "Manifest to use for the initial request.")
 	update   = flag.String("update", "", "If provided, use this manifest to make a follow-up request after the initial request succeeds.")
 	cleanup  = flag.Bool("rm", false, "Delete the cluster once all other requests have completed successfully.")
+
+	// timeouts
+	rmTimeout     = flag.Duration("rm-timeout", 20*time.Minute, "Timeout of the cleanup request")
+	timeout       = flag.Duration("timeout", 30*time.Minute, "Timeout of the initial request")
+	updateTimeout = flag.Duration("update-timeout", 30*time.Minute, "Timeout of the update request")
+
 	// TODO: Flag for gathering artifacts from the cluster
+	// TODO: Flag for requesting one or more ginkgo suites to run after the initial request
+	// TODO: Flag for requesting one or more ginkgo suites to run after the update request
 )
 
 func validate() error {
@@ -333,8 +341,6 @@ func main() {
 	logger := logrus.New()
 	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
 	log := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-	defer cancel()
 
 	flag.Parse()
 	if err := validate(); err != nil {
@@ -360,6 +366,8 @@ func main() {
 	}
 	rpc.Authorizer = authorizer
 
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
 	if strings.ToUpper(*method) == http.MethodDelete {
 		if err := delete(ctx, log, rpc); err != nil {
 			log.Fatal(err)
@@ -370,7 +378,9 @@ func main() {
 	// if a cleanup is requested, do it unconditionally at the end
 	if *cleanup {
 		defer func() {
-			if err := delete(ctx, log, rpc); err != nil {
+			delCtx, delCancel := context.WithTimeout(context.Background(), *rmTimeout)
+			defer delCancel()
+			if err := delete(delCtx, log, rpc); err != nil {
 				log.Fatal(err)
 			}
 		}()
@@ -383,7 +393,9 @@ func main() {
 
 	// if an update is requested, do it
 	if *update != "" {
-		if err := createOrUpdate(ctx, log, rpc, *update); err != nil {
+		updateCtx, updateCancel := context.WithTimeout(context.Background(), *updateTimeout)
+		defer updateCancel()
+		if err := createOrUpdate(updateCtx, log, rpc, *update); err != nil {
 			log.Fatal(err)
 		}
 	}
