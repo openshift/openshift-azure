@@ -395,8 +395,11 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) 
 		}
 	}
 
-	// set the user passwords when testing
+	// set config objects when testing
 	if g.pluginConfig.TestConfig.RunningUnderTest {
+
+		c.RunningUnderTest = true
+
 		users := []struct {
 			username string
 			passwd   *string

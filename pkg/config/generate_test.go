@@ -69,6 +69,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, pc api.PluginConfig, t 
 	assert(c.ServiceAccountKey != nil, "service account key")
 
 	if pc.TestConfig.RunningUnderTest {
+		assert(c.RunningUnderTest == true, "running under test")
 		assert(len(c.HtPasswd) != 0, "htpassword")
 		assert(len(c.CustomerAdminPasswd) != 0, "customer-cluster-admin password")
 		assert(len(c.CustomerReaderPasswd) != 0, "customer-cluster-reader password")
