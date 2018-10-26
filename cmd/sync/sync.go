@@ -21,6 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	azureclientstorage "github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
+	"github.com/openshift/openshift-azure/pkg/util/nodeconf"
 )
 
 var (
@@ -83,14 +84,9 @@ type sync struct {
 }
 
 func (s *sync) init(ctx context.Context) error {
-	b, err := ioutil.ReadFile("_data/_out/azure.conf")
+	m, err := nodeconf.GetAzureConf()
 	if err != nil {
-		return errors.Wrap(err, "cannot read _data/_out/azure.conf")
-	}
-
-	var m map[string]string
-	if err := yaml.Unmarshal(b, &m); err != nil {
-		return errors.Wrap(err, "cannot unmarshal _data/_out/azure.conf")
+		return err
 	}
 
 	s.stc, err = newAzureClients(ctx, m)

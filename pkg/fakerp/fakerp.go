@@ -2,7 +2,6 @@ package fakerp
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -15,12 +14,11 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/plugin"
-	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
+	"github.com/openshift/openshift-azure/pkg/util/nodeconf"
 )
 
 // CreateOrUpdate simulates the RP
@@ -94,7 +92,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 
 	// write out development files
 	log.Info("write helpers")
-	err = writeHelpers(cs, azuretemplate)
+	err = nodeconf.Write(cs, azuretemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -201,41 +199,4 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	}
 
 	return nil
-}
-
-func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}) error {
-	b, err := config.Derived.CloudProviderConf(c)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile("_data/_out/azure.conf", b, 0600)
-	if err != nil {
-		return err
-	}
-
-	azuredeploy, err := json.Marshal(azuretemplate)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile("_data/_out/azuredeploy.json", azuredeploy, 0600)
-	if err != nil {
-		return err
-	}
-
-	b, err = tls.PrivateKeyAsBytes(c.Config.SSHKey)
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile("_data/_out/id_rsa", b, 0600)
-	if err != nil {
-		return err
-	}
-
-	b, err = yaml.Marshal(c.Config.AdminKubeconfig)
-	if err != nil {
-		return err
-	}
-	return ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
 }
