@@ -8,5 +8,5 @@ roleRef:
   name: cluster-reader
 subjects:
 - kind: ServiceAccount
-  name: router
-  namespace: default
+  name: management-admin
+  namespace: management-infra

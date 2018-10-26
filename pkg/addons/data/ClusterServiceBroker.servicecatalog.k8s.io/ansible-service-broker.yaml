@@ -12,6 +12,5 @@ spec:
         namespace: openshift-ansible-service-broker
   caBundle: '*** GENERATED ***'
   relistBehavior: Duration
-  relistDuration: 15m0s
   relistRequests: 0
-  url: https://asb.openshift-ansible-service-broker.svc:1338/ansible-service-broker
+  url: https://asb.openshift-ansible-service-broker.svc:1338/osb

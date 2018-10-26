@@ -48,5 +48,10 @@ spec:
             port: 9090
             scheme: HTTP
           timeoutSeconds: 5
+      dnsPolicy: ClusterFirst
       nodeSelector:
-        region: infra
+        node-role.kubernetes.io/infra: "true"
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

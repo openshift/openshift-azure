@@ -1,0 +1,459 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  template: rhpam70-trial-ephemeral
+  xpaas: 1.4.0
+message: A new Process Automation Manager trial environment has been created. Please
+  remember that this is an ephemeral enviornment and any work will be LOST with a
+  simple pod restart.
+metadata:
+  annotations:
+    description: Application template for an ephemeral authoring and testing environment,
+      for Red Hat Process Automation Manager 7.0
+    iconClass: icon-jboss
+    openshift.io/display-name: Red Hat Process Automation Manager 7.0 ephemeral trial
+      environment
+    tags: rhpam,jboss,xpaas
+    version: 1.4.0
+  name: rhpam70-trial-ephemeral
+  namespace: openshift
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: All the Business Central web server's ports.
+    labels:
+      application: ${APPLICATION_NAME}
+      service: ${APPLICATION_NAME}-rhpamcentr
+    name: ${APPLICATION_NAME}-rhpamcentr
+  spec:
+    ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: git-ssh
+      port: 8001
+      targetPort: 8001
+    selector:
+      deploymentConfig: ${APPLICATION_NAME}-rhpamcentr
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: All the KIE server web server's ports.
+    labels:
+      application: ${APPLICATION_NAME}
+      service: ${APPLICATION_NAME}-kieserver
+    name: ${APPLICATION_NAME}-kieserver
+  spec:
+    ports:
+    - port: 8080
+      targetPort: 8080
+    selector:
+      deploymentConfig: ${APPLICATION_NAME}-kieserver
+- apiVersion: v1
+  id: ${APPLICATION_NAME}-rhpamcentr-http
+  kind: Route
+  metadata:
+    annotations:
+      description: Route for Business Central's http service.
+    labels:
+      application: ${APPLICATION_NAME}
+      service: ${APPLICATION_NAME}-rhpamcentr
+    name: ${APPLICATION_NAME}-rhpamcentr
+  spec:
+    host: ${BUSINESS_CENTRAL_HOSTNAME_HTTP}
+    port:
+      targetPort: http
+    to:
+      name: ${APPLICATION_NAME}-rhpamcentr
+- apiVersion: v1
+  id: ${APPLICATION_NAME}-kieserver-http
+  kind: Route
+  metadata:
+    annotations:
+      description: Route for execution server's http service.
+    labels:
+      application: ${APPLICATION_NAME}
+      service: ${APPLICATION_NAME}-kieserver
+    name: ${APPLICATION_NAME}-kieserver
+  spec:
+    host: ${EXECUTION_SERVER_HOSTNAME_HTTP}
+    to:
+      name: ${APPLICATION_NAME}-kieserver
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      application: ${APPLICATION_NAME}
+      service: ${APPLICATION_NAME}-rhpamcentr
+    name: ${APPLICATION_NAME}-rhpamcentr
+  spec:
+    replicas: 1
+    selector:
+      deploymentConfig: ${APPLICATION_NAME}-rhpamcentr
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          application: ${APPLICATION_NAME}
+          deploymentConfig: ${APPLICATION_NAME}-rhpamcentr
+          service: ${APPLICATION_NAME}-rhpamcentr
+        name: ${APPLICATION_NAME}-rhpamcentr
+      spec:
+        containers:
+        - env:
+          - name: KIE_ADMIN_USER
+            value: ${KIE_ADMIN_USER}
+          - name: KIE_ADMIN_PWD
+            value: ${DEFAULT_PASSWORD}
+          - name: KIE_MBEANS
+            value: ${KIE_MBEANS}
+          - name: KIE_SERVER_CONTROLLER_USER
+            value: ${KIE_SERVER_CONTROLLER_USER}
+          - name: KIE_SERVER_CONTROLLER_PWD
+            value: ${DEFAULT_PASSWORD}
+          - name: KIE_SERVER_USER
+            value: ${KIE_SERVER_USER}
+          - name: KIE_SERVER_PWD
+            value: ${DEFAULT_PASSWORD}
+          - name: MAVEN_REPO_URL
+            value: ${MAVEN_REPO_URL}
+          - name: MAVEN_REPO_USERNAME
+            value: ${MAVEN_REPO_USERNAME}
+          - name: MAVEN_REPO_PASSWORD
+            value: ${MAVEN_REPO_PASSWORD}
+          - name: KIE_MAVEN_USER
+            value: ${BUSINESS_CENTRAL_MAVEN_USERNAME}
+          - name: KIE_MAVEN_PWD
+            value: ${DEFAULT_PASSWORD}
+          - name: ADMIN_USERNAME
+            value: ${ADMIN_USERNAME}
+          - name: ADMIN_PASSWORD
+            value: ${DEFAULT_PASSWORD}
+          - name: PROBE_IMPL
+            value: probe.eap.jolokia.EapProbe
+          - name: PROBE_DISABLE_BOOT_ERRORS_CHECK
+            value: "true"
+          - name: SSO_URL
+            value: ${SSO_URL}
+          - name: SSO_OPENIDCONNECT_DEPLOYMENTS
+            value: ROOT.war
+          - name: SSO_REALM
+            value: ${SSO_REALM}
+          - name: SSO_SECRET
+            value: ${BUSINESS_CENTRAL_SSO_SECRET}
+          - name: SSO_CLIENT
+            value: ${BUSINESS_CENTRAL_SSO_CLIENT}
+          - name: SSO_USERNAME
+            value: ${SSO_USERNAME}
+          - name: SSO_PASSWORD
+            value: ${SSO_PASSWORD}
+          - name: SSO_DISABLE_SSL_CERTIFICATE_VALIDATION
+            value: ${SSO_DISABLE_SSL_CERTIFICATE_VALIDATION}
+          - name: HOSTNAME_HTTP
+            value: ${BUSINESS_CENTRAL_HOSTNAME_HTTP}
+          image: rhpam70-businesscentral-openshift
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - curl --fail --silent -u '${KIE_ADMIN_USER}:${KIE_ADMIN_PWD}' http://localhost:8080/kie-wb.jsp
+            initialDelaySeconds: 180
+            periodSeconds: 15
+            timeoutSeconds: 2
+          name: ${APPLICATION_NAME}-rhpamcentr
+          ports:
+          - containerPort: 8778
+            name: jolokia
+            protocol: TCP
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          - containerPort: 8001
+            name: git-ssh
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - curl --fail --silent -u '${KIE_ADMIN_USER}:${KIE_ADMIN_PWD}' http://localhost:8080/kie-wb.jsp
+            failureThreshold: 6
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 2
+          resources:
+            limits:
+              memory: ${BUSINESS_CENTRAL_MEMORY_LIMIT}
+        terminationGracePeriodSeconds: 60
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APPLICATION_NAME}-rhpamcentr
+        from:
+          kind: ImageStreamTag
+          name: rhpam70-businesscentral-openshift:${IMAGE_STREAM_TAG}
+          namespace: ${IMAGE_STREAM_NAMESPACE}
+      type: ImageChange
+    - type: ConfigChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      application: ${APPLICATION_NAME}
+      service: ${APPLICATION_NAME}-kieserver
+    name: ${APPLICATION_NAME}-kieserver
+  spec:
+    replicas: 1
+    selector:
+      deploymentConfig: ${APPLICATION_NAME}-kieserver
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          application: ${APPLICATION_NAME}
+          deploymentConfig: ${APPLICATION_NAME}-kieserver
+          service: ${APPLICATION_NAME}-kieserver
+        name: ${APPLICATION_NAME}-kieserver
+      spec:
+        containers:
+        - env:
+          - name: DROOLS_SERVER_FILTER_CLASSES
+            value: ${DROOLS_SERVER_FILTER_CLASSES}
+          - name: KIE_ADMIN_USER
+            value: ${KIE_ADMIN_USER}
+          - name: KIE_ADMIN_PWD
+            value: ${DEFAULT_PASSWORD}
+          - name: KIE_MBEANS
+            value: ${KIE_MBEANS}
+          - name: KIE_SERVER_BYPASS_AUTH_USER
+            value: ${KIE_SERVER_BYPASS_AUTH_USER}
+          - name: KIE_SERVER_CONTROLLER_USER
+            value: ${KIE_SERVER_CONTROLLER_USER}
+          - name: KIE_SERVER_CONTROLLER_PWD
+            value: ${DEFAULT_PASSWORD}
+          - name: KIE_SERVER_CONTROLLER_SERVICE
+            value: ${APPLICATION_NAME}-rhpamcentr
+          - name: KIE_SERVER_ID
+            value: ${KIE_SERVER_ID}
+          - name: KIE_SERVER_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: KIE_SERVER_USER
+            value: ${KIE_SERVER_USER}
+          - name: KIE_SERVER_PWD
+            value: ${DEFAULT_PASSWORD}
+          - name: KIE_SERVER_CONTAINER_DEPLOYMENT
+            value: ${KIE_SERVER_CONTAINER_DEPLOYMENT}
+          - name: MAVEN_REPOS
+            value: RHPAMCENTR,EXTERNAL
+          - name: RHPAMCENTR_MAVEN_REPO_SERVICE
+            value: ${APPLICATION_NAME}-rhpamcentr
+          - name: RHPAMCENTR_MAVEN_REPO_PATH
+            value: /maven2/
+          - name: RHPAMCENTR_MAVEN_REPO_USERNAME
+            value: ${BUSINESS_CENTRAL_MAVEN_USERNAME}
+          - name: RHPAMCENTR_MAVEN_REPO_PASSWORD
+            value: ${DEFAULT_PASSWORD}
+          - name: EXTERNAL_MAVEN_REPO_URL
+            value: ${MAVEN_REPO_URL}
+          - name: EXTERNAL_MAVEN_REPO_USERNAME
+            value: ${MAVEN_REPO_USERNAME}
+          - name: MAVEN_REPO_PASSWORD
+            value: ${MAVEN_REPO_USERNAME}
+          - name: SSO_URL
+            value: ${SSO_URL}
+          - name: SSO_OPENIDCONNECT_DEPLOYMENTS
+            value: ROOT.war
+          - name: SSO_REALM
+            value: ${SSO_REALM}
+          - name: SSO_SECRET
+            value: ${KIE_SERVER_SSO_SECRET}
+          - name: SSO_CLIENT
+            value: ${KIE_SERVER_SSO_CLIENT}
+          - name: SSO_USERNAME
+            value: ${SSO_USERNAME}
+          - name: SSO_PASSWORD
+            value: ${SSO_PASSWORD}
+          - name: SSO_DISABLE_SSL_CERTIFICATE_VALIDATION
+            value: ${SSO_DISABLE_SSL_CERTIFICATE_VALIDATION}
+          - name: HOSTNAME_HTTP
+            value: ${EXECUTION_SERVER_HOSTNAME_HTTP}
+          image: rhpam70-kieserver-openshift
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - curl --fail --silent -u ${KIE_ADMIN_USER}:${DEFAULT_PASSWORD} http://localhost:8080/services/rest/server/healthcheck
+            failureThreshold: 3
+            initialDelaySeconds: 180
+            periodSeconds: 15
+            timeoutSeconds: 2
+          name: ${APPLICATION_NAME}-kieserver
+          ports:
+          - containerPort: 8778
+            name: jolokia
+            protocol: TCP
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - curl --fail --silent -u ${KIE_ADMIN_USER}:${DEFAULT_PASSWORD} http://localhost:8080/services/rest/server/readycheck
+            failureThreshold: 6
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 2
+          resources:
+            limits:
+              memory: ${EXCECUTION_SERVER_MEMORY_LIMIT}
+        terminationGracePeriodSeconds: 60
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APPLICATION_NAME}-kieserver
+        from:
+          kind: ImageStreamTag
+          name: rhpam70-kieserver-openshift:${IMAGE_STREAM_TAG}
+          namespace: ${IMAGE_STREAM_NAMESPACE}
+      type: ImageChange
+    - type: ConfigChange
+parameters:
+- description: The name for the application.
+  displayName: Application Name
+  name: APPLICATION_NAME
+  required: true
+  value: myapp
+- description: Default password used for multiple components for user convenience
+    in this trial environment
+  displayName: Default Password
+  name: DEFAULT_PASSWORD
+  required: true
+  value: RedHat
+- description: EAP administrator username
+  displayName: EAP Admin User
+  name: ADMIN_USERNAME
+  value: eapadmin
+- description: KIE administrator username
+  displayName: KIE Admin User
+  name: KIE_ADMIN_USER
+  value: adminUser
+- description: KIE execution server username (Sets the org.kie.server.user system
+    property)
+  displayName: KIE Server User
+  name: KIE_SERVER_USER
+  value: executionUser
+- description: Business server identifier. Determines the template ID in Business
+    Central or controller. If this parameter is left blank, it is set using the $HOSTNAME
+    environment variable or a random value. (Sets the org.kie.server.id system property).
+  displayName: KIE Server ID
+  name: KIE_SERVER_ID
+- description: KIE execution server bypass auth user (Sets the org.kie.server.bypass.auth.user
+    system property)
+  displayName: KIE Server Bypass Auth User
+  name: KIE_SERVER_BYPASS_AUTH_USER
+  value: "false"
+- description: KIE server controller username (Sets the org.kie.server.controller.user
+    system property)
+  displayName: KIE Server Controller User
+  name: KIE_SERVER_CONTROLLER_USER
+  value: controllerUser
+- description: KIE execution server mbeans enabled/disabled (Sets the kie.mbeans and
+    kie.scanner.mbeans system properties)
+  displayName: KIE MBeans
+  name: KIE_MBEANS
+  value: enabled
+- description: KIE execution server class filtering (Sets the org.drools.server.filter.classes
+    system property)
+  displayName: Drools Server Filter Classes
+  name: DROOLS_SERVER_FILTER_CLASSES
+  value: "true"
+- description: 'Custom hostname for http service route.  Leave blank for default hostname,
+    e.g.: <application-name>-kieserver-<project>.<default-domain-suffix>'
+  displayName: Execution Server Custom http Route Hostname
+  name: EXECUTION_SERVER_HOSTNAME_HTTP
+- description: 'Custom hostname for http service route.  Leave blank for default hostname,
+    e.g.: <application-name>-rhpamcentr-<project>.<default-domain-suffix>'
+  displayName: Business Central Custom http Route Hostname
+  name: BUSINESS_CENTRAL_HOSTNAME_HTTP
+- description: Namespace in which the ImageStreams for Red Hat Middleware images are
+    installed. These ImageStreams are normally installed in the openshift namespace.
+    You should only need to modify this if you've installed the ImageStreams in a
+    different namespace/project.
+  displayName: ImageStream Namespace
+  name: IMAGE_STREAM_NAMESPACE
+  required: true
+  value: openshift
+- description: A named pointer to an image in an image stream. Default is "1.0".
+  displayName: ImageStream Tag
+  name: IMAGE_STREAM_TAG
+  value: "1.0"
+- description: 'KIE Server Container deployment configuration in format: containerId=groupId:artifactId:version|c2=g2:a2:v2'
+  displayName: KIE Server Container Deployment
+  name: KIE_SERVER_CONTAINER_DEPLOYMENT
+- description: Fully qualified URL to a Maven repository or service.
+  displayName: Maven repository URL
+  name: MAVEN_REPO_URL
+- description: Username to access the Maven repository.
+  displayName: Maven repository username
+  name: MAVEN_REPO_USERNAME
+- description: Password to access the Maven repository, if required.
+  displayName: Maven repository password
+  name: MAVEN_REPO_PASSWORD
+- description: Username to access the Maven service hosted by Business Central inside
+    EAP.
+  displayName: Username for the Maven service hosted by Business Central
+  name: BUSINESS_CENTRAL_MAVEN_USERNAME
+  required: true
+  value: mavenUser
+- description: Business Central Container memory limit
+  displayName: Business Central Container Memory Limit
+  name: BUSINESS_CENTRAL_MEMORY_LIMIT
+  value: 2Gi
+- description: Execution Server Container memory limit
+  displayName: Execution Server Container Memory Limit
+  name: EXCECUTION_SERVER_MEMORY_LIMIT
+  value: 1Gi
+- description: RH-SSO URL
+  displayName: RH-SSO URL
+  name: SSO_URL
+- description: RH-SSO Realm name
+  displayName: RH-SSO Realm name
+  name: SSO_REALM
+- description: Business Central RH-SSO Client name
+  displayName: Business Central RH-SSO Client name
+  name: BUSINESS_CENTRAL_SSO_CLIENT
+- description: Business Central RH-SSO Client Secret
+  displayName: Business Central RH-SSO Client Secret
+  name: BUSINESS_CENTRAL_SSO_SECRET
+- description: KIE Server RH-SSO Client name
+  displayName: KIE Server RH-SSO Client name
+  name: KIE_SERVER_SSO_CLIENT
+- description: KIE Server RH-SSO Client Secret
+  displayName: KIE Server RH-SSO Client Secret
+  name: KIE_SERVER_SSO_SECRET
+- description: RH-SSO Realm Admin Username used to create the Client if it doesn't
+    exist
+  displayName: RH-SSO Realm Admin Username
+  name: SSO_USERNAME
+- description: RH-SSO Realm Admin Password used to create the Client
+  displayName: RH-SSO Realm Admin Password
+  name: SSO_PASSWORD
+- description: RH-SSO Disable SSL Certificate Validation
+  displayName: RH-SSO Disable SSL Certificate Validation
+  name: SSO_DISABLE_SSL_CERTIFICATE_VALIDATION
+  value: "false"

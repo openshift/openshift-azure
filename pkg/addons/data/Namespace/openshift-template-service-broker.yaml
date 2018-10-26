@@ -8,5 +8,4 @@ metadata:
   name: openshift-template-service-broker
 spec:
   finalizers:
-  - openshift.io/origin
   - kubernetes

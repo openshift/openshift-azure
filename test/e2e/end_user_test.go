@@ -83,7 +83,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 
 		// Poll for the deployment status
 		By(fmt.Sprintf("waiting for the template instance to turn ready (%v)", time.Now()))
-		err = wait.PollImmediate(2*time.Second, 5*time.Minute, c.templateInstanceIsReady)
+		err = wait.PollImmediate(2*time.Second, 10*time.Minute, c.templateInstanceIsReady)
 		Expect(err).NotTo(HaveOccurred())
 
 		// Pull the route ingress from the namespace

@@ -3,6 +3,7 @@ allowHostIPC: true
 allowHostNetwork: true
 allowHostPID: true
 allowHostPorts: true
+allowPrivilegeEscalation: true
 allowPrivilegedContainer: false
 allowedCapabilities: null
 apiVersion: security.openshift.io/v1
@@ -31,8 +32,7 @@ seLinuxContext:
   type: MustRunAs
 supplementalGroups:
   type: RunAsAny
-users:
-- system:serviceaccount:openshift-metrics:prometheus-node-exporter
+users: []
 volumes:
 - configMap
 - downwardAPI

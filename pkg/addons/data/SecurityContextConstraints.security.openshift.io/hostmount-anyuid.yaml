@@ -3,6 +3,7 @@ allowHostIPC: false
 allowHostNetwork: false
 allowHostPID: false
 allowHostPorts: false
+allowPrivilegeEscalation: true
 allowPrivilegedContainer: false
 allowedCapabilities: null
 apiVersion: security.openshift.io/v1
@@ -30,6 +31,7 @@ supplementalGroups:
   type: RunAsAny
 users:
 - system:serviceaccount:openshift-infra:pv-recycler-controller
+- system:serviceaccount:kube-service-catalog:service-catalog-apiserver
 volumes:
 - configMap
 - downwardAPI

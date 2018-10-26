@@ -27,11 +27,9 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader]", func
 			},
 			"compute": {
 				"node-role.kubernetes.io/compute": "true",
-				"region": "primary",
 			},
 			"infra": {
 				"node-role.kubernetes.io/infra": "true",
-				"region":                        "infra",
 			},
 		}
 		list, err := c.kc.CoreV1().Nodes().List(metav1.ListOptions{})
@@ -48,12 +46,12 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader]", func
 
 	It("should start prometheus correctly", func() {
 		err := wait.Poll(2*time.Second, 20*time.Minute, func() (bool, error) {
-			ss, err := c.kc.AppsV1().StatefulSets("openshift-metrics").Get("prometheus", metav1.GetOptions{})
+			ss, err := c.kc.AppsV1().StatefulSets("openshift-monitoring").Get("prometheus-k8s", metav1.GetOptions{})
 			switch {
 			case kerrors.IsNotFound(err):
 				return false, nil
 			case err == nil:
-				specReplicas := int32(1)
+				specReplicas := int32(2)
 				if ss.Spec.Replicas != nil {
 					specReplicas = *ss.Spec.Replicas
 				}
@@ -86,7 +84,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader]", func
 		if strings.HasPrefix(master0.Status.NodeInfo.OSImage, "Red Hat Enterprise") {
 			registryPrefix = "registry.access.redhat.com/openshift3/ose-"
 		} else {
-			registryPrefix = "docker.io/openshift/origin-"
+			registryPrefix = "quay.io/openshift/origin-"
 		}
 
 		// Check all Configmaps for image format matches master's OS type

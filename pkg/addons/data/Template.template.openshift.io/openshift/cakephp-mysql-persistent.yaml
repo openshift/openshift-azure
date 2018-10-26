@@ -10,10 +10,10 @@ message: |-
 metadata:
   annotations:
     description: An example CakePHP application with a MySQL database. For more information
-      about using this template, including OpenShift considerations, see https://github.com/openshift/cakephp-ex/blob/master/README.md.
+      about using this template, including OpenShift considerations, see https://github.com/sclorg/cakephp-ex/blob/master/README.md.
     iconClass: icon-php
     openshift.io/display-name: CakePHP + MySQL
-    openshift.io/documentation-url: https://github.com/openshift/cakephp-ex
+    openshift.io/documentation-url: https://github.com/sclorg/cakephp-ex
     openshift.io/long-description: This template defines resources needed to develop
       a CakePHP application, including a build configuration, application deployment
       configuration, and database deployment configuration.
@@ -30,7 +30,6 @@ objects:
     name: ${NAME}
   stringData:
     cakephp-secret-token: ${CAKEPHP_SECRET_TOKEN}
-    cakephp-security-cipher-seed: ${CAKEPHP_SECURITY_CIPHER_SEED}
     cakephp-security-salt: ${CAKEPHP_SECURITY_SALT}
     database-password: ${DATABASE_PASSWORD}
     database-user: ${DATABASE_USER}
@@ -77,7 +76,7 @@ objects:
         kind: ImageStreamTag
         name: ${NAME}:latest
     postCommit:
-      script: ./lib/Cake/Console/cake test app AllTests
+      script: ./vendor/bin/phpunit
     source:
       contextDir: ${CONTEXT_DIR}
       git:
@@ -91,7 +90,7 @@ objects:
           value: ${COMPOSER_MIRROR}
         from:
           kind: ImageStreamTag
-          name: php:7.0
+          name: php:${PHP_VERSION}
           namespace: ${NAMESPACE}
       type: Source
     triggers:
@@ -153,11 +152,6 @@ objects:
             valueFrom:
               secretKeyRef:
                 key: cakephp-security-salt
-                name: ${NAME}
-          - name: CAKEPHP_SECURITY_CIPHER_SEED
-            valueFrom:
-              secretKeyRef:
-                key: cakephp-security-cipher-seed
                 name: ${NAME}
           - name: OPCACHE_REVALIDATE_FREQ
             value: ${OPCACHE_REVALIDATE_FREQ}
@@ -299,6 +293,11 @@ parameters:
   name: NAMESPACE
   required: true
   value: openshift
+- description: Version of PHP image to be used (5.6, 7.0, 7.1 or latest).
+  displayName: PHP Version
+  name: PHP_VERSION
+  required: true
+  value: "7.1"
 - description: Maximum amount of memory the CakePHP container can use.
   displayName: Memory Limit
   name: MEMORY_LIMIT
@@ -318,7 +317,7 @@ parameters:
   displayName: Git Repository URL
   name: SOURCE_REPOSITORY_URL
   required: true
-  value: https://github.com/openshift/cakephp-ex.git
+  value: https://github.com/sclorg/cakephp-ex.git
 - description: Set this to a branch name, tag or other ref of your repository if you
     are not using the default branch.
   displayName: Git Reference
@@ -368,11 +367,6 @@ parameters:
   from: '[a-zA-Z0-9]{40}'
   generate: expression
   name: CAKEPHP_SECURITY_SALT
-- description: Security cipher seed for session hash.
-  displayName: CakePHP Security Cipher Seed
-  from: '[0-9]{30}'
-  generate: expression
-  name: CAKEPHP_SECURITY_CIPHER_SEED
 - description: How often to check script timestamps for updates, in seconds. 0 will
     result in OPcache checking for updates on every request.
   displayName: OPcache Revalidation Frequency

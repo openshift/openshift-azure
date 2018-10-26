@@ -472,6 +472,12 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) 
 		c.RegistryConsoleOAuthSecret = fmt.Sprintf("user%s", pass)
 	}
 
+	if len(c.ConsoleOAuthSecret) == 0 {
+		if c.ConsoleOAuthSecret, err = randomString(64); err != nil {
+			return err
+		}
+	}
+
 	if len(c.RouterStatsPassword) == 0 {
 		if c.RouterStatsPassword, err = randomString(10); err != nil {
 			return

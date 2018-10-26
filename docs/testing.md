@@ -40,7 +40,7 @@ found in [OpenShift Release repository](https://github.com/openshift/release/)
 If you want just to run conformance test locally, you can use docker image to do so.
 ```
 # run and attach to test the container
-docker run -v $(pwd)/_data:/tmp/_data  -it openshift/origin-tests:v3.10 sh
+docker run -v $(pwd)/_data:/tmp/_data  -it openshift/origin-tests:v3.11 sh
 # export kubeconfig
 export KUBECONFIG=/tmp/_data/_out/admin.kubeconfig
 # filter tests

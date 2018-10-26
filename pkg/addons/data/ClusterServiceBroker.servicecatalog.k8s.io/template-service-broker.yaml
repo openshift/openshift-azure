@@ -12,6 +12,5 @@ spec:
         namespace: openshift-template-service-broker
   caBundle: '*** GENERATED ***'
   relistBehavior: Duration
-  relistDuration: 15m0s
   relistRequests: 0
   url: https://apiserver.openshift-template-service-broker.svc:443/brokers/template.openshift.io

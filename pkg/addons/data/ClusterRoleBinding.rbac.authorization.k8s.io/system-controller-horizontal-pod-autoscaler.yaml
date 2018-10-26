@@ -13,7 +13,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: horizontal-pod-autoscaler
-  namespace: kube-system
+  namespace: openshift-infra
 - kind: ServiceAccount
   name: horizontal-pod-autoscaler
-  namespace: openshift-infra
+  namespace: kube-system

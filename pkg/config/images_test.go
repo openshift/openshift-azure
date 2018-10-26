@@ -13,8 +13,8 @@ func TestOpenShiftVersion(t *testing.T) {
 		testError   string
 	}{
 		"valid version string": {
-			testVersion: "310.14.20180101",
-			testResult:  "v3.10.14",
+			testVersion: "311.14.20180101",
+			testResult:  "v3.11.14",
 		},
 		"invalid version string extra periods": {
 			testVersion: "3.1.0.1.4",
@@ -44,7 +44,7 @@ func TestNodeImageVersion(t *testing.T) {
 	for _, deployOS := range []string{"", "rhel7", "centos7"} {
 		cs := &api.OpenShiftManagedCluster{
 			Properties: &api.Properties{
-				OpenShiftVersion: "v3.10",
+				OpenShiftVersion: "v3.11",
 			},
 			Config: &api.Config{},
 		}

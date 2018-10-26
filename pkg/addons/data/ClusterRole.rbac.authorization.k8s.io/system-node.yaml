@@ -4,6 +4,8 @@ metadata:
   annotations:
     authorization.openshift.io/system-only: "true"
     rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
   name: system:node
 rules:
 - apiGroups:
@@ -39,16 +41,16 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - nodes
+  - nodes/status
   verbs:
-  - delete
   - patch
   - update
 - apiGroups:
   - ""
   resources:
-  - nodes/status
+  - nodes
   verbs:
+  - delete
   - patch
   - update
 - apiGroups:
@@ -74,12 +76,12 @@ rules:
   verbs:
   - create
   - delete
-  - get
 - apiGroups:
   - ""
   resources:
   - pods/status
   verbs:
+  - patch
   - update
 - apiGroups:
   - ""
@@ -94,17 +96,13 @@ rules:
   - secrets
   verbs:
   - get
+  - list
+  - watch
 - apiGroups:
   - ""
   resources:
   - persistentvolumeclaims
   - persistentvolumes
-  verbs:
-  - get
-- apiGroups:
-  - storage.k8s.io
-  resources:
-  - volumeattachments
   verbs:
   - get
 - apiGroups:
@@ -122,3 +120,17 @@ rules:
   - get
   - list
   - watch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - volumeattachments
+  verbs:
+  - get

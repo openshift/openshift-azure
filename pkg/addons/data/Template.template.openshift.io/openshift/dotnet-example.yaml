@@ -72,10 +72,10 @@ objects:
           value: ${DOTNET_TEST_PROJECTS}
         - name: DOTNET_CONFIGURATION
           value: ${DOTNET_CONFIGURATION}
-        - name: DOTNET_PUBLISH
-          value: "true"
         - name: DOTNET_RESTORE_SOURCES
           value: ${DOTNET_RESTORE_SOURCES}
+        - name: DOTNET_TOOLS
+          value: ${DOTNET_TOOLS}
         from:
           kind: ImageStreamTag
           name: ${DOTNET_IMAGE_STREAM_TAG}
@@ -151,12 +151,12 @@ parameters:
   displayName: Memory Limit
   name: MEMORY_LIMIT
   required: true
-  value: 512Mi
+  value: 128Mi
 - description: The image stream tag which is used to build the code.
   displayName: .NET builder
   name: DOTNET_IMAGE_STREAM_TAG
   required: true
-  value: dotnet:2.0
+  value: dotnet:2.1
 - description: The OpenShift Namespace where the ImageStream resides.
   displayName: Namespace
   name: NAMESPACE
@@ -171,7 +171,7 @@ parameters:
     are not using the default branch.
   displayName: Git Reference
   name: SOURCE_REPOSITORY_REF
-  value: dotnetcore-2.0
+  value: dotnetcore-2.1
 - description: Set this to use a subdirectory of the source code repository
   displayName: Context Directory
   name: CONTEXT_DIR
@@ -201,10 +201,12 @@ parameters:
 - description: Set this when the assembly name is overridden in the project file.
   displayName: Startup Assembly
   name: DOTNET_ASSEMBLY_NAME
+- description: Set this to a space separated list of .NET tools needed to publish.
+  displayName: .NET Tools
+  name: DOTNET_TOOLS
 - description: Set this to a space separated list of npm tools needed to publish.
   displayName: Npm Tools
   name: DOTNET_NPM_TOOLS
-  value: bower gulp
 - description: Set this to a space separated list of test projects to run before publishing.
   displayName: Test projects
   name: DOTNET_TEST_PROJECTS
