@@ -170,6 +170,11 @@ func (g *simpleGenerator) selectContainerImages(cs *api.OpenShiftManagedCluster)
 	if g.pluginConfig.SyncImage != "" {
 		cs.Config.Images.Sync = g.pluginConfig.SyncImage
 	}
+	if g.pluginConfig.TestConfig.EtcdBackupImage != "" {
+		cs.Config.Images.EtcdBackup = g.pluginConfig.TestConfig.EtcdBackupImage
+	} else {
+		cs.Config.Images.EtcdBackup = "quay.io/openshift-on-azure/etcdbackup:latest"
+	}
 
 	return nil
 }

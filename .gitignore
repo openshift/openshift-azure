@@ -6,6 +6,7 @@
 /e2e.test
 /kubeconfig*
 /sync
+/etcdbackup
 .vscode
 .idea
 coverage.out

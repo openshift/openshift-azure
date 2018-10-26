@@ -301,6 +301,12 @@ var Translations = map[string][]struct {
 			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}",
 		},
 	},
+	"CronJob.batch/openshift-etcd/etcd-backup-hourly": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.jobTemplate.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.EtcdBackup }}",
+		},
+	},
 	"DaemonSet.apps/kube-service-catalog/apiserver": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),

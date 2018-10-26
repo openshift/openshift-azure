@@ -205,6 +205,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		ImageOffer:         os.Getenv("IMAGE_OFFER"),
 		ImageVersion:       os.Getenv("IMAGE_VERSION"),
 		ORegURL:            os.Getenv("OREG_URL"),
+		EtcdBackupImage:    os.Getenv("ETCD_BACKUP_IMAGE"),
 	}
 
 	config := &api.PluginConfig{

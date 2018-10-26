@@ -67,6 +67,7 @@ type TestConfig struct {
 	ImageVersion       string
 	DeployOS           string
 	ORegURL            string
+	EtcdBackupImage    string
 }
 
 // Plugin is the main interface to openshift-azure
