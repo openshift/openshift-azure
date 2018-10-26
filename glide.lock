@@ -1,5 +1,5 @@
-hash: b32fedcaf76833c37e396ac4f3daf860a84a0a320942c7445f47fea7ff94d83f
-updated: 2018-10-24T13:16:45.475837252+02:00
+hash: d2c5765f43edc2a84876d86d0557fda8a31bfd5ffc1c7bc6dec0bba4cf932cf8
+updated: 2018-10-26T19:59:03.139044323+01:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
@@ -29,7 +29,7 @@ imports:
   subpackages:
   - sdjournal
 - name: github.com/coreos/pkg
-  version: 97fdf19511ea361ae1c100dd393cc47f8dcfa1e1
+  version: 399ea9e2e55f791b6e3d920860dbecb99c3692f0
   subpackages:
   - dlopen
 - name: github.com/davecgh/go-spew
@@ -56,13 +56,15 @@ imports:
   subpackages:
   - gomock
 - name: github.com/golang/protobuf
-  version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
+  version: b4deda0973fb4c70b50d226b1af49f3da59f5265
   subpackages:
   - proto
   - ptypes
   - ptypes/any
   - ptypes/duration
   - ptypes/timestamp
+- name: github.com/google/btree
+  version: 7d79101e329e5a3adf994758c578dab82b90c017
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/googleapis/gnostic
@@ -71,8 +73,10 @@ imports:
   - OpenAPIv2
   - compiler
   - extensions
-- name: github.com/howeyc/gopass
-  version: bf9dde6d0d2c004a008c27aaee91170c786f6db8
+- name: github.com/gregjones/httpcache
+  version: 787624de3eb7bd915c329cba748687a3b22666a6
+  subpackages:
+  - diskcache
 - name: github.com/imdario/mergo
   version: 6633656539c1639d9d78127b7d47c622b5d7b6dc
 - name: github.com/json-iterator/go
@@ -120,14 +124,15 @@ imports:
   - matchers/support/goraph/util
   - types
 - name: github.com/openshift/api
-  version: 7eef55a5dc24306c455777b9897ddc3cbeaf8b59
+  version: 5ad8479f64f1b60ee9c62ce8ef1fe6638838725e
   subpackages:
   - pkg/serialization
   - project/v1
   - route/v1
   - template/v1
+  - user/v1
 - name: github.com/openshift/client-go
-  version: 6a9817e0a0720dd8e837d1d18cd2938342ef6e54
+  version: 431ec9a26e5021f35fa41ee9a89842db9bfdb370
   subpackages:
   - project/clientset/versioned/scheme
   - project/clientset/versioned/typed/project/v1
@@ -135,8 +140,12 @@ imports:
   - route/clientset/versioned/typed/route/v1
   - template/clientset/versioned/scheme
   - template/clientset/versioned/typed/template/v1
+  - user/clientset/versioned/scheme
+  - user/clientset/versioned/typed/user/v1
+- name: github.com/peterbourgon/diskv
+  version: 5f041e8faa004a95c88a202771f4cc3e991971e6
 - name: github.com/pkg/errors
-  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+  version: 059132a15dd08d6704c67711dae0cf35ab991756
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/sirupsen/logrus
@@ -144,15 +153,17 @@ imports:
 - name: github.com/spf13/pflag
   version: 583c0c0531f06d5278b7d917446061adc344b5cd
 - name: golang.org/x/crypto
-  version: 81e90905daefcd6fd217b62423c0908922eadb30
+  version: 49796115aa4b964c318aad4f3084fdb41e9aa067
   subpackages:
   - bcrypt
   - blowfish
   - curve25519
   - ed25519
   - ed25519/internal/edwards25519
+  - internal/chacha20
   - pkcs12
   - pkcs12/internal/rc2
+  - poly1305
   - ssh
   - ssh/terminal
 - name: golang.org/x/net
@@ -202,7 +213,7 @@ imports:
 - name: gopkg.in/yaml.v2
   version: 670d4cfef0544295bc27a114dbac37980d83185a
 - name: k8s.io/api
-  version: 0f11257a8a25954878633ebdc9841c67d8f83bdb
+  version: 37c5ce6f2f592fbbd798bb86a8814d0918b3abe1
   subpackages:
   - admissionregistration/v1alpha1
   - admissionregistration/v1beta1
@@ -228,12 +239,13 @@ imports:
   - rbac/v1alpha1
   - rbac/v1beta1
   - scheduling/v1alpha1
+  - scheduling/v1beta1
   - settings/v1alpha1
   - storage/v1
   - storage/v1alpha1
   - storage/v1beta1
 - name: k8s.io/apiextensions-apiserver
-  version: 93388cb0d0453a627cbfddabd1b800e60b47753d
+  version: 67bb9d92aa024a38a3e323cbb9e115e82c0d50b3
   subpackages:
   - pkg/apis/apiextensions
   - pkg/apis/apiextensions/v1beta1
@@ -241,7 +253,7 @@ imports:
   - pkg/client/clientset/clientset/scheme
   - pkg/client/clientset/clientset/typed/apiextensions/v1beta1
 - name: k8s.io/apimachinery
-  version: e386b2658ed20923da8cc9250e552f082899a1ee
+  version: 8ee1a638bafa4ae9691077e690cb45dd54f45111
   subpackages:
   - pkg/api/errors
   - pkg/api/meta
@@ -268,19 +280,22 @@ imports:
   - pkg/util/framer
   - pkg/util/intstr
   - pkg/util/json
+  - pkg/util/mergepatch
   - pkg/util/net
   - pkg/util/rand
   - pkg/util/runtime
   - pkg/util/sets
+  - pkg/util/strategicpatch
   - pkg/util/validation
   - pkg/util/validation/field
   - pkg/util/wait
   - pkg/util/yaml
   - pkg/version
   - pkg/watch
+  - third_party/forked/golang/json
   - third_party/forked/golang/reflect
 - name: k8s.io/client-go
-  version: 483aada58add12af1546a0f55e7a50493e8026f3
+  version: 3db8bfc8858dc9a5d6e7ef5817f58a7ca30b0c6a
   subpackages:
   - discovery
   - discovery/fake
@@ -336,6 +351,8 @@ imports:
   - kubernetes/typed/rbac/v1beta1/fake
   - kubernetes/typed/scheduling/v1alpha1
   - kubernetes/typed/scheduling/v1alpha1/fake
+  - kubernetes/typed/scheduling/v1beta1
+  - kubernetes/typed/scheduling/v1beta1/fake
   - kubernetes/typed/settings/v1alpha1
   - kubernetes/typed/settings/v1alpha1/fake
   - kubernetes/typed/storage/v1
@@ -346,6 +363,7 @@ imports:
   - kubernetes/typed/storage/v1beta1/fake
   - pkg/apis/clientauthentication
   - pkg/apis/clientauthentication/v1alpha1
+  - pkg/apis/clientauthentication/v1beta1
   - pkg/version
   - plugin/pkg/client/auth/exec
   - rest
@@ -360,12 +378,13 @@ imports:
   - tools/reference
   - transport
   - util/cert
+  - util/connrotation
   - util/flowcontrol
   - util/homedir
   - util/integer
   - util/retry
 - name: k8s.io/kube-aggregator
-  version: e88bdebab831fbccbce7ef47d6f42d7b4cea2e96
+  version: e3f31b59c012953f09b0e9d0ea769e1894545191
   subpackages:
   - pkg/apis/apiregistration
   - pkg/apis/apiregistration/v1
@@ -374,6 +393,10 @@ imports:
   - pkg/client/clientset_generated/clientset/scheme
   - pkg/client/clientset_generated/clientset/typed/apiregistration/v1
   - pkg/client/clientset_generated/clientset/typed/apiregistration/v1beta1
+- name: k8s.io/kube-openapi
+  version: 91cfa479c814065e420cee7ed227db0f63a5854e
+  subpackages:
+  - pkg/util/proto
 testImports:
 - name: github.com/hpcloud/tail
   version: a1dbeea552b7c8df4b542c66073e393de198a800
