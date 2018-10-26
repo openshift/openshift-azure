@@ -6,15 +6,15 @@ labels:
 message: |-
   The following service(s) have been created in your project: ${NAME}, ${DATABASE_SERVICE_NAME}.
 
-  For more information about using this template, including OpenShift considerations, see https://github.com/openshift/django-ex/blob/master/README.md.
+  For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/django-ex/blob/master/README.md.
 metadata:
   annotations:
     description: An example Django application with a PostgreSQL database. For more
       information about using this template, including OpenShift considerations, see
-      https://github.com/openshift/django-ex/blob/master/README.md.
+      https://github.com/sclorg/django-ex/blob/master/README.md.
     iconClass: icon-python
     openshift.io/display-name: Django + PostgreSQL
-    openshift.io/documentation-url: https://github.com/openshift/django-ex
+    openshift.io/documentation-url: https://github.com/sclorg/django-ex
     openshift.io/long-description: This template defines resources needed to develop
       a Django based application, including a build configuration, application deployment
       configuration, and database deployment configuration.
@@ -90,7 +90,7 @@ objects:
           value: ${PIP_INDEX_URL}
         from:
           kind: ImageStreamTag
-          name: python:3.5
+          name: python:${PYTHON_VERSION}
           namespace: ${NAMESPACE}
       type: Source
     triggers:
@@ -262,7 +262,7 @@ objects:
         - postgresql
         from:
           kind: ImageStreamTag
-          name: postgresql:9.5
+          name: postgresql:${POSTGRESQL_VERSION}
           namespace: ${NAMESPACE}
       type: ImageChange
     - type: ConfigChange
@@ -277,6 +277,16 @@ parameters:
   name: NAMESPACE
   required: true
   value: openshift
+- description: Version of Python image to be used (3.4, 3.5, 3.6 or latest).
+  displayName: Version of Python Image
+  name: PYTHON_VERSION
+  required: true
+  value: "3.6"
+- description: Version of PostgreSQL image to be used (9.4, 9.5, 9.6 or latest).
+  displayName: Version of PostgreSQL Image
+  name: POSTGRESQL_VERSION
+  required: true
+  value: "9.6"
 - description: Maximum amount of memory the Django container can use.
   displayName: Memory Limit
   name: MEMORY_LIMIT
@@ -296,7 +306,7 @@ parameters:
   displayName: Git Repository URL
   name: SOURCE_REPOSITORY_URL
   required: true
-  value: https://github.com/openshift/django-ex.git
+  value: https://github.com/sclorg/django-ex.git
 - description: Set this to a branch name, tag or other ref of your repository if you
     are not using the default branch.
   displayName: Git Reference

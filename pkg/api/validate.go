@@ -164,7 +164,7 @@ func validateProperties(p *Properties, location string, externalOnly bool) (errs
 
 	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
 	switch p.OpenShiftVersion {
-	case "v3.10":
+	case "v3.11":
 	default:
 		errs = append(errs, fmt.Errorf("invalid properties.openShiftVersion %q", p.OpenShiftVersion))
 	}

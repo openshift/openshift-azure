@@ -6,6 +6,7 @@ metadata:
   name: docker-registry
   namespace: default
 spec:
+  clusterIP: 172.30.104.119
   ports:
   - name: 5000-tcp
     port: 5000

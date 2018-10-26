@@ -143,7 +143,9 @@ func writeDB(db map[string]unstructured.Unstructured) error {
 // write outputs a YAML file for a given object.
 func write(o unstructured.Unstructured) error {
 	gk := o.GroupVersionKind().GroupKind()
-	p := fmt.Sprintf("pkg/addons/data/%s/%s/%s.yaml", gk.String(), o.GetNamespace(), o.GetName())
+	// we dont support : in the file name due windows developers
+	name := strings.Replace(o.GetName(), ":", "-", 0)
+	p := fmt.Sprintf("pkg/addons/data/%s/%s/%s.yaml", gk.String(), o.GetNamespace(), name)
 
 	err := os.MkdirAll(filepath.Dir(p), 0777)
 	if err != nil {

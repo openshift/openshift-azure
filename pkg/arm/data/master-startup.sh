@@ -86,6 +86,10 @@ base64 -d <<< {{ YamlMarshal .Config.MasterKubeconfig | Base64Encode }} >/etc/or
 base64 -d <<< {{ .Config.HtPasswd | Base64Encode }} >/etc/origin/master/htpasswd
 {{- end }}
 
+mkdir -p /root/.docker/
+cat >/root/.docker/config.json <<EOF
+{{ print (.Derived.RegistrySecret .ContainerService) }}
+EOF
 
 cat >/etc/etcd/etcd.conf <<EOF
 ETCD_ADVERTISE_CLIENT_URLS=https://$(hostname):2379
@@ -115,30 +119,25 @@ update-ca-trust
 cat >/etc/origin/master/master-config.yaml <<EOF
 admissionConfig:
   pluginConfig:
-    AlwaysPullImages:
-      configuration:
-        kind: DefaultAdmissionConfig
-        apiVersion: v1
-        disable: false
     BuildDefaults:
       configuration:
         apiVersion: v1
+        env: []
         kind: BuildDefaultsConfig
+        resources:
+          limits: {}
+          requests: {}
     BuildOverrides:
       configuration:
         apiVersion: v1
         kind: BuildOverridesConfig
-    PodPreset:
-      configuration:
-        apiVersion: v1
-        kind: DefaultAdmissionConfig
     openshift.io/ImagePolicy:
       configuration:
         apiVersion: v1
         executionRules:
         - matchImageAnnotations:
           - key: images.openshift.io/deny-execution
-            value: "true"
+            value: 'true'
           name: execution-denied
           onResources:
           - resource: pods
@@ -199,32 +198,37 @@ kubeletClientInfo:
   port: 10250
 kubernetesMasterConfig:
   apiServerArguments:
-    cloud-config:
-    - /etc/origin/cloudprovider/azure.conf
-    cloud-provider:
-    - azure
-    runtime-config:
-    - settings.k8s.io/v1alpha1=true
     storage-backend:
     - etcd3
     storage-media-type:
     - application/vnd.kubernetes.protobuf
   controllerArguments:
-    cloud-config:
-    - /etc/origin/cloudprovider/azure.conf
-    cloud-provider:
-    - azure
     cluster-signing-cert-file:
     - /etc/origin/master/ca.crt
     cluster-signing-key-file:
     - /etc/origin/master/ca.key
+    pv-recycler-pod-template-filepath-hostpath:
+    - /etc/origin/master/recycler_pod.yaml
+    pv-recycler-pod-template-filepath-nfs:
+    - /etc/origin/master/recycler_pod.yaml
+  masterCount: 3
   masterIP: 127.0.0.1
+  podEvictionTimeout: null
   proxyClientInfo:
     certFile: master.proxy-client.crt
     keyFile: master.proxy-client.key
+  schedulerArguments: null
   schedulerConfigFile: /etc/origin/master/scheduler.json
+  servicesNodePortRange: ''
   servicesSubnet: 172.30.0.0/16
+  staticNodeNames: []
 masterClients:
+  externalKubernetesClientConnectionOverrides:
+    acceptContentTypes: application/vnd.kubernetes.protobuf,application/json
+    burst: 400
+    contentType: application/vnd.kubernetes.protobuf
+    qps: 200
+  externalKubernetesKubeConfig: ''
   openshiftLoopbackClientConnectionOverrides:
     acceptContentTypes: application/vnd.kubernetes.protobuf,application/json
     burst: 600
@@ -431,7 +435,12 @@ cat >/etc/origin/node/pods/etcd.yaml <<EOF
 apiVersion: v1
 kind: Pod
 metadata:
-  name: etcd
+  annotations:
+    scheduler.alpha.kubernetes.io/critical-pod: ''
+  labels:
+    openshift.io/component: etcd
+    openshift.io/control-plane: 'true'
+  name: master-etcd
   namespace: kube-system
 spec:
   containers:
@@ -470,6 +479,7 @@ spec:
       name: etcd-data
     workingDir: /var/lib/etcd
   hostNetwork: true
+  priorityClassName: system-node-critical
   volumes:
   - hostPath:
       path: /etc/etcd
@@ -479,13 +489,16 @@ spec:
     name: etcd-data
 EOF
 
-cat >/etc/origin/node/pods/api.yaml <<'EOF'
+cat >/etc/origin/node/pods/apiserver.yaml <<'EOF'
 apiVersion: v1
 kind: Pod
 metadata:
+  annotations:
+    scheduler.alpha.kubernetes.io/critical-pod: ''
   labels:
     openshift.io/component: api
-  name: api
+    openshift.io/control-plane: 'true'
+  name: master-api
   namespace: kube-system
 spec:
   containers:
@@ -527,7 +540,12 @@ spec:
     - mountPath: /etc/origin/cloudprovider
       name: master-cloud-provider
       readOnly: true
+    - mountPath: /var/lib/origin/
+      name: master-data
+    - mountPath: /etc/pki
+      name: master-pki
   hostNetwork: true
+  priorityClassName: system-node-critical
   volumes:
   - hostPath:
       path: /etc/origin/master
@@ -535,6 +553,12 @@ spec:
   - hostPath:
       path: /etc/origin/cloudprovider
     name: master-cloud-provider
+  - hostPath:
+      path: /var/lib/origin
+    name: master-data
+  - hostPath:
+      path: /etc/pki
+    name: master-pki
 EOF
 
 cat >/etc/origin/node/pods/controllers.yaml <<'EOF'
@@ -569,20 +593,56 @@ spec:
     securityContext:
       privileged: true
     volumeMounts:
-    - mountPath: /etc/origin/master
+    - mountPath: /etc/origin/master/
       name: master-config
-      readOnly: true
-    - mountPath: /etc/origin/cloudprovider
+    - mountPath: /etc/origin/cloudprovider/
       name: master-cloud-provider
-      readOnly: true
+    - mountPath: /etc/containers/registries.d/
+      name: signature-import
+    - mountPath: /usr/libexec/kubernetes/kubelet-plugins
+      mountPropagation: HostToContainer
+      name: kubelet-plugins
   hostNetwork: true
+  priorityClassName: system-node-critical
   volumes:
   - hostPath:
-      path: /etc/origin/master
+      path: /etc/origin/master/
     name: master-config
   - hostPath:
       path: /etc/origin/cloudprovider
     name: master-cloud-provider
+  - hostPath:
+      path: /etc/containers/registries.d
+    name: signature-import
+  - hostPath:
+      path: /usr/libexec/kubernetes/kubelet-plugins
+    name: kubelet-plugins
+EOF
+
+cat >/etc/origin/master/recycler_pod.yaml <<'EOF'
+apiVersion: "v1"
+kind: "Pod"
+metadata:
+  name: "recyler-pod-"
+  namespace: "openshift-infra"
+spec:
+  activeDeadlineSeconds: 60
+  restartPolicy: "Never"
+  serviceAccountName: "pv-recycler-controller"
+  containers:
+    - name: "recyler-container"
+      image: {{ .Config.Images.Recycler | quote }}
+      command:
+      - "/usr/bin/openshift-recycle"
+      args:
+      - "/scrub"
+      volumeMounts:
+        - mountPath: "/scrub"
+          name: "vol"
+      securityContext:
+        runAsUser: 0
+  volumes:
+    - name: "vol"
 EOF
 
 if [[ "$(hostname)" == "master-000000" ]]; then
@@ -654,6 +714,7 @@ spec:
     name: var-log
 EOF
 {{- end }}
+
 
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig

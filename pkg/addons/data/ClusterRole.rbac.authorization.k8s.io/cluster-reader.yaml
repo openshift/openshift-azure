@@ -1,3 +1,9 @@
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
+  - matchLabels:
+      rbac.authorization.k8s.io/aggregate-to-view: "true"
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -9,34 +15,16 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - bindings
   - componentstatuses
-  - configmaps
-  - endpoints
-  - events
-  - limitranges
-  - namespaces
-  - namespaces/status
   - nodes
   - nodes/status
-  - persistentvolumeclaims
   - persistentvolumeclaims/status
   - persistentvolumes
   - persistentvolumes/status
-  - pods
   - pods/binding
   - pods/eviction
-  - pods/log
-  - pods/status
   - podtemplates
-  - replicationcontrollers
-  - replicationcontrollers/scale
-  - replicationcontrollers/status
-  - resourcequotas
-  - resourcequotas/status
   - securitycontextconstraints
-  - serviceaccounts
-  - services
   - services/status
   verbs:
   - get
@@ -55,16 +43,9 @@ rules:
   - apps
   resources:
   - controllerrevisions
-  - daemonsets
   - daemonsets/status
-  - deployments
-  - deployments/scale
   - deployments/status
-  - replicasets
-  - replicasets/scale
   - replicasets/status
-  - statefulsets
-  - statefulsets/scale
   - statefulsets/status
   verbs:
   - get
@@ -91,7 +72,6 @@ rules:
 - apiGroups:
   - autoscaling
   resources:
-  - horizontalpodautoscalers
   - horizontalpodautoscalers/status
   verbs:
   - get
@@ -100,9 +80,7 @@ rules:
 - apiGroups:
   - batch
   resources:
-  - cronjobs
   - cronjobs/status
-  - jobs
   - jobs/status
   verbs:
   - get
@@ -111,24 +89,16 @@ rules:
 - apiGroups:
   - extensions
   resources:
-  - daemonsets
   - daemonsets/status
-  - deployments
-  - deployments/scale
   - deployments/status
   - horizontalpodautoscalers
   - horizontalpodautoscalers/status
-  - ingresses
   - ingresses/status
   - jobs
   - jobs/status
-  - networkpolicies
   - podsecuritypolicies
-  - replicasets
-  - replicasets/scale
   - replicasets/status
   - replicationcontrollers
-  - replicationcontrollers/scale
   - storageclasses
   - thirdpartyresources
   verbs:
@@ -144,17 +114,8 @@ rules:
   - list
   - watch
 - apiGroups:
-  - networking.k8s.io
-  resources:
-  - networkpolicies
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
   - policy
   resources:
-  - poddisruptionbudgets
   - poddisruptionbudgets/status
   - podsecuritypolicies
   verbs:
@@ -190,6 +151,14 @@ rules:
   - list
   - watch
 - apiGroups:
+  - scheduling.k8s.io
+  resources:
+  - priorityclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - certificates.k8s.io
   resources:
   - certificatesigningrequests
@@ -216,23 +185,7 @@ rules:
   - ""
   - build.openshift.io
   resources:
-  - buildconfigs
-  - buildconfigs/webhooks
-  - builds
   - builds/details
-  - builds/log
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  - apps.openshift.io
-  resources:
-  - deploymentconfigs
-  - deploymentconfigs/log
-  - deploymentconfigs/scale
-  - deploymentconfigs/status
   verbs:
   - get
   - list
@@ -243,10 +196,6 @@ rules:
   resources:
   - images
   - imagesignatures
-  - imagestreamimages
-  - imagestreams
-  - imagestreams/status
-  - imagestreamtags
   verbs:
   - get
   - list
@@ -271,8 +220,15 @@ rules:
   - ""
   - project.openshift.io
   resources:
-  - projectrequests
   - projects
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - project.openshift.io
+  resources:
+  - projectrequests
   verbs:
   - get
   - list
@@ -281,19 +237,8 @@ rules:
   - ""
   - quota.openshift.io
   resources:
-  - appliedclusterresourcequotas
   - clusterresourcequotas
   - clusterresourcequotas/status
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  - route.openshift.io
-  resources:
-  - routes
-  - routes/status
   verbs:
   - get
   - list
@@ -323,18 +268,6 @@ rules:
   - security.openshift.io
   resources:
   - rangeallocations
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  - template.openshift.io
-  resources:
-  - processedtemplates
-  - templateconfigs
-  - templateinstances
-  - templates
   verbs:
   - get
   - list
@@ -417,6 +350,220 @@ rules:
   - get
 - apiGroups:
   - ""
+  resources:
+  - configmaps
+  - endpoints
+  - persistentvolumeclaims
+  - pods
+  - replicationcontrollers
+  - replicationcontrollers/scale
+  - serviceaccounts
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - bindings
+  - events
+  - limitranges
+  - namespaces/status
+  - pods/log
+  - pods/status
+  - replicationcontrollers/status
+  - resourcequotas
+  - resourcequotas/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - deployments/scale
+  - replicasets
+  - replicasets/scale
+  - statefulsets
+  - statefulsets/scale
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - daemonsets
+  - deployments
+  - deployments/scale
+  - ingresses
+  - networkpolicies
+  - replicasets
+  - replicasets/scale
+  - replicationcontrollers/scale
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - networkpolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - build.openshift.io
+  resources:
+  - buildconfigs
+  - buildconfigs/webhooks
+  - builds
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - build.openshift.io
+  resources:
+  - builds/log
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - build.openshift.io
+  resources:
+  - jenkins
+  verbs:
+  - view
+- apiGroups:
+  - ""
+  - apps.openshift.io
+  resources:
+  - deploymentconfigs
+  - deploymentconfigs/scale
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - apps.openshift.io
+  resources:
+  - deploymentconfigs/log
+  - deploymentconfigs/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreamimages
+  - imagestreammappings
+  - imagestreams
+  - imagestreamtags
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - image.openshift.io
+  resources:
+  - imagestreams/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - project.openshift.io
+  resources:
+  - projects
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  - quota.openshift.io
+  resources:
+  - appliedclusterresourcequotas
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - route.openshift.io
+  resources:
+  - routes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - route.openshift.io
+  resources:
+  - routes/status
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  - template.openshift.io
+  resources:
+  - processedtemplates
+  - templateconfigs
+  - templateinstances
+  - templates
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
   - build.openshift.io
   resources:
   - buildlogs
@@ -428,6 +575,18 @@ rules:
   - ""
   resources:
   - resourcequotausages
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - servicecatalog.k8s.io
+  resources:
+  - servicebrokers
+  - serviceclasses
+  - serviceplans
+  - serviceinstances
+  - servicebindings
   verbs:
   - get
   - list

@@ -1,6 +1,8 @@
 package config
 
 import (
+	"encoding/base64"
+	"fmt"
 	"strings"
 
 	"github.com/ghodss/yaml"
@@ -37,6 +39,16 @@ func (derived) PublicHostname(cs *api.OpenShiftManagedCluster) string {
 		return cs.Properties.PublicHostname
 	}
 	return cs.Properties.FQDN
+}
+
+func (derived) ConsoleBaseAddress(cs *api.OpenShiftManagedCluster) string {
+	return fmt.Sprintf("https://console.%s", cs.Properties.RouterProfiles[0].PublicSubdomain)
+}
+
+func (derived) RegistrySecret(cs *api.OpenShiftManagedCluster) string {
+	format := "{\"auths\":{\"registry.redhat.io\":{\"auth\":\"%s\"}}}"
+	auth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", cs.Config.RHUsername, cs.Config.RHPasswd)))
+	return fmt.Sprintf(format, auth)
 }
 
 func (derived) RouterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {

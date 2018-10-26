@@ -52,8 +52,13 @@ type Config struct {
 	AlertManagerProxySessionSecret []byte    `json:"alertManagerProxySessionSecret,omitempty"`
 	AlertsProxySessionSecret       []byte    `json:"alertsProxySessionSecret,omitempty"`
 	RegistryConsoleOAuthSecret     string    `json:"registryConsoleOAuthSecret,omitempty"`
+	ConsoleOAuthSecret             string    `json:"consoleOAuthSecret,omitempty"`
 	RouterStatsPassword            string    `json:"routerStatsPassword,omitempty"`
 	ServiceCatalogClusterID        uuid.UUID `json:"serviceCatalogClusterId,omitempty"`
+
+	// RH Credentials
+	RHUsername string `json:"rhUsername,omitempty"`
+	RHPasswd   string `json:"rhPasswd,omitempty"`
 }
 
 // ImageConfig contains all images for the pods
@@ -62,6 +67,19 @@ type ImageConfig struct {
 	// used in the cluster.
 	Format string `json:"format,omitempty"`
 
+	ClusterMonitoringOperator    string `json:"clusterMonitoringOperator,omitempty"`
+	PrometheusOperatorBase       string `json:"prometheusOperatorBase,omitempty"`
+	PrometheusBase               string `json:"prometheusBase,omitempty"`
+	PrometheusConfigReloaderBase string `json:"prometheusConfigReloaderBase,omitempty"`
+	ConfigReloaderBase           string `json:"configReloaderBase,omitempty"`
+	AlertManagerBase             string `json:"alertManagerBase,omitempty"`
+	NodeExporterBase             string `json:"nodeExporterBase,omitempty"`
+	GrafanaBase                  string `json:"grafanaBase,omitempty"`
+	KubeStateMetricsBase         string `json:"kubeStateMetricsBase,omitempty"`
+	KubeRbacProxyBase            string `json:"kubeRbacProxyBase,omitempty"`
+	OAuthProxyBase               string `json:"oAuthProxyBase,omitempty"`
+
+	Recycler               string `json:"recycler,omitempty"`
 	MasterEtcd             string `json:"masterEtcd,omitempty"`
 	ControlPlane           string `json:"controlPlane,omitempty"`
 	Node                   string `json:"node,omitempty"`
@@ -74,14 +92,9 @@ type ImageConfig struct {
 	RegistryConsole        string `json:"registryConsole,omitempty"`
 	AnsibleServiceBroker   string `json:"ansibleServiceBroker,omitempty"`
 	WebConsole             string `json:"webConsole,omitempty"`
-	OAuthProxy             string `json:"oAuthProxy,omitempty"`
-	Prometheus             string `json:"prometheus,omitempty"`
-	PrometheusAlertBuffer  string `json:"prometheusAlertBuffer,omitempty"`
-	PrometheusAlertManager string `json:"prometheusAlertManager,omitempty"`
-	LogBridge              string `json:"logBridge,omitempty"`
-	EtcdOperator           string `json:"etcdOperator,omitempty"`
-	KubeStateMetrics       string `json:"kubeStateMetrics,omitempty"`
-	AddonsResizer          string `json:"addonsResizer,omitempty"`
+	Console                string `json:"console,omitempty"`
+
+	LogBridge string `json:"logBridge,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.

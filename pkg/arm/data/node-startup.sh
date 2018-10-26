@@ -41,6 +41,11 @@ base64 -d <<< {{ Base64Encode (CertAsBytes .Config.Certificates.Ca.Cert) }} >/et
 cp /etc/origin/node/ca.crt /etc/pki/ca-trust/source/anchors/openshift-ca.crt
 update-ca-trust
 
+mkdir -p /root/.docker/
+cat >/root/.docker/config.json <<EOF
+{{ print (.Derived.RegistrySecret .ContainerService) }}
+EOF
+
 echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
 mkdir -p /etc/origin/cloudprovider
 

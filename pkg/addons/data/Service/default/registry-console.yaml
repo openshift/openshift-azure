@@ -3,10 +3,12 @@ kind: Service
 metadata:
   labels:
     app: registry-console
+    createdBy: registry-console-template
     name: registry-console
   name: registry-console
   namespace: default
 spec:
+  clusterIP: 172.30.104.236
   ports:
   - name: registry-console
     port: 9000

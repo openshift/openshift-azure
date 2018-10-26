@@ -3,6 +3,7 @@ data:
   webconsole-config.yaml: |
     apiVersion: webconsole.config.openshift.io/v1
     clusterInfo:
+      adminConsolePublicURL: '*** GENERATED ***'
       consolePublicURL: '*** GENERATED ***'
       loggingPublicURL: ""
       logoutPublicURL: ""

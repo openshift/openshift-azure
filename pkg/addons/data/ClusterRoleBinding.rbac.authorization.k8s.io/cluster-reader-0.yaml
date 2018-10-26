@@ -8,5 +8,5 @@ roleRef:
   name: cluster-reader
 subjects:
 - kind: ServiceAccount
-  name: prometheus
-  namespace: openshift-metrics
+  name: router
+  namespace: default

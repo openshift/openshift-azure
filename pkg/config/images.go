@@ -64,44 +64,6 @@ func (g *simpleGenerator) image(component, version string) string {
 	return strings.Replace(image, "${version}", version, -1)
 }
 
-func (g *simpleGenerator) selectContainerImagesOrigin(cs *api.OpenShiftManagedCluster) error {
-	c := cs.Config
-	v, err := openShiftVersion(c.ImageVersion)
-	if err != nil {
-		return err
-	}
-
-	switch cs.Properties.OpenShiftVersion {
-	case "v3.10":
-		c.Images.ControlPlane = g.image("control-plane", v)
-		c.Images.Node = g.image("node", v)
-		c.Images.ServiceCatalog = g.image("service-catalog", v)
-		c.Images.TemplateServiceBroker = g.image("template-service-broker", v)
-		c.Images.Registry = g.image("docker-registry", v)
-		c.Images.Router = g.image("haproxy-router", v)
-		c.Images.WebConsole = g.image("web-console", v)
-
-		c.Images.MasterEtcd = "quay.io/coreos/etcd:v3.2.15"
-		c.Images.EtcdOperator = "quay.io/coreos/etcd-operator:v0.9.2"
-		c.Images.KubeStateMetrics = "quay.io/coreos/kube-state-metrics:v1.4.0"
-		c.Images.AddonsResizer = "k8s.gcr.io/addon-resizer:1.7"
-
-		c.Images.OAuthProxy = "docker.io/openshift/oauth-proxy:v1.0.0"
-		c.Images.Prometheus = "docker.io/openshift/prometheus:v2.2.1"
-		c.Images.PrometheusAlertBuffer = "docker.io/openshift/prometheus-alert-buffer:v0.0.2"
-		c.Images.PrometheusAlertManager = "docker.io/openshift/prometheus-alertmanager:v0.14.0"
-		c.Images.PrometheusNodeExporter = "docker.io/openshift/prometheus-node-exporter:v0.15.2"
-
-		c.Images.AnsibleServiceBroker = "docker.io/ansibleplaybookbundle/origin-ansible-service-broker:latest"
-
-		c.Images.RegistryConsole = "docker.io/cockpit/kubernetes:latest"
-		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.10"
-		c.Images.LogBridge = "quay.io/openshift-on-azure/logbridge:latest"
-	}
-
-	return nil
-}
-
 func (g *simpleGenerator) selectContainerImagesOSA(cs *api.OpenShiftManagedCluster) error {
 	c := cs.Config
 	v, err := openShiftVersion(c.ImageVersion)
@@ -111,28 +73,39 @@ func (g *simpleGenerator) selectContainerImagesOSA(cs *api.OpenShiftManagedClust
 
 	switch cs.Properties.OpenShiftVersion {
 	//TODO: confirm minor version after release
-	case "v3.10":
+	case "v3.11":
+
+		// Operators
+		c.Images.ClusterMonitoringOperator = g.image("cluster-monitoring-operator", v)
+
+		// Operators base images
+		c.Images.PrometheusOperatorBase = "registry.redhat.io/openshift3/ose-prometheus-operator"
+		c.Images.PrometheusConfigReloaderBase = "registry.redhat.io/openshift3/ose-prometheus-config-reloader"
+		c.Images.ConfigReloaderBase = "registry.redhat.io/openshift3/ose-configmap-reloader"
+		c.Images.PrometheusBase = "registry.redhat.io/openshift3/prometheus"
+		c.Images.AlertManagerBase = "registry.redhat.io/openshift3/prometheus-alertmanager"
+		c.Images.NodeExporterBase = "registry.redhat.io/openshift3/prometheus-node-exporter"
+		c.Images.GrafanaBase = "registry.redhat.io/openshift3/grafana"
+		c.Images.KubeStateMetricsBase = "registry.redhat.io/openshift3/ose-kube-state-metrics"
+		c.Images.KubeRbacProxyBase = "registry.redhat.io/openshift3/ose-kube-rbac-proxy"
+		c.Images.OAuthProxyBase = "registry.redhat.io/openshift3/oauth-proxy"
+
+		// other images
 		c.Images.ControlPlane = g.image("control-plane", v)
 		c.Images.Node = g.image("node", v)
+		c.Images.Router = g.image("haproxy-router", v)
+		c.Images.MasterEtcd = "registry.redhat.io/rhel7/etcd:3.2.22"
+
+		c.Images.WebConsole = g.image("web-console", v)
+		c.Images.Console = g.image("console", v)
+		c.Images.RegistryConsole = "registry.redhat.io/openshift3/registry-console:" + v
+		c.Images.ServiceCatalog = g.image("service-catalog", v)
+		c.Images.Recycler = g.image("recycler", v)
 		c.Images.ServiceCatalog = g.image("service-catalog", v)
 		c.Images.AnsibleServiceBroker = g.image("ansible-service-broker", v)
 		c.Images.TemplateServiceBroker = g.image("template-service-broker", v)
 		c.Images.Registry = g.image("docker-registry", v)
-		c.Images.Router = g.image("haproxy-router", v)
-		c.Images.WebConsole = g.image("web-console", v)
 
-		c.Images.MasterEtcd = "registry.access.redhat.com/rhel7/etcd:3.2.22"
-		c.Images.EtcdOperator = "quay.io/coreos/etcd-operator:v0.9.2"
-		c.Images.KubeStateMetrics = "quay.io/coreos/kube-state-metrics:v1.4.0"
-		c.Images.AddonsResizer = "k8s.gcr.io/addon-resizer:1.7"
-
-		c.Images.OAuthProxy = "registry.access.redhat.com/openshift3/oauth-proxy:" + v
-		c.Images.Prometheus = "registry.access.redhat.com/openshift3/prometheus:" + v
-		c.Images.PrometheusAlertBuffer = "registry.access.redhat.com/openshift3/prometheus-alert-buffer:" + v
-		c.Images.PrometheusAlertManager = "registry.access.redhat.com/openshift3/prometheus-alertmanager:" + v
-		c.Images.PrometheusNodeExporter = "registry.access.redhat.com/openshift3/prometheus-node-exporter:" + v
-
-		c.Images.RegistryConsole = "registry.access.redhat.com/openshift3/registry-console:" + v
 		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.10"
 		c.Images.LogBridge = "quay.io/openshift-on-azure/logbridge:latest"
 	}
@@ -146,8 +119,6 @@ func (g *simpleGenerator) selectContainerImages(cs *api.OpenShiftManagedCluster)
 	switch g.pluginConfig.TestConfig.DeployOS {
 	case "", "rhel7":
 		err = g.selectContainerImagesOSA(cs)
-	case "centos7":
-		err = g.selectContainerImagesOrigin(cs)
 	default:
 		err = fmt.Errorf("unrecognised DeployOS value")
 	}
@@ -173,7 +144,7 @@ func (g *simpleGenerator) imageConfigFormat() string {
 
 	switch g.pluginConfig.TestConfig.DeployOS {
 	case "", "rhel7":
-		imageConfigFormat = "registry.access.redhat.com/openshift3/ose-${component}:${version}"
+		imageConfigFormat = "registry.redhat.io/openshift3/ose-${component}:${version}"
 	case "centos7":
 		imageConfigFormat = "docker.io/openshift/origin-${component}:${version}"
 	}

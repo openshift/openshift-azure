@@ -5,7 +5,8 @@ metadata:
   namespace: kube-service-catalog
 spec:
   ports:
-  - port: 443
+  - name: secure
+    port: 443
     targetPort: 6443
   selector:
     app: apiserver

@@ -1,0 +1,37 @@
+apiVersion: v1
+data:
+  config.yaml: |
+    prometheusOperator:
+      baseImage: '*** GENERATED ***'
+      prometheusConfigReloaderBaseImage: '*** GENERATED ***'
+      configReloaderBaseImage: '*** GENERATED ***'
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
+    prometheusK8s:
+      baseImage: '*** GENERATED ***'
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
+      externalLabels:
+        cluster: ' *** GENERATED ***'
+    alertmanagerMain:
+      baseImage: ' *** GENERATED ***'
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
+    nodeExporter:
+      baseImage: '*** GENERATED ***'
+    grafana:
+      baseImage: '*** GENERATED ***'
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
+    kubeStateMetrics:
+      baseImage: '*** GENERATED ***'
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
+    kubeRbacProxy:
+      baseImage: '*** GENERATED ***'
+    auth:
+      baseImage: '*** GENERATED ***'
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring

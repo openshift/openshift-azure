@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    service.alpha.openshift.io/serving-cert-secret-name: router-metrics-tls
     service.beta.kubernetes.io/azure-dns-label-name: '*** GENERATED ***'
   labels:
     router: router
@@ -15,4 +16,4 @@ spec:
     port: 443
   selector:
     router: router
-  type: LoadBalancer
+    type: LoadBalancer

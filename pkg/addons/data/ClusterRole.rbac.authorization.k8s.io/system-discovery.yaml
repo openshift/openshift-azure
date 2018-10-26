@@ -4,26 +4,23 @@ metadata:
   annotations:
     authorization.openshift.io/system-only: "true"
     rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
   name: system:discovery
 rules:
 - nonResourceURLs:
-  - /version
-  - /version/*
   - /api
   - /api/*
   - /apis
   - /apis/*
-  - /oapi
-  - /oapi/*
-  - /openapi/v2
+  - /healthz
+  - /openapi
+  - /openapi/*
+  - /swagger-2.0.0.pb-v1
+  - /swagger.json
   - /swaggerapi
   - /swaggerapi/*
-  - /swagger.json
-  - /swagger-2.0.0.pb-v1
-  - /osapi
-  - /osapi/
-  - /.well-known
-  - /.well-known/*
-  - /
+  - /version
+  - /version/
   verbs:
   - get

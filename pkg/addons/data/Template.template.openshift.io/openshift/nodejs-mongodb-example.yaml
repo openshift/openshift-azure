@@ -6,16 +6,16 @@ labels:
 message: |-
   The following service(s) have been created in your project: ${NAME}, ${DATABASE_SERVICE_NAME}.
 
-  For more information about using this template, including OpenShift considerations, see https://github.com/openshift/nodejs-ex/blob/master/README.md.
+  For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/nodejs-ex/blob/master/README.md.
 metadata:
   annotations:
     description: |-
-      An example Node.js application with a MongoDB database. For more information about using this template, including OpenShift considerations, see https://github.com/openshift/nodejs-ex/blob/master/README.md.
+      An example Node.js application with a MongoDB database. For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/nodejs-ex/blob/master/README.md.
 
       WARNING: Any data stored will be lost upon pod destruction. Only use this template for testing.
     iconClass: icon-nodejs
     openshift.io/display-name: Node.js + MongoDB (Ephemeral)
-    openshift.io/documentation-url: https://github.com/openshift/nodejs-ex
+    openshift.io/documentation-url: https://github.com/sclorg/nodejs-ex
     openshift.io/long-description: This template defines resources needed to develop
       a NodeJS application, including a build configuration, application deployment
       configuration, and database deployment configuration.  The database is stored
@@ -93,7 +93,7 @@ objects:
           value: ${NPM_MIRROR}
         from:
           kind: ImageStreamTag
-          name: nodejs:6
+          name: nodejs:${NODEJS_VERSION}
           namespace: ${NAMESPACE}
       type: Source
     triggers:
@@ -148,7 +148,7 @@ objects:
           image: ' '
           livenessProbe:
             httpGet:
-              path: /pagecount
+              path: /
               port: 8080
             initialDelaySeconds: 30
             timeoutSeconds: 3
@@ -157,7 +157,7 @@ objects:
           - containerPort: 8080
           readinessProbe:
             httpGet:
-              path: /pagecount
+              path: /
               port: 8080
             initialDelaySeconds: 3
             timeoutSeconds: 3
@@ -261,7 +261,7 @@ objects:
         - mongodb
         from:
           kind: ImageStreamTag
-          name: mongodb:3.2
+          name: mongodb:${MONGODB_VERSION}
           namespace: ${NAMESPACE}
       type: ImageChange
     - type: ConfigChange
@@ -276,6 +276,16 @@ parameters:
   name: NAMESPACE
   required: true
   value: openshift
+- description: Version of NodeJS image to be used (6, 8, or latest).
+  displayName: Version of NodeJS Image
+  name: NODEJS_VERSION
+  required: true
+  value: "8"
+- description: Version of MongoDB image to be used (3.2, 3.4, or latest).
+  displayName: Version of MongoDB Image
+  name: MONGODB_VERSION
+  required: true
+  value: "3.4"
 - description: Maximum amount of memory the Node.js container can use.
   displayName: Memory Limit
   name: MEMORY_LIMIT
@@ -290,7 +300,7 @@ parameters:
   displayName: Git Repository URL
   name: SOURCE_REPOSITORY_URL
   required: true
-  value: https://github.com/openshift/nodejs-ex.git
+  value: https://github.com/sclorg/nodejs-ex.git
 - description: Set this to a branch name, tag or other ref of your repository if you
     are not using the default branch.
   displayName: Git Reference
