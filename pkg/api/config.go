@@ -36,6 +36,9 @@ type Config struct {
 	ServiceAccountKey *rsa.PrivateKey `json:"serviceAccountKey,omitempty"`
 	SessionSecretAuth []byte          `json:"sessionSecretAuth,omitempty"`
 	SessionSecretEnc  []byte          `json:"sessionSecretEnc,omitempty"`
+
+	RunningUnderTest bool `json:"runningUnderTest,omitempty"`
+
 	// This section defines local test users to be created via htpasswd file.
 	// Must define environment variable RUNNING_UNDER_TEST to create.
 	HtPasswd             []byte `json:"htPasswd,omitempty"`             //Only enabled during test

@@ -328,7 +328,7 @@ var Translations = map[string][]struct {
 		{
 			Path: jsonpath.MustCompile("$.users"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				if cs.Config.CustomerAdminPasswd != "" {
+				if cs.Config.RunningUnderTest {
 					return []interface{}{"customer-cluster-admin"}, nil
 				}
 				return []interface{}{}, nil
@@ -339,7 +339,7 @@ var Translations = map[string][]struct {
 		{
 			Path: jsonpath.MustCompile("$.users"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				if cs.Config.CustomerReaderPasswd != "" {
+				if cs.Config.RunningUnderTest {
 					return []interface{}{"customer-cluster-reader"}, nil
 				}
 				return []interface{}{}, nil
