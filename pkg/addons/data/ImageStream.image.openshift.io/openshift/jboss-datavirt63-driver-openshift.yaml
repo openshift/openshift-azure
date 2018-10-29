@@ -21,7 +21,7 @@ spec:
       version: "1.0"
     from:
       kind: DockerImage
-      name: registry.redhat.io/jboss-datavirt-6/datavirt63-driver-openshift:1.0
+      name: registry.access.redhat.com/jboss-datavirt-6/datavirt63-driver-openshift:1.0
     generation: 2
     importPolicy: {}
     name: "1.0"
@@ -36,7 +36,7 @@ spec:
       version: "1.1"
     from:
       kind: DockerImage
-      name: registry.redhat.io/jboss-datavirt-6/datavirt63-driver-openshift:1.1
+      name: registry.access.redhat.com/jboss-datavirt-6/datavirt63-driver-openshift:1.1
     generation: 2
     importPolicy: {}
     name: "1.1"

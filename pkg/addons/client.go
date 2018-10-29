@@ -18,6 +18,7 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/tools/clientcmd/api/latest"
@@ -49,9 +50,10 @@ type client struct {
 	ac         *kaggregator.Clientset
 	ae         *kapiextensions.Clientset
 	cli        *discovery.DiscoveryClient
-	dyn        dynamic.ClientPool
-	grs        []*discovery.APIGroupResources
+	dyn        dynamic.Interface
+	grs        []*restmapper.APIGroupResources
 	azs        azureclient.AccountsClient
+	rmap       meta.RESTMapper
 }
 
 func newClient(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) (Interface, error) {
@@ -125,14 +127,20 @@ func (c *client) GetStorageAccountKey(ctx context.Context, resourceGroup, storag
 // UpdateDynamicClient updates the client's server API group resource
 // information and dynamic client pool.
 func (c *client) UpdateDynamicClient() error {
-	grs, err := discovery.GetAPIGroupResources(c.cli)
+	grs, err := restmapper.GetAPIGroupResources(c.cli)
 	if err != nil {
 		return err
 	}
 	c.grs = grs
 
-	rm := discovery.NewRESTMapper(c.grs, meta.InterfacesForUnstructured)
-	c.dyn = dynamic.NewClientPool(c.restconfig, rm, dynamic.LegacyAPIPathResolverFunc)
+	rmap := restmapper.NewDiscoveryRESTMapper(c.grs)
+	c.rmap = rmap
+
+	dyn, err := dynamic.NewForConfig(c.restconfig)
+	if err != nil {
+		return err
+	}
+	c.dyn = dyn
 
 	return nil
 }
@@ -146,7 +154,7 @@ func (c *client) ApplyResources(filter func(unstructured.Unstructured) bool, db 
 			continue
 		}
 
-		if err := write(c.dyn, c.grs, &o); err != nil {
+		if err := write(c.dyn, c.grs, c.rmap, &o); err != nil {
 			return err
 		}
 	}
@@ -154,13 +162,13 @@ func (c *client) ApplyResources(filter func(unstructured.Unstructured) bool, db 
 }
 
 // write synchronises a single object with the API server.
-func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstructured.Unstructured) error {
-	dc, err := dyn.ClientForGroupVersionKind(o.GroupVersionKind())
+func write(dyn dynamic.Interface, grs []*restmapper.APIGroupResources, rmap meta.RESTMapper, o *unstructured.Unstructured) error {
+	restMapping, err := rmap.RESTMapping(o.GroupVersionKind().GroupKind(), o.GroupVersionKind().Version)
 	if err != nil {
 		return err
 	}
 
-	var gr *discovery.APIGroupResources
+	var gr *restmapper.APIGroupResources
 	for _, g := range grs {
 		if g.Group.Name == o.GroupVersionKind().Group {
 			gr = g
@@ -189,10 +197,10 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 
 	err = retry.RetryOnConflict(retry.DefaultRetry, func() (err error) {
 		var existing *unstructured.Unstructured
-		existing, err = dc.Resource(res, o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
+		existing, err = dyn.Resource(restMapping.Resource).Namespace(o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
 		if kerrors.IsNotFound(err) {
 			log.Infof("Create " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
-			_, err = dc.Resource(res, o.GetNamespace()).Create(o)
+			_, err = dyn.Resource(restMapping.Resource).Namespace(o.GetNamespace()).Create(o)
 			if kerrors.IsAlreadyExists(err) {
 				// The "hot path" in write() is Get, check, then maybe Update.
 				// Optimising for this has the disadvantage that at cluster
@@ -222,7 +230,7 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		printDiff(existing, o)
 
 		o.SetResourceVersion(rv)
-		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
+		_, err = dyn.Resource(restMapping.Resource).Namespace(o.GetNamespace()).Update(o)
 		return
 	})
 

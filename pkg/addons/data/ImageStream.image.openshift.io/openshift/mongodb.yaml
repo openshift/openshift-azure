@@ -19,7 +19,7 @@ spec:
       version: "2.4"
     from:
       kind: DockerImage
-      name: registry.redhat.io/openshift3/mongodb-24-rhel7:latest
+      name: registry.access.redhat.com/openshift3/mongodb-24-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "2.4"
@@ -35,7 +35,7 @@ spec:
       version: "2.6"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/mongodb-26-rhel7:latest
+      name: registry.access.redhat.com/rhscl/mongodb-26-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "2.6"
@@ -51,7 +51,7 @@ spec:
       version: "3.2"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/mongodb-32-rhel7:latest
+      name: registry.access.redhat.com/rhscl/mongodb-32-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "3.2"
@@ -67,7 +67,7 @@ spec:
       version: "3.4"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/mongodb-34-rhel7:latest
+      name: registry.access.redhat.com/rhscl/mongodb-34-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "3.4"
@@ -83,7 +83,7 @@ spec:
       version: "3.6"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/mongodb-36-rhel7:latest
+      name: registry.access.redhat.com/rhscl/mongodb-36-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "3.6"

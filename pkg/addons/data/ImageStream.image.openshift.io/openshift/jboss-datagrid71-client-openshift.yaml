@@ -19,7 +19,7 @@ spec:
       version: "1.0"
     from:
       kind: DockerImage
-      name: registry.redhat.io/jboss-datagrid-7/datagrid71-client-openshift:1.0
+      name: registry.access.redhat.com/jboss-datagrid-7/datagrid71-client-openshift:1.0
     generation: 2
     importPolicy: {}
     name: "1.0"

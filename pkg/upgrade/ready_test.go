@@ -193,7 +193,7 @@ func TestMasterIsReady(t *testing.T) {
 					Kind: "pod",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "etcd-master-000000",
+					Name:      "master-etcd-master-000000",
 					Namespace: "kube-system",
 				},
 				Status: corev1.PodStatus{
@@ -209,7 +209,7 @@ func TestMasterIsReady(t *testing.T) {
 					Kind: "pod",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "api-master-000000",
+					Name:      "master-api-master-000000",
 					Namespace: "kube-system",
 				},
 				Status: corev1.PodStatus{
@@ -242,11 +242,11 @@ func TestMasterIsReady(t *testing.T) {
 	for _, tt := range tests {
 		got, err := masterIsReady(tt.kc, tt.nodeName)
 		if (err != nil) != tt.wantErr {
-			t.Errorf("masterIsReady() error = %v, wantErr %v", err, tt.wantErr)
+			t.Errorf("masterIsReady() error = %v, wantErr %v. Test: %v", err, tt.wantErr, tt.name)
 			return
 		}
 		if got != tt.want {
-			t.Errorf("masterIsReady() = %v, want %v", got, tt.want)
+			t.Errorf("masterIsReady() = %v, want %v. Test: %v", got, tt.want, tt.name)
 		}
 	}
 }

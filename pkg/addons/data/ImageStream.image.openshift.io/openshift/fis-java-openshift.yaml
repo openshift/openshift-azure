@@ -19,7 +19,7 @@ spec:
       version: "1.0"
     from:
       kind: DockerImage
-      name: registry.redhat.io/jboss-fuse-6/fis-java-openshift:1.0
+      name: registry.access.redhat.com/jboss-fuse-6/fis-java-openshift:1.0
     generation: 2
     importPolicy: {}
     name: "1.0"
@@ -34,7 +34,7 @@ spec:
       version: "2.0"
     from:
       kind: DockerImage
-      name: registry.redhat.io/jboss-fuse-6/fis-java-openshift:2.0
+      name: registry.access.redhat.com/jboss-fuse-6/fis-java-openshift:2.0
     generation: 2
     importPolicy: {}
     name: "2.0"

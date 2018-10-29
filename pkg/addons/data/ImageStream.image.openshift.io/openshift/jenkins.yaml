@@ -19,7 +19,7 @@ spec:
       version: 1.x
     from:
       kind: DockerImage
-      name: registry.redhat.io/openshift3/jenkins-1-rhel7:latest
+      name: registry.access.redhat.com/openshift3/jenkins-1-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "1"
@@ -35,7 +35,7 @@ spec:
       version: 2.x
     from:
       kind: DockerImage
-      name: registry.redhat.io/openshift3/jenkins-2-rhel7:v3.11
+      name: registry.access.redhat.com/openshift3/jenkins-2-rhel7:v3.11
     generation: 2
     importPolicy: {}
     name: "2"

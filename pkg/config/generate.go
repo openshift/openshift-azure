@@ -6,7 +6,6 @@ import (
 	"crypto/x509/pkix"
 	"fmt"
 	"net"
-	"os"
 
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -485,12 +484,6 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) 
 
 	if uuid.Equal(c.ServiceCatalogClusterID, uuid.Nil) {
 		c.ServiceCatalogClusterID = uuid.NewV4()
-	}
-
-	// TODO: Make this better configurable when clear how
-	if len(c.RHUsername) == 0 {
-		c.RHUsername = os.Getenv("RH_USERNAME")
-		c.RHPasswd = os.Getenv("RH_PASSWD")
 	}
 
 	return

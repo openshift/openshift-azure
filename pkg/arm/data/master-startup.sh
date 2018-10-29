@@ -86,11 +86,6 @@ base64 -d <<< {{ YamlMarshal .Config.MasterKubeconfig | Base64Encode }} >/etc/or
 base64 -d <<< {{ .Config.HtPasswd | Base64Encode }} >/etc/origin/master/htpasswd
 {{- end }}
 
-mkdir -p /root/.docker/
-cat >/root/.docker/config.json <<EOF
-{{ print (.Derived.RegistrySecret .ContainerService) }}
-EOF
-
 cat >/etc/etcd/etcd.conf <<EOF
 ETCD_ADVERTISE_CLIENT_URLS=https://$(hostname):2379
 ETCD_CERT_FILE=/etc/etcd/server.crt
@@ -198,11 +193,19 @@ kubeletClientInfo:
   port: 10250
 kubernetesMasterConfig:
   apiServerArguments:
+    cloud-config:
+    - /etc/origin/cloudprovider/azure.conf
+    cloud-provider:
+    - azure
     storage-backend:
     - etcd3
     storage-media-type:
     - application/vnd.kubernetes.protobuf
   controllerArguments:
+    cloud-config:
+    - /etc/origin/cloudprovider/azure.conf
+    cloud-provider: 
+    - azure
     cluster-signing-cert-file:
     - /etc/origin/master/ca.crt
     cluster-signing-key-file:
@@ -213,11 +216,9 @@ kubernetesMasterConfig:
     - /etc/origin/master/recycler_pod.yaml
   masterCount: 3
   masterIP: 127.0.0.1
-  podEvictionTimeout: null
   proxyClientInfo:
     certFile: master.proxy-client.crt
     keyFile: master.proxy-client.key
-  schedulerArguments: null
   schedulerConfigFile: /etc/origin/master/scheduler.json
   servicesNodePortRange: ''
   servicesSubnet: 172.30.0.0/16

@@ -69,7 +69,6 @@ spec:
           name: stats
         readinessProbe:
           httpGet:
-            host: localhost
             path: healthz/ready
             port: 1936
             scheme: HTTP

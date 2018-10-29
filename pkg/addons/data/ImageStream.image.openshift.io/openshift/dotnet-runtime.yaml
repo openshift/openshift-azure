@@ -19,7 +19,7 @@ spec:
       version: "2.0"
     from:
       kind: DockerImage
-      name: registry.redhat.io/dotnet/dotnet-20-runtime-rhel7:2.0
+      name: registry.access.redhat.com/dotnet/dotnet-20-runtime-rhel7:2.0
     generation: 2
     importPolicy: {}
     name: "2.0"
@@ -35,7 +35,7 @@ spec:
       version: "2.1"
     from:
       kind: DockerImage
-      name: registry.redhat.io/dotnet/dotnet-21-runtime-rhel7:2.1
+      name: registry.access.redhat.com/dotnet/dotnet-21-runtime-rhel7:2.1
     generation: 2
     importPolicy: {}
     name: "2.1"

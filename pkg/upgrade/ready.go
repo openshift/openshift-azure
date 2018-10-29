@@ -33,15 +33,7 @@ var deploymentWhitelist = []struct {
 		Namespace: "default",
 	},
 	{
-		Name:      "apiserver",
-		Namespace: "kube-service-catalog",
-	},
-	{
-		Name:      "controller-manager",
-		Namespace: "kube-service-catalog",
-	},
-	{
-		Name:      "bootstrap-autoapprover",
+		Name:      "customer-admin-reconciler",
 		Namespace: "openshift-infra",
 	},
 	{
@@ -49,16 +41,16 @@ var deploymentWhitelist = []struct {
 		Namespace: "openshift-ansible-service-broker",
 	},
 	{
-		Name:      "apiserver",
-		Namespace: "openshift-template-service-broker",
-	},
-	{
-		Name:      "bootstrap-autoapprover",
-		Namespace: "openshift-infra",
-	},
-	{
 		Name:      "webconsole",
 		Namespace: "openshift-web-console",
+	},
+	{
+		Name:      "console",
+		Namespace: "openshift-console",
+	},
+	{
+		Name:      "cluster-monitoring-operator",
+		Namespace: "openshift-monitoring",
 	},
 }
 
@@ -66,10 +58,6 @@ var daemonsetWhitelist = []struct {
 	Name      string
 	Namespace string
 }{
-	{
-		Name:      "prometheus-node-exporter",
-		Namespace: "openshift-metrics",
-	},
 	{
 		Name:      "sync",
 		Namespace: "openshift-node",
@@ -81,6 +69,28 @@ var daemonsetWhitelist = []struct {
 	{
 		Name:      "sdn",
 		Namespace: "openshift-sdn",
+	},
+	{
+		Name:      "apiserver",
+		Namespace: "kube-service-catalog",
+	},
+	{
+		Name:      "controller-manager",
+		Namespace: "kube-service-catalog",
+	},
+	{
+		Name:      "apiserver",
+		Namespace: "openshift-template-service-broker",
+	},
+}
+
+var statefulsetWhitelist = []struct {
+	Name      string
+	Namespace string
+}{
+	{
+		Name:      "bootstrap-autoapprover",
+		Namespace: "openshift-infra",
 	},
 }
 
@@ -120,6 +130,32 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 					ds.Status.DesiredNumberScheduled == ds.Status.NumberReady &&
 					ds.Status.DesiredNumberScheduled == ds.Status.UpdatedNumberScheduled &&
 					ds.Generation == ds.Status.ObservedGeneration, nil
+			default:
+				return false, err
+			}
+		}, ctx.Done())
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, app := range statefulsetWhitelist {
+		log.Infof("checking statefulset %s/%s", app.Namespace, app.Name)
+
+		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
+			sts, err := kc.AppsV1().StatefulSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
+			switch {
+			case kerrors.IsNotFound(err):
+				return false, nil
+			case err == nil:
+				specReplicas := int32(1)
+				specReplicas = *sts.Spec.Replicas
+
+				return specReplicas == sts.Status.Replicas &&
+					specReplicas == sts.Status.ReadyReplicas &&
+					specReplicas == sts.Status.CurrentReplicas &&
+					specReplicas == sts.Status.UpdatedReplicas &&
+					sts.Generation == sts.Status.ObservedGeneration, nil
 			default:
 				return false, err
 			}
@@ -183,7 +219,7 @@ func masterIsReady(kc kubernetes.Interface, nodeName string) (bool, error) {
 		return ready, err
 	}
 
-	etcdPod, err := kc.CoreV1().Pods("kube-system").Get("etcd-"+nodeName, metav1.GetOptions{})
+	etcdPod, err := kc.CoreV1().Pods("kube-system").Get("master-etcd-"+nodeName, metav1.GetOptions{})
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
@@ -192,7 +228,7 @@ func masterIsReady(kc kubernetes.Interface, nodeName string) (bool, error) {
 		return false, err
 	}
 
-	apiPod, err := kc.CoreV1().Pods("kube-system").Get("api-"+nodeName, metav1.GetOptions{})
+	apiPod, err := kc.CoreV1().Pods("kube-system").Get("master-api-"+nodeName, metav1.GetOptions{})
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):

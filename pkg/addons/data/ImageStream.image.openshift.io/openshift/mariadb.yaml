@@ -19,7 +19,7 @@ spec:
       version: "10.1"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/mariadb-101-rhel7:latest
+      name: registry.access.redhat.com/rhscl/mariadb-101-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "10.1"
@@ -35,7 +35,7 @@ spec:
       version: "10.2"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/mariadb-102-rhel7:latest
+      name: registry.access.redhat.com/rhscl/mariadb-102-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "10.2"

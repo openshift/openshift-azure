@@ -34,7 +34,7 @@ type Properties struct {
 	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
 
 	// OpenShiftVersion (in): OpenShift version to be created/updated, e.g.
-	// `v3.10`.
+	// `v3.11`.
 	OpenShiftVersion string `json:"openShiftVersion,omitempty"`
 
 	// PublicHostname (in,optional): Optional user-specified FQDN for OpenShift
