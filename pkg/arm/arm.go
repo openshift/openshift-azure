@@ -11,7 +11,11 @@ package arm
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"strings"
 	"text/template"
 
 	"github.com/sirupsen/logrus"
@@ -20,6 +24,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util"
 )
+
+const hashKey = "scaleset-checksum"
 
 type Generator interface {
 	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error)
@@ -77,10 +83,134 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 		return nil, err
 	}
 
-	var azuretemplate map[string]interface{}
-	err = json.Unmarshal(azuredeploy, &azuretemplate)
-	if err != nil {
+	var original, copied map[string]interface{}
+	if err := json.Unmarshal(azuredeploy, &original); err != nil {
 		return nil, err
 	}
-	return azuretemplate, nil
+	if err := json.Unmarshal(azuredeploy, &copied); err != nil {
+		return nil, err
+	}
+	if err := hashScaleSets(original, copied); err != nil {
+		return nil, err
+	}
+	return original, nil
+}
+
+func hashScaleSets(original, copied map[string]interface{}) error {
+	for key, value := range copied {
+		if key != "resources" {
+			continue
+		}
+
+		for _, r := range value.([]interface{}) {
+			resource, ok := r.(map[string]interface{})
+			if !ok {
+				continue
+			}
+
+			if !isScaleSet(resource) {
+				continue
+			}
+
+			// cleanup capacity so that no unnecessary VM rotations are going
+			// to occur because of a scale up/down.
+			deleteField(resource, "sku", "capacity")
+
+			// cleanup previous hash
+			deleteField(resource, "tags", hashKey)
+
+			// hash scale set
+			data, err := json.Marshal(resource)
+			if err != nil {
+				return err
+			}
+			hf := sha256.New()
+			fmt.Fprintf(hf, string(data))
+			h := base64.StdEncoding.EncodeToString(hf.Sum(nil))
+
+			// update tags in the original template
+			role := getRole(resource)
+			if added := addTag(role, hashKey, h, original); !added {
+				return fmt.Errorf("could not tag ARM template with new hash for role %q", role)
+			}
+		}
+	}
+	return nil
+}
+
+func isScaleSet(resource map[string]interface{}) bool {
+	for k, v := range resource {
+		if k == "type" && v.(string) == "Microsoft.Compute/virtualMachineScaleSets" {
+			return true
+		}
+	}
+	return false
+}
+
+func deleteField(resource map[string]interface{}, parent, field string) {
+	for key, value := range resource {
+		if key != parent {
+			continue
+		}
+		if p, ok := value.(map[string]interface{}); ok {
+			delete(p, field)
+			resource[key] = p
+			return
+		}
+	}
+}
+
+func getRole(resource map[string]interface{}) string {
+	for k, v := range resource {
+		if k == "name" && strings.HasPrefix(v.(string), "ss-") {
+			return v.(string)[3:]
+		}
+	}
+	return ""
+}
+
+// addTag adds the provided key and value as a tag in the scaleset
+// with the given role inside azuretemplate. It returns true when
+// the tag has been added in the template, false otherwise (ie. when
+// the provided role is missing from the ARM template or there is no
+// scale set).
+func addTag(role, key, value string, azuretemplate map[string]interface{}) bool {
+	for k, resources := range azuretemplate {
+		if k != "resources" {
+			continue
+		}
+
+		for _, r := range resources.([]interface{}) {
+			resource, ok := r.(map[string]interface{})
+			if !ok {
+				continue
+			}
+
+			if !isScaleSet(resource) {
+				continue
+			}
+			if !hasRole(role, resource) {
+				continue
+			}
+			newTags := make(map[string]interface{})
+			if tags, ok := resource["tags"].(map[string]interface{}); ok {
+				for k, v := range tags {
+					newTags[k] = v
+				}
+			}
+			newTags[key] = value
+			resource["tags"] = newTags
+			return true
+		}
+	}
+	return false
+}
+
+func hasRole(role string, resource map[string]interface{}) bool {
+	for k, v := range resource {
+		if k == "name" && v.(string) == "ss-"+role {
+			return true
+		}
+	}
+	return false
 }
