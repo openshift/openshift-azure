@@ -1,16 +1,45 @@
 apiVersion: v1
 data:
-  broker-config: "registry:\n  - type: rhcc\n    name: rh\n    url:  https://registry.redhat.io\n
-    \   org:  \n    tag:  v3.11.16\n    white_list: [.*-apb$]\n\n    black_list: [.*automation-broker-apb$]\n\n
-    \   auth_type: \"secret\"\n    auth_name: \"asb-registry-auth\"\n  - type: local_openshift\n
-    \   name: localregistry\n    white_list: []\n\n    namespaces: [openshift]\n\ndao:\n
-    \ type: crd\nlog:\n  stdout: true\n  level: info\n  color: true\nopenshift:\n
-    \ host: \"\"\n  ca_file: \"\"\n  bearer_token_file: \"\"\n  namespace: openshift-ansible-service-broker\n
-    \ sandbox_role: edit\n  image_pull_policy: Always\n  keep_namespace: false\n  keep_namespace_on_error:
-    false\nbroker:\n  dev_broker: false\n  bootstrap_on_startup: true\n  refresh_interval:
-    600s\n  launch_apb_on_bind: false\n  output_request: false\n  recovery: true\n
-    \ ssl_cert_key: /etc/tls/private/tls.key\n  ssl_cert: /etc/tls/private/tls.crt\n
-    \ auto_escalate: False\n  auth:\n    - type: basic\n      enabled: false\n"
+  broker-config: |
+    registry:
+      - type: rhcc
+        name: rh
+        url: '*** GENERATED ***'
+        tag:  '*** GENERATED ***'
+        white_list: [.*-apb$]
+        black_list: [.*automation-broker-apb$]
+      - type: local_openshift
+        name: localregistry
+        white_list: []
+        namespaces: [openshift]
+    dao:
+      type: crd
+    log:
+      stdout: true
+      level: info
+      color: true
+    openshift:
+      host: ""
+      ca_file: ""
+      bearer_token_file: ""
+      namespace: openshift-ansible-service-broker
+      sandbox_role: edit
+      image_pull_policy: Always
+      keep_namespace: false
+      keep_namespace_on_error: false
+    broker:
+      dev_broker: false
+      bootstrap_on_startup: true
+      refresh_interval: 600s
+      launch_apb_on_bind: false
+      output_request: false
+      recovery: true
+      ssl_cert_key: /etc/tls/private/tls.key
+      ssl_cert: /etc/tls/private/tls.crt
+      auto_escalate: False
+      auth:
+        - type: basic
+          enabled: false
 kind: ConfigMap
 metadata:
   labels:

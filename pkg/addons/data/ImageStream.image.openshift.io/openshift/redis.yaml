@@ -19,7 +19,7 @@ spec:
       version: "3.2"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/redis-32-rhel7:latest
+      name: registry.access.redhat.com/rhscl/redis-32-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "3.2"

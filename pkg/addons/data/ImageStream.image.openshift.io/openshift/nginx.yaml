@@ -22,7 +22,7 @@ spec:
       version: "1.10"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/nginx-110-rhel7:latest
+      name: registry.access.redhat.com/rhscl/nginx-110-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "1.10"
@@ -41,7 +41,7 @@ spec:
       version: "1.12"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/nginx-112-rhel7:latest
+      name: registry.access.redhat.com/rhscl/nginx-112-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "1.12"
@@ -60,7 +60,7 @@ spec:
       version: "1.8"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/nginx-18-rhel7:latest
+      name: registry.access.redhat.com/rhscl/nginx-18-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "1.8"

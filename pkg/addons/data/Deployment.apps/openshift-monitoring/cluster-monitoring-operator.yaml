@@ -22,20 +22,7 @@ spec:
     spec:
       containers:
       - args:
-        - -namespace=openshift-monitoring
-        - -configmap=cluster-monitoring-config
-        - -logtostderr=true
-        - -v=4
-        - -tags=prometheus-operator='v3.11.16'
-        - -tags=prometheus-config-reloader=v3.11.16
-        - -tags=config-reloader=v3.11.16
-        - -tags=prometheus=v3.11.16
-        - -tags=alertmanager=v3.11.16
-        - -tags=grafana=v3.11.16
-        - -tags=oauth-proxy=v3.11.16
-        - -tags=node-exporter=v3.11.16
-        - -tags=kube-state-metrics=v3.11.16
-        - -tags=kube-rbac-proxy=v3.11.16
+         - '*** GENERATED ***'
         image: '*** GENERATED ***'
         name: cluster-monitoring-operator
         ports:

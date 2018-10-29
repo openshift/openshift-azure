@@ -11,7 +11,7 @@ func NewTestOpenShiftCluster() *api.OpenShiftManagedCluster {
 		Config:   &api.Config{},
 		Properties: &api.Properties{
 			FQDN:             "example.eastus.cloudapp.azure.com",
-			OpenShiftVersion: "v3.10",
+			OpenShiftVersion: "v3.11",
 			NetworkProfile: &api.NetworkProfile{
 				VnetCIDR: "10.0.0.0/8",
 			},

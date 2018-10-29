@@ -41,7 +41,7 @@ spec:
         - mountPath: /var/apiserver-config
           name: apiserver-config
       nodeSelector:
-        node-role.kubernetes.io/master: "true"
+        node-role.kubernetes.io/infra: "true"
       serviceAccountName: apiserver
       volumes:
       - name: serving-cert

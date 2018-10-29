@@ -22,7 +22,7 @@ spec:
       version: "0.10"
     from:
       kind: DockerImage
-      name: registry.redhat.io/openshift3/nodejs-010-rhel7:latest
+      name: registry.access.redhat.com/openshift3/nodejs-010-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "0.10"
@@ -39,7 +39,7 @@ spec:
       version: "10"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhoar-nodejs/nodejs-10
+      name: registry.access.redhat.com/rhoar-nodejs/nodejs-10
     generation: 2
     importPolicy: {}
     name: "10"
@@ -57,7 +57,7 @@ spec:
       version: "4"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/nodejs-4-rhel7:latest
+      name: registry.access.redhat.com/rhscl/nodejs-4-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "4"
@@ -75,7 +75,7 @@ spec:
       version: "6"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/nodejs-6-rhel7:latest
+      name: registry.access.redhat.com/rhscl/nodejs-6-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "6"
@@ -92,7 +92,7 @@ spec:
       version: "8"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhscl/nodejs-8-rhel7:latest
+      name: registry.access.redhat.com/rhscl/nodejs-8-rhel7:latest
     generation: 2
     importPolicy: {}
     name: "8"
@@ -109,7 +109,7 @@ spec:
       version: "8"
     from:
       kind: DockerImage
-      name: registry.redhat.io/rhoar-nodejs/nodejs-8
+      name: registry.access.redhat.com/rhoar-nodejs/nodejs-8
     generation: 2
     importPolicy: {}
     name: 8-RHOAR

@@ -55,10 +55,6 @@ type Config struct {
 	ConsoleOAuthSecret             string    `json:"consoleOAuthSecret,omitempty"`
 	RouterStatsPassword            string    `json:"routerStatsPassword,omitempty"`
 	ServiceCatalogClusterID        uuid.UUID `json:"serviceCatalogClusterId,omitempty"`
-
-	// RH Credentials
-	RHUsername string `json:"rhUsername,omitempty"`
-	RHPasswd   string `json:"rhPasswd,omitempty"`
 }
 
 // ImageConfig contains all images for the pods
@@ -79,20 +75,19 @@ type ImageConfig struct {
 	KubeRbacProxyBase            string `json:"kubeRbacProxyBase,omitempty"`
 	OAuthProxyBase               string `json:"oAuthProxyBase,omitempty"`
 
-	Recycler               string `json:"recycler,omitempty"`
-	MasterEtcd             string `json:"masterEtcd,omitempty"`
-	ControlPlane           string `json:"controlPlane,omitempty"`
-	Node                   string `json:"node,omitempty"`
-	ServiceCatalog         string `json:"serviceCatalog,omitempty"`
-	Sync                   string `json:"sync,omitempty"`
-	TemplateServiceBroker  string `json:"templateServiceBroker,omitempty"`
-	PrometheusNodeExporter string `json:"prometheusNodeExporter,omitempty"`
-	Registry               string `json:"registry,omitempty"`
-	Router                 string `json:"router,omitempty"`
-	RegistryConsole        string `json:"registryConsole,omitempty"`
-	AnsibleServiceBroker   string `json:"ansibleServiceBroker,omitempty"`
-	WebConsole             string `json:"webConsole,omitempty"`
-	Console                string `json:"console,omitempty"`
+	Recycler              string `json:"recycler,omitempty"`
+	MasterEtcd            string `json:"masterEtcd,omitempty"`
+	ControlPlane          string `json:"controlPlane,omitempty"`
+	Node                  string `json:"node,omitempty"`
+	ServiceCatalog        string `json:"serviceCatalog,omitempty"`
+	Sync                  string `json:"sync,omitempty"`
+	TemplateServiceBroker string `json:"templateServiceBroker,omitempty"`
+	Registry              string `json:"registry,omitempty"`
+	Router                string `json:"router,omitempty"`
+	RegistryConsole       string `json:"registryConsole,omitempty"`
+	AnsibleServiceBroker  string `json:"ansibleServiceBroker,omitempty"`
+	WebConsole            string `json:"webConsole,omitempty"`
+	Console               string `json:"console,omitempty"`
 
 	LogBridge string `json:"logBridge,omitempty"`
 }

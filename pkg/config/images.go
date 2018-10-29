@@ -25,8 +25,8 @@ func NewSimpleGenerator(pluginConfig *api.PluginConfig) Generator {
 	}
 }
 
-// openshiftVersion converts a VM image version (e.g. 310.14.20180101) to an
-// openshift container image version (e.g. v3.10.14)
+// openshiftVersion converts a VM image version (e.g. 311.14.20180101) to an
+// openshift container image version (e.g. v3.11.14)
 func openShiftVersion(imageVersion string) (string, error) {
 	parts := strings.Split(imageVersion, ".")
 	if len(parts) != 3 || len(parts[0]) < 2 {
@@ -64,6 +64,48 @@ func (g *simpleGenerator) image(component, version string) string {
 	return strings.Replace(image, "${version}", version, -1)
 }
 
+func (g *simpleGenerator) selectContainerImagesOrigin(cs *api.OpenShiftManagedCluster) error {
+	c := cs.Config
+	v := "v3.11"
+	switch cs.Properties.OpenShiftVersion {
+	case "v3.11":
+		// Operators
+		c.Images.ClusterMonitoringOperator = "quay.io/coreos/cluster-monitoring-operator:v0.1.1"
+
+		// Operators base images
+		c.Images.PrometheusOperatorBase = "quay.io/coreos/prometheus-operator"
+		c.Images.PrometheusConfigReloaderBase = "quay.io/coreos/prometheus-config-reloader"
+		c.Images.ConfigReloaderBase = "quay.io/coreos/configmap-reload"
+		c.Images.PrometheusBase = "openshift/prometheus"
+		c.Images.AlertManagerBase = "openshift/prometheus-alertmanager"
+		c.Images.NodeExporterBase = "openshift/prometheus-node-exporter"
+		c.Images.GrafanaBase = "grafana/grafana"
+		c.Images.KubeStateMetricsBase = "quay.io/coreos/kube-state-metrics"
+		c.Images.KubeRbacProxyBase = "quay.io/coreos/kube-rbac-proxy"
+		c.Images.OAuthProxyBase = "openshift/oauth-proxy"
+
+		// other images
+		c.Images.ControlPlane = g.image("control-plane", v)
+		c.Images.Node = g.image("node", v)
+		c.Images.Router = g.image("haproxy-router", v)
+		c.Images.MasterEtcd = "quay.io/coreos/etcd:v3.2.22"
+
+		c.Images.WebConsole = g.image("web-console", v)
+		c.Images.Console = g.image("console", v)
+		c.Images.RegistryConsole = "docker.io/cockpit/kubernetes:latest"
+		c.Images.ServiceCatalog = g.image("service-catalog", v)
+		c.Images.Recycler = g.image("recycler", v)
+		c.Images.ServiceCatalog = g.image("service-catalog", v)
+		c.Images.AnsibleServiceBroker = "docker.io/ansibleplaybookbundle/origin-ansible-service-broker:latest"
+		c.Images.TemplateServiceBroker = "docker.io/openshift/origin-template-service-broker:latest"
+		c.Images.Registry = g.image("docker-registry", v)
+
+		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.11"
+		c.Images.LogBridge = "quay.io/openshift-on-azure/logbridge:latest"
+	}
+	return nil
+}
+
 func (g *simpleGenerator) selectContainerImagesOSA(cs *api.OpenShiftManagedCluster) error {
 	c := cs.Config
 	v, err := openShiftVersion(c.ImageVersion)
@@ -72,33 +114,31 @@ func (g *simpleGenerator) selectContainerImagesOSA(cs *api.OpenShiftManagedClust
 	}
 
 	switch cs.Properties.OpenShiftVersion {
-	//TODO: confirm minor version after release
 	case "v3.11":
-
 		// Operators
 		c.Images.ClusterMonitoringOperator = g.image("cluster-monitoring-operator", v)
 
 		// Operators base images
-		c.Images.PrometheusOperatorBase = "registry.redhat.io/openshift3/ose-prometheus-operator"
-		c.Images.PrometheusConfigReloaderBase = "registry.redhat.io/openshift3/ose-prometheus-config-reloader"
-		c.Images.ConfigReloaderBase = "registry.redhat.io/openshift3/ose-configmap-reloader"
-		c.Images.PrometheusBase = "registry.redhat.io/openshift3/prometheus"
-		c.Images.AlertManagerBase = "registry.redhat.io/openshift3/prometheus-alertmanager"
-		c.Images.NodeExporterBase = "registry.redhat.io/openshift3/prometheus-node-exporter"
-		c.Images.GrafanaBase = "registry.redhat.io/openshift3/grafana"
-		c.Images.KubeStateMetricsBase = "registry.redhat.io/openshift3/ose-kube-state-metrics"
-		c.Images.KubeRbacProxyBase = "registry.redhat.io/openshift3/ose-kube-rbac-proxy"
-		c.Images.OAuthProxyBase = "registry.redhat.io/openshift3/oauth-proxy"
+		c.Images.PrometheusOperatorBase = "registry.access.redhat.com/openshift3/ose-prometheus-operator"
+		c.Images.PrometheusConfigReloaderBase = "registry.access.redhat.com/openshift3/ose-prometheus-config-reloader"
+		c.Images.ConfigReloaderBase = "registry.access.redhat.com/openshift3/ose-configmap-reloader"
+		c.Images.PrometheusBase = "registry.access.redhat.com/openshift3/prometheus"
+		c.Images.AlertManagerBase = "registry.access.redhat.com/openshift3/prometheus-alertmanager"
+		c.Images.NodeExporterBase = "registry.access.redhat.com/openshift3/prometheus-node-exporter"
+		c.Images.GrafanaBase = "registry.access.redhat.com/openshift3/grafana"
+		c.Images.KubeStateMetricsBase = "registry.access.redhat.com/openshift3/ose-kube-state-metrics"
+		c.Images.KubeRbacProxyBase = "registry.access.redhat.com/openshift3/ose-kube-rbac-proxy"
+		c.Images.OAuthProxyBase = "registry.access.redhat.com/openshift3/oauth-proxy"
 
 		// other images
 		c.Images.ControlPlane = g.image("control-plane", v)
 		c.Images.Node = g.image("node", v)
 		c.Images.Router = g.image("haproxy-router", v)
-		c.Images.MasterEtcd = "registry.redhat.io/rhel7/etcd:3.2.22"
+		c.Images.MasterEtcd = "registry.access.redhat.com/rhel7/etcd:3.2.22"
 
 		c.Images.WebConsole = g.image("web-console", v)
 		c.Images.Console = g.image("console", v)
-		c.Images.RegistryConsole = "registry.redhat.io/openshift3/registry-console:" + v
+		c.Images.RegistryConsole = "registry.access.redhat.com/openshift3/registry-console:" + v
 		c.Images.ServiceCatalog = g.image("service-catalog", v)
 		c.Images.Recycler = g.image("recycler", v)
 		c.Images.ServiceCatalog = g.image("service-catalog", v)
@@ -106,7 +146,7 @@ func (g *simpleGenerator) selectContainerImagesOSA(cs *api.OpenShiftManagedClust
 		c.Images.TemplateServiceBroker = g.image("template-service-broker", v)
 		c.Images.Registry = g.image("docker-registry", v)
 
-		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.10"
+		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.11"
 		c.Images.LogBridge = "quay.io/openshift-on-azure/logbridge:latest"
 	}
 
@@ -119,6 +159,8 @@ func (g *simpleGenerator) selectContainerImages(cs *api.OpenShiftManagedCluster)
 	switch g.pluginConfig.TestConfig.DeployOS {
 	case "", "rhel7":
 		err = g.selectContainerImagesOSA(cs)
+	case "centos7":
+		err = g.selectContainerImagesOrigin(cs)
 	default:
 		err = fmt.Errorf("unrecognised DeployOS value")
 	}
@@ -144,9 +186,9 @@ func (g *simpleGenerator) imageConfigFormat() string {
 
 	switch g.pluginConfig.TestConfig.DeployOS {
 	case "", "rhel7":
-		imageConfigFormat = "registry.redhat.io/openshift3/ose-${component}:${version}"
+		imageConfigFormat = "registry.access.redhat.com/openshift3/ose-${component}:${version}"
 	case "centos7":
-		imageConfigFormat = "docker.io/openshift/origin-${component}:${version}"
+		imageConfigFormat = "quay.io/openshift/origin-${component}:${version}"
 	}
 
 	return imageConfigFormat

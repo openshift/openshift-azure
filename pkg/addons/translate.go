@@ -159,6 +159,18 @@ var Translations = map[string][]struct {
 			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}",
 		},
 	},
+	"ConfigMap/openshift-ansible-service-broker/broker-config": {
+		{
+			Path:       jsonpath.MustCompile("$.data.'broker-config'"),
+			NestedPath: jsonpath.MustCompile("$.registry[?(@.type='rhcc')].url"),
+			Template:   "https://{{ .Derived.RegistryURL .ContainerService }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'broker-config'"),
+			NestedPath: jsonpath.MustCompile("$.registry[?(@.type='rhcc')].tag"),
+			Template:   "{{ .Derived.OpenShiftVersionTag .ContainerService }}",
+		},
+	},
 	"ConfigMap/openshift-monitoring/cluster-monitoring-config": {
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
@@ -380,6 +392,12 @@ var Translations = map[string][]struct {
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.ClusterMonitoringOperator }}",
 		},
+		{
+			Path: jsonpath.MustCompile("$.spec.template.spec.containers[0].args"),
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+				return config.Derived.ClusterMonitoringOperatorArgs(cs)
+			},
+		},
 	},
 	"Deployment.apps/openshift-web-console/webconsole": {
 		{
@@ -520,24 +538,6 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.key'"),
 			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.ServiceCatalogServer.Key) }}",
-		},
-	},
-	"Secret/openshift/imagestreamsecret": {
-		{
-			Path: jsonpath.MustCompile("$.stringData.'.dockerconfigjson'"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.RegistrySecret(cs), nil
-			},
-		},
-	},
-	"Secret/openshift-ansible-service-broker/asb-registry-auth": {
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'password'"),
-			Template: "{{ .Config.RHPasswd }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'username'"),
-			Template: "{{ .Config.RHUsername }}",
 		},
 	},
 	"Secret/openshift-console/console-oatuh-config": {

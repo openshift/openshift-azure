@@ -16,4 +16,4 @@ spec:
     port: 443
   selector:
     router: router
-    type: LoadBalancer
+  type: LoadBalancer
