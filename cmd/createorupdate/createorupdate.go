@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -9,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -268,9 +270,11 @@ var (
 	timeout       = flag.Duration("timeout", 30*time.Minute, "Timeout of the initial request")
 	updateTimeout = flag.Duration("update-timeout", 30*time.Minute, "Timeout of the update request")
 
+	// exec hooks
+	hook       = flag.String("exec", "", "Command to execute after the initial request to the RP has succeeded.")
+	updateHook = flag.String("update-exec", "", "Command to execute after the update request to the RP has succeeded.")
+
 	// TODO: Flag for gathering artifacts from the cluster
-	// TODO: Flag for requesting one or more ginkgo suites to run after the initial request
-	// TODO: Flag for requesting one or more ginkgo suites to run after the update request
 )
 
 func validate() error {
@@ -284,6 +288,12 @@ func validate() error {
 	}
 	if *method == http.MethodDelete && *cleanup {
 		return errors.New("cannot request a DELETE and -rm at the same time - use one of the two")
+	}
+	if *method == http.MethodDelete && (*hook != "" || *updateHook != "") {
+		return errors.New("cannot request a DELETE and run an exec hook at the same time")
+	}
+	if *updateHook != "" && *update == "" {
+		return errors.New("cannot exec an update hook when no update request is defined")
 	}
 	return nil
 }
@@ -335,6 +345,21 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftMan
 	}
 	log.Info("created/updated cluster")
 	return ioutil.WriteFile(manifest, out, 0666)
+}
+
+func execCommand(c string) error {
+	args := strings.Split(c, " ")
+	cmd := exec.Command(args[0], args[1:]...)
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("%s\n%v: %s", stdout.String(), err, stderr.String())
+	}
+	fmt.Println(stdout.String())
+	return nil
 }
 
 func main() {
@@ -391,11 +416,23 @@ func main() {
 		log.Fatal(err)
 	}
 
+	if *hook != "" {
+		if err := execCommand(*hook); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	// if an update is requested, do it
 	if *update != "" {
 		updateCtx, updateCancel := context.WithTimeout(context.Background(), *updateTimeout)
 		defer updateCancel()
 		if err := createOrUpdate(updateCtx, log, rpc, *update); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if *updateHook != "" {
+		if err := execCommand(*updateHook); err != nil {
 			log.Fatal(err)
 		}
 	}
