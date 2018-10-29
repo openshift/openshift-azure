@@ -15,13 +15,27 @@ import (
 )
 
 func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error {
-	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
-	if err != nil {
-		return err
+	var err error
+	if u.kubeclient == nil {
+		u.kubeclient, err = managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
+		if err != nil {
+			return err
+		}
 	}
-
-	virtualMachineScaleSetVMs := azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
-	virtualMachineScaleSets := azureclient.NewVirtualMachineScaleSetsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
+	if u.vmc == nil {
+		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+		if err != nil {
+			return err
+		}
+		u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
+	}
+	if u.ssc == nil {
+		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+		if err != nil {
+			return err
+		}
+		u.ssc = azureclient.NewVirtualMachineScaleSetsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
+	}
 
 	// Deploy() may change the number of VMs.  If we can see that any VMs are
 	// about to be deleted, drain them first.  Record which VMs are visible now
@@ -31,7 +45,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	vmsBefore := map[string]struct{}{}
 
 	for _, agent := range cs.Properties.AgentPoolProfiles {
-		vms, err := ListVMs(ctx, cs, virtualMachineScaleSetVMs, agent.Role)
+		vms, err := ListVMs(ctx, cs, u.vmc, agent.Role)
 		if err != nil {
 			return err
 		}
@@ -41,7 +55,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 				vmsBefore[*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName] = struct{}{}
 
 			} else {
-				err = u.delete(ctx, cs, virtualMachineScaleSetVMs, agent.Role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+				err = u.delete(ctx, cs, agent.Role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 				if err != nil {
 					return err
 				}
@@ -60,7 +74,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	for _, agent := range cs.Properties.AgentPoolProfiles {
-		vms, err := ListVMs(ctx, cs, virtualMachineScaleSetVMs, agent.Role)
+		vms, err := ListVMs(ctx, cs, u.vmc, agent.Role)
 		if err != nil {
 			return err
 		}
@@ -70,7 +84,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 			hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
 			if _, found := vmsBefore[hostname]; !found {
 				log.Infof("waiting for %s to be ready", hostname)
-				err = WaitForReady(ctx, cs, agent.Role, hostname)
+				err = WaitForReady(ctx, cs, agent.Role, hostname, u.kubeclient)
 				if err != nil {
 					return err
 				}
@@ -84,17 +98,17 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	// mechanism to avoid unnecessary VM rotations as well.
 
 	if os.Getenv("RUNNING_UNDER_TEST") != "" {
-		err = u.updateInPlace(ctx, cs, virtualMachineScaleSets, virtualMachineScaleSetVMs, api.AgentPoolProfileRoleMaster)
+		err = u.updateInPlace(ctx, cs, api.AgentPoolProfileRoleMaster)
 		if err != nil {
 			return err
 		}
 
-		err = u.updatePlusOne(ctx, cs, virtualMachineScaleSets, virtualMachineScaleSetVMs, api.AgentPoolProfileRoleInfra)
+		err = u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleInfra)
 		if err != nil {
 			return err
 		}
 
-		err = u.updatePlusOne(ctx, cs, virtualMachineScaleSets, virtualMachineScaleSetVMs, api.AgentPoolProfileRoleCompute)
+		err = u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleCompute)
 		if err != nil {
 			return err
 		}
@@ -134,13 +148,13 @@ func ListVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc azureclie
 
 // updatePlusOne creates an extra VM, then runs updateInPlace, then removes the
 // extra VM.
-func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole) error {
+func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) error {
 	count := getCount(cs, role)
 
 	// store a list of all the VM instances now, so that if we end up creating
 	// new ones (in the crash recovery case, we might not), we can detect which
 	// they are
-	oldVMs, err := ListVMs(ctx, cs, vmc, role)
+	oldVMs, err := ListVMs(ctx, cs, u.vmc, role)
 	if err != nil {
 		return err
 	}
@@ -154,7 +168,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 
 	for _, vm := range oldVMs {
 		log.Infof("setting ss-%s capacity to %d", role, count+1)
-		future, err := ssc.Update(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), compute.VirtualMachineScaleSetUpdate{
+		future, err := u.ssc.Update(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), compute.VirtualMachineScaleSetUpdate{
 			Sku: &compute.Sku{
 				Capacity: to.Int64Ptr(int64(count) + 1),
 			},
@@ -163,11 +177,11 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			return err
 		}
 
-		if err := future.WaitForCompletionRef(ctx, ssc.Client()); err != nil {
+		if err := future.WaitForCompletionRef(ctx, u.ssc.Client()); err != nil {
 			return err
 		}
 
-		updatedList, err := ListVMs(ctx, cs, vmc, role)
+		updatedList, err := ListVMs(ctx, cs, u.vmc, role)
 		if err != nil {
 			return err
 		}
@@ -178,7 +192,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 		for _, updated := range updatedList {
 			if _, found := vmsBefore[*updated.InstanceID]; !found {
 				log.Infof("waiting for %s to be ready", *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-				err = WaitForReady(ctx, cs, role, *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+				err = WaitForReady(ctx, cs, role, *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
 				if err != nil {
 					return err
 				}
@@ -186,7 +200,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			}
 		}
 
-		if err := u.delete(ctx, cs, vmc, role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName); err != nil {
+		if err := u.delete(ctx, cs, role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName); err != nil {
 			return err
 		}
 	}
@@ -195,8 +209,8 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 }
 
 // updateInPlace updates one by one all the VMs of a scale set, in place.
-func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftManagedCluster, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole) error {
-	vms, err := ListVMs(ctx, cs, vmc, role)
+func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) error {
+	vms, err := ListVMs(ctx, cs, u.vmc, role)
 	if err != nil {
 		return err
 	}
@@ -215,12 +229,12 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 
 		{
 			log.Infof("deallocating %s (%s)", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, *vm.InstanceID)
-			future, err := vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
+			future, err := u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
 			if err != nil {
 				return err
 			}
 
-			err = future.WaitForCompletionRef(ctx, vmc.Client())
+			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
 				return err
 			}
@@ -228,14 +242,14 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 
 		{
 			log.Infof("updating %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			future, err := ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
+			future, err := u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
 				InstanceIds: &[]string{*vm.InstanceID},
 			})
 			if err != nil {
 				return err
 			}
 
-			err = future.WaitForCompletionRef(ctx, ssc.Client())
+			err = future.WaitForCompletionRef(ctx, u.ssc.Client())
 			if err != nil {
 				return err
 			}
@@ -243,12 +257,12 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 
 		{
 			log.Infof("reimaging %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			future, err := vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
+			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
 			if err != nil {
 				return err
 			}
 
-			err = future.WaitForCompletionRef(ctx, vmc.Client())
+			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
 				return err
 			}
@@ -256,19 +270,19 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 
 		{
 			log.Infof("starting %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			future, err := vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
+			future, err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
 			if err != nil {
 				return err
 			}
 
-			err = future.WaitForCompletionRef(ctx, vmc.Client())
+			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
 				return err
 			}
 		}
 
 		log.Infof("waiting for %s to be ready", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		err = WaitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		err = WaitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
 		if err != nil {
 			return err
 		}
@@ -300,17 +314,17 @@ func sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenS
 	return append(unready, ready...), nil
 }
 
-func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc azureclient.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole, instanceID, nodeName string) error {
+func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, instanceID, nodeName string) error {
 	log.Infof("draining %s", nodeName)
 	if err := u.drain(ctx, cs, role, nodeName); err != nil {
 		return err
 	}
 
 	log.Infof("deleting %s", nodeName)
-	future, err := vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), instanceID)
+	future, err := u.vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), instanceID)
 	if err != nil {
 		return err
 	}
 
-	return future.WaitForCompletionRef(ctx, vmc.Client())
+	return future.WaitForCompletionRef(ctx, u.vmc.Client())
 }

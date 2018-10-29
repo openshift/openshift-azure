@@ -30,6 +30,8 @@ type simpleUpgrader struct {
 	pluginConfig   api.PluginConfig
 	accountsClient azureclient.AccountsClient
 	storageClient  storage.Client
+	vmc            azureclient.VirtualMachineScaleSetVMsClient
+	ssc            azureclient.VirtualMachineScaleSetsClient
 	kubeclient     kubernetes.Interface
 }
 
