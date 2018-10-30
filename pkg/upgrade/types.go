@@ -16,8 +16,10 @@ import (
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
+// Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
 	InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error
@@ -37,9 +39,23 @@ type simpleUpgrader struct {
 
 var _ Upgrader = &simpleUpgrader{}
 
+// NewSimpleUpgrader creates a new upgrader instance
 func NewSimpleUpgrader(entry *logrus.Entry, pluginConfig *api.PluginConfig) Upgrader {
 	log.New(entry)
 	return &simpleUpgrader{
 		pluginConfig: *pluginConfig,
 	}
+}
+
+func (u *simpleUpgrader) createClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+	if err != nil {
+		return err
+	}
+	u.accountsClient = azureclient.NewAccountsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
+	u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
+	u.ssc = azureclient.NewVirtualMachineScaleSetsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
+
+	u.kubeclient, err = managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
+	return err
 }

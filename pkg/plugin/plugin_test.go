@@ -11,20 +11,35 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/arm"
+	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/fixtures"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_upgrade"
 )
 
+func NewPluginWithFakeUpgrader(ctrl *gomock.Controller, entry *logrus.Entry, pluginConfig *api.PluginConfig) api.Plugin {
+	log.New(entry)
+	return &plugin{
+		entry:           entry,
+		config:          *pluginConfig,
+		clusterUpgrader: mock_upgrade.NewMockUpgrader(ctrl),
+		configGenerator: config.NewSimpleGenerator(pluginConfig),
+		armGenerator:    arm.NewSimpleGenerator(entry, pluginConfig),
+	}
+}
+
 func TestMerge(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
 	var config = api.PluginConfig{
 		SyncImage:       "sync:latest",
 		LogBridgeImage:  "logbridge:latest",
 		AcceptLanguages: []string{"en-us"},
 	}
-	p := NewPlugin(logrus.NewEntry(logrus.New()), &config)
 	newCluster := fixtures.NewTestOpenShiftCluster()
+	p := NewPluginWithFakeUpgrader(mockCtrl, logrus.NewEntry(logrus.New()), &config)
 	oldCluster := fixtures.NewTestOpenShiftCluster()
 
 	newCluster.Config = nil

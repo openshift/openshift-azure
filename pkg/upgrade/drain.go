@@ -15,21 +15,13 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 var errUnrecognisedRole = errors.New("unrecognised role")
 
 func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
-	var err error
-	if u.kubeclient == nil {
-		u.kubeclient, err = managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
-		if err != nil {
-			return err
-		}
-	}
-	_, err = u.kubeclient.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
+	_, err := u.kubeclient.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
