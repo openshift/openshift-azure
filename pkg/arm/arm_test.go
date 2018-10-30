@@ -156,10 +156,10 @@ func compareAndRemove(t *testing.T, expected string, template map[string]interfa
 					continue
 				}
 				tags := v.(map[string]interface{})
-				if expected != "" && tags[hashKey].(string) != expected {
-					t.Errorf("unexpected tag: %q, expected: %q", tags[hashKey].(string), expected)
+				if expected != "" && tags[HashKey].(string) != expected {
+					t.Errorf("unexpected tag: %q, expected: %q", tags[HashKey].(string), expected)
 				}
-				delete(tags, hashKey)
+				delete(tags, HashKey)
 				resource[k] = tags
 				break
 			}

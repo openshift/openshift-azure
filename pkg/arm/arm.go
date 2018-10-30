@@ -25,7 +25,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util"
 )
 
-const hashKey = "scaleset-checksum"
+// TODO: Move in pkg/api to share between pkg/arm and pkg/upgrade
+const HashKey = "scaleset-checksum"
 
 type Generator interface {
 	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error)
@@ -117,7 +118,7 @@ func hashScaleSets(original, copied map[string]interface{}) error {
 			deleteField(resource, "sku", "capacity")
 
 			// cleanup previous hash
-			deleteField(resource, "tags", hashKey)
+			deleteField(resource, "tags", HashKey)
 
 			// hash scale set
 			data, err := json.Marshal(resource)
@@ -130,7 +131,7 @@ func hashScaleSets(original, copied map[string]interface{}) error {
 
 			// update tags in the original template
 			role := getRole(resource)
-			if added := addTag(role, hashKey, h, original); !added {
+			if added := addTag(role, HashKey, h, original); !added {
 				return fmt.Errorf("could not tag ARM template with new hash for role %q", role)
 			}
 		}
@@ -204,6 +205,32 @@ func addTag(role, key, value string, azuretemplate map[string]interface{}) bool 
 		}
 	}
 	return false
+}
+
+func GetTag(role, key string, azuretemplate map[string]interface{}) string {
+	for k, resources := range azuretemplate {
+		if k != "resources" {
+			continue
+		}
+		for _, r := range resources.([]interface{}) {
+			resource, ok := r.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			if !isScaleSet(resource) {
+				continue
+			}
+			if !hasRole(role, resource) {
+				continue
+			}
+			if tags, ok := resource["tags"].(map[string]interface{}); ok {
+				if tag, ok := tags[key].(string); ok {
+					return tag
+				}
+			}
+		}
+	}
+	return ""
 }
 
 func hasRole(role string, resource map[string]interface{}) bool {

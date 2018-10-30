@@ -255,6 +255,7 @@
 // data/ConfigMap/kube-service-catalog/cluster-info.yaml
 // data/ConfigMap/kube-system/extension-apiserver-authentication.yaml
 // data/ConfigMap/openshift-ansible-service-broker/broker-config.yaml
+// data/ConfigMap/openshift-azure/upgrade-tracker.yaml
 // data/ConfigMap/openshift-infra/reconciler-rolebindings.yaml
 // data/ConfigMap/openshift-metrics/alertmanager.yaml
 // data/ConfigMap/openshift-metrics/prometheus.yaml
@@ -5649,6 +5650,26 @@ func configmapOpenshiftAnsibleServiceBrokerBrokerConfigYaml() (*asset, error) {
 	return a, nil
 }
 
+var _configmapOpenshiftAzureUpgradeTrackerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x2c\xc8\x21\x12\xc2\x40\x0c\x05\x50\xbf\xa7\xc8\x05\x2a\xb0\xb1\x68\x2c\xfe\x4f\xf7\xb7\x64\x3a\xcd\x66\xb2\x29\x82\xd3\x63\x6a\x1f\xc2\xde\xcc\x69\xc3\x55\xbe\x8f\x76\x98\x77\x95\xe7\xf0\xcd\xf6\x17\xa2\x9d\x2c\x74\x14\xb4\x89\x38\x4e\xaa\x5c\xb1\x27\x3a\x97\x4a\xac\x07\xf3\xf6\x19\x58\xa9\x32\x82\x3e\x3f\xb6\xd5\x82\xdf\x95\x6c\xff\x00\x00\x00\xff\xff\x58\x22\x3b\xfe\x5e\x00\x00\x00")
+
+func configmapOpenshiftAzureUpgradeTrackerYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_configmapOpenshiftAzureUpgradeTrackerYaml,
+		"ConfigMap/openshift-azure/upgrade-tracker.yaml",
+	)
+}
+
+func configmapOpenshiftAzureUpgradeTrackerYaml() (*asset, error) {
+	bytes, err := configmapOpenshiftAzureUpgradeTrackerYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ConfigMap/openshift-azure/upgrade-tracker.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _configmapOpenshiftInfraReconcilerRolebindingsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xdc\x94\xbd\x52\xeb\x40\x0c\x85\x7b\x3f\x85\x5e\xc0\xbe\x73\x3b\x66\x4b\x28\x68\xa0\x49\x41\xaf\xac\xe5\x44\xc4\xbb\xda\x91\xd6\x61\xf8\x7b\x77\xc6\xce\x26\x98\x14\x2e\x98\x21\xcc\xd0\x79\x25\x1d\x7d\x47\xa7\x30\x26\x7e\x20\x35\x96\xe8\x60\xff\xbf\x6a\x31\xa3\xab\x00\x54\x7a\x5a\x73\x6c\x39\x6e\xac\x79\xc6\xd0\x3b\x78\xab\x00\x00\x76\x1c\x5b\x07\x77\x6c\x79\x7a\x9e\xc9\xc7\x52\xa0\x8c\xd3\x1a\x78\x7d\x9f\x0a\x9c\x29\x98\x9b\x3e\xeb\x2f\x02\x5d\xa3\x6f\x70\xc8\x5b\x51\x7e\xc1\xcc\x12\x9b\xdd\x95\x35\x2c\xff\xca\xaa\x23\x6e\x25\x3d\x5d\x1f\xdc\x94\xfa\x09\x52\xde\x00\x11\x03\x39\xf0\x83\x65\x09\xa4\x35\xb6\x81\x63\x69\x8e\xc7\xac\xa8\xfb\x9c\xc5\xc4\xb7\x2a\x43\x5a\xb0\x70\x9a\x3d\x38\xb8\xe9\x07\xcb\xa4\xa3\x91\x33\xe2\x1c\x64\xc3\xfa\x91\x7c\xb6\x23\xa9\xfe\x06\x69\x1a\x5f\xbc\xca\x7e\x23\xca\x3a\xa9\x8c\xb7\x5d\x22\xd2\x45\xf2\xdf\xcc\x78\xcf\xf4\x74\x89\x68\x67\x9c\x1f\x0f\x52\x09\x5b\x52\xab\x8a\x27\x89\x1d\x6f\xee\x31\x55\xf3\x30\x0e\x12\x25\x2f\xd1\x73\x3f\x8a\x66\x3f\x9e\xd2\xb7\x84\x9e\x1c\x48\xa2\x68\x5b\xee\x72\xcd\xb1\x53\xac\x3e\x02\x00\x00\xff\xff\x93\x01\x20\xaa\xba\x04\x00\x00")
 
 func configmapOpenshiftInfraReconcilerRolebindingsYamlBytes() ([]byte, error) {
@@ -10536,6 +10557,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ConfigMap/kube-service-catalog/cluster-info.yaml":                                                                                   configmapKubeServiceCatalogClusterInfoYaml,
 	"ConfigMap/kube-system/extension-apiserver-authentication.yaml":                                                                      configmapKubeSystemExtensionApiserverAuthenticationYaml,
 	"ConfigMap/openshift-ansible-service-broker/broker-config.yaml":                                                                      configmapOpenshiftAnsibleServiceBrokerBrokerConfigYaml,
+	"ConfigMap/openshift-azure/upgrade-tracker.yaml":                                                                                     configmapOpenshiftAzureUpgradeTrackerYaml,
 	"ConfigMap/openshift-infra/reconciler-rolebindings.yaml":                                                                             configmapOpenshiftInfraReconcilerRolebindingsYaml,
 	"ConfigMap/openshift-metrics/alertmanager.yaml":                                                                                      configmapOpenshiftMetricsAlertmanagerYaml,
 	"ConfigMap/openshift-metrics/prometheus.yaml":                                                                                        configmapOpenshiftMetricsPrometheusYaml,
@@ -11077,6 +11099,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"openshift-ansible-service-broker": {nil, map[string]*bintree{
 			"broker-config.yaml": {configmapOpenshiftAnsibleServiceBrokerBrokerConfigYaml, map[string]*bintree{}},
+		}},
+		"openshift-azure": {nil, map[string]*bintree{
+			"upgrade-tracker.yaml": {configmapOpenshiftAzureUpgradeTrackerYaml, map[string]*bintree{}},
 		}},
 		"openshift-infra": {nil, map[string]*bintree{
 			"reconciler-rolebindings.yaml": {configmapOpenshiftInfraReconcilerRolebindingsYaml, map[string]*bintree{}},

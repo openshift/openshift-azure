@@ -89,6 +89,19 @@ func (mr *MockVirtualMachineScaleSetsClientMockRecorder) Client() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockVirtualMachineScaleSetsClient)(nil).Client))
 }
 
+// Get mocks base method
+func (m *MockVirtualMachineScaleSetsClient) Get(arg0 context.Context, arg1, arg2 string) (compute.VirtualMachineScaleSet, error) {
+	ret := m.ctrl.Call(m, "Get", arg0, arg1, arg2)
+	ret0, _ := ret[0].(compute.VirtualMachineScaleSet)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get
+func (mr *MockVirtualMachineScaleSetsClientMockRecorder) Get(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockVirtualMachineScaleSetsClient)(nil).Get), arg0, arg1, arg2)
+}
+
 // List mocks base method
 func (m *MockVirtualMachineScaleSetsClient) List(arg0 context.Context, arg1 string) (compute.VirtualMachineScaleSetListResultPage, error) {
 	ret := m.ctrl.Call(m, "List", arg0, arg1)

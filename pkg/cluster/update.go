@@ -7,9 +7,11 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
+	"k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
@@ -139,8 +141,7 @@ func listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc azureclie
 	return vms, nil
 }
 
-// updatePlusOne creates an extra VM, then runs updateInPlace, then removes the
-// extra VM.
+// updatePlusOne creates new VMs and removes old VMs one by one.
 func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) error {
 	count := getCount(cs, role)
 
@@ -152,8 +153,22 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 		return err
 	}
 
-	// TODO: Filter out VMs that do not need to get upgraded. Should speed
+	ss, err := u.ssc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role))
+	if err != nil {
+		return err
+	}
+
+	cm, err := u.readConfigMap()
+	if err != nil {
+		return err
+	}
+
+	// Filter out VMs that do not need to get upgraded. Should speed
 	// up retrying failed upgrades.
+	oldVMs, err = u.filterOldVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ss, oldVMs, role, cm)
+	if err != nil {
+		return err
+	}
 	vmsBefore := map[string]struct{}{}
 	for _, vm := range oldVMs {
 		vmsBefore[*vm.InstanceID] = struct{}{}
@@ -190,20 +205,63 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 					return err
 				}
 				vmsBefore[*updated.InstanceID] = struct{}{}
+				if hash := ss.Tags[arm.HashKey]; hash != nil && *hash != "" {
+					cm.Data[*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName] = *hash
+					if err := u.updateConfigMap(cm.Data); err != nil {
+						log.Warn(err)
+					}
+				}
 			}
 		}
 
 		if err := u.delete(ctx, cs, role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName); err != nil {
 			return err
 		}
+		delete(cm.Data, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		if err := u.updateConfigMap(cm.Data); err != nil {
+			log.Warn(err)
+		}
 	}
 
 	return nil
 }
 
+func (u *simpleUpgrader) filterOldVMs(ctx context.Context, resourceGroup string, ss compute.VirtualMachineScaleSet, vms []compute.VirtualMachineScaleSetVM, role api.AgentPoolProfileRole, cm *v1.ConfigMap) ([]compute.VirtualMachineScaleSetVM, error) {
+	var oldVMs []compute.VirtualMachineScaleSetVM
+	if ssTag := ss.Tags["scaleset-checksum"]; ssTag != nil && *ssTag != "" {
+		for _, vm := range vms {
+			if !vmMatchesScaleSet(vm, ss, cm) {
+				oldVMs = append(oldVMs, vm)
+			} else {
+				log.Debugf("skipping vm %q since it's already updated", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+			}
+		}
+	} else {
+		log.Warnf("scale set %q is not tagged with its hash - unnecessary VM rotations may occur", "ss-"+string(role))
+		oldVMs = vms
+	}
+	return oldVMs, nil
+}
+
+func vmMatchesScaleSet(vm compute.VirtualMachineScaleSetVM, ss compute.VirtualMachineScaleSet, cm *v1.ConfigMap) bool {
+	vmHash := cm.Data[*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName]
+	ssHash := ss.Tags["scaleset-checksum"]
+	return vmHash != "" && ssHash != nil && vmHash == *ssHash
+}
+
 // updateInPlace updates one by one all the VMs of a scale set, in place.
 func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) error {
 	vms, err := listVMs(ctx, cs, u.vmc, role)
+	if err != nil {
+		return err
+	}
+
+	ss, err := u.ssc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role))
+	if err != nil {
+		return err
+	}
+
+	cm, err := u.readConfigMap()
 	if err != nil {
 		return err
 	}
@@ -214,6 +272,11 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 	}
 
 	for _, vm := range sorted {
+		if isUpdated := vmMatchesScaleSet(vm, ss, cm); isUpdated {
+			log.Infof("skipping already updated %q", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+			continue
+		}
+
 		log.Infof("draining %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		err = u.drain(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		if err != nil {
@@ -278,6 +341,13 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		err = waitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
 		if err != nil {
 			return err
+		}
+
+		if hash := ss.Tags[arm.HashKey]; hash != nil && *hash != "" {
+			cm.Data[*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName] = *hash
+			if err := u.updateConfigMap(cm.Data); err != nil {
+				log.Warn(err)
+			}
 		}
 	}
 
