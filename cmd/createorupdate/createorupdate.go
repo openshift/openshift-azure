@@ -8,17 +8,22 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	"github.com/Azure/go-autorest/autorest"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
@@ -412,7 +417,22 @@ func main() {
 	}
 
 	// simulate the API call to the RP
-	if err := createOrUpdate(ctx, log, rpc, *manifest); err != nil {
+	if err := wait.PollImmediate(time.Second, 10*time.Second, func() (bool, error) {
+		if err := createOrUpdate(ctx, log, rpc, *manifest); err != nil {
+			autoRestErr := err.(autorest.DetailedError)
+			if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
+				if netErr, ok := urlErr.Err.(*net.OpError); ok {
+					if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
+						if sysErr.Err == syscall.ECONNREFUSED {
+							return false, nil
+						}
+					}
+				}
+			}
+			return false, err
+		}
+		return true, nil
+	}); err != nil {
 		log.Fatal(err)
 	}
 
