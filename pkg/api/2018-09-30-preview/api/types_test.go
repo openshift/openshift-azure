@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+
+	"github.com/openshift/openshift-azure/pkg/util/structtags"
 )
 
 var unmarshalled = &OpenShiftManagedCluster{
@@ -215,5 +217,14 @@ func TestStructTypes(t *testing.T) {
 		if !reflect.DeepEqual(appFields[name], mppFields[name]) {
 			t.Errorf("mismatch in field %s:\n%#v\n%#v", name, appFields[name], mppFields[name])
 		}
+	}
+}
+
+// TestJSONTags ensures that all the `json:"..."` struct field tags under
+// OpenShiftManagedCluster correspond with their field names
+func TestJSONTags(t *testing.T) {
+	o := OpenShiftManagedCluster{}
+	for _, err := range structtags.CheckJsonTags(o) {
+		t.Errorf("mismatch in struct tags for %T: %s", o, err.Error())
 	}
 }
