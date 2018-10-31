@@ -100,16 +100,6 @@ func (p *plugin) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluste
 	return p.armGenerator.Generate(ctx, cs, isUpdate)
 }
 
-func (p *plugin) InitializeCluster(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	log.Info("initializing cluster")
-	return p.clusterUpgrader.InitializeCluster(ctx, cs)
-}
-
-func (p *plugin) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	log.Info("starting health check")
-	return p.clusterUpgrader.HealthCheck(ctx, cs)
-}
-
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployFn api.DeployFn) error {
 	var err error
 	if isUpdate {
@@ -129,5 +119,6 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		return err
 	}
 
-	return p.HealthCheck(ctx, cs)
+	log.Info("starting health check")
+	return p.clusterUpgrader.HealthCheck(ctx, cs)
 }

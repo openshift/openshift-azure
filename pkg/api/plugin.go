@@ -61,10 +61,6 @@ type Plugin interface {
 
 	GenerateARM(ctx context.Context, cs *OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error)
 
-	InitializeCluster(ctx context.Context, cs *OpenShiftManagedCluster) error
-
-	HealthCheck(ctx context.Context, cs *OpenShiftManagedCluster) error
-
 	// CreateOrUpdate either deploys or runs the update depending on the isUpdate argument
 	// this will call the deployer.
 	CreateOrUpdate(ctx context.Context, cs *OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployer DeployFn) error
