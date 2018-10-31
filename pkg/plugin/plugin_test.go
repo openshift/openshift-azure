@@ -150,6 +150,7 @@ func TestCreateOrUpdate(t *testing.T) {
 		name     string
 		isUpdate bool
 		wantErr  bool
+		errStep  api.PluginStep
 	}{
 		{
 			name:     "deploy",
@@ -162,22 +163,122 @@ func TestCreateOrUpdate(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name:     "error",
+			name:     "deploy: deploy error",
+			isUpdate: false,
+			wantErr:  true,
+			errStep:  api.PluginStepDeploy,
+		},
+		{
+			name:     "deploy: initialize error",
+			isUpdate: false,
+			wantErr:  true,
+			errStep:  api.PluginStepInitialize,
+		},
+		{
+			name:     "deploy: openshift healthz error",
+			isUpdate: false,
+			wantErr:  true,
+			errStep:  api.PluginStepWaitForWaitForOpenShiftAPI,
+		},
+		{
+			name:     "deploy: nodes error",
+			isUpdate: false,
+			wantErr:  true,
+			errStep:  api.PluginStepWaitForNodes,
+		},
+		{
+			name:     "update: drain error",
 			isUpdate: true,
 			wantErr:  true,
+			errStep:  api.PluginStepDrain,
+		},
+		{
+			name:     "update: deploy error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepDeploy,
+		},
+		{
+			name:     "update: initialize error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepInitialize,
+		},
+		{
+			name:     "update: nodes error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepWaitForNodes,
+		},
+		{
+			name:     "update: MasterVMRotation error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdateMasterVMRotation,
+		},
+		{
+			name:     "update: InfraVMRotation error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdateInfraVMRotation,
+		},
+		{
+			name:     "update: ComputeVMRotation error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdateComputeVMRotation,
+		},
+		{
+			name:     "waitforinfra: daemon error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepWaitForInfraDaemonSets,
+		},
+		{
+			name:     "waitforinfra: deployments error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepWaitForInfraDeployments,
+		},
+		{
+			name:     "ConsoleHealth: error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepWaitForConsoleHealth,
 		},
 	}
 	for _, tt := range tests {
-		var err error
 		if tt.wantErr {
-			err = fmt.Errorf("test error")
-		}
-		if tt.isUpdate {
-			mockUp.EXPECT().Update(nil, nil, nil, nil).Return(err)
+			err := &api.PluginError{Err: fmt.Errorf("test error"), Step: tt.errStep}
+			switch tt.errStep {
+			case api.PluginStepDrain, api.PluginStepDeploy, api.PluginStepInitialize, api.PluginStepWaitForConsoleHealth, api.PluginStepWaitForNodes, api.PluginStepUpdateComputeVMRotation, api.PluginStepUpdateInfraVMRotation, api.PluginStepUpdateMasterVMRotation:
+				if tt.isUpdate {
+					mockUp.EXPECT().Update(nil, nil, nil, nil).Return(err)
+				} else {
+					mockUp.EXPECT().Deploy(nil, nil, nil, nil).Return(err)
+				}
+			case api.PluginStepWaitForWaitForOpenShiftAPI:
+				if tt.isUpdate {
+					mockUp.EXPECT().Update(nil, nil, nil, nil).Return(nil)
+				} else {
+					mockUp.EXPECT().Deploy(nil, nil, nil, nil).Return(nil)
+				}
+				mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
+				mockUp.EXPECT().HealthCheck(nil, nil).Return(err)
+			case api.PluginStepWaitForInfraDaemonSets, api.PluginStepWaitForInfraDeployments:
+				if tt.isUpdate {
+					mockUp.EXPECT().Update(nil, nil, nil, nil).Return(nil)
+				} else {
+					mockUp.EXPECT().Deploy(nil, nil, nil, nil).Return(nil)
+				}
+				mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(err)
+			}
 		} else {
-			mockUp.EXPECT().Deploy(nil, nil, nil, nil).Return(err)
-		}
-		if !tt.wantErr {
+			if tt.isUpdate {
+				mockUp.EXPECT().Update(nil, nil, nil, nil).Return(nil)
+			} else {
+				mockUp.EXPECT().Deploy(nil, nil, nil, nil).Return(nil)
+			}
 			mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
 			mockUp.EXPECT().HealthCheck(nil, nil).Return(nil)
 		}

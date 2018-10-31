@@ -32,7 +32,7 @@ func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManag
 
 	req, err := http.NewRequest("HEAD", "https://"+cs.Properties.FQDN+"/console/", nil)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepWaitForConsoleHealth}
 	}
 	req = req.WithContext(ctx)
 
@@ -43,7 +43,7 @@ func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManag
 			continue
 		}
 		if err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepWaitForConsoleHealth}
 		}
 
 		switch resp.StatusCode {
@@ -53,7 +53,8 @@ func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManag
 		case http.StatusBadGateway:
 			time.Sleep(10 * time.Second)
 		default:
-			return fmt.Errorf("unexpected error code %d from console", resp.StatusCode)
+			err = fmt.Errorf("unexpected error code %d from console", resp.StatusCode)
+			return &api.PluginError{Err: err, Step: api.PluginStepWaitForConsoleHealth}
 		}
 	}
 }

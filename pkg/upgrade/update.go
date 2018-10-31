@@ -12,31 +12,36 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error {
 	err := u.createClients(ctx, cs)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 	// deployFn() may change the number of VMs.  If we can see that any VMs are
 	// about to be deleted, drain them first.  Record which VMs are visible now
 	// so that we can detect newly created VMs and wait for them to become ready.
 	vmsBefore, err := u.getNodesAndDrain(ctx, cs)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepDrain}
 	}
 	err = deployFn(ctx, azuretemplate)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}
 	err = u.InitializeCluster(ctx, cs)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
+	}
+	err = managedcluster.WaitForHealthz(ctx, cs.Config.AdminKubeconfig)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 	}
 	err = u.waitForNewNodes(ctx, cs, vmsBefore)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 	}
 
 	// For PP day 1, scale is permitted but not any other sort of update.  When
@@ -44,17 +49,17 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	// the same time, current thinking is that we will add a hash-based
 	// mechanism to avoid unnecessary VM rotations as well.
 	if os.Getenv("RUNNING_UNDER_TEST") != "" {
-		err := u.updateInPlace(ctx, cs, api.AgentPoolProfileRoleMaster)
+		err = u.updateInPlace(ctx, cs, api.AgentPoolProfileRoleMaster)
 		if err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterVMRotation}
 		}
 		err = u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleInfra)
 		if err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInfraVMRotation}
 		}
 		err = u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleCompute)
 		if err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateComputeVMRotation}
 		}
 	}
 	return nil

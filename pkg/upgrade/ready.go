@@ -12,7 +12,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
@@ -103,10 +102,6 @@ func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftMana
 }
 
 func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	err := managedcluster.WaitForHealthz(ctx, cs.Config.AdminKubeconfig)
-	if err != nil {
-		return err
-	}
 	for _, app := range daemonsetWhitelist {
 		log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
 
@@ -125,7 +120,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 			}
 		}, ctx.Done())
 		if err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepWaitForInfraDaemonSets}
 		}
 	}
 
@@ -153,7 +148,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 			}
 		}, ctx.Done())
 		if err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepWaitForInfraDeployments}
 		}
 	}
 
