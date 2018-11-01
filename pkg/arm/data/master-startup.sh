@@ -265,6 +265,7 @@ oauthConfig:
       urls:
         authorize: {{ print "https://login.microsoftonline.com/" (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.TenantID "/oauth2/authorize" | quote }}
         token: {{ print "https://login.microsoftonline.com/" (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.TenantID "/oauth2/token" | quote }}
+{{- if $.Extra.TestConfig.RunningUnderTest }}
   - challenge: true
     login: true
     mappingMethod: claim
@@ -273,6 +274,7 @@ oauthConfig:
       apiVersion: v1
       file: /etc/origin/master/htpasswd
       kind: HTPasswdPasswordIdentityProvider
+{{- end }}
   masterCA: ca.crt
   masterPublicURL: {{ print "https://" (.Derived.PublicHostname .ContainerService) | quote }}
   masterURL: {{ print "https://" .ContainerService.Properties.FQDN | quote }}
