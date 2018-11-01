@@ -11,6 +11,7 @@ import (
 type DeploymentsClient interface {
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, deploymentName string, parameters resources.Deployment) (result resources.DeploymentsCreateOrUpdateFuture, err error)
 	Client
+	DeploymentClient() resources.DeploymentsClient
 }
 
 type deploymentsClient struct {
@@ -32,4 +33,8 @@ func NewDeploymentsClient(subscriptionID string, authorizer autorest.Authorizer,
 
 func (c *deploymentsClient) Client() autorest.Client {
 	return c.DeploymentsClient.Client
+}
+
+func (c *deploymentsClient) DeploymentClient() resources.DeploymentsClient {
+	return c.DeploymentsClient
 }
