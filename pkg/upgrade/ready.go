@@ -143,7 +143,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 		log.Infof("checking statefulset %s/%s", app.Namespace, app.Name)
 
 		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
-			sts, err := kc.AppsV1().StatefulSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
+			sts, err := u.kubeclient.AppsV1().StatefulSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
 			switch {
 			case kerrors.IsNotFound(err):
 				return false, nil
