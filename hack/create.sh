@@ -32,7 +32,7 @@ fi
 valid_regions=(eastus westeurope australiasoutheast)
 match=0
 for region in "${valid_regions[@]}"; do
-    if [[ $region = "$valid_regions" ]]; then
+    if [[ $region == "$AZURE_REGION" ]]; then
         match=1
         break
     fi
