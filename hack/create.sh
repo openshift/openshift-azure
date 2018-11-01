@@ -29,18 +29,6 @@ if [[ -z "$AZURE_REGION" ]]; then
     echo error: must set AZURE_REGION
     exit 1
 fi
-valid_regions=(eastus westeurope australiasoutheast)
-match=0
-for region in "${valid_regions[@]}"; do
-    if [[ $region == "$AZURE_REGION" ]]; then
-        match=1
-        break
-    fi
-done
-if [[ $match = 0 ]]; then
-    echo "Error invalid region: must be one of ${valid_regions[@]}"
-    exit 1
-fi
 
 if [[ -z "$DNS_DOMAIN" ]]; then
     echo error: must set DNS_DOMAIN
@@ -62,15 +50,6 @@ export RESOURCEGROUP=$1
 
 rm -rf _data
 mkdir -p _data/_out
-
-if [[ -z "$NOGROUPTAGS" ]]; then
-  ttl=76h
-  if [[ -n "$RESOURCEGROUP_TTL" ]]; then
-    ttl=$RESOURCEGROUP_TTL
-  fi
-  GROUPTAGS="--tags now=$(date +%s) ttl=$ttl"
-fi
-az group create --subscription $AZURE_SUBSCRIPTION_ID -n $RESOURCEGROUP -l $AZURE_REGION $GROUPTAGS >/dev/null
 
 # if AZURE_CLIENT_ID is used as AZURE_AAD_CLIENT_ID, script will reset global team account!
 set +x

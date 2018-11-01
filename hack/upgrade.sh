@@ -1,38 +1,6 @@
 #!/bin/bash -ex
 
-set +x
 if ! az account show >/dev/null; then
-    exit 1
-fi
-
-if [[ -z "$AZURE_SUBSCRIPTION_ID" ]]; then
-    echo error: must set AZURE_SUBSCRIPTION_ID
-    exit 1
-fi
-
-if [[ -z "$AZURE_TENANT_ID" ]]; then
-    echo error: must set AZURE_TENANT_ID
-    exit 1
-fi
-
-if [[ -z "$AZURE_CLIENT_ID" ]]; then
-    echo error: must set AZURE_CLIENT_ID
-    exit 1
-fi
-
-if [[ -z "$AZURE_CLIENT_SECRET" ]]; then
-    echo error: must set AZURE_CLIENT_SECRET
-    exit 1
-fi
-set -x
-
-if [[ -z "$DNS_DOMAIN" ]]; then
-    echo error: must set DNS_DOMAIN
-    exit 1
-fi
-
-if [[ -z "$DNS_RESOURCEGROUP" ]]; then
-    echo error: must set DNS_RESOURCEGROUP
     exit 1
 fi
 
@@ -46,7 +14,12 @@ if [[ $# -eq 1 ]]; then
 else
     export RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
 fi
-sed -i '/provisioningState/d' _data/manifest.yaml
 
+USE_PROD_FLAG="-use-prod=false"
+if [[ -n "$TEST_IN_PRODUCTION" ]]; then
+    USE_PROD_FLAG="-use-prod=true"
+fi
+
+sed -i '/provisioningState/d' _data/manifest.yaml
 go generate ./...
-go run cmd/createorupdate/createorupdate.go -timeout 1h
+go run cmd/createorupdate/createorupdate.go -timeout 1h $USE_PROD_FLAG
