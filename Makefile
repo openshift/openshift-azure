@@ -3,7 +3,7 @@ COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain -
 # all is the default target to build everything
 all: clean build sync e2e-bin logbridge
 
-build:
+build: generate
 	go build ./...
 
 clean:
