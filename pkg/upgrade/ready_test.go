@@ -394,7 +394,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 					Kind: "pod",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "etcd-master-000000",
+					Name:      "master-etcd-master-000000",
 					Namespace: "kube-system",
 				},
 				Status: corev1.PodStatus{
@@ -410,7 +410,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 					Kind: "pod",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "api-master-000000",
+					Name:      "master-api-master-000000",
 					Namespace: "kube-system",
 				},
 				Status: corev1.PodStatus{
