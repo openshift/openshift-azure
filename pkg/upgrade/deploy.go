@@ -10,23 +10,23 @@ import (
 func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error {
 	err := u.createClients(ctx, cs)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 	err = deployFn(ctx, azuretemplate)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}
-
 	err = u.InitializeCluster(ctx, cs)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
-
 	err = managedcluster.WaitForHealthz(ctx, cs.Config.AdminKubeconfig)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 	}
-
-	// ensure that all nodes are ready
-	return u.waitForNodes(ctx, cs)
+	err = u.waitForNodes(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+	}
+	return nil
 }

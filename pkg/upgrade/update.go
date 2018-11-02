@@ -12,49 +12,83 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error {
 	err := u.createClients(ctx, cs)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
-	// Deploy() may change the number of VMs.  If we can see that any VMs are
+	// deployFn() may change the number of VMs.  If we can see that any VMs are
 	// about to be deleted, drain them first.  Record which VMs are visible now
-	// so that we can detect newly created VMs and wait for them to become
-	// ready.
+	// so that we can detect newly created VMs and wait for them to become ready.
+	vmsBefore, err := u.getNodesAndDrain(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepDrain}
+	}
+	err = deployFn(ctx, azuretemplate)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
+	}
+	err = u.InitializeCluster(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
+	}
+	err = managedcluster.WaitForHealthz(ctx, cs.Config.AdminKubeconfig)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
+	}
+	err = u.waitForNewNodes(ctx, cs, vmsBefore)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+	}
 
+	// For PP day 1, scale is permitted but not any other sort of update.  When
+	// we enable configuration changes and/or upgrades, uncomment this code.  At
+	// the same time, current thinking is that we will add a hash-based
+	// mechanism to avoid unnecessary VM rotations as well.
+	if os.Getenv("RUNNING_UNDER_TEST") != "" {
+		err = u.updateInPlace(ctx, cs, api.AgentPoolProfileRoleMaster)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterVMRotation}
+		}
+		err = u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleInfra)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInfraVMRotation}
+		}
+		err = u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleCompute)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateComputeVMRotation}
+		}
+	}
+	return nil
+}
+
+func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShiftManagedCluster) (map[string]struct{}, error) {
 	vmsBefore := map[string]struct{}{}
 
 	for _, agent := range cs.Properties.AgentPoolProfiles {
 		vms, err := listVMs(ctx, cs, u.vmc, agent.Role)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		for i, vm := range vms {
 			if i < agent.Count {
 				vmsBefore[*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName] = struct{}{}
-
 			} else {
 				err = u.delete(ctx, cs, agent.Role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 				if err != nil {
-					return err
+					return nil, err
 				}
 			}
 		}
 	}
+	return vmsBefore, nil
+}
 
-	err = deployFn(ctx, azuretemplate)
-	if err != nil {
-		return err
-	}
-
-	err = u.InitializeCluster(ctx, cs)
-	if err != nil {
-		return err
-	}
-
+func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, nodes map[string]struct{}) error {
 	for _, agent := range cs.Properties.AgentPoolProfiles {
 		vms, err := listVMs(ctx, cs, u.vmc, agent.Role)
 		if err != nil {
@@ -64,7 +98,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 		// wait for newly created VMs to reach readiness
 		for _, vm := range vms {
 			hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
-			if _, found := vmsBefore[hostname]; !found {
+			if _, found := nodes[hostname]; !found {
 				log.Infof("waiting for %s to be ready", hostname)
 				err = waitForReady(ctx, cs, agent.Role, hostname, u.kubeclient)
 				if err != nil {
@@ -73,29 +107,6 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 			}
 		}
 	}
-
-	// For PP day 1, scale is permitted but not any other sort of update.  When
-	// we enable configuration changes and/or upgrades, uncomment this code.  At
-	// the same time, current thinking is that we will add a hash-based
-	// mechanism to avoid unnecessary VM rotations as well.
-
-	if os.Getenv("RUNNING_UNDER_TEST") != "" {
-		err = u.updateInPlace(ctx, cs, api.AgentPoolProfileRoleMaster)
-		if err != nil {
-			return err
-		}
-
-		err = u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleInfra)
-		if err != nil {
-			return err
-		}
-
-		err = u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleCompute)
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 

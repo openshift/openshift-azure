@@ -14,6 +14,35 @@ const (
 	ContextKeyTenantID     ContextKey = "TenantID"
 )
 
+type PluginStep string
+
+const (
+	PluginStepDeploy                     PluginStep = "Deploy"
+	PluginStepInitialize                 PluginStep = "InitializeCluster"
+	PluginStepClientCreation             PluginStep = "ClientCreation"
+	PluginStepDrain                      PluginStep = "Drain"
+	PluginStepUpdateMasterVMRotation     PluginStep = "UpdateMasterVMRotation"
+	PluginStepUpdateInfraVMRotation      PluginStep = "UpdateInfraVMRotation"
+	PluginStepUpdateComputeVMRotation    PluginStep = "UpdateComputeVMRotation"
+	PluginStepWaitForWaitForOpenShiftAPI PluginStep = "WaitForOpenShiftAPI"
+	PluginStepWaitForNodes               PluginStep = "WaitForNodes"
+	PluginStepWaitForConsoleHealth       PluginStep = "WaitForConsoleHealth"
+	PluginStepWaitForInfraDaemonSets     PluginStep = "WaitForInfraDaemonSets"
+	PluginStepWaitForInfraDeployments    PluginStep = "WaitForInfraDeployments"
+)
+
+// PluginError error returned by CreateOrUpdate to specify the step that failed.
+type PluginError struct {
+	Err  error
+	Step PluginStep
+}
+
+var _ error = &PluginError{}
+
+func (pe *PluginError) Error() string {
+	return string(pe.Step) + ": " + pe.Err.Error()
+}
+
 // DeployFn makes it possible to plug in different logic to the deploy.
 // The implementor must initiate a deployment of the given template using
 // mode resources.Incremental and wait for it to complete.
