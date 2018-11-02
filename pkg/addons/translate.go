@@ -540,9 +540,9 @@ var Translations = map[string][]struct {
 			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.ServiceCatalogServer.Key) }}",
 		},
 	},
-	"Secret/openshift-console/console-oatuh-config": {
+	"Secret/openshift-console/console-oauth-config": {
 		{
-			Path:     jsonpath.MustCompile("$.stringData.'clientSecret'"),
+			Path:     jsonpath.MustCompile("$.stringData.clientSecret"),
 			Template: "{{ .Config.ConsoleOAuthSecret }}",
 		},
 	},
