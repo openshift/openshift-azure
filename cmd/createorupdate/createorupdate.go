@@ -118,7 +118,7 @@ func (s *server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
 	if err != nil {
 		resp := "500 Internal Error: Failed to determine request credentials"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
@@ -134,20 +134,20 @@ func (s *server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	future, err := gc.Delete(ctx, resourceGroup)
 	if err != nil {
 		resp := "500 Internal Error: Failed to delete resource group"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
 	if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
 		resp := "500 Internal Error: Failed to wait for resource group deletion"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
 	resp, err := future.Result(gc)
 	if err != nil {
 		resp := "500 Internal Error: Failed to get resource group deletion response"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
@@ -168,7 +168,7 @@ func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	b, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		resp := "400 Bad Request: Failed to read request body"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusBadRequest)
 		return
 	}
@@ -176,7 +176,7 @@ func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	var oc *v20180930preview.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(b, &oc); err != nil {
 		resp := "400 Bad Request: Failed to unmarshal request"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusBadRequest)
 		return
 	}
@@ -217,7 +217,7 @@ func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	if _, err := fakerp.CreateOrUpdate(ctx, oc, s.log, config); err != nil {
 		s.writeState(v20180930preview.Failed)
 		resp := "400 Bad Request: Failed to apply request"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusBadRequest)
 		return
 	}
@@ -260,7 +260,7 @@ func (s *server) reply(w http.ResponseWriter, req *http.Request) {
 	res, err := json.Marshal(azureclient.ExternalToSdk(oc))
 	if err != nil {
 		resp := "500 Internal Server Error: Failed to marshal response"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
