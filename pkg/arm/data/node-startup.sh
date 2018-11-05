@@ -8,6 +8,9 @@ if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
     SERVICE_TYPE=atomic-openshift
 fi
 
+# remove registry certificate softlink from docker
+unlink /etc/docker/certs.d/registry.access.redhat.com/redhat-ca.crt 
+
 if ! grep /var/lib/docker /etc/fstab; then
   mkfs.xfs -f /dev/disk/azure/resource-part1
   echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
