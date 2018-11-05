@@ -13,10 +13,32 @@ data:
         node-role.kubernetes.io/infra: "true"
       externalLabels:
         cluster: ' *** GENERATED ***'
+      volumeClaimTemplate:
+        kind: PersistentVolumeClaim
+        apiVersion: v1
+        metadata:
+          name: prometheus-data
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 128Gi
     alertmanagerMain:
       baseImage: ' *** GENERATED ***'
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
+      volumeClaimTemplate:
+        kind: PersistentVolumeClaim
+        apiVersion: v1
+        metadata:
+          name: alertmanager-data
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 32Gi
     nodeExporter:
       baseImage: '*** GENERATED ***'
     grafana:
