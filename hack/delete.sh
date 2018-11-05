@@ -4,27 +4,9 @@ if ! az account show >/dev/null; then
     exit 1
 fi
 
-if [[ -z "$DNS_DOMAIN" ]]; then
-    echo error: must set DNS_DOMAIN
-    exit 1
-fi
-
-if [[ -z "$DNS_RESOURCEGROUP" ]]; then
-    echo error: must set DNS_RESOURCEGROUP
-    exit 1
-fi
-
-if [[ "$NO_WAIT" == "true" ]]; then
-	NO_WAIT_FLAG="--no-wait"
-fi
-
 if [[ $# -eq 0 && ! -e _data/containerservice.yaml ]]; then
     echo error: _data/containerservice.yaml must exist
     exit 1
-fi
-
-if [[ -z "$AZURE_SUBSCRIPTION_ID" ]]; then
-    AZURE_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
 fi
 
 if [[ $# -eq 1 ]]; then

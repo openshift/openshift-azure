@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -22,6 +23,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/ghodss/yaml"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 
@@ -112,15 +114,16 @@ func (s *server) validate(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (s *server) handleDelete(w http.ResponseWriter, req *http.Request) {
-	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
+	// TODO: Get the azure credentials from the request headers
+	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
 	if err != nil {
 		resp := "500 Internal Error: Failed to determine request credentials"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
-	subID := os.Getenv("AZURE_SUBSCRIPTION_ID")
-	gc := resources.NewGroupsClient(subID)
+	// TODO: Determine subscription ID from the request path
+	gc := resources.NewGroupsClient(conf.SubscriptionID)
 	gc.Authorizer = authorizer
 
 	resourceGroup := filepath.Base(req.URL.Path)
@@ -131,20 +134,20 @@ func (s *server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	future, err := gc.Delete(ctx, resourceGroup)
 	if err != nil {
 		resp := "500 Internal Error: Failed to delete resource group"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
 	if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
 		resp := "500 Internal Error: Failed to wait for resource group deletion"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
 	resp, err := future.Result(gc)
 	if err != nil {
 		resp := "500 Internal Error: Failed to get resource group deletion response"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
@@ -165,7 +168,7 @@ func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	b, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		resp := "400 Bad Request: Failed to read request body"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusBadRequest)
 		return
 	}
@@ -173,7 +176,7 @@ func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	var oc *v20180930preview.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(b, &oc); err != nil {
 		resp := "400 Bad Request: Failed to unmarshal request"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusBadRequest)
 		return
 	}
@@ -182,9 +185,10 @@ func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	// simulate Context with property bag
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
 	defer cancel()
-	ctx = context.WithValue(ctx, api.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
-	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-	ctx = context.WithValue(ctx, api.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
+	// TODO: Get the azure credentials from the request headers
+	ctx = context.WithValue(ctx, api.ContextKeyClientID, conf.ClientID)
+	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, conf.ClientSecret)
+	ctx = context.WithValue(ctx, api.ContextKeyTenantID, conf.TenantID)
 
 	tc := api.TestConfig{
 		RunningUnderTest:   os.Getenv("RUNNING_UNDER_TEST") != "",
@@ -213,7 +217,7 @@ func (s *server) handlePut(w http.ResponseWriter, req *http.Request) {
 	if _, err := fakerp.CreateOrUpdate(ctx, oc, s.log, config); err != nil {
 		s.writeState(v20180930preview.Failed)
 		resp := "400 Bad Request: Failed to apply request"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusBadRequest)
 		return
 	}
@@ -256,11 +260,49 @@ func (s *server) reply(w http.ResponseWriter, req *http.Request) {
 	res, err := json.Marshal(azureclient.ExternalToSdk(oc))
 	if err != nil {
 		resp := "500 Internal Server Error: Failed to marshal response"
-		s.log.Debug(resp, err)
+		s.log.Debugf("%s: %v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
 	w.Write(res)
+}
+
+var conf config
+
+type config struct {
+	SubscriptionID   string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
+	TenantID         string `envconfig:"AZURE_TENANT_ID" required:"true"`
+	ClientID         string `envconfig:"AZURE_CLIENT_ID" required:"true"`
+	ClientSecret     string `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
+	AADClientID      string `envconfig:"AZURE_AAD_CLIENT_ID"`
+	Region           string `envconfig:"AZURE_REGION"`
+	DnsDomain        string `envconfig:"DNS_DOMAIN" required:"true"`
+	DnsResourceGroup string `envconfig:"DNS_RESOURCEGROUP" required:"true"`
+	ResourceGroup    string `envconfig:"RESOURCEGROUP" required:"true"`
+
+	NoGroupTags      bool   `envconfig:"NOGROUPTAGS"`
+	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
+}
+
+func (c *config) init() error {
+	supportedRegions := []string{"eastus", "westeurope", "australiasoutheast"}
+	if c.Region == "" {
+		// Randomly assign a supported region
+		rand.Seed(time.Now().UTC().UnixNano())
+		c.Region = supportedRegions[rand.Intn(3)]
+		logrus.Infof("using randomly selected region %q", c.Region)
+	}
+
+	var supported bool
+	for _, region := range supportedRegions {
+		if c.Region == region {
+			supported = true
+		}
+	}
+	if !supported {
+		return fmt.Errorf("%q is not a supported region (supported regions: %v)", c.Region, supportedRegions)
+	}
+	return nil
 }
 
 var (
@@ -305,7 +347,7 @@ func validate() error {
 
 func delete(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient) error {
 	log.Info("deleting cluster")
-	future, err := rpc.Delete(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+	future, err := rpc.Delete(ctx, conf.ResourceGroup, conf.ResourceGroup)
 	if err != nil {
 		return err
 	}
@@ -333,7 +375,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftMan
 	if err := yaml.Unmarshal(in, &oc); err != nil {
 		return err
 	}
-	future, err := rpc.CreateOrUpdate(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), oc)
+	future, err := rpc.CreateOrUpdate(ctx, conf.ResourceGroup, conf.ResourceGroup, oc)
 	if err != nil {
 		return err
 	}
@@ -367,20 +409,67 @@ func execCommand(c string) error {
 	return nil
 }
 
+func createResourceGroup(log *logrus.Entry) error {
+	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
+	if err != nil {
+		return err
+	}
+	gc := resources.NewGroupsClient(conf.SubscriptionID)
+	gc.Authorizer = authorizer
+
+	if _, err := gc.Get(context.Background(), conf.ResourceGroup); err == nil {
+		log.Infof("reusing existing resource group %s", conf.ResourceGroup)
+		return nil
+	}
+
+	var tags map[string]*string
+	if !conf.NoGroupTags {
+		tags = make(map[string]*string)
+		ttl, now := "76h", fmt.Sprintf("%d", time.Now().Unix())
+		tags["now"] = &now
+		tags["ttl"] = &ttl
+		if conf.ResourceGroupTTL != "" {
+			if _, err := time.ParseDuration(conf.ResourceGroupTTL); err != nil {
+				return fmt.Errorf("invalid ttl provided: %q - %v", conf.ResourceGroupTTL, err)
+			}
+			tags["ttl"] = &conf.ResourceGroupTTL
+		}
+	}
+
+	rg := resources.Group{Location: &conf.Region, Tags: tags}
+	_, err = gc.CreateOrUpdate(context.Background(), conf.ResourceGroup, rg)
+	return err
+}
+
 func main() {
 	logger := logrus.New()
 	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
-	log := logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": os.Getenv("RESOURCEGROUP")})
+	log := logrus.NewEntry(logger)
+
+	if err := envconfig.Process("", &conf); err != nil {
+		log.Fatal(err)
+	}
+	if err := conf.init(); err != nil {
+		log.Fatal(err)
+	}
+	log = logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": conf.ResourceGroup})
 
 	flag.Parse()
 	if err := validate(); err != nil {
 		log.Fatal(err)
 	}
 
+	if strings.ToUpper(*method) != http.MethodDelete {
+		log.Infof("creating resource group %s", conf.ResourceGroup)
+		if err := createResourceGroup(log); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	// simulate the RP
 	if !*useProd {
 		log.Info("starting the fake resource provider")
-		s := newServer(os.Getenv("RESOURCEGROUP"))
+		s := newServer(conf.ResourceGroup)
 		go s.ListenAndServe()
 	}
 
@@ -389,8 +478,8 @@ func main() {
 	if *useProd {
 		rpURL = sdk.DefaultBaseURI
 	}
-	rpc := sdk.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, os.Getenv("AZURE_SUBSCRIPTION_ID"))
-	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
+	rpc := sdk.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
+	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
 	if err != nil {
 		log.Fatal(err)
 	}
