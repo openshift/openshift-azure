@@ -397,7 +397,6 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) 
 
 	// set config objects when testing
 	if g.pluginConfig.TestConfig.RunningUnderTest {
-
 		c.RunningUnderTest = true
 
 		users := []struct {
@@ -419,6 +418,9 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) 
 		}
 
 		for _, user := range users {
+			if user.passwd != nil && *user.passwd != "" {
+				continue
+			}
 			htPassEntry, err := createUserHtPassEntry(user.username, user.passwd, c.HtPasswd)
 			if err != nil {
 				return err
