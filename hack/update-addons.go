@@ -65,9 +65,9 @@ func readDB() (map[string]unstructured.Unstructured, error) {
 
 			gk := schema.ParseGroupKind(resource.Kind)
 
-			log.Print("Version " + resource.Version)
+			log.Print("Version " + gr.Group.PreferredVersion.Version)
+			log.Print("Kind " + gk.Kind)
 			spew.Dump(gk)
-			//log.Print(resource.Version)
 
 			restMapping, err := rm.RESTMapping(gk, gr.Group.PreferredVersion.Version)
 			if err != nil {
