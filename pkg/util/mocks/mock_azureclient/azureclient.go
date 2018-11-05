@@ -486,6 +486,18 @@ func (mr *MockDeploymentsClientMockRecorder) CreateOrUpdate(arg0, arg1, arg2, ar
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdate", reflect.TypeOf((*MockDeploymentsClient)(nil).CreateOrUpdate), arg0, arg1, arg2, arg3)
 }
 
+// DeploymentClient mocks base method
+func (m *MockDeploymentsClient) DeploymentClient() resources.DeploymentsClient {
+	ret := m.ctrl.Call(m, "DeploymentClient")
+	ret0, _ := ret[0].(resources.DeploymentsClient)
+	return ret0
+}
+
+// DeploymentClient indicates an expected call of DeploymentClient
+func (mr *MockDeploymentsClientMockRecorder) DeploymentClient() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeploymentClient", reflect.TypeOf((*MockDeploymentsClient)(nil).DeploymentClient))
+}
+
 // MockAccountsClient is a mock of AccountsClient interface
 type MockAccountsClient struct {
 	ctrl     *gomock.Controller

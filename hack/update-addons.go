@@ -3,16 +3,16 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/ghodss/yaml"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
@@ -48,23 +48,12 @@ func readDB() (map[string]unstructured.Unstructured, error) {
 	}
 
 	rm := restmapper.NewDiscoveryRESTMapper(grs)
-	dyn, err := dynamic.NewForConfig(restconfig)
+	//dyn, err := dynamic.NewForConfig(restconfig)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, gr := range grs {
-		gv, err := schema.ParseGroupVersion(gr.Group.PreferredVersion.GroupVersion)
-		if err != nil {
-			return nil, err
-		}
-		gvr := schema.ParseGroupKind(gr.Group.PreferredVersion.GroupVersion)
-
-		restMapping, err := rm.RESTMapping(gvr, gv.Version)
-		if err != nil {
-			return nil, err
-		}
-
 		for _, resource := range gr.VersionedResources[gr.Group.PreferredVersion.Version] {
 			if strings.ContainsRune(resource.Name, '/') { // no subresources
 				continue
@@ -74,14 +63,36 @@ func readDB() (map[string]unstructured.Unstructured, error) {
 				continue
 			}
 
-			o, err := dyn.Resource(restMapping.Resource).List(metav1.ListOptions{})
+			gk := schema.ParseGroupKind(resource.Kind)
+
+			log.Print("Version " + resource.Version)
+			spew.Dump(gk)
+			//log.Print(resource.Version)
+
+			restMapping, err := rm.RESTMapping(gk, gr.Group.PreferredVersion.Version)
 			if err != nil {
 				return nil, err
 			}
+			spew.Dump(restMapping)
 
-			for _, i := range o.Items {
-				db[addons.KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())] = i
-			}
+			//dc, err := dyn.ClientForGroupVersionKind(gv.WithKind(resource.Kind))
+			//if err != nil {
+			//	return nil, err
+			//}
+			//
+			//o, err := dc.Resource(&resource, "").List(metav1.ListOptions{})
+			//if err != nil {
+			//	return nil, err
+			//}
+			//
+			//l, ok := o.(*unstructured.UnstructuredList)
+			//if !ok {
+			//	continue
+			//}
+			//
+			//for _, i := range l.Items {
+			//	db[addons.KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())] = i
+			//}
 		}
 	}
 
