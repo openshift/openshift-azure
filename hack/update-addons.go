@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/ghodss/yaml"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -47,34 +48,27 @@ func readDB() (map[string]unstructured.Unstructured, error) {
 		return nil, err
 	}
 
-	rm := restmapper.NewDiscoveryRESTMapper(grs)
 	dyn, err := dynamic.NewForConfig(restconfig)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, gr := range grs {
-		gv, err := schema.ParseGroupVersion(gr.Group.PreferredVersion.GroupVersion)
-		if err != nil {
-			return nil, err
-		}
-		gvr := schema.ParseGroupKind(gr.Group.PreferredVersion.GroupVersion)
-
-		restMapping, err := rm.RESTMapping(gvr, gv.Version)
-		if err != nil {
-			return nil, err
-		}
-
 		for _, resource := range gr.VersionedResources[gr.Group.PreferredVersion.Version] {
-			if strings.ContainsRune(resource.Name, '/') { // no subresources
+			if !contains(resource.Verbs, "list") ||
+				strings.ContainsRune(resource.Name, '/') { // api services
 				continue
 			}
 
-			if !contains(resource.Verbs, "list") {
-				continue
+			// construct GVR resource manually
+			gvr := schema.GroupVersionResource{
+				Group:    gr.Group.Name,
+				Resource: resource.Name,
+				Version:  gr.Group.PreferredVersion.Version,
 			}
+			spew.Dump(gvr)
 
-			o, err := dyn.Resource(restMapping.Resource).List(metav1.ListOptions{})
+			o, err := dyn.Resource(gvr).List(metav1.ListOptions{})
 			if err != nil {
 				return nil, err
 			}
