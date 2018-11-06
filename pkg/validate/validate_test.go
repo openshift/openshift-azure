@@ -264,6 +264,7 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{
 				errors.New(`invalid properties.agentPoolProfiles["infra"].vmSize "SuperBigVM"`),
+				errors.New(`invalid properties.agentPoolProfiles.vmSize "SuperBigVM": master and infra vmSizes must match`),
 			},
 		},
 		"agent pool unmatched subnet cidr": {
@@ -314,7 +315,7 @@ func TestValidate(t *testing.T) {
 					}
 				}
 			},
-			expectedErrs: []error{errors.New(`invalid masterPoolProfile.count 1`)},
+			expectedErrs: []error{errors.New(`invalid properties.masterPoolProfile.count 1`)},
 		},
 		//we dont check authProfile because it is non pointer struct. Which is all zero values.
 		"authProfile.identityProviders empty": {

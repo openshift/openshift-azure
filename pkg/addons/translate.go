@@ -154,14 +154,14 @@ var Translations = map[string][]struct {
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
 			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
-				return config.Derived.KubeReserved(cs, acsapi.AgentPoolProfileRoleCompute), nil
+				return config.Derived.KubeReserved(cs, acsapi.AgentPoolProfileRoleCompute)
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
 			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
-				return config.Derived.SystemReserved(cs, acsapi.AgentPoolProfileRoleCompute), nil
+				return config.Derived.SystemReserved(cs, acsapi.AgentPoolProfileRoleCompute)
 			},
 		},
 	},
@@ -177,14 +177,14 @@ var Translations = map[string][]struct {
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
 			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
-				return config.Derived.KubeReserved(cs, acsapi.AgentPoolProfileRoleInfra), nil
+				return config.Derived.KubeReserved(cs, acsapi.AgentPoolProfileRoleInfra)
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
 			F: func(cs *acsapi.OpenShiftManagedCluster) (string, error) {
-				return config.Derived.SystemReserved(cs, acsapi.AgentPoolProfileRoleInfra), nil
+				return config.Derived.SystemReserved(cs, acsapi.AgentPoolProfileRoleInfra)
 			},
 		},
 	},
