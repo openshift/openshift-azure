@@ -152,14 +152,14 @@ var Translations = map[string][]struct {
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.KubeReserved(cs, api.AgentPoolProfileRoleCompute), nil
+				return config.Derived.KubeReserved(cs, api.AgentPoolProfileRoleCompute)
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleCompute), nil
+				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleCompute)
 			},
 		},
 	},
@@ -173,14 +173,14 @@ var Translations = map[string][]struct {
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.KubeReserved(cs, api.AgentPoolProfileRoleInfra), nil
+				return config.Derived.KubeReserved(cs, api.AgentPoolProfileRoleInfra)
 			},
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleInfra), nil
+				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleInfra)
 			},
 		},
 	},
@@ -194,7 +194,7 @@ var Translations = map[string][]struct {
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleMaster), nil
+				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleMaster)
 			},
 		},
 	},
