@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -13,24 +14,49 @@ type derived struct{}
 
 var Derived derived
 
-func (derived) SystemReserved(cs *acsapi.OpenShiftManagedCluster, role acsapi.AgentPoolProfileRole) string {
-	for _, pool := range cs.Properties.AgentPoolProfiles {
-		if pool.Role != role {
-			continue
-		}
-		return acsapi.DefaultVMSizeKubeArguments[pool.VMSize]["system-reserved"]
-	}
-	return ""
+func isSmallVM(vmSize acsapi.VMSize) bool {
+	// TODO: we should only be allowing StandardD2sV3 for test
+	return vmSize == acsapi.StandardD2sV3
 }
 
-func (derived) KubeReserved(cs *acsapi.OpenShiftManagedCluster, role acsapi.AgentPoolProfileRole) string {
+func (derived) SystemReserved(cs *acsapi.OpenShiftManagedCluster, role acsapi.AgentPoolProfileRole) (string, error) {
+	if role == acsapi.AgentPoolProfileRoleMaster {
+		return "", fmt.Errorf("systemreserved not defined for role %s", role)
+	}
+
 	for _, pool := range cs.Properties.AgentPoolProfiles {
 		if pool.Role != role {
 			continue
 		}
-		return acsapi.DefaultVMSizeKubeArguments[pool.VMSize]["kube-reserved"]
+
+		if isSmallVM(pool.VMSize) {
+			return "cpu=200m,memory=512Mi", nil
+		} else {
+			return "cpu=500m,memory=512Mi", nil
+		}
 	}
-	return ""
+
+	return "", fmt.Errorf("role %s not found", role)
+}
+
+func (derived) KubeReserved(cs *acsapi.OpenShiftManagedCluster, role acsapi.AgentPoolProfileRole) (string, error) {
+	if role == acsapi.AgentPoolProfileRoleMaster {
+		return "", fmt.Errorf("kubereserved not defined for role %s", role)
+	}
+
+	for _, pool := range cs.Properties.AgentPoolProfiles {
+		if pool.Role != role {
+			continue
+		}
+
+		if isSmallVM(pool.VMSize) {
+			return "cpu=200m,memory=512Mi", nil
+		} else {
+			return "cpu=500m,memory=512Mi", nil
+		}
+	}
+
+	return "", fmt.Errorf("role %s not found", role)
 }
 
 func (derived) PublicHostname(cs *acsapi.OpenShiftManagedCluster) string {

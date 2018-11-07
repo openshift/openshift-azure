@@ -145,11 +145,52 @@ const (
 // VMSize represents supported VMSizes
 type VMSize string
 
+// VMSizes
 const (
-	// StandardD2sV3 represents Standard_D2s_v3
-	StandardD2sV3 VMSize = "Standard_D2s_v3"
-	// StandardD4sV3 represents Standard_D2s_v3
-	StandardD4sV3 VMSize = "Standard_D4s_v3"
+	// General purpose VMs
+	StandardD2sV3  VMSize = "Standard_D2s_v3"
+	StandardD4sV3  VMSize = "Standard_D4s_v3"
+	StandardD8sV3  VMSize = "Standard_D8s_v3"
+	StandardD16sV3 VMSize = "Standard_D16s_v3"
+	StandardD32sV3 VMSize = "Standard_D32s_v3"
+	StandardD64sV3 VMSize = "Standard_D64s_v3"
+
+	StandardDS4V2 VMSize = "Standard_DS4_v2"
+	StandardDS5V2 VMSize = "Standard_DS5_v2"
+
+	// Compute optimized VMs
+	StandardF8sV2  VMSize = "Standard_F8s_v2"
+	StandardF16sV2 VMSize = "Standard_F16s_v2"
+	StandardF32sV2 VMSize = "Standard_F32s_v2"
+	StandardF64sV2 VMSize = "Standard_F64s_v2"
+	StandardF72sV2 VMSize = "Standard_F72s_v2"
+
+	StandardF8s  VMSize = "Standard_F8s"
+	StandardF16s VMSize = "Standard_F16s"
+
+	// Memory optimized VMs
+	StandardE4sV3  VMSize = "Standard_E4s_v3"
+	StandardE8sV3  VMSize = "Standard_E8s_v3"
+	StandardE16sV3 VMSize = "Standard_E16s_v3"
+	StandardE20sV3 VMSize = "Standard_E20s_v3"
+	StandardE32sV3 VMSize = "Standard_E32s_v3"
+	StandardE64sV3 VMSize = "Standard_E64s_v3"
+
+	StandardGS2 VMSize = "Standard_GS2"
+	StandardGS3 VMSize = "Standard_GS3"
+	StandardGS4 VMSize = "Standard_GS4"
+	StandardGS5 VMSize = "Standard_GS5"
+
+	StandardDS12V2 VMSize = "Standard_DS12_v2"
+	StandardDS13V2 VMSize = "Standard_DS13_v2"
+	StandardDS14V2 VMSize = "Standard_DS14_v2"
+	StandardDS15V2 VMSize = "Standard_DS15_v2"
+
+	// Storage optimized VMs
+	StandardL4s  VMSize = "Standard_L4s"
+	StandardL8s  VMSize = "Standard_L8s"
+	StandardL16s VMSize = "Standard_L16s"
+	StandardL32s VMSize = "Standard_L32s"
 )
 
 // AuthProfile defines all possible authentication profiles for the OpenShift
