@@ -508,12 +508,13 @@ func main() {
 	// simulate the API call to the RP
 	if err := wait.PollImmediate(time.Second, 10*time.Second, func() (bool, error) {
 		if err := createOrUpdate(ctx, log, rpc, *manifest); err != nil {
-			autoRestErr := err.(autorest.DetailedError)
-			if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
-				if netErr, ok := urlErr.Err.(*net.OpError); ok {
-					if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
-						if sysErr.Err == syscall.ECONNREFUSED {
-							return false, nil
+			if autoRestErr, ok := err.(autorest.DetailedError); ok {
+				if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
+					if netErr, ok := urlErr.Err.(*net.OpError); ok {
+						if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
+							if sysErr.Err == syscall.ECONNREFUSED {
+								return false, nil
+							}
 						}
 					}
 				}
