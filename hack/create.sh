@@ -59,44 +59,13 @@ else
     AZURE_AAD_CLIENT_ID=$AZURE_CLIENT_ID
     AZURE_AAD_CLIENT_SECRET=$AZURE_CLIENT_SECRET
 fi
+export AZURE_AAD_CLIENT_SECRET
 set -x
 
-cat >_data/manifest.yaml <<EOF
-name: $RESOURCEGROUP
-location: $AZURE_REGION
-properties:
-  openShiftVersion: "$DEPLOY_VERSION"
-  fqdn: $RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com
-  authProfile:
-    identityProviders:
-    - name: Azure AD
-      provider:
-        kind: AADIdentityProvider
-        clientId: $AZURE_AAD_CLIENT_ID
-        secret: $AZURE_AAD_CLIENT_SECRET
-        tenantId: $AZURE_TENANT_ID
-  networkProfile:
-    vnetCidr: 10.0.0.0/8
-  routerProfiles:
-  - name: default
-  masterPoolProfile:
-    count: 3
-    vmSize: Standard_D2s_v3
-    subnetCidr: 10.0.0.0/24
-  agentPoolProfiles:
-  - name: infra
-    role: infra
-    count: 2
-    vmSize: Standard_D2s_v3
-    subnetCidr: 10.0.0.0/24
-    osType: Linux
-  - name: compute
-    role: compute
-    count: 1
-    vmSize: Standard_D2s_v3
-    subnetCidr: 10.0.0.0/24
-    osType: Linux
-EOF
+if [[ -z "$MANIFEST" ]]; then
+    MANIFEST="test/manifests/normal/create.yaml"
+fi
+cat $MANIFEST | envsubst > _data/manifest.yaml
 
 go generate ./...
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
