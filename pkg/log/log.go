@@ -64,6 +64,11 @@ func Warn(args ...interface{}) {
 	logger.log.Warn(args...)
 }
 
+// Warnf logs at fatal level
+func Warnf(format string, args ...interface{}) {
+	logger.log.Warnf(format, args...)
+}
+
 // WithFields adds a map of fields to the Entry.
 func WithFields(fields logrus.Fields) *logrus.Entry {
 	return logger.log.WithFields(fields)

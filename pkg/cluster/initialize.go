@@ -29,6 +29,13 @@ func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManage
 		return err
 	}
 
+	// update tracking container
+	c = bsc.GetContainerReference("update")
+	_, err = c.CreateIfNotExists(nil)
+	if err != nil {
+		return err
+	}
+
 	// cluster config container
 	c = bsc.GetContainerReference("config")
 	_, err = c.CreateIfNotExists(nil)
