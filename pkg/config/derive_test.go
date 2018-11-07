@@ -102,76 +102,90 @@ func TestDerivedPublicHostname(t *testing.T) {
 
 func TestDerivedKubeAndSystemReserved(t *testing.T) {
 	tests := []struct {
-		cs   api.OpenShiftManagedCluster
-		role api.AgentPoolProfileRole
-		want string
+		cs        api.OpenShiftManagedCluster
+		role      api.AgentPoolProfileRole
+		wantKR    string
+		wantKRErr string
+		wantSR    string
+		wantSRErr string
 	}{
 		{
 			cs: api.OpenShiftManagedCluster{
 				Properties: &api.Properties{
 					AgentPoolProfiles: []api.AgentPoolProfile{
 						{
-							Name:   "1",
 							Role:   api.AgentPoolProfileRoleCompute,
-							VMSize: "Standard_D4s_v3",
+							VMSize: api.StandardD4sV3,
 						},
 					},
 				},
 			},
-			want: "cpu=500m,memory=512Mi",
-			role: api.AgentPoolProfileRoleCompute,
+			role:   api.AgentPoolProfileRoleCompute,
+			wantKR: "cpu=500m,memory=512Mi",
+			wantSR: "cpu=500m,memory=512Mi",
 		},
 		{
 			cs: api.OpenShiftManagedCluster{
 				Properties: &api.Properties{
 					AgentPoolProfiles: []api.AgentPoolProfile{
 						{
-							Name:   "1",
-							Role:   api.AgentPoolProfileRoleCompute,
-							VMSize: "Standard_D4s_v3",
-						},
-						{
-							Name:   "2",
 							Role:   api.AgentPoolProfileRoleInfra,
-							VMSize: "Standard_D2s_v3",
+							VMSize: api.StandardD2sV3,
 						},
 					},
 				}},
-			want: "cpu=200m,memory=512Mi",
-			role: api.AgentPoolProfileRoleInfra,
+			role:   api.AgentPoolProfileRoleInfra,
+			wantKR: "cpu=200m,memory=512Mi",
+			wantSR: "cpu=200m,memory=512Mi",
 		},
 		{
 			cs: api.OpenShiftManagedCluster{
 				Properties: &api.Properties{
 					AgentPoolProfiles: []api.AgentPoolProfile{
 						{
-							Name:   "infra",
 							Role:   api.AgentPoolProfileRoleMaster,
-							VMSize: "unknown",
+							VMSize: api.StandardD2sV3,
 						},
 					},
 				},
 			},
-			want: "",
-			role: api.AgentPoolProfileRoleMaster,
+			role:      api.AgentPoolProfileRoleMaster,
+			wantKRErr: "kubereserved not defined for role master",
+			wantSR:    "cpu=500m,memory=1Gi",
 		},
 		{
 			cs: api.OpenShiftManagedCluster{
 				Properties: &api.Properties{
-					AgentPoolProfiles: []api.AgentPoolProfile{},
+					AgentPoolProfiles: []api.AgentPoolProfile{
+						{
+							Role:   api.AgentPoolProfileRoleMaster,
+							VMSize: api.StandardD4sV3,
+						},
+					},
 				},
 			},
-			want: "",
-			role: "anewrole",
+			role:      api.AgentPoolProfileRoleMaster,
+			wantKRErr: "kubereserved not defined for role master",
+			wantSR:    "cpu=1000m,memory=1Gi",
+		},
+		{
+			cs: api.OpenShiftManagedCluster{
+				Properties: &api.Properties{},
+			},
+			role:      "anewrole",
+			wantKRErr: "role anewrole not found",
+			wantSRErr: "role anewrole not found",
 		},
 	}
 	for _, tt := range tests {
-		if got := Derived.KubeReserved(&tt.cs, tt.role); got != tt.want {
-			t.Errorf("derived.KubeReserved(%s) = %v, want %v", tt.role, got, tt.want)
+		got, err := Derived.KubeReserved(&tt.cs, tt.role)
+		if got != tt.wantKR || (err == nil && tt.wantKRErr != "") || (err != nil && err.Error() != tt.wantKRErr) {
+			t.Errorf("derived.KubeReserved(%s) = %v, %v: wanted %v, %v", tt.role, got, err, tt.wantKR, tt.wantKRErr)
 		}
 
-		if got := Derived.SystemReserved(&tt.cs, tt.role); got != tt.want {
-			t.Errorf("derived.SystemReserved(%s) = %v, want %v", tt.role, got, tt.want)
+		got, err = Derived.SystemReserved(&tt.cs, tt.role)
+		if got != tt.wantSR || (err == nil && tt.wantSRErr != "") || (err != nil && err.Error() != tt.wantSRErr) {
+			t.Errorf("derived.SystemReserved(%s) = %v, %v: wanted %v, %v", tt.role, got, err, tt.wantSR, tt.wantSRErr)
 		}
 	}
 }

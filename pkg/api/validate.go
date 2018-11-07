@@ -27,6 +27,88 @@ var (
 
 	// This regexp is to guard against InvalidDomainNameLabel for hostname validation
 	rxCloudDomainLabel = regexp.MustCompile(`^[a-z][a-z0-9-]{1,61}[a-z0-9]\.`)
+
+	validMasterAndInfraVMSizes = map[VMSize]struct{}{
+		// Rationale here is: a highly limited set of modern general purpose
+		// offerings which we can reason about and test for now.
+
+		// GENERAL PURPOSE VMS
+
+		StandardD2sV3:  {}, // TODO: probably should only be enabled for test
+		StandardD4sV3:  {},
+		StandardD8sV3:  {},
+		StandardD16sV3: {},
+		StandardD32sV3: {},
+		StandardD64sV3: {},
+
+		// TODO: consider enabling storage optimized (Ls) series for masters and
+		// moving the etcd onto the VM SSD storage.
+
+		// TODO: enable vertical scaling of existing OSA clusters.
+	}
+
+	validComputeVMSizes = map[VMSize]struct{}{
+		// Rationale here is: modern offerings per (general purpose /
+		// memory-optimized / compute-optimized / storage-optimized) family,
+		// with at least 16GiB RAM, 32GiB SSD, 8 data disks, premium storage
+		// support.  GPU and HPC use cases are probably blocked for now on
+		// drivers / multiple agent pool support.
+
+		// GENERAL PURPOSE VMS
+
+		// Skiping StandardB* (burstable) VMs for now as they could be hard to
+		// reason about performance-wise.
+
+		StandardD2sV3:  {}, // TODO: probably should only be enabled for test
+		StandardD4sV3:  {},
+		StandardD8sV3:  {},
+		StandardD16sV3: {},
+		StandardD32sV3: {},
+		StandardD64sV3: {},
+
+		StandardDS4V2: {},
+		StandardDS5V2: {},
+
+		// COMPUTE OPTIMIZED VMS
+
+		StandardF8sV2:  {},
+		StandardF16sV2: {},
+		StandardF32sV2: {},
+		StandardF64sV2: {},
+		StandardF72sV2: {},
+
+		StandardF8s:  {},
+		StandardF16s: {},
+
+		// MEMORY OPTIMIZED VMS
+
+		StandardE4sV3:  {},
+		StandardE8sV3:  {},
+		StandardE16sV3: {},
+		StandardE20sV3: {},
+		StandardE32sV3: {},
+		StandardE64sV3: {},
+
+		// Skipping StandardM* for now as they may require significant extra
+		// effort/spend to certify and support.
+
+		StandardGS2: {},
+		StandardGS3: {},
+		StandardGS4: {},
+		StandardGS5: {},
+
+		StandardDS12V2: {},
+		StandardDS13V2: {},
+		StandardDS14V2: {},
+		StandardDS15V2: {},
+
+		// STORAGE OPTIMIZED VMS
+
+		StandardL4s:  {},
+		StandardL8s:  {},
+		StandardL16s: {},
+		StandardL32s: {},
+	}
 )
 
 var (
@@ -220,7 +302,7 @@ func validateAuthProfile(ap *AuthProfile) (errs []error) {
 }
 
 func validateAgentPoolProfiles(apps []AgentPoolProfile, vnet *net.IPNet) (errs []error) {
-	appmap := map[AgentPoolProfileRole]struct{}{}
+	appmap := map[AgentPoolProfileRole]AgentPoolProfile{}
 
 	for i, app := range apps {
 		if _, found := validAgentPoolProfileRoles[app.Role]; !found {
@@ -230,7 +312,7 @@ func validateAgentPoolProfiles(apps []AgentPoolProfile, vnet *net.IPNet) (errs [
 		if _, found := appmap[app.Role]; found {
 			errs = append(errs, fmt.Errorf("duplicate role %q in properties.agentPoolProfiles[%q]", app.Role, app.Name))
 		}
-		appmap[app.Role] = struct{}{}
+		appmap[app.Role] = app
 
 		if i > 0 && app.SubnetCIDR != apps[i-1].SubnetCIDR { // TODO: in the future, test that these are disjoint
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.subnetCidr %q: all subnetCidrs must match", app.SubnetCIDR))
@@ -243,6 +325,10 @@ func validateAgentPoolProfiles(apps []AgentPoolProfile, vnet *net.IPNet) (errs [
 		if _, found := appmap[role]; !found {
 			errs = append(errs, fmt.Errorf("missing role %q in properties.agentPoolProfiles", role))
 		}
+	}
+
+	if appmap[AgentPoolProfileRoleMaster].VMSize != appmap[AgentPoolProfileRoleInfra].VMSize {
+		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.vmSize %q: master and infra vmSizes must match", appmap[AgentPoolProfileRoleInfra].VMSize))
 	}
 
 	return
@@ -258,8 +344,11 @@ func validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPNet) (errs []err
 		if !rxAgentPoolProfileName.MatchString(app.Name) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 		}
-		if app.Count < 1 || app.Count > 5 {
+		if app.Count < 1 || app.Count > 20 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
+		}
+		if _, found := validComputeVMSizes[app.VMSize]; !found {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
 		}
 
 	case AgentPoolProfileRoleInfra:
@@ -269,15 +358,17 @@ func validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPNet) (errs []err
 		if app.Count != 2 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
+		if _, found := validMasterAndInfraVMSizes[app.VMSize]; !found {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
+		}
 
 	case AgentPoolProfileRoleMaster:
 		if app.Count != 3 {
-			errs = append(errs, fmt.Errorf("invalid masterPoolProfile.count %d", app.Count))
+			errs = append(errs, fmt.Errorf("invalid properties.masterPoolProfile.count %d", app.Count))
 		}
-	}
-
-	if _, found := DefaultVMSizeKubeArguments[app.VMSize][app.Role]; !found {
-		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
+		if _, found := validMasterAndInfraVMSizes[app.VMSize]; !found {
+			errs = append(errs, fmt.Errorf("invalid properties.masterPoolProfile.vmSize %q", app.VMSize))
+		}
 	}
 
 	if !isValidIPV4CIDR(app.SubnetCIDR) {
