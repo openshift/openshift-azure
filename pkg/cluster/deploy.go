@@ -1,4 +1,4 @@
-package upgrade
+package cluster
 
 import (
 	"context"
@@ -16,7 +16,7 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}
-	err = u.InitializeCluster(ctx, cs)
+	err = u.Initialize(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
