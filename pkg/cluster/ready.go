@@ -32,7 +32,7 @@ var deploymentWhitelist = []struct {
 		Namespace: "default",
 	},
 	{
-		Name:      "customer-admin-reconciler",
+		Name:      "customer-admin-controller",
 		Namespace: "openshift-infra",
 	},
 	{

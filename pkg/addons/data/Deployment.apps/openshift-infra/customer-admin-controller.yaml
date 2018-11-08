@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-admin-controller
+  namespace: openshift-infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: customer-admin-controller
+  template:
+    metadata:
+      labels:
+        app: customer-admin-controller
+    spec:
+      serviceAccountName: customer-admin-controller
+      containers:
+      - image: '*** GENERATED ***'
+        name: customer-admin-controller

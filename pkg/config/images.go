@@ -103,6 +103,7 @@ func (g *simpleGenerator) selectContainerImagesOrigin(cs *api.OpenShiftManagedCl
 		c.Images.Registry = g.image("docker-registry", v)
 
 		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.11"
+		c.Images.AzureControllers = "quay.io/openshift-on-azure/azure-controllers:v3.11"
 	}
 	return nil
 }
@@ -147,6 +148,7 @@ func (g *simpleGenerator) selectContainerImagesOSA(cs *api.OpenShiftManagedClust
 		c.Images.Registry = g.image("docker-registry", v)
 
 		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.11"
+		c.Images.AzureControllers = "quay.io/openshift-on-azure/azure-controllers:v3.11"
 	}
 
 	return nil
@@ -174,6 +176,9 @@ func (g *simpleGenerator) selectContainerImages(cs *api.OpenShiftManagedCluster)
 		cs.Config.Images.EtcdBackup = g.pluginConfig.TestConfig.EtcdBackupImage
 	} else {
 		cs.Config.Images.EtcdBackup = "quay.io/openshift-on-azure/etcdbackup:latest"
+	}
+	if g.pluginConfig.TestConfig.AzureControllersImage != "" {
+		cs.Config.Images.AzureControllers = g.pluginConfig.TestConfig.AzureControllersImage
 	}
 
 	return nil

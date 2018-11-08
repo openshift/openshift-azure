@@ -170,6 +170,7 @@ var marshalled = []byte(`{
 		"images": {
 			"format": "Config.Images.Format",
 			"clusterMonitoringOperator": "Config.Images.ClusterMonitoringOperator",
+			"azureControllers": "Config.Images.AzureControllers",
 			"prometheusOperatorBase": "Config.Images.PrometheusOperatorBase",
 			"prometheusBase": "Config.Images.PrometheusBase",
 			"prometheusConfigReloaderBase": "Config.Images.PrometheusConfigReloaderBase",
@@ -256,7 +257,6 @@ func TestUnmarshall(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	if !reflect.DeepEqual(populatedOc, unmarshalledOc) {
 		t.Errorf("json.Unmarshal returned unexpected result\n%#v\n", unmarshalledOc)
 	}

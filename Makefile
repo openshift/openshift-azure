@@ -1,13 +1,13 @@
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain --ignored) = "" ]] && echo -clean || echo -dirty)
 
 # all is the default target to build everything
-all: clean build sync etcdbackup
+all: clean build azure-controllers etcdbackup sync
 
 build: generate
 	go build ./...
 
 clean:
-	rm -f coverage.out e2e.test sync etcdbackup
+	rm -f coverage.out e2e.test azure-controllers etcdbackup sync
 
 test: unit e2e
 
@@ -15,9 +15,20 @@ generate:
 	go generate ./...
 
 TAG ?= $(shell git rev-parse --short HEAD)
-SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
+AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
 ETCD_BACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
+SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
+
+azure-controllers: generate
+	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/azure-controllers
+
+azure-controllers-image: azure-controllers
+	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+	imagebuilder -f Dockerfile.azure-controllers -t $(AZURE_CONTROLLERS_IMAGE) .
+
+azure-controllers-push: azure-controllers-image
+	docker push $(AZURE_CONTROLLERS_IMAGE)
 
 etcdbackup: generate
 	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/etcdbackup
