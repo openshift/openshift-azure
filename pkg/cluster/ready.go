@@ -111,7 +111,7 @@ func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftMana
 	return nil
 }
 
-func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	for _, app := range daemonsetWhitelist {
 		log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
 
@@ -156,7 +156,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 			}
 		}, ctx.Done())
 		if err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepWaitForInfraStatefulSets}
 		}
 	}
 

@@ -21,11 +21,10 @@ import (
 
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
-	Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error
-	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error
-	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) error
+	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError
+	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError
+	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
+	WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 }
 
 type simpleUpgrader struct {

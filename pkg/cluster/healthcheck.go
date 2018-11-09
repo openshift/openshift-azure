@@ -14,7 +14,7 @@ import (
 )
 
 // HealthCheck function to verify cluster health
-func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	// Wait for the console to be 200 status
 	log.Info("checking console health")
 	c := cs.Config
