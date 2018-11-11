@@ -27,6 +27,8 @@ spec:
           value: "false"
         - name: REGISTRY_HTTP_TLS_KEY
           value: /etc/secrets/registry.key
+        - name: OPENSHIFT_DEFAULT_REGISTRY
+          value: docker-registry.default.svc:5000
         - name: REGISTRY_OPENSHIFT_SERVER_ADDR
           value: docker-registry.default.svc:5000
         - name: REGISTRY_CONFIGURATION_PATH
@@ -60,7 +62,11 @@ spec:
         - mountPath: /etc/registry
           name: docker-config
       nodeSelector:
-        region: infra
+        node-role.kubernetes.io/infra: "true"
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: registry
       serviceAccountName: registry
       volumes:
       - name: registry-certificates

@@ -218,12 +218,6 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 		return err
 	}
 
-	log.Debug("Waiting for the Etcd CRD to be ready")
-	if err := wait.PollImmediateInfinite(time.Second, client.EtcdCRDReady); err != nil {
-		return err
-	}
-	log.Debug("Etcd CRD is ready")
-
 	// refresh dynamic client
 	if err := client.UpdateDynamicClient(); err != nil {
 		return err

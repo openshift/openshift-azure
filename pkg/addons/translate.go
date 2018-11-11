@@ -142,6 +142,92 @@ var Translations = map[string][]struct {
 			Template: "{{ String (CertAsBytes .Config.Certificates.FrontProxyCa.Cert) }}",
 		},
 	},
+	"ConfigMap/openshift-console/console-config": {
+		{
+			Path:       jsonpath.MustCompile("$.data.'console-config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.clusterInfo.consoleBaseAddress"),
+			Template:   "https://console.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'console-config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.clusterInfo.developerConsolePublicURL"),
+			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}/console/",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'console-config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.clusterInfo.masterPublicURL"),
+			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}",
+		},
+	},
+	"ConfigMap/openshift-ansible-service-broker/broker-config": {
+		{
+			Path:       jsonpath.MustCompile("$.data.'broker-config'"),
+			NestedPath: jsonpath.MustCompile("$.registry[?(@.type='rhcc')].url"),
+			Template:   "https://{{ .Derived.RegistryURL .ContainerService }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'broker-config'"),
+			NestedPath: jsonpath.MustCompile("$.registry[?(@.type='rhcc')].tag"),
+			Template:   "{{ .Derived.OpenShiftVersionTag .ContainerService }}",
+		},
+	},
+	"ConfigMap/openshift-monitoring/cluster-monitoring-config": {
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.prometheusOperator.baseImage"),
+			Template:   "{{ .Config.Images.PrometheusOperatorBase }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.prometheusOperator.prometheusConfigReloaderBaseImage"),
+			Template:   "{{ .Config.Images.PrometheusConfigReloaderBase }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.prometheusOperator.configReloaderBaseImage"),
+			Template:   "{{ .Config.Images.ConfigReloaderBase }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.prometheusK8s.baseImage"),
+			Template:   "{{ .Config.Images.PrometheusBase }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.prometheusK8s.externalLabels.cluster"),
+			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.alertmanagerMain.baseImage"),
+			Template:   "{{ .Config.Images.AlertManagerBase }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.nodeExporter.baseImage"),
+			Template:   "{{ .Config.Images.NodeExporterBase }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.grafana.baseImage"),
+			Template:   "{{ .Config.Images.GrafanaBase }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.kubeStateMetrics.baseImage"),
+			Template:   "{{ .Config.Images.KubeStateMetricsBase }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.kubeRbacProxy.baseImage"),
+			Template:   "{{ .Config.Images.KubeRbacProxyBase }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.auth.baseImage"),
+			Template:   "{{ .Config.Images.OAuthProxyBase }}",
+		},
+	},
 	"ConfigMap/openshift-node/node-config-compute": {
 		{
 			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
@@ -201,6 +287,11 @@ var Translations = map[string][]struct {
 	"ConfigMap/openshift-web-console/webconsole-config": {
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.clusterInfo.adminConsolePublicURL"),
+			Template:   "https://console.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.consolePublicURL"),
 			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}/console/",
 		},
@@ -210,10 +301,16 @@ var Translations = map[string][]struct {
 			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}",
 		},
 	},
-	"DaemonSet.apps/openshift-metrics/prometheus-node-exporter": {
+	"DaemonSet.apps/kube-service-catalog/apiserver": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.PrometheusNodeExporter }}",
+			Template: "{{ .Config.Images.ServiceCatalog }}",
+		},
+	},
+	"DaemonSet.apps/kube-service-catalog/controller-manager": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.ServiceCatalog }}",
 		},
 	},
 	"DaemonSet.apps/openshift-node/sync": {
@@ -232,6 +329,12 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.Node }}",
+		},
+	},
+	"DaemonSet.apps/openshift-template-service-broker/apiserver": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.TemplateServiceBroker }}",
 		},
 	},
 	"Deployment.apps/default/docker-registry": {
@@ -272,56 +375,56 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
-	"Deployment.apps/kube-service-catalog/apiserver": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.ServiceCatalog }}",
-		},
-	},
-	"Deployment.apps/kube-service-catalog/controller-manager": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.ServiceCatalog }}",
-		},
-	},
 	"Deployment.apps/openshift-ansible-service-broker/asb": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.AnsibleServiceBroker }}",
 		},
 	},
-	"Deployment.apps/openshift-etcd/etcd-operator": {
+	"Deployment.apps/openshift-console/console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.EtcdOperator }}",
+			Template: "{{ .Config.Images.Console }}",
 		},
 	},
-	"Deployment.apps/openshift-infra/bootstrap-autoapprover": {
+	"Deployment.apps/openshift-monitoring/cluster-monitoring-operator": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.Node }}",
-		},
-	},
-	"Deployment.apps/openshift-template-service-broker/apiserver": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.TemplateServiceBroker }}",
-		},
-	},
-	"Deployment.apps/openshift-metrics/kube-state-metrics": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='kube-state-metrics')].image"),
-			Template: "{{ .Config.Images.KubeStateMetrics }}",
+			Template: "{{ .Config.Images.ClusterMonitoringOperator }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='addon-resizer')].image"),
-			Template: "{{ .Config.Images.AddonsResizer }}",
+			Path: jsonpath.MustCompile("$.spec.template.spec.containers[0].args"),
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+				return config.Derived.ClusterMonitoringOperatorArgs(cs)
+			},
 		},
 	},
 	"Deployment.apps/openshift-web-console/webconsole": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.WebConsole }}",
+		},
+	},
+	"ImageStream.image.openshift.io/openshift-node/node": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.tags[0].from.name"),
+			Template: "{{ .Config.Images.Node }}",
+		},
+	},
+	"ImageStream.image.openshift.io/openshift-sdn/node": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.tags[0].from.name"),
+			Template: "{{ .Config.Images.Node }}",
+		},
+	},
+	"OAuthClient.oauth.openshift.io/cockpit-oauth-client": {
+		{
+			Path:     jsonpath.MustCompile("$.redirectURIs[0]"),
+			Template: "https://registry-console-default.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.secret"),
+			Template: "{{ .Config.RegistryConsoleOAuthSecret }}",
 		},
 	},
 	"Group.user.openshift.io/customer-admins": {
@@ -346,14 +449,14 @@ var Translations = map[string][]struct {
 			},
 		},
 	},
-	"OAuthClient.oauth.openshift.io/cockpit-oauth-client": {
+	"OAuthClient.oauth.openshift.io/openshift-console": {
 		{
 			Path:     jsonpath.MustCompile("$.redirectURIs[0]"),
-			Template: "https://registry-console-default.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
+			Template: "https://console.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.secret"),
-			Template: "{{ .Config.RegistryConsoleOAuthSecret }}",
+			Template: "{{ .Config.ConsoleOAuthSecret }}",
 		},
 	},
 	"Route.route.openshift.io/default/docker-registry": {
@@ -380,22 +483,10 @@ var Translations = map[string][]struct {
 			Template: "asb-1338-openshift-ansible-service-broker.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
-	"Route.route.openshift.io/openshift-metrics/alertmanager": {
+	"Route.route.openshift.io/openshift-console/console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "alertmanager-openshift-metrics.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
-		},
-	},
-	"Route.route.openshift.io/openshift-metrics/alerts": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "alerts-openshift-metrics.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
-		},
-	},
-	"Route.route.openshift.io/openshift-metrics/prometheus": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "prometheus-openshift-metrics.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
+			Template: "console.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
 	"Secret/default/registry-certificates": {
@@ -441,68 +532,18 @@ var Translations = map[string][]struct {
 	},
 	"Secret/kube-service-catalog/apiserver-ssl": {
 		{
-			Path:     jsonpath.MustCompile("$.stringData.'apiserver.crt'"),
+			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),
 			Template: "{{ String (CertAsBytes .Config.Certificates.ServiceCatalogServer.Cert) }}\n{{ String (CertAsBytes .Config.Certificates.ServiceCatalogCa.Cert) }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.stringData.'apiserver.key'"),
+			Path:     jsonpath.MustCompile("$.stringData.'tls.key'"),
 			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.ServiceCatalogServer.Key) }}",
 		},
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'etcd-ca.crt'"),
-			Template: "{{ String (CertAsBytes .Config.Certificates.EtcdCa.Cert) }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'etcd-client.crt'"),
-			Template: "{{ String (CertAsBytes .Config.Certificates.EtcdClient.Cert) }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'etcd-client.key'"),
-			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.EtcdClient.Key) }}",
-		},
 	},
-	"Secret/openshift-etcd/etcd-backup-abs-credentials": {
+	"Secret/openshift-console/console-oauth-config": {
 		{
-			Path:     jsonpath.MustCompile("$.stringData.'storage-account'"),
-			Template: "{{ .Config.ConfigStorageAccount }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'storage-key'"),
-			Template: "{{ .Extra.ConfigStorageAccountKey }}",
-		},
-	},
-	"Secret/openshift-etcd/etcd-client-tls": {
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'etcd-client-ca.crt'"),
-			Template: "{{ String (CertAsBytes .Config.Certificates.EtcdCa.Cert) }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'etcd-client.crt'"),
-			Template: "{{ String (CertAsBytes .Config.Certificates.EtcdClient.Cert) }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'etcd-client.key'"),
-			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.EtcdClient.Key) }}",
-		},
-	},
-	"Secret/openshift-metrics/alertmanager-proxy": {
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),
-			Template: "{{ Base64Encode .Config.AlertManagerProxySessionSecret }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'console-cert'"),
-			Template: "{{ String (CertAsBytes .Config.Certificates.OpenshiftConsole.Cert) }}",
-		},
-	},
-	"Secret/openshift-metrics/alerts-proxy": {
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),
-			Template: "{{ Base64Encode .Config.AlertsProxySessionSecret }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'console-cert'"),
-			Template: "{{ String (CertAsBytes .Config.Certificates.OpenshiftConsole.Cert) }}",
+			Path:     jsonpath.MustCompile("$.stringData.clientSecret"),
+			Template: "{{ .Config.ConsoleOAuthSecret }}",
 		},
 	},
 	"Service/default/router": {
@@ -519,40 +560,10 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
-	"Secret/openshift-metrics/prometheus-proxy": {
+	"StatefulSet.apps/openshift-infra/bootstrap-autoapprover": {
 		{
-			Path:     jsonpath.MustCompile("$.stringData.'session_secret'"),
-			Template: "{{ Base64Encode .Config.PrometheusProxySessionSecret }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.stringData.'console-cert'"),
-			Template: "{{ String (CertAsBytes .Config.Certificates.OpenshiftConsole.Cert) }}",
-		},
-	},
-	"StatefulSet.apps/openshift-metrics/prometheus": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='prom-proxy')].image"),
-			Template: "{{ .Config.Images.OAuthProxy }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='prometheus')].image"),
-			Template: "{{ .Config.Images.Prometheus }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alerts-proxy')].image"),
-			Template: "{{ .Config.Images.OAuthProxy }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alert-buffer')].image"),
-			Template: "{{ .Config.Images.PrometheusAlertBuffer }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alertmanager-proxy')].image"),
-			Template: "{{ .Config.Images.OAuthProxy }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='alertmanager')].image"),
-			Template: "{{ .Config.Images.PrometheusAlertManager }}",
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.Node }}",
 		},
 	},
 	"StorageClass.storage.k8s.io/azure": {

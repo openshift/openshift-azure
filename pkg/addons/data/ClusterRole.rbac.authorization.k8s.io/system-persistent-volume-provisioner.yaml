@@ -4,6 +4,8 @@ metadata:
   annotations:
     authorization.openshift.io/system-only: "true"
     rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
   name: system:persistent-volume-provisioner
 rules:
 - apiGroups:
@@ -38,8 +40,12 @@ rules:
   resources:
   - events
   verbs:
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
   - create
-  - list
   - patch
   - update
-  - watch

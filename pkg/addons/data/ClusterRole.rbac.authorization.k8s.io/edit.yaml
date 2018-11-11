@@ -14,6 +14,12 @@ metadata:
   name: edit
 rules:
 - apiGroups:
+  - automationbroker.io
+  resources:
+  - access
+  verbs:
+  - create
+- apiGroups:
   - ""
   resources:
   - pods
@@ -396,6 +402,9 @@ rules:
 - apiGroups:
   - servicecatalog.k8s.io
   resources:
+  - servicebrokers
+  - serviceclasses
+  - serviceplans
   - serviceinstances
   - servicebindings
   verbs:

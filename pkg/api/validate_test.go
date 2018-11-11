@@ -15,7 +15,7 @@ var testOpenShiftClusterYAML = []byte(`---
 location: eastus
 name: openshift
 properties:
-  openShiftVersion: v3.10
+  openShiftVersion: v3.11
   fqdn: example.eastus.cloudapp.azure.com
   authProfile:
     identityProviders:
@@ -123,7 +123,7 @@ func TestValidate(t *testing.T) {
 			f: func(oc *OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "" },
 		},
 		"openshift version good": {
-			f: func(oc *OpenShiftManagedCluster) { oc.Properties.OpenShiftVersion = "v3.10" },
+			f: func(oc *OpenShiftManagedCluster) { oc.Properties.OpenShiftVersion = "v3.11" },
 		},
 		"openshift version bad": {
 			f:            func(oc *OpenShiftManagedCluster) { oc.Properties.OpenShiftVersion = "" },

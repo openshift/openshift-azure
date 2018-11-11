@@ -32,7 +32,7 @@
    programmatic deployment of the image.
 
    In the Azure web console, click `Create a resource`.  Search for `OpenShift
-   Origin 3.10 on Azure (Staged)` and click the result.  At the bottom of the
+   Origin 3.11 on Azure (Staged)` and click the result.  At the bottom of the
    resulting screen, click `Want to deploy programmatically?  Get started`.
    Click `Enable`, then `Save`.
 
@@ -114,7 +114,7 @@ Basic OpenShift configuration:
 name: openshift
 location: $AZURE_REGION
 properties:
-  openShiftVersion: v3.10
+  openShiftVersion: v3.11
   fqdn: $RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com
   authProfile:
     identityProviders:

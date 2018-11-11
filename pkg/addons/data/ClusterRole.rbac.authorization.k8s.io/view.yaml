@@ -247,6 +247,9 @@ rules:
 - apiGroups:
   - servicecatalog.k8s.io
   resources:
+  - servicebrokers
+  - serviceclasses
+  - serviceplans
   - serviceinstances
   - servicebindings
   verbs:

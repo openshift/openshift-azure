@@ -189,3 +189,16 @@ func TestDerivedKubeAndSystemReserved(t *testing.T) {
 		}
 	}
 }
+
+func TestRegistryURL(t *testing.T) {
+	cs := api.OpenShiftManagedCluster{
+		Config: &api.Config{
+			Images: api.ImageConfig{
+				Format: "quay.io/openshift/origin-${component}:${version}",
+			},
+		},
+	}
+	if got := Derived.RegistryURL(&cs); got != "quay.io" {
+		t.Errorf("derived.RegistryURL() = %v, want %v", got, "quay.io")
+	}
+}
