@@ -149,7 +149,6 @@
             }
         }
 {{- range $app := .ContainerService.Properties.AgentPoolProfiles }},
-{{- if not IsUpgrade}}
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
@@ -190,19 +189,16 @@
                 ]
             }
         },
-{{- end }}
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2017-12-01",
             "location": "{{ $.ContainerService.Location | js }}",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]"
-{{- if eq $app.Role "master" }},
-                "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]"
+{{- if eq $app.Role "master" }}
+                "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]",
 {{- end }}
-{{- if not IsUpgrade}},
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name | js }}')]"
-{{- end }}
             ],
             "name": "ss-{{ $app.Name | js }}",
             "sku": {
