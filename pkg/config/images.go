@@ -49,12 +49,12 @@ func (g *simpleGenerator) selectNodeImage(cs *api.OpenShiftManagedCluster) {
 	case "", "rhel7":
 		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OpenShiftVersion[1:], ".", "", -1)
 		if c.ImageVersion == "" {
-			c.ImageVersion = "310.34.20180913"
+			c.ImageVersion = "311.16.20181109"
 		}
 	case "centos7":
 		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OpenShiftVersion[1:], ".", "", -1)
 		if c.ImageVersion == "" {
-			c.ImageVersion = "310.0.20180913"
+			c.ImageVersion = "311.0.20181109"
 		}
 	}
 }
