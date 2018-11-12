@@ -645,50 +645,6 @@ spec:
 EOF
 fi
 
-{{- if not $.Extra.TestConfig.RunningUnderTest }}
-mkdir -p /var/lib/logbridge
-cat >/etc/origin/node/pods/logbridge.yaml <<'EOF'
-apiVersion: v1
-kind: Pod
-metadata:
-  name: logbridge
-  namespace: kube-system
-spec:
-  containers:
-  - image: {{ .Config.Images.LogBridge | quote }}
-    imagePullPolicy: Always
-    name: logbridge
-    securityContext:
-      privileged: true
-    volumeMounts:
-    - mountPath: /state
-      name: state
-    - mountPath: /cloudprovider
-      name: master-cloud-provider
-      readOnly: true
-    - mountPath: /etc
-      name: etc
-      readOnly: true
-    - mountPath: /var/log
-      name: var-log
-      readOnly: true
-  hostNetwork: true
-  volumes:
-  - hostPath:
-      path: /var/lib/logbridge
-    name: state
-  - hostPath:
-      path: /etc/origin/cloudprovider
-    name: master-cloud-provider
-  - hostPath:
-      path: /etc
-    name: etc
-  - hostPath:
-      path: /var/log
-    name: var-log
-EOF
-{{- end }}
-
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig
 # HACK: copy node.kubeconfig to bootstrap.kubeconfig so that openshift start node used in the sync

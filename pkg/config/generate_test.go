@@ -60,7 +60,6 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, pc api.PluginConfig, t 
 	assert(c.Images.MasterEtcd != "", "master etcd image")
 	assert(c.Images.RegistryConsole != "", "registry console image")
 	assert(c.Images.Sync != "", "sync image")
-	assert(c.Images.LogBridge != "", "logbridge image")
 	assert(c.Images.ClusterMonitoringOperator != "", "cluster monitoring operator image")
 	assert(c.Images.PrometheusOperatorBase != "", "cluster monitoring operator image")
 	assert(c.Images.PrometheusConfigReloaderBase != "", "prometheus config reloader base image")
@@ -87,8 +86,6 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, pc api.PluginConfig, t 
 	assert(len(c.RegistryStorageAccount) != 0, "registry storage account")
 	assert(len(c.RegistryConsoleOAuthSecret) != 0, "registry console oauth secret")
 	assert(len(c.RouterStatsPassword) != 0, "router stats password")
-	assert(len(c.LoggingWorkspace) != 0, "logging workspace")
-	assert(len(c.LoggingLocation) != 0, "logging location")
 
 	assert(c.ServiceCatalogClusterID != uuid.Nil, "service catalog cluster id")
 

@@ -4,22 +4,6 @@
     "parameters": {},
     "variables": {},
     "resources": [
-{{- if not $.Extra.TestConfig.RunningUnderTest }}
-        {
-            "type": "Microsoft.OperationalInsights/workspaces",
-            "name": "{{ .Config.LoggingWorkspace | js }}",
-            "apiVersion": "2017-03-15-preview",
-            "location": "{{ .Config.LoggingLocation | js }}",
-            "properties": {
-                "sku": {
-                    "Name": "PerGB2018"
-                },
-                "features": {
-                    "searchVersion": 1
-                }
-            }
-        },
-{{- end }}
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2016-03-30",

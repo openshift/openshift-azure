@@ -20,8 +20,6 @@ type Config struct {
 	// configuration of other ARM resources
 	ConfigStorageAccount   string `json:"configStorageAccount,omitempty"`
 	RegistryStorageAccount string `json:"registryStorageAccount,omitempty"`
-	LoggingWorkspace       string `json:"loggingWorkspace,omitempty"` // workspace for Azure Log Analytics resource
-	LoggingLocation        string `json:"loggingLocation,omitempty"`  // location for Azure Log Analytics resource
 
 	Certificates CertificateConfig `json:"certificates,omitempty"`
 	Images       ImageConfig       `json:"images,omitempty"`
@@ -87,8 +85,6 @@ type ImageConfig struct {
 	AnsibleServiceBroker  string `json:"ansibleServiceBroker,omitempty"`
 	WebConsole            string `json:"webConsole,omitempty"`
 	Console               string `json:"console,omitempty"`
-
-	LogBridge string `json:"logBridge,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.

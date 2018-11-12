@@ -1,13 +1,13 @@
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain --ignored) = "" ]] && echo -clean || echo -dirty)
 
 # all is the default target to build everything
-all: clean build sync e2e-bin logbridge
+all: clean build sync e2e-bin
 
 build: generate
 	go build ./...
 
 clean:
-	rm -f azure-reader.log coverage.out end-user.log e2e.test logbridge sync
+	rm -f azure-reader.log coverage.out end-user.log e2e.test sync
 
 test: unit e2e
 
@@ -16,18 +16,7 @@ generate:
 
 TAG ?= $(shell git rev-parse --short HEAD)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
-LOGBRIDGE_IMAGE ?= quay.io/openshift-on-azure/logbridge:$(TAG)
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
-
-logbridge: generate
-	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/logbridge
-
-logbridge-image: logbridge
-	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-	imagebuilder -f Dockerfile.logbridge -t $(LOGBRIDGE_IMAGE) .
-
-logbridge-push: logbridge-image
-	docker push $(LOGBRIDGE_IMAGE)
 
 sync: generate
 	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/sync
