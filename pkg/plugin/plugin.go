@@ -100,25 +100,30 @@ func (p *plugin) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluste
 	return p.armGenerator.Generate(ctx, cs, isUpdate)
 }
 
-func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployFn api.DeployFn) error {
-	var err error
+func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
 	if isUpdate {
 		log.Info("starting update")
-		err = p.clusterUpgrader.Update(ctx, cs, azuretemplate, deployFn)
+		if err := p.clusterUpgrader.Update(ctx, cs, azuretemplate, deployFn); err != nil {
+			return err
+		}
 	} else {
 		log.Info("starting deploy")
-		err = p.clusterUpgrader.Deploy(ctx, cs, azuretemplate, deployFn)
-	}
-	if err != nil {
-		return err
+		if err := p.clusterUpgrader.Deploy(ctx, cs, azuretemplate, deployFn); err != nil {
+			return err
+		}
 	}
 
 	// Wait for infrastructure services to be healthy
-	err = p.clusterUpgrader.WaitForInfraServices(ctx, cs)
-	if err != nil {
+	log.Info("waiting for infra services to be ready")
+	if err := p.clusterUpgrader.WaitForInfraServices(ctx, cs); err != nil {
 		return err
 	}
 
 	log.Info("starting health check")
-	return p.clusterUpgrader.HealthCheck(ctx, cs)
+	if err := p.clusterUpgrader.HealthCheck(ctx, cs); err != nil {
+		return err
+	}
+
+	// explicitly return nil if all went well
+	return nil
 }

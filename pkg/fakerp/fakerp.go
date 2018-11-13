@@ -145,8 +145,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil
 	}
 
-	err = p.CreateOrUpdate(ctx, cs, azuretemplate, oldCs != nil, deployer)
-	if err != nil {
+	if err := p.CreateOrUpdate(ctx, cs, azuretemplate, oldCs != nil, deployer); err != nil {
 		return nil, err
 	}
 

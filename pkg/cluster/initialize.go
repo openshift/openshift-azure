@@ -9,7 +9,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
-func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (u *simpleUpgrader) initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	if u.storageClient == nil {
 		keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
 		if err != nil {

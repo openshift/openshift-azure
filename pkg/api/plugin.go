@@ -28,6 +28,7 @@ const (
 	PluginStepWaitForNodes               PluginStep = "WaitForNodes"
 	PluginStepWaitForConsoleHealth       PluginStep = "WaitForConsoleHealth"
 	PluginStepWaitForInfraDaemonSets     PluginStep = "WaitForInfraDaemonSets"
+	PluginStepWaitForInfraStatefulSets   PluginStep = "WaitForInfraStatefulSets"
 	PluginStepWaitForInfraDeployments    PluginStep = "WaitForInfraDeployments"
 )
 
@@ -92,5 +93,5 @@ type Plugin interface {
 
 	// CreateOrUpdate either deploys or runs the update depending on the isUpdate argument
 	// this will call the deployer.
-	CreateOrUpdate(ctx context.Context, cs *OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployer DeployFn) error
+	CreateOrUpdate(ctx context.Context, cs *OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployer DeployFn) *PluginError
 }

@@ -36,22 +36,10 @@ func (m *MockUpgrader) EXPECT() *MockUpgraderMockRecorder {
 	return m.recorder
 }
 
-// Initialize mocks base method
-func (m *MockUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	ret := m.ctrl.Call(m, "Initialize", ctx, cs)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Initialize indicates an expected call of Initialize
-func (mr *MockUpgraderMockRecorder) Initialize(ctx, cs interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Initialize", reflect.TypeOf((*MockUpgrader)(nil).Initialize), ctx, cs)
-}
-
 // Deploy mocks base method
-func (m *MockUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error {
+func (m *MockUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
 	ret := m.ctrl.Call(m, "Deploy", ctx, cs, azuretemplate, deployFn)
-	ret0, _ := ret[0].(error)
+	ret0, _ := ret[0].(*api.PluginError)
 	return ret0
 }
 
@@ -61,9 +49,9 @@ func (mr *MockUpgraderMockRecorder) Deploy(ctx, cs, azuretemplate, deployFn inte
 }
 
 // Update mocks base method
-func (m *MockUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) error {
+func (m *MockUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
 	ret := m.ctrl.Call(m, "Update", ctx, cs, azuretemplate, deployFn)
-	ret0, _ := ret[0].(error)
+	ret0, _ := ret[0].(*api.PluginError)
 	return ret0
 }
 
@@ -73,9 +61,9 @@ func (mr *MockUpgraderMockRecorder) Update(ctx, cs, azuretemplate, deployFn inte
 }
 
 // HealthCheck mocks base method
-func (m *MockUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (m *MockUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	ret := m.ctrl.Call(m, "HealthCheck", ctx, cs)
-	ret0, _ := ret[0].(error)
+	ret0, _ := ret[0].(*api.PluginError)
 	return ret0
 }
 
@@ -85,9 +73,9 @@ func (mr *MockUpgraderMockRecorder) HealthCheck(ctx, cs interface{}) *gomock.Cal
 }
 
 // WaitForInfraServices mocks base method
-func (m *MockUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (m *MockUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	ret := m.ctrl.Call(m, "WaitForInfraServices", ctx, cs)
-	ret0, _ := ret[0].(error)
+	ret0, _ := ret[0].(*api.PluginError)
 	return ret0
 }
 
