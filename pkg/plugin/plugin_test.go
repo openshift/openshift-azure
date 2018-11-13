@@ -317,7 +317,7 @@ func TestNewPlugin(t *testing.T) {
 				errors.New(`tdAgentImage cannot be empty`),
 			},
 		},
-		"nil loggingCert.Key": {
+		"nil loggingKey": {
 			f: func(p *api.PluginConfig) {
 				p.GenevaConfig.LoggingKey = nil
 			},
@@ -325,12 +325,60 @@ func TestNewPlugin(t *testing.T) {
 				errors.New(`loggingKey cannot be nil`),
 			},
 		},
-		"nil loggingCert.Cert": {
+		"nil loggingCert": {
 			f: func(p *api.PluginConfig) {
 				p.GenevaConfig.LoggingCert = nil
 			},
 			expectedErrs: []error{
 				errors.New(`loggingCert cannot be nil`),
+			},
+		},
+		"nil metricsCert": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.MetricsCert = nil
+			},
+			expectedErrs: []error{
+				errors.New(`metricsCert cannot be nil`),
+			},
+		},
+		"nil metricsKey": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.MetricsKey = nil
+			},
+			expectedErrs: []error{
+				errors.New(`metricsKey cannot be nil`),
+			},
+		},
+		"empty promConverterImage": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.PromConverterImage = ""
+			},
+			expectedErrs: []error{
+				errors.New(`promConverterImage cannot be empty`),
+			},
+		},
+		"empty statsdImage": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.StatsdImage = ""
+			},
+			expectedErrs: []error{
+				errors.New(`statsdImage cannot be empty`),
+			},
+		},
+		"empty mdmEndpoint": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.MDMEndpoint = ""
+			},
+			expectedErrs: []error{
+				errors.New(`mdmEndpoint cannot be empty`),
+			},
+		},
+		"empty mdmAccount": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.MDMAccount = ""
+			},
+			expectedErrs: []error{
+				errors.New(`mdmAccount cannot be empty`),
 			},
 		},
 	}
@@ -361,12 +409,18 @@ func getDummyPluginConfig() (*api.PluginConfig, error) {
 	return &api.PluginConfig{
 		SyncImage: "syncImage",
 		GenevaConfig: api.GenevaConfig{
-			ImagePullSecret: []byte("imagePullSecret"),
-			LoggingSector:   "loggingSector",
-			LoggingCert:     tls.GetDummyCertificate(),
-			LoggingKey:      tls.GetDummyPrivateKey(),
-			TDAgentImage:    "tdAgentImage",
-			LoggingImage:    "loggingImage",
+			ImagePullSecret:    []byte("imagePullSecret"),
+			LoggingSector:      "loggingSector",
+			LoggingCert:        tls.GetDummyCertificate(),
+			LoggingKey:         tls.GetDummyPrivateKey(),
+			TDAgentImage:       "tdAgentImage",
+			LoggingImage:       "loggingImage",
+			MetricsCert:        tls.GetDummyCertificate(),
+			MetricsKey:         tls.GetDummyPrivateKey(),
+			PromConverterImage: "promConverterImage",
+			StatsdImage:        "statsdImage",
+			MDMAccount:         "mdmAccount",
+			MDMEndpoint:        "mdmEndpoint",
 		},
 	}, nil
 }

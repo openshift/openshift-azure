@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prom-mdm-converter
+  labels:
+    app: prom-mdm-converter
+  namespace: openshift-azure-monitoring
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: prom-mdm-converter
+  template:
+    metadata:
+      labels:
+        app: prom-mdm-converter
+    spec:
+      containers:
+        - name: prom-mdm-converter
+          image: "*** GENERATED ***"
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: REGION
+              value: "*** GENERATED ***"
+            - name: STATSD_ENDPOINT
+              value: "mdm.openshift-azure-monitoring"
+            - name: STATSD_PORT
+              value: "8125"
+          volumeMounts:
+            - mountPath: /config
+              name: prom-mdm-converter-rules
+              readOnly: true
+          resources:
+            limits:
+              cpu: 400m
+              memory: 32Mi
+            requests:
+              cpu: 50m
+              memory: 16Mi
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
+      imagePullSecrets:
+        - name: azure-registry
+      volumes:
+        - name: prom-mdm-converter-rules
+          configMap:
+            name: prom-mdm-converter-rules

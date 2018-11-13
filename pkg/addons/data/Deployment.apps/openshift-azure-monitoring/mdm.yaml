@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mdm-shard
+  name: mdm
+  namespace: openshift-azure-monitoring
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: mdm-shard
+  template:
+    metadata:
+      labels:
+        app: mdm-shard
+    spec:
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - operator: Exists
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: azure-registry
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: statsd
+          image: "*** GENERATED ***"
+          imagePullPolicy: Always
+          env:
+            - name: MDMENDPOINT
+              value: "*** GENERATED ***"
+            - name: MDM_ACCOUNT
+              value: "*** GENERATED ***"
+            - name: MDM_LOG_LEVEL
+              value: "Debug"
+            - name: REGION
+              value: "*** GENERATED ***"
+          ports:
+            - containerPort: 8125
+              protocol: UDP
+          resources:
+            requests:
+              cpu: 0.4
+              memory: 400Mi
+            limits:
+              cpu: 0.4
+              memory: 400Mi
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+            - mountPath: /mdm/certs
+              name: mdm-cert
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
+      volumes:
+        - name: mdm-cert
+          secret:
+            secretName: mdm-cert

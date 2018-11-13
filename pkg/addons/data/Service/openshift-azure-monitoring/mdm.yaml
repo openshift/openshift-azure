@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mdm
+  namespace: openshift-azure-monitoring
+spec:
+  ports:
+    - port: 8125
+      protocol: UDP
+      targetPort: 8125
+  selector:
+    app: mdm-shard
+  type: ClusterIP

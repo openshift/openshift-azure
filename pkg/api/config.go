@@ -56,6 +56,8 @@ type Config struct {
 
 	// geneva logging sector
 	GenevaLoggingSector string `json:"genevaLoggingSector,omitempty"`
+	GenevaMDMAccount    string `json:"genevaMDMAccount,omitempty"`
+	GenevaMDMEndpoint   string `json:"genevaMDMEndpoint,omitempty"`
 }
 
 // ImageConfig contains all images for the pods
@@ -66,6 +68,7 @@ type ImageConfig struct {
 
 	ClusterMonitoringOperator    string `json:"clusterMonitoringOperator,omitempty"`
 	AzureControllers             string `json:"azureControllers,omitempty"`
+	Prometheus                   string `json:"prometheus,omitempty"`
 	PrometheusOperatorBase       string `json:"prometheusOperatorBase,omitempty"`
 	PrometheusBase               string `json:"prometheusBase,omitempty"`
 	PrometheusConfigReloaderBase string `json:"prometheusConfigReloaderBase,omitempty"`
@@ -94,8 +97,10 @@ type ImageConfig struct {
 	// GenevaImagePullSecret defines secret used to pull private Azure images
 	GenevaImagePullSecret []byte `json:"genevaImagePullSecret,omitempty"`
 	// Geneva integration images
-	GenevaLogging string `json:"genevaLogging,omitempty"`
-	GenevaTDAgent string `json:"genevaTDAgent,omitempty"`
+	GenevaLogging       string `json:"genevaLogging,omitempty"`
+	GenevaTDAgent       string `json:"genevaTDAgent,omitempty"`
+	GenevaStatsd        string `json:"genevaStatsd,omitempty"`
+	GenevaPromConverter string `json:"genevaPromConverter,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.
@@ -133,6 +138,7 @@ type CertificateConfig struct {
 
 	// geneva integration certificates
 	GenevaLogging CertKeyPair `json:"genevaLogging,omitempty"`
+	GenevaMetrics CertKeyPair `json:"genevaMetrics,omitempty"`
 }
 
 // CertKeyPair is an rsa private key and x509 certificate pair.

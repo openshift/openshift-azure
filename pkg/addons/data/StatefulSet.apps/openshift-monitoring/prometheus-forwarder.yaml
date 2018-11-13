@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: prometheus-forwarder
+  name: prometheus-forwarder
+  namespace: openshift-azure-monitoring
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-forwarder
+  template:
+    metadata:
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+      labels:
+        app: prometheus-forwarder
+    spec:
+      serviceAccountName: geneva
+      containers:
+      # Prometheus
+      - name: prometheus
+        command:
+        - /bin/bash
+        - -c
+        - |-
+          /bin/prometheus --storage.tsdb.retention=3d --config.file=/config/config.yaml --web.listen-address=localhost:9090
+        image: "*** GENERATED ***"
+        resources:
+          limits:
+            cpu: 400m
+            memory: 2Gi
+          requests:
+            cpu: 400m
+            memory: 2Gi
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - |-
+              set -euo pipefail;
+              touch /tmp/prometheusconfig.hash;
+              if [[ $(find /config -type f | sort | xargs md5sum | md5sum) != $(cat /tmp/prometheusconfig.hash) ]]; then
+                find /config -type f | sort | xargs md5sum | md5sum > /tmp/prometheusconfig.hash;
+                kill -HUP 1;
+              fi
+          initialDelaySeconds: 120
+          periodSeconds: 60
+        volumeMounts:
+        - mountPath: /prometheus
+          name: prometheus-data
+        - name: config
+          mountPath: /config
+      volumes:
+      - name: config
+        projected:
+          sources:
+            - configMap:
+                name: prometheus-forwarder-config
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
+
+  volumeClaimTemplates:
+  - metadata:
+      name: prometheus-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 128Gi
+  updateStrategy:
+    type: RollingUpdate

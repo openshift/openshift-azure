@@ -419,6 +419,34 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.AnsibleServiceBroker }}",
 		},
 	},
+	"Deployment.apps/openshift-azure-monitoring/mdm": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.GenevaStatsd }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGION')].value"),
+			Template: "{{ .ContainerService.Location }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='MDMENDPOINT')].value"),
+			Template: "{{ .Config.GenevaMDMEndpoint }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='MDM_ACCOUNT')].value"),
+			Template: "{{ .Config.GenevaMDMAccount }}",
+		},
+	},
+	"Deployment.apps/openshift-azure-monitoring/prom-mdm-converter": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.GenevaPromConverter }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGION')].value"),
+			Template: "{{ .ContainerService.Location }}",
+		},
+	},
 	"Deployment.apps/openshift-console/console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
@@ -600,6 +628,22 @@ var Translations = map[string][]struct {
 			Template: "{{ Base64Encode .Config.Images.GenevaImagePullSecret }}",
 		},
 	},
+	"Secret/openshift-azure-monitoring/azure-registry": {
+		{
+			Path:     jsonpath.MustCompile("$.data.'.dockerconfigjson'"),
+			Template: "{{ Base64Encode .Config.Images.GenevaImagePullSecret }}",
+		},
+	},
+	"Secret/openshift-azure-monitoring/mdm-cert": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'cert.pem'"),
+			Template: "{{ String (CertAsBytes .Config.Certificates.GenevaMetrics.Cert) }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'key.pem'"),
+			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.GenevaMetrics.Key) }}",
+		},
+	},
 	"Secret/openshift-console/console-oauth-config": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.clientSecret"),
@@ -624,6 +668,12 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.Node }}",
+		},
+	},
+	"StatefulSet.apps/openshift-azure-monitoring/prometheus-forwarder": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.Prometheus }}",
 		},
 	},
 	"StorageClass.storage.k8s.io/azure": {

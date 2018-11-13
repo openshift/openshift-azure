@@ -102,6 +102,14 @@ func GetPluginConfig() (*api.PluginConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	metCert, err := readCert(filepath.Join(artifactDir, "metrics-int.cert"))
+	if err != nil {
+		return nil, err
+	}
+	metKey, err := readKey(filepath.Join(artifactDir, "metrics-int.key"))
+	if err != nil {
+		return nil, err
+	}
 	pullSecret, err := readFile(filepath.Join(artifactDir, ".dockerconfigjson"))
 	if err != nil {
 		return nil, err
@@ -114,12 +122,18 @@ func GetPluginConfig() (*api.PluginConfig, error) {
 		syncImage = os.Getenv("SYNC_IMAGE")
 	}
 	genevaConfig := api.GenevaConfig{
-		LoggingCert:     logCert,
-		LoggingKey:      logKey,
-		ImagePullSecret: pullSecret,
-		LoggingSector:   "US-Test",
-		LoggingImage:    "osarpint.azurecr.io/acs/mdsd:11201801",
-		TDAgentImage:    "osarpint.azurecr.io/acs/td-agent:latest",
+		LoggingCert:        logCert,
+		LoggingKey:         logKey,
+		MetricsCert:        metCert,
+		MetricsKey:         metKey,
+		ImagePullSecret:    pullSecret,
+		LoggingSector:      "US-Test",
+		LoggingImage:       "osarpint.azurecr.io/acs/mdsd:11201801",
+		TDAgentImage:       "osarpint.azurecr.io/acs/td-agent:latest",
+		PromConverterImage: "osarpint.azurecr.io/acs/prom-mdm-converter:git-a909a2e76",
+		StatsdImage:        "osarpint.azurecr.io/acs/mdm:git-a909a2e76",
+		MDMAccount:         "RPOpenShift",
+		MDMEndpoint:        "https://az-int.metrics.nsatc.net/",
 	}
 	return &api.PluginConfig{
 		SyncImage:       syncImage,
