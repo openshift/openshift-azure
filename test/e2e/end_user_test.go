@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
-	"strconv"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -135,47 +134,29 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 	})
 
 	It("should deploy a template with persistent storage and test failure modes", func() {
+		// instantiate the template
 		tpl := "django-psql-persistent"
 		By(fmt.Sprintf("instantiating the template and getting the route (%v)", time.Now()))
-		// instantiate the template
 		err := c.instantiateTemplate(tpl)
 		Expect(err).NotTo(HaveOccurred())
-		// Pull the route ingress from the namespace
+
+		// Pull the route ingress from the namespace and make sure only 1 ingress point is returned
 		route, err := c.rc.Routes(c.namespace).Get(tpl, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
-		// make sure only 1 ingress point is returned
 		Expect(len(route.Status.Ingress)).To(Equal(1))
+
+		// hit the ingress 3 times before killing the DB
 		host := route.Status.Ingress[0].Host
 		url := fmt.Sprintf("http://%s", host)
-
-		// Curl the endpoint and search for a string
-		httpc := &http.Client{
-			Timeout: 10 * time.Second,
-		}
 		regex := regexp.MustCompile(`Page views:\s*(\d+)`)
 		By(fmt.Sprintf("hitting the route 3 times, expecting counter to increment (%v)", time.Now()))
-		var prevCounter, currCounter int
-		for i := 0; i < 3; i++ {
-			resp, err := httpc.Get(url)
-			Expect(err).NotTo(HaveOccurred())
-			defer resp.Body.Close()
-			Expect(resp.StatusCode).Should(Equal(http.StatusOK))
+		hit := c.loopHTTPGet(url, regex, 3)
+		preHitErr := hit()
+		Expect(preHitErr).NotTo(HaveOccurred())
 
-			contents, err := ioutil.ReadAll(resp.Body)
-			Expect(err).NotTo(HaveOccurred())
-			matches := regex.FindStringSubmatch(string(contents))
-			Expect(matches).NotTo(BeNil())
-
-			currCounter, err = strconv.Atoi(matches[1])
-			Expect(err).NotTo(HaveOccurred())
-			Expect(currCounter).Should(BeNumerically(">", prevCounter))
-			prevCounter = currCounter
-			time.Sleep(time.Second)
-		}
-
-		// Find the database deploymentconfig and scale to 0
+		// Find the database deploymentconfig and scale down to 0, then back up to 1
 		dcName := "postgresql"
-		for i := range []int{0, 1} {
+		for _, i := range []int32{0, 1} {
 			By(fmt.Sprintf("searching for the database deploymentconfig (%v)", time.Now()))
 			dbDeploymentConfig, err := c.ac.DeploymentConfigs(c.namespace).Get(dcName, metav1.GetOptions{})
 			Expect(err).NotTo(HaveOccurred())
@@ -188,13 +169,12 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 			By(fmt.Sprintf("waiting for database deploymentconfig to reflect %d replicas (%v)", i, time.Now()))
 			waitErr := wait.PollImmediate(2*time.Second, 10*time.Minute, func() (bool, error) {
 				dc, err := c.ac.DeploymentConfigs(c.namespace).Get(dcName, metav1.GetOptions{})
-				i32 := int32(i)
 				switch {
 				case err == nil:
-					return i32 == dc.Status.Replicas &&
-						i32 == dc.Status.ReadyReplicas &&
-						i32 == dc.Status.AvailableReplicas &&
-						i32 == dc.Status.UpdatedReplicas &&
+					return i == dc.Status.Replicas &&
+						i == dc.Status.ReadyReplicas &&
+						i == dc.Status.AvailableReplicas &&
+						i == dc.Status.UpdatedReplicas &&
 						dc.Generation == dc.Status.ObservedGeneration, nil
 				default:
 					return false, err
@@ -209,23 +189,9 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		waitErr := waitutil.ForHTTPStatusOk(context.Background(), rt, url)
 		Expect(waitErr).NotTo(HaveOccurred())
 
-		By(fmt.Sprintf("hitting the route again, expecting counter to increment from last=%d (%v)", currCounter, time.Now()))
-		for i := 0; i < 3; i++ {
-			resp, err := httpc.Get(url)
-			Expect(err).NotTo(HaveOccurred())
-			defer resp.Body.Close()
-			Expect(resp.StatusCode).Should(Equal(http.StatusOK))
-
-			contents, err := ioutil.ReadAll(resp.Body)
-			Expect(err).NotTo(HaveOccurred())
-			matches := regex.FindStringSubmatch(string(contents))
-			Expect(matches).NotTo(BeNil())
-
-			currCounter, err = strconv.Atoi(matches[1])
-			Expect(err).NotTo(HaveOccurred())
-			Expect(currCounter).Should(BeNumerically(">", prevCounter))
-			prevCounter = currCounter
-			time.Sleep(time.Second)
-		}
+		// hit it again, will hit 3 times as specified initially
+		By(fmt.Sprintf("hitting the route again, expecting counter to increment from last (%v)", time.Now()))
+		postHitErr := hit()
+		Expect(postHitErr).NotTo(HaveOccurred())
 	})
 })

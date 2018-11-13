@@ -6,7 +6,10 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/ghodss/yaml"
@@ -212,4 +215,45 @@ func (t *testClient) instantiateTemplate(tpl string) error {
 
 	// Return after waiting for instance to complete
 	return wait.PollImmediate(2*time.Second, 10*time.Minute, c.templateInstanceIsReady)
+}
+
+func (t *testClient) loopHTTPGet(url string, regex *regexp.Regexp, times int) func() error {
+
+	httpc := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+	var prevCounter, currCounter int
+
+	return func() error {
+		for i := 0; i < times; i++ {
+			resp, err := httpc.Get(url)
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+			if resp.StatusCode != http.StatusOK {
+				return fmt.Errorf("unexpected http error returned: %d", resp.StatusCode)
+			}
+
+			contents, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return err
+			}
+			matches := regex.FindStringSubmatch(string(contents))
+			if matches == nil {
+				return fmt.Errorf("no matches found for %s", regex)
+			}
+
+			currCounter, err = strconv.Atoi(matches[1])
+			if err != nil {
+				return err
+			}
+			if currCounter <= prevCounter {
+				return fmt.Errorf("visit counter didn't increment: %d should be > than %d", currCounter, prevCounter)
+			}
+			prevCounter = currCounter
+			time.Sleep(time.Second)
+		}
+		return nil
+	}
 }
