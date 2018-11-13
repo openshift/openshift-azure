@@ -53,6 +53,8 @@ type Config struct {
 	ConsoleOAuthSecret             string    `json:"consoleOAuthSecret,omitempty"`
 	RouterStatsPassword            string    `json:"routerStatsPassword,omitempty"`
 	ServiceCatalogClusterID        uuid.UUID `json:"serviceCatalogClusterId,omitempty"`
+
+	GenevaLoggingSelector string `json:"genevaLoggingSelector,omitempty"`
 }
 
 // ImageConfig contains all images for the pods
@@ -60,6 +62,9 @@ type ImageConfig struct {
 	// Format of the pull spec that is going to be
 	// used in the cluster.
 	Format string `json:"format,omitempty"`
+
+	// GenevaImagePullSecret defines secret used to pull private Azure images
+	GenevaImagePullSecret []byte `json:"genevaImagePullSecret,omitempty"`
 
 	ClusterMonitoringOperator    string `json:"clusterMonitoringOperator,omitempty"`
 	AzureControllers             string `json:"azureControllers,omitempty"`
@@ -87,6 +92,9 @@ type ImageConfig struct {
 	WebConsole            string `json:"webConsole,omitempty"`
 	Console               string `json:"console,omitempty"`
 	EtcdBackup            string `json:"etcdBackup,omitempty"`
+
+	GenevaLogging string `json:"genevaLogging,omitempty"`
+	GenevaTDAgent string `json:"genevaTDAgent,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.
@@ -121,6 +129,9 @@ type CertificateConfig struct {
 
 	// misc certificates
 	AzureClusterReader CertKeyPair `json:"azureClusterReader,omitempty"`
+
+	// geneva integration certificates
+	GenevaLogging CertKeyPair `json:"genevaLogging,omitempty"`
 }
 
 // CertKeyPair is an rsa private key and x509 certificate pair.

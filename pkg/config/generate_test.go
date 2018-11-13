@@ -70,6 +70,8 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.Images.KubeStateMetricsBase != "", "kube state metrics base image")
 	assert(c.Images.KubeRbacProxyBase != "", "kube rbac proxy base image")
 	assert(c.Images.OAuthProxyBase != "", "oauth proxy base image")
+	assert(c.Images.GenevaLogging != "", "azure logging image")
+	assert(c.Images.GenevaTDAgent != "", "azure TDAgent image")
 
 	assert(c.ServiceAccountKey != nil, "service account key")
 

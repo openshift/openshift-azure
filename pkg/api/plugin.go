@@ -3,6 +3,8 @@ package api
 
 import (
 	"context"
+	"crypto/rsa"
+	"crypto/x509"
 )
 
 // ContextKey is a type for context property bag payload keys
@@ -67,7 +69,9 @@ type DeployFn func(context.Context, map[string]interface{}) error
 type PluginConfig struct {
 	SyncImage       string
 	AcceptLanguages []string
-	TestConfig      TestConfig
+	GenevaConfig    GenevaConfig
+
+	TestConfig TestConfig
 }
 
 // TestConfig holds all testing variables.  It should be empty in production.
@@ -81,6 +85,21 @@ type TestConfig struct {
 	ORegURL               string
 	EtcdBackupImage       string
 	AzureControllersImage string
+}
+
+// GenevaConfig holds all configuration for Plugin integration with Azure
+type GenevaConfig struct {
+	// common values
+	ImagePullSecret []byte
+
+	// logging configuration
+	LoggingCert     *x509.Certificate
+	LoggingKey      *rsa.PrivateKey
+	LoggingSelector string
+	LoggingImage    string
+	TDAgentImage    string
+
+	// TODO: metrics configuration
 }
 
 // Plugin is the main interface to openshift-azure

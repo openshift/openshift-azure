@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"github.com/sirupsen/logrus"
+	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
@@ -24,8 +25,8 @@ type plugin struct {
 var _ api.Plugin = &plugin{}
 
 // NewPlugin creates a new plugin instance
-func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) api.Plugin {
-	return &plugin{
+func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) (api.Plugin, error) {
+	p := &plugin{
 		log:             log,
 		config:          *pluginConfig,
 		clusterUpgrader: cluster.NewSimpleUpgrader(log, pluginConfig),
@@ -33,6 +34,12 @@ func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) api.Plugin {
 		configGenerator: config.NewSimpleGenerator(pluginConfig),
 		apiValidator:    api.NewValidator(pluginConfig.TestConfig.RunningUnderTest),
 	}
+	// validate plugin config
+	errs := p.validateConfig()
+	if len(errs) > 0 {
+		return nil, kerrors.NewAggregate(errs)
+	}
+	return p, nil
 }
 
 func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *api.OpenShiftManagedCluster) {

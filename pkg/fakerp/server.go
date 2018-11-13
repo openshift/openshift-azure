@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"path/filepath"
 	"sync"
 	"time"
@@ -193,22 +192,13 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, s.conf.ClientSecret)
 	ctx = context.WithValue(ctx, api.ContextKeyTenantID, s.conf.TenantID)
 
-	tc := api.TestConfig{
-		RunningUnderTest:      os.Getenv("RUNNING_UNDER_TEST") != "",
-		ImageResourceGroup:    os.Getenv("IMAGE_RESOURCEGROUP"),
-		ImageResourceName:     os.Getenv("IMAGE_RESOURCENAME"),
-		DeployOS:              os.Getenv("DEPLOY_OS"),
-		ImageOffer:            os.Getenv("IMAGE_OFFER"),
-		ImageVersion:          os.Getenv("IMAGE_VERSION"),
-		ORegURL:               os.Getenv("OREG_URL"),
-		EtcdBackupImage:       os.Getenv("ETCDBACKUP_IMAGE"),
-		AzureControllersImage: os.Getenv("AZURE_CONTROLLERS_IMAGE"),
-	}
-
-	config := &api.PluginConfig{
-		SyncImage:       os.Getenv("SYNC_IMAGE"),
-		AcceptLanguages: []string{"en-us"},
-		TestConfig:      tc,
+	// populate plugin configuration
+	config, err := getPluginConfig()
+	if err != nil {
+		resp := "400 Bad Request: Failed to configure plugin"
+		s.log.Debugf("%s: %v", resp, err)
+		http.Error(w, resp, http.StatusBadRequest)
+		return
 	}
 
 	if currentState := s.readState(); string(currentState) == "" {

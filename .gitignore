@@ -11,3 +11,4 @@
 .vscode
 .idea
 coverage.out
+/secrets/*

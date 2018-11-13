@@ -26,7 +26,10 @@ import (
 // CreateOrUpdate simulates the RP
 func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, log *logrus.Entry, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
-	p := plugin.NewPlugin(log, config)
+	p, err := plugin.NewPlugin(log, config)
+	if err != nil {
+		return nil, err
+	}
 
 	// convert the external API manifest into the internal API representation
 	log.Info("convert to internal")
@@ -35,7 +38,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	// the RP will enrich the internal API representation with data not included
 	// in the original request
 	log.Info("enrich")
-	err := enrich(cs)
+	err = enrich(cs)
 	if err != nil {
 		return nil, err
 	}

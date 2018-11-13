@@ -478,5 +478,15 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) 
 		c.ServiceCatalogClusterID = uuid.NewV4()
 	}
 
+	// configure geneva configuration
+	c.Certificates.GenevaLogging.Cert = g.pluginConfig.GenevaConfig.LoggingCert
+	c.Certificates.GenevaLogging.Key = g.pluginConfig.GenevaConfig.LoggingKey
+	if g.pluginConfig.GenevaConfig.LoggingSelector != "" {
+		cs.Config.GenevaLoggingSelector = g.pluginConfig.GenevaConfig.LoggingSelector
+	} else {
+		// test logging selector
+		cs.Config.GenevaLoggingSelector = "US-Test"
+	}
+
 	return
 }

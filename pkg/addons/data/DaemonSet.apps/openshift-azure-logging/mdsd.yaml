@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: mdsd
+  name: mdsd
+  namespace: openshift-azure-logging
+spec:
+  selector:
+    matchLabels:
+      app: mdsd-shard
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: mdsd-shard
+    spec:
+      tolerations:
+        - operator: "Exists"
+          effect: "NoExecute"
+        - operator: "Exists"
+          effect: "NoSchedule"
+      containers:
+        - name: mdsd-customerdata
+          image: "*** GENERATED ***"
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          args:
+            - "-c"
+            - ./bootstrap.sh
+          env:
+            - name: SECTOR
+              value: "*** GENERATED ***"
+            - name: REGION
+              value: "*** GENERATED ***"
+            - name: SUBSCRIPTION_ID
+              value: "*** GENERATED ***"
+            - name: RESOURCE_NAME
+              value: "*** GENERATED ***"
+            - name: RESOURCE_GROUP_NAME
+              value: "*** GENERATED ***"
+          volumeMounts:
+            - mountPath: /var/run/mdsd/
+              name: customerdata-mdsd-sockets
+            - mountPath: /etc/mdsd.d/secret
+              name: gcs-cert
+            - mountPath: /etc/mdsd.d/template
+              name: customerdata-mdsd-config
+      hostPID: true
+      serviceAccountName: geneva
+      imagePullSecrets:
+        - name: azure-registry
+      volumes:
+        - name: customerdata-mdsd-sockets
+          hostPath:
+            path: /var/run/customerDataMdsdContainer/
+        - name: customerdata-mdsd-config
+          configMap:
+            name: mdsd-customerdata-config
+            items:
+            - key: mdsd.xml
+              path: mdsd.xml
+        - name: gcs-cert
+          secret:
+            secretName: gcs-cert
+            items:
+            - key: gcscert.pem
+              path: gcscert.pem
+            - key: gcskey.pem
+              path: gcskey.pem
