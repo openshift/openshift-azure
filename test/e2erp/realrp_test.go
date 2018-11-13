@@ -3,29 +3,15 @@
 package e2erp
 
 import (
-	"context"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
-
-	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
 )
 
 var _ = Describe("Resource provider e2e tests [Real]", func() {
 	defer GinkgoRecover()
 
 	It("should not be possible for customer to mutate an osa scale set", func() {
-		ctx := context.Background()
-		ctx = context.WithValue(ctx, api.ContextKeyClientID, azureConf.ClientID)
-		ctx = context.WithValue(ctx, api.ContextKeyClientSecret, azureConf.ClientSecret)
-		ctx = context.WithValue(ctx, api.ContextKeyTenantID, azureConf.TenantID)
-
-		logrus.SetLevel(log.SanitizeLogLevel("Debug"))
-		logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-		logger := logrus.WithFields(logrus.Fields{"location": c.location, "resourceGroup": c.resourceGroup})
-
 		appRg := ApplicationResourceGroup(c.resourceGroup, c.resourceGroup, c.location)
 		Expect(appRg).NotTo(And(BeNil(), BeEmpty()))
 		logger.Infof("application resource group is %s", appRg)

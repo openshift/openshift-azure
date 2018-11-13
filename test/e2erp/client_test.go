@@ -54,8 +54,7 @@ func newTestClient(conf AzureConfig) *testClient {
 	switch {
 	case fakeRe.Match(focus):
 		fmt.Println("Creating a cluster using the fake resource provider")
-		// rpc = sdk.NewOpenShiftManagedClustersClientWithBaseURI("http://localhost:8080", subID)
-		panic("not implemented yet")
+		rpc = sdk.NewOpenShiftManagedClustersClientWithBaseURI("http://localhost:8080", subID)
 	case realRe.Match(focus):
 		fmt.Println("Creating a cluster using the real resource provider")
 		rpc = sdk.NewOpenShiftManagedClustersClient(subID)

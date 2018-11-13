@@ -30,21 +30,23 @@ type Server struct {
 	state v20180930preview.ProvisioningState
 	oc    *v20180930preview.OpenShiftManagedCluster
 
-	log     *logrus.Entry
-	address string
-	conf    *Config
+	log            *logrus.Entry
+	address        string
+	conf           *Config
+	configBlobPath string
 }
 
-func NewServer(resourceGroup, address string, c *Config) *Server {
+func NewServer(resourceGroup, address string, c *Config, configBlobPath string) *Server {
 	logger := logrus.New()
 	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
 	logger.SetLevel(logrus.DebugLevel)
 
 	return &Server{
-		inProgress: make(chan struct{}, 1),
-		log:        logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": resourceGroup}),
-		address:    address,
-		conf:       c,
+		inProgress:     make(chan struct{}, 1),
+		log:            logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": resourceGroup}),
+		address:        address,
+		conf:           c,
+		configBlobPath: configBlobPath,
 	}
 }
 
@@ -201,7 +203,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		s.writeState(v20180930preview.Updating)
 	}
 
-	if _, err := CreateOrUpdate(ctx, oc, s.log, config); err != nil {
+	if _, err := CreateOrUpdate(ctx, oc, s.configBlobPath, s.log, config); err != nil {
 		s.writeState(v20180930preview.Failed)
 		resp := "400 Bad Request: Failed to apply request"
 		s.log.Debugf("%s: %v", resp, err)

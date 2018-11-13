@@ -25,7 +25,7 @@ import (
 )
 
 // CreateOrUpdate simulates the RP
-func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, entry *logrus.Entry, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
+func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, configBlobPath string, entry *logrus.Entry, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
 	p := plugin.NewPlugin(entry, config)
 
@@ -45,9 +45,9 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
 	var oldCs *api.OpenShiftManagedCluster
-	if _, err := os.Stat("_data/containerservice.yaml"); err == nil {
+	if _, err := os.Stat(configBlobPath); err == nil {
 		log.Info("read old config")
-		oldCs, err = managedcluster.ReadConfig("_data/containerservice.yaml")
+		oldCs, err = managedcluster.ReadConfig(configBlobPath)
 		if err != nil {
 			return nil, err
 		}
@@ -77,7 +77,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	if err != nil {
 		return nil, err
 	}
-	err = ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
+	err = ioutil.WriteFile(configBlobPath, bytes, 0600)
 	if err != nil {
 		return nil, err
 	}

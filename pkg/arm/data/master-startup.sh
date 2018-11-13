@@ -9,7 +9,7 @@ if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
 fi
 
 # remove registry certificate softlink from docker
-unlink /etc/docker/certs.d/registry.access.redhat.com/redhat-ca.crt 
+unlink /etc/docker/certs.d/registry.access.redhat.com/redhat-ca.crt || true
 
 if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker.service

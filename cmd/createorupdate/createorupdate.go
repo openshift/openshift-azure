@@ -29,11 +29,12 @@ import (
 )
 
 var (
-	method   = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
-	useProd  = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
-	manifest = flag.String("manifest", "_data/manifest.yaml", "Manifest to use for the initial request.")
-	update   = flag.String("update", "", "If provided, use this manifest to make a follow-up request after the initial request succeeds.")
-	cleanup  = flag.Bool("rm", false, "Delete the cluster once all other requests have completed successfully.")
+	method     = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
+	useProd    = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
+	manifest   = flag.String("manifest", "_data/manifest.yaml", "Manifest to use for the initial request.")
+	configBlob = flag.String("configBlob", "_data/containerservice.yaml", "Path on disk where the internal cluster representation is written")
+	update     = flag.String("update", "", "If provided, use this manifest to make a follow-up request after the initial request succeeds.")
+	cleanup    = flag.Bool("rm", false, "Delete the cluster once all other requests have completed successfully.")
 
 	// timeouts
 	rmTimeout     = flag.Duration("rm-timeout", 20*time.Minute, "Timeout of the cleanup request")
@@ -195,7 +196,7 @@ func main() {
 	fakeRpAddr := "localhost:8080"
 	if !*useProd {
 		log.Info("starting the fake resource provider")
-		s := fakerp.NewServer(conf.ResourceGroup, fakeRpAddr, conf)
+		s := fakerp.NewServer(conf.ResourceGroup, fakeRpAddr, conf, *configBlob)
 		go s.ListenAndServe()
 	}
 
