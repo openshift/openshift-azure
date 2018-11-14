@@ -7,176 +7,112 @@ import (
 	"testing"
 
 	"github.com/openshift/openshift-azure/pkg/util/structtags"
+	"github.com/openshift/openshift-azure/test/util/populate"
 )
-
-var unmarshalled = &OpenShiftManagedCluster{
-	ID:       "id",
-	Location: "location",
-	Name:     "name",
-	Plan: &ResourcePurchasePlan{
-		Name:          "plan.name",
-		Product:       "plan.product",
-		PromotionCode: "plan.promotionCode",
-		Publisher:     "plan.publisher",
-	},
-	Tags: map[string]string{
-		"tags.k1": "v1",
-		"tags.k2": "v2",
-	},
-	Type: "type",
-	Properties: &Properties{
-		ProvisioningState: "properties.provisioningState",
-		OpenShiftVersion:  "properties.openShiftVersion",
-		PublicHostname:    "properties.publicHostname",
-		FQDN:              "properties.fqdn",
-		AuthProfile: &AuthProfile{
-			IdentityProviders: []IdentityProvider{
-				{
-					Name: "properties.authProfile.identityProviders.0.name",
-					Provider: &AADIdentityProvider{
-						Kind:     "AADIdentityProvider",
-						ClientID: "properties.authProfile.identityProviders.0.provider.clientId",
-						Secret:   "properties.authProfile.identityProviders.0.provider.secret",
-						TenantID: "properties.authProfile.identityProviders.0.provider.tenantId",
-					},
-				},
-			},
-		},
-		RouterProfiles: []RouterProfile{
-			{
-				Name:            "properties.routerProfiles.0.name",
-				PublicSubdomain: "properties.routerProfiles.0.publicSubdomain",
-				FQDN:            "properties.routerProfiles.0.fqdn",
-			},
-			{
-				Name:            "properties.routerProfiles.1.name",
-				PublicSubdomain: "properties.routerProfiles.1.publicSubdomain",
-				FQDN:            "properties.routerProfiles.1.fqdn",
-			},
-		},
-		NetworkProfile: &NetworkProfile{
-			VnetCIDR:   "properties.networkProfile.vnetCidr",
-			PeerVnetID: "properties.networkProfile.peerVnetId",
-		},
-		MasterPoolProfile: &MasterPoolProfile{
-			Count:      1,
-			VMSize:     "properties.agentPoolProfiles.0.vmSize",
-			SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
-		},
-		AgentPoolProfiles: []AgentPoolProfile{
-			{
-				Name:       "properties.agentPoolProfiles.0.name",
-				Count:      1,
-				VMSize:     "properties.agentPoolProfiles.0.vmSize",
-				SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
-				OSType:     "properties.agentPoolProfiles.0.osType",
-				Role:       "properties.agentPoolProfiles.0.role",
-			},
-			{
-				Name:       "properties.agentPoolProfiles.0.name",
-				Count:      2,
-				VMSize:     "properties.agentPoolProfiles.0.vmSize",
-				SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
-				OSType:     "properties.agentPoolProfiles.0.osType",
-				Role:       "properties.agentPoolProfiles.0.role",
-			},
-		},
-	},
-}
 
 var marshalled = []byte(`{
 	"plan": {
-		"name": "plan.name",
-		"product": "plan.product",
-		"promotionCode": "plan.promotionCode",
-		"publisher": "plan.publisher"
+		"name": "Plan.Name",
+		"product": "Plan.Product",
+		"promotionCode": "Plan.PromotionCode",
+		"publisher": "Plan.Publisher"
 	},
 	"properties": {
-		"provisioningState": "properties.provisioningState",
-		"openShiftVersion": "properties.openShiftVersion",
-		"publicHostname": "properties.publicHostname",
-		"fqdn": "properties.fqdn",
+		"provisioningState": "Properties.ProvisioningState",
+		"openShiftVersion": "Properties.OpenShiftVersion",
+		"publicHostname": "Properties.PublicHostname",
+		"fqdn": "Properties.FQDN",
 		"networkProfile": {
-			"vnetCidr": "properties.networkProfile.vnetCidr",
-			"peerVnetId": "properties.networkProfile.peerVnetId"
+			"vnetCidr": "Properties.NetworkProfile.VnetCIDR",
+			"peerVnetId": "Properties.NetworkProfile.PeerVnetID"
 		},
 		"routerProfiles": [
 			{
-				"name": "properties.routerProfiles.0.name",
-				"publicSubdomain": "properties.routerProfiles.0.publicSubdomain",
-				"fqdn": "properties.routerProfiles.0.fqdn"
-			},
-			{
-				"name": "properties.routerProfiles.1.name",
-				"publicSubdomain": "properties.routerProfiles.1.publicSubdomain",
-				"fqdn": "properties.routerProfiles.1.fqdn"
+				"name": "Properties.RouterProfiles[0].Name",
+				"publicSubdomain": "Properties.RouterProfiles[0].PublicSubdomain",
+				"fqdn": "Properties.RouterProfiles[0].FQDN"
 			}
 		],
 		"masterPoolProfile": {
 			"count": 1,
-			"vmSize": "properties.agentPoolProfiles.0.vmSize",
-			"subnetCidr": "properties.agentPoolProfiles.0.subnetCidr"
+			"vmSize": "Properties.MasterPoolProfile.VMSize",
+			"subnetCidr": "Properties.MasterPoolProfile.SubnetCIDR"
 		},
 		"agentPoolProfiles": [
 			{
-				"name": "properties.agentPoolProfiles.0.name",
+				"name": "Properties.AgentPoolProfiles[0].Name",
 				"count": 1,
-				"vmSize": "properties.agentPoolProfiles.0.vmSize",
-				"subnetCidr": "properties.agentPoolProfiles.0.subnetCidr",
-				"osType": "properties.agentPoolProfiles.0.osType",
-				"role": "properties.agentPoolProfiles.0.role"
-			},
-			{
-				"name": "properties.agentPoolProfiles.0.name",
-				"count": 2,
-				"vmSize": "properties.agentPoolProfiles.0.vmSize",
-				"subnetCidr": "properties.agentPoolProfiles.0.subnetCidr",
-				"osType": "properties.agentPoolProfiles.0.osType",
-				"role": "properties.agentPoolProfiles.0.role"
+				"vmSize": "Properties.AgentPoolProfiles[0].VMSize",
+				"subnetCidr": "Properties.AgentPoolProfiles[0].SubnetCIDR",
+				"osType": "Properties.AgentPoolProfiles[0].OSType",
+				"role": "Properties.AgentPoolProfiles[0].Role"
 			}
 		],
 		"authProfile": {
 			"identityProviders": [
 				{
-					"name": "properties.authProfile.identityProviders.0.name",
+					"name": "Properties.AuthProfile.IdentityProviders[0].Name",
 					"provider": {
 						"kind": "AADIdentityProvider",
-						"clientId": "properties.authProfile.identityProviders.0.provider.clientId",
-						"secret": "properties.authProfile.identityProviders.0.provider.secret",
-						"tenantId": "properties.authProfile.identityProviders.0.provider.tenantId"
+						"clientId": "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
+						"secret": "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
+						"tenantId": "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID"
 					}
 				}
 			]
 		}
 	},
-	"id": "id",
-	"name": "name",
-	"type": "type",
-	"location": "location",
+	"id": "ID",
+	"name": "Name",
+	"type": "Type",
+	"location": "Location",
 	"tags": {
-		"tags.k1": "v1",
-		"tags.k2": "v2"
+		"Tags.key": "Tags.val"
 	}
 }`)
 
 func TestMarshal(t *testing.T) {
-	b, err := json.MarshalIndent(unmarshalled, "", "\t")
+	prepare := func(v reflect.Value) {
+		switch v.Interface().(type) {
+		case []IdentityProvider:
+			// set the Provider to AADIdentityProvider
+			v.Set(reflect.ValueOf([]IdentityProvider{{Provider: &AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
+		}
+	}
+
+	populatedOc := OpenShiftManagedCluster{}
+	populate.Walk(&populatedOc, prepare)
+
+	b, err := json.MarshalIndent(populatedOc, "", "\t")
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	if !bytes.Equal(b, marshalled) {
 		t.Errorf("json.MarshalIndent returned unexpected result\n%s\n", string(b))
 	}
 }
 
 func TestUnmarshal(t *testing.T) {
-	var oc *OpenShiftManagedCluster
-	err := json.Unmarshal(marshalled, &oc)
+	prepare := func(v reflect.Value) {
+		switch v.Interface().(type) {
+		case []IdentityProvider:
+			// set the Provider to AADIdentityProvider
+			v.Set(reflect.ValueOf([]IdentityProvider{{Provider: &AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
+		}
+	}
+
+	populatedOc := OpenShiftManagedCluster{}
+	populate.Walk(&populatedOc, prepare)
+
+	var unmarshalledOc OpenShiftManagedCluster
+	err := json.Unmarshal(marshalled, &unmarshalledOc)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(oc, unmarshalled) {
-		t.Errorf("json.Unmarshal returned unexpected result\n%#v\n", oc)
+
+	if !reflect.DeepEqual(populatedOc, unmarshalledOc) {
+		t.Errorf("json.Unmarshal returned unexpected result\n%#v\n", unmarshalledOc)
 	}
 }
 
