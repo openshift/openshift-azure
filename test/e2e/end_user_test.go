@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"strconv"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -134,6 +135,44 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 	})
 
 	It("should deploy a template with persistent storage and test failure modes", func() {
+		prevCounter := 0
+
+		loopHTTPGet := func(url string, regex *regexp.Regexp, times int) error {
+			httpc := &http.Client{
+				Timeout: 10 * time.Second,
+			}
+
+			for i := 0; i < times; i++ {
+				resp, err := httpc.Get(url)
+				if err != nil {
+					return err
+				}
+				defer resp.Body.Close()
+				if resp.StatusCode != http.StatusOK {
+					return fmt.Errorf("unexpected http error returned: %d", resp.StatusCode)
+				}
+
+				contents, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					return err
+				}
+				matches := regex.FindStringSubmatch(string(contents))
+				if matches == nil {
+					return fmt.Errorf("no matches found for %s", regex)
+				}
+
+				currCounter, err := strconv.Atoi(matches[1])
+				if err != nil {
+					return err
+				}
+				if currCounter <= prevCounter {
+					return fmt.Errorf("visit counter didn't increment: %d should be > than %d", currCounter, prevCounter)
+				}
+				prevCounter = currCounter
+			}
+			return nil
+		}
+
 		// instantiate the template
 		tpl := "django-psql-persistent"
 		By(fmt.Sprintf("instantiating the template and getting the route (%v)", time.Now()))
@@ -150,48 +189,34 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		url := fmt.Sprintf("http://%s", host)
 		regex := regexp.MustCompile(`Page views:\s*(\d+)`)
 		By(fmt.Sprintf("hitting the route 3 times, expecting counter to increment (%v)", time.Now()))
-		hit := c.loopHTTPGet(url, regex, 3)
-		preHitErr := hit()
-		Expect(preHitErr).NotTo(HaveOccurred())
+		err = loopHTTPGet(url, regex, 3)
+		Expect(err).NotTo(HaveOccurred())
 
 		// Find the database deploymentconfig and scale down to 0, then back up to 1
 		dcName := "postgresql"
 		for _, i := range []int32{0, 1} {
 			By(fmt.Sprintf("searching for the database deploymentconfig (%v)", time.Now()))
-			dbDeploymentConfig, err := c.ac.DeploymentConfigs(c.namespace).Get(dcName, metav1.GetOptions{})
+			dc, err := c.ac.DeploymentConfigs(c.namespace).Get(dcName, metav1.GetOptions{})
 			Expect(err).NotTo(HaveOccurred())
-			Expect(dbDeploymentConfig).NotTo(BeNil())
+
 			By(fmt.Sprintf("scaling the database deploymentconfig to %d (%v)", i, time.Now()))
-			dbDeploymentConfig.Spec.Replicas = int32(i)
-			updated, err := c.ac.DeploymentConfigs(c.namespace).Update(dbDeploymentConfig)
+			dc.Spec.Replicas = int32(i)
+			_, err = c.ac.DeploymentConfigs(c.namespace).Update(dc)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(updated).NotTo(BeNil())
+
 			By(fmt.Sprintf("waiting for database deploymentconfig to reflect %d replicas (%v)", i, time.Now()))
-			waitErr := wait.PollImmediate(2*time.Second, 10*time.Minute, func() (bool, error) {
-				dc, err := c.ac.DeploymentConfigs(c.namespace).Get(dcName, metav1.GetOptions{})
-				switch {
-				case err == nil:
-					return i == dc.Status.Replicas &&
-						i == dc.Status.ReadyReplicas &&
-						i == dc.Status.AvailableReplicas &&
-						i == dc.Status.UpdatedReplicas &&
-						dc.Generation == dc.Status.ObservedGeneration, nil
-				default:
-					return false, err
-				}
-			})
+			waitErr := wait.PollImmediate(2*time.Second, 10*time.Minute, c.deploymentConfigIsReady(dcName, i))
 			Expect(waitErr).NotTo(HaveOccurred())
 		}
 
 		// wait for the ingress to return 200 in case healthcheck failed when database got recreated
 		By(fmt.Sprintf("making sure the ingress is healthy (%v)", time.Now()))
-		var rt http.RoundTripper
-		waitErr := waitutil.ForHTTPStatusOk(context.Background(), rt, url)
+		waitErr := waitutil.ForHTTPStatusOk(context.Background(), nil, url)
 		Expect(waitErr).NotTo(HaveOccurred())
 
 		// hit it again, will hit 3 times as specified initially
 		By(fmt.Sprintf("hitting the route again, expecting counter to increment from last (%v)", time.Now()))
-		postHitErr := hit()
-		Expect(postHitErr).NotTo(HaveOccurred())
+		err = loopHTTPGet(url, regex, 3)
+		Expect(err).NotTo(HaveOccurred())
 	})
 })
