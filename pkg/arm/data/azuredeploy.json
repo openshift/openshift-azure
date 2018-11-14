@@ -149,14 +149,15 @@
             }
         }
 {{- range $app := .ContainerService.Properties.AgentPoolProfiles }},
-{{- if not IsUpgrade}}
+{{- if not IsUpgrade }}
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
             "location": "{{ $.ContainerService.Location | js }}",
-            "name": "nsg-{{ $app.Name }}",
+            "name": "nsg-{{ $app.Name | js }}",
             "properties": {
                 "securityRules": [
+{{- if eq $app.Role "master" }}
                     {
                         "name": "allow_ssh",
                         "properties": {
@@ -170,8 +171,7 @@
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*"
                         }
-                    }
-{{- if eq $app.Role "master" }},
+                    },
                     {
                         "name": "allow_https",
                         "properties": {
@@ -200,7 +200,7 @@
 {{- if eq $app.Role "master" }},
                 "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]"
 {{- end }}
-{{- if not IsUpgrade}},
+{{- if not IsUpgrade }},
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name | js }}')]"
 {{- end }}
             ],
@@ -274,7 +274,7 @@
                                     "primary": true,
                                     "enableIPForwarding": true,
                                     "networkSecurityGroup": {
-                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name }}')]"
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name | js }}')]"
                                     },
                                     "ipConfigurations": [
                                         {
