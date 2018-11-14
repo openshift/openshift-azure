@@ -219,7 +219,7 @@ var marshalled = []byte(`{
 	}
 }`)
 
-func TestMarshall(t *testing.T) {
+func TestMarshal(t *testing.T) {
 	prepare := func(v reflect.Value) {
 		switch v.Interface().(type) {
 		case []IdentityProvider:
@@ -237,7 +237,7 @@ func TestMarshall(t *testing.T) {
 	}
 
 	if !bytes.Equal(b, marshalled) {
-		t.Errorf("json.MarshallIndent returned unexpected result\n%s\n%s\n", string(b), marshalled)
+		t.Errorf("json.MarshalIndent returned unexpected result\n%s\n", string(b))
 	}
 }
 

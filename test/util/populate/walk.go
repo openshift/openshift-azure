@@ -74,7 +74,7 @@ func init() {
 	}
 }
 
-type Walker struct {
+type walker struct {
 	prepare func(v reflect.Value)
 }
 
@@ -97,11 +97,11 @@ func Walk(v interface{}, prepare func(v reflect.Value)) {
 	if val.Kind() != reflect.Ptr {
 		panic("argument is not a pointer to a value")
 	}
-	Walker{prepare: prepare}.walk(val, "")
+	walker{prepare: prepare}.walk(val, "")
 }
 
 // walk fills in the complete structure of a complex value v using path as the root of the labelling.
-func (w Walker) walk(v reflect.Value, path string) {
+func (w walker) walk(v reflect.Value, path string) {
 	if !v.IsValid() {
 		return
 	}
@@ -149,11 +149,13 @@ func (w Walker) walk(v reflect.Value, path string) {
 			newpath := extendPath(path, v.Type().Field(i).Name, v.Kind())
 			w.walk(field, newpath)
 		}
-	case reflect.Array, reflect.Slice:
-		// if the array/slice has length 0 allocate a new slice of length 1
+	case reflect.Slice:
+		// if the slice has length 0 allocate a new slice of length 1
 		if v.Len() == 0 {
 			v.Set(reflect.MakeSlice(v.Type(), 1, 1))
 		}
+		fallthrough
+	case reflect.Array:
 		for i := 0; i < v.Len(); i++ {
 			field := v.Index(i)
 			newpath := extendPath(path, strconv.Itoa(i), v.Kind())
