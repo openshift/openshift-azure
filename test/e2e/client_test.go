@@ -11,6 +11,8 @@ import (
 
 	"github.com/ghodss/yaml"
 	project "github.com/openshift/api/project/v1"
+	templatev1 "github.com/openshift/api/template/v1"
+	appsv1 "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	projectclient "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
@@ -26,6 +28,7 @@ import (
 var c, cadmin, creader *testClient
 
 type testClient struct {
+	ac        *appsv1.AppsV1Client
 	kc        *kubernetes.Clientset
 	pc        *projectclient.ProjectV1Client
 	rc        *routev1client.RouteV1Client
@@ -83,7 +86,13 @@ func newTestClient(kubeconfig, artifactDir string) *testClient {
 		panic(err)
 	}
 
+	ac, err := appsv1.NewForConfig(config)
+	if err != nil {
+		panic(err)
+	}
+
 	return &testClient{
+		ac:          ac,
 		kc:          kc,
 		pc:          pc,
 		rc:          rc,
@@ -177,4 +186,30 @@ func (t *testClient) dumpInfo() error {
 		fmt.Println(podBuf.String())
 	}
 	return nil
+}
+
+func (t *testClient) instantiateTemplate(tpl string) error {
+	// Create the template
+	template, err := t.tc.Templates("openshift").Get(
+		tpl, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	// Instantiate the template
+	_, err = t.tc.TemplateInstances(c.namespace).Create(
+		&templatev1.TemplateInstance{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: c.namespace,
+			},
+			Spec: templatev1.TemplateInstanceSpec{
+				Template: *template,
+			},
+		})
+	if err != nil {
+		return err
+	}
+
+	// Return after waiting for instance to complete
+	return wait.PollImmediate(2*time.Second, 10*time.Minute, c.templateInstanceIsReady)
 }

@@ -33,6 +33,22 @@ func (t *testClient) templateInstanceIsReady() (bool, error) {
 	return false, nil
 }
 
+func (t *testClient) deploymentConfigIsReady(name string, replicas int32) func() (bool, error) {
+	return func() (bool, error) {
+		dc, err := c.ac.DeploymentConfigs(c.namespace).Get(name, metav1.GetOptions{})
+		switch {
+		case err == nil:
+			return replicas == dc.Status.Replicas &&
+				replicas == dc.Status.ReadyReplicas &&
+				replicas == dc.Status.AvailableReplicas &&
+				replicas == dc.Status.UpdatedReplicas &&
+				dc.Generation == dc.Status.ObservedGeneration, nil
+		default:
+			return false, err
+		}
+	}
+}
+
 func (t *testClient) projectIsCleanedUp() (bool, error) {
 	_, err := t.pc.Projects().Get(t.namespace, metav1.GetOptions{})
 	if kerrors.IsNotFound(err) {
