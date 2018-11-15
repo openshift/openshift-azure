@@ -8,6 +8,8 @@ if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
     SERVICE_TYPE=atomic-openshift
 fi
 
+
+# whatever
 # remove registry certificate softlink from docker
 unlink /etc/docker/certs.d/registry.access.redhat.com/redhat-ca.crt 
 
