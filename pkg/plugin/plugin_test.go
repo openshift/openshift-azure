@@ -35,7 +35,6 @@ func TestMerge(t *testing.T) {
 	defer mockCtrl.Finish()
 	var config = api.PluginConfig{
 		SyncImage:       "sync:latest",
-		LogBridgeImage:  "logbridge:latest",
 		AcceptLanguages: []string{"en-us"},
 	}
 	newCluster := fixtures.NewTestOpenShiftCluster()

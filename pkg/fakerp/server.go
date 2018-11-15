@@ -189,7 +189,6 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 
 	config := &api.PluginConfig{
 		SyncImage:       os.Getenv("SYNC_IMAGE"),
-		LogBridgeImage:  os.Getenv("LOGBRIDGE_IMAGE"),
 		AcceptLanguages: []string{"en-us"},
 		TestConfig:      tc,
 	}

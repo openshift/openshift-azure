@@ -81,8 +81,6 @@ var marshalled = []byte(`{
 		"sshKey": "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlCT1FJQkFBSkJBTko2cWhjWmlBK0tsUURETlZqQTY0TVRJbSt3WGFWUnZ6Q2Zwbm9ya0Y0OVJHMVYvVm5mClZCTmVPNTBvb3E1ZGNpcElOM284bmVwY09QQU5Ybk5vVkVNQ0F3RUFBUUpBSFNIclR2MHlydXdBaWJWN09jaWkKRUdkaW1kRHdkVVJtVVNXWDFrc1hWV09uTXFxeFk4c1ZEZTQrOVNqbW1uMHRpZjc3UDRHWE0zUWxKSjFXa0tvQQo4UUloQVBPWjhjRDd0NTNBazIzOWh1bytMR1FnNUZZaVdVM0JGWTJ1VUQ0RG1EL0xBaUVBM1RFbHdFcC8ybXN5CkVlaXNlc3B6ZlBqQXVSME16clRoS3FEcTEwa3BQbWtDSUdFaThORElUd2FicE81R0cwZEt0WDdUMHRrNTV5eG4KSXdZVkRUQTlWTGVUQWlBd2dhcXB0S3k5Rld6eGlIanFwS01XOE9ZeXNqQXcxSEhjaTFWMHlOS0dvUUlnWlZiVQpNZU1kQVdVdkVJbXowY0RnQ3BLTCtqNDAySm1iZFZ1dkhNNyt3QVU9Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==",
 		"configStorageAccount": "Config.ConfigStorageAccount",
 		"registryStorageAccount": "Config.RegistryStorageAccount",
-		"loggingWorkspace": "Config.LoggingWorkspace",
-		"loggingLocation": "Config.LoggingLocation",
 		"certificates": {
 			"etcdCa": {
 				"key": "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlCT1FJQkFBSkJBTko2cWhjWmlBK0tsUURETlZqQTY0TVRJbSt3WGFWUnZ6Q2Zwbm9ya0Y0OVJHMVYvVm5mClZCTmVPNTBvb3E1ZGNpcElOM284bmVwY09QQU5Ybk5vVkVNQ0F3RUFBUUpBSFNIclR2MHlydXdBaWJWN09jaWkKRUdkaW1kRHdkVVJtVVNXWDFrc1hWV09uTXFxeFk4c1ZEZTQrOVNqbW1uMHRpZjc3UDRHWE0zUWxKSjFXa0tvQQo4UUloQVBPWjhjRDd0NTNBazIzOWh1bytMR1FnNUZZaVdVM0JGWTJ1VUQ0RG1EL0xBaUVBM1RFbHdFcC8ybXN5CkVlaXNlc3B6ZlBqQXVSME16clRoS3FEcTEwa3BQbWtDSUdFaThORElUd2FicE81R0cwZEt0WDdUMHRrNTV5eG4KSXdZVkRUQTlWTGVUQWlBd2dhcXB0S3k5Rld6eGlIanFwS01XOE9ZeXNqQXcxSEhjaTFWMHlOS0dvUUlnWlZiVQpNZU1kQVdVdkVJbXowY0RnQ3BLTCtqNDAySm1iZFZ1dkhNNyt3QVU9Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==",
@@ -193,8 +191,7 @@ var marshalled = []byte(`{
 			"registryConsole": "Config.Images.RegistryConsole",
 			"ansibleServiceBroker": "Config.Images.AnsibleServiceBroker",
 			"webConsole": "Config.Images.WebConsole",
-			"console": "Config.Images.Console",
-			"logBridge": "Config.Images.LogBridge"
+			"console": "Config.Images.Console"
 		},
 		"adminKubeconfig": "eyJwcmVmZXJlbmNlcyI6e30sImNsdXN0ZXJzIjpudWxsLCJ1c2VycyI6bnVsbCwiY29udGV4dHMiOm51bGwsImN1cnJlbnQtY29udGV4dCI6IiJ9",
 		"masterKubeconfig": "eyJwcmVmZXJlbmNlcyI6e30sImNsdXN0ZXJzIjpudWxsLCJ1c2VycyI6bnVsbCwiY29udGV4dHMiOm51bGwsImN1cnJlbnQtY29udGV4dCI6IiJ9",
@@ -237,7 +234,7 @@ func TestMarshal(t *testing.T) {
 	}
 
 	if !bytes.Equal(b, marshalled) {
-		t.Errorf("json.MarshalIndent returned unexpected result\n%s\n", string(b))
+		t.Errorf("json.MarshalIndent returned unexpected result\n%s\n--------------\n%s", string(b), string(marshalled))
 	}
 }
 

@@ -51,50 +51,6 @@ cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
 {{ .Derived.CloudProviderConf .ContainerService | String }}
 EOF
 
-{{- if not $.Extra.TestConfig.RunningUnderTest }}
-mkdir -p /var/lib/logbridge
-cat >/etc/origin/node/pods/logbridge.yaml <<'EOF'
-apiVersion: v1
-kind: Pod
-metadata:
-  name: logbridge
-  namespace: kube-system
-spec:
-  containers:
-  - image: {{ .Config.Images.LogBridge | quote }}
-    imagePullPolicy: Always
-    name: logbridge
-    securityContext:
-      privileged: true
-    volumeMounts:
-    - mountPath: /state
-      name: state
-    - mountPath: /cloudprovider
-      name: master-cloud-provider
-      readOnly: true
-    - mountPath: /etc
-      name: etc
-      readOnly: true
-    - mountPath: /var/log
-      name: var-log
-      readOnly: true
-  hostNetwork: true
-  volumes:
-  - hostPath:
-      path: /var/lib/logbridge
-    name: state
-  - hostPath:
-      path: /etc/origin/cloudprovider
-    name: master-cloud-provider
-  - hostPath:
-      path: /etc
-    name: etc
-  - hostPath:
-      path: /var/log
-    name: var-log
-EOF
-{{- end }}
-
 # note: ${SERVICE_TYPE}-node crash loops until master is up
 systemctl enable ${SERVICE_TYPE}-node.service
 systemctl start ${SERVICE_TYPE}-node.service &

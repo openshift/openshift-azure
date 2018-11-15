@@ -103,7 +103,6 @@ func (g *simpleGenerator) selectContainerImagesOrigin(cs *api.OpenShiftManagedCl
 		c.Images.Registry = g.image("docker-registry", v)
 
 		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.11"
-		c.Images.LogBridge = "quay.io/openshift-on-azure/logbridge:latest"
 	}
 	return nil
 }
@@ -148,7 +147,6 @@ func (g *simpleGenerator) selectContainerImagesOSA(cs *api.OpenShiftManagedClust
 		c.Images.Registry = g.image("docker-registry", v)
 
 		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.11"
-		c.Images.LogBridge = "quay.io/openshift-on-azure/logbridge:latest"
 	}
 
 	return nil
@@ -171,9 +169,6 @@ func (g *simpleGenerator) selectContainerImages(cs *api.OpenShiftManagedCluster)
 
 	if g.pluginConfig.SyncImage != "" {
 		cs.Config.Images.Sync = g.pluginConfig.SyncImage
-	}
-	if g.pluginConfig.LogBridgeImage != "" {
-		cs.Config.Images.LogBridge = g.pluginConfig.LogBridgeImage
 	}
 
 	return nil
