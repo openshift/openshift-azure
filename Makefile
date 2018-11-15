@@ -17,7 +17,6 @@ generate:
 TAG ?= $(shell git rev-parse --short HEAD)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
-E2E_EXEC ?= ./hack/e2e.sh
 
 sync: generate
 	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/sync
@@ -45,9 +44,12 @@ cover: unit
 	go tool cover -html=coverage.out
 
 e2e: generate
-	sh ${E2E_EXEC}
+	./hack/e2e.sh
 
 e2e-prod:
 	go test ./test/e2erp -tags e2erp -test.v -ginkgo.v -ginkgo.randomizeAllSpecs -ginkgo.noColor -ginkgo.focus=Real -timeout 4h
 
-.PHONY: clean sync-image sync-push verify unit e2e e2e-prod
+e2e-bushslicer: generate
+	SUITE=bushslicer ./hack/e2e.sh
+
+.PHONY: clean sync-image sync-push verify unit e2e e2e-prod e2e-bushslicer

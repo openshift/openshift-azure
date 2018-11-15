@@ -41,3 +41,9 @@ if [[ -z "$SUITE" || "$SUITE" == "customer-cluster-admin" ]]; then
   KUBECONFIG=$KUBECONFIG_END_USER oc login $fqdn --username enduser --password "$(awk '/^  endUserPasswd:/{ print $2 }' <_data/containerservice.yaml)" --insecure-skip-tls-verify=true
   go test ./test/e2e -test.v -ginkgo.v -ginkgo.focus="\[CustomerAdmin\]" -ginkgo.noColor -ginkgo.randomizeAllSpecs -tags e2e -kubeconfig ../../_data/_out/enduser.kubeconfig "${ARTIFACT_FLAG:-}"
 fi
+
+if [[ -z "$SUITE" || "$SUITE" == "bushslicer" ]]; then
+  echo "Running bushslicer tests"
+  # TODO: setup environment here
+  /usr/bin/scl enable rh-git29 rh-ror50 -- /opt/rh/rh-ruby24/root/usr/local/bin/cucumber feature/cli/build.feature:5
+fi
