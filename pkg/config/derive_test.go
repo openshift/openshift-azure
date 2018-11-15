@@ -16,11 +16,11 @@ func TestDerivedCloudProviderConf(t *testing.T) {
 		{
 			name: "one",
 			cs: api.OpenShiftManagedCluster{
-				Properties: &api.Properties{AzProfile: &api.AzProfile{
+				Properties: api.Properties{AzProfile: api.AzProfile{
 					TenantID:       "tenant",
 					SubscriptionID: "sub",
 					ResourceGroup:  "rg",
-				}, ServicePrincipalProfile: &api.ServicePrincipalProfile{
+				}, ServicePrincipalProfile: api.ServicePrincipalProfile{
 					ClientID: "client_id",
 					Secret:   "client_secrett",
 				}},
@@ -53,7 +53,7 @@ vmType: vmss
 
 func TestDerivedMasterLBCNamePrefix(t *testing.T) {
 	cs := api.OpenShiftManagedCluster{
-		Properties: &api.Properties{FQDN: "bar.baz"},
+		Properties: api.Properties{FQDN: "bar.baz"},
 	}
 	if got := Derived.MasterLBCNamePrefix(&cs); got != "bar" {
 		t.Errorf("derived.MasterLBCNamePrefix() = %v, want %v", got, "bar")
@@ -62,7 +62,7 @@ func TestDerivedMasterLBCNamePrefix(t *testing.T) {
 
 func TestDerivedRouterLBCNamePrefix(t *testing.T) {
 	cs := api.OpenShiftManagedCluster{
-		Properties: &api.Properties{
+		Properties: api.Properties{
 			RouterProfiles: []api.RouterProfile{
 				{
 					FQDN: "one.two.three",
@@ -82,13 +82,13 @@ func TestDerivedPublicHostname(t *testing.T) {
 	}{
 		{
 			cs: api.OpenShiftManagedCluster{
-				Properties: &api.Properties{FQDN: "bar", PublicHostname: "baar"},
+				Properties: api.Properties{FQDN: "bar", PublicHostname: "baar"},
 			},
 			want: "baar",
 		},
 		{
 			cs: api.OpenShiftManagedCluster{
-				Properties: &api.Properties{FQDN: "bar", PublicHostname: ""},
+				Properties: api.Properties{FQDN: "bar", PublicHostname: ""},
 			},
 			want: "bar",
 		},
@@ -111,7 +111,7 @@ func TestDerivedKubeAndSystemReserved(t *testing.T) {
 	}{
 		{
 			cs: api.OpenShiftManagedCluster{
-				Properties: &api.Properties{
+				Properties: api.Properties{
 					AgentPoolProfiles: []api.AgentPoolProfile{
 						{
 							Role:   api.AgentPoolProfileRoleCompute,
@@ -126,7 +126,7 @@ func TestDerivedKubeAndSystemReserved(t *testing.T) {
 		},
 		{
 			cs: api.OpenShiftManagedCluster{
-				Properties: &api.Properties{
+				Properties: api.Properties{
 					AgentPoolProfiles: []api.AgentPoolProfile{
 						{
 							Role:   api.AgentPoolProfileRoleInfra,
@@ -140,7 +140,7 @@ func TestDerivedKubeAndSystemReserved(t *testing.T) {
 		},
 		{
 			cs: api.OpenShiftManagedCluster{
-				Properties: &api.Properties{
+				Properties: api.Properties{
 					AgentPoolProfiles: []api.AgentPoolProfile{
 						{
 							Role:   api.AgentPoolProfileRoleMaster,
@@ -155,7 +155,7 @@ func TestDerivedKubeAndSystemReserved(t *testing.T) {
 		},
 		{
 			cs: api.OpenShiftManagedCluster{
-				Properties: &api.Properties{
+				Properties: api.Properties{
 					AgentPoolProfiles: []api.AgentPoolProfile{
 						{
 							Role:   api.AgentPoolProfileRoleMaster,
@@ -170,7 +170,7 @@ func TestDerivedKubeAndSystemReserved(t *testing.T) {
 		},
 		{
 			cs: api.OpenShiftManagedCluster{
-				Properties: &api.Properties{},
+				Properties: api.Properties{},
 			},
 			role:      "anewrole",
 			wantKRErr: "role anewrole not found",

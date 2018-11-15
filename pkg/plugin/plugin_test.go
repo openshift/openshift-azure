@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -13,72 +12,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
-	"github.com/openshift/openshift-azure/test/util/populate"
 	"github.com/openshift/openshift-azure/test/util/tls"
 )
-
-func TestMerge(t *testing.T) {
-	log := logrus.NewEntry(logrus.StandardLogger())
-
-	prepare := func(v reflect.Value) {
-		switch v.Interface().(type) {
-		case []api.IdentityProvider:
-			// set the Provider to AADIdentityProvider
-			v.Set(reflect.ValueOf([]api.IdentityProvider{{Provider: &api.AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
-		}
-	}
-	var config = api.PluginConfig{
-		SyncImage:       "sync:latest",
-		AcceptLanguages: []string{"en-us"},
-		GenevaConfig: api.GenevaConfig{
-			ImagePullSecret: []byte("ImagePullSecret"),
-			LoggingImage:    "loggingImage",
-			TDAgentImage:    "tdAgentImage",
-			LoggingSector:   "loggingSector",
-			LoggingCert:     tls.GetDummyCertificate(),
-			LoggingKey:      tls.GetDummyPrivateKey(),
-		},
-	}
-
-	oldCluster := &api.OpenShiftManagedCluster{}
-	populate.Walk(&oldCluster, prepare)
-
-	newCluster := &api.OpenShiftManagedCluster{Properties: &api.Properties{}}
-
-	p, err := NewPlugin(log, &config)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// should fix all of the items removed above and we should
-	// be able to run through the entire plugin process.
-	p.MergeConfig(context.Background(), newCluster, oldCluster)
-
-	if newCluster.Config == nil {
-		t.Errorf("new cluster config should be merged")
-	}
-	if len(newCluster.Properties.AgentPoolProfiles) == 0 {
-		t.Errorf("new cluster agent pool profiles should be merged")
-	}
-	if newCluster.Properties.NetworkProfile == nil {
-		t.Errorf("new cluster network profile should be merged")
-	}
-	if len(newCluster.Properties.RouterProfiles) == 0 {
-		t.Errorf("new cluster router profiles should be merged")
-	}
-	if newCluster.Properties.ServicePrincipalProfile == nil {
-		t.Errorf("new cluster service principal profile should be merged")
-	}
-	if newCluster.Properties.AzProfile == nil {
-		t.Errorf("new cluster az profile should be merged")
-	}
-	if newCluster.Properties.AuthProfile == nil {
-		t.Errorf("new cluster auth profile should be merged")
-	}
-	if newCluster.Properties.FQDN == "" {
-		t.Errorf("new cluster fqdn should be merged")
-	}
-}
 
 func TestGenerateARM(t *testing.T) {
 	mockCtrl := gomock.NewController(t)

@@ -8,13 +8,13 @@ const (
 // OpenShiftManagedCluster complies with the ARM model of resource definition in
 // a JSON template.
 type OpenShiftManagedCluster struct {
-	Plan       *ResourcePurchasePlan `json:"plan,omitempty"`
-	Properties *Properties           `json:"properties,omitempty"`
-	ID         string                `json:"id,omitempty"`
-	Name       string                `json:"name,omitempty"`
-	Type       string                `json:"type,omitempty"`
-	Location   string                `json:"location,omitempty"`
-	Tags       map[string]string     `json:"tags"`
+	Plan       ResourcePurchasePlan `json:"plan,omitempty"`
+	Properties Properties           `json:"properties,omitempty"`
+	ID         string               `json:"id,omitempty"`
+	Name       string               `json:"name,omitempty"`
+	Type       string               `json:"type,omitempty"`
+	Location   string               `json:"location,omitempty"`
+	Tags       map[string]string    `json:"tags"`
 
 	Config *Config `json:"config,omitempty"`
 }
@@ -47,7 +47,7 @@ type Properties struct {
 	FQDN string `json:"fqdn,omitempty"`
 
 	// NetworkProfile (in): Configuration for OpenShift networking.
-	NetworkProfile *NetworkProfile `json:"networkProfile,omitempty"`
+	NetworkProfile NetworkProfile `json:"networkProfile,omitempty"`
 
 	// RouterProfiles (in,optional/out): Configuration for OpenShift router(s).
 	RouterProfiles []RouterProfile `json:"routerProfiles,omitempty"`
@@ -56,11 +56,11 @@ type Properties struct {
 	AgentPoolProfiles []AgentPoolProfile `json:"agentPoolProfiles,omitempty"`
 
 	// AuthProfile (in): configures OpenShift authentication
-	AuthProfile *AuthProfile `json:"authProfile,omitempty"`
+	AuthProfile AuthProfile `json:"authProfile,omitempty"`
 
-	ServicePrincipalProfile *ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
+	ServicePrincipalProfile ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
 
-	AzProfile *AzProfile `json:"azProfile,omitempty"`
+	AzProfile AzProfile `json:"azProfile,omitempty"`
 }
 
 // ProvisioningState represents the current state of the OSA resource.

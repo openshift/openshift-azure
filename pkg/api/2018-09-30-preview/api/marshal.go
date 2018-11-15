@@ -7,7 +7,7 @@ import (
 
 func (ip *IdentityProvider) UnmarshalJSON(b []byte) error {
 	dummy := struct {
-		Name     string          `json:"name,omitempty"`
+		Name     *string         `json:"name,omitempty"`
 		Provider json.RawMessage `json:"provider,omityempty"`
 	}{}
 	err := json.Unmarshal(b, &dummy)

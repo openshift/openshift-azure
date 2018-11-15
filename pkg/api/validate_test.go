@@ -68,9 +68,9 @@ func TestValidate(t *testing.T) {
 			},
 			simulateProd: true,
 			expectedErrs: []error{
+				errors.New(`invalid properties.masterPoolProfile.vmSize "Standard_D2s_v3"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].vmSize "Standard_D2s_v3"`),
 				errors.New(`invalid properties.agentPoolProfiles["myCompute"].vmSize "Standard_D2s_v3"`),
-				errors.New(`invalid properties.masterPoolProfile.vmSize "Standard_D2s_v3"`),
 			},
 		},
 		"simulating prod, Standard_D8s_v3": {
@@ -114,10 +114,6 @@ func TestValidate(t *testing.T) {
 		"name": {
 			f:            func(oc *OpenShiftManagedCluster) { oc.Name = "" },
 			expectedErrs: []error{errors.New(`invalid name ""`)},
-		},
-		"nil properties": {
-			f:            func(oc *OpenShiftManagedCluster) { oc.Properties = nil },
-			expectedErrs: []error{errors.New(`properties cannot be nil`)},
 		},
 		"openshift config invalid api fqdn": {
 			f: func(oc *OpenShiftManagedCluster) {
@@ -187,9 +183,9 @@ func TestValidate(t *testing.T) {
 				oc.Properties.NetworkProfile.VnetCIDR = "192.168.0.0/16"
 			},
 			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
-				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
 			},
 		},
 		"network profile valid peerVnetId": {
@@ -265,7 +261,7 @@ func TestValidate(t *testing.T) {
 			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.AgentPoolProfiles = append(
 					oc.Properties.AgentPoolProfiles,
-					oc.Properties.AgentPoolProfiles[0])
+					oc.Properties.AgentPoolProfiles[1])
 			},
 			expectedErrs: []error{errors.New(`duplicate role "infra" in properties.agentPoolProfiles["infra"]`)},
 		},
@@ -295,7 +291,7 @@ func TestValidate(t *testing.T) {
 		},
 		"agent pool profile invalid vm size": {
 			f: func(oc *OpenShiftManagedCluster) {
-				oc.Properties.AgentPoolProfiles[0].VMSize = VMSize("SuperBigVM")
+				oc.Properties.AgentPoolProfiles[1].VMSize = VMSize("SuperBigVM")
 			},
 			expectedErrs: []error{
 				errors.New(`invalid properties.agentPoolProfiles["infra"].vmSize "SuperBigVM"`),
@@ -314,7 +310,7 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{
 				errors.New(`invalid properties.agentPoolProfiles.subnetCidr "foo": all subnetCidrs must match`),
-				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "foo"`),
+				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "foo"`),
 			},
 		},
 		"agent pool subnet cidr clash cluster": {
@@ -324,9 +320,9 @@ func TestValidate(t *testing.T) {
 				}
 			},
 			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
 				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
-				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
 			},
 		},
 		"agent pool subnet cidr clash service": {
@@ -337,9 +333,9 @@ func TestValidate(t *testing.T) {
 				}
 			},
 			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
-				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
 			},
 		},
 		"agent pool bad master count": {
@@ -354,7 +350,7 @@ func TestValidate(t *testing.T) {
 		},
 		//we dont check authProfile because it is non pointer struct. Which is all zero values.
 		"authProfile.identityProviders empty": {
-			f:            func(oc *OpenShiftManagedCluster) { oc.Properties.AuthProfile = &AuthProfile{} },
+			f:            func(oc *OpenShiftManagedCluster) { oc.Properties.AuthProfile = AuthProfile{} },
 			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders length`)},
 		},
 		"AADIdentityProvider secret empty": {
@@ -406,14 +402,18 @@ func TestValidate(t *testing.T) {
 		}
 
 		// TODO we're hoping conversion is correct. Change this to a known valid config
-		cs := ConvertFromV20180930preview(oc)
+		cs, err := ConvertFromV20180930preview(oc, nil)
+		if err != nil {
+			t.Errorf("%s: unexpected error: %v", name, err)
+		}
 		if test.f != nil {
 			test.f(cs)
 		}
 		v := Validator{runningUnderTest: !test.simulateProd}
 		errs := v.Validate(cs, nil, test.externalOnly)
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
-			t.Errorf("%s expected errors:", name)
+			t.Logf("test case %q", name)
+			t.Errorf("expected errors:")
 			for _, err := range test.expectedErrs {
 				t.Errorf("\t%v", err)
 			}

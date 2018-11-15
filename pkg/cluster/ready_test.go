@@ -272,8 +272,8 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			name:       "nothing to wait for",
 			kubeclient: fake.NewSimpleClientset(),
 			cs: &api.OpenShiftManagedCluster{
-				Properties: &api.Properties{
-					AzProfile: &api.AzProfile{ResourceGroup: testRg},
+				Properties: api.Properties{
+					AzProfile: api.AzProfile{ResourceGroup: testRg},
 				},
 			},
 			wantErr: false,
@@ -282,8 +282,8 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			name:       "list vm error",
 			kubeclient: fake.NewSimpleClientset(),
 			cs: &api.OpenShiftManagedCluster{
-				Properties: &api.Properties{
-					AzProfile: &api.AzProfile{ResourceGroup: testRg},
+				Properties: api.Properties{
+					AzProfile: api.AzProfile{ResourceGroup: testRg},
 				},
 			},
 			wantErr:     true,
@@ -293,8 +293,8 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			name:       "node get error",
 			kubeclient: fake.NewSimpleClientset(),
 			cs: &api.OpenShiftManagedCluster{
-				Properties: &api.Properties{
-					AzProfile: &api.AzProfile{ResourceGroup: testRg},
+				Properties: api.Properties{
+					AzProfile: api.AzProfile{ResourceGroup: testRg},
 				},
 			},
 			wantErr:     true,
@@ -440,8 +440,8 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 				},
 			}),
 			cs: &api.OpenShiftManagedCluster{
-				Properties: &api.Properties{
-					AzProfile: &api.AzProfile{ResourceGroup: testRg},
+				Properties: api.Properties{
+					AzProfile: api.AzProfile{ResourceGroup: testRg},
 				},
 			},
 			expect: map[string][]compute.VirtualMachineScaleSetVM{

@@ -1,168 +1,280 @@
 package api
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 
+	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/go-test/deep"
+
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
-var v20180930previewManagedCluster = &v20180930preview.OpenShiftManagedCluster{
-	ID:       "id",
-	Location: "location",
-	Name:     "name",
-	Plan: &v20180930preview.ResourcePurchasePlan{
-		Name:          "plan.name",
-		Product:       "plan.product",
-		PromotionCode: "plan.promotionCode",
-		Publisher:     "plan.publisher",
-	},
-	Tags: map[string]string{
-		"tags.k1": "v1",
-		"tags.k2": "v2",
-	},
-	Type: "type",
-	Properties: &v20180930preview.Properties{
-		ProvisioningState: "properties.provisioningState",
-		OpenShiftVersion:  "properties.openShiftVersion",
-		PublicHostname:    "properties.publicHostname",
-		FQDN:              "properties.fqdn",
-		AuthProfile: &v20180930preview.AuthProfile{
-			IdentityProviders: []v20180930preview.IdentityProvider{
-				{
-					Name: "properties.authProfile.identityProviders.0.name",
-					Provider: &v20180930preview.AADIdentityProvider{
-						Kind:     "AADIdentityProvider",
-						ClientID: "properties.authProfile.identityProviders.0.provider.clientId",
-						Secret:   "properties.authProfile.identityProviders.0.provider.secret",
-						TenantID: "properties.authProfile.identityProviders.0.provider.tenantId",
-					},
-				},
-			},
-		},
-		NetworkProfile: &v20180930preview.NetworkProfile{
-			VnetCIDR:   "properties.networkProfile.vnetCidr",
-			PeerVnetID: "properties.networkProfile.peerVnetId",
-		},
-		RouterProfiles: []v20180930preview.RouterProfile{
-			{
-				Name:            "properties.routerProfiles.0.name",
-				PublicSubdomain: "properties.routerProfiles.0.publicSubdomain",
-				FQDN:            "properties.routerProfiles.0.fqdn",
-			},
-			{
-				Name:            "properties.routerProfiles.1.name",
-				PublicSubdomain: "properties.routerProfiles.1.publicSubdomain",
-				FQDN:            "properties.routerProfiles.1.fqdn",
-			},
-		},
-		MasterPoolProfile: &v20180930preview.MasterPoolProfile{
-			Count:      1,
-			VMSize:     "properties.agentPoolProfiles.0.vmSize",
-			SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
-		},
-		AgentPoolProfiles: []v20180930preview.AgentPoolProfile{
-			{
-				Role:       "properties.agentPoolProfiles.0.role",
-				Name:       "properties.agentPoolProfiles.0.name",
-				Count:      1,
-				VMSize:     "properties.agentPoolProfiles.0.vmSize",
-				SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
-				OSType:     "properties.agentPoolProfiles.0.osType",
-			},
-			{
-				Role:       "properties.agentPoolProfiles.0.role",
-				Name:       "properties.agentPoolProfiles.0.name",
-				Count:      2,
-				VMSize:     "properties.agentPoolProfiles.0.vmSize",
-				SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
-				OSType:     "properties.agentPoolProfiles.0.osType",
-			},
-		},
-	},
+func v20180930previewManagedCluster() *v20180930preview.OpenShiftManagedCluster {
+	// use populate.Walk to generate a fully populated
+	// v20180930preview.OpenShiftManagedCluster
+
+	prepare := func(v reflect.Value) {
+		switch v.Interface().(type) {
+		case []v20180930preview.IdentityProvider:
+			// set the Provider to AADIdentityProvider
+			v.Set(reflect.ValueOf([]v20180930preview.IdentityProvider{{Provider: &v20180930preview.AADIdentityProvider{Kind: to.StringPtr("AADIdentityProvider")}}}))
+		}
+	}
+
+	omc := v20180930preview.OpenShiftManagedCluster{}
+	populate.Walk(&omc, prepare)
+
+	return &omc
 }
 
-var internalManagedCluster = &OpenShiftManagedCluster{
-	ID:       "id",
-	Location: "location",
-	Name:     "name",
-	Plan: &ResourcePurchasePlan{
-		Name:          "plan.name",
-		Product:       "plan.product",
-		PromotionCode: "plan.promotionCode",
-		Publisher:     "plan.publisher",
-	},
-	Tags: map[string]string{
-		"tags.k1": "v1",
-		"tags.k2": "v2",
-	},
-	Type: "type",
-	Properties: &Properties{
-		ProvisioningState: "properties.provisioningState",
-		OpenShiftVersion:  "properties.openShiftVersion",
-		PublicHostname:    "properties.publicHostname",
-		RouterProfiles: []RouterProfile{
-			{
-				Name:            "properties.routerProfiles.0.name",
-				PublicSubdomain: "properties.routerProfiles.0.publicSubdomain",
-				FQDN:            "properties.routerProfiles.0.fqdn",
-			},
-			{
-				Name:            "properties.routerProfiles.1.name",
-				PublicSubdomain: "properties.routerProfiles.1.publicSubdomain",
-				FQDN:            "properties.routerProfiles.1.fqdn",
-			},
+func internalManagedCluster() *OpenShiftManagedCluster {
+	// this is the expected internal equivalent to
+	// v20180930previewManagedCluster()
+
+	return &OpenShiftManagedCluster{
+		ID:       "ID",
+		Location: "Location",
+		Name:     "Name",
+		Plan: ResourcePurchasePlan{
+			Name:          "Plan.Name",
+			Product:       "Plan.Product",
+			PromotionCode: "Plan.PromotionCode",
+			Publisher:     "Plan.Publisher",
 		},
-		FQDN: "properties.fqdn",
-		AuthProfile: &AuthProfile{
-			IdentityProviders: []IdentityProvider{
+		Tags: map[string]string{
+			"Tags.key": "Tags.val",
+		},
+		Type: "Type",
+		Properties: Properties{
+			ProvisioningState: "Properties.ProvisioningState",
+			OpenShiftVersion:  "Properties.OpenShiftVersion",
+			PublicHostname:    "Properties.PublicHostname",
+			RouterProfiles: []RouterProfile{
 				{
-					Name: "properties.authProfile.identityProviders.0.name",
-					Provider: &AADIdentityProvider{
-						Kind:     "AADIdentityProvider",
-						ClientID: "properties.authProfile.identityProviders.0.provider.clientId",
-						Secret:   "properties.authProfile.identityProviders.0.provider.secret",
-						TenantID: "properties.authProfile.identityProviders.0.provider.tenantId",
+					Name:            "Properties.RouterProfiles[0].Name",
+					PublicSubdomain: "Properties.RouterProfiles[0].PublicSubdomain",
+					FQDN:            "Properties.RouterProfiles[0].FQDN",
+				},
+			},
+			FQDN: "Properties.FQDN",
+			AuthProfile: AuthProfile{
+				IdentityProviders: []IdentityProvider{
+					{
+						Name: "Properties.AuthProfile.IdentityProviders[0].Name",
+						Provider: &AADIdentityProvider{
+							Kind:     "AADIdentityProvider",
+							ClientID: "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
+							Secret:   "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
+							TenantID: "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
+						},
 					},
 				},
 			},
-		},
-		NetworkProfile: &NetworkProfile{
-			VnetCIDR:   "properties.networkProfile.vnetCidr",
-			PeerVnetID: "properties.networkProfile.peerVnetId",
-		},
-		AgentPoolProfiles: []AgentPoolProfile{
-			{
-				Name:       "properties.agentPoolProfiles.0.name",
-				Count:      1,
-				VMSize:     "properties.agentPoolProfiles.0.vmSize",
-				SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
-				OSType:     "properties.agentPoolProfiles.0.osType",
-				Role:       "properties.agentPoolProfiles.0.role",
+			NetworkProfile: NetworkProfile{
+				VnetCIDR:   "Properties.NetworkProfile.VnetCIDR",
+				PeerVnetID: "Properties.NetworkProfile.PeerVnetID",
 			},
-			{
-				Name:       "properties.agentPoolProfiles.0.name",
-				Count:      2,
-				VMSize:     "properties.agentPoolProfiles.0.vmSize",
-				SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
-				OSType:     "properties.agentPoolProfiles.0.osType",
-				Role:       "properties.agentPoolProfiles.0.role",
-			},
-			{
-				Name:       string(AgentPoolProfileRoleMaster),
-				Count:      1,
-				VMSize:     "properties.agentPoolProfiles.0.vmSize",
-				SubnetCIDR: "properties.agentPoolProfiles.0.subnetCidr",
-				OSType:     OSTypeLinux,
-				Role:       AgentPoolProfileRoleMaster,
+			AgentPoolProfiles: []AgentPoolProfile{
+				{
+					Name:       string(AgentPoolProfileRoleMaster),
+					Count:      1,
+					VMSize:     "Properties.MasterPoolProfile.VMSize",
+					SubnetCIDR: "Properties.MasterPoolProfile.SubnetCIDR",
+					OSType:     OSTypeLinux,
+					Role:       AgentPoolProfileRoleMaster,
+				},
+				{
+					Name:       "Properties.AgentPoolProfiles[0].Name",
+					Count:      1,
+					VMSize:     "Properties.AgentPoolProfiles[0].VMSize",
+					SubnetCIDR: "Properties.AgentPoolProfiles[0].SubnetCIDR",
+					OSType:     "Properties.AgentPoolProfiles[0].OSType",
+					Role:       "Properties.AgentPoolProfiles[0].Role",
+				},
 			},
 		},
-	},
+	}
 }
 
 func TestConvertFromV20180930preview(t *testing.T) {
-	cs := ConvertFromV20180930preview(v20180930previewManagedCluster)
-	if !reflect.DeepEqual(cs, internalManagedCluster) {
-		t.Errorf("ConvertFromV20180930preview returned unexpected result\n%#v\n", cs)
+	tests := []struct {
+		name           string
+		input          *v20180930preview.OpenShiftManagedCluster
+		base           *OpenShiftManagedCluster
+		expectedChange func(*OpenShiftManagedCluster)
+		err            error
+	}{
+		{
+			name:  "create",
+			input: v20180930previewManagedCluster(),
+		},
+		{
+			name: "router profile update",
+			input: &v20180930preview.OpenShiftManagedCluster{
+				Properties: &v20180930preview.Properties{
+					RouterProfiles: []v20180930preview.RouterProfile{
+						{
+							Name:            to.StringPtr("Properties.RouterProfiles[0].Name"),
+							PublicSubdomain: to.StringPtr("NewPublicSubdomain"),
+						},
+					},
+				},
+			},
+			base: internalManagedCluster(),
+			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
+				expectedCs.Properties.RouterProfiles[0].PublicSubdomain = "NewPublicSubdomain"
+			},
+		},
+		{
+			name: "missing name in router profile update",
+			input: &v20180930preview.OpenShiftManagedCluster{
+				Properties: &v20180930preview.Properties{
+					RouterProfiles: []v20180930preview.RouterProfile{
+						{
+							PublicSubdomain: to.StringPtr("NewPublicSubdomain"),
+						},
+					},
+				},
+			},
+			base: internalManagedCluster(),
+			err:  errors.New("invalid router profile - name is missing"),
+		},
+		{
+			name: "new agent pool profile",
+			input: &v20180930preview.OpenShiftManagedCluster{
+				Properties: &v20180930preview.Properties{
+					AgentPoolProfiles: []v20180930preview.AgentPoolProfile{
+						{
+							Name:       to.StringPtr("NewName"),
+							Count:      to.IntPtr(2),
+							VMSize:     (*v20180930preview.VMSize)(to.StringPtr("NewVMSize")),
+							SubnetCIDR: to.StringPtr("NewSubnetCIDR"),
+							OSType:     (*v20180930preview.OSType)(to.StringPtr("NewOSType")),
+							Role:       (*v20180930preview.AgentPoolProfileRole)(to.StringPtr("NewRole")),
+						},
+					},
+				},
+			},
+			base: internalManagedCluster(),
+			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
+				expectedCs.Properties.AgentPoolProfiles = append(expectedCs.Properties.AgentPoolProfiles,
+					AgentPoolProfile{
+						Name:       "NewName",
+						Count:      2,
+						VMSize:     VMSize("NewVMSize"),
+						SubnetCIDR: "NewSubnetCIDR",
+						OSType:     OSType("NewOSType"),
+						Role:       AgentPoolProfileRole("NewRole"),
+					})
+			},
+		},
+		{
+			name: "missing name in agent pool profile update",
+			input: &v20180930preview.OpenShiftManagedCluster{
+				Properties: &v20180930preview.Properties{
+					AgentPoolProfiles: []v20180930preview.AgentPoolProfile{
+						{
+							Count:      to.IntPtr(2),
+							VMSize:     (*v20180930preview.VMSize)(to.StringPtr("NewVMSize")),
+							SubnetCIDR: to.StringPtr("NewSubnetCIDR"),
+							OSType:     (*v20180930preview.OSType)(to.StringPtr("NewOSType")),
+							Role:       (*v20180930preview.AgentPoolProfileRole)(to.StringPtr("NewRole")),
+						},
+					},
+				},
+			},
+			base: internalManagedCluster(),
+			err:  errors.New("invalid agent pool profile - name is missing"),
+		},
+		{
+			name: "auth profile update",
+			input: &v20180930preview.OpenShiftManagedCluster{
+				Properties: &v20180930preview.Properties{
+					AuthProfile: &v20180930preview.AuthProfile{
+						IdentityProviders: []v20180930preview.IdentityProvider{
+							{
+								Name: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Name"),
+								Provider: &v20180930preview.AADIdentityProvider{
+									Secret: to.StringPtr("NewSecret"),
+								},
+							},
+						},
+					},
+				},
+			},
+			base: internalManagedCluster(),
+			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
+				expectedCs.Properties.AuthProfile = AuthProfile{
+					IdentityProviders: []IdentityProvider{
+						{
+							Name: "Properties.AuthProfile.IdentityProviders[0].Name",
+							Provider: &AADIdentityProvider{
+								Kind:     "AADIdentityProvider",
+								ClientID: "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
+								Secret:   "NewSecret",
+								TenantID: "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			name: "invalid auth profile update",
+			input: &v20180930preview.OpenShiftManagedCluster{
+				Properties: &v20180930preview.Properties{
+					AuthProfile: &v20180930preview.AuthProfile{
+						IdentityProviders: []v20180930preview.IdentityProvider{
+							{
+								Name: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Name"),
+								Provider: &v20180930preview.AADIdentityProvider{
+									Kind: to.StringPtr("HtPasswd"),
+								},
+							},
+						},
+					},
+				},
+			},
+			base: internalManagedCluster(),
+			err:  errors.New("cannot update the kind of the identity provider"),
+		},
+		{
+			name: "missing name in auth profile update",
+			input: &v20180930preview.OpenShiftManagedCluster{
+				Properties: &v20180930preview.Properties{
+					AuthProfile: &v20180930preview.AuthProfile{
+						IdentityProviders: []v20180930preview.IdentityProvider{
+							{
+								Provider: &v20180930preview.AADIdentityProvider{
+									Kind: to.StringPtr("HtPasswd"),
+								},
+							},
+						},
+					},
+				},
+			},
+			base: internalManagedCluster(),
+			err:  errors.New("invalid identity provider - name is missing"),
+		},
+	}
+
+	for _, test := range tests {
+		expected := internalManagedCluster()
+		if test.expectedChange != nil {
+			test.expectedChange(expected)
+		}
+
+		output, err := ConvertFromV20180930preview(test.input, test.base)
+		if !reflect.DeepEqual(err, test.err) {
+			t.Errorf("%s: expected error: %v, got error: %v", test.name, test.err, err)
+		}
+		if err == nil {
+			if !reflect.DeepEqual(output, expected) {
+				t.Errorf("%s: unexpected diff %s", test.name, deep.Equal(output, expected))
+			}
+		}
 	}
 }

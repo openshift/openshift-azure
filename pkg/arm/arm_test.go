@@ -11,13 +11,10 @@ import (
 
 func TestGenerate(t *testing.T) {
 	cs := &api.OpenShiftManagedCluster{
-		Properties: &api.Properties{
-			NetworkProfile: &api.NetworkProfile{},
+		Properties: api.Properties{
 			AgentPoolProfiles: []api.AgentPoolProfile{
 				{},
 			},
-			ServicePrincipalProfile: &api.ServicePrincipalProfile{},
-			AzProfile:               &api.AzProfile{},
 		},
 		Config: &api.Config{
 			SSHKey: tls.GetDummyPrivateKey(),

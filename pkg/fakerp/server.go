@@ -146,10 +146,6 @@ func (s *Server) readRequest(w http.ResponseWriter, body io.ReadCloser) *v201809
 }
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
-	config := &api.PluginConfig{
-		AcceptLanguages: []string{"en-us"},
-	}
-
 	// simulate Context with property bag
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
@@ -168,7 +164,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// delete dns records
-	err = DeleteOCPDNS(ctx, s.conf.SubscriptionID, s.conf.ResourceGroup, s.conf.DnsResourceGroup, s.conf.DnsDomain, config)
+	err = DeleteOCPDNS(ctx, s.conf.SubscriptionID, s.conf.ResourceGroup, s.conf.DnsResourceGroup, s.conf.DnsDomain)
 	if err != nil {
 		resp := "500 Internal Error: Failed to delete dns records"
 		s.log.Debugf("%s: %v", resp, err)
@@ -311,7 +307,8 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 		// it must have been deleted. Exit successfully.
 		return
 	}
-	oc.Properties.ProvisioningState = s.readState()
+	state := s.readState()
+	oc.Properties.ProvisioningState = &state
 	res, err := json.Marshal(azureclient.ExternalToSdk(oc))
 	if err != nil {
 		resp := "500 Internal Server Error: Failed to marshal response"

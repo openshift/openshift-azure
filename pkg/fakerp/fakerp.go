@@ -39,18 +39,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, kerrors.NewAggregate(errs)
 	}
 
-	// convert the external API manifest into the internal API representation
-	log.Info("convert to internal")
-	cs := api.ConvertFromV20180930preview(oc)
-
-	// the RP will enrich the internal API representation with data not included
-	// in the original request
-	log.Info("enrich")
-	err := enrich(cs)
-	if err != nil {
-		return nil, err
-	}
-
+	var err error
 	// read in the OpenShift config blob if it exists (i.e. we're updating)
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
@@ -61,16 +50,27 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		if err != nil {
 			return nil, err
 		}
-
-		log.Info("merge old and new config")
-		p.MergeConfig(ctx, cs, oldCs)
 	} else {
 		// If containerservice.yaml does not exist - it is Create call
 		// create DNS records only on first call
-		err = CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"), config, oc)
+		err = CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"), oc)
 		if err != nil {
 			return nil, err
 		}
+	}
+	// convert the external API manifest into the internal API representation
+	log.Info("convert to internal")
+	cs, err := api.ConvertFromV20180930preview(oc, oldCs)
+	if err != nil {
+		return nil, err
+	}
+
+	// the RP will enrich the internal API representation with data not included
+	// in the original request
+	log.Info("enrich")
+	err = enrich(cs)
+	if err != nil {
+		return nil, err
 	}
 
 	// validate the internal API representation (with reference to the previous
@@ -203,6 +203,7 @@ func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedClu
 }
 
 func enrich(cs *api.OpenShiftManagedCluster) error {
+	// TODO: Use kelseyhightower/envconfig
 	for _, env := range []string{
 		"AZURE_CLIENT_ID",
 		"AZURE_CLIENT_SECRET",
@@ -216,7 +217,7 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 		}
 	}
 
-	cs.Properties.AzProfile = &api.AzProfile{
+	cs.Properties.AzProfile = api.AzProfile{
 		TenantID:       os.Getenv("AZURE_TENANT_ID"),
 		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
 		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
@@ -230,7 +231,7 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 		},
 	}
 
-	cs.Properties.ServicePrincipalProfile = &api.ServicePrincipalProfile{
+	cs.Properties.ServicePrincipalProfile = api.ServicePrincipalProfile{
 		ClientID: os.Getenv("AZURE_CLIENT_ID"),
 		Secret:   os.Getenv("AZURE_CLIENT_SECRET"),
 	}

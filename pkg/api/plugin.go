@@ -104,13 +104,6 @@ type GenevaConfig struct {
 
 // Plugin is the main interface to openshift-azure
 type Plugin interface {
-	// MergeConfig merges new and old config so that no unnecessary config
-	// is going to get regenerated during generation. It also handles merging
-	// partial user requests to allow reusing the same validation code during
-	// upgrades. This method should be the first one called by the RP, before
-	// validation and generation.
-	MergeConfig(ctx context.Context, new, old *OpenShiftManagedCluster)
-
 	// Validate exists (a) to be able to place validation logic in a
 	// single place in the event of multiple external API versions, and (b) to
 	// be able to compare a new API manifest against a pre-existing API manifest

@@ -230,7 +230,7 @@ func (v *Validator) validateContainerService(c *OpenShiftManagedCluster, externa
 		errs = append(errs, fmt.Errorf("invalid name %q", c.Name))
 	}
 
-	errs = append(errs, v.validateProperties(c.Properties, c.Location, externalOnly)...)
+	errs = append(errs, v.validateProperties(&c.Properties, c.Location, externalOnly)...)
 	return
 }
 
@@ -279,20 +279,16 @@ func (v *Validator) validateProperties(p *Properties, location string, externalO
 	if p.PublicHostname != "" { // TODO: relax after private preview (&& !isValidHostname(p.PublicHostname))
 		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
 	}
-	errs = append(errs, v.validateNetworkProfile(p.NetworkProfile)...)
+	errs = append(errs, v.validateNetworkProfile(&p.NetworkProfile)...)
 	if !externalOnly {
 		errs = append(errs, v.validateRouterProfiles(p.RouterProfiles, location)...)
 	}
 	errs = append(errs, v.validateFQDN(p, location)...)
-	var vnet *net.IPNet
-	if p.NetworkProfile != nil {
-		// we can disregard any error below because we are already going to fail
-		// validation if VnetCIDR does not parse correctly.
-
-		_, vnet, _ = net.ParseCIDR(p.NetworkProfile.VnetCIDR)
-	}
+	// we can disregard any error below because we are already going to fail
+	// validation if VnetCIDR does not parse correctly.
+	_, vnet, _ := net.ParseCIDR(p.NetworkProfile.VnetCIDR)
 	errs = append(errs, v.validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
-	errs = append(errs, v.validateAuthProfile(p.AuthProfile)...)
+	errs = append(errs, v.validateAuthProfile(&p.AuthProfile)...)
 	return
 }
 

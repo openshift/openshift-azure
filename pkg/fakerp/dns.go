@@ -7,18 +7,11 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
 	"github.com/Azure/go-autorest/autorest/to"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourceGroup, dnsDomain string, config *api.PluginConfig, oc *v20180930preview.OpenShiftManagedCluster) error {
-	zoneName := fmt.Sprintf("%s.%s", resourceGroup, dnsDomain)
-	zoneLocation := "global"
-	routerCName := fmt.Sprintf("%s-router.%s.%s", resourceGroup, oc.Location, "cloudapp.azure.com")
-	soaEmail := "azuredns-hostmaster.microsoft.com"
-	defaultRecordName := "@"
-
+func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourceGroup, dnsDomain string, oc *v20180930preview.OpenShiftManagedCluster) error {
 	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
@@ -32,8 +25,9 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 
 	// dns zone object
 	z := dns.Zone{
-		Location: &zoneLocation,
+		Location: to.StringPtr("global"),
 	}
+	zoneName := fmt.Sprintf("%s.%s", resourceGroup, dnsDomain)
 	zone, err := zc.CreateOrUpdate(ctx, dnsResourceGroup, zoneName, z, "", "")
 	if err != nil {
 		return err
@@ -57,7 +51,7 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 			TTL: to.Int64Ptr(3600),
 			SoaRecord: &dns.SoaRecord{
 				Host:         &nsServer[0],
-				Email:        &soaEmail,
+				Email:        to.StringPtr("azuredns-hostmaster.microsoft.com"),
 				RefreshTime:  to.Int64Ptr(60),
 				RetryTime:    to.Int64Ptr(60),
 				ExpireTime:   to.Int64Ptr(60),
@@ -66,6 +60,7 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 			},
 		},
 	}
+	defaultRecordName := "@"
 	_, err = rsc.CreateOrUpdate(ctx, dnsResourceGroup, zoneName, defaultRecordName, dns.SOA, soa, "", "")
 	if err != nil {
 		return err
@@ -85,6 +80,7 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 	}
 
 	// create router wildcard DNS CName record
+	routerCName := fmt.Sprintf("%s-router.%s.%s", resourceGroup, *oc.Location, "cloudapp.azure.com")
 	cn := dns.RecordSet{
 		Etag: zone.Etag,
 		RecordSetProperties: &dns.RecordSetProperties{
@@ -110,8 +106,7 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 	return err
 }
 
-func DeleteOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourceGroup, dnsDomain string, config *api.PluginConfig) error {
-	zoneName := fmt.Sprintf("%s.%s", resourceGroup, dnsDomain)
+func DeleteOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourceGroup, dnsDomain string) error {
 	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
@@ -123,6 +118,7 @@ func DeleteOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 	rsc := dns.NewRecordSetsClient(subscriptionID)
 	rsc.Authorizer = authorizer
 
+	zoneName := fmt.Sprintf("%s.%s", resourceGroup, dnsDomain)
 	future, err := zc.Delete(ctx, dnsResourceGroup, zoneName, "")
 	if err != nil {
 		return err
