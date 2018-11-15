@@ -3,7 +3,6 @@ package cluster
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -48,7 +47,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	// we enable configuration changes and/or upgrades, uncomment this code.  At
 	// the same time, current thinking is that we will add a hash-based
 	// mechanism to avoid unnecessary VM rotations as well.
-	if os.Getenv("RUNNING_UNDER_TEST") != "" {
+	if u.pluginConfig.TestConfig.RunningUnderTest {
 		err = u.updateInPlace(ctx, cs, api.AgentPoolProfileRoleMaster)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterVMRotation}
