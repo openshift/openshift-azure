@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -265,7 +266,8 @@ func nodeWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, node
 }
 
 func nodeIsReady(kc kubernetes.Interface, nodeName string) (bool, error) {
-	node, err := kc.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
+	name := strings.ToLower(nodeName)
+	node, err := kc.CoreV1().Nodes().Get(name, metav1.GetOptions{})
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):

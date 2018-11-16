@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -21,7 +22,8 @@ import (
 var errUnrecognisedRole = errors.New("unrecognised role")
 
 func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
-	_, err := u.kubeclient.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
+	name := strings.ToLower(nodeName)
+	_, err := u.kubeclient.CoreV1().Nodes().Get(name, metav1.GetOptions{})
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
@@ -55,7 +57,8 @@ func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedClus
 
 func setUnschedulable(ctx context.Context, kc kubernetes.Interface, nodeName string, unschedulable bool) error {
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		node, err := kc.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
+		name := strings.ToLower(nodeName)
+		node, err := kc.CoreV1().Nodes().Get(name, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}

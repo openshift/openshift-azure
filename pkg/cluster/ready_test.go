@@ -118,6 +118,28 @@ func TestNodeIsReady(t *testing.T) {
 				},
 			}),
 		},
+		{
+			name:     "ready, highly rotated",
+			nodeName: "infra-00000A",
+			wantErr:  false,
+			want:     true,
+			kc: fake.NewSimpleClientset(&corev1.Node{
+				TypeMeta: metav1.TypeMeta{
+					Kind: "node",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "infra-00000a",
+				},
+				Status: corev1.NodeStatus{
+					Conditions: []corev1.NodeCondition{
+						{
+							Type:   corev1.NodeReady,
+							Status: corev1.ConditionTrue,
+						},
+					},
+				},
+			}),
+		},
 	}
 	for _, tt := range tests {
 		got, err := nodeIsReady(tt.kc, tt.nodeName)
@@ -232,6 +254,28 @@ func TestMasterIsReady(t *testing.T) {
 					Conditions: []corev1.PodCondition{
 						{
 							Type:   corev1.PodReady,
+							Status: corev1.ConditionTrue,
+						},
+					},
+				},
+			}),
+		},
+		{
+			name:     "node ready, highly rotated",
+			nodeName: "master-ABCDEF",
+			wantErr:  false,
+			want:     false,
+			kc: fake.NewSimpleClientset(&corev1.Node{
+				TypeMeta: metav1.TypeMeta{
+					Kind: "node",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "master-abcdef",
+				},
+				Status: corev1.NodeStatus{
+					Conditions: []corev1.NodeCondition{
+						{
+							Type:   corev1.NodeReady,
 							Status: corev1.ConditionTrue,
 						},
 					},
@@ -364,6 +408,21 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 					Kind: "node",
 				},
 				ObjectMeta: metav1.ObjectMeta{
+					Name: "infra-zyxwvu",
+				},
+				Status: corev1.NodeStatus{
+					Conditions: []corev1.NodeCondition{
+						{
+							Type:   corev1.NodeReady,
+							Status: corev1.ConditionTrue,
+						},
+					},
+				},
+			}, &corev1.Node{
+				TypeMeta: metav1.TypeMeta{
+					Kind: "node",
+				},
+				ObjectMeta: metav1.ObjectMeta{
 					Name: "infra-000000",
 				},
 				Status: corev1.NodeStatus{
@@ -460,6 +519,14 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
 							OsProfile: &compute.OSProfile{
 								ComputerName: to.StringPtr("infra-000000"),
+							},
+						},
+					},
+					{
+						Name: to.StringPtr("ss-infra"),
+						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+							OsProfile: &compute.OSProfile{
+								ComputerName: to.StringPtr("infra-ZYXWVU"),
 							},
 						},
 					},
