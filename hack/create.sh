@@ -73,9 +73,6 @@ if [[ -n "$TEST_IN_PRODUCTION" ]]; then
   go run cmd/createorupdate/createorupdate.go -use-prod=true
 else
   go run cmd/createorupdate/createorupdate.go
-
-  hack/dns.sh zone-create $RESOURCEGROUP
-  hack/dns.sh cname-create $RESOURCEGROUP '*' $RESOURCEGROUP-router.$AZURE_REGION.cloudapp.azure.com
 fi
 
 echo
