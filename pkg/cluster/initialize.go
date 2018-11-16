@@ -23,7 +23,7 @@ func (u *simpleUpgrader) initialize(ctx context.Context, cs *api.OpenShiftManage
 	bsc := u.storageClient.GetBlobService()
 
 	// etcd data container
-	c := bsc.GetContainerReference("etcd")
+	c := bsc.GetContainerReference(EtcdBackupContainerName)
 	_, err := c.CreateIfNotExists(nil)
 	if err != nil {
 		return err
@@ -37,13 +37,13 @@ func (u *simpleUpgrader) initialize(ctx context.Context, cs *api.OpenShiftManage
 	}
 
 	// cluster config container
-	c = bsc.GetContainerReference("config")
+	c = bsc.GetContainerReference(ConfigContainerName)
 	_, err = c.CreateIfNotExists(nil)
 	if err != nil {
 		return err
 	}
 
-	b := c.GetBlobReference("config")
+	b := c.GetBlobReference(ConfigBlobName)
 
 	csj, err := json.Marshal(cs)
 	if err != nil {

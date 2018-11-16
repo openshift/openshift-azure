@@ -62,6 +62,8 @@ func (c *blobStorageClient) GetContainerReference(name string) Container {
 type Container interface {
 	CreateIfNotExists(options *storage.CreateContainerOptions) (bool, error)
 	GetBlobReference(name string) Blob
+	Exists() (bool, error)
+	ListBlobs(params storage.ListBlobsParameters) (storage.BlobListResponse, error)
 }
 
 type container struct {
@@ -77,7 +79,11 @@ func (c *container) GetBlobReference(name string) Blob {
 // Blob is a minimal interface for azure Blob
 type Blob interface {
 	CreateBlockBlobFromReader(blob io.Reader, options *storage.PutBlobOptions) error
+	CreateBlockBlob(options *storage.PutBlobOptions) error
+	PutBlock(blockID string, chunk []byte, options *storage.PutBlockOptions) error
+	PutBlockList(blocks []storage.Block, options *storage.PutBlockListOptions) error
 	Get(options *storage.GetBlobOptions) (io.ReadCloser, error)
+	Delete(options *storage.DeleteBlobOptions) error
 }
 
 type blob struct {

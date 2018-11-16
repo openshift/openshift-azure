@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	azstorage "github.com/Azure/azure-sdk-for-go/storage"
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
@@ -18,9 +17,12 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	azureclientstorage "github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
+	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
+	"github.com/openshift/openshift-azure/pkg/util/configblob"
 )
 
 var (
@@ -31,76 +33,31 @@ var (
 	gitCommit = "unknown"
 )
 
-type azureStorageClient struct {
-	accounts azureclient.AccountsClient
-	storage  azureclientstorage.Client
-}
-
-func newAzureClients(ctx context.Context, m map[string]string) (*azureStorageClient, error) {
-	authorizer, err := azureclient.NewAuthorizer(m["aadClientId"], m["aadClientSecret"], m["tenantId"])
-	if err != nil {
-		return nil, err
-	}
-
-	clients := &azureStorageClient{}
-	clients.accounts = azureclient.NewAccountsClient(m["subscriptionId"], authorizer, nil)
-
-	accts, err := clients.accounts.ListByResourceGroup(ctx, m["resourceGroup"])
-	if err != nil {
-		return nil, err
-	}
-
-	var acct storage.Account
-	var found bool
-	for _, acct = range *accts.Value {
-		found = acct.Tags["type"] != nil && *acct.Tags["type"] == "config"
-		if found {
-			break
-		}
-	}
-	if !found {
-		return nil, errors.New("storage account not found")
-	}
-	logrus.Printf("found account %s", *acct.Name)
-
-	keys, err := clients.accounts.ListKeys(ctx, m["resourceGroup"], *acct.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	clients.storage, err = azureclientstorage.NewClient(*acct.Name, *(*keys.Keys)[0].Value, azureclientstorage.DefaultBaseURL, azureclientstorage.DefaultAPIVersion, true)
-	if err != nil {
-		return nil, err
-	}
-
-	return clients, nil
-}
-
 type sync struct {
-	stc *azureStorageClient
-
+	azs  azureclient.AccountsClient
 	blob azureclientstorage.Blob
 }
 
 func (s *sync) init(ctx context.Context) error {
-	b, err := ioutil.ReadFile("_data/_out/azure.conf")
-	if err != nil {
-		return errors.Wrap(err, "cannot read _data/_out/azure.conf")
-	}
-
-	var m map[string]string
-	if err := yaml.Unmarshal(b, &m); err != nil {
-		return errors.Wrap(err, "cannot unmarshal _data/_out/azure.conf")
-	}
-
-	s.stc, err = newAzureClients(ctx, m)
+	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
 	if err != nil {
 		return err
 	}
 
-	bsc := s.stc.storage.GetBlobService()
-	c := bsc.GetContainerReference("config")
-	s.blob = c.GetBlobReference("config")
+	authorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID)
+	if err != nil {
+		return err
+	}
+
+	s.azs = azureclient.NewAccountsClient(cpc.SubscriptionID, authorizer, nil)
+
+	bsc, err := configblob.GetService(ctx, cpc)
+	if err != nil {
+		return err
+	}
+
+	s.blob = bsc.GetContainerReference(cluster.ConfigContainerName).GetBlobReference(cluster.ConfigBlobName)
+
 	return nil
 }
 
@@ -151,7 +108,7 @@ func (s *sync) sync(ctx context.Context) (bool, error) {
 		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 
-	if err := addons.Main(ctx, cs, s.stc.accounts, *dryRun); err != nil {
+	if err := addons.Main(ctx, cs, s.azs, *dryRun); err != nil {
 		return true, errors.Wrap(err, "cannot sync cluster config")
 	}
 

@@ -29,7 +29,7 @@ func TestInitialize(t *testing.T) {
 	storageClient.EXPECT().GetBlobService().Return(bsa)
 
 	etcdCr := mock_storage.NewMockContainer(gmc)
-	bsa.EXPECT().GetContainerReference("etcd").Return(etcdCr)
+	bsa.EXPECT().GetContainerReference(EtcdBackupContainerName).Return(etcdCr)
 	etcdCr.EXPECT().CreateIfNotExists(nil).Return(true, nil)
 
 	updateCr := mock_storage.NewMockContainer(gmc)
@@ -37,11 +37,11 @@ func TestInitialize(t *testing.T) {
 	updateCr.EXPECT().CreateIfNotExists(nil).Return(true, nil)
 
 	configCr := mock_storage.NewMockContainer(gmc)
-	bsa.EXPECT().GetContainerReference("config").Return(configCr)
+	bsa.EXPECT().GetContainerReference(ConfigContainerName).Return(configCr)
 	configCr.EXPECT().CreateIfNotExists(nil).Return(true, nil)
 
 	configBlob := mock_storage.NewMockBlob(gmc)
-	configCr.EXPECT().GetBlobReference("config").Return(configBlob)
+	configCr.EXPECT().GetBlobReference(ConfigBlobName).Return(configBlob)
 
 	cs := fixtures.NewTestOpenShiftCluster()
 	csj, err := json.Marshal(cs)

@@ -19,6 +19,13 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
+// here follow well known container and blob names
+const (
+	ConfigContainerName     = "config"
+	EtcdBackupContainerName = "etcd"
+	ConfigBlobName          = "config"
+)
+
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
 	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError

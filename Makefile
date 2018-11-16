@@ -1,13 +1,13 @@
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain --ignored) = "" ]] && echo -clean || echo -dirty)
 
 # all is the default target to build everything
-all: clean build sync
+all: clean build sync etcdbackup
 
 build: generate
 	go build ./...
 
 clean:
-	rm -f azure-reader.log coverage.out end-user.log e2e.test sync
+	rm -f coverage.out e2e.test sync etcdbackup
 
 test: unit e2e
 
@@ -17,6 +17,17 @@ generate:
 TAG ?= $(shell git rev-parse --short HEAD)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
+ETCD_BACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
+
+etcdbackup: generate
+	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/etcdbackup
+
+etcdbackup-image: etcdbackup
+	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+	imagebuilder -f Dockerfile.etcdbackup -t $(ETCD_BACKUP_IMAGE) .
+
+etcdbackup-push: etcdbackup-image
+	docker push $(ETCD_BACKUP_IMAGE)
 
 sync: generate
 	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/sync

@@ -191,7 +191,8 @@ var marshalled = []byte(`{
 			"registryConsole": "Config.Images.RegistryConsole",
 			"ansibleServiceBroker": "Config.Images.AnsibleServiceBroker",
 			"webConsole": "Config.Images.WebConsole",
-			"console": "Config.Images.Console"
+			"console": "Config.Images.Console",
+			"etcdBackup": "Config.Images.EtcdBackup"
 		},
 		"adminKubeconfig": "eyJwcmVmZXJlbmNlcyI6e30sImNsdXN0ZXJzIjpudWxsLCJ1c2VycyI6bnVsbCwiY29udGV4dHMiOm51bGwsImN1cnJlbnQtY29udGV4dCI6IiJ9",
 		"masterKubeconfig": "eyJwcmVmZXJlbmNlcyI6e30sImNsdXN0ZXJzIjpudWxsLCJ1c2VycyI6bnVsbCwiY29udGV4dHMiOm51bGwsImN1cnJlbnQtY29udGV4dCI6IiJ9",

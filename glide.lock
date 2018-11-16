@@ -1,5 +1,5 @@
-hash: b32fedcaf76833c37e396ac4f3daf860a84a0a320942c7445f47fea7ff94d83f
-updated: 2018-10-24T13:16:45.475837252+02:00
+hash: a080ab82b511b90cff21a46df7207932a793c05d536123304bc15c7debedf5bc
+updated: 2018-11-08T16:48:57.875564904+10:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
@@ -24,20 +24,31 @@ imports:
   - autorest/to
   - autorest/validation
   - version
+- name: github.com/coreos/etcd
+  version: 135cf9b40738d17886f499b40bc176fc892ba5e9
+  repo: https://github.com/openshift/coreos-etcd.git
+  subpackages:
+  - auth/authpb
+  - clientv3
+  - etcdserver/api/v3rpc/rpctypes
+  - etcdserver/etcdserverpb
+  - mvcc/mvccpb
+  - pkg/types
 - name: github.com/coreos/go-systemd
   version: 39ca1b05acc7ad1220e09f133283b8859a8b71ab
   subpackages:
   - sdjournal
 - name: github.com/coreos/pkg
-  version: 97fdf19511ea361ae1c100dd393cc47f8dcfa1e1
+  version: 3ac0863d7acf3bc44daf49afef8919af12f704ef
   subpackages:
+  - capnslog
   - dlopen
 - name: github.com/davecgh/go-spew
   version: 8991bc29aa16c548c550c7ff78260e27b9ab7c73
   subpackages:
   - spew
 - name: github.com/dgrijalva/jwt-go
-  version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
+  version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/dimchansky/utfbom
   version: 6c6132ff69f0f6c088739067407b5d32c52e1d0f
 - name: github.com/ghodss/yaml
@@ -45,7 +56,7 @@ imports:
 - name: github.com/go-test/deep
   version: 6592d9cc0a499ad2d5f574fde80a2b5c5cc3b4f5
 - name: github.com/gogo/protobuf
-  version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
+  version: 100ba4e885062801d56799d78530b73b178a78f3
   subpackages:
   - proto
   - sortkeys
@@ -56,15 +67,19 @@ imports:
   subpackages:
   - gomock
 - name: github.com/golang/protobuf
-  version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
+  version: 5a0f697c9ed9d68fef0116532c6e05cfeae00e55
   subpackages:
+  - jsonpb
   - proto
+  - protoc-gen-go/descriptor
   - ptypes
   - ptypes/any
   - ptypes/duration
   - ptypes/timestamp
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
+- name: github.com/google/uuid
+  version: 9b3b1e0f5f99ae461456d768e7d301a7acdaa2d8
 - name: github.com/googleapis/gnostic
   version: 0c5108395e2debce0d731cf0287ddf7242066aba
   subpackages:
@@ -126,6 +141,7 @@ imports:
   - project/v1
   - route/v1
   - template/v1
+  - user/v1
 - name: github.com/openshift/client-go
   version: 6a9817e0a0720dd8e837d1d18cd2938342ef6e54
   subpackages:
@@ -135,6 +151,10 @@ imports:
   - route/clientset/versioned/typed/route/v1
   - template/clientset/versioned/scheme
   - template/clientset/versioned/typed/template/v1
+  - user/clientset/versioned/scheme
+  - user/clientset/versioned/typed/user/v1
+- name: github.com/pborman/uuid
+  version: adf5a7427709b9deb95d29d3fa8a2bf9cfd388f1
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/satori/go.uuid
@@ -144,7 +164,7 @@ imports:
 - name: github.com/spf13/pflag
   version: 583c0c0531f06d5278b7d917446061adc344b5cd
 - name: golang.org/x/crypto
-  version: 81e90905daefcd6fd217b62423c0908922eadb30
+  version: 9419663f5a44be8b34ca85f08abc5fe1be11f8a3
   subpackages:
   - bcrypt
   - blowfish
@@ -156,7 +176,7 @@ imports:
   - ssh
   - ssh/terminal
 - name: golang.org/x/net
-  version: 1c05540f6879653db88113bc4a2b70aec4bd491f
+  version: 66aacef3dd8a676686c7ae3716979581e8b03c47
   subpackages:
   - context
   - html
@@ -165,15 +185,16 @@ imports:
   - http2
   - http2/hpack
   - idna
+  - internal/timeseries
   - lex/httplex
-  - websocket
+  - trace
 - name: golang.org/x/sys
-  version: 95c6576299259db960f6c5b9b69ea52422860fce
+  version: e48874b42435b4347fc52bdee0424a52abc974d7
   subpackages:
   - unix
   - windows
 - name: golang.org/x/text
-  version: b19bf474d317b857955b12035d2c5acb57ce8b01
+  version: 4ee4af566555f5fbe026368b75596286a312663a
   subpackages:
   - encoding
   - encoding/charmap
@@ -194,13 +215,39 @@ imports:
   - unicode/bidi
   - unicode/norm
 - name: golang.org/x/time
-  version: f51c12702a4d776e4c1fa9b0fabab841babae631
+  version: c06e80d9300e4443158a03817b8a8cb37d230320
   subpackages:
   - rate
+- name: google.golang.org/genproto
+  version: 09f6ed296fc66555a25fe4ce95173148778dfa85
+  subpackages:
+  - googleapis/api/annotations
+  - googleapis/rpc/status
+- name: google.golang.org/grpc
+  version: 5b3c4e850e90a4cf6a20ebd46c8b32a0a3afcb9e
+  subpackages:
+  - balancer
+  - codes
+  - connectivity
+  - credentials
+  - grpclb/grpc_lb_v1/messages
+  - grpclog
+  - health
+  - health/grpc_health_v1
+  - internal
+  - keepalive
+  - metadata
+  - naming
+  - peer
+  - resolver
+  - stats
+  - status
+  - tap
+  - transport
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
 - name: gopkg.in/yaml.v2
-  version: 670d4cfef0544295bc27a114dbac37980d83185a
+  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
 - name: k8s.io/api
   version: 0f11257a8a25954878633ebdc9841c67d8f83bdb
   subpackages:

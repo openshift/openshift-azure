@@ -85,6 +85,7 @@ type ImageConfig struct {
 	AnsibleServiceBroker  string `json:"ansibleServiceBroker,omitempty"`
 	WebConsole            string `json:"webConsole,omitempty"`
 	Console               string `json:"console,omitempty"`
+	EtcdBackup            string `json:"etcdBackup,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.

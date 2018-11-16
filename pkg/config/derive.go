@@ -7,6 +7,7 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 )
 
 type derived struct{}
@@ -93,16 +94,16 @@ func (derived) MasterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
 }
 
 func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
-	return yaml.Marshal(map[string]string{
-		"tenantId":            cs.Properties.AzProfile.TenantID,
-		"subscriptionId":      cs.Properties.AzProfile.SubscriptionID,
-		"aadClientId":         cs.Properties.ServicePrincipalProfile.ClientID,
-		"aadClientSecret":     cs.Properties.ServicePrincipalProfile.Secret,
-		"resourceGroup":       cs.Properties.AzProfile.ResourceGroup,
-		"location":            cs.Location,
-		"securityGroupName":   "nsg-compute",
-		"primaryScaleSetName": "ss-compute",
-		"vmType":              "vmss",
+	return yaml.Marshal(cloudprovider.Config{
+		TenantID:            cs.Properties.AzProfile.TenantID,
+		SubscriptionID:      cs.Properties.AzProfile.SubscriptionID,
+		AadClientID:         cs.Properties.ServicePrincipalProfile.ClientID,
+		AadClientSecret:     cs.Properties.ServicePrincipalProfile.Secret,
+		ResourceGroup:       cs.Properties.AzProfile.ResourceGroup,
+		Location:            cs.Location,
+		SecurityGroupName:   "nsg-compute",
+		PrimaryScaleSetName: "ss-compute",
+		VMType:              "vmss",
 	})
 }
 

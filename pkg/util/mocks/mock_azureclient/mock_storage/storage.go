@@ -120,6 +120,19 @@ func (mr *MockContainerMockRecorder) CreateIfNotExists(arg0 interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIfNotExists", reflect.TypeOf((*MockContainer)(nil).CreateIfNotExists), arg0)
 }
 
+// Exists mocks base method
+func (m *MockContainer) Exists() (bool, error) {
+	ret := m.ctrl.Call(m, "Exists")
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Exists indicates an expected call of Exists
+func (mr *MockContainerMockRecorder) Exists() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exists", reflect.TypeOf((*MockContainer)(nil).Exists))
+}
+
 // GetBlobReference mocks base method
 func (m *MockContainer) GetBlobReference(arg0 string) storage0.Blob {
 	ret := m.ctrl.Call(m, "GetBlobReference", arg0)
@@ -130,6 +143,19 @@ func (m *MockContainer) GetBlobReference(arg0 string) storage0.Blob {
 // GetBlobReference indicates an expected call of GetBlobReference
 func (mr *MockContainerMockRecorder) GetBlobReference(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBlobReference", reflect.TypeOf((*MockContainer)(nil).GetBlobReference), arg0)
+}
+
+// ListBlobs mocks base method
+func (m *MockContainer) ListBlobs(arg0 storage.ListBlobsParameters) (storage.BlobListResponse, error) {
+	ret := m.ctrl.Call(m, "ListBlobs", arg0)
+	ret0, _ := ret[0].(storage.BlobListResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListBlobs indicates an expected call of ListBlobs
+func (mr *MockContainerMockRecorder) ListBlobs(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListBlobs", reflect.TypeOf((*MockContainer)(nil).ListBlobs), arg0)
 }
 
 // MockBlob is a mock of Blob interface
@@ -155,6 +181,18 @@ func (m *MockBlob) EXPECT() *MockBlobMockRecorder {
 	return m.recorder
 }
 
+// CreateBlockBlob mocks base method
+func (m *MockBlob) CreateBlockBlob(arg0 *storage.PutBlobOptions) error {
+	ret := m.ctrl.Call(m, "CreateBlockBlob", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateBlockBlob indicates an expected call of CreateBlockBlob
+func (mr *MockBlobMockRecorder) CreateBlockBlob(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBlockBlob", reflect.TypeOf((*MockBlob)(nil).CreateBlockBlob), arg0)
+}
+
 // CreateBlockBlobFromReader mocks base method
 func (m *MockBlob) CreateBlockBlobFromReader(arg0 io.Reader, arg1 *storage.PutBlobOptions) error {
 	ret := m.ctrl.Call(m, "CreateBlockBlobFromReader", arg0, arg1)
@@ -165,6 +203,18 @@ func (m *MockBlob) CreateBlockBlobFromReader(arg0 io.Reader, arg1 *storage.PutBl
 // CreateBlockBlobFromReader indicates an expected call of CreateBlockBlobFromReader
 func (mr *MockBlobMockRecorder) CreateBlockBlobFromReader(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBlockBlobFromReader", reflect.TypeOf((*MockBlob)(nil).CreateBlockBlobFromReader), arg0, arg1)
+}
+
+// Delete mocks base method
+func (m *MockBlob) Delete(arg0 *storage.DeleteBlobOptions) error {
+	ret := m.ctrl.Call(m, "Delete", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete
+func (mr *MockBlobMockRecorder) Delete(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockBlob)(nil).Delete), arg0)
 }
 
 // Get mocks base method
@@ -178,4 +228,28 @@ func (m *MockBlob) Get(arg0 *storage.GetBlobOptions) (io.ReadCloser, error) {
 // Get indicates an expected call of Get
 func (mr *MockBlobMockRecorder) Get(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockBlob)(nil).Get), arg0)
+}
+
+// PutBlock mocks base method
+func (m *MockBlob) PutBlock(arg0 string, arg1 []byte, arg2 *storage.PutBlockOptions) error {
+	ret := m.ctrl.Call(m, "PutBlock", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PutBlock indicates an expected call of PutBlock
+func (mr *MockBlobMockRecorder) PutBlock(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutBlock", reflect.TypeOf((*MockBlob)(nil).PutBlock), arg0, arg1, arg2)
+}
+
+// PutBlockList mocks base method
+func (m *MockBlob) PutBlockList(arg0 []storage.Block, arg1 *storage.PutBlockListOptions) error {
+	ret := m.ctrl.Call(m, "PutBlockList", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PutBlockList indicates an expected call of PutBlockList
+func (mr *MockBlobMockRecorder) PutBlockList(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutBlockList", reflect.TypeOf((*MockBlob)(nil).PutBlockList), arg0, arg1)
 }

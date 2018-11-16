@@ -42,3 +42,10 @@ import:
   - gomock
 - package: github.com/kelseyhightower/envconfig
   version: ^1.3.0
+- package: github.com/pborman/uuid
+  version: ^1.2.0
+- package: github.com/coreos/etcd
+  repo: https://github.com/openshift/coreos-etcd.git
+  version: origin-3.10-etcd-v3.2.16
+  subpackages:
+  - clientv3

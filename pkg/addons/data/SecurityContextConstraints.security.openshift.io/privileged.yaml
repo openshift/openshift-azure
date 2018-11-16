@@ -40,6 +40,7 @@ users:
 - system:admin
 - system:serviceaccount:openshift-infra:build-controller
 - system:serviceaccount:openshift-node:sync
+- system:serviceaccount:openshift-etcd:etcd-backup
 - system:serviceaccount:openshift-sdn:sdn
 - system:serviceaccount:management-infra:management-admin
 - system:serviceaccount:management-infra:inspector-admin
