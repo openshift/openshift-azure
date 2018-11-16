@@ -210,22 +210,94 @@ func TestCreateOrUpdate(t *testing.T) {
 			errStep:  api.PluginStepWaitForNodes,
 		},
 		{
-			name:     "update: MasterVMRotation error",
+			name:     "update in place: list VMs error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdateMasterVMRotation,
+			errStep:  api.PluginStepUpdateInPlaceListVMs,
 		},
 		{
-			name:     "update: InfraVMRotation error",
+			name:     "update in place: sort masters error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdateInfraVMRotation,
+			errStep:  api.PluginStepUpdateInPlaceSortMasters,
 		},
 		{
-			name:     "update: ComputeVMRotation error",
+			name:     "update in place: read blob error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdateComputeVMRotation,
+			errStep:  api.PluginStepUpdateInPlaceReadBlob,
+		},
+		{
+			name:     "update in place: drain error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdateInPlaceDrain,
+		},
+		{
+			name:     "update in place: deallocate error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdateInPlaceDeallocate,
+		},
+		{
+			name:     "update in place: update VMs error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdateInPlaceUpdateVMs,
+		},
+		{
+			name:     "update in place: reimage error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdateInPlaceReimage,
+		},
+		{
+			name:     "update in place: start error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdateInPlaceStart,
+		},
+		{
+			name:     "update in place: wait for ready error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdateInPlaceWaitForReady,
+		},
+		{
+			name:     "update in place: update blob error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdateInPlaceUpdateBlob,
+		},
+		{
+			name:     "update plus one: list VMs error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdatePlusOneListVMs,
+		},
+		{
+			name:     "update plus one: read blob error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdatePlusOneReadBlob,
+		},
+		{
+			name:     "update plus one: wait for ready error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdatePlusOneWaitForReady,
+		},
+		{
+			name:     "update plus one: update blob error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdatePlusOneUpdateBlob,
+		},
+		{
+			name:     "update plus one: delete VMs error",
+			isUpdate: true,
+			wantErr:  true,
+			errStep:  api.PluginStepUpdatePlusOneDeleteVMs,
 		},
 		{
 			name:     "waitforinfra: daemon error",
@@ -250,7 +322,16 @@ func TestCreateOrUpdate(t *testing.T) {
 		if tt.wantErr {
 			err := &api.PluginError{Err: fmt.Errorf("test error"), Step: tt.errStep}
 			switch tt.errStep {
-			case api.PluginStepDrain, api.PluginStepDeploy, api.PluginStepInitialize, api.PluginStepWaitForConsoleHealth, api.PluginStepWaitForNodes, api.PluginStepUpdateComputeVMRotation, api.PluginStepUpdateInfraVMRotation, api.PluginStepUpdateMasterVMRotation:
+			case api.PluginStepDrain, api.PluginStepDeploy, api.PluginStepInitialize,
+				api.PluginStepWaitForConsoleHealth, api.PluginStepWaitForNodes,
+				api.PluginStepUpdateInPlaceListVMs, api.PluginStepUpdateInPlaceSortMasters,
+				api.PluginStepUpdateInPlaceReadBlob, api.PluginStepUpdateInPlaceDrain,
+				api.PluginStepUpdateInPlaceDeallocate, api.PluginStepUpdateInPlaceUpdateVMs,
+				api.PluginStepUpdateInPlaceReimage, api.PluginStepUpdateInPlaceStart,
+				api.PluginStepUpdateInPlaceWaitForReady, api.PluginStepUpdateInPlaceUpdateBlob,
+				api.PluginStepUpdatePlusOneListVMs, api.PluginStepUpdatePlusOneReadBlob,
+				api.PluginStepUpdatePlusOneWaitForReady, api.PluginStepUpdatePlusOneUpdateBlob,
+				api.PluginStepUpdatePlusOneDeleteVMs:
 				if tt.isUpdate {
 					mockUp.EXPECT().Update(nil, nil, nil, nil).Return(err)
 				} else {

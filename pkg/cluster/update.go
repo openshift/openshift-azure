@@ -47,17 +47,14 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 	}
-	err = u.updateInPlace(ctx, cs, api.AgentPoolProfileRoleMaster, ssHashes)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterVMRotation}
+	if perr := u.updateInPlace(ctx, cs, api.AgentPoolProfileRoleMaster, ssHashes); perr != nil {
+		return perr
 	}
-	err = u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleInfra, ssHashes)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInfraVMRotation}
+	if perr := u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleInfra, ssHashes); perr != nil {
+		return perr
 	}
-	err = u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleCompute, ssHashes)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateComputeVMRotation}
+	if perr := u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleCompute, ssHashes); perr != nil {
+		return perr
 	}
 	return nil
 }
@@ -161,7 +158,7 @@ func listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc azureclie
 }
 
 // updatePlusOne creates new VMs and removes old VMs one by one.
-func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, ssHashes map[scalesetName]hash) error {
+func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, ssHashes map[scalesetName]hash) *api.PluginError {
 	count := getCount(cs, role)
 
 	// store a list of all the VM instances now, so that if we end up creating
@@ -169,12 +166,12 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 	// they are
 	oldVMs, err := listVMs(ctx, cs, u.vmc, role)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneListVMs}
 	}
 
 	blob, err := u.readBlob()
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneReadBlob}
 	}
 
 	// Filter out VMs that do not need to get upgraded. Should speed
@@ -193,16 +190,16 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			},
 		})
 		if err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 		}
 
 		if err := future.WaitForCompletionRef(ctx, u.ssc.Client()); err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 		}
 
 		updatedList, err := listVMs(ctx, cs, u.vmc, role)
 		if err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneListVMs}
 		}
 
 		// wait for newly created VMs to reach readiness (n.b. one alternative to
@@ -213,22 +210,22 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 				log.Infof("waiting for %s to be ready", *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 				err = waitForReady(ctx, cs, role, *updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
 				if err != nil {
-					return err
+					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 				}
 				vmsBefore[*updated.InstanceID] = struct{}{}
 				blob[instanceName(*updated.Name)] = ssHashes[ssNameForVm(&updated)]
 				if err := u.updateBlob(blob); err != nil {
-					return err
+					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneUpdateBlob}
 				}
 			}
 		}
 
 		if err := u.delete(ctx, cs, role, *vm.InstanceID, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName); err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneDeleteVMs}
 		}
 		delete(blob, instanceName(*vm.Name))
 		if err := u.updateBlob(blob); err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneUpdateBlob}
 		}
 	}
 
@@ -253,20 +250,20 @@ func ssNameForVm(vm *compute.VirtualMachineScaleSetVM) scalesetName {
 }
 
 // updateInPlace updates one by one all the VMs of a scale set, in place.
-func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, ssHashes map[scalesetName]hash) error {
+func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, ssHashes map[scalesetName]hash) *api.PluginError {
 	vms, err := listVMs(ctx, cs, u.vmc, role)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceListVMs}
 	}
 
 	sorted, err := sortMasterVMsByHealth(vms, cs, u.kubeclient)
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceSortMasters}
 	}
 
 	blob, err := u.readBlob()
 	if err != nil {
-		return err
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReadBlob}
 	}
 
 	sorted = filterOldVMs(sorted, blob, ssHashes)
@@ -274,19 +271,19 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		log.Infof("draining %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		err = u.drain(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		if err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDrain}
 		}
 
 		{
 			log.Infof("deallocating %s (%s)", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, *vm.InstanceID)
 			future, err := u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
 			if err != nil {
-				return err
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDeallocate}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
-				return err
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDeallocate}
 			}
 		}
 
@@ -296,12 +293,12 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 				InstanceIds: &[]string{*vm.InstanceID},
 			})
 			if err != nil {
-				return err
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceUpdateVMs}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.ssc.Client())
 			if err != nil {
-				return err
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceUpdateVMs}
 			}
 		}
 
@@ -309,12 +306,12 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 			log.Infof("reimaging %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
 			if err != nil {
-				return err
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReimage}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
-				return err
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReimage}
 			}
 		}
 
@@ -322,24 +319,24 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 			log.Infof("starting %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 			future, err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
 			if err != nil {
-				return err
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceStart}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
-				return err
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceStart}
 			}
 		}
 
 		log.Infof("waiting for %s to be ready", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		err = waitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
 		if err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceWaitForReady}
 		}
 
 		blob[instanceName(*vm.Name)] = ssHashes["master"]
 		if err := u.updateBlob(blob); err != nil {
-			return err
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceUpdateBlob}
 		}
 	}
 
