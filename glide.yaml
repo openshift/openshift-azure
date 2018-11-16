@@ -49,3 +49,5 @@ import:
   version: origin-3.10-etcd-v3.2.16
   subpackages:
   - clientv3
+- package: sigs.k8s.io/controller-runtime
+  version: v0.1.1
