@@ -167,6 +167,58 @@ func createResourceGroup(conf *fakerp.Config) (bool, error) {
 	return true, err
 }
 
+func execute(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, conf *fakerp.Config) error {
+	// simulate the API call to the RP
+	if err := wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
+		if err := createOrUpdate(ctx, log, rpc, conf.ResourceGroup, *manifest); err != nil {
+			if autoRestErr, ok := err.(autorest.DetailedError); ok {
+				if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
+					if netErr, ok := urlErr.Err.(*net.OpError); ok {
+						if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
+							if sysErr.Err == syscall.ECONNREFUSED {
+								return false, nil
+							}
+						}
+					}
+				}
+			}
+			return false, err
+		}
+		return true, nil
+	}); err != nil {
+		return err
+	}
+
+	if *hook != "" {
+		if err := execCommand(*hook); err != nil {
+			return err
+		}
+	}
+
+	// if an update is requested, do it
+	if *update != "" {
+		updateCtx, updateCancel := context.WithTimeout(context.Background(), *updateTimeout)
+		defer updateCancel()
+		if err := createOrUpdate(updateCtx, log, rpc, conf.ResourceGroup, *update); err != nil {
+			return err
+		}
+	}
+
+	if *updateHook != "" {
+		if err := execCommand(*updateHook); err != nil {
+			return err
+		}
+	}
+
+	if *artifactDir != "" {
+		if err := fakerp.GatherArtifacts(*artifactDir, *artifactKubeconfig); err != nil {
+			log.Warnf("could not gather artifacts: %v", err)
+		}
+	}
+
+	return nil
+}
+
 func main() {
 	flag.Parse()
 	if err := validate(); err != nil {
@@ -220,62 +272,20 @@ func main() {
 		return
 	}
 
-	// if a cleanup is requested, do it unconditionally at the end
+	err = execute(ctx, log, rpc, conf)
+	if err != nil {
+		log.Warn(err)
+	}
+
 	if *cleanup {
-		defer func() {
-			delCtx, delCancel := context.WithTimeout(context.Background(), *rmTimeout)
-			defer delCancel()
-			if err := delete(delCtx, log, rpc, conf.ResourceGroup); err != nil {
-				log.Fatal(err)
-			}
-		}()
-	}
-
-	// simulate the API call to the RP
-	if err := wait.PollImmediate(time.Second, 10*time.Second, func() (bool, error) {
-		if err := createOrUpdate(ctx, log, rpc, conf.ResourceGroup, *manifest); err != nil {
-			if autoRestErr, ok := err.(autorest.DetailedError); ok {
-				if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
-					if netErr, ok := urlErr.Err.(*net.OpError); ok {
-						if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
-							if sysErr.Err == syscall.ECONNREFUSED {
-								return false, nil
-							}
-						}
-					}
-				}
-			}
-			return false, err
-		}
-		return true, nil
-	}); err != nil {
-		log.Fatal(err)
-	}
-
-	if *hook != "" {
-		if err := execCommand(*hook); err != nil {
-			log.Fatal(err)
+		delCtx, delCancel := context.WithTimeout(context.Background(), *rmTimeout)
+		defer delCancel()
+		if err := delete(delCtx, log, rpc, conf.ResourceGroup); err != nil {
+			log.Warn(err)
 		}
 	}
 
-	// if an update is requested, do it
-	if *update != "" {
-		updateCtx, updateCancel := context.WithTimeout(context.Background(), *updateTimeout)
-		defer updateCancel()
-		if err := createOrUpdate(updateCtx, log, rpc, conf.ResourceGroup, *update); err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	if *updateHook != "" {
-		if err := execCommand(*updateHook); err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	if *artifactDir != "" {
-		if err := fakerp.GatherArtifacts(*artifactDir, *artifactKubeconfig); err != nil {
-			log.Warnf("could not gather artifacts: %v", err)
-		}
+	if err != nil {
+		os.Exit(1)
 	}
 }
