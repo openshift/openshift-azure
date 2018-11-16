@@ -101,13 +101,12 @@ func (s *Server) validate(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
-
 	config := &api.PluginConfig{
 		AcceptLanguages: []string{"en-us"},
 	}
 
 	// simulate Context with property bag
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 	// TODO: Get the azure credentials from the request headers
 	ctx = context.WithValue(ctx, api.ContextKeyClientID, s.conf.ClientID)
@@ -126,7 +125,10 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	// delete dns records
 	err = DeleteOCPDNS(ctx, s.conf.SubscriptionID, s.conf.ResourceGroup, s.conf.DnsResourceGroup, s.conf.DnsDomain, config)
 	if err != nil {
-		s.log.Fatal(err)
+		resp := "500 Internal Error: Failed to delete dns records"
+		s.log.Debugf("%s: %v", resp, err)
+		http.Error(w, resp, http.StatusInternalServerError)
+		return
 	}
 
 	// TODO: Determine subscription ID from the request path

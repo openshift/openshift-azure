@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Azure/go-autorest/autorest/to"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
@@ -25,8 +26,10 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 	}
 
 	// create clients
-	zc := azureclient.NewZonesClient(subscriptionID, authorizer, config.AcceptLanguages)
-	rsc := azureclient.NewRecordSetsClient(subscriptionID, authorizer, config.AcceptLanguages)
+	zc := dns.NewZonesClient(subscriptionID)
+	zc.Authorizer = authorizer
+	rsc := dns.NewRecordSetsClient(subscriptionID)
+	rsc.Authorizer = authorizer
 
 	// dns zone object
 	z := dns.Zone{
@@ -105,11 +108,7 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 		},
 	}
 	_, err = rsc.CreateOrUpdate(ctx, dnsResourceGroup, dnsDomain, resourceGroup, dns.NS, ns, "", "")
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func DeleteOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourceGroup, dnsDomain string, config *api.PluginConfig) error {
@@ -120,23 +119,21 @@ func DeleteOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 	}
 
 	// delete zone
-	zc := azureclient.NewZonesClient(subscriptionID, authorizer, config.AcceptLanguages)
-	rsc := azureclient.NewRecordSetsClient(subscriptionID, authorizer, config.AcceptLanguages)
+	zc := dns.NewZonesClient(subscriptionID)
+	zc.Authorizer = authorizer
+	rsc := dns.NewRecordSetsClient(subscriptionID)
+	rsc.Authorizer = authorizer
 
 	future, err := zc.Delete(ctx, dnsResourceGroup, zoneName, "")
 	if err != nil {
 		return err
 	}
 
-	if err := future.WaitForCompletionRef(ctx, zc.Client()); err != nil {
+	if err := future.WaitForCompletionRef(ctx, zc.Client); err != nil {
 		return err
 	}
 
 	// delete main zone NS record
 	_, err = rsc.Delete(ctx, dnsResourceGroup, dnsDomain+"-test", resourceGroup, dns.NS, "")
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
