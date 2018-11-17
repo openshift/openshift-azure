@@ -17,7 +17,7 @@ generate:
 TAG ?= $(shell git rev-parse --short HEAD)
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
 AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
-ETCD_BACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
+ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 
 azure-controllers: generate
@@ -35,10 +35,10 @@ etcdbackup: generate
 
 etcdbackup-image: etcdbackup
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-	imagebuilder -f Dockerfile.etcdbackup -t $(ETCD_BACKUP_IMAGE) .
+	imagebuilder -f Dockerfile.etcdbackup -t $(ETCDBACKUP_IMAGE) .
 
 etcdbackup-push: etcdbackup-image
-	docker push $(ETCD_BACKUP_IMAGE)
+	docker push $(ETCDBACKUP_IMAGE)
 
 sync: generate
 	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/sync

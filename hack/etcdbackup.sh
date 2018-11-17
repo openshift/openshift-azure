@@ -22,8 +22,8 @@ if [[ -z "$KUBECONFIG" ]]; then
     exit 1
 fi
 
-if [[ -z "$ETCD_BACKUP_IMAGE" ]]; then
-    ETCD_BACKUP_IMAGE=quay.io/openshift-on-azure/etcdbackup:latest
+if [[ -z "$ETCDBACKUP_IMAGE" ]]; then
+    ETCDBACKUP_IMAGE=quay.io/openshift-on-azure/etcdbackup:latest
 fi
 
 name="$1"
@@ -47,7 +47,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: etcd-backup-hourly
-        image: '$ETCD_BACKUP_IMAGE'
+        image: '$ETCDBACKUP_IMAGE'
         imagePullPolicy: Always
         args:
         - '-blobname=$name'
