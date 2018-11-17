@@ -34,7 +34,6 @@ var (
 
 		// GENERAL PURPOSE VMS
 
-		StandardD2sV3:  {}, // TODO: probably should only be enabled for test
 		StandardD4sV3:  {},
 		StandardD8sV3:  {},
 		StandardD16sV3: {},
@@ -59,7 +58,6 @@ var (
 		// Skiping StandardB* (burstable) VMs for now as they could be hard to
 		// reason about performance-wise.
 
-		StandardD2sV3:  {}, // TODO: probably should only be enabled for test
 		StandardD4sV3:  {},
 		StandardD8sV3:  {},
 		StandardD16sV3: {},
@@ -115,6 +113,15 @@ var (
 	clusterNetworkCIDR *net.IPNet
 	serviceNetworkCIDR *net.IPNet
 )
+
+// Validator shares objects between validation methods
+type Validator struct {
+	runningUnderTest bool
+}
+
+func NewValidator(runningUnderTest bool) *Validator {
+	return &Validator{runningUnderTest: runningUnderTest}
+}
 
 func init() {
 	var err error
@@ -177,19 +184,37 @@ func vnetContainsSubnet(vnet, subnet *net.IPNet) bool {
 	return vnet.IP.Equal(subnet.IP.Mask(vnet.Mask))
 }
 
+func (v *Validator) isValidMasterAndInfraVMSize(size VMSize) bool {
+	if v.runningUnderTest && size == StandardD2sV3 {
+		return true
+	}
+
+	_, found := validMasterAndInfraVMSizes[size]
+	return found
+}
+
+func (v *Validator) isValidComputeVMSize(size VMSize) bool {
+	if v.runningUnderTest && size == StandardD2sV3 {
+		return true
+	}
+
+	_, found := validComputeVMSizes[size]
+	return found
+}
+
 // Validate validates a OpenShiftManagedCluster struct
-func Validate(new, old *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+func (v *Validator) Validate(new, old *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	// TODO are these error messages confusing since they may not correspond with the external model?
-	if errs := validateContainerService(new, externalOnly); len(errs) > 0 {
+	if errs := v.validateContainerService(new, externalOnly); len(errs) > 0 {
 		return errs
 	}
 	if old != nil {
-		return validateUpdateContainerService(new, old, externalOnly)
+		return v.validateUpdateContainerService(new, old, externalOnly)
 	}
 	return nil
 }
 
-func validateContainerService(c *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+func (v *Validator) validateContainerService(c *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	if c == nil {
 		errs = append(errs, fmt.Errorf("openShiftManagedCluster cannot be nil"))
 		return
@@ -205,11 +230,11 @@ func validateContainerService(c *OpenShiftManagedCluster, externalOnly bool) (er
 		errs = append(errs, fmt.Errorf("invalid name %q", c.Name))
 	}
 
-	errs = append(errs, validateProperties(c.Properties, c.Location, externalOnly)...)
+	errs = append(errs, v.validateProperties(c.Properties, c.Location, externalOnly)...)
 	return
 }
 
-func validateUpdateContainerService(cs, oldCs *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+func (v *Validator) validateUpdateContainerService(cs, oldCs *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	if cs == nil || oldCs == nil {
 		errs = append(errs, fmt.Errorf("openShiftManagedCluster cannot be nil"))
 		return
@@ -238,13 +263,13 @@ func validateUpdateContainerService(cs, oldCs *OpenShiftManagedCluster, external
 	return
 }
 
-func validateProperties(p *Properties, location string, externalOnly bool) (errs []error) {
+func (v *Validator) validateProperties(p *Properties, location string, externalOnly bool) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("properties cannot be nil"))
 		return
 	}
 
-	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
+	errs = append(errs, v.validateProvisioningState(p.ProvisioningState)...)
 	switch p.OpenShiftVersion {
 	case "v3.11":
 	default:
@@ -254,11 +279,11 @@ func validateProperties(p *Properties, location string, externalOnly bool) (errs
 	if p.PublicHostname != "" { // TODO: relax after private preview (&& !isValidHostname(p.PublicHostname))
 		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
 	}
-	errs = append(errs, validateNetworkProfile(p.NetworkProfile)...)
+	errs = append(errs, v.validateNetworkProfile(p.NetworkProfile)...)
 	if !externalOnly {
-		errs = append(errs, validateRouterProfiles(p.RouterProfiles, location)...)
+		errs = append(errs, v.validateRouterProfiles(p.RouterProfiles, location)...)
 	}
-	errs = append(errs, validateFQDN(p, location)...)
+	errs = append(errs, v.validateFQDN(p, location)...)
 	var vnet *net.IPNet
 	if p.NetworkProfile != nil {
 		// we can disregard any error below because we are already going to fail
@@ -266,12 +291,12 @@ func validateProperties(p *Properties, location string, externalOnly bool) (errs
 
 		_, vnet, _ = net.ParseCIDR(p.NetworkProfile.VnetCIDR)
 	}
-	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
-	errs = append(errs, validateAuthProfile(p.AuthProfile)...)
+	errs = append(errs, v.validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
+	errs = append(errs, v.validateAuthProfile(p.AuthProfile)...)
 	return
 }
 
-func validateAuthProfile(ap *AuthProfile) (errs []error) {
+func (v *Validator) validateAuthProfile(ap *AuthProfile) (errs []error) {
 	if ap == nil {
 		errs = append(errs, fmt.Errorf("properties.authProfile cannot be nil"))
 		return
@@ -301,7 +326,7 @@ func validateAuthProfile(ap *AuthProfile) (errs []error) {
 	return
 }
 
-func validateAgentPoolProfiles(apps []AgentPoolProfile, vnet *net.IPNet) (errs []error) {
+func (v *Validator) validateAgentPoolProfiles(apps []AgentPoolProfile, vnet *net.IPNet) (errs []error) {
 	appmap := map[AgentPoolProfileRole]AgentPoolProfile{}
 
 	for i, app := range apps {
@@ -318,7 +343,7 @@ func validateAgentPoolProfiles(apps []AgentPoolProfile, vnet *net.IPNet) (errs [
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.subnetCidr %q: all subnetCidrs must match", app.SubnetCIDR))
 		}
 
-		errs = append(errs, validateAgentPoolProfile(app, vnet)...)
+		errs = append(errs, v.validateAgentPoolProfile(app, vnet)...)
 	}
 
 	for role := range validAgentPoolProfileRoles {
@@ -334,7 +359,7 @@ func validateAgentPoolProfiles(apps []AgentPoolProfile, vnet *net.IPNet) (errs [
 	return
 }
 
-func validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPNet) (errs []error) {
+func (v *Validator) validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPNet) (errs []error) {
 	switch app.Role {
 	case AgentPoolProfileRoleCompute:
 		switch app.Name {
@@ -347,7 +372,7 @@ func validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPNet) (errs []err
 		if app.Count < 1 || app.Count > 20 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
-		if _, found := validComputeVMSizes[app.VMSize]; !found {
+		if !v.isValidComputeVMSize(app.VMSize) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
 		}
 
@@ -358,7 +383,7 @@ func validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPNet) (errs []err
 		if app.Count != 2 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
-		if _, found := validMasterAndInfraVMSizes[app.VMSize]; !found {
+		if !v.isValidMasterAndInfraVMSize(app.VMSize) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
 		}
 
@@ -366,7 +391,7 @@ func validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPNet) (errs []err
 		if app.Count != 3 {
 			errs = append(errs, fmt.Errorf("invalid properties.masterPoolProfile.count %d", app.Count))
 		}
-		if _, found := validMasterAndInfraVMSizes[app.VMSize]; !found {
+		if !v.isValidMasterAndInfraVMSize(app.VMSize) {
 			errs = append(errs, fmt.Errorf("invalid properties.masterPoolProfile.vmSize %q", app.VMSize))
 		}
 	}
@@ -399,7 +424,7 @@ func validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPNet) (errs []err
 	return
 }
 
-func validateFQDN(p *Properties, location string) (errs []error) {
+func (v *Validator) validateFQDN(p *Properties, location string) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
 		return
@@ -410,7 +435,7 @@ func validateFQDN(p *Properties, location string) (errs []error) {
 	return
 }
 
-func validateNetworkProfile(np *NetworkProfile) (errs []error) {
+func (v *Validator) validateNetworkProfile(np *NetworkProfile) (errs []error) {
 	if np == nil {
 		errs = append(errs, fmt.Errorf("networkProfile cannot be nil"))
 		return
@@ -424,7 +449,7 @@ func validateNetworkProfile(np *NetworkProfile) (errs []error) {
 	return
 }
 
-func validateRouterProfiles(rps []RouterProfile, location string) (errs []error) {
+func (v *Validator) validateRouterProfiles(rps []RouterProfile, location string) (errs []error) {
 	rpmap := map[string]RouterProfile{}
 
 	for _, rp := range rps {
@@ -437,7 +462,7 @@ func validateRouterProfiles(rps []RouterProfile, location string) (errs []error)
 		}
 		rpmap[rp.Name] = rp
 
-		errs = append(errs, validateRouterProfile(rp, location)...)
+		errs = append(errs, v.validateRouterProfile(rp, location)...)
 	}
 
 	for name := range validRouterProfileNames {
@@ -449,7 +474,7 @@ func validateRouterProfiles(rps []RouterProfile, location string) (errs []error)
 	return
 }
 
-func validateRouterProfile(rp RouterProfile, location string) (errs []error) {
+func (v *Validator) validateRouterProfile(rp RouterProfile, location string) (errs []error) {
 	if rp.Name == "" {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
 	}
@@ -467,7 +492,7 @@ func validateRouterProfile(rp RouterProfile, location string) (errs []error) {
 	return
 }
 
-func validateProvisioningState(ps ProvisioningState) (errs []error) {
+func (v *Validator) validateProvisioningState(ps ProvisioningState) (errs []error) {
 	switch ps {
 	case "",
 		Creating,

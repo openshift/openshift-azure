@@ -55,9 +55,45 @@ func TestValidate(t *testing.T) {
 		f            func(*OpenShiftManagedCluster)
 		expectedErrs []error
 		externalOnly bool
+		simulateProd bool // this defaults to false, that way I don't have to define it everywhere
 	}{
 		"test yaml parsing": { // test yaml parsing
 
+		},
+		"simulating prod, Standard_D2s_v3": {
+			f: func(oc *OpenShiftManagedCluster) {
+				for i := range oc.Properties.AgentPoolProfiles {
+					oc.Properties.AgentPoolProfiles[i].VMSize = "Standard_D2s_v3"
+				}
+			},
+			simulateProd: true,
+			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["infra"].vmSize "Standard_D2s_v3"`),
+				errors.New(`invalid properties.agentPoolProfiles["myCompute"].vmSize "Standard_D2s_v3"`),
+				errors.New(`invalid properties.masterPoolProfile.vmSize "Standard_D2s_v3"`),
+			},
+		},
+		"simulating prod, Standard_D8s_v3": {
+			f: func(oc *OpenShiftManagedCluster) {
+				for i := range oc.Properties.AgentPoolProfiles {
+					oc.Properties.AgentPoolProfiles[i].VMSize = "Standard_D8s_v3"
+				}
+			},
+			simulateProd: true,
+		},
+		"running under test, Standard_D8s_v3": {
+			f: func(oc *OpenShiftManagedCluster) {
+				for i := range oc.Properties.AgentPoolProfiles {
+					oc.Properties.AgentPoolProfiles[i].VMSize = "Standard_D8s_v3"
+				}
+			},
+		},
+		"running under test, Standard_D2s_v3": {
+			f: func(oc *OpenShiftManagedCluster) {
+				for i := range oc.Properties.AgentPoolProfiles {
+					oc.Properties.AgentPoolProfiles[i].VMSize = "Standard_D2s_v3"
+				}
+			},
 		},
 		"empty location": {
 			f: func(oc *OpenShiftManagedCluster) { oc.Location = "" },
@@ -374,7 +410,8 @@ func TestValidate(t *testing.T) {
 		if test.f != nil {
 			test.f(cs)
 		}
-		errs := Validate(cs, nil, test.externalOnly)
+		v := Validator{runningUnderTest: !test.simulateProd}
+		errs := v.Validate(cs, nil, test.externalOnly)
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
 			t.Errorf("%s expected errors:", name)
 			for _, err := range test.expectedErrs {
@@ -558,7 +595,8 @@ properties:
 			newCs.Properties.PublicHostname = tt.newHostNameValue
 		}
 
-		gotErrs := validateUpdateContainerService(newCs, oldCs, false)
+		var v Validator
+		gotErrs := v.validateUpdateContainerService(newCs, oldCs, false)
 		if !reflect.DeepEqual(gotErrs, tt.wantErrs) {
 			t.Errorf("validateUpdateContainerService:%s() = %v, want %v", name, gotErrs, tt.wantErrs)
 		}

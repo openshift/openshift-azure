@@ -104,7 +104,8 @@ func (s *sync) sync(ctx context.Context) (bool, error) {
 		return false, err
 	}
 
-	if errs := api.Validate(cs, nil, false); len(errs) > 0 {
+	v := api.NewValidator(cs.Config.RunningUnderTest)
+	if errs := v.Validate(cs, nil, false); len(errs) > 0 {
 		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 
