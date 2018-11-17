@@ -20,8 +20,8 @@ import (
 
 var errUnrecognisedRole = errors.New("unrecognised role")
 
-func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string) error {
-	_, err := u.kubeclient.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
+func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, computerName computerName) error {
+	_, err := u.kubeclient.CoreV1().Nodes().Get(computerName.toKubernetes(), metav1.GetOptions{})
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
@@ -36,12 +36,12 @@ func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedClus
 		// no-op for now
 
 	case api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute:
-		err := setUnschedulable(ctx, u.kubeclient, nodeName, true)
+		err := setUnschedulable(ctx, u.kubeclient, computerName, true)
 		if err != nil {
 			return err
 		}
 
-		err = deletePods(ctx, u.kubeclient, nodeName)
+		err = deletePods(ctx, u.kubeclient, computerName)
 		if err != nil {
 			return err
 		}
@@ -50,12 +50,12 @@ func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedClus
 		return errUnrecognisedRole
 	}
 
-	return u.kubeclient.CoreV1().Nodes().Delete(nodeName, &metav1.DeleteOptions{})
+	return u.kubeclient.CoreV1().Nodes().Delete(computerName.toKubernetes(), &metav1.DeleteOptions{})
 }
 
-func setUnschedulable(ctx context.Context, kc kubernetes.Interface, nodeName string, unschedulable bool) error {
+func setUnschedulable(ctx context.Context, kc kubernetes.Interface, computerName computerName, unschedulable bool) error {
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		node, err := kc.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
+		node, err := kc.CoreV1().Nodes().Get(computerName.toKubernetes(), metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
@@ -82,9 +82,9 @@ func max(i, j time.Duration) time.Duration {
 	return j
 }
 
-func deletePods(ctx context.Context, kc kubernetes.Interface, nodeName string) error {
+func deletePods(ctx context.Context, kc kubernetes.Interface, computerName computerName) error {
 	podList, err := kc.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
-		FieldSelector: fields.SelectorFromSet(fields.Set{"spec.nodeName": nodeName}).String(),
+		FieldSelector: fields.SelectorFromSet(fields.Set{"spec.nodeName": computerName.toKubernetes()}).String(),
 	})
 	if err != nil {
 		return err

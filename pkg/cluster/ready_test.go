@@ -69,24 +69,24 @@ func TestIsPodReady(t *testing.T) {
 
 func TestNodeIsReady(t *testing.T) {
 	tests := []struct {
-		name     string
-		kc       *fake.Clientset
-		nodeName string
-		want     bool
-		wantErr  bool
+		name         string
+		kc           *fake.Clientset
+		computerName computerName
+		want         bool
+		wantErr      bool
 	}{
 		{
-			name:     "not found",
-			nodeName: "master-000000",
-			wantErr:  false,
-			want:     false,
-			kc:       fake.NewSimpleClientset(),
+			name:         "not found",
+			computerName: "master-000000",
+			wantErr:      false,
+			want:         false,
+			kc:           fake.NewSimpleClientset(),
 		},
 		{
-			name:     "not ready",
-			nodeName: "master-000000",
-			wantErr:  false,
-			want:     false,
+			name:         "not ready",
+			computerName: "master-000000",
+			wantErr:      false,
+			want:         false,
 			kc: fake.NewSimpleClientset(&corev1.Node{
 				TypeMeta: metav1.TypeMeta{
 					Kind: "node",
@@ -97,16 +97,16 @@ func TestNodeIsReady(t *testing.T) {
 			}),
 		},
 		{
-			name:     "ready",
-			nodeName: "master-000000",
-			wantErr:  false,
-			want:     true,
+			name:         "ready",
+			computerName: "master-00000A",
+			wantErr:      false,
+			want:         true,
 			kc: fake.NewSimpleClientset(&corev1.Node{
 				TypeMeta: metav1.TypeMeta{
 					Kind: "node",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "master-000000",
+					Name: "master-00000a",
 				},
 				Status: corev1.NodeStatus{
 					Conditions: []corev1.NodeCondition{
@@ -120,7 +120,7 @@ func TestNodeIsReady(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got, err := nodeIsReady(tt.kc, tt.nodeName)
+		got, err := nodeIsReady(tt.kc, tt.computerName)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("nodeIsReady() error = %v, wantErr %v", err, tt.wantErr)
 			return
@@ -133,24 +133,24 @@ func TestNodeIsReady(t *testing.T) {
 
 func TestMasterIsReady(t *testing.T) {
 	tests := []struct {
-		name     string
-		kc       kubernetes.Interface
-		nodeName string
-		want     bool
-		wantErr  bool
+		name         string
+		kc           kubernetes.Interface
+		computerName computerName
+		want         bool
+		wantErr      bool
 	}{
 		{
-			name:     "node not found",
-			nodeName: "master-000000",
-			wantErr:  false,
-			want:     false,
-			kc:       fake.NewSimpleClientset(),
+			name:         "node not found",
+			computerName: "master-000000",
+			wantErr:      false,
+			want:         false,
+			kc:           fake.NewSimpleClientset(),
 		},
 		{
-			name:     "node ready, pods not found",
-			nodeName: "master-000000",
-			wantErr:  false,
-			want:     false,
+			name:         "node ready, pods not found",
+			computerName: "master-000000",
+			wantErr:      false,
+			want:         false,
 			kc: fake.NewSimpleClientset(&corev1.Node{
 				TypeMeta: metav1.TypeMeta{
 					Kind: "node",
@@ -169,16 +169,16 @@ func TestMasterIsReady(t *testing.T) {
 			}),
 		},
 		{
-			name:     "node ready, pods ready",
-			nodeName: "master-000000",
-			wantErr:  false,
-			want:     true,
+			name:         "node ready, pods ready",
+			computerName: "master-00000A",
+			wantErr:      false,
+			want:         true,
 			kc: fake.NewSimpleClientset(&corev1.Node{
 				TypeMeta: metav1.TypeMeta{
 					Kind: "node",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "master-000000",
+					Name: "master-00000a",
 				},
 				Status: corev1.NodeStatus{
 					Conditions: []corev1.NodeCondition{
@@ -193,7 +193,7 @@ func TestMasterIsReady(t *testing.T) {
 					Kind: "pod",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "master-etcd-master-000000",
+					Name:      "master-etcd-master-00000a",
 					Namespace: "kube-system",
 				},
 				Status: corev1.PodStatus{
@@ -209,7 +209,7 @@ func TestMasterIsReady(t *testing.T) {
 					Kind: "pod",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "master-api-master-000000",
+					Name:      "master-api-master-00000a",
 					Namespace: "kube-system",
 				},
 				Status: corev1.PodStatus{
@@ -225,7 +225,7 @@ func TestMasterIsReady(t *testing.T) {
 					Kind: "pod",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "controllers-master-000000",
+					Name:      "controllers-master-00000a",
 					Namespace: "kube-system",
 				},
 				Status: corev1.PodStatus{
@@ -240,7 +240,7 @@ func TestMasterIsReady(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got, err := masterIsReady(tt.kc, tt.nodeName)
+		got, err := masterIsReady(tt.kc, tt.computerName)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("masterIsReady() error = %v, wantErr %v. Test: %v", err, tt.wantErr, tt.name)
 			return
@@ -379,7 +379,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 					Kind: "node",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "master-000000",
+					Name: "master-00000a",
 				},
 				Status: corev1.NodeStatus{
 					Conditions: []corev1.NodeCondition{
@@ -394,7 +394,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 					Kind: "pod",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "master-etcd-master-000000",
+					Name:      "master-etcd-master-00000a",
 					Namespace: "kube-system",
 				},
 				Status: corev1.PodStatus{
@@ -410,7 +410,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 					Kind: "pod",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "master-api-master-000000",
+					Name:      "master-api-master-00000a",
 					Namespace: "kube-system",
 				},
 				Status: corev1.PodStatus{
@@ -426,7 +426,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 					Kind: "pod",
 				},
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      "controllers-master-000000",
+					Name:      "controllers-master-00000a",
 					Namespace: "kube-system",
 				},
 				Status: corev1.PodStatus{
@@ -449,7 +449,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 						Name: to.StringPtr("ss-master"),
 						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
 							OsProfile: &compute.OSProfile{
-								ComputerName: to.StringPtr("master-000000"),
+								ComputerName: to.StringPtr("master-00000A"),
 							},
 						},
 					},
