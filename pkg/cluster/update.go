@@ -213,7 +213,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 				}
 				vmsBefore[*updated.InstanceID] = struct{}{}
-				blob[instanceName(*updated.Name)] = ssHashes[ssNameForVm(&updated)]
+				blob[instanceName(*updated.Name)] = ssHashes[ssNameForVM(&updated)]
 				if err := u.updateBlob(blob); err != nil {
 					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneUpdateBlob}
 				}
@@ -235,7 +235,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 func filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob map[instanceName]hash, ssHashes map[scalesetName]hash) []compute.VirtualMachineScaleSetVM {
 	var oldVMs []compute.VirtualMachineScaleSetVM
 	for _, vm := range vms {
-		if blob[instanceName(*vm.Name)] != ssHashes[ssNameForVm(&vm)] {
+		if blob[instanceName(*vm.Name)] != ssHashes[ssNameForVM(&vm)] {
 			oldVMs = append(oldVMs, vm)
 		} else {
 			log.Infof("skipping vm %q since it's already updated", *vm.Name)
@@ -244,7 +244,7 @@ func filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob map[instanceName]
 	return oldVMs
 }
 
-func ssNameForVm(vm *compute.VirtualMachineScaleSetVM) scalesetName {
+func ssNameForVM(vm *compute.VirtualMachineScaleSetVM) scalesetName {
 	hostname := strings.Split(*vm.Name, "_")[0]
 	return scalesetName(hostname)
 }
