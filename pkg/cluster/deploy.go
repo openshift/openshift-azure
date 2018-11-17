@@ -51,7 +51,7 @@ type instanceName string
 type hash string
 
 type vmInfo struct {
-	ComputerName instanceName `json:"computerName,omitempty"`
+	InstanceName instanceName `json:"instanceName,omitempty"`
 	ScalesetHash hash         `json:"scalesetHash,omitempty"`
 }
 
@@ -119,7 +119,7 @@ func (u *simpleUpgrader) updateBlob(b map[instanceName]hash) error {
 	blob := make([]vmInfo, len(b))
 	for instancename, hash := range b {
 		blob = append(blob, vmInfo{
-			ComputerName: instancename,
+			InstanceName: instancename,
 			ScalesetHash: hash,
 		})
 	}
@@ -155,7 +155,7 @@ func (u *simpleUpgrader) readBlob() (map[instanceName]hash, error) {
 	}
 	b := make(map[instanceName]hash)
 	for _, vi := range blob {
-		b[vi.ComputerName] = vi.ScalesetHash
+		b[vi.InstanceName] = vi.ScalesetHash
 	}
 	return b, nil
 }
