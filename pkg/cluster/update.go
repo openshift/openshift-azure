@@ -7,11 +7,9 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
-	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
@@ -63,7 +61,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 	vmsBefore := map[computerName]struct{}{}
 
 	for _, agent := range cs.Properties.AgentPoolProfiles {
-		vms, err := listVMs(ctx, cs, u.vmc, agent.Role)
+		vms, err := u.listVMs(ctx, cs, agent.Role)
 		if err != nil {
 			return nil, err
 		}
@@ -91,7 +89,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 
 	existingVMs := make(map[instanceName]struct{})
 	for _, agent := range cs.Properties.AgentPoolProfiles {
-		vms, err := listVMs(ctx, cs, u.vmc, agent.Role)
+		vms, err := u.listVMs(ctx, cs, agent.Role)
 		if err != nil {
 			return err
 		}
@@ -101,7 +99,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 			computerName := computerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 			if _, found := nodes[computerName]; !found {
 				log.Infof("waiting for %s to be ready", computerName)
-				err = waitForReady(ctx, cs, agent.Role, computerName, u.kubeclient)
+				err = u.waitForReady(ctx, cs, agent.Role, computerName)
 				if err != nil {
 					return err
 				}
@@ -139,8 +137,8 @@ func getCount(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) in
 	panic("invalid role")
 }
 
-func listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, vmc azureclient.VirtualMachineScaleSetVMsClient, role api.AgentPoolProfileRole) ([]compute.VirtualMachineScaleSetVM, error) {
-	vmPages, err := vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), "", "", "")
+func (u *simpleUpgrader) listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) ([]compute.VirtualMachineScaleSetVM, error) {
+	vmPages, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), "", "", "")
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +163,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 	// store a list of all the VM instances now, so that if we end up creating
 	// new ones (in the crash recovery case, we might not), we can detect which
 	// they are
-	oldVMs, err := listVMs(ctx, cs, u.vmc, role)
+	oldVMs, err := u.listVMs(ctx, cs, role)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneListVMs}
 	}
@@ -198,7 +196,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 		}
 
-		updatedList, err := listVMs(ctx, cs, u.vmc, role)
+		updatedList, err := u.listVMs(ctx, cs, role)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneListVMs}
 		}
@@ -210,7 +208,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			if _, found := vmsBefore[*updated.InstanceID]; !found {
 				computerName := computerName(*updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 				log.Infof("waiting for %s to be ready", computerName)
-				err = waitForReady(ctx, cs, role, computerName, u.kubeclient)
+				err = u.waitForReady(ctx, cs, role, computerName)
 				if err != nil {
 					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 				}
@@ -253,12 +251,12 @@ func ssNameForVm(vm *compute.VirtualMachineScaleSetVM) scalesetName {
 
 // updateInPlace updates one by one all the VMs of a scale set, in place.
 func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, ssHashes map[scalesetName]hash) *api.PluginError {
-	vms, err := listVMs(ctx, cs, u.vmc, role)
+	vms, err := u.listVMs(ctx, cs, role)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceListVMs}
 	}
 
-	sorted, err := sortMasterVMsByHealth(vms, cs, u.kubeclient)
+	sorted, err := u.sortMasterVMsByHealth(vms, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceSortMasters}
 	}
@@ -332,7 +330,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		}
 
 		log.Infof("waiting for %s to be ready", computerName)
-		err = waitForReady(ctx, cs, role, computerName, u.kubeclient)
+		err = u.waitForReady(ctx, cs, role, computerName)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceWaitForReady}
 		}
@@ -346,11 +344,11 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 	return nil
 }
 
-func sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenShiftManagedCluster, kc kubernetes.Interface) ([]compute.VirtualMachineScaleSetVM, error) {
+func (u *simpleUpgrader) sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenShiftManagedCluster) ([]compute.VirtualMachineScaleSetVM, error) {
 	var ready, unready []compute.VirtualMachineScaleSetVM
 	for _, vm := range vms {
 		nodeName := computerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		isReady, err := masterIsReady(kc, nodeName)
+		isReady, err := u.masterIsReady(nodeName)
 		if err != nil {
 			return nil, fmt.Errorf("cannot get health for %q: %v", nodeName, err)
 		}

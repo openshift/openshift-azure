@@ -120,7 +120,8 @@ func TestNodeIsReady(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got, err := nodeIsReady(tt.kc, tt.computerName)
+		u := &simpleUpgrader{kubeclient: tt.kc}
+		got, err := u.nodeIsReady(tt.computerName)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("nodeIsReady() error = %v, wantErr %v", err, tt.wantErr)
 			return
@@ -240,7 +241,8 @@ func TestMasterIsReady(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got, err := masterIsReady(tt.kc, tt.computerName)
+		u := &simpleUpgrader{kubeclient: tt.kc}
+		got, err := u.masterIsReady(tt.computerName)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("masterIsReady() error = %v, wantErr %v. Test: %v", err, tt.wantErr, tt.name)
 			return
