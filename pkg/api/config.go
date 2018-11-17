@@ -62,6 +62,7 @@ type ImageConfig struct {
 	Format string `json:"format,omitempty"`
 
 	ClusterMonitoringOperator    string `json:"clusterMonitoringOperator,omitempty"`
+	AzureControllers             string `json:"azureControllers,omitempty"`
 	PrometheusOperatorBase       string `json:"prometheusOperatorBase,omitempty"`
 	PrometheusBase               string `json:"prometheusBase,omitempty"`
 	PrometheusConfigReloaderBase string `json:"prometheusConfigReloaderBase,omitempty"`

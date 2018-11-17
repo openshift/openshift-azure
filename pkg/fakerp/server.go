@@ -198,14 +198,15 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	ctx = context.WithValue(ctx, api.ContextKeyTenantID, s.conf.TenantID)
 
 	tc := api.TestConfig{
-		RunningUnderTest:   os.Getenv("RUNNING_UNDER_TEST") != "",
-		ImageResourceGroup: os.Getenv("IMAGE_RESOURCEGROUP"),
-		ImageResourceName:  os.Getenv("IMAGE_RESOURCENAME"),
-		DeployOS:           os.Getenv("DEPLOY_OS"),
-		ImageOffer:         os.Getenv("IMAGE_OFFER"),
-		ImageVersion:       os.Getenv("IMAGE_VERSION"),
-		ORegURL:            os.Getenv("OREG_URL"),
-		EtcdBackupImage:    os.Getenv("ETCD_BACKUP_IMAGE"),
+		RunningUnderTest:      os.Getenv("RUNNING_UNDER_TEST") != "",
+		ImageResourceGroup:    os.Getenv("IMAGE_RESOURCEGROUP"),
+		ImageResourceName:     os.Getenv("IMAGE_RESOURCENAME"),
+		DeployOS:              os.Getenv("DEPLOY_OS"),
+		ImageOffer:            os.Getenv("IMAGE_OFFER"),
+		ImageVersion:          os.Getenv("IMAGE_VERSION"),
+		ORegURL:               os.Getenv("OREG_URL"),
+		EtcdBackupImage:       os.Getenv("ETCDBACKUP_IMAGE"),
+		AzureControllersImage: os.Getenv("AZURE_CONTROLLERS_IMAGE"),
 	}
 
 	config := &api.PluginConfig{

@@ -72,14 +72,15 @@ type PluginConfig struct {
 
 // TestConfig holds all testing variables.  It should be empty in production.
 type TestConfig struct {
-	RunningUnderTest   bool
-	ImageResourceGroup string
-	ImageResourceName  string
-	ImageOffer         string
-	ImageVersion       string
-	DeployOS           string
-	ORegURL            string
-	EtcdBackupImage    string
+	RunningUnderTest      bool
+	ImageResourceGroup    string
+	ImageResourceName     string
+	ImageOffer            string
+	ImageVersion          string
+	DeployOS              string
+	ORegURL               string
+	EtcdBackupImage       string
+	AzureControllersImage string
 }
 
 // Plugin is the main interface to openshift-azure

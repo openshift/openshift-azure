@@ -393,6 +393,12 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.Console }}",
 		},
 	},
+	"Deployment.apps/openshift-infra/customer-admin-controller": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.AzureControllers }}",
+		},
+	},
 	"Deployment.apps/openshift-monitoring/cluster-monitoring-operator": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
@@ -433,7 +439,7 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.RegistryConsoleOAuthSecret }}",
 		},
 	},
-	"Group.user.openshift.io/customer-admins": {
+	"Group.user.openshift.io/osa-customer-admins": {
 		{
 			Path: jsonpath.MustCompile("$.users"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
@@ -444,7 +450,7 @@ var Translations = map[string][]struct {
 			},
 		},
 	},
-	"Group.user.openshift.io/customer-readers": {
+	"Group.user.openshift.io/osa-customer-readers": {
 		{
 			Path: jsonpath.MustCompile("$.users"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {

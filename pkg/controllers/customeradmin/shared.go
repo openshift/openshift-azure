@@ -1,0 +1,89 @@
+package customeradmin
+
+import (
+	"strings"
+
+	"github.com/sirupsen/logrus"
+	rbacv1 "k8s.io/api/rbac/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+)
+
+var desiredRolebindings = map[string]rbacv1.RoleBinding{
+	"osa-customer-admin": {
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "osa-customer-admin",
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				APIGroup: "rbac.authorization.k8s.io",
+				Kind:     "Group",
+				Name:     "osa-customer-admins",
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "ClusterRole",
+			Name:     "admin",
+		},
+	},
+	"osa-customer-admin-project": {
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "osa-customer-admin-project",
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				APIGroup: "rbac.authorization.k8s.io",
+				Kind:     "Group",
+				Name:     "osa-customer-admins",
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "ClusterRole",
+			Name:     "customer-admin-project",
+		},
+	},
+	"osa-customer-view": {
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "osa-customer-view",
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				APIGroup: "rbac.authorization.k8s.io",
+				Kind:     "Group",
+				Name:     "osa-customer-readers",
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "ClusterRole",
+			Name:     "view",
+		},
+	},
+}
+
+// AddToManager adds all Controllers to the Manager
+func AddToManager(m manager.Manager, log *logrus.Entry) error {
+	if err := addNamespaceController(m, log); err != nil {
+		return err
+	}
+	if err := addRolebindingController(m, log); err != nil {
+		return err
+	}
+	return nil
+}
+
+func ignoredNamespace(namespace string) bool {
+	for _, name := range []string{"openshift", "kubernetes", "kube", "default"} {
+		if namespace == name {
+			return true
+		}
+	}
+	for _, prefix := range []string{"openshift-", "kubernetes-", "kube-"} {
+		if strings.HasPrefix(namespace, prefix) {
+			return true
+		}
+	}
+	return false
+}

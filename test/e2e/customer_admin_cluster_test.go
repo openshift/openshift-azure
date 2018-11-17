@@ -28,7 +28,7 @@ var _ = Describe("Openshift on Azure customer-cluster-admin e2e tests [CustomerA
 		c.createProject(namespace)
 
 		err := wait.PollImmediate(2*time.Second, 5*time.Minute, func() (bool, error) {
-			rb, err := cadmin.kc.RbacV1().RoleBindings(c.namespace).Get("customer-admin", metav1.GetOptions{})
+			rb, err := cadmin.kc.RbacV1().RoleBindings(c.namespace).Get("osa-customer-admin", metav1.GetOptions{})
 			if err != nil {
 				// still waiting for namespace
 				if kerrors.IsNotFound(err) {
@@ -41,7 +41,7 @@ var _ = Describe("Openshift on Azure customer-cluster-admin e2e tests [CustomerA
 				return false, err
 			}
 			for _, subject := range rb.Subjects {
-				if subject.Kind == "Group" && subject.Name == "customer-admins" {
+				if subject.Kind == "Group" && subject.Name == "osa-customer-admins" {
 					return true, nil
 				}
 			}
