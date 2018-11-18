@@ -11,7 +11,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
-	"github.com/openshift/openshift-azure/pkg/util/fixtures"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 )
@@ -43,7 +42,7 @@ func TestInitialize(t *testing.T) {
 	configBlob := mock_storage.NewMockBlob(gmc)
 	configCr.EXPECT().GetBlobReference(ConfigBlobName).Return(configBlob)
 
-	cs := fixtures.NewTestOpenShiftCluster()
+	cs := &api.OpenShiftManagedCluster{}
 	csj, err := json.Marshal(cs)
 	if err != nil {
 		t.Fatal(err)

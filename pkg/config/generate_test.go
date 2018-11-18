@@ -6,31 +6,29 @@ import (
 	"github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/fixtures"
 )
 
 func TestGenerate(t *testing.T) {
-	tests := map[string]struct {
-		cs *api.OpenShiftManagedCluster
-	}{
-		"test generate new": {
-			cs: fixtures.NewTestOpenShiftCluster(),
+	cs := &api.OpenShiftManagedCluster{
+		Config: &api.Config{},
+		Properties: &api.Properties{
+			OpenShiftVersion: "v3.11",
+			RouterProfiles: []api.RouterProfile{
+				{},
+			},
 		},
-		//TODO "test generate doesn't overwrite": {},
 	}
-	var cg simpleGenerator
-	for name, test := range tests {
-		err := cg.Generate(test.cs)
-		if err != nil {
-			t.Errorf("%s received generation error %v", name, err)
-			continue
-		}
-		testRequiredFields(test.cs, cg.pluginConfig, t)
-		// check mutation
+
+	cg := simpleGenerator{pluginConfig: api.PluginConfig{TestConfig: api.TestConfig{RunningUnderTest: true}}}
+	err := cg.Generate(cs)
+	if err != nil {
+		t.Error(err)
 	}
+
+	testRequiredFields(cs, t)
 }
 
-func testRequiredFields(cs *api.OpenShiftManagedCluster, pc api.PluginConfig, t *testing.T) {
+func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert := func(c bool, name string) {
 		if !c {
 			t.Errorf("missing %s", name)
@@ -75,13 +73,11 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, pc api.PluginConfig, t 
 
 	assert(c.ServiceAccountKey != nil, "service account key")
 
-	if pc.TestConfig.RunningUnderTest {
-		assert(c.RunningUnderTest == true, "running under test")
-		assert(len(c.HtPasswd) != 0, "htpassword")
-		assert(len(c.CustomerAdminPasswd) != 0, "customer-cluster-admin password")
-		assert(len(c.CustomerReaderPasswd) != 0, "customer-cluster-reader password")
-		assert(len(c.EndUserPasswd) != 0, "end user password")
-	}
+	assert(len(c.HtPasswd) != 0, "htpassword")
+	assert(len(c.CustomerAdminPasswd) != 0, "customer-cluster-admin password")
+	assert(len(c.CustomerReaderPasswd) != 0, "customer-cluster-reader password")
+	assert(len(c.EndUserPasswd) != 0, "end user password")
+
 	assert(c.SSHKey != nil, "ssh key")
 
 	assert(len(c.RegistryStorageAccount) != 0, "registry storage account")

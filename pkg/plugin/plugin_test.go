@@ -11,25 +11,28 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
-	"github.com/openshift/openshift-azure/pkg/util/fixtures"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
+	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
 func TestMerge(t *testing.T) {
 	log.New(logrus.NewEntry(logrus.New()))
 
-	newCluster := fixtures.NewTestOpenShiftCluster()
-	p := &plugin{}
-	oldCluster := fixtures.NewTestOpenShiftCluster()
+	prepare := func(v reflect.Value) {
+		switch v.Interface().(type) {
+		case []api.IdentityProvider:
+			// set the Provider to AADIdentityProvider
+			v.Set(reflect.ValueOf([]api.IdentityProvider{{Provider: &api.AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
+		}
+	}
 
-	newCluster.Config = nil
-	newCluster.Properties.AgentPoolProfiles = nil
-	newCluster.Properties.RouterProfiles = nil
-	newCluster.Properties.ServicePrincipalProfile = nil
-	newCluster.Properties.AzProfile = nil
-	newCluster.Properties.AuthProfile = nil
-	newCluster.Properties.FQDN = ""
+	oldCluster := &api.OpenShiftManagedCluster{}
+	populate.Walk(&oldCluster, prepare)
+
+	newCluster := &api.OpenShiftManagedCluster{Properties: &api.Properties{}}
+
+	p := &plugin{}
 
 	// should fix all of the items removed above and we should
 	// be able to run through the entire plugin process.
