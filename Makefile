@@ -1,13 +1,13 @@
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain --ignored) = "" ]] && echo -clean || echo -dirty)
 
 # all is the default target to build everything
-all: clean build azure-controllers etcdbackup sync
+all: clean build azure-controllers etcdbackup sync aad
 
 build: generate
 	go build ./...
 
 clean:
-	rm -f coverage.out e2e.test azure-controllers etcdbackup sync
+	rm -f coverage.out e2e.test azure-controllers etcdbackup sync aad
 
 test: unit e2e
 
@@ -19,6 +19,9 @@ E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
 AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
 ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
+
+aad: generate
+	go build ./cmd/aad
 
 azure-controllers: generate
 	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/azure-controllers

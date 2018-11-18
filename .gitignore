@@ -8,6 +8,7 @@
 /sync
 /etcdbackup
 /azure-controllers
+/aad
 .vscode
 .idea
 coverage.out
