@@ -110,6 +110,10 @@ func unmarshalJSON(v reflect.Value, b []byte) error {
 	for i := 0; i < v.NumField(); i++ {
 		switch v.Field(i).Interface().(type) {
 		case *rsa.PrivateKey:
+			if len(shadow.Field(i).Bytes()) == 0 {
+				continue
+			}
+
 			var b []byte
 			err = json.Unmarshal(shadow.Field(i).Bytes(), &b)
 			if err != nil {
@@ -124,6 +128,10 @@ func unmarshalJSON(v reflect.Value, b []byte) error {
 			v.Field(i).Set(reflect.ValueOf(key))
 
 		case *v1.Config:
+			if len(shadow.Field(i).Bytes()) == 0 {
+				continue
+			}
+
 			var b []byte
 			err = json.Unmarshal(shadow.Field(i).Bytes(), &b)
 			if err != nil {
@@ -139,6 +147,10 @@ func unmarshalJSON(v reflect.Value, b []byte) error {
 			v.Field(i).Set(reflect.ValueOf(&c))
 
 		case *x509.Certificate:
+			if len(shadow.Field(i).Bytes()) == 0 {
+				continue
+			}
+
 			var b []byte
 			err = json.Unmarshal(shadow.Field(i).Bytes(), &b)
 			if err != nil {
