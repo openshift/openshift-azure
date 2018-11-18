@@ -6,39 +6,21 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/arm"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/fixtures"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 )
 
-func NewPluginWithFakeUpgrader(ctrl *gomock.Controller, entry *logrus.Entry, pluginConfig *api.PluginConfig) api.Plugin {
-	log.New(entry)
-	return &plugin{
-		entry:           entry,
-		config:          *pluginConfig,
-		clusterUpgrader: mock_cluster.NewMockUpgrader(ctrl),
-		configGenerator: config.NewSimpleGenerator(pluginConfig),
-		armGenerator:    arm.NewSimpleGenerator(entry, pluginConfig),
-	}
-}
-
 func TestMerge(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-	var config = api.PluginConfig{
-		SyncImage:       "sync:latest",
-		AcceptLanguages: []string{"en-us"},
-	}
+	log.New(logrus.NewEntry(logrus.New()))
+
 	newCluster := fixtures.NewTestOpenShiftCluster()
-	p := NewPluginWithFakeUpgrader(mockCtrl, logrus.NewEntry(logrus.New()), &config)
+	p := &plugin{}
 	oldCluster := fixtures.NewTestOpenShiftCluster()
 
 	newCluster.Config = nil
@@ -48,12 +30,6 @@ func TestMerge(t *testing.T) {
 	newCluster.Properties.AzProfile = nil
 	newCluster.Properties.AuthProfile = nil
 	newCluster.Properties.FQDN = ""
-
-	// make old cluster go through plugin first
-	armTemplate := testPluginRun(p, oldCluster, nil, t)
-	if !hasResourceType(armTemplate, "Microsoft.Network/networkSecurityGroups") {
-		t.Fatalf("networkSecurityGroups should be applied during cluster creation")
-	}
 
 	// should fix all of the items removed above and we should
 	// be able to run through the entire plugin process.
@@ -83,39 +59,6 @@ func TestMerge(t *testing.T) {
 	if newCluster.Properties.FQDN == "" {
 		t.Errorf("new cluster fqdn should be merged")
 	}
-
-	armTemplate = testPluginRun(p, newCluster, oldCluster, t)
-	if hasResourceType(armTemplate, "Microsoft.Network/networkSecurityGroups") {
-		t.Fatalf("networkSecurityGroups should not be applied during cluster upgrade")
-	}
-}
-
-func hasResourceType(armTemplate map[string]interface{}, resType string) bool {
-	for _, res := range armTemplate["resources"].([]interface{}) {
-		if res.(map[string]interface{})["type"] == resType {
-			return true
-		}
-	}
-	return false
-}
-
-func testPluginRun(p api.Plugin, newCluster *api.OpenShiftManagedCluster, oldCluster *api.OpenShiftManagedCluster, t *testing.T) (armTemplate map[string]interface{}) {
-	if errs := p.Validate(context.Background(), newCluster, oldCluster, false); len(errs) != 0 {
-		t.Fatalf("error validating: %s", spew.Sdump(errs))
-	}
-
-	if err := p.GenerateConfig(context.Background(), newCluster); err != nil {
-		t.Fatalf("error generating config for arm generate test: %s", spew.Sdump(err))
-	}
-
-	azuretemplate, err := p.GenerateARM(context.Background(), newCluster, oldCluster != nil)
-	if err != nil {
-		t.Fatalf("error generating arm: %s", spew.Sdump(err))
-	}
-	if len(azuretemplate) == 0 {
-		t.Errorf("no arm was generated")
-	}
-	return azuretemplate
 }
 
 func TestGenerateARM(t *testing.T) {
