@@ -11,6 +11,9 @@ fi
 # remove registry certificate softlink from docker
 unlink /etc/docker/certs.d/registry.access.redhat.com/redhat-ca.crt 
 
+# replace escape chars in bootstrap script for imageFormat
+sed -i "s|\\$|\$|" /etc/origin/node/bootstrap-node-config.yaml
+
 if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker.service
   mkfs.xfs -f /dev/disk/azure/resource-part1
