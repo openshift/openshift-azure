@@ -26,7 +26,7 @@ func TestGenerate(t *testing.T) {
 	}
 
 	var sg simpleGenerator
-	armtemplate, err := sg.Generate(context.Background(), cs, false)
+	armtemplate, err := sg.Generate(context.Background(), cs, false, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +35,7 @@ func TestGenerate(t *testing.T) {
 		t.Error("expected to find one networkSecurityGroup on create")
 	}
 
-	armtemplate, err = sg.Generate(context.Background(), cs, true)
+	armtemplate, err = sg.Generate(context.Background(), cs, true, "")
 	if err != nil {
 		t.Fatal(err)
 	}

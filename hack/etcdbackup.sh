@@ -26,10 +26,10 @@ if [[ -z "$ETCDBACKUP_IMAGE" ]]; then
     ETCDBACKUP_IMAGE=quay.io/openshift-on-azure/etcdbackup:latest
 fi
 
-name="$1"
-if [[ -z "$name" ]]; then
+if [[ $# -ne 1 ]]; then
     usage
 fi
+name="$1"
 
 oc delete job etcd-manual-backup -n openshift-etcd || true
 oc create -f - <<EOF

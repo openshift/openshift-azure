@@ -13,10 +13,6 @@ import (
 )
 
 func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
-	err := u.createClients(ctx, cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
-	}
 	// deployFn() may change the number of VMs.  If we can see that any VMs are
 	// about to be deleted, drain them first.  Record which VMs are visible now
 	// so that we can detect newly created VMs and wait for them to become ready.

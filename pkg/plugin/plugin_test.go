@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -21,7 +22,7 @@ func TestGenerateARM(t *testing.T) {
 
 	testData := map[string]interface{}{"test": "data"}
 	mockGen := mock_arm.NewMockGenerator(mockCtrl)
-	mockGen.EXPECT().Generate(nil, nil, true).Return(testData, nil)
+	mockGen.EXPECT().Generate(nil, nil, true, "").Return(testData, nil)
 	p := &plugin{
 		armGenerator: mockGen,
 		log:          logrus.NewEntry(logrus.StandardLogger()),
@@ -259,6 +260,7 @@ func TestCreateOrUpdate(t *testing.T) {
 			mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
 			mockUp.EXPECT().HealthCheck(nil, nil).Return(nil)
 		}
+		mockUp.EXPECT().CreateClients(nil, nil).Return(nil)
 		p := &plugin{
 			clusterUpgrader: mockUp,
 			log:             logrus.NewEntry(logrus.StandardLogger()),
@@ -367,4 +369,37 @@ func getDummyPluginConfig() (*api.PluginConfig, error) {
 			LoggingImage:    "loggingImage",
 		},
 	}, nil
+}
+
+func TestRecoverEtcdCluster(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	testData := map[string]interface{}{"test": "data"}
+	testDataWithBackup := map[string]interface{}{"test": "backup"}
+	mockGen := mock_arm.NewMockGenerator(mockCtrl)
+	mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
+	firstGenerate := true
+	mockGen.EXPECT().Generate(nil, nil, true, gomock.Any()).Times(2).DoAndReturn(func(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, backupBlob string) (map[string]interface{}, error) {
+		if firstGenerate {
+			firstGenerate = false
+			return testDataWithBackup, nil
+		}
+		return testData, nil
+	})
+	mockUp.EXPECT().CreateClients(nil, nil).Return(nil)
+	mockUp.EXPECT().Evacuate(nil, nil).Return(nil)
+	mockUp.EXPECT().Deploy(nil, nil, testDataWithBackup, nil).Return(nil)
+	mockUp.EXPECT().Update(nil, nil, testData, nil).Return(nil)
+	mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
+	mockUp.EXPECT().HealthCheck(nil, nil).Times(2).Return(nil)
+	p := &plugin{
+		clusterUpgrader: mockUp,
+		armGenerator:    mockGen,
+		log:             logrus.NewEntry(logrus.StandardLogger()),
+	}
+
+	if err := p.RecoverEtcdCluster(nil, nil, nil, "test-backup"); err != nil {
+		t.Errorf("plugin.RecoverEtcdCluster error = %v", err)
+	}
 }

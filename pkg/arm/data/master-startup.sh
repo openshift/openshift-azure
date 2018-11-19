@@ -9,7 +9,7 @@ if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
 fi
 
 # remove registry certificate softlink from docker
-unlink /etc/docker/certs.d/registry.access.redhat.com/redhat-ca.crt 
+unlink /etc/docker/certs.d/registry.access.redhat.com/redhat-ca.crt
 
 if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker.service
@@ -650,6 +650,37 @@ sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubec
 # HACK: copy node.kubeconfig to bootstrap.kubeconfig so that openshift start node used in the sync
 # daemonset will not fail and set the master node labels correctly.
 cp /etc/origin/node/node.kubeconfig /etc/origin/node/bootstrap.kubeconfig
+
+{{- if $.Extra.IsRecovery }}
+logger -t master-startup.sh "starting recovery on $(hostname)"
+# step 1 get the backup
+rm -Rf /var/lib/etcd/*
+tempBackDir=/var/lib/etcd/backup
+mkdir $tempBackDir
+docker pull {{ .Config.Images.EtcdBackup }}
+docker run --dns 8.8.8.8 -v /etc/origin/master:/etc/origin/master -v /etc/origin/cloudprovider/:/_data/_out -v $tempBackDir:/out:z {{ .Config.Images.EtcdBackup }} -blobname={{ .Extra.BackupBlobName }} -destination=/out/backup.db "download"
+logger -t master-startup.sh "backup downloaded to " $(ls $tempBackDir) ""
+
+# step 2 restore
+logger -t master-startup.sh "restoring snapshot"
+docker pull {{ .Config.Images.MasterEtcd }}
+docker run --network host  \
+           -v /etc/etcd:/etc/etcd \
+           -v /var/lib/etcd:/var/lib/etcd:z \
+           -e ETCDCTL_API="3" {{ .Config.Images.MasterEtcd }} \
+           etcdctl snapshot restore $tempBackDir/backup.db \
+           --data-dir /var/lib/etcd/new \
+           --name $(hostname) \
+           --initial-cluster "master-000000=https://master-000000:2380,master-000001=https://master-000001:2380,master-000002=https://master-000002:2380" \
+           --initial-cluster-token etcd-for-azure \
+           --initial-advertise-peer-urls https://$(hostname):2380
+
+mv /var/lib/etcd/new/* /var/lib/etcd/
+rm -rf /var/lib/etcd/new
+rm -rf $tempBackDir
+restorecon -Rv /var/lib/etcd
+logger -t master-startup.sh "restore done"
+{{- end }}
 
 # note: ${SERVICE_TYPE}-node crash loops until master is up
 systemctl enable ${SERVICE_TYPE}-node.service

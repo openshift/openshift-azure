@@ -1,13 +1,13 @@
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain --ignored) = "" ]] && echo -clean || echo -dirty)
 
 # all is the default target to build everything
-all: clean build azure-controllers etcdbackup sync
+all: clean build azure-controllers etcdbackup sync recoveretcdcluster
 
 build: generate
 	go build ./...
 
 clean:
-	rm -f coverage.out azure-controllers etcdbackup sync
+	rm -f coverage.out azure-controllers etcdbackup sync recoveretcdcluster
 
 test: unit e2e
 
@@ -30,6 +30,9 @@ azure-controllers-image: azure-controllers
 
 azure-controllers-push: azure-controllers-image
 	docker push $(AZURE_CONTROLLERS_IMAGE)
+
+recoveretcdcluster: generate
+	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/recoveretcdcluster
 
 etcdbackup: generate
 	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/etcdbackup

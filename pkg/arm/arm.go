@@ -19,7 +19,7 @@ import (
 )
 
 type Generator interface {
-	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error)
+	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, backupBlob string) (map[string]interface{}, error)
 }
 
 type simpleGenerator struct {
@@ -35,7 +35,7 @@ func NewSimpleGenerator(pluginConfig *api.PluginConfig) Generator {
 	}
 }
 
-func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error) {
+func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, backupBlob string) (map[string]interface{}, error) {
 	masterStartup, err := Asset("master-startup.sh")
 	if err != nil {
 		return nil, err
@@ -54,8 +54,10 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 		"Startup": func(role api.AgentPoolProfileRole) ([]byte, error) {
 			if role == api.AgentPoolProfileRoleMaster {
 				return util.Template(string(masterStartup), nil, cs, map[string]interface{}{
-					"Role":       role,
-					"TestConfig": g.pluginConfig.TestConfig,
+					"IsRecovery":     len(backupBlob) > 0,
+					"BackupBlobName": backupBlob,
+					"Role":           role,
+					"TestConfig":     g.pluginConfig.TestConfig,
 				})
 			}
 			return util.Template(string(nodeStartup), nil, cs, map[string]interface{}{

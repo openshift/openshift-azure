@@ -72,3 +72,10 @@ func (u *simpleUpgrader) readUpdateBlob() (updateblob, error) {
 
 	return b, nil
 }
+
+func (u *simpleUpgrader) deleteUpdateBlob() error {
+	bsc := u.storageClient.GetBlobService()
+	c := bsc.GetContainerReference(updateContainerName)
+	bc := c.GetBlobReference(updateBlobName)
+	return bc.Delete(nil)
+}

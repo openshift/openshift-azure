@@ -31,6 +31,48 @@ func IsUpdate() bool {
 	return false
 }
 
+func GetDeployer(cs *api.OpenShiftManagedCluster, log *logrus.Entry, config *api.PluginConfig) api.DeployFn {
+	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
+		log.Info("applying arm template deployment")
+		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+		if err != nil {
+			return err
+		}
+
+		deployments := azureclient.NewDeploymentsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, config.AcceptLanguages)
+		future, err := deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
+			Properties: &resources.DeploymentProperties{
+				Template: azuretemplate,
+				Mode:     resources.Incremental,
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		log.Info("waiting for arm template deployment to complete")
+		if err := future.WaitForCompletionRef(ctx, deployments.Client()); err != nil {
+			return err
+		}
+		resp, err := future.Result(deployments.DeploymentClient())
+		if err != nil {
+			return err
+		}
+		if *resp.Properties.ProvisioningState != "Succeeded" {
+			returnErr := fmt.Sprintf("arm deployment failed (correlation id: %s)", *resp.Properties.CorrelationID)
+			dopc := resources.NewDeploymentOperationsClient(cs.Properties.AzProfile.SubscriptionID)
+			dopc.Authorizer = authorizer
+			if op, err := dopc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, *resp.Name, *resp.Properties.CorrelationID); err != nil {
+				log.Warn(err.Error())
+			} else {
+				returnErr = fmt.Sprintf("%s - %v", returnErr, op.Properties.StatusMessage)
+			}
+			return errors.New(returnErr)
+		}
+		return nil
+	}
+}
+
 // CreateOrUpdate simulates the RP
 func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, log *logrus.Entry, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
@@ -121,47 +163,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	if err != nil {
 		return nil, err
 	}
-
-	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
-		log.Info("applying arm template deployment")
-		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
-		if err != nil {
-			return err
-		}
-
-		deployments := azureclient.NewDeploymentsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, config.AcceptLanguages)
-		future, err := deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
-			Properties: &resources.DeploymentProperties{
-				Template: azuretemplate,
-				Mode:     resources.Incremental,
-			},
-		})
-		if err != nil {
-			return err
-		}
-
-		log.Info("waiting for arm template deployment to complete")
-		if err := future.WaitForCompletionRef(ctx, deployments.Client()); err != nil {
-			return err
-		}
-		resp, err := future.Result(deployments.DeploymentClient())
-		if err != nil {
-			return err
-		}
-		if *resp.Properties.ProvisioningState != "Succeeded" {
-			returnErr := fmt.Sprintf("arm deployment failed (correlation id: %s)", *resp.Properties.CorrelationID)
-			dopc := resources.NewDeploymentOperationsClient(cs.Properties.AzProfile.SubscriptionID)
-			dopc.Authorizer = authorizer
-			if op, err := dopc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, *resp.Name, *resp.Properties.CorrelationID); err != nil {
-				log.Warn(err.Error())
-			} else {
-				returnErr = fmt.Sprintf("%s - %v", returnErr, op.Properties.StatusMessage)
-			}
-			return errors.New(returnErr)
-		}
-		return nil
-	}
-
+	deployer := GetDeployer(cs, log, config)
 	if err := p.CreateOrUpdate(ctx, cs, azuretemplate, oldCs != nil, deployer); err != nil {
 		return nil, err
 	}

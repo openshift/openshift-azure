@@ -250,7 +250,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	ctx = context.WithValue(ctx, api.ContextKeyTenantID, s.conf.TenantID)
 
 	// populate plugin configuration
-	config, err := getPluginConfig()
+	config, err := GetPluginConfig()
 	if err != nil {
 		resp := "400 Bad Request: Failed to configure plugin"
 		s.log.Debugf("%s: %v", resp, err)
