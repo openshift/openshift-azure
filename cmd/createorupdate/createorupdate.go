@@ -261,13 +261,12 @@ func main() {
 	}
 	log = logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": conf.ResourceGroup})
 
-	isCreate := true
+	var isCreate bool
 	if strings.ToUpper(*method) != http.MethodDelete {
 		log.Infof("creating resource group %s", conf.ResourceGroup)
-		if created, err := createResourceGroup(conf); err != nil {
+		if isCreate, err = createResourceGroup(conf); err != nil {
 			log.Fatal(err)
-		} else if !created {
-			isCreate = false
+		} else if !isCreate {
 			log.Infof("reusing existing resource group %s", conf.ResourceGroup)
 		}
 	}
