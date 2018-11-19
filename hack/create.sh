@@ -51,22 +51,7 @@ export RESOURCEGROUP=$1
 rm -rf _data
 mkdir -p _data/_out
 
-# if AZURE_CLIENT_ID is used as AZURE_AAD_CLIENT_ID, script will reset global team account!
-set +x
-if [[ "$AZURE_AAD_CLIENT_ID" && "$AZURE_AAD_CLIENT_ID" != "$AZURE_CLIENT_ID" ]]; then
-    . <(hack/aad.sh app-update $AZURE_AAD_CLIENT_ID https://$RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com/oauth2callback/Azure%20AD)
-else
-    AZURE_AAD_CLIENT_ID=$AZURE_CLIENT_ID
-    AZURE_AAD_CLIENT_SECRET=$AZURE_CLIENT_SECRET
-fi
-export AZURE_AAD_CLIENT_ID
-export AZURE_AAD_CLIENT_SECRET
 set -x
-
-if [[ -z "$MANIFEST" ]]; then
-    MANIFEST="test/manifests/normal/create.yaml"
-fi
-cat $MANIFEST | envsubst > _data/manifest.yaml
 
 go generate ./...
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
