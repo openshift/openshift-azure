@@ -102,4 +102,4 @@ if [[ -n "$ARTIFACT_DIR" ]]; then
     ARTIFACT_KUBECONFIG_FLAG="-artifact-kubeconfig=_data/_out/admin.kubeconfig"
 fi
 
-go run cmd/createorupdate/createorupdate.go -rm "$USE_PROD_FLAG" "$EXEC_FLAG" "$UPDATE_FLAG" "$UPDATE_EXEC_FLAG" "$ARTIFACT_DIR_FLAG" "$ARTIFACT_KUBECONFIG_FLAG"
+go run cmd/createorupdate/createorupdate.go -rm $USE_PROD_FLAG $EXEC_FLAG $UPDATE_FLAG $UPDATE_EXEC_FLAG $ARTIFACT_DIR_FLAG $ARTIFACT_KUBECONFIG_FLAG
