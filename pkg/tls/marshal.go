@@ -7,14 +7,21 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"errors"
+	"fmt"
 
 	"golang.org/x/crypto/ssh"
 )
 
-func CertAsBytes(cert *x509.Certificate) ([]byte, error) {
+func CertAsBytes(cert *x509.Certificate) (b []byte, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			b, err = nil, fmt.Errorf("%v", r)
+		}
+	}()
+
 	buf := &bytes.Buffer{}
 
-	err := pem.Encode(buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
+	err = pem.Encode(buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
 	if err != nil {
 		return nil, err
 	}
@@ -22,10 +29,16 @@ func CertAsBytes(cert *x509.Certificate) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func PrivateKeyAsBytes(key *rsa.PrivateKey) ([]byte, error) {
+func PrivateKeyAsBytes(key *rsa.PrivateKey) (b []byte, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			b, err = nil, fmt.Errorf("%v", r)
+		}
+	}()
+
 	buf := &bytes.Buffer{}
 
-	err := pem.Encode(buf, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
+	err = pem.Encode(buf, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
 	if err != nil {
 		return nil, err
 	}
@@ -33,10 +46,16 @@ func PrivateKeyAsBytes(key *rsa.PrivateKey) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func PublicKeyAsBytes(key *rsa.PublicKey) ([]byte, error) {
+func PublicKeyAsBytes(key *rsa.PublicKey) (b []byte, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			b, err = nil, fmt.Errorf("%v", r)
+		}
+	}()
+
 	buf := &bytes.Buffer{}
 
-	b, err := x509.MarshalPKIXPublicKey(key)
+	b, err = x509.MarshalPKIXPublicKey(key)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +68,13 @@ func PublicKeyAsBytes(key *rsa.PublicKey) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func SSHPublicKeyAsString(key *rsa.PublicKey) (string, error) {
+func SSHPublicKeyAsString(key *rsa.PublicKey) (s string, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			s, err = "", fmt.Errorf("%v", r)
+		}
+	}()
+
 	sshkey, err := ssh.NewPublicKey(key)
 	if err != nil {
 		return "", err
