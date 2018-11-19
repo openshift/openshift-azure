@@ -18,22 +18,22 @@ func TestUpgraderDrain(t *testing.T) {
 		name            string
 		kubeclient      *fake.Clientset
 		role            api.AgentPoolProfileRole
-		nodeName        string
+		computerName    computerName
 		wantErr         error
 		expectedActions [][]string
 	}{
 		{
-			name:     "master-empty",
-			role:     api.AgentPoolProfileRoleMaster,
-			nodeName: "master-000000",
+			name:         "master-empty",
+			role:         api.AgentPoolProfileRoleMaster,
+			computerName: "master-000000",
 			expectedActions: [][]string{
 				{"get", "nodes"}},
 			kubeclient: fake.NewSimpleClientset(),
 		},
 		{
-			name:     "unknown-role",
-			role:     "cant-find-this",
-			nodeName: "master-000000",
+			name:         "unknown-role",
+			role:         "cant-find-this",
+			computerName: "master-000000",
 			expectedActions: [][]string{
 				{"get", "nodes"}},
 			wantErr: errUnrecognisedRole,
@@ -44,9 +44,9 @@ func TestUpgraderDrain(t *testing.T) {
 			}),
 		},
 		{
-			name:     "master-no-pods",
-			role:     api.AgentPoolProfileRoleMaster,
-			nodeName: "master-000000",
+			name:         "master-no-pods",
+			role:         api.AgentPoolProfileRoleMaster,
+			computerName: "master-000000",
 			expectedActions: [][]string{
 				{"get", "nodes"},
 				{"delete", "nodes"}},
@@ -57,9 +57,9 @@ func TestUpgraderDrain(t *testing.T) {
 			}),
 		},
 		{
-			name:     "compute-with-a-pod",
-			role:     api.AgentPoolProfileRoleCompute,
-			nodeName: "kubernetes",
+			name:         "compute-with-a-pod",
+			role:         api.AgentPoolProfileRoleCompute,
+			computerName: "kubernetes",
 			expectedActions: [][]string{
 				{"get", "nodes"},
 				{"get", "nodes"},
@@ -84,7 +84,7 @@ func TestUpgraderDrain(t *testing.T) {
 		u := &simpleUpgrader{
 			kubeclient: tt.kubeclient,
 		}
-		if err := u.drain(context.Background(), nil, tt.role, tt.nodeName); err != tt.wantErr {
+		if err := u.drain(context.Background(), nil, tt.role, tt.computerName); err != tt.wantErr {
 			t.Errorf("[%v] simpleUpgrader.drain() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
 		actions := tt.kubeclient.Actions()

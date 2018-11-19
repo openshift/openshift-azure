@@ -3,12 +3,12 @@ package cluster
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/log"
@@ -93,15 +93,22 @@ var statefulsetWhitelist = []struct {
 	},
 }
 
+type computerName string
+
+func (computerName computerName) toKubernetes() string {
+	return strings.ToLower(string(computerName))
+}
+
 func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute} {
-		vms, err := listVMs(ctx, cs, u.vmc, role)
+		vms, err := u.listVMs(ctx, cs, role)
 		if err != nil {
 			return err
 		}
 		for _, vm := range vms {
-			log.Infof("waiting for %s to be ready", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			err = waitForReady(ctx, cs, role, *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, u.kubeclient)
+			computerName := computerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+			log.Infof("waiting for %s to be ready", computerName)
+			err = u.waitForReady(ctx, cs, role, computerName)
 			if err != nil {
 				return err
 			}
@@ -191,30 +198,30 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 	return nil
 }
 
-func waitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, nodeName string, kc kubernetes.Interface) error {
+func (u *simpleUpgrader) waitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, computerName computerName) error {
 	switch role {
 	case api.AgentPoolProfileRoleMaster:
-		return masterWaitForReady(ctx, cs, nodeName, kc)
+		return u.masterWaitForReady(ctx, cs, computerName)
 	case api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute:
-		return nodeWaitForReady(ctx, cs, nodeName, kc)
+		return u.nodeWaitForReady(ctx, cs, computerName)
 	default:
 		return errors.New("unrecognised role")
 	}
 }
 
-func masterWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string, kc kubernetes.Interface) error {
+func (u *simpleUpgrader) masterWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, computerName computerName) error {
 	return wait.PollImmediateUntil(time.Second, func() (bool, error) {
-		return masterIsReady(kc, nodeName)
+		return u.masterIsReady(computerName)
 	}, ctx.Done())
 }
 
-func masterIsReady(kc kubernetes.Interface, nodeName string) (bool, error) {
-	ready, err := nodeIsReady(kc, nodeName)
+func (u *simpleUpgrader) masterIsReady(computerName computerName) (bool, error) {
+	ready, err := u.nodeIsReady(computerName)
 	if !ready || err != nil {
 		return ready, err
 	}
 
-	etcdPod, err := kc.CoreV1().Pods("kube-system").Get("master-etcd-"+nodeName, metav1.GetOptions{})
+	etcdPod, err := u.kubeclient.CoreV1().Pods("kube-system").Get("master-etcd-"+computerName.toKubernetes(), metav1.GetOptions{})
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
@@ -223,7 +230,7 @@ func masterIsReady(kc kubernetes.Interface, nodeName string) (bool, error) {
 		return false, err
 	}
 
-	apiPod, err := kc.CoreV1().Pods("kube-system").Get("master-api-"+nodeName, metav1.GetOptions{})
+	apiPod, err := u.kubeclient.CoreV1().Pods("kube-system").Get("master-api-"+computerName.toKubernetes(), metav1.GetOptions{})
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
@@ -232,7 +239,7 @@ func masterIsReady(kc kubernetes.Interface, nodeName string) (bool, error) {
 		return false, err
 	}
 
-	cmPod, err := kc.CoreV1().Pods("kube-system").Get("controllers-"+nodeName, metav1.GetOptions{})
+	cmPod, err := u.kubeclient.CoreV1().Pods("kube-system").Get("controllers-"+computerName.toKubernetes(), metav1.GetOptions{})
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
@@ -253,19 +260,19 @@ func isPodReady(pod *corev1.Pod) bool {
 	return false
 }
 
-func nodeWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, nodeName string, kc kubernetes.Interface) error {
+func (u *simpleUpgrader) nodeWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, computerName computerName) error {
 	err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
-		return nodeIsReady(kc, nodeName)
+		return u.nodeIsReady(computerName)
 	}, ctx.Done())
 	if err != nil {
 		return err
 	}
 
-	return setUnschedulable(ctx, kc, nodeName, false)
+	return u.setUnschedulable(ctx, computerName, false)
 }
 
-func nodeIsReady(kc kubernetes.Interface, nodeName string) (bool, error) {
-	node, err := kc.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
+func (u *simpleUpgrader) nodeIsReady(computerName computerName) (bool, error) {
+	node, err := u.kubeclient.CoreV1().Nodes().Get(computerName.toKubernetes(), metav1.GetOptions{})
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
