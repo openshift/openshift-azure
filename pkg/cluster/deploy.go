@@ -116,7 +116,7 @@ const updateContainerName = "update"
 const updateBlobName = "update"
 
 func (u *simpleUpgrader) updateBlob(b map[instanceName]hash) error {
-	blob := make([]vmInfo, len(b))
+	blob := make([]vmInfo, 0, len(b))
 	for instancename, hash := range b {
 		blob = append(blob, vmInfo{
 			InstanceName: instancename,
