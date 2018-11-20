@@ -7,7 +7,7 @@ build: generate
 	go build ./...
 
 clean:
-	rm -f coverage.out e2e.test azure-controllers etcdbackup sync
+	rm -f coverage.out azure-controllers etcdbackup sync
 
 test: unit e2e
 
