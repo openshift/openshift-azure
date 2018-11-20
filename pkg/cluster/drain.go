@@ -13,7 +13,6 @@ import (
 	"k8s.io/client-go/util/retry"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
@@ -24,7 +23,7 @@ func (u *simpleUpgrader) drain(ctx context.Context, cs *api.OpenShiftManagedClus
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
-		log.Info("drain: node not found, skipping")
+		u.log.Info("drain: node not found, skipping")
 		return nil
 	default:
 		return err

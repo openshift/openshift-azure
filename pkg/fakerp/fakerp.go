@@ -17,7 +17,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
@@ -25,9 +24,9 @@ import (
 )
 
 // CreateOrUpdate simulates the RP
-func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, entry *logrus.Entry, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
+func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, log *logrus.Entry, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
-	p := plugin.NewPlugin(entry, config)
+	p := plugin.NewPlugin(log, config)
 
 	// convert the external API manifest into the internal API representation
 	log.Info("convert to internal")
@@ -107,7 +106,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
-	err = acceptMarketplaceAgreement(ctx, cs, config)
+	err = acceptMarketplaceAgreement(ctx, cs, config, log)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +162,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	return oc, nil
 }
 
-func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig *api.PluginConfig) error {
+func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig *api.PluginConfig, log *logrus.Entry) error {
 	if pluginConfig.TestConfig.ImageResourceName != "" ||
 		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
 		return nil

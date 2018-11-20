@@ -253,14 +253,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	logger := logrus.New()
-	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
-	log := logrus.NewEntry(logger)
-	conf, err := fakerp.NewConfig()
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+	log := logrus.NewEntry(logrus.StandardLogger())
+	conf, err := fakerp.NewConfig(log)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log = logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": conf.ResourceGroup})
 
 	var isCreate bool
 	if strings.ToUpper(*method) != http.MethodDelete {
@@ -276,7 +274,7 @@ func main() {
 	fakeRpAddr := "localhost:8080"
 	if !*useProd {
 		log.Info("starting the fake resource provider")
-		s := fakerp.NewServer(conf.ResourceGroup, fakeRpAddr, conf)
+		s := fakerp.NewServer(log, conf.ResourceGroup, fakeRpAddr, conf)
 		go s.ListenAndServe()
 	}
 

@@ -9,7 +9,6 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
@@ -98,7 +97,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 		for _, vm := range vms {
 			computerName := computerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 			if _, found := nodes[computerName]; !found {
-				log.Infof("waiting for %s to be ready", computerName)
+				u.log.Infof("waiting for %s to be ready", computerName)
 				err = u.waitForReady(ctx, cs, agent.Role, computerName)
 				if err != nil {
 					return err
@@ -175,14 +174,14 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 
 	// Filter out VMs that do not need to get upgraded. Should speed
 	// up retrying failed upgrades.
-	oldVMs = filterOldVMs(oldVMs, blob, ssHashes)
+	oldVMs = u.filterOldVMs(oldVMs, blob, ssHashes)
 	vmsBefore := map[string]struct{}{}
 	for _, vm := range oldVMs {
 		vmsBefore[*vm.InstanceID] = struct{}{}
 	}
 
 	for _, vm := range oldVMs {
-		log.Infof("setting ss-%s capacity to %d", role, count+1)
+		u.log.Infof("setting ss-%s capacity to %d", role, count+1)
 		future, err := u.ssc.Update(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), compute.VirtualMachineScaleSetUpdate{
 			Sku: &compute.Sku{
 				Capacity: to.Int64Ptr(int64(count) + 1),
@@ -207,7 +206,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 		for _, updated := range updatedList {
 			if _, found := vmsBefore[*updated.InstanceID]; !found {
 				computerName := computerName(*updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-				log.Infof("waiting for %s to be ready", computerName)
+				u.log.Infof("waiting for %s to be ready", computerName)
 				err = u.waitForReady(ctx, cs, role, computerName)
 				if err != nil {
 					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
@@ -232,13 +231,13 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 	return nil
 }
 
-func filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob map[instanceName]hash, ssHashes map[scalesetName]hash) []compute.VirtualMachineScaleSetVM {
+func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob map[instanceName]hash, ssHashes map[scalesetName]hash) []compute.VirtualMachineScaleSetVM {
 	var oldVMs []compute.VirtualMachineScaleSetVM
 	for _, vm := range vms {
 		if blob[instanceName(*vm.Name)] != ssHashes[ssNameForVM(&vm)] {
 			oldVMs = append(oldVMs, vm)
 		} else {
-			log.Infof("skipping vm %q since it's already updated", *vm.Name)
+			u.log.Infof("skipping vm %q since it's already updated", *vm.Name)
 		}
 	}
 	return oldVMs
@@ -266,17 +265,17 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReadBlob}
 	}
 
-	sorted = filterOldVMs(sorted, blob, ssHashes)
+	sorted = u.filterOldVMs(sorted, blob, ssHashes)
 	for _, vm := range sorted {
 		computerName := computerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		log.Infof("draining %s", computerName)
+		u.log.Infof("draining %s", computerName)
 		err = u.drain(ctx, cs, role, computerName)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDrain}
 		}
 
 		{
-			log.Infof("deallocating %s (%s)", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, *vm.InstanceID)
+			u.log.Infof("deallocating %s (%s)", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, *vm.InstanceID)
 			future, err := u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDeallocate}
@@ -289,7 +288,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		}
 
 		{
-			log.Infof("updating %s", computerName)
+			u.log.Infof("updating %s", computerName)
 			future, err := u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
 				InstanceIds: &[]string{*vm.InstanceID},
 			})
@@ -304,7 +303,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		}
 
 		{
-			log.Infof("reimaging %s", computerName)
+			u.log.Infof("reimaging %s", computerName)
 			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReimage}
@@ -317,7 +316,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		}
 
 		{
-			log.Infof("starting %s", computerName)
+			u.log.Infof("starting %s", computerName)
 			future, err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceStart}
@@ -329,7 +328,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 			}
 		}
 
-		log.Infof("waiting for %s to be ready", computerName)
+		u.log.Infof("waiting for %s to be ready", computerName)
 		err = u.waitForReady(ctx, cs, role, computerName)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceWaitForReady}
@@ -363,12 +362,12 @@ func (u *simpleUpgrader) sortMasterVMsByHealth(vms []compute.VirtualMachineScale
 }
 
 func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, instanceID string, nodeName computerName) error {
-	log.Infof("draining %s", nodeName)
+	u.log.Infof("draining %s", nodeName)
 	if err := u.drain(ctx, cs, role, nodeName); err != nil {
 		return err
 	}
 
-	log.Infof("deleting %s", nodeName)
+	u.log.Infof("deleting %s", nodeName)
 	future, err := u.vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), instanceID)
 	if err != nil {
 		return err

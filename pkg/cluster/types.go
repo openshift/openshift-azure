@@ -13,7 +13,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
@@ -41,15 +40,16 @@ type simpleUpgrader struct {
 	vmc            azureclient.VirtualMachineScaleSetVMsClient
 	ssc            azureclient.VirtualMachineScaleSetsClient
 	kubeclient     kubernetes.Interface
+	log            *logrus.Entry
 }
 
 var _ Upgrader = &simpleUpgrader{}
 
 // NewSimpleUpgrader creates a new upgrader instance
-func NewSimpleUpgrader(entry *logrus.Entry, pluginConfig *api.PluginConfig) Upgrader {
-	log.New(entry)
+func NewSimpleUpgrader(log *logrus.Entry, pluginConfig *api.PluginConfig) Upgrader {
 	return &simpleUpgrader{
 		pluginConfig: *pluginConfig,
+		log:          log,
 	}
 }
 

@@ -14,10 +14,7 @@ import (
 	"encoding/json"
 	"text/template"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util"
 )
 
@@ -32,8 +29,7 @@ type simpleGenerator struct {
 var _ Generator = &simpleGenerator{}
 
 // NewSimpleGenerator create a new SimpleGenerator
-func NewSimpleGenerator(entry *logrus.Entry, pluginConfig *api.PluginConfig) Generator {
-	log.New(entry)
+func NewSimpleGenerator(pluginConfig *api.PluginConfig) Generator {
 	return &simpleGenerator{
 		pluginConfig: *pluginConfig,
 	}

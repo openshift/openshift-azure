@@ -6,6 +6,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/sirupsen/logrus"
 )
 
 func TestFilterOldVMs(t *testing.T) {
@@ -71,9 +72,12 @@ func TestFilterOldVMs(t *testing.T) {
 		},
 	}
 
+	u := &simpleUpgrader{
+		log: logrus.NewEntry(logrus.StandardLogger()),
+	}
 	for _, test := range tests {
 		t.Logf("running scenario %q", test.name)
-		got := filterOldVMs(test.vms, test.blob, test.ssHashes)
+		got := u.filterOldVMs(test.vms, test.blob, test.ssHashes)
 		if !reflect.DeepEqual(got, test.exp) {
 			t.Errorf("expected vms:\n%#v\ngot:\n%#v", test.exp, got)
 		}

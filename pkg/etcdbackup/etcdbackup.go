@@ -28,29 +28,31 @@ type etcdBackup struct {
 	etcdContainer azureclientstorage.Container
 	etcdClient    *clientv3.Client
 	maxBackups    int
+	log           *logrus.Entry
 }
 
 var _ EtcdBackup = &etcdBackup{}
 
 // NewEtcdBackup create a new instance
-func NewEtcdBackup(etcdContainer azureclientstorage.Container, etcdClient *clientv3.Client, maxBackups int) EtcdBackup {
+func NewEtcdBackup(log *logrus.Entry, etcdContainer azureclientstorage.Container, etcdClient *clientv3.Client, maxBackups int) EtcdBackup {
 	eb := etcdBackup{
 		etcdContainer: etcdContainer,
 		etcdClient:    etcdClient,
 		maxBackups:    maxBackups,
+		log:           log,
 	}
 	return &eb
 }
 
 func (b *etcdBackup) SaveSnapshot(ctx context.Context, bname string) error {
-	logrus.Infof("Creating Snapshot")
+	b.log.Infof("Creating Snapshot")
 	rc, err := b.etcdClient.Snapshot(ctx)
 	if err != nil {
 		return errors.Wrap(err, "failed to receive snapshot")
 	}
 	defer rc.Close()
 
-	logrus.Infof("Creating New Blob")
+	b.log.Infof("Creating New Blob")
 
 	blob := b.etcdContainer.GetBlobReference(bname)
 	err = blob.CreateBlockBlob(&azstorage.PutBlobOptions{})
@@ -63,7 +65,7 @@ func (b *etcdBackup) SaveSnapshot(ctx context.Context, bname string) error {
 		return errors.Wrap(err, "failed to create blob")
 	}
 
-	logrus.Infof("Copying blocks to blob")
+	b.log.Infof("Copying blocks to blob")
 	bufferedBw := bufio.NewWriterSize(bw, 1024*1024)
 	_, err = io.Copy(bufferedBw, rc)
 	if err != nil {
@@ -78,7 +80,7 @@ func (b *etcdBackup) SaveSnapshot(ctx context.Context, bname string) error {
 	if err != nil {
 		return errors.Wrap(err, "BlobWriter.Close")
 	}
-	logrus.Infof("Snapshot saved to blob storage")
+	b.log.Infof("Snapshot saved to blob storage")
 	return nil
 }
 
@@ -101,7 +103,7 @@ func (b *etcdBackup) Prune() error {
 		return time.Time(blobs.Blobs[i].Properties.LastModified).Before(time.Time(blobs.Blobs[j].Properties.LastModified))
 	})
 	for _, blob := range blobs.Blobs[:toDelete] {
-		logrus.Infof("pruning blob %v", blob.Name)
+		b.log.Infof("pruning blob %v", blob.Name)
 		err = blob.Delete(nil)
 		if err != nil {
 			return errors.Wrapf(err, "error deleting blob %v : %v", blob.Name, err)
@@ -116,7 +118,7 @@ func (b *etcdBackup) Delete(name string) error {
 }
 
 func (b *etcdBackup) Retrieve(srcBlob, destPath string) error {
-	logrus.Printf("copy blob %v to filesystem %v", srcBlob, destPath)
+	b.log.Printf("copy blob %v to filesystem %v", srcBlob, destPath)
 	blob := b.etcdContainer.GetBlobReference(srcBlob)
 	rc, err := blob.Get(&azstorage.GetBlobOptions{})
 	if err != nil {
