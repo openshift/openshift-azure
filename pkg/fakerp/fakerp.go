@@ -40,13 +40,23 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
+	// determine the paths where various configs should be written on disk
+	configBlob := os.Getenv("CONFIG_BLOB_PATH")
+	helpers := os.Getenv("HELPERS_PATH")
+	if configBlob == "" {
+		configBlob = "_data/containerservice.yaml"
+	}
+	if helpers == "" {
+		helpers = "_data/_out/"
+	}
+
 	// read in the OpenShift config blob if it exists (i.e. we're updating)
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
 	var oldCs *api.OpenShiftManagedCluster
-	if _, err := os.Stat("_data/containerservice.yaml"); err == nil {
+	if _, err := os.Stat(configBlob); err == nil {
 		log.Info("read old config")
-		oldCs, err = managedcluster.ReadConfig("_data/containerservice.yaml")
+		oldCs, err = managedcluster.ReadConfig(configBlob)
 		if err != nil {
 			return nil, err
 		}
@@ -83,12 +93,12 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	if err != nil {
 		return nil, err
 	}
-	err = ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
+	err = ioutil.WriteFile(configBlob, bytes, 0600)
 	if err != nil {
 		return nil, err
 	}
 
-	err = os.MkdirAll("_data/_out", 0777)
+	err = os.MkdirAll(helpers, 0777)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +111,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 
 	// write out development files
 	log.Info("write helpers")
-	err = writeHelpers(cs, azuretemplate)
+	err = writeHelpers(cs, azuretemplate, helpers)
 	if err != nil {
 		return nil, err
 	}
@@ -227,13 +237,13 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}) error {
+func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, path string) error {
 	b, err := config.Derived.CloudProviderConf(c)
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile("_data/_out/azure.conf", b, 0600)
+	err = ioutil.WriteFile(path+"azure.conf", b, 0600)
 	if err != nil {
 		return err
 	}
@@ -243,7 +253,7 @@ func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]inter
 		return err
 	}
 
-	err = ioutil.WriteFile("_data/_out/azuredeploy.json", azuredeploy, 0600)
+	err = ioutil.WriteFile(path+"azuredeploy.json", azuredeploy, 0600)
 	if err != nil {
 		return err
 	}
@@ -252,7 +262,7 @@ func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]inter
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile("_data/_out/id_rsa", b, 0600)
+	err = ioutil.WriteFile(path+"id_rsa", b, 0600)
 	if err != nil {
 		return err
 	}
@@ -261,5 +271,5 @@ func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]inter
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
+	return ioutil.WriteFile(path+"admin.kubeconfig", b, 0600)
 }
