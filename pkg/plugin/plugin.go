@@ -49,10 +49,6 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	p.log.Info("generating configs")
 	// TODO should we save off the original config here and if there are any errors we can restore it?
-	if cs.Config == nil {
-		cs.Config = &api.Config{}
-	}
-
 	err := p.configGenerator.Generate(cs)
 	if err != nil {
 		return err

@@ -16,7 +16,7 @@ func TestGenerate(t *testing.T) {
 				{},
 			},
 		},
-		Config: &api.Config{
+		Config: api.Config{
 			SSHKey: tls.GetDummyPrivateKey(),
 			Certificates: api.CertificateConfig{
 				Ca:            api.CertKeyPair{Cert: tls.GetDummyCertificate(), Key: tls.GetDummyPrivateKey()},
