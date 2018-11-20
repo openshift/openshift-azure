@@ -103,7 +103,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 				if err != nil {
 					return err
 				}
-				blob[instanceName(*vm.Name)] = ssHashes[scalesetName(agent.Name)]
+				blob[instanceName(*vm.Name)] = ssHashes[ssNameForVM(&vm)]
 				if err := u.updateBlob(blob); err != nil {
 					return err
 				}
@@ -335,7 +335,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceWaitForReady}
 		}
 
-		blob[instanceName(*vm.Name)] = ssHashes["master"]
+		blob[instanceName(*vm.Name)] = ssHashes[ssNameForVM(&vm)]
 		if err := u.updateBlob(blob); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceUpdateBlob}
 		}
