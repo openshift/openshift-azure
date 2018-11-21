@@ -262,12 +262,12 @@ func main() {
 	}
 	log = logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": conf.ResourceGroup})
 
-	var isCreate bool
+	var rgCreated bool
 	if strings.ToUpper(*method) != http.MethodDelete {
 		log.Infof("creating resource group %s", conf.ResourceGroup)
-		if isCreate, err = createResourceGroup(conf); err != nil {
+		if rgCreated, err = createResourceGroup(conf); err != nil {
 			log.Fatal(err)
-		} else if !isCreate {
+		} else if !rgCreated {
 			log.Infof("reusing existing resource group %s", conf.ResourceGroup)
 		}
 	}
@@ -301,7 +301,8 @@ func main() {
 		return
 	}
 
-	if isCreate {
+	if _, err := os.Stat(path.Join(outputDirectory, "manifest.yaml")); os.IsNotExist(err) {
+		// Must still be a create if we don't have a generated manifest
 		if err := updateAadApplictation(ctx, log, conf); err != nil {
 			log.Fatal(err)
 		}
