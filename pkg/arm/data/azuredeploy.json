@@ -141,7 +141,7 @@
             "name": "nsg-{{ $app.Name | js }}",
             "properties": {
                 "securityRules": [
-{{- if eq $app.Role "master" }}
+{{- if or (eq $app.Role "master") ($.Extra.TestConfig.RunningUnderTest) }}
                     {
                         "name": "allow_ssh",
                         "properties": {
