@@ -27,7 +27,6 @@ type AzureConfig struct {
 	ClientID        string   `envconfig:"AZURE_CLIENT_ID" required:"true"`
 	ClientSecret    string   `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
 	ResourceGroup   string   `envconfig:"RESOURCEGROUP" required:"true"`
-	ClusterName     string   `envconfig:"CLUSTERNAME"`
 	AcceptLanguages []string `envconfig:"ACCEPT_LANGUAGES" default:"en-us"`
 }
 
@@ -43,7 +42,6 @@ type testClient struct {
 
 	resourceGroup    string
 	location         string
-	clusterName      string
 	appResourceGroup string
 }
 
@@ -81,11 +79,8 @@ func newTestClient(conf AzureConfig) *testClient {
 	appsc := azureclient.NewApplicationsClient(subID, authorizer, conf.AcceptLanguages)
 	accsc := azureclient.NewAccountsClient(subID, authorizer, conf.AcceptLanguages)
 
-	clusterName := conf.ResourceGroup
-	if conf.ClusterName != "" {
-		clusterName = conf.ClusterName
-	}
-	appRg := ApplicationResourceGroup(conf.ResourceGroup, clusterName, conf.Region)
+	// TODO: az cli tool supports more than 1 cluster per RG, may need to use another env var for the cluster name in the future
+	appRg := ApplicationResourceGroup(conf.ResourceGroup, conf.ResourceGroup, conf.Region)
 
 	return &testClient{
 		ctx:              ctx,
@@ -97,7 +92,6 @@ func newTestClient(conf AzureConfig) *testClient {
 		appsc:            appsc,
 		accsc:            accsc,
 		resourceGroup:    conf.ResourceGroup,
-		clusterName:      clusterName,
 		location:         conf.Region,
 		appResourceGroup: appRg,
 	}
