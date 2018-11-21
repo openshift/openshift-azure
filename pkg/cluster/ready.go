@@ -11,7 +11,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
@@ -107,7 +106,7 @@ func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftMana
 		}
 		for _, vm := range vms {
 			computerName := computerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			log.Infof("waiting for %s to be ready", computerName)
+			u.log.Infof("waiting for %s to be ready", computerName)
 			err = u.waitForReady(ctx, cs, role, computerName)
 			if err != nil {
 				return err
@@ -120,7 +119,7 @@ func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftMana
 
 func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	for _, app := range daemonsetWhitelist {
-		log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
+		u.log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
 
 		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
 			ds, err := u.kubeclient.AppsV1().DaemonSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
@@ -142,7 +141,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 	}
 
 	for _, app := range statefulsetWhitelist {
-		log.Infof("checking statefulset %s/%s", app.Namespace, app.Name)
+		u.log.Infof("checking statefulset %s/%s", app.Namespace, app.Name)
 
 		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
 			sts, err := u.kubeclient.AppsV1().StatefulSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
@@ -168,7 +167,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 	}
 
 	for _, app := range deploymentWhitelist {
-		log.Infof("checking deployment %s/%s", app.Namespace, app.Name)
+		u.log.Infof("checking deployment %s/%s", app.Namespace, app.Name)
 
 		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
 			d, err := u.kubeclient.AppsV1().Deployments(app.Namespace).Get(app.Name, metav1.GetOptions{})

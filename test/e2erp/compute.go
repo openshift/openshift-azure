@@ -57,7 +57,7 @@ func ManagedResourceGroup(ctx context.Context, appsc azureclient.ApplicationsCli
 }
 
 // ScaleSets returns a slice of VirtualMachineScaleSets within a given resource group
-func ScaleSets(ctx context.Context, logger *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, resourceGroup string) ([]compute.VirtualMachineScaleSet, error) {
+func ScaleSets(ctx context.Context, ssc azureclient.VirtualMachineScaleSetsClient, resourceGroup string) ([]compute.VirtualMachineScaleSet, error) {
 	vmssPages, err := ssc.List(ctx, resourceGroup)
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func ScaleSets(ctx context.Context, logger *logrus.Entry, ssc azureclient.Virtua
 }
 
 // ScaleSetVMs returns a slice of VirtualMachineScaleSetVMs within a given scale set
-func ScaleSetVMs(ctx context.Context, logger *logrus.Entry, ssvmc azureclient.VirtualMachineScaleSetVMsClient, resourceGroup string, scaleSet string) ([]compute.VirtualMachineScaleSetVM, error) {
+func ScaleSetVMs(ctx context.Context, ssvmc azureclient.VirtualMachineScaleSetVMsClient, resourceGroup string, scaleSet string) ([]compute.VirtualMachineScaleSetVM, error) {
 	vmPages, err := ssvmc.List(ctx, resourceGroup, scaleSet, "", "", "")
 	if err != nil {
 		return nil, err
@@ -94,23 +94,23 @@ func ScaleSetVMs(ctx context.Context, logger *logrus.Entry, ssvmc azureclient.Vi
 
 // UpdateScaleSetsCapacity returns a slice of the errors it encounters as it attempts to increment the capacity
 // (by one) for all scale sets within a given resource group
-func UpdateScaleSetsCapacity(ctx context.Context, logger *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, ssvmc azureclient.VirtualMachineScaleSetVMsClient, resourceGroup string) []error {
+func UpdateScaleSetsCapacity(ctx context.Context, ssc azureclient.VirtualMachineScaleSetsClient, ssvmc azureclient.VirtualMachineScaleSetVMsClient, resourceGroup string) []error {
 	var errs []error
-	logger.Debugf("listing scale sets for resource group %s", resourceGroup)
-	scaleSets, err := ScaleSets(ctx, logger, ssc, resourceGroup)
+	logrus.Debugf("listing scale sets for resource group %s", resourceGroup)
+	scaleSets, err := ScaleSets(ctx, ssc, resourceGroup)
 	if err != nil {
 		errs = append(errs, err)
 		return errs
 	}
 	for _, s := range scaleSets {
-		logger.Debugf("listing virtual machines in scale set %s", *s.Name)
-		vms, err := ScaleSetVMs(ctx, logger, ssvmc, resourceGroup, *s.Name)
+		logrus.Debugf("listing virtual machines in scale set %s", *s.Name)
+		vms, err := ScaleSetVMs(ctx, ssvmc, resourceGroup, *s.Name)
 		if err != nil {
 			errs = append(errs, err)
 			return errs
 		}
 		vmsCount := len(vms)
-		logger.Debugf("resizing scale set %s from %d to %d virtual machines", *s.Name, vmsCount, vmsCount+1)
+		logrus.Debugf("resizing scale set %s from %d to %d virtual machines", *s.Name, vmsCount, vmsCount+1)
 		// we only care about possible errors therefore we do not need to process the returned future
 		_, err = ssc.Update(ctx, resourceGroup, *s.Name, compute.VirtualMachineScaleSetUpdate{
 			Sku: &compute.Sku{
@@ -126,16 +126,16 @@ func UpdateScaleSetsCapacity(ctx context.Context, logger *logrus.Entry, ssc azur
 
 // UpdateScaleSetsInstanceType returns a slice of the errors it encounters as it attempts to change the instance
 // types for all scale sets within a given resource group
-func UpdateScaleSetsInstanceType(ctx context.Context, logger *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, resourceGroup string) []error {
+func UpdateScaleSetsInstanceType(ctx context.Context, ssc azureclient.VirtualMachineScaleSetsClient, resourceGroup string) []error {
 	var errs []error
-	logger.Debugf("listing scale sets for resource group %s", resourceGroup)
-	scaleSets, err := ScaleSets(ctx, logger, ssc, resourceGroup)
+	logrus.Debugf("listing scale sets for resource group %s", resourceGroup)
+	scaleSets, err := ScaleSets(ctx, ssc, resourceGroup)
 	if err != nil {
 		errs = append(errs, err)
 		return errs
 	}
 	for _, s := range scaleSets {
-		logger.Debugf("updating instance type for scale set %s from %s to %s", *s.Name, api.StandardD4sV3, api.StandardD2sV3)
+		logrus.Debugf("updating instance type for scale set %s from %s to %s", *s.Name, api.StandardD4sV3, api.StandardD2sV3)
 		// we only care about possible errors therefore we do not need to process the returned future
 		_, err = ssc.Update(ctx, resourceGroup, *s.Name, compute.VirtualMachineScaleSetUpdate{
 			Sku: &compute.Sku{
@@ -151,17 +151,17 @@ func UpdateScaleSetsInstanceType(ctx context.Context, logger *logrus.Entry, ssc 
 
 // UpdateScaleSetSSHKey returns a slice of the errors it encounters as it attempts to update the SSH key for all
 // scale sets within a given resource group
-func UpdateScaleSetSSHKey(ctx context.Context, logger *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, resourceGroup string) []error {
+func UpdateScaleSetSSHKey(ctx context.Context, ssc azureclient.VirtualMachineScaleSetsClient, resourceGroup string) []error {
 	var errs []error
 	var sshKeyData = fakepubkey
-	logger.Debugf("listing scale sets for resource group %s", resourceGroup)
-	scaleSets, err := ScaleSets(ctx, logger, ssc, resourceGroup)
+	logrus.Debugf("listing scale sets for resource group %s", resourceGroup)
+	scaleSets, err := ScaleSets(ctx, ssc, resourceGroup)
 	if err != nil {
 		errs = append(errs, err)
 		return errs
 	}
 	for _, s := range scaleSets {
-		logger.Debugf("updating ssh key for scale set %s", *s.Name)
+		logrus.Debugf("updating ssh key for scale set %s", *s.Name)
 		// we only care about possible errors therefore we do not need to process the returned future
 		_, err := ssc.Update(ctx, resourceGroup, *s.Name, compute.VirtualMachineScaleSetUpdate{
 			VirtualMachineScaleSetUpdateProperties: &compute.VirtualMachineScaleSetUpdateProperties{
@@ -190,23 +190,23 @@ func UpdateScaleSetSSHKey(ctx context.Context, logger *logrus.Entry, ssc azurecl
 
 // RebootScaleSetVMs returns a slice of the errors it encounters as it attempts to reboot all the VMs for all
 // scale sets within a given resource group
-func RebootScaleSetVMs(ctx context.Context, logger *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, ssvmc azureclient.VirtualMachineScaleSetVMsClient, resourceGroup string) []error {
+func RebootScaleSetVMs(ctx context.Context, ssc azureclient.VirtualMachineScaleSetsClient, ssvmc azureclient.VirtualMachineScaleSetVMsClient, resourceGroup string) []error {
 	var errs []error
-	logger.Debugf("listing scale sets in resource group %s", resourceGroup)
-	scaleSets, err := ScaleSets(ctx, logger, ssc, resourceGroup)
+	logrus.Debugf("listing scale sets in resource group %s", resourceGroup)
+	scaleSets, err := ScaleSets(ctx, ssc, resourceGroup)
 	if err != nil {
 		errs = append(errs, err)
 		return errs
 	}
 	for _, s := range scaleSets {
-		logger.Debugf("listing virtual machines in scale set %s", *s.Name)
-		vms, err := ScaleSetVMs(ctx, logger, ssvmc, resourceGroup, *s.Name)
+		logrus.Debugf("listing virtual machines in scale set %s", *s.Name)
+		vms, err := ScaleSetVMs(ctx, ssvmc, resourceGroup, *s.Name)
 		if err != nil {
 			errs = append(errs, err)
 			return errs
 		}
 		for _, vm := range vms {
-			logger.Debugf("restarting virtual machine %s", *vm.Name)
+			logrus.Debugf("restarting virtual machine %s", *vm.Name)
 			// we only care about possible errors therefore we do not need to process the returned future
 			_, err := ssvmc.Restart(ctx, resourceGroup, *s.Name, *vm.ID)
 			if err != nil {
@@ -219,16 +219,16 @@ func RebootScaleSetVMs(ctx context.Context, logger *logrus.Entry, ssc azureclien
 
 // UpdateScaleSetScriptExtension returns a slice of the errors it encounters as it attempts to set script extensions
 // for all scale sets within a given resource group
-func UpdateScaleSetScriptExtension(ctx context.Context, logger *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, ssec azureclient.VirtualMachineScaleSetExtensionsClient, resourceGroup string) []error {
+func UpdateScaleSetScriptExtension(ctx context.Context, ssc azureclient.VirtualMachineScaleSetsClient, ssec azureclient.VirtualMachineScaleSetExtensionsClient, resourceGroup string) []error {
 	var errs []error
-	logger.Debugf("listing scale sets in resource group %s", resourceGroup)
-	scaleSets, err := ScaleSets(ctx, logger, ssc, resourceGroup)
+	logrus.Debugf("listing scale sets in resource group %s", resourceGroup)
+	scaleSets, err := ScaleSets(ctx, ssc, resourceGroup)
 	if err != nil {
 		errs = append(errs, err)
 		return errs
 	}
 	for _, s := range scaleSets {
-		logger.Debugf("updating script extension for scale set %s", *s.Name)
+		logrus.Debugf("updating script extension for scale set %s", *s.Name)
 		// we only care about possible errors therefore we do not need to process the returned future
 		_, err := ssec.CreateOrUpdate(ctx, resourceGroup, *s.Name, "test", compute.VirtualMachineScaleSetExtension{
 			VirtualMachineScaleSetExtensionProperties: &compute.VirtualMachineScaleSetExtensionProperties{

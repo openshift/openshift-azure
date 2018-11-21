@@ -35,14 +35,10 @@ type Server struct {
 	conf    *Config
 }
 
-func NewServer(resourceGroup, address string, c *Config) *Server {
-	logger := logrus.New()
-	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
-	logger.SetLevel(logrus.DebugLevel)
-
+func NewServer(log *logrus.Entry, resourceGroup, address string, c *Config) *Server {
 	return &Server{
 		inProgress: make(chan struct{}, 1),
-		log:        logrus.NewEntry(logger).WithFields(logrus.Fields{"resourceGroup": resourceGroup}),
+		log:        log,
 		address:    address,
 		conf:       c,
 	}

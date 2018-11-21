@@ -13,9 +13,9 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/etcdbackup"
-	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
+	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
 var (
@@ -60,7 +60,9 @@ func main() {
 	flag.Parse()
 	logrus.SetLevel(log.SanitizeLogLevel(*logLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-	logrus.Printf("etcdbackup starting, git commit %s", gitCommit)
+
+	log := logrus.NewEntry(logrus.StandardLogger())
+	log.Printf("etcdbackup starting, git commit %s", gitCommit)
 
 	if flag.NArg() != 1 {
 		flag.Usage()
@@ -70,21 +72,21 @@ func main() {
 
 	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
 	if err != nil {
-		logrus.Fatal(errors.Wrap(err, "could not read azure.conf"))
+		log.Fatal(errors.Wrap(err, "could not read azure.conf"))
 	}
 
 	bsc, err := configblob.GetService(ctx, cpc)
 	if err != nil {
-		logrus.Fatal(errors.Wrap(err, "could not find storage account"))
+		log.Fatal(errors.Wrap(err, "could not find storage account"))
 	}
 	etcdContainer := bsc.GetContainerReference("etcd")
 
 	etcdcli, err := getEtcdClient()
 	if err != nil {
-		logrus.Fatal(errors.Wrap(err, "create etcd client failed"))
+		log.Fatal(errors.Wrap(err, "create etcd client failed"))
 	}
 	defer etcdcli.Close()
-	b := etcdbackup.NewEtcdBackup(etcdContainer, etcdcli, *maxBackups)
+	b := etcdbackup.NewEtcdBackup(log, etcdContainer, etcdcli, *maxBackups)
 
 	switch flag.Arg(0) {
 	case "save":
@@ -92,13 +94,13 @@ func main() {
 		if len(*blobName) > 0 {
 			path = *blobName
 		}
-		logrus.Infof("backing up etcd to %s", path)
+		log.Infof("backing up etcd to %s", path)
 		err = b.SaveSnapshot(ctx, path)
 		if err != nil {
 			// don't override the initial error.
 			derr := b.Delete(path)
 			if derr != nil {
-				logrus.Errorf("deleting bad backup %s failed with %v", path, derr)
+				log.Errorf("deleting bad backup %s failed with %v", path, derr)
 			}
 		} else {
 			err = b.Prune()
@@ -107,12 +109,12 @@ func main() {
 		if len(*destination) == 0 || len(*blobName) == 0 {
 			flag.Usage()
 		}
-		logrus.Infof("copying backup from %s to %s", *blobName, *destination)
+		log.Infof("copying backup from %s to %s", *blobName, *destination)
 		err = b.Retrieve(*blobName, *destination)
 	default:
 		flag.Usage()
 	}
 	if err != nil {
-		logrus.Fatal(err)
+		log.Fatal(err)
 	}
 }

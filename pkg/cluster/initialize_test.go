@@ -7,10 +7,8 @@ import (
 	"testing"
 
 	gomock "github.com/golang/mock/gomock"
-	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 )
@@ -50,7 +48,6 @@ func TestInitialize(t *testing.T) {
 	var finalError error
 	configBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader(csj), nil).Return(finalError)
 
-	log.New(logrus.NewEntry(logrus.New()))
 	if err := si.initialize(context.Background(), cs); err != finalError {
 		t.Errorf("simpleUpgrader.initialize() error = %v", err)
 	}

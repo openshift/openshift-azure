@@ -36,7 +36,7 @@ type Config struct {
 	Manifest         string `envconfig:"MANIFEST"`
 }
 
-func NewConfig() (*Config, error) {
+func NewConfig(log *logrus.Entry) (*Config, error) {
 	var c Config
 	if err := envconfig.Process("", &c); err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func NewConfig() (*Config, error) {
 		// Randomly assign a supported region
 		rand.Seed(time.Now().UTC().UnixNano())
 		c.Region = supportedRegions[rand.Intn(len(supportedRegions))]
-		logrus.Infof("using randomly selected region %q", c.Region)
+		log.Infof("using randomly selected region %q", c.Region)
 	}
 
 	var supported bool

@@ -17,7 +17,6 @@ import (
 	clienttesting "k8s.io/client-go/testing"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 )
 
@@ -481,7 +480,6 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 		},
 	}
 
-	log.New(logrus.NewEntry(logrus.New()))
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
@@ -543,6 +541,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 				vmc:        virtualMachineScaleSetVMsClient,
 				ssc:        virtualMachineScaleSetsClient,
 				kubeclient: tt.kubeclient,
+				log:        logrus.NewEntry(logrus.StandardLogger()),
 			}
 			err := u.waitForNodes(context.Background(), tt.cs)
 			if tt.wantErr && tt.expectedErr != err {

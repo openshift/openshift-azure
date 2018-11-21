@@ -10,7 +10,6 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
 )
 
 func TestUpgraderDrain(t *testing.T) {
@@ -79,10 +78,10 @@ func TestUpgraderDrain(t *testing.T) {
 			}),
 		},
 	}
-	log.New(logrus.NewEntry(logrus.New()))
 	for _, tt := range tests {
 		u := &simpleUpgrader{
 			kubeclient: tt.kubeclient,
+			log:        logrus.NewEntry(logrus.StandardLogger()),
 		}
 		if err := u.drain(context.Background(), nil, tt.role, tt.computerName); err != tt.wantErr {
 			t.Errorf("[%v] simpleUpgrader.drain() error = %v, wantErr %v", tt.name, err, tt.wantErr)

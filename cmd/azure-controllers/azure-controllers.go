@@ -9,7 +9,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/runtime/signals"
 
 	"github.com/openshift/openshift-azure/pkg/controllers/customeradmin"
-	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
 var (
@@ -30,18 +30,18 @@ func main() {
 
 	cfg, err := config.GetConfig()
 	if err != nil {
-		logrus.Fatal(err)
+		log.Fatal(err)
 	}
 
 	m, err := manager.New(cfg, manager.Options{})
 	if err != nil {
-		logrus.Fatal(err)
+		log.Fatal(err)
 	}
 
 	if err := customeradmin.AddToManager(m, log); err != nil {
-		logrus.Fatal(err)
+		log.Fatal(err)
 	}
 
-	logrus.Print("starting manager")
-	logrus.Fatal(m.Start(signals.SetupSignalHandler()))
+	log.Print("starting manager")
+	log.Fatal(m.Start(signals.SetupSignalHandler()))
 }

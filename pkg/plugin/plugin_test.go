@@ -10,15 +10,12 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
 func TestMerge(t *testing.T) {
-	log.New(logrus.NewEntry(logrus.New()))
-
 	prepare := func(v reflect.Value) {
 		switch v.Interface().(type) {
 		case []api.IdentityProvider:
@@ -32,7 +29,9 @@ func TestMerge(t *testing.T) {
 
 	newCluster := &api.OpenShiftManagedCluster{Properties: &api.Properties{}}
 
-	p := &plugin{}
+	p := &plugin{
+		log: logrus.NewEntry(logrus.StandardLogger()),
+	}
 
 	// should fix all of the items removed above and we should
 	// be able to run through the entire plugin process.
@@ -73,8 +72,8 @@ func TestGenerateARM(t *testing.T) {
 	mockGen.EXPECT().Generate(nil, nil, true).Return(testData, nil)
 	p := &plugin{
 		armGenerator: mockGen,
+		log:          logrus.NewEntry(logrus.StandardLogger()),
 	}
-	log.New(logrus.NewEntry(logrus.New()))
 
 	got, err := p.GenerateARM(nil, nil, true)
 	if err != nil {
@@ -310,8 +309,8 @@ func TestCreateOrUpdate(t *testing.T) {
 		}
 		p := &plugin{
 			clusterUpgrader: mockUp,
+			log:             logrus.NewEntry(logrus.StandardLogger()),
 		}
-		log.New(logrus.NewEntry(logrus.New()))
 		if err := p.CreateOrUpdate(nil, nil, nil, tt.isUpdate, nil); (err != nil) != tt.wantErr {
 			t.Errorf("plugin.CreateOrUpdate(%s) error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
