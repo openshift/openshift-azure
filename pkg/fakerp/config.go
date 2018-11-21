@@ -41,6 +41,7 @@ type Config struct {
 	NoGroupTags      bool   `envconfig:"NOGROUPTAGS"`
 	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
 	Manifest         string `envconfig:"MANIFEST"`
+	SecretsDir       string `envconfig:"SECRETSDIR"`
 }
 
 func NewConfig(log *logrus.Entry) (*Config, error) {
@@ -51,6 +52,10 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 
 	if c.Manifest == "" {
 		c.Manifest = "test/manifests/normal/create.yaml"
+	}
+
+	if c.SecretsDir == "" {
+		c.SecretsDir = "./secrets"
 	}
 
 	if c.Region == "" {
@@ -73,7 +78,7 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 	return &c, nil
 }
 
-func getPluginConfig() (*api.PluginConfig, error) {
+func getPluginConfig(basePath string) (*api.PluginConfig, error) {
 	tc := api.TestConfig{
 		RunningUnderTest:      os.Getenv("RUNNING_UNDER_TEST") != "",
 		ImageResourceGroup:    os.Getenv("IMAGE_RESOURCEGROUP"),
@@ -92,7 +97,7 @@ func getPluginConfig() (*api.PluginConfig, error) {
 	var key *rsa.PrivateKey
 	var err error
 	var syncImage string
-	artifactDir := "./secrets/azure/"
+	artifactDir := fmt.Sprintf("%s/", basePath)
 	// if test files exist, load them
 	if fileExist(artifactDir+"logging-int.cert") &&
 		fileExist(artifactDir+"logging-int.key") &&
@@ -118,7 +123,7 @@ func getPluginConfig() (*api.PluginConfig, error) {
 			return nil, err
 		}
 	} else {
-		return nil, fmt.Errorf("azure secrets files does not exist in ./secrets/azure")
+		return nil, fmt.Errorf("azure secrets files does not exist in ./%s/azure", basePath)
 	}
 
 	if os.Getenv("SYNC_IMAGE") == "" {

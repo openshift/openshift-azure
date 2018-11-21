@@ -46,6 +46,7 @@ var (
 
 	artifactDir        = flag.String("artifact-dir", "", "Directory to place artifacts before a cluster is deleted.")
 	artifactKubeconfig = flag.String("artifact-kubeconfig", "", "Path to kubeconfig to use for gathering artifacts.")
+	secretsDir         = flag.String("secrets-dir", "secrets", "Path to secrets directory")
 )
 
 const (
