@@ -54,6 +54,7 @@ verify:
 	./hack/validate-generated.sh
 	go vet ./...
 	./hack/verify-code-format.sh
+	./hack/validate-util.sh
 
 unit: generate
 	go test ./... -coverprofile=coverage.out

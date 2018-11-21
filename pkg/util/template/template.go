@@ -1,4 +1,4 @@
-package util
+package template
 
 import (
 	"bytes"
@@ -13,8 +13,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
-
-// TODO: util packages are an anti-pattern, don't do this
 
 func Template(tmpl string, f template.FuncMap, cs *api.OpenShiftManagedCluster, extra interface{}) ([]byte, error) {
 	t, err := template.New("").Funcs(template.FuncMap{
