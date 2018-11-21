@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-
-	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
 )
 
 func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourceGroup, dnsDomain string, config *api.PluginConfig, oc *v20180930preview.OpenShiftManagedCluster) error {
