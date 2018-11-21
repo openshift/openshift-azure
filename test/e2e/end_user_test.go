@@ -79,6 +79,10 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 			Timeout: 10 * time.Second,
 		}
 		By(fmt.Sprintf("hitting the route and checking the contents (%v)", time.Now()))
+		timeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		err = waitutil.ForHTTPStatusOk(timeout, nil, url)
+		Expect(err).NotTo(HaveOccurred())
 		resp, err := httpc.Get(url)
 		Expect(err).NotTo(HaveOccurred())
 		defer resp.Body.Close()
@@ -140,6 +144,13 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		loopHTTPGet := func(url string, regex *regexp.Regexp, times int) error {
 			httpc := &http.Client{
 				Timeout: 10 * time.Second,
+			}
+
+			timeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+			defer cancel()
+			err := waitutil.ForHTTPStatusOk(timeout, nil, url)
+			if err != nil {
+				return err
 			}
 
 			for i := 0; i < times; i++ {
@@ -208,11 +219,6 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 			waitErr := wait.PollImmediate(2*time.Second, 10*time.Minute, c.deploymentConfigIsReady(dcName, i))
 			Expect(waitErr).NotTo(HaveOccurred())
 		}
-
-		// wait for the ingress to return 200 in case healthcheck failed when database got recreated
-		By(fmt.Sprintf("making sure the ingress is healthy (%v)", time.Now()))
-		waitErr := waitutil.ForHTTPStatusOk(context.Background(), nil, url)
-		Expect(waitErr).NotTo(HaveOccurred())
 
 		// hit it again, will hit 3 times as specified initially
 		By(fmt.Sprintf("hitting the route again, expecting counter to increment from last (%v)", time.Now()))
