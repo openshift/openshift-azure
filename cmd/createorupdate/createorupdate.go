@@ -97,11 +97,12 @@ func delete(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClus
 }
 
 func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, resourceGroup, manifestTemplate, manifestFile string) error {
-	log.Info("creating/updating cluster")
+	log.Infof("generating manifest from %q", manifestTemplate)
 	oc, err := fakerp.GenerateManifest(manifestTemplate)
 	if err != nil {
 		return err
 	}
+	log.Info("creating/updating cluster")
 	future, err := rpc.CreateOrUpdate(ctx, resourceGroup, resourceGroup, *oc)
 	if err != nil {
 		return err

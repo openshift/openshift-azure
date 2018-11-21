@@ -25,7 +25,7 @@ func readEnv() map[string]string {
 func GenerateManifest(manifestFile string) (*sdk.OpenShiftManagedCluster, error) {
 	t, err := template.ParseFiles(manifestFile)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed parsing the manifest %s", manifestFile)
+		return nil, errors.Wrapf(err, "failed parsing the manifest %q", manifestFile)
 	}
 
 	b := &bytes.Buffer{}

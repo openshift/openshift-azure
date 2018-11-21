@@ -33,13 +33,17 @@ type Config struct {
 
 	NoGroupTags      bool   `envconfig:"NOGROUPTAGS"`
 	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
-	Manifest         string `envconfig:"MANIFEST" default:"test/manifests/normal/create.yaml"`
+	Manifest         string `envconfig:"MANIFEST"`
 }
 
 func NewConfig() (*Config, error) {
 	var c Config
 	if err := envconfig.Process("", &c); err != nil {
 		return nil, err
+	}
+
+	if c.Manifest == "" {
+		c.Manifest = "test/manifests/normal/create.yaml"
 	}
 
 	if c.Region == "" {
