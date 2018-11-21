@@ -34,6 +34,7 @@ type Config struct {
 	NoGroupTags      bool   `envconfig:"NOGROUPTAGS"`
 	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
 	Manifest         string `envconfig:"MANIFEST"`
+	NoWait           bool   `envconfig:"NO_WAIT"`
 }
 
 func NewConfig(log *logrus.Entry) (*Config, error) {
