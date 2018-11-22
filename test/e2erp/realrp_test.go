@@ -3,34 +3,47 @@
 package e2erp
 
 import (
-	"context"
+	"fmt"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
-
-	"github.com/openshift/openshift-azure/pkg/api"
 )
 
 var _ = Describe("Resource provider e2e tests [Real]", func() {
 	defer GinkgoRecover()
 
-	It("should not be possible for customer to mutate an osa scale set", func() {
-		ctx := context.Background()
-		ctx = context.WithValue(ctx, api.ContextKeyClientID, azureConf.ClientID)
-		ctx = context.WithValue(ctx, api.ContextKeyClientSecret, azureConf.ClientSecret)
-		ctx = context.WithValue(ctx, api.ContextKeyTenantID, azureConf.TenantID)
+	It("should keep the end user from reading the config blob", func() {
+		By(fmt.Sprintf("application resource group is %s", c.appResourceGroup))
 
-		appRg := ApplicationResourceGroup(c.resourceGroup, c.resourceGroup, c.location)
-		Expect(appRg).NotTo(And(BeNil(), BeEmpty()))
-		logrus.Infof("application resource group is %s", appRg)
-
-		managedRg, err := ManagedResourceGroup(ctx, c.appsc, appRg)
+		managedRg, err := ManagedResourceGroup(c.ctx, c.appsc, c.appResourceGroup)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(appRg).NotTo(And(BeNil(), BeEmpty()))
+		Expect(managedRg).NotTo(And(BeNil(), BeEmpty()))
+		By(fmt.Sprintf("managed resource group is %s", managedRg))
+		accts, err := c.accsc.ListByResourceGroup(c.ctx, managedRg)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(accts).NotTo(BeNil())
+		for _, acct := range *accts.Value {
+			By(fmt.Sprintf("trying to read account %s", *acct.Name))
+			if acct.Tags["type"] != nil && *acct.Tags["type"] == "config" {
+				// should throw an error when trying to list the keys with the given name
+				_, err := c.accsc.ListKeys(c.ctx, managedRg, *acct.Name)
+				Expect(err).To(HaveOccurred())
+				if err != nil {
+					By(fmt.Sprintf("can't read %s, OK", *acct.Name))
+				}
+			} else {
+				By(fmt.Sprintf("account %s is not a config account", *acct.Name))
+			}
+		}
+	})
+
+	It("should not be possible for customer to mutate an osa scale set", func() {
+		managedRg, err := ManagedResourceGroup(c.ctx, c.appsc, c.appResourceGroup)
+		Expect(err).NotTo(HaveOccurred())
 		logrus.Infof("managed resource group is %s", managedRg)
 
-		scaleSets, err := ScaleSets(ctx, c.ssc, managedRg)
+		scaleSets, err := ScaleSets(c.ctx, c.ssc, managedRg)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(scaleSets).NotTo(And(BeNil(), BeEmpty()))
 		Expect(len(scaleSets)).Should(Equal(3))
@@ -39,35 +52,35 @@ var _ = Describe("Resource provider e2e tests [Real]", func() {
 		var errs []error
 
 		By("Updating the scale set instance count")
-		errs = UpdateScaleSetsCapacity(ctx, c.ssc, c.ssvmc, managedRg)
+		errs = UpdateScaleSetsCapacity(c.ctx, c.ssc, c.ssvmc, managedRg)
 		Expect(errs).NotTo(BeNil())
 		Expect(len(errs)).To(BeEquivalentTo(len(scaleSets)))
 
 		By("Updating the scale set instance type")
-		errs = UpdateScaleSetsInstanceType(ctx, c.ssc, managedRg)
+		errs = UpdateScaleSetsInstanceType(c.ctx, c.ssc, managedRg)
 		Expect(errs).NotTo(BeNil())
 		Expect(len(errs)).To(BeEquivalentTo(len(scaleSets)))
 
 		By("Updating the scale set SSH key")
-		errs = UpdateScaleSetSSHKey(ctx, c.ssc, managedRg)
+		errs = UpdateScaleSetSSHKey(c.ctx, c.ssc, managedRg)
 		Expect(errs).NotTo(BeNil())
 		Expect(len(errs)).To(BeEquivalentTo(len(scaleSets)))
 
 		var vmCount int
 		for _, s := range scaleSets {
-			scaleSetVMs, err := ScaleSetVMs(ctx, c.ssvmc, managedRg, *s.Name)
+			scaleSetVMs, err := ScaleSetVMs(c.ctx, c.ssvmc, managedRg, *s.Name)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(scaleSetVMs).NotTo(And(BeNil(), BeEmpty()))
 			vmCount = vmCount + len(scaleSetVMs)
 		}
 
 		By("Rebooting all scale set instances")
-		errs = RebootScaleSetVMs(ctx, logger, c.ssc, c.ssvmc, managedRg)
+		errs = RebootScaleSetVMs(c.ctx, c.ssc, c.ssvmc, managedRg)
 		Expect(errs).NotTo(BeNil())
 		Expect(len(errs)).To(BeEquivalentTo(vmCount))
 
 		By("Creating scale set script extensions")
-		errs = UpdateScaleSetScriptExtension(ctx, logger, c.ssc, c.ssec, managedRg)
+		errs = UpdateScaleSetScriptExtension(c.ctx, c.ssc, c.ssec, managedRg)
 		Expect(errs).NotTo(BeNil())
 		Expect(len(errs)).To(BeEquivalentTo(len(scaleSets)))
 	})

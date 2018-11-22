@@ -3,12 +3,14 @@
 package e2erp
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/onsi/ginkgo/config"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	sdk "github.com/openshift/openshift-azure/pkg/util/azureclient/osa-go-sdk/services/containerservice/mgmt/2018-09-30-preview/containerservice"
 )
@@ -29,15 +31,18 @@ type AzureConfig struct {
 }
 
 type testClient struct {
+	ctx   context.Context
 	gc    resources.GroupsClient
 	rpc   sdk.OpenShiftManagedClustersClient
 	ssc   azureclient.VirtualMachineScaleSetsClient
 	ssvmc azureclient.VirtualMachineScaleSetVMsClient
 	ssec  azureclient.VirtualMachineScaleSetExtensionsClient
 	appsc azureclient.ApplicationsClient
+	accsc azureclient.AccountsClient
 
-	resourceGroup string
-	location      string
+	resourceGroup    string
+	location         string
+	appResourceGroup string
 }
 
 func newTestClient(conf AzureConfig) *testClient {
@@ -48,6 +53,11 @@ func newTestClient(conf AzureConfig) *testClient {
 	subID := conf.SubscriptionID
 	gc := resources.NewGroupsClient(subID)
 	gc.Authorizer = authorizer
+
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, api.ContextKeyClientID, conf.ClientID)
+	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, conf.ClientSecret)
+	ctx = context.WithValue(ctx, api.ContextKeyTenantID, conf.TenantID)
 
 	var rpc sdk.OpenShiftManagedClustersClient
 	focus := []byte(config.GinkgoConfig.FocusString)
@@ -67,15 +77,22 @@ func newTestClient(conf AzureConfig) *testClient {
 	ssvmc := azureclient.NewVirtualMachineScaleSetVMsClient(subID, authorizer, conf.AcceptLanguages)
 	ssec := azureclient.NewVirtualMachineScaleSetExtensionsClient(subID, authorizer, conf.AcceptLanguages)
 	appsc := azureclient.NewApplicationsClient(subID, authorizer, conf.AcceptLanguages)
+	accsc := azureclient.NewAccountsClient(subID, authorizer, conf.AcceptLanguages)
+
+	// TODO: az cli tool supports more than 1 cluster per RG, may need to use another env var for the cluster name in the future
+	appRg := ApplicationResourceGroup(conf.ResourceGroup, conf.ResourceGroup, conf.Region)
 
 	return &testClient{
-		gc:            gc,
-		rpc:           rpc,
-		ssc:           ssc,
-		ssvmc:         ssvmc,
-		ssec:          ssec,
-		appsc:         appsc,
-		resourceGroup: conf.ResourceGroup,
-		location:      conf.Region,
+		ctx:              ctx,
+		gc:               gc,
+		rpc:              rpc,
+		ssc:              ssc,
+		ssvmc:            ssvmc,
+		ssec:             ssec,
+		appsc:            appsc,
+		accsc:            accsc,
+		resourceGroup:    conf.ResourceGroup,
+		location:         conf.Region,
+		appResourceGroup: appRg,
 	}
 }
