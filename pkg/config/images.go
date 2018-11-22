@@ -25,8 +25,8 @@ func NewSimpleGenerator(pluginConfig *api.PluginConfig) Generator {
 	}
 }
 
-// openshiftVersion converts a VM image version (e.g. 311.14.20180101) to an
-// openshift container image version (e.g. v3.11.14)
+// openshiftVersion converts a VM image version (e.g. 311.43.20181121) to an
+// openshift container image version (e.g. v3.11.43)
 func openShiftVersion(imageVersion string) (string, error) {
 	parts := strings.Split(imageVersion, ".")
 	if len(parts) != 3 || len(parts[0]) < 2 {
@@ -49,7 +49,7 @@ func (g *simpleGenerator) selectNodeImage(cs *api.OpenShiftManagedCluster) {
 	case "", "rhel7":
 		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OpenShiftVersion[1:], ".", "", -1)
 		if c.ImageVersion == "" {
-			c.ImageVersion = "311.16.20181109"
+			c.ImageVersion = "311.43.20181121"
 		}
 	case "centos7":
 		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OpenShiftVersion[1:], ".", "", -1)
