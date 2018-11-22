@@ -54,11 +54,7 @@ func (az *Client) ManagedResourceGroup(applicationResourceGroup string) (string,
 
 	for _, app := range apps.Values() {
 		if appid := *app.ManagedResourceGroupID; appid != "" {
-			r, err := az.ResourceGroupFromManagedResourceID(appid)
-			if err != nil {
-				return "", err
-			}
-			return r, nil
+			return az.ResourceGroupFromManagedResourceID(appid)
 		}
 	}
 	return "", nil
@@ -104,21 +100,21 @@ func (az *Client) ScaleSetVMs(resourceGroup string, scaleSet string) ([]compute.
 // (by one) for all scale sets within a given resource group
 func (az *Client) UpdateScaleSetsCapacity(resourceGroup string) []error {
 	var errs []error
-	az.logger.Debugf("listing scale sets for resource group %s", resourceGroup)
+	az.log.Debugf("listing scale sets for resource group %s", resourceGroup)
 	scaleSets, err := az.ScaleSets(resourceGroup)
 	if err != nil {
 		errs = append(errs, err)
 		return errs
 	}
 	for _, s := range scaleSets {
-		az.logger.Debugf("listing virtual machines in scale set %s", *s.Name)
+		az.log.Debugf("listing virtual machines in scale set %s", *s.Name)
 		vms, err := az.ScaleSetVMs(resourceGroup, *s.Name)
 		if err != nil {
 			errs = append(errs, err)
 			return errs
 		}
 		vmsCount := len(vms)
-		az.logger.Debugf("resizing scale set %s from %d to %d virtual machines", *s.Name, vmsCount, vmsCount+1)
+		az.log.Debugf("resizing scale set %s from %d to %d virtual machines", *s.Name, vmsCount, vmsCount+1)
 		// we only care about possible errors therefore we do not need to process the returned future
 		_, err = az.ssc.Update(az.ctx, resourceGroup, *s.Name, compute.VirtualMachineScaleSetUpdate{
 			Sku: &compute.Sku{
@@ -136,14 +132,14 @@ func (az *Client) UpdateScaleSetsCapacity(resourceGroup string) []error {
 // types for all scale sets within a given resource group
 func (az *Client) UpdateScaleSetsInstanceType(resourceGroup string) []error {
 	var errs []error
-	az.logger.Debugf("listing scale sets for resource group %s", resourceGroup)
+	az.log.Debugf("listing scale sets for resource group %s", resourceGroup)
 	scaleSets, err := az.ScaleSets(resourceGroup)
 	if err != nil {
 		errs = append(errs, err)
 		return errs
 	}
 	for _, s := range scaleSets {
-		az.logger.Debugf("updating instance type for scale set %s from %s to %s", *s.Name, api.StandardD4sV3, api.StandardD2sV3)
+		az.log.Debugf("updating instance type for scale set %s from %s to %s", *s.Name, api.StandardD4sV3, api.StandardD2sV3)
 		// we only care about possible errors therefore we do not need to process the returned future
 		_, err = az.ssc.Update(az.ctx, resourceGroup, *s.Name, compute.VirtualMachineScaleSetUpdate{
 			Sku: &compute.Sku{
@@ -162,14 +158,14 @@ func (az *Client) UpdateScaleSetsInstanceType(resourceGroup string) []error {
 func (az *Client) UpdateScaleSetSSHKey(resourceGroup string) []error {
 	var errs []error
 	var sshKeyData = fakepubkey
-	az.logger.Debugf("listing scale sets for resource group %s", resourceGroup)
+	az.log.Debugf("listing scale sets for resource group %s", resourceGroup)
 	scaleSets, err := az.ScaleSets(resourceGroup)
 	if err != nil {
 		errs = append(errs, err)
 		return errs
 	}
 	for _, s := range scaleSets {
-		az.logger.Debugf("updating ssh key for scale set %s", *s.Name)
+		az.log.Debugf("updating ssh key for scale set %s", *s.Name)
 		// we only care about possible errors therefore we do not need to process the returned future
 		_, err := az.ssc.Update(az.ctx, resourceGroup, *s.Name, compute.VirtualMachineScaleSetUpdate{
 			VirtualMachineScaleSetUpdateProperties: &compute.VirtualMachineScaleSetUpdateProperties{
@@ -200,21 +196,21 @@ func (az *Client) UpdateScaleSetSSHKey(resourceGroup string) []error {
 // scale sets within a given resource group
 func (az *Client) RebootScaleSetVMs(resourceGroup string) []error {
 	var errs []error
-	az.logger.Debugf("listing scale sets in resource group %s", resourceGroup)
+	az.log.Debugf("listing scale sets in resource group %s", resourceGroup)
 	scaleSets, err := az.ScaleSets(resourceGroup)
 	if err != nil {
 		errs = append(errs, err)
 		return errs
 	}
 	for _, s := range scaleSets {
-		az.logger.Debugf("listing virtual machines in scale set %s", *s.Name)
+		az.log.Debugf("listing virtual machines in scale set %s", *s.Name)
 		vms, err := az.ScaleSetVMs(resourceGroup, *s.Name)
 		if err != nil {
 			errs = append(errs, err)
 			return errs
 		}
 		for _, vm := range vms {
-			az.logger.Debugf("restarting virtual machine %s", *vm.Name)
+			az.log.Debugf("restarting virtual machine %s", *vm.Name)
 			// we only care about possible errors therefore we do not need to process the returned future
 			_, err := az.ssvmc.Restart(az.ctx, resourceGroup, *s.Name, *vm.ID)
 			if err != nil {
@@ -229,14 +225,14 @@ func (az *Client) RebootScaleSetVMs(resourceGroup string) []error {
 // for all scale sets within a given resource group
 func (az *Client) UpdateScaleSetScriptExtension(resourceGroup string) []error {
 	var errs []error
-	az.logger.Debugf("listing scale sets in resource group %s", resourceGroup)
+	az.log.Debugf("listing scale sets in resource group %s", resourceGroup)
 	scaleSets, err := az.ScaleSets(resourceGroup)
 	if err != nil {
 		errs = append(errs, err)
 		return errs
 	}
 	for _, s := range scaleSets {
-		az.logger.Debugf("updating script extension for scale set %s", *s.Name)
+		az.log.Debugf("updating script extension for scale set %s", *s.Name)
 		// we only care about possible errors therefore we do not need to process the returned future
 		_, err := az.ssec.CreateOrUpdate(az.ctx, resourceGroup, *s.Name, "test", compute.VirtualMachineScaleSetExtension{
 			VirtualMachineScaleSetExtensionProperties: &compute.VirtualMachineScaleSetExtensionProperties{
@@ -261,7 +257,7 @@ func (az *Client) UpdateCluster(external *v20180930preview.OpenShiftManagedClust
 	var err error
 	// simulate the API call to the RP
 	if err := wait.PollImmediate(5*time.Second, 1*time.Hour, func() (bool, error) {
-		if oc, err = fakerp.CreateOrUpdate(az.ctx, external, az.logger, config); err != nil {
+		if oc, err = fakerp.CreateOrUpdate(az.ctx, external, az.log, config); err != nil {
 			if autoRestErr, ok := err.(autorest.DetailedError); ok {
 				if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
 					if netErr, ok := urlErr.Err.(*net.OpError); ok {
@@ -294,7 +290,7 @@ func (az *Client) ScaleScaleSet(scaleSetName string, count int, op ScaleOperatio
 	var err error
 	scaleSet, err := az.ssc.Get(az.ctx, az.resourceGroup, scaleSetName)
 	if err != nil {
-		az.logger.Errorf("failed to get scale set %s: %v", scaleSetName, err)
+		az.log.Errorf("failed to get scale set %s: %v", scaleSetName, err)
 		return err
 	}
 	currentCapacity := *scaleSet.Sku.Capacity
@@ -302,26 +298,26 @@ func (az *Client) ScaleScaleSet(scaleSetName string, count int, op ScaleOperatio
 	case ScaleOutOperation:
 		if int64(count) < currentCapacity {
 			msg := fmt.Sprintf("scale out requires a vm count higher than the current: current=%d, requested=%d", currentCapacity, count)
-			az.logger.Errorf(msg)
+			az.log.Errorf(msg)
 			err = fmt.Errorf(msg)
 			return err
 		}
 	case ScaleInOperation:
 		if int64(count) > currentCapacity {
 			msg := fmt.Sprintf("scale in requires a vm count lower than the current: current=%d, requested=%d", currentCapacity, count)
-			az.logger.Errorf(msg)
+			az.log.Errorf(msg)
 			err = fmt.Errorf(msg)
 			return err
 		}
 	}
-	az.logger.Debugf("scaling %s %s scale set to %d vms", op, scaleSetName, count)
+	az.log.Debugf("scaling %s %s scale set to %d vms", op, scaleSetName, count)
 	future, err := az.ssc.Update(az.ctx, az.resourceGroup, scaleSetName, compute.VirtualMachineScaleSetUpdate{
 		Sku: &compute.Sku{
 			Capacity: to.Int64Ptr(int64(count)),
 		},
 	})
 	if err != nil {
-		az.logger.Errorf("failed to scale %s scale set %s: %v", op, scaleSetName, err)
+		az.log.Errorf("failed to scale %s scale set %s: %v", op, scaleSetName, err)
 		return err
 	}
 	if err := future.WaitForCompletionRef(az.ctx, az.ssc.Client()); err != nil {

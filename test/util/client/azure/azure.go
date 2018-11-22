@@ -7,42 +7,21 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/kelseyhightower/envconfig"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	"github.com/onsi/ginkgo/config"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/log"
-
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
-	"github.com/onsi/ginkgo/config"
-
+	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	sdk "github.com/openshift/openshift-azure/pkg/util/azureclient/osa-go-sdk/services/containerservice/mgmt/2018-09-30-preview/containerservice"
+	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
 var (
 	fakeRe = regexp.MustCompile("Fake")
 	realRe = regexp.MustCompile("Real")
 )
-
-type Config struct {
-	SubscriptionID  string   `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
-	TenantID        string   `envconfig:"AZURE_TENANT_ID" required:"true"`
-	Region          string   `envconfig:"AZURE_REGION" required:"true"`
-	ClientID        string   `envconfig:"AZURE_CLIENT_ID" required:"true"`
-	ClientSecret    string   `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
-	ResourceGroup   string   `envconfig:"RESOURCEGROUP" required:"true"`
-	AcceptLanguages []string `envconfig:"ACCEPT_LANGUAGES" default:"en-us"`
-}
-
-var conf Config
-
-func init() {
-	err := envconfig.Process("", &conf)
-	if err != nil {
-		panic(err)
-	}
-}
 
 type Client struct {
 	gc    resources.GroupsClient
@@ -54,11 +33,20 @@ type Client struct {
 
 	resourceGroup string
 	location      string
-	logger        *logrus.Entry
+	log           *logrus.Entry
 	ctx           context.Context
 }
 
 func NewClient() *Client {
+	logrus.SetLevel(log.SanitizeLogLevel("Debug"))
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+	log := logrus.NewEntry(logrus.StandardLogger())
+	conf, err := fakerp.NewConfig(log)
+	if err != nil {
+		panic(err)
+	}
+	log = logrus.WithFields(logrus.Fields{"location": conf.Region, "resourceGroup": conf.ResourceGroup})
+
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
 	if err != nil {
 		panic(err)
@@ -90,10 +78,6 @@ func NewClient() *Client {
 	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, conf.ClientSecret)
 	ctx = context.WithValue(ctx, api.ContextKeyTenantID, conf.TenantID)
 
-	logrus.SetLevel(log.SanitizeLogLevel("Debug"))
-	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-	logger := logrus.WithFields(logrus.Fields{"location": conf.Region, "resourceGroup": conf.ResourceGroup})
-
 	return &Client{
 		gc:            gc,
 		rpc:           rpc,
@@ -104,6 +88,6 @@ func NewClient() *Client {
 		resourceGroup: conf.ResourceGroup,
 		location:      conf.Region,
 		ctx:           ctx,
-		logger:        logger,
+		log:           log,
 	}
 }

@@ -10,6 +10,7 @@ import (
 	"k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 
+	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/test/util/client/azure"
 	"github.com/openshift/openshift-azure/test/util/client/cluster"
 	"github.com/openshift/openshift-azure/test/util/client/kubernetes"
@@ -27,7 +28,7 @@ func ResizeComputeScaleSet(az *azure.Client, manifest, configBlob string, size i
 	external.Properties.AgentPoolProfiles[1].Count = size
 
 	By("Calling update on the rp with the updated manifest")
-	updated, err := az.UpdateCluster(external, configBlob, cluster.NewPluginConfig())
+	updated, err := az.UpdateCluster(external, configBlob, fakerp.NewPluginConfig())
 	Expect(err).NotTo(HaveOccurred())
 	Expect(updated).NotTo(BeNil())
 }

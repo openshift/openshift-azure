@@ -35,7 +35,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/openshift/openshift-azure/pkg/log"
+	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/test/util/client"
 )
 

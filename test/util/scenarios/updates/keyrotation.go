@@ -8,6 +8,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/openshift/openshift-azure/pkg/fakerp"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/test/util/client/azure"
 	"github.com/openshift/openshift-azure/test/util/client/cluster"
 )
@@ -19,7 +21,7 @@ func RotateClusterCredentials(az *azure.Client, manifest, configBlob string) {
 	Expect(external).NotTo(BeNil())
 
 	By("Parsing the internal manifest containing config blob")
-	internal, err := cluster.ParseInternalConfig(configBlob)
+	internal, err := managedcluster.ReadConfig(configBlob)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(internal).NotTo(BeNil())
 
@@ -37,12 +39,12 @@ func RotateClusterCredentials(az *azure.Client, manifest, configBlob string) {
 	Expect(err).NotTo(HaveOccurred())
 
 	By("Calling update on the fake rp with the updated config blob")
-	updated, err := az.UpdateCluster(external, configBlob, cluster.NewPluginConfig())
+	updated, err := az.UpdateCluster(external, configBlob, fakerp.NewPluginConfig())
 	Expect(err).NotTo(HaveOccurred())
 	Expect(updated).NotTo(BeNil())
 
 	By("Parsing the config blob after the update")
-	internalAfterUpdate, err := cluster.ParseInternalConfig(configBlob)
+	internalAfterUpdate, err := managedcluster.ReadConfig(configBlob)
 	Expect(err).NotTo(HaveOccurred())
 	Expect(internalAfterUpdate).NotTo(BeNil())
 

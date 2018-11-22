@@ -44,6 +44,28 @@ func NewServer(log *logrus.Entry, resourceGroup, address string, c *Config) *Ser
 	}
 }
 
+// NewPluginConfig creates a new PluginConfig from the current environment
+func NewPluginConfig() *api.PluginConfig {
+	tc := api.TestConfig{
+		RunningUnderTest:      os.Getenv("RUNNING_UNDER_TEST") != "",
+		ImageResourceGroup:    os.Getenv("IMAGE_RESOURCEGROUP"),
+		ImageResourceName:     os.Getenv("IMAGE_RESOURCENAME"),
+		DeployOS:              os.Getenv("DEPLOY_OS"),
+		ImageOffer:            os.Getenv("IMAGE_OFFER"),
+		ImageVersion:          os.Getenv("IMAGE_VERSION"),
+		ORegURL:               os.Getenv("OREG_URL"),
+		EtcdBackupImage:       os.Getenv("ETCDBACKUP_IMAGE"),
+		AzureControllersImage: os.Getenv("AZURE_CONTROLLERS_IMAGE"),
+	}
+
+	config := &api.PluginConfig{
+		SyncImage:       os.Getenv("SYNC_IMAGE"),
+		AcceptLanguages: []string{"en-us"},
+		TestConfig:      tc,
+	}
+	return config
+}
+
 func (s *Server) ListenAndServe() {
 	// TODO: match the request path the real RP would use
 	http.Handle("/", s)
@@ -193,23 +215,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, s.conf.ClientSecret)
 	ctx = context.WithValue(ctx, api.ContextKeyTenantID, s.conf.TenantID)
 
-	tc := api.TestConfig{
-		RunningUnderTest:      os.Getenv("RUNNING_UNDER_TEST") != "",
-		ImageResourceGroup:    os.Getenv("IMAGE_RESOURCEGROUP"),
-		ImageResourceName:     os.Getenv("IMAGE_RESOURCENAME"),
-		DeployOS:              os.Getenv("DEPLOY_OS"),
-		ImageOffer:            os.Getenv("IMAGE_OFFER"),
-		ImageVersion:          os.Getenv("IMAGE_VERSION"),
-		ORegURL:               os.Getenv("OREG_URL"),
-		EtcdBackupImage:       os.Getenv("ETCDBACKUP_IMAGE"),
-		AzureControllersImage: os.Getenv("AZURE_CONTROLLERS_IMAGE"),
-	}
-
-	config := &api.PluginConfig{
-		SyncImage:       os.Getenv("SYNC_IMAGE"),
-		AcceptLanguages: []string{"en-us"},
-		TestConfig:      tc,
-	}
+	config := NewPluginConfig()
 
 	if currentState := s.readState(); string(currentState) == "" {
 		s.writeState(v20180930preview.Creating)

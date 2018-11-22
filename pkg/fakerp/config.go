@@ -31,9 +31,10 @@ type Config struct {
 	DnsResourceGroup string `envconfig:"DNS_RESOURCEGROUP" required:"true"`
 	ResourceGroup    string `envconfig:"RESOURCEGROUP" required:"true"`
 
-	NoGroupTags      bool   `envconfig:"NOGROUPTAGS"`
-	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
-	Manifest         string `envconfig:"MANIFEST"`
+	NoGroupTags      bool     `envconfig:"NOGROUPTAGS"`
+	ResourceGroupTTL string   `envconfig:"RESOURCEGROUP_TTL"`
+	Manifest         string   `envconfig:"MANIFEST"`
+	AcceptLanguages  []string `envconfig:"ACCEPT_LANGUAGES" default:"en-us"`
 }
 
 func NewConfig(log *logrus.Entry) (*Config, error) {
