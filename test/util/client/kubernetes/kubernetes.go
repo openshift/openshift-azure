@@ -7,19 +7,13 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-
-	"github.com/openshift/api/route/v1"
-	apiappsv1 "k8s.io/api/apps/v1"
-	policy "k8s.io/api/policy/v1beta1"
-
-	"github.com/openshift/openshift-azure/pkg/log"
-
 	"path/filepath"
 	"time"
 
 	"github.com/ghodss/yaml"
 	dcv1 "github.com/openshift/api/apps/v1"
 	project "github.com/openshift/api/project/v1"
+	"github.com/openshift/api/route/v1"
 	templatev1 "github.com/openshift/api/template/v1"
 	usersv1 "github.com/openshift/api/user/v1"
 	appsv1 "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
@@ -28,16 +22,20 @@ import (
 	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
 	userv1client "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
 	"github.com/sirupsen/logrus"
+	apiappsv1 "k8s.io/api/apps/v1"
 	authorizationapiv1 "k8s.io/api/authorization/v1"
 	corev1 "k8s.io/api/core/v1"
+	policy "k8s.io/api/policy/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
+	"github.com/openshift/openshift-azure/pkg/log"
 	"github.com/openshift/openshift-azure/test/util/client"
 )
 
@@ -319,7 +317,7 @@ func (t *Client) SelfSarSuccess() (bool, error) {
 }
 
 func (t *Client) CreatePodDisruptionBudget(p *policy.PodDisruptionBudget) error {
-	_, err := t.kc.Policy().PodDisruptionBudgets(t.namespace).Create(p)
+	_, err := t.kc.PolicyV1beta1().PodDisruptionBudgets(t.namespace).Create(p)
 	return err
 }
 
@@ -349,6 +347,27 @@ func (t *Client) GetPodByName(namespace, name string, options *metav1.GetOptions
 		options = &metav1.GetOptions{}
 	}
 	return t.kc.CoreV1().Pods(namespace).Get(name, *options)
+}
+
+func (t *Client) DeletePod(namespace, name string, options *metav1.DeleteOptions) error {
+	if options == nil {
+		options = &metav1.DeleteOptions{}
+	}
+	err := t.kc.CoreV1().Pods(namespace).Delete(name, &metav1.DeleteOptions{})
+	if err != nil {
+		return err
+	}
+
+	return wait.PollImmediate(2*time.Second, 1*time.Minute, func() (bool, error) {
+		_, err := t.kc.CoreV1().Pods(namespace).Get(name, metav1.GetOptions{})
+		if kerrors.IsNotFound(err) {
+			return true, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		return false, nil
+	})
 }
 
 func (t *Client) GetPodLogs(namespace string, name string, options *corev1.PodLogOptions) *rest.Request {
@@ -445,4 +464,129 @@ func (t *Client) GetDeploymentConfig(name string, options *metav1.GetOptions) (*
 
 func (t *Client) UpdateDeploymentConfig(dc *dcv1.DeploymentConfig) (*dcv1.DeploymentConfig, error) {
 	return t.ac.DeploymentConfigs(t.namespace).Update(dc)
+}
+
+func (t *Client) CreateSampleDeployment(namespace, name string, replicas int) error {
+	int32Ptr := func(i int32) *int32 { return &i }
+	deployment := &apiappsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+		},
+		Spec: apiappsv1.DeploymentSpec{
+			Replicas: int32Ptr(int32(replicas)),
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"app": name,
+				},
+			},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: name,
+					Labels: map[string]string{
+						"app": name,
+					},
+				},
+				Spec: corev1.PodSpec{
+					Affinity: &corev1.Affinity{
+						PodAntiAffinity: &corev1.PodAntiAffinity{
+							PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{
+								{
+									Weight: 100,
+									PodAffinityTerm: corev1.PodAffinityTerm{
+										TopologyKey: "kubernetes.io/hostname",
+										LabelSelector: &metav1.LabelSelector{
+											MatchExpressions: []metav1.LabelSelectorRequirement{
+												{
+													Key:      "app",
+													Operator: metav1.LabelSelectorOperator("In"),
+													Values:   []string{name},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					NodeSelector: map[string]string{
+						"node-role.kubernetes.io/compute": "true",
+					},
+					Containers: []corev1.Container{
+						{
+							Name:  name,
+							Image: "openshift/hello-openshift",
+							Ports: []corev1.ContainerPort{
+								{
+									Name:          "http",
+									Protocol:      corev1.ProtocolTCP,
+									ContainerPort: 8080,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	_, err := t.kc.AppsV1().Deployments(namespace).Create(deployment)
+	if err != nil {
+		return err
+	}
+	return wait.PollImmediate(2*time.Second, 10*time.Minute, func() (bool, error) {
+		d, err := t.kc.AppsV1().Deployments(namespace).Get(name, metav1.GetOptions{})
+		if kerrors.IsNotFound(err) {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+
+		for _, cond := range d.Status.Conditions {
+			if cond.Type == "Available" &&
+				cond.Status == corev1.ConditionTrue {
+				return true, nil
+			} else if cond.Type == "ReplicaFailure" &&
+				cond.Status == corev1.ConditionTrue {
+				return false, fmt.Errorf("deployment %s.%s failed", namespace, name)
+			}
+		}
+		return false, nil
+	})
+}
+
+func (t *Client) GetDeployment(namespace, name string) (*apiappsv1.Deployment, error) {
+	return t.kc.AppsV1().Deployments(namespace).Get(name, metav1.GetOptions{})
+}
+
+func (t *Client) DeleteDeployment(namespace, name string) error {
+	return t.kc.AppsV1().Deployments(namespace).Delete(name, &metav1.DeleteOptions{})
+}
+
+func (t *Client) GetDeploymentPods(namespace, name string) ([]corev1.Pod, error) {
+	dep, err := t.GetDeployment(namespace, name)
+	if err != nil {
+		return nil, err
+	}
+	set := labels.Set(dep.Spec.Template.Labels)
+	listOptions := metav1.ListOptions{LabelSelector: set.AsSelector().String()}
+	pods, err := t.ListPods(namespace, &listOptions)
+	if err != nil {
+		return nil, err
+	}
+	return pods.Items, nil
+}
+
+func (t *Client) DeleteDeploymentPods(namespace, name string) error {
+	pods, err := t.GetDeploymentPods(namespace, name)
+	if err != nil {
+		return err
+	}
+	for _, pod := range pods {
+		err := t.DeletePod(pod.Namespace, pod.Name, nil)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

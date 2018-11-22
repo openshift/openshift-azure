@@ -12,16 +12,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Azure/go-autorest/autorest"
-	"k8s.io/apimachinery/pkg/util/wait"
-
-	"github.com/openshift/openshift-azure/pkg/fakerp"
-
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
+	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/to"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	"github.com/openshift/openshift-azure/pkg/fakerp"
 )
 
 const (
@@ -100,68 +98,6 @@ func (az *Client) ScaleSetVMs(resourceGroup string, scaleSet string) ([]compute.
 		}
 	}
 	return vms, nil
-}
-
-// ScaleOutScaleSet scales out the capacity of a given scale set to count VMs
-func (az *Client) ScaleOutScaleSet(scaleSetName string, count int) error {
-	var err error
-	scaleSet, err := az.ssc.Get(az.ctx, az.resourceGroup, scaleSetName)
-	if err != nil {
-		az.logger.Errorf("failed to get scale set %s: %v", scaleSetName, err)
-		return err
-	}
-	currentCapacity := *scaleSet.Sku.Capacity
-	if int64(count) < currentCapacity {
-		msg := fmt.Sprintf("scale out requires a vm count higher than the current: current=%d, requested=%d", currentCapacity, count)
-		az.logger.Errorf(msg)
-		err = fmt.Errorf(msg)
-		return err
-	}
-	az.logger.Debugf("scaling out %s scale set to %d vms", scaleSetName, count)
-	future, err := az.ssc.Update(az.ctx, az.resourceGroup, scaleSetName, compute.VirtualMachineScaleSetUpdate{
-		Sku: &compute.Sku{
-			Capacity: to.Int64Ptr(int64(count)),
-		},
-	})
-	if err != nil {
-		az.logger.Errorf("failed to scale out scale set %s: %v", scaleSetName, err)
-		return err
-	}
-	if err := future.WaitForCompletionRef(az.ctx, az.ssc.Client()); err != nil {
-		return err
-	}
-	return nil
-}
-
-// ScaleInScaleSet scales in the capacity of a given scale set to count VMs
-func (az *Client) ScaleInScaleSet(scaleSetName string, count int) error {
-	var err error
-	scaleSet, err := az.ssc.Get(az.ctx, az.resourceGroup, scaleSetName)
-	if err != nil {
-		az.logger.Errorf("failed to get scale set %s: %v", scaleSetName, err)
-		return err
-	}
-	currentCapacity := *scaleSet.Sku.Capacity
-	if int64(count) > currentCapacity {
-		msg := fmt.Sprintf("scale in requires a vm count lower than the current: current=%d, requested=%d", currentCapacity, count)
-		az.logger.Errorf(msg)
-		err = fmt.Errorf(msg)
-		return err
-	}
-	az.logger.Debugf("scaling in %s scale set to %d vms", scaleSetName, count)
-	future, err := az.ssc.Update(az.ctx, az.resourceGroup, scaleSetName, compute.VirtualMachineScaleSetUpdate{
-		Sku: &compute.Sku{
-			Capacity: to.Int64Ptr(int64(count)),
-		},
-	})
-	if err != nil {
-		az.logger.Errorf("failed to scale in scale set %s: %v", scaleSetName, err)
-		return err
-	}
-	if err := future.WaitForCompletionRef(az.ctx, az.ssc.Client()); err != nil {
-		return err
-	}
-	return nil
 }
 
 // UpdateScaleSetsCapacity returns a slice of the errors it encounters as it attempts to increment the capacity
@@ -344,4 +280,52 @@ func (az *Client) UpdateCluster(external *v20180930preview.OpenShiftManagedClust
 		return nil, err
 	}
 	return oc, nil
+}
+
+type ScaleOperation string
+
+const (
+	ScaleOutOperation ScaleOperation = "out"
+	ScaleInOperation  ScaleOperation = "in"
+)
+
+// ScaleScaleSet scales the capacity of a given scale set to count VMs.
+func (az *Client) ScaleScaleSet(scaleSetName string, count int, op ScaleOperation) error {
+	var err error
+	scaleSet, err := az.ssc.Get(az.ctx, az.resourceGroup, scaleSetName)
+	if err != nil {
+		az.logger.Errorf("failed to get scale set %s: %v", scaleSetName, err)
+		return err
+	}
+	currentCapacity := *scaleSet.Sku.Capacity
+	switch op {
+	case ScaleOutOperation:
+		if int64(count) < currentCapacity {
+			msg := fmt.Sprintf("scale out requires a vm count higher than the current: current=%d, requested=%d", currentCapacity, count)
+			az.logger.Errorf(msg)
+			err = fmt.Errorf(msg)
+			return err
+		}
+	case ScaleInOperation:
+		if int64(count) > currentCapacity {
+			msg := fmt.Sprintf("scale in requires a vm count lower than the current: current=%d, requested=%d", currentCapacity, count)
+			az.logger.Errorf(msg)
+			err = fmt.Errorf(msg)
+			return err
+		}
+	}
+	az.logger.Debugf("scaling %s %s scale set to %d vms", op, scaleSetName, count)
+	future, err := az.ssc.Update(az.ctx, az.resourceGroup, scaleSetName, compute.VirtualMachineScaleSetUpdate{
+		Sku: &compute.Sku{
+			Capacity: to.Int64Ptr(int64(count)),
+		},
+	})
+	if err != nil {
+		az.logger.Errorf("failed to scale %s scale set %s: %v", op, scaleSetName, err)
+		return err
+	}
+	if err := future.WaitForCompletionRef(az.ctx, az.ssc.Client()); err != nil {
+		return err
+	}
+	return nil
 }

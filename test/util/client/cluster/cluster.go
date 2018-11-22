@@ -72,9 +72,9 @@ func DeleteSecrets(config *api.OpenShiftManagedCluster) *api.OpenShiftManagedClu
 	configCopy.Config.Certificates.FrontProxyCa = frontproxy
 	configCopy.Config.Certificates.ServiceCatalogCa = servicecatalog
 	configCopy.Config.Certificates.ServiceSigningCa = servicesigning
-	configCopy.Config.SSHKey = nil
 
 	// remove secrets
+	configCopy.Config.SSHKey = nil
 	configCopy.Config.RegistryHTTPSecret = nil
 	configCopy.Config.RegistryConsoleOAuthSecret = ""
 	configCopy.Config.ConsoleOAuthSecret = ""
