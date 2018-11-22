@@ -6,9 +6,8 @@ import (
 	"crypto/x509"
 	"testing"
 
-	"github.com/openshift/openshift-azure/pkg/jsonpath"
-
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/jsonpath"
 )
 
 var (

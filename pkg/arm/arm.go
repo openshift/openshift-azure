@@ -15,7 +15,7 @@ import (
 	"text/template"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util"
+	util "github.com/openshift/openshift-azure/pkg/util/template"
 )
 
 type Generator interface {

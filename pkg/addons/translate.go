@@ -10,7 +10,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
-	"github.com/openshift/openshift-azure/pkg/util"
+	util "github.com/openshift/openshift-azure/pkg/util/template"
 )
 
 func KeyFunc(gk schema.GroupKind, namespace, name string) string {
