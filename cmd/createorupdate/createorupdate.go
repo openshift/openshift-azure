@@ -222,7 +222,7 @@ func execute(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClu
 	return nil
 }
 
-func updateAadApplictation(ctx context.Context, log *logrus.Entry, conf *fakerp.Config) error {
+func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.Config) error {
 	if len(conf.AADClientID) > 0 && conf.AADClientID != conf.ClientID {
 		log.Info("updating the aad application")
 		if len(conf.Username) == 0 || len(conf.Password) == 0 {
@@ -254,6 +254,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 	log := logrus.NewEntry(logrus.StandardLogger())
 	conf, err := fakerp.NewConfig(log)
@@ -301,7 +302,7 @@ func main() {
 	}
 
 	if isCreate {
-		if err := updateAadApplictation(ctx, log, conf); err != nil {
+		if err := updateAadApplication(ctx, log, conf); err != nil {
 			log.Fatal(err)
 		}
 	}
