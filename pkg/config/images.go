@@ -149,9 +149,6 @@ func (g *simpleGenerator) selectContainerImagesOSA(cs *api.OpenShiftManagedClust
 
 		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.11"
 		c.Images.AzureControllers = "quay.io/openshift-on-azure/azure-controllers:v3.11"
-
-		c.Images.GenevaLogging = "osarpint.azurecr.io/acs/mdsd:11201801"
-		c.Images.GenevaTDAgent = "osarpint.azurecr.io/acs/td-agent:latest"
 	}
 
 	return nil
@@ -190,7 +187,9 @@ func (g *simpleGenerator) selectContainerImages(cs *api.OpenShiftManagedCluster)
 	if g.pluginConfig.GenevaConfig.LoggingImage != "" {
 		cs.Config.Images.GenevaLogging = g.pluginConfig.GenevaConfig.LoggingImage
 	}
-	cs.Config.Images.GenevaImagePullSecret = g.pluginConfig.GenevaConfig.ImagePullSecret
+	if len(g.pluginConfig.GenevaConfig.ImagePullSecret) > 0 {
+		cs.Config.Images.GenevaImagePullSecret = g.pluginConfig.GenevaConfig.ImagePullSecret
+	}
 
 	return nil
 }

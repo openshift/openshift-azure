@@ -102,16 +102,19 @@ func ParsePrivateKey(b []byte) (*rsa.PrivateKey, error) {
 	if len(rest) > 0 {
 		return nil, errors.New("extra data after decoding PEM block")
 	}
-
-	if key, err := x509.ParsePKCS1PrivateKey(block.Bytes); err == nil {
-		return key, nil
-	}
-	if key, err := x509.ParsePKCS8PrivateKey(block.Bytes); err == nil {
-		switch key := key.(type) {
-		case *rsa.PrivateKey:
+	switch block.Type {
+	case "RSA PRIVATE KEY":
+		if key, err := x509.ParsePKCS1PrivateKey(block.Bytes); err == nil {
 			return key, nil
-		default:
-			return nil, errors.New("found unknown private key type in PKCS#8 wrapping")
+		}
+	case "PRIVATE KEY":
+		if key, err := x509.ParsePKCS8PrivateKey(block.Bytes); err == nil {
+			switch key := key.(type) {
+			case *rsa.PrivateKey:
+				return key, nil
+			default:
+				return nil, errors.New("found unknown private key type in PKCS#8 wrapping")
+			}
 		}
 	}
 	return nil, errors.New(" failed to parse private key")

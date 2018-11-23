@@ -5,7 +5,6 @@ import (
 	"context"
 
 	"github.com/sirupsen/logrus"
-	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
@@ -25,7 +24,7 @@ type plugin struct {
 var _ api.Plugin = &plugin{}
 
 // NewPlugin creates a new plugin instance
-func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) (api.Plugin, error) {
+func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) (api.Plugin, []error) {
 	p := &plugin{
 		log:             log,
 		config:          *pluginConfig,
@@ -37,7 +36,7 @@ func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) (api.Plugin, e
 	// validate plugin config
 	errs := p.validateConfig()
 	if len(errs) > 0 {
-		return nil, kerrors.NewAggregate(errs)
+		return nil, errs
 	}
 	return p, nil
 }

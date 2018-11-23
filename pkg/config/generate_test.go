@@ -18,8 +18,17 @@ func TestGenerate(t *testing.T) {
 			},
 		},
 	}
+	pc := api.PluginConfig{
+		TestConfig: api.TestConfig{
+			RunningUnderTest: true,
+		},
+		GenevaConfig: api.GenevaConfig{
+			LoggingImage: "loggingImage",
+			TDAgentImage: "tdAgentImage",
+		},
+	}
 
-	cg := simpleGenerator{pluginConfig: api.PluginConfig{TestConfig: api.TestConfig{RunningUnderTest: true}}}
+	cg := simpleGenerator{pluginConfig: pc}
 	err := cg.Generate(cs)
 	if err != nil {
 		t.Error(err)

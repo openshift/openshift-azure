@@ -173,7 +173,6 @@ var marshalled = []byte(`{
 		},
 		"images": {
 			"format": "Config.Images.Format",
-			"genevaImagePullSecret": "Q29uZmlnLkltYWdlcy5HZW5ldmFJbWFnZVB1bGxTZWNyZXQ=",
 			"clusterMonitoringOperator": "Config.Images.ClusterMonitoringOperator",
 			"azureControllers": "Config.Images.AzureControllers",
 			"prometheusOperatorBase": "Config.Images.PrometheusOperatorBase",
@@ -199,6 +198,7 @@ var marshalled = []byte(`{
 			"webConsole": "Config.Images.WebConsole",
 			"console": "Config.Images.Console",
 			"etcdBackup": "Config.Images.EtcdBackup",
+			"genevaImagePullSecret": "Q29uZmlnLkltYWdlcy5HZW5ldmFJbWFnZVB1bGxTZWNyZXQ=",
 			"genevaLogging": "Config.Images.GenevaLogging",
 			"genevaTDAgent": "Config.Images.GenevaTDAgent"
 		},
@@ -222,7 +222,7 @@ var marshalled = []byte(`{
 		"consoleOAuthSecret": "Config.ConsoleOAuthSecret",
 		"routerStatsPassword": "Config.RouterStatsPassword",
 		"serviceCatalogClusterId": "01010101-0101-0101-0101-010101010101",
-		"genevaLoggingSelector": "Config.GenevaLoggingSelector"
+		"genevaLoggingSector": "Config.GenevaLoggingSector"
 	}
 }`)
 

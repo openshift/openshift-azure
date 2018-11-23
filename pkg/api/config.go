@@ -54,7 +54,8 @@ type Config struct {
 	RouterStatsPassword            string    `json:"routerStatsPassword,omitempty"`
 	ServiceCatalogClusterID        uuid.UUID `json:"serviceCatalogClusterId,omitempty"`
 
-	GenevaLoggingSelector string `json:"genevaLoggingSelector,omitempty"`
+	// geneva logging sector
+	GenevaLoggingSector string `json:"genevaLoggingSector,omitempty"`
 }
 
 // ImageConfig contains all images for the pods
@@ -62,9 +63,6 @@ type ImageConfig struct {
 	// Format of the pull spec that is going to be
 	// used in the cluster.
 	Format string `json:"format,omitempty"`
-
-	// GenevaImagePullSecret defines secret used to pull private Azure images
-	GenevaImagePullSecret []byte `json:"genevaImagePullSecret,omitempty"`
 
 	ClusterMonitoringOperator    string `json:"clusterMonitoringOperator,omitempty"`
 	AzureControllers             string `json:"azureControllers,omitempty"`
@@ -93,6 +91,9 @@ type ImageConfig struct {
 	Console               string `json:"console,omitempty"`
 	EtcdBackup            string `json:"etcdBackup,omitempty"`
 
+	// GenevaImagePullSecret defines secret used to pull private Azure images
+	GenevaImagePullSecret []byte `json:"genevaImagePullSecret,omitempty"`
+	// Geneva integration images
 	GenevaLogging string `json:"genevaLogging,omitempty"`
 	GenevaTDAgent string `json:"genevaTDAgent,omitempty"`
 }

@@ -326,7 +326,7 @@ var Translations = map[string][]struct {
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='SECTOR')].value"),
-			Template: "{{ .Config.GenevaLoggingSelector }}",
+			Template: "{{ .Config.GenevaLoggingSector }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGION')].value"),

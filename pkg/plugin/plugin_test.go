@@ -9,19 +9,16 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
-	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/test/util/tls"
-
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/test/util/populate"
+	"github.com/openshift/openshift-azure/test/util/tls"
 )
 
 func TestMerge(t *testing.T) {
-	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-	entry := logrus.NewEntry(logrus.StandardLogger())
+	log := logrus.NewEntry(logrus.StandardLogger())
 
 	prepare := func(v reflect.Value) {
 		switch v.Interface().(type) {
@@ -35,6 +32,9 @@ func TestMerge(t *testing.T) {
 		AcceptLanguages: []string{"en-us"},
 		GenevaConfig: api.GenevaConfig{
 			ImagePullSecret: []byte("ImagePullSecret"),
+			LoggingImage:    "loggingImage",
+			TDAgentImage:    "tdAgentImage",
+			LoggingSector:   "loggingSector",
 			LoggingCert:     tls.GetDummyCertificate(),
 			LoggingKey:      tls.GetDummyPrivateKey(),
 		},
@@ -45,7 +45,7 @@ func TestMerge(t *testing.T) {
 
 	newCluster := &api.OpenShiftManagedCluster{Properties: &api.Properties{}}
 
-	p, err := NewPlugin(entry, &config)
+	p, err := NewPlugin(log, &config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -356,6 +356,30 @@ func TestNewPlugin(t *testing.T) {
 				errors.New(`imagePullSecret cannot be empty`),
 			},
 		},
+		"empty LoggingSector": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.LoggingSector = ""
+			},
+			expectedErrs: []error{
+				errors.New(`loggingSector cannot be empty`),
+			},
+		},
+		"empty LoggingImage": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.LoggingImage = ""
+			},
+			expectedErrs: []error{
+				errors.New(`loggingImage cannot be empty`),
+			},
+		},
+		"empty tdAgentImage": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.TDAgentImage = ""
+			},
+			expectedErrs: []error{
+				errors.New(`tdAgentImage cannot be empty`),
+			},
+		},
 		"nil loggingCert.Key": {
 			f: func(p *api.PluginConfig) {
 				p.GenevaConfig.LoggingKey = nil
@@ -381,11 +405,16 @@ func TestNewPlugin(t *testing.T) {
 		}
 
 		test.f(pCfg)
-		_, err = NewPlugin(log, pCfg)
-
-		if !reflect.DeepEqual(err, kerrors.NewAggregate(test.expectedErrs)) {
+		_, errs := NewPlugin(log, pCfg)
+		if !reflect.DeepEqual(errs, test.expectedErrs) {
 			t.Errorf("%s expected errors:", name)
-			t.Errorf("%s != %s", err, test.expectedErrs)
+			for _, err := range test.expectedErrs {
+				t.Errorf("\t%v", err)
+			}
+			t.Error("received errors:")
+			for _, err := range errs {
+				t.Errorf("\t%v", err)
+			}
 		}
 	}
 }
@@ -396,7 +425,7 @@ func getDummyPluginConfig() (*api.PluginConfig, error) {
 		SyncImage: "syncImage",
 		GenevaConfig: api.GenevaConfig{
 			ImagePullSecret: []byte("imagePullSecret"),
-			LoggingSelector: "loggingSelector",
+			LoggingSector:   "loggingSector",
 			LoggingCert:     tls.GetDummyCertificate(),
 			LoggingKey:      tls.GetDummyPrivateKey(),
 			TDAgentImage:    "tdAgentImage",

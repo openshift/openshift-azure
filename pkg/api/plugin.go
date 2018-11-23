@@ -93,11 +93,11 @@ type GenevaConfig struct {
 	ImagePullSecret []byte
 
 	// logging configuration
-	LoggingCert     *x509.Certificate
-	LoggingKey      *rsa.PrivateKey
-	LoggingSelector string
-	LoggingImage    string
-	TDAgentImage    string
+	LoggingCert   *x509.Certificate
+	LoggingKey    *rsa.PrivateKey
+	LoggingSector string
+	LoggingImage  string
+	TDAgentImage  string
 
 	// TODO: metrics configuration
 }

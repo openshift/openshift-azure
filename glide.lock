@@ -74,7 +74,6 @@ imports:
   version: c34cdb4725f4c3844d095133c6e40e448b86589b
   subpackages:
   - gomock
-  - mockgen/model
 - name: github.com/golang/protobuf
   version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
   subpackages:
@@ -98,11 +97,6 @@ imports:
   version: a0d98a5f288019575c6d1f4bb1573fef2d1fcdc4
   subpackages:
   - simplelru
-- name: github.com/hashicorp/packer
-  version: 6881d841a1a8374d696d79f156cbc462efe17984
-  subpackages:
-  - builder/azure/pkcs12
-  - builder/azure/pkcs12/rc2
 - name: github.com/howeyc/gopass
   version: bf9dde6d0d2c004a008c27aaee91170c786f6db8
 - name: github.com/imdario/mergo
@@ -180,7 +174,7 @@ imports:
 - name: github.com/pborman/uuid
   version: adf5a7427709b9deb95d29d3fa8a2bf9cfd388f1
 - name: github.com/pkg/errors
-  version: 059132a15dd08d6704c67711dae0cf35ab991756
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/sirupsen/logrus

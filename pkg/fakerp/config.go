@@ -9,12 +9,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/openshift/openshift-azure/pkg/tls"
-
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
 var supportedRegions = []string{
@@ -41,7 +40,6 @@ type Config struct {
 	NoGroupTags      bool   `envconfig:"NOGROUPTAGS"`
 	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
 	Manifest         string `envconfig:"MANIFEST"`
-	SecretsDir       string `envconfig:"SECRETSDIR"`
 }
 
 func NewConfig(log *logrus.Entry) (*Config, error) {
@@ -52,10 +50,6 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 
 	if c.Manifest == "" {
 		c.Manifest = "test/manifests/normal/create.yaml"
-	}
-
-	if c.SecretsDir == "" {
-		c.SecretsDir = "./secrets"
 	}
 
 	if c.Region == "" {
@@ -78,7 +72,7 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 	return &c, nil
 }
 
-func getPluginConfig(basePath string) (*api.PluginConfig, error) {
+func getPluginConfig() (*api.PluginConfig, error) {
 	tc := api.TestConfig{
 		RunningUnderTest:      os.Getenv("RUNNING_UNDER_TEST") != "",
 		ImageResourceGroup:    os.Getenv("IMAGE_RESOURCEGROUP"),
@@ -92,58 +86,62 @@ func getPluginConfig(basePath string) (*api.PluginConfig, error) {
 	}
 
 	// populate geneva artifacts
-	var cb, kb, db []byte
-	var crt *x509.Certificate
-	var key *rsa.PrivateKey
-	var err error
-	var syncImage string
-	artifactDir := fmt.Sprintf("%s/", basePath)
-	// if test files exist, load them
-	if fileExist(artifactDir+"logging-int.cert") &&
-		fileExist(artifactDir+"logging-int.key") &&
-		fileExist(artifactDir+".dockerconfigjson") {
-		cb, err = ioutil.ReadFile(artifactDir + "logging-int.cert")
-		if err != nil {
-			return nil, err
-		}
-		kb, err = ioutil.ReadFile(artifactDir + "logging-int.key")
-		if err != nil {
-			return nil, err
-		}
-		crt, err = tls.ParseCert(cb)
-		if err != nil {
-			return nil, err
-		}
-		key, err = tls.ParsePrivateKey(kb)
-		if err != nil {
-			return nil, err
-		}
-		db, err = ioutil.ReadFile(artifactDir + ".dockerconfigjson")
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		return nil, fmt.Errorf("azure secrets files does not exist in ./%s/azure", basePath)
+	artifactDir := "secrets/"
+	logCert, err := readCert(artifactDir + "logging-int.cert")
+	if err != nil {
+		return nil, err
 	}
-
+	logKey, err := readKey(artifactDir + "logging-int.key")
+	if err != nil {
+		return nil, err
+	}
+	pullSecret, err := readFile(artifactDir + ".dockerconfigjson")
+	if err != nil {
+		return nil, err
+	}
+	var syncImage string
 	if os.Getenv("SYNC_IMAGE") == "" {
 		syncImage = "quay.io/openshift-on-azure/sync:latest"
 	} else {
 		syncImage = os.Getenv("SYNC_IMAGE")
 	}
-
 	genevaConfig := api.GenevaConfig{
-		LoggingCert:     crt,
-		LoggingKey:      key,
-		ImagePullSecret: db,
+		LoggingCert:     logCert,
+		LoggingKey:      logKey,
+		ImagePullSecret: pullSecret,
+		LoggingSector:   "US-Test",
+		LoggingImage:    "osarpint.azurecr.io/acs/mdsd:11201801",
+		TDAgentImage:    "osarpint.azurecr.io/acs/td-agent:latest",
 	}
-
 	return &api.PluginConfig{
 		SyncImage:       syncImage,
 		AcceptLanguages: []string{"en-us"},
 		TestConfig:      tc,
 		GenevaConfig:    genevaConfig,
 	}, nil
+}
+
+func readCert(path string) (*x509.Certificate, error) {
+	b, err := readFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return tls.ParseCert(b)
+}
+
+func readKey(path string) (*rsa.PrivateKey, error) {
+	b, err := readFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return tls.ParsePrivateKey(b)
+}
+
+func readFile(path string) ([]byte, error) {
+	if fileExist(path) {
+		return ioutil.ReadFile(path)
+	}
+	return []byte{}, fmt.Errorf("file %s does not exist", path)
 }
 
 func fileExist(path string) bool {

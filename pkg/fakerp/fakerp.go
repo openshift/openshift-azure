@@ -26,9 +26,9 @@ import (
 // CreateOrUpdate simulates the RP
 func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, log *logrus.Entry, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
-	p, err := plugin.NewPlugin(log, config)
-	if err != nil {
-		return nil, err
+	p, errs := plugin.NewPlugin(log, config)
+	if len(errs) > 0 {
+		return nil, kerrors.NewAggregate(errs)
 	}
 
 	// convert the external API manifest into the internal API representation
@@ -38,7 +38,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	// the RP will enrich the internal API representation with data not included
 	// in the original request
 	log.Info("enrich")
-	err = enrich(cs)
+	err := enrich(cs)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	// internal API representation)
 	// we set fqdn during enrichment which is slightly different than what the RP
 	// will do so we are only validating once.
-	errs := p.Validate(ctx, cs, oldCs, false)
+	errs = p.Validate(ctx, cs, oldCs, false)
 	if len(errs) > 0 {
 		return nil, kerrors.NewAggregate(errs)
 	}
