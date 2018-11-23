@@ -30,6 +30,7 @@ type Client struct {
 	ssvmc azureclient.VirtualMachineScaleSetVMsClient
 	ssec  azureclient.VirtualMachineScaleSetExtensionsClient
 	appsc azureclient.ApplicationsClient
+	accsc azureclient.AccountsClient
 
 	resourceGroup string
 	location      string
@@ -40,12 +41,12 @@ type Client struct {
 func NewClient() *Client {
 	logrus.SetLevel(log.SanitizeLogLevel("Debug"))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-	log := logrus.NewEntry(logrus.StandardLogger())
-	conf, err := fakerp.NewConfig(log)
+	logger := logrus.NewEntry(logrus.StandardLogger())
+	conf, err := fakerp.NewConfig(logger)
 	if err != nil {
 		panic(err)
 	}
-	log = logrus.WithFields(logrus.Fields{"location": conf.Region, "resourceGroup": conf.ResourceGroup})
+	logger = logrus.WithFields(logrus.Fields{"location": conf.Region, "resourceGroup": conf.ResourceGroup})
 
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
 	if err != nil {
@@ -72,6 +73,7 @@ func NewClient() *Client {
 	ssvmc := azureclient.NewVirtualMachineScaleSetVMsClient(subID, authorizer, conf.AcceptLanguages)
 	ssec := azureclient.NewVirtualMachineScaleSetExtensionsClient(subID, authorizer, conf.AcceptLanguages)
 	appsc := azureclient.NewApplicationsClient(subID, authorizer, conf.AcceptLanguages)
+	accsc := azureclient.NewAccountsClient(subID, authorizer, conf.AcceptLanguages)
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, api.ContextKeyClientID, conf.ClientID)
@@ -85,9 +87,10 @@ func NewClient() *Client {
 		ssvmc:         ssvmc,
 		ssec:          ssec,
 		appsc:         appsc,
+		accsc:         accsc,
 		resourceGroup: conf.ResourceGroup,
 		location:      conf.Region,
 		ctx:           ctx,
-		log:           log,
+		log:           logger,
 	}
 }

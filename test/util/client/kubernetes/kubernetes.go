@@ -34,6 +34,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
 
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/test/util/client"
@@ -54,21 +55,19 @@ type Client struct {
 	logger      *logrus.Entry
 }
 
-func NewClient(kubeconfig, artifactDir string) *Client {
+func NewClient(artifactDir string) *Client {
 	var err error
 	var config *rest.Config
 
-	if kubeconfig != "" {
-		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
-		if err != nil {
-			panic(err)
-		}
-	} else {
-		// use in-cluster config if no kubeconfig has been specified
-		config, err = rest.InClusterConfig()
-		if err != nil {
-			panic(err.Error())
-		}
+	configOptions := clientcmd.NewDefaultPathOptions()
+	mergedConfig, err := mergedKubeConfig(configOptions)
+	if err != nil {
+		panic(err)
+	}
+	configOverride := &clientcmd.ConfigOverrides{}
+	config, err = clientcmd.NewDefaultClientConfig(*mergedConfig, configOverride).ClientConfig()
+	if err != nil {
+		panic(err)
 	}
 
 	// create the clientset
@@ -123,6 +122,17 @@ func NewClient(kubeconfig, artifactDir string) *Client {
 		artifactDir: artifactDir,
 		logger:      logger,
 		ctx:         ctx,
+	}
+}
+
+// mergedKubeConfig returns the merged kube config taking into account the cases of single files and a list of files
+// provided in the format KUBECONFIG=file-a:file-b:file-c. This is the same functionality used to merged kube configs
+// in (kubectl | oc) config view
+func mergedKubeConfig(configOptions clientcmd.ConfigAccess) (*api.Config, error) {
+	if configOptions.IsExplicitFile() {
+		return clientcmd.LoadFromFile(configOptions.GetExplicitFile())
+	} else {
+		return configOptions.GetStartingConfig()
 	}
 }
 
@@ -406,6 +416,9 @@ func (t *Client) GetProject(namespace string, options *metav1.GetOptions) (*proj
 }
 
 func (t *Client) DeleteProject(namespace string, options *metav1.DeleteOptions) error {
+	if options == nil {
+		options = &metav1.DeleteOptions{}
+	}
 	return t.pc.Projects().Delete(namespace, options)
 }
 

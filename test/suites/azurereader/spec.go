@@ -15,7 +15,6 @@ var (
 	kc        *kubernetes.Client
 	gitCommit = "unknown"
 
-	kubeconfig  = flag.String("kubeconfig", "../../../_data/_out/azure-cluster-reader.kubeconfig", "Location of the kubeconfig")
 	artifactDir = flag.String("artifact-dir", "../../../_data/_out/", "Directory to place artifacts when a test fails")
 )
 

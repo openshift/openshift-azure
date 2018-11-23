@@ -14,7 +14,7 @@ import (
 )
 
 var _ = BeforeSuite(func() {
-	c = kubernetes.NewClient(*kubeconfig, *artifactDir)
+	c = kubernetes.NewClient(*artifactDir)
 })
 
 func TestExtended(t *testing.T) {

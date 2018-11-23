@@ -19,7 +19,6 @@ var (
 
 	manifest    = flag.String("manifest", "../../../_data/manifest.yaml", "Path to the manifest to send to the RP")
 	configBlob  = flag.String("configBlob", "../../../_data/containerservice.yaml", "Path on disk where the OpenShift internal config blob should be written")
-	kubeconfig  = flag.String("kubeconfig", "../../../_data/_out/admin.kubeconfig", "Location of the kubeconfig")
 	artifactDir = flag.String("artifact-dir", "../../../_data/_out/", "Directory to place artifacts when a test fails")
 )
 

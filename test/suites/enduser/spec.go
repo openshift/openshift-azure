@@ -14,9 +14,9 @@ import (
 )
 
 var (
-	c           *kubernetes.Client
-	gitCommit   = "unknown"
-	kubeconfig  = flag.String("kubeconfig", "../../../_data/_out/enduser.kubeconfig", "Location of the kubeconfig")
+	c         *kubernetes.Client
+	gitCommit = "unknown"
+
 	artifactDir = flag.String("artifact-dir", "../../../_data/_out/", "Directory to place artifacts when a test fails")
 )
 

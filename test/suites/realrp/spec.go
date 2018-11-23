@@ -18,6 +18,10 @@ var _ = Describe("Azure resource provider E2E tests [Real]", func() {
 	defer GinkgoRecover()
 
 	It("should not be possible for customer to mutate an osa scale set", func() {
-		realrp.TestCustomerCannotModifyScaleSet(az)
+		realrp.TestCustomerCannotModifyScaleSet(az, az.ResourceGroup())
+	})
+
+	It("should keep the end user from reading the config blob", func() {
+		realrp.TestCustomerCannotReadConfigBlob(az, az.ResourceGroup())
 	})
 })

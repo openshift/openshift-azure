@@ -70,6 +70,6 @@ e2e: generate
 	./hack/e2e.sh
 
 e2e-prod:
-	go test ./test/e2erp -tags e2erp -test.v -ginkgo.v -ginkgo.randomizeAllSpecs -ginkgo.noColor -ginkgo.focus=Real -timeout 4h
+	go test ./test/suites/realrp -tags e2e -test.v -ginkgo.v -ginkgo.randomizeAllSpecs -ginkgo.noColor -ginkgo.focus=Real -timeout 4h
 
 .PHONY: clean sync-image sync-push verify unit e2e e2e-prod

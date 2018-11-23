@@ -26,6 +26,11 @@ const (
 	fakepubkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7laRyN4B3YZmVrDEZLZoIuUA72pQ0DpGuZBZWykCofIfCPrFZAJgFvonKGgKJl6FGKIunkZL9Us/mV4ZPkZhBlE7uX83AAf5i9Q8FmKpotzmaxN10/1mcnEE7pFvLoSkwqrQSkrrgSm8zaJ3g91giXSbtqvSIj/vk2f05stYmLfhAwNo3Oh27ugCakCoVeuCrZkvHMaJgcYrIGCuFo6q0Pfk9rsZyriIqEa9AtiUOtViInVYdby7y71wcbl0AbbCZsTSqnSoVxm2tRkOsXV6+8X4SnwcmZbao3H+zfO1GBhQOLxJ4NQbzAa8IJh810rYARNLptgmsd4cYXVOSosTX azureuser"
 )
 
+// ResourceGroup returns the resource group
+func (az *Client) ResourceGroup() string {
+	return az.resourceGroup
+}
+
 // ResourceGroupFromManagedResourceID returns the resource group name from  a managed resource group identifier. The managed resource
 // group id for managed applications is formatted as follows `/subscriptions/(.+)/resourceGroups/(.+)`
 func (az *Client) ResourceGroupFromManagedResourceID(resourceID string) (string, error) {
@@ -40,8 +45,8 @@ func (az *Client) ResourceGroupFromManagedResourceID(resourceID string) (string,
 
 // ApplicationResourceGroup returns the name of the resource group holding an OpenShift on Azure application
 // instance. This resource group may only contain one resource
-func (az *Client) ApplicationResourceGroup() string {
-	return strings.Join([]string{"OS", az.resourceGroup, az.resourceGroup, az.location}, "_")
+func (az *Client) ApplicationResourceGroup(applicationName string) string {
+	return strings.Join([]string{"OS", az.resourceGroup, applicationName, az.location}, "_")
 }
 
 // ManagedResourceGroup returns the name of the resource group holding all resources required by an OpenShift on Azure
@@ -309,6 +314,11 @@ func (az *Client) ScaleScaleSet(scaleSetName string, count int, op ScaleOperatio
 			err = fmt.Errorf(msg)
 			return err
 		}
+	default:
+		msg := fmt.Sprintf("unsupported op %s", op)
+		az.log.Errorf(msg)
+		err = fmt.Errorf(msg)
+		return err
 	}
 	az.log.Debugf("scaling %s %s scale set to %d vms", op, scaleSetName, count)
 	future, err := az.ssc.Update(az.ctx, az.resourceGroup, scaleSetName, compute.VirtualMachineScaleSetUpdate{

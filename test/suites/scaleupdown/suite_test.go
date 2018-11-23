@@ -16,7 +16,7 @@ import (
 
 var _ = BeforeSuite(func() {
 	az = azure.NewClient()
-	kc = kubernetes.NewClient(*kubeconfig, *artifactDir)
+	kc = kubernetes.NewClient(*artifactDir)
 })
 
 func TestE2eRealRP(t *testing.T) {

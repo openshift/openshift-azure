@@ -3,14 +3,16 @@
 package realrp
 
 import (
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"github.com/openshift/openshift-azure/test/util/client/azure"
 )
 
-func TestCustomerCannotModifyScaleSet(az *azure.Client) {
-	appRg := az.ApplicationResourceGroup()
+func TestCustomerCannotModifyScaleSet(az *azure.Client, applicationName string) {
+	appRg := az.ApplicationResourceGroup(applicationName)
 	Expect(appRg).NotTo(And(BeNil(), BeEmpty()))
 
 	managedRg, err := az.ManagedResourceGroup(appRg)
@@ -57,4 +59,20 @@ func TestCustomerCannotModifyScaleSet(az *azure.Client) {
 	errs = az.UpdateScaleSetScriptExtension(managedRg)
 	Expect(errs).NotTo(BeNil())
 	Expect(len(errs)).To(BeEquivalentTo(len(scaleSets)))
+}
+
+func TestCustomerCannotReadConfigBlob(az *azure.Client, applicationName string) {
+	appRg := az.ApplicationResourceGroup(applicationName)
+	Expect(appRg).NotTo(And(BeNil(), BeEmpty()))
+	By(fmt.Sprintf("application resource group is %s", appRg))
+
+	managedRg, err := az.ManagedResourceGroup(appRg)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(appRg).NotTo(And(BeNil(), BeEmpty()))
+	By(fmt.Sprintf("managed resource group is %s", managedRg))
+
+	By("Listing the storage account keys")
+	errs := az.ListKeys(managedRg)
+	Expect(errs).NotTo(BeNil())
+	Expect(len(errs)).To(Equal(1))
 }
