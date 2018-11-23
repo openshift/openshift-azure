@@ -23,6 +23,14 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
+// IsUpdate return whether or not this is an update or create.
+func IsUpdate() bool {
+	if _, err := os.Stat("_data/containerservice.yaml"); err == nil {
+		return true
+	}
+	return false
+}
+
 // CreateOrUpdate simulates the RP
 func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, log *logrus.Entry, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
@@ -44,7 +52,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
 	var oldCs *api.OpenShiftManagedCluster
-	if _, err := os.Stat("_data/containerservice.yaml"); err == nil {
+	if IsUpdate() {
 		log.Info("read old config")
 		oldCs, err = managedcluster.ReadConfig("_data/containerservice.yaml")
 		if err != nil {

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -20,7 +19,6 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 
@@ -46,10 +44,6 @@ var (
 
 	artifactDir        = flag.String("artifact-dir", "", "Directory to place artifacts before a cluster is deleted.")
 	artifactKubeconfig = flag.String("artifact-kubeconfig", "", "Path to kubeconfig to use for gathering artifacts.")
-)
-
-const (
-	outputDirectory = "_data"
 )
 
 func validate() error {
@@ -96,12 +90,7 @@ func delete(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClus
 	return nil
 }
 
-func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, resourceGroup, manifestTemplate, manifestFile string) error {
-	log.Infof("generating manifest from %q", manifestTemplate)
-	oc, err := fakerp.GenerateManifest(manifestTemplate)
-	if err != nil {
-		return err
-	}
+func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, resourceGroup string, oc *sdk.OpenShiftManagedCluster, manifestFile string) error {
 	log.Info("creating/updating cluster")
 	future, err := rpc.CreateOrUpdate(ctx, resourceGroup, resourceGroup, *oc)
 	if err != nil {
@@ -114,12 +103,8 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftMan
 	if err != nil {
 		return err
 	}
-	out, err := yaml.Marshal(resp)
-	if err != nil {
-		return err
-	}
 	log.Info("created/updated cluster")
-	return ioutil.WriteFile(manifestFile, out, 0666)
+	return fakerp.WriteClusterConfigToManifest(&resp, manifestFile)
 }
 
 func execCommand(c string) error {
@@ -169,10 +154,14 @@ func createResourceGroup(conf *fakerp.Config) (bool, error) {
 }
 
 func execute(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, conf *fakerp.Config) error {
+	oc, err := fakerp.LoadClusterConfigFromManifest(log, "", conf)
+	if err != nil {
+		return err
+	}
 	// simulate the API call to the RP
-	manifestFile := path.Join(outputDirectory, "manifest.yaml")
+	defaultManifestFile := path.Join(fakerp.DataDirectory, "manifest.yaml")
 	if err := wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
-		if err := createOrUpdate(ctx, log, rpc, conf.ResourceGroup, conf.Manifest, manifestFile); err != nil {
+		if err := createOrUpdate(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile); err != nil {
 			if autoRestErr, ok := err.(autorest.DetailedError); ok {
 				if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
 					if netErr, ok := urlErr.Err.(*net.OpError); ok {
@@ -201,8 +190,13 @@ func execute(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClu
 	if *update != "" {
 		updateCtx, updateCancel := context.WithTimeout(context.Background(), *updateTimeout)
 		defer updateCancel()
-		updateManifestFile := path.Join(outputDirectory, "update.yaml")
-		if err := createOrUpdate(updateCtx, log, rpc, conf.ResourceGroup, *update, updateManifestFile); err != nil {
+
+		oc, err := fakerp.LoadClusterConfigFromManifest(log, *update, conf)
+		if err != nil {
+			return err
+		}
+		updateManifestFile := path.Join(fakerp.DataDirectory, "update.yaml")
+		if err := createOrUpdate(updateCtx, log, rpc, conf.ResourceGroup, oc, updateManifestFile); err != nil {
 			return err
 		}
 	}
@@ -301,7 +295,7 @@ func main() {
 		return
 	}
 
-	if isCreate {
+	if !fakerp.IsUpdate() {
 		if err := updateAadApplication(ctx, log, conf); err != nil {
 			log.Fatal(err)
 		}
