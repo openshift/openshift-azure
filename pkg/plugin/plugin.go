@@ -18,6 +18,7 @@ type plugin struct {
 	clusterUpgrader cluster.Upgrader
 	armGenerator    arm.Generator
 	configGenerator config.Generator
+	apiValidator    *api.Validator
 }
 
 var _ api.Plugin = &plugin{}
@@ -30,6 +31,7 @@ func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) api.Plugin {
 		clusterUpgrader: cluster.NewSimpleUpgrader(log, pluginConfig),
 		armGenerator:    arm.NewSimpleGenerator(pluginConfig),
 		configGenerator: config.NewSimpleGenerator(pluginConfig),
+		apiValidator:    api.NewValidator(pluginConfig.TestConfig.RunningUnderTest),
 	}
 }
 
@@ -76,7 +78,7 @@ func (p *plugin) MergeConfig(ctx context.Context, cs, oldCs *api.OpenShiftManage
 
 func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) []error {
 	p.log.Info("validating internal data models")
-	return api.Validate(new, old, externalOnly)
+	return p.apiValidator.Validate(new, old, externalOnly)
 }
 
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
