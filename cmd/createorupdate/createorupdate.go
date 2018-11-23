@@ -6,7 +6,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -244,13 +243,14 @@ func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.C
 
 func main() {
 	flag.Parse()
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+	log := logrus.NewEntry(logrus.StandardLogger())
+
 	if err := validate(); err != nil {
 		log.Fatal(err)
 	}
 
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-	log := logrus.NewEntry(logrus.StandardLogger())
 	conf, err := fakerp.NewConfig(log)
 	if err != nil {
 		log.Fatal(err)
