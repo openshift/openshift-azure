@@ -66,10 +66,10 @@ endif
 cover: unit
 	go tool cover -html=coverage.out
 
-e2e: generate
-	./hack/e2e.sh
+e2e:
+	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]" ./hack/e2e.sh
 
 e2e-prod:
-	go test ./test/e2erp -tags e2erp -test.v -ginkgo.v -ginkgo.randomizeAllSpecs -ginkgo.noColor -ginkgo.focus=Real -timeout 4h
+	FOCUS="\[Real\]" ./hack/e2e.sh
 
-.PHONY: clean sync-image sync-push verify unit e2e e2e-prod
+.PHONY: clean sync-image sync-push verify unit e2e

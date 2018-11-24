@@ -83,7 +83,7 @@ const (
 	// Migrating means the OSA resource is being migrated from one subscription
 	// or resource group to another.
 	Migrating ProvisioningState = "Migrating"
-	// Upgrading means the existing OAS resource is being upgraded.
+	// Upgrading means the existing OSA resource is being upgraded.
 	Upgrading ProvisioningState = "Upgrading"
 )
 

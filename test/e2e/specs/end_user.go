@@ -1,6 +1,4 @@
-//+build e2e
-
-package e2e
+package specs
 
 import (
 	"context"
@@ -13,7 +11,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/sirupsen/logrus"
+
 	"k8s.io/api/core/v1"
 	policy "k8s.io/api/policy/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -22,24 +20,40 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/wait"
 
+	"github.com/openshift/openshift-azure/pkg/util/randomstring"
+	"github.com/openshift/openshift-azure/pkg/util/ready"
 	waitutil "github.com/openshift/openshift-azure/pkg/util/wait"
+	"github.com/openshift/openshift-azure/test/clients/openshift"
 )
 
 var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
-	defer GinkgoRecover()
+	var (
+		cli       *openshift.Client
+		namespace string
+	)
 
 	BeforeEach(func() {
-		namespace := nameGen.generate("e2e-test-")
-		c.createProject(namespace)
+		var err error
+		cli, err = openshift.NewEndUserClient()
+		if err != nil {
+			Skip(err.Error())
+		}
+
+		namespace, err = randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
+		Expect(err).ToNot(HaveOccurred())
+		namespace = "e2e-test-" + namespace
+		err = cli.CreateProject(namespace)
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
 		if CurrentGinkgoTestDescription().Failed {
-			if err := c.dumpInfo(); err != nil {
-				logrus.Warn(err)
+			if err := cli.DumpInfo(namespace); err != nil {
+				fmt.Fprint(GinkgoWriter, err)
 			}
 		}
-		c.cleanupProject(10 * time.Minute)
+		err := cli.CleanupProject(namespace)
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	It("should disallow PDB mutations", func() {
@@ -57,7 +71,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 			},
 		}
 
-		_, err = c.kc.Policy().PodDisruptionBudgets(c.namespace).Create(pdb)
+		_, err = cli.PolicyV1beta1.PodDisruptionBudgets(namespace).Create(pdb)
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 	})
 
@@ -65,9 +79,9 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		tpl := "nginx-example"
 		By(fmt.Sprintf("instantiating the template and getting the route (%v)", time.Now()))
 		// instantiate the template
-		err := c.instantiateTemplate(tpl)
+		err := cli.InstantiateTemplate(tpl, namespace)
 		Expect(err).NotTo(HaveOccurred())
-		route, err := c.rc.Routes(c.namespace).Get(tpl, metav1.GetOptions{})
+		route, err := cli.RouteV1.Routes(namespace).Get(tpl, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 		// make sure only 1 ingress point is returned
 		Expect(len(route.Status.Ingress)).To(Equal(1))
@@ -94,19 +108,19 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 
 	It("should not crud infra resources", func() {
 		// attempt to read secrets
-		_, err := c.kc.CoreV1().Secrets("default").List(metav1.ListOptions{})
+		_, err := cli.CoreV1.Secrets("default").List(metav1.ListOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 
 		// attempt to list pods
-		_, err = c.kc.CoreV1().Pods("default").List(metav1.ListOptions{})
+		_, err = cli.CoreV1.Pods("default").List(metav1.ListOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 
 		// attempt to fetch pod by name
-		_, err = c.kc.CoreV1().Pods("kube-system").Get("api-master-000000", metav1.GetOptions{})
+		_, err = cli.CoreV1.Pods("kube-system").Get("api-master-000000", metav1.GetOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 
 		// attempt to escalate privileges
-		_, err = c.kc.RbacV1().ClusterRoleBindings().Create(&rbacv1.ClusterRoleBinding{
+		_, err = cli.RbacV1.ClusterRoleBindings().Create(&rbacv1.ClusterRoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "test-escalate-cluster-admin",
 			},
@@ -124,15 +138,15 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 
 		// attempt to delete clusterrolebindings
-		err = c.kc.RbacV1().ClusterRoleBindings().Delete("cluster-admin", &metav1.DeleteOptions{})
+		err = cli.RbacV1.ClusterRoleBindings().Delete("cluster-admin", &metav1.DeleteOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 
 		// attempt to delete clusterrole
-		err = c.kc.RbacV1().ClusterRoles().Delete("cluster-admin", &metav1.DeleteOptions{})
+		err = cli.RbacV1.ClusterRoles().Delete("cluster-admin", &metav1.DeleteOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 
 		// attempt to fetch pod logs
-		req := c.kc.CoreV1().Pods("kube-system").GetLogs("sync-master-000000", &v1.PodLogOptions{})
+		req := cli.CoreV1.Pods("kube-system").GetLogs("sync-master-000000", &v1.PodLogOptions{})
 		result := req.Do()
 		fmt.Println(result.Error().Error())
 		Expect(result.Error().Error()).To(ContainSubstring("pods \"sync-master-000000\" is forbidden: User \"enduser\" cannot get pods/log in the namespace \"kube-system\""))
@@ -187,11 +201,11 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		// instantiate the template
 		tpl := "django-psql-persistent"
 		By(fmt.Sprintf("instantiating the template and getting the route (%v)", time.Now()))
-		err := c.instantiateTemplate(tpl)
+		err := cli.InstantiateTemplate(tpl, namespace)
 		Expect(err).NotTo(HaveOccurred())
 
 		// Pull the route ingress from the namespace and make sure only 1 ingress point is returned
-		route, err := c.rc.Routes(c.namespace).Get(tpl, metav1.GetOptions{})
+		route, err := cli.RouteV1.Routes(namespace).Get(tpl, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(len(route.Status.Ingress)).To(Equal(1))
 
@@ -207,16 +221,16 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		dcName := "postgresql"
 		for _, i := range []int32{0, 1} {
 			By(fmt.Sprintf("searching for the database deploymentconfig (%v)", time.Now()))
-			dc, err := c.ac.DeploymentConfigs(c.namespace).Get(dcName, metav1.GetOptions{})
+			dc, err := cli.OAppsV1.DeploymentConfigs(namespace).Get(dcName, metav1.GetOptions{})
 			Expect(err).NotTo(HaveOccurred())
 
 			By(fmt.Sprintf("scaling the database deploymentconfig to %d (%v)", i, time.Now()))
 			dc.Spec.Replicas = int32(i)
-			_, err = c.ac.DeploymentConfigs(c.namespace).Update(dc)
+			_, err = cli.OAppsV1.DeploymentConfigs(namespace).Update(dc)
 			Expect(err).NotTo(HaveOccurred())
 
 			By(fmt.Sprintf("waiting for database deploymentconfig to reflect %d replicas (%v)", i, time.Now()))
-			waitErr := wait.PollImmediate(2*time.Second, 10*time.Minute, c.deploymentConfigIsReady(dcName, i))
+			waitErr := wait.PollImmediate(2*time.Second, 10*time.Minute, ready.DeploymentConfigIsReady(cli.OAppsV1.DeploymentConfigs(namespace), dcName))
 			Expect(waitErr).NotTo(HaveOccurred())
 		}
 

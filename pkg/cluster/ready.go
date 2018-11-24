@@ -6,11 +6,8 @@ import (
 	"strings"
 	"time"
 
-	corev1 "k8s.io/api/core/v1"
-	kerrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
@@ -129,20 +126,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 	for _, app := range daemonsetWhitelist {
 		u.log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
 
-		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
-			ds, err := u.kubeclient.AppsV1().DaemonSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
-			switch {
-			case kerrors.IsNotFound(err):
-				return false, nil
-			case err == nil:
-				return ds.Status.DesiredNumberScheduled == ds.Status.CurrentNumberScheduled &&
-					ds.Status.DesiredNumberScheduled == ds.Status.NumberReady &&
-					ds.Status.DesiredNumberScheduled == ds.Status.UpdatedNumberScheduled &&
-					ds.Generation == ds.Status.ObservedGeneration, nil
-			default:
-				return false, err
-			}
-		}, ctx.Done())
+		err := wait.PollImmediateUntil(time.Second, ready.DaemonSetIsReady(u.kubeclient.AppsV1().DaemonSets(app.Namespace), app.Name), ctx.Done())
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForInfraDaemonSets}
 		}
@@ -151,24 +135,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 	for _, app := range statefulsetWhitelist {
 		u.log.Infof("checking statefulset %s/%s", app.Namespace, app.Name)
 
-		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
-			sts, err := u.kubeclient.AppsV1().StatefulSets(app.Namespace).Get(app.Name, metav1.GetOptions{})
-			switch {
-			case kerrors.IsNotFound(err):
-				return false, nil
-			case err == nil:
-				specReplicas := int32(1)
-				specReplicas = *sts.Spec.Replicas
-
-				return specReplicas == sts.Status.Replicas &&
-					specReplicas == sts.Status.ReadyReplicas &&
-					specReplicas == sts.Status.CurrentReplicas &&
-					specReplicas == sts.Status.UpdatedReplicas &&
-					sts.Generation == sts.Status.ObservedGeneration, nil
-			default:
-				return false, err
-			}
-		}, ctx.Done())
+		err := wait.PollImmediateUntil(time.Second, ready.StatefulSetIsReady(u.kubeclient.AppsV1().StatefulSets(app.Namespace), app.Name), ctx.Done())
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForInfraStatefulSets}
 		}
@@ -177,26 +144,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 	for _, app := range deploymentWhitelist {
 		u.log.Infof("checking deployment %s/%s", app.Namespace, app.Name)
 
-		err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
-			d, err := u.kubeclient.AppsV1().Deployments(app.Namespace).Get(app.Name, metav1.GetOptions{})
-			switch {
-			case kerrors.IsNotFound(err):
-				return false, nil
-			case err == nil:
-				specReplicas := int32(1)
-				if d.Spec.Replicas != nil {
-					specReplicas = *d.Spec.Replicas
-				}
-
-				return specReplicas == d.Status.Replicas &&
-					specReplicas == d.Status.ReadyReplicas &&
-					specReplicas == d.Status.AvailableReplicas &&
-					specReplicas == d.Status.UpdatedReplicas &&
-					d.Generation == d.Status.ObservedGeneration, nil
-			default:
-				return false, err
-			}
-		}, ctx.Done())
+		err := wait.PollImmediateUntil(time.Second, ready.DeploymentIsReady(u.kubeclient.AppsV1().Deployments(app.Namespace), app.Name), ctx.Done())
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForInfraDeployments}
 		}
@@ -217,81 +165,38 @@ func (u *simpleUpgrader) waitForReady(ctx context.Context, cs *api.OpenShiftMana
 }
 
 func (u *simpleUpgrader) masterWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, computerName computerName) error {
-	return wait.PollImmediateUntil(time.Second, func() (bool, error) {
-		return u.masterIsReady(computerName)
-	}, ctx.Done())
+	return wait.PollImmediateUntil(time.Second, func() (bool, error) { return u.masterIsReady(computerName) }, ctx.Done())
 }
 
 func (u *simpleUpgrader) masterIsReady(computerName computerName) (bool, error) {
-	ready, err := u.nodeIsReady(computerName)
-	if !ready || err != nil {
-		return ready, err
+	r, err := ready.NodeIsReady(u.kubeclient.CoreV1().Nodes(), computerName.toKubernetes())()
+	if !r || err != nil {
+		return r, err
 	}
 
-	etcdPod, err := u.kubeclient.CoreV1().Pods("kube-system").Get("master-etcd-"+computerName.toKubernetes(), metav1.GetOptions{})
-	switch {
-	case err == nil:
-	case kerrors.IsNotFound(err):
-		return false, nil
-	default:
-		return false, err
+	r, err = ready.PodIsReady(u.kubeclient.CoreV1().Pods("kube-system"), "master-etcd-"+computerName.toKubernetes())()
+	if !r || err != nil {
+		return r, err
 	}
 
-	apiPod, err := u.kubeclient.CoreV1().Pods("kube-system").Get("master-api-"+computerName.toKubernetes(), metav1.GetOptions{})
-	switch {
-	case err == nil:
-	case kerrors.IsNotFound(err):
-		return false, nil
-	default:
-		return false, err
+	r, err = ready.PodIsReady(u.kubeclient.CoreV1().Pods("kube-system"), "master-api-"+computerName.toKubernetes())()
+	if !r || err != nil {
+		return r, err
 	}
 
-	cmPod, err := u.kubeclient.CoreV1().Pods("kube-system").Get("controllers-"+computerName.toKubernetes(), metav1.GetOptions{})
-	switch {
-	case err == nil:
-	case kerrors.IsNotFound(err):
-		return false, nil
-	default:
-		return false, err
+	r, err = ready.PodIsReady(u.kubeclient.CoreV1().Pods("kube-system"), "controllers-"+computerName.toKubernetes())()
+	if !r || err != nil {
+		return r, err
 	}
 
-	return isPodReady(etcdPod) && isPodReady(apiPod) && isPodReady(cmPod), nil
-}
-
-func isPodReady(pod *corev1.Pod) bool {
-	for _, c := range pod.Status.Conditions {
-		if c.Type == corev1.PodReady {
-			return c.Status == corev1.ConditionTrue
-		}
-	}
-	return false
+	return true, nil
 }
 
 func (u *simpleUpgrader) nodeWaitForReady(ctx context.Context, cs *api.OpenShiftManagedCluster, computerName computerName) error {
-	err := wait.PollImmediateUntil(time.Second, func() (bool, error) {
-		return u.nodeIsReady(computerName)
-	}, ctx.Done())
+	err := wait.PollImmediateUntil(time.Second, ready.NodeIsReady(u.kubeclient.CoreV1().Nodes(), computerName.toKubernetes()), ctx.Done())
 	if err != nil {
 		return err
 	}
 
 	return u.setUnschedulable(ctx, computerName, false)
-}
-
-func (u *simpleUpgrader) nodeIsReady(computerName computerName) (bool, error) {
-	node, err := u.kubeclient.CoreV1().Nodes().Get(computerName.toKubernetes(), metav1.GetOptions{})
-	switch {
-	case err == nil:
-	case kerrors.IsNotFound(err):
-		return false, nil
-	default:
-		return false, err
-	}
-
-	for _, c := range node.Status.Conditions {
-		if c.Type == corev1.NodeReady {
-			return c.Status == corev1.ConditionTrue, nil
-		}
-	}
-	return false, nil
 }

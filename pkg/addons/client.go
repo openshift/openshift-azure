@@ -22,11 +22,11 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api/latest"
 	"k8s.io/client-go/util/flowcontrol"
 	"k8s.io/client-go/util/retry"
-	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
@@ -259,20 +259,7 @@ func printDiff(existing, o *unstructured.Unstructured) bool {
 
 // ServiceCatalogExists returns whether the service catalog API exists.
 func (c *client) ServiceCatalogExists() (bool, error) {
-	svc, err := c.ac.ApiregistrationV1().APIServices().Get("v1beta1.servicecatalog.k8s.io", metav1.GetOptions{})
-	switch {
-	case kerrors.IsNotFound(err):
-		return false, nil
-	case err != nil:
-		return false, err
-	}
-	for _, cond := range svc.Status.Conditions {
-		if cond.Type == apiregistrationv1.Available &&
-			cond.Status == apiregistrationv1.ConditionTrue {
-			return true, nil
-		}
-	}
-	return false, nil
+	return ready.APIServiceIsReady(c.ac.ApiregistrationV1().APIServices(), "v1beta1.servicecatalog.k8s.io")()
 }
 
 type dryClient struct{}
