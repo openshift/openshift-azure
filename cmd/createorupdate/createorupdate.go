@@ -76,23 +76,28 @@ func validate() error {
 	return nil
 }
 
-func delete(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, resourceGroup string) error {
+func delete(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, resourceGroup string, noWait bool) error {
 	log.Info("deleting cluster")
 	future, err := rpc.Delete(ctx, resourceGroup, resourceGroup)
 	if err != nil {
 		return err
 	}
-	if err := future.WaitForCompletionRef(ctx, rpc.Client); err != nil {
-		return err
+	if noWait {
+		log.Info("will not wait for cluster deletion")
+	} else {
+		log.Info("waiting for cluster deletion")
+		if err := future.WaitForCompletionRef(ctx, rpc.Client); err != nil {
+			return err
+		}
+		resp, err := future.Result(rpc)
+		if err != nil {
+			return err
+		}
+		if resp.StatusCode != http.StatusOK {
+			return fmt.Errorf("unexpected status: %s, expected 200 OK", resp.Status)
+		}
+		log.Info("deleted cluster")
 	}
-	resp, err := future.Result(rpc)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status: %s, expected 200 OK", resp.Status)
-	}
-	log.Info("deleted cluster")
 	return nil
 }
 
@@ -295,7 +300,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 	if strings.ToUpper(*method) == http.MethodDelete {
-		if err := delete(ctx, log, rpc, conf.ResourceGroup); err != nil {
+		if err := delete(ctx, log, rpc, conf.ResourceGroup, conf.NoWait); err != nil {
 			log.Fatal(err)
 		}
 		return
@@ -315,7 +320,7 @@ func main() {
 	if *cleanup {
 		delCtx, delCancel := context.WithTimeout(context.Background(), *rmTimeout)
 		defer delCancel()
-		if err := delete(delCtx, log, rpc, conf.ResourceGroup); err != nil {
+		if err := delete(delCtx, log, rpc, conf.ResourceGroup, conf.NoWait); err != nil {
 			log.Warn(err)
 		}
 	}

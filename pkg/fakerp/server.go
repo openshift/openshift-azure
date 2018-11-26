@@ -1,8 +1,11 @@
 package fakerp
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -11,6 +14,8 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 
@@ -65,6 +70,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// process the request
 	switch req.Method {
 	case http.MethodDelete:
+		// The way we run the fake RP during development cannot really
+		// be consistent with how the RP runs in production so we need
+		// to restore the previous request and its provisioning state
+		// from the filesystem.
+		if ok := s.restore(w, "_data/manifest.yaml"); !ok {
+			return
+		}
 		s.handleDelete(w, req)
 	case http.MethodGet:
 		s.handleGet(w, req)
@@ -94,6 +106,43 @@ func (s *Server) validate(w http.ResponseWriter, r *http.Request) bool {
 		}
 	}
 	return true
+}
+
+func (s *Server) restore(w http.ResponseWriter, path string) bool {
+	if _, err := os.Stat(path); err != nil {
+		return true
+	}
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		resp := "500 Internal Error: Failed to restore OpenShift resource"
+		s.log.Debugf("%s: %v", resp, err)
+		http.Error(w, resp, http.StatusInternalServerError)
+		return false
+	}
+	oc := s.readRequest(w, ioutil.NopCloser(bytes.NewReader(data)))
+	if oc == nil {
+		return false
+	}
+	s.write(oc)
+	return true
+}
+
+func (s *Server) readRequest(w http.ResponseWriter, body io.ReadCloser) *v20180930preview.OpenShiftManagedCluster {
+	b, err := ioutil.ReadAll(body)
+	if err != nil {
+		resp := "400 Bad Request: Failed to read request body"
+		s.log.Debugf("%s: %v", resp, err)
+		http.Error(w, resp, http.StatusBadRequest)
+		return nil
+	}
+	var oc *v20180930preview.OpenShiftManagedCluster
+	if err := yaml.Unmarshal(b, &oc); err != nil {
+		resp := "400 Bad Request: Failed to unmarshal request"
+		s.log.Debugf("%s: %v", resp, err)
+		http.Error(w, resp, http.StatusBadRequest)
+		return nil
+	}
+	return oc
 }
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
@@ -136,26 +185,48 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 
 	future, err := gc.Delete(ctx, resourceGroup)
 	if err != nil {
+		if autoRestErr, ok := err.(autorest.DetailedError); ok {
+			if original, ok := autoRestErr.Original.(*azure.RequestError); ok {
+				if original.StatusCode == http.StatusNotFound {
+					return
+				}
+			}
+		}
 		resp := "500 Internal Error: Failed to delete resource group"
-		s.log.Debugf("%s: %v", resp, err)
+		s.log.Debugf("%s: %#v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
-	if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
-		resp := "500 Internal Error: Failed to wait for resource group deletion"
-		s.log.Debugf("%s: %v", resp, err)
-		http.Error(w, resp, http.StatusInternalServerError)
-		return
-	}
-	resp, err := future.Result(gc)
-	if err != nil {
-		resp := "500 Internal Error: Failed to get resource group deletion response"
-		s.log.Debugf("%s: %v", resp, err)
-		http.Error(w, resp, http.StatusInternalServerError)
-		return
-	}
-	s.log.Infof("deleted resource group %s", resourceGroup)
-	w.WriteHeader(resp.StatusCode)
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+		defer cancel()
+		if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
+			resp := "500 Internal Error: Failed to wait for resource group deletion"
+			s.log.Debugf("%s: %v", resp, err)
+			return
+		}
+		resp, err := future.Result(gc)
+		if err != nil {
+			resp := "500 Internal Error: Failed to get resource group deletion response"
+			s.log.Debugf("%s: %v", resp, err)
+			return
+		}
+		// If the resource group deletion is successful, cleanup the object
+		// from the memory so the next GET from the client waiting for this
+		// long-running operation can exit successfully.
+		if resp.StatusCode == http.StatusOK {
+			s.log.Infof("deleted resource group %s", resourceGroup)
+			s.write(nil)
+		}
+	}()
+	s.writeState(v20180930preview.Deleting)
+	// Update headers with Location so subsequent GET requests know the
+	// location to query.
+	headers := w.Header()
+	headers.Add(autorest.HeaderLocation, fmt.Sprintf("http://%s", s.address))
+	// And last but not least, we have accepted this DELETE request
+	// and are processing it in the background.
+	w.WriteHeader(http.StatusAccepted)
 }
 
 func (s *Server) handleGet(w http.ResponseWriter, req *http.Request) {
@@ -168,19 +239,8 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		<-s.inProgress
 	}()
 
-	b, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		resp := "400 Bad Request: Failed to read request body"
-		s.log.Debugf("%s: %v", resp, err)
-		http.Error(w, resp, http.StatusBadRequest)
-		return
-	}
-
-	var oc *v20180930preview.OpenShiftManagedCluster
-	if err := yaml.Unmarshal(b, &oc); err != nil {
-		resp := "400 Bad Request: Failed to unmarshal request"
-		s.log.Debugf("%s: %v", resp, err)
-		http.Error(w, resp, http.StatusBadRequest)
+	oc := s.readRequest(w, req.Body)
+	if oc == nil {
 		return
 	}
 	s.write(oc)
@@ -256,8 +316,8 @@ func (s *Server) readState() v20180930preview.ProvisioningState {
 func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 	oc := s.read()
 	if oc == nil {
-		// This is a delete (trust me)
-		// TODO: Need to model this better.
+		// If the object is not found in memory then
+		// it must have been deleted. Exit successfully.
 		return
 	}
 	oc.Properties.ProvisioningState = s.readState()
