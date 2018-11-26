@@ -55,6 +55,7 @@ verify:
 	go vet ./...
 	./hack/verify-code-format.sh
 	./hack/validate-util.sh
+	go run ./hack/validate-imports/validate-imports.go cmd hack pkg test
 
 unit: generate
 	go test ./... -coverprofile=coverage.out
