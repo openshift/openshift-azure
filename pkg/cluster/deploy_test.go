@@ -135,9 +135,9 @@ func TestReadBlob(t *testing.T) {
 		bsa := mock_storage.NewMockBlobStorageClient(gmc)
 		storageClient.EXPECT().GetBlobService().Return(bsa)
 		updateCr := mock_storage.NewMockContainer(gmc)
-		bsa.EXPECT().GetContainerReference("update").Return(updateCr)
+		bsa.EXPECT().GetContainerReference(updateContainerName).Return(updateCr)
 		updateBlob := mock_storage.NewMockBlob(gmc)
-		updateCr.EXPECT().GetBlobReference("update").Return(updateBlob)
+		updateCr.EXPECT().GetBlobReference(updateBlobName).Return(updateBlob)
 		data := ioutil.NopCloser(strings.NewReader(tt.blob))
 		updateBlob.EXPECT().Get(nil).Return(data, nil)
 
@@ -184,9 +184,9 @@ func TestUpdateBlob(t *testing.T) {
 			bsa := mock_storage.NewMockBlobStorageClient(gmc)
 			storageClient.EXPECT().GetBlobService().Return(bsa)
 			updateCr := mock_storage.NewMockContainer(gmc)
-			bsa.EXPECT().GetContainerReference("update").Return(updateCr)
+			bsa.EXPECT().GetContainerReference(updateContainerName).Return(updateCr)
 			updateBlob := mock_storage.NewMockBlob(gmc)
-			updateCr.EXPECT().GetBlobReference("update").Return(updateBlob)
+			updateCr.EXPECT().GetBlobReference(updateBlobName).Return(updateBlob)
 			updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(tt.blob)), nil)
 			u := &simpleUpgrader{
 				pluginConfig:  api.PluginConfig{},

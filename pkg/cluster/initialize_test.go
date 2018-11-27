@@ -30,7 +30,7 @@ func TestInitialize(t *testing.T) {
 	etcdCr.EXPECT().CreateIfNotExists(nil).Return(true, nil)
 
 	updateCr := mock_storage.NewMockContainer(gmc)
-	bsa.EXPECT().GetContainerReference("update").Return(updateCr)
+	bsa.EXPECT().GetContainerReference(updateContainerName).Return(updateCr)
 	updateCr.EXPECT().CreateIfNotExists(nil).Return(true, nil)
 
 	configCr := mock_storage.NewMockContainer(gmc)

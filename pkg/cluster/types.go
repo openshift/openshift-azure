@@ -21,8 +21,10 @@ import (
 // here follow well known container and blob names
 const (
 	ConfigContainerName     = "config"
-	EtcdBackupContainerName = "etcd"
 	ConfigBlobName          = "config"
+	updateContainerName     = "update"
+	updateBlobName          = "update"
+	EtcdBackupContainerName = "etcd"
 )
 
 // Upgrader is the public interface to the upgrade module used by the plugin.

@@ -112,9 +112,6 @@ func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 	return u.updateBlob(vmHashes)
 }
 
-const updateContainerName = "update"
-const updateBlobName = "update"
-
 func (u *simpleUpgrader) updateBlob(b map[instanceName]hash) error {
 	blob := make([]vmInfo, 0, len(b))
 	for instancename, hash := range b {
