@@ -109,10 +109,10 @@ func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 			vmHashes[name] = ssHashes[scalesetName("ss-"+profile.Name)]
 		}
 	}
-	return u.updateBlob(vmHashes)
+	return u.writeUpdateBlob(vmHashes)
 }
 
-func (u *simpleUpgrader) updateBlob(b map[instanceName]hash) error {
+func (u *simpleUpgrader) writeUpdateBlob(b map[instanceName]hash) error {
 	blob := make([]vmInfo, 0, len(b))
 	for instancename, hash := range b {
 		blob = append(blob, vmInfo{
@@ -130,7 +130,7 @@ func (u *simpleUpgrader) updateBlob(b map[instanceName]hash) error {
 	return bc.CreateBlockBlobFromReader(bytes.NewReader(data), nil)
 }
 
-func (u *simpleUpgrader) readBlob() (map[instanceName]hash, error) {
+func (u *simpleUpgrader) readUpdateBlob() (map[instanceName]hash, error) {
 	bsc := u.storageClient.GetBlobService()
 	c := bsc.GetContainerReference(updateContainerName)
 	bc := c.GetBlobReference(updateBlobName)

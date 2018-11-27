@@ -102,7 +102,7 @@ func TestHashScaleSets(t *testing.T) {
 	}
 }
 
-func TestReadBlob(t *testing.T) {
+func TestReadUpdateBlob(t *testing.T) {
 	tests := []struct {
 		name    string
 		want    map[instanceName]hash
@@ -141,21 +141,21 @@ func TestReadBlob(t *testing.T) {
 		data := ioutil.NopCloser(strings.NewReader(tt.blob))
 		updateBlob.EXPECT().Get(nil).Return(data, nil)
 
-		got, err := u.readBlob()
+		got, err := u.readUpdateBlob()
 		if (err != nil) != (len(tt.wantErr) > 0) {
-			t.Errorf("simpleUpgrader.readBlob() error = %v, wantErr %v", err, tt.wantErr)
+			t.Errorf("simpleUpgrader.readUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
 			return
 		}
 		if len(tt.wantErr) > 0 && !strings.Contains(err.Error(), tt.wantErr) {
-			t.Errorf("simpleUpgrader.readBlob() error = %v, wantErr %v", err, tt.wantErr)
+			t.Errorf("simpleUpgrader.readUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
 		}
 		if !reflect.DeepEqual(got, tt.want) && len(tt.wantErr) == 0 {
-			t.Errorf("simpleUpgrader.readBlob() = %v, want %v", got, tt.want)
+			t.Errorf("simpleUpgrader.readUpdateBlob() = %v, want %v", got, tt.want)
 		}
 	}
 }
 
-func TestUpdateBlob(t *testing.T) {
+func TestWriteUpdateBlob(t *testing.T) {
 	tests := []struct {
 		name    string
 		b       map[instanceName]hash
@@ -192,8 +192,8 @@ func TestUpdateBlob(t *testing.T) {
 				pluginConfig:  api.PluginConfig{},
 				storageClient: storageClient,
 			}
-			if err := u.updateBlob(tt.b); (err != nil) != (tt.wantErr != "") {
-				t.Errorf("simpleUpgrader.updateBlob() error = %v, wantErr %v", err, tt.wantErr)
+			if err := u.writeUpdateBlob(tt.b); (err != nil) != (tt.wantErr != "") {
+				t.Errorf("simpleUpgrader.writeUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

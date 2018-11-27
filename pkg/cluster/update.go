@@ -81,7 +81,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 }
 
 func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, nodes map[computerName]struct{}, ssHashes map[scalesetName]hash) error {
-	blob, err := u.readBlob()
+	blob, err := u.readUpdateBlob()
 	if err != nil {
 		return err
 	}
@@ -103,7 +103,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 					return err
 				}
 				blob[instanceName(*vm.Name)] = ssHashes[ssNameForVM(&vm)]
-				if err := u.updateBlob(blob); err != nil {
+				if err := u.writeUpdateBlob(blob); err != nil {
 					return err
 				}
 			}
@@ -121,7 +121,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 		}
 	}
 	if needsUpdate {
-		return u.updateBlob(blob)
+		return u.writeUpdateBlob(blob)
 	}
 	return nil
 }
@@ -167,7 +167,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneListVMs}
 	}
 
-	blob, err := u.readBlob()
+	blob, err := u.readUpdateBlob()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneReadBlob}
 	}
@@ -213,7 +213,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 				}
 				vmsBefore[*updated.InstanceID] = struct{}{}
 				blob[instanceName(*updated.Name)] = ssHashes[ssNameForVM(&updated)]
-				if err := u.updateBlob(blob); err != nil {
+				if err := u.writeUpdateBlob(blob); err != nil {
 					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneUpdateBlob}
 				}
 			}
@@ -223,7 +223,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneDeleteVMs}
 		}
 		delete(blob, instanceName(*vm.Name))
-		if err := u.updateBlob(blob); err != nil {
+		if err := u.writeUpdateBlob(blob); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneUpdateBlob}
 		}
 	}
@@ -260,7 +260,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceSortMasters}
 	}
 
-	blob, err := u.readBlob()
+	blob, err := u.readUpdateBlob()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReadBlob}
 	}
@@ -335,7 +335,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		}
 
 		blob[instanceName(*vm.Name)] = ssHashes[ssNameForVM(&vm)]
-		if err := u.updateBlob(blob); err != nil {
+		if err := u.writeUpdateBlob(blob); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceUpdateBlob}
 		}
 	}
