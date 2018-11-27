@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	gomock "github.com/golang/mock/gomock"
+	"github.com/golang/mock/gomock"
 
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 )
@@ -16,9 +16,9 @@ import (
 func TestReadUpdateBlob(t *testing.T) {
 	tests := []struct {
 		name    string
+		blob    string
 		want    updateblob
 		wantErr error
-		blob    string
 	}{
 		{
 			name:    "empty",
@@ -26,11 +26,11 @@ func TestReadUpdateBlob(t *testing.T) {
 		},
 		{
 			name: "ok",
+			blob: `[{"instanceName":"ss-infra_0","scalesetHash":"45"},{"instanceName":"ss-compute_0","scalesetHash":"7x99="}]`,
 			want: updateblob{
 				"ss-infra_0":   "45",
 				"ss-compute_0": "7x99=",
 			},
-			blob: `[{"instanceName": "ss-infra_0", "scalesetHash": "45"},{"instanceName":"ss-compute_0","scalesetHash":"7x99="}]`,
 		},
 	}
 	gmc := gomock.NewController(t)
@@ -59,32 +59,32 @@ func TestReadUpdateBlob(t *testing.T) {
 func TestWriteUpdateBlob(t *testing.T) {
 	tests := []struct {
 		name    string
-		b       updateblob
+		blob    updateblob
+		want    string
 		wantErr string
-		blob    string
 	}{
 		{
 			name: "empty",
-			blob: "[]",
+			want: "[]",
 		},
 		{
 			name: "valid",
-			b: updateblob{
+			blob: updateblob{
 				"ss-infra_0":   "45",
 				"ss-compute_0": "7x99=",
 			},
-			blob: `[{"instanceName":"ss-infra_0","scalesetHash":"45"},{"instanceName":"ss-compute_0","scalesetHash":"7x99="}]`,
+			want: `[{"instanceName":"ss-infra_0","scalesetHash":"45"},{"instanceName":"ss-compute_0","scalesetHash":"7x99="}]`,
 		},
 	}
 	gmc := gomock.NewController(t)
 	for _, tt := range tests {
 		updateBlob := mock_storage.NewMockBlob(gmc)
-		updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(tt.blob)), nil)
+		updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(tt.want)), nil)
 		u := &simpleUpgrader{
 			updateBlob: updateBlob,
 		}
 
-		if err := u.writeUpdateBlob(tt.b); (err != nil) != (tt.wantErr != "") {
+		if err := u.writeUpdateBlob(tt.blob); (err != nil) != (tt.wantErr != "") {
 			t.Errorf("simpleUpgrader.writeUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
 		}
 	}
