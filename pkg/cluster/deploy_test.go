@@ -9,7 +9,6 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 )
 
@@ -111,8 +110,6 @@ func TestReadUpdateBlob(t *testing.T) {
 	}{
 		{
 			name:    "empty",
-			want:    map[instanceName]hash{},
-			blob:    "",
 			wantErr: "unexpected end of JSON input",
 		},
 		{
@@ -121,19 +118,17 @@ func TestReadUpdateBlob(t *testing.T) {
 				"ss-infra_0":   "45",
 				"ss-compute_0": "7x99=",
 			},
-			blob: "[{\"instanceName\": \"ss-infra_0\", \"scalesetHash\": \"45\"},{\"instanceName\":\"ss-compute_0\",\"scalesetHash\":\"7x99=\"}]",
+			blob: `[{"instanceName": "ss-infra_0", "scalesetHash": "45"},{"instanceName":"ss-compute_0","scalesetHash":"7x99="}]`,
 		},
 	}
 	gmc := gomock.NewController(t)
-	u := &simpleUpgrader{
-		pluginConfig: api.PluginConfig{},
-	}
-
 	for _, tt := range tests {
 		updateBlob := mock_storage.NewMockBlob(gmc)
 		data := ioutil.NopCloser(strings.NewReader(tt.blob))
 		updateBlob.EXPECT().Get(nil).Return(data, nil)
-		u.updateBlob = updateBlob
+		u := &simpleUpgrader{
+			updateBlob: updateBlob,
+		}
 
 		got, err := u.readUpdateBlob()
 		if (err != nil) != (len(tt.wantErr) > 0) {
@@ -158,7 +153,6 @@ func TestWriteUpdateBlob(t *testing.T) {
 	}{
 		{
 			name: "empty",
-			b:    map[instanceName]hash{},
 			blob: "[]",
 		},
 		{
@@ -167,22 +161,19 @@ func TestWriteUpdateBlob(t *testing.T) {
 				"ss-infra_0":   "45",
 				"ss-compute_0": "7x99=",
 			},
-			blob: "[{\"instanceName\":\"ss-infra_0\",\"scalesetHash\":\"45\"},{\"instanceName\":\"ss-compute_0\",\"scalesetHash\":\"7x99=\"}]",
+			blob: `[{"instanceName":"ss-infra_0","scalesetHash":"45"},{"instanceName":"ss-compute_0","scalesetHash":"7x99="}]`,
 		},
 	}
+	gmc := gomock.NewController(t)
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gmc := gomock.NewController(t)
+		updateBlob := mock_storage.NewMockBlob(gmc)
+		updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(tt.blob)), nil)
+		u := &simpleUpgrader{
+			updateBlob: updateBlob,
+		}
 
-			updateBlob := mock_storage.NewMockBlob(gmc)
-			updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(tt.blob)), nil)
-			u := &simpleUpgrader{
-				pluginConfig: api.PluginConfig{},
-				updateBlob:   updateBlob,
-			}
-			if err := u.writeUpdateBlob(tt.b); (err != nil) != (tt.wantErr != "") {
-				t.Errorf("simpleUpgrader.writeUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
+		if err := u.writeUpdateBlob(tt.b); (err != nil) != (tt.wantErr != "") {
+			t.Errorf("simpleUpgrader.writeUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
+		}
 	}
 }
