@@ -5,13 +5,13 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"io"
-	"math/big"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/randomstring"
 )
 
 func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certificate, endpoint, username, namespace string) (*v1.Config, error) {
@@ -91,31 +91,9 @@ func randomBytes(n int) ([]byte, error) {
 }
 
 func randomStorageAccountName() (string, error) {
-	const letterBytes = "abcdefghijklmnopqrstuvwxyz0123456789"
-
-	b := make([]byte, 24)
-	for i := range b {
-		o, err := rand.Int(rand.Reader, big.NewInt(int64(len(letterBytes))))
-		if err != nil {
-			return "", err
-		}
-		b[i] = letterBytes[o.Int64()]
-	}
-
-	return string(b), nil
+	return randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 24)
 }
 
 func randomString(length int) (string, error) {
-	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-	b := make([]byte, length)
-	for i := range b {
-		o, err := rand.Int(rand.Reader, big.NewInt(int64(len(letterBytes))))
-		if err != nil {
-			return "", err
-		}
-		b[i] = letterBytes[o.Int64()]
-	}
-
-	return string(b), nil
+	return randomstring.RandomString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", length)
 }

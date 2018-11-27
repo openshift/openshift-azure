@@ -12,6 +12,7 @@ package azureclient
 import (
 	"context"
 	"net/http"
+	"os"
 
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
@@ -47,4 +48,8 @@ func NewAuthorizer(clientID, clientSecret, tenantID string) (autorest.Authorizer
 
 func NewAuthorizerFromContext(ctx context.Context) (autorest.Authorizer, error) {
 	return NewAuthorizer(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
+}
+
+func NewAuthorizerFromEnvironment() (autorest.Authorizer, error) {
+	return auth.NewClientCredentialsConfig(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID")).Authorizer()
 }

@@ -1,6 +1,4 @@
-//+build e2e
-
-package e2e
+package specs
 
 import (
 	"errors"
@@ -8,27 +6,48 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
 	rbacv1 "k8s.io/api/rbac/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+
+	"github.com/openshift/openshift-azure/pkg/util/randomstring"
+	"github.com/openshift/openshift-azure/test/clients/openshift"
 )
 
-var _ = Describe("Openshift on Azure customer-cluster-admin e2e tests [CustomerAdmin]", func() {
-	defer GinkgoRecover()
+var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin]", func() {
+	var (
+		cli      *openshift.Client
+		admincli *openshift.Client
+	)
+
+	BeforeEach(func() {
+		var err error
+		cli, err = openshift.NewEndUserClient()
+		if err != nil {
+			Skip(err.Error())
+		}
+		admincli, err = openshift.NewCustomerAdminClient()
+		if err != nil {
+			Skip(err.Error())
+		}
+	})
 
 	It("should not read nodes", func() {
-		_, err := cadmin.kc.CoreV1().Nodes().Get("master-000000", metav1.GetOptions{})
+		_, err := admincli.CoreV1.Nodes().Get("master-000000", metav1.GetOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 	})
 
 	It("should have full access on all non-infrastructure namespaces", func() {
 		// Create project as normal user
-		namespace := nameGen.generate("e2e-test-")
-		c.createProject(namespace)
+		namespace, err := randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
+		Expect(err).ToNot(HaveOccurred())
+		namespace = "e2e-test-" + namespace
+		cli.CreateProject(namespace)
 
-		err := wait.PollImmediate(2*time.Second, 5*time.Minute, func() (bool, error) {
-			rb, err := cadmin.kc.RbacV1().RoleBindings(c.namespace).Get("osa-customer-admin", metav1.GetOptions{})
+		err = wait.PollImmediate(2*time.Second, 5*time.Minute, func() (bool, error) {
+			rb, err := admincli.RbacV1.RoleBindings(namespace).Get("osa-customer-admin", metav1.GetOptions{})
 			if err != nil {
 				// still waiting for namespace
 				if kerrors.IsNotFound(err) {
@@ -49,26 +68,26 @@ var _ = Describe("Openshift on Azure customer-cluster-admin e2e tests [CustomerA
 		})
 		Expect(err).ToNot(HaveOccurred())
 		// get namespace created by user
-		_, err = cadmin.pc.Projects().Get(c.namespace, metav1.GetOptions{})
+		_, err = admincli.ProjectV1.Projects().Get(namespace, metav1.GetOptions{})
 		Expect(err).ToNot(HaveOccurred())
 		// attempt to delete namespace
-		err = cadmin.pc.Projects().Delete(c.namespace, &metav1.DeleteOptions{})
+		err = admincli.ProjectV1.Projects().Delete(namespace, &metav1.DeleteOptions{})
 		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("should not list infra namespace secrets", func() {
 		// list all namespaces. should not see default
-		_, err := cadmin.kc.CoreV1().Secrets("default").List(metav1.ListOptions{})
+		_, err := admincli.CoreV1.Secrets("default").List(metav1.ListOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 	})
 
 	It("should not able to query groups", func() {
-		_, err := cadmin.uc.Groups().Get("customer-admins", metav1.GetOptions{})
+		_, err := admincli.UserV1.Groups().Get("customer-admins", metav1.GetOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 	})
 
 	It("should not be able to escalate privileges", func() {
-		_, err := cadmin.kc.RbacV1().ClusterRoleBindings().Create(&rbacv1.ClusterRoleBinding{
+		_, err := admincli.RbacV1.ClusterRoleBindings().Create(&rbacv1.ClusterRoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "test-cluster-admin",
 			},
@@ -87,5 +106,4 @@ var _ = Describe("Openshift on Azure customer-cluster-admin e2e tests [CustomerA
 	})
 
 	// Placeholder to test that a ded admin cannot delete pods in the default or openshift- namespaces
-
 })
