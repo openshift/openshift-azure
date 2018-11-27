@@ -43,14 +43,14 @@ type Config struct {
 	NoWait           bool   `envconfig:"NO_WAIT"`
 }
 
+const (
+	DataDirectory = "_data"
+)
+
 func NewConfig(log *logrus.Entry) (*Config, error) {
 	var c Config
 	if err := envconfig.Process("", &c); err != nil {
 		return nil, err
-	}
-
-	if c.Manifest == "" {
-		c.Manifest = "test/manifests/normal/create.yaml"
 	}
 
 	if c.Region == "" {
