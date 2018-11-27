@@ -53,7 +53,7 @@ data:
     masterKubeConfig: node.kubeconfig
     networkConfig:
       mtu: 1450
-      networkPluginName: redhat/openshift-ovs-subnet
+      networkPluginName: redhat/openshift-ovs-networkpolicy
     proxyArguments:
       cluster-cidr:
       - 10.128.0.0/14

@@ -242,7 +242,7 @@ networkConfig:
     hostSubnetLength: 9
   externalIPNetworkCIDRs:
   - 0.0.0.0/0
-  networkPluginName: redhat/openshift-ovs-subnet
+  networkPluginName: redhat/openshift-ovs-networkpolicy
   serviceNetworkCIDR: 172.30.0.0/16
 oauthConfig:
   assetPublicURL: {{ print "https://" (.Derived.PublicHostname .ContainerService) "/console/" | quote }}
