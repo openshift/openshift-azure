@@ -319,6 +319,38 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.ServiceCatalog }}",
 		},
 	},
+	"DaemonSet.apps/openshift-azure-logging/mdsd": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.GenevaLogging }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='SECTOR')].value"),
+			Template: "{{ .Config.GenevaLoggingSector }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGION')].value"),
+			Template: "{{ .ContainerService.Location }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='SUBSCRIPTION_ID')].value"),
+			Template: "{{ .ContainerService.Properties.AzProfile.SubscriptionID }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='RESOURCE_NAME')].value"),
+			Template: "{{ .ContainerService.Name }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='RESOURCE_GROUP_NAME')].value"),
+			Template: "{{ .ContainerService.Properties.AzProfile.ResourceGroup }}",
+		},
+	},
+	"DaemonSet.apps/openshift-azure-logging/td-agent": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.GenevaTDAgent }}",
+		},
+	},
 	"DaemonSet.apps/openshift-node/sync": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
@@ -550,6 +582,22 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.key'"),
 			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.ServiceCatalogServer.Key) }}",
+		},
+	},
+	"Secret/openshift-azure-logging/gcs-cert": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'gcscert.pem'"),
+			Template: "{{ String (CertAsBytes .Config.Certificates.GenevaLogging.Cert) }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'gcskey.pem'"),
+			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.GenevaLogging.Key) }}",
+		},
+	},
+	"Secret/openshift-azure-logging/azure-registry": {
+		{
+			Path:     jsonpath.MustCompile("$.data.'.dockerconfigjson'"),
+			Template: "{{ Base64Encode .Config.Images.GenevaImagePullSecret }}",
 		},
 	},
 	"Secret/openshift-console/console-oauth-config": {

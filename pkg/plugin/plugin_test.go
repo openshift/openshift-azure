@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
@@ -13,9 +14,12 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/test/util/populate"
+	"github.com/openshift/openshift-azure/test/util/tls"
 )
 
 func TestMerge(t *testing.T) {
+	log := logrus.NewEntry(logrus.StandardLogger())
+
 	prepare := func(v reflect.Value) {
 		switch v.Interface().(type) {
 		case []api.IdentityProvider:
@@ -23,14 +27,27 @@ func TestMerge(t *testing.T) {
 			v.Set(reflect.ValueOf([]api.IdentityProvider{{Provider: &api.AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
 		}
 	}
+	var config = api.PluginConfig{
+		SyncImage:       "sync:latest",
+		AcceptLanguages: []string{"en-us"},
+		GenevaConfig: api.GenevaConfig{
+			ImagePullSecret: []byte("ImagePullSecret"),
+			LoggingImage:    "loggingImage",
+			TDAgentImage:    "tdAgentImage",
+			LoggingSector:   "loggingSector",
+			LoggingCert:     tls.GetDummyCertificate(),
+			LoggingKey:      tls.GetDummyPrivateKey(),
+		},
+	}
 
 	oldCluster := &api.OpenShiftManagedCluster{}
 	populate.Walk(&oldCluster, prepare)
 
 	newCluster := &api.OpenShiftManagedCluster{Properties: &api.Properties{}}
 
-	p := &plugin{
-		log: logrus.NewEntry(logrus.StandardLogger()),
+	p, err := NewPlugin(log, &config)
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	// should fix all of the items removed above and we should
@@ -315,4 +332,104 @@ func TestCreateOrUpdate(t *testing.T) {
 			t.Errorf("plugin.CreateOrUpdate(%s) error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
 	}
+}
+
+func TestNewPlugin(t *testing.T) {
+	log := logrus.NewEntry(logrus.New())
+	tests := map[string]struct {
+		f            func(*api.PluginConfig)
+		expectedErrs []error
+	}{
+		"empty syncImage": {
+			f: func(p *api.PluginConfig) {
+				p.SyncImage = ""
+			},
+			expectedErrs: []error{
+				errors.New(`syncImage cannot be empty`),
+			},
+		},
+		"empty imagePullSecret": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.ImagePullSecret = []byte{}
+			},
+			expectedErrs: []error{
+				errors.New(`imagePullSecret cannot be empty`),
+			},
+		},
+		"empty LoggingSector": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.LoggingSector = ""
+			},
+			expectedErrs: []error{
+				errors.New(`loggingSector cannot be empty`),
+			},
+		},
+		"empty LoggingImage": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.LoggingImage = ""
+			},
+			expectedErrs: []error{
+				errors.New(`loggingImage cannot be empty`),
+			},
+		},
+		"empty tdAgentImage": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.TDAgentImage = ""
+			},
+			expectedErrs: []error{
+				errors.New(`tdAgentImage cannot be empty`),
+			},
+		},
+		"nil loggingCert.Key": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.LoggingKey = nil
+			},
+			expectedErrs: []error{
+				errors.New(`loggingKey cannot be nil`),
+			},
+		},
+		"nil loggingCert.Cert": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.LoggingCert = nil
+			},
+			expectedErrs: []error{
+				errors.New(`loggingCert cannot be nil`),
+			},
+		},
+	}
+
+	for name, test := range tests {
+		pCfg, err := getDummyPluginConfig()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		test.f(pCfg)
+		_, errs := NewPlugin(log, pCfg)
+		if !reflect.DeepEqual(errs, test.expectedErrs) {
+			t.Errorf("%s expected errors:", name)
+			for _, err := range test.expectedErrs {
+				t.Errorf("\t%v", err)
+			}
+			t.Error("received errors:")
+			for _, err := range errs {
+				t.Errorf("\t%v", err)
+			}
+		}
+	}
+}
+
+func getDummyPluginConfig() (*api.PluginConfig, error) {
+	// dummy config
+	return &api.PluginConfig{
+		SyncImage: "syncImage",
+		GenevaConfig: api.GenevaConfig{
+			ImagePullSecret: []byte("imagePullSecret"),
+			LoggingSector:   "loggingSector",
+			LoggingCert:     tls.GetDummyCertificate(),
+			LoggingKey:      tls.GetDummyPrivateKey(),
+			TDAgentImage:    "tdAgentImage",
+			LoggingImage:    "loggingImage",
+		},
+	}, nil
 }

@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: mdsd-customerdata-config
+    namespace: openshift-azure-logging
+data:
+    mdsd.xml: |
+        <?xml version="1.0" encoding="utf-8"?>
+        <MonitoringManagement version="1.0" namespace="CCPOpenShift" eventVersion="1" timestamp="2017-08-01T00:00:00.000Z">
+            <Accounts>
+                <Account moniker="ccpopenshiftdiag" isDefault="true" autoKey="false" />
+            </Accounts>
+            <Management eventVolume="Large" defaultRetentionInDays="90" >
+                <Identity tenantNameAlias="RPTenant" roleNameAlias="Service" roleInstanceNameAlias="Host">
+                    <IdentityComponent name="RPSector">_SECTOR_</IdentityComponent>
+                    <IdentityComponent name="RPTenant">_REGION_</IdentityComponent>
+                    <IdentityComponent name="Service">OSA</IdentityComponent>
+                    <IdentityComponent name="Host" useComputerName="true" />
+                    <IdentityComponent name="SubscriptionId">_SUBSCRIPTIONID_</IdentityComponent>
+                    <IdentityComponent name="ResourceName">_RESOURCENAME_</IdentityComponent>
+                    <IdentityComponent name="ResourceGroupName">_RESOURCEGROUPNAME_</IdentityComponent>
+                </Identity>
+                <AgentResourceUsage diskQuotaInMB="50000" />
+            </Management>
+            <Sources>
+                <Source name="mdsd.controlplane" dynamic_schema="true" />
+                <Source name="mdsd.syslog" dynamic_schema="true" />
+            </Sources>
+            <Events>
+                <MdsdEvents>
+                    <MdsdEventSource source="mdsd.controlplane">
+                        <RouteEvent eventName="CustomerControlPlaneEvents" storeType="CentralBond" priority="Normal"/>
+                    </MdsdEventSource>
+                    <MdsdEventSource source="mdsd.syslog">
+                        <RouteEvent eventName="CustomerSyslogEvents" storeType="CentralBond" priority="Normal"/>
+                    </MdsdEventSource>
+                </MdsdEvents>
+            </Events>
+        </MonitoringManagement>

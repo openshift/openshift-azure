@@ -1,13 +1,19 @@
 package fakerp
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
+
+	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
 var supportedRegions = []string{
@@ -65,4 +71,81 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 	}
 	os.Setenv("AZURE_REGION", c.Region)
 	return &c, nil
+}
+
+func getPluginConfig() (*api.PluginConfig, error) {
+	tc := api.TestConfig{
+		RunningUnderTest:      os.Getenv("RUNNING_UNDER_TEST") != "",
+		ImageResourceGroup:    os.Getenv("IMAGE_RESOURCEGROUP"),
+		ImageResourceName:     os.Getenv("IMAGE_RESOURCENAME"),
+		DeployOS:              os.Getenv("DEPLOY_OS"),
+		ImageOffer:            os.Getenv("IMAGE_OFFER"),
+		ImageVersion:          os.Getenv("IMAGE_VERSION"),
+		ORegURL:               os.Getenv("OREG_URL"),
+		EtcdBackupImage:       os.Getenv("ETCDBACKUP_IMAGE"),
+		AzureControllersImage: os.Getenv("AZURE_CONTROLLERS_IMAGE"),
+	}
+
+	// populate geneva artifacts
+	artifactDir := "secrets/"
+	logCert, err := readCert(artifactDir + "logging-int.cert")
+	if err != nil {
+		return nil, err
+	}
+	logKey, err := readKey(artifactDir + "logging-int.key")
+	if err != nil {
+		return nil, err
+	}
+	pullSecret, err := readFile(artifactDir + ".dockerconfigjson")
+	if err != nil {
+		return nil, err
+	}
+	var syncImage string
+	if os.Getenv("SYNC_IMAGE") == "" {
+		syncImage = "quay.io/openshift-on-azure/sync:latest"
+	} else {
+		syncImage = os.Getenv("SYNC_IMAGE")
+	}
+	genevaConfig := api.GenevaConfig{
+		LoggingCert:     logCert,
+		LoggingKey:      logKey,
+		ImagePullSecret: pullSecret,
+		LoggingSector:   "US-Test",
+		LoggingImage:    "osarpint.azurecr.io/acs/mdsd:11201801",
+		TDAgentImage:    "osarpint.azurecr.io/acs/td-agent:latest",
+	}
+	return &api.PluginConfig{
+		SyncImage:       syncImage,
+		AcceptLanguages: []string{"en-us"},
+		TestConfig:      tc,
+		GenevaConfig:    genevaConfig,
+	}, nil
+}
+
+func readCert(path string) (*x509.Certificate, error) {
+	b, err := readFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return tls.ParseCert(b)
+}
+
+func readKey(path string) (*rsa.PrivateKey, error) {
+	b, err := readFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return tls.ParsePrivateKey(b)
+}
+
+func readFile(path string) ([]byte, error) {
+	if fileExist(path) {
+		return ioutil.ReadFile(path)
+	}
+	return []byte{}, fmt.Errorf("file %s does not exist", path)
+}
+
+func fileExist(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }

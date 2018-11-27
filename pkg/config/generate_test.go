@@ -18,8 +18,17 @@ func TestGenerate(t *testing.T) {
 			},
 		},
 	}
+	pc := api.PluginConfig{
+		TestConfig: api.TestConfig{
+			RunningUnderTest: true,
+		},
+		GenevaConfig: api.GenevaConfig{
+			LoggingImage: "loggingImage",
+			TDAgentImage: "tdAgentImage",
+		},
+	}
 
-	cg := simpleGenerator{pluginConfig: api.PluginConfig{TestConfig: api.TestConfig{RunningUnderTest: true}}}
+	cg := simpleGenerator{pluginConfig: pc}
 	err := cg.Generate(cs)
 	if err != nil {
 		t.Error(err)
@@ -70,6 +79,8 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.Images.KubeStateMetricsBase != "", "kube state metrics base image")
 	assert(c.Images.KubeRbacProxyBase != "", "kube rbac proxy base image")
 	assert(c.Images.OAuthProxyBase != "", "oauth proxy base image")
+	assert(c.Images.GenevaLogging != "", "azure logging image")
+	assert(c.Images.GenevaTDAgent != "", "azure TDAgent image")
 
 	assert(c.ServiceAccountKey != nil, "service account key")
 
