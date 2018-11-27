@@ -3,6 +3,7 @@ package cluster
 import (
 	"bytes"
 	"encoding/json"
+	"sort"
 )
 
 type updateblob map[instanceName]hash
@@ -16,11 +17,17 @@ type vmInfo struct {
 }
 
 func (blob updateblob) MarshalJSON() ([]byte, error) {
+	instancenames := make([]instanceName, 0, len(blob))
+	for instancename := range blob {
+		instancenames = append(instancenames, instancename)
+	}
+	sort.Slice(instancenames, func(i, j int) bool { return instancenames[i] < instancenames[j] })
+
 	slice := make([]vmInfo, 0, len(blob))
-	for instancename, hash := range blob {
+	for _, instancename := range instancenames {
 		slice = append(slice, vmInfo{
 			InstanceName: instancename,
-			ScalesetHash: hash,
+			ScalesetHash: blob[instancename],
 		})
 	}
 

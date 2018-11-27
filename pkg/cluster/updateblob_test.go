@@ -26,7 +26,7 @@ func TestReadUpdateBlob(t *testing.T) {
 		},
 		{
 			name: "ok",
-			blob: `[{"instanceName":"ss-infra_0","scalesetHash":"45"},{"instanceName":"ss-compute_0","scalesetHash":"7x99="}]`,
+			blob: `[{"instanceName":"ss-compute_0","scalesetHash":"7x99="},{"instanceName":"ss-infra_0","scalesetHash":"45"}]`,
 			want: updateblob{
 				"ss-infra_0":   "45",
 				"ss-compute_0": "7x99=",
@@ -73,7 +73,7 @@ func TestWriteUpdateBlob(t *testing.T) {
 				"ss-infra_0":   "45",
 				"ss-compute_0": "7x99=",
 			},
-			want: `[{"instanceName":"ss-infra_0","scalesetHash":"45"},{"instanceName":"ss-compute_0","scalesetHash":"7x99="}]`,
+			want: `[{"instanceName":"ss-compute_0","scalesetHash":"7x99="},{"instanceName":"ss-infra_0","scalesetHash":"45"}]`,
 		},
 	}
 	gmc := gomock.NewController(t)
