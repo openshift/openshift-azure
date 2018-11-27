@@ -124,18 +124,11 @@ func (u *simpleUpgrader) writeUpdateBlob(b map[instanceName]hash) error {
 	if err != nil {
 		return err
 	}
-	bsc := u.storageClient.GetBlobService()
-	c := bsc.GetContainerReference(updateContainerName)
-	bc := c.GetBlobReference(updateBlobName)
-	return bc.CreateBlockBlobFromReader(bytes.NewReader(data), nil)
+	return u.updateBlob.CreateBlockBlobFromReader(bytes.NewReader(data), nil)
 }
 
 func (u *simpleUpgrader) readUpdateBlob() (map[instanceName]hash, error) {
-	bsc := u.storageClient.GetBlobService()
-	c := bsc.GetContainerReference(updateContainerName)
-	bc := c.GetBlobReference(updateBlobName)
-
-	rc, err := bc.Get(nil)
+	rc, err := u.updateBlob.Get(nil)
 	if err != nil {
 		return nil, err
 	}

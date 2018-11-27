@@ -35,6 +35,7 @@ func (u *simpleUpgrader) initialize(ctx context.Context, cs *api.OpenShiftManage
 	if err != nil {
 		return err
 	}
+	u.updateBlob = c.GetBlobReference(updateBlobName)
 
 	// cluster config container
 	c = bsc.GetContainerReference(ConfigContainerName)
