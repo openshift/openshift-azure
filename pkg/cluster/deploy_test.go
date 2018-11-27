@@ -1,16 +1,8 @@
 package cluster
 
 import (
-	"bytes"
-	"io/ioutil"
 	"reflect"
-	"strings"
 	"testing"
-
-	gomock "github.com/golang/mock/gomock"
-
-	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 )
 
 const masterHash = "RmID82LhPjuQbCEdiVa5cGCVEkdLGD6iU6ozX3vxkD0="
@@ -99,102 +91,5 @@ func TestHashScaleSets(t *testing.T) {
 		if !reflect.DeepEqual(got, test.exp) {
 			t.Errorf("%s: expected:\n%#v\ngot:\n%#v", test.name, test.exp, got)
 		}
-	}
-}
-
-func TestReadBlob(t *testing.T) {
-	tests := []struct {
-		name    string
-		want    map[instanceName]hash
-		wantErr string
-		blob    string
-	}{
-		{
-			name:    "empty",
-			want:    map[instanceName]hash{},
-			blob:    "",
-			wantErr: "unexpected end of JSON input",
-		},
-		{
-			name: "ok",
-			want: map[instanceName]hash{
-				"ss-infra_0":   "45",
-				"ss-compute_0": "7x99=",
-			},
-			blob: "[{\"instanceName\": \"ss-infra_0\", \"scalesetHash\": \"45\"},{\"instanceName\":\"ss-compute_0\",\"scalesetHash\":\"7x99=\"}]",
-		},
-	}
-	gmc := gomock.NewController(t)
-	storageClient := mock_storage.NewMockClient(gmc)
-	u := &simpleUpgrader{
-		pluginConfig:  api.PluginConfig{},
-		storageClient: storageClient,
-	}
-
-	for _, tt := range tests {
-		bsa := mock_storage.NewMockBlobStorageClient(gmc)
-		storageClient.EXPECT().GetBlobService().Return(bsa)
-		updateCr := mock_storage.NewMockContainer(gmc)
-		bsa.EXPECT().GetContainerReference("update").Return(updateCr)
-		updateBlob := mock_storage.NewMockBlob(gmc)
-		updateCr.EXPECT().GetBlobReference("update").Return(updateBlob)
-		data := ioutil.NopCloser(strings.NewReader(tt.blob))
-		updateBlob.EXPECT().Get(nil).Return(data, nil)
-
-		got, err := u.readBlob()
-		if (err != nil) != (len(tt.wantErr) > 0) {
-			t.Errorf("simpleUpgrader.readBlob() error = %v, wantErr %v", err, tt.wantErr)
-			return
-		}
-		if len(tt.wantErr) > 0 && !strings.Contains(err.Error(), tt.wantErr) {
-			t.Errorf("simpleUpgrader.readBlob() error = %v, wantErr %v", err, tt.wantErr)
-		}
-		if !reflect.DeepEqual(got, tt.want) && len(tt.wantErr) == 0 {
-			t.Errorf("simpleUpgrader.readBlob() = %v, want %v", got, tt.want)
-		}
-	}
-}
-
-func TestUpdateBlob(t *testing.T) {
-	tests := []struct {
-		name    string
-		b       map[instanceName]hash
-		wantErr string
-		blob    string
-	}{
-		{
-			name: "empty",
-			b:    map[instanceName]hash{},
-			blob: "[]",
-		},
-		{
-			name: "valid",
-			b: map[instanceName]hash{
-				"ss-infra_0":   "45",
-				"ss-compute_0": "7x99=",
-			},
-			blob: "[{\"instanceName\":\"ss-infra_0\",\"scalesetHash\":\"45\"},{\"instanceName\":\"ss-compute_0\",\"scalesetHash\":\"7x99=\"}]",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gmc := gomock.NewController(t)
-			storageClient := mock_storage.NewMockClient(gmc)
-
-			bsa := mock_storage.NewMockBlobStorageClient(gmc)
-			storageClient.EXPECT().GetBlobService().Return(bsa)
-			updateCr := mock_storage.NewMockContainer(gmc)
-			bsa.EXPECT().GetContainerReference("update").Return(updateCr)
-			updateBlob := mock_storage.NewMockBlob(gmc)
-			updateCr.EXPECT().GetBlobReference("update").Return(updateBlob)
-			updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(tt.blob)), nil)
-			u := &simpleUpgrader{
-				pluginConfig:  api.PluginConfig{},
-				storageClient: storageClient,
-			}
-			if err := u.updateBlob(tt.b); (err != nil) != (tt.wantErr != "") {
-				t.Errorf("simpleUpgrader.updateBlob() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
 	}
 }

@@ -6,21 +6,17 @@ import (
 	"encoding/json"
 	"testing"
 
-	gomock "github.com/golang/mock/gomock"
+	"github.com/golang/mock/gomock"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 )
 
 func TestInitialize(t *testing.T) {
 	gmc := gomock.NewController(t)
-	accountsClient := mock_azureclient.NewMockAccountsClient(gmc)
 	storageClient := mock_storage.NewMockClient(gmc)
-	si := &simpleUpgrader{
-		pluginConfig:   api.PluginConfig{},
-		accountsClient: accountsClient,
-		storageClient:  storageClient,
+	u := &simpleUpgrader{
+		storageClient: storageClient,
 	}
 	bsa := mock_storage.NewMockBlobStorageClient(gmc)
 	storageClient.EXPECT().GetBlobService().Return(bsa)
@@ -30,8 +26,9 @@ func TestInitialize(t *testing.T) {
 	etcdCr.EXPECT().CreateIfNotExists(nil).Return(true, nil)
 
 	updateCr := mock_storage.NewMockContainer(gmc)
-	bsa.EXPECT().GetContainerReference("update").Return(updateCr)
+	bsa.EXPECT().GetContainerReference(updateContainerName).Return(updateCr)
 	updateCr.EXPECT().CreateIfNotExists(nil).Return(true, nil)
+	updateCr.EXPECT().GetBlobReference(updateBlobName)
 
 	configCr := mock_storage.NewMockContainer(gmc)
 	bsa.EXPECT().GetContainerReference(ConfigContainerName).Return(configCr)
@@ -48,7 +45,7 @@ func TestInitialize(t *testing.T) {
 	var finalError error
 	configBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader(csj), nil).Return(finalError)
 
-	if err := si.initialize(context.Background(), cs); err != finalError {
+	if err := u.initialize(context.Background(), cs); err != finalError {
 		t.Errorf("simpleUpgrader.initialize() error = %v", err)
 	}
 }

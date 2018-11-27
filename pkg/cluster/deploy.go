@@ -1,13 +1,11 @@
 package cluster
 
 import (
-	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
@@ -49,11 +47,6 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 type scalesetName string
 type instanceName string
 type hash string
-
-type vmInfo struct {
-	InstanceName instanceName `json:"instanceName,omitempty"`
-	ScalesetHash hash         `json:"scalesetHash,omitempty"`
-}
 
 func hashScaleSets(azuretemplate map[string]interface{}) (map[scalesetName]hash, error) {
 	ssHashes := make(map[scalesetName]hash)
@@ -102,60 +95,12 @@ func deepCopy(in map[string]interface{}) map[string]interface{} {
 }
 
 func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName]hash) error {
-	vmHashes := make(map[instanceName]hash)
+	blob := updateblob{}
 	for _, profile := range cs.Properties.AgentPoolProfiles {
 		for i := 0; i < profile.Count; i++ {
 			name := instanceName(fmt.Sprintf("ss-%s_%d", profile.Name, i))
-			vmHashes[name] = ssHashes[scalesetName("ss-"+profile.Name)]
+			blob[name] = ssHashes[scalesetName("ss-"+profile.Name)]
 		}
 	}
-	return u.updateBlob(vmHashes)
-}
-
-const updateContainerName = "update"
-const updateBlobName = "update"
-
-func (u *simpleUpgrader) updateBlob(b map[instanceName]hash) error {
-	blob := make([]vmInfo, 0, len(b))
-	for instancename, hash := range b {
-		blob = append(blob, vmInfo{
-			InstanceName: instancename,
-			ScalesetHash: hash,
-		})
-	}
-	data, err := json.Marshal(blob)
-	if err != nil {
-		return err
-	}
-	bsc := u.storageClient.GetBlobService()
-	c := bsc.GetContainerReference(updateContainerName)
-	bc := c.GetBlobReference(updateBlobName)
-	return bc.CreateBlockBlobFromReader(bytes.NewReader(data), nil)
-}
-
-func (u *simpleUpgrader) readBlob() (map[instanceName]hash, error) {
-	bsc := u.storageClient.GetBlobService()
-	c := bsc.GetContainerReference(updateContainerName)
-	bc := c.GetBlobReference(updateBlobName)
-
-	rc, err := bc.Get(nil)
-	if err != nil {
-		return nil, err
-	}
-	defer rc.Close()
-
-	data, err := ioutil.ReadAll(rc)
-	if err != nil {
-		return nil, err
-	}
-
-	var blob []vmInfo
-	if err := json.Unmarshal(data, &blob); err != nil {
-		return nil, err
-	}
-	b := make(map[instanceName]hash)
-	for _, vi := range blob {
-		b[vi.InstanceName] = vi.ScalesetHash
-	}
-	return b, nil
+	return u.writeUpdateBlob(blob)
 }

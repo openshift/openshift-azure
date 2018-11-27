@@ -13,7 +13,7 @@ func TestFilterOldVMs(t *testing.T) {
 	tests := []struct {
 		name     string
 		vms      []compute.VirtualMachineScaleSetVM
-		blob     map[instanceName]hash
+		blob     updateblob
 		ssHashes map[scalesetName]hash
 		exp      []compute.VirtualMachineScaleSetVM
 	}{
@@ -30,7 +30,7 @@ func TestFilterOldVMs(t *testing.T) {
 					Name: to.StringPtr("ss-master_2"),
 				},
 			},
-			blob: map[instanceName]hash{
+			blob: updateblob{
 				"ss-master_0": "newhash",
 				"ss-master_1": "oldhash",
 				"ss-master_2": "oldhash",
@@ -60,7 +60,7 @@ func TestFilterOldVMs(t *testing.T) {
 					Name: to.StringPtr("ss-master_2"),
 				},
 			},
-			blob: map[instanceName]hash{
+			blob: updateblob{
 				"ss-master_0": "newhash",
 				"ss-master_1": "newhash",
 				"ss-master_2": "newhash",
