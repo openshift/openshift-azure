@@ -231,7 +231,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 	return nil
 }
 
-func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob map[instanceName]hash, ssHashes map[scalesetName]hash) []compute.VirtualMachineScaleSetVM {
+func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob updateblob, ssHashes map[scalesetName]hash) []compute.VirtualMachineScaleSetVM {
 	var oldVMs []compute.VirtualMachineScaleSetVM
 	for _, vm := range vms {
 		if blob[instanceName(*vm.Name)] != ssHashes[ssNameForVM(&vm)] {

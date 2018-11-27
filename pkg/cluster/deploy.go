@@ -46,6 +46,7 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	return nil
 }
 
+type updateblob map[instanceName]hash
 type scalesetName string
 type instanceName string
 type hash string
@@ -102,7 +103,7 @@ func deepCopy(in map[string]interface{}) map[string]interface{} {
 }
 
 func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName]hash) error {
-	vmHashes := make(map[instanceName]hash)
+	vmHashes := updateblob{}
 	for _, profile := range cs.Properties.AgentPoolProfiles {
 		for i := 0; i < profile.Count; i++ {
 			name := instanceName(fmt.Sprintf("ss-%s_%d", profile.Name, i))
@@ -112,7 +113,7 @@ func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 	return u.writeUpdateBlob(vmHashes)
 }
 
-func (u *simpleUpgrader) writeUpdateBlob(b map[instanceName]hash) error {
+func (u *simpleUpgrader) writeUpdateBlob(b updateblob) error {
 	blob := make([]vmInfo, 0, len(b))
 	for instancename, hash := range b {
 		blob = append(blob, vmInfo{
@@ -127,7 +128,7 @@ func (u *simpleUpgrader) writeUpdateBlob(b map[instanceName]hash) error {
 	return u.updateBlob.CreateBlockBlobFromReader(bytes.NewReader(data), nil)
 }
 
-func (u *simpleUpgrader) readUpdateBlob() (map[instanceName]hash, error) {
+func (u *simpleUpgrader) readUpdateBlob() (updateblob, error) {
 	rc, err := u.updateBlob.Get(nil)
 	if err != nil {
 		return nil, err
@@ -143,7 +144,7 @@ func (u *simpleUpgrader) readUpdateBlob() (map[instanceName]hash, error) {
 	if err := json.Unmarshal(data, &blob); err != nil {
 		return nil, err
 	}
-	b := make(map[instanceName]hash)
+	b := updateblob{}
 	for _, vi := range blob {
 		b[vi.InstanceName] = vi.ScalesetHash
 	}

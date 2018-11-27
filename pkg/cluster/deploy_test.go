@@ -104,7 +104,7 @@ func TestHashScaleSets(t *testing.T) {
 func TestReadUpdateBlob(t *testing.T) {
 	tests := []struct {
 		name    string
-		want    map[instanceName]hash
+		want    updateblob
 		wantErr string
 		blob    string
 	}{
@@ -114,7 +114,7 @@ func TestReadUpdateBlob(t *testing.T) {
 		},
 		{
 			name: "ok",
-			want: map[instanceName]hash{
+			want: updateblob{
 				"ss-infra_0":   "45",
 				"ss-compute_0": "7x99=",
 			},
@@ -147,7 +147,7 @@ func TestReadUpdateBlob(t *testing.T) {
 func TestWriteUpdateBlob(t *testing.T) {
 	tests := []struct {
 		name    string
-		b       map[instanceName]hash
+		b       updateblob
 		wantErr string
 		blob    string
 	}{
@@ -157,7 +157,7 @@ func TestWriteUpdateBlob(t *testing.T) {
 		},
 		{
 			name: "valid",
-			b: map[instanceName]hash{
+			b: updateblob{
 				"ss-infra_0":   "45",
 				"ss-compute_0": "7x99=",
 			},
