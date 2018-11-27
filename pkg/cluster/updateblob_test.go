@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
 	"reflect"
 	"strings"
@@ -16,12 +17,12 @@ func TestReadUpdateBlob(t *testing.T) {
 	tests := []struct {
 		name    string
 		want    updateblob
-		wantErr string
+		wantErr error
 		blob    string
 	}{
 		{
 			name:    "empty",
-			wantErr: "unexpected end of JSON input",
+			wantErr: io.EOF,
 		},
 		{
 			name: "ok",
@@ -42,14 +43,14 @@ func TestReadUpdateBlob(t *testing.T) {
 		}
 
 		got, err := u.readUpdateBlob()
-		if (err != nil) != (len(tt.wantErr) > 0) {
+		if (err != nil) != (tt.wantErr != nil) {
 			t.Errorf("simpleUpgrader.readUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
 			return
 		}
-		if len(tt.wantErr) > 0 && !strings.Contains(err.Error(), tt.wantErr) {
+		if tt.wantErr != nil && err != tt.wantErr {
 			t.Errorf("simpleUpgrader.readUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
 		}
-		if !reflect.DeepEqual(got, tt.want) && len(tt.wantErr) == 0 {
+		if tt.wantErr == nil && !reflect.DeepEqual(got, tt.want) {
 			t.Errorf("simpleUpgrader.readUpdateBlob() = %v, want %v", got, tt.want)
 		}
 	}

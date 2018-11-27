@@ -3,7 +3,6 @@ package cluster
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 )
 
 type updateblob map[instanceName]hash
@@ -57,14 +56,12 @@ func (u *simpleUpgrader) readUpdateBlob() (updateblob, error) {
 	}
 	defer rc.Close()
 
-	data, err := ioutil.ReadAll(rc)
-	if err != nil {
+	d := json.NewDecoder(rc)
+
+	b := updateblob{}
+	if err := d.Decode(&b); err != nil {
 		return nil, err
 	}
 
-	b := updateblob{}
-	if err := json.Unmarshal(data, &b); err != nil {
-		return nil, err
-	}
 	return b, nil
 }
