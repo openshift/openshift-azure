@@ -39,7 +39,7 @@ func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certific
 			{
 				Name: clustername,
 				Cluster: v1.Cluster{
-					Server: "https://" + endpoint,
+					Server:                   "https://" + endpoint,
 					CertificateAuthorityData: caCertBytes,
 				},
 			},
