@@ -8,19 +8,41 @@ import (
 
 type updateblob map[instanceName]hash
 
+var _ json.Marshaler = &updateblob{}
+var _ json.Unmarshaler = &updateblob{}
+
 type vmInfo struct {
 	InstanceName instanceName `json:"instanceName,omitempty"`
 	ScalesetHash hash         `json:"scalesetHash,omitempty"`
 }
 
-func (u *simpleUpgrader) writeUpdateBlob(b updateblob) error {
-	blob := make([]vmInfo, 0, len(b))
-	for instancename, hash := range b {
-		blob = append(blob, vmInfo{
+func (blob updateblob) MarshalJSON() ([]byte, error) {
+	slice := make([]vmInfo, 0, len(blob))
+	for instancename, hash := range blob {
+		slice = append(slice, vmInfo{
 			InstanceName: instancename,
 			ScalesetHash: hash,
 		})
 	}
+
+	return json.Marshal(slice)
+}
+
+func (blob *updateblob) UnmarshalJSON(data []byte) error {
+	var slice []vmInfo
+	if err := json.Unmarshal(data, &slice); err != nil {
+		return err
+	}
+
+	*blob = updateblob{}
+	for _, vi := range slice {
+		(*blob)[vi.InstanceName] = vi.ScalesetHash
+	}
+
+	return nil
+}
+
+func (u *simpleUpgrader) writeUpdateBlob(blob updateblob) error {
 	data, err := json.Marshal(blob)
 	if err != nil {
 		return err
@@ -40,13 +62,9 @@ func (u *simpleUpgrader) readUpdateBlob() (updateblob, error) {
 		return nil, err
 	}
 
-	var blob []vmInfo
-	if err := json.Unmarshal(data, &blob); err != nil {
-		return nil, err
-	}
 	b := updateblob{}
-	for _, vi := range blob {
-		b[vi.InstanceName] = vi.ScalesetHash
+	if err := json.Unmarshal(data, &b); err != nil {
+		return nil, err
 	}
 	return b, nil
 }
