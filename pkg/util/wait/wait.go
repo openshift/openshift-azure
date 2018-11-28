@@ -54,7 +54,8 @@ func forHTTPStatusOk(ctx context.Context, cli SimpleHTTPClient, urltocheck strin
 		if err, ok := err.(*url.Error); ok {
 			if err, ok := err.Err.(*net.OpError); ok {
 				if err, ok := err.Err.(*os.SyscallError); ok {
-					if err.Err == syscall.ENETUNREACH {
+					switch err.Err {
+					case syscall.ENETUNREACH, syscall.ECONNREFUSED:
 						return false, nil
 					}
 				}

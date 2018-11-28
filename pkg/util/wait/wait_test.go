@@ -48,6 +48,18 @@ func TestForHTTPStatusOk(t *testing.T) {
 			},
 		},
 		{
+			name: "ECONNREFUSED then ok",
+			responses: []cliResp{
+				{err: &url.Error{
+					URL: urltocheck,
+					Err: &net.OpError{
+						Err: os.NewSyscallError("socket", syscall.ECONNREFUSED),
+					},
+				}},
+				{resp: &http.Response{StatusCode: 200}},
+			},
+		},
+		{
 			name: "io.EOF then ok",
 			responses: []cliResp{
 				{err: io.EOF},
