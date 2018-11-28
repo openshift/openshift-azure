@@ -87,7 +87,7 @@ func delete(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClus
 			return err
 		}
 		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("unexpected status: %s, expected 200 OK", resp.Status)
+			return fmt.Errorf("unexpected response: %s", resp.Status)
 		}
 		log.Info("deleted cluster")
 	}
@@ -106,6 +106,9 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftMan
 	resp, err := future.Result(rpc)
 	if err != nil {
 		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected response: %s", resp.Status)
 	}
 	log.Info("created/updated cluster")
 	return fakerp.WriteClusterConfigToManifest(&resp, manifestFile)
