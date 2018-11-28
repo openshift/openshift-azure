@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	sdk "github.com/openshift/openshift-azure/pkg/util/azureclient/osa-go-sdk/services/containerservice/mgmt/2018-09-30-preview/containerservice"
+	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
 func readEnv() map[string]string {
@@ -25,7 +25,7 @@ func readEnv() map[string]string {
 }
 
 // LoadClusterConfigFromManifest reads (and potentially template) the mainifest
-func LoadClusterConfigFromManifest(log *logrus.Entry, manifestTemplate string, conf *Config) (*sdk.OpenShiftManagedCluster, error) {
+func LoadClusterConfigFromManifest(log *logrus.Entry, manifestTemplate string, conf *Config) (*v20180930preview.OpenShiftManagedCluster, error) {
 	if IsUpdate() && conf.Manifest == "" && manifestTemplate == "" {
 		defaultManifestFile := path.Join(DataDirectory, "manifest.yaml")
 		log.Debugf("using manifest from %q", defaultManifestFile)
@@ -42,7 +42,7 @@ func LoadClusterConfigFromManifest(log *logrus.Entry, manifestTemplate string, c
 }
 
 // WriteClusterConfigToManifest write to file
-func WriteClusterConfigToManifest(oc *sdk.OpenShiftManagedCluster, manifestFile string) error {
+func WriteClusterConfigToManifest(oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) error {
 	out, err := yaml.Marshal(oc)
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func WriteClusterConfigToManifest(oc *sdk.OpenShiftManagedCluster, manifestFile 
 	return ioutil.WriteFile(manifestFile, out, 0666)
 }
 
-func generateManifest(manifestFile string) (*sdk.OpenShiftManagedCluster, error) {
+func generateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCluster, error) {
 	t, err := template.ParseFiles(manifestFile)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed parsing the manifest %q", manifestFile)
@@ -62,29 +62,29 @@ func generateManifest(manifestFile string) (*sdk.OpenShiftManagedCluster, error)
 		return nil, errors.Wrapf(err, "failed templating the manifest")
 	}
 
-	oc := &sdk.OpenShiftManagedCluster{}
+	oc := &v20180930preview.OpenShiftManagedCluster{}
 	if err = yaml.Unmarshal(b.Bytes(), oc); err != nil {
 		return nil, err
 	}
 
-	if oc.OpenShiftManagedClusterProperties != nil {
-		oc.OpenShiftManagedClusterProperties.ProvisioningState = nil
+	if oc.Properties != nil {
+		oc.Properties.ProvisioningState = nil
 	}
 	return oc, nil
 }
 
-func loadManifestFromFile(manifest string) (*sdk.OpenShiftManagedCluster, error) {
+func loadManifestFromFile(manifest string) (*v20180930preview.OpenShiftManagedCluster, error) {
 	in, err := ioutil.ReadFile(manifest)
 	if err != nil {
 		return nil, err
 	}
-	var oc sdk.OpenShiftManagedCluster
+	var oc v20180930preview.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(in, &oc); err != nil {
 		return nil, err
 	}
 
-	if oc.OpenShiftManagedClusterProperties != nil {
-		oc.OpenShiftManagedClusterProperties.ProvisioningState = nil
+	if oc.Properties != nil {
+		oc.Properties.ProvisioningState = nil
 	}
 	return &oc, nil
 }

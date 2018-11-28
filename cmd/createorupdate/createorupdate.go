@@ -21,9 +21,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 
+	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	sdk "github.com/openshift/openshift-azure/pkg/util/azureclient/osa-go-sdk/services/containerservice/mgmt/2018-09-30-preview/containerservice"
 )
 
 var (
@@ -69,7 +69,7 @@ func validate() error {
 	return nil
 }
 
-func delete(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, resourceGroup string, noWait bool) error {
+func delete(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShiftManagedClustersClient, resourceGroup string, noWait bool) error {
 	log.Info("deleting cluster")
 	future, err := rpc.Delete(ctx, resourceGroup, resourceGroup)
 	if err != nil {
@@ -94,7 +94,7 @@ func delete(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClus
 	return nil
 }
 
-func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, resourceGroup string, oc *sdk.OpenShiftManagedCluster, manifestFile string) error {
+func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShiftManagedClustersClient, resourceGroup string, oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) error {
 	log.Info("creating/updating cluster")
 	future, err := rpc.CreateOrUpdate(ctx, resourceGroup, resourceGroup, *oc)
 	if err != nil {
@@ -160,7 +160,7 @@ func createResourceGroup(conf *fakerp.Config) (bool, error) {
 	return true, err
 }
 
-func execute(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, conf *fakerp.Config) error {
+func execute(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShiftManagedClustersClient, conf *fakerp.Config) error {
 	oc, err := fakerp.LoadClusterConfigFromManifest(log, "", conf)
 	if err != nil {
 		return err
@@ -285,9 +285,9 @@ func main() {
 	// setup the osa client
 	rpURL := fmt.Sprintf("http://%s", fakeRpAddr)
 	if *useProd {
-		rpURL = sdk.DefaultBaseURI
+		rpURL = v20180930preview.DefaultBaseURI
 	}
-	rpc := sdk.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
+	rpc := v20180930preview.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
 	if err != nil {
 		log.Fatal(err)

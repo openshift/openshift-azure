@@ -309,7 +309,7 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 	}
 	state := s.readState()
 	oc.Properties.ProvisioningState = &state
-	res, err := json.Marshal(azureclient.ExternalToSdk(oc))
+	res, err := json.Marshal(oc)
 	if err != nil {
 		resp := "500 Internal Server Error: Failed to marshal response"
 		s.log.Debugf("%s: %v", resp, err)
