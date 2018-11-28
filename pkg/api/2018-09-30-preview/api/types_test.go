@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Azure/go-autorest/autorest/to"
+
 	"github.com/openshift/openshift-azure/pkg/util/structtags"
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
@@ -76,7 +78,7 @@ func TestMarshal(t *testing.T) {
 		switch v.Interface().(type) {
 		case []IdentityProvider:
 			// set the Provider to AADIdentityProvider
-			v.Set(reflect.ValueOf([]IdentityProvider{{Provider: &AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
+			v.Set(reflect.ValueOf([]IdentityProvider{{Provider: &AADIdentityProvider{Kind: to.StringPtr("AADIdentityProvider")}}}))
 		}
 	}
 
@@ -98,7 +100,7 @@ func TestUnmarshal(t *testing.T) {
 		switch v.Interface().(type) {
 		case []IdentityProvider:
 			// set the Provider to AADIdentityProvider
-			v.Set(reflect.ValueOf([]IdentityProvider{{Provider: &AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
+			v.Set(reflect.ValueOf([]IdentityProvider{{Provider: &AADIdentityProvider{Kind: to.StringPtr("AADIdentityProvider")}}}))
 		}
 	}
 

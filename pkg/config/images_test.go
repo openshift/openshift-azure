@@ -43,7 +43,7 @@ func TestOpenShiftVersion(t *testing.T) {
 func TestNodeImageVersion(t *testing.T) {
 	for _, deployOS := range []string{"", "rhel7", "centos7"} {
 		cs := &api.OpenShiftManagedCluster{
-			Properties: &api.Properties{
+			Properties: api.Properties{
 				OpenShiftVersion: "v3.11",
 			},
 			Config: &api.Config{},

@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Azure/go-autorest/autorest/to"
+
 	"github.com/openshift/openshift-azure/test/util/tls"
 )
 
@@ -99,12 +101,17 @@ func (w walker) walk(v reflect.Value, path string) {
 			w.walk(field, newpath)
 		}
 	case reflect.Map:
-		// only map[string]string types are supported
-		if v.Type().Key().Kind() != reflect.String || v.Type().Elem().Kind() != reflect.String {
-			return
+		switch {
+		// map[string]string
+		case v.Type().Key().Kind() == reflect.String && v.Type().Elem().Kind() == reflect.String:
+			v.Set(reflect.MakeMap(v.Type()))
+			v.SetMapIndex(reflect.ValueOf(path+".key"), reflect.ValueOf(path+".val"))
+
+		// map[string]*string
+		case v.Type().Key().Kind() == reflect.String && v.Type().Elem().Kind() == reflect.Ptr && v.Type().Elem().Elem().Kind() == reflect.String:
+			v.Set(reflect.MakeMap(v.Type()))
+			v.SetMapIndex(reflect.ValueOf(path+".key"), reflect.ValueOf(to.StringPtr(path+".val")))
 		}
-		v.Set(reflect.MakeMap(v.Type()))
-		v.SetMapIndex(reflect.ValueOf(path+".key"), reflect.ValueOf(path+".val"))
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		v.SetInt(1)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:

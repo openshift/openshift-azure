@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	_ "github.com/davecgh/go-spew/spew"
 	"github.com/go-test/deep"
 )
 
