@@ -90,4 +90,7 @@ e2e-prod:
 e2e-etcdbackuprecovery:
 	FOCUS="\[EtcdRecovery\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
 
+e2e-keyrotation:
+	FOCUS="\[KeyRotation\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
+
 .PHONY: clean sync-image sync-push verify unit e2e

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"os"
+	"path/filepath"
 
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
@@ -39,7 +40,11 @@ func main() {
 	if len(errs) > 0 {
 		log.Fatal(kerrors.NewAggregate(errs))
 	}
-	cs, err := managedcluster.ReadConfig("_data/containerservice.yaml")
+	dataDir, err := fakerp.FindDirectory(fakerp.DataDirectory)
+	if err != nil {
+		return
+	}
+	cs, err := managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
 	if err != nil {
 		log.Fatal(err)
 	}

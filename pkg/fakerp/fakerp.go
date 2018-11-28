@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -25,7 +26,11 @@ import (
 
 // IsUpdate return whether or not this is an update or create.
 func IsUpdate() bool {
-	if _, err := os.Stat("_data/containerservice.yaml"); err == nil {
+	dataDir, err := FindDirectory(DataDirectory)
+	if err != nil {
+		return false
+	}
+	if _, err := os.Stat(filepath.Join(dataDir, "containerservice.yaml")); err == nil {
 		return true
 	}
 	return false
@@ -82,13 +87,18 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	}
 
 	var err error
+	// locate directories
+	dataDir, err := FindDirectory(DataDirectory)
+	if err != nil {
+		return nil, err
+	}
 	// read in the OpenShift config blob if it exists (i.e. we're updating)
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
 	var oldCs *api.OpenShiftManagedCluster
 	if IsUpdate() {
 		log.Info("read old config")
-		oldCs, err = managedcluster.ReadConfig("_data/containerservice.yaml")
+		oldCs, err = managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
 		if err != nil {
 			return nil, err
 		}
@@ -108,11 +118,14 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	}
 
 	// the RP will enrich the internal API representation with data not included
-	// in the original request
-	log.Info("enrich")
-	err = enrich(cs)
-	if err != nil {
-		return nil, err
+	// in the original request. this should only be called during the initial
+	// create request and not during a cluster update
+	if !IsUpdate() {
+		log.Info("enrich")
+		err = enrich(cs)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// validate the internal API representation (with reference to the previous
@@ -136,12 +149,12 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	if err != nil {
 		return nil, err
 	}
-	err = ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
+	err = ioutil.WriteFile(filepath.Join(dataDir, "containerservice.yaml"), bytes, 0600)
 	if err != nil {
 		return nil, err
 	}
 
-	err = os.MkdirAll("_data/_out", 0777)
+	err = os.MkdirAll(filepath.Join(dataDir, "_out"), 0777)
 	if err != nil {
 		return nil, err
 	}
@@ -242,12 +255,16 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 }
 
 func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}) error {
+	dataDir, err := FindDirectory(DataDirectory)
+	if err != nil {
+		return err
+	}
 	b, err := config.Derived.CloudProviderConf(c)
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile("_data/_out/azure.conf", b, 0600)
+	err = ioutil.WriteFile(filepath.Join(dataDir, "_out/azure.conf"), b, 0600)
 	if err != nil {
 		return err
 	}
@@ -257,7 +274,7 @@ func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]inter
 		return err
 	}
 
-	err = ioutil.WriteFile("_data/_out/azuredeploy.json", azuredeploy, 0600)
+	err = ioutil.WriteFile(filepath.Join(dataDir, "_out/azuredeploy.json"), azuredeploy, 0600)
 	if err != nil {
 		return err
 	}
@@ -266,7 +283,7 @@ func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]inter
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile("_data/_out/id_rsa", b, 0600)
+	err = ioutil.WriteFile(filepath.Join(dataDir, "_out/id_rsa"), b, 0600)
 	if err != nil {
 		return err
 	}
@@ -275,5 +292,5 @@ func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]inter
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
+	return ioutil.WriteFile(filepath.Join(dataDir, "_out/admin.kubeconfig"), b, 0600)
 }

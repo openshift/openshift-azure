@@ -74,7 +74,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		// be consistent with how the RP runs in production so we need
 		// to restore the previous request and its provisioning state
 		// from the filesystem.
-		if ok := s.restore(w, "_data/manifest.yaml"); !ok {
+		dataDir, err := FindDirectory(DataDirectory)
+		if err != nil {
+			return
+		}
+		if ok := s.restore(w, filepath.Join(dataDir, "manifest.yaml")); !ok {
 			return
 		}
 		s.handleDelete(w, req)
