@@ -1,0 +1,5 @@
+location: "{{ .Env.AZURE_REGION }}"
+properties:
+  agentPoolProfiles:
+  - name: compute
+    count: 1
