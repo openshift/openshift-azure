@@ -34,6 +34,7 @@ func TestReadUpdateBlob(t *testing.T) {
 		},
 	}
 	gmc := gomock.NewController(t)
+	defer gmc.Finish()
 	for _, tt := range tests {
 		updateBlob := mock_storage.NewMockBlob(gmc)
 		data := ioutil.NopCloser(strings.NewReader(tt.blob))
@@ -77,6 +78,7 @@ func TestWriteUpdateBlob(t *testing.T) {
 		},
 	}
 	gmc := gomock.NewController(t)
+	defer gmc.Finish()
 	for _, tt := range tests {
 		updateBlob := mock_storage.NewMockBlob(gmc)
 		updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(tt.want)), nil)
