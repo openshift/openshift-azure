@@ -24,13 +24,9 @@ var _ = Describe("Openshift on Azure customer-reader e2e tests [CustomerAdmin]",
 	BeforeEach(func() {
 		var err error
 		cli, err = openshift.NewEndUserClient()
-		if err != nil {
-			Skip(err.Error())
-		}
+		Expect(err).ToNot(HaveOccurred())
 		readercli, err = openshift.NewCustomerReaderClient()
-		if err != nil {
-			Skip(err.Error())
-		}
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	It("should not read nodes", func() {

@@ -2,6 +2,7 @@ package realrp
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -27,11 +28,9 @@ var _ = Describe("Resource provider e2e tests [Real]", func() {
 	BeforeEach(func() {
 		var err error
 		cli, err = azure.NewClientFromEnvironment()
-		if err != nil {
-			Skip(err.Error())
-		}
+		Expect(err).ToNot(HaveOccurred())
 		if os.Getenv("AZURE_REGION") == "" || os.Getenv("RESOURCEGROUP") == "" {
-			Skip("AZURE_REGION and/or RESOURCEGROUP not set")
+			Expect(errors.New("AZURE_REGION and/or RESOURCEGROUP not set")).ToNot(HaveOccurred())
 		}
 	})
 
