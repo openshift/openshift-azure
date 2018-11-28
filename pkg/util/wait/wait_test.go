@@ -10,6 +10,7 @@ import (
 	"os"
 	"syscall"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 
@@ -97,7 +98,7 @@ func TestForHTTPStatusOk(t *testing.T) {
 
 		req, _ := http.NewRequest("GET", urltocheck, nil)
 		mockCli.EXPECT().Do(req).DoAndReturn(returner).Times(len(tt.responses))
-		err := forHTTPStatusOkWithTimeout(context.Background(), mockCli, urltocheck)
+		err := forHTTPStatusOk(context.Background(), mockCli, urltocheck, time.Nanosecond)
 		if tt.wantErr != (err != nil) || tt.wantErr && tt.err.Error() != err.Error() {
 			t.Errorf("forHTTPStatusOkWithTimeout(%s) error = %v, Err %v", tt.name, err, tt.err)
 		}

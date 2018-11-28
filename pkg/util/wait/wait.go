@@ -41,15 +41,15 @@ func ForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urltochec
 		Transport: transport,
 		Timeout:   10 * time.Second,
 	}
-	return forHTTPStatusOkWithTimeout(ctx, cli, urltocheck)
+	return forHTTPStatusOk(ctx, cli, urltocheck, time.Second)
 }
 
-func forHTTPStatusOkWithTimeout(ctx context.Context, cli SimpleHTTPClient, urltocheck string) error {
+func forHTTPStatusOk(ctx context.Context, cli SimpleHTTPClient, urltocheck string, interval time.Duration) error {
 	req, err := http.NewRequest("GET", urltocheck, nil)
 	if err != nil {
 		return err
 	}
-	return PollImmediateUntil(time.Second, func() (bool, error) {
+	return PollImmediateUntil(interval, func() (bool, error) {
 		resp, err := cli.Do(req)
 		if err, ok := err.(*url.Error); ok {
 			if err, ok := err.Err.(*net.OpError); ok {
