@@ -30,8 +30,8 @@ func PollImmediateUntil(interval time.Duration, condition wait.ConditionFunc, st
 	return wait.PollUntil(interval, condition, stopCh)
 }
 
-// SimpleHttpClient to aid in mocking
-type SimpleHttpClient interface {
+// SimpleHTTPClient to aid in mocking
+type SimpleHTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
@@ -44,7 +44,7 @@ func ForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urltochec
 	return forHTTPStatusOkWithTimeout(ctx, cli, urltocheck)
 }
 
-func forHTTPStatusOkWithTimeout(ctx context.Context, cli SimpleHttpClient, urltocheck string) error {
+func forHTTPStatusOkWithTimeout(ctx context.Context, cli SimpleHTTPClient, urltocheck string) error {
 	req, err := http.NewRequest("GET", urltocheck, nil)
 	if err != nil {
 		return err

@@ -87,7 +87,7 @@ func TestForHTTPStatusOk(t *testing.T) {
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
 
-		mockCli := mock_wait.NewMockSimpleHttpClient(mockCtrl)
+		mockCli := mock_wait.NewMockSimpleHTTPClient(mockCtrl)
 		iteration := 0
 		returner := func(req *http.Request) (*http.Response, error) {
 			resp := tt.responses[iteration]
