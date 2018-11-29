@@ -47,29 +47,30 @@ const (
 	DataDirectory = "_data"
 )
 
-func NewConfig(log *logrus.Entry) (*Config, error) {
+func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
 	var c Config
 	if err := envconfig.Process("", &c); err != nil {
 		return nil, err
 	}
-
-	if c.Region == "" {
-		// Randomly assign a supported region
-		rand.Seed(time.Now().UTC().UnixNano())
-		c.Region = supportedRegions[rand.Intn(len(supportedRegions))]
-		log.Infof("using randomly selected region %q", c.Region)
-	}
-
-	var supported bool
-	for _, region := range supportedRegions {
-		if c.Region == region {
-			supported = true
+	if needRegion {
+		if c.Region == "" {
+			// Randomly assign a supported region
+			rand.Seed(time.Now().UTC().UnixNano())
+			c.Region = supportedRegions[rand.Intn(len(supportedRegions))]
+			log.Infof("using randomly selected region %q", c.Region)
 		}
+
+		var supported bool
+		for _, region := range supportedRegions {
+			if c.Region == region {
+				supported = true
+			}
+		}
+		if !supported {
+			return nil, fmt.Errorf("%q is not a supported region (supported regions: %v)", c.Region, supportedRegions)
+		}
+		os.Setenv("AZURE_REGION", c.Region)
 	}
-	if !supported {
-		return nil, fmt.Errorf("%q is not a supported region (supported regions: %v)", c.Region, supportedRegions)
-	}
-	os.Setenv("AZURE_REGION", c.Region)
 	return &c, nil
 }
 

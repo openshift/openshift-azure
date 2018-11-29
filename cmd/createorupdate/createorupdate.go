@@ -259,15 +259,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	conf, err := fakerp.NewConfig(log)
+	isDelete := strings.ToUpper(*method) == http.MethodDelete
+	conf, err := fakerp.NewConfig(log, !isDelete)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var isCreate bool
-	if strings.ToUpper(*method) != http.MethodDelete {
+	if !isDelete {
 		log.Infof("creating resource group %s", conf.ResourceGroup)
-		if isCreate, err = createResourceGroup(conf); err != nil {
+		if isCreate, err := createResourceGroup(conf); err != nil {
 			log.Fatal(err)
 		} else if !isCreate {
 			log.Infof("reusing existing resource group %s", conf.ResourceGroup)
@@ -275,18 +275,16 @@ func main() {
 	}
 
 	// simulate the RP
-	fakeRpAddr := "localhost:8080"
+	rpURL := v20180930preview.DefaultBaseURI
 	if !*useProd {
 		log.Info("starting the fake resource provider")
+		fakeRpAddr := "localhost:8080"
+		rpURL = fmt.Sprintf("http://%s", fakeRpAddr)
 		s := fakerp.NewServer(log, conf.ResourceGroup, fakeRpAddr, conf)
 		go s.ListenAndServe()
 	}
 
 	// setup the osa client
-	rpURL := fmt.Sprintf("http://%s", fakeRpAddr)
-	if *useProd {
-		rpURL = v20180930preview.DefaultBaseURI
-	}
 	rpc := v20180930preview.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
 	if err != nil {
@@ -296,7 +294,7 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
-	if strings.ToUpper(*method) == http.MethodDelete {
+	if isDelete {
 		if err := delete(ctx, log, rpc, conf.ResourceGroup, conf.NoWait); err != nil {
 			log.Fatal(err)
 		}
