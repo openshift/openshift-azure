@@ -9,10 +9,10 @@ data:
       bearer_token_file: "/run/secrets/kubernetes.io/serviceaccount/token"
       scheme: https
       tls_config:
-        ca_file: "/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+        ca_file: "/config/ca.crt"
       params:
         'match[]':
-        - '{__name__=~".+"}'
+          - '{__name__=~".+"}'
     
       honor_labels: true
       metrics_path: /federate

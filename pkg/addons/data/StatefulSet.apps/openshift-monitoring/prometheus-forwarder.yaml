@@ -60,6 +60,8 @@ spec:
           sources:
             - configMap:
                 name: prometheus-forwarder-config
+            - secret:
+                name: prometheus-forwarder-ca
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
 

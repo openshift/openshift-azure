@@ -644,6 +644,12 @@ var Translations = map[string][]struct {
 			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.GenevaMetrics.Key) }}",
 		},
 	},
+	"Secret/openshift-azure-monitoring/prometheus-forwarder-ca": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'ca.crt'"),
+			Template: "{{ String (CertAsBytes .Config.Certificates.ServiceSigningCa.Cert) }}",
+		},
+	},
 	"Secret/openshift-console/console-oauth-config": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.clientSecret"),
