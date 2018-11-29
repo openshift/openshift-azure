@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 
 	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
@@ -19,6 +20,36 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 )
+
+func mockListVMs(ctx context.Context, gmc *gomock.Controller, virtualMachineScaleSetVMsClient *mock_azureclient.MockVirtualMachineScaleSetVMsClient, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, rg string, outVMS []compute.VirtualMachineScaleSetVM, outErr error) {
+	mPage := mock_azureclient.NewMockVirtualMachineScaleSetVMListResultPage(gmc)
+	if len(outVMS) > 0 {
+		mPage.EXPECT().Values().Return(outVMS)
+		mPage.EXPECT().Next()
+	}
+	callTimes := func(vms []compute.VirtualMachineScaleSetVM) int {
+		if len(vms) > 0 {
+			// NotDone gets called twice once for yes, there is data, and once more for no data
+			return 2
+		}
+		// NotDone gets called once for there is no data
+		return 1
+	}
+	if outErr == nil {
+		mNotDone := len(outVMS) > 0
+		mPage.EXPECT().NotDone().Times(callTimes(outVMS)).DoAndReturn(func() bool {
+			ret := mNotDone
+			mNotDone = false
+			return ret
+		})
+	}
+	scalesetName := strings.TrimSpace("ss-" + string(role))
+	if outErr != nil {
+		virtualMachineScaleSetVMsClient.EXPECT().List(ctx, rg, scalesetName, "", "", "").Return(nil, outErr)
+	} else {
+		virtualMachineScaleSetVMsClient.EXPECT().List(ctx, rg, scalesetName, "", "", "").Return(mPage, nil)
+	}
+}
 
 func TestMasterIsReady(t *testing.T) {
 	tests := []struct {
@@ -373,66 +404,29 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
 			gmc := gomock.NewController(t)
+			defer gmc.Finish()
 			virtualMachineScaleSetsClient := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
 			virtualMachineScaleSetVMsClient := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 
-			mPage := mock_azureclient.NewMockVirtualMachineScaleSetVMListResultPage(gmc)
-			iPage := mock_azureclient.NewMockVirtualMachineScaleSetVMListResultPage(gmc)
-			cPage := mock_azureclient.NewMockVirtualMachineScaleSetVMListResultPage(gmc)
+			if tt.wantErr {
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, nil, tt.expectedErr)
+			} else {
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, tt.expect["master"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "infra", testRg, tt.expect["infra"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "compute", testRg, tt.expect["compute"], nil)
+			}
 
 			for _, react := range tt.reactors {
 				tt.kubeclient.PrependReactor(react.verb, "nodes", react.reaction)
 			}
 
-			if len(tt.expect) > 0 {
-				mPage.EXPECT().Values().Return(tt.expect["master"])
-				mPage.EXPECT().Next()
-				iPage.EXPECT().Values().Return(tt.expect["infra"])
-				iPage.EXPECT().Next()
-				cPage.EXPECT().Values().Return(tt.expect["compute"])
-				cPage.EXPECT().Next()
-			}
-			callTimes := func(vms []compute.VirtualMachineScaleSetVM) int {
-				if len(vms) > 0 {
-					// NotDone gets called twice once for yes, there is data, and once more for no data
-					return 2
-				}
-				// NotDone gets called once for there is no data
-				return 1
-			}
-			mNotDone := len(tt.expect["master"]) > 0
-			mPage.EXPECT().NotDone().Times(callTimes(tt.expect["master"])).DoAndReturn(func() bool {
-				ret := mNotDone
-				mNotDone = false
-				return ret
-			})
-			iNotDone := len(tt.expect["infra"]) > 0
-			iPage.EXPECT().NotDone().Times(callTimes(tt.expect["infra"])).DoAndReturn(func() bool {
-				ret := iNotDone
-				iNotDone = false
-				return ret
-			})
-			cNotDone := len(tt.expect["compute"]) > 0
-			cPage.EXPECT().NotDone().Times(callTimes(tt.expect["compute"])).DoAndReturn(func() bool {
-				ret := cNotDone
-				cNotDone = false
-				return ret
-			})
-
-			if tt.wantErr && len(tt.reactors) == 0 {
-				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, "ss-master", "", "", "").Return(nil, tt.expectedErr)
-			} else {
-				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, "ss-master", "", "", "").Return(mPage, nil)
-				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, "ss-infra", "", "", "").Return(iPage, nil)
-				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, "ss-compute", "", "", "").Return(cPage, nil)
-			}
 			u := &simpleUpgrader{
 				vmc:        virtualMachineScaleSetVMsClient,
 				ssc:        virtualMachineScaleSetsClient,
 				kubeclient: tt.kubeclient,
 				log:        logrus.NewEntry(logrus.StandardLogger()),
 			}
-			err := u.waitForNodes(context.Background(), tt.cs)
+			err := u.waitForNodes(ctx, tt.cs)
 			if tt.wantErr && tt.expectedErr != err {
 				t.Errorf("simpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
 			}
