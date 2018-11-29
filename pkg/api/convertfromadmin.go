@@ -99,27 +99,6 @@ func mergePropertiesAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManage
 		return err
 	}
 
-	if oc.Properties.ServicePrincipalProfile != nil {
-		if oc.Properties.ServicePrincipalProfile.ClientID != nil {
-			cs.Properties.ServicePrincipalProfile.ClientID = *oc.Properties.ServicePrincipalProfile.ClientID
-		}
-		if oc.Properties.ServicePrincipalProfile.Secret != nil {
-			cs.Properties.ServicePrincipalProfile.Secret = *oc.Properties.ServicePrincipalProfile.Secret
-		}
-	}
-
-	if oc.Properties.AzProfile != nil {
-		if oc.Properties.AzProfile.TenantID != nil {
-			cs.Properties.AzProfile.TenantID = *oc.Properties.AzProfile.TenantID
-		}
-		if oc.Properties.AzProfile.SubscriptionID != nil {
-			cs.Properties.AzProfile.SubscriptionID = *oc.Properties.AzProfile.SubscriptionID
-		}
-		if oc.Properties.AzProfile.ResourceGroup != nil {
-			cs.Properties.AzProfile.ResourceGroup = *oc.Properties.AzProfile.ResourceGroup
-		}
-	}
-
 	return nil
 }
 
@@ -269,9 +248,6 @@ func convertIdentityProviderAdmin(in admin.IdentityProvider, old *IdentityProvid
 			if provider.ClientID != nil {
 				p.ClientID = *provider.ClientID
 			}
-			if provider.Secret != nil {
-				p.Secret = *provider.Secret
-			}
 			if provider.TenantID != nil {
 				p.TenantID = *provider.TenantID
 			}
@@ -299,9 +275,6 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	if in.ImageVersion != nil {
 		out.ImageVersion = *in.ImageVersion
 	}
-	if in.SSHKey != nil {
-		out.SSHKey = in.SSHKey
-	}
 	if in.ConfigStorageAccount != nil {
 		out.ConfigStorageAccount = *in.ConfigStorageAccount
 	}
@@ -313,63 +286,6 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	}
 	if in.Images != nil {
 		mergeImageConfig(in.Images, &out.Images)
-	}
-	if in.AdminKubeconfig != nil {
-		out.AdminKubeconfig = in.AdminKubeconfig.DeepCopy()
-	}
-	if in.MasterKubeconfig != nil {
-		out.MasterKubeconfig = in.MasterKubeconfig.DeepCopy()
-	}
-	if in.NodeBootstrapKubeconfig != nil {
-		out.NodeBootstrapKubeconfig = in.NodeBootstrapKubeconfig.DeepCopy()
-	}
-	if in.AzureClusterReaderKubeconfig != nil {
-		out.AzureClusterReaderKubeconfig = in.AzureClusterReaderKubeconfig.DeepCopy()
-	}
-	if in.ServiceAccountKey != nil {
-		out.ServiceAccountKey = in.ServiceAccountKey
-	}
-	if len(in.SessionSecretAuth) > 0 {
-		out.SessionSecretAuth = in.SessionSecretAuth
-	}
-	if len(in.SessionSecretEnc) > 0 {
-		out.SessionSecretEnc = in.SessionSecretEnc
-	}
-	if in.RunningUnderTest != nil {
-		out.RunningUnderTest = *in.RunningUnderTest
-	}
-	if len(in.HtPasswd) > 0 {
-		out.HtPasswd = in.HtPasswd
-	}
-	if in.CustomerAdminPasswd != nil {
-		out.CustomerAdminPasswd = *in.CustomerAdminPasswd
-	}
-	if in.CustomerReaderPasswd != nil {
-		out.CustomerReaderPasswd = *in.CustomerReaderPasswd
-	}
-	if in.EndUserPasswd != nil {
-		out.EndUserPasswd = *in.EndUserPasswd
-	}
-	if len(in.RegistryHTTPSecret) > 0 {
-		out.RegistryHTTPSecret = in.RegistryHTTPSecret
-	}
-	if len(in.PrometheusProxySessionSecret) > 0 {
-		out.PrometheusProxySessionSecret = in.PrometheusProxySessionSecret
-	}
-	if len(in.AlertManagerProxySessionSecret) > 0 {
-		out.AlertManagerProxySessionSecret = in.AlertManagerProxySessionSecret
-	}
-	if len(in.AlertsProxySessionSecret) > 0 {
-		out.AlertsProxySessionSecret = in.AlertsProxySessionSecret
-	}
-	if in.RegistryConsoleOAuthSecret != nil {
-		out.RegistryConsoleOAuthSecret = *in.RegistryConsoleOAuthSecret
-	}
-	if in.ConsoleOAuthSecret != nil {
-		out.ConsoleOAuthSecret = *in.ConsoleOAuthSecret
-	}
-	if in.RouterStatsPassword != nil {
-		out.RouterStatsPassword = *in.RouterStatsPassword
 	}
 	if in.ServiceCatalogClusterID != nil {
 		out.ServiceCatalogClusterID = *in.ServiceCatalogClusterID
@@ -450,10 +366,7 @@ func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig)
 	return
 }
 
-func mergeCertKeyPair(in *admin.CertKeyPair, out *CertKeyPair) {
-	if in.Key != nil {
-		out.Key = in.Key
-	}
+func mergeCertKeyPair(in *admin.Certificate, out *CertKeyPair) {
 	if in.Cert != nil {
 		out.Cert = in.Cert
 	}
@@ -538,9 +451,6 @@ func mergeImageConfig(in *admin.ImageConfig, out *ImageConfig) {
 	}
 	if in.EtcdBackup != nil {
 		out.EtcdBackup = *in.EtcdBackup
-	}
-	if len(in.GenevaImagePullSecret) > 0 {
-		out.GenevaImagePullSecret = in.GenevaImagePullSecret
 	}
 	if in.GenevaLogging != nil {
 		out.GenevaLogging = *in.GenevaLogging

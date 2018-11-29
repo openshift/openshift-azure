@@ -74,24 +74,12 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 			oc.Properties.AuthProfile.IdentityProviders[i].Provider = &admin.AADIdentityProvider{
 				Kind:     &provider.Kind,
 				ClientID: &provider.ClientID,
-				Secret:   &provider.Secret,
 				TenantID: &provider.TenantID,
 			}
 
 		default:
 			panic("authProfile.identityProviders conversion failed")
 		}
-	}
-
-	oc.Properties.ServicePrincipalProfile = &admin.ServicePrincipalProfile{
-		ClientID: &cs.Properties.ServicePrincipalProfile.ClientID,
-		Secret:   &cs.Properties.ServicePrincipalProfile.Secret,
-	}
-
-	oc.Properties.AzProfile = &admin.AzProfile{
-		TenantID:       &cs.Properties.AzProfile.TenantID,
-		SubscriptionID: &cs.Properties.AzProfile.SubscriptionID,
-		ResourceGroup:  &cs.Properties.AzProfile.ResourceGroup,
 	}
 
 	oc.Config = convertConfigToAdmin(&cs.Config)
@@ -101,36 +89,16 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 
 func convertConfigToAdmin(cs *Config) *admin.Config {
 	return &admin.Config{
-		ImageOffer:                     &cs.ImageOffer,
-		ImagePublisher:                 &cs.ImagePublisher,
-		ImageSKU:                       &cs.ImageSKU,
-		ImageVersion:                   &cs.ImageVersion,
-		SSHKey:                         cs.SSHKey,
-		ConfigStorageAccount:           &cs.ConfigStorageAccount,
-		RegistryStorageAccount:         &cs.RegistryStorageAccount,
-		Certificates:                   convertCertificateConfigToAdmin(cs.Certificates),
-		Images:                         convertImageConfigToAdmin(cs.Images),
-		AdminKubeconfig:                cs.AdminKubeconfig,
-		MasterKubeconfig:               cs.MasterKubeconfig,
-		NodeBootstrapKubeconfig:        cs.NodeBootstrapKubeconfig,
-		AzureClusterReaderKubeconfig:   cs.AzureClusterReaderKubeconfig,
-		ServiceAccountKey:              cs.ServiceAccountKey,
-		SessionSecretAuth:              cs.SessionSecretAuth,
-		SessionSecretEnc:               cs.SessionSecretEnc,
-		RunningUnderTest:               &cs.RunningUnderTest,
-		HtPasswd:                       cs.HtPasswd,
-		CustomerAdminPasswd:            &cs.CustomerAdminPasswd,
-		CustomerReaderPasswd:           &cs.CustomerReaderPasswd,
-		EndUserPasswd:                  &cs.EndUserPasswd,
-		RegistryHTTPSecret:             cs.RegistryHTTPSecret,
-		PrometheusProxySessionSecret:   cs.PrometheusProxySessionSecret,
-		AlertManagerProxySessionSecret: cs.AlertManagerProxySessionSecret,
-		AlertsProxySessionSecret:       cs.AlertsProxySessionSecret,
-		RegistryConsoleOAuthSecret:     &cs.RegistryConsoleOAuthSecret,
-		ConsoleOAuthSecret:             &cs.ConsoleOAuthSecret,
-		RouterStatsPassword:            &cs.RouterStatsPassword,
-		ServiceCatalogClusterID:        &cs.ServiceCatalogClusterID,
-		GenevaLoggingSector:            &cs.GenevaLoggingSector,
+		ImageOffer:              &cs.ImageOffer,
+		ImagePublisher:          &cs.ImagePublisher,
+		ImageSKU:                &cs.ImageSKU,
+		ImageVersion:            &cs.ImageVersion,
+		ConfigStorageAccount:    &cs.ConfigStorageAccount,
+		RegistryStorageAccount:  &cs.RegistryStorageAccount,
+		Certificates:            convertCertificateConfigToAdmin(cs.Certificates),
+		Images:                  convertImageConfigToAdmin(cs.Images),
+		ServiceCatalogClusterID: &cs.ServiceCatalogClusterID,
+		GenevaLoggingSector:     &cs.GenevaLoggingSector,
 	}
 }
 
@@ -161,9 +129,8 @@ func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateCon
 	}
 }
 
-func convertCertKeyPairToAdmin(in CertKeyPair) *admin.CertKeyPair {
-	return &admin.CertKeyPair{
-		Key:  in.Key,
+func convertCertKeyPairToAdmin(in CertKeyPair) *admin.Certificate {
+	return &admin.Certificate{
 		Cert: in.Cert,
 	}
 }
@@ -196,7 +163,6 @@ func convertImageConfigToAdmin(in ImageConfig) *admin.ImageConfig {
 		WebConsole:                   &in.WebConsole,
 		Console:                      &in.Console,
 		EtcdBackup:                   &in.EtcdBackup,
-		GenevaImagePullSecret:        in.GenevaImagePullSecret,
 		GenevaLogging:                &in.GenevaLogging,
 		GenevaTDAgent:                &in.GenevaTDAgent,
 	}

@@ -57,10 +57,6 @@ type Properties struct {
 
 	// AuthProfile (in): configures OpenShift authentication
 	AuthProfile *AuthProfile `json:"authProfile,omitempty"`
-
-	ServicePrincipalProfile *ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
-
-	AzProfile *AzProfile `json:"azProfile,omitempty"`
 }
 
 // ProvisioningState represents the current state of the OSA resource.
@@ -214,20 +210,5 @@ type IdentityProvider struct {
 type AADIdentityProvider struct {
 	Kind     *string `json:"kind,omitempty"`
 	ClientID *string `json:"clientId,omitempty"`
-	Secret   *string `json:"secret,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
-}
-
-// ServicePrincipalProfile contains the client and secret used by the cluster
-// for Azure Resource CRUD.
-type ServicePrincipalProfile struct {
-	ClientID *string `json:"clientId,omitempty"`
-	Secret   *string `json:"secret,omitempty"`
-}
-
-// AzProfile holds the azure context for where the cluster resides
-type AzProfile struct {
-	TenantID       *string `json:"tenantId,omitempty"`
-	SubscriptionID *string `json:"subscriptionId,omitempty"`
-	ResourceGroup  *string `json:"resourceGroup,omitempty"`
 }
