@@ -1,7 +1,0 @@
-# Placeholder file to overwrite ci-operator variables for tests.
-# This file should be used ONLY for development. 
-# No permanent overrides should be added here. 
-# Permanent overrides should be in openshift/release repository
-#
-# example: 
-# export TEST_FOCUS="my-awesome-test-I-want-to-run"
