@@ -85,20 +85,22 @@ func getPluginConfig() (*api.PluginConfig, error) {
 		ORegURL:               os.Getenv("OREG_URL"),
 		EtcdBackupImage:       os.Getenv("ETCDBACKUP_IMAGE"),
 		AzureControllersImage: os.Getenv("AZURE_CONTROLLERS_IMAGE"),
+		SecretsDir:            os.Getenv("SECRETS_DIR"),
 	}
 
 	// populate geneva artifacts
-	gp := os.Getenv("GOPATH")
-	artifactDir := path.Join(gp, "src/github.com/openshift/openshift-azure/secrets/")
-	logCert, err := readCert(path.Join(artifactDir, "logging-int.cert"))
+	if tc.SecretsDir == "" {
+		tc.SecretsDir = "secrets/"
+	}
+	logCert, err := readCert(path.Join(tc.SecretsDir, "logging-int.cert"))
 	if err != nil {
 		return nil, err
 	}
-	logKey, err := readKey(path.Join(artifactDir, "logging-int.key"))
+	logKey, err := readKey(path.Join(tc.SecretsDir, "logging-int.key"))
 	if err != nil {
 		return nil, err
 	}
-	pullSecret, err := readFile(path.Join(artifactDir, ".dockerconfigjson"))
+	pullSecret, err := readFile(path.Join(tc.SecretsDir, ".dockerconfigjson"))
 	if err != nil {
 		return nil, err
 	}

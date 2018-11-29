@@ -85,6 +85,7 @@ type TestConfig struct {
 	ORegURL               string
 	EtcdBackupImage       string
 	AzureControllersImage string
+	SecretsDir            string
 }
 
 // GenevaConfig holds all configuration for Plugin integration with Azure
