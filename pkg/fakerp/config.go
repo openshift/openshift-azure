@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"path"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -87,16 +88,17 @@ func getPluginConfig() (*api.PluginConfig, error) {
 	}
 
 	// populate geneva artifacts
-	artifactDir := "secrets/"
-	logCert, err := readCert(artifactDir + "logging-int.cert")
+	gp := os.Getenv("GOPATH")
+	artifactDir := path.Join(gp, "src/github.com/openshift/openshift-azure/secrets/")
+	logCert, err := readCert(path.Join(artifactDir, "logging-int.cert"))
 	if err != nil {
 		return nil, err
 	}
-	logKey, err := readKey(artifactDir + "logging-int.key")
+	logKey, err := readKey(path.Join(artifactDir, "logging-int.key"))
 	if err != nil {
 		return nil, err
 	}
-	pullSecret, err := readFile(artifactDir + ".dockerconfigjson")
+	pullSecret, err := readFile(path.Join(artifactDir, ".dockerconfigjson"))
 	if err != nil {
 		return nil, err
 	}
