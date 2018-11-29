@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"regexp"
 	"strconv"
 	"time"
@@ -87,18 +86,12 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		url := fmt.Sprintf("http://%s", host)
 
 		// Curl the endpoint and search for a string
-		httpc := &http.Client{
-			Timeout: 10 * time.Second,
-		}
 		By(fmt.Sprintf("hitting the route and checking the contents (%v)", time.Now()))
 		timeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
-		err = waitutil.ForHTTPStatusOk(timeout, nil, url)
-		Expect(err).NotTo(HaveOccurred())
-		resp, err := httpc.Get(url)
+		resp, err := waitutil.ForHTTPStatusOk(timeout, nil, url)
 		Expect(err).NotTo(HaveOccurred())
 		defer resp.Body.Close()
-		Expect(resp.StatusCode).Should(Equal(http.StatusOK))
 		contents, err := ioutil.ReadAll(resp.Body)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(string(contents)).Should(ContainSubstring("Welcome to your static nginx application on OpenShift"))
@@ -154,25 +147,13 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		prevCounter := 0
 
 		loopHTTPGet := func(url string, regex *regexp.Regexp, times int) error {
-			httpc := &http.Client{
-				Timeout: 10 * time.Second,
-			}
-
 			timeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
-			err := waitutil.ForHTTPStatusOk(timeout, nil, url)
-			if err != nil {
-				return err
-			}
 
 			for i := 0; i < times; i++ {
-				resp, err := httpc.Get(url)
+				resp, err := waitutil.ForHTTPStatusOk(timeout, nil, url)
 				if err != nil {
 					return err
-				}
-				defer resp.Body.Close()
-				if resp.StatusCode != http.StatusOK {
-					return fmt.Errorf("unexpected http error returned: %d", resp.StatusCode)
 				}
 
 				contents, err := ioutil.ReadAll(resp.Body)

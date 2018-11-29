@@ -16,6 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
+// ReadConfig returns a config object from a config file
 func ReadConfig(path string) (*api.OpenShiftManagedCluster, error) {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -66,5 +67,6 @@ func WaitForHealthz(ctx context.Context, config *v1.Config) error {
 	}
 
 	// Wait for the healthz to be 200 status
-	return wait.ForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
+	_, err = wait.ForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
+	return err
 }
