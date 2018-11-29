@@ -244,8 +244,14 @@ func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.C
 		conf.AADClientSecret = conf.ClientSecret
 	}
 	// set env variable so enrich() still works
-	os.Setenv("AZURE_AAD_CLIENT_ID", conf.AADClientID)
-	os.Setenv("AZURE_AAD_CLIENT_SECRET", conf.AADClientSecret)
+	err := os.Setenv("AZURE_AAD_CLIENT_ID", conf.AADClientID)
+	if err != nil {
+		return err
+	}
+	err = os.Setenv("AZURE_AAD_CLIENT_SECRET", conf.AADClientSecret)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
