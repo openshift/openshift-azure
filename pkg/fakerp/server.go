@@ -180,14 +180,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	s.log.Infof("deleting resource group %s", resourceGroup)
 
 	future, err := gc.Delete(ctx, resourceGroup)
-	if err != nil {
-		if autoRestErr, ok := err.(autorest.DetailedError); ok {
-			if original, ok := autoRestErr.Original.(*azure.RequestError); ok {
-				if original.StatusCode == http.StatusNotFound {
-					return
-				}
-			}
-		}
+	if err != nil && !isNotFound(err) {
 		resp := "500 Internal Error: Failed to delete resource group"
 		s.log.Debugf("%s: %#v", resp, err)
 		http.Error(w, resp, http.StatusInternalServerError)
@@ -223,6 +216,15 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	// And last but not least, we have accepted this DELETE request
 	// and are processing it in the background.
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func isNotFound(err error) bool {
+	if autoRestErr, ok := err.(autorest.DetailedError); ok {
+		if original, ok := autoRestErr.Original.(*azure.RequestError); ok {
+			return original.StatusCode == http.StatusNotFound
+		}
+	}
+	return false
 }
 
 func (s *Server) handleGet(w http.ResponseWriter, req *http.Request) {
