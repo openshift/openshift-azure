@@ -14,6 +14,7 @@ if [[ -n "$TEST_IN_PRODUCTION" ]]; then
   USE_PROD="-use-prod=true"
 fi
 
+cp test/manifests/normal/create.yaml _data/manifest.yaml
 go generate ./...
 go run cmd/createorupdate/createorupdate.go "${USE_PROD:-}"
 
