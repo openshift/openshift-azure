@@ -35,9 +35,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 	BeforeEach(func() {
 		var err error
 		cli, err = openshift.NewEndUserClient()
-		if err != nil {
-			Skip(err.Error())
-		}
+		Expect(err).ToNot(HaveOccurred())
 
 		namespace, err = randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
 		Expect(err).ToNot(HaveOccurred())
