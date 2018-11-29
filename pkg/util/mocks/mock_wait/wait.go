@@ -11,31 +11,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockSimpleHttpClient is a mock of SimpleHttpClient interface
-type MockSimpleHttpClient struct {
+// MockSimpleHTTPClient is a mock of SimpleHTTPClient interface
+type MockSimpleHTTPClient struct {
 	ctrl     *gomock.Controller
-	recorder *MockSimpleHttpClientMockRecorder
+	recorder *MockSimpleHTTPClientMockRecorder
 }
 
-// MockSimpleHttpClientMockRecorder is the mock recorder for MockSimpleHttpClient
-type MockSimpleHttpClientMockRecorder struct {
-	mock *MockSimpleHttpClient
+// MockSimpleHTTPClientMockRecorder is the mock recorder for MockSimpleHTTPClient
+type MockSimpleHTTPClientMockRecorder struct {
+	mock *MockSimpleHTTPClient
 }
 
-// NewMockSimpleHttpClient creates a new mock instance
-func NewMockSimpleHttpClient(ctrl *gomock.Controller) *MockSimpleHttpClient {
-	mock := &MockSimpleHttpClient{ctrl: ctrl}
-	mock.recorder = &MockSimpleHttpClientMockRecorder{mock}
+// NewMockSimpleHTTPClient creates a new mock instance
+func NewMockSimpleHTTPClient(ctrl *gomock.Controller) *MockSimpleHTTPClient {
+	mock := &MockSimpleHTTPClient{ctrl: ctrl}
+	mock.recorder = &MockSimpleHTTPClientMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockSimpleHttpClient) EXPECT() *MockSimpleHttpClientMockRecorder {
+func (m *MockSimpleHTTPClient) EXPECT() *MockSimpleHTTPClientMockRecorder {
 	return m.recorder
 }
 
 // Do mocks base method
-func (m *MockSimpleHttpClient) Do(req *http.Request) (*http.Response, error) {
+func (m *MockSimpleHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	ret := m.ctrl.Call(m, "Do", req)
 	ret0, _ := ret[0].(*http.Response)
 	ret1, _ := ret[1].(error)
@@ -43,6 +43,6 @@ func (m *MockSimpleHttpClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 // Do indicates an expected call of Do
-func (mr *MockSimpleHttpClientMockRecorder) Do(req interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockSimpleHttpClient)(nil).Do), req)
+func (mr *MockSimpleHTTPClientMockRecorder) Do(req interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockSimpleHTTPClient)(nil).Do), req)
 }

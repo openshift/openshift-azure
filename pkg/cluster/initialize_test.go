@@ -14,6 +14,7 @@ import (
 
 func TestInitialize(t *testing.T) {
 	gmc := gomock.NewController(t)
+	defer gmc.Finish()
 	storageClient := mock_storage.NewMockClient(gmc)
 	u := &simpleUpgrader{
 		storageClient: storageClient,
