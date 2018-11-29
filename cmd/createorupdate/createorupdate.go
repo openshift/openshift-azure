@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -14,10 +15,12 @@ import (
 	"path"
 	"strings"
 	"syscall"
+	"text/template"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 
@@ -26,11 +29,16 @@ import (
 	sdk "github.com/openshift/openshift-azure/pkg/util/azureclient/osa-go-sdk/services/containerservice/mgmt/2018-09-30-preview/containerservice"
 )
 
+const (
+	dataDirectory = "_data"
+)
+
 var (
-	method  = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
-	useProd = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
-	update  = flag.String("update", "", "If provided, use this manifest to make a follow-up request after the initial request succeeds.")
-	cleanup = flag.Bool("rm", false, "Delete the cluster once all other requests have completed successfully.")
+	method   = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
+	useProd  = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
+	manifest = flag.String("manifest", "_data/manifest.yaml", "Use this manifest to make a request to the OpenShift resource provider.")
+	update   = flag.String("update", "", "If provided, use this manifest to make a follow-up request after the initial request succeeds.")
+	cleanup  = flag.Bool("rm", false, "Delete the cluster once all other requests have completed successfully.")
 
 	// timeouts
 	rmTimeout     = flag.Duration("rm-timeout", 20*time.Minute, "Timeout of the cleanup request")
@@ -94,8 +102,12 @@ func delete(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClus
 	return nil
 }
 
-func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, resourceGroup string, oc *sdk.OpenShiftManagedCluster, manifestFile string) error {
+func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, resourceGroup, manifestTemplate string) error {
 	log.Info("creating/updating cluster")
+	oc, err := loadClusterConfigFromManifest(log, manifestTemplate)
+	if err != nil {
+		return err
+	}
 	future, err := rpc.CreateOrUpdate(ctx, resourceGroup, resourceGroup, *oc)
 	if err != nil {
 		return err
@@ -111,7 +123,60 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftMan
 		return fmt.Errorf("unexpected response: %s", resp.Status)
 	}
 	log.Info("created/updated cluster")
-	return fakerp.WriteClusterConfigToManifest(&resp, manifestFile)
+	return writeClusterConfigToManifest(&resp, manifestTemplate)
+}
+
+func loadClusterConfigFromManifest(log *logrus.Entry, manifestTemplate string) (*sdk.OpenShiftManagedCluster, error) {
+	var data []byte
+	var err error
+
+	if manifestTemplate == "" {
+		defaultManifestFile := path.Join(dataDirectory, "manifest.yaml")
+		log.Debugf("using manifest from %q", defaultManifestFile)
+		data, err = ioutil.ReadFile(defaultManifestFile)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		log.Debugf("generating manifest from %q", manifestTemplate)
+		t, err := template.ParseFiles(manifestTemplate)
+		if err != nil {
+			return nil, fmt.Errorf("failed parsing the manifest %q: %v", manifestTemplate, err)
+		}
+		b := &bytes.Buffer{}
+		err = t.Execute(b, struct{ Env map[string]string }{Env: readEnv()})
+		if err != nil {
+			return nil, fmt.Errorf("failed templating the manifest: %v", err)
+		}
+		data = b.Bytes()
+	}
+
+	var oc *sdk.OpenShiftManagedCluster
+	if err := yaml.Unmarshal(data, &oc); err != nil {
+		return nil, err
+	}
+
+	if oc.OpenShiftManagedClusterProperties != nil {
+		oc.OpenShiftManagedClusterProperties.ProvisioningState = nil
+	}
+	return oc, nil
+}
+
+func readEnv() map[string]string {
+	env := make(map[string]string)
+	for _, setting := range os.Environ() {
+		pair := strings.SplitN(setting, "=", 2)
+		env[pair[0]] = pair[1]
+	}
+	return env
+}
+
+func writeClusterConfigToManifest(oc *sdk.OpenShiftManagedCluster, manifestFile string) error {
+	out, err := yaml.Marshal(oc)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(manifestFile, out, 0666)
 }
 
 func execCommand(c string) error {
@@ -161,14 +226,9 @@ func createResourceGroup(conf *fakerp.Config) (bool, error) {
 }
 
 func execute(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClustersClient, conf *fakerp.Config) error {
-	oc, err := fakerp.LoadClusterConfigFromManifest(log, "", conf)
-	if err != nil {
-		return err
-	}
 	// simulate the API call to the RP
-	defaultManifestFile := path.Join(fakerp.DataDirectory, "manifest.yaml")
 	if err := wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
-		if err := createOrUpdate(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile); err != nil {
+		if err := createOrUpdate(ctx, log, rpc, conf.ResourceGroup, *manifest); err != nil {
 			if autoRestErr, ok := err.(autorest.DetailedError); ok {
 				if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
 					if netErr, ok := urlErr.Err.(*net.OpError); ok {
@@ -197,13 +257,7 @@ func execute(ctx context.Context, log *logrus.Entry, rpc sdk.OpenShiftManagedClu
 	if *update != "" {
 		updateCtx, updateCancel := context.WithTimeout(context.Background(), *updateTimeout)
 		defer updateCancel()
-
-		oc, err := fakerp.LoadClusterConfigFromManifest(log, *update, conf)
-		if err != nil {
-			return err
-		}
-		updateManifestFile := path.Join(fakerp.DataDirectory, "update.yaml")
-		if err := createOrUpdate(updateCtx, log, rpc, conf.ResourceGroup, oc, updateManifestFile); err != nil {
+		if err := createOrUpdate(updateCtx, log, rpc, conf.ResourceGroup, *update); err != nil {
 			return err
 		}
 	}

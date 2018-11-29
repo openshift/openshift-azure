@@ -10,14 +10,12 @@ export RESOURCEGROUP=$1
 rm -rf _data
 mkdir -p _data/_out
 
-set -x
+if [[ -n "$TEST_IN_PRODUCTION" ]]; then
+  USE_PROD="-use-prod=true"
+fi
 
 go generate ./...
-if [[ -n "$TEST_IN_PRODUCTION" ]]; then
-  go run cmd/createorupdate/createorupdate.go -use-prod=true
-else
-  go run cmd/createorupdate/createorupdate.go
-fi
+go run cmd/createorupdate/createorupdate.go "${USE_PROD:-}"
 
 echo
 echo  Cluster available at https://$RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com/
