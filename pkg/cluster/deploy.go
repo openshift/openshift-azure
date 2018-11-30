@@ -57,7 +57,7 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
 	}
-	err = managedcluster.WaitForHealthz(ctx, cs.Config.AdminKubeconfig)
+	err = managedcluster.WaitForHealthz(ctx, cs.Config.AdminKubeconfig, u.log)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 	}

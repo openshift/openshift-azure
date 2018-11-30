@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 
 	"github.com/ghodss/yaml"
+	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -55,7 +56,7 @@ func ClientsetFromV1Config(config *v1.Config) (*kubernetes.Clientset, error) {
 
 // WaitForHealthz takes a context, v1 config.
 // It waits for the cluster to respond to healthz requests.
-func WaitForHealthz(ctx context.Context, config *v1.Config) error {
+func WaitForHealthz(ctx context.Context, config *v1.Config, log *logrus.Entry) error {
 	restconfig, err := getRestConfigFromV1Config(config)
 	if err != nil {
 		return err
@@ -67,6 +68,6 @@ func WaitForHealthz(ctx context.Context, config *v1.Config) error {
 	}
 
 	// Wait for the healthz to be 200 status
-	_, err = wait.ForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
+	_, err = wait.ForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz", log)
 	return err
 }

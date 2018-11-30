@@ -12,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/golang/mock/gomock"
 
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_wait"
@@ -19,6 +21,7 @@ import (
 
 func TestForHTTPStatusOk(t *testing.T) {
 	urltocheck := "http://localhost:12345/nowhere"
+	log := &logrus.Entry{}
 
 	type cliResp struct {
 		err  error
@@ -106,7 +109,7 @@ func TestForHTTPStatusOk(t *testing.T) {
 			mockCli.EXPECT().Do(req).Return(resp.resp, resp.err)
 		}
 
-		_, err := forHTTPStatusOk(context.Background(), mockCli, urltocheck, time.Nanosecond)
+		_, err := forHTTPStatusOk(context.Background(), mockCli, urltocheck, time.Nanosecond, log)
 		if tt.wantErr != (err != nil) || tt.wantErr && tt.err.Error() != err.Error() {
 			t.Errorf("forHTTPStatusOk(%s) error = %v, Err %v", tt.name, err, tt.err)
 		}
