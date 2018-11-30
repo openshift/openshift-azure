@@ -1,17 +1,13 @@
-hash: 814d56d86f1d21cb976fcb22cfa60b34d6db3e2ea7e13acf469cbf581d0bfb6d
-updated: 2018-11-16T14:02:00.097066476-06:00
+hash: 9da453cfe07f92af95b0301fb9aad61623a1ae1c096bf8a8c5715fbcf656437f
+updated: 2018-11-30T11:24:41.027636859-06:00
 imports:
-- name: cloud.google.com/go
-  version: 3b1ae45394a234c385be014e9a488f2bb6eef821
-  subpackages:
-  - compute/metadata
-  - internal
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
   subpackages:
   - profiles/preview/resources/mgmt/managedapplications
   - services/compute/mgmt/2018-06-01/compute
   - services/dns/mgmt/2017-10-01/dns
+  - services/graphrbac/1.6/graphrbac
   - services/marketplaceordering/mgmt/2015-06-01/marketplaceordering
   - services/resources/mgmt/2018-05-01/resources
   - services/resources/mgmt/2018-06-01/managedapplications
@@ -48,7 +44,7 @@ imports:
   subpackages:
   - spew
 - name: github.com/dgrijalva/jwt-go
-  version: 01aeca54ebda6e0fbfafd0a524d234159c05ec20
+  version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/dimchansky/utfbom
   version: 6c6132ff69f0f6c088739067407b5d32c52e1d0f
 - name: github.com/ghodss/yaml
@@ -75,7 +71,7 @@ imports:
   subpackages:
   - gomock
 - name: github.com/golang/protobuf
-  version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
+  version: aa810b61a9c79d51363740d207bb46cf8e620ed5
   subpackages:
   - proto
   - protoc-gen-go/descriptor
@@ -99,6 +95,13 @@ imports:
   - simplelru
 - name: github.com/howeyc/gopass
   version: bf9dde6d0d2c004a008c27aaee91170c786f6db8
+- name: github.com/hpcloud/tail
+  version: a1dbeea552b7c8df4b542c66073e393de198a800
+  subpackages:
+  - ratelimiter
+  - util
+  - watch
+  - winfile
 - name: github.com/imdario/mergo
   version: 6633656539c1639d9d78127b7d47c622b5d7b6dc
 - name: github.com/json-iterator/go
@@ -107,6 +110,10 @@ imports:
   version: f611eb38b3875cc3bd991ca91c51d06446afa14c
 - name: github.com/marstr/guid
   version: 8bd9a64bf37eb297b492a4101fb28e80ac0b290f
+- name: github.com/matttproud/golang_protobuf_extensions
+  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
+  subpackages:
+  - pbutil
 - name: github.com/modern-go/concurrent
   version: bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94
 - name: github.com/modern-go/reflect2
@@ -167,14 +174,20 @@ imports:
   - template/clientset/versioned/typed/template/v1
   - user/clientset/versioned/scheme
   - user/clientset/versioned/typed/user/v1
-- name: github.com/operator-framework/operator-sdk
-  version: acb5dbef1f89dd46c4ad8089de37034405032750
-  subpackages:
-  - version
 - name: github.com/pborman/uuid
   version: adf5a7427709b9deb95d29d3fa8a2bf9cfd388f1
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/prometheus/client_model
+  version: 5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f
+  subpackages:
+  - go
+- name: github.com/prometheus/common
+  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
+  subpackages:
+  - expfmt
+  - internal/bitbucket.org/ww/goautoneg
+  - model
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/sirupsen/logrus
@@ -194,7 +207,7 @@ imports:
   - internal/exit
   - zapcore
 - name: golang.org/x/crypto
-  version: 81e90905daefcd6fd217b62423c0908922eadb30
+  version: 9419663f5a44be8b34ca85f08abc5fe1be11f8a3
   subpackages:
   - bcrypt
   - blowfish
@@ -209,7 +222,6 @@ imports:
   version: 1c05540f6879653db88113bc4a2b70aec4bd491f
   subpackages:
   - context
-  - context/ctxhttp
   - html
   - html/atom
   - html/charset
@@ -219,15 +231,9 @@ imports:
   - internal/timeseries
   - lex/httplex
   - trace
-- name: golang.org/x/oauth2
-  version: a6bd8cefa1811bd24b86f8902872e4e8225f74c4
-  subpackages:
-  - google
-  - internal
-  - jws
-  - jwt
+  - websocket
 - name: golang.org/x/sys
-  version: 95c6576299259db960f6c5b9b69ea52422860fce
+  version: e48874b42435b4347fc52bdee0424a52abc974d7
   subpackages:
   - unix
   - windows
@@ -253,21 +259,9 @@ imports:
   - unicode/bidi
   - unicode/norm
 - name: golang.org/x/time
-  version: f51c12702a4d776e4c1fa9b0fabab841babae631
+  version: c06e80d9300e4443158a03817b8a8cb37d230320
   subpackages:
   - rate
-- name: google.golang.org/appengine
-  version: 4a4468ece617fc8205e99368fa2200e9d1fad421
-  subpackages:
-  - internal
-  - internal/app_identity
-  - internal/base
-  - internal/datastore
-  - internal/log
-  - internal/modules
-  - internal/remote_api
-  - internal/urlfetch
-  - urlfetch
 - name: google.golang.org/genproto
   version: 09f6ed296fc66555a25fe4ce95173148778dfa85
   subpackages:
@@ -294,8 +288,12 @@ imports:
   - status
   - tap
   - transport
+- name: gopkg.in/fsnotify/fsnotify.v1
+  version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
+- name: gopkg.in/tomb.v1
+  version: c131134a1947e9afd9cecfe11f4c6dff0732ae58
 - name: gopkg.in/yaml.v2
   version: 670d4cfef0544295bc27a114dbac37980d83185a
 - name: k8s.io/api
@@ -370,7 +368,6 @@ imports:
   - pkg/util/json
   - pkg/util/mergepatch
   - pkg/util/net
-  - pkg/util/rand
   - pkg/util/runtime
   - pkg/util/sets
   - pkg/util/strategicpatch
@@ -451,11 +448,9 @@ imports:
   - pkg/apis/clientauthentication/v1alpha1
   - pkg/version
   - plugin/pkg/client/auth/exec
-  - plugin/pkg/client/auth/gcp
   - rest
   - rest/watch
   - testing
-  - third_party/forked/golang/template
   - tools/auth
   - tools/cache
   - tools/clientcmd
@@ -472,7 +467,6 @@ imports:
   - util/flowcontrol
   - util/homedir
   - util/integer
-  - util/jsonpath
   - util/retry
   - util/workqueue
 - name: k8s.io/kube-aggregator
@@ -511,15 +505,4 @@ imports:
   - pkg/runtime/signals
   - pkg/source
   - pkg/source/internal
-testImports:
-- name: github.com/hpcloud/tail
-  version: a1dbeea552b7c8df4b542c66073e393de198a800
-  subpackages:
-  - ratelimiter
-  - util
-  - watch
-  - winfile
-- name: gopkg.in/fsnotify/fsnotify.v1
-  version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
-- name: gopkg.in/tomb.v1
-  version: c131134a1947e9afd9cecfe11f4c6dff0732ae58
+testImports: []
