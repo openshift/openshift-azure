@@ -1,0 +1,4 @@
+properties:
+  agentPoolProfiles:
+  - name: compute
+    count: 2

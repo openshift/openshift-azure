@@ -114,15 +114,7 @@ func NewOpenShiftManagedClustersClientWithBaseURI(baseURI string, subscriptionID
 func (client OpenShiftManagedClustersClient) CreateOrUpdate(ctx context.Context, resourceGroupName string, resourceName string, parameters OpenShiftManagedCluster) (result OpenShiftManagedClustersCreateOrUpdateFuture, err error) {
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: parameters,
-			Constraints: []validation.Constraint{{Target: "parameters.Properties", Name: validation.Null, Rule: false,
-				Chain: []validation.Constraint{{Target: "parameters.Properties.OpenShiftVersion", Name: validation.Null, Rule: true, Chain: nil},
-					{Target: "parameters.Properties.MasterPoolProfile", Name: validation.Null, Rule: false,
-						Chain: []validation.Constraint{{Target: "parameters.Properties.MasterPoolProfile.Count", Name: validation.Null, Rule: true,
-							Chain: []validation.Constraint{{Target: "parameters.Properties.MasterPoolProfile.Count", Name: validation.InclusiveMaximum, Rule: int64(10), Chain: nil},
-								{Target: "parameters.Properties.MasterPoolProfile.Count", Name: validation.InclusiveMinimum, Rule: 1, Chain: nil},
-							}},
-						}},
-				}}}}}); err != nil {
+			Constraints: []validation.Constraint{{Target: "parameters.Properties", Name: validation.Null, Rule: false}}}}); err != nil {
 		return result, validation.NewError("containerservice.OpenShiftManagedClustersClient", "CreateOrUpdate", err.Error())
 	}
 
