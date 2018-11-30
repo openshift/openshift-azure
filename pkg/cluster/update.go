@@ -9,6 +9,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
@@ -52,8 +53,8 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	return nil
 }
 
-func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShiftManagedCluster) (map[computerName]struct{}, error) {
-	vmsBefore := map[computerName]struct{}{}
+func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShiftManagedCluster) (map[kubeclient.ComputerName]struct{}, error) {
+	vmsBefore := map[kubeclient.ComputerName]struct{}{}
 
 	for _, agent := range cs.Properties.AgentPoolProfiles {
 		vms, err := u.listVMs(ctx, cs, agent.Role)
@@ -62,7 +63,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 		}
 
 		for i, vm := range vms {
-			computerName := computerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+			computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 			if i < agent.Count {
 				vmsBefore[computerName] = struct{}{}
 			} else {
@@ -76,7 +77,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 	return vmsBefore, nil
 }
 
-func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, nodes map[computerName]struct{}, ssHashes map[scalesetName]hash) error {
+func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, nodes map[kubeclient.ComputerName]struct{}, ssHashes map[scalesetName]hash) error {
 	blob, err := u.readUpdateBlob()
 	if err != nil {
 		return err
@@ -91,10 +92,10 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 
 		// wait for newly created VMs to reach readiness
 		for _, vm := range vms {
-			computerName := computerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+			computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 			if _, found := nodes[computerName]; !found {
 				u.log.Infof("waiting for %s to be ready", computerName)
-				err = u.waitForReady(ctx, cs, agent.Role, computerName)
+				err = u.kubeclient.WaitForReady(ctx, agent.Role, computerName)
 				if err != nil {
 					return err
 				}
@@ -201,9 +202,9 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 		// ready, but that is also problematic)
 		for _, updated := range updatedList {
 			if _, found := vmsBefore[*updated.InstanceID]; !found {
-				computerName := computerName(*updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+				computerName := kubeclient.ComputerName(*updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 				u.log.Infof("waiting for %s to be ready", computerName)
-				err = u.waitForReady(ctx, cs, role, computerName)
+				err = u.kubeclient.WaitForReady(ctx, role, computerName)
 				if err != nil {
 					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 				}
@@ -215,7 +216,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			}
 		}
 
-		if err := u.delete(ctx, cs, role, *vm.InstanceID, computerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)); err != nil {
+		if err := u.delete(ctx, cs, role, *vm.InstanceID, kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneDeleteVMs}
 		}
 		delete(blob, instanceName(*vm.Name))
@@ -263,9 +264,9 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 
 	sorted = u.filterOldVMs(sorted, blob, ssHashes)
 	for _, vm := range sorted {
-		computerName := computerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		u.log.Infof("draining %s", computerName)
-		err = u.drain(ctx, cs, role, computerName)
+		err = u.kubeclient.Drain(ctx, role, computerName)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDrain}
 		}
@@ -325,7 +326,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		}
 
 		u.log.Infof("waiting for %s to be ready", computerName)
-		err = u.waitForReady(ctx, cs, role, computerName)
+		err = u.kubeclient.WaitForReady(ctx, role, computerName)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceWaitForReady}
 		}
@@ -342,8 +343,8 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 func (u *simpleUpgrader) sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenShiftManagedCluster) ([]compute.VirtualMachineScaleSetVM, error) {
 	var ready, unready []compute.VirtualMachineScaleSetVM
 	for _, vm := range vms {
-		nodeName := computerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		isReady, err := u.masterIsReady(nodeName)
+		nodeName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		isReady, err := u.kubeclient.MasterIsReady(nodeName)
 		if err != nil {
 			return nil, fmt.Errorf("cannot get health for %q: %v", nodeName, err)
 		}
@@ -357,9 +358,9 @@ func (u *simpleUpgrader) sortMasterVMsByHealth(vms []compute.VirtualMachineScale
 	return append(unready, ready...), nil
 }
 
-func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, instanceID string, nodeName computerName) error {
+func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, instanceID string, nodeName kubeclient.ComputerName) error {
 	u.log.Infof("draining %s", nodeName)
-	if err := u.drain(ctx, cs, role, nodeName); err != nil {
+	if err := u.kubeclient.Drain(ctx, role, nodeName); err != nil {
 		return err
 	}
 

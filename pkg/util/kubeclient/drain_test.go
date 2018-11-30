@@ -1,4 +1,4 @@
-package cluster
+package kubeclient
 
 import (
 	"context"
@@ -12,12 +12,12 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-func TestUpgraderDrain(t *testing.T) {
+func TestDrain(t *testing.T) {
 	tests := []struct {
 		name            string
 		kubeclient      *fake.Clientset
 		role            api.AgentPoolProfileRole
-		computerName    computerName
+		computerName    ComputerName
 		wantErr         error
 		expectedActions [][]string
 	}{
@@ -79,11 +79,11 @@ func TestUpgraderDrain(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		u := &simpleUpgrader{
-			kubeclient: tt.kubeclient,
-			log:        logrus.NewEntry(logrus.StandardLogger()),
+		u := &kubeclient{
+			client: tt.kubeclient,
+			log:    logrus.NewEntry(logrus.StandardLogger()),
 		}
-		if err := u.drain(context.Background(), nil, tt.role, tt.computerName); err != tt.wantErr {
+		if err := u.Drain(context.Background(), tt.role, tt.computerName); err != tt.wantErr {
 			t.Errorf("[%v] simpleUpgrader.drain() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
 		actions := tt.kubeclient.Actions()

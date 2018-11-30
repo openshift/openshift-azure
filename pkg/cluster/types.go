@@ -10,12 +10,11 @@ import (
 	"context"
 
 	"github.com/sirupsen/logrus"
-	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
+	"github.com/openshift/openshift-azure/pkg/util/kubeclient"
 )
 
 // here follow well known container and blob names
@@ -44,7 +43,7 @@ type simpleUpgrader struct {
 	updateContainer storage.Container
 	vmc             azureclient.VirtualMachineScaleSetVMsClient
 	ssc             azureclient.VirtualMachineScaleSetsClient
-	kubeclient      kubernetes.Interface
+	kubeclient      kubeclient.Kubeclient
 	log             *logrus.Entry
 }
 
@@ -66,10 +65,7 @@ func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftMan
 	u.accountsClient = azureclient.NewAccountsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
 	u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
 	u.ssc = azureclient.NewVirtualMachineScaleSetsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
-	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
-	if err != nil {
-		return err
-	}
-	u.kubeclient, err = kubernetes.NewForConfig(restconfig)
+
+	u.kubeclient, err = kubeclient.NewKubeclient(u.log, cs.Config.AdminKubeconfig, &u.pluginConfig)
 	return err
 }

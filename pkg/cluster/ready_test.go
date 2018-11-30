@@ -10,15 +10,10 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/kubernetes/fake"
-	clienttesting "k8s.io/client-go/testing"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
 
 func mockListVMs(ctx context.Context, gmc *gomock.Controller, virtualMachineScaleSetVMsClient *mock_azureclient.MockVirtualMachineScaleSetVMsClient, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, rg string, outVMS []compute.VirtualMachineScaleSetVM, outErr error) {
@@ -51,146 +46,19 @@ func mockListVMs(ctx context.Context, gmc *gomock.Controller, virtualMachineScal
 	}
 }
 
-func TestMasterIsReady(t *testing.T) {
-	tests := []struct {
-		name         string
-		kc           kubernetes.Interface
-		computerName computerName
-		want         bool
-		wantErr      bool
-	}{
-		{
-			name:         "node not found",
-			computerName: "master-000000",
-			wantErr:      false,
-			want:         false,
-			kc:           fake.NewSimpleClientset(),
-		},
-		{
-			name:         "node ready, pods not found",
-			computerName: "master-000000",
-			wantErr:      false,
-			want:         false,
-			kc: fake.NewSimpleClientset(&corev1.Node{
-				TypeMeta: metav1.TypeMeta{
-					Kind: "node",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "master-000000",
-				},
-				Status: corev1.NodeStatus{
-					Conditions: []corev1.NodeCondition{
-						{
-							Type:   corev1.NodeReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
-				},
-			}),
-		},
-		{
-			name:         "node ready, pods ready",
-			computerName: "master-00000A",
-			wantErr:      false,
-			want:         true,
-			kc: fake.NewSimpleClientset(&corev1.Node{
-				TypeMeta: metav1.TypeMeta{
-					Kind: "node",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "master-00000a",
-				},
-				Status: corev1.NodeStatus{
-					Conditions: []corev1.NodeCondition{
-						{
-							Type:   corev1.NodeReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
-				},
-			}, &corev1.Pod{
-				TypeMeta: metav1.TypeMeta{
-					Kind: "pod",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "master-etcd-master-00000a",
-					Namespace: "kube-system",
-				},
-				Status: corev1.PodStatus{
-					Conditions: []corev1.PodCondition{
-						{
-							Type:   corev1.PodReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
-				},
-			}, &corev1.Pod{
-				TypeMeta: metav1.TypeMeta{
-					Kind: "pod",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "master-api-master-00000a",
-					Namespace: "kube-system",
-				},
-				Status: corev1.PodStatus{
-					Conditions: []corev1.PodCondition{
-						{
-							Type:   corev1.PodReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
-				},
-			}, &corev1.Pod{
-				TypeMeta: metav1.TypeMeta{
-					Kind: "pod",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "controllers-master-00000a",
-					Namespace: "kube-system",
-				},
-				Status: corev1.PodStatus{
-					Conditions: []corev1.PodCondition{
-						{
-							Type:   corev1.PodReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
-				},
-			}),
-		},
-	}
-	for _, tt := range tests {
-		u := &simpleUpgrader{kubeclient: tt.kc}
-		got, err := u.masterIsReady(tt.computerName)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("masterIsReady() error = %v, wantErr %v. Test: %v", err, tt.wantErr, tt.name)
-			return
-		}
-		if got != tt.want {
-			t.Errorf("masterIsReady() = %v, want %v. Test: %v", got, tt.want, tt.name)
-		}
-	}
-}
-
 func TestUpgraderWaitForNodes(t *testing.T) {
 	vmListErr := fmt.Errorf("vm list failed")
 	nodeGetErr := fmt.Errorf("node get failed")
 	testRg := "myrg"
 	tests := []struct {
 		name        string
-		kubeclient  *fake.Clientset
 		cs          *api.OpenShiftManagedCluster
 		expect      map[string][]compute.VirtualMachineScaleSetVM
 		wantErr     bool
 		expectedErr error
-		reactors    []struct {
-			verb     string
-			reaction clienttesting.ReactionFunc
-		}
 	}{
 		{
-			name:       "nothing to wait for",
-			kubeclient: fake.NewSimpleClientset(),
+			name: "nothing to wait for",
 			cs: &api.OpenShiftManagedCluster{
 				Properties: api.Properties{
 					AzProfile: api.AzProfile{ResourceGroup: testRg},
@@ -199,8 +67,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:       "list vm error",
-			kubeclient: fake.NewSimpleClientset(),
+			name: "list vm error",
 			cs: &api.OpenShiftManagedCluster{
 				Properties: api.Properties{
 					AzProfile: api.AzProfile{ResourceGroup: testRg},
@@ -210,8 +77,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			expectedErr: vmListErr,
 		},
 		{
-			name:       "node get error",
-			kubeclient: fake.NewSimpleClientset(),
+			name: "node get error",
 			cs: &api.OpenShiftManagedCluster{
 				Properties: api.Properties{
 					AzProfile: api.AzProfile{ResourceGroup: testRg},
@@ -219,17 +85,6 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			},
 			wantErr:     true,
 			expectedErr: nodeGetErr,
-			reactors: []struct {
-				verb     string
-				reaction clienttesting.ReactionFunc
-			}{
-				{
-					verb: "get",
-					reaction: func(action clienttesting.Action) (handled bool, ret runtime.Object, err error) {
-						return true, nil, nodeGetErr
-					},
-				},
-			},
 			expect: map[string][]compute.VirtualMachineScaleSetVM{
 				"master": {
 					{
@@ -265,100 +120,6 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 		},
 		{
 			name: "all ready",
-			kubeclient: fake.NewSimpleClientset(&corev1.Node{
-				TypeMeta: metav1.TypeMeta{
-					Kind: "node",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "compute-000000",
-				},
-				Status: corev1.NodeStatus{
-					Conditions: []corev1.NodeCondition{
-						{
-							Type:   corev1.NodeReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
-				},
-			}, &corev1.Node{
-				TypeMeta: metav1.TypeMeta{
-					Kind: "node",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "infra-000000",
-				},
-				Status: corev1.NodeStatus{
-					Conditions: []corev1.NodeCondition{
-						{
-							Type:   corev1.NodeReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
-				},
-			}, &corev1.Node{
-				TypeMeta: metav1.TypeMeta{
-					Kind: "node",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "master-00000a",
-				},
-				Status: corev1.NodeStatus{
-					Conditions: []corev1.NodeCondition{
-						{
-							Type:   corev1.NodeReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
-				},
-			}, &corev1.Pod{
-				TypeMeta: metav1.TypeMeta{
-					Kind: "pod",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "master-etcd-master-00000a",
-					Namespace: "kube-system",
-				},
-				Status: corev1.PodStatus{
-					Conditions: []corev1.PodCondition{
-						{
-							Type:   corev1.PodReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
-				},
-			}, &corev1.Pod{
-				TypeMeta: metav1.TypeMeta{
-					Kind: "pod",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "master-api-master-00000a",
-					Namespace: "kube-system",
-				},
-				Status: corev1.PodStatus{
-					Conditions: []corev1.PodCondition{
-						{
-							Type:   corev1.PodReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
-				},
-			}, &corev1.Pod{
-				TypeMeta: metav1.TypeMeta{
-					Kind: "pod",
-				},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "controllers-master-00000a",
-					Namespace: "kube-system",
-				},
-				Status: corev1.PodStatus{
-					Conditions: []corev1.PodCondition{
-						{
-							Type:   corev1.PodReady,
-							Status: corev1.ConditionTrue,
-						},
-					},
-				},
-			}),
 			cs: &api.OpenShiftManagedCluster{
 				Properties: api.Properties{
 					AzProfile: api.AzProfile{ResourceGroup: testRg},
@@ -408,22 +169,25 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			virtualMachineScaleSetsClient := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
 			virtualMachineScaleSetVMsClient := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 
+			kubeclient := mock_kubeclient.NewMockKubeclient(gmc)
 			if tt.wantErr {
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, nil, tt.expectedErr)
+				if tt.expectedErr == vmListErr {
+					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, nil, tt.expectedErr)
+				} else {
+					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, tt.expect["master"], nil)
+					kubeclient.EXPECT().WaitForReady(ctx, api.AgentPoolProfileRoleMaster, gomock.Any()).Return(nodeGetErr)
+				}
 			} else {
 				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, tt.expect["master"], nil)
 				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "infra", testRg, tt.expect["infra"], nil)
 				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "compute", testRg, tt.expect["compute"], nil)
-			}
-
-			for _, react := range tt.reactors {
-				tt.kubeclient.PrependReactor(react.verb, "nodes", react.reaction)
+				kubeclient.EXPECT().WaitForReady(ctx, gomock.Any(), gomock.Any()).Times(len(tt.expect)).Return(nil)
 			}
 
 			u := &simpleUpgrader{
 				vmc:        virtualMachineScaleSetVMsClient,
 				ssc:        virtualMachineScaleSetsClient,
-				kubeclient: tt.kubeclient,
+				kubeclient: kubeclient,
 				log:        logrus.NewEntry(logrus.StandardLogger()),
 			}
 			err := u.waitForNodes(ctx, tt.cs)
