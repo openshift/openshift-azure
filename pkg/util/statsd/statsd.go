@@ -28,6 +28,11 @@ func (g *Gauge) marshal() ([]byte, error) {
 		return nil, err
 	}
 
+	// json.Encoder.Encode() appends a "\n" that we don't want - remove it
+	if buf.Len() > 1 {
+		buf.Truncate(buf.Len() - 1)
+	}
+
 	_, err = fmt.Fprintf(buf, ":%f|g\n", g.Value)
 	if err != nil {
 		return nil, err
