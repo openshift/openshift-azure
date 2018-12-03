@@ -1,7 +1,10 @@
 package cluster
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"reflect"
 	"testing"
@@ -16,6 +19,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
 
@@ -242,6 +246,164 @@ func TestGetNodesAndDrain(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("simpleUpgrader.getNodesAndDrain() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestWaitForNewNodes(t *testing.T) {
+	testRg := "testResourceG"
+	tests := []struct {
+		name              string
+		cs                *api.OpenShiftManagedCluster
+		nodes             map[kubeclient.ComputerName]struct{}
+		vmsList           map[string][]compute.VirtualMachineScaleSetVM
+		ssHashes          map[scalesetName]hash
+		wantHashes        updateblob
+		wantErr           error
+		initialUpdateBlob updateblob
+	}{
+		{
+			name:     "no new nodes",
+			ssHashes: map[scalesetName]hash{"ss-master": "hashish"},
+			nodes:    map[kubeclient.ComputerName]struct{}{"master-000000": {}},
+			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
+				"master": {
+					{
+						Name: to.StringPtr("ss-master_0"),
+						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+							OsProfile: &compute.OSProfile{
+								ComputerName: to.StringPtr("master-000000"),
+							},
+						},
+					},
+				},
+			},
+			cs: &api.OpenShiftManagedCluster{
+				Properties: api.Properties{
+					AzProfile: api.AzProfile{ResourceGroup: testRg},
+					AgentPoolProfiles: []api.AgentPoolProfile{
+						{Role: api.AgentPoolProfileRoleMaster, Count: 1},
+					},
+				},
+			},
+		},
+		{
+			name:       "wait for new nodes",
+			ssHashes:   map[scalesetName]hash{"ss-master": "hashish"},
+			wantHashes: updateblob{"ss-master_0": "hashish"},
+			nodes:      map[kubeclient.ComputerName]struct{}{},
+			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
+				"master": {
+					{
+						Name: to.StringPtr("ss-master_0"),
+						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+							OsProfile: &compute.OSProfile{
+								ComputerName: to.StringPtr("master-000000"),
+							},
+						},
+					},
+				},
+			},
+			cs: &api.OpenShiftManagedCluster{
+				Properties: api.Properties{
+					AzProfile: api.AzProfile{ResourceGroup: testRg},
+					AgentPoolProfiles: []api.AgentPoolProfile{
+						{Role: api.AgentPoolProfileRoleMaster, Count: 1},
+					},
+				},
+			},
+		},
+		{
+			name:              "clear blob of stale instances",
+			ssHashes:          map[scalesetName]hash{"ss-master": "hashish"},
+			nodes:             map[kubeclient.ComputerName]struct{}{"master-000000": {}},
+			initialUpdateBlob: updateblob{"ss-master_0": "oldhash", "ss-master_1": "oldhash"},
+			wantHashes:        updateblob{"ss-master_0": "oldhash"},
+			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
+				"master": {
+					{
+						Name: to.StringPtr("ss-master_0"),
+						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+							OsProfile: &compute.OSProfile{
+								ComputerName: to.StringPtr("master-000000"),
+							},
+						},
+					},
+				},
+			},
+			cs: &api.OpenShiftManagedCluster{
+				Properties: api.Properties{
+					AzProfile: api.AzProfile{ResourceGroup: testRg},
+					AgentPoolProfiles: []api.AgentPoolProfile{
+						{Role: api.AgentPoolProfileRoleMaster, Count: 1},
+					},
+				},
+			},
+		},
+		{
+			name:     "new node not ready",
+			wantErr:  fmt.Errorf("node not ready test"),
+			ssHashes: map[scalesetName]hash{"ss-master": "hashish"},
+			nodes:    map[kubeclient.ComputerName]struct{}{},
+			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
+				"master": {
+					{
+						Name: to.StringPtr("ss-master_0"),
+						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+							OsProfile: &compute.OSProfile{
+								ComputerName: to.StringPtr("master-000000"),
+							},
+						},
+					},
+				},
+			},
+			cs: &api.OpenShiftManagedCluster{
+				Properties: api.Properties{
+					AzProfile: api.AzProfile{ResourceGroup: testRg},
+					AgentPoolProfiles: []api.AgentPoolProfile{
+						{Role: api.AgentPoolProfileRoleMaster, Count: 1},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			gmc := gomock.NewController(t)
+			defer gmc.Finish()
+			client := mock_kubeclient.NewMockKubeclient(gmc)
+			virtualMachineScaleSetsClient := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
+			virtualMachineScaleSetVMsClient := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
+			storageClient := mock_storage.NewMockClient(gmc)
+			updateContainer := mock_storage.NewMockContainer(gmc)
+			updateBlob := mock_storage.NewMockBlob(gmc)
+			blob, _ := tt.initialUpdateBlob.MarshalJSON()
+			updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
+			updateBlob.EXPECT().Get(nil).Return(ioutil.NopCloser(bytes.NewReader(blob)), nil)
+
+			if len(tt.nodes) < len(tt.vmsList["master"]) {
+				client.EXPECT().WaitForReady(ctx, api.AgentPoolProfileRoleMaster, kubeclient.ComputerName("master-000000")).Return(tt.wantErr)
+			}
+			if tt.wantErr == nil && (len(tt.nodes) < len(tt.vmsList["master"]) || len(tt.initialUpdateBlob) > len(tt.vmsList["master"])) {
+				updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
+				hashData, _ := tt.wantHashes.MarshalJSON()
+				updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(hashData)), nil)
+			}
+			u := &simpleUpgrader{
+				updateContainer: updateContainer,
+				vmc:             virtualMachineScaleSetVMsClient,
+				ssc:             virtualMachineScaleSetsClient,
+				storageClient:   storageClient,
+				kubeclient:      client,
+				log:             logrus.NewEntry(logrus.StandardLogger()).WithField("test", tt.name),
+			}
+			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, tt.vmsList["master"], nil)
+
+			err := u.waitForNewNodes(ctx, tt.cs, tt.nodes, tt.ssHashes)
+			if !reflect.DeepEqual(err, tt.wantErr) {
+				t.Errorf("simpleUpgrader.waitForNewNodes() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
