@@ -349,12 +349,12 @@ func TestNewPlugin(t *testing.T) {
 				errors.New(`metricsKey cannot be nil`),
 			},
 		},
-		"empty promConverterImage": {
+		"empty metricsBridge": {
 			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.PromConverterImage = ""
+				p.GenevaConfig.MetricsBridge = ""
 			},
 			expectedErrs: []error{
-				errors.New(`promConverterImage cannot be empty`),
+				errors.New(`metricsBridge cannot be empty`),
 			},
 		},
 		"empty statsdImage": {
@@ -409,18 +409,18 @@ func getDummyPluginConfig() (*api.PluginConfig, error) {
 	return &api.PluginConfig{
 		SyncImage: "syncImage",
 		GenevaConfig: api.GenevaConfig{
-			ImagePullSecret:    []byte("imagePullSecret"),
-			LoggingSector:      "loggingSector",
-			LoggingCert:        tls.GetDummyCertificate(),
-			LoggingKey:         tls.GetDummyPrivateKey(),
-			TDAgentImage:       "tdAgentImage",
-			LoggingImage:       "loggingImage",
-			MetricsCert:        tls.GetDummyCertificate(),
-			MetricsKey:         tls.GetDummyPrivateKey(),
-			PromConverterImage: "promConverterImage",
-			StatsdImage:        "statsdImage",
-			MDMAccount:         "mdmAccount",
-			MDMEndpoint:        "mdmEndpoint",
+			ImagePullSecret: []byte("imagePullSecret"),
+			LoggingSector:   "loggingSector",
+			LoggingCert:     tls.GetDummyCertificate(),
+			LoggingKey:      tls.GetDummyPrivateKey(),
+			TDAgentImage:    "tdAgentImage",
+			LoggingImage:    "loggingImage",
+			MetricsCert:     tls.GetDummyCertificate(),
+			MetricsKey:      tls.GetDummyPrivateKey(),
+			MetricsBridge:   "metricsBridge",
+			StatsdImage:     "statsdImage",
+			MDMAccount:      "mdmAccount",
+			MDMEndpoint:     "mdmEndpoint",
 		},
 	}, nil
 }

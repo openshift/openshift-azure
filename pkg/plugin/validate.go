@@ -31,8 +31,8 @@ func (p *plugin) validateConfig() (errs []error) {
 	if p.config.GenevaConfig.MetricsKey == nil {
 		errs = append(errs, fmt.Errorf("metricsKey cannot be nil"))
 	}
-	if p.config.GenevaConfig.PromConverterImage == "" {
-		errs = append(errs, fmt.Errorf("promConverterImage cannot be empty"))
+	if p.config.GenevaConfig.MetricsBridge == "" {
+		errs = append(errs, fmt.Errorf("metricsBridge cannot be empty"))
 	}
 	if p.config.GenevaConfig.StatsdImage == "" {
 		errs = append(errs, fmt.Errorf("statsdImage cannot be empty"))

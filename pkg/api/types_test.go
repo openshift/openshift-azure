@@ -180,7 +180,6 @@ var marshalled = []byte(`{
 			"format": "Config.Images.Format",
 			"clusterMonitoringOperator": "Config.Images.ClusterMonitoringOperator",
 			"azureControllers": "Config.Images.AzureControllers",
-			"prometheus": "Config.Images.Prometheus",
 			"prometheusOperatorBase": "Config.Images.PrometheusOperatorBase",
 			"prometheusBase": "Config.Images.PrometheusBase",
 			"prometheusConfigReloaderBase": "Config.Images.PrometheusConfigReloaderBase",
@@ -208,7 +207,7 @@ var marshalled = []byte(`{
 			"genevaLogging": "Config.Images.GenevaLogging",
 			"genevaTDAgent": "Config.Images.GenevaTDAgent",
 			"genevaStatsd": "Config.Images.GenevaStatsd",
-			"genevaPromConverter": "Config.Images.GenevaPromConverter"
+			"metricsBridge": "Config.Images.MetricsBridge"
 		},
 		"adminKubeconfig": "eyJwcmVmZXJlbmNlcyI6e30sImNsdXN0ZXJzIjpudWxsLCJ1c2VycyI6bnVsbCwiY29udGV4dHMiOm51bGwsImN1cnJlbnQtY29udGV4dCI6IiJ9",
 		"masterKubeconfig": "eyJwcmVmZXJlbmNlcyI6e30sImNsdXN0ZXJzIjpudWxsLCJ1c2VycyI6bnVsbCwiY29udGV4dHMiOm51bGwsImN1cnJlbnQtY29udGV4dCI6IiJ9",
@@ -254,7 +253,7 @@ func TestMarshal(t *testing.T) {
 	}
 
 	if !bytes.Equal(b, marshalled) {
-		t.Errorf("json.MarshalIndent returned unexpected result\n%s\n--------------\n%s", string(b), string(marshalled))
+		t.Errorf("json.MarshalIndent returned unexpected result\n%s\n", string(b))
 	}
 }
 

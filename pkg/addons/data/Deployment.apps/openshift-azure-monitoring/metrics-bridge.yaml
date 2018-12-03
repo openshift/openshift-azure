@@ -2,8 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: mdm-shard
-  name: mdm
+    app: metrics-bridge
+  name: metrics-bridge
   namespace: openshift-azure-monitoring
 spec:
   replicas: 1
@@ -14,11 +14,11 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: mdm-shard
+      app: metrics-bridge
   template:
     metadata:
       labels:
-        app: mdm-shard
+        app: metrics-bridge
     spec:
       tolerations:
         - key: CriticalAddonsOnly
@@ -46,19 +46,40 @@ spec:
             - containerPort: 8125
               protocol: UDP
           resources:
-            requests:
-              cpu: 0.4
-              memory: 400Mi
             limits:
-              cpu: 0.4
+              cpu: 400m
               memory: 400Mi
+            requests:
+              cpu: 200m
+              memory: 200Mi
           terminationMessagePath: /dev/termination-log
           volumeMounts:
             - mountPath: /mdm/certs
               name: mdm-cert
+        - name: metricsbridge
+          image: "*** GENERATED ***"
+          command:
+          - /metricsbridge
+          - /config/config.yaml
+          imagePullPolicy: "Always"
+          volumeMounts:
+            - mountPath: /config
+              name: metrics-bridge
+              readOnly: true
+          resources:
+            limits:
+              cpu: 400m
+              memory: 1Gi
+            requests:
+              cpu: 200m
+              memory: 500Mi
+      serviceAccountName: geneva
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
       volumes:
         - name: mdm-cert
           secret:
             secretName: mdm-cert
+        - name: metrics-bridge
+          configMap:
+            name: metrics-bridge

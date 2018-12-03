@@ -103,12 +103,12 @@ type GenevaConfig struct {
 	TDAgentImage  string
 
 	// metrics configuration
-	MetricsCert        *x509.Certificate
-	MetricsKey         *rsa.PrivateKey
-	StatsdImage        string
-	PromConverterImage string
-	MDMEndpoint        string
-	MDMAccount         string
+	MetricsCert   *x509.Certificate
+	MetricsKey    *rsa.PrivateKey
+	StatsdImage   string
+	MetricsBridge string
+	MDMEndpoint   string
+	MDMAccount    string
 }
 
 // Plugin is the main interface to openshift-azure

@@ -54,10 +54,12 @@ type Config struct {
 	RouterStatsPassword            string    `json:"routerStatsPassword,omitempty"`
 	ServiceCatalogClusterID        uuid.UUID `json:"serviceCatalogClusterId,omitempty"`
 
-	// geneva logging sector
+	// Geneva Metrics System (MDM) sector used for logging
 	GenevaLoggingSector string `json:"genevaLoggingSector,omitempty"`
-	GenevaMDMAccount    string `json:"genevaMDMAccount,omitempty"`
-	GenevaMDMEndpoint   string `json:"genevaMDMEndpoint,omitempty"`
+	// Geneva Metrics System (MDM) account name for logging
+	GenevaMDMAccount string `json:"genevaMDMAccount,omitempty"`
+	// Geneva Metrics System (MDM) endpoint for logging
+	GenevaMDMEndpoint string `json:"genevaMDMEndpoint,omitempty"`
 }
 
 // ImageConfig contains all images for the pods
@@ -68,7 +70,6 @@ type ImageConfig struct {
 
 	ClusterMonitoringOperator    string `json:"clusterMonitoringOperator,omitempty"`
 	AzureControllers             string `json:"azureControllers,omitempty"`
-	Prometheus                   string `json:"prometheus,omitempty"`
 	PrometheusOperatorBase       string `json:"prometheusOperatorBase,omitempty"`
 	PrometheusBase               string `json:"prometheusBase,omitempty"`
 	PrometheusConfigReloaderBase string `json:"prometheusConfigReloaderBase,omitempty"`
@@ -97,10 +98,10 @@ type ImageConfig struct {
 	// GenevaImagePullSecret defines secret used to pull private Azure images
 	GenevaImagePullSecret []byte `json:"genevaImagePullSecret,omitempty"`
 	// Geneva integration images
-	GenevaLogging       string `json:"genevaLogging,omitempty"`
-	GenevaTDAgent       string `json:"genevaTDAgent,omitempty"`
-	GenevaStatsd        string `json:"genevaStatsd,omitempty"`
-	GenevaPromConverter string `json:"genevaPromConverter,omitempty"`
+	GenevaLogging string `json:"genevaLogging,omitempty"`
+	GenevaTDAgent string `json:"genevaTDAgent,omitempty"`
+	GenevaStatsd  string `json:"genevaStatsd,omitempty"`
+	MetricsBridge string `json:"metricsBridge,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.

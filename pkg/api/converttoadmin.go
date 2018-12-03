@@ -99,6 +99,8 @@ func convertConfigToAdmin(cs *Config) *admin.Config {
 		Images:                  convertImageConfigToAdmin(cs.Images),
 		ServiceCatalogClusterID: &cs.ServiceCatalogClusterID,
 		GenevaLoggingSector:     &cs.GenevaLoggingSector,
+		GenevaMDMAccount:        &cs.GenevaMDMAccount,
+		GenevaMDMEndpoint:       &cs.GenevaMDMEndpoint,
 	}
 }
 
@@ -126,6 +128,7 @@ func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateCon
 		ServiceCatalogAPIClient: convertCertKeyPairToAdmin(in.ServiceCatalogAPIClient),
 		AzureClusterReader:      convertCertKeyPairToAdmin(in.AzureClusterReader),
 		GenevaLogging:           convertCertKeyPairToAdmin(in.GenevaLogging),
+		GenevaMetrics:           convertCertKeyPairToAdmin(in.GenevaMetrics),
 	}
 }
 
@@ -165,5 +168,7 @@ func convertImageConfigToAdmin(in ImageConfig) *admin.ImageConfig {
 		EtcdBackup:                   &in.EtcdBackup,
 		GenevaLogging:                &in.GenevaLogging,
 		GenevaTDAgent:                &in.GenevaTDAgent,
+		GenevaStatsd:                 &in.GenevaStatsd,
+		MetricsBridge:                &in.MetricsBridge,
 	}
 }

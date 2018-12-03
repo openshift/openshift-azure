@@ -293,6 +293,12 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	if in.GenevaLoggingSector != nil {
 		out.GenevaLoggingSector = *in.GenevaLoggingSector
 	}
+	if in.GenevaMDMAccount != nil {
+		out.GenevaMDMAccount = *in.GenevaMDMAccount
+	}
+	if in.GenevaMDMEndpoint != nil {
+		out.GenevaMDMEndpoint = *in.GenevaMDMEndpoint
+	}
 	return
 }
 
@@ -362,6 +368,9 @@ func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig)
 	}
 	if in.GenevaLogging != nil {
 		mergeCertKeyPair(in.GenevaLogging, &out.GenevaLogging)
+	}
+	if in.GenevaMetrics != nil {
+		mergeCertKeyPair(in.GenevaMetrics, &out.GenevaMetrics)
 	}
 	return
 }
@@ -457,6 +466,12 @@ func mergeImageConfig(in *admin.ImageConfig, out *ImageConfig) {
 	}
 	if in.GenevaTDAgent != nil {
 		out.GenevaTDAgent = *in.GenevaTDAgent
+	}
+	if in.GenevaStatsd != nil {
+		out.GenevaStatsd = *in.GenevaStatsd
+	}
+	if in.MetricsBridge != nil {
+		out.MetricsBridge = *in.MetricsBridge
 	}
 	return
 }

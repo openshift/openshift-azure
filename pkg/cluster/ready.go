@@ -43,18 +43,6 @@ var deploymentWhitelist = []struct {
 		Name:      "console",
 		Namespace: "openshift-console",
 	},
-	{
-		Name:      "cluster-monitoring-operator",
-		Namespace: "openshift-monitoring",
-	},
-	{
-		Name:      "mdm",
-		Namespace: "openshift-azure-monitoring",
-	},
-	{
-		Name:      "prom-mdm-converter",
-		Namespace: "openshift-azure-monitoring",
-	},
 }
 
 var daemonsetWhitelist = []struct {
@@ -102,10 +90,6 @@ var statefulsetWhitelist = []struct {
 	{
 		Name:      "bootstrap-autoapprover",
 		Namespace: "openshift-infra",
-	},
-	{
-		Name:      "prometheus-forwarder",
-		Namespace: "openshift-azure-monitoring",
 	},
 }
 
