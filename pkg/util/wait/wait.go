@@ -19,6 +19,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
+// PollImmediateUntil will poll until a stop condition is met
 func PollImmediateUntil(interval time.Duration, condition wait.ConditionFunc, stopCh <-chan struct{}) error {
 	done, err := condition()
 	if err != nil {
@@ -36,7 +37,7 @@ type SimpleHTTPClient interface {
 }
 
 // ForHTTPStatusOk poll until URL returns 200
-func ForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urltocheck string) error {
+func ForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urltocheck string) (*http.Response, error) {
 	cli := &http.Client{
 		Transport: transport,
 		Timeout:   10 * time.Second,
@@ -44,12 +45,13 @@ func ForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urltochec
 	return forHTTPStatusOk(ctx, cli, urltocheck, time.Second)
 }
 
-func forHTTPStatusOk(ctx context.Context, cli SimpleHTTPClient, urltocheck string, interval time.Duration) error {
+func forHTTPStatusOk(ctx context.Context, cli SimpleHTTPClient, urltocheck string, interval time.Duration) (*http.Response, error) {
 	req, err := http.NewRequest("GET", urltocheck, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return PollImmediateUntil(interval, func() (bool, error) {
+	var response *http.Response
+	err = PollImmediateUntil(interval, func() (bool, error) {
 		resp, err := cli.Do(req)
 		if err, ok := err.(*url.Error); ok {
 			if err, ok := err.Err.(*net.OpError); ok {
@@ -70,6 +72,11 @@ func forHTTPStatusOk(ctx context.Context, cli SimpleHTTPClient, urltocheck strin
 		if err != nil {
 			return false, err
 		}
-		return resp != nil && resp.StatusCode == http.StatusOK, nil
+		response = resp
+		if resp != nil && resp.StatusCode == http.StatusOK {
+			return true, nil
+		}
+		return false, nil
 	}, ctx.Done())
+	return response, err
 }

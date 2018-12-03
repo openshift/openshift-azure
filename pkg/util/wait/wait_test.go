@@ -106,9 +106,9 @@ func TestForHTTPStatusOk(t *testing.T) {
 			mockCli.EXPECT().Do(req).Return(resp.resp, resp.err)
 		}
 
-		err := forHTTPStatusOk(context.Background(), mockCli, urltocheck, time.Nanosecond)
+		_, err := forHTTPStatusOk(context.Background(), mockCli, urltocheck, time.Nanosecond)
 		if tt.wantErr != (err != nil) || tt.wantErr && tt.err.Error() != err.Error() {
-			t.Errorf("forHTTPStatusOkWithTimeout(%s) error = %v, Err %v", tt.name, err, tt.err)
+			t.Errorf("forHTTPStatusOk(%s) error = %v, Err %v", tt.name, err, tt.err)
 		}
 	}
 }

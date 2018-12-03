@@ -99,7 +99,7 @@ func newClient(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, azs azur
 		return nil, err
 	}
 
-	if err := wait.ForHTTPStatusOk(ctx, transport, c.restconfig.Host+"/healthz"); err != nil {
+	if _, err := wait.ForHTTPStatusOk(ctx, transport, c.restconfig.Host+"/healthz"); err != nil {
 		return nil, err
 	}
 
