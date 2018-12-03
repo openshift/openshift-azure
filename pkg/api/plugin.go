@@ -24,7 +24,9 @@ const (
 	PluginStepHashScaleSets              PluginStep = "HashScaleSets"
 	PluginStepInitializeUpdateBlob       PluginStep = "InitializeUpdateBlob"
 	PluginStepClientCreation             PluginStep = "ClientCreation"
+	PluginStepScaleSetDelete             PluginStep = "ScaleSetDelete"
 	PluginStepDrain                      PluginStep = "Drain"
+	PluginStepGenerateARM                PluginStep = "GenerateARM"
 	PluginStepWaitForWaitForOpenShiftAPI PluginStep = "WaitForOpenShiftAPI"
 	PluginStepWaitForNodes               PluginStep = "WaitForNodes"
 	PluginStepWaitForConsoleHealth       PluginStep = "WaitForConsoleHealth"
@@ -46,6 +48,7 @@ const (
 	PluginStepUpdatePlusOneWaitForReady  PluginStep = "UpdatePlusOneWaitForReady"
 	PluginStepUpdatePlusOneUpdateBlob    PluginStep = "UpdatePlusOneUpdateBlob"
 	PluginStepUpdatePlusOneDeleteVMs     PluginStep = "UpdatePlusOneDeleteVMs"
+	PluginStepDeleteBlob                 PluginStep = "DeleteBlob"
 )
 
 // PluginError error returned by CreateOrUpdate to specify the step that failed.
@@ -121,4 +124,7 @@ type Plugin interface {
 	// CreateOrUpdate either deploys or runs the update depending on the isUpdate argument
 	// this will call the deployer.
 	CreateOrUpdate(ctx context.Context, cs *OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployer DeployFn) *PluginError
+
+	// RecoverEtcdCluster recovers the cluster's etcd using the backup specified in the pluginConfig
+	RecoverEtcdCluster(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn, backupBlob string) *PluginError
 }

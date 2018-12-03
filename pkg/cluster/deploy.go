@@ -9,15 +9,39 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
-func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
-	err := u.createClients(ctx, cs)
+func (u *simpleUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
+	// We may need/want to delete all the scalesets in the future
+	future, err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-master")
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
 	}
-	err = deployFn(ctx, azuretemplate)
+	err = future.WaitForCompletionRef(ctx, u.ssc.Client())
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
+	}
+	if u.storageClient == nil {
+		keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+		}
+		u.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, *(*keys.Keys)[0].Value, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+		}
+	}
+	err = u.deleteUpdateBlob()
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepDeleteBlob}
+	}
+	return nil
+}
+
+func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
+	err := deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}

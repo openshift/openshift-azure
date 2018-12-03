@@ -74,7 +74,7 @@ func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
 	return &c, nil
 }
 
-func getPluginConfig() (*api.PluginConfig, error) {
+func GetPluginConfig() (*api.PluginConfig, error) {
 	tc := api.TestConfig{
 		RunningUnderTest:      os.Getenv("RUNNING_UNDER_TEST") != "",
 		ImageResourceGroup:    os.Getenv("IMAGE_RESOURCEGROUP"),
