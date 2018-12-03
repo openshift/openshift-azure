@@ -6,7 +6,6 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	kapi "k8s.io/client-go/tools/clientcmd/api"
@@ -32,8 +31,8 @@ func ReadConfig(path string) (*api.OpenShiftManagedCluster, error) {
 	return cs, nil
 }
 
-// getKubeconfigFromV1Config takes a v1 config and returns a kubeconfig
-func getRestConfigFromV1Config(kc *v1.Config) (*rest.Config, error) {
+// RestConfigFromV1Config takes a v1 config and returns a kubeconfig
+func RestConfigFromV1Config(kc *v1.Config) (*rest.Config, error) {
 	var c kapi.Config
 	err := latest.Scheme.Convert(kc, &c, nil)
 	if err != nil {
@@ -44,24 +43,13 @@ func getRestConfigFromV1Config(kc *v1.Config) (*rest.Config, error) {
 	return kubeconfig.ClientConfig()
 }
 
-// ClientsetFromV1Config takes a v1 config and returns a Clientset
-func ClientsetFromV1Config(config *v1.Config) (*kubernetes.Clientset, error) {
-	restconfig, err := getRestConfigFromV1Config(config)
-	if err != nil {
-		return nil, err
-	}
-
-	return kubernetes.NewForConfig(restconfig)
-}
-
-// WaitForHealthz takes a context, v1 config.
+// WaitForHealthz takes a context, a OpenShiftManagedCluster, and a logrus.Entry
 // It waits for the cluster to respond to healthz requests.
-func WaitForHealthz(ctx context.Context, config *v1.Config, log *logrus.Entry) error {
-	restconfig, err := getRestConfigFromV1Config(config)
+func WaitForHealthz(ctx context.Context, cs *api.OpenShiftManagedCluster, log *logrus.Entry) error {
+	restconfig, err := RestConfigFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}
-
 	t, err := rest.TransportFor(restconfig)
 	if err != nil {
 		return err

@@ -66,7 +66,10 @@ func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftMan
 	u.accountsClient = azureclient.NewAccountsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
 	u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
 	u.ssc = azureclient.NewVirtualMachineScaleSetsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
-
-	u.kubeclient, err = managedcluster.ClientsetFromV1Config(cs.Config.AdminKubeconfig)
+	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
+	if err != nil {
+		return err
+	}
+	u.kubeclient, err = kubernetes.NewForConfig(restconfig)
 	return err
 }

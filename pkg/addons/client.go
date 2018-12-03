@@ -17,15 +17,13 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/tools/clientcmd/api"
-	"k8s.io/client-go/tools/clientcmd/api/latest"
 	"k8s.io/client-go/util/flowcontrol"
 	"k8s.io/client-go/util/retry"
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
@@ -58,18 +56,11 @@ func newClient(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, azs azur
 		return &dryClient{}, nil
 	}
 
-	var kc api.Config
-	err := latest.Scheme.Convert(cs.Config.AdminKubeconfig, &kc, nil)
+	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return nil, err
 	}
 
-	kubeconfig := clientcmd.NewDefaultClientConfig(kc, &clientcmd.ConfigOverrides{})
-
-	restconfig, err := kubeconfig.ClientConfig()
-	if err != nil {
-		return nil, err
-	}
 	restconfig.RateLimiter = flowcontrol.NewFakeAlwaysRateLimiter()
 
 	ac, err := kaggregator.NewForConfig(restconfig)
@@ -95,12 +86,10 @@ func newClient(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, azs azur
 		azs:        azs,
 		log:        log,
 	}
-
 	transport, err := rest.TransportFor(c.restconfig)
 	if err != nil {
 		return nil, err
 	}
-
 	if _, err := wait.ForHTTPStatusOk(ctx, transport, c.restconfig.Host+"/healthz", log); err != nil {
 		return nil, err
 	}
