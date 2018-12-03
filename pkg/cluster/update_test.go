@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
@@ -404,6 +405,118 @@ func TestWaitForNewNodes(t *testing.T) {
 			err := u.waitForNewNodes(ctx, tt.cs, tt.nodes, tt.ssHashes)
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("simpleUpgrader.waitForNewNodes() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestUpdateInPlace(t *testing.T) {
+	testRg := "testrg"
+	tests := []struct {
+		name     string
+		cs       *api.OpenShiftManagedCluster
+		role     api.AgentPoolProfileRole
+		ssHashes map[scalesetName]hash
+		vmsList  []compute.VirtualMachineScaleSetVM
+		want     *api.PluginError
+	}{
+		{
+			name:     "basic coverage",
+			role:     api.AgentPoolProfileRoleMaster,
+			ssHashes: map[scalesetName]hash{"ss-master": "hashish"},
+			vmsList: []compute.VirtualMachineScaleSetVM{
+				{
+					Name:       to.StringPtr("ss-master_0"),
+					InstanceID: to.StringPtr("0123456"),
+					VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+						OsProfile: &compute.OSProfile{
+							ComputerName: to.StringPtr("master-000000"),
+						},
+					},
+				},
+			},
+			cs: &api.OpenShiftManagedCluster{
+				Properties: api.Properties{
+					AzProfile: api.AzProfile{ResourceGroup: testRg},
+					AgentPoolProfiles: []api.AgentPoolProfile{
+						{Role: api.AgentPoolProfileRoleMaster, Count: 1},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			gmc := gomock.NewController(t)
+			defer gmc.Finish()
+			client := mock_kubeclient.NewMockKubeclient(gmc)
+			virtualMachineScaleSetsClient := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
+			virtualMachineScaleSetVMsClient := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
+			storageClient := mock_storage.NewMockClient(gmc)
+			updateBlob := mock_storage.NewMockBlob(gmc)
+			updateContainer := mock_storage.NewMockContainer(gmc)
+			updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
+			data := ioutil.NopCloser(strings.NewReader(`[]`))
+			updateBlob.EXPECT().Get(nil).Return(data, nil)
+			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, tt.role, testRg, tt.vmsList, nil)
+			uBlob := updateblob{}
+			for _, vm := range tt.vmsList {
+				compName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+				client.EXPECT().MasterIsReady(compName).Return(true, nil)
+
+				// 1 drain
+				client.EXPECT().Drain(ctx, tt.role, compName).Return(nil)
+
+				// 2 deallocate
+				arc := autorest.NewClientWithUserAgent("unittest")
+				req, _ := http.NewRequest("delete", "http://example.com", nil)
+				fakeResp := http.Response{Request: req, StatusCode: 200}
+				ft, _ := azure.NewFutureFromResponse(&fakeResp)
+				{
+					virtualMachineScaleSetVMsClient.EXPECT().Client().Return(arc)
+					vFt := compute.VirtualMachineScaleSetVMsDeallocateFuture{Future: ft}
+					virtualMachineScaleSetVMsClient.EXPECT().Deallocate(ctx, testRg, "ss-"+string(tt.role), *vm.InstanceID).Return(vFt, nil)
+				}
+				// 3  updateinstances
+				{
+					virtualMachineScaleSetsClient.EXPECT().Client().Return(arc)
+					vFt := compute.VirtualMachineScaleSetsUpdateInstancesFuture{Future: ft}
+					virtualMachineScaleSetsClient.EXPECT().UpdateInstances(ctx, testRg, "ss-"+string(tt.role), compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
+						InstanceIds: &[]string{*vm.InstanceID},
+					}).Return(vFt, nil)
+				}
+				// 4. reimage
+				{
+					virtualMachineScaleSetVMsClient.EXPECT().Client().Return(arc)
+					vFt := compute.VirtualMachineScaleSetVMsReimageFuture{Future: ft}
+					virtualMachineScaleSetVMsClient.EXPECT().Reimage(ctx, testRg, "ss-"+string(tt.role), *vm.InstanceID).Return(vFt, nil)
+				}
+				// 5. start
+				{
+					virtualMachineScaleSetVMsClient.EXPECT().Client().Return(arc)
+					vFt := compute.VirtualMachineScaleSetVMsStartFuture{Future: ft}
+					virtualMachineScaleSetVMsClient.EXPECT().Start(ctx, testRg, "ss-"+string(tt.role), *vm.InstanceID).Return(vFt, nil)
+				}
+				// 6. waitforready
+				client.EXPECT().WaitForReady(ctx, tt.role, compName).Return(nil)
+				uBlob[instanceName(*vm.Name)] = tt.ssHashes[scalesetName("ss-"+string(tt.role))]
+
+				// write the updatehash
+				hashData, _ := uBlob.MarshalJSON()
+				updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(hashData)), nil)
+				updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
+			}
+			u := &simpleUpgrader{
+				updateContainer: updateContainer,
+				vmc:             virtualMachineScaleSetVMsClient,
+				ssc:             virtualMachineScaleSetsClient,
+				storageClient:   storageClient,
+				kubeclient:      client,
+				log:             logrus.NewEntry(logrus.StandardLogger()).WithField("test", tt.name),
+			}
+			if got := u.updateInPlace(ctx, tt.cs, tt.role, tt.ssHashes); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("simpleUpgrader.updateInPlace() = %v, want %v", got, tt.want)
 			}
 		})
 	}
