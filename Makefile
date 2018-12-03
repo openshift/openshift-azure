@@ -18,6 +18,7 @@ TAG ?= $(shell git rev-parse --short HEAD)
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
 AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
 ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
+METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 
 azure-controllers: generate
@@ -39,6 +40,16 @@ etcdbackup-image: etcdbackup
 
 etcdbackup-push: etcdbackup-image
 	docker push $(ETCDBACKUP_IMAGE)
+
+metricsbridge:
+	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/metricsbridge
+
+metricsbridge-image: metricsbridge
+	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+	imagebuilder -f Dockerfile.metricsbridge -t $(METRICSBRIDGE_IMAGE) .
+
+metricsbridge-push: metricsbridge-image
+	docker push $(METRICSBRIDGE_IMAGE)
 
 sync: generate
 	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/sync

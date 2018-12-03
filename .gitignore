@@ -8,6 +8,7 @@
 /sync
 /etcdbackup
 /azure-controllers
+/metricsbridge
 .vscode
 .idea
 coverage.out

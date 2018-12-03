@@ -45,9 +45,16 @@ import:
 - package: github.com/pborman/uuid
   version: ^1.2.0
 - package: github.com/coreos/etcd
-  repo: https://github.com/openshift/coreos-etcd.git
   version: origin-3.10-etcd-v3.2.16
+  repo: https://github.com/openshift/coreos-etcd.git
   subpackages:
   - clientv3
 - package: sigs.k8s.io/controller-runtime
   version: v0.1.1
+- package: github.com/prometheus/client_model
+  subpackages:
+  - go
+- package: github.com/golang/protobuf
+  version: ^1.2.0
+  subpackages:
+  - proto
