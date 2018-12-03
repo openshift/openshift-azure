@@ -28,6 +28,11 @@ func (g *Gauge) marshal() ([]byte, error) {
 		return nil, err
 	}
 
+	// json.Encoder.Encode() appends a "\n" that we don't want - remove it
+	if buf.Len() > 1 {
+		buf.Truncate(buf.Len() - 1)
+	}
+
 	_, err = fmt.Fprintf(buf, ":%f|g\n", g.Value)
 	if err != nil {
 		return nil, err
@@ -119,6 +124,11 @@ func (c *Client) setMaxPayload() error {
 	}
 
 	c.maxPayload = mtu - 28 // len(typical IP header) + len(UDP header)
+
+	if c.maxPayload > 2048 {
+		c.maxPayload = 2048 // downstream reader may not be able to cope with larger packets *cough*
+	}
+
 	c.log.Infof("set maxPayload to %d", c.maxPayload)
 
 	return nil
