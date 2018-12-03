@@ -32,7 +32,7 @@ func selectNodeImage(cs *acsapi.OpenShiftManagedCluster, deployOS string) {
 	case "", "rhel7":
 		c.ImageSKU = "osa_" + strings.Replace(cs.Properties.OpenShiftVersion[1:], ".", "", -1)
 		if c.ImageVersion == "" {
-			c.ImageVersion = "310.34.20180913"
+			c.ImageVersion = "310.72.20181126"
 		}
 	case "centos7":
 		c.ImageSKU = "origin_" + strings.Replace(cs.Properties.OpenShiftVersion[1:], ".", "", -1)
