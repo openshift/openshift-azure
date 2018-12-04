@@ -53,6 +53,26 @@ var _ = Describe("Resource provider e2e tests [Real]", func() {
 		}
 	})
 
+	It("should keep the end user from deleting any azure resources", func() {
+		resourcegroup, err := cli.OSAResourceGroup(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), os.Getenv("AZURE_REGION"))
+		Expect(err).NotTo(HaveOccurred())
+		By(fmt.Sprintf("OSA resource group is %s", resourcegroup))
+
+		pages, err := cli.Resources.ListByResourceGroup(ctx, resourcegroup, "", "", nil)
+		Expect(err).ToNot(HaveOccurred())
+		// attempt to delete all resources in the resourcegroup
+		for pages.NotDone() {
+			for _, v := range pages.Values() {
+				By(fmt.Sprintf("trying to delete %s/%s", *v.Type, *v.Name))
+				_, err := cli.Resources.DeleteByID(ctx, *v.ID)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).Should(ContainSubstring(`Status=409 Code="ScopeLocked"`))
+			}
+			err = pages.Next()
+			Expect(err).NotTo(HaveOccurred())
+		}
+	})
+
 	It("should keep the end user from reading the config blob", func() {
 		resourcegroup, err := cli.OSAResourceGroup(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), os.Getenv("AZURE_REGION"))
 		Expect(err).NotTo(HaveOccurred())
