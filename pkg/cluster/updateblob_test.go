@@ -80,10 +80,17 @@ func TestWriteUpdateBlob(t *testing.T) {
 	gmc := gomock.NewController(t)
 	defer gmc.Finish()
 	for _, tt := range tests {
+		storageClient := mock_storage.NewMockClient(gmc)
+		bsa := mock_storage.NewMockBlobStorageClient(gmc)
+		storageClient.EXPECT().GetBlobService().Return(bsa)
+		updateCr := mock_storage.NewMockContainer(gmc)
+		bsa.EXPECT().GetContainerReference("update").Return(updateCr)
 		updateBlob := mock_storage.NewMockBlob(gmc)
+		updateCr.EXPECT().GetBlobReference("update").Return(updateBlob)
 		updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(tt.want)), nil)
 		u := &simpleUpgrader{
-			updateBlob: updateBlob,
+			updateBlob:    updateBlob,
+			storageClient: storageClient,
 		}
 
 		if err := u.writeUpdateBlob(tt.blob); (err != nil) != (tt.wantErr != "") {

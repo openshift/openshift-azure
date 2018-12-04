@@ -53,6 +53,10 @@ func (u *simpleUpgrader) writeUpdateBlob(blob updateblob) error {
 	if err != nil {
 		return err
 	}
+
+	bsc := u.storageClient.GetBlobService()
+	c := bsc.GetContainerReference(updateContainerName)
+	u.updateBlob = c.GetBlobReference(updateBlobName)
 	return u.updateBlob.CreateBlockBlobFromReader(bytes.NewReader(data), nil)
 }
 
