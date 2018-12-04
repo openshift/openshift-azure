@@ -46,6 +46,8 @@ type config struct {
 	rootCAs *x509.CertPool
 	http    *http.Client
 	statsd  *statsd.Client
+
+	ready bool
 }
 
 func (c *config) load(path string) error {
@@ -113,7 +115,9 @@ func (c *config) init() error {
 			},
 		},
 	}
-
+	// not ready by default
+	c.ready = false
+	go c.health()
 	return nil
 }
 
@@ -178,9 +182,10 @@ func (c *config) runOnce(req *http.Request) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		c.ready = false
 		return fmt.Errorf("prometheus returned status code %d", resp.StatusCode)
 	}
-
+	c.ready = true
 	d := expfmt.NewDecoder(resp.Body, expfmt.FmtText)
 
 	for {
@@ -214,6 +219,25 @@ func (c *config) runOnce(req *http.Request) error {
 	}
 
 	return c.statsd.Flush()
+}
+
+func (c *config) health() {
+	c.log.Debug("starting health endpoints")
+	http.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	},
+	)
+	http.HandleFunc("/ready", func(w http.ResponseWriter, _ *http.Request) {
+		if c.ready {
+			// 200
+			w.WriteHeader(http.StatusOK)
+		} else {
+			// 503
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+	},
+	)
+	http.ListenAndServe(":8080", nil)
 }
 
 func main() {
