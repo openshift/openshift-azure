@@ -54,10 +54,12 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api
 
 		log.Info("waiting for arm template deployment to complete")
 		if err := future.WaitForCompletionRef(ctx, deployments.Client()); err != nil {
-			return err
+			return fmt.Errorf("failed waiting for arm template deployment to complete: %#v", err)
 		}
-		_, err = future.Result(deployments.DeploymentClient())
-		return err
+		if _, err := future.Result(deployments.DeploymentClient()); err != nil {
+			return fmt.Errorf("failed to get arm template deloyment result: %#v", err)
+		}
+		return nil
 	}
 }
 
