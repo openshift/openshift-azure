@@ -24,7 +24,7 @@ type plugin struct {
 var _ api.Plugin = &plugin{}
 
 // NewPlugin creates a new plugin instance
-func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) (api.Plugin, []error) {
+func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig, skipValidate ...bool) (api.Plugin, []error) {
 	p := &plugin{
 		log:             log,
 		config:          *pluginConfig,
@@ -33,11 +33,20 @@ func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) (api.Plugin, [
 		configGenerator: config.NewSimpleGenerator(pluginConfig),
 		apiValidator:    api.NewValidator(pluginConfig.TestConfig.RunningUnderTest),
 	}
+
+	// HACK: the caller can skip validation: e.g. on the front end, where none
+	// of the validated items are actually used.  TODO: revisit this.
+	if len(skipValidate) == 1 && skipValidate[0] {
+		log.Warn("skipValidate was set, not validating config")
+		return p, nil
+	}
+
 	// validate plugin config
 	errs := p.validateConfig()
 	if len(errs) > 0 {
 		return nil, errs
 	}
+
 	return p, nil
 }
 
