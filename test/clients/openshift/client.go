@@ -8,6 +8,7 @@ import (
 	userv1client "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
 	appsv1client "k8s.io/client-go/kubernetes/typed/apps/v1"
 	authorizationv1client "k8s.io/client-go/kubernetes/typed/authorization/v1"
+	batchv1client "k8s.io/client-go/kubernetes/typed/batch/v1"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	policyv1beta1client "k8s.io/client-go/kubernetes/typed/policy/v1beta1"
 	rbacv1client "k8s.io/client-go/kubernetes/typed/rbac/v1"
@@ -23,6 +24,7 @@ type Client struct {
 	AppsV1          appsv1client.AppsV1Interface
 	AuthorizationV1 authorizationv1client.AuthorizationV1Interface
 	CoreV1          corev1client.CoreV1Interface
+	BatchV1         batchv1client.BatchV1Interface
 	PolicyV1beta1   policyv1beta1client.PolicyV1beta1Interface
 	RbacV1          rbacv1client.RbacV1Interface
 
@@ -40,6 +42,7 @@ func newClientFromRestConfig(config *rest.Config) *Client {
 		CoreV1:          corev1client.NewForConfigOrDie(config),
 		PolicyV1beta1:   policyv1beta1client.NewForConfigOrDie(config),
 		RbacV1:          rbacv1client.NewForConfigOrDie(config),
+		BatchV1:         batchv1client.NewForConfigOrDie(config),
 
 		OAppsV1:    oappsv1client.NewForConfigOrDie(config),
 		ProjectV1:  projectv1client.NewForConfigOrDie(config),
@@ -77,6 +80,15 @@ func NewAzureClusterReaderClient() (*Client, error) {
 
 func NewCustomerReaderClient() (*Client, error) {
 	kc, err := login("customer-cluster-reader")
+	if err != nil {
+		return nil, err
+	}
+
+	return newClientFromKubeConfig(kc)
+}
+
+func NewAdminClient() (*Client, error) {
+	kc, err := login("admin")
 	if err != nil {
 		return nil, err
 	}

@@ -6,10 +6,12 @@ import (
 	templatev1 "github.com/openshift/api/template/v1"
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	appsv1client "k8s.io/client-go/kubernetes/typed/apps/v1"
+	batchv1client "k8s.io/client-go/kubernetes/typed/batch/v1"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 	apiregistrationv1client "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset/typed/apiregistration/v1"
@@ -129,6 +131,27 @@ func PodIsReady(cli corev1client.PodInterface, name string) func() (bool, error)
 
 		for _, c := range node.Status.Conditions {
 			if c.Type == corev1.PodReady &&
+				c.Status == corev1.ConditionTrue {
+				return true, nil
+			}
+		}
+
+		return false, nil
+	}
+}
+
+func BatchIsReady(cli batchv1client.JobInterface, name string) func() (bool, error) {
+	return func() (bool, error) {
+		job, err := cli.Get(name, metav1.GetOptions{})
+		switch {
+		case errors.IsNotFound(err):
+			return false, nil
+		case err != nil:
+			return false, err
+		}
+
+		for _, c := range job.Status.Conditions {
+			if c.Type == batchv1.JobComplete &&
 				c.Status == corev1.ConditionTrue {
 				return true, nil
 			}
