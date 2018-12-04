@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -120,7 +120,11 @@ func execute(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenSh
 		return err
 	}
 	// simulate the API call to the RP
-	defaultManifestFile := path.Join(fakerp.DataDirectory, "manifest.yaml")
+	dataDir, err := fakerp.FindDirectory(fakerp.DataDirectory)
+	if err != nil {
+		return err
+	}
+	defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
 	if err := wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
 		if err := createOrUpdate(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile); err != nil {
 			if autoRestErr, ok := err.(autorest.DetailedError); ok {

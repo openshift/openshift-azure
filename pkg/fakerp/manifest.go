@@ -5,7 +5,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/ghodss/yaml"
@@ -27,7 +27,11 @@ func readEnv() map[string]string {
 // LoadClusterConfigFromManifest reads (and potentially template) the mainifest
 func LoadClusterConfigFromManifest(log *logrus.Entry, manifestTemplate string, conf *Config) (*v20180930preview.OpenShiftManagedCluster, error) {
 	if IsUpdate() && conf.Manifest == "" && manifestTemplate == "" {
-		defaultManifestFile := path.Join(DataDirectory, "manifest.yaml")
+		dataDir, err := FindDirectory(DataDirectory)
+		if err != nil {
+			return nil, err
+		}
+		defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
 		log.Debugf("using manifest from %q", defaultManifestFile)
 		return loadManifestFromFile(defaultManifestFile)
 	}
