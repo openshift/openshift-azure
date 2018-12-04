@@ -1,16 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 	"syscall"
@@ -29,20 +26,7 @@ import (
 var (
 	method  = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
 	useProd = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
-	update  = flag.String("update", "", "If provided, use this manifest to make a follow-up request after the initial request succeeds.")
-	cleanup = flag.Bool("rm", false, "Delete the cluster once all other requests have completed successfully.")
-
-	// timeouts
-	rmTimeout     = flag.Duration("rm-timeout", 20*time.Minute, "Timeout of the cleanup request")
-	timeout       = flag.Duration("timeout", 30*time.Minute, "Timeout of the initial request")
-	updateTimeout = flag.Duration("update-timeout", 30*time.Minute, "Timeout of the update request")
-
-	// exec hooks
-	hook       = flag.String("exec", "", "Command to execute after the initial request to the RP has succeeded.")
-	updateHook = flag.String("update-exec", "", "Command to execute after the update request to the RP has succeeded.")
-
-	artifactDir        = flag.String("artifact-dir", "", "Directory to place artifacts before a cluster is deleted.")
-	artifactKubeconfig = flag.String("artifact-kubeconfig", "", "Path to kubeconfig to use for gathering artifacts.")
+	timeout = flag.Duration("timeout", 30*time.Minute, "Timeout of the request to the OpenShift resource provider.")
 )
 
 func validate() error {
@@ -50,21 +34,6 @@ func validate() error {
 	case http.MethodPut, http.MethodDelete:
 	default:
 		return fmt.Errorf("invalid request: %s, Supported methods are PUT and DELETE", strings.ToUpper(*method))
-	}
-	if *method == http.MethodDelete && *update != "" {
-		return errors.New("cannot do an update when a DELETE is the initial request")
-	}
-	if *method == http.MethodDelete && *cleanup {
-		return errors.New("cannot request a DELETE and -rm at the same time - use one of the two")
-	}
-	if *method == http.MethodDelete && (*hook != "" || *updateHook != "") {
-		return errors.New("cannot request a DELETE and run an exec hook at the same time")
-	}
-	if *updateHook != "" && *update == "" {
-		return errors.New("cannot exec an update hook when no update request is defined")
-	}
-	if (*artifactDir == "" && *artifactKubeconfig != "") || (*artifactDir != "" && *artifactKubeconfig == "") {
-		return errors.New("both -artifact-dir and -artifact-kubeconfig need to be specified")
 	}
 	return nil
 }
@@ -112,21 +81,6 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc v20180930preview
 	}
 	log.Info("created/updated cluster")
 	return fakerp.WriteClusterConfigToManifest(&resp, manifestFile)
-}
-
-func execCommand(c string) error {
-	args := strings.Split(c, " ")
-	cmd := exec.Command(args[0], args[1:]...)
-
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%s\n%v: %s", stdout.String(), err, stderr.String())
-	}
-	fmt.Println(stdout.String())
-	return nil
 }
 
 func createResourceGroup(conf *fakerp.Config) (bool, error) {
@@ -185,39 +139,6 @@ func execute(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenSh
 		return true, nil
 	}); err != nil {
 		return err
-	}
-
-	if *hook != "" {
-		if err := execCommand(*hook); err != nil {
-			return err
-		}
-	}
-
-	// if an update is requested, do it
-	if *update != "" {
-		updateCtx, updateCancel := context.WithTimeout(context.Background(), *updateTimeout)
-		defer updateCancel()
-
-		oc, err := fakerp.LoadClusterConfigFromManifest(log, *update, conf)
-		if err != nil {
-			return err
-		}
-		updateManifestFile := path.Join(fakerp.DataDirectory, "update.yaml")
-		if err := createOrUpdate(updateCtx, log, rpc, conf.ResourceGroup, oc, updateManifestFile); err != nil {
-			return err
-		}
-	}
-
-	if *updateHook != "" {
-		if err := execCommand(*updateHook); err != nil {
-			return err
-		}
-	}
-
-	if *artifactDir != "" {
-		if err := fakerp.GatherArtifacts(*artifactDir, *artifactKubeconfig); err != nil {
-			log.Warnf("could not gather artifacts: %v", err)
-		}
 	}
 
 	return nil
@@ -315,18 +236,6 @@ func main() {
 
 	err = execute(ctx, log, rpc, conf)
 	if err != nil {
-		log.Warn(err)
-	}
-
-	if *cleanup {
-		delCtx, delCancel := context.WithTimeout(context.Background(), *rmTimeout)
-		defer delCancel()
-		if err := delete(delCtx, log, rpc, conf.ResourceGroup, conf.NoWait); err != nil {
-			log.Warn(err)
-		}
-	}
-
-	if err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
