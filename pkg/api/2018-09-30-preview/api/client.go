@@ -38,7 +38,7 @@ func NewWithBaseURI(baseURI string, subscriptionID string) BaseClient {
 
 // UserAgent returns the UserAgent string to use when sending http.Requests.
 func UserAgent() string {
-	return "Azure-SDK-For-Go/0.0.0 containerservice/2018-09-30-preview"
+	return "openshift-azure/pkg/api/2018-09-30-preview/api/client"
 }
 
 // Version returns the semantic version (see http://semver.org) of the client.
@@ -141,7 +141,6 @@ func (client OpenShiftManagedClustersClient) CreateOrUpdatePreparer(ctx context.
 		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
 	}
 
-	const APIVersion = "2018-09-30-preview"
 	queryParameters := map[string]interface{}{
 		"api-version": APIVersion,
 	}
@@ -214,7 +213,6 @@ func (client OpenShiftManagedClustersClient) DeletePreparer(ctx context.Context,
 		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
 	}
 
-	const APIVersion = "2018-09-30-preview"
 	queryParameters := map[string]interface{}{
 		"api-version": APIVersion,
 	}
@@ -290,7 +288,6 @@ func (client OpenShiftManagedClustersClient) GetPreparer(ctx context.Context, re
 		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
 	}
 
-	const APIVersion = "2018-09-30-preview"
 	queryParameters := map[string]interface{}{
 		"api-version": APIVersion,
 	}
@@ -352,7 +349,6 @@ func (client OpenShiftManagedClustersClient) UpdateTagsPreparer(ctx context.Cont
 		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
 	}
 
-	const APIVersion = "2018-09-30-preview"
 	queryParameters := map[string]interface{}{
 		"api-version": APIVersion,
 	}
