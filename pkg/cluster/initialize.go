@@ -30,12 +30,11 @@ func (u *simpleUpgrader) initialize(ctx context.Context, cs *api.OpenShiftManage
 	}
 
 	// update tracking container
-	c = bsc.GetContainerReference(updateContainerName)
-	_, err = c.CreateIfNotExists(nil)
+	u.updateContainer = bsc.GetContainerReference(updateContainerName)
+	_, err = u.updateContainer.CreateIfNotExists(nil)
 	if err != nil {
 		return err
 	}
-	u.updateBlob = c.GetBlobReference(updateBlobName)
 
 	// cluster config container
 	c = bsc.GetContainerReference(ConfigContainerName)

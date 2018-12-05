@@ -36,11 +36,13 @@ func TestReadUpdateBlob(t *testing.T) {
 	gmc := gomock.NewController(t)
 	defer gmc.Finish()
 	for _, tt := range tests {
+		updateCr := mock_storage.NewMockContainer(gmc)
 		updateBlob := mock_storage.NewMockBlob(gmc)
+		updateCr.EXPECT().GetBlobReference(updateBlobName).Return(updateBlob)
 		data := ioutil.NopCloser(strings.NewReader(tt.blob))
 		updateBlob.EXPECT().Get(nil).Return(data, nil)
 		u := &simpleUpgrader{
-			updateBlob: updateBlob,
+			updateContainer: updateCr,
 		}
 
 		got, err := u.readUpdateBlob()
@@ -80,17 +82,12 @@ func TestWriteUpdateBlob(t *testing.T) {
 	gmc := gomock.NewController(t)
 	defer gmc.Finish()
 	for _, tt := range tests {
-		storageClient := mock_storage.NewMockClient(gmc)
-		bsa := mock_storage.NewMockBlobStorageClient(gmc)
-		storageClient.EXPECT().GetBlobService().Return(bsa)
 		updateCr := mock_storage.NewMockContainer(gmc)
-		bsa.EXPECT().GetContainerReference("update").Return(updateCr)
 		updateBlob := mock_storage.NewMockBlob(gmc)
 		updateCr.EXPECT().GetBlobReference("update").Return(updateBlob)
 		updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(tt.want)), nil)
 		u := &simpleUpgrader{
-			updateBlob:    updateBlob,
-			storageClient: storageClient,
+			updateContainer: updateCr,
 		}
 
 		if err := u.writeUpdateBlob(tt.blob); (err != nil) != (tt.wantErr != "") {
