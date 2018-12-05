@@ -115,6 +115,7 @@ func check(path string) (errs []error) {
 }
 
 func main() {
+	var rv int
 	for _, path := range os.Args[1:] {
 		if err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -124,6 +125,7 @@ func main() {
 			if !info.IsDir() && strings.HasSuffix(path, ".go") {
 				for _, err := range check(path) {
 					fmt.Printf("%s: %v\n", path, err)
+					rv = 1
 				}
 			}
 
@@ -132,4 +134,5 @@ func main() {
 			panic(err)
 		}
 	}
+	os.Exit(rv)
 }
