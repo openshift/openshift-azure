@@ -10,8 +10,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/sirupsen/logrus"
 
+	"github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
 	policy "k8s.io/api/policy/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -30,7 +30,8 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 	var (
 		cli       *openshift.Client
 		namespace string
-		log       *logrus.Entry = &logrus.Entry{}
+		logger    *logrus.Logger = logrus.New()
+		log       *logrus.Entry  = logrus.NewEntry(logger)
 	)
 
 	BeforeEach(func() {
@@ -91,7 +92,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 		By(fmt.Sprintf("hitting the route and checking the contents (%v)", time.Now()))
 		timeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
-		resp, err := waitutil.ForHTTPStatusOk(timeout, nil, url, log)
+		resp, err := waitutil.ForHTTPStatusOk(timeout, log, nil, url)
 		Expect(err).NotTo(HaveOccurred())
 		defer resp.Body.Close()
 		contents, err := ioutil.ReadAll(resp.Body)
@@ -153,7 +154,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
 			defer cancel()
 
 			for i := 0; i < times; i++ {
-				resp, err := waitutil.ForHTTPStatusOk(timeout, nil, url, log)
+				resp, err := waitutil.ForHTTPStatusOk(timeout, log, nil, url)
 				if err != nil {
 					return err
 				}

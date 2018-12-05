@@ -51,7 +51,7 @@ type client struct {
 	log        *logrus.Entry
 }
 
-func newClient(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, azs azureclient.AccountsClient, log *logrus.Entry, dryRun bool) (Interface, error) {
+func newClient(ctx context.Context, log *logrus.Entry, cs *acsapi.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) (Interface, error) {
 	if dryRun {
 		return &dryClient{}, nil
 	}
@@ -90,7 +90,7 @@ func newClient(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, azs azur
 	if err != nil {
 		return nil, err
 	}
-	if _, err := wait.ForHTTPStatusOk(ctx, transport, c.restconfig.Host+"/healthz", log); err != nil {
+	if _, err := wait.ForHTTPStatusOk(ctx, log, transport, c.restconfig.Host+"/healthz"); err != nil {
 		return nil, err
 	}
 

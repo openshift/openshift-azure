@@ -32,7 +32,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepHashScaleSets}
 	}
-	err = managedcluster.WaitForHealthz(ctx, cs, u.log)
+	err = managedcluster.WaitForHealthz(ctx, u.log, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 	}

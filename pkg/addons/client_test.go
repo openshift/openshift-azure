@@ -36,12 +36,16 @@ var clientTests = []struct {
 		diff:     false, // no diff expected
 	},
 }
-var logger = logrus.New()
-var entry = logrus.NewEntry(logger)
+var log *logrus.Entry
+
+func init() {
+	logger := logrus.New()
+	log = logrus.NewEntry(logger)
+}
 
 func TestNeedsUpdate(t *testing.T) {
 	for _, test := range clientTests {
-		if got := needsUpdate(test.existing, test.updated, entry); got != test.exp {
+		if got := needsUpdate(test.existing, test.updated, log); got != test.exp {
 			t.Errorf("%s: expected update %t, got %t", test.name, test.exp, got)
 		}
 	}
@@ -49,7 +53,7 @@ func TestNeedsUpdate(t *testing.T) {
 
 func TestShouldPrintDiff(t *testing.T) {
 	for _, test := range clientTests {
-		if got := printDiff(test.existing, test.updated, entry); got != test.diff {
+		if got := printDiff(test.existing, test.updated, log); got != test.diff {
 			t.Errorf("%s: expected to print diff %t, got %t", test.name, test.diff, got)
 		}
 	}

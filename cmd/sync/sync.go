@@ -39,7 +39,7 @@ type sync struct {
 	log  *logrus.Entry
 }
 
-func (s *sync) init(ctx context.Context, entry *logrus.Entry) error {
+func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
 	if err != nil {
 		return err
@@ -59,7 +59,7 @@ func (s *sync) init(ctx context.Context, entry *logrus.Entry) error {
 
 	s.blob = bsc.GetContainerReference(cluster.ConfigContainerName).GetBlobReference(cluster.ConfigBlobName)
 
-	s.log = entry
+	s.log = log
 
 	return nil
 }
@@ -112,7 +112,7 @@ func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
 		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 
-	if err := addons.Main(ctx, cs, s.azs, s.log, *dryRun); err != nil {
+	if err := addons.Main(ctx, s.log, cs, s.azs, *dryRun); err != nil {
 		return true, errors.Wrap(err, "cannot sync cluster config")
 	}
 
@@ -122,7 +122,6 @@ func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
 
 func main() {
 	flag.Parse()
-	// log := logrus.New()
 	logger := logrus.New()
 	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
 	logger.SetLevel(log.SanitizeLogLevel(*logLevel))

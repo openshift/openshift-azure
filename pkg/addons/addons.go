@@ -245,8 +245,8 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured, log *log
 	return client.ApplyResources(scFilter, db, keys)
 }
 
-func Main(ctx context.Context, cs *api.OpenShiftManagedCluster, azs azureclient.AccountsClient, log *logrus.Entry, dryRun bool) error {
-	client, err := newClient(ctx, cs, azs, log, dryRun)
+func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) error {
+	client, err := newClient(ctx, log, cs, azs, dryRun)
 	if err != nil {
 		return err
 	}

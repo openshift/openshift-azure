@@ -39,15 +39,15 @@ type SimpleHTTPClient interface {
 }
 
 // ForHTTPStatusOk poll until URL returns 200
-func ForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urltocheck string, log *logrus.Entry) (*http.Response, error) {
+func ForHTTPStatusOk(ctx context.Context, log *logrus.Entry, transport http.RoundTripper, urltocheck string) (*http.Response, error) {
 	cli := &http.Client{
 		Transport: transport,
 		Timeout:   10 * time.Second,
 	}
-	return forHTTPStatusOk(ctx, cli, urltocheck, time.Second, log)
+	return forHTTPStatusOk(ctx, log, cli, urltocheck, time.Second)
 }
 
-func forHTTPStatusOk(ctx context.Context, cli SimpleHTTPClient, urltocheck string, interval time.Duration, log *logrus.Entry) (*http.Response, error) {
+func forHTTPStatusOk(ctx context.Context, log *logrus.Entry, cli SimpleHTTPClient, urltocheck string, interval time.Duration) (*http.Response, error) {
 	req, err := http.NewRequest("GET", urltocheck, nil)
 	if err != nil {
 		return nil, err

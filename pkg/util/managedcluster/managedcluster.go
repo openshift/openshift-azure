@@ -2,7 +2,10 @@ package managedcluster
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -45,17 +48,17 @@ func RestConfigFromV1Config(kc *v1.Config) (*rest.Config, error) {
 
 // WaitForHealthz takes a context, a OpenShiftManagedCluster, and a logrus.Entry
 // It waits for the cluster to respond to healthz requests.
-func WaitForHealthz(ctx context.Context, cs *api.OpenShiftManagedCluster, log *logrus.Entry) error {
-	restconfig, err := RestConfigFromV1Config(cs.Config.AdminKubeconfig)
-	if err != nil {
-		return err
-	}
-	t, err := rest.TransportFor(restconfig)
-	if err != nil {
-		return err
+func WaitForHealthz(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster) error {
+	pool := x509.NewCertPool()
+	pool.AddCert(cs.Config.Certificates.Ca.Cert)
+
+	t := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			RootCAs: pool,
+		},
 	}
 
 	// Wait for the healthz to be 200 status
-	_, err = wait.ForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz", log)
+	_, err := wait.ForHTTPStatusOk(ctx, log, t, "https://"+cs.Properties.FQDN+"/healthz")
 	return err
 }
