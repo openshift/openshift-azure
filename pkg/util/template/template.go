@@ -40,7 +40,7 @@ func Template(tmpl string, f template.FuncMap, cs *api.OpenShiftManagedCluster, 
 		Config           *api.Config
 		Derived          interface{}
 		Extra            interface{}
-	}{ContainerService: cs, Config: cs.Config, Derived: config.Derived, Extra: extra})
+	}{ContainerService: cs, Config: &cs.Config, Derived: config.Derived, Extra: extra})
 	if err != nil {
 		return nil, err
 	}

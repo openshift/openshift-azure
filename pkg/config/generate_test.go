@@ -10,7 +10,6 @@ import (
 
 func TestGenerate(t *testing.T) {
 	cs := &api.OpenShiftManagedCluster{
-		Config: &api.Config{},
 		Properties: api.Properties{
 			OpenShiftVersion: "v3.11",
 			RouterProfiles: []api.RouterProfile{

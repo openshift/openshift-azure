@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/openshift/openshift-azure/pkg/util/structtags"
@@ -277,4 +278,131 @@ func TestJSONTags(t *testing.T) {
 	for _, err := range structtags.CheckJsonTags(o) {
 		t.Errorf("mismatch in struct tags for %T: %s", o, err.Error())
 	}
+}
+
+// TestFieldParity ensures the admin type stays in sync with the
+// internal type.
+func TestFieldParity(t *testing.T) {
+	ignoreFields := map[string]map[string]struct{}{
+		"Properties": {
+			"servicePrincipalProfile": {},
+			"azProfile":               {},
+		},
+		"Config": {
+			"sshKey":                         {},
+			"adminKubeconfig":                {},
+			"masterKubeconfig":               {},
+			"nodeBootstrapKubeconfig":        {},
+			"azureClusterReaderKubeconfig":   {},
+			"serviceAccountKey":              {},
+			"sessionSecretAuth":              {},
+			"sessionSecretEnc":               {},
+			"runningUnderTest":               {},
+			"htPasswd":                       {},
+			"customerAdminPasswd":            {},
+			"customerReaderPasswd":           {},
+			"endUserPasswd":                  {},
+			"registryHttpSecret":             {},
+			"prometheusProxySessionSecret":   {},
+			"alertManagerProxySessionSecret": {},
+			"alertsProxySessionSecret":       {},
+			"registryConsoleOAuthSecret":     {},
+			"consoleOAuthSecret":             {},
+			"routerStatsPassword":            {},
+		},
+		"ImageConfig": {
+			"genevaImagePullSecret": {},
+		},
+		"CertKeyPair": {
+			"key": {},
+		},
+	}
+
+	prepare := func(v reflect.Value) {
+		switch v.Interface().(type) {
+		case []IdentityProvider:
+			// set the Provider to AADIdentityProvider
+			v.Set(reflect.ValueOf([]IdentityProvider{{Provider: &AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
+		}
+	}
+
+	var internalValue *OpenShiftManagedCluster
+	populate.Walk(&internalValue, prepare)
+	adminValue := ConvertToAdmin(internalValue)
+
+	walkStruct(t, reflect.ValueOf(internalValue), reflect.ValueOf(adminValue), nil, ignoreFields)
+}
+
+func walkStruct(t *testing.T, internalValue, adminValue reflect.Value, parent *string, ignoreFields map[string]map[string]struct{}) {
+	if adminValue.Kind() == reflect.Ptr {
+		adminValue = reflect.Indirect(adminValue)
+	}
+	if internalValue.Kind() == reflect.Ptr {
+		internalValue = reflect.Indirect(internalValue)
+	}
+	adminType := adminValue.Type()
+	internalType := internalValue.Type()
+
+	t.Logf("=== comparing internal type %q with admin type %q", internalType.Name(), adminType.Name())
+	if internalType.Name() != adminType.Name() && !isException(internalType.Name(), adminType.Name()) {
+		t.Fatalf("invalid type comparison: %q vs %q", internalType.Name(), adminType.Name())
+	}
+	internalNum := internalType.NumField()
+	adminNum := adminType.NumField()
+	if adminNum != internalNum-len(ignoreFields[internalType.Name()]) {
+		t.Fatalf("number of fields mismatch: admin type has %d fields, internal type has %d fields", adminNum, internalNum-len(ignoreFields[internalType.Name()]))
+	}
+
+	adminIndexOffset := 0
+	for i := 0; i < internalNum; i++ {
+		var parentPrefix string
+		if parent != nil {
+			parentPrefix = *parent + "."
+			tag := filterName(internalType.Field(i).Tag)
+			if _, ok := ignoreFields[*parent][tag]; ok {
+				t.Logf("ignoring internal field %q", parentPrefix+tag)
+				adminIndexOffset++
+				continue
+			}
+		}
+
+		internalTag := filterName(internalType.Field(i).Tag)
+		adminTag := filterName(adminType.Field(i - adminIndexOffset).Tag)
+		t.Logf("comparing internal field tag %q with admin field tag %q", parentPrefix+internalTag, parentPrefix+adminTag)
+		if internalTag != adminTag {
+			t.Fatalf("admin field tag is %q, internal field tag is %q", adminTag, internalTag)
+		}
+
+		internalFieldValue := internalValue.Field(i)
+		if internalFieldValue.Kind() == reflect.Ptr {
+			internalFieldValue = reflect.Indirect(internalFieldValue)
+		}
+		adminFieldValue := adminValue.Field(i - adminIndexOffset)
+		if adminFieldValue.Kind() == reflect.Ptr {
+			adminFieldValue = reflect.Indirect(adminFieldValue)
+		}
+
+		if internalFieldValue.Type().Name() == "Certificate" {
+			// Ignore comparing x509.Certificate
+			continue
+		}
+
+		if adminFieldValue.Kind() == reflect.Struct {
+			name := internalFieldValue.Type().Name()
+			t.Logf("walking %q", name)
+			walkStruct(t, internalFieldValue, adminFieldValue, &name, ignoreFields)
+		} else if internalFieldValue.Kind() == reflect.Slice {
+			name := internalFieldValue.Index(0).Type().Name()
+			t.Logf("walking %q", name)
+			walkStruct(t, internalFieldValue.Index(0), adminFieldValue.Index(0), &name, ignoreFields)
+		}
+	}
+}
+
+func filterName(tag reflect.StructTag) string {
+	return strings.TrimSuffix(tag.Get("json"), ",omitempty")
+}
+
+func isException(internalName, adminName string) bool {
+	return internalName == "CertKeyPair" && adminName == "Certificate"
 }

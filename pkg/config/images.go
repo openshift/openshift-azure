@@ -37,7 +37,7 @@ func openShiftVersion(imageVersion string) (string, error) {
 }
 
 func (g *simpleGenerator) selectNodeImage(cs *api.OpenShiftManagedCluster) {
-	c := cs.Config
+	c := &cs.Config
 	c.ImagePublisher = "redhat"
 	c.ImageOffer = g.pluginConfig.TestConfig.ImageOffer
 	if c.ImageOffer == "" {
@@ -65,7 +65,7 @@ func (g *simpleGenerator) image(component, version string) string {
 }
 
 func (g *simpleGenerator) selectContainerImagesOrigin(cs *api.OpenShiftManagedCluster) error {
-	c := cs.Config
+	c := &cs.Config
 	v, err := openShiftVersion(c.ImageVersion)
 	if err != nil {
 		return err
@@ -109,7 +109,7 @@ func (g *simpleGenerator) selectContainerImagesOrigin(cs *api.OpenShiftManagedCl
 }
 
 func (g *simpleGenerator) selectContainerImagesOSA(cs *api.OpenShiftManagedCluster) error {
-	c := cs.Config
+	c := &cs.Config
 	v, err := openShiftVersion(c.ImageVersion)
 	if err != nil {
 		return err

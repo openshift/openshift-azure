@@ -33,7 +33,7 @@ func createUserHtPassEntry(name string, passwd *string, htPasswd []byte) ([]byte
 }
 
 func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) {
-	c := cs.Config
+	c := &cs.Config
 
 	g.selectNodeImage(cs)
 

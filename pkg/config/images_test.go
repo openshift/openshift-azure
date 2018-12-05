@@ -46,7 +46,6 @@ func TestNodeImageVersion(t *testing.T) {
 			Properties: api.Properties{
 				OpenShiftVersion: "v3.11",
 			},
-			Config: &api.Config{},
 		}
 		cg := simpleGenerator{
 			pluginConfig: api.PluginConfig{
