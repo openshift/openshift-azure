@@ -10,21 +10,11 @@ import (
 	"github.com/Azure/go-autorest/autorest/validation"
 )
 
-const (
-	// DefaultBaseURI is the default URI used for the service Containerservice
-	DefaultBaseURI = "https://management.azure.com"
-)
-
 // BaseClient is the base client for Containerservice.
 type BaseClient struct {
 	autorest.Client
 	BaseURI        string
 	SubscriptionID string
-}
-
-// New creates an instance of the BaseClient client.
-func New(subscriptionID string) BaseClient {
-	return NewWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewWithBaseURI creates an instance of the BaseClient client.
@@ -38,7 +28,7 @@ func NewWithBaseURI(baseURI string, subscriptionID string) BaseClient {
 
 // UserAgent returns the UserAgent string to use when sending http.Requests.
 func UserAgent() string {
-	return "openshift-azure/pkg/api/2018-09-30-preview/api/client"
+	return "openshift-azure/pkg/api/admin/api/client"
 }
 
 // Version returns the semantic version (see http://semver.org) of the client.
@@ -93,11 +83,6 @@ func (future *OpenShiftManagedClustersUpdateTagsFuture) Result(client OpenShiftM
 // OpenShiftManagedClustersClient is the the Container Service Client.
 type OpenShiftManagedClustersClient struct {
 	BaseClient
-}
-
-// NewOpenShiftManagedClustersClient creates an instance of the OpenShiftManagedClustersClient client.
-func NewOpenShiftManagedClustersClient(subscriptionID string) OpenShiftManagedClustersClient {
-	return NewOpenShiftManagedClustersClientWithBaseURI(DefaultBaseURI, subscriptionID)
 }
 
 // NewOpenShiftManagedClustersClientWithBaseURI creates an instance of the OpenShiftManagedClustersClient client.
