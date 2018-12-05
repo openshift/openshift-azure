@@ -97,12 +97,12 @@ func (g *simpleGenerator) selectContainerImagesOrigin(cs *api.OpenShiftManagedCl
 		c.Images.Console = g.image("console", v)
 		c.Images.RegistryConsole = "docker.io/cockpit/kubernetes:latest"
 		c.Images.ServiceCatalog = g.image("service-catalog", v)
-		c.Images.ServiceCatalog = g.image("service-catalog", v)
 		c.Images.AnsibleServiceBroker = "docker.io/ansibleplaybookbundle/origin-ansible-service-broker:latest"
 		c.Images.TemplateServiceBroker = "docker.io/openshift/origin-template-service-broker:latest"
 		c.Images.Registry = g.image("docker-registry", v)
 
 		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.11"
+		c.Images.MetricsBridge = "quay.io/openshift-on-azure/metricsbridge:v3.11"
 		c.Images.AzureControllers = "quay.io/openshift-on-azure/azure-controllers:v3.11"
 	}
 	return nil
@@ -142,12 +142,12 @@ func (g *simpleGenerator) selectContainerImagesOSA(cs *api.OpenShiftManagedClust
 		c.Images.Console = g.image("console", v)
 		c.Images.RegistryConsole = "registry.access.redhat.com/openshift3/registry-console:" + v
 		c.Images.ServiceCatalog = g.image("service-catalog", v)
-		c.Images.ServiceCatalog = g.image("service-catalog", v)
 		c.Images.AnsibleServiceBroker = g.image("ansible-service-broker", v)
 		c.Images.TemplateServiceBroker = g.image("template-service-broker", v)
 		c.Images.Registry = g.image("docker-registry", v)
 
 		c.Images.Sync = "quay.io/openshift-on-azure/sync:v3.11"
+		c.Images.MetricsBridge = "quay.io/openshift-on-azure/metricsbridge:v3.11"
 		c.Images.AzureControllers = "quay.io/openshift-on-azure/azure-controllers:v3.11"
 	}
 
@@ -186,6 +186,12 @@ func (g *simpleGenerator) selectContainerImages(cs *api.OpenShiftManagedCluster)
 	}
 	if g.pluginConfig.GenevaConfig.LoggingImage != "" {
 		cs.Config.Images.GenevaLogging = g.pluginConfig.GenevaConfig.LoggingImage
+	}
+	if g.pluginConfig.GenevaConfig.MetricsBridge != "" {
+		cs.Config.Images.MetricsBridge = g.pluginConfig.GenevaConfig.MetricsBridge
+	}
+	if g.pluginConfig.GenevaConfig.StatsdImage != "" {
+		cs.Config.Images.GenevaStatsd = g.pluginConfig.GenevaConfig.StatsdImage
 	}
 	if len(g.pluginConfig.GenevaConfig.ImagePullSecret) > 0 {
 		cs.Config.Images.GenevaImagePullSecret = g.pluginConfig.GenevaConfig.ImagePullSecret

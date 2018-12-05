@@ -102,24 +102,44 @@ func GetPluginConfig() (*api.PluginConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	metCert, err := readCert(filepath.Join(artifactDir, "metrics-int.cert"))
+	if err != nil {
+		return nil, err
+	}
+	metKey, err := readKey(filepath.Join(artifactDir, "metrics-int.key"))
+	if err != nil {
+		return nil, err
+	}
 	pullSecret, err := readFile(filepath.Join(artifactDir, ".dockerconfigjson"))
 	if err != nil {
 		return nil, err
 	}
 
-	var syncImage string
+	var syncImage, metricsBridge string
 	if os.Getenv("SYNC_IMAGE") == "" {
 		syncImage = "quay.io/openshift-on-azure/sync:latest"
 	} else {
 		syncImage = os.Getenv("SYNC_IMAGE")
 	}
+	if os.Getenv("METRICSBRIDGE_IMAGE") == "" {
+		metricsBridge = "quay.io/openshift-on-azure/metricsbridge:latest"
+	} else {
+		metricsBridge = os.Getenv("METRICSBRIDGE_IMAGE")
+	}
+
 	genevaConfig := api.GenevaConfig{
 		LoggingCert:     logCert,
 		LoggingKey:      logKey,
+		MetricsCert:     metCert,
+		MetricsKey:      metKey,
 		ImagePullSecret: pullSecret,
 		LoggingSector:   "US-Test",
 		LoggingImage:    "osarpint.azurecr.io/acs/mdsd:11201801",
 		TDAgentImage:    "osarpint.azurecr.io/acs/td-agent:latest",
+		MetricsBridge:   metricsBridge,
+		StatsdImage:     "osarpint.azurecr.io/acs/mdm:git-a909a2e76",
+		MDMAccount:      "RPOpenShift",
+		MDMEndpoint:     "https://az-int.metrics.nsatc.net/",
 	}
 	return &api.PluginConfig{
 		SyncImage:       syncImage,

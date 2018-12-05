@@ -43,10 +43,6 @@ var deploymentWhitelist = []struct {
 		Name:      "console",
 		Namespace: "openshift-console",
 	},
-	{
-		Name:      "cluster-monitoring-operator",
-		Namespace: "openshift-monitoring",
-	},
 }
 
 var daemonsetWhitelist = []struct {

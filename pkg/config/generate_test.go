@@ -22,8 +22,9 @@ func TestGenerate(t *testing.T) {
 			RunningUnderTest: true,
 		},
 		GenevaConfig: api.GenevaConfig{
-			LoggingImage: "loggingImage",
-			TDAgentImage: "tdAgentImage",
+			LoggingImage:  "loggingImage",
+			TDAgentImage:  "tdAgentImage",
+			MetricsBridge: "metricsBridge",
 		},
 	}
 
@@ -80,6 +81,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.Images.OAuthProxyBase != "", "oauth proxy base image")
 	assert(c.Images.GenevaLogging != "", "azure logging image")
 	assert(c.Images.GenevaTDAgent != "", "azure TDAgent image")
+	assert(c.Images.MetricsBridge != "", "metrics-bridge image")
 
 	assert(c.ServiceAccountKey != nil, "service account key")
 

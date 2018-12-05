@@ -266,6 +266,7 @@
 // data/ConfigMap/openshift-ansible-service-broker/broker-config.yaml
 // data/ConfigMap/openshift-azure-logging/fluentd-config.yaml
 // data/ConfigMap/openshift-azure-logging/mdsd-customerdata-config.yaml
+// data/ConfigMap/openshift-azure-monitoring/metrics-bridge.yaml
 // data/ConfigMap/openshift-console/console-config.yaml
 // data/ConfigMap/openshift-monitoring/cluster-monitoring-config.yaml
 // data/ConfigMap/openshift-node/node-config-compute.yaml
@@ -289,6 +290,7 @@
 // data/Deployment.apps/default/registry-console.yaml
 // data/Deployment.apps/default/router.yaml
 // data/Deployment.apps/openshift-ansible-service-broker/asb.yaml
+// data/Deployment.apps/openshift-azure-monitoring/metrics-bridge.yaml
 // data/Deployment.apps/openshift-console/console.yaml
 // data/Deployment.apps/openshift-infra/customer-admin-controller.yaml
 // data/Deployment.apps/openshift-monitoring/cluster-monitoring-operator.yaml
@@ -363,6 +365,7 @@
 // data/Namespace/kube-system.yaml
 // data/Namespace/openshift-ansible-service-broker.yaml
 // data/Namespace/openshift-azure-logging.yaml
+// data/Namespace/openshift-azure-monitoring.yaml
 // data/Namespace/openshift-azure.yaml
 // data/Namespace/openshift-console.yaml
 // data/Namespace/openshift-etcd.yaml
@@ -417,6 +420,8 @@
 // data/Secret/openshift-ansible-service-broker/asb-client.yaml
 // data/Secret/openshift-azure-logging/azure-registry.yaml
 // data/Secret/openshift-azure-logging/gcs-cert.yaml
+// data/Secret/openshift-azure-monitoring/azure-registry.yaml
+// data/Secret/openshift-azure-monitoring/mdm-cert.yaml
 // data/Secret/openshift-console/console-oauth-config.yaml
 // data/Secret/openshift-template-service-broker/templateservicebroker-client.yaml
 // data/SecurityContextConstraints.security.openshift.io/anyuid.yaml
@@ -471,6 +476,7 @@
 // data/ServiceAccount/openshift-ansible-service-broker/asb.yaml
 // data/ServiceAccount/openshift-azure/azure-cluster-reader.yaml
 // data/ServiceAccount/openshift-azure-logging/geneva.yaml
+// data/ServiceAccount/openshift-azure-monitoring/geneva.yaml
 // data/ServiceAccount/openshift-console/console.yaml
 // data/ServiceAccount/openshift-etcd/etcd-backup.yaml
 // data/ServiceAccount/openshift-infra/bootstrap-autoapprover.yaml
@@ -4025,7 +4031,7 @@ func clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerSaYaml() (*a
 	return a, nil
 }
 
-var _clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\x8f\xb1\x4e\x03\x41\x0c\x44\xfb\xfd\x0a\xff\xc0\x1e\xa2\x43\xdb\x01\x05\x7d\x90\xe8\x9d\xbd\xc9\xc5\xe4\x62\xaf\xbc\xde\x2b\xf2\xf5\x28\x22\xa2\x08\x52\x4a\x4b\xcf\xf3\x66\xb8\xc9\x17\xbc\x8b\x69\x21\xdf\x73\x9d\x78\xc4\xd1\x5c\x2e\x1c\x62\x3a\x9d\x5e\xfa\x24\xf6\xb4\x3d\xa7\x93\xe8\x5c\xe8\x7d\x1d\x3d\xe0\x3b\x5b\xf1\x26\x3a\x8b\x2e\xe9\x8c\xe0\x99\x83\x4b\x22\x52\x3e\xa3\xd0\x02\xc5\xc6\xb9\xfe\xb2\xd9\xc1\x33\x3c\xb9\xad\xd8\xe1\x70\xc5\xb8\xc9\x87\xdb\x68\x0f\x94\x89\xe8\x9f\xf1\x4f\x70\x97\xdc\xc7\xfe\x1b\x35\x7a\x49\xf9\xf6\xf4\x09\xdf\xa4\xe2\xb5\x56\x1b\x1a\x77\xc5\x6e\x67\x6f\x5c\x51\xc8\x1a\xb4\x1f\xe5\x10\x99\x2f\xc3\x91\x57\x5b\x96\xeb\xac\x9f\x00\x00\x00\xff\xff\x84\xcf\x62\xc0\x19\x01\x00\x00")
+var _clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xac\x8f\xb1\x4e\x03\x31\x0c\x86\xf7\x3c\x45\x5e\x20\x87\xd8\x50\x36\x60\x60\x2f\x12\xbb\x9b\xfb\x7b\x35\xcd\xd9\x91\xe3\xdc\xd0\xa7\x47\x27\x2a\x86\x22\x31\x31\x5a\xfa\xfc\x7d\x36\x35\xfe\x80\x75\x56\xc9\xd1\x8e\x54\x26\x1a\x7e\x56\xe3\x2b\x39\xab\x4c\x97\xa7\x3e\xb1\x3e\x6c\x8f\xe1\xc2\x32\xe7\xf8\x5a\x47\x77\xd8\x41\x2b\x5e\x58\x66\x96\x25\xac\x70\x9a\xc9\x29\x87\x18\x85\x56\xe4\xb8\x40\xb0\x51\x2a\xdf\x6c\x32\xd0\x0c\x0b\xa6\x15\x07\x9c\x76\x8c\x1a\xbf\x99\x8e\xf6\x47\x32\xc4\xf8\xab\xf8\x13\xb8\x33\xf7\x71\xfc\x44\xf1\x9e\x43\xba\x2d\xbd\xc3\x36\x2e\x78\x2e\x45\x87\xf8\xdd\x61\xb7\xb1\x37\x2a\xc8\x51\x1b\xa4\x9f\xf9\xe4\x89\xae\xc3\x90\xaa\x2e\xcb\xfe\xd6\x3f\xa8\x56\x15\x76\xb5\xdd\xf6\x15\x00\x00\xff\xff\x44\x12\xf1\x66\x67\x01\x00\x00")
 
 func clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYamlBytes() ([]byte, error) {
 	return bindataRead(
@@ -6065,6 +6071,26 @@ func configmapOpenshiftAzureLoggingMdsdCustomerdataConfigYaml() (*asset, error) 
 	return a, nil
 }
 
+var _configmapOpenshiftAzureMonitoringMetricsBridgeYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x92\xcf\x6b\xdb\x50\x0c\xc7\xef\xfe\x2b\x04\x3b\x14\x0c\xce\x8f\x95\x41\xfb\x6e\x63\xcb\x76\x5a\x19\x63\xec\x6a\x14\x3f\x25\x11\xb1\xa5\x87\x24\x07\x3c\xf6\xc7\x8f\x78\x69\x53\x3a\x0a\xf5\xc9\xe8\xfb\xd1\x07\x3d\x21\x2c\xfc\x8b\xcc\x59\x25\xc1\x69\x5d\x1d\x59\x72\x82\x4f\x2a\x3b\xde\x7f\xc3\x52\x0d\x14\x98\x31\x30\x55\x00\x82\x03\x25\x18\x28\x8c\x3b\x6f\xb6\xc6\x79\x4f\x97\xb2\x17\xec\x28\x81\x16\x12\x3f\xf0\x2e\x1a\xfc\x3d\x1a\x35\x83\x0a\x87\x1a\xcb\xbe\x7a\x94\x74\xb3\x7a\x31\xe1\xd0\x27\xf8\x53\x01\x00\xb0\x04\xd9\x09\xfb\x07\x14\x75\xea\x54\xb2\x27\xb8\x5d\x3d\x7d\xf0\x0e\xe8\x44\x36\xc1\xed\x0a\x2e\xf9\xdc\x57\x4c\x07\x8a\x03\x8d\xfe\x85\x32\x19\x06\x6d\x24\x17\x65\x89\x04\x87\x88\xe2\x69\xb9\xbc\x32\xcd\xf1\xce\x17\xd7\x01\xaf\xa3\x2d\xfc\xd4\xa5\xfb\xd5\xfd\x7a\xb9\xbb\x68\x66\xbb\x07\x86\xe7\xab\x31\xdd\xad\xdf\x7f\xf8\x97\x90\x31\x79\x9a\xff\x1b\x38\x8e\x5b\x6a\x45\x33\xb5\x2c\x3b\xfd\xaf\x78\xd6\x8c\xde\x62\xdf\x6b\x87\x81\xdb\x9e\xda\xae\x8c\x6d\xa7\x46\xfe\x16\x78\xa0\x41\x6d\x6a\xb7\x53\xbc\xce\x9f\x57\xc2\xc1\x2a\xcf\x81\xa2\xf9\x1c\x04\xb2\x90\x3d\x92\x46\x1e\x68\xe1\x6d\x68\x60\xff\x12\x7f\xf9\x80\x73\xed\xd2\x58\x0e\xe8\xf4\x4a\x66\x84\x79\x9a\xb3\x67\xa7\xf0\xfd\x69\xf1\x73\x62\xb4\x9f\x4f\xec\xa6\xae\x6b\xf8\xba\x79\xd8\xfc\xf8\xf8\x73\xf3\x19\xea\xba\xbe\xa9\xfe\x06\x00\x00\xff\xff\x22\x62\x79\xca\x83\x02\x00\x00")
+
+func configmapOpenshiftAzureMonitoringMetricsBridgeYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_configmapOpenshiftAzureMonitoringMetricsBridgeYaml,
+		"ConfigMap/openshift-azure-monitoring/metrics-bridge.yaml",
+	)
+}
+
+func configmapOpenshiftAzureMonitoringMetricsBridgeYaml() (*asset, error) {
+	bytes, err := configmapOpenshiftAzureMonitoringMetricsBridgeYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ConfigMap/openshift-azure-monitoring/metrics-bridge.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _configmapOpenshiftConsoleConsoleConfigYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x93\x4f\x8b\xdb\x3c\x10\xc6\xef\xf9\x14\x73\x0b\x18\x62\xbd\x61\xf7\xf0\xa2\x5b\x9a\x4d\xcb\x42\x5b\x96\xf4\xcf\x7d\x2c\x4f\x12\x11\x79\xc6\x48\xe3\x40\x4a\x3f\x7c\xb1\xa2\x18\xb7\x5d\x96\xe2\x8b\x19\xff\x9e\x47\x8f\x66\xc6\xd8\xfb\xef\x14\x93\x17\xb6\x70\x59\x2f\x5a\x54\xb4\x0b\x00\x27\x9c\x24\xd0\xca\x09\x1f\xfc\xb1\xbe\x62\x17\x2c\xfc\x5c\x00\x00\xcc\x15\x05\xab\xa5\x27\x4e\x27\x7f\xd0\xda\x8b\xb9\xac\x1b\x52\x5c\xdf\xe0\x41\x4f\x36\xbf\x01\xb8\xe0\x89\xf5\xf9\xc9\xc2\x84\xaf\x8a\xc1\x6f\xc4\x17\x72\x91\xf4\xbd\x0f\x64\xc1\x5c\x30\x1a\x19\x5d\x4a\x14\x33\x67\x8a\x2c\xc8\x51\x06\xdd\x53\xeb\x23\x39\xb5\xb0\x5c\x96\x0f\x59\xb8\xe3\xb6\x17\xcf\xba\xdd\xcc\x2c\xe3\xc0\x26\x65\x8f\x64\xce\x43\x43\x91\x49\x29\x8d\xe9\x13\xc5\x8b\x77\x84\xce\xc9\xc0\x6a\x1c\xd6\x2e\xde\x0e\x72\x61\x48\x4a\xf1\x99\x0f\x32\x5d\xe9\x16\xff\x1d\x26\xda\xb4\x6d\xa4\x94\x2c\x2c\xab\xaa\x82\x0f\xbb\xcf\xbb\xfd\xe6\xeb\xee\x09\xaa\xaa\x5a\xfe\x4d\xbf\xa0\x9e\x66\x41\x5b\xba\x50\x90\x9e\xe2\xf6\x86\xbc\x0c\x4d\xf0\xee\xdb\xfe\xe3\x5b\x76\x1d\x8e\x71\xfe\x01\x75\x43\x52\xe9\xfc\x0f\xd4\x71\x68\x45\xdd\x44\xe4\xd6\xf3\xd1\x82\xb8\xfe\x1e\x43\xdc\xd0\x11\x6b\x06\xc7\x98\xd9\xf6\xa4\xda\x27\x6b\x4c\x2b\x2e\xcd\x26\xed\xa4\x33\x4e\x58\xd1\x33\xc5\x55\x1f\x50\x0f\x12\x3b\xf3\x50\xaf\xd7\x26\xfb\x9d\x3d\xb7\x16\xca\x8d\xb6\x79\x7a\xb9\x9e\x3b\xcc\xc7\x79\x1f\x1b\xcf\xed\xd4\xc0\xfb\x79\xff\xd5\xf9\xb1\xff\x3f\x3e\x3e\xdc\x3b\x48\x71\xbe\x18\xc5\x69\x35\x96\x8d\x86\x34\x8d\x0a\xe0\x4c\xd7\xb7\xc0\x33\x5d\x17\x53\xbe\x83\x3f\x7e\xc2\x7e\xd1\x91\xe2\x7d\xff\x03\x36\x14\x92\x2d\x0b\xdf\xbf\xbe\xb2\x8c\x1d\xd9\x3f\x7e\x95\x52\x4e\x3d\x3a\x7a\x4d\xf5\x2b\x00\x00\xff\xff\x63\xe7\x87\xc0\x70\x03\x00\x00")
 
 func configmapOpenshiftConsoleConsoleConfigYamlBytes() ([]byte, error) {
@@ -6521,6 +6547,26 @@ func deploymentAppsOpenshiftAnsibleServiceBrokerAsbYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "Deployment.apps/openshift-ansible-service-broker/asb.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _deploymentAppsOpenshiftAzureMonitoringMetricsBridgeYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xb4\x55\x4d\x6f\x22\x49\x0c\xbd\xf3\x2b\x2c\x8e\x48\x1d\x92\xec\x8e\xb4\xaa\x1b\x0a\x2c\x1a\x29\x7c\x28\x19\xe6\x3a\x32\x55\x4e\xa7\x94\xfa\xe8\x75\xb9\xd9\x61\x7f\xfd\xaa\x68\xc8\x74\x03\xbd\x3b\x1a\xcd\xd4\x05\xb0\xcb\xef\xf9\xd9\x2e\x83\x95\xfd\x4c\x9c\x6c\x0c\x0a\xb0\xaa\xd2\x78\x77\x37\x78\xb3\xc1\x28\x98\x52\xe5\xe2\xde\x53\x90\x81\x27\x41\x83\x82\x6a\x00\xe0\x70\x4b\x2e\xe5\x6f\x90\x03\x14\x78\x12\xb6\x3a\x15\x5b\xb6\xa6\xa4\x01\x40\x40\x4f\x3d\xe6\x54\xa1\x26\x05\xb1\xa2\x90\x5e\xed\x8b\x14\xf8\x4f\xcd\x54\xf8\x18\xac\x44\xb6\xa1\x1c\xa4\x8a\x74\x06\x67\xaa\x9c\xd5\x98\x14\xdc\x0d\x00\x92\x30\x0a\x95\xfb\x86\x56\xf6\x15\x29\x78\x8a\xce\xd9\x50\x6e\x2a\x83\x42\x07\x3b\xb7\x2d\xcd\x55\x00\x8f\x5f\x9f\x6b\x2e\xa9\x01\x3a\x5a\x36\x01\x77\x68\x1d\x6e\x1d\x29\xb8\xcd\x04\xe4\x48\x4b\xe4\x26\xca\xa3\xe8\xd7\xc7\x96\xd0\x3e\xa9\x42\xbe\x72\xef\x64\xed\x32\xe5\xe3\x3a\x08\x7d\x18\x00\x27\xcd\x07\x6d\xd1\x11\xa3\xd8\x18\x5a\x81\x05\xbc\xd1\x5e\xc1\x03\x5b\xb1\x1a\xdd\xc4\x98\x18\xd2\x2a\xb8\xfd\xfb\x0d\xc8\x35\x65\xcc\x0a\x60\xf6\xd5\x26\x49\xad\xe0\x1e\x97\x09\x69\x1d\x9d\xd5\x19\xd9\xd5\x49\x88\xff\xb4\x9c\xe4\xe8\xb5\x1e\x4b\x5a\xd7\xce\x3d\x93\x66\x92\x4e\x36\x4d\x87\x9b\xde\x31\x95\x36\x09\x9f\x52\x61\x4a\x82\x2c\x27\xe0\x89\xfb\x1b\xf7\x27\x42\x21\xf6\x36\x1c\xc4\xcd\x19\x35\xad\x89\x6d\x34\xcf\xa4\x63\x30\x49\xc1\x6f\xb7\xc7\x7b\x3a\x06\x41\x1b\x88\xaf\x90\x26\x41\x49\xa6\xa5\xfb\x90\xa7\x82\xe1\x68\x34\x82\xf9\x6c\x39\x7b\x9a\x7c\x9a\x4d\x61\x34\x1a\x0d\xcf\x2f\x65\x31\x57\xf3\xca\x87\xc2\x4e\xb5\x7e\x7e\x23\x5c\x4c\x17\xb3\xe5\x74\xbd\xfa\xb8\xfc\xd4\xf1\x03\xec\xd0\xd5\xff\xcb\xdc\x01\xfa\x32\x79\x78\x58\x6d\x7e\x06\xd0\xe3\x6a\xfe\xe5\x71\xf6\x79\xf6\xd8\x03\x35\xa5\x6d\x5d\x5e\x0f\x7f\x9a\xcd\x3f\xae\x96\x3f\x92\x42\x15\xb9\x3d\x07\x0d\xe8\x7b\xb3\xd6\x91\x45\xc1\x1f\x77\xf7\x1f\xce\xb0\x2b\x8e\x12\x75\x74\x0a\x36\xd3\x75\xcb\xc7\x94\x62\xcd\x9a\xce\x20\x9d\xf5\xf6\x9c\x06\x40\x57\xb5\x82\xdf\x6f\x6f\xfd\x99\xdd\x93\x8f\xbc\x3f\xb8\x16\xb6\xe3\x63\xfa\xab\xa6\xd4\x83\x74\xdf\x8f\x74\x7f\x86\xd4\x9a\xda\x05\xa5\x94\x07\x09\xe5\x55\xc1\xd8\xd0\x6e\xdc\x72\x16\x2e\x96\xad\xb0\x5d\x74\xb5\xa7\x45\xac\xc3\x65\xcd\x7c\xb6\x1e\x51\xbc\xf1\x63\x4d\x2c\xe9\x2c\x9d\xe3\x16\x35\xbe\xc8\xde\x8b\x77\x70\x5c\x23\xad\x2d\xd2\x9c\xef\x7a\x0e\x3a\x7a\x8f\xc1\xb4\xd3\x2a\x60\xdc\x07\x59\xc0\x58\xc7\xf0\x62\xcb\xe3\xc7\xcd\x1e\xbd\xfb\xaf\xc7\x35\x6c\x5e\xd7\xf0\x07\xaa\xd1\x30\x5c\x2f\xc5\xe5\xe2\xfc\x76\x98\xd0\xe4\x85\xa8\x40\xb8\xa6\x5f\x35\x64\x77\xf3\x9f\x33\x62\x1f\x5a\x23\x96\x88\x77\x56\xd3\x44\xeb\x5c\x86\xe5\x41\x6a\x49\x81\x76\x78\xbc\x10\xa2\xa1\xe7\xce\xdf\xd3\xc9\x5a\x70\x74\x74\xf3\x56\x6f\x89\x03\x09\xa5\x1b\x1b\xc7\x36\xbc\x30\x2a\x18\xe6\x32\x9c\x1a\xd0\x14\xff\xca\x32\xbd\x98\xae\x9c\x4e\xde\xf6\x5d\x41\x8d\x6d\xf9\x5d\x03\x79\xd9\x9e\xa6\xa5\x0b\xac\xba\xa0\x57\xa3\xfe\x0d\x00\x00\xff\xff\xf1\x98\xe6\x1c\x8e\x08\x00\x00")
+
+func deploymentAppsOpenshiftAzureMonitoringMetricsBridgeYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_deploymentAppsOpenshiftAzureMonitoringMetricsBridgeYaml,
+		"Deployment.apps/openshift-azure-monitoring/metrics-bridge.yaml",
+	)
+}
+
+func deploymentAppsOpenshiftAzureMonitoringMetricsBridgeYaml() (*asset, error) {
+	bytes, err := deploymentAppsOpenshiftAzureMonitoringMetricsBridgeYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Deployment.apps/openshift-azure-monitoring/metrics-bridge.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -8005,6 +8051,26 @@ func namespaceOpenshiftAzureLoggingYaml() (*asset, error) {
 	return a, nil
 }
 
+var _namespaceOpenshiftAzureMonitoringYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x44\xcc\x31\x0e\xc2\x30\x0c\x46\xe1\x3d\xa7\xb0\xba\x07\xc4\x9a\x43\x30\xb2\x9b\xe6\x2f\x58\x6d\xec\x28\x76\x19\x7a\x7a\x54\x16\xc6\x27\x3d\x7d\xdc\xe5\x81\xe1\x62\x5a\xe8\x73\x4b\xab\x68\x2d\x74\xe7\x06\xef\x3c\x23\x35\x04\x57\x0e\x2e\x89\x88\x55\x2d\x38\xc4\xd4\xcf\x24\xb2\x0e\xf5\xb7\x2c\x71\x11\xbb\xaa\x55\x64\xc7\x86\x39\x6c\x14\x9a\xa6\x44\xa4\xdc\x50\xfe\x5b\xe6\x63\x1f\xc8\xcd\x54\xc2\x86\xe8\x2b\x79\xc7\x7c\x5a\x8b\x28\x6f\x72\x60\xfc\xe4\x4c\xeb\xfe\xc4\x50\x04\x3c\x7d\x03\x00\x00\xff\xff\x15\x0a\xae\x39\xa1\x00\x00\x00")
+
+func namespaceOpenshiftAzureMonitoringYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_namespaceOpenshiftAzureMonitoringYaml,
+		"Namespace/openshift-azure-monitoring.yaml",
+	)
+}
+
+func namespaceOpenshiftAzureMonitoringYaml() (*asset, error) {
+	bytes, err := namespaceOpenshiftAzureMonitoringYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Namespace/openshift-azure-monitoring.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _namespaceOpenshiftAzureYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x44\xcc\xb1\xae\xc2\x30\x0c\x46\xe1\xdd\x4f\x61\x75\xef\xbd\x62\xcd\x43\x30\xb2\x9b\xe6\xaf\xb0\xda\xd8\x51\xec\x32\xf4\xe9\x51\x59\x18\x8f\x74\xf4\x49\xd7\x07\x46\xa8\x5b\xe1\xf7\x8d\x36\xb5\x5a\xf8\x2e\x0d\xd1\x65\x01\x35\xa4\x54\x49\x29\xc4\x2c\x66\x9e\x92\xea\x16\x57\x32\x7b\x87\xc5\x4b\xd7\xfc\x53\xff\x37\xaf\x98\x03\x3b\x96\xf4\x51\x78\x9a\x88\xd9\xa4\xa1\xfc\xb6\x59\xce\x63\x80\xa2\x63\xb9\x80\x55\x4d\x76\x3d\x31\xbe\xdc\xcc\xdb\xf1\xc4\x30\x24\x82\x3e\x01\x00\x00\xff\xff\xdc\x03\x86\xe5\x96\x00\x00\x00")
 
 func namespaceOpenshiftAzureYamlBytes() ([]byte, error) {
@@ -9085,6 +9151,46 @@ func secretOpenshiftAzureLoggingGcsCertYaml() (*asset, error) {
 	return a, nil
 }
 
+var _secretOpenshiftAzureMonitoringAzureRegistryYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x5c\x8d\xb1\x8a\xc2\x40\x10\x40\xfb\xfd\x8a\xe9\x02\x0b\xc9\x71\xed\x76\x07\x17\xec\x2c\x54\xec\xc7\xcd\x24\x8e\x21\x33\xcb\xec\x44\x88\x5f\x6f\xa1\x36\xb6\xef\x3d\x78\x58\xf8\x4c\x56\x59\x25\xc1\xfd\x37\xcc\x2c\x43\x82\x23\x65\x23\x0f\x0b\x39\x0e\xe8\x98\x02\x80\xe0\x42\x09\xf0\xb1\x1a\xb5\x46\x13\x57\xb7\xed\x8d\x6b\xc1\x4c\x09\xb4\x90\xd4\x2b\x8f\xde\xbe\xaa\x45\x85\x5d\x8d\x65\x0a\xbe\x15\x4a\x30\xaf\x17\x32\x21\xa7\xda\xb1\xfe\x0c\x9a\x67\xb2\xac\x32\xf2\x74\xab\x2a\xe1\x73\xea\xbe\x4d\x82\x26\xc6\x08\xbb\x7e\xdf\x1f\xfe\x4e\xfd\x3f\xc4\x18\x9b\xf0\x0c\x00\x00\xff\xff\x3a\x33\x58\x93\xb9\x00\x00\x00")
+
+func secretOpenshiftAzureMonitoringAzureRegistryYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_secretOpenshiftAzureMonitoringAzureRegistryYaml,
+		"Secret/openshift-azure-monitoring/azure-registry.yaml",
+	)
+}
+
+func secretOpenshiftAzureMonitoringAzureRegistryYaml() (*asset, error) {
+	bytes, err := secretOpenshiftAzureMonitoringAzureRegistryYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Secret/openshift-azure-monitoring/azure-registry.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _secretOpenshiftAzureMonitoringMdmCertYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x74\xcc\xb1\x0a\xc2\x30\x10\x87\xf1\x3d\x4f\x71\x74\x0c\x54\x70\xbd\x4d\x68\x71\x53\x50\x71\x3f\xda\xbf\x1a\x4a\x92\x33\xb9\x0a\xf5\xe9\xa5\xd0\xd5\xf5\xfb\xe0\x27\x1a\xee\x28\x35\xe4\xc4\xf4\xd9\xbb\x29\xa4\x91\xe9\x8a\xa1\xc0\x5c\x84\xc9\x28\x26\xec\x88\x92\x44\x30\xc5\x31\xb6\x03\x8a\x6d\xa1\xaa\x0c\x60\xca\x8a\x54\x5f\xe1\x61\xad\x7c\xe7\x82\x36\xe6\x14\x2c\x97\x90\x9e\xce\x16\x05\xd3\x59\xe5\x3d\xc3\x55\x5b\x5b\xb7\x89\xab\xb3\x53\x44\xa6\xc6\x7b\x4f\xc7\xfe\xd4\x5f\x0e\xb7\xbe\x23\xef\x7d\xe3\x88\x26\x2c\xff\xf7\x2f\x00\x00\xff\xff\x76\x43\xcb\x8a\xb7\x00\x00\x00")
+
+func secretOpenshiftAzureMonitoringMdmCertYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_secretOpenshiftAzureMonitoringMdmCertYaml,
+		"Secret/openshift-azure-monitoring/mdm-cert.yaml",
+	)
+}
+
+func secretOpenshiftAzureMonitoringMdmCertYaml() (*asset, error) {
+	bytes, err := secretOpenshiftAzureMonitoringMdmCertYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Secret/openshift-azure-monitoring/mdm-cert.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _secretOpenshiftConsoleConsoleOauthConfigYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x8e\x31\xaa\xc3\x30\x10\x44\x7b\x9d\x62\x3a\x83\xc0\xc5\x6f\xd5\x7d\xb0\x49\x97\x22\x09\xe9\x37\xf2\xda\x5e\x22\xaf\x84\xb5\xc9\xf9\x83\x89\xca\x74\x33\x3c\x86\x79\x54\xe4\xce\x7b\x95\xac\x01\xef\x3f\xf7\x14\x9d\x02\xae\x1c\x77\x36\xb7\xb1\xd1\x44\x46\xc1\x01\x89\x1e\x9c\xea\x91\x00\x2a\x25\x20\x17\xd6\xba\xca\x6c\x7d\xcc\x5a\x73\x62\x07\x28\x6d\x1c\xd0\x7a\x9f\xe9\x65\xeb\x41\x67\x59\x1a\xac\x85\x22\xff\xda\x56\xdb\x45\x97\xa1\x9d\xc5\x24\xac\xf6\xb5\x08\xe8\xbc\xf7\x38\x8d\xe7\xf1\xf2\x7f\x1b\x07\x78\xef\x3b\xf7\x09\x00\x00\xff\xff\x91\x3f\xf0\xba\xb7\x00\x00\x00")
 
 func secretOpenshiftConsoleConsoleOauthConfigYamlBytes() ([]byte, error) {
@@ -10161,6 +10267,26 @@ func serviceaccountOpenshiftAzureLoggingGenevaYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "ServiceAccount/openshift-azure-logging/geneva.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _serviceaccountOpenshiftAzureMonitoringGenevaYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x2c\xc7\xb1\x0d\x02\x31\x0c\x05\xd0\x3e\x53\x78\x81\x2b\x68\xdd\x31\x03\x12\xbd\x95\xfb\x1c\x16\xca\x77\x94\x38\x29\x98\x9e\x86\xf2\x59\xf7\x27\xc6\xf4\xa0\xca\xbe\x95\x8f\xf3\x54\x79\x60\x6c\xaf\xb8\xd7\x1a\x8b\x59\x1a\xd2\x4e\x4b\xd3\x22\x42\x6b\x50\xb9\x40\x6c\xfb\x73\x76\xab\x50\x89\x0e\xce\xb7\xbf\xf2\xb0\xef\x1a\x38\x5a\xd0\x33\x86\xf3\x2a\xbf\x00\x00\x00\xff\xff\x68\x81\xb3\xf5\x65\x00\x00\x00")
+
+func serviceaccountOpenshiftAzureMonitoringGenevaYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_serviceaccountOpenshiftAzureMonitoringGenevaYaml,
+		"ServiceAccount/openshift-azure-monitoring/geneva.yaml",
+	)
+}
+
+func serviceaccountOpenshiftAzureMonitoringGenevaYaml() (*asset, error) {
+	bytes, err := serviceaccountOpenshiftAzureMonitoringGenevaYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ServiceAccount/openshift-azure-monitoring/geneva.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -14663,6 +14789,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ConfigMap/openshift-ansible-service-broker/broker-config.yaml":                                                              configmapOpenshiftAnsibleServiceBrokerBrokerConfigYaml,
 	"ConfigMap/openshift-azure-logging/fluentd-config.yaml":                                                                      configmapOpenshiftAzureLoggingFluentdConfigYaml,
 	"ConfigMap/openshift-azure-logging/mdsd-customerdata-config.yaml":                                                            configmapOpenshiftAzureLoggingMdsdCustomerdataConfigYaml,
+	"ConfigMap/openshift-azure-monitoring/metrics-bridge.yaml":                                                                   configmapOpenshiftAzureMonitoringMetricsBridgeYaml,
 	"ConfigMap/openshift-console/console-config.yaml":                                                                            configmapOpenshiftConsoleConsoleConfigYaml,
 	"ConfigMap/openshift-monitoring/cluster-monitoring-config.yaml":                                                              configmapOpenshiftMonitoringClusterMonitoringConfigYaml,
 	"ConfigMap/openshift-node/node-config-compute.yaml":                                                                          configmapOpenshiftNodeNodeConfigComputeYaml,
@@ -14686,6 +14813,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Deployment.apps/default/registry-console.yaml":                                                                              deploymentAppsDefaultRegistryConsoleYaml,
 	"Deployment.apps/default/router.yaml":                                                                                        deploymentAppsDefaultRouterYaml,
 	"Deployment.apps/openshift-ansible-service-broker/asb.yaml":                                                                  deploymentAppsOpenshiftAnsibleServiceBrokerAsbYaml,
+	"Deployment.apps/openshift-azure-monitoring/metrics-bridge.yaml":                                                             deploymentAppsOpenshiftAzureMonitoringMetricsBridgeYaml,
 	"Deployment.apps/openshift-console/console.yaml":                                                                             deploymentAppsOpenshiftConsoleConsoleYaml,
 	"Deployment.apps/openshift-infra/customer-admin-controller.yaml":                                                             deploymentAppsOpenshiftInfraCustomerAdminControllerYaml,
 	"Deployment.apps/openshift-monitoring/cluster-monitoring-operator.yaml":                                                      deploymentAppsOpenshiftMonitoringClusterMonitoringOperatorYaml,
@@ -14760,6 +14888,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Namespace/kube-system.yaml":                                                                                                         namespaceKubeSystemYaml,
 	"Namespace/openshift-ansible-service-broker.yaml":                                                                                    namespaceOpenshiftAnsibleServiceBrokerYaml,
 	"Namespace/openshift-azure-logging.yaml":                                                                                             namespaceOpenshiftAzureLoggingYaml,
+	"Namespace/openshift-azure-monitoring.yaml":                                                                                          namespaceOpenshiftAzureMonitoringYaml,
 	"Namespace/openshift-azure.yaml":                                                                                                     namespaceOpenshiftAzureYaml,
 	"Namespace/openshift-console.yaml":                                                                                                   namespaceOpenshiftConsoleYaml,
 	"Namespace/openshift-etcd.yaml":                                                                                                      namespaceOpenshiftEtcdYaml,
@@ -14814,6 +14943,8 @@ var _bindata = map[string]func() (*asset, error){
 	"Secret/openshift-ansible-service-broker/asb-client.yaml":                                                                            secretOpenshiftAnsibleServiceBrokerAsbClientYaml,
 	"Secret/openshift-azure-logging/azure-registry.yaml":                                                                                 secretOpenshiftAzureLoggingAzureRegistryYaml,
 	"Secret/openshift-azure-logging/gcs-cert.yaml":                                                                                       secretOpenshiftAzureLoggingGcsCertYaml,
+	"Secret/openshift-azure-monitoring/azure-registry.yaml":                                                                              secretOpenshiftAzureMonitoringAzureRegistryYaml,
+	"Secret/openshift-azure-monitoring/mdm-cert.yaml":                                                                                    secretOpenshiftAzureMonitoringMdmCertYaml,
 	"Secret/openshift-console/console-oauth-config.yaml":                                                                                 secretOpenshiftConsoleConsoleOauthConfigYaml,
 	"Secret/openshift-template-service-broker/templateservicebroker-client.yaml":                                                         secretOpenshiftTemplateServiceBrokerTemplateservicebrokerClientYaml,
 	"SecurityContextConstraints.security.openshift.io/anyuid.yaml":                                                                       securitycontextconstraintsSecurityOpenshiftIoAnyuidYaml,
@@ -14868,6 +14999,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ServiceAccount/openshift-ansible-service-broker/asb.yaml":                                                                           serviceaccountOpenshiftAnsibleServiceBrokerAsbYaml,
 	"ServiceAccount/openshift-azure/azure-cluster-reader.yaml":                                                                           serviceaccountOpenshiftAzureAzureClusterReaderYaml,
 	"ServiceAccount/openshift-azure-logging/geneva.yaml":                                                                                 serviceaccountOpenshiftAzureLoggingGenevaYaml,
+	"ServiceAccount/openshift-azure-monitoring/geneva.yaml":                                                                              serviceaccountOpenshiftAzureMonitoringGenevaYaml,
 	"ServiceAccount/openshift-console/console.yaml":                                                                                      serviceaccountOpenshiftConsoleConsoleYaml,
 	"ServiceAccount/openshift-etcd/etcd-backup.yaml":                                                                                     serviceaccountOpenshiftEtcdEtcdBackupYaml,
 	"ServiceAccount/openshift-infra/bootstrap-autoapprover.yaml":                                                                         serviceaccountOpenshiftInfraBootstrapAutoapproverYaml,
@@ -15403,6 +15535,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"fluentd-config.yaml":           {configmapOpenshiftAzureLoggingFluentdConfigYaml, map[string]*bintree{}},
 			"mdsd-customerdata-config.yaml": {configmapOpenshiftAzureLoggingMdsdCustomerdataConfigYaml, map[string]*bintree{}},
 		}},
+		"openshift-azure-monitoring": {nil, map[string]*bintree{
+			"metrics-bridge.yaml": {configmapOpenshiftAzureMonitoringMetricsBridgeYaml, map[string]*bintree{}},
+		}},
 		"openshift-console": {nil, map[string]*bintree{
 			"console-config.yaml": {configmapOpenshiftConsoleConsoleConfigYaml, map[string]*bintree{}},
 		}},
@@ -15459,6 +15594,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"openshift-ansible-service-broker": {nil, map[string]*bintree{
 			"asb.yaml": {deploymentAppsOpenshiftAnsibleServiceBrokerAsbYaml, map[string]*bintree{}},
+		}},
+		"openshift-azure-monitoring": {nil, map[string]*bintree{
+			"metrics-bridge.yaml": {deploymentAppsOpenshiftAzureMonitoringMetricsBridgeYaml, map[string]*bintree{}},
 		}},
 		"openshift-console": {nil, map[string]*bintree{
 			"console.yaml": {deploymentAppsOpenshiftConsoleConsoleYaml, map[string]*bintree{}},
@@ -15554,6 +15692,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"kube-system.yaml":                       {namespaceKubeSystemYaml, map[string]*bintree{}},
 		"openshift-ansible-service-broker.yaml":  {namespaceOpenshiftAnsibleServiceBrokerYaml, map[string]*bintree{}},
 		"openshift-azure-logging.yaml":           {namespaceOpenshiftAzureLoggingYaml, map[string]*bintree{}},
+		"openshift-azure-monitoring.yaml":        {namespaceOpenshiftAzureMonitoringYaml, map[string]*bintree{}},
 		"openshift-azure.yaml":                   {namespaceOpenshiftAzureYaml, map[string]*bintree{}},
 		"openshift-console.yaml":                 {namespaceOpenshiftConsoleYaml, map[string]*bintree{}},
 		"openshift-etcd.yaml":                    {namespaceOpenshiftEtcdYaml, map[string]*bintree{}},
@@ -15660,6 +15799,10 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"azure-registry.yaml": {secretOpenshiftAzureLoggingAzureRegistryYaml, map[string]*bintree{}},
 			"gcs-cert.yaml":       {secretOpenshiftAzureLoggingGcsCertYaml, map[string]*bintree{}},
 		}},
+		"openshift-azure-monitoring": {nil, map[string]*bintree{
+			"azure-registry.yaml": {secretOpenshiftAzureMonitoringAzureRegistryYaml, map[string]*bintree{}},
+			"mdm-cert.yaml":       {secretOpenshiftAzureMonitoringMdmCertYaml, map[string]*bintree{}},
+		}},
 		"openshift-console": {nil, map[string]*bintree{
 			"console-oauth-config.yaml": {secretOpenshiftConsoleConsoleOauthConfigYaml, map[string]*bintree{}},
 		}},
@@ -15749,6 +15892,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"openshift-azure-logging": {nil, map[string]*bintree{
 			"geneva.yaml": {serviceaccountOpenshiftAzureLoggingGenevaYaml, map[string]*bintree{}},
+		}},
+		"openshift-azure-monitoring": {nil, map[string]*bintree{
+			"geneva.yaml": {serviceaccountOpenshiftAzureMonitoringGenevaYaml, map[string]*bintree{}},
 		}},
 		"openshift-console": {nil, map[string]*bintree{
 			"console.yaml": {serviceaccountOpenshiftConsoleConsoleYaml, map[string]*bintree{}},

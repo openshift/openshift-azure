@@ -54,8 +54,12 @@ type Config struct {
 	RouterStatsPassword            string    `json:"routerStatsPassword,omitempty"`
 	ServiceCatalogClusterID        uuid.UUID `json:"serviceCatalogClusterId,omitempty"`
 
-	// geneva logging sector
+	// Geneva Metrics System (MDM) sector used for logging
 	GenevaLoggingSector string `json:"genevaLoggingSector,omitempty"`
+	// Geneva Metrics System (MDM) account name for logging
+	GenevaMDMAccount string `json:"genevaMDMAccount,omitempty"`
+	// Geneva Metrics System (MDM) endpoint for logging
+	GenevaMDMEndpoint string `json:"genevaMDMEndpoint,omitempty"`
 }
 
 // ImageConfig contains all images for the pods
@@ -96,6 +100,8 @@ type ImageConfig struct {
 	// Geneva integration images
 	GenevaLogging string `json:"genevaLogging,omitempty"`
 	GenevaTDAgent string `json:"genevaTDAgent,omitempty"`
+	GenevaStatsd  string `json:"genevaStatsd,omitempty"`
+	MetricsBridge string `json:"metricsBridge,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.
@@ -133,6 +139,7 @@ type CertificateConfig struct {
 
 	// geneva integration certificates
 	GenevaLogging CertKeyPair `json:"genevaLogging,omitempty"`
+	GenevaMetrics CertKeyPair `json:"genevaMetrics,omitempty"`
 }
 
 // CertKeyPair is an rsa private key and x509 certificate pair.

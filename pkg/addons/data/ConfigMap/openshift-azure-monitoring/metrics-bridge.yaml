@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metrics-bridge
+  namespace: openshift-azure-monitoring
+data:
+  config.yaml: |
+    intervalNanoseconds: 30000000000 # every 30 seconds
+    prometheusFederateEndpoint: https://prometheus-k8s.openshift-monitoring.svc:9091/federate
+    statsdEndpoint: :8125
+    series:
+    - kube_node_info
+    - kube_node_status_allocatable_cpu_cores
+    - kube_node_status_allocatable_memory_bytes
+    - kube_node_status_condition
+    - kube_pod_container_status_restarts_total
+    - kube_pod_info
+    - kube_pod_status_phase
+    - kube_pod_status_ready
+    namespace: Prometheus
+    region: '*** GENERATED ***'

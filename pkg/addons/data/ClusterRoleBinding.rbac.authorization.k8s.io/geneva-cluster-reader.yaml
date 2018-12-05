@@ -10,3 +10,6 @@ subjects:
 - kind: ServiceAccount
   name: geneva
   namespace: openshift-azure-logging
+- kind: ServiceAccount
+  name: geneva
+  namespace: openshift-azure-monitoring

@@ -25,5 +25,23 @@ func (p *plugin) validateConfig() (errs []error) {
 	if p.config.GenevaConfig.TDAgentImage == "" {
 		errs = append(errs, fmt.Errorf("tdAgentImage cannot be empty"))
 	}
+	if p.config.GenevaConfig.MetricsCert == nil {
+		errs = append(errs, fmt.Errorf("metricsCert cannot be nil"))
+	}
+	if p.config.GenevaConfig.MetricsKey == nil {
+		errs = append(errs, fmt.Errorf("metricsKey cannot be nil"))
+	}
+	if p.config.GenevaConfig.MetricsBridge == "" {
+		errs = append(errs, fmt.Errorf("metricsBridge cannot be empty"))
+	}
+	if p.config.GenevaConfig.StatsdImage == "" {
+		errs = append(errs, fmt.Errorf("statsdImage cannot be empty"))
+	}
+	if p.config.GenevaConfig.MDMAccount == "" {
+		errs = append(errs, fmt.Errorf("mdmAccount cannot be empty"))
+	}
+	if p.config.GenevaConfig.MDMEndpoint == "" {
+		errs = append(errs, fmt.Errorf("mdmEndpoint cannot be empty"))
+	}
 	return errs
 }
