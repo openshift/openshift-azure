@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	"github.com/openshift/openshift-azure/pkg/util/structtags"
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
@@ -257,7 +258,7 @@ func TestMarshal(t *testing.T) {
 	}
 }
 
-func TestUnmarshall(t *testing.T) {
+func TestUnmarshal(t *testing.T) {
 	prepare := func(v reflect.Value) {
 		switch v.Interface().(type) {
 		case []IdentityProvider:
@@ -291,7 +292,7 @@ func TestJSONTags(t *testing.T) {
 // TestFieldParity ensures the admin type stays in sync with the
 // internal type.
 func TestFieldParity(t *testing.T) {
-	ignoreFields := map[string]map[string]struct{}{
+	internalIgnoredFields := map[string]map[string]struct{}{
 		"Properties": {
 			"servicePrincipalProfile": {},
 			"azProfile":               {},
@@ -324,6 +325,15 @@ func TestFieldParity(t *testing.T) {
 		"CertKeyPair": {
 			"key": {},
 		},
+		"AADIdentityProvider": {
+			"secret": {},
+		},
+	}
+
+	adminIgnoredFields := map[string]map[string]struct{}{
+		"OpenShiftManagedCluster": {
+			"-": {},
+		},
 	}
 
 	prepare := func(v reflect.Value) {
@@ -334,14 +344,16 @@ func TestFieldParity(t *testing.T) {
 		}
 	}
 
-	var internalValue *OpenShiftManagedCluster
-	populate.Walk(&internalValue, prepare)
-	adminValue := ConvertToAdmin(internalValue)
+	var i OpenShiftManagedCluster
+	populate.Walk(&i, prepare)
+	a := ConvertToAdmin(&i)
 
-	walkStruct(t, reflect.ValueOf(internalValue), reflect.ValueOf(adminValue), nil, ignoreFields)
+	internalValue := reflect.ValueOf(i)
+	adminValue := reflect.ValueOf(a)
+	walkStruct(t, internalValue, adminValue, internalValue.Type().Name(), internalIgnoredFields, adminIgnoredFields)
 }
 
-func walkStruct(t *testing.T, internalValue, adminValue reflect.Value, parent *string, ignoreFields map[string]map[string]struct{}) {
+func walkStruct(t *testing.T, internalValue, adminValue reflect.Value, parent string, internalIgnoredFields, adminIgnoredFields map[string]map[string]struct{}) {
 	if adminValue.Kind() == reflect.Ptr {
 		adminValue = reflect.Indirect(adminValue)
 	}
@@ -357,31 +369,33 @@ func walkStruct(t *testing.T, internalValue, adminValue reflect.Value, parent *s
 	}
 	internalNum := internalType.NumField()
 	adminNum := adminType.NumField()
-	if adminNum != internalNum-len(ignoreFields[internalType.Name()]) {
-		t.Fatalf("number of fields mismatch: admin type has %d fields, internal type has %d fields", adminNum, internalNum-len(ignoreFields[internalType.Name()]))
+	if adminNum-len(adminIgnoredFields[adminType.Name()]) != internalNum-len(internalIgnoredFields[internalType.Name()]) {
+		t.Fatalf("number of fields mismatch: admin type has %d fields, internal type has %d fields", adminNum-len(adminIgnoredFields[adminType.Name()]), internalNum-len(internalIgnoredFields[internalType.Name()]))
 	}
 
 	adminIndexOffset := 0
+	internalIndexOffeset := 0
 	for i := 0; i < internalNum; i++ {
-		var parentPrefix string
-		if parent != nil {
-			parentPrefix = *parent + "."
-			tag := filterName(internalType.Field(i).Tag)
-			if _, ok := ignoreFields[*parent][tag]; ok {
-				t.Logf("ignoring internal field %q", parentPrefix+tag)
-				adminIndexOffset++
-				continue
-			}
+		parentPrefix := parent + "."
+		internalTag := filterName(internalType.Field(i - internalIndexOffeset).Tag)
+		if _, ok := internalIgnoredFields[parent][internalTag]; ok {
+			t.Logf("ignoring internal field %q", parentPrefix+internalTag)
+			adminIndexOffset++
+			continue
+		}
+		adminTag := filterName(adminType.Field(i - adminIndexOffset).Tag)
+		if _, ok := adminIgnoredFields[parent][adminTag]; ok {
+			t.Logf("ignoring admin field %q", parentPrefix+adminTag)
+			internalIndexOffeset++
+			continue
 		}
 
-		internalTag := filterName(internalType.Field(i).Tag)
-		adminTag := filterName(adminType.Field(i - adminIndexOffset).Tag)
 		t.Logf("comparing internal field tag %q with admin field tag %q", parentPrefix+internalTag, parentPrefix+adminTag)
 		if internalTag != adminTag {
 			t.Fatalf("admin field tag is %q, internal field tag is %q", adminTag, internalTag)
 		}
 
-		internalFieldValue := internalValue.Field(i)
+		internalFieldValue := internalValue.Field(i - internalIndexOffeset)
 		if internalFieldValue.Kind() == reflect.Ptr {
 			internalFieldValue = reflect.Indirect(internalFieldValue)
 		}
@@ -395,14 +409,24 @@ func walkStruct(t *testing.T, internalValue, adminValue reflect.Value, parent *s
 			continue
 		}
 
-		if adminFieldValue.Kind() == reflect.Struct {
+		if internalFieldValue.Kind() == reflect.Interface {
+			internalInterface := internalFieldValue.Interface()
+			if internalAad, ok := internalInterface.(*AADIdentityProvider); ok {
+				internalFieldValue = reflect.ValueOf(*internalAad)
+			}
+			adminInterface := adminFieldValue.Interface()
+			if adminAad, ok := adminInterface.(*admin.AADIdentityProvider); ok {
+				adminFieldValue = reflect.ValueOf(*adminAad)
+			}
+		}
+		if internalFieldValue.Kind() == reflect.Struct {
 			name := internalFieldValue.Type().Name()
 			t.Logf("walking %q", name)
-			walkStruct(t, internalFieldValue, adminFieldValue, &name, ignoreFields)
+			walkStruct(t, internalFieldValue, adminFieldValue, name, internalIgnoredFields, adminIgnoredFields)
 		} else if internalFieldValue.Kind() == reflect.Slice {
 			name := internalFieldValue.Index(0).Type().Name()
 			t.Logf("walking %q", name)
-			walkStruct(t, internalFieldValue.Index(0), adminFieldValue.Index(0), &name, ignoreFields)
+			walkStruct(t, internalFieldValue.Index(0), adminFieldValue.Index(0), name, internalIgnoredFields, adminIgnoredFields)
 		}
 	}
 }
