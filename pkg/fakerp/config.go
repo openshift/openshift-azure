@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -44,7 +45,8 @@ type Config struct {
 }
 
 const (
-	DataDirectory = "_data"
+	DataDirectory           = "_data/"
+	LoggingSecretsDirectory = "secrets/"
 )
 
 func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
@@ -88,19 +90,23 @@ func GetPluginConfig() (*api.PluginConfig, error) {
 	}
 
 	// populate geneva artifacts
-	artifactDir := "secrets/"
-	logCert, err := readCert(artifactDir + "logging-int.cert")
+	artifactDir, err := FindDirectory(LoggingSecretsDirectory)
 	if err != nil {
 		return nil, err
 	}
-	logKey, err := readKey(artifactDir + "logging-int.key")
+	logCert, err := readCert(filepath.Join(artifactDir, "logging-int.cert"))
 	if err != nil {
 		return nil, err
 	}
-	pullSecret, err := readFile(artifactDir + ".dockerconfigjson")
+	logKey, err := readKey(filepath.Join(artifactDir, "logging-int.key"))
 	if err != nil {
 		return nil, err
 	}
+	pullSecret, err := readFile(filepath.Join(artifactDir, ".dockerconfigjson"))
+	if err != nil {
+		return nil, err
+	}
+
 	var syncImage string
 	if os.Getenv("SYNC_IMAGE") == "" {
 		syncImage = "quay.io/openshift-on-azure/sync:latest"
