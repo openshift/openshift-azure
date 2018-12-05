@@ -15,3 +15,11 @@ if [ -n "$FILES" ]; then
     echo $FILES
     exit 1
 fi
+
+FILES=$(find -name '*:*')
+
+if [ -n "$FILES" ]; then
+    echo The following filenames contain :, please rename them for Windows users
+    echo $FILES
+    exit 1
+fi
