@@ -128,18 +128,22 @@ func GetPluginConfig() (*api.PluginConfig, error) {
 	}
 
 	genevaConfig := api.GenevaConfig{
-		LoggingCert:     logCert,
-		LoggingKey:      logKey,
+		ImagePullSecret: pullSecret,
+
+		LoggingCert:      logCert,
+		LoggingKey:       logKey,
+		LoggingSector:    "US-Test",
+		LoggingAccount:   "OpenShift",
+		LoggingNamespace: "openshiftdiag",
+		LoggingImage:     "osarpint.azurecr.io/acs/mdsd:11201801",
+		TDAgentImage:     "osarpint.azurecr.io/acs/td-agent:latest",
+
 		MetricsCert:     metCert,
 		MetricsKey:      metKey,
-		ImagePullSecret: pullSecret,
-		LoggingSector:   "US-Test",
-		LoggingImage:    "osarpint.azurecr.io/acs/mdsd:11201801",
-		TDAgentImage:    "osarpint.azurecr.io/acs/td-agent:latest",
 		MetricsBridge:   metricsBridge,
 		StatsdImage:     "osarpint.azurecr.io/acs/mdm:git-a909a2e76",
-		MDMAccount:      "RPOpenShift",
-		MDMEndpoint:     "https://az-int.metrics.nsatc.net/",
+		MetricsAccount:  "RPOpenShift",
+		MetricsEndpoint: "https://az-int.metrics.nsatc.net/",
 	}
 	return &api.PluginConfig{
 		SyncImage:       syncImage,

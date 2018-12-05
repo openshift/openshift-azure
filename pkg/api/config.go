@@ -56,10 +56,14 @@ type Config struct {
 
 	// Geneva Metrics System (MDM) sector used for logging
 	GenevaLoggingSector string `json:"genevaLoggingSector,omitempty"`
-	// Geneva Metrics System (MDM) account name for logging
-	GenevaMDMAccount string `json:"genevaMDMAccount,omitempty"`
-	// Geneva Metrics System (MDM) endpoint for logging
-	GenevaMDMEndpoint string `json:"genevaMDMEndpoint,omitempty"`
+	// Geneva Metrics System (MDM) logging account
+	GenevaLoggingAccount string `json:"genevaLoggingAccount,omitempty"`
+	// Geneva Metrics System (MDM) logging namespace
+	GenevaLoggingNamespace string `json:"genevaLoggingNamespace,omitempty"`
+	// Geneva Metrics System (MDM) account name for metrics
+	GenevaMetricsAccount string `json:"genevaMetricsAccount,omitempty"`
+	// Geneva Metrics System (MDM) endpoint for metrics
+	GenevaMetricsEndpoint string `json:"genevaMetricsEndpoint,omitempty"`
 }
 
 // ImageConfig contains all images for the pods

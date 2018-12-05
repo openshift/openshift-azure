@@ -484,8 +484,10 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) 
 	c.Certificates.GenevaMetrics.Cert = g.pluginConfig.GenevaConfig.MetricsCert
 	c.Certificates.GenevaMetrics.Key = g.pluginConfig.GenevaConfig.MetricsKey
 	cs.Config.GenevaLoggingSector = g.pluginConfig.GenevaConfig.LoggingSector
-	cs.Config.GenevaMDMAccount = g.pluginConfig.GenevaConfig.MDMAccount
-	cs.Config.GenevaMDMEndpoint = g.pluginConfig.GenevaConfig.MDMEndpoint
+	cs.Config.GenevaLoggingAccount = g.pluginConfig.GenevaConfig.LoggingAccount
+	cs.Config.GenevaLoggingNamespace = g.pluginConfig.GenevaConfig.LoggingNamespace
+	cs.Config.GenevaMetricsAccount = g.pluginConfig.GenevaConfig.MetricsAccount
+	cs.Config.GenevaMetricsEndpoint = g.pluginConfig.GenevaConfig.MetricsEndpoint
 
 	return
 }
