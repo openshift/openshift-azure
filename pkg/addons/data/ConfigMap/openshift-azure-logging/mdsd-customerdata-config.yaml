@@ -6,9 +6,9 @@ metadata:
 data:
     mdsd.xml: |
         <?xml version="1.0" encoding="utf-8"?>
-        <MonitoringManagement version="1.0" namespace="OpenShift" eventVersion="1" timestamp="2017-08-01T00:00:00.000Z">
+        <MonitoringManagement version="1.0" namespace="OSAClusterLogs" eventVersion="1" timestamp="2017-08-01T00:00:00.000Z">
             <Accounts>
-                <Account moniker="openshiftdiag" isDefault="true" autoKey="false" />
+                <Account moniker="osaclusterlogsdiag" isDefault="true" autoKey="false" />
             </Accounts>
             <Management eventVolume="Large" defaultRetentionInDays="90" >
                 <Identity tenantNameAlias="RPTenant" roleNameAlias="Service" roleInstanceNameAlias="Host">
