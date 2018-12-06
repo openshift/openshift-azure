@@ -155,12 +155,7 @@ func (u *kubeclient) MasterIsReady(computerName ComputerName) (bool, error) {
 		return r, err
 	}
 
-	r, err = ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "controllers-"+computerName.toKubernetes())()
-	if !r || err != nil {
-		return r, err
-	}
-
-	return true, nil
+	return ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "controllers-"+computerName.toKubernetes())()
 }
 
 func (u *kubeclient) nodeWaitForReady(ctx context.Context, computerName ComputerName) error {
