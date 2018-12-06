@@ -61,34 +61,6 @@ func NewRBACApplicationsClient(tenantID string, authorizer autorest.Authorizer, 
 	}
 }
 
-func (c *rbacApplicationsClient) Create(ctx context.Context, parameters graphrbac.ApplicationCreateParameters) (result graphrbac.Application, err error) {
-	return c.ApplicationsClient.Create(ctx, parameters)
-}
-
-func (c *rbacApplicationsClient) Delete(ctx context.Context, applicationObjectID string) (result autorest.Response, err error) {
-	return c.ApplicationsClient.Delete(ctx, applicationObjectID)
-}
-
-func (c *rbacApplicationsClient) Get(ctx context.Context, applicationObjectID string) (result graphrbac.Application, err error) {
-	return c.ApplicationsClient.Get(ctx, applicationObjectID)
-}
-
-func (c *rbacApplicationsClient) ListPasswordCredentials(ctx context.Context, applicationObjectID string) (result graphrbac.PasswordCredentialListResult, err error) {
-	return c.ApplicationsClient.ListPasswordCredentials(ctx, applicationObjectID)
-}
-
-func (c *rbacApplicationsClient) List(ctx context.Context, filter string) (result graphrbac.ApplicationListResultPage, err error) {
-	return c.ApplicationsClient.List(ctx, filter)
-}
-
-func (c *rbacApplicationsClient) Patch(ctx context.Context, applicationObjectID string, parameters graphrbac.ApplicationUpdateParameters) (result autorest.Response, err error) {
-	return c.ApplicationsClient.Patch(ctx, applicationObjectID, parameters)
-}
-
-func (c *rbacApplicationsClient) UpdatePasswordCredentials(ctx context.Context, applicationObjectID string, parameters graphrbac.PasswordCredentialsUpdateParameters) (result autorest.Response, err error) {
-	return c.ApplicationsClient.UpdatePasswordCredentials(ctx, applicationObjectID, parameters)
-}
-
 func (c *rbacApplicationsClient) Client() autorest.Client {
 	return c.ApplicationsClient.Client
 }
