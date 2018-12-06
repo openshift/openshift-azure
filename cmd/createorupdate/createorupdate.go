@@ -15,12 +15,24 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+)
+
+const (
+	// https://developer.microsoft.com/en-us/graph/docs/api-reference/beta/api/application_list
+	// To list and patch AAD applications, this code needs to have the clientID
+	// of an application with the following permissions:
+	// API: Windows Azure Active Directory
+	//   Delegated permissions:
+	//      Sign in and read user profile
+	//      Access the directory as the signed-in user
+	clientID = "5935b8e2-3915-409c-bfb2-865b7a9291e0"
 )
 
 var (
@@ -154,7 +166,7 @@ func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.C
 		if len(conf.Username) == 0 || len(conf.Password) == 0 {
 			log.Fatal("AZURE_USERNAME and AZURE_PASSWORD are required to when updating the aad application")
 		}
-		authorizer, err := azureclient.NewAadAuthorizer(conf.Username, conf.Password, conf.TenantID)
+		authorizer, err := azureclient.NewAuthorizerFromUsernamePassword(conf.Username, conf.Password, clientID, conf.TenantID, azure.PublicCloud.GraphEndpoint)
 		if err != nil {
 			return err
 		}
