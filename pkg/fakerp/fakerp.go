@@ -16,12 +16,10 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 // IsUpdate return whether or not this is an update or create.
@@ -78,49 +76,25 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api
 	}
 }
 
-// CreateOrUpdate simulates the RP
-func CreateOrUpdate(ctx context.Context, log *logrus.Entry, oc *v20180930preview.OpenShiftManagedCluster, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
+func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, config *api.PluginConfig) (*api.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
 	p, errs := plugin.NewPlugin(log, config)
 	if len(errs) > 0 {
 		return nil, kerrors.NewAggregate(errs)
 	}
 
-	var err error
-	// locate directories
-	dataDir, err := FindDirectory(DataDirectory)
-	if err != nil {
-		return nil, err
-	}
 	// read in the OpenShift config blob if it exists (i.e. we're updating)
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
-	var oldCs *api.OpenShiftManagedCluster
-	if IsUpdate() {
-		log.Info("read old config")
-		oldCs, err = managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
-		if err != nil {
-			return nil, err
-		}
-	} else {
+	if !IsUpdate() {
 		// If containerservice.yaml does not exist - it is Create call
 		// create DNS records only on first call
-		err = CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"), oc)
+		err := CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
 		if err != nil {
 			return nil, err
 		}
-	}
-	// convert the external API manifest into the internal API representation
-	log.Info("convert to internal")
-	cs, err := api.ConvertFromV20180930preview(oc, oldCs)
-	if err != nil {
-		return nil, err
-	}
-
-	// the RP will enrich the internal API representation with data not included
-	// in the original request. this should only be called during the initial
-	// create request and not during a cluster update
-	if !IsUpdate() {
+		// the RP will enrich the internal API representation with data not included
+		// in the original request
 		log.Info("enrich")
 		err = enrich(cs)
 		if err != nil {
@@ -138,7 +112,7 @@ func CreateOrUpdate(ctx context.Context, log *logrus.Entry, oc *v20180930preview
 	}
 
 	// generate or update the OpenShift config blob
-	err = p.GenerateConfig(ctx, cs)
+	err := p.GenerateConfig(ctx, cs)
 	if err != nil {
 		return nil, err
 	}
@@ -146,6 +120,10 @@ func CreateOrUpdate(ctx context.Context, log *logrus.Entry, oc *v20180930preview
 	// persist the OpenShift container service
 	log.Info("persist config")
 	bytes, err := yaml.Marshal(cs)
+	if err != nil {
+		return nil, err
+	}
+	dataDir, err := FindDirectory(DataDirectory)
 	if err != nil {
 		return nil, err
 	}
@@ -181,11 +159,7 @@ func CreateOrUpdate(ctx context.Context, log *logrus.Entry, oc *v20180930preview
 		return nil, err
 	}
 
-	// convert our (probably changed) internal API representation back to the
-	// external API manifest to return it to the user
-	oc = api.ConvertToV20180930preview(cs)
-
-	return oc, nil
+	return cs, nil
 }
 
 func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, pluginConfig *api.PluginConfig) error {

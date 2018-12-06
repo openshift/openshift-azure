@@ -7,11 +7,10 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
 	"github.com/Azure/go-autorest/autorest/to"
 
-	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourceGroup, dnsDomain string, oc *v20180930preview.OpenShiftManagedCluster) error {
+func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, dnsResourceGroup, dnsDomain string) error {
 	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
@@ -80,7 +79,7 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 	}
 
 	// create router wildcard DNS CName record
-	routerCName := fmt.Sprintf("%s-router.%s.%s", resourceGroup, *oc.Location, "cloudapp.azure.com")
+	routerCName := fmt.Sprintf("%s-router.%s.%s", resourceGroup, location, "cloudapp.azure.com")
 	cn := dns.RecordSet{
 		Etag: zone.Etag,
 		RecordSetProperties: &dns.RecordSetProperties{
