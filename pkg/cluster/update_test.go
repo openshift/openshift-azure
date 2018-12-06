@@ -87,15 +87,16 @@ func TestFilterOldVMs(t *testing.T) {
 		},
 	}
 
-	u := &simpleUpgrader{
-		log: logrus.NewEntry(logrus.StandardLogger()),
-	}
 	for _, test := range tests {
-		t.Logf("running scenario %q", test.name)
-		got := u.filterOldVMs(test.vms, test.blob, test.ssHashes)
-		if !reflect.DeepEqual(got, test.exp) {
-			t.Errorf("expected vms:\n%#v\ngot:\n%#v", test.exp, got)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			u := &simpleUpgrader{
+				log: logrus.NewEntry(logrus.StandardLogger()).WithField("test", test.name),
+			}
+			got := u.filterOldVMs(test.vms, test.blob, test.ssHashes)
+			if !reflect.DeepEqual(got, test.exp) {
+				t.Errorf("expected vms:\n%#v\ngot:\n%#v", test.exp, got)
+			}
+		})
 	}
 }
 
