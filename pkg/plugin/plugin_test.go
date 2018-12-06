@@ -333,6 +333,14 @@ func TestNewPlugin(t *testing.T) {
 				errors.New(`loggingCert cannot be nil`),
 			},
 		},
+		"empty loggingControlPlaneAccount": {
+			f: func(p *api.PluginConfig) {
+				p.GenevaConfig.LoggingControlPlaneAccount = ""
+			},
+			expectedErrs: []error{
+				errors.New(`loggingControlPlaneAccount cannot be empty`),
+			},
+		},
 		"nil metricsCert": {
 			f: func(p *api.PluginConfig) {
 				p.GenevaConfig.MetricsCert = nil
@@ -365,20 +373,20 @@ func TestNewPlugin(t *testing.T) {
 				errors.New(`statsdImage cannot be empty`),
 			},
 		},
-		"empty mdmEndpoint": {
+		"empty metricsEndpoint": {
 			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.MDMEndpoint = ""
+				p.GenevaConfig.MetricsEndpoint = ""
 			},
 			expectedErrs: []error{
-				errors.New(`mdmEndpoint cannot be empty`),
+				errors.New(`metricsEndpoint cannot be empty`),
 			},
 		},
-		"empty mdmAccount": {
+		"empty metricsAccount": {
 			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.MDMAccount = ""
+				p.GenevaConfig.MetricsAccount = ""
 			},
 			expectedErrs: []error{
-				errors.New(`mdmAccount cannot be empty`),
+				errors.New(`metricsAccount cannot be empty`),
 			},
 		},
 	}
@@ -410,17 +418,22 @@ func getDummyPluginConfig() (*api.PluginConfig, error) {
 		SyncImage: "syncImage",
 		GenevaConfig: api.GenevaConfig{
 			ImagePullSecret: []byte("imagePullSecret"),
-			LoggingSector:   "loggingSector",
-			LoggingCert:     tls.GetDummyCertificate(),
-			LoggingKey:      tls.GetDummyPrivateKey(),
-			TDAgentImage:    "tdAgentImage",
-			LoggingImage:    "loggingImage",
+
+			LoggingSector:              "loggingSector",
+			LoggingAccount:             "loggingAccount",
+			LoggingNamespace:           "loggingNamespace",
+			LoggingControlPlaneAccount: "loggingControlPlaneAccount",
+			LoggingCert:                tls.GetDummyCertificate(),
+			LoggingKey:                 tls.GetDummyPrivateKey(),
+			TDAgentImage:               "tdAgentImage",
+			LoggingImage:               "loggingImage",
+
 			MetricsCert:     tls.GetDummyCertificate(),
 			MetricsKey:      tls.GetDummyPrivateKey(),
 			MetricsBridge:   "metricsBridge",
 			StatsdImage:     "statsdImage",
-			MDMAccount:      "mdmAccount",
-			MDMEndpoint:     "mdmEndpoint",
+			MetricsAccount:  "metricsAccount",
+			MetricsEndpoint: "metricsEndpoint",
 		},
 	}, nil
 }

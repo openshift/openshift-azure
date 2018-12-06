@@ -133,9 +133,9 @@ func GetPluginConfig() (*api.PluginConfig, error) {
 		LoggingCert:                logCert,
 		LoggingKey:                 logKey,
 		LoggingSector:              "US-Test",
-		LoggingAccount:             "OSAClusterLogs",
-		LoggingNamespace:           "osaclusterlogsdiag",
-		LoggingControlPlaneAccount: "OpenShift",
+		LoggingAccount:             "ccpopenshiftdiag",
+		LoggingNamespace:           "CCPOpenShift",
+		LoggingControlPlaneAccount: "RPOpenShiftAccount",
 		LoggingImage:               "osarpint.azurecr.io/acs/mdsd:12051806",
 		TDAgentImage:               "osarpint.azurecr.io/acs/td-agent:latest",
 
