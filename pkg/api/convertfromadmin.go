@@ -305,6 +305,9 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	if in.GenevaMetricsEndpoint != nil {
 		out.GenevaMetricsEndpoint = *in.GenevaMetricsEndpoint
 	}
+	if in.GenevaLoggingControlPlaneAccount != nil {
+		out.GenevaLoggingControlPlaneAccount = *in.GenevaLoggingControlPlaneAccount
+	}
 	return
 }
 

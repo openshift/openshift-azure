@@ -359,6 +359,10 @@ var Translations = map[string][]struct {
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='NAMESPACE')].value"),
 			Template: "{{ .Config.GenevaLoggingNamespace }}",
 		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='MONITORING_GCS_ACCOUNT')].value"),
+			Template: "{{ .Config.GenevaLoggingControlPlaneAccount }}",
+		},
 	},
 	"DaemonSet.apps/openshift-azure-logging/td-agent": {
 		{
