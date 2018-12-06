@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"reflect"
@@ -117,10 +118,15 @@ var (
 // Validator shares objects between validation methods
 type Validator struct {
 	runningUnderTest bool
+	isAdmin          bool
 }
 
 func NewValidator(runningUnderTest bool) *Validator {
 	return &Validator{runningUnderTest: runningUnderTest}
+}
+
+func NewAdminValidator(runningUnderTest bool) *Validator {
+	return &Validator{runningUnderTest: runningUnderTest, isAdmin: true}
 }
 
 func init() {
@@ -209,7 +215,18 @@ func (v *Validator) Validate(new, old *OpenShiftManagedCluster, externalOnly boo
 		return errs
 	}
 	if old != nil {
-		return v.validateUpdateContainerService(new, old, externalOnly)
+		if errs := v.validateUpdateContainerService(new, old, externalOnly); len(errs) > 0 {
+			return errs
+		}
+	}
+	if v.isAdmin {
+		if old == nil {
+			errs = append(errs, errors.New("admin requests cannot create clusters"))
+			return errs
+		}
+		if errs := v.validateUpdateConfig(new.Config, old.Config); len(errs) > 0 {
+			return errs
+		}
 	}
 	return nil
 }
@@ -498,6 +515,13 @@ func (v *Validator) validateProvisioningState(ps ProvisioningState) (errs []erro
 		Upgrading:
 	default:
 		errs = append(errs, fmt.Errorf("invalid properties.provisioningState %q", ps))
+	}
+	return
+}
+
+func (v *Validator) validateUpdateConfig(internalConfig, adminConfig Config) (errs []error) {
+	if !reflect.DeepEqual(internalConfig, adminConfig) {
+		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(internalConfig, adminConfig)))
 	}
 	return
 }

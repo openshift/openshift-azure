@@ -124,6 +124,9 @@ type Plugin interface {
 	// should be excluded.
 	Validate(ctx context.Context, new, old *OpenShiftManagedCluster, externalOnly bool) []error
 
+	// ValidateAdmin is used for validating admin API requests.
+	ValidateAdmin(ctx context.Context, new, old *OpenShiftManagedCluster) []error
+
 	// GenerateConfig ensures all the necessary in-cluster config is generated
 	// for an Openshift cluster.
 	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster) error
