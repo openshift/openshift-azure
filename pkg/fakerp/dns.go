@@ -129,6 +129,6 @@ func DeleteOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 	}
 
 	// delete main zone NS record
-	_, err = rsc.Delete(ctx, dnsResourceGroup, dnsDomain+"-test", resourceGroup, dns.NS, "")
+	_, err = rsc.Delete(ctx, dnsResourceGroup, dnsDomain, resourceGroup, dns.NS, "")
 	return err
 }
