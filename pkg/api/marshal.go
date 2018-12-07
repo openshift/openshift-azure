@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"k8s.io/client-go/tools/clientcmd/api/v1"
+	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/tls"
 )

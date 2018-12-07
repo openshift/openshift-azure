@@ -3,7 +3,7 @@ package api
 import (
 	"crypto/x509"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Config struct {
