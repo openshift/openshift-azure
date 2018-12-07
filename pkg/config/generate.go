@@ -478,14 +478,17 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) 
 		c.ServiceCatalogClusterID = uuid.NewV4()
 	}
 
-	// configure geneva configuration
+	// configure Geneva Metrics system (MDM) configuration
 	c.Certificates.GenevaLogging.Cert = g.pluginConfig.GenevaConfig.LoggingCert
 	c.Certificates.GenevaLogging.Key = g.pluginConfig.GenevaConfig.LoggingKey
 	c.Certificates.GenevaMetrics.Cert = g.pluginConfig.GenevaConfig.MetricsCert
 	c.Certificates.GenevaMetrics.Key = g.pluginConfig.GenevaConfig.MetricsKey
 	cs.Config.GenevaLoggingSector = g.pluginConfig.GenevaConfig.LoggingSector
-	cs.Config.GenevaMDMAccount = g.pluginConfig.GenevaConfig.MDMAccount
-	cs.Config.GenevaMDMEndpoint = g.pluginConfig.GenevaConfig.MDMEndpoint
+	cs.Config.GenevaLoggingAccount = g.pluginConfig.GenevaConfig.LoggingAccount
+	cs.Config.GenevaLoggingNamespace = g.pluginConfig.GenevaConfig.LoggingNamespace
+	cs.Config.GenevaLoggingControlPlaneAccount = g.pluginConfig.GenevaConfig.LoggingControlPlaneAccount
+	cs.Config.GenevaMetricsAccount = g.pluginConfig.GenevaConfig.MetricsAccount
+	cs.Config.GenevaMetricsEndpoint = g.pluginConfig.GenevaConfig.MetricsEndpoint
 
 	return
 }

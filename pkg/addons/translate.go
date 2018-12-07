@@ -351,6 +351,18 @@ var Translations = map[string][]struct {
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='RESOURCE_GROUP_NAME')].value"),
 			Template: "{{ .ContainerService.Properties.AzProfile.ResourceGroup }}",
 		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='ACCOUNT')].value"),
+			Template: "{{ .Config.GenevaLoggingAccount }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='NAMESPACE')].value"),
+			Template: "{{ .Config.GenevaLoggingNamespace }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='MONITORING_GCS_ACCOUNT')].value"),
+			Template: "{{ .Config.GenevaLoggingControlPlaneAccount }}",
+		},
 	},
 	"DaemonSet.apps/openshift-azure-logging/td-agent": {
 		{
@@ -437,11 +449,11 @@ var Translations = map[string][]struct {
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].env[?(@.name='MDMENDPOINT')].value"),
-			Template: "{{ .Config.GenevaMDMEndpoint }}",
+			Template: "{{ .Config.GenevaMetricsEndpoint }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].env[?(@.name='MDM_ACCOUNT')].value"),
-			Template: "{{ .Config.GenevaMDMAccount }}",
+			Template: "{{ .Config.GenevaMetricsAccount }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='metricsbridge')].image"),

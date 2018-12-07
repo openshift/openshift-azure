@@ -92,23 +92,26 @@ type TestConfig struct {
 
 // GenevaConfig holds all configuration for Plugin integration with Azure
 type GenevaConfig struct {
-	// common values
+	// Azure image pull secret
 	ImagePullSecret []byte
 
-	// logging configuration
-	LoggingCert   *x509.Certificate
-	LoggingKey    *rsa.PrivateKey
-	LoggingSector string
-	LoggingImage  string
-	TDAgentImage  string
+	// Geneva Metric System (MDM) logging configration
+	LoggingCert                *x509.Certificate
+	LoggingKey                 *rsa.PrivateKey
+	LoggingSector              string
+	LoggingControlPlaneAccount string
+	LoggingAccount             string
+	LoggingNamespace           string
+	LoggingImage               string
+	TDAgentImage               string
 
-	// metrics configuration
-	MetricsCert   *x509.Certificate
-	MetricsKey    *rsa.PrivateKey
-	StatsdImage   string
-	MetricsBridge string
-	MDMEndpoint   string
-	MDMAccount    string
+	// Geneva Metric System (MDM) metrics configration
+	MetricsCert     *x509.Certificate
+	MetricsKey      *rsa.PrivateKey
+	StatsdImage     string
+	MetricsBridge   string
+	MetricsEndpoint string
+	MetricsAccount  string
 }
 
 // Plugin is the main interface to openshift-azure

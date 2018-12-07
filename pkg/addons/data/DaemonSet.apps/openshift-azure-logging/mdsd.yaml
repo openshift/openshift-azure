@@ -42,6 +42,12 @@ spec:
               value: "*** GENERATED ***"
             - name: RESOURCE_GROUP_NAME
               value: "*** GENERATED ***"
+            - name: ACCOUNT
+              value: "*** GENERATED ***"
+            - name: NAMESPACE
+              value: "*** GENERATED ***"
+            - name: MONITORING_GCS_ACCOUNT
+              value: "*** GENERATED ***"
           volumeMounts:
             - mountPath: /var/run/mdsd/
               name: customerdata-mdsd-sockets

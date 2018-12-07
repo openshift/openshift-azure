@@ -231,8 +231,11 @@ var marshalled = []byte(`{
 		"routerStatsPassword": "Config.RouterStatsPassword",
 		"serviceCatalogClusterId": "01010101-0101-0101-0101-010101010101",
 		"genevaLoggingSector": "Config.GenevaLoggingSector",
-		"genevaMDMAccount": "Config.GenevaMDMAccount",
-		"genevaMDMEndpoint": "Config.GenevaMDMEndpoint"
+		"genevaLoggingAccount": "Config.GenevaLoggingAccount",
+		"genevaLoggingNamespace": "Config.GenevaLoggingNamespace",
+		"genevaLoggingControlPlaneAccount": "Config.GenevaLoggingControlPlaneAccount",
+		"genevaMetricsAccount": "Config.GenevaMetricsAccount",
+		"genevaMetricsEndpoint": "Config.GenevaMetricsEndpoint"
 	}
 }`)
 

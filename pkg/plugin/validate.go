@@ -22,6 +22,15 @@ func (p *plugin) validateConfig() (errs []error) {
 	if p.config.GenevaConfig.LoggingImage == "" {
 		errs = append(errs, fmt.Errorf("loggingImage cannot be empty"))
 	}
+	if p.config.GenevaConfig.LoggingAccount == "" {
+		errs = append(errs, fmt.Errorf("loggingAccount cannot be empty"))
+	}
+	if p.config.GenevaConfig.LoggingNamespace == "" {
+		errs = append(errs, fmt.Errorf("loggingNamespace cannot be empty"))
+	}
+	if p.config.GenevaConfig.LoggingControlPlaneAccount == "" {
+		errs = append(errs, fmt.Errorf("loggingControlPlaneAccount cannot be empty"))
+	}
 	if p.config.GenevaConfig.TDAgentImage == "" {
 		errs = append(errs, fmt.Errorf("tdAgentImage cannot be empty"))
 	}
@@ -37,11 +46,11 @@ func (p *plugin) validateConfig() (errs []error) {
 	if p.config.GenevaConfig.StatsdImage == "" {
 		errs = append(errs, fmt.Errorf("statsdImage cannot be empty"))
 	}
-	if p.config.GenevaConfig.MDMAccount == "" {
-		errs = append(errs, fmt.Errorf("mdmAccount cannot be empty"))
+	if p.config.GenevaConfig.MetricsAccount == "" {
+		errs = append(errs, fmt.Errorf("metricsAccount cannot be empty"))
 	}
-	if p.config.GenevaConfig.MDMEndpoint == "" {
-		errs = append(errs, fmt.Errorf("mdmEndpoint cannot be empty"))
+	if p.config.GenevaConfig.MetricsEndpoint == "" {
+		errs = append(errs, fmt.Errorf("metricsEndpoint cannot be empty"))
 	}
 	return errs
 }
