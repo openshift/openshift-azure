@@ -1,9 +1,5 @@
 #!/bin/bash
 
-if ! az account show >/dev/null; then
-    exit 1
-fi
-
 if [[ $# -lt 2 ]]; then
     echo error: usage "$0 resourceGroup backupblobname"
     exit 1

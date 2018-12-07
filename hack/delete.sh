@@ -1,9 +1,5 @@
 #!/bin/bash -x
 
-if ! az account show >/dev/null; then
-    exit 1
-fi
-
 if [[ $# -eq 0 && ! -e _data/containerservice.yaml ]]; then
     echo error: _data/containerservice.yaml must exist
     exit 1
