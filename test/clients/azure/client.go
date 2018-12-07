@@ -26,6 +26,7 @@ var (
 	adminRpFocus = rpFocus(regexp.QuoteMeta("[Admin]"))
 	fakeRpFocus  = rpFocus(regexp.QuoteMeta("[Fake]"))
 	realRpFocus  = rpFocus(regexp.QuoteMeta("[Real]"))
+	vnetRpFocus  = rpFocus(regexp.QuoteMeta("[Vnet]"))
 )
 
 func (tf rpFocus) match(focusString string) bool {
@@ -43,6 +44,9 @@ type Client struct {
 	VirtualMachineScaleSetExtensions azureclient.VirtualMachineScaleSetExtensionsClient
 	VirtualMachineScaleSetVMs        azureclient.VirtualMachineScaleSetVMsClient
 	Resources                        azureclient.ResourcesClient
+	VirtualNetworks                  azureclient.VirtualNetworksClient
+	VirtualNetworksPeerings          azureclient.VirtualNetworksPeeringsClient
+	Groups                           azureclient.GroupsClient
 }
 
 // NewClientFromEnvironment creates a new azure client from environment variables.
@@ -79,11 +83,11 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 	case adminRpFocus.match(focus), fakeRpFocus.match(focus):
 		fmt.Println("configuring the fake resource provider")
 		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
-	case realRpFocus.match(focus):
+	case realRpFocus.match(focus), vnetRpFocus.match(focus):
 		fmt.Println("configuring the real resource provider")
 		rpURL = externalapi.DefaultBaseURI
 	default:
-		panic(fmt.Sprintf("invalid focus %q - need to -ginkgo.focus=\\[Admin\\], -ginkgo.focus=\\[Fake\\] or -ginkgo.focus=\\[Real\\]", config.GinkgoConfig.FocusString))
+		panic(fmt.Sprintf("invalid focus %q - need to -ginkgo.focus=\\[Admin\\], -ginkgo.focus=\\[Fake\\] or -ginkgo.focus=\\[Real\\] or -ginkgo.focus=\\[Vnet\\]", config.GinkgoConfig.FocusString))
 	}
 
 	rpc := externalapi.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, subscriptionID)
@@ -102,5 +106,8 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 		VirtualMachineScaleSetExtensions: azureclient.NewVirtualMachineScaleSetExtensionsClient(subscriptionID, authorizer, nil),
 		VirtualMachineScaleSetVMs:        azureclient.NewVirtualMachineScaleSetVMsClient(subscriptionID, authorizer, nil),
 		Resources:                        azureclient.NewResourcesClient(subscriptionID, authorizer, nil),
+		VirtualNetworks:                  azureclient.NewVirtualNetworkClient(subscriptionID, authorizer, nil),
+		VirtualNetworksPeerings:          azureclient.NewVirtualNetworksPeeringsClient(subscriptionID, authorizer, nil),
+		Groups:                           azureclient.NewGroupsClient(subscriptionID, authorizer, nil),
 	}, nil
 }

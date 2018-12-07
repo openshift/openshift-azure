@@ -324,7 +324,7 @@ func (v *Validator) validateAuthProfile(ap *AuthProfile) (errs []error) {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders name"))
 			}
 			if provider.Secret == "" {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider clientId %q", provider.Secret))
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider secret %q", provider.Secret))
 			}
 			if provider.ClientID == "" {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider clientId %q", provider.ClientID))
