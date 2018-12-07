@@ -1,6 +1,8 @@
 package openshift
 
 import (
+	"path/filepath"
+
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	projectv1client "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
@@ -16,6 +18,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/tools/clientcmd/api/latest"
 
+	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
@@ -61,7 +64,11 @@ func newClientFromKubeConfig(kc *api.Config) (*Client, error) {
 }
 
 func NewAzureClusterReaderClient() (*Client, error) {
-	cs, err := managedcluster.ReadConfig("../../_data/containerservice.yaml")
+	dataDir, err := fakerp.FindDirectory(fakerp.DataDirectory)
+	if err != nil {
+		return nil, err
+	}
+	cs, err := managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
 	if err != nil {
 		return nil, err
 	}
