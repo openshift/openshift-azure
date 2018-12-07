@@ -46,6 +46,14 @@ func NewAuthorizer(clientID, clientSecret, tenantID string) (autorest.Authorizer
 	return auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID).Authorizer()
 }
 
+func NewAuthorizerFromUsernamePassword(username, password, clientID, tenantID, resource string) (autorest.Authorizer, error) {
+	config := auth.NewUsernamePasswordConfig(username, password, clientID, tenantID)
+	if resource != "" {
+		config.Resource = resource
+	}
+	return config.Authorizer()
+}
+
 func NewAuthorizerFromContext(ctx context.Context) (autorest.Authorizer, error) {
 	return NewAuthorizer(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
 }
