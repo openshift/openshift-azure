@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/go-test/deep"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	kapiextensions "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -17,15 +17,13 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/tools/clientcmd/api"
-	"k8s.io/client-go/tools/clientcmd/api/latest"
 	"k8s.io/client-go/util/flowcontrol"
 	"k8s.io/client-go/util/retry"
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
@@ -50,25 +48,19 @@ type client struct {
 	dyn        dynamic.ClientPool
 	grs        []*discovery.APIGroupResources
 	azs        azureclient.AccountsClient
+	log        *logrus.Entry
 }
 
-func newClient(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) (Interface, error) {
+func newClient(ctx context.Context, log *logrus.Entry, cs *acsapi.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) (Interface, error) {
 	if dryRun {
 		return &dryClient{}, nil
 	}
 
-	var kc api.Config
-	err := latest.Scheme.Convert(cs.Config.AdminKubeconfig, &kc, nil)
+	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return nil, err
 	}
 
-	kubeconfig := clientcmd.NewDefaultClientConfig(kc, &clientcmd.ConfigOverrides{})
-
-	restconfig, err := kubeconfig.ClientConfig()
-	if err != nil {
-		return nil, err
-	}
 	restconfig.RateLimiter = flowcontrol.NewFakeAlwaysRateLimiter()
 
 	ac, err := kaggregator.NewForConfig(restconfig)
@@ -92,14 +84,13 @@ func newClient(ctx context.Context, cs *acsapi.OpenShiftManagedCluster, azs azur
 		ae:         ae,
 		cli:        cli,
 		azs:        azs,
+		log:        log,
 	}
-
 	transport, err := rest.TransportFor(c.restconfig)
 	if err != nil {
 		return nil, err
 	}
-
-	if _, err := wait.ForHTTPStatusOk(ctx, transport, c.restconfig.Host+"/healthz"); err != nil {
+	if _, err := wait.ForHTTPStatusOk(ctx, log, transport, c.restconfig.Host+"/healthz"); err != nil {
 		return nil, err
 	}
 
@@ -144,7 +135,7 @@ func (c *client) ApplyResources(filter func(unstructured.Unstructured) bool, db 
 			continue
 		}
 
-		if err := write(c.dyn, c.grs, &o); err != nil {
+		if err := write(c.dyn, c.grs, &o, c.log); err != nil {
 			return err
 		}
 	}
@@ -152,7 +143,7 @@ func (c *client) ApplyResources(filter func(unstructured.Unstructured) bool, db 
 }
 
 // write synchronises a single object with the API server.
-func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstructured.Unstructured) error {
+func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstructured.Unstructured, log *logrus.Entry) error {
 	dc, err := dyn.ClientForGroupVersionKind(o.GroupVersionKind())
 	if err != nil {
 		return err
@@ -189,7 +180,7 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		var existing *unstructured.Unstructured
 		existing, err = dc.Resource(res, o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
 		if kerrors.IsNotFound(err) {
-			log.Infof("Create " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+			log.Info("Create " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 			_, err = dc.Resource(res, o.GetNamespace()).Create(o)
 			if kerrors.IsAlreadyExists(err) {
 				// The "hot path" in write() is Get, check, then maybe Update.
@@ -214,10 +205,10 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		}
 		Default(*existing)
 
-		if !needsUpdate(existing, o) {
+		if !needsUpdate(existing, o, log) {
 			return
 		}
-		printDiff(existing, o)
+		printDiff(existing, o, log)
 
 		o.SetResourceVersion(rv)
 		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
@@ -227,20 +218,20 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 	return err
 }
 
-func needsUpdate(existing, o *unstructured.Unstructured) bool {
+func needsUpdate(existing, o *unstructured.Unstructured, log *logrus.Entry) bool {
 	handleSpecialObjects(*existing, *o)
 
 	if reflect.DeepEqual(*existing, *o) {
-		log.Infof("Skip " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+		log.Info("Skip " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 		return false
 	}
 
-	log.Infof("Update " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+	log.Info("Update " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 
 	return true
 }
 
-func printDiff(existing, o *unstructured.Unstructured) bool {
+func printDiff(existing, o *unstructured.Unstructured, log *logrus.Entry) bool {
 	// TODO: we should have tests that monitor these diffs:
 	// 1) when a cluster is created
 	// 2) when sync is run twice back-to-back on the same cluster
@@ -250,7 +241,7 @@ func printDiff(existing, o *unstructured.Unstructured) bool {
 	diffShown := false
 	if strings.ToLower(oGroupKind.String()) != "secret" {
 		for _, diff := range deep.Equal(*existing, *o) {
-			log.Infof("- " + diff)
+			log.Info("- " + diff)
 			diffShown = true
 		}
 	}

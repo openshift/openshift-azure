@@ -2,10 +2,13 @@ package managedcluster
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/ghodss/yaml"
-	"k8s.io/client-go/kubernetes"
+	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	kapi "k8s.io/client-go/tools/clientcmd/api"
@@ -31,8 +34,8 @@ func ReadConfig(path string) (*api.OpenShiftManagedCluster, error) {
 	return cs, nil
 }
 
-// getKubeconfigFromV1Config takes a v1 config and returns a kubeconfig
-func getRestConfigFromV1Config(kc *v1.Config) (*rest.Config, error) {
+// RestConfigFromV1Config takes a v1 config and returns a kubeconfig
+func RestConfigFromV1Config(kc *v1.Config) (*rest.Config, error) {
 	var c kapi.Config
 	err := latest.Scheme.Convert(kc, &c, nil)
 	if err != nil {
@@ -43,30 +46,19 @@ func getRestConfigFromV1Config(kc *v1.Config) (*rest.Config, error) {
 	return kubeconfig.ClientConfig()
 }
 
-// ClientsetFromV1Config takes a v1 config and returns a Clientset
-func ClientsetFromV1Config(config *v1.Config) (*kubernetes.Clientset, error) {
-	restconfig, err := getRestConfigFromV1Config(config)
-	if err != nil {
-		return nil, err
-	}
-
-	return kubernetes.NewForConfig(restconfig)
-}
-
-// WaitForHealthz takes a context, v1 config.
+// WaitForHealthz takes a context, a OpenShiftManagedCluster, and a logrus.Entry
 // It waits for the cluster to respond to healthz requests.
-func WaitForHealthz(ctx context.Context, config *v1.Config) error {
-	restconfig, err := getRestConfigFromV1Config(config)
-	if err != nil {
-		return err
-	}
+func WaitForHealthz(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster) error {
+	pool := x509.NewCertPool()
+	pool.AddCert(cs.Config.Certificates.Ca.Cert)
 
-	t, err := rest.TransportFor(restconfig)
-	if err != nil {
-		return err
+	t := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			RootCAs: pool,
+		},
 	}
 
 	// Wait for the healthz to be 200 status
-	_, err = wait.ForHTTPStatusOk(ctx, t, restconfig.Host+"/healthz")
+	_, err := wait.ForHTTPStatusOk(ctx, log, t, "https://"+cs.Properties.FQDN+"/healthz")
 	return err
 }

@@ -36,9 +36,10 @@ var (
 type sync struct {
 	azs  azureclient.AccountsClient
 	blob azureclientstorage.Blob
+	log  *logrus.Entry
 }
 
-func (s *sync) init(ctx context.Context) error {
+func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
 	if err != nil {
 		return err
@@ -58,11 +59,13 @@ func (s *sync) init(ctx context.Context) error {
 
 	s.blob = bsc.GetContainerReference(cluster.ConfigContainerName).GetBlobReference(cluster.ConfigBlobName)
 
+	s.log = log
+
 	return nil
 }
 
 func (s *sync) getBlob() (*api.OpenShiftManagedCluster, error) {
-	logrus.Print("reading config blob")
+	s.log.Print("reading config blob")
 
 	var rc io.ReadCloser
 	var err error
@@ -79,7 +82,7 @@ func (s *sync) getBlob() (*api.OpenShiftManagedCluster, error) {
 		return nil, err
 	}
 	defer rc.Close()
-	logrus.Print("read config blob")
+	s.log.Print("read config blob")
 
 	b, err := ioutil.ReadAll(rc)
 	if err != nil {
@@ -97,8 +100,8 @@ func (s *sync) getBlob() (*api.OpenShiftManagedCluster, error) {
 // desired state that is kept in a blob in an Azure storage
 // account. It returns whether it managed to access the
 // config blob or not and any error that occured.
-func (s *sync) sync(ctx context.Context) (bool, error) {
-	logrus.Print("Sync process started")
+func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
+	s.log.Print("Sync process started")
 	cs, err := s.getBlob()
 	if err != nil {
 		return false, err
@@ -109,36 +112,38 @@ func (s *sync) sync(ctx context.Context) (bool, error) {
 		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 
-	if err := addons.Main(ctx, cs, s.azs, *dryRun); err != nil {
+	if err := addons.Main(ctx, s.log, cs, s.azs, *dryRun); err != nil {
 		return true, errors.Wrap(err, "cannot sync cluster config")
 	}
 
-	logrus.Print("Sync process complete")
+	s.log.Print("Sync process complete")
 	return true, nil
 }
 
 func main() {
 	flag.Parse()
-	logrus.SetLevel(log.SanitizeLogLevel(*logLevel))
-	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-	logrus.Printf("sync pod starting, git commit %s", gitCommit)
+	logger := logrus.New()
+	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
+	logger.SetLevel(log.SanitizeLogLevel(*logLevel))
+	log := logrus.NewEntry(logger)
+	log.Printf("sync pod starting, git commit %s", gitCommit)
 
 	s := new(sync)
 	ctx := context.Background()
 
-	if err := s.init(ctx); err != nil {
-		logrus.Fatalf("Cannot initialize sync: %v", err)
+	if err := s.init(ctx, log); err != nil {
+		log.Fatalf("Cannot initialize sync: %v", err)
 	}
 
 	for {
-		gotBlob, err := s.sync(ctx)
+		gotBlob, err := s.sync(ctx, log)
 		if !gotBlob {
 			// If we didn't manage to access the blob, error out and start
 			// again.
-			logrus.Fatalf("Error while accessing config blob: %v", err)
+			log.Fatalf("Error while accessing config blob: %v", err)
 		}
 		if err != nil {
-			logrus.Printf("Error while syncing: %v", err)
+			log.Printf("Error while syncing: %v", err)
 		}
 		if *once {
 			return

@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/ghodss/yaml"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -189,7 +189,7 @@ var (
 // writeDB uses the discovery and dynamic clients to synchronise an API server's
 // objects with db.
 // TODO: need to implement deleting objects which we don't want any more.
-func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
+func writeDB(client Interface, db map[string]unstructured.Unstructured, log *logrus.Entry) error {
 	// impose an order to improve debuggability.
 	var keys []string
 	for k := range db {
@@ -245,8 +245,8 @@ func writeDB(client Interface, db map[string]unstructured.Unstructured) error {
 	return client.ApplyResources(scFilter, db, keys)
 }
 
-func Main(ctx context.Context, cs *api.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) error {
-	client, err := newClient(ctx, cs, azs, dryRun)
+func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) error {
+	client, err := newClient(ctx, log, cs, azs, dryRun)
 	if err != nil {
 		return err
 	}
@@ -291,5 +291,5 @@ func Main(ctx context.Context, cs *api.OpenShiftManagedCluster, azs azureclient.
 		return nil
 	}
 
-	return writeDB(client, db)
+	return writeDB(client, db, log)
 }

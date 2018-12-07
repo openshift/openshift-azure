@@ -8,6 +8,7 @@ package wait
 
 import (
 	"context"
+	"crypto/x509"
 	"io"
 	"net"
 	"net/http"
@@ -16,6 +17,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
@@ -37,15 +39,15 @@ type SimpleHTTPClient interface {
 }
 
 // ForHTTPStatusOk poll until URL returns 200
-func ForHTTPStatusOk(ctx context.Context, transport http.RoundTripper, urltocheck string) (*http.Response, error) {
+func ForHTTPStatusOk(ctx context.Context, log *logrus.Entry, transport http.RoundTripper, urltocheck string) (*http.Response, error) {
 	cli := &http.Client{
 		Transport: transport,
 		Timeout:   10 * time.Second,
 	}
-	return forHTTPStatusOk(ctx, cli, urltocheck, time.Second)
+	return forHTTPStatusOk(ctx, log, cli, urltocheck, time.Second)
 }
 
-func forHTTPStatusOk(ctx context.Context, cli SimpleHTTPClient, urltocheck string, interval time.Duration) (*http.Response, error) {
+func forHTTPStatusOk(ctx context.Context, log *logrus.Entry, cli SimpleHTTPClient, urltocheck string, interval time.Duration) (*http.Response, error) {
 	req, err := http.NewRequest("GET", urltocheck, nil)
 	if err != nil {
 		return nil, err
@@ -61,6 +63,10 @@ func forHTTPStatusOk(ctx context.Context, cli SimpleHTTPClient, urltocheck strin
 						return false, nil
 					}
 				}
+			}
+			if _, ok := err.Err.(x509.UnknownAuthorityError); ok {
+				log.Info(err)
+				return false, nil
 			}
 			if err.Timeout() || err.Err == io.EOF || err.Err == io.ErrUnexpectedEOF {
 				return false, nil
