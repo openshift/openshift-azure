@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"k8s.io/client-go/tools/clientcmd/api"
+	"k8s.io/client-go/tools/clientcmd/api/latest"
 
 	"github.com/openshift/openshift-azure/pkg/fakerp"
 	azuretls "github.com/openshift/openshift-azure/pkg/tls"
@@ -34,6 +35,13 @@ func login(username string) (*api.Config, error) {
 		password = cs.Config.CustomerReaderPasswd
 	case "enduser":
 		password = cs.Config.EndUserPasswd
+	case "admin":
+		var c api.Config
+		err := latest.Scheme.Convert(cs.Config.AdminKubeconfig, &c, nil)
+		if err != nil {
+			return nil, err
+		}
+		return &c, nil
 	default:
 		return nil, fmt.Errorf("unknown username %q", username)
 	}
