@@ -6,16 +6,22 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"strings"
 
 	"k8s.io/client-go/tools/clientcmd/api"
 
+	"github.com/openshift/openshift-azure/pkg/fakerp"
 	azuretls "github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 func login(username string) (*api.Config, error) {
-	cs, err := managedcluster.ReadConfig("../../_data/containerservice.yaml")
+	dataDir, err := fakerp.FindDirectory(fakerp.DataDirectory)
+	if err != nil {
+		return nil, err
+	}
+	cs, err := managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
 	if err != nil {
 		return nil, err
 	}
