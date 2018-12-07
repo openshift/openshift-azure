@@ -222,8 +222,6 @@ func (v *Validator) validateContainerService(c *OpenShiftManagedCluster, externa
 
 	if c.Location == "" {
 		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
-	} else if _, found := AzureLocations[c.Location]; !found {
-		errs = append(errs, fmt.Errorf("unsupported location %q", c.Location))
 	}
 
 	if c.Name == "" {

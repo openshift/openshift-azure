@@ -103,14 +103,6 @@ func TestValidate(t *testing.T) {
 				errors.New(`invalid properties.fqdn "example.eastus.cloudapp.azure.com"`),
 			},
 		},
-		"unsupported location": {
-			f: func(oc *OpenShiftManagedCluster) { oc.Location = "themoon" },
-			expectedErrs: []error{
-				errors.New(`unsupported location "themoon"`),
-				errors.New(`invalid properties.routerProfiles["default"].fqdn "router-fqdn.eastus.cloudapp.azure.com"`),
-				errors.New(`invalid properties.fqdn "example.eastus.cloudapp.azure.com"`),
-			},
-		},
 		"name": {
 			f:            func(oc *OpenShiftManagedCluster) { oc.Name = "" },
 			expectedErrs: []error{errors.New(`invalid name ""`)},
