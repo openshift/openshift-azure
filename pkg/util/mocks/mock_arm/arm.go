@@ -38,6 +38,7 @@ func (m *MockGenerator) EXPECT() *MockGeneratorMockRecorder {
 
 // Generate mocks base method
 func (m *MockGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, backupBlob string) (map[string]interface{}, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Generate", ctx, cs, isUpdate, backupBlob)
 	ret0, _ := ret[0].(map[string]interface{})
 	ret1, _ := ret[1].(error)
@@ -46,5 +47,6 @@ func (m *MockGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCl
 
 // Generate indicates an expected call of Generate
 func (mr *MockGeneratorMockRecorder) Generate(ctx, cs, isUpdate, backupBlob interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockGenerator)(nil).Generate), ctx, cs, isUpdate, backupBlob)
 }
