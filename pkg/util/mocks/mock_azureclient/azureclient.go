@@ -44,6 +44,7 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 
 // Client mocks base method
 func (m *MockClient) Client() autorest.Client {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Client")
 	ret0, _ := ret[0].(autorest.Client)
 	return ret0
@@ -51,6 +52,7 @@ func (m *MockClient) Client() autorest.Client {
 
 // Client indicates an expected call of Client
 func (mr *MockClientMockRecorder) Client() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockClient)(nil).Client))
 }
 
@@ -79,6 +81,7 @@ func (m *MockVirtualMachineScaleSetsClient) EXPECT() *MockVirtualMachineScaleSet
 
 // Client mocks base method
 func (m *MockVirtualMachineScaleSetsClient) Client() autorest.Client {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Client")
 	ret0, _ := ret[0].(autorest.Client)
 	return ret0
@@ -86,11 +89,13 @@ func (m *MockVirtualMachineScaleSetsClient) Client() autorest.Client {
 
 // Client indicates an expected call of Client
 func (mr *MockVirtualMachineScaleSetsClientMockRecorder) Client() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockVirtualMachineScaleSetsClient)(nil).Client))
 }
 
 // Delete mocks base method
 func (m *MockVirtualMachineScaleSetsClient) Delete(arg0 context.Context, arg1, arg2 string) (compute.VirtualMachineScaleSetsDeleteFuture, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetsDeleteFuture)
 	ret1, _ := ret[1].(error)
@@ -99,11 +104,13 @@ func (m *MockVirtualMachineScaleSetsClient) Delete(arg0 context.Context, arg1, a
 
 // Delete indicates an expected call of Delete
 func (mr *MockVirtualMachineScaleSetsClientMockRecorder) Delete(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockVirtualMachineScaleSetsClient)(nil).Delete), arg0, arg1, arg2)
 }
 
 // List mocks base method
 func (m *MockVirtualMachineScaleSetsClient) List(arg0 context.Context, arg1 string) (compute.VirtualMachineScaleSetListResultPage, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0, arg1)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetListResultPage)
 	ret1, _ := ret[1].(error)
@@ -112,11 +119,13 @@ func (m *MockVirtualMachineScaleSetsClient) List(arg0 context.Context, arg1 stri
 
 // List indicates an expected call of List
 func (mr *MockVirtualMachineScaleSetsClientMockRecorder) List(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockVirtualMachineScaleSetsClient)(nil).List), arg0, arg1)
 }
 
 // Update mocks base method
 func (m *MockVirtualMachineScaleSetsClient) Update(arg0 context.Context, arg1, arg2 string, arg3 compute.VirtualMachineScaleSetUpdate) (compute.VirtualMachineScaleSetsUpdateFuture, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetsUpdateFuture)
 	ret1, _ := ret[1].(error)
@@ -125,11 +134,13 @@ func (m *MockVirtualMachineScaleSetsClient) Update(arg0 context.Context, arg1, a
 
 // Update indicates an expected call of Update
 func (mr *MockVirtualMachineScaleSetsClientMockRecorder) Update(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockVirtualMachineScaleSetsClient)(nil).Update), arg0, arg1, arg2, arg3)
 }
 
 // UpdateInstances mocks base method
 func (m *MockVirtualMachineScaleSetsClient) UpdateInstances(arg0 context.Context, arg1, arg2 string, arg3 compute.VirtualMachineScaleSetVMInstanceRequiredIDs) (compute.VirtualMachineScaleSetsUpdateInstancesFuture, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateInstances", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetsUpdateInstancesFuture)
 	ret1, _ := ret[1].(error)
@@ -138,6 +149,7 @@ func (m *MockVirtualMachineScaleSetsClient) UpdateInstances(arg0 context.Context
 
 // UpdateInstances indicates an expected call of UpdateInstances
 func (mr *MockVirtualMachineScaleSetsClientMockRecorder) UpdateInstances(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateInstances", reflect.TypeOf((*MockVirtualMachineScaleSetsClient)(nil).UpdateInstances), arg0, arg1, arg2, arg3)
 }
 
@@ -166,6 +178,7 @@ func (m *MockVirtualMachineScaleSetVMsClient) EXPECT() *MockVirtualMachineScaleS
 
 // Client mocks base method
 func (m *MockVirtualMachineScaleSetVMsClient) Client() autorest.Client {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Client")
 	ret0, _ := ret[0].(autorest.Client)
 	return ret0
@@ -173,11 +186,13 @@ func (m *MockVirtualMachineScaleSetVMsClient) Client() autorest.Client {
 
 // Client indicates an expected call of Client
 func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Client() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Client))
 }
 
 // Deallocate mocks base method
 func (m *MockVirtualMachineScaleSetVMsClient) Deallocate(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsDeallocateFuture, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Deallocate", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsDeallocateFuture)
 	ret1, _ := ret[1].(error)
@@ -186,11 +201,13 @@ func (m *MockVirtualMachineScaleSetVMsClient) Deallocate(arg0 context.Context, a
 
 // Deallocate indicates an expected call of Deallocate
 func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Deallocate(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Deallocate", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Deallocate), arg0, arg1, arg2, arg3)
 }
 
 // Delete mocks base method
 func (m *MockVirtualMachineScaleSetVMsClient) Delete(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsDeleteFuture, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsDeleteFuture)
 	ret1, _ := ret[1].(error)
@@ -199,11 +216,13 @@ func (m *MockVirtualMachineScaleSetVMsClient) Delete(arg0 context.Context, arg1,
 
 // Delete indicates an expected call of Delete
 func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Delete(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Delete), arg0, arg1, arg2, arg3)
 }
 
 // List mocks base method
 func (m *MockVirtualMachineScaleSetVMsClient) List(arg0 context.Context, arg1, arg2, arg3, arg4, arg5 string) (azureclient.VirtualMachineScaleSetVMListResultPage, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2, arg3, arg4, arg5)
 	ret0, _ := ret[0].(azureclient.VirtualMachineScaleSetVMListResultPage)
 	ret1, _ := ret[1].(error)
@@ -212,11 +231,13 @@ func (m *MockVirtualMachineScaleSetVMsClient) List(arg0 context.Context, arg1, a
 
 // List indicates an expected call of List
 func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) List(arg0, arg1, arg2, arg3, arg4, arg5 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).List), arg0, arg1, arg2, arg3, arg4, arg5)
 }
 
 // Reimage mocks base method
 func (m *MockVirtualMachineScaleSetVMsClient) Reimage(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsReimageFuture, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Reimage", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsReimageFuture)
 	ret1, _ := ret[1].(error)
@@ -225,11 +246,13 @@ func (m *MockVirtualMachineScaleSetVMsClient) Reimage(arg0 context.Context, arg1
 
 // Reimage indicates an expected call of Reimage
 func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Reimage(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reimage", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Reimage), arg0, arg1, arg2, arg3)
 }
 
 // Restart mocks base method
 func (m *MockVirtualMachineScaleSetVMsClient) Restart(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsRestartFuture, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Restart", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsRestartFuture)
 	ret1, _ := ret[1].(error)
@@ -238,11 +261,13 @@ func (m *MockVirtualMachineScaleSetVMsClient) Restart(arg0 context.Context, arg1
 
 // Restart indicates an expected call of Restart
 func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Restart(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Restart", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Restart), arg0, arg1, arg2, arg3)
 }
 
 // Start mocks base method
 func (m *MockVirtualMachineScaleSetVMsClient) Start(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsStartFuture, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Start", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsStartFuture)
 	ret1, _ := ret[1].(error)
@@ -251,6 +276,7 @@ func (m *MockVirtualMachineScaleSetVMsClient) Start(arg0 context.Context, arg1, 
 
 // Start indicates an expected call of Start
 func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Start(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Start), arg0, arg1, arg2, arg3)
 }
 
@@ -279,6 +305,7 @@ func (m *MockVirtualMachineScaleSetExtensionsClient) EXPECT() *MockVirtualMachin
 
 // Client mocks base method
 func (m *MockVirtualMachineScaleSetExtensionsClient) Client() autorest.Client {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Client")
 	ret0, _ := ret[0].(autorest.Client)
 	return ret0
@@ -286,11 +313,13 @@ func (m *MockVirtualMachineScaleSetExtensionsClient) Client() autorest.Client {
 
 // Client indicates an expected call of Client
 func (mr *MockVirtualMachineScaleSetExtensionsClientMockRecorder) Client() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockVirtualMachineScaleSetExtensionsClient)(nil).Client))
 }
 
 // CreateOrUpdate mocks base method
 func (m *MockVirtualMachineScaleSetExtensionsClient) CreateOrUpdate(arg0 context.Context, arg1, arg2, arg3 string, arg4 compute.VirtualMachineScaleSetExtension) (compute.VirtualMachineScaleSetExtensionsCreateOrUpdateFuture, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdate", arg0, arg1, arg2, arg3, arg4)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetExtensionsCreateOrUpdateFuture)
 	ret1, _ := ret[1].(error)
@@ -299,11 +328,13 @@ func (m *MockVirtualMachineScaleSetExtensionsClient) CreateOrUpdate(arg0 context
 
 // CreateOrUpdate indicates an expected call of CreateOrUpdate
 func (mr *MockVirtualMachineScaleSetExtensionsClientMockRecorder) CreateOrUpdate(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdate", reflect.TypeOf((*MockVirtualMachineScaleSetExtensionsClient)(nil).CreateOrUpdate), arg0, arg1, arg2, arg3, arg4)
 }
 
 // Get mocks base method
 func (m *MockVirtualMachineScaleSetExtensionsClient) Get(arg0 context.Context, arg1, arg2, arg3, arg4 string) (compute.VirtualMachineScaleSetExtension, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", arg0, arg1, arg2, arg3, arg4)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetExtension)
 	ret1, _ := ret[1].(error)
@@ -312,11 +343,13 @@ func (m *MockVirtualMachineScaleSetExtensionsClient) Get(arg0 context.Context, a
 
 // Get indicates an expected call of Get
 func (mr *MockVirtualMachineScaleSetExtensionsClientMockRecorder) Get(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockVirtualMachineScaleSetExtensionsClient)(nil).Get), arg0, arg1, arg2, arg3, arg4)
 }
 
 // List mocks base method
 func (m *MockVirtualMachineScaleSetExtensionsClient) List(arg0 context.Context, arg1, arg2 string) (compute.VirtualMachineScaleSetExtensionListResultPage, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0, arg1, arg2)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetExtensionListResultPage)
 	ret1, _ := ret[1].(error)
@@ -325,6 +358,7 @@ func (m *MockVirtualMachineScaleSetExtensionsClient) List(arg0 context.Context, 
 
 // List indicates an expected call of List
 func (mr *MockVirtualMachineScaleSetExtensionsClientMockRecorder) List(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockVirtualMachineScaleSetExtensionsClient)(nil).List), arg0, arg1, arg2)
 }
 
@@ -353,6 +387,7 @@ func (m *MockApplicationsClient) EXPECT() *MockApplicationsClientMockRecorder {
 
 // Client mocks base method
 func (m *MockApplicationsClient) Client() autorest.Client {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Client")
 	ret0, _ := ret[0].(autorest.Client)
 	return ret0
@@ -360,11 +395,13 @@ func (m *MockApplicationsClient) Client() autorest.Client {
 
 // Client indicates an expected call of Client
 func (mr *MockApplicationsClientMockRecorder) Client() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockApplicationsClient)(nil).Client))
 }
 
 // Get mocks base method
 func (m *MockApplicationsClient) Get(arg0 context.Context, arg1, arg2 string) (managedapplications.Application, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", arg0, arg1, arg2)
 	ret0, _ := ret[0].(managedapplications.Application)
 	ret1, _ := ret[1].(error)
@@ -373,11 +410,13 @@ func (m *MockApplicationsClient) Get(arg0 context.Context, arg1, arg2 string) (m
 
 // Get indicates an expected call of Get
 func (mr *MockApplicationsClientMockRecorder) Get(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockApplicationsClient)(nil).Get), arg0, arg1, arg2)
 }
 
 // GetByID mocks base method
 func (m *MockApplicationsClient) GetByID(arg0 context.Context, arg1 string) (managedapplications.Application, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByID", arg0, arg1)
 	ret0, _ := ret[0].(managedapplications.Application)
 	ret1, _ := ret[1].(error)
@@ -386,11 +425,13 @@ func (m *MockApplicationsClient) GetByID(arg0 context.Context, arg1 string) (man
 
 // GetByID indicates an expected call of GetByID
 func (mr *MockApplicationsClientMockRecorder) GetByID(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockApplicationsClient)(nil).GetByID), arg0, arg1)
 }
 
 // ListByResourceGroup mocks base method
 func (m *MockApplicationsClient) ListByResourceGroup(arg0 context.Context, arg1 string) (managedapplications.ApplicationListResultPage, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListByResourceGroup", arg0, arg1)
 	ret0, _ := ret[0].(managedapplications.ApplicationListResultPage)
 	ret1, _ := ret[1].(error)
@@ -399,6 +440,7 @@ func (m *MockApplicationsClient) ListByResourceGroup(arg0 context.Context, arg1 
 
 // ListByResourceGroup indicates an expected call of ListByResourceGroup
 func (mr *MockApplicationsClientMockRecorder) ListByResourceGroup(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListByResourceGroup", reflect.TypeOf((*MockApplicationsClient)(nil).ListByResourceGroup), arg0, arg1)
 }
 
@@ -427,6 +469,7 @@ func (m *MockMarketPlaceAgreementsClient) EXPECT() *MockMarketPlaceAgreementsCli
 
 // Create mocks base method
 func (m *MockMarketPlaceAgreementsClient) Create(arg0 context.Context, arg1, arg2, arg3 string, arg4 marketplaceordering.AgreementTerms) (marketplaceordering.AgreementTerms, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2, arg3, arg4)
 	ret0, _ := ret[0].(marketplaceordering.AgreementTerms)
 	ret1, _ := ret[1].(error)
@@ -435,11 +478,13 @@ func (m *MockMarketPlaceAgreementsClient) Create(arg0 context.Context, arg1, arg
 
 // Create indicates an expected call of Create
 func (mr *MockMarketPlaceAgreementsClientMockRecorder) Create(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockMarketPlaceAgreementsClient)(nil).Create), arg0, arg1, arg2, arg3, arg4)
 }
 
 // Get mocks base method
 func (m *MockMarketPlaceAgreementsClient) Get(arg0 context.Context, arg1, arg2, arg3 string) (marketplaceordering.AgreementTerms, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(marketplaceordering.AgreementTerms)
 	ret1, _ := ret[1].(error)
@@ -448,6 +493,7 @@ func (m *MockMarketPlaceAgreementsClient) Get(arg0 context.Context, arg1, arg2, 
 
 // Get indicates an expected call of Get
 func (mr *MockMarketPlaceAgreementsClientMockRecorder) Get(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockMarketPlaceAgreementsClient)(nil).Get), arg0, arg1, arg2, arg3)
 }
 
@@ -476,6 +522,7 @@ func (m *MockDeploymentsClient) EXPECT() *MockDeploymentsClientMockRecorder {
 
 // Client mocks base method
 func (m *MockDeploymentsClient) Client() autorest.Client {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Client")
 	ret0, _ := ret[0].(autorest.Client)
 	return ret0
@@ -483,11 +530,13 @@ func (m *MockDeploymentsClient) Client() autorest.Client {
 
 // Client indicates an expected call of Client
 func (mr *MockDeploymentsClientMockRecorder) Client() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockDeploymentsClient)(nil).Client))
 }
 
 // CreateOrUpdate mocks base method
 func (m *MockDeploymentsClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 string, arg3 resources.Deployment) (resources.DeploymentsCreateOrUpdateFuture, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdate", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(resources.DeploymentsCreateOrUpdateFuture)
 	ret1, _ := ret[1].(error)
@@ -496,11 +545,13 @@ func (m *MockDeploymentsClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 
 
 // CreateOrUpdate indicates an expected call of CreateOrUpdate
 func (mr *MockDeploymentsClientMockRecorder) CreateOrUpdate(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdate", reflect.TypeOf((*MockDeploymentsClient)(nil).CreateOrUpdate), arg0, arg1, arg2, arg3)
 }
 
 // DeploymentClient mocks base method
 func (m *MockDeploymentsClient) DeploymentClient() resources.DeploymentsClient {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeploymentClient")
 	ret0, _ := ret[0].(resources.DeploymentsClient)
 	return ret0
@@ -508,6 +559,7 @@ func (m *MockDeploymentsClient) DeploymentClient() resources.DeploymentsClient {
 
 // DeploymentClient indicates an expected call of DeploymentClient
 func (mr *MockDeploymentsClientMockRecorder) DeploymentClient() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeploymentClient", reflect.TypeOf((*MockDeploymentsClient)(nil).DeploymentClient))
 }
 
@@ -536,6 +588,7 @@ func (m *MockAccountsClient) EXPECT() *MockAccountsClientMockRecorder {
 
 // ListByResourceGroup mocks base method
 func (m *MockAccountsClient) ListByResourceGroup(arg0 context.Context, arg1 string) (storage.AccountListResult, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListByResourceGroup", arg0, arg1)
 	ret0, _ := ret[0].(storage.AccountListResult)
 	ret1, _ := ret[1].(error)
@@ -544,11 +597,13 @@ func (m *MockAccountsClient) ListByResourceGroup(arg0 context.Context, arg1 stri
 
 // ListByResourceGroup indicates an expected call of ListByResourceGroup
 func (mr *MockAccountsClientMockRecorder) ListByResourceGroup(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListByResourceGroup", reflect.TypeOf((*MockAccountsClient)(nil).ListByResourceGroup), arg0, arg1)
 }
 
 // ListKeys mocks base method
 func (m *MockAccountsClient) ListKeys(arg0 context.Context, arg1, arg2 string) (storage.AccountListKeysResult, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListKeys", arg0, arg1, arg2)
 	ret0, _ := ret[0].(storage.AccountListKeysResult)
 	ret1, _ := ret[1].(error)
@@ -557,6 +612,7 @@ func (m *MockAccountsClient) ListKeys(arg0 context.Context, arg1, arg2 string) (
 
 // ListKeys indicates an expected call of ListKeys
 func (mr *MockAccountsClientMockRecorder) ListKeys(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListKeys", reflect.TypeOf((*MockAccountsClient)(nil).ListKeys), arg0, arg1, arg2)
 }
 
@@ -585,6 +641,7 @@ func (m *MockVirtualMachineScaleSetVMListResultPage) EXPECT() *MockVirtualMachin
 
 // Next mocks base method
 func (m *MockVirtualMachineScaleSetVMListResultPage) Next() error {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Next")
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -592,11 +649,13 @@ func (m *MockVirtualMachineScaleSetVMListResultPage) Next() error {
 
 // Next indicates an expected call of Next
 func (mr *MockVirtualMachineScaleSetVMListResultPageMockRecorder) Next() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Next", reflect.TypeOf((*MockVirtualMachineScaleSetVMListResultPage)(nil).Next))
 }
 
 // NotDone mocks base method
 func (m *MockVirtualMachineScaleSetVMListResultPage) NotDone() bool {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "NotDone")
 	ret0, _ := ret[0].(bool)
 	return ret0
@@ -604,11 +663,13 @@ func (m *MockVirtualMachineScaleSetVMListResultPage) NotDone() bool {
 
 // NotDone indicates an expected call of NotDone
 func (mr *MockVirtualMachineScaleSetVMListResultPageMockRecorder) NotDone() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotDone", reflect.TypeOf((*MockVirtualMachineScaleSetVMListResultPage)(nil).NotDone))
 }
 
 // Values mocks base method
 func (m *MockVirtualMachineScaleSetVMListResultPage) Values() []compute.VirtualMachineScaleSetVM {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Values")
 	ret0, _ := ret[0].([]compute.VirtualMachineScaleSetVM)
 	return ret0
@@ -616,5 +677,6 @@ func (m *MockVirtualMachineScaleSetVMListResultPage) Values() []compute.VirtualM
 
 // Values indicates an expected call of Values
 func (mr *MockVirtualMachineScaleSetVMListResultPageMockRecorder) Values() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Values", reflect.TypeOf((*MockVirtualMachineScaleSetVMListResultPage)(nil).Values))
 }

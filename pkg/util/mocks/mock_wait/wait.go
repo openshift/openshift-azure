@@ -36,6 +36,7 @@ func (m *MockSimpleHTTPClient) EXPECT() *MockSimpleHTTPClientMockRecorder {
 
 // Do mocks base method
 func (m *MockSimpleHTTPClient) Do(req *http.Request) (*http.Response, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Do", req)
 	ret0, _ := ret[0].(*http.Response)
 	ret1, _ := ret[1].(error)
@@ -44,5 +45,6 @@ func (m *MockSimpleHTTPClient) Do(req *http.Request) (*http.Response, error) {
 
 // Do indicates an expected call of Do
 func (mr *MockSimpleHTTPClientMockRecorder) Do(req interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockSimpleHTTPClient)(nil).Do), req)
 }
