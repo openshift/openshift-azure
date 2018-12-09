@@ -1,5 +1,5 @@
-hash: 9da453cfe07f92af95b0301fb9aad61623a1ae1c096bf8a8c5715fbcf656437f
-updated: 2018-11-30T11:24:41.027636859-06:00
+hash: cf5adf3a57ac800a4b5a3eab3c5c627a1f7acf34e1a0762fe03afcc75c93ee42
+updated: 2018-12-10T09:00:57.339592467+10:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
@@ -67,7 +67,7 @@ imports:
   subpackages:
   - lru
 - name: github.com/golang/mock
-  version: c34cdb4725f4c3844d095133c6e40e448b86589b
+  version: 51421b967af1f557f93a59e0057aaf15ca02e29c
   subpackages:
   - gomock
 - name: github.com/golang/protobuf
