@@ -46,6 +46,7 @@ type Config struct {
 
 const (
 	DataDirectory           = "_data/"
+	LocalHttpAddr           = "localhost:8080"
 	LoggingSecretsDirectory = "secrets/"
 )
 
