@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -12,12 +13,27 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	"github.com/openshift/openshift-azure/pkg/fakerp"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 )
 
 const (
 	fakepubkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7laRyN4B3YZmVrDEZLZoIuUA72pQ0DpGuZBZWykCofIfCPrFZAJgFvonKGgKJl6FGKIunkZL9Us/mV4ZPkZhBlE7uX83AAf5i9Q8FmKpotzmaxN10/1mcnEE7pFvLoSkwqrQSkrrgSm8zaJ3g91giXSbtqvSIj/vk2f05stYmLfhAwNo3Oh27ugCakCoVeuCrZkvHMaJgcYrIGCuFo6q0Pfk9rsZyriIqEa9AtiUOtViInVYdby7y71wcbl0AbbCZsTSqnSoVxm2tRkOsXV6+8X4SnwcmZbao3H+zfO1GBhQOLxJ4NQbzAa8IJh810rYARNLptgmsd4cYXVOSosTX azureuser"
 )
+
+var _ = BeforeSuite(func() {
+	if os.Getenv("AZURE_REGION") == "" {
+		// Set AZURE_REGION from the manifest if it is not set and the manifest exists.
+		dataDir, err := fakerp.FindDirectory(fakerp.DataDirectory)
+		if err == nil {
+			oc, err := managedcluster.ReadConfig(path.Join(dataDir, "manifest.yaml"))
+			if err == nil {
+				os.Setenv("AZURE_REGION", oc.Location)
+			}
+		}
+	}
+})
 
 var _ = Describe("Resource provider e2e tests [Real]", func() {
 	var (
@@ -29,8 +45,11 @@ var _ = Describe("Resource provider e2e tests [Real]", func() {
 		var err error
 		cli, err = azure.NewClientFromEnvironment()
 		Expect(err).ToNot(HaveOccurred())
-		if os.Getenv("AZURE_REGION") == "" || os.Getenv("RESOURCEGROUP") == "" {
-			Expect(errors.New("AZURE_REGION and/or RESOURCEGROUP not set")).ToNot(HaveOccurred())
+		if os.Getenv("AZURE_REGION") == "" {
+			Expect(errors.New("AZURE_REGION is not set")).ToNot(HaveOccurred())
+		}
+		if os.Getenv("RESOURCEGROUP") == "" {
+			Expect(errors.New("RESOURCEGROUP is not set")).ToNot(HaveOccurred())
 		}
 	})
 
