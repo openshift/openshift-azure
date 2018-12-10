@@ -27,7 +27,9 @@ The project has its own end-to-end testing test suite. You can find it under:
 `test/e2e/`. It uses [ginko](https://github.com/onsi/ginkgo) and [gomega](https://github.com/onsi/gomega).
 
 To run these tests you will need to have OpenShift cluster running.
-to execute e2e tests locally, execute: `make e2e` or `go test -tags e2e ./test/e2e`
+to execute e2e tests locally, execute: `make e2e` or `go test -tags e2e ./test/e2e`.
+
+See [e2e requirements](e2e/requirements.md) for more information on the expected inputs to our e2e tests.
 
 ## OpenShift Origin Conformance tests
 
