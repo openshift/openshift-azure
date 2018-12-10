@@ -220,11 +220,7 @@ func main() {
 	// simulate the RP
 	rpURL := v20180930preview.DefaultBaseURI
 	if !*useProd {
-		log.Info("starting the fake resource provider")
-		fakeRpAddr := "localhost:8080"
-		rpURL = fmt.Sprintf("http://%s", fakeRpAddr)
-		s := fakerp.NewServer(log, conf.ResourceGroup, fakeRpAddr, conf)
-		go s.ListenAndServe()
+		rpURL = fakerp.StartServer(log, conf, fakerp.LocalHttpAddr)
 	}
 
 	// setup the osa client

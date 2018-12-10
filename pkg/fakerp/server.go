@@ -19,10 +19,12 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/api"
+	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
+
+var once sync.Once
 
 type Server struct {
 	// the server will not process more than a single
@@ -47,6 +49,18 @@ func NewServer(log *logrus.Entry, resourceGroup, address string, c *Config) *Ser
 		address:    address,
 		conf:       c,
 	}
+}
+
+// StartServer starts the fake rp server, ensuring that is done only once. It returns the
+// address to the running http server
+func StartServer(log *logrus.Entry, conf *Config, address string) string {
+	// once ensures that the server start is invoked only once
+	once.Do(func() {
+		log.Info("starting the fake resource provider")
+		s := NewServer(log, conf.ResourceGroup, address, conf)
+		go s.ListenAndServe()
+	})
+	return "http://" + address
 }
 
 func (s *Server) ListenAndServe() {
@@ -154,9 +168,9 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 	// TODO: Get the azure credentials from the request headers
-	ctx = context.WithValue(ctx, api.ContextKeyClientID, s.conf.ClientID)
-	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, s.conf.ClientSecret)
-	ctx = context.WithValue(ctx, api.ContextKeyTenantID, s.conf.TenantID)
+	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, s.conf.ClientID)
+	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, s.conf.ClientSecret)
+	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, s.conf.TenantID)
 
 	// TODO: Get the azure credentials from the request headers
 	authorizer, err := azureclient.NewAuthorizer(s.conf.ClientID, s.conf.ClientSecret, s.conf.TenantID)
@@ -249,9 +263,9 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
 	defer cancel()
 	// TODO: Get the azure credentials from the request headers
-	ctx = context.WithValue(ctx, api.ContextKeyClientID, s.conf.ClientID)
-	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, s.conf.ClientSecret)
-	ctx = context.WithValue(ctx, api.ContextKeyTenantID, s.conf.TenantID)
+	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, s.conf.ClientID)
+	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, s.conf.ClientSecret)
+	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, s.conf.TenantID)
 
 	// populate plugin configuration
 	config, err := GetPluginConfig()
