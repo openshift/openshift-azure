@@ -22,7 +22,7 @@ func TestGenerateARM(t *testing.T) {
 
 	testData := map[string]interface{}{"test": "data"}
 	mockGen := mock_arm.NewMockGenerator(mockCtrl)
-	mockGen.EXPECT().Generate(nil, nil, true, "").Return(testData, nil)
+	mockGen.EXPECT().Generate(nil, nil, "", true).Return(testData, nil)
 	p := &plugin{
 		armGenerator: mockGen,
 		log:          logrus.NewEntry(logrus.StandardLogger()),
@@ -447,7 +447,7 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	mockGen := mock_arm.NewMockGenerator(mockCtrl)
 	mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
 	firstGenerate := true
-	mockGen.EXPECT().Generate(nil, nil, true, gomock.Any()).Times(2).DoAndReturn(func(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, backupBlob string) (map[string]interface{}, error) {
+	mockGen.EXPECT().Generate(nil, nil, gomock.Any(), true).Times(2).DoAndReturn(func(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool) (map[string]interface{}, error) {
 		if firstGenerate {
 			firstGenerate = false
 			return testDataWithBackup, nil

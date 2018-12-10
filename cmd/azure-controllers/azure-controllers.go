@@ -38,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := customeradmin.AddToManager(m, log); err != nil {
+	if err := customeradmin.AddToManager(log, m); err != nil {
 		log.Fatal(err)
 	}
 

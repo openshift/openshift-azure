@@ -18,7 +18,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-func addRolebindingController(m manager.Manager, log *logrus.Entry) error {
+func addRolebindingController(log *logrus.Entry, m manager.Manager) error {
 	options := controller.Options{
 		Reconciler: &reconcileRolebinding{
 			client: m.GetClient(),

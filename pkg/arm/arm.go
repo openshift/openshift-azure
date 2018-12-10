@@ -19,7 +19,7 @@ import (
 )
 
 type Generator interface {
-	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, backupBlob string) (map[string]interface{}, error)
+	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool) (map[string]interface{}, error)
 }
 
 type simpleGenerator struct {
@@ -35,7 +35,7 @@ func NewSimpleGenerator(pluginConfig *api.PluginConfig) Generator {
 	}
 }
 
-func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, backupBlob string) (map[string]interface{}, error) {
+func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool) (map[string]interface{}, error) {
 	masterStartup, err := Asset("master-startup.sh")
 	if err != nil {
 		return nil, err

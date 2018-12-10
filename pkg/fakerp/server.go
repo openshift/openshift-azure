@@ -269,7 +269,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		s.writeState(v20180930preview.Updating)
 	}
 
-	if _, err := CreateOrUpdate(ctx, oc, s.log, config); err != nil {
+	if _, err := CreateOrUpdate(ctx, s.log, oc, config); err != nil {
 		s.writeState(v20180930preview.Failed)
 		resp := "400 Bad Request: Failed to apply request"
 		s.log.Debugf("%s: %v", resp, err)

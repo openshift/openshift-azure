@@ -64,11 +64,11 @@ var desiredRolebindings = map[string]rbacv1.RoleBinding{
 }
 
 // AddToManager adds all Controllers to the Manager
-func AddToManager(m manager.Manager, log *logrus.Entry) error {
-	if err := addNamespaceController(m, log); err != nil {
+func AddToManager(log *logrus.Entry, m manager.Manager) error {
+	if err := addNamespaceController(log, m); err != nil {
 		return err
 	}
-	if err := addRolebindingController(m, log); err != nil {
+	if err := addRolebindingController(log, m); err != nil {
 		return err
 	}
 	return nil

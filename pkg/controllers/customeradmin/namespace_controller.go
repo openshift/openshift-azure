@@ -15,7 +15,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-func addNamespaceController(m manager.Manager, log *logrus.Entry) error {
+func addNamespaceController(log *logrus.Entry, m manager.Manager) error {
 	options := controller.Options{
 		Reconciler: &reconcileNamespace{
 			client: m.GetClient(),

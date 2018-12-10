@@ -49,7 +49,7 @@ func (cli *Client) UpdateOSACluster(ctx context.Context, external *v20180930prev
 	var oc *v20180930preview.OpenShiftManagedCluster
 	var err error
 	// simulate the API call to the RP
-	if oc, err = fakerp.CreateOrUpdate(ctx, external, logger, config); err != nil {
+	if oc, err = fakerp.CreateOrUpdate(ctx, logger, external, config); err != nil {
 		return nil, err
 	}
 	return oc, nil
