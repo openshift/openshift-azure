@@ -18,7 +18,3 @@ if [[ -n "$TEST_IN_PRODUCTION" ]]; then
 else
   go run cmd/createorupdate/createorupdate.go
 fi
-
-echo
-echo  Cluster available at https://$RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com/
-echo

@@ -254,4 +254,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Printf("Cluster available at https://%s.%s.cloudapp.azure.com/\n", conf.ResourceGroup, conf.Region)
 }
