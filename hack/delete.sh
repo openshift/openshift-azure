@@ -11,4 +11,9 @@ else
     export RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
 fi
 
+USE_PROD_FLAG="-use-prod=false"
+if [[ -n "$TEST_IN_PRODUCTION" ]]; then
+    USE_PROD_FLAG="-use-prod=true"
+fi
+
 go run cmd/createorupdate/createorupdate.go -request=DELETE $USE_PROD_FLAG

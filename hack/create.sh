@@ -12,9 +12,10 @@ mkdir -p _data/_out
 
 set -x
 
-go generate ./...
+USE_PROD_FLAG="-use-prod=false"
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
-  go run cmd/createorupdate/createorupdate.go -use-prod=true
-else
-  go run cmd/createorupdate/createorupdate.go
+    USE_PROD_FLAG="-use-prod=true"
 fi
+
+go generate ./...
+go run cmd/createorupdate/createorupdate.go $USE_PROD_FLAG
