@@ -3,9 +3,13 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/Azure/go-autorest/autorest/to"
 
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	"github.com/openshift/openshift-azure/pkg/util/structtags"
@@ -292,152 +296,123 @@ func TestJSONTags(t *testing.T) {
 	}
 }
 
-// TestFieldParity ensures the admin type stays in sync with the
-// internal type.
-func TestFieldParity(t *testing.T) {
-	internalIgnoredFields := map[string]map[string]struct{}{
-		"Properties": {
-			"servicePrincipalProfile": {},
-			"azProfile":               {},
-		},
-		"Config": {
-			"sshKey":                         {},
-			"adminKubeconfig":                {},
-			"masterKubeconfig":               {},
-			"nodeBootstrapKubeconfig":        {},
-			"azureClusterReaderKubeconfig":   {},
-			"serviceAccountKey":              {},
-			"sessionSecretAuth":              {},
-			"sessionSecretEnc":               {},
-			"runningUnderTest":               {},
-			"htPasswd":                       {},
-			"customerAdminPasswd":            {},
-			"customerReaderPasswd":           {},
-			"endUserPasswd":                  {},
-			"registryHttpSecret":             {},
-			"prometheusProxySessionSecret":   {},
-			"alertManagerProxySessionSecret": {},
-			"alertsProxySessionSecret":       {},
-			"registryConsoleOAuthSecret":     {},
-			"consoleOAuthSecret":             {},
-			"routerStatsPassword":            {},
-		},
-		"ImageConfig": {
-			"genevaImagePullSecret": {},
-		},
-		"CertKeyPair": {
-			"key": {},
-		},
-		"AADIdentityProvider": {
-			"secret": {},
-		},
-	}
-
-	adminIgnoredFields := map[string]map[string]struct{}{
-		"OpenShiftManagedCluster": {
-			"-": {},
-		},
-	}
-
-	prepare := func(v reflect.Value) {
-		switch v.Interface().(type) {
-		case []IdentityProvider:
-			// set the Provider to AADIdentityProvider
-			v.Set(reflect.ValueOf([]IdentityProvider{{Provider: &AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
+// walk recursively returns a list of field names contained in a given type.
+// For fields of interface type, it iterates a list of candidate types which
+// fulfil the interface, passed in in imap.
+// TODO: pkg/test/util/populate should be refactored to use an imap argument
+// too.
+func walk(t reflect.Type, imap map[string][]reflect.Type) []string {
+	var walk func(reflect.Type, string) []string
+	walk = func(t reflect.Type, path string) (fields []string) {
+		if t.PkgPath() != "" &&
+			(!strings.HasPrefix(t.PkgPath(), "github.com/openshift/openshift-azure/") ||
+				strings.HasPrefix(t.PkgPath(), "github.com/openshift/openshift-azure/vendor/")) {
+			fields = append(fields, path)
+			return
 		}
+
+		switch t.Kind() {
+		case reflect.Struct:
+			for i := 0; i < t.NumField(); i++ {
+				fields = append(fields, walk(t.Field(i).Type, path+"."+t.Field(i).Name)...)
+			}
+		case reflect.Ptr, reflect.Slice:
+			fields = append(fields, walk(t.Elem(), path)...)
+		case reflect.Interface:
+			if _, found := imap[path]; !found {
+				panic(fmt.Sprintf("imap[%s] not found", path))
+			}
+			for _, t := range imap[path] {
+				fields = append(fields, walk(t, path)...)
+			}
+		case reflect.Map:
+			if (t.Key() != reflect.TypeOf("") && t.Key() != reflect.TypeOf(to.StringPtr(""))) ||
+				(t.Elem() != reflect.TypeOf("") && t.Elem() != reflect.TypeOf(to.StringPtr(""))) {
+				panic(fmt.Sprintf("unimplemented map type %s", t))
+			}
+		case reflect.Bool, reflect.Int, reflect.String, reflect.Uint8:
+			fields = append(fields, path)
+		default:
+			panic(fmt.Sprintf("unimplemented kind %s", t.Kind()))
+		}
+		return
 	}
-
-	var i OpenShiftManagedCluster
-	populate.Walk(&i, prepare)
-	a := ConvertToAdmin(&i)
-
-	internalValue := reflect.ValueOf(i)
-	adminValue := reflect.ValueOf(a)
-	walkStruct(t, internalValue, adminValue, internalValue.Type().Name(), internalIgnoredFields, adminIgnoredFields)
+	return walk(t, "")
 }
 
-func walkStruct(t *testing.T, internalValue, adminValue reflect.Value, parent string, internalIgnoredFields, adminIgnoredFields map[string]map[string]struct{}) {
-	if adminValue.Kind() == reflect.Ptr {
-		adminValue = reflect.Indirect(adminValue)
+func TestAdminAPIParity(t *testing.T) {
+	// the algorithm is: list the fields of both types.  If the head of either
+	// list is expected not to be matched in the other, pop it.  If the heads of
+	// both lists match, pop them.  In any other case, error out.
+
+	afields := walk(reflect.TypeOf(admin.OpenShiftManagedCluster{}),
+		map[string][]reflect.Type{
+			".Properties.AuthProfile.IdentityProviders.Provider": {
+				reflect.TypeOf(admin.AADIdentityProvider{}),
+			},
+		},
+	)
+	ifields := walk(reflect.TypeOf(OpenShiftManagedCluster{}),
+		map[string][]reflect.Type{
+			".Properties.AuthProfile.IdentityProviders.Provider": {
+				reflect.TypeOf(AADIdentityProvider{}),
+			},
+		},
+	)
+
+	// TODO: I don't believe this should be in the admin type at all
+	notInInternal := []*regexp.Regexp{
+		regexp.MustCompile(`^\.Response$`),
 	}
-	if internalValue.Kind() == reflect.Ptr {
-		internalValue = reflect.Indirect(internalValue)
-	}
-	adminType := adminValue.Type()
-	internalType := internalValue.Type()
 
-	t.Logf("=== comparing internal type %q with admin type %q", internalType.Name(), adminType.Name())
-	if internalType.Name() != adminType.Name() && !isException(internalType.Name(), adminType.Name()) {
-		t.Fatalf("invalid type comparison: %q vs %q", internalType.Name(), adminType.Name())
-	}
-	internalNum := internalType.NumField()
-	adminNum := adminType.NumField()
-	if adminNum-len(adminIgnoredFields[adminType.Name()]) != internalNum-len(internalIgnoredFields[internalType.Name()]) {
-		t.Fatalf("number of fields mismatch: admin type has %d fields, internal type has %d fields", adminNum-len(adminIgnoredFields[adminType.Name()]), internalNum-len(internalIgnoredFields[internalType.Name()]))
+	// TODO: why don't we just include all of these in the admin type?
+	notInAdmin := []*regexp.Regexp{
+		regexp.MustCompile(`^\.Config\.RunningUnderTest$`),
+		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
+		regexp.MustCompile(`^\.Properties\.ServicePrincipalProfile\.`),
 	}
 
-	adminIndexOffset := 0
-	internalIndexOffeset := 0
-	for i := 0; i < internalNum; i++ {
-		parentPrefix := parent + "."
-		internalTag := filterName(internalType.Field(i - internalIndexOffeset).Tag)
-		if _, ok := internalIgnoredFields[parent][internalTag]; ok {
-			t.Logf("ignoring internal field %q", parentPrefix+internalTag)
-			adminIndexOffset++
-			continue
-		}
-		adminTag := filterName(adminType.Field(i - adminIndexOffset).Tag)
-		if _, ok := adminIgnoredFields[parent][adminTag]; ok {
-			t.Logf("ignoring admin field %q", parentPrefix+adminTag)
-			internalIndexOffeset++
-			continue
-		}
-
-		t.Logf("comparing internal field tag %q with admin field tag %q", parentPrefix+internalTag, parentPrefix+adminTag)
-		if internalTag != adminTag {
-			t.Fatalf("admin field tag is %q, internal field tag is %q", adminTag, internalTag)
-		}
-
-		internalFieldValue := internalValue.Field(i - internalIndexOffeset)
-		if internalFieldValue.Kind() == reflect.Ptr {
-			internalFieldValue = reflect.Indirect(internalFieldValue)
-		}
-		adminFieldValue := adminValue.Field(i - adminIndexOffset)
-		if adminFieldValue.Kind() == reflect.Ptr {
-			adminFieldValue = reflect.Indirect(adminFieldValue)
-		}
-
-		if internalFieldValue.Type().Name() == "Certificate" {
-			// Ignore comparing x509.Certificate
-			continue
-		}
-
-		if internalFieldValue.Kind() == reflect.Interface {
-			internalInterface := internalFieldValue.Interface()
-			if internalAad, ok := internalInterface.(*AADIdentityProvider); ok {
-				internalFieldValue = reflect.ValueOf(*internalAad)
-			}
-			adminInterface := adminFieldValue.Interface()
-			if adminAad, ok := adminInterface.(*admin.AADIdentityProvider); ok {
-				adminFieldValue = reflect.ValueOf(*adminAad)
+loop:
+	for len(afields) > 0 || len(ifields) > 0 {
+		if len(afields) > 0 {
+			for _, rx := range notInInternal {
+				if rx.MatchString(afields[0]) {
+					afields = afields[1:]
+					continue loop
+				}
 			}
 		}
-		if internalFieldValue.Kind() == reflect.Struct {
-			name := internalFieldValue.Type().Name()
-			t.Logf("walking %q", name)
-			walkStruct(t, internalFieldValue, adminFieldValue, name, internalIgnoredFields, adminIgnoredFields)
-		} else if internalFieldValue.Kind() == reflect.Slice {
-			name := internalFieldValue.Index(0).Type().Name()
-			t.Logf("walking %q", name)
-			walkStruct(t, internalFieldValue.Index(0), adminFieldValue.Index(0), name, internalIgnoredFields, adminIgnoredFields)
+
+		if len(ifields) > 0 {
+			if strings.Contains(ifields[0], "Key") ||
+				strings.Contains(ifields[0], "Kubeconfig") ||
+				strings.Contains(ifields[0], "Passwd") ||
+				strings.Contains(ifields[0], "Password") ||
+				strings.Contains(ifields[0], "Secret") {
+				ifields = ifields[1:]
+				continue
+			}
+
+			for _, rx := range notInAdmin {
+				if rx.MatchString(ifields[0]) {
+					ifields = ifields[1:]
+					continue loop
+				}
+			}
 		}
+
+		if len(afields) > 0 && len(ifields) > 0 && afields[0] == ifields[0] {
+			afields, ifields = afields[1:], ifields[1:]
+			continue
+		}
+
+		var afield, ifield string
+		if len(afields) > 0 {
+			afield = afields[0]
+		}
+		if len(ifields) > 0 {
+			ifield = ifields[0]
+		}
+		t.Fatalf("mismatch between internal and admin API fields: afield=%q, ifield=%q", afield, ifield)
 	}
-}
-
-func filterName(tag reflect.StructTag) string {
-	return strings.TrimSuffix(tag.Get("json"), ",omitempty")
-}
-
-func isException(internalName, adminName string) bool {
-	return internalName == "CertKeyPair" && adminName == "Certificate"
 }

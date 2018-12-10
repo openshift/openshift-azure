@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/Azure/go-autorest/autorest/to"
+
 	"github.com/openshift/openshift-azure/pkg/util/structtags"
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
