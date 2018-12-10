@@ -3,6 +3,7 @@ package fakerp
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -10,7 +11,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, dnsResourceGroup, dnsDomain string) error {
+func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, dnsResourceGroup, dnsDomain string, noTags bool) error {
 	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
@@ -25,6 +26,12 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, 
 	// dns zone object
 	z := dns.Zone{
 		Location: to.StringPtr("global"),
+	}
+	if !noTags {
+		z.Tags = make(map[string]*string)
+		ttl, now := "76h", fmt.Sprintf("%d", time.Now().Unix())
+		z.Tags["ttl"] = &ttl
+		z.Tags["now"] = &now
 	}
 	zoneName := fmt.Sprintf("%s.%s", resourceGroup, dnsDomain)
 	zone, err := zc.CreateOrUpdate(ctx, dnsResourceGroup, zoneName, z, "", "")
