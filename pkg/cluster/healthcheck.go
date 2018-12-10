@@ -10,17 +10,15 @@ import (
 	"time"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-// HealthCheck function to verify cluster health
-func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
-	// Wait for the console to be 200 status
-	u.log.Info("checking console health")
+func getHealthCheckHTTPClient(cs *api.OpenShiftManagedCluster) *http.Client {
 	c := cs.Config
 	pool := x509.NewCertPool()
 	pool.AddCert(c.Certificates.Ca.Cert)
 
-	cli := &http.Client{
+	return &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				RootCAs: pool,
@@ -28,17 +26,20 @@ func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManag
 		},
 		Timeout: 10 * time.Second,
 	}
+}
 
-	req, err := http.NewRequest("HEAD", "https://"+cs.Properties.FQDN+"/console/", nil)
+func (u *simpleUpgrader) doHealthCheck(ctx context.Context, cli wait.SimpleHTTPClient, uri string, sleepDuration time.Duration) *api.PluginError {
+	req, err := http.NewRequest("HEAD", uri, nil)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForConsoleHealth}
 	}
 	req = req.WithContext(ctx)
 
+	// Wait for the console to be 200 status
 	for {
 		resp, err := cli.Do(req)
 		if err, ok := err.(*url.Error); ok && err.Timeout() {
-			time.Sleep(10 * time.Second)
+			time.Sleep(sleepDuration)
 			continue
 		}
 		if err != nil {
@@ -50,10 +51,16 @@ func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManag
 			u.log.Info("OK")
 			return nil
 		case http.StatusBadGateway:
-			time.Sleep(10 * time.Second)
+			time.Sleep(sleepDuration)
 		default:
 			err = fmt.Errorf("unexpected error code %d from console", resp.StatusCode)
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForConsoleHealth}
 		}
 	}
+}
+
+// HealthCheck function to verify cluster health
+func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
+	u.log.Info("checking console health")
+	return u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://"+cs.Properties.FQDN+"/console/", 10*time.Second)
 }
