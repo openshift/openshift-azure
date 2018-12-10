@@ -2,15 +2,17 @@ package cluster
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
+	"github.com/sirupsen/logrus"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_wait"
-	"github.com/sirupsen/logrus"
 )
 
 func TestHealthCheck(t *testing.T) {
@@ -44,6 +46,30 @@ func TestHealthCheck(t *testing.T) {
 				{resp: &http.Response{StatusCode: http.StatusBadGateway}},
 				{resp: &http.Response{StatusCode: 200}},
 			},
+		},
+		{
+			name: "bad status",
+			cs: &api.OpenShiftManagedCluster{
+				Properties: api.Properties{
+					FQDN: "notarealaddress",
+				},
+			},
+			responses: []cliResp{
+				{resp: &http.Response{StatusCode: http.StatusBadRequest}},
+			},
+			want: &api.PluginError{Err: fmt.Errorf("unexpected error code %d from console", 400), Step: api.PluginStepWaitForConsoleHealth},
+		},
+		{
+			name: "bad Do error",
+			cs: &api.OpenShiftManagedCluster{
+				Properties: api.Properties{
+					FQDN: "notarealaddress",
+				},
+			},
+			responses: []cliResp{
+				{err: fmt.Errorf("bad thing")},
+			},
+			want: &api.PluginError{Err: fmt.Errorf("bad thing"), Step: api.PluginStepWaitForConsoleHealth},
 		},
 	}
 	for _, tt := range tests {
