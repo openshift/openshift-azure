@@ -12,9 +12,10 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
+	"github.com/openshift/openshift-azure/pkg/cluster/updatehash"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
-	"github.com/openshift/openshift-azure/pkg/util/kubeclient"
 )
 
 // here follow well known container and blob names
@@ -22,7 +23,6 @@ const (
 	ConfigContainerName     = "config"
 	ConfigBlobName          = "config"
 	updateContainerName     = "update"
-	updateBlobName          = "update"
 	EtcdBackupContainerName = "etcd"
 )
 
@@ -37,14 +37,14 @@ type Upgrader interface {
 }
 
 type simpleUpgrader struct {
-	pluginConfig    api.PluginConfig
-	accountsClient  azureclient.AccountsClient
-	storageClient   storage.Client
-	updateContainer storage.Container
-	vmc             azureclient.VirtualMachineScaleSetVMsClient
-	ssc             azureclient.VirtualMachineScaleSetsClient
-	kubeclient      kubeclient.Kubeclient
-	log             *logrus.Entry
+	pluginConfig   api.PluginConfig
+	accountsClient azureclient.AccountsClient
+	storageClient  storage.Client
+	updateHash     updatehash.UpdateHash
+	vmc            azureclient.VirtualMachineScaleSetVMsClient
+	ssc            azureclient.VirtualMachineScaleSetsClient
+	kubeclient     kubeclient.Kubeclient
+	log            *logrus.Entry
 }
 
 var _ Upgrader = &simpleUpgrader{}
@@ -62,6 +62,7 @@ func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftMan
 	if err != nil {
 		return err
 	}
+	u.updateHash = updatehash.NewUpdateHash(u.log)
 	u.accountsClient = azureclient.NewAccountsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
 	u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)
 	u.ssc = azureclient.NewVirtualMachineScaleSetsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, u.pluginConfig.AcceptLanguages)

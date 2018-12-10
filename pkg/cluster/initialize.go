@@ -30,8 +30,7 @@ func (u *simpleUpgrader) initialize(ctx context.Context, cs *api.OpenShiftManage
 	}
 
 	// update tracking container
-	u.updateContainer = bsc.GetContainerReference(updateContainerName)
-	_, err = u.updateContainer.CreateIfNotExists(nil)
+	err = u.updateHash.SetContainer(bsc.GetContainerReference(updateContainerName))
 	if err != nil {
 		return err
 	}

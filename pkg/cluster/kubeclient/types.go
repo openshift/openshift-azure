@@ -2,9 +2,9 @@ package kubeclient
 
 //go:generate go get github.com/golang/mock/gomock
 //go:generate go install github.com/golang/mock/mockgen
-//go:generate mockgen -destination=../mocks/mock_$GOPACKAGE/types.go  github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE Kubeclient
-//go:generate gofmt -s -l -w ../mocks/mock_$GOPACKAGE/types.go
-//go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../mocks/mock_$GOPACKAGE/types.go
+//go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/types.go  github.com/openshift/openshift-azure/pkg/cluster/$GOPACKAGE Kubeclient
+//go:generate gofmt -s -l -w ../../util/mocks/mock_$GOPACKAGE/types.go
+//go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../../util/mocks/mock_$GOPACKAGE/types.go
 
 import (
 	"context"
