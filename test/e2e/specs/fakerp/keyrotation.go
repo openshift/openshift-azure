@@ -12,9 +12,10 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/ghodss/yaml"
+	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 )
@@ -38,8 +39,13 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 		ctx = context.WithValue(ctx, api.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
 		ctx = context.WithValue(ctx, api.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
 
+		logrus.SetLevel(logrus.DebugLevel)
+		logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+		logrus.SetOutput(GinkgoWriter)
+		log := logrus.NewEntry(logrus.StandardLogger())
+
 		By("Parsing the external manifest")
-		external, err := parseExternalConfig(*manifest)
+		external, err := fakerp.LoadClusterConfigFromManifest(log, *manifest)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
 
@@ -113,20 +119,6 @@ func deleteSecrets(config *api.OpenShiftManagedCluster) *api.OpenShiftManagedClu
 	configCopy.Config.SessionSecretEnc = nil
 	configCopy.Config.Images.GenevaImagePullSecret = nil
 	return configCopy
-}
-
-// parseExternalConfig parses an external manifest located at path and returns
-// an external OpenshiftManagedCluster struct
-func parseExternalConfig(path string) (*v20180930preview.OpenShiftManagedCluster, error) {
-	b, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	var cs *v20180930preview.OpenShiftManagedCluster
-	if err := yaml.Unmarshal(b, &cs); err != nil {
-		return nil, err
-	}
-	return cs, nil
 }
 
 // saveConfig writes an internal OpenShiftManagedCluster struct as yaml content
