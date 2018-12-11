@@ -16,17 +16,17 @@ func (c *Config) UnmarshalJSON(b []byte) error {
 	return oajson.UnmarshalJSON(reflect.ValueOf(c).Elem(), b)
 }
 
-func (c CertKeyPair) MarshalJSON() ([]byte, error) {
+func (c Certificate) MarshalJSON() ([]byte, error) {
 	return oajson.MarshalJSON(reflect.ValueOf(c))
 }
 
-func (c *CertKeyPair) UnmarshalJSON(b []byte) error {
+func (c *Certificate) UnmarshalJSON(b []byte) error {
 	return oajson.UnmarshalJSON(reflect.ValueOf(c).Elem(), b)
 }
 
 func (ip *IdentityProvider) UnmarshalJSON(b []byte) error {
 	dummy := struct {
-		Name     string          `json:"name,omitempty"`
+		Name     *string         `json:"name,omitempty"`
 		Provider json.RawMessage `json:"provider,omityempty"`
 	}{}
 	err := json.Unmarshal(b, &dummy)
