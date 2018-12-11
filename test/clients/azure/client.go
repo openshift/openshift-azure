@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 
 	"github.com/onsi/ginkgo/config"
 	"github.com/sirupsen/logrus"
@@ -14,11 +15,19 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
+// rpFocus represents the supported RP APIs which e2e tests use to create their azure clients,
+// The client will be configured to work either against the real, fake or admin apis
+type rpFocus string
+
 var (
-	adminRpFocus = regexp.MustCompile("Admin")
-	fakeRpFocus  = regexp.MustCompile("Fake")
-	realRpFocus  = regexp.MustCompile("Real")
+	adminRpFocus = rpFocus(regexp.QuoteMeta("[Admin]"))
+	fakeRpFocus  = rpFocus(regexp.QuoteMeta("[Fake]"))
+	realRpFocus  = rpFocus(regexp.QuoteMeta("[Real]"))
 )
+
+func (tf rpFocus) match(focusString string) bool {
+	return strings.Contains(focusString, string(tf))
+}
 
 // Client is the main controller for azure client objects
 type Client struct {
@@ -50,12 +59,12 @@ func NewClientFromEnvironment() (*Client, error) {
 	}
 
 	var rpURL string
-	focus := []byte(config.GinkgoConfig.FocusString)
+	focus := config.GinkgoConfig.FocusString
 	switch {
-	case adminRpFocus.Match(focus), fakeRpFocus.Match(focus):
+	case adminRpFocus.match(focus), fakeRpFocus.match(focus):
 		fmt.Println("configuring the fake resource provider")
 		rpURL = realfakerp.StartServer(log, conf, realfakerp.LocalHttpAddr)
-	case realRpFocus.Match(focus):
+	case realRpFocus.match(focus):
 		fmt.Println("configuring the real resource provider")
 		rpURL = externalapi.DefaultBaseURI
 	default:
