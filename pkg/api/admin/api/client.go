@@ -90,13 +90,27 @@ func NewOpenShiftManagedClustersClientWithBaseURI(baseURI string, subscriptionID
 	return OpenShiftManagedClustersClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
+// CreateOrUpdateAndWait creates or updates a openshift managed cluster and waits for the
+// request to complete before returning.
+func (client OpenShiftManagedClustersClient) CreateOrUpdateAndWait(ctx context.Context, resourceGroupName, resourceName string, parameters OpenShiftManagedCluster) (osmc OpenShiftManagedCluster, err error) {
+	var future OpenShiftManagedClustersCreateOrUpdateFuture
+	future, err = client.CreateOrUpdate(ctx, resourceGroupName, resourceName, parameters)
+	if err != nil {
+		return
+	}
+	if err = future.WaitForCompletionRef(ctx, client.Client); err != nil {
+		return
+	}
+	return future.Result(client)
+}
+
 // CreateOrUpdate creates or updates a openshift managed cluster with the specified configuration for agents and
 // OpenShift version.
 // Parameters:
 // resourceGroupName - the name of the resource group.
 // resourceName - the name of the openshift managed cluster resource.
 // parameters - parameters supplied to the Create or Update an OpenShift Managed Cluster operation.
-func (client OpenShiftManagedClustersClient) CreateOrUpdate(ctx context.Context, resourceGroupName string, resourceName string, parameters OpenShiftManagedCluster) (result OpenShiftManagedClustersCreateOrUpdateFuture, err error) {
+func (client OpenShiftManagedClustersClient) CreateOrUpdate(ctx context.Context, resourceGroupName, resourceName string, parameters OpenShiftManagedCluster) (result OpenShiftManagedClustersCreateOrUpdateFuture, err error) {
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: parameters,
 			Constraints: []validation.Constraint{{Target: "parameters.Properties", Name: validation.Null, Rule: false}}}}); err != nil {
