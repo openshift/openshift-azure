@@ -120,7 +120,7 @@ func createResourceGroup(conf *fakerp.Config) (bool, error) {
 }
 
 func execute(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShiftManagedClustersClient, conf *fakerp.Config) error {
-	oc, err := fakerp.LoadClusterConfigFromManifest(log, "", conf)
+	oc, err := fakerp.LoadClusterConfigFromManifest(log, conf.Manifest)
 	if err != nil {
 		return err
 	}

@@ -25,8 +25,8 @@ func readEnv() map[string]string {
 }
 
 // LoadClusterConfigFromManifest reads (and potentially template) the mainifest
-func LoadClusterConfigFromManifest(log *logrus.Entry, manifestTemplate string, conf *Config) (*v20180930preview.OpenShiftManagedCluster, error) {
-	if IsUpdate() && conf.Manifest == "" && manifestTemplate == "" {
+func LoadClusterConfigFromManifest(log *logrus.Entry, manifestTemplate string) (*v20180930preview.OpenShiftManagedCluster, error) {
+	if IsUpdate() && manifestTemplate == "" {
 		dataDir, err := FindDirectory(DataDirectory)
 		if err != nil {
 			return nil, err
@@ -34,9 +34,6 @@ func LoadClusterConfigFromManifest(log *logrus.Entry, manifestTemplate string, c
 		defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
 		log.Debugf("using manifest from %q", defaultManifestFile)
 		return loadManifestFromFile(defaultManifestFile)
-	}
-	if manifestTemplate == "" {
-		manifestTemplate = conf.Manifest
 	}
 	if manifestTemplate == "" {
 		manifestTemplate = "test/manifests/normal/create.yaml"
