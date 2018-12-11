@@ -198,3 +198,21 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	// explicitly return nil if all went well
 	return nil
 }
+
+func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, pluginTemplate *pluginapi.Config) *api.PluginError {
+	p.log.Info("invalidating non-ca certificates, private keys and secrets")
+	err := p.configGenerator.InvalidateSecrets(cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInvalidateClusterSecrets}
+	}
+	p.log.Info("regenerating config including private keys and secrets")
+	err = p.GenerateConfig(ctx, cs, pluginTemplate)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepRegenerateClusterSecrets}
+	}
+	p.log.Info("running CreateOrUpdate")
+	if err := p.CreateOrUpdate(ctx, cs, true, deployFn); err != nil {
+		return err
+	}
+	return nil
+}

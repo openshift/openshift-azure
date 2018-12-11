@@ -477,3 +477,39 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 
 	return
 }
+
+// InvalidateSecrets removes all non-ca certificates, private keys and secrets from an
+// OpenShiftManagedCluster's Config
+func (g *simpleGenerator) InvalidateSecrets(cs *api.OpenShiftManagedCluster) (err error) {
+	cs.Config.Certificates.Admin = api.CertKeyPair{}
+	cs.Config.Certificates.AggregatorFrontProxy = api.CertKeyPair{}
+	cs.Config.Certificates.AzureClusterReader = api.CertKeyPair{}
+	cs.Config.Certificates.EtcdClient = api.CertKeyPair{}
+	cs.Config.Certificates.EtcdPeer = api.CertKeyPair{}
+	cs.Config.Certificates.EtcdServer = api.CertKeyPair{}
+	cs.Config.Certificates.GenevaLogging = api.CertKeyPair{}
+	cs.Config.Certificates.GenevaMetrics = api.CertKeyPair{}
+	cs.Config.Certificates.MasterKubeletClient = api.CertKeyPair{}
+	cs.Config.Certificates.MasterProxyClient = api.CertKeyPair{}
+	cs.Config.Certificates.MasterServer = api.CertKeyPair{}
+	cs.Config.Certificates.NodeBootstrap = api.CertKeyPair{}
+	cs.Config.Certificates.OpenShiftConsole = api.CertKeyPair{}
+	cs.Config.Certificates.OpenShiftMaster = api.CertKeyPair{}
+	cs.Config.Certificates.Registry = api.CertKeyPair{}
+	cs.Config.Certificates.Router = api.CertKeyPair{}
+	cs.Config.Certificates.ServiceCatalogAPIClient = api.CertKeyPair{}
+	cs.Config.Certificates.ServiceCatalogServer = api.CertKeyPair{}
+
+	cs.Config.SSHKey = nil
+	cs.Config.RegistryHTTPSecret = nil
+	cs.Config.RegistryConsoleOAuthSecret = ""
+	cs.Config.ConsoleOAuthSecret = ""
+	cs.Config.AlertManagerProxySessionSecret = nil
+	cs.Config.AlertsProxySessionSecret = nil
+	cs.Config.PrometheusProxySessionSecret = nil
+	cs.Config.SessionSecretAuth = nil
+	cs.Config.SessionSecretEnc = nil
+	cs.Config.Images.GenevaImagePullSecret = nil
+
+	return
+}

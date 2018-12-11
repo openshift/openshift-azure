@@ -10,6 +10,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_config"
 )
 
 func TestCreateOrUpdate(t *testing.T) {
@@ -130,5 +131,51 @@ func TestRecoverEtcdCluster(t *testing.T) {
 
 	if err := p.RecoverEtcdCluster(nil, cs, deployer, "test-backup"); err != nil {
 		t.Errorf("plugin.RecoverEtcdCluster error = %v", err)
+	}
+}
+
+func TestRotateClusterSecrets(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
+		return nil
+	}
+	cs := &api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			AgentPoolProfiles: []api.AgentPoolProfile{
+				{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
+				{Role: api.AgentPoolProfileRoleCompute, Name: "compute"},
+				{Role: api.AgentPoolProfileRoleInfra, Name: "infra"},
+			},
+		},
+	}
+
+	mockGen := mock_config.NewMockGenerator(mockCtrl)
+	mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
+	mockArm := mock_arm.NewMockGenerator(mockCtrl)
+
+	c := mockGen.EXPECT().InvalidateSecrets(cs).Return(nil)
+	c = mockGen.EXPECT().Generate(cs, nil).Return(nil).After(c)
+	c = mockArm.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
+	c = mockUp.EXPECT().CreateClients(nil, cs).Return(nil).After(c)
+	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
+	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+	c = mockUp.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
+	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+	c = mockUp.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+	c = mockUp.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = mockUp.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
+
+	p := &plugin{
+		armGenerator:    mockArm,
+		clusterUpgrader: mockUp,
+		configGenerator: mockGen,
+		log:             logrus.NewEntry(logrus.StandardLogger()),
+	}
+
+	if err := p.RotateClusterSecrets(nil, cs, deployer, nil); err != nil {
+		t.Errorf("plugin.RotateClusterSecrets error = %v", err)
 	}
 }
