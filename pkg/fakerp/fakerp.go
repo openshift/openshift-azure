@@ -36,7 +36,7 @@ func IsUpdate() bool {
 	return false
 }
 
-func GetDeployer(cs *api.OpenShiftManagedCluster, log *logrus.Entry, config *api.PluginConfig) api.DeployFn {
+func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api.PluginConfig) api.DeployFn {
 	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
 		log.Info("applying arm template deployment")
 		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
@@ -79,7 +79,7 @@ func GetDeployer(cs *api.OpenShiftManagedCluster, log *logrus.Entry, config *api
 }
 
 // CreateOrUpdate simulates the RP
-func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, log *logrus.Entry, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
+func CreateOrUpdate(ctx context.Context, log *logrus.Entry, oc *v20180930preview.OpenShiftManagedCluster, config *api.PluginConfig) (*v20180930preview.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
 	p, errs := plugin.NewPlugin(log, config)
 	if len(errs) > 0 {
@@ -172,11 +172,11 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
-	err = acceptMarketplaceAgreement(ctx, cs, config, log)
+	err = acceptMarketplaceAgreement(ctx, log, cs, config)
 	if err != nil {
 		return nil, err
 	}
-	deployer := GetDeployer(cs, log, config)
+	deployer := GetDeployer(log, cs, config)
 	if err := p.CreateOrUpdate(ctx, cs, azuretemplate, oldCs != nil, deployer); err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func CreateOrUpdate(ctx context.Context, oc *v20180930preview.OpenShiftManagedCl
 	return oc, nil
 }
 
-func acceptMarketplaceAgreement(ctx context.Context, cs *api.OpenShiftManagedCluster, pluginConfig *api.PluginConfig, log *logrus.Entry) error {
+func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, pluginConfig *api.PluginConfig) error {
 	if pluginConfig.TestConfig.ImageResourceName != "" ||
 		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
 		return nil

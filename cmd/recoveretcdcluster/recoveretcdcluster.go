@@ -49,7 +49,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	deployer := fakerp.GetDeployer(cs, log, config)
+	deployer := fakerp.GetDeployer(log, cs, config)
 	if err := p.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
 		log.Fatal(err)
 	}

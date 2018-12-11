@@ -184,7 +184,7 @@ func recover(ctx context.Context, log *logrus.Entry, blobName string, cs *api.Op
 	if len(errs) > 0 {
 		return kerrors.NewAggregate(errs)
 	}
-	deployer := realfakerp.GetDeployer(cs, log, config)
+	deployer := realfakerp.GetDeployer(log, cs, config)
 	if err := p.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
 		fmt.Fprintf(GinkgoWriter, "RecoverEtcdCluster error: %v", err)
 		return err

@@ -67,7 +67,7 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 
 func (p *plugin) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error) {
 	p.log.Info("generating arm templates")
-	return p.armGenerator.Generate(ctx, cs, isUpdate, "")
+	return p.armGenerator.Generate(ctx, cs, "", isUpdate)
 }
 
 func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, backupBlob string) *api.PluginError {
@@ -80,7 +80,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 		return err
 	}
 	p.log.Debugf("generating ARM with recovery from %s", backupBlob)
-	azuretemplate, err := p.armGenerator.Generate(ctx, cs, true, backupBlob)
+	azuretemplate, err := p.armGenerator.Generate(ctx, cs, backupBlob, true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
@@ -93,7 +93,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 		return err
 	}
 	p.log.Debugf("generating ARM without recovery")
-	azuretemplate, err = p.armGenerator.Generate(ctx, cs, true, "")
+	azuretemplate, err = p.armGenerator.Generate(ctx, cs, "", true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}

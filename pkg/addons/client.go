@@ -135,7 +135,7 @@ func (c *client) ApplyResources(filter func(unstructured.Unstructured) bool, db 
 			continue
 		}
 
-		if err := write(c.dyn, c.grs, &o, c.log); err != nil {
+		if err := write(c.log, c.dyn, c.grs, &o); err != nil {
 			return err
 		}
 	}
@@ -143,7 +143,7 @@ func (c *client) ApplyResources(filter func(unstructured.Unstructured) bool, db 
 }
 
 // write synchronises a single object with the API server.
-func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstructured.Unstructured, log *logrus.Entry) error {
+func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstructured.Unstructured) error {
 	dc, err := dyn.ClientForGroupVersionKind(o.GroupVersionKind())
 	if err != nil {
 		return err
@@ -205,10 +205,10 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 		}
 		Default(*existing)
 
-		if !needsUpdate(existing, o, log) {
+		if !needsUpdate(log, existing, o) {
 			return
 		}
-		printDiff(existing, o, log)
+		printDiff(log, existing, o)
 
 		o.SetResourceVersion(rv)
 		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
@@ -218,7 +218,7 @@ func write(dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstru
 	return err
 }
 
-func needsUpdate(existing, o *unstructured.Unstructured, log *logrus.Entry) bool {
+func needsUpdate(log *logrus.Entry, existing, o *unstructured.Unstructured) bool {
 	handleSpecialObjects(*existing, *o)
 
 	if reflect.DeepEqual(*existing, *o) {
@@ -231,7 +231,7 @@ func needsUpdate(existing, o *unstructured.Unstructured, log *logrus.Entry) bool
 	return true
 }
 
-func printDiff(existing, o *unstructured.Unstructured, log *logrus.Entry) bool {
+func printDiff(log *logrus.Entry, existing, o *unstructured.Unstructured) bool {
 	// TODO: we should have tests that monitor these diffs:
 	// 1) when a cluster is created
 	// 2) when sync is run twice back-to-back on the same cluster

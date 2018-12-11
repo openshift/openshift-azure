@@ -45,7 +45,7 @@ func init() {
 
 func TestNeedsUpdate(t *testing.T) {
 	for _, test := range clientTests {
-		if got := needsUpdate(test.existing, test.updated, log); got != test.exp {
+		if got := needsUpdate(log, test.existing, test.updated); got != test.exp {
 			t.Errorf("%s: expected update %t, got %t", test.name, test.exp, got)
 		}
 	}
@@ -53,7 +53,7 @@ func TestNeedsUpdate(t *testing.T) {
 
 func TestShouldPrintDiff(t *testing.T) {
 	for _, test := range clientTests {
-		if got := printDiff(test.existing, test.updated, log); got != test.diff {
+		if got := printDiff(log, test.existing, test.updated); got != test.diff {
 			t.Errorf("%s: expected to print diff %t, got %t", test.name, test.diff, got)
 		}
 	}
