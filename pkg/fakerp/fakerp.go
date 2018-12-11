@@ -76,7 +76,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api
 	}
 }
 
-func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, config *api.PluginConfig) (*api.OpenShiftManagedCluster, error) {
+func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, config *api.PluginConfig, isAdmin bool) (*api.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
 	p, errs := plugin.NewPlugin(log, config)
 	if len(errs) > 0 {
@@ -106,7 +106,11 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	// internal API representation)
 	// we set fqdn during enrichment which is slightly different than what the RP
 	// will do so we are only validating once.
-	errs = p.Validate(ctx, cs, oldCs, false)
+	if isAdmin {
+		errs = p.ValidateAdmin(ctx, cs, oldCs)
+	} else {
+		errs = p.Validate(ctx, cs, oldCs, false)
+	}
 	if len(errs) > 0 {
 		return nil, kerrors.NewAggregate(errs)
 	}

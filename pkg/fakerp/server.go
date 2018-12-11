@@ -18,7 +18,6 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
@@ -36,8 +35,8 @@ type Server struct {
 	gc resources.GroupsClient
 
 	sync.RWMutex
-	state api.ProvisioningState
-	cs    *api.OpenShiftManagedCluster
+	state internalapi.ProvisioningState
+	cs    *internalapi.OpenShiftManagedCluster
 
 	log     *logrus.Entry
 	address string
@@ -122,16 +121,16 @@ func (s *Server) validate(w http.ResponseWriter, r *http.Request) bool {
 // be consistent with how the RP runs in production so we need
 // to restore the internal state of the cluster from the
 // filesystem.
-func (s *Server) restore(path string) error {
-	dataDir, err := FindDirectory(path)
+func (s *Server) restore() error {
+	dataDir, err := FindDirectory(DataDirectory)
 	if err != nil {
 		return err
 	}
-	data, err := ioutil.ReadFile(dataDir)
+	data, err := ioutil.ReadFile(filepath.Join(dataDir, "containerservice.yaml"))
 	if err != nil {
 		return err
 	}
-	var cs *api.OpenShiftManagedCluster
+	var cs *internalapi.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(data, &cs); err != nil {
 		return err
 	}
@@ -166,7 +165,7 @@ func (s *Server) readAdminRequest(body io.ReadCloser) (*admin.OpenShiftManagedCl
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	// We need to restore the internal cluster state into memory for GETs
 	// to work appropriately for the DELETE to complete.
-	if err := s.restore(DataDirectory); err != nil {
+	if err := s.restore(); err != nil {
 		resp := fmt.Sprintf("500 Internal Error: Failed to restore internal cluster state: %v", err)
 		s.log.Debug(resp)
 		http.Error(w, resp, http.StatusInternalServerError)
@@ -242,7 +241,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 			s.write(nil)
 		}
 	}()
-	s.writeState(api.Deleting)
+	s.writeState(internalapi.Deleting)
 	// Update headers with Location so subsequent GET requests know the
 	// location to query.
 	headers := w.Header()
@@ -263,10 +262,10 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	}()
 
 	// read old config if it exists
-	var oldCs *api.OpenShiftManagedCluster
+	var oldCs *internalapi.OpenShiftManagedCluster
 	var err error
 	if !IsUpdate() {
-		s.writeState(api.Creating)
+		s.writeState(internalapi.Creating)
 	} else {
 		s.log.Info("read old config")
 		dataDir, err := FindDirectory(DataDirectory)
@@ -283,23 +282,26 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 			http.Error(w, resp, http.StatusInternalServerError)
 			return
 		}
-		s.writeState(api.Updating)
+		s.writeState(internalapi.Updating)
 	}
+
+	// TODO: Align with the production RP once it supports the admin API
+	isAdminRequest := strings.HasPrefix(req.URL.Path, "/admin")
 
 	// convert the external API manifest into the internal API representation
 	s.log.Info("read request and convert to internal")
-	var cs *api.OpenShiftManagedCluster
-	if strings.HasPrefix(req.URL.Path, "/admin") {
+	var cs *internalapi.OpenShiftManagedCluster
+	if isAdminRequest {
 		var oc *admin.OpenShiftManagedCluster
 		oc, err = s.readAdminRequest(req.Body)
 		if err == nil {
-			cs, err = api.ConvertFromAdmin(oc, oldCs)
+			cs, err = internalapi.ConvertFromAdmin(oc, oldCs)
 		}
 	} else {
 		var oc *v20180930preview.OpenShiftManagedCluster
 		oc, err = s.read20180930previewRequest(req.Body)
 		if err == nil {
-			cs, err = api.ConvertFromV20180930preview(oc, oldCs)
+			cs, err = internalapi.ConvertFromV20180930preview(oc, oldCs)
 		}
 	}
 	if err != nil {
@@ -328,39 +330,39 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, s.conf.TenantID)
 
 	// apply the request
-	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, config)
+	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, config, isAdminRequest)
 	if err != nil {
-		s.writeState(api.Failed)
+		s.writeState(internalapi.Failed)
 		resp := fmt.Sprintf("400 Bad Request: Failed to apply request: %v", err)
 		s.log.Debug(resp)
 		http.Error(w, resp, http.StatusBadRequest)
 		return
 	}
 	s.write(cs)
-	s.writeState(api.Succeeded)
+	s.writeState(internalapi.Succeeded)
 	// TODO: Should return status.Accepted similar to how we handle DELETEs
 	s.reply(w, req)
 }
 
-func (s *Server) write(cs *api.OpenShiftManagedCluster) {
+func (s *Server) write(cs *internalapi.OpenShiftManagedCluster) {
 	s.Lock()
 	defer s.Unlock()
 	s.cs = cs
 }
 
-func (s *Server) read() *api.OpenShiftManagedCluster {
+func (s *Server) read() *internalapi.OpenShiftManagedCluster {
 	s.RLock()
 	defer s.RUnlock()
 	return s.cs
 }
 
-func (s *Server) writeState(state api.ProvisioningState) {
+func (s *Server) writeState(state internalapi.ProvisioningState) {
 	s.Lock()
 	defer s.Unlock()
 	s.state = state
 }
 
-func (s *Server) readState() api.ProvisioningState {
+func (s *Server) readState() internalapi.ProvisioningState {
 	s.RLock()
 	defer s.RUnlock()
 	return s.state
@@ -379,10 +381,10 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 	var res []byte
 	var err error
 	if strings.HasPrefix(req.URL.Path, "/admin") {
-		oc := api.ConvertToAdmin(cs)
+		oc := internalapi.ConvertToAdmin(cs)
 		res, err = json.Marshal(oc)
 	} else {
-		oc := api.ConvertToV20180930preview(cs)
+		oc := internalapi.ConvertToV20180930preview(cs)
 		res, err = json.Marshal(oc)
 	}
 	if err != nil {
