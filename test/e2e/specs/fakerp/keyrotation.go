@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"reflect"
 
@@ -14,8 +15,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
-	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 )
@@ -53,21 +52,15 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 		mutated := deleteSecrets(internal)
 		Expect(mutated).NotTo(BeNil())
 
-		By("Running generate on the modified config blob")
-		pluginConfig, err := fakerp.GetPluginConfig()
-		Expect(err).NotTo(HaveOccurred())
-		configGen := config.NewSimpleGenerator(pluginConfig)
-		Expect(configGen).NotTo(BeNil())
-		err = configGen.Generate(mutated)
-		Expect(err).NotTo(HaveOccurred())
-
 		By("Persisting the config blob containing the new certificates and credentials")
 		err = saveConfig(mutated, *configBlob)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Calling update on the fake rp with the updated config blob")
-		updated, err := cli.UpdateOSACluster(ctx, external, pluginConfig)
+		external.Properties.ProvisioningState = nil
+		updated, err := cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), *external)
 		Expect(err).NotTo(HaveOccurred())
+		Expect(updated.StatusCode).To(Equal(http.StatusOK))
 		Expect(updated).NotTo(BeNil())
 
 		By("Parsing the config blob after the update")

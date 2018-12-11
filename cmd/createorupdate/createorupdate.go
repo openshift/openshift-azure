@@ -77,14 +77,7 @@ func delete(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShi
 
 func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShiftManagedClustersClient, resourceGroup string, oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) error {
 	log.Info("creating/updating cluster")
-	future, err := rpc.CreateOrUpdate(ctx, resourceGroup, resourceGroup, *oc)
-	if err != nil {
-		return err
-	}
-	if err := future.WaitForCompletionRef(ctx, rpc.Client); err != nil {
-		return err
-	}
-	resp, err := future.Result(rpc)
+	resp, err := rpc.CreateOrUpdateAndWait(ctx, resourceGroup, resourceGroup, *oc)
 	if err != nil {
 		return err
 	}
