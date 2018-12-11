@@ -34,8 +34,8 @@ type Config struct {
 	AADClientSecret string `envconfig:"AZURE_AAD_CLIENT_SECRET"`
 
 	Region           string `envconfig:"AZURE_REGION"`
-	DnsDomain        string `envconfig:"DNS_DOMAIN" required:"true"`
-	DnsResourceGroup string `envconfig:"DNS_RESOURCEGROUP" required:"true"`
+	DnsDomain        string `envconfig:"DNS_DOMAIN"`
+	DnsResourceGroup string `envconfig:"DNS_RESOURCEGROUP"`
 	ResourceGroup    string `envconfig:"RESOURCEGROUP" required:"true"`
 
 	NoGroupTags      bool   `envconfig:"NOGROUPTAGS"`
