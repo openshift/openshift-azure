@@ -244,5 +244,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Cluster available at https://%s.%s.cloudapp.azure.com/\n", conf.ResourceGroup, conf.Region)
+	fmt.Printf("\nCluster available at https://%s.%s.cloudapp.azure.com/\n", conf.ResourceGroup, conf.Region)
 }
