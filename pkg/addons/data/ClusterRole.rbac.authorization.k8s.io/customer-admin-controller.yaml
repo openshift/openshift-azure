@@ -24,3 +24,11 @@ rules:
   - list
   - watch
   - create
+- apiGroups:
+  - user.openshift.io
+  resources:
+  - groups
+  verbs:
+  - create
+  - get
+  - update

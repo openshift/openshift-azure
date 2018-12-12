@@ -170,6 +170,42 @@ func TestConvertFromAdmin(t *testing.T) {
 			},
 		},
 		{
+			name: "auth profile update aad groups",
+			input: &admin.OpenShiftManagedCluster{
+				Properties: &admin.Properties{
+					AuthProfile: &admin.AuthProfile{
+						IdentityProviders: []admin.IdentityProvider{
+							{
+								Name: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Name"),
+								Provider: &admin.AADIdentityProvider{
+									CustomerAdminGroupID:  to.StringPtr("admin"),
+									CustomerReaderGroupID: to.StringPtr("reader"),
+								},
+							},
+						},
+					},
+				},
+			},
+			base: internalManagedClusterAdmin(),
+			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
+				expectedCs.Properties.AuthProfile = AuthProfile{
+					IdentityProviders: []IdentityProvider{
+						{
+							Name: "Properties.AuthProfile.IdentityProviders[0].Name",
+							Provider: &AADIdentityProvider{
+								Kind:                  "AADIdentityProvider",
+								ClientID:              "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
+								Secret:                "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
+								TenantID:              "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
+								CustomerAdminGroupID:  to.StringPtr("admin"),
+								CustomerReaderGroupID: to.StringPtr("reader"),
+							},
+						},
+					},
+				}
+			},
+		},
+		{
 			name: "invalid auth profile update",
 			input: &admin.OpenShiftManagedCluster{
 				Properties: &admin.Properties{

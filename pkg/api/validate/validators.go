@@ -5,6 +5,8 @@ import (
 	"net"
 	"strings"
 
+	"github.com/google/uuid"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
@@ -141,9 +143,20 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 			if provider.TenantID == "" {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider tenantId %q", provider.TenantID))
 			}
+			if provider.CustomerAdminGroupID != nil && !isValidUUID(*provider.CustomerAdminGroupID) {
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider customerAdminGroupId %q", *provider.CustomerAdminGroupID))
+			}
+			if provider.CustomerReaderGroupID != nil && !isValidUUID(*provider.CustomerReaderGroupID) {
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider customerReaderGroupId %q", *provider.CustomerReaderGroupID))
+			}
 		}
 	}
 	return
+}
+
+func isValidUUID(u string) bool {
+	_, err := uuid.Parse(u)
+	return err == nil
 }
 
 func validateAgentPoolProfiles(apps []api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {

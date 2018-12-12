@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Azure/go-autorest/autorest/to"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
@@ -58,6 +60,43 @@ vnetName: vnet
 		if !reflect.DeepEqual(got, tt.want) {
 			t.Errorf("derived.CloudProviderConf() = \"%v\", want \"%v\"", string(got), string(tt.want))
 		}
+	}
+}
+
+func TestDerivedAADGroupSyncConf(t *testing.T) {
+	provider := api.AADIdentityProvider{
+		ClientID:              "client_id",
+		Secret:                "hush",
+		TenantID:              "tenant-id",
+		CustomerAdminGroupID:  to.StringPtr("customerAdminGroupId"),
+		CustomerReaderGroupID: to.StringPtr("customerReaderGroupId"),
+	}
+
+	cs := api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			AuthProfile: api.AuthProfile{
+				IdentityProviders: []api.IdentityProvider{
+					{
+						Provider: &provider,
+					},
+				},
+			},
+		},
+	}
+	want := []byte(`clientId: client_id
+customerAdminGroupId: customerAdminGroupId
+customerReaderGroupId: customerReaderGroupId
+secret: hush
+tenantId: tenant-id
+`)
+
+	got, err := Derived.AadGroupSyncConf(&cs)
+	if err != nil {
+		t.Fatal(err)
+		return
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("derived.AadGroupSyncConf() = \"%v\", want \"%v\"", string(got), string(want))
 	}
 }
 

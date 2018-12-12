@@ -59,7 +59,9 @@ var marshalled = []byte(`{
 						"kind": "AADIdentityProvider",
 						"clientId": "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
 						"secret": "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
-						"tenantId": "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID"
+						"tenantId": "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
+						"customerAdminGroupId": "Properties.AuthProfile.IdentityProviders[0].Provider.CustomerAdminGroupID",
+						"customerReaderGroupId": "Properties.AuthProfile.IdentityProviders[0].Provider.CustomerReaderGroupID"
 					}
 				}
 			]
