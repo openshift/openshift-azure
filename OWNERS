@@ -12,7 +12,6 @@ reviewers:
 - kwoodson
 - makdaam
 - mjudeikis
-- pweil-
 - thekad
 labels:
 - sig/azure
