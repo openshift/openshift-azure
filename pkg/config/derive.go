@@ -112,6 +112,11 @@ func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error
 	})
 }
 
+func (derived) AadGroupSyncConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	provider := cs.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider)
+	return yaml.Marshal(provider)
+}
+
 func (derived) ClusterMonitoringOperatorArgs(cs *api.OpenShiftManagedCluster) ([]interface{}, error) {
 	return []interface{}{
 		"-namespace=openshift-monitoring",

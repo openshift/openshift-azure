@@ -11,6 +11,8 @@ properties:
         clientId: "{{ .Env.AZURE_AAD_CLIENT_ID }}"
         secret: "{{ .Env.AZURE_AAD_CLIENT_SECRET }}"
         tenantId: "{{ .Env.AZURE_TENANT_ID }}"
+        customerAdminGroupId: {{ .Env.AZURE_AAD_GROUP_ADMINS_ID }}
+        customerReaderGroupId: {{ .Env.AZURE_AAD_GROUP_READERS_ID }}
   networkProfile:
     vnetCidr: 10.0.0.0/8
   routerProfiles:

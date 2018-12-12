@@ -622,6 +622,15 @@ var Translations = map[string][]struct {
 			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.Router.Key) }}",
 		},
 	},
+	"Secret/openshift-infra/aad-group-sync-config": {
+		{
+			Path: jsonpath.MustCompile("$.stringData.'aad-group-sync.yaml'"),
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+				b, err := config.Derived.AadGroupSyncConf(cs)
+				return string(b), err
+			},
+		},
+	},
 	"Secret/kube-service-catalog/apiserver-ssl": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),

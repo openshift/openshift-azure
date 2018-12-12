@@ -234,4 +234,8 @@ type AADIdentityProvider struct {
 	Kind     *string `json:"kind,omitempty"`
 	ClientID *string `json:"clientId,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
+	// CustomerAdminGroupID group memberships will get synced into the OpenShift group "osa-customer-admins"
+	CustomerAdminGroupID *string `json:"customerAdminGroupId,omitempty"`
+	// CustomerReaderGroupID group memberships will get synced into the OpenShift group "osa-customer-readers"
+	CustomerReaderGroupID *string `json:"customerReaderGroupId,omitempty"`
 }
