@@ -26,7 +26,7 @@ import (
 	"github.com/openshift/openshift-azure/test/clients/openshift"
 )
 
-var _ = Describe("Openshift on Azure end user e2e tests [EndUser]", func() {
+var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake]", func() {
 	var (
 		cli       *openshift.Client
 		namespace string

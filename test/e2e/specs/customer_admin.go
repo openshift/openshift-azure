@@ -16,7 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/test/clients/openshift"
 )
 
-var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin]", func() {
+var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fake]", func() {
 	var (
 		cli      *openshift.Client
 		admincli *openshift.Client
