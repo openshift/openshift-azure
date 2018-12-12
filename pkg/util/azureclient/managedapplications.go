@@ -24,8 +24,7 @@ var _ ApplicationsClient = &applicationsClient{}
 // NewApplicationsClient creates a new ApplicationsClient
 func NewApplicationsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) ApplicationsClient {
 	client := managedapplications.NewApplicationsClient(subscriptionID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(&client.Client, authorizer, languages)
 
 	return &applicationsClient{
 		ApplicationsClient: client,

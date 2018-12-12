@@ -22,8 +22,8 @@ var _ RBACApplicationsClient = &rbacApplicationsClient{}
 // NewRBACApplicationsClient creates a new ApplicationsClient
 func NewRBACApplicationsClient(tenantID string, authorizer autorest.Authorizer, languages []string) RBACApplicationsClient {
 	client := graphrbac.NewApplicationsClient(tenantID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(&client.Client, authorizer, languages)
+
 	return &rbacApplicationsClient{
 		ApplicationsClient: client,
 	}

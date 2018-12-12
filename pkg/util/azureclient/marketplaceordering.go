@@ -22,8 +22,7 @@ var _ MarketPlaceAgreementsClient = &marketPlaceAgreementsClient{}
 // NewMarketPlaceAgreementsClient creates a new MarketPlaceAgreementsClient
 func NewMarketPlaceAgreementsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) MarketPlaceAgreementsClient {
 	client := marketplaceordering.NewMarketplaceAgreementsClient(subscriptionID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(&client.Client, authorizer, languages)
 
 	return &marketPlaceAgreementsClient{
 		MarketplaceAgreementsClient: client,
