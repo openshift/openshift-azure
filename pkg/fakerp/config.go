@@ -60,7 +60,7 @@ func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
 			// Randomly assign a supported region
 			rand.Seed(time.Now().UTC().UnixNano())
 			c.Region = supportedRegions[rand.Intn(len(supportedRegions))]
-			log.Infof("using randomly selected region %q", c.Region)
+			log.Infof("using randomly selected region %s", c.Region)
 		}
 
 		var supported bool
@@ -70,7 +70,7 @@ func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
 			}
 		}
 		if !supported {
-			return nil, fmt.Errorf("%q is not a supported region (supported regions: %v)", c.Region, supportedRegions)
+			return nil, fmt.Errorf("%s is not a supported region (supported regions: %v)", c.Region, supportedRegions)
 		}
 		os.Setenv("AZURE_REGION", c.Region)
 	}

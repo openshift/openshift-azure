@@ -3,7 +3,6 @@ package fakerp
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -59,22 +58,8 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api
 		if err := future.WaitForCompletionRef(ctx, deployments.Client()); err != nil {
 			return err
 		}
-		resp, err := future.Result(deployments.DeploymentClient())
-		if err != nil {
-			return err
-		}
-		if *resp.Properties.ProvisioningState != "Succeeded" {
-			returnErr := fmt.Sprintf("arm deployment failed (correlation id: %s)", *resp.Properties.CorrelationID)
-			dopc := resources.NewDeploymentOperationsClient(cs.Properties.AzProfile.SubscriptionID)
-			dopc.Authorizer = authorizer
-			if op, err := dopc.Get(ctx, cs.Properties.AzProfile.ResourceGroup, *resp.Name, *resp.Properties.CorrelationID); err != nil {
-				log.Warn(err.Error())
-			} else {
-				returnErr = fmt.Sprintf("%s - %v", returnErr, op.Properties.StatusMessage)
-			}
-			return errors.New(returnErr)
-		}
-		return nil
+		_, err = future.Result(deployments.DeploymentClient())
+		return err
 	}
 }
 

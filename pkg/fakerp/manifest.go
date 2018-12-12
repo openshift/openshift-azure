@@ -32,13 +32,13 @@ func LoadClusterConfigFromManifest(log *logrus.Entry, manifestTemplate string) (
 			return nil, err
 		}
 		defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
-		log.Debugf("using manifest from %q", defaultManifestFile)
+		log.Debugf("using manifest from %s", defaultManifestFile)
 		return loadManifestFromFile(defaultManifestFile)
 	}
 	if manifestTemplate == "" {
 		manifestTemplate = "test/manifests/normal/create.yaml"
 	}
-	log.Debugf("generating manifest from %q", manifestTemplate)
+	log.Debugf("generating manifest from %s", manifestTemplate)
 	return generateManifest(manifestTemplate)
 }
 
@@ -54,7 +54,7 @@ func WriteClusterConfigToManifest(oc *v20180930preview.OpenShiftManagedCluster, 
 func generateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCluster, error) {
 	t, err := template.ParseFiles(manifestFile)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed parsing the manifest %q", manifestFile)
+		return nil, errors.Wrapf(err, "failed parsing the manifest %s", manifestFile)
 	}
 
 	b := &bytes.Buffer{}
