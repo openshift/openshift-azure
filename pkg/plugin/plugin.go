@@ -19,6 +19,7 @@ type plugin struct {
 	armGenerator    arm.Generator
 	configGenerator config.Generator
 	apiValidator    *api.Validator
+	adminValidator  *api.Validator
 }
 
 var _ api.Plugin = &plugin{}
@@ -32,6 +33,7 @@ func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig, skipValidate .
 		armGenerator:    arm.NewSimpleGenerator(pluginConfig),
 		configGenerator: config.NewSimpleGenerator(pluginConfig),
 		apiValidator:    api.NewValidator(pluginConfig.TestConfig.RunningUnderTest),
+		adminValidator:  api.NewAdminValidator(pluginConfig.TestConfig.RunningUnderTest),
 	}
 
 	// HACK: the caller can skip validation: e.g. on the front end, where none
@@ -53,6 +55,11 @@ func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig, skipValidate .
 func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) []error {
 	p.log.Info("validating internal data models")
 	return p.apiValidator.Validate(new, old, externalOnly)
+}
+
+func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManagedCluster) []error {
+	p.log.Info("validating internal admin data models")
+	return p.adminValidator.Validate(new, old, false)
 }
 
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {

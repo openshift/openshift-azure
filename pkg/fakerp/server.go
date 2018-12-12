@@ -1,15 +1,14 @@
 package fakerp
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -21,7 +20,9 @@ import (
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 var once sync.Once
@@ -34,8 +35,8 @@ type Server struct {
 	gc resources.GroupsClient
 
 	sync.RWMutex
-	state v20180930preview.ProvisioningState
-	oc    *v20180930preview.OpenShiftManagedCluster
+	state internalapi.ProvisioningState
+	cs    *internalapi.OpenShiftManagedCluster
 
 	log     *logrus.Entry
 	address string
@@ -66,6 +67,7 @@ func StartServer(log *logrus.Entry, conf *Config, address string) string {
 func (s *Server) ListenAndServe() {
 	// TODO: match the request path the real RP would use
 	http.Handle("/", s)
+	http.Handle("/admin", s)
 	httpServer := &http.Server{Addr: s.address}
 	s.log.Infof("starting server on %s", s.address)
 	s.log.WithError(httpServer.ListenAndServe()).Warn("Server exited.")
@@ -84,17 +86,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// process the request
 	switch req.Method {
 	case http.MethodDelete:
-		// The way we run the fake RP during development cannot really
-		// be consistent with how the RP runs in production so we need
-		// to restore the previous request and its provisioning state
-		// from the filesystem.
-		dataDir, err := FindDirectory(DataDirectory)
-		if err != nil {
-			return
-		}
-		if ok := s.restore(w, filepath.Join(dataDir, "manifest.yaml")); !ok {
-			return
-		}
 		s.handleDelete(w, req)
 	case http.MethodGet:
 		s.handleGet(w, req)
@@ -105,8 +96,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (s *Server) validate(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != http.MethodPut && r.Method != http.MethodGet && r.Method != http.MethodDelete {
-		resp := "405 Method not allowed"
-		s.log.Debugf("%s: %s", r.Method, resp)
+		resp := fmt.Sprintf("405 Method not allowed: %s", r.Method)
+		s.log.Debug(resp)
 		http.Error(w, resp, http.StatusMethodNotAllowed)
 		return false
 	}
@@ -126,44 +117,61 @@ func (s *Server) validate(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func (s *Server) restore(w http.ResponseWriter, path string) bool {
-	if _, err := os.Stat(path); err != nil {
-		return true
-	}
-	data, err := ioutil.ReadFile(path)
+// The way we run the fake RP during development cannot really
+// be consistent with how the RP runs in production so we need
+// to restore the internal state of the cluster from the
+// filesystem.
+func (s *Server) restore() error {
+	dataDir, err := FindDirectory(DataDirectory)
 	if err != nil {
-		resp := "500 Internal Error: Failed to restore OpenShift resource"
-		s.log.Debugf("%s: %v", resp, err)
-		http.Error(w, resp, http.StatusInternalServerError)
-		return false
+		return err
 	}
-	oc := s.readRequest(w, ioutil.NopCloser(bytes.NewReader(data)))
-	if oc == nil {
-		return false
+	data, err := ioutil.ReadFile(filepath.Join(dataDir, "containerservice.yaml"))
+	if err != nil {
+		return err
 	}
-	s.write(oc)
-	return true
+	var cs *internalapi.OpenShiftManagedCluster
+	if err := yaml.Unmarshal(data, &cs); err != nil {
+		return err
+	}
+	s.write(cs)
+	return nil
 }
 
-func (s *Server) readRequest(w http.ResponseWriter, body io.ReadCloser) *v20180930preview.OpenShiftManagedCluster {
-	b, err := ioutil.ReadAll(body)
+func (s *Server) read20180930previewRequest(body io.ReadCloser) (*v20180930preview.OpenShiftManagedCluster, error) {
+	data, err := ioutil.ReadAll(body)
 	if err != nil {
-		resp := "400 Bad Request: Failed to read request body"
-		s.log.Debugf("%s: %v", resp, err)
-		http.Error(w, resp, http.StatusBadRequest)
-		return nil
+		return nil, fmt.Errorf("failed to read request body: %v", err)
 	}
 	var oc *v20180930preview.OpenShiftManagedCluster
-	if err := yaml.Unmarshal(b, &oc); err != nil {
-		resp := "400 Bad Request: Failed to unmarshal request"
-		s.log.Debugf("%s: %v", resp, err)
-		http.Error(w, resp, http.StatusBadRequest)
-		return nil
+	if err := yaml.Unmarshal(data, &oc); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal request: %v", err)
 	}
-	return oc
+	return oc, nil
+}
+
+func (s *Server) readAdminRequest(body io.ReadCloser) (*admin.OpenShiftManagedCluster, error) {
+	data, err := ioutil.ReadAll(body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read request body: %v", err)
+	}
+	var oc *admin.OpenShiftManagedCluster
+	if err := yaml.Unmarshal(data, &oc); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal request: %v", err)
+	}
+	return oc, nil
 }
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
+	// We need to restore the internal cluster state into memory for GETs
+	// to work appropriately for the DELETE to complete.
+	if err := s.restore(); err != nil {
+		resp := fmt.Sprintf("500 Internal Error: Failed to restore internal cluster state: %v", err)
+		s.log.Debug(resp)
+		http.Error(w, resp, http.StatusInternalServerError)
+		return
+	}
+
 	// simulate Context with property bag
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
@@ -175,8 +183,8 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	// TODO: Get the azure credentials from the request headers
 	authorizer, err := azureclient.NewAuthorizer(s.conf.ClientID, s.conf.ClientSecret, s.conf.TenantID)
 	if err != nil {
-		resp := "500 Internal Error: Failed to determine request credentials"
-		s.log.Debugf("%s: %v", resp, err)
+		resp := fmt.Sprintf("500 Internal Error: Failed to determine request credentials: %v", err)
+		s.log.Debug(resp)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
@@ -184,8 +192,8 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	// delete dns records
 	err = DeleteOCPDNS(ctx, s.conf.SubscriptionID, s.conf.ResourceGroup, s.conf.DnsResourceGroup, s.conf.DnsDomain)
 	if err != nil {
-		resp := "500 Internal Error: Failed to delete dns records"
-		s.log.Debugf("%s: %v", resp, err)
+		resp := fmt.Sprintf("500 Internal Error: Failed to delete dns records: %v", err)
+		s.log.Debug(resp)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
@@ -206,8 +214,8 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 				}
 			}
 		}
-		resp := "500 Internal Error: Failed to delete resource group"
-		s.log.Debugf("%s: %#v", resp, err)
+		resp := fmt.Sprintf("500 Internal Error: Failed to delete resource group: %v", err)
+		s.log.Debug(resp)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
@@ -233,7 +241,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 			s.write(nil)
 		}
 	}()
-	s.writeState(v20180930preview.Deleting)
+	s.writeState(internalapi.Deleting)
 	// Update headers with Location so subsequent GET requests know the
 	// location to query.
 	headers := w.Header()
@@ -253,11 +261,65 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		<-s.inProgress
 	}()
 
-	oc := s.readRequest(w, req.Body)
-	if oc == nil {
+	// read old config if it exists
+	var oldCs *internalapi.OpenShiftManagedCluster
+	var err error
+	if !IsUpdate() {
+		s.writeState(internalapi.Creating)
+	} else {
+		s.log.Info("read old config")
+		dataDir, err := FindDirectory(DataDirectory)
+		if err != nil {
+			resp := fmt.Sprintf("500 Internal Error: Failed to read old config: %v", err)
+			s.log.Debug(resp)
+			http.Error(w, resp, http.StatusInternalServerError)
+			return
+		}
+		oldCs, err = managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
+		if err != nil {
+			resp := fmt.Sprintf("500 Internal Error: Failed to read old config: %v", err)
+			s.log.Debug(resp)
+			http.Error(w, resp, http.StatusInternalServerError)
+			return
+		}
+		s.writeState(internalapi.Updating)
+	}
+
+	// TODO: Align with the production RP once it supports the admin API
+	isAdminRequest := strings.HasPrefix(req.URL.Path, "/admin")
+
+	// convert the external API manifest into the internal API representation
+	s.log.Info("read request and convert to internal")
+	var cs *internalapi.OpenShiftManagedCluster
+	if isAdminRequest {
+		var oc *admin.OpenShiftManagedCluster
+		oc, err = s.readAdminRequest(req.Body)
+		if err == nil {
+			cs, err = internalapi.ConvertFromAdmin(oc, oldCs)
+		}
+	} else {
+		var oc *v20180930preview.OpenShiftManagedCluster
+		oc, err = s.read20180930previewRequest(req.Body)
+		if err == nil {
+			cs, err = internalapi.ConvertFromV20180930preview(oc, oldCs)
+		}
+	}
+	if err != nil {
+		resp := fmt.Sprintf("400 Bad Request: Failed to convert to internal type: %v", err)
+		s.log.Debug(resp)
+		http.Error(w, resp, http.StatusBadRequest)
 		return
 	}
-	s.write(oc)
+	s.write(cs)
+
+	// populate plugin configuration
+	config, err := GetPluginConfig()
+	if err != nil {
+		resp := fmt.Sprintf("400 Bad Request: Failed to configure plugin: %v", err)
+		s.log.Debug(resp)
+		http.Error(w, resp, http.StatusBadRequest)
+		return
+	}
 
 	// simulate Context with property bag
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
@@ -267,70 +329,67 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, s.conf.ClientSecret)
 	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, s.conf.TenantID)
 
-	// populate plugin configuration
-	config, err := GetPluginConfig()
+	// apply the request
+	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, config, isAdminRequest)
 	if err != nil {
-		resp := "400 Bad Request: Failed to configure plugin"
-		s.log.Debugf("%s: %v", resp, err)
+		s.writeState(internalapi.Failed)
+		resp := fmt.Sprintf("400 Bad Request: Failed to apply request: %v", err)
+		s.log.Debug(resp)
 		http.Error(w, resp, http.StatusBadRequest)
 		return
 	}
-
-	if currentState := s.readState(); string(currentState) == "" {
-		s.writeState(v20180930preview.Creating)
-	} else {
-		// TODO: Need to separate between updates and upgrades
-		s.writeState(v20180930preview.Updating)
-	}
-
-	if _, err := CreateOrUpdate(ctx, s.log, oc, config); err != nil {
-		s.writeState(v20180930preview.Failed)
-		resp := "400 Bad Request: Failed to apply request"
-		s.log.Debugf("%s: %v", resp, err)
-		http.Error(w, resp, http.StatusBadRequest)
-		return
-	}
-	s.writeState(v20180930preview.Succeeded)
+	s.write(cs)
+	s.writeState(internalapi.Succeeded)
+	// TODO: Should return status.Accepted similar to how we handle DELETEs
 	s.reply(w, req)
 }
 
-func (s *Server) write(oc *v20180930preview.OpenShiftManagedCluster) {
+func (s *Server) write(cs *internalapi.OpenShiftManagedCluster) {
 	s.Lock()
 	defer s.Unlock()
-	s.oc = oc
+	s.cs = cs
 }
 
-func (s *Server) read() *v20180930preview.OpenShiftManagedCluster {
+func (s *Server) read() *internalapi.OpenShiftManagedCluster {
 	s.RLock()
 	defer s.RUnlock()
-	return s.oc
+	return s.cs
 }
 
-func (s *Server) writeState(state v20180930preview.ProvisioningState) {
+func (s *Server) writeState(state internalapi.ProvisioningState) {
 	s.Lock()
 	defer s.Unlock()
 	s.state = state
 }
 
-func (s *Server) readState() v20180930preview.ProvisioningState {
+func (s *Server) readState() internalapi.ProvisioningState {
 	s.RLock()
 	defer s.RUnlock()
 	return s.state
 }
 
 func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
-	oc := s.read()
-	if oc == nil {
+	cs := s.read()
+	if cs == nil {
 		// If the object is not found in memory then
 		// it must have been deleted. Exit successfully.
 		return
 	}
 	state := s.readState()
-	oc.Properties.ProvisioningState = &state
-	res, err := json.Marshal(oc)
+	cs.Properties.ProvisioningState = state
+
+	var res []byte
+	var err error
+	if strings.HasPrefix(req.URL.Path, "/admin") {
+		oc := internalapi.ConvertToAdmin(cs)
+		res, err = json.Marshal(oc)
+	} else {
+		oc := internalapi.ConvertToV20180930preview(cs)
+		res, err = json.Marshal(oc)
+	}
 	if err != nil {
-		resp := "500 Internal Server Error: Failed to marshal response"
-		s.log.Debugf("%s: %v", resp, err)
+		resp := fmt.Sprintf("500 Internal Server Error: Failed to marshal response: %v", err)
+		s.log.Debug(resp)
 		http.Error(w, resp, http.StatusInternalServerError)
 		return
 	}
