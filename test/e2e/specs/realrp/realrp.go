@@ -43,7 +43,7 @@ var _ = Describe("Resource provider e2e tests [Real]", func() {
 
 	BeforeEach(func() {
 		var err error
-		cli, err = azure.NewClientFromEnvironment()
+		cli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).ToNot(HaveOccurred())
 		if os.Getenv("AZURE_REGION") == "" {
 			Expect(errors.New("AZURE_REGION is not set")).ToNot(HaveOccurred())

@@ -10,7 +10,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/sirupsen/logrus"
 	apiappsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,6 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/clients/openshift"
+	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", func() {
@@ -38,7 +38,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 
 	BeforeEach(func() {
 		var err error
-		azurecli, err = azure.NewClientFromEnvironment()
+		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
 		occli, err = openshift.NewEndUserClient()
 		Expect(err).NotTo(HaveOccurred())
@@ -56,13 +56,8 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 	})
 
 	It("should be possible to maintain a healthy cluster after scaling it out and in", func() {
-		logrus.SetLevel(logrus.DebugLevel)
-		logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-		logrus.SetOutput(GinkgoWriter)
-		log := logrus.NewEntry(logrus.StandardLogger())
-
 		By("Fetching the scale up manifest")
-		external, err := fakerp.LoadClusterConfigFromManifest(log, *scaleUpManifest)
+		external, err := fakerp.LoadClusterConfigFromManifest(log.GetTestLogger(), *scaleUpManifest)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
 
@@ -143,7 +138,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		Expect(len(nodes)).To(Equal(2))
 
 		By("Fetching the scale down manifest")
-		external, err = fakerp.LoadClusterConfigFromManifest(log, *scaleDownManifest)
+		external, err = fakerp.LoadClusterConfigFromManifest(log.GetTestLogger(), *scaleDownManifest)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
 

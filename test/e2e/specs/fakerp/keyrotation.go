@@ -12,12 +12,12 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/ghodss/yaml"
-	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/test/clients/azure"
+	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func() {
@@ -29,26 +29,11 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 
 	BeforeEach(func() {
 		var err error
-		cli, err = azure.NewClientFromEnvironment()
+		cli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("should be possible to maintain a healthy cluster after rotating all credentials", func() {
-		ctx := context.Background()
-		ctx = context.WithValue(ctx, api.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
-		ctx = context.WithValue(ctx, api.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-		ctx = context.WithValue(ctx, api.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
-
-		logrus.SetLevel(logrus.DebugLevel)
-		logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-		logrus.SetOutput(GinkgoWriter)
-		log := logrus.NewEntry(logrus.StandardLogger())
-
-		By("Parsing the external manifest")
-		external, err := fakerp.LoadClusterConfigFromManifest(log, *manifest)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(external).NotTo(BeNil())
-
 		By("Parsing the internal manifest containing config blob")
 		internal, err := managedcluster.ReadConfig(*configBlob)
 		Expect(err).NotTo(HaveOccurred())
@@ -62,9 +47,14 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 		err = saveConfig(mutated, *configBlob)
 		Expect(err).NotTo(HaveOccurred())
 
+		By("Parsing the external manifest")
+		external, err := fakerp.LoadClusterConfigFromManifest(log.GetTestLogger(), *manifest)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(external).NotTo(BeNil())
+
 		By("Calling update on the fake rp with the updated config blob")
 		external.Properties.ProvisioningState = nil
-		updated, err := cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), *external)
+		updated, err := cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), *external)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updated.StatusCode).To(Equal(http.StatusOK))
 		Expect(updated).NotTo(BeNil())

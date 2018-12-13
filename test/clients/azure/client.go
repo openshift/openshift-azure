@@ -1,18 +1,22 @@
 package azure
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"regexp"
 	"strings"
 
 	"github.com/onsi/ginkgo/config"
-	"github.com/sirupsen/logrus"
 
 	externalapi "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	adminapi "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	realfakerp "github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
+	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
+	"github.com/openshift/openshift-azure/pkg/util/configblob"
+	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 // rpFocus represents the supported RP APIs which e2e tests use to create their azure clients,
@@ -33,6 +37,7 @@ func (tf rpFocus) match(focusString string) bool {
 type Client struct {
 	Accounts                         azureclient.AccountsClient
 	Applications                     azureclient.ApplicationsClient
+	BlobStorage                      storage.BlobStorageClient
 	OpenShiftManagedClusters         externalapi.OpenShiftManagedClustersClient
 	OpenShiftManagedClustersAdmin    adminapi.OpenShiftManagedClustersClient
 	VirtualMachineScaleSets          azureclient.VirtualMachineScaleSetsClient
@@ -42,20 +47,32 @@ type Client struct {
 }
 
 // NewClientFromEnvironment creates a new azure client from environment variables
-func NewClientFromEnvironment() (*Client, error) {
+func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 	authorizer, err := azureclient.NewAuthorizerFromEnvironment()
 	if err != nil {
 		return nil, err
 	}
-	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
 
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-	log := logrus.NewEntry(logrus.StandardLogger())
+	cfg := &cloudprovider.Config{
+		TenantID:        os.Getenv("AZURE_TENANT_ID"),
+		SubscriptionID:  os.Getenv("AZURE_SUBSCRIPTION_ID"),
+		AadClientID:     os.Getenv("AZURE_CLIENT_ID"),
+		AadClientSecret: os.Getenv("AZURE_CLIENT_SECRET"),
+		ResourceGroup:   os.Getenv("RESOURCEGROUP"),
+		Location:        os.Getenv("AZURE_REGION"),
+	}
+	subscriptionID := cfg.SubscriptionID
 
-	conf, err := realfakerp.NewConfig(log, true)
-	if err != nil {
-		return nil, err
+	var storageClient storage.BlobStorageClient
+	if setStorageClient {
+		// Setting the storage client is optional and should only be used
+		// selectively by tests that need access to the config storage blob
+		// because configblob.GetService makes api calls to Azure in order
+		// to setup the blob client.
+		storageClient, err = configblob.GetService(context.Background(), cfg)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var rpURL string
@@ -63,7 +80,12 @@ func NewClientFromEnvironment() (*Client, error) {
 	switch {
 	case adminRpFocus.match(focus), fakeRpFocus.match(focus):
 		fmt.Println("configuring the fake resource provider")
-		rpURL = realfakerp.StartServer(log, conf, realfakerp.LocalHttpAddr)
+		logger := log.GetTestLogger()
+		conf, err := realfakerp.NewConfig(logger, true)
+		if err != nil {
+			return nil, err
+		}
+		rpURL = realfakerp.StartServer(logger, conf, realfakerp.LocalHttpAddr)
 	case realRpFocus.match(focus):
 		fmt.Println("configuring the real resource provider")
 		rpURL = externalapi.DefaultBaseURI
@@ -80,6 +102,7 @@ func NewClientFromEnvironment() (*Client, error) {
 	return &Client{
 		Accounts:                         azureclient.NewAccountsClient(subscriptionID, authorizer, nil),
 		Applications:                     azureclient.NewApplicationsClient(subscriptionID, authorizer, nil),
+		BlobStorage:                      storageClient,
 		OpenShiftManagedClusters:         rpc,
 		OpenShiftManagedClustersAdmin:    rpcAdmin,
 		VirtualMachineScaleSets:          azureclient.NewVirtualMachineScaleSetsClient(subscriptionID, authorizer, nil),
