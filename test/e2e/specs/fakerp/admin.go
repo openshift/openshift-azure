@@ -53,6 +53,11 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader]", func
 	})
 
 	// check prometheus-operator and related components readiness
+	It("should start cluster-monitoring-operator correctly", func() {
+		err := wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(cli.AppsV1.Deployments("openshift-monitoring"), "cluster-monitoring-operator"))
+		Expect(err).ToNot(HaveOccurred())
+	})
+
 	It("should start prometheus-operator correctly", func() {
 		err := wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(cli.AppsV1.Deployments("openshift-monitoring"), "prometheus-operator"))
 		Expect(err).ToNot(HaveOccurred())
@@ -63,13 +68,18 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader]", func
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	It("should start kube-state-metrics correctly", func() {
-		err := wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(cli.AppsV1.Deployments("openshift-monitoring"), "kube-state-metrics"))
+	It("should start prometheus correctly", func() {
+		err := wait.Poll(2*time.Second, 20*time.Minute, ready.StatefulSetIsReady(cli.AppsV1.StatefulSets("openshift-monitoring"), "prometheus-k8s"))
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	It("should start prometheus correctly", func() {
-		err := wait.Poll(2*time.Second, 20*time.Minute, ready.StatefulSetIsReady(cli.AppsV1.StatefulSets("openshift-monitoring"), "prometheus-k8s"))
+	It("should start alert manager correctly", func() {
+		err := wait.Poll(2*time.Second, 20*time.Minute, ready.StatefulSetIsReady(cli.AppsV1.StatefulSets("openshift-monitoring"), "alertmanager-main"))
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	It("should start kube-state-metrics correctly", func() {
+		err := wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(cli.AppsV1.Deployments("openshift-monitoring"), "kube-state-metrics"))
 		Expect(err).ToNot(HaveOccurred())
 	})
 
