@@ -11,10 +11,12 @@ else
     export RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
 fi
 
-USE_PROD_FLAG="-use-prod=false"
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
-    USE_PROD_FLAG="-use-prod=true"
+    TEST_IN_PRODUCTION="-use-prod=true"
+fi
+if [[ -n "$ADMIN_MANIFEST" ]]; then
+    ADMIN_MANIFEST="-admin-manifest=$ADMIN_MANIFEST"
 fi
 
 go generate ./...
-go run cmd/createorupdate/createorupdate.go -timeout 1h $USE_PROD_FLAG
+go run cmd/createorupdate/createorupdate.go -timeout 1h ${TEST_IN_PRODUCTION:-} ${ADMIN_MANIFEST:-}

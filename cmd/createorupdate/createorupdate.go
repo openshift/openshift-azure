@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -16,10 +18,12 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
+	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
@@ -39,6 +43,8 @@ var (
 	method  = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
 	useProd = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
 	timeout = flag.Duration("timeout", 30*time.Minute, "Timeout of the request to the OpenShift resource provider.")
+	// if set, use the admin api to send this request
+	adminManifest = flag.String("admin-manifest", "", "If set, use the admin API to send this request.")
 )
 
 func validate() error {
@@ -46,6 +52,9 @@ func validate() error {
 	case http.MethodPut, http.MethodDelete:
 	default:
 		return fmt.Errorf("invalid request: %s, Supported methods are PUT and DELETE", strings.ToUpper(*method))
+	}
+	if *adminManifest != "" && *useProd {
+		return errors.New("sending requests to the Admin API is not supported yet in the production RP")
 	}
 	return nil
 }
@@ -75,7 +84,7 @@ func delete(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShi
 	return nil
 }
 
-func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShiftManagedClustersClient, resourceGroup string, oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) error {
+func createOrUpdatev20180930preview(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShiftManagedClustersClient, resourceGroup string, oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) error {
 	log.Info("creating/updating cluster")
 	resp, err := rpc.CreateOrUpdateAndWait(ctx, resourceGroup, resourceGroup, *oc)
 	if err != nil {
@@ -86,6 +95,23 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, rpc v20180930preview
 	}
 	log.Info("created/updated cluster")
 	return fakerp.WriteClusterConfigToManifest(&resp, manifestFile)
+}
+
+func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, rpc admin.OpenShiftManagedClustersClient, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) error {
+	log.Info("creating/updating cluster")
+	resp, err := rpc.CreateOrUpdateAndWait(ctx, resourceGroup, resourceGroup, *oc)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected response: %s", resp.Status)
+	}
+	data, err := yaml.Marshal(resp)
+	if err != nil {
+		return err
+	}
+	log.Info("created/updated cluster")
+	return ioutil.WriteFile(manifestFile, data, 0600)
 }
 
 func createResourceGroup(conf *fakerp.Config) (bool, error) {
@@ -119,7 +145,26 @@ func createResourceGroup(conf *fakerp.Config) (bool, error) {
 	return true, err
 }
 
-func execute(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShiftManagedClustersClient, conf *fakerp.Config) error {
+func execute(
+	ctx context.Context,
+	log *logrus.Entry,
+	ac admin.OpenShiftManagedClustersClient,
+	rpc v20180930preview.OpenShiftManagedClustersClient,
+	conf *fakerp.Config,
+	adminManifest string,
+) error {
+	if adminManifest != "" {
+		data, err := ioutil.ReadFile(adminManifest)
+		if err != nil {
+			return err
+		}
+		var oc *admin.OpenShiftManagedCluster
+		if err := yaml.Unmarshal(data, &oc); err != nil {
+			return err
+		}
+		return createOrUpdateAdmin(ctx, log, ac, conf.ResourceGroup, oc, adminManifest)
+	}
+
 	oc, err := fakerp.LoadClusterConfigFromManifest(log, conf.Manifest)
 	if err != nil {
 		return err
@@ -131,7 +176,7 @@ func execute(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenSh
 	}
 	defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
 	if err := wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
-		if err := createOrUpdate(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile); err != nil {
+		if err := createOrUpdatev20180930preview(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile); err != nil {
 			if autoRestErr, ok := err.(autorest.DetailedError); ok {
 				if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
 					if netErr, ok := urlErr.Err.(*net.OpError); ok {
@@ -216,18 +261,20 @@ func main() {
 		rpURL = fakerp.StartServer(log, conf, fakerp.LocalHttpAddr)
 	}
 
-	// setup the osa client
-	rpc := v20180930preview.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
+	// setup the osa clients
+	adminClient := admin.NewOpenShiftManagedClustersClientWithBaseURI(rpURL+"/admin", conf.SubscriptionID)
+	v20180930previewClient := v20180930preview.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
 	if err != nil {
 		log.Fatal(err)
 	}
-	rpc.Authorizer = authorizer
+	adminClient.Authorizer = authorizer
+	v20180930previewClient.Authorizer = authorizer
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 	if isDelete {
-		if err := delete(ctx, log, rpc, conf.ResourceGroup, conf.NoWait); err != nil {
+		if err := delete(ctx, log, v20180930previewClient, conf.ResourceGroup, conf.NoWait); err != nil {
 			log.Fatal(err)
 		}
 		return
@@ -239,7 +286,7 @@ func main() {
 		}
 	}
 
-	err = execute(ctx, log, rpc, conf)
+	err = execute(ctx, log, adminClient, v20180930previewClient, conf, *adminManifest)
 	if err != nil {
 		log.Fatal(err)
 	}
