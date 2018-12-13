@@ -157,10 +157,17 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 		err = json.Unmarshal(data, &before)
 		Expect(err).ToNot(HaveOccurred())
 
-		By("running an update")
+		By("ensuring the update blob has the right amount of entries")
 		external, err := fakerp.LoadClusterConfigFromManifest(log.GetTestLogger(), *manifest)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
+		expectedEntries := *external.Properties.MasterPoolProfile.Count
+		for _, profile := range external.Properties.AgentPoolProfiles {
+			expectedEntries += *profile.Count
+		}
+		Expect(len(before)).To(Equal(expectedEntries))
+
+		By("running an update")
 		updated, err := azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), *external)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updated.StatusCode).To(Equal(http.StatusOK))

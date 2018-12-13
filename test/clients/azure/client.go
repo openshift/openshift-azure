@@ -46,7 +46,10 @@ type Client struct {
 	Resources                        azureclient.ResourcesClient
 }
 
-// NewClientFromEnvironment creates a new azure client from environment variables
+// NewClientFromEnvironment creates a new azure client from environment variables.
+// Setting the storage client is optional and should only be used selectively by
+// tests that need access to the config storage blob because configblob.GetService
+// makes api calls to Azure in order to setup the blob client.
 func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 	authorizer, err := azureclient.NewAuthorizerFromEnvironment()
 	if err != nil {
@@ -65,10 +68,6 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 
 	var storageClient storage.BlobStorageClient
 	if setStorageClient {
-		// Setting the storage client is optional and should only be used
-		// selectively by tests that need access to the config storage blob
-		// because configblob.GetService makes api calls to Azure in order
-		// to setup the blob client.
 		storageClient, err = configblob.GetService(context.Background(), cfg)
 		if err != nil {
 			return nil, err
