@@ -28,13 +28,22 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-var once sync.Once
+type serverResponse struct {
+	status int
+	msg    string
+}
 
 type Server struct {
 	router *chi.Mux
 	// the server will not process more than a single
 	// PUT request at all times.
 	inProgress chan struct{}
+	// used by the server to inform clients asynchronously
+	// about the status of a PUT request
+	putAsyncErr chan serverResponse
+	// used by the server to inform clients asynchronously
+	// about the status of a DELETE request
+	deleteAsyncErr chan serverResponse
 
 	gc resources.GroupsClient
 
@@ -49,11 +58,13 @@ type Server struct {
 
 func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	s := &Server{
-		router:     chi.NewRouter(),
-		inProgress: make(chan struct{}, 1),
-		log:        log,
-		address:    address,
-		basePath:   "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{provider}/openShiftManagedClusters/{resourceName}",
+		router:         chi.NewRouter(),
+		inProgress:     make(chan struct{}, 1),
+		putAsyncErr:    make(chan serverResponse, 1),
+		deleteAsyncErr: make(chan serverResponse, 1),
+		log:            log,
+		address:        address,
+		basePath:       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{provider}/openShiftManagedClusters/{resourceName}",
 	}
 	// We need to restore the internal cluster state into memory for GETs
 	// and DELETEs to work appropriately.
@@ -135,6 +146,13 @@ func (s *Server) readAdminRequest(body io.ReadCloser) (*admin.OpenShiftManagedCl
 }
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
+	// TODO: Get the azure credentials from the request headers
+	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
+		return
+	}
+
 	// simulate Context with property bag
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
@@ -142,13 +160,6 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
 	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
 	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
-
-	// TODO: Get the azure credentials from the request headers
-	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
-		return
-	}
 
 	// delete dns records
 	// TODO: get resource group from request path
@@ -181,12 +192,16 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 		defer cancel()
 		if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
-			s.internalError(w, fmt.Sprintf("Failed to wait for resource group deletion: %v", err))
+			msg := fmt.Sprintf("500 Internal Error: Failed to wait for resource group deletion: %v", err)
+			s.log.Debug(msg)
+			s.deleteAsyncErr <- serverResponse{status: http.StatusInternalServerError, msg: msg}
 			return
 		}
 		resp, err := future.Result(gc)
 		if err != nil {
-			s.internalError(w, fmt.Sprintf("Failed to get resource group deletion response: %v", err))
+			msg := fmt.Sprintf("500 Internal Error: Failed to get resource group deletion response: %v", err)
+			s.log.Debug(msg)
+			s.deleteAsyncErr <- serverResponse{status: http.StatusInternalServerError, msg: msg}
 			return
 		}
 		// If the resource group deletion is successful, cleanup the object
@@ -208,15 +223,43 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) handleGet(w http.ResponseWriter, req *http.Request) {
-	s.reply(w, req)
+	select {
+	case err := <-s.deleteAsyncErr:
+		http.Error(w, err.msg, err.status)
+		return
+	case err := <-s.putAsyncErr:
+		http.Error(w, err.msg, err.status)
+		return
+	default:
+		// no async error so far
+	}
+	cs := s.read()
+	if cs == nil {
+		// If the object is not found in memory then
+		// it must have been deleted or never existed.
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	cp := cs.DeepCopy()
+	cp.Properties.ProvisioningState = s.readState()
+
+	var res []byte
+	var err error
+	if strings.HasPrefix(req.URL.Path, "/admin") {
+		oc := internalapi.ConvertToAdmin(cp)
+		res, err = json.Marshal(oc)
+	} else {
+		oc := internalapi.ConvertToV20180930preview(cp)
+		res, err = json.Marshal(oc)
+	}
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to marshal response: %v", err))
+		return
+	}
+	w.Write(res)
 }
 
 func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
-	defer func() {
-		// drain once we are done processing this request
-		<-s.inProgress
-	}()
-
 	// read old config if it exists
 	var oldCs *internalapi.OpenShiftManagedCluster
 	var err error
@@ -264,25 +307,40 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// simulate Context with property bag
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
-	defer cancel()
-	// TODO: Get the azure credentials from the request headers
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
+	// apply the request asynchronously
+	go func() {
+		defer func() {
+			// drain once we are done processing this request
+			<-s.inProgress
+		}()
 
-	// apply the request
-	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, config, isAdminRequest)
-	if err != nil {
-		s.writeState(internalapi.Failed)
-		s.badRequest(w, fmt.Sprintf("Failed to apply request: %v", err))
-		return
-	}
-	s.write(cs)
-	s.writeState(internalapi.Succeeded)
-	// TODO: Should return status.Accepted similar to how we handle DELETEs
-	s.reply(w, req)
+		// simulate Context with property bag
+		ctx, cancel := context.WithTimeout(context.TODO(), 1*time.Hour)
+		defer cancel()
+		// TODO: Get the azure credentials from the request headers
+		ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
+		ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
+		ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
+
+		cs, err = createOrUpdate(ctx, s.log, cs, oldCs, config, isAdminRequest)
+		if err != nil {
+			s.writeState(internalapi.Failed)
+			msg := fmt.Sprintf("400 Bad Request: Failed to apply request: %v", err)
+			s.log.Debug(msg)
+			s.putAsyncErr <- serverResponse{status: http.StatusBadRequest, msg: msg}
+			return
+		}
+		s.write(cs)
+		s.writeState(internalapi.Succeeded)
+	}()
+
+	// Update headers with Location so subsequent GET requests know the
+	// location to query.
+	headers := w.Header()
+	headers.Add(autorest.HeaderLocation, fmt.Sprintf("http://%s", s.address))
+	// And last but not least, we have accepted this PUT request
+	// and are processing it in the background.
+	w.WriteHeader(http.StatusAccepted)
 }
 
 func (s *Server) write(cs *internalapi.OpenShiftManagedCluster) {
@@ -307,31 +365,4 @@ func (s *Server) readState() internalapi.ProvisioningState {
 	s.RLock()
 	defer s.RUnlock()
 	return s.state
-}
-
-func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		// If the object is not found in memory then
-		// it must have been deleted or never existed.
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-	state := s.readState()
-	cs.Properties.ProvisioningState = state
-
-	var res []byte
-	var err error
-	if strings.HasPrefix(req.URL.Path, "/admin") {
-		oc := internalapi.ConvertToAdmin(cs)
-		res, err = json.Marshal(oc)
-	} else {
-		oc := internalapi.ConvertToV20180930preview(cs)
-		res, err = json.Marshal(oc)
-	}
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to marshal response: %v", err))
-		return
-	}
-	w.Write(res)
 }
