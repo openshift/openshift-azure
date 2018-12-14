@@ -10,6 +10,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
@@ -22,15 +23,11 @@ func main() {
 		log.Fatal("Usage recoveretcdcluster <blobname>")
 	}
 	blobName := os.Args[1]
-	conf, err := fakerp.NewConfig(log, true)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, api.ContextKeyClientID, conf.ClientID)
-	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, conf.ClientSecret)
-	ctx = context.WithValue(ctx, api.ContextKeyTenantID, conf.TenantID)
+	ctx = context.WithValue(ctx, api.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
+	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
+	ctx = context.WithValue(ctx, api.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
 
 	config, err := fakerp.GetPluginConfig()
 	if err != nil {
@@ -40,7 +37,7 @@ func main() {
 	if len(errs) > 0 {
 		log.Fatal(kerrors.NewAggregate(errs))
 	}
-	dataDir, err := fakerp.FindDirectory(fakerp.DataDirectory)
+	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
 		return
 	}

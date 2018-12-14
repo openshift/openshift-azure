@@ -18,7 +18,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	realfakerp "github.com/openshift/openshift-azure/pkg/fakerp"
+	"github.com/openshift/openshift-azure/pkg/fakerp"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
@@ -62,7 +63,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 	})
 
 	It("should be possible to recover etcd from a backup", func() {
-		dataDir, err := realfakerp.FindDirectory(realfakerp.DataDirectory)
+		dataDir, err := shared.FindDirectory(shared.DataDirectory)
 		Expect(err).NotTo(HaveOccurred())
 		cs, err := managedcluster.ReadConfig(path.Join(dataDir, "containerservice.yaml"))
 		Expect(cs).NotTo(BeNil())
@@ -175,7 +176,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 })
 
 func recover(ctx context.Context, log *logrus.Entry, blobName string, cs *api.OpenShiftManagedCluster) error {
-	config, err := realfakerp.GetPluginConfig()
+	config, err := fakerp.GetPluginConfig()
 	if err != nil {
 		return err
 	}
@@ -184,7 +185,7 @@ func recover(ctx context.Context, log *logrus.Entry, blobName string, cs *api.Op
 	if len(errs) > 0 {
 		return kerrors.NewAggregate(errs)
 	}
-	deployer := realfakerp.GetDeployer(log, cs, config)
+	deployer := fakerp.GetDeployer(log, cs, config)
 	if err := p.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
 		fmt.Fprintf(GinkgoWriter, "RecoverEtcdCluster error: %v", err)
 		return err

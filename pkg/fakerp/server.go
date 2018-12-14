@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -21,6 +22,7 @@ import (
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
@@ -40,28 +42,14 @@ type Server struct {
 
 	log     *logrus.Entry
 	address string
-	conf    *Config
 }
 
-func NewServer(log *logrus.Entry, resourceGroup, address string, c *Config) *Server {
+func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	return &Server{
 		inProgress: make(chan struct{}, 1),
 		log:        log,
 		address:    address,
-		conf:       c,
 	}
-}
-
-// StartServer starts the fake rp server, ensuring that is done only once. It returns the
-// address to the running http server
-func StartServer(log *logrus.Entry, conf *Config, address string) string {
-	// once ensures that the server start is invoked only once
-	once.Do(func() {
-		log.Info("starting the fake resource provider")
-		s := NewServer(log, conf.ResourceGroup, address, conf)
-		go s.ListenAndServe()
-	})
-	return "http://" + address
 }
 
 func (s *Server) ListenAndServe() {
@@ -122,7 +110,7 @@ func (s *Server) validate(w http.ResponseWriter, r *http.Request) bool {
 // to restore the internal state of the cluster from the
 // filesystem.
 func (s *Server) restore() error {
-	dataDir, err := FindDirectory(DataDirectory)
+	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
 		return err
 	}
@@ -176,12 +164,12 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 	// TODO: Get the azure credentials from the request headers
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, s.conf.ClientID)
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, s.conf.ClientSecret)
-	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, s.conf.TenantID)
+	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
+	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
+	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
 
 	// TODO: Get the azure credentials from the request headers
-	authorizer, err := azureclient.NewAuthorizer(s.conf.ClientID, s.conf.ClientSecret, s.conf.TenantID)
+	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
 	if err != nil {
 		resp := fmt.Sprintf("500 Internal Error: Failed to determine request credentials: %v", err)
 		s.log.Debug(resp)
@@ -190,7 +178,8 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// delete dns records
-	err = DeleteOCPDNS(ctx, s.conf.SubscriptionID, s.conf.ResourceGroup, s.conf.DnsResourceGroup, s.conf.DnsDomain)
+	// TODO: get resource group from request path
+	err = DeleteOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
 	if err != nil {
 		resp := fmt.Sprintf("500 Internal Error: Failed to delete dns records: %v", err)
 		s.log.Debug(resp)
@@ -199,7 +188,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// TODO: Determine subscription ID from the request path
-	gc := resources.NewGroupsClient(s.conf.SubscriptionID)
+	gc := resources.NewGroupsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
 	gc.Authorizer = authorizer
 
 	resourceGroup := filepath.Base(req.URL.Path)
@@ -264,11 +253,11 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	// read old config if it exists
 	var oldCs *internalapi.OpenShiftManagedCluster
 	var err error
-	if !IsUpdate() {
+	if !shared.IsUpdate() {
 		s.writeState(internalapi.Creating)
 	} else {
 		s.log.Info("read old config")
-		dataDir, err := FindDirectory(DataDirectory)
+		dataDir, err := shared.FindDirectory(shared.DataDirectory)
 		if err != nil {
 			resp := fmt.Sprintf("500 Internal Error: Failed to read old config: %v", err)
 			s.log.Debug(resp)
@@ -325,9 +314,9 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
 	defer cancel()
 	// TODO: Get the azure credentials from the request headers
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, s.conf.ClientID)
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, s.conf.ClientSecret)
-	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, s.conf.TenantID)
+	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
+	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
+	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
 
 	// apply the request
 	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, config, isAdminRequest)

@@ -16,22 +16,11 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
-
-// IsUpdate return whether or not this is an update or create.
-func IsUpdate() bool {
-	dataDir, err := FindDirectory(DataDirectory)
-	if err != nil {
-		return false
-	}
-	if _, err := os.Stat(filepath.Join(dataDir, "containerservice.yaml")); err == nil {
-		return true
-	}
-	return false
-}
 
 func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api.PluginConfig) api.DeployFn {
 	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
@@ -73,7 +62,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	// read in the OpenShift config blob if it exists (i.e. we're updating)
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
-	if !IsUpdate() {
+	if !shared.IsUpdate() {
 		// If containerservice.yaml does not exist - it is Create call
 		// create DNS records only on first call
 		err := CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"), os.Getenv("NOGROUPTAGS") == "true")
@@ -114,7 +103,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	if err != nil {
 		return nil, err
 	}
-	dataDir, err := FindDirectory(DataDirectory)
+	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
 		return nil, err
 	}
@@ -220,7 +209,7 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 }
 
 func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}) error {
-	dataDir, err := FindDirectory(DataDirectory)
+	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
 		return err
 	}

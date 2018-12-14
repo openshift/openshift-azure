@@ -13,10 +13,12 @@ fi
 
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
     TEST_IN_PRODUCTION="-use-prod=true"
+else
+	hack/fakerp.sh $RESOURCEGROUP &
 fi
 if [[ -n "$ADMIN_MANIFEST" ]]; then
     ADMIN_MANIFEST="-admin-manifest=$ADMIN_MANIFEST"
 fi
 
-go generate ./...
+
 go run cmd/createorupdate/createorupdate.go -timeout 1h ${TEST_IN_PRODUCTION:-} ${ADMIN_MANIFEST:-}

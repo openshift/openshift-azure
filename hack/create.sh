@@ -15,7 +15,8 @@ set -x
 USE_PROD_FLAG="-use-prod=false"
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
     USE_PROD_FLAG="-use-prod=true"
+else
+	hack/fakerp.sh $RESOURCEGROUP &
 fi
 
-go generate ./...
 go run cmd/createorupdate/createorupdate.go $USE_PROD_FLAG

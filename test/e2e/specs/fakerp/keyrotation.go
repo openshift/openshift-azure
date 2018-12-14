@@ -14,7 +14,7 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp"
+	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/util/log"

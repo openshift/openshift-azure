@@ -1,4 +1,4 @@
-package fakerp
+package shared
 
 import (
 	"fmt"

@@ -24,7 +24,8 @@ import (
 
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp"
+	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
@@ -170,7 +171,7 @@ func execute(
 		return err
 	}
 	// simulate the API call to the RP
-	dataDir, err := fakerp.FindDirectory(fakerp.DataDirectory)
+	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
 		return err
 	}
@@ -258,7 +259,7 @@ func main() {
 	// simulate the RP
 	rpURL := v20180930preview.DefaultBaseURI
 	if !*useProd {
-		rpURL = fakerp.StartServer(log, conf, fakerp.LocalHttpAddr)
+		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
 	}
 
 	// setup the osa clients
@@ -280,7 +281,7 @@ func main() {
 		return
 	}
 
-	if !fakerp.IsUpdate() {
+	if !shared.IsUpdate() {
 		if err := updateAadApplication(ctx, log, conf); err != nil {
 			log.Fatal(err)
 		}
