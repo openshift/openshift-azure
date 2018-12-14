@@ -199,13 +199,21 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{errors.New(`duplicate properties.routerProfiles "default"`)},
 		},
-		"router profile invalid name": {
+		"test external only false - router profile invalid name": {
 			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].Name = "foo"
 			},
+			externalOnly: false,
 			// two errors expected here because we require the default profile
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["foo"]`),
 				errors.New(`invalid properties.routerProfiles["default"]`)},
+		},
+		"test external only true - router profile invalid name": {
+			f: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.RouterProfiles[0].Name = "foo"
+			},
+			externalOnly: true,
+			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["foo"]`)},
 		},
 		"router profile empty name": {
 			f: func(oc *OpenShiftManagedCluster) {

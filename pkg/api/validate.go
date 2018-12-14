@@ -295,9 +295,9 @@ func (v *Validator) validateProperties(p *Properties, location string, externalO
 		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
 	}
 	errs = append(errs, v.validateNetworkProfile(&p.NetworkProfile)...)
-	if !externalOnly {
-		errs = append(errs, v.validateRouterProfiles(p.RouterProfiles, location)...)
-	}
+
+	errs = append(errs, v.validateRouterProfiles(p.RouterProfiles, location, externalOnly)...)
+
 	errs = append(errs, v.validateFQDN(p, location)...)
 	// we can disregard any error below because we are already going to fail
 	// validation if VnetCIDR does not parse correctly.
@@ -460,7 +460,7 @@ func (v *Validator) validateNetworkProfile(np *NetworkProfile) (errs []error) {
 	return
 }
 
-func (v *Validator) validateRouterProfiles(rps []RouterProfile, location string) (errs []error) {
+func (v *Validator) validateRouterProfiles(rps []RouterProfile, location string, externalOnly bool) (errs []error) {
 	rpmap := map[string]RouterProfile{}
 
 	for _, rp := range rps {
@@ -473,19 +473,19 @@ func (v *Validator) validateRouterProfiles(rps []RouterProfile, location string)
 		}
 		rpmap[rp.Name] = rp
 
-		errs = append(errs, v.validateRouterProfile(rp, location)...)
+		errs = append(errs, v.validateRouterProfile(rp, location, externalOnly)...)
 	}
-
-	for name := range validRouterProfileNames {
-		if _, found := rpmap[name]; !found {
-			errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q]", name))
+	if !externalOnly {
+		for name := range validRouterProfileNames {
+			if _, found := rpmap[name]; !found {
+				errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q]", name))
+			}
 		}
 	}
-
 	return
 }
 
-func (v *Validator) validateRouterProfile(rp RouterProfile, location string) (errs []error) {
+func (v *Validator) validateRouterProfile(rp RouterProfile, location string, externalOnly bool) (errs []error) {
 	if rp.Name == "" {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
 	}
@@ -496,7 +496,7 @@ func (v *Validator) validateRouterProfile(rp RouterProfile, location string) (er
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].publicSubdomain %q", rp.Name, rp.PublicSubdomain))
 	}
 
-	if rp.FQDN != "" && !isValidCloudAppHostname(rp.FQDN, location) {
+	if !externalOnly && rp.FQDN != "" && !isValidCloudAppHostname(rp.FQDN, location) {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].fqdn %q", rp.Name, rp.FQDN))
 	}
 
