@@ -3,7 +3,7 @@
 /env
 /env.*
 !/env.example
-/e2e.test
+/e2e
 /kubeconfig*
 /sync
 /etcdbackup
