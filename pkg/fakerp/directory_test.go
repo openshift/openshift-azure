@@ -57,3 +57,21 @@ func TestFindDirectory(t *testing.T) {
 		t.Errorf("expected %s, got %s", secretDir, target)
 	}
 }
+
+func TestFindDirectoryAtRoot(t *testing.T) {
+	wd, _ := os.Getwd()
+	defer cleanUp(t, wd)
+
+	tmpDir(t, "/_data")
+	chDir(t, "/")
+
+	dataDir, err := FindDirectory("_data")
+	if err != nil {
+		t.Errorf("error finding directory: %v", err)
+	}
+
+	target := pathTo("/_data")
+	if dataDir != target {
+		t.Errorf("expected %s, got %s", dataDir, target)
+	}
+}
