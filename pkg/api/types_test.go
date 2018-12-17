@@ -363,6 +363,7 @@ func TestAdminAPIParity(t *testing.T) {
 	// TODO: I don't believe this should be in the admin type at all
 	notInInternal := []*regexp.Regexp{
 		regexp.MustCompile(`^\.Response$`),
+		regexp.MustCompile(`^\.Properties\.MasterPoolProfile\.`),
 	}
 
 	// TODO: why don't we just include all of these in the admin type?

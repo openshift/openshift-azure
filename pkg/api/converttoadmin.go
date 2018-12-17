@@ -51,17 +51,26 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 	for i := range cs.Properties.AgentPoolProfiles {
 		app := cs.Properties.AgentPoolProfiles[i]
 		vmSize := admin.VMSize(app.VMSize)
-		osType := admin.OSType(app.OSType)
-		role := admin.AgentPoolProfileRole(app.Role)
 
-		oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, admin.AgentPoolProfile{
-			Name:       &app.Name,
-			Count:      &app.Count,
-			VMSize:     &vmSize,
-			SubnetCIDR: &app.SubnetCIDR,
-			OSType:     &osType,
-			Role:       &role,
-		})
+		if app.Role == AgentPoolProfileRoleMaster {
+			oc.Properties.MasterPoolProfile = &admin.MasterPoolProfile{
+				Count:      &app.Count,
+				VMSize:     &vmSize,
+				SubnetCIDR: &app.SubnetCIDR,
+			}
+		} else {
+			osType := admin.OSType(app.OSType)
+			role := admin.AgentPoolProfileRole(app.Role)
+
+			oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, admin.AgentPoolProfile{
+				Name:       &app.Name,
+				Count:      &app.Count,
+				VMSize:     &vmSize,
+				SubnetCIDR: &app.SubnetCIDR,
+				OSType:     &osType,
+				Role:       &role,
+			})
+		}
 	}
 
 	oc.Properties.AuthProfile = &admin.AuthProfile{}

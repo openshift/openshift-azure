@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/go-test/deep"
 
 	"github.com/openshift/openshift-azure/pkg/util/structtags"
 	"github.com/openshift/openshift-azure/test/util/populate"
@@ -35,6 +37,11 @@ var marshalled = []byte(`{
 				"fqdn": "Properties.RouterProfiles[0].FQDN"
 			}
 		],
+		"masterPoolProfile": {
+			"count": 1,
+			"vmSize": "Properties.MasterPoolProfile.VMSize",
+			"subnetCidr": "Properties.MasterPoolProfile.SubnetCIDR"
+		},
 		"agentPoolProfiles": [
 			{
 				"name": "Properties.AgentPoolProfiles[0].Name",
@@ -236,5 +243,36 @@ func TestJSONTags(t *testing.T) {
 	o := OpenShiftManagedCluster{}
 	for _, err := range structtags.CheckJsonTags(o) {
 		t.Errorf("mismatch in struct tags for %T: %s", o, err.Error())
+	}
+}
+
+func TestEnsureMasterProfileExists(t *testing.T) {
+	prepare := func(v reflect.Value) {
+		switch v.Interface().(type) {
+		case []IdentityProvider:
+			// set the Provider to AADIdentityProvider
+			v.Set(reflect.ValueOf([]IdentityProvider{{Provider: &AADIdentityProvider{Kind: to.StringPtr("AADIdentityProvider")}}}))
+		}
+	}
+
+	populatedOc := OpenShiftManagedCluster{}
+	populate.Walk(&populatedOc, prepare)
+
+	var unmarshalledOc OpenShiftManagedCluster
+	err := json.Unmarshal(marshalled, &unmarshalledOc)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if unmarshalledOc.Properties.MasterPoolProfile == nil {
+		t.Fatalf("expected master pool profile to be set in external struct:\n%#v\n", spew.Sprint(unmarshalledOc))
+	}
+
+	if populatedOc.Properties.MasterPoolProfile == nil {
+		t.Fatalf("expected master pool profile to be set in external struct:\n%#v\n", spew.Sprint(populatedOc))
+	}
+
+	if !reflect.DeepEqual(unmarshalledOc.Properties.MasterPoolProfile, populatedOc.Properties.MasterPoolProfile) {
+		t.Errorf("json.Unmarshal returned unexpected result\n%#v\n", deep.Equal(unmarshalledOc.Properties.MasterPoolProfile, populatedOc.Properties.MasterPoolProfile))
 	}
 }

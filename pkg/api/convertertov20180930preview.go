@@ -60,7 +60,6 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 				VMSize:     &vmSize,
 				SubnetCIDR: &app.SubnetCIDR,
 			}
-
 		} else {
 			osType := v20180930preview.OSType(app.OSType)
 			role := v20180930preview.AgentPoolProfileRole(app.Role)

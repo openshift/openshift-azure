@@ -162,7 +162,6 @@ func mergeAgentPoolProfiles(oc *v20180930preview.OpenShiftManagedCluster, cs *Op
 			head := append(cs.Properties.AgentPoolProfiles[:index], convertMasterToAgentPoolProfile(*p, &cs.Properties.AgentPoolProfiles[index]))
 			cs.Properties.AgentPoolProfiles = append(head, cs.Properties.AgentPoolProfiles[index+1:]...)
 		}
-
 	}
 
 	for _, in := range oc.Properties.AgentPoolProfiles {

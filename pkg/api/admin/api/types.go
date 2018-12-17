@@ -58,6 +58,9 @@ type Properties struct {
 	// RouterProfiles (in,optional/out): Configuration for OpenShift router(s).
 	RouterProfiles []RouterProfile `json:"routerProfiles,omitempty"`
 
+	// MasterPoolProfile (in): Configuration for OpenShift master VMs.
+	MasterPoolProfile *MasterPoolProfile `json:"masterPoolProfile,omitempty"`
+
 	// AgentPoolProfiles (in): configuration of OpenShift cluster VMs.
 	AgentPoolProfiles []AgentPoolProfile `json:"agentPoolProfiles,omitempty"`
 
@@ -112,6 +115,13 @@ type RouterProfile struct {
 
 	// FQDN (out): Auto-allocated FQDN for the OpenShift router.
 	FQDN *string `json:"fqdn,omitempty"`
+}
+
+// MasterPoolProfile contains configuration for OpenShift master VMs.
+type MasterPoolProfile struct {
+	Count      *int    `json:"count,omitempty"`
+	VMSize     *VMSize `json:"vmSize,omitempty"`
+	SubnetCIDR *string `json:"subnetCidr,omitempty"`
 }
 
 // AgentPoolProfile represents configuration of OpenShift cluster VMs.
