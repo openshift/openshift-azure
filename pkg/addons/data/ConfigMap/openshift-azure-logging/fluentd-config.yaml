@@ -1,114 +1,114 @@
 apiVersion: v1
+data:
+  fluent.conf: |
+    <source>
+      @id journald
+      @type systemd
+      <storage>
+        persistent true
+        path /var/log/journald.pos
+      </storage>
+      tag journal
+    </source>
+    <source>
+      @type exec
+      command /bin/sh -c 'date +%s'
+      tag heartbeat
+      keys last_heartbeat_time
+      run_interval 60s
+    </source>
+    <filter journal>
+      @type record_transformer
+      remove_keys _BOOT_ID,_CAP_EFFECTIVE,_MACHINE_ID,_SOURCE_REALTIME_TIMESTAMP,_STREAM_ID,_SYSTEMD_CGROUP,_TRANSPORT,_SOURCE_MONOTONIC_TIMESTAMP
+    </filter>
+    <match journal>
+      @type rewrite_tag_filter
+      <rule>
+        key SYSLOG_IDENTIFIER
+        pattern atomic-openshift-node
+        tag mdsd.syslog
+      </rule>
+      <rule>
+        key SYSLOG_IDENTIFIER
+        pattern kernel
+        tag mdsd.syslog
+      </rule>
+      <rule>
+        key CONTAINER_NAME
+        pattern ^k8s_api_api
+        tag journal.controlplane.apiserver
+      </rule>
+      <rule>
+        key CONTAINER_NAME
+        pattern ^k8s_controllers_controllers
+        tag journal.controlplane.controller
+      </rule>
+      <rule>
+        key CONTAINER_NAME
+        pattern ^k8s_sync_sync
+        tag journal.controlplane.sync
+      </rule>
+      <rule>
+        key CONTAINER_NAME
+        pattern ^k8s_backup_etcd
+        tag journal.controlplane.etcdoperator
+      </rule>
+      <rule>
+        key CONTAINER_NAME
+        pattern ^k8s_etcd_etcd
+        tag journal.controlplane.etcd
+      </rule>
+    </match>
+    <filter journal.controlplane.*>
+      @type kubernetes_metadata
+      use_journal true
+    </filter>
+    <filter journal.controlplane.*>
+      @type record_transformer
+      enable_ruby true
+      <record>
+        pod ${record["kubernetes"]["pod_name"]}
+        namespace ${record["kubernetes"]["namespace_name"]}
+        containerID ${record["docker"]["container_id"]}
+        container ${record["kubernetes"]["container_name"]}
+        hostMachine ${record["kubernetes"]["host"]}
+      </record>
+      remove_keys kubernetes,docker
+    </filter>
+    <match journal.controlplane.*>
+      @type rewrite_tag_filter
+      <rule>
+        key namespace
+        pattern ^kube-system$
+        tag mdsd.controlplane
+      </rule>
+    </match>
+    <match mdsd.*>
+      @type copy
+      <store>
+        @type mdsd
+        @log_level warn
+        djsonsocket /var/run/mdsdcustomerdata/default_djson.socket  # Full path to mdsd dynamic json socket file
+        acktimeoutms 5000  # max time in milliseconds to wait for mdsd acknowledge response. If 0, no wait.
+        mdsd_tag_regex_patterns [ "^mdsd\\.\\w+" ]  # fluentd tag patterns whose match will be used as mdsd source name
+        num_threads 1
+        buffer_chunk_limit 1000k
+        buffer_type file
+        buffer_path /var/log/td-agent/buffer/out_mdsdcustomerdata*.buffer
+        buffer_queue_limit 128
+        emit_timestamp_name time
+        flush_interval 10s
+        retry_limit 3
+        retry_wait 10s
+      </store>
+    </match>
+    <match heartbeat>
+      @type file
+      path /var/log/td-agent/heartbeat/hb
+      time_slice_format %Y%m%d%H%M
+      append true
+    </match>
 kind: ConfigMap
 metadata:
-    name: fluentd-config
-    namespace: openshift-azure-logging
-data:
-    fluent.conf: |
-        <source>
-          @id journald
-          @type systemd
-          <storage>
-            persistent true
-            path /var/log/journald.pos
-          </storage>
-          tag journal
-        </source>
-        <source>
-          @type exec
-          command /bin/sh -c 'date +%s'
-          tag heartbeat
-          keys last_heartbeat_time
-          run_interval 60s
-        </source>
-        <filter journal>
-          @type record_transformer
-          remove_keys _BOOT_ID,_CAP_EFFECTIVE,_MACHINE_ID,_SOURCE_REALTIME_TIMESTAMP,_STREAM_ID,_SYSTEMD_CGROUP,_TRANSPORT,_SOURCE_MONOTONIC_TIMESTAMP
-        </filter>
-        <match journal>
-          @type rewrite_tag_filter
-          <rule>
-            key SYSLOG_IDENTIFIER
-            pattern atomic-openshift-node
-            tag mdsd.syslog
-          </rule>
-          <rule>
-            key SYSLOG_IDENTIFIER
-            pattern kernel
-            tag mdsd.syslog
-          </rule>
-          <rule>
-            key CONTAINER_NAME
-            pattern ^k8s_api_api
-            tag journal.controlplane.apiserver
-          </rule>
-          <rule>
-            key CONTAINER_NAME
-            pattern ^k8s_controllers_controllers
-            tag journal.controlplane.controller
-          </rule>
-          <rule>
-            key CONTAINER_NAME
-            pattern ^k8s_sync_sync
-            tag journal.controlplane.sync
-          </rule>
-          <rule>
-            key CONTAINER_NAME
-            pattern ^k8s_backup_etcd
-            tag journal.controlplane.etcdoperator
-          </rule>
-          <rule>
-            key CONTAINER_NAME
-            pattern ^k8s_etcd_etcd
-            tag journal.controlplane.etcd
-          </rule>
-        </match>
-        <filter journal.controlplane.*>
-          @type kubernetes_metadata
-          use_journal true
-        </filter>
-        <filter journal.controlplane.*>
-          @type record_transformer
-          enable_ruby true
-          <record>
-            pod ${record["kubernetes"]["pod_name"]}
-            namespace ${record["kubernetes"]["namespace_name"]}
-            containerID ${record["docker"]["container_id"]}
-            container ${record["kubernetes"]["container_name"]}
-            hostMachine ${record["kubernetes"]["host"]}
-          </record>
-          remove_keys kubernetes,docker
-        </filter>
-        <match journal.controlplane.*>
-          @type rewrite_tag_filter
-          <rule>
-            key namespace
-            pattern ^kube-system$
-            tag mdsd.controlplane
-          </rule>
-        </match>
-        <match mdsd.*>
-          @type copy
-          <store>
-            @type mdsd
-            @log_level warn
-            djsonsocket /var/run/mdsdcustomerdata/default_djson.socket  # Full path to mdsd dynamic json socket file
-            acktimeoutms 5000  # max time in milliseconds to wait for mdsd acknowledge response. If 0, no wait.
-            mdsd_tag_regex_patterns [ "^mdsd\\.\\w+" ]  # fluentd tag patterns whose match will be used as mdsd source name
-            num_threads 1
-            buffer_chunk_limit 1000k
-            buffer_type file
-            buffer_path /var/log/td-agent/buffer/out_mdsdcustomerdata*.buffer
-            buffer_queue_limit 128
-            emit_timestamp_name time
-            flush_interval 10s
-            retry_limit 3
-            retry_wait 10s
-          </store>
-        </match>
-        <match heartbeat>
-          @type file
-          path /var/log/td-agent/heartbeat/hb
-          time_slice_format %Y%m%d%H%M
-          append true
-        </match>
+  name: fluentd-config
+  namespace: openshift-azure-logging
