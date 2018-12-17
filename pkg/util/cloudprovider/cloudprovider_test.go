@@ -14,6 +14,7 @@ subscriptionId: b
 aadClientId: c
 aadClientSecret: d
 resourceGroup: e
+loadBalancerSku: l
 location: f
 securityGroupName: g
 primaryScaleSetName: h
@@ -25,6 +26,7 @@ vmType: i`)
 		AadClientID:         "c",
 		AadClientSecret:     "d",
 		ResourceGroup:       "e",
+		LoadBalancerSku:     "l",
 		Location:            "f",
 		SecurityGroupName:   "g",
 		PrimaryScaleSetName: "h",

@@ -13,6 +13,7 @@ type Config struct {
 	AadClientID         string `json:"aadClientId,omitempty"`
 	AadClientSecret     string `json:"aadClientSecret,omitempty"`
 	ResourceGroup       string `json:"resourceGroup,omitempty"`
+	LoadBalancerSku     string `json:"loadBalancerSku,omitempty"`
 	Location            string `json:"location,omitempty"`
 	SecurityGroupName   string `json:"securityGroupName,omitempty"`
 	PrimaryScaleSetName string `json:"primaryScaleSetName,omitempty"`
