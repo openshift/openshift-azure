@@ -22,3 +22,6 @@ fi
 
 
 go run cmd/createorupdate/createorupdate.go -timeout 1h ${TEST_IN_PRODUCTION:-} ${ADMIN_MANIFEST:-}
+
+# terminate the fake RP process
+curl -s localhost:8080/exit || true

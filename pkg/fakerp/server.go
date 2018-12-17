@@ -56,6 +56,9 @@ func (s *Server) ListenAndServe() {
 	// TODO: match the request path the real RP would use
 	http.Handle("/", s)
 	http.Handle("/admin", s)
+	http.HandleFunc("/exit", func(w http.ResponseWriter, r *http.Request) {
+		os.Exit(0)
+	})
 	httpServer := &http.Server{Addr: s.address}
 	s.log.Infof("starting server on %s", s.address)
 	s.log.WithError(httpServer.ListenAndServe()).Warn("Server exited.")

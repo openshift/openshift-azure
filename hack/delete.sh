@@ -19,3 +19,6 @@ else
 fi
 
 go run cmd/createorupdate/createorupdate.go -request=DELETE $USE_PROD_FLAG
+
+# terminate the fake RP process
+curl -s localhost:8080/exit || true
