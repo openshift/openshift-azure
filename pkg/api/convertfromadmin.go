@@ -291,7 +291,7 @@ func convertIdentityProviderAdmin(in admin.IdentityProvider, old *IdentityProvid
 }
 
 func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) {
-	in, out := oc.Config, cs.Config
+	in, out := oc.Config, &cs.Config
 
 	if in.ImageOffer != nil {
 		out.ImageOffer = *in.ImageOffer
