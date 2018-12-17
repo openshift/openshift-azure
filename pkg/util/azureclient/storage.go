@@ -22,8 +22,7 @@ var _ AccountsClient = &accountsClient{}
 // NewAccountsClient returns a new AccountsClient
 func NewAccountsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) AccountsClient {
 	client := storage.NewAccountsClient(subscriptionID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(&client.Client, authorizer, languages)
 
 	return &accountsClient{
 		AccountsClient: client,

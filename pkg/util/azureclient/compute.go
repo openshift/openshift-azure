@@ -25,8 +25,7 @@ var _ VirtualMachineScaleSetsClient = &virtualMachineScaleSetsClient{}
 // NewVirtualMachineScaleSetsClient creates a new VirtualMachineScaleSetsClient
 func NewVirtualMachineScaleSetsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) VirtualMachineScaleSetsClient {
 	client := compute.NewVirtualMachineScaleSetsClient(subscriptionID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(&client.Client, authorizer, languages)
 
 	return &virtualMachineScaleSetsClient{
 		VirtualMachineScaleSetsClient: client,
@@ -57,8 +56,7 @@ var _ VirtualMachineScaleSetVMsClient = &virtualMachineScaleSetVMsClient{}
 // NewVirtualMachineScaleSetVMsClient creates a new VirtualMachineScaleSetVMsClient
 func NewVirtualMachineScaleSetVMsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) VirtualMachineScaleSetVMsClient {
 	client := compute.NewVirtualMachineScaleSetVMsClient(subscriptionID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(&client.Client, authorizer, languages)
 
 	return &virtualMachineScaleSetVMsClient{
 		VirtualMachineScaleSetVMsClient: client,
@@ -91,8 +89,7 @@ var _ VirtualMachineScaleSetExtensionsClient = &virtualMachineScaleSetExtensions
 // NewVirtualMachineScaleSetExtensionsClient creates a new VirtualMachineScaleSetExtensionsClient
 func NewVirtualMachineScaleSetExtensionsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) VirtualMachineScaleSetExtensionsClient {
 	client := compute.NewVirtualMachineScaleSetExtensionsClient(subscriptionID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(&client.Client, authorizer, languages)
 
 	return &virtualMachineScaleSetExtensionsClient{
 		VirtualMachineScaleSetExtensionsClient: client,

@@ -12,7 +12,9 @@ package azureclient
 import (
 	"context"
 	"net/http"
+	"net/http/httputil"
 	"os"
+	"time"
 
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
@@ -32,14 +34,34 @@ func addAcceptLanguages(acceptLanguages []string) autorest.PrepareDecorator {
 			if err != nil {
 				return r, err
 			}
-			if acceptLanguages != nil {
-				for _, language := range acceptLanguages {
-					r.Header.Add("Accept-Language", language)
-				}
+			for _, language := range acceptLanguages {
+				r.Header.Add("Accept-Language", language)
 			}
 			return r, nil
 		})
 	}
+}
+
+type loggingSender struct {
+	autorest.Sender
+}
+
+func (ls *loggingSender) Do(req *http.Request) (*http.Response, error) {
+	b, _ := httputil.DumpRequestOut(req, true)
+	os.Stdout.Write(b)
+	resp, err := ls.Sender.Do(req)
+	if resp != nil {
+		b, _ = httputil.DumpResponse(resp, true)
+		os.Stdout.Write(b)
+	}
+	return resp, err
+}
+
+func setupClient(client *autorest.Client, authorizer autorest.Authorizer, languages []string) {
+	client.Authorizer = authorizer
+	client.RequestInspector = addAcceptLanguages(languages)
+	client.PollingDelay = 10 * time.Second
+	// client.Sender = &loggingSender{client.Sender}
 }
 
 func NewAuthorizer(clientID, clientSecret, tenantID string) (autorest.Authorizer, error) {

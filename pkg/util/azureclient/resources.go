@@ -23,8 +23,7 @@ var _ DeploymentsClient = &deploymentsClient{}
 // NewDeploymentsClient creates a new DeploymentsClient
 func NewDeploymentsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) DeploymentsClient {
 	client := resources.NewDeploymentsClient(subscriptionID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(&client.Client, authorizer, languages)
 
 	return &deploymentsClient{
 		DeploymentsClient: client,
@@ -54,8 +53,7 @@ var _ ResourcesClient = &resourcesClient{}
 // NewResourcesClient creates a new ResourcesClient
 func NewResourcesClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) ResourcesClient {
 	client := resources.NewClient(subscriptionID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(&client.Client, authorizer, languages)
 
 	return &resourcesClient{
 		Client: client,
