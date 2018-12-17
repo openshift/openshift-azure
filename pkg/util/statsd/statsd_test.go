@@ -13,7 +13,7 @@ func TestMarshal(t *testing.T) {
 		Value:     1.0,
 		TS:        time.Unix(0, 0),
 	}
-	b, err := f.marshal()
+	b, err := f.Marshal()
 	if err != nil {
 		t.Fatal(err)
 	}

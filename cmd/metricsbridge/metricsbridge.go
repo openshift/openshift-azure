@@ -227,7 +227,11 @@ func (c *config) runOnce(req *http.Request) error {
 			for _, label := range m.Label {
 				f.Dims[*label.Name] = *label.Value
 			}
-			if err = c.statsd.Write(f); err != nil {
+			b, err := f.Marshal()
+			if err != nil {
+				return err
+			}
+			if _, err = c.statsd.Write(b); err != nil {
 				return err
 			}
 		}

@@ -37,7 +37,8 @@ func (f *Float) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (f *Float) marshal() ([]byte, error) {
+// Marshal a Float into its statsd format.  Call this instead of MarshalJSON().
+func (f *Float) Marshal() ([]byte, error) {
 	buf := &bytes.Buffer{}
 
 	e := json.NewEncoder(buf)
@@ -75,15 +76,9 @@ func (c *Client) Flush() error {
 	return c.w.Flush()
 }
 
-// Write writes a Float to the internal buffer
-func (c *Client) Write(f *Float) error {
-	b, err := f.marshal()
-	if err != nil {
-		return err
-	}
-
-	_, err = c.w.Write(b)
-	return err
+// Write writes to the internal buffer
+func (c *Client) Write(b []byte) (int, error) {
+	return c.w.Write(b)
 }
 
 // Close flushes the internal buffer and closes the connection
