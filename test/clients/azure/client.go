@@ -11,12 +11,11 @@ import (
 
 	externalapi "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	adminapi "github.com/openshift/openshift-azure/pkg/api/admin/api"
-	realfakerp "github.com/openshift/openshift-azure/pkg/fakerp"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
-	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 // rpFocus represents the supported RP APIs which e2e tests use to create their azure clients,
@@ -79,12 +78,7 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 	switch {
 	case adminRpFocus.match(focus), fakeRpFocus.match(focus):
 		fmt.Println("configuring the fake resource provider")
-		logger := log.GetTestLogger()
-		conf, err := realfakerp.NewConfig(logger, true)
-		if err != nil {
-			return nil, err
-		}
-		rpURL = realfakerp.StartServer(logger, conf, realfakerp.LocalHttpAddr)
+		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
 	case realRpFocus.match(focus):
 		fmt.Println("configuring the real resource provider")
 		rpURL = externalapi.DefaultBaseURI

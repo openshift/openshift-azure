@@ -1,4 +1,4 @@
-package fakerp
+package client
 
 import (
 	"context"

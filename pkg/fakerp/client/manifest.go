@@ -1,4 +1,4 @@
-package fakerp
+package client
 
 import (
 	"bytes"
@@ -13,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 )
 
 func readEnv() map[string]string {
@@ -26,8 +27,8 @@ func readEnv() map[string]string {
 
 // LoadClusterConfigFromManifest reads (and potentially template) the mainifest
 func LoadClusterConfigFromManifest(log *logrus.Entry, manifestTemplate string) (*v20180930preview.OpenShiftManagedCluster, error) {
-	if IsUpdate() && manifestTemplate == "" {
-		dataDir, err := FindDirectory(DataDirectory)
+	if shared.IsUpdate() && manifestTemplate == "" {
+		dataDir, err := shared.FindDirectory(shared.DataDirectory)
 		if err != nil {
 			return nil, err
 		}

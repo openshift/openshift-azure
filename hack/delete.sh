@@ -14,6 +14,8 @@ fi
 USE_PROD_FLAG="-use-prod=false"
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
     USE_PROD_FLAG="-use-prod=true"
+else
+	hack/fakerp.sh $RESOURCEGROUP &
 fi
 
 go run cmd/createorupdate/createorupdate.go -request=DELETE $USE_PROD_FLAG
