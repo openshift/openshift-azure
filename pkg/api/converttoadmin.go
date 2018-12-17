@@ -4,46 +4,74 @@ import (
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 )
 
+func nilIfAdminProvisioningStateEmpty(s *admin.ProvisioningState) *admin.ProvisioningState {
+	if s == nil || len(*s) == 0 {
+		return nil
+	}
+	return s
+}
+
+func nilIfAdminAgentPoolProfileRoleEmpty(s *admin.AgentPoolProfileRole) *admin.AgentPoolProfileRole {
+	if s == nil || len(*s) == 0 {
+		return nil
+	}
+	return s
+}
+
+func nilIfAdminVMSizeEmpty(s *admin.VMSize) *admin.VMSize {
+	if s == nil || len(*s) == 0 {
+		return nil
+	}
+	return s
+}
+
+func nilIfAdminOSTypeEmpty(s *admin.OSType) *admin.OSType {
+	if s == nil || len(*s) == 0 {
+		return nil
+	}
+	return s
+}
+
 func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster {
 	oc := &admin.OpenShiftManagedCluster{
-		ID:       &cs.ID,
-		Location: &cs.Location,
-		Name:     &cs.Name,
-		Type:     &cs.Type,
+		ID:       nilIfStringEmpty(&cs.ID),
+		Location: nilIfStringEmpty(&cs.Location),
+		Name:     nilIfStringEmpty(&cs.Name),
+		Type:     nilIfStringEmpty(&cs.Type),
 	}
 	oc.Tags = make(map[string]*string, len(cs.Tags))
 	for k := range cs.Tags {
 		v := cs.Tags[k]
-		oc.Tags[k] = &v
+		oc.Tags[k] = nilIfStringEmpty(&v)
 	}
 
 	oc.Plan = &admin.ResourcePurchasePlan{
-		Name:          &cs.Plan.Name,
-		Product:       &cs.Plan.Product,
-		PromotionCode: &cs.Plan.PromotionCode,
-		Publisher:     &cs.Plan.Publisher,
+		Name:          nilIfStringEmpty(&cs.Plan.Name),
+		Product:       nilIfStringEmpty(&cs.Plan.Product),
+		PromotionCode: nilIfStringEmpty(&cs.Plan.PromotionCode),
+		Publisher:     nilIfStringEmpty(&cs.Plan.Publisher),
 	}
 
 	provisioningState := admin.ProvisioningState(cs.Properties.ProvisioningState)
 	oc.Properties = &admin.Properties{
-		ProvisioningState: &provisioningState,
-		OpenShiftVersion:  &cs.Properties.OpenShiftVersion,
-		PublicHostname:    &cs.Properties.PublicHostname,
-		FQDN:              &cs.Properties.FQDN,
+		ProvisioningState: nilIfAdminProvisioningStateEmpty(&provisioningState),
+		OpenShiftVersion:  nilIfStringEmpty(&cs.Properties.OpenShiftVersion),
+		PublicHostname:    nilIfStringEmpty(&cs.Properties.PublicHostname),
+		FQDN:              nilIfStringEmpty(&cs.Properties.FQDN),
 	}
 
 	oc.Properties.NetworkProfile = &admin.NetworkProfile{
-		VnetCIDR:   &cs.Properties.NetworkProfile.VnetCIDR,
-		PeerVnetID: &cs.Properties.NetworkProfile.PeerVnetID,
+		VnetCIDR:   nilIfStringEmpty(&cs.Properties.NetworkProfile.VnetCIDR),
+		PeerVnetID: nilIfStringEmpty(&cs.Properties.NetworkProfile.PeerVnetID),
 	}
 
 	oc.Properties.RouterProfiles = make([]admin.RouterProfile, len(cs.Properties.RouterProfiles))
 	for i := range cs.Properties.RouterProfiles {
 		rp := cs.Properties.RouterProfiles[i]
 		oc.Properties.RouterProfiles[i] = admin.RouterProfile{
-			Name:            &rp.Name,
-			PublicSubdomain: &rp.PublicSubdomain,
-			FQDN:            &rp.FQDN,
+			Name:            nilIfStringEmpty(&rp.Name),
+			PublicSubdomain: nilIfStringEmpty(&rp.PublicSubdomain),
+			FQDN:            nilIfStringEmpty(&rp.FQDN),
 		}
 	}
 
@@ -55,12 +83,12 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 		role := admin.AgentPoolProfileRole(app.Role)
 
 		oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, admin.AgentPoolProfile{
-			Name:       &app.Name,
+			Name:       nilIfStringEmpty(&app.Name),
 			Count:      &app.Count,
-			VMSize:     &vmSize,
-			SubnetCIDR: &app.SubnetCIDR,
-			OSType:     &osType,
-			Role:       &role,
+			VMSize:     nilIfAdminVMSizeEmpty(&vmSize),
+			SubnetCIDR: nilIfStringEmpty(&app.SubnetCIDR),
+			OSType:     nilIfAdminOSTypeEmpty(&osType),
+			Role:       nilIfAdminAgentPoolProfileRoleEmpty(&role),
 		})
 	}
 
@@ -72,9 +100,9 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 		switch provider := ip.Provider.(type) {
 		case *AADIdentityProvider:
 			oc.Properties.AuthProfile.IdentityProviders[i].Provider = &admin.AADIdentityProvider{
-				Kind:     &provider.Kind,
-				ClientID: &provider.ClientID,
-				TenantID: &provider.TenantID,
+				Kind:     nilIfStringEmpty(&provider.Kind),
+				ClientID: nilIfStringEmpty(&provider.ClientID),
+				TenantID: nilIfStringEmpty(&provider.TenantID),
 			}
 
 		default:
@@ -89,21 +117,21 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 
 func convertConfigToAdmin(cs *Config) *admin.Config {
 	return &admin.Config{
-		ImageOffer:                       &cs.ImageOffer,
-		ImagePublisher:                   &cs.ImagePublisher,
-		ImageSKU:                         &cs.ImageSKU,
-		ImageVersion:                     &cs.ImageVersion,
-		ConfigStorageAccount:             &cs.ConfigStorageAccount,
-		RegistryStorageAccount:           &cs.RegistryStorageAccount,
+		ImageOffer:                       nilIfStringEmpty(&cs.ImageOffer),
+		ImagePublisher:                   nilIfStringEmpty(&cs.ImagePublisher),
+		ImageSKU:                         nilIfStringEmpty(&cs.ImageSKU),
+		ImageVersion:                     nilIfStringEmpty(&cs.ImageVersion),
+		ConfigStorageAccount:             nilIfStringEmpty(&cs.ConfigStorageAccount),
+		RegistryStorageAccount:           nilIfStringEmpty(&cs.RegistryStorageAccount),
 		Certificates:                     convertCertificateConfigToAdmin(cs.Certificates),
 		Images:                           convertImageConfigToAdmin(cs.Images),
 		ServiceCatalogClusterID:          &cs.ServiceCatalogClusterID,
-		GenevaLoggingSector:              &cs.GenevaLoggingSector,
-		GenevaLoggingAccount:             &cs.GenevaLoggingAccount,
-		GenevaLoggingNamespace:           &cs.GenevaLoggingNamespace,
-		GenevaLoggingControlPlaneAccount: &cs.GenevaLoggingControlPlaneAccount,
-		GenevaMetricsAccount:             &cs.GenevaMetricsAccount,
-		GenevaMetricsEndpoint:            &cs.GenevaMetricsEndpoint,
+		GenevaLoggingSector:              nilIfStringEmpty(&cs.GenevaLoggingSector),
+		GenevaLoggingAccount:             nilIfStringEmpty(&cs.GenevaLoggingAccount),
+		GenevaLoggingNamespace:           nilIfStringEmpty(&cs.GenevaLoggingNamespace),
+		GenevaLoggingControlPlaneAccount: nilIfStringEmpty(&cs.GenevaLoggingControlPlaneAccount),
+		GenevaMetricsAccount:             nilIfStringEmpty(&cs.GenevaMetricsAccount),
+		GenevaMetricsEndpoint:            nilIfStringEmpty(&cs.GenevaMetricsEndpoint),
 	}
 }
 
@@ -143,35 +171,35 @@ func convertCertKeyPairToAdmin(in CertKeyPair) *admin.Certificate {
 
 func convertImageConfigToAdmin(in ImageConfig) *admin.ImageConfig {
 	return &admin.ImageConfig{
-		Format:                       &in.Format,
-		ClusterMonitoringOperator:    &in.ClusterMonitoringOperator,
-		AzureControllers:             &in.AzureControllers,
-		PrometheusOperatorBase:       &in.PrometheusOperatorBase,
-		PrometheusBase:               &in.PrometheusBase,
-		PrometheusConfigReloaderBase: &in.PrometheusConfigReloaderBase,
-		ConfigReloaderBase:           &in.ConfigReloaderBase,
-		AlertManagerBase:             &in.AlertManagerBase,
-		NodeExporterBase:             &in.NodeExporterBase,
-		GrafanaBase:                  &in.GrafanaBase,
-		KubeStateMetricsBase:         &in.KubeStateMetricsBase,
-		KubeRbacProxyBase:            &in.KubeRbacProxyBase,
-		OAuthProxyBase:               &in.OAuthProxyBase,
-		MasterEtcd:                   &in.MasterEtcd,
-		ControlPlane:                 &in.ControlPlane,
-		Node:                         &in.Node,
-		ServiceCatalog:               &in.ServiceCatalog,
-		Sync:                         &in.Sync,
-		TemplateServiceBroker:        &in.TemplateServiceBroker,
-		Registry:                     &in.Registry,
-		Router:                       &in.Router,
-		RegistryConsole:              &in.RegistryConsole,
-		AnsibleServiceBroker:         &in.AnsibleServiceBroker,
-		WebConsole:                   &in.WebConsole,
-		Console:                      &in.Console,
-		EtcdBackup:                   &in.EtcdBackup,
-		GenevaLogging:                &in.GenevaLogging,
-		GenevaTDAgent:                &in.GenevaTDAgent,
-		GenevaStatsd:                 &in.GenevaStatsd,
-		MetricsBridge:                &in.MetricsBridge,
+		Format:                       nilIfStringEmpty(&in.Format),
+		ClusterMonitoringOperator:    nilIfStringEmpty(&in.ClusterMonitoringOperator),
+		AzureControllers:             nilIfStringEmpty(&in.AzureControllers),
+		PrometheusOperatorBase:       nilIfStringEmpty(&in.PrometheusOperatorBase),
+		PrometheusBase:               nilIfStringEmpty(&in.PrometheusBase),
+		PrometheusConfigReloaderBase: nilIfStringEmpty(&in.PrometheusConfigReloaderBase),
+		ConfigReloaderBase:           nilIfStringEmpty(&in.ConfigReloaderBase),
+		AlertManagerBase:             nilIfStringEmpty(&in.AlertManagerBase),
+		NodeExporterBase:             nilIfStringEmpty(&in.NodeExporterBase),
+		GrafanaBase:                  nilIfStringEmpty(&in.GrafanaBase),
+		KubeStateMetricsBase:         nilIfStringEmpty(&in.KubeStateMetricsBase),
+		KubeRbacProxyBase:            nilIfStringEmpty(&in.KubeRbacProxyBase),
+		OAuthProxyBase:               nilIfStringEmpty(&in.OAuthProxyBase),
+		MasterEtcd:                   nilIfStringEmpty(&in.MasterEtcd),
+		ControlPlane:                 nilIfStringEmpty(&in.ControlPlane),
+		Node:                         nilIfStringEmpty(&in.Node),
+		ServiceCatalog:               nilIfStringEmpty(&in.ServiceCatalog),
+		Sync:                         nilIfStringEmpty(&in.Sync),
+		TemplateServiceBroker:        nilIfStringEmpty(&in.TemplateServiceBroker),
+		Registry:                     nilIfStringEmpty(&in.Registry),
+		Router:                       nilIfStringEmpty(&in.Router),
+		RegistryConsole:              nilIfStringEmpty(&in.RegistryConsole),
+		AnsibleServiceBroker:         nilIfStringEmpty(&in.AnsibleServiceBroker),
+		WebConsole:                   nilIfStringEmpty(&in.WebConsole),
+		Console:                      nilIfStringEmpty(&in.Console),
+		EtcdBackup:                   nilIfStringEmpty(&in.EtcdBackup),
+		GenevaLogging:                nilIfStringEmpty(&in.GenevaLogging),
+		GenevaTDAgent:                nilIfStringEmpty(&in.GenevaTDAgent),
+		GenevaStatsd:                 nilIfStringEmpty(&in.GenevaStatsd),
+		MetricsBridge:                nilIfStringEmpty(&in.MetricsBridge),
 	}
 }
