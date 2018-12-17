@@ -399,6 +399,9 @@ func (v *Validator) validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPN
 		}
 
 	case AgentPoolProfileRoleMaster:
+		if app.Name != string(app.Role) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
+		}
 		if app.Count != 3 {
 			errs = append(errs, fmt.Errorf("invalid properties.masterPoolProfile.count %d", app.Count))
 		}

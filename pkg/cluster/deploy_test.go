@@ -117,6 +117,9 @@ func TestEvacuate(t *testing.T) {
 	cs := &api.OpenShiftManagedCluster{
 		Properties: api.Properties{
 			AzProfile: api.AzProfile{ResourceGroup: "test-rg"},
+			AgentPoolProfiles: []api.AgentPoolProfile{
+				{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
+			},
 		},
 	}
 	ctx := context.Background()

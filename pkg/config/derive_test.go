@@ -16,22 +16,30 @@ func TestDerivedCloudProviderConf(t *testing.T) {
 		{
 			name: "one",
 			cs: api.OpenShiftManagedCluster{
-				Properties: api.Properties{AzProfile: api.AzProfile{
-					TenantID:       "tenant",
-					SubscriptionID: "sub",
-					ResourceGroup:  "rg",
-				}, ServicePrincipalProfile: api.ServicePrincipalProfile{
-					ClientID: "client_id",
-					Secret:   "client_secrett",
-				}},
+				Properties: api.Properties{
+					AzProfile: api.AzProfile{
+						TenantID:       "tenant",
+						SubscriptionID: "sub",
+						ResourceGroup:  "rg",
+					},
+					ServicePrincipalProfile: api.ServicePrincipalProfile{
+						ClientID: "client_id",
+						Secret:   "client_secrett",
+					},
+					AgentPoolProfiles: []api.AgentPoolProfile{
+						{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
+						{Role: api.AgentPoolProfileRoleInfra, Name: "infra"},
+						{Role: api.AgentPoolProfileRoleCompute, Name: "computetest"},
+					},
+				},
 				Location: "eastus",
 			},
 			want: []byte(`aadClientId: client_id
 aadClientSecret: client_secrett
 location: eastus
-primaryScaleSetName: ss-compute
+primaryScaleSetName: ss-computetest
 resourceGroup: rg
-securityGroupName: nsg-compute
+securityGroupName: nsg-computetest
 subscriptionId: sub
 tenantId: tenant
 vmType: vmss

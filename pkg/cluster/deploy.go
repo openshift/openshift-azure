@@ -5,9 +5,9 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
@@ -15,7 +15,7 @@ import (
 
 func (u *simpleUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	// We may need/want to delete all the scalesets in the future
-	future, err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-master")
+	future, err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, api.AgentPoolProfileRoleMaster))
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
 	}
@@ -122,8 +122,8 @@ func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 	blob := updateblob{}
 	for _, profile := range cs.Properties.AgentPoolProfiles {
 		for i := 0; i < profile.Count; i++ {
-			name := instanceName(fmt.Sprintf("ss-%s_%d", profile.Name, i))
-			blob[name] = ssHashes[scalesetName("ss-"+profile.Name)]
+			name := instanceName(config.GetInstanceName(cs, profile.Role, i))
+			blob[name] = ssHashes[scalesetName(config.GetScalesetName(cs, profile.Role))]
 		}
 	}
 	return u.writeUpdateBlob(blob)
