@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"reflect"
-	"strings"
 
 	"github.com/go-test/deep"
 	"github.com/sirupsen/logrus"
@@ -237,9 +236,9 @@ func printDiff(log *logrus.Entry, existing, o *unstructured.Unstructured) bool {
 	// 2) when sync is run twice back-to-back on the same cluster
 
 	// Don't show a diff if kind is Secret
-	oGroupKind := o.GroupVersionKind().GroupKind()
+	gk := o.GroupVersionKind().GroupKind()
 	diffShown := false
-	if strings.ToLower(oGroupKind.String()) != "secret" {
+	if gk.String() != "Secret" {
 		for _, diff := range deep.Equal(*existing, *o) {
 			log.Info("- " + diff)
 			diffShown = true
