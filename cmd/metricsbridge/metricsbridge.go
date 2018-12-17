@@ -219,8 +219,7 @@ func (c *config) runOnce(req *http.Request) error {
 				Account:   c.Account,
 				Namespace: c.Namespace,
 				Dims: map[string]string{
-					"Region":       c.Region,
-					"UnderlayName": "",
+					"Region": c.Region,
 				},
 				TS:    now,
 				Value: *m.Untyped.Value,
