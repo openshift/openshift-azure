@@ -21,6 +21,8 @@ type Float struct {
 	Value     float64
 }
 
+// MarshalJSON marshals a Float into JSON format.  You should probably call
+// Marshal() instead.
 func (f *Float) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Metric    string
