@@ -176,27 +176,15 @@ func execute(
 		return err
 	}
 	defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
-	if err := wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
+	return wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
 		if err := createOrUpdatev20180930preview(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile); err != nil {
-			if autoRestErr, ok := err.(autorest.DetailedError); ok {
-				if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
-					if netErr, ok := urlErr.Err.(*net.OpError); ok {
-						if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
-							if sysErr.Err == syscall.ECONNREFUSED {
-								return false, nil
-							}
-						}
-					}
-				}
+			if isConnectionRefused(err) {
+				return false, nil
 			}
 			return false, err
 		}
 		return true, nil
-	}); err != nil {
-		return err
-	}
-
-	return nil
+	})
 }
 
 func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.Config) error {
@@ -229,6 +217,21 @@ func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.C
 		return err
 	}
 	return nil
+}
+
+func isConnectionRefused(err error) bool {
+	if autoRestErr, ok := err.(autorest.DetailedError); ok {
+		if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
+			if netErr, ok := urlErr.Err.(*net.OpError); ok {
+				if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
+					if sysErr.Err == syscall.ECONNREFUSED {
+						return true
+					}
+				}
+			}
+		}
+	}
+	return false
 }
 
 func main() {
@@ -275,7 +278,15 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 	if isDelete {
-		if err := delete(ctx, log, v20180930previewClient, conf.ResourceGroup, conf.NoWait); err != nil {
+		if err := wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
+			if err := delete(ctx, log, v20180930previewClient, conf.ResourceGroup, conf.NoWait); err != nil {
+				if isConnectionRefused(err) {
+					return false, nil
+				}
+				return false, err
+			}
+			return true, nil
+		}); err != nil {
 			log.Fatal(err)
 		}
 		return
