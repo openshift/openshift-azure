@@ -187,6 +187,8 @@ func (c *config) run() error {
 }
 
 func (c *config) runOnce(req *http.Request) error {
+	now := time.Now()
+
 	resp, err := c.http.Do(req)
 	if err != nil {
 		return err
@@ -211,19 +213,20 @@ func (c *config) runOnce(req *http.Request) error {
 		}
 
 		for _, m := range family.Metric {
-			gauge := &statsd.Gauge{
-				Namespace: c.Namespace,
+			f := &statsd.Float{
 				Metric:    *family.Name,
+				Namespace: c.Namespace,
 				Dims: map[string]string{
 					"Region":       c.Region,
 					"UnderlayName": "",
 				},
+				TS:    now,
 				Value: *m.Untyped.Value,
 			}
 			for _, label := range m.Label {
-				gauge.Dims[*label.Name] = *label.Value
+				f.Dims[*label.Name] = *label.Value
 			}
-			if err = c.statsd.Write(gauge); err != nil {
+			if err = c.statsd.Write(f); err != nil {
 				return err
 			}
 		}
