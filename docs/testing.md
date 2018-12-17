@@ -14,7 +14,7 @@ PR commands to execute tests:
 ## Unit test
 
 Packages under `pkg` directory contain their individual unit tests.
-To run all unit tests locally, execute: `make unit` or `go test ./....`
+To run all unit tests locally, execute: `make unit` or `go test ./...`
 To run a single package's tests:
 `go test ./pkg/tls`
 
@@ -30,6 +30,8 @@ To run these tests you will need to have OpenShift cluster running.
 to execute e2e tests locally, execute: `make e2e` or `go test -tags e2e ./test/e2e`.
 
 See [e2e requirements](e2e/requirements.md) for more information on the expected inputs to our e2e tests.
+
+See [running](e2e/README.md) for more information on how to run the e2e tests with the container image.
 
 ## OpenShift Origin Conformance tests
 
