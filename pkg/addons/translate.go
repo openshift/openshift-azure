@@ -637,14 +637,14 @@ var Translations = map[string][]struct {
 	},
 	"Secret/openshift-azure-logging/azure-registry": {
 		{
-			Path:     jsonpath.MustCompile("$.data.'.dockerconfigjson'"),
-			Template: "{{ Base64Encode .Config.Images.GenevaImagePullSecret }}",
+			Path:     jsonpath.MustCompile("$.stringData.'.dockerconfigjson'"),
+			Template: "{{ String .Config.Images.GenevaImagePullSecret }}",
 		},
 	},
 	"Secret/openshift-azure-monitoring/azure-registry": {
 		{
-			Path:     jsonpath.MustCompile("$.data.'.dockerconfigjson'"),
-			Template: "{{ Base64Encode .Config.Images.GenevaImagePullSecret }}",
+			Path:     jsonpath.MustCompile("$.stringData.'.dockerconfigjson'"),
+			Template: "{{ String .Config.Images.GenevaImagePullSecret }}",
 		},
 	},
 	"Secret/openshift-azure-monitoring/mdm-cert": {
