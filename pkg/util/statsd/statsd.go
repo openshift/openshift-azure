@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-
-	"github.com/sirupsen/logrus"
 )
 
 // Gauge represents a statsd gauge
@@ -41,14 +39,13 @@ func (g *Gauge) marshal() ([]byte, error) {
 
 // Client is a buffering statsd client
 type Client struct {
-	log  *logrus.Entry
 	conn net.Conn
 	buf  bytes.Buffer
 }
 
 // NewClient returns a new client
-func NewClient(log *logrus.Entry, conn net.Conn) *Client {
-	return &Client{log: log, conn: conn}
+func NewClient(conn net.Conn) *Client {
+	return &Client{conn: conn}
 }
 
 // Flush flushes the internal buffer

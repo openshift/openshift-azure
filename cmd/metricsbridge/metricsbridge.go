@@ -118,7 +118,7 @@ func (c *config) init() error {
 		return err
 	}
 
-	c.statsd = statsd.NewClient(c.log, conn)
+	c.statsd = statsd.NewClient(conn)
 
 	c.http = &http.Client{
 		Transport: &http.Transport{
