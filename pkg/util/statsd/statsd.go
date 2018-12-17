@@ -7,7 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net"
+	"io"
 	"time"
 )
 
@@ -62,23 +62,23 @@ func (f *Float) Marshal() ([]byte, error) {
 
 // Client is a buffering statsd client
 type Client struct {
-	conn net.Conn
-	w    *bufio.Writer
+	w   io.WriteCloser
+	buf *bufio.Writer
 }
 
 // NewClient returns a new client
-func NewClient(conn net.Conn) *Client {
-	return &Client{conn: conn, w: bufio.NewWriter(conn)}
+func NewClient(w io.WriteCloser) *Client {
+	return &Client{w: w, buf: bufio.NewWriter(w)}
 }
 
 // Flush flushes the internal buffer
 func (c *Client) Flush() error {
-	return c.w.Flush()
+	return c.buf.Flush()
 }
 
 // Write writes to the internal buffer
 func (c *Client) Write(b []byte) (int, error) {
-	return c.w.Write(b)
+	return c.buf.Write(b)
 }
 
 // Close flushes the internal buffer and closes the connection
@@ -87,5 +87,5 @@ func (c *Client) Close() error {
 		return err
 	}
 
-	return c.conn.Close()
+	return c.w.Close()
 }
