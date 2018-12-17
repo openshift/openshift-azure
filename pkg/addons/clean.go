@@ -79,6 +79,12 @@ func Clean(o unstructured.Unstructured) error {
 	jsonpath.MustCompile("$.status").Delete(o.Object)
 
 	switch gk.String() {
+	case "CronJob.batch":
+		cleanMetadata(jsonpath.MustCompile("$.spec.jobTemplate").Get(o.Object)[0].(map[string]interface{}))
+		jsonpath.MustCompile("$.spec.jobTemplate.metadata").DeleteIfMatch(o.Object, map[string]interface{}{})
+		cleanMetadata(jsonpath.MustCompile("$.spec.jobTemplate.spec.template").Get(o.Object)[0].(map[string]interface{}))
+		jsonpath.MustCompile("$.spec.jobTemplate.spec.template.metadata").DeleteIfMatch(o.Object, map[string]interface{}{})
+
 	case "DaemonSet.apps":
 		jsonpath.MustCompile("$.metadata.annotations.'deprecated.daemonset.template.generation'").Delete(o.Object)
 		cleanPodTemplate(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
