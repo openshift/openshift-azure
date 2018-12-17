@@ -32,7 +32,7 @@ var (
 type config struct {
 	Interval                   time.Duration `json:"intervalNanoseconds,omitempty"`
 	PrometheusFederateEndpoint string        `json:"prometheusFederateEndpoint,omitempty"`
-	StatsdEndpoint             string        `json:"statsdEndpoint,omitempty"`
+	StatsdSocket               string        `json:"statsdSocket,omitempty"`
 
 	Series []string `json:"series,omitempty"`
 
@@ -87,8 +87,8 @@ func (c *config) validate() (errs []error) {
 	if _, err := url.Parse(c.PrometheusFederateEndpoint); err != nil {
 		errs = append(errs, fmt.Errorf("prometheusFederateEndpoint: %s", err))
 	}
-	if _, err := net.ResolveUDPAddr("udp", c.StatsdEndpoint); err != nil {
-		errs = append(errs, fmt.Errorf("statsdEndpoint: %s", err))
+	if _, err := net.ResolveUnixAddr("unix", c.StatsdSocket); err != nil {
+		errs = append(errs, fmt.Errorf("statsdSocket: %s", err))
 	}
 	if len(c.Series) == 0 {
 		errs = append(errs, fmt.Errorf("must configure at least one series"))
@@ -100,7 +100,7 @@ func (c *config) validate() (errs []error) {
 func (c *config) init() error {
 	var err error
 
-	c.statsd, err = statsd.NewClient(c.log, c.StatsdEndpoint)
+	c.statsd, err = statsd.NewClient(c.log, c.StatsdSocket)
 	if err != nil {
 		return err
 	}
@@ -136,6 +136,7 @@ func run(log *logrus.Entry, configpath string) error {
 	if err := c.init(); err != nil {
 		return err
 	}
+	defer c.statsd.Close()
 
 	return c.run()
 }

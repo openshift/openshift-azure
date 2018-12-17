@@ -444,6 +444,12 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.GenevaStatsd }}",
 		},
 		{
+			Path: jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].args"),
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+				return config.Derived.StatsdArgs(cs)
+			},
+		},
+		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].env[?(@.name='REGION')].value"),
 			Template: "{{ .ContainerService.Location }}",
 		},

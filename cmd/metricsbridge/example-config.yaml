@@ -1,6 +1,6 @@
 intervalNanoseconds: 60000000000 # every minute
 prometheusFederateEndpoint: https://prometheus-k8s.openshift-monitoring.svc:9091/federate
-statsdEndpoint: localhost:8051
+statsdSocket: mdm_statsd.socket # nc -U -l mdm_statsd.socket
 series:
 - kube_node_info
 - kube_node_status_allocatable_cpu_cores

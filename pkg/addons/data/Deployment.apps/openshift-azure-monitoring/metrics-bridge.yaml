@@ -31,6 +31,9 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: statsd
+          args: "*** GENERATED ***"
+          command:
+          - /usr/sbin/MetricsExtension
           image: "*** GENERATED ***"
           imagePullPolicy: Always
           env:
@@ -42,9 +45,6 @@ spec:
               value: "Debug"
             - name: REGION
               value: "*** GENERATED ***"
-          ports:
-            - containerPort: 8125
-              protocol: UDP
           resources:
             limits:
               cpu: 400m
@@ -56,6 +56,8 @@ spec:
           volumeMounts:
             - mountPath: /mdm/certs
               name: mdm-cert
+            - mountPath: /var/etw
+              name: socket
         - name: metricsbridge
           image: "*** GENERATED ***"
           command:
@@ -66,6 +68,8 @@ spec:
             - mountPath: /config
               name: metrics-bridge
               readOnly: true
+            - mountPath: /var/etw
+              name: socket
           resources:
             limits:
               cpu: 400m
@@ -83,3 +87,5 @@ spec:
         - name: metrics-bridge
           configMap:
             name: metrics-bridge
+        - emptyDir: {}
+          name: socket

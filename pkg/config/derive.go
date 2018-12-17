@@ -125,3 +125,18 @@ func (derived) ClusterMonitoringOperatorArgs(cs *api.OpenShiftManagedCluster) ([
 		fmt.Sprintf("-tags=kube-rbac-proxy=%s", cs.Properties.OpenShiftVersion),
 	}, nil
 }
+
+func (derived) StatsdArgs(cs *api.OpenShiftManagedCluster) ([]interface{}, error) {
+	return []interface{}{
+		"-StopEvent", "MDMEvent",
+		"-FrontEndUrl", cs.Config.GenevaMetricsEndpoint,
+		"-MonitoringAccount", cs.Config.GenevaMetricsAccount,
+		"-CertFile", "/mdm/certs/cert.pem",
+		"-Input", "statsd_local",
+		"-PrivateKeyFile", "/mdm/certs/key.pem",
+		"-ConfigOverrides", `{"internalMetricProductionLevel":3,"enableDimensionTrimming":false}`,
+		"-SourceIdentity", cs.Location,
+		"-SourceRole", "OSA",
+		"-SourceRoleInstance", "OSA",
+	}, nil
+}
