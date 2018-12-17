@@ -47,13 +47,8 @@ type Client struct {
 }
 
 // NewClient returns a new client
-func NewClient(log *logrus.Entry, address string) (*Client, error) {
-	conn, err := net.Dial("unix", address)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Client{log: log, conn: conn}, nil
+func NewClient(log *logrus.Entry, conn net.Conn) *Client {
+	return &Client{log: log, conn: conn}
 }
 
 // Flush flushes the internal buffer

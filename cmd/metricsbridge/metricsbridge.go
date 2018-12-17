@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/ghodss/yaml"
@@ -98,12 +99,26 @@ func (c *config) validate() (errs []error) {
 }
 
 func (c *config) init() error {
-	var err error
-
-	c.statsd, err = statsd.NewClient(c.log, c.StatsdSocket)
-	if err != nil {
+	var conn net.Conn
+	for {
+		var err error
+		conn, err = net.Dial("unix", c.StatsdSocket)
+		if err == nil {
+			break
+		}
+		if err, ok := err.(*net.OpError); ok {
+			if err, ok := err.Err.(*os.SyscallError); ok {
+				if err.Err == syscall.ENOENT {
+					c.log.Warn("socket not found, sleeping...")
+					time.Sleep(5 * time.Second)
+					continue
+				}
+			}
+		}
 		return err
 	}
+
+	c.statsd = statsd.NewClient(c.log, conn)
 
 	c.http = &http.Client{
 		Transport: &http.Transport{
