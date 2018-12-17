@@ -15,9 +15,7 @@ spec:
       webconsole: "true"
   strategy:
     rollingUpdate:
-      maxSurge: 25%
       maxUnavailable: 100%
-    type: RollingUpdate
   template:
     metadata:
       labels:

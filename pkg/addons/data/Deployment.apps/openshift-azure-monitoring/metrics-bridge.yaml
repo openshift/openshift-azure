@@ -7,79 +7,72 @@ metadata:
   namespace: openshift-azure-monitoring
 spec:
   replicas: 1
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
   selector:
     matchLabels:
       app: metrics-bridge
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   template:
     metadata:
       labels:
         app: metrics-bridge
     spec:
-      tolerations:
-        - key: CriticalAddonsOnly
-          operator: Exists
-        - operator: Exists
-      dnsPolicy: ClusterFirst
-      imagePullSecrets:
-        - name: azure-registry
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
       containers:
-        - name: statsd
-          image: "*** GENERATED ***"
-          imagePullPolicy: Always
-          env:
-            - name: MDMENDPOINT
-              value: "*** GENERATED ***"
-            - name: MDM_ACCOUNT
-              value: "*** GENERATED ***"
-            - name: MDM_LOG_LEVEL
-              value: "Debug"
-            - name: REGION
-              value: "*** GENERATED ***"
-          ports:
-            - containerPort: 8125
-              protocol: UDP
-          resources:
-            limits:
-              cpu: 400m
-              memory: 400Mi
-            requests:
-              cpu: 200m
-              memory: 200Mi
-          terminationMessagePath: /dev/termination-log
-          volumeMounts:
-            - mountPath: /mdm/certs
-              name: mdm-cert
-        - name: metricsbridge
-          image: "*** GENERATED ***"
-          command:
-          - /metricsbridge
-          - /config/config.yaml
-          imagePullPolicy: "Always"
-          volumeMounts:
-            - mountPath: /config
-              name: metrics-bridge
-              readOnly: true
-          resources:
-            limits:
-              cpu: 400m
-              memory: 1Gi
-            requests:
-              cpu: 200m
-              memory: 500Mi
-      serviceAccountName: geneva
+      - env:
+        - name: MDMENDPOINT
+          value: '*** GENERATED ***'
+        - name: MDM_ACCOUNT
+          value: '*** GENERATED ***'
+        - name: MDM_LOG_LEVEL
+          value: Debug
+        - name: REGION
+          value: '*** GENERATED ***'
+        image: '*** GENERATED ***'
+        name: statsd
+        ports:
+        - containerPort: 8125
+          protocol: UDP
+        resources:
+          limits:
+            cpu: 400m
+            memory: 400Mi
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        volumeMounts:
+        - mountPath: /mdm/certs
+          name: mdm-cert
+      - command:
+        - /metricsbridge
+        - /config/config.yaml
+        image: '*** GENERATED ***'
+        name: metricsbridge
+        resources:
+          limits:
+            cpu: 400m
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+        volumeMounts:
+        - mountPath: /config
+          name: metrics-bridge
+          readOnly: true
+      imagePullSecrets:
+      - name: azure-registry
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
+      serviceAccountName: geneva
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - operator: Exists
       volumes:
-        - name: mdm-cert
-          secret:
-            secretName: mdm-cert
-        - name: metrics-bridge
-          configMap:
-            name: metrics-bridge
+      - name: mdm-cert
+        secret:
+          secretName: mdm-cert
+      - configMap:
+          name: metrics-bridge
+        name: metrics-bridge

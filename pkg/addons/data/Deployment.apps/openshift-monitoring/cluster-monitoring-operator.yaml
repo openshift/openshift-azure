@@ -14,7 +14,6 @@ spec:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
-    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -22,7 +21,7 @@ spec:
     spec:
       containers:
       - args:
-         - '*** GENERATED ***'
+        - '*** GENERATED ***'
         image: '*** GENERATED ***'
         name: cluster-monitoring-operator
         ports:

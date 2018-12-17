@@ -4,32 +4,32 @@ metadata:
   name: etcd-backup-hourly
   namespace: openshift-etcd
 spec:
-  schedule: "0 */1 * * *"
   jobTemplate:
     spec:
       template:
         spec:
-          nodeSelector:
-            node-role.kubernetes.io/master: "true"
-          serviceAccountName: etcd-backup
-          restartPolicy: Never
           containers:
-          - name: etcd-backup-hourly
+          - args:
+            - save
             image: '*** GENERATED ***'
             imagePullPolicy: Always
-            args:
-            - save
+            name: etcd-backup-hourly
             volumeMounts:
-            - name: azureconfig
-              mountPath: /_data/_out
+            - mountPath: /_data/_out
+              name: azureconfig
               readOnly: true
-            - name: origin-master
-              mountPath: /etc/origin/master
+            - mountPath: /etc/origin/master
+              name: origin-master
               readOnly: true
+          nodeSelector:
+            node-role.kubernetes.io/master: "true"
+          restartPolicy: Never
+          serviceAccountName: etcd-backup
           volumes:
-          - name: azureconfig
-            hostPath:
+          - hostPath:
               path: /etc/origin/cloudprovider
-          - name: origin-master
-            hostPath:
+            name: azureconfig
+          - hostPath:
               path: /etc/origin/master
+            name: origin-master
+  schedule: 0 */1 * * *

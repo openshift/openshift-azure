@@ -13,7 +13,7 @@ spec:
       labels:
         app: customer-admin-controller
     spec:
-      serviceAccountName: customer-admin-controller
       containers:
       - image: '*** GENERATED ***'
         name: customer-admin-controller
+      serviceAccountName: customer-admin-controller
