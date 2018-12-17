@@ -1,6 +1,7 @@
 package statsd
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -40,18 +41,17 @@ func (g *Gauge) marshal() ([]byte, error) {
 // Client is a buffering statsd client
 type Client struct {
 	conn net.Conn
-	buf  bytes.Buffer
+	w    *bufio.Writer
 }
 
 // NewClient returns a new client
 func NewClient(conn net.Conn) *Client {
-	return &Client{conn: conn}
+	return &Client{conn: conn, w: bufio.NewWriter(conn)}
 }
 
 // Flush flushes the internal buffer
 func (c *Client) Flush() error {
-	_, err := c.buf.WriteTo(c.conn)
-	return err
+	return c.w.Flush()
 }
 
 // Write writes a gauge to the internal buffer
@@ -61,7 +61,7 @@ func (c *Client) Write(g *Gauge) error {
 		return err
 	}
 
-	_, err = c.buf.Write(b)
+	_, err = c.w.Write(b)
 	return err
 }
 
