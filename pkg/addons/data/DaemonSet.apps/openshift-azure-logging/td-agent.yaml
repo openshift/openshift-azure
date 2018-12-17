@@ -46,10 +46,10 @@ spec:
               - /td-agent/liveness-probe.sh
           resources:
             requests:
-              cpu: 0.2
+              cpu: 200m
               memory: 200Mi
             limits:
-              cpu: 0.4
+              cpu: 400m
               memory: 800Mi
           volumeMounts:
             - mountPath: /var/run/mdsdcustomerdata/
