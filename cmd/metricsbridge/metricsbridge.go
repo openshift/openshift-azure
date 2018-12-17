@@ -37,6 +37,7 @@ type config struct {
 
 	Series []string `json:"series,omitempty"`
 
+	Account   string `json:"account,omitempty"`
 	Namespace string `json:"namespace,omitempty"`
 	Region    string `json:"region,omitempty"`
 
@@ -215,6 +216,7 @@ func (c *config) runOnce(req *http.Request) error {
 		for _, m := range family.Metric {
 			f := &statsd.Float{
 				Metric:    *family.Name,
+				Account:   c.Account,
 				Namespace: c.Namespace,
 				Dims: map[string]string{
 					"Region":       c.Region,

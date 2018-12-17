@@ -10,6 +10,7 @@ series:
 - kube_pod_info
 - kube_pod_status_phase
 - kube_pod_status_ready
+account: RPOpenShift
 namespace: Prometheus
 region: eastus
 

@@ -231,6 +231,11 @@ var Translations = map[string][]struct {
 	"ConfigMap/openshift-azure-monitoring/metrics-bridge": {
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.account"),
+			Template:   "{{ .Config.GenevaMetricsAccount }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.region"),
 			Template:   "{{ .ContainerService.Location }}",
 		},
