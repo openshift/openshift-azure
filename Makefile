@@ -1,13 +1,13 @@
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain --ignored) = "" ]] && echo -clean || echo -dirty)
 
 # all is the default target to build everything
-all: clean build azure-controllers etcdbackup sync recoveretcdcluster metricsbridge
+all: clean build azure-controllers etcdbackup sync recoveretcdcluster metricsbridge e2e-bin
 
 build: generate
 	go build ./...
 
 clean:
-	rm -f coverage.out azure-controllers etcdbackup sync recoveretcdcluster metricsbridge
+	rm -f coverage.out azure-controllers etcdbackup sync recoveretcdcluster metricsbridge e2e
 
 test: unit e2e
 
@@ -30,6 +30,16 @@ azure-controllers-image: azure-controllers
 
 azure-controllers-push: azure-controllers-image
 	docker push $(AZURE_CONTROLLERS_IMAGE)
+
+e2e-bin: generate
+	go test -ldflags "-X main.gitCommit=$(COMMIT)" -tags e2e -c -o ./e2e ./test/e2e
+
+e2e-image: e2e-bin
+	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+	imagebuilder -f Dockerfile.e2e -t $(E2E_IMAGE) .
+
+e2e-push: e2e-image
+	docker push $(E2E_IMAGE)
 
 recoveretcdcluster: generate
 	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/recoveretcdcluster
