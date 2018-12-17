@@ -43,6 +43,16 @@ func Default(o unstructured.Unstructured) {
 	gk := o.GroupVersionKind().GroupKind()
 
 	switch gk.String() {
+	case "CronJob.batch":
+		for _, c := range jsonpath.MustCompile("$.spec.jobTemplate.spec.template.spec").Get(o.Object) {
+			defaultPodSpec(c.(map[string]interface{}))
+		}
+
+		jsonpath.MustCompile("$.spec.concurrencyPolicy").DeleteIfMatch(o.Object, "Allow")
+		jsonpath.MustCompile("$.spec.failedJobsHistoryLimit").DeleteIfMatch(o.Object, int64(1))
+		jsonpath.MustCompile("$.spec.successfulJobsHistoryLimit").DeleteIfMatch(o.Object, int64(3))
+		jsonpath.MustCompile("$.spec.suspend").DeleteIfMatch(o.Object, false)
+
 	case "DaemonSet.apps":
 		jsonpath.MustCompile("$.spec.revisionHistoryLimit").DeleteIfMatch(o.Object, int64(10))
 
@@ -50,26 +60,20 @@ func Default(o unstructured.Unstructured) {
 			defaultPodSpec(c.(map[string]interface{}))
 		}
 
-		defaultUpdateStrategy := map[string]interface{}{
-			"rollingUpdate": map[string]interface{}{
-				"maxUnavailable": int64(1),
-			},
-			"type": "RollingUpdate",
-		}
-		jsonpath.MustCompile("$.spec.updateStrategy").DeleteIfMatch(o.Object, defaultUpdateStrategy)
+		jsonpath.MustCompile("$.spec.updateStrategy.rollingUpdate.maxUnavailable").DeleteIfMatch(o.Object, int64(1))
+		jsonpath.MustCompile("$.spec.updateStrategy.rollingUpdate").DeleteIfMatch(o.Object, map[string]interface{}{})
+		jsonpath.MustCompile("$.spec.updateStrategy.type").DeleteIfMatch(o.Object, "RollingUpdate")
+		jsonpath.MustCompile("$.spec.updateStrategy").DeleteIfMatch(o.Object, map[string]interface{}{})
 
 	case "Deployment.apps":
 		jsonpath.MustCompile("$.spec.progressDeadlineSeconds").DeleteIfMatch(o.Object, int64(600))
 		jsonpath.MustCompile("$.spec.revisionHistoryLimit").DeleteIfMatch(o.Object, int64(10))
 
-		defaultStrategy := map[string]interface{}{
-			"rollingUpdate": map[string]interface{}{
-				"maxSurge":       "25%",
-				"maxUnavailable": "25%",
-			},
-			"type": "RollingUpdate",
-		}
-		jsonpath.MustCompile("$.spec.strategy").DeleteIfMatch(o.Object, defaultStrategy)
+		jsonpath.MustCompile("$.spec.strategy.rollingUpdate.maxSurge").DeleteIfMatch(o.Object, "25%")
+		jsonpath.MustCompile("$.spec.strategy.rollingUpdate.maxUnavailable").DeleteIfMatch(o.Object, "25%")
+		jsonpath.MustCompile("$.spec.strategy.rollingUpdate").DeleteIfMatch(o.Object, map[string]interface{}{})
+		jsonpath.MustCompile("$.spec.strategy.type").DeleteIfMatch(o.Object, "RollingUpdate")
+		jsonpath.MustCompile("$.spec.strategy").DeleteIfMatch(o.Object, map[string]interface{}{})
 
 		for _, c := range jsonpath.MustCompile("$.spec.template.spec").Get(o.Object) {
 			defaultPodSpec(c.(map[string]interface{}))
