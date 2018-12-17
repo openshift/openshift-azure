@@ -36,15 +36,6 @@ spec:
           - /usr/sbin/MetricsExtension
           image: "*** GENERATED ***"
           imagePullPolicy: Always
-          env:
-            - name: MDMENDPOINT
-              value: "*** GENERATED ***"
-            - name: MDM_ACCOUNT
-              value: "*** GENERATED ***"
-            - name: MDM_LOG_LEVEL
-              value: "Debug"
-            - name: REGION
-              value: "*** GENERATED ***"
           resources:
             limits:
               cpu: 400m

@@ -450,18 +450,6 @@ var Translations = map[string][]struct {
 			},
 		},
 		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].env[?(@.name='REGION')].value"),
-			Template: "{{ .ContainerService.Location }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].env[?(@.name='MDMENDPOINT')].value"),
-			Template: "{{ .Config.GenevaMetricsEndpoint }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].env[?(@.name='MDM_ACCOUNT')].value"),
-			Template: "{{ .Config.GenevaMetricsAccount }}",
-		},
-		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='metricsbridge')].image"),
 			Template: "{{ .Config.Images.MetricsBridge }}",
 		},
