@@ -104,7 +104,8 @@ func Clean(o unstructured.Unstructured) error {
 		}
 
 	case "Secret":
-		if jsonpath.MustCompile("$.type").MustGetString(o.Object) == "kubernetes.io/service-account-token" {
+		typ := jsonpath.MustCompile("$.type").Get(o.Object)
+		if len(typ) == 1 && typ[0].(string) == "kubernetes.io/service-account-token" {
 			for _, k := range []string{
 				"$.data",
 				"$.metadata.annotations.'kubernetes.io/service-account.uid'",

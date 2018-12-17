@@ -86,6 +86,7 @@ verify:
 	./hack/verify-code-format.sh
 	./hack/validate-util.sh
 	go run ./hack/validate-imports/validate-imports.go cmd hack pkg test
+	go run ./hack/lint-addons/lint-addons.go -n
 
 unit: generate
 	go test ./... -coverprofile=coverage.out
