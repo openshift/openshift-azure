@@ -28,7 +28,7 @@ type extra struct {
 	ConfigStorageAccountKey   string
 }
 
-func unmarshal(b []byte) (unstructured.Unstructured, error) {
+func Unmarshal(b []byte) (unstructured.Unstructured, error) {
 	// can't use straight yaml.Unmarshal() because it universally mangles yaml
 	// integers into float64s, whereas the Kubernetes client library uses int64s
 	// wherever it can.  Such a difference can cause us to update objects when
@@ -58,7 +58,7 @@ func readDB(cs *api.OpenShiftManagedCluster, ext *extra) (map[string]unstructure
 			return nil, err
 		}
 
-		o, err := unmarshal(b)
+		o, err := Unmarshal(b)
 		if err != nil {
 			return nil, err
 		}

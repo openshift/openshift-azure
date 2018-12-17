@@ -101,7 +101,9 @@ func (r rules) Delete(i interface{}) {
 	}
 
 	for _, i := range is {
-		i.Delete()
+		if i.Get().IsValid() {
+			i.Delete()
+		}
 	}
 
 	return
@@ -114,7 +116,7 @@ func (r rules) DeleteIfMatch(i interface{}, j interface{}) {
 	}
 
 	for _, i := range is {
-		if reflect.DeepEqual(i.Get().Interface(), j) {
+		if i.Get().IsValid() && reflect.DeepEqual(i.Get().Interface(), j) {
 			i.Delete()
 		}
 	}
