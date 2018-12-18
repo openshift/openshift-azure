@@ -99,6 +99,7 @@ func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error
 		AadClientSecret:     cs.Properties.ServicePrincipalProfile.Secret,
 		ResourceGroup:       cs.Properties.AzProfile.ResourceGroup,
 		Location:            cs.Location,
+		LoadBalancerSku:     "standard",
 		SecurityGroupName:   GetSecurityGroupName(cs, api.AgentPoolProfileRoleCompute),
 		PrimaryScaleSetName: GetScalesetName(cs, api.AgentPoolProfileRoleCompute),
 		VMType:              "vmss",
