@@ -78,7 +78,9 @@ These flags are required for any test focus which includes the key rotation test
 ##### Reentrant Updates
 The reentrant updates e2e test accepts one flag for customizing its functionality
 
-* `manifest`: Path to a customer manifest specifying a cluster for which reentrant updates should be tested (default: `_data/manifest.yaml`)
+* `request`: Path to a customer manifest specifying a cluster for which reentrant updates should be tested (default: `_data/manifest.yaml`)
+
+The `request` flag must refer to the same manifest which was used during cluster creation.
 
 These flags are required for any test focus which includes the reentrant updates test.
 

@@ -1,23 +1,22 @@
 #### Running e2e tests locally with go test
 
-If you are developing tests locally, you'd probably want to use native `go test` to invoke your ginkgo test specs.
+If you are developing tests locally, you can use the native `go test` to invoke your ginkgo test specs.
 
-Example: Run the end user e2e tests in a container
+Example: Run the end user e2e tests
 ```
 source ./env
 export FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]"
-export TIMEOUT=20m
 ./hack/e2e.sh
 ```
 
 As a shorthand to the above, you could simply run `make e2e`
 
-Example: Run the scale up/down e2e tests against the fake rp in a container
+Example: Run the scale up/down e2e tests against the fake rp
 ```
 source ./env
 export FOCUS="\[ScaleUpDown\]\[Fake\]"
 export TIMEOUT=30m
-export EXTRA_FLAGS="-scaleUpManifest=/path/to/scaleup.yaml -scaleDownManifest=/path/to/scaledown.yaml"
+export EXTRA_FLAGS="-scaleUpManifest=test/manifests/normal/scaleup.yaml -scaleDownManifest=test/manifests/normal/scaledown.yaml"
 ./hack/e2e.sh
 ```
 
