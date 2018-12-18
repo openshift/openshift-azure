@@ -114,12 +114,6 @@ func TestCreateOrUpdate(t *testing.T) {
 			errStep:  api.PluginStepUpdateInPlaceListVMs,
 		},
 		{
-			name:     "update in place: sort masters error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateInPlaceSortMasters,
-		},
-		{
 			name:     "update in place: read blob error",
 			isUpdate: true,
 			wantErr:  true,
@@ -222,7 +216,7 @@ func TestCreateOrUpdate(t *testing.T) {
 			switch tt.errStep {
 			case api.PluginStepDrain, api.PluginStepDeploy, api.PluginStepInitialize,
 				api.PluginStepWaitForConsoleHealth, api.PluginStepWaitForNodes,
-				api.PluginStepUpdateInPlaceListVMs, api.PluginStepUpdateInPlaceSortMasters,
+				api.PluginStepUpdateInPlaceListVMs,
 				api.PluginStepUpdateInPlaceReadBlob, api.PluginStepUpdateInPlaceDrain,
 				api.PluginStepUpdateInPlaceDeallocate, api.PluginStepUpdateInPlaceUpdateVMs,
 				api.PluginStepUpdateInPlaceReimage, api.PluginStepUpdateInPlaceStart,

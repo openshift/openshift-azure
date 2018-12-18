@@ -464,7 +464,6 @@ func TestUpdateInPlace(t *testing.T) {
 			uBlob := updateblob{}
 			for _, vm := range tt.vmsList {
 				compName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-				client.EXPECT().MasterIsReady(compName).Return(true, nil)
 
 				// 1 drain
 				client.EXPECT().Drain(ctx, tt.role, compName).Return(nil)

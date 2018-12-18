@@ -2,7 +2,7 @@ package cluster
 
 import (
 	"context"
-	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
@@ -254,18 +254,20 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceListVMs}
 	}
 
-	sorted, err := u.sortMasterVMsByHealth(vms, cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceSortMasters}
-	}
-
 	blob, err := u.readUpdateBlob()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReadBlob}
 	}
 
-	sorted = u.filterOldVMs(sorted, blob, ssHashes)
-	for _, vm := range sorted {
+	// range our vms in order, so that if we previously crashed half-way through
+	// updating one and it is broken, we pick up where we left off.
+	sort.Slice(vms, func(i, j int) bool {
+		return *vms[i].VirtualMachineScaleSetVMProperties.OsProfile.ComputerName <
+			*vms[j].VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
+	})
+
+	vms = u.filterOldVMs(vms, blob, ssHashes)
+	for _, vm := range vms {
 		computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		u.log.Infof("draining %s", computerName)
 		err = u.kubeclient.Drain(ctx, role, computerName)
@@ -340,24 +342,6 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 	}
 
 	return nil
-}
-
-func (u *simpleUpgrader) sortMasterVMsByHealth(vms []compute.VirtualMachineScaleSetVM, cs *api.OpenShiftManagedCluster) ([]compute.VirtualMachineScaleSetVM, error) {
-	var ready, unready []compute.VirtualMachineScaleSetVM
-	for _, vm := range vms {
-		nodeName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		isReady, err := u.kubeclient.MasterIsReady(nodeName)
-		if err != nil {
-			return nil, fmt.Errorf("cannot get health for %q: %v", nodeName, err)
-		}
-		if isReady {
-			ready = append(ready, vm)
-		} else {
-			unready = append(unready, vm)
-		}
-	}
-
-	return append(unready, ready...), nil
 }
 
 func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, instanceID string, nodeName kubeclient.ComputerName) error {
