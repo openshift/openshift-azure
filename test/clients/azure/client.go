@@ -26,7 +26,6 @@ var (
 	adminRpFocus = rpFocus(regexp.QuoteMeta("[Admin]"))
 	fakeRpFocus  = rpFocus(regexp.QuoteMeta("[Fake]"))
 	realRpFocus  = rpFocus(regexp.QuoteMeta("[Real]"))
-	vnetRpFocus  = rpFocus(regexp.QuoteMeta("[Vnet]"))
 )
 
 func (tf rpFocus) match(focusString string) bool {
@@ -83,11 +82,11 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 	case adminRpFocus.match(focus), fakeRpFocus.match(focus):
 		fmt.Println("configuring the fake resource provider")
 		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
-	case realRpFocus.match(focus), vnetRpFocus.match(focus):
+	case realRpFocus.match(focus):
 		fmt.Println("configuring the real resource provider")
 		rpURL = externalapi.DefaultBaseURI
 	default:
-		panic(fmt.Sprintf("invalid focus %q - need to -ginkgo.focus=\\[Admin\\], -ginkgo.focus=\\[Fake\\] or -ginkgo.focus=\\[Real\\] or -ginkgo.focus=\\[Vnet\\]", config.GinkgoConfig.FocusString))
+		panic(fmt.Sprintf("invalid focus %q - need to -ginkgo.focus=\\[Admin\\], -ginkgo.focus=\\[Fake\\] or -ginkgo.focus=\\[Real\\]", config.GinkgoConfig.FocusString))
 	}
 
 	rpc := externalapi.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, subscriptionID)

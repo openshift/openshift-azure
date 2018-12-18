@@ -2,7 +2,6 @@ package realrp
 
 import (
 	"context"
-	"errors"
 	"os"
 	"time"
 
@@ -11,14 +10,14 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-06-01/network"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
-	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/test/clients/azure"
+	tlog "github.com/openshift/openshift-azure/test/util/log"
 )
 
-var _ = Describe("Peer Vnet tests [Vnet]", func() {
+var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 	var (
 		ctx          = context.Background()
 		cli          *azure.Client
@@ -32,13 +31,9 @@ var _ = Describe("Peer Vnet tests [Vnet]", func() {
 	BeforeEach(func() {
 		var err error
 		cli, err = azure.NewClientFromEnvironment(false)
-		Expect(err).ToNot(HaveOccurred())
-		if os.Getenv("AZURE_REGION") == "" {
-			Expect(errors.New("AZURE_REGION is not set")).ToNot(HaveOccurred())
-		}
-		if os.Getenv("RESOURCEGROUP") == "" {
-			Expect(errors.New("RESOURCEGROUP is not set")).ToNot(HaveOccurred())
-		}
+		Expect(err).NotTo(HaveOccurred())
+		Expect(region).NotTo(BeEmpty())
+		Expect(rg).NotTo(BeEmpty())
 	})
 
 	AfterEach(func() {
@@ -47,10 +42,7 @@ var _ = Describe("Peer Vnet tests [Vnet]", func() {
 	})
 
 	It("should create the vnet and cluster and verify peering", func() {
-		logrus.SetLevel(logrus.DebugLevel)
-		logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-		logrus.SetOutput(GinkgoWriter)
-		log := logrus.NewEntry(logrus.StandardLogger())
+		log := tlog.GetTestLogger()
 
 		// create a resource group and a vnet
 		exists, err := cli.Groups.CheckExistence(ctx, rg)
@@ -89,16 +81,19 @@ var _ = Describe("Peer Vnet tests [Vnet]", func() {
 			Location: &region,
 		})
 		Expect(err).ToNot(HaveOccurred())
+		Expect(future).ToNot(BeNil())
 		err = future.WaitForCompletionRef(ctx, cli.VirtualNetworks.Client())
 		Expect(err).ToNot(HaveOccurred())
 
 		vnet, err := cli.VirtualNetworks.Get(ctx, rg, vnetPeerName, "")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(len(*vnet.VirtualNetworkPeerings)).To(BeEquivalentTo(0))
+		Expect(vnet).ToNot(BeNil())
+		Expect(len(*vnet.VirtualNetworkPeerings)).To(Equal(0))
 
 		// load cluster config
 		config, err := client.LoadClusterConfigFromManifest(log, "../../test/manifests/normal/create.yaml")
 		Expect(err).ToNot(HaveOccurred())
+		Expect(config).ToNot(BeNil())
 		// Set clientid and secret if not set
 		for _, ip := range config.Properties.AuthProfile.IdentityProviders {
 			switch provider := ip.Provider.(type) {
@@ -118,12 +113,13 @@ var _ = Describe("Peer Vnet tests [Vnet]", func() {
 		_, err = cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(ctx, rg, rg, *config)
 		Expect(err).NotTo(HaveOccurred())
 
-		clusterVnet, err := cli.VirtualNetworks.Get(ctx, rg, vnetPeerName, "")
-		Expect(err).NotTo(HaveOccurred())
-		Expect(len(*clusterVnet.VirtualNetworkPeerings)).To(BeEquivalentTo(1))
-		for _, vnetPeering := range *clusterVnet.VirtualNetworkPeerings {
+		vnetPeer, err := cli.VirtualNetworks.Get(ctx, rg, vnetPeerName, "")
+		Expect(err).ToNot(HaveOccurred())
+		Expect(vnetPeer).ToNot(BeNil())
+		Expect(len(*vnetPeer.VirtualNetworkPeerings)).To(BeEquivalentTo(1))
+		for _, vnetPeering := range *vnetPeer.VirtualNetworkPeerings {
 			Expect(vnetPeering.PeeringState).To(BeEquivalentTo("Connected"))
-			Expect(vnetPeering.Name).To(BeEquivalentTo("OSACustomerVNetPeer"))
+			Expect(*vnetPeering.Name).To(BeEquivalentTo("OSACustomerVNetPeer"))
 		}
 	})
 })
