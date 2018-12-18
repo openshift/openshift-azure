@@ -91,9 +91,14 @@ const (
 
 // NetworkProfile contains configuration for OpenShift networking.
 type NetworkProfile struct {
+	// VnetCIDR (in): the CIDR with which the OSA cluster's Vnet is configured
 	VnetCIDR *string `json:"vnetCidr,omitempty"`
 
-	// PeerVnetID is expected to be empty or match
+	// VnetID (out): the ID of the Vnet created for the OSA cluster
+	VnetID *string `json:"vnetId,omitempty"`
+
+	// PeerVnetID (in, optional): ID of a Vnet with which the OSA cluster Vnet should be peered.
+	// If non-empty, this should match
 	// `^/subscriptions/[^/]+
 	//   /resourceGroups/[^/]+
 	//   /providers/Microsoft.Network

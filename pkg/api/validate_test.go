@@ -165,6 +165,17 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{errors.New(`invalid properties.publicHostname "www.example.com"`)},
 		},
+		"network profile valid VnetId": {
+			f: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.VnetID = "/subscriptions/b07e8fae-2f3f-4769-8fa8-8570b426ba13/resourceGroups/test/providers/Microsoft.Network/virtualNetworks/vnet"
+			},
+		},
+		"network profile invalid VnetId": {
+			f: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.VnetID = "foo"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.networkProfile.vnetId "foo"`)},
+		},
 		"network profile bad vnetCidr": {
 			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.NetworkProfile.VnetCIDR = "foo"
