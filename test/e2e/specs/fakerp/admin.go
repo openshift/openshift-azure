@@ -92,6 +92,11 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 		Expect(err).ToNot(HaveOccurred())
 	})
 
+	It("should start node-exporter correctly", func() {
+		err := wait.Poll(2*time.Second, 20*time.Minute, ready.DaemonSetIsReady(cli.AppsV1.DaemonSets("openshift-monitoring"), "node-exporter"))
+		Expect(err).ToNot(HaveOccurred())
+	})
+
 	It("should start kube-state-metrics correctly", func() {
 		err := wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(cli.AppsV1.Deployments("openshift-monitoring"), "kube-state-metrics"))
 		Expect(err).ToNot(HaveOccurred())
