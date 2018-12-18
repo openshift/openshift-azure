@@ -56,10 +56,8 @@ func (derived) KubeReserved(cs *api.OpenShiftManagedCluster, role api.AgentPoolP
 
 		if isSmallVM(app.VMSize) {
 			return "cpu=200m,memory=512Mi", nil
-
-		} else {
-			return "cpu=500m,memory=512Mi", nil
 		}
+		return "cpu=500m,memory=512Mi", nil
 	}
 
 	return "", fmt.Errorf("role %s not found", role)
@@ -101,8 +99,8 @@ func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error
 		AadClientSecret:     cs.Properties.ServicePrincipalProfile.Secret,
 		ResourceGroup:       cs.Properties.AzProfile.ResourceGroup,
 		Location:            cs.Location,
-		SecurityGroupName:   "nsg-compute",
-		PrimaryScaleSetName: "ss-compute",
+		SecurityGroupName:   GetSecurityGroupName(cs, api.AgentPoolProfileRoleCompute),
+		PrimaryScaleSetName: GetScalesetName(cs, api.AgentPoolProfileRoleCompute),
 		VMType:              "vmss",
 	})
 }

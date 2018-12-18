@@ -117,9 +117,9 @@ func TestGetNodesAndDrain(t *testing.T) {
 				Properties: api.Properties{
 					AzProfile: api.AzProfile{ResourceGroup: testRg},
 					AgentPoolProfiles: []api.AgentPoolProfile{
-						{Role: api.AgentPoolProfileRoleMaster, Count: 1},
-						{Role: api.AgentPoolProfileRoleInfra, Count: 1},
-						{Role: api.AgentPoolProfileRoleCompute, Count: 1},
+						{Role: api.AgentPoolProfileRoleMaster, Name: "master", Count: 1},
+						{Role: api.AgentPoolProfileRoleInfra, Name: "infra", Count: 1},
+						{Role: api.AgentPoolProfileRoleCompute, Name: "compute", Count: 1},
 					},
 				},
 			},
@@ -164,9 +164,9 @@ func TestGetNodesAndDrain(t *testing.T) {
 				Properties: api.Properties{
 					AzProfile: api.AzProfile{ResourceGroup: testRg},
 					AgentPoolProfiles: []api.AgentPoolProfile{
-						{Role: api.AgentPoolProfileRoleMaster, Count: 1},
-						{Role: api.AgentPoolProfileRoleInfra, Count: 1},
-						{Role: api.AgentPoolProfileRoleCompute, Count: 1},
+						{Role: api.AgentPoolProfileRoleMaster, Name: "master", Count: 1},
+						{Role: api.AgentPoolProfileRoleInfra, Name: "infra", Count: 1},
+						{Role: api.AgentPoolProfileRoleCompute, Name: "compute", Count: 1},
 					},
 				},
 			},
@@ -440,7 +440,7 @@ func TestUpdateInPlace(t *testing.T) {
 				Properties: api.Properties{
 					AzProfile: api.AzProfile{ResourceGroup: testRg},
 					AgentPoolProfiles: []api.AgentPoolProfile{
-						{Role: api.AgentPoolProfileRoleMaster, Count: 1},
+						{Role: api.AgentPoolProfileRoleMaster, Name: "master", Count: 1},
 					},
 				},
 			},
@@ -573,7 +573,7 @@ func TestUpdatePlusOne(t *testing.T) {
 				Properties: api.Properties{
 					AzProfile: api.AzProfile{ResourceGroup: testRg},
 					AgentPoolProfiles: []api.AgentPoolProfile{
-						{Role: api.AgentPoolProfileRoleCompute, Count: 1},
+						{Role: api.AgentPoolProfileRoleCompute, Name: "compute", Count: 1},
 					},
 				},
 			},

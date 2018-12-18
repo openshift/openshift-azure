@@ -13,7 +13,7 @@ func TestGenerate(t *testing.T) {
 	cs := &api.OpenShiftManagedCluster{
 		Properties: api.Properties{
 			AgentPoolProfiles: []api.AgentPoolProfile{
-				{},
+				{Role: api.AgentPoolProfileRoleCompute, Name: "compute"},
 			},
 		},
 		Config: api.Config{

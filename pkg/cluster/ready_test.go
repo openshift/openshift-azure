@@ -3,7 +3,6 @@ package cluster
 import (
 	"context"
 	"fmt"
-	"strings"
 	"testing"
 
 	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
@@ -12,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
@@ -38,7 +38,7 @@ func mockListVMs(ctx context.Context, gmc *gomock.Controller, virtualMachineScal
 			return ret
 		})
 	}
-	scalesetName := strings.TrimSpace("ss-" + string(role))
+	scalesetName := config.GetScalesetName(cs, role)
 	if outErr != nil {
 		virtualMachineScaleSetVMsClient.EXPECT().List(ctx, rg, scalesetName, "", "", "").Return(nil, outErr)
 	} else {
@@ -52,37 +52,21 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 	testRg := "myrg"
 	tests := []struct {
 		name        string
-		cs          *api.OpenShiftManagedCluster
 		expect      map[string][]compute.VirtualMachineScaleSetVM
 		wantErr     bool
 		expectedErr error
 	}{
 		{
-			name: "nothing to wait for",
-			cs: &api.OpenShiftManagedCluster{
-				Properties: api.Properties{
-					AzProfile: api.AzProfile{ResourceGroup: testRg},
-				},
-			},
+			name:    "nothing to wait for",
 			wantErr: false,
 		},
 		{
-			name: "list vm error",
-			cs: &api.OpenShiftManagedCluster{
-				Properties: api.Properties{
-					AzProfile: api.AzProfile{ResourceGroup: testRg},
-				},
-			},
+			name:        "list vm error",
 			wantErr:     true,
 			expectedErr: vmListErr,
 		},
 		{
-			name: "node get error",
-			cs: &api.OpenShiftManagedCluster{
-				Properties: api.Properties{
-					AzProfile: api.AzProfile{ResourceGroup: testRg},
-				},
-			},
+			name:        "node get error",
 			wantErr:     true,
 			expectedErr: nodeGetErr,
 			expect: map[string][]compute.VirtualMachineScaleSetVM{
@@ -120,11 +104,6 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 		},
 		{
 			name: "all ready",
-			cs: &api.OpenShiftManagedCluster{
-				Properties: api.Properties{
-					AzProfile: api.AzProfile{ResourceGroup: testRg},
-				},
-			},
 			expect: map[string][]compute.VirtualMachineScaleSetVM{
 				"master": {
 					{
@@ -163,6 +142,26 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			cs := &api.OpenShiftManagedCluster{
+				Properties: api.Properties{
+					AzProfile: api.AzProfile{ResourceGroup: testRg},
+					AgentPoolProfiles: []api.AgentPoolProfile{
+						{
+							Name: "foo",
+							Role: api.AgentPoolProfileRoleCompute,
+						},
+						{
+							Name: "infra",
+							Role: api.AgentPoolProfileRoleInfra,
+						},
+						{
+							Name: "master",
+							Role: api.AgentPoolProfileRoleMaster,
+						},
+					},
+				},
+			}
+
 			ctx := context.Background()
 			gmc := gomock.NewController(t)
 			defer gmc.Finish()
@@ -172,15 +171,15 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			kubeclient := mock_kubeclient.NewMockKubeclient(gmc)
 			if tt.wantErr {
 				if tt.expectedErr == vmListErr {
-					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, nil, tt.expectedErr)
+					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, "master", testRg, nil, tt.expectedErr)
 				} else {
-					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, tt.expect["master"], nil)
+					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, "master", testRg, tt.expect["master"], nil)
 					kubeclient.EXPECT().WaitForReady(ctx, api.AgentPoolProfileRoleMaster, gomock.Any()).Return(nodeGetErr)
 				}
 			} else {
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, tt.expect["master"], nil)
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "infra", testRg, tt.expect["infra"], nil)
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "compute", testRg, tt.expect["compute"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, "master", testRg, tt.expect["master"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, "infra", testRg, tt.expect["infra"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, "compute", testRg, tt.expect["compute"], nil)
 				kubeclient.EXPECT().WaitForReady(ctx, gomock.Any(), gomock.Any()).Times(len(tt.expect)).Return(nil)
 			}
 
@@ -190,7 +189,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 				kubeclient: kubeclient,
 				log:        logrus.NewEntry(logrus.StandardLogger()),
 			}
-			err := u.waitForNodes(ctx, tt.cs)
+			err := u.waitForNodes(ctx, cs)
 			if tt.wantErr && tt.expectedErr != err {
 				t.Errorf("simpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
 			}
