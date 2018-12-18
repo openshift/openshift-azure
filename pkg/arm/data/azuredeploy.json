@@ -25,10 +25,6 @@
                 ]
             }
         },
-{{- /* TODO: we may be able to avoid the IP and LB here if we stop using */}}
-{{- /* DaemonSets for SDN.  Then Master nodes should come up as Ready */}}
-{{- /* automatically, and hence be entered into consideration for a */}}
-{{- /* LoadBalancer Service fronting the API server */}}
         {
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2017-10-01",
@@ -131,17 +127,14 @@
             "tags": {
                 "type": "config"
             }
-        }
-{{- range $app := .ContainerService.Properties.AgentPoolProfiles }},
-{{- if not IsUpgrade }}
+        },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
             "location": "{{ $.ContainerService.Location | js }}",
-            "name": "nsg-{{ $app.Name | js }}",
+            "name": "nsg-master",
             "properties": {
                 "securityRules": [
-{{- if eq $app.Role "master" }}
                     {
                         "name": "allow_ssh",
                         "properties": {
@@ -170,11 +163,23 @@
                             "sourcePortRange": "*"
                         }
                     }
-{{- end }}
                 ]
             }
-        },
+        }
+{{- if not IsUpgrade }},
+{{- /* we don't specify nsg-nonmaster on upgrade because we don't want to */}}
+{{- /* overwrite the securityRules that the cloud controller put there */}}
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2016-03-30",
+            "location": "{{ $.ContainerService.Location | js }}",
+            "name": "nsg-nonmaster",
+            "properties": {
+                "securityRules": []
+            }
+        }
 {{- end }}
+{{- range $app := .ContainerService.Properties.AgentPoolProfiles }},
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
             "apiVersion": "2017-12-01",
@@ -185,7 +190,11 @@
                 "[resourceId('Microsoft.Network/loadBalancers', 'lb-apiserver')]"
 {{- end }}
 {{- if not IsUpgrade }},
-                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name | js }}')]"
+{{- if eq $app.Role "master" }}
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-master')]"
+{{- else }}
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-nonmaster')]"
+{{- end }}
 {{- end }}
             ],
             "name": "ss-{{ $app.Name | js }}",
@@ -258,7 +267,11 @@
                                     "primary": true,
                                     "enableIPForwarding": true,
                                     "networkSecurityGroup": {
-                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-{{ $app.Name | js }}')]"
+{{- if eq $app.Role "master" }}
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-master')]"
+{{- else }}
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-nonmaster')]"
+{{- end }}
                                     },
                                     "ipConfigurations": [
                                         {

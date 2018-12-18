@@ -31,8 +31,8 @@ func TestGenerate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(jsonpath.MustCompile("$.resources[?(@.type='Microsoft.Network/networkSecurityGroups')]").Get(armtemplate)) != 1 {
-		t.Error("expected to find one networkSecurityGroup on create")
+	if len(jsonpath.MustCompile("$.resources[?(@.type='Microsoft.Network/networkSecurityGroups')]").Get(armtemplate)) != 2 {
+		t.Error("expected to find two networkSecurityGroups on create")
 	}
 
 	armtemplate, err = sg.Generate(context.Background(), cs, "", true)
@@ -40,7 +40,7 @@ func TestGenerate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(jsonpath.MustCompile("$.resources[?(@.type='Microsoft.Network/networkSecurityGroups')]").Get(armtemplate)) != 0 {
-		t.Error("expected to find no networkSecurityGroup on update")
+	if len(jsonpath.MustCompile("$.resources[?(@.type='Microsoft.Network/networkSecurityGroups')]").Get(armtemplate)) != 1 {
+		t.Error("expected to find one networkSecurityGroup on update")
 	}
 }

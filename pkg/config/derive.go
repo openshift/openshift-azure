@@ -93,15 +93,15 @@ func (derived) MasterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
 
 func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
 	return yaml.Marshal(cloudprovider.Config{
-		TenantID:            cs.Properties.AzProfile.TenantID,
-		SubscriptionID:      cs.Properties.AzProfile.SubscriptionID,
-		AadClientID:         cs.Properties.ServicePrincipalProfile.ClientID,
-		AadClientSecret:     cs.Properties.ServicePrincipalProfile.Secret,
-		ResourceGroup:       cs.Properties.AzProfile.ResourceGroup,
-		Location:            cs.Location,
-		SecurityGroupName:   GetSecurityGroupName(cs, api.AgentPoolProfileRoleCompute),
-		PrimaryScaleSetName: GetScalesetName(cs, api.AgentPoolProfileRoleCompute),
-		VMType:              "vmss",
+		TenantID:          cs.Properties.AzProfile.TenantID,
+		SubscriptionID:    cs.Properties.AzProfile.SubscriptionID,
+		AadClientID:       cs.Properties.ServicePrincipalProfile.ClientID,
+		AadClientSecret:   cs.Properties.ServicePrincipalProfile.Secret,
+		ResourceGroup:     cs.Properties.AzProfile.ResourceGroup,
+		LoadBalancerSku:   "standard",
+		Location:          cs.Location,
+		SecurityGroupName: "nsg-nonmaster",
+		VMType:            "vmss",
 	})
 }
 
