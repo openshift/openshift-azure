@@ -43,6 +43,9 @@ type Client struct {
 	VirtualMachineScaleSetExtensions azureclient.VirtualMachineScaleSetExtensionsClient
 	VirtualMachineScaleSetVMs        azureclient.VirtualMachineScaleSetVMsClient
 	Resources                        azureclient.ResourcesClient
+	VirtualNetworks                  azureclient.VirtualNetworksClient
+	VirtualNetworksPeerings          azureclient.VirtualNetworksPeeringsClient
+	Groups                           azureclient.GroupsClient
 }
 
 // NewClientFromEnvironment creates a new azure client from environment variables.
@@ -102,5 +105,8 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 		VirtualMachineScaleSetExtensions: azureclient.NewVirtualMachineScaleSetExtensionsClient(subscriptionID, authorizer, nil),
 		VirtualMachineScaleSetVMs:        azureclient.NewVirtualMachineScaleSetVMsClient(subscriptionID, authorizer, nil),
 		Resources:                        azureclient.NewResourcesClient(subscriptionID, authorizer, nil),
+		VirtualNetworks:                  azureclient.NewVirtualNetworkClient(subscriptionID, authorizer, nil),
+		VirtualNetworksPeerings:          azureclient.NewVirtualNetworksPeeringsClient(subscriptionID, authorizer, nil),
+		Groups:                           azureclient.NewGroupsClient(subscriptionID, authorizer, nil),
 	}, nil
 }

@@ -106,4 +106,7 @@ e2e-keyrotation:
 e2e-scaleupdown:
 	FOCUS="\[ScaleUpDown\]\[Fake\]" TIMEOUT=30m ./hack/e2e.sh
 
+e2e-vnet:
+	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=30m ./hack/e2e.sh
+
 .PHONY: clean sync-image sync-push verify unit e2e
