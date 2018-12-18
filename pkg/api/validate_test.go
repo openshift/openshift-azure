@@ -56,6 +56,7 @@ func TestValidate(t *testing.T) {
 		expectedErrs []error
 		externalOnly bool
 		simulateProd bool // this defaults to false, that way I don't have to define it everywhere
+		isAdmin      bool
 	}{
 		"test yaml parsing": { // test yaml parsing
 
@@ -392,6 +393,10 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider tenantId ""`)},
 		},
+		"admin api cluster create": {
+			isAdmin:      true,
+			expectedErrs: []error{errors.New(`admin requests cannot create clusters`)},
+		},
 	}
 
 	for name, test := range tests {
@@ -409,7 +414,7 @@ func TestValidate(t *testing.T) {
 		if test.f != nil {
 			test.f(cs)
 		}
-		v := Validator{runningUnderTest: !test.simulateProd}
+		v := Validator{runningUnderTest: !test.simulateProd, isAdmin: test.isAdmin}
 		errs := v.Validate(cs, nil, test.externalOnly)
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
 			t.Logf("test case %q", name)
