@@ -8,13 +8,13 @@ const (
 // OpenShiftManagedCluster complies with the ARM model of resource definition in
 // a JSON template.
 type OpenShiftManagedCluster struct {
-	Plan       ResourcePurchasePlan `json:"plan,omitempty"`
-	Properties Properties           `json:"properties,omitempty"`
-	ID         string               `json:"id,omitempty"`
-	Name       string               `json:"name,omitempty"`
-	Type       string               `json:"type,omitempty"`
-	Location   string               `json:"location,omitempty"`
-	Tags       map[string]string    `json:"tags"`
+	Plan       *ResourcePurchasePlan `json:"plan,omitempty"`
+	Properties Properties            `json:"properties,omitempty"`
+	ID         string                `json:"id,omitempty"`
+	Name       string                `json:"name,omitempty"`
+	Type       string                `json:"type,omitempty"`
+	Location   string                `json:"location,omitempty"`
+	Tags       map[string]string     `json:"tags"`
 
 	Config Config `json:"config,omitempty"`
 }
@@ -22,10 +22,10 @@ type OpenShiftManagedCluster struct {
 // ResourcePurchasePlan defines the resource plan as required by ARM for billing
 // purposes.
 type ResourcePurchasePlan struct {
-	Name          string `json:"name,omitempty"`
-	Product       string `json:"product,omitempty"`
-	PromotionCode string `json:"promotionCode,omitempty"`
-	Publisher     string `json:"publisher,omitempty"`
+	Name          *string `json:"name,omitempty"`
+	Product       *string `json:"product,omitempty"`
+	PromotionCode *string `json:"promotionCode,omitempty"`
+	Publisher     *string `json:"publisher,omitempty"`
 }
 
 // Properties represents the cluster definition.

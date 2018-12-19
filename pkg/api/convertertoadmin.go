@@ -17,11 +17,13 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 		oc.Tags[k] = &v
 	}
 
-	oc.Plan = &admin.ResourcePurchasePlan{
-		Name:          &cs.Plan.Name,
-		Product:       &cs.Plan.Product,
-		PromotionCode: &cs.Plan.PromotionCode,
-		Publisher:     &cs.Plan.Publisher,
+	if cs.Plan != nil {
+		oc.Plan = &admin.ResourcePurchasePlan{
+			Name:          cs.Plan.Name,
+			Product:       cs.Plan.Product,
+			PromotionCode: cs.Plan.PromotionCode,
+			Publisher:     cs.Plan.Publisher,
+		}
 	}
 
 	provisioningState := admin.ProvisioningState(cs.Properties.ProvisioningState)
