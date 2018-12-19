@@ -131,7 +131,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 }
 
 func (u *simpleUpgrader) listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]compute.VirtualMachineScaleSetVM, error) {
-	vmPages, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, app.Role), "", "", "")
+	vmPages, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), "", "", "")
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +173,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 	}
 
 	for _, vm := range oldVMs {
-		ssName := config.GetScalesetName(cs, app.Role)
+		ssName := config.GetScalesetName(app.Name)
 		u.log.Infof("setting %s capacity to %d", ssName, app.Count+1)
 		future, err := u.ssc.Update(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetUpdate{
 			Sku: &compute.Sku{
@@ -271,7 +271,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 
 		{
 			u.log.Infof("deallocating %s (%s)", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, *vm.InstanceID)
-			future, err := u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, app.Role), *vm.InstanceID)
+			future, err := u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), *vm.InstanceID)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDeallocate}
 			}
@@ -284,7 +284,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 
 		{
 			u.log.Infof("updating %s", computerName)
-			future, err := u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, app.Role), compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
+			future, err := u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
 				InstanceIds: &[]string{*vm.InstanceID},
 			})
 			if err != nil {
@@ -299,7 +299,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 
 		{
 			u.log.Infof("reimaging %s", computerName)
-			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, app.Role), *vm.InstanceID)
+			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), *vm.InstanceID)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReimage}
 			}
@@ -312,7 +312,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 
 		{
 			u.log.Infof("starting %s", computerName)
-			future, err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, app.Role), *vm.InstanceID)
+			future, err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), *vm.InstanceID)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceStart}
 			}
@@ -345,7 +345,7 @@ func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	u.log.Infof("deleting %s", nodeName)
-	future, err := u.vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, app.Role), instanceID)
+	future, err := u.vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), instanceID)
 	if err != nil {
 		return err
 	}

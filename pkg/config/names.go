@@ -2,18 +2,11 @@ package config
 
 import (
 	"fmt"
-
-	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// GetScalesetName get the scaleset name as built in the arm template
-func GetScalesetName(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) string {
-	for _, app := range cs.Properties.AgentPoolProfiles {
-		if app.Role == role {
-			return "ss-" + app.Name
-		}
-	}
-	panic("invalid role")
+// GetScalesetName returns the VMSS name for a given AgentPoolProfile
+func GetScalesetName(appName string) string {
+	return "ss-" + appName
 }
 
 // GetInstanceName returns the VMSS instance name for a given AgentPoolProfile

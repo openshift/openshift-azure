@@ -16,7 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
 
-func mockListVMs(ctx context.Context, gmc *gomock.Controller, virtualMachineScaleSetVMsClient *mock_azureclient.MockVirtualMachineScaleSetVMsClient, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, rg string, outVMS []compute.VirtualMachineScaleSetVM, outErr error) {
+func mockListVMs(ctx context.Context, gmc *gomock.Controller, virtualMachineScaleSetVMsClient *mock_azureclient.MockVirtualMachineScaleSetVMsClient, cs *api.OpenShiftManagedCluster, appName string, rg string, outVMS []compute.VirtualMachineScaleSetVM, outErr error) {
 	mPage := mock_azureclient.NewMockVirtualMachineScaleSetVMListResultPage(gmc)
 	if len(outVMS) > 0 {
 		mPage.EXPECT().Values().Return(outVMS)
@@ -38,7 +38,7 @@ func mockListVMs(ctx context.Context, gmc *gomock.Controller, virtualMachineScal
 			return ret
 		})
 	}
-	scalesetName := config.GetScalesetName(cs, app.Role)
+	scalesetName := config.GetScalesetName(appName)
 	if outErr != nil {
 		virtualMachineScaleSetVMsClient.EXPECT().List(ctx, rg, scalesetName, "", "", "").Return(nil, outErr)
 	} else {
@@ -171,15 +171,15 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			kubeclient := mock_kubeclient.NewMockKubeclient(gmc)
 			if tt.wantErr {
 				if tt.expectedErr == vmListErr {
-					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, &api.AgentPoolProfile{Role: api.AgentPoolProfileRoleMaster}, testRg, nil, tt.expectedErr)
+					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, "master", testRg, nil, tt.expectedErr)
 				} else {
-					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, &api.AgentPoolProfile{Role: api.AgentPoolProfileRoleMaster}, testRg, tt.expect["master"], nil)
+					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, "master", testRg, tt.expect["master"], nil)
 					kubeclient.EXPECT().WaitForReady(ctx, api.AgentPoolProfileRoleMaster, gomock.Any()).Return(nodeGetErr)
 				}
 			} else {
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, &api.AgentPoolProfile{Role: api.AgentPoolProfileRoleMaster}, testRg, tt.expect["master"], nil)
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, &api.AgentPoolProfile{Role: api.AgentPoolProfileRoleInfra}, testRg, tt.expect["infra"], nil)
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, &api.AgentPoolProfile{Role: api.AgentPoolProfileRoleCompute}, testRg, tt.expect["compute"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, "master", testRg, tt.expect["master"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, "infra", testRg, tt.expect["infra"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, cs, "foo", testRg, tt.expect["compute"], nil)
 				kubeclient.EXPECT().WaitForReady(ctx, gomock.Any(), gomock.Any()).Times(len(tt.expect)).Return(nil)
 			}
 

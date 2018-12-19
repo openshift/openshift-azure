@@ -15,7 +15,7 @@ import (
 
 func (u *simpleUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	// We may need/want to delete all the scalesets in the future
-	future, err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, api.AgentPoolProfileRoleMaster))
+	future, err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(string(api.AgentPoolProfileRoleMaster)))
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
 	}
@@ -123,7 +123,7 @@ func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		for i := 0; i < app.Count; i++ {
 			name := instanceName(config.GetInstanceName(app.Name, i))
-			blob[name] = ssHashes[scalesetName(config.GetScalesetName(cs, app.Role))]
+			blob[name] = ssHashes[scalesetName(config.GetScalesetName(app.Name))]
 		}
 	}
 	return u.writeUpdateBlob(blob)
