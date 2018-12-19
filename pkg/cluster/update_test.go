@@ -221,9 +221,9 @@ func TestGetNodesAndDrain(t *testing.T) {
 			kubeclient := mock_kubeclient.NewMockKubeclient(gmc)
 			virtualMachineScaleSetsClient := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
 			virtualMachineScaleSetVMsClient := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
-			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, tt.vmsBefore["master"], nil)
-			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "infra", testRg, tt.vmsBefore["infra"], nil)
-			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "compute", testRg, tt.vmsBefore["compute"], nil)
+			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "master", testRg, tt.vmsBefore["master"], nil)
+			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "infra", testRg, tt.vmsBefore["infra"], nil)
+			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "compute", testRg, tt.vmsBefore["compute"], nil)
 
 			for comp, scalesetName := range tt.expectDrain {
 				kubeclient.EXPECT().Drain(ctx, gomock.Any(), comp)
@@ -401,7 +401,7 @@ func TestWaitForNewNodes(t *testing.T) {
 				kubeclient:      client,
 				log:             logrus.NewEntry(logrus.StandardLogger()).WithField("test", tt.name),
 			}
-			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, "master", testRg, tt.vmsList["master"], nil)
+			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "master", testRg, tt.vmsList["master"], nil)
 
 			err := u.waitForNewNodes(ctx, tt.cs, tt.nodes, tt.ssHashes)
 			if !reflect.DeepEqual(err, tt.wantErr) {
@@ -464,7 +464,7 @@ func TestUpdateInPlace(t *testing.T) {
 			updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
 			data := ioutil.NopCloser(strings.NewReader(`[]`))
 			updateBlob.EXPECT().Get(nil).Return(data, nil)
-			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.cs, tt.app.Name, testRg, tt.vmsList, nil)
+			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.app.Name, testRg, tt.vmsList, nil)
 			uBlob := updateblob{}
 			for _, vm := range tt.vmsList {
 				compName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
@@ -615,9 +615,9 @@ func TestUpdatePlusOne(t *testing.T) {
 			arc := autorest.NewClientWithUserAgent("unittest")
 			ssc.EXPECT().Client().Return(arc)
 			// initial listing
-			mockListVMs(ctx, gmc, vmc, tt.cs, tt.app.Name, testRg, tt.vmsList1, nil)
+			mockListVMs(ctx, gmc, vmc, tt.app.Name, testRg, tt.vmsList1, nil)
 			// once updated to count+1
-			mockListVMs(ctx, gmc, vmc, tt.cs, tt.app.Name, testRg, tt.vmsList2, nil)
+			mockListVMs(ctx, gmc, vmc, tt.app.Name, testRg, tt.vmsList2, nil)
 			// waitforready
 			client := mock_kubeclient.NewMockKubeclient(gmc)
 			uBlob := updateblob{}
