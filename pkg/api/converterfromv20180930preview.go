@@ -36,7 +36,9 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster, o
 		}
 	}
 
-	mergeResourcePurchasePlan(oc, cs)
+	if oc.Plan != nil {
+		mergeFromResourcePurchasePlanv20180930preview(oc, cs)
+	}
 
 	if err := mergeProperties(oc, cs); err != nil {
 		return nil, err
@@ -45,21 +47,23 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster, o
 	return cs, nil
 }
 
-func mergeResourcePurchasePlan(oc *v20180930preview.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) {
-	if oc.Plan == nil {
-		return
+// mergeFromResourcePurchasePlanv20180930preview merges filled out fields from the external API to the internal representation, doesn't change fields which are nil in the input.
+// The user is allowed to provide partial PurchasePlan via the API.
+func mergeFromResourcePurchasePlanv20180930preview(oc *v20180930preview.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) {
+	if cs.Plan == nil {
+		cs.Plan = &ResourcePurchasePlan{}
 	}
 	if oc.Plan.Name != nil {
-		cs.Plan.Name = *oc.Plan.Name
+		cs.Plan.Name = oc.Plan.Name
 	}
 	if oc.Plan.Product != nil {
-		cs.Plan.Product = *oc.Plan.Product
+		cs.Plan.Product = oc.Plan.Product
 	}
 	if oc.Plan.PromotionCode != nil {
-		cs.Plan.PromotionCode = *oc.Plan.PromotionCode
+		cs.Plan.PromotionCode = oc.Plan.PromotionCode
 	}
 	if oc.Plan.Publisher != nil {
-		cs.Plan.Publisher = *oc.Plan.Publisher
+		cs.Plan.Publisher = oc.Plan.Publisher
 	}
 }
 
