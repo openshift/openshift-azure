@@ -8,6 +8,8 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
+
+	"github.com/openshift/openshift-azure/pkg/util/randomstring"
 )
 
 var supportedRegions = []string{
@@ -27,7 +29,7 @@ type Config struct {
 	AADClientSecret string `envconfig:"AZURE_AAD_CLIENT_SECRET"`
 
 	Region        string `envconfig:"AZURE_REGION"`
-	ResourceGroup string `envconfig:"RESOURCEGROUP" required:"true"`
+	ResourceGroup string `envconfig:"RESOURCEGROUP"`
 
 	NoGroupTags      bool   `envconfig:"NOGROUPTAGS"`
 	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
@@ -46,6 +48,7 @@ func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
 			rand.Seed(time.Now().UTC().UnixNano())
 			c.Region = supportedRegions[rand.Intn(len(supportedRegions))]
 			log.Infof("using randomly selected region %s", c.Region)
+			os.Setenv("AZURE_REGION", c.Region)
 		}
 
 		var supported bool
@@ -57,7 +60,16 @@ func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
 		if !supported {
 			return nil, fmt.Errorf("%s is not a supported region (supported regions: %v)", c.Region, supportedRegions)
 		}
-		os.Setenv("AZURE_REGION", c.Region)
+	}
+	if c.ResourceGroup == "" {
+		// Generate a resource group name
+		suffix, err := randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 8)
+		if err != nil {
+			return nil, err
+		}
+		c.ResourceGroup = fmt.Sprintf("generated-%s", suffix)
+		log.Infof("using generated resource group name %s", c.ResourceGroup)
+		os.Setenv("RESOURCEGROUP", c.ResourceGroup)
 	}
 	return &c, nil
 }

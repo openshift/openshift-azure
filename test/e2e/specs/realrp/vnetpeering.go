@@ -2,7 +2,7 @@ package realrp
 
 import (
 	"context"
-	"os"
+	"fmt"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -19,50 +19,47 @@ import (
 
 var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 	var (
+		cfg          *client.Config
 		ctx          = context.Background()
 		cli          *azure.Client
-		rg           = os.Getenv("RESOURCEGROUP")
 		vnetPeerName = "vnetPeer"
-		region       = os.Getenv("AZURE_REGION")
-		clientID     = os.Getenv("AZURE_CLIENT_ID")
-		clientSecret = os.Getenv("AZURE_CLIENT_SECRET")
 	)
 
 	BeforeEach(func() {
 		var err error
 		cli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(region).NotTo(BeEmpty())
-		Expect(rg).NotTo(BeEmpty())
+		cfg, err = client.NewConfig(tlog.GetTestLogger(), true)
+		Expect(err).NotTo(HaveOccurred())
+
+		// create a new resource group
+		now := time.Now().String()
+		ttl := "4h"
+		By(fmt.Sprintf("creating resource group %s", cfg.ResourceGroup))
+		_, err = cli.Groups.CreateOrUpdate(ctx, cfg.ResourceGroup, resources.Group{
+			Name:     &cfg.ResourceGroup,
+			Location: &cfg.Region,
+			Tags: map[string]*string{
+				"now": &now,
+				"ttl": &ttl,
+			},
+		})
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
-		result, _ := cli.Groups.Delete(ctx, rg)
-		_ = result.WaitForCompletionRef(ctx, cli.Groups.Client())
+		By(fmt.Sprintf("deleting resource group %s", cfg.ResourceGroup))
+		result, err := cli.Groups.Delete(ctx, cfg.ResourceGroup)
+		Expect(err).NotTo(HaveOccurred())
+		result.WaitForCompletionRef(ctx, cli.Groups.Client())
 	})
 
 	It("should create the vnet and cluster and verify peering", func() {
-		log := tlog.GetTestLogger()
-
-		// create a resource group and a vnet
-		exists, err := cli.Groups.CheckExistence(ctx, rg)
-		Expect(err).ToNot(HaveOccurred())
-		if !exists {
-			now := time.Now().String()
-			ttl := "4h"
-			_, err := cli.Groups.CreateOrUpdate(ctx, rg, resources.Group{
-				Name:     &rg,
-				Location: &region,
-				Tags: map[string]*string{
-					"now": &now,
-					"ttl": &ttl,
-				},
-			})
-			Expect(err).ToNot(HaveOccurred())
-		}
+		// create a vnet
 		subnetName := "vnetPeerSubnet"
 		subnetAddressPrefix := "192.168.0.0/24"
-		future, err := cli.VirtualNetworks.CreateOrUpdate(ctx, rg, vnetPeerName, network.VirtualNetwork{
+		By("creating a custom vnet")
+		future, err := cli.VirtualNetworks.CreateOrUpdate(ctx, cfg.ResourceGroup, vnetPeerName, network.VirtualNetwork{
 			VirtualNetworkPropertiesFormat: &network.VirtualNetworkPropertiesFormat{
 				AddressSpace: &network.AddressSpace{
 					AddressPrefixes: &[]string{
@@ -78,31 +75,28 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 					},
 				},
 			},
-			Location: &region,
+			Location: &cfg.Region,
 		})
 		Expect(err).ToNot(HaveOccurred())
-		Expect(future).ToNot(BeNil())
 		err = future.WaitForCompletionRef(ctx, cli.VirtualNetworks.Client())
 		Expect(err).ToNot(HaveOccurred())
 
-		vnet, err := cli.VirtualNetworks.Get(ctx, rg, vnetPeerName, "")
+		vnet, err := cli.VirtualNetworks.Get(ctx, cfg.ResourceGroup, vnetPeerName, "")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(vnet).ToNot(BeNil())
 		Expect(len(*vnet.VirtualNetworkPeerings)).To(Equal(0))
 
 		// load cluster config
-		config, err := client.LoadClusterConfigFromManifest(log, "../../test/manifests/normal/create.yaml")
+		config, err := client.LoadClusterConfigFromManifest(tlog.GetTestLogger(), "../../test/manifests/normal/create.yaml")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(config).ToNot(BeNil())
 		// Set clientid and secret if not set
 		for _, ip := range config.Properties.AuthProfile.IdentityProviders {
 			switch provider := ip.Provider.(type) {
 			case (*api.AADIdentityProvider):
 				if *provider.ClientID == "" {
-					provider.ClientID = &clientID
+					provider.ClientID = &cfg.ClientID
 				}
 				if *provider.Secret == "" {
-					provider.Secret = &clientSecret
+					provider.Secret = &cfg.ClientSecret
 				}
 			}
 		}
@@ -110,12 +104,13 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 		config.Properties.NetworkProfile.PeerVnetID = vnet.ID
 
 		// create a cluster with the peerVnet
-		_, err = cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(ctx, rg, rg, *config)
+		By("creating an OSA cluster")
+		_, err = cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(ctx, cfg.ResourceGroup, cfg.ResourceGroup, *config)
 		Expect(err).NotTo(HaveOccurred())
 
-		vnetPeer, err := cli.VirtualNetworks.Get(ctx, rg, vnetPeerName, "")
+		By("ensuring the OSA cluster vnet is peered with the custom vnet")
+		vnetPeer, err := cli.VirtualNetworks.Get(ctx, cfg.ResourceGroup, vnetPeerName, "")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(vnetPeer).ToNot(BeNil())
 		Expect(len(*vnetPeer.VirtualNetworkPeerings)).To(BeEquivalentTo(1))
 		for _, vnetPeering := range *vnetPeer.VirtualNetworkPeerings {
 			Expect(vnetPeering.PeeringState).To(BeEquivalentTo("Connected"))
