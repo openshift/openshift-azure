@@ -16,12 +16,8 @@ func GetScalesetName(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileR
 	panic("invalid role")
 }
 
-// GetInstanceName get the instance name as built in the arm template
-func GetInstanceName(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, instance int) string {
-	for _, app := range cs.Properties.AgentPoolProfiles {
-		if app.Role == role {
-			return fmt.Sprintf("ss-%s_%d", app.Name, instance)
-		}
-	}
-	panic("invalid role")
+// GetInstanceName returns the VMSS instance name for a given AgentPoolProfile
+// name and instance number
+func GetInstanceName(appName string, instance int) string {
+	return fmt.Sprintf("ss-%s_%d", appName, instance)
 }

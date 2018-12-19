@@ -122,7 +122,7 @@ func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 	blob := updateblob{}
 	for _, profile := range cs.Properties.AgentPoolProfiles {
 		for i := 0; i < profile.Count; i++ {
-			name := instanceName(config.GetInstanceName(cs, profile.Role, i))
+			name := instanceName(config.GetInstanceName(profile.Name, i))
 			blob[name] = ssHashes[scalesetName(config.GetScalesetName(cs, profile.Role))]
 		}
 	}

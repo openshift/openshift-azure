@@ -32,7 +32,7 @@ func TestGetNames(t *testing.T) {
 			},
 		},
 		{
-			name:         "compute - thingy",
+			name:         "thingy",
 			role:         api.AgentPoolProfileRoleCompute,
 			wantScaleset: "ss-thingy",
 			wantInstance: "ss-thingy_3",
@@ -53,8 +53,8 @@ func TestGetNames(t *testing.T) {
 			if got := GetScalesetName(tt.cs, tt.role); got != tt.wantScaleset {
 				t.Errorf("GetScalesetName() = %v, want %v", got, tt.wantScaleset)
 			}
-			if got := GetInstanceName(tt.cs, tt.role, tt.instance); got != tt.wantInstance {
-				t.Errorf("GetScalesetName() = %v, want %v", got, tt.wantInstance)
+			if got := GetInstanceName(tt.name, tt.instance); got != tt.wantInstance {
+				t.Errorf("GetInstanceName() = %v, want %v", got, tt.wantInstance)
 			}
 		})
 	}
