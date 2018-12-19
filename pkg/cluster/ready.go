@@ -11,19 +11,41 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 	return u.kubeclient.WaitForInfraServices(ctx)
 }
 
-func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute} {
-		vms, err := u.listVMs(ctx, cs, role)
+func (u *simpleUpgrader) waitForNode(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) error {
+	vms, err := u.listVMs(ctx, cs, role)
+	if err != nil {
+		return err
+	}
+	for _, vm := range vms {
+		computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		u.log.Infof("waiting for %s to be ready", computerName)
+		err = u.kubeclient.WaitForReady(ctx, role, computerName)
 		if err != nil {
 			return err
 		}
-		for _, vm := range vms {
-			computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			u.log.Infof("waiting for %s to be ready", computerName)
-			err = u.kubeclient.WaitForReady(ctx, role, computerName)
-			if err != nil {
-				return err
-			}
+	}
+	return nil
+}
+
+func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+		err := u.waitForNode(ctx, cs, app.Role)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
+		err := u.waitForNode(ctx, cs, app.Role)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
+		err := u.waitForNode(ctx, cs, app.Role)
+		if err != nil {
+			return err
 		}
 	}
 

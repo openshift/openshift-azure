@@ -42,14 +42,20 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 	}
-	if perr := u.updateInPlace(ctx, cs, api.AgentPoolProfileRoleMaster, ssHashes); perr != nil {
-		return perr
+	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+		if perr := u.updateInPlace(ctx, cs, app.Role, ssHashes); perr != nil {
+			return perr
+		}
 	}
-	if perr := u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleInfra, ssHashes); perr != nil {
-		return perr
+	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
+		if perr := u.updatePlusOne(ctx, cs, app.Role, ssHashes); perr != nil {
+			return perr
+		}
 	}
-	if perr := u.updatePlusOne(ctx, cs, api.AgentPoolProfileRoleCompute, ssHashes); perr != nil {
-		return perr
+	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
+		if perr := u.updatePlusOne(ctx, cs, app.Role, ssHashes); perr != nil {
+			return perr
+		}
 	}
 	return nil
 }
@@ -357,4 +363,18 @@ func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	return future.WaitForCompletionRef(ctx, u.vmc.Client())
+}
+
+// sortedAgentPoolProfilesForRole returns a shallow copy of the
+// AgentPoolProfiles of a given role, sorted by name
+func sortedAgentPoolProfilesForRole(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) (apps []api.AgentPoolProfile) {
+	for _, app := range cs.Properties.AgentPoolProfiles {
+		if app.Role == role {
+			apps = append(apps, app)
+		}
+	}
+
+	sort.Slice(apps, func(i, j int) bool { return apps[i].Name < apps[j].Name })
+
+	return apps
 }
