@@ -14,11 +14,13 @@ fi
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
     TEST_IN_PRODUCTION="-use-prod=true"
 else
-	hack/fakerp.sh $RESOURCEGROUP &
+    go generate ./...
+    go run cmd/fakerp/main.go &
 fi
 if [[ -n "$ADMIN_MANIFEST" ]]; then
     ADMIN_MANIFEST="-admin-manifest=$ADMIN_MANIFEST"
 fi
 
+trap 'set +ex; return_id=$?; kill $(lsof -t -i :8080); wait; exit $return_id' EXIT
 
 go run cmd/createorupdate/createorupdate.go -timeout 1h ${TEST_IN_PRODUCTION:-} ${ADMIN_MANIFEST:-}
