@@ -17,6 +17,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
@@ -55,7 +57,8 @@ func forHTTPStatusOk(ctx context.Context, log *logrus.Entry, cli SimpleHTTPClien
 	var response *http.Response
 	err = PollImmediateUntil(interval, func() (bool, error) {
 		resp, err := cli.Do(req)
-		log.Debug(err)
+		spew.Dump(resp)
+		spew.Dump(err)
 		if err, ok := err.(*url.Error); ok {
 			if err, ok := err.Err.(*net.OpError); ok {
 				if err, ok := err.Err.(*os.SyscallError); ok {
