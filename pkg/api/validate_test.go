@@ -42,7 +42,7 @@ properties:
     vmSize: Standard_D2s_v3
     osType: Linux
     subnetCidr: 10.0.0.0/24
-  - name: myCompute
+  - name: mycompute
     role: compute
     count: 1
     vmSize: Standard_D2s_v3
@@ -70,7 +70,7 @@ func TestValidate(t *testing.T) {
 			expectedErrs: []error{
 				errors.New(`invalid properties.masterPoolProfile.vmSize "Standard_D2s_v3"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].vmSize "Standard_D2s_v3"`),
-				errors.New(`invalid properties.agentPoolProfiles["myCompute"].vmSize "Standard_D2s_v3"`),
+				errors.New(`invalid properties.agentPoolProfiles["mycompute"].vmSize "Standard_D2s_v3"`),
 			},
 		},
 		"simulating prod, Standard_D8s_v3": {
@@ -177,7 +177,7 @@ func TestValidate(t *testing.T) {
 			expectedErrs: []error{
 				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
-				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
+				errors.New(`invalid properties.agentPoolProfiles["mycompute"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
 			},
 		},
 		"network profile valid peerVnetId": {
@@ -289,6 +289,18 @@ func TestValidate(t *testing.T) {
 				errors.New(`invalid properties.agentPoolProfiles["$"].name "$"`),
 			},
 		},
+		"agent pool profile invalid compute name case": {
+			f: func(oc *OpenShiftManagedCluster) {
+				for i, app := range oc.Properties.AgentPoolProfiles {
+					if app.Role == AgentPoolProfileRoleCompute {
+						oc.Properties.AgentPoolProfiles[i].Name = "UPPERCASE"
+					}
+				}
+			},
+			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles["UPPERCASE"].name "UPPERCASE"`),
+			},
+		},
 		"agent pool profile invalid vm size": {
 			f: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.AgentPoolProfiles[1].VMSize = VMSize("SuperBigVM")
@@ -310,7 +322,7 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{
 				errors.New(`invalid properties.agentPoolProfiles.subnetCidr "foo": all subnetCidrs must match`),
-				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "foo"`),
+				errors.New(`invalid properties.agentPoolProfiles["mycompute"].subnetCidr "foo"`),
 			},
 		},
 		"agent pool subnet cidr clash cluster": {
@@ -322,7 +334,7 @@ func TestValidate(t *testing.T) {
 			expectedErrs: []error{
 				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
-				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
+				errors.New(`invalid properties.agentPoolProfiles["mycompute"].subnetCidr "10.128.0.0/24": overlaps with cluster network "10.128.0.0/14"`),
 			},
 		},
 		"agent pool subnet cidr clash service": {
@@ -335,7 +347,7 @@ func TestValidate(t *testing.T) {
 			expectedErrs: []error{
 				errors.New(`invalid properties.agentPoolProfiles["master"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
 				errors.New(`invalid properties.agentPoolProfiles["infra"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
-				errors.New(`invalid properties.agentPoolProfiles["myCompute"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
+				errors.New(`invalid properties.agentPoolProfiles["mycompute"].subnetCidr "172.30.0.0/16": overlaps with service network "172.30.0.0/16"`),
 			},
 		},
 		"agent pool bad master count": {
@@ -546,7 +558,7 @@ properties:
     count: 1
     vmSize: Standard_D2s_v3
     osType: Linux
-  - name: myCompute
+  - name: mycompute
     role: compute
     count: 1
     vmSize: Standard_D2s_v3
