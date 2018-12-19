@@ -54,6 +54,7 @@ func forHTTPStatusOk(ctx context.Context, log *logrus.Entry, cli SimpleHTTPClien
 	if err != nil {
 		return nil, err
 	}
+
 	var response *http.Response
 	err = PollImmediateUntil(interval, func() (bool, error) {
 		resp, err := cli.Do(req)
