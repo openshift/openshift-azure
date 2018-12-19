@@ -174,13 +174,14 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "master", testRg, nil, tt.expectedErr)
 				} else {
 					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "master", testRg, tt.expect["master"], nil)
-					kubeclient.EXPECT().WaitForReady(ctx, api.AgentPoolProfileRoleMaster, gomock.Any()).Return(nodeGetErr)
+					kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Return(nodeGetErr)
 				}
 			} else {
 				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "master", testRg, tt.expect["master"], nil)
 				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "infra", testRg, tt.expect["infra"], nil)
 				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "foo", testRg, tt.expect["compute"], nil)
-				kubeclient.EXPECT().WaitForReady(ctx, gomock.Any(), gomock.Any()).Times(len(tt.expect)).Return(nil)
+				kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Times(len(tt.expect["master"])).Return(nil)
+				kubeclient.EXPECT().WaitForReadyWorker(ctx, gomock.Any()).Times(len(tt.expect["infra"]) + len(tt.expect["compute"])).Return(nil)
 			}
 
 			u := &simpleUpgrader{

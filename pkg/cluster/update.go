@@ -102,7 +102,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 			computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 			if _, found := nodes[computerName]; !found {
 				u.log.Infof("waiting for %s to be ready", computerName)
-				err = u.kubeclient.WaitForReady(ctx, app.Role, computerName)
+				err = u.kubeclient.WaitForReadyWorker(ctx, computerName)
 				if err != nil {
 					return err
 				}
@@ -200,7 +200,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			if _, found := vmsBefore[*updated.InstanceID]; !found {
 				computerName := kubeclient.ComputerName(*updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 				u.log.Infof("waiting for %s to be ready", computerName)
-				err = u.kubeclient.WaitForReady(ctx, app.Role, computerName)
+				err = u.kubeclient.WaitForReadyWorker(ctx, computerName)
 				if err != nil {
 					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 				}
@@ -324,7 +324,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		}
 
 		u.log.Infof("waiting for %s to be ready", computerName)
-		err = u.kubeclient.WaitForReady(ctx, app.Role, computerName)
+		err = u.kubeclient.WaitForReadyMaster(ctx, computerName)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceWaitForReady}
 		}

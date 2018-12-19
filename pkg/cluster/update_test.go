@@ -386,7 +386,7 @@ func TestWaitForNewNodes(t *testing.T) {
 			updateBlob.EXPECT().Get(nil).Return(ioutil.NopCloser(bytes.NewReader(blob)), nil)
 
 			if len(tt.nodes) < len(tt.vmsList["master"]) {
-				client.EXPECT().WaitForReady(ctx, api.AgentPoolProfileRoleMaster, kubeclient.ComputerName("master-000000")).Return(tt.wantErr)
+				client.EXPECT().WaitForReadyWorker(ctx, kubeclient.ComputerName("master-000000")).Return(tt.wantErr)
 			}
 			if tt.wantErr == nil && (len(tt.nodes) < len(tt.vmsList["master"]) || len(tt.initialUpdateBlob) > len(tt.vmsList["master"])) {
 				updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
@@ -503,7 +503,7 @@ func TestUpdateInPlace(t *testing.T) {
 					virtualMachineScaleSetVMsClient.EXPECT().Start(ctx, testRg, "ss-"+string(tt.app.Role), *vm.InstanceID).Return(vFt, nil)
 				}
 				// 6. waitforready
-				client.EXPECT().WaitForReady(ctx, tt.app.Role, compName).Return(nil)
+				client.EXPECT().WaitForReadyMaster(ctx, compName).Return(nil)
 				uBlob[instanceName(*vm.Name)] = tt.ssHashes[scalesetName("ss-"+string(tt.app.Role))]
 
 				// write the updatehash
@@ -623,7 +623,7 @@ func TestUpdatePlusOne(t *testing.T) {
 			uBlob := updateblob{}
 			for _, vm := range tt.vmsList2 {
 				compName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-				client.EXPECT().WaitForReady(ctx, tt.app.Role, compName).Return(nil)
+				client.EXPECT().WaitForReadyWorker(ctx, compName).Return(nil)
 
 				// write the updatehash
 				uBlob[instanceName(*vm.Name)] = tt.ssHashes[scalesetName("ss-"+string(tt.app.Role))]

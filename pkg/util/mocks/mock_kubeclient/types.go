@@ -65,16 +65,30 @@ func (mr *MockKubeclientMockRecorder) WaitForInfraServices(arg0 interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForInfraServices", reflect.TypeOf((*MockKubeclient)(nil).WaitForInfraServices), arg0)
 }
 
-// WaitForReady mocks base method
-func (m *MockKubeclient) WaitForReady(arg0 context.Context, arg1 api.AgentPoolProfileRole, arg2 kubeclient.ComputerName) error {
+// WaitForReadyMaster mocks base method
+func (m *MockKubeclient) WaitForReadyMaster(arg0 context.Context, arg1 kubeclient.ComputerName) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WaitForReady", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "WaitForReadyMaster", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// WaitForReady indicates an expected call of WaitForReady
-func (mr *MockKubeclientMockRecorder) WaitForReady(arg0, arg1, arg2 interface{}) *gomock.Call {
+// WaitForReadyMaster indicates an expected call of WaitForReadyMaster
+func (mr *MockKubeclientMockRecorder) WaitForReadyMaster(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForReady", reflect.TypeOf((*MockKubeclient)(nil).WaitForReady), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForReadyMaster", reflect.TypeOf((*MockKubeclient)(nil).WaitForReadyMaster), arg0, arg1)
+}
+
+// WaitForReadyWorker mocks base method
+func (m *MockKubeclient) WaitForReadyWorker(arg0 context.Context, arg1 kubeclient.ComputerName) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForReadyWorker", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForReadyWorker indicates an expected call of WaitForReadyWorker
+func (mr *MockKubeclientMockRecorder) WaitForReadyWorker(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForReadyWorker", reflect.TypeOf((*MockKubeclient)(nil).WaitForReadyWorker), arg0, arg1)
 }

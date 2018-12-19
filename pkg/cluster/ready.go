@@ -19,7 +19,11 @@ func (u *simpleUpgrader) waitForNodesInAgentPoolProfile(ctx context.Context, cs 
 	for _, vm := range vms {
 		computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		u.log.Infof("waiting for %s to be ready", computerName)
-		err = u.kubeclient.WaitForReady(ctx, app.Role, computerName)
+		if app.Role == api.AgentPoolProfileRoleMaster {
+			err = u.kubeclient.WaitForReadyMaster(ctx, computerName)
+		} else {
+			err = u.kubeclient.WaitForReadyWorker(ctx, computerName)
+		}
 		if err != nil {
 			return err
 		}
