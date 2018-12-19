@@ -95,7 +95,7 @@ e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" ./hack/e2e.sh
 
 e2e-prod:
-	FOCUS="\[Real\]" ./hack/e2e.sh
+	FOCUS="\[Default\]\[Real\]" ./hack/e2e.sh
 
 e2e-etcdbackuprecovery:
 	FOCUS="\[EtcdRecovery\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh

@@ -2,10 +2,10 @@ package realrp
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"net/http"
 	"os"
-	"path"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -13,48 +13,44 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
 
-	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/shared"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
+	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/test/clients/azure"
+	"github.com/openshift/openshift-azure/test/util/log"
 )
 
-const (
-	fakepubkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7laRyN4B3YZmVrDEZLZoIuUA72pQ0DpGuZBZWykCofIfCPrFZAJgFvonKGgKJl6FGKIunkZL9Us/mV4ZPkZhBlE7uX83AAf5i9Q8FmKpotzmaxN10/1mcnEE7pFvLoSkwqrQSkrrgSm8zaJ3g91giXSbtqvSIj/vk2f05stYmLfhAwNo3Oh27ugCakCoVeuCrZkvHMaJgcYrIGCuFo6q0Pfk9rsZyriIqEa9AtiUOtViInVYdby7y71wcbl0AbbCZsTSqnSoVxm2tRkOsXV6+8X4SnwcmZbao3H+zfO1GBhQOLxJ4NQbzAa8IJh810rYARNLptgmsd4cYXVOSosTX azureuser"
-)
-
-var _ = BeforeSuite(func() {
-	if os.Getenv("AZURE_REGION") == "" {
-		// Set AZURE_REGION from the manifest if it is not set and the manifest exists.
-		dataDir, err := fakerp.FindDirectory(fakerp.DataDirectory)
-		if err == nil {
-			oc, err := managedcluster.ReadConfig(path.Join(dataDir, "manifest.yaml"))
-			if err == nil {
-				os.Setenv("AZURE_REGION", oc.Location)
-			}
-		}
-	}
-})
-
-var _ = Describe("Resource provider e2e tests [Real]", func() {
+var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 	var (
 		ctx = context.Background()
 		cli *azure.Client
+		cfg *client.Config
 	)
 
-	BeforeEach(func() {
+	// NOTE: Ensure this is always the first test in the [Default][Real] spec!
+	It("should deploy a cluster using the production RP", func() {
 		var err error
 		cli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).ToNot(HaveOccurred())
-		if os.Getenv("AZURE_REGION") == "" {
-			Expect(errors.New("AZURE_REGION is not set")).ToNot(HaveOccurred())
-		}
-		if os.Getenv("RESOURCEGROUP") == "" {
-			Expect(errors.New("RESOURCEGROUP is not set")).ToNot(HaveOccurred())
-		}
+		// setting dummy aad
+		os.Setenv("AZURE_AAD_CLIENT_ID", os.Getenv("AZURE_CLIENT_ID"))
+		os.Setenv("AZURE_AAD_CLIENT_SECRET", os.Getenv("AZURE_CLIENT_SECRET"))
+		cfg, err = client.NewConfig(log.GetTestLogger(), true)
+		Expect(err).NotTo(HaveOccurred())
+
+		// create a new resource group
+		_, err = client.CreateResourceGroup(cfg)
+		Expect(err).ToNot(HaveOccurred())
+
+		By("creating an OSA cluster")
+		config, err := client.LoadClusterConfigFromManifest(log.GetTestLogger(), "../../test/manifests/normal/create.yaml")
+		Expect(err).ToNot(HaveOccurred())
+		deployCtx, cancelFn := context.WithTimeout(context.Background(), 30*time.Minute)
+		defer cancelFn()
+		_, err = cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(deployCtx, cfg.ResourceGroup, cfg.ResourceGroup, *config)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("should keep the end user from deleting any azure resources", func() {
-		resourcegroup, err := cli.OSAResourceGroup(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), os.Getenv("AZURE_REGION"))
+		resourcegroup, err := cli.OSAResourceGroup(ctx, cfg.ResourceGroup, cfg.ResourceGroup, cfg.Region)
 		Expect(err).NotTo(HaveOccurred())
 		By(fmt.Sprintf("OSA resource group is %s", resourcegroup))
 
@@ -74,7 +70,7 @@ var _ = Describe("Resource provider e2e tests [Real]", func() {
 	})
 
 	It("should keep the end user from reading the config blob", func() {
-		resourcegroup, err := cli.OSAResourceGroup(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), os.Getenv("AZURE_REGION"))
+		resourcegroup, err := cli.OSAResourceGroup(ctx, cfg.ResourceGroup, cfg.ResourceGroup, cfg.Region)
 		Expect(err).NotTo(HaveOccurred())
 		By(fmt.Sprintf("OSA resource group is %s", resourcegroup))
 
@@ -89,7 +85,11 @@ var _ = Describe("Resource provider e2e tests [Real]", func() {
 	})
 
 	It("should not be possible for customer to mutate an osa scale set", func() {
-		resourcegroup, err := cli.OSAResourceGroup(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), os.Getenv("AZURE_REGION"))
+		const (
+			fakepubkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7laRyN4B3YZmVrDEZLZoIuUA72pQ0DpGuZBZWykCofIfCPrFZAJgFvonKGgKJl6FGKIunkZL9Us/mV4ZPkZhBlE7uX83AAf5i9Q8FmKpotzmaxN10/1mcnEE7pFvLoSkwqrQSkrrgSm8zaJ3g91giXSbtqvSIj/vk2f05stYmLfhAwNo3Oh27ugCakCoVeuCrZkvHMaJgcYrIGCuFo6q0Pfk9rsZyriIqEa9AtiUOtViInVYdby7y71wcbl0AbbCZsTSqnSoVxm2tRkOsXV6+8X4SnwcmZbao3H+zfO1GBhQOLxJ4NQbzAa8IJh810rYARNLptgmsd4cYXVOSosTX azureuser"
+		)
+
+		resourcegroup, err := cli.OSAResourceGroup(ctx, cfg.ResourceGroup, cfg.ResourceGroup, cfg.Region)
 		Expect(err).NotTo(HaveOccurred())
 		By(fmt.Sprintf("OSA resource group is %s", resourcegroup))
 
@@ -154,5 +154,28 @@ var _ = Describe("Resource provider e2e tests [Real]", func() {
 				Expect(err).To(HaveOccurred())
 			}
 		}
+	})
+
+	// NOTE: Ensure this is always the last test in the [Default][Real] spec!
+	It("should delete a cluster using the production RP", func() {
+		deleteCtx, cancelFn := context.WithTimeout(context.Background(), time.Hour)
+		defer cancelFn()
+		By("deleting OSA resource")
+		future, err := cli.OpenShiftManagedClusters.Delete(deleteCtx, cfg.ResourceGroup, cfg.ResourceGroup)
+		Expect(err).NotTo(HaveOccurred())
+		// Avoid failing while waiting for the OSA resource to get cleaned up
+		// since the delete code is not super-stable atm.
+		err = future.WaitForCompletionRef(deleteCtx, cli.OpenShiftManagedClusters.Client)
+		if err != nil {
+			fmt.Fprintf(GinkgoWriter, "error while waiting for OSA resource to get cleaned up: %v", err)
+		} else {
+			resp, err := future.Result(cli.OpenShiftManagedClusters)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(resp.StatusCode).To(Equal(http.StatusOK))
+		}
+
+		By(fmt.Sprintf("deleting resource group %s", cfg.ResourceGroup))
+		_, err = cli.Groups.Delete(deleteCtx, cfg.ResourceGroup)
+		Expect(err).NotTo(HaveOccurred())
 	})
 })

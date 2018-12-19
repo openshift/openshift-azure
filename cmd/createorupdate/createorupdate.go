@@ -15,7 +15,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/ghodss/yaml"
@@ -113,37 +112,6 @@ func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, rpc admin.OpenS
 	}
 	log.Info("created/updated cluster")
 	return ioutil.WriteFile(manifestFile, data, 0600)
-}
-
-func createResourceGroup(conf *fakerp.Config) (bool, error) {
-	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
-	if err != nil {
-		return false, err
-	}
-	gc := resources.NewGroupsClient(conf.SubscriptionID)
-	gc.Authorizer = authorizer
-
-	if _, err := gc.Get(context.Background(), conf.ResourceGroup); err == nil {
-		return false, nil
-	}
-
-	var tags map[string]*string
-	if !conf.NoGroupTags {
-		tags = make(map[string]*string)
-		ttl, now := "76h", fmt.Sprintf("%d", time.Now().Unix())
-		tags["now"] = &now
-		tags["ttl"] = &ttl
-		if conf.ResourceGroupTTL != "" {
-			if _, err := time.ParseDuration(conf.ResourceGroupTTL); err != nil {
-				return false, fmt.Errorf("invalid ttl provided: %q - %v", conf.ResourceGroupTTL, err)
-			}
-			tags["ttl"] = &conf.ResourceGroupTTL
-		}
-	}
-
-	rg := resources.Group{Location: &conf.Region, Tags: tags}
-	_, err = gc.CreateOrUpdate(context.Background(), conf.ResourceGroup, rg)
-	return true, err
 }
 
 func execute(
@@ -252,7 +220,7 @@ func main() {
 
 	if !isDelete {
 		log.Infof("creating resource group %s", conf.ResourceGroup)
-		if isCreate, err := createResourceGroup(conf); err != nil {
+		if isCreate, err := fakerp.CreateResourceGroup(conf); err != nil {
 			log.Fatal(err)
 		} else if !isCreate {
 			log.Infof("reusing existing resource group %s", conf.ResourceGroup)
