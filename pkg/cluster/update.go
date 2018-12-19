@@ -130,16 +130,6 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 	return nil
 }
 
-func getCount(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) int {
-	for _, app := range cs.Properties.AgentPoolProfiles {
-		if app.Role == role {
-			return app.Count
-		}
-	}
-
-	panic("invalid role")
-}
-
 func (u *simpleUpgrader) listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) ([]compute.VirtualMachineScaleSetVM, error) {
 	vmPages, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, role), "", "", "")
 	if err != nil {
@@ -161,8 +151,6 @@ func (u *simpleUpgrader) listVMs(ctx context.Context, cs *api.OpenShiftManagedCl
 
 // updatePlusOne creates new VMs and removes old VMs one by one.
 func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, ssHashes map[scalesetName]hash) *api.PluginError {
-	count := getCount(cs, app.Role)
-
 	// store a list of all the VM instances now, so that if we end up creating
 	// new ones (in the crash recovery case, we might not), we can detect which
 	// they are
@@ -186,10 +174,10 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 
 	for _, vm := range oldVMs {
 		ssName := config.GetScalesetName(cs, app.Role)
-		u.log.Infof("setting %s capacity to %d", ssName, count+1)
+		u.log.Infof("setting %s capacity to %d", ssName, app.Count+1)
 		future, err := u.ssc.Update(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetUpdate{
 			Sku: &compute.Sku{
-				Capacity: to.Int64Ptr(int64(count) + 1),
+				Capacity: to.Int64Ptr(int64(app.Count) + 1),
 			},
 		})
 		if err != nil {
