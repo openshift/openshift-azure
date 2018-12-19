@@ -63,18 +63,18 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShiftManagedCluster) (map[kubeclient.ComputerName]struct{}, error) {
 	vmsBefore := map[kubeclient.ComputerName]struct{}{}
 
-	for _, agent := range cs.Properties.AgentPoolProfiles {
-		vms, err := u.listVMs(ctx, cs, agent.Role)
+	for _, app := range cs.Properties.AgentPoolProfiles {
+		vms, err := u.listVMs(ctx, cs, app.Role)
 		if err != nil {
 			return nil, err
 		}
 
 		for i, vm := range vms {
 			computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			if i < agent.Count {
+			if i < app.Count {
 				vmsBefore[computerName] = struct{}{}
 			} else {
-				err = u.delete(ctx, cs, agent.Role, *vm.InstanceID, computerName)
+				err = u.delete(ctx, cs, app.Role, *vm.InstanceID, computerName)
 				if err != nil {
 					return nil, err
 				}
@@ -91,8 +91,8 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 	}
 
 	existingVMs := make(map[instanceName]struct{})
-	for _, agent := range cs.Properties.AgentPoolProfiles {
-		vms, err := u.listVMs(ctx, cs, agent.Role)
+	for _, app := range cs.Properties.AgentPoolProfiles {
+		vms, err := u.listVMs(ctx, cs, app.Role)
 		if err != nil {
 			return err
 		}
@@ -102,7 +102,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 			computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 			if _, found := nodes[computerName]; !found {
 				u.log.Infof("waiting for %s to be ready", computerName)
-				err = u.kubeclient.WaitForReady(ctx, agent.Role, computerName)
+				err = u.kubeclient.WaitForReady(ctx, app.Role, computerName)
 				if err != nil {
 					return err
 				}

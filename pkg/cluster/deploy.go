@@ -120,10 +120,10 @@ func deepCopy(in map[string]interface{}) map[string]interface{} {
 
 func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName]hash) error {
 	blob := updateblob{}
-	for _, profile := range cs.Properties.AgentPoolProfiles {
-		for i := 0; i < profile.Count; i++ {
-			name := instanceName(config.GetInstanceName(profile.Name, i))
-			blob[name] = ssHashes[scalesetName(config.GetScalesetName(cs, profile.Role))]
+	for _, app := range cs.Properties.AgentPoolProfiles {
+		for i := 0; i < app.Count; i++ {
+			name := instanceName(config.GetInstanceName(app.Name, i))
+			blob[name] = ssHashes[scalesetName(config.GetScalesetName(cs, app.Role))]
 		}
 	}
 	return u.writeUpdateBlob(blob)
