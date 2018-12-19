@@ -64,7 +64,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 	vmsBefore := map[kubeclient.ComputerName]struct{}{}
 
 	for _, app := range cs.Properties.AgentPoolProfiles {
-		vms, err := u.listVMs(ctx, cs, app.Role)
+		vms, err := u.listVMs(ctx, cs, &app)
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +74,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 			if i < app.Count {
 				vmsBefore[computerName] = struct{}{}
 			} else {
-				err = u.delete(ctx, cs, app.Role, *vm.InstanceID, computerName)
+				err = u.delete(ctx, cs, &app, *vm.InstanceID, computerName)
 				if err != nil {
 					return nil, err
 				}
@@ -92,7 +92,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 
 	existingVMs := make(map[instanceName]struct{})
 	for _, app := range cs.Properties.AgentPoolProfiles {
-		vms, err := u.listVMs(ctx, cs, app.Role)
+		vms, err := u.listVMs(ctx, cs, &app)
 		if err != nil {
 			return err
 		}
@@ -130,8 +130,8 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 	return nil
 }
 
-func (u *simpleUpgrader) listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) ([]compute.VirtualMachineScaleSetVM, error) {
-	vmPages, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, role), "", "", "")
+func (u *simpleUpgrader) listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]compute.VirtualMachineScaleSetVM, error) {
+	vmPages, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, app.Role), "", "", "")
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 	// store a list of all the VM instances now, so that if we end up creating
 	// new ones (in the crash recovery case, we might not), we can detect which
 	// they are
-	oldVMs, err := u.listVMs(ctx, cs, app.Role)
+	oldVMs, err := u.listVMs(ctx, cs, app)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneListVMs}
 	}
@@ -188,7 +188,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 		}
 
-		updatedList, err := u.listVMs(ctx, cs, app.Role)
+		updatedList, err := u.listVMs(ctx, cs, app)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneListVMs}
 		}
@@ -212,7 +212,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			}
 		}
 
-		if err := u.delete(ctx, cs, app.Role, *vm.InstanceID, kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)); err != nil {
+		if err := u.delete(ctx, cs, app, *vm.InstanceID, kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneDeleteVMs}
 		}
 		delete(blob, instanceName(*vm.Name))
@@ -243,7 +243,7 @@ func ssNameForVM(vm *compute.VirtualMachineScaleSetVM) scalesetName {
 
 // updateInPlace updates one by one all the VMs of a scale set, in place.
 func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, ssHashes map[scalesetName]hash) *api.PluginError {
-	vms, err := u.listVMs(ctx, cs, app.Role)
+	vms, err := u.listVMs(ctx, cs, app)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceListVMs}
 	}
@@ -338,14 +338,14 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 	return nil
 }
 
-func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, instanceID string, nodeName kubeclient.ComputerName) error {
+func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, instanceID string, nodeName kubeclient.ComputerName) error {
 	u.log.Infof("draining %s", nodeName)
-	if err := u.kubeclient.Drain(ctx, role, nodeName); err != nil {
+	if err := u.kubeclient.Drain(ctx, app.Role, nodeName); err != nil {
 		return err
 	}
 
 	u.log.Infof("deleting %s", nodeName)
-	future, err := u.vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, role), instanceID)
+	future, err := u.vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(cs, app.Role), instanceID)
 	if err != nil {
 		return err
 	}

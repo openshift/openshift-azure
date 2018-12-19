@@ -12,7 +12,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 }
 
 func (u *simpleUpgrader) waitForNode(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) error {
-	vms, err := u.listVMs(ctx, cs, app.Role)
+	vms, err := u.listVMs(ctx, cs, app)
 	if err != nil {
 		return err
 	}
