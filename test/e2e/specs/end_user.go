@@ -90,7 +90,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake]", func()
 
 		// Curl the endpoint and search for a string
 		By(fmt.Sprintf("hitting the route and checking the contents (%v)", time.Now()))
-		timeout, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		timeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 		resp, err := waitutil.ForHTTPStatusOk(timeout, log, nil, url)
 		Expect(err).NotTo(HaveOccurred())
@@ -150,7 +150,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake]", func()
 		prevCounter := 0
 
 		loopHTTPGet := func(url string, regex *regexp.Regexp, times int) error {
-			timeout, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+			timeout, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
 			for i := 0; i < times; i++ {
