@@ -1,6 +1,5 @@
 ## openshift-azure
 
-
 [![Go Report Card](https://goreportcard.com/badge/github.com/openshift/openshift-azure)](https://goreportcard.com/report/github.com/openshift/openshift-azure)
 [![GoDoc](https://godoc.org/github.com/openshift/openshift-azure?status.svg)](https://godoc.org/github.com/openshift/openshift-azure)
 
