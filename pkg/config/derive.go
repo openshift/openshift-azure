@@ -100,7 +100,7 @@ func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error
 		ResourceGroup:     cs.Properties.AzProfile.ResourceGroup,
 		LoadBalancerSku:   "standard",
 		Location:          cs.Location,
-		SecurityGroupName: "nsg-nonmaster",
+		SecurityGroupName: "nsg-worker",
 		VMType:            "vmss",
 	})
 }

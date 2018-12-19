@@ -167,13 +167,13 @@
             }
         }
 {{- if not IsUpgrade }},
-{{- /* we don't specify nsg-nonmaster on upgrade because we don't want to */}}
+{{- /* we don't specify nsg-worker on upgrade because we don't want to */}}
 {{- /* overwrite the securityRules that the cloud controller put there */}}
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2016-03-30",
             "location": "{{ $.ContainerService.Location | js }}",
-            "name": "nsg-nonmaster",
+            "name": "nsg-worker",
             "properties": {
                 "securityRules": []
             }
@@ -193,7 +193,7 @@
 {{- if eq $app.Role "master" }}
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-master')]"
 {{- else }}
-                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-nonmaster')]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-worker')]"
 {{- end }}
 {{- end }}
             ],
@@ -270,7 +270,7 @@
 {{- if eq $app.Role "master" }}
                                         "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-master')]"
 {{- else }}
-                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-nonmaster')]"
+                                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-worker')]"
 {{- end }}
                                     },
                                     "ipConfigurations": [
