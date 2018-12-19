@@ -9,6 +9,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
+	"github.com/Azure/go-autorest/autorest/to"
 	gomock "github.com/golang/mock/gomock"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -21,81 +22,33 @@ const masterHash = "RmID82LhPjuQbCEdiVa5cGCVEkdLGD6iU6ozX3vxkD0="
 func TestHashScaleSets(t *testing.T) {
 	tests := []struct {
 		name string
-		t    map[string]interface{}
-		exp  map[scalesetName]hash
+		vmss *compute.VirtualMachineScaleSet
+		exp  hash
 	}{
 		{
 			name: "expect a scale set",
-			t: map[string]interface{}{
-				"schema": "schemaversion",
-				"resources": []interface{}{
-					map[string]interface{}{
-						"type": "Microsoft.Compute/virtualMachineScaleSets",
-						"dependsOn": []interface{}{
-							"[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
-							"[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-master')]",
-						},
-						"sku": map[string]interface{}{
-							"capacity": "3",
-						},
-						"name": "ss-master",
-					},
-					map[string]interface{}{
-						"type": "Microsoft.Storage/storageAccounts",
-						"name": "dsdgskjgjner",
-					},
-				},
+			vmss: &compute.VirtualMachineScaleSet{
+				Sku:  &compute.Sku{},
+				Name: to.StringPtr("ss-master"),
+				Type: to.StringPtr("Microsoft.Compute/virtualMachineScaleSets"),
 			},
-			exp: map[scalesetName]hash{
-				"ss-master": masterHash,
-			},
+			exp: masterHash,
 		},
 		{
-			name: "expect three scale sets",
-			t: map[string]interface{}{
-				"schema": "schemaversion",
-				"resources": []interface{}{
-					map[string]interface{}{
-
-						"type": "Microsoft.Compute/virtualMachineScaleSets",
-						"dependsOn": []interface{}{
-							"[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]",
-						},
-						"sku": map[string]interface{}{
-							"capacity": "2",
-						},
-						"name": "ss-master",
-					},
-					map[string]interface{}{
-						"type": "Microsoft.Compute/virtualMachineScaleSets",
-						"sku": map[string]interface{}{
-							"capacity": "2",
-						},
-						"name": "ss-infra",
-					},
-					map[string]interface{}{
-						"type": "Microsoft.Compute/virtualMachineScaleSets",
-						"sku": map[string]interface{}{
-							"capacity": "1",
-						},
-						"name": "ss-compute",
-					},
-					map[string]interface{}{
-						"type": "Microsoft.Storage/storageAccounts",
-						"name": "dsdgskjgjner",
-					},
+			name: "hash is invariant with capacity",
+			vmss: &compute.VirtualMachineScaleSet{
+				Sku: &compute.Sku{
+					Capacity: to.Int64Ptr(3),
 				},
+				Name: to.StringPtr("ss-master"),
+				Type: to.StringPtr("Microsoft.Compute/virtualMachineScaleSets"),
 			},
-			exp: map[scalesetName]hash{
-				"ss-master":  masterHash,
-				"ss-infra":   "aqOO0n4n/nx5onYVUEwoW3s/GCnFoEZIZBowvhaHD6c=",
-				"ss-compute": "iWDo277FXQHmvzHj5z1l4o+L/hoRvVSzTGroojwA2ZU=",
-			},
+			exp: masterHash,
 		},
 	}
 
 	for _, test := range tests {
-		got, err := hashScaleSets(test.t)
+		got, err := hashVMSS(test.vmss)
 		if err != nil {
 			t.Errorf("%s: unexpected error: %v", test.name, err)
 		}

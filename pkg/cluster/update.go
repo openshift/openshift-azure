@@ -30,7 +30,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
-	ssHashes, err := hashScaleSets(azuretemplate)
+	ssHashes, err := u.hashScaleSets(cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepHashScaleSets}
 	}

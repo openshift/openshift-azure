@@ -59,7 +59,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 		t.Resources = append(t.Resources, nsgWorker(cs))
 	}
 	for _, app := range cs.Properties.AgentPoolProfiles {
-		vmss, err := vmss(&g.pluginConfig, cs, &app, backupBlob)
+		vmss, err := Vmss(&g.pluginConfig, cs, &app, backupBlob)
 		if err != nil {
 			return nil, err
 		}

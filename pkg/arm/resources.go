@@ -334,7 +334,7 @@ func nsgWorker(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
 	}
 }
 
-func vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob string) (*compute.VirtualMachineScaleSet, error) {
+func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob string) (*compute.VirtualMachineScaleSet, error) {
 	sshPublicKey, err := tls.SSHPublicKeyAsString(&cs.Config.SSHKey.PublicKey)
 	if err != nil {
 		return nil, err
