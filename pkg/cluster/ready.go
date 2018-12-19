@@ -11,7 +11,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 	return u.kubeclient.WaitForInfraServices(ctx)
 }
 
-func (u *simpleUpgrader) waitForNode(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) error {
+func (u *simpleUpgrader) waitForNodesInAgentPoolProfile(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) error {
 	vms, err := u.listVMs(ctx, cs, app)
 	if err != nil {
 		return err
@@ -29,21 +29,21 @@ func (u *simpleUpgrader) waitForNode(ctx context.Context, cs *api.OpenShiftManag
 
 func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
-		err := u.waitForNode(ctx, cs, &app)
+		err := u.waitForNodesInAgentPoolProfile(ctx, cs, &app)
 		if err != nil {
 			return err
 		}
 	}
 
 	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
-		err := u.waitForNode(ctx, cs, &app)
+		err := u.waitForNodesInAgentPoolProfile(ctx, cs, &app)
 		if err != nil {
 			return err
 		}
 	}
 
 	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
-		err := u.waitForNode(ctx, cs, &app)
+		err := u.waitForNodesInAgentPoolProfile(ctx, cs, &app)
 		if err != nil {
 			return err
 		}
