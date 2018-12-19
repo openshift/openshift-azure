@@ -7,8 +7,7 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
-	network20160330 "github.com/Azure/azure-sdk-for-go/services/network/mgmt/2016-03-30/network"
-	network20171001 "github.com/Azure/azure-sdk-for-go/services/network/mgmt/2017-10-01/network"
+	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2017-10-01/network"
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2015-06-15/storage"
 	"github.com/Azure/go-autorest/autorest/to"
 
@@ -47,12 +46,13 @@ func fixupAPIVersions(template map[string]interface{}) {
 		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
 		var apiVersion string
 		switch typ {
-		case "Microsoft.Network/networkSecurityGroups", "Microsoft.Network/virtualNetworks":
-			apiVersion = "2016-03-30"
-		case "Microsoft.Network/loadBalancers", "Microsoft.Network/publicIPAddresses":
-			apiVersion = "2017-10-01"
 		case "Microsoft.Compute/virtualMachineScaleSets":
 			apiVersion = "2018-06-01"
+		case "Microsoft.Network/loadBalancers",
+			"Microsoft.Network/networkSecurityGroups",
+			"Microsoft.Network/publicIPAddresses",
+			"Microsoft.Network/virtualNetworks":
+			apiVersion = "2017-10-01"
 		case "Microsoft.Storage/storageAccounts":
 			apiVersion = "2015-06-15"
 		default:
@@ -132,17 +132,17 @@ func resourceID(subscriptionID, resourceGroup, resourceProvider, resourceName st
 	return fmt.Sprintf("/subscriptions/%s/resourceGroups/%s/providers/%s/%s", subscriptionID, resourceGroup, resourceProvider, resourceName)
 }
 
-func vnet(cs *api.OpenShiftManagedCluster) *network20160330.VirtualNetwork {
-	return &network20160330.VirtualNetwork{
-		VirtualNetworkPropertiesFormat: &network20160330.VirtualNetworkPropertiesFormat{
-			AddressSpace: &network20160330.AddressSpace{
+func vnet(cs *api.OpenShiftManagedCluster) *network.VirtualNetwork {
+	return &network.VirtualNetwork{
+		VirtualNetworkPropertiesFormat: &network.VirtualNetworkPropertiesFormat{
+			AddressSpace: &network.AddressSpace{
 				AddressPrefixes: &[]string{
 					cs.Properties.NetworkProfile.VnetCIDR,
 				},
 			},
-			Subnets: &[]network20160330.Subnet{
+			Subnets: &[]network.Subnet{
 				{
-					SubnetPropertiesFormat: &network20160330.SubnetPropertiesFormat{
+					SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
 						AddressPrefix: to.StringPtr(cs.Properties.AgentPoolProfiles[0].SubnetCIDR),
 					},
 					Name: to.StringPtr(vnetSubnetName),
@@ -155,14 +155,14 @@ func vnet(cs *api.OpenShiftManagedCluster) *network20160330.VirtualNetwork {
 	}
 }
 
-func ipAPIServer(cs *api.OpenShiftManagedCluster) *network20171001.PublicIPAddress {
-	return &network20171001.PublicIPAddress{
-		Sku: &network20171001.PublicIPAddressSku{
-			Name: network20171001.PublicIPAddressSkuNameStandard,
+func ipAPIServer(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
+	return &network.PublicIPAddress{
+		Sku: &network.PublicIPAddressSku{
+			Name: network.PublicIPAddressSkuNameStandard,
 		},
-		PublicIPAddressPropertiesFormat: &network20171001.PublicIPAddressPropertiesFormat{
-			PublicIPAllocationMethod: network20171001.Static,
-			DNSSettings: &network20171001.PublicIPAddressDNSSettings{
+		PublicIPAddressPropertiesFormat: &network.PublicIPAddressPropertiesFormat{
+			PublicIPAllocationMethod: network.Static,
+			DNSSettings: &network.PublicIPAddressDNSSettings{
 				DomainNameLabel: to.StringPtr(config.Derived.MasterLBCNamePrefix(cs)),
 			},
 			IdleTimeoutInMinutes: to.Int32Ptr(15),
@@ -173,17 +173,17 @@ func ipAPIServer(cs *api.OpenShiftManagedCluster) *network20171001.PublicIPAddre
 	}
 }
 
-func lbAPIServer(cs *api.OpenShiftManagedCluster) *network20171001.LoadBalancer {
-	return &network20171001.LoadBalancer{
-		Sku: &network20171001.LoadBalancerSku{
-			Name: network20171001.LoadBalancerSkuNameStandard,
+func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
+	return &network.LoadBalancer{
+		Sku: &network.LoadBalancerSku{
+			Name: network.LoadBalancerSkuNameStandard,
 		},
-		LoadBalancerPropertiesFormat: &network20171001.LoadBalancerPropertiesFormat{
-			FrontendIPConfigurations: &[]network20171001.FrontendIPConfiguration{
+		LoadBalancerPropertiesFormat: &network.LoadBalancerPropertiesFormat{
+			FrontendIPConfigurations: &[]network.FrontendIPConfiguration{
 				{
-					FrontendIPConfigurationPropertiesFormat: &network20171001.FrontendIPConfigurationPropertiesFormat{
-						PrivateIPAllocationMethod: network20171001.Dynamic,
-						PublicIPAddress: &network20171001.PublicIPAddress{
+					FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
+						PrivateIPAllocationMethod: network.Dynamic,
+						PublicIPAddress: &network.PublicIPAddress{
 							ID: to.StringPtr(resourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
@@ -195,15 +195,15 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network20171001.LoadBalancer 
 					Name: to.StringPtr(lbAPIServerFrontendConfigurationName),
 				},
 			},
-			BackendAddressPools: &[]network20171001.BackendAddressPool{
+			BackendAddressPools: &[]network.BackendAddressPool{
 				{
 					Name: to.StringPtr(lbAPIServerBackendPoolName),
 				},
 			},
-			LoadBalancingRules: &[]network20171001.LoadBalancingRule{
+			LoadBalancingRules: &[]network.LoadBalancingRule{
 				{
-					LoadBalancingRulePropertiesFormat: &network20171001.LoadBalancingRulePropertiesFormat{
-						FrontendIPConfiguration: &network20171001.SubResource{
+					LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
+						FrontendIPConfiguration: &network.SubResource{
 							ID: to.StringPtr(resourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
@@ -211,7 +211,7 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network20171001.LoadBalancer 
 								lbAPIServerName,
 							) + "/frontendIPConfigurations/" + lbAPIServerFrontendConfigurationName),
 						},
-						BackendAddressPool: &network20171001.SubResource{
+						BackendAddressPool: &network.SubResource{
 							ID: to.StringPtr(resourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
@@ -219,7 +219,7 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network20171001.LoadBalancer 
 								lbAPIServerName,
 							) + "/backendAddressPools/" + lbAPIServerBackendPoolName),
 						},
-						Probe: &network20171001.SubResource{
+						Probe: &network.SubResource{
 							ID: to.StringPtr(resourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
@@ -227,8 +227,8 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network20171001.LoadBalancer 
 								lbAPIServerName,
 							) + "/probes/" + lbAPIServerProbeName),
 						},
-						Protocol:             network20171001.TransportProtocolTCP,
-						LoadDistribution:     network20171001.Default,
+						Protocol:             network.TransportProtocolTCP,
+						LoadDistribution:     network.Default,
 						FrontendPort:         to.Int32Ptr(443),
 						BackendPort:          to.Int32Ptr(443),
 						IdleTimeoutInMinutes: to.Int32Ptr(15),
@@ -237,10 +237,10 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network20171001.LoadBalancer 
 					Name: to.StringPtr(lbAPIServerLoadBalancingRuleName),
 				},
 			},
-			Probes: &[]network20171001.Probe{
+			Probes: &[]network.Probe{
 				{
-					ProbePropertiesFormat: &network20171001.ProbePropertiesFormat{
-						Protocol:          network20171001.ProbeProtocolTCP,
+					ProbePropertiesFormat: &network.ProbePropertiesFormat{
+						Protocol:          network.ProbeProtocolTCP,
 						Port:              to.Int32Ptr(443),
 						IntervalInSeconds: to.Int32Ptr(5),
 						NumberOfProbes:    to.Int32Ptr(2),
@@ -248,9 +248,9 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network20171001.LoadBalancer 
 					Name: to.StringPtr(lbAPIServerProbeName),
 				},
 			},
-			InboundNatRules:  &[]network20171001.InboundNatRule{},
-			InboundNatPools:  &[]network20171001.InboundNatPool{},
-			OutboundNatRules: &[]network20171001.OutboundNatRule{},
+			InboundNatRules:  &[]network.InboundNatRule{},
+			InboundNatPools:  &[]network.InboundNatPool{},
+			OutboundNatRules: &[]network.OutboundNatRule{},
 		},
 		Name:     to.StringPtr(lbAPIServerName),
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
@@ -283,35 +283,35 @@ func storageConfig(cs *api.OpenShiftManagedCluster) *storage.Account {
 	}
 }
 
-func nsgMaster(cs *api.OpenShiftManagedCluster) *network20160330.SecurityGroup {
-	return &network20160330.SecurityGroup{
-		SecurityGroupPropertiesFormat: &network20160330.SecurityGroupPropertiesFormat{
-			SecurityRules: &[]network20160330.SecurityRule{
+func nsgMaster(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
+	return &network.SecurityGroup{
+		SecurityGroupPropertiesFormat: &network.SecurityGroupPropertiesFormat{
+			SecurityRules: &[]network.SecurityRule{
 				{
-					SecurityRulePropertiesFormat: &network20160330.SecurityRulePropertiesFormat{
+					SecurityRulePropertiesFormat: &network.SecurityRulePropertiesFormat{
 						Description:              to.StringPtr("Allow SSH traffic"),
-						Protocol:                 network20160330.TCP,
+						Protocol:                 network.SecurityRuleProtocolTCP,
 						SourcePortRange:          to.StringPtr("*"),
 						DestinationPortRange:     to.StringPtr("22-22"),
 						SourceAddressPrefix:      to.StringPtr("*"),
 						DestinationAddressPrefix: to.StringPtr("*"),
-						Access:                   network20160330.Allow,
+						Access:                   network.SecurityRuleAccessAllow,
 						Priority:                 to.Int32Ptr(101),
-						Direction:                network20160330.Inbound,
+						Direction:                network.SecurityRuleDirectionInbound,
 					},
 					Name: to.StringPtr(nsgMasterAllowSSHRuleName),
 				},
 				{
-					SecurityRulePropertiesFormat: &network20160330.SecurityRulePropertiesFormat{
+					SecurityRulePropertiesFormat: &network.SecurityRulePropertiesFormat{
 						Description:              to.StringPtr("Allow HTTPS traffic"),
-						Protocol:                 network20160330.TCP,
+						Protocol:                 network.SecurityRuleProtocolTCP,
 						SourcePortRange:          to.StringPtr("*"),
 						DestinationPortRange:     to.StringPtr("443-443"),
 						SourceAddressPrefix:      to.StringPtr("*"),
 						DestinationAddressPrefix: to.StringPtr("*"),
-						Access:                   network20160330.Allow,
+						Access:                   network.SecurityRuleAccessAllow,
 						Priority:                 to.Int32Ptr(102),
-						Direction:                network20160330.Inbound,
+						Direction:                network.SecurityRuleDirectionInbound,
 					},
 					Name: to.StringPtr(nsgMasterAllowHTTPSRuleName),
 				},
@@ -323,10 +323,10 @@ func nsgMaster(cs *api.OpenShiftManagedCluster) *network20160330.SecurityGroup {
 	}
 }
 
-func nsgWorker(cs *api.OpenShiftManagedCluster) *network20160330.SecurityGroup {
-	return &network20160330.SecurityGroup{
-		SecurityGroupPropertiesFormat: &network20160330.SecurityGroupPropertiesFormat{
-			SecurityRules: &[]network20160330.SecurityRule{},
+func nsgWorker(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
+	return &network.SecurityGroup{
+		SecurityGroupPropertiesFormat: &network.SecurityGroupPropertiesFormat{
+			SecurityRules: &[]network.SecurityRule{},
 		},
 		Name:     to.StringPtr(nsgWorkerName),
 		Type:     to.StringPtr("Microsoft.Network/networkSecurityGroups"),
