@@ -11,6 +11,7 @@ import (
 
 	"github.com/Azure/go-autorest/autorest/to"
 
+	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	"github.com/openshift/openshift-azure/pkg/util/structtags"
 	"github.com/openshift/openshift-azure/test/util/populate"
@@ -414,5 +415,72 @@ loop:
 			ifield = ifields[0]
 		}
 		t.Fatalf("mismatch between internal and admin API fields: afield=%q, ifield=%q", afield, ifield)
+	}
+}
+
+func Test20180930previewAPIParity(t *testing.T) {
+	// the algorithm is: list the fields of both types.  If the head of either
+	// list is expected not to be matched in the other, pop it.  If the heads of
+	// both lists match, pop them.  In any other case, error out.
+
+	pfields := walk(reflect.TypeOf(v20180930preview.OpenShiftManagedCluster{}),
+		map[string][]reflect.Type{
+			".Properties.AuthProfile.IdentityProviders.Provider": {
+				reflect.TypeOf(v20180930preview.AADIdentityProvider{}),
+			},
+		},
+	)
+	ifields := walk(reflect.TypeOf(OpenShiftManagedCluster{}),
+		map[string][]reflect.Type{
+			".Properties.AuthProfile.IdentityProviders.Provider": {
+				reflect.TypeOf(AADIdentityProvider{}),
+			},
+		},
+	)
+
+	notInInternal := []*regexp.Regexp{
+		regexp.MustCompile(`^\.Response`),
+		regexp.MustCompile(`^\.Properties\.MasterPoolProfile`),
+	}
+
+	notInV20180930preview := []*regexp.Regexp{
+		regexp.MustCompile(`^\.Properties\.ServicePrincipalProfile`),
+		regexp.MustCompile(`^\.Properties\.AzProfile`),
+		regexp.MustCompile(`^\.Config`),
+	}
+
+restartCheck:
+	for len(pfields) > 0 || len(ifields) > 0 {
+		if len(pfields) > 0 {
+			for _, rx := range notInInternal {
+				if rx.MatchString(pfields[0]) {
+					pfields = pfields[1:]
+					continue restartCheck
+				}
+			}
+		}
+
+		if len(ifields) > 0 {
+			for _, rx := range notInV20180930preview {
+				if rx.MatchString(ifields[0]) {
+					ifields = ifields[1:]
+					continue restartCheck
+				}
+			}
+		}
+
+		if len(pfields) > 0 && len(ifields) > 0 && pfields[0] == ifields[0] {
+			pfields, ifields = pfields[1:], ifields[1:]
+			continue
+		}
+
+		var pfield, ifield string
+		if len(pfields) > 0 {
+			pfield = pfields[0]
+		}
+		if len(ifields) > 0 {
+			ifield = ifields[0]
+		}
+		t.Fatalf("mismatch between internal and v20180930preview API fields: pfield=%q, ifield=%q", pfield, ifield)
 	}
 }
