@@ -23,7 +23,6 @@ type Kubeclient interface {
 	Drain(ctx context.Context, role api.AgentPoolProfileRole, computerName ComputerName) error
 	WaitForInfraServices(ctx context.Context) *api.PluginError
 	WaitForReady(ctx context.Context, role api.AgentPoolProfileRole, computerName ComputerName) error
-	MasterIsReady(computerName ComputerName) (bool, error)
 }
 
 type kubeclient struct {

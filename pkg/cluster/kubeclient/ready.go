@@ -136,10 +136,10 @@ func (u *kubeclient) WaitForReady(ctx context.Context, role api.AgentPoolProfile
 }
 
 func (u *kubeclient) masterWaitForReady(ctx context.Context, computerName ComputerName) error {
-	return wait.PollImmediateUntil(time.Second, func() (bool, error) { return u.MasterIsReady(computerName) }, ctx.Done())
+	return wait.PollImmediateUntil(time.Second, func() (bool, error) { return u.masterIsReady(computerName) }, ctx.Done())
 }
 
-func (u *kubeclient) MasterIsReady(computerName ComputerName) (bool, error) {
+func (u *kubeclient) masterIsReady(computerName ComputerName) (bool, error) {
 	r, err := ready.NodeIsReady(u.client.CoreV1().Nodes(), computerName.toKubernetes())()
 	if !r || err != nil {
 		return r, err

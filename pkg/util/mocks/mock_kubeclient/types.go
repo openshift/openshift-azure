@@ -51,21 +51,6 @@ func (mr *MockKubeclientMockRecorder) Drain(arg0, arg1, arg2 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Drain", reflect.TypeOf((*MockKubeclient)(nil).Drain), arg0, arg1, arg2)
 }
 
-// MasterIsReady mocks base method
-func (m *MockKubeclient) MasterIsReady(arg0 kubeclient.ComputerName) (bool, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MasterIsReady", arg0)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// MasterIsReady indicates an expected call of MasterIsReady
-func (mr *MockKubeclientMockRecorder) MasterIsReady(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MasterIsReady", reflect.TypeOf((*MockKubeclient)(nil).MasterIsReady), arg0)
-}
-
 // WaitForInfraServices mocks base method
 func (m *MockKubeclient) WaitForInfraServices(arg0 context.Context) *api.PluginError {
 	m.ctrl.T.Helper()
