@@ -34,7 +34,6 @@ const (
 	PluginStepWaitForInfraStatefulSets   PluginStep = "WaitForInfraStatefulSets"
 	PluginStepWaitForInfraDeployments    PluginStep = "WaitForInfraDeployments"
 	PluginStepUpdateInPlaceListVMs       PluginStep = "UpdateInPlaceListVMs"
-	PluginStepUpdateInPlaceSortMasters   PluginStep = "UpdateInPlaceSortMasters"
 	PluginStepUpdateInPlaceReadBlob      PluginStep = "UpdateInPlaceReadBlob"
 	PluginStepUpdateInPlaceDrain         PluginStep = "UpdateInPlaceDrain"
 	PluginStepUpdateInPlaceDeallocate    PluginStep = "UpdateInPlaceDeallocate"

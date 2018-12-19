@@ -162,8 +162,8 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
 		expectedEntries := *external.Properties.MasterPoolProfile.Count
-		for _, profile := range external.Properties.AgentPoolProfiles {
-			expectedEntries += *profile.Count
+		for _, app := range external.Properties.AgentPoolProfiles {
+			expectedEntries += *app.Count
 		}
 		Expect(len(before)).To(Equal(expectedEntries))
 

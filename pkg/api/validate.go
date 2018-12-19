@@ -24,7 +24,7 @@ var (
 		`/virtualNetworks/[^/]+` +
 		`$`)
 
-	rxAgentPoolProfileName = regexp.MustCompile(`(?i)^[a-z0-9]{1,12}$`)
+	rxAgentPoolProfileName = regexp.MustCompile(`^[a-z0-9]{1,12}$`)
 
 	// This regexp is to guard against InvalidDomainNameLabel for hostname validation
 	rxCloudDomainLabel = regexp.MustCompile(`^[a-z][a-z0-9-]{1,61}[a-z0-9]\.`)
