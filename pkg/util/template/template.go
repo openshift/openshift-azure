@@ -16,14 +16,13 @@ import (
 
 func Template(tmpl string, f template.FuncMap, cs *api.OpenShiftManagedCluster, extra interface{}) ([]byte, error) {
 	t, err := template.New("").Funcs(template.FuncMap{
-		"CertAsBytes":          tls.CertAsBytes,
-		"PrivateKeyAsBytes":    tls.PrivateKeyAsBytes,
-		"PublicKeyAsBytes":     tls.PublicKeyAsBytes,
-		"SSHPublicKeyAsString": tls.SSHPublicKeyAsString,
-		"YamlMarshal":          yaml.Marshal,
-		"Base64Encode":         base64.StdEncoding.EncodeToString,
-		"String":               func(b []byte) string { return string(b) },
-		"quote":                strconv.Quote,
+		"CertAsBytes":       tls.CertAsBytes,
+		"PrivateKeyAsBytes": tls.PrivateKeyAsBytes,
+		"PublicKeyAsBytes":  tls.PublicKeyAsBytes,
+		"YamlMarshal":       yaml.Marshal,
+		"Base64Encode":      base64.StdEncoding.EncodeToString,
+		"String":            func(b []byte) string { return string(b) },
+		"quote":             strconv.Quote,
 		"escape": func(b string) string {
 			replacer := strings.NewReplacer("$", "\\$")
 			return replacer.Replace(b)
