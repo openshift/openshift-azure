@@ -411,23 +411,17 @@ func TestWaitForNewNodes(t *testing.T) {
 	}
 }
 
-func TestUpdateInPlace(t *testing.T) {
+func TestUpdateMasterAgentPool(t *testing.T) {
 	testRg := "testrg"
 	tests := []struct {
 		name     string
 		cs       *api.OpenShiftManagedCluster
-		app      *api.AgentPoolProfile
 		ssHashes map[scalesetName]hash
 		vmsList  []compute.VirtualMachineScaleSetVM
 		want     *api.PluginError
 	}{
 		{
-			name: "basic coverage",
-			app: &api.AgentPoolProfile{
-				Role:  api.AgentPoolProfileRoleMaster,
-				Name:  "master",
-				Count: 1,
-			},
+			name:     "basic coverage",
 			ssHashes: map[scalesetName]hash{"ss-master": "hashish"},
 			vmsList: []compute.VirtualMachineScaleSetVM{
 				{
@@ -464,7 +458,7 @@ func TestUpdateInPlace(t *testing.T) {
 			updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
 			data := ioutil.NopCloser(strings.NewReader(`[]`))
 			updateBlob.EXPECT().Get(nil).Return(data, nil)
-			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, tt.app.Name, testRg, tt.vmsList, nil)
+			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "master", testRg, tt.vmsList, nil)
 			uBlob := updateblob{}
 			for _, vm := range tt.vmsList {
 				compName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
@@ -480,13 +474,13 @@ func TestUpdateInPlace(t *testing.T) {
 				{
 					virtualMachineScaleSetVMsClient.EXPECT().Client().Return(arc)
 					vFt := compute.VirtualMachineScaleSetVMsDeallocateFuture{Future: ft}
-					virtualMachineScaleSetVMsClient.EXPECT().Deallocate(ctx, testRg, "ss-"+string(tt.app.Role), *vm.InstanceID).Return(vFt, nil)
+					virtualMachineScaleSetVMsClient.EXPECT().Deallocate(ctx, testRg, "ss-master", *vm.InstanceID).Return(vFt, nil)
 				}
 				// 3  updateinstances
 				{
 					virtualMachineScaleSetsClient.EXPECT().Client().Return(arc)
 					vFt := compute.VirtualMachineScaleSetsUpdateInstancesFuture{Future: ft}
-					virtualMachineScaleSetsClient.EXPECT().UpdateInstances(ctx, testRg, "ss-"+string(tt.app.Role), compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
+					virtualMachineScaleSetsClient.EXPECT().UpdateInstances(ctx, testRg, "ss-master", compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
 						InstanceIds: &[]string{*vm.InstanceID},
 					}).Return(vFt, nil)
 				}
@@ -494,17 +488,17 @@ func TestUpdateInPlace(t *testing.T) {
 				{
 					virtualMachineScaleSetVMsClient.EXPECT().Client().Return(arc)
 					vFt := compute.VirtualMachineScaleSetVMsReimageFuture{Future: ft}
-					virtualMachineScaleSetVMsClient.EXPECT().Reimage(ctx, testRg, "ss-"+string(tt.app.Role), *vm.InstanceID).Return(vFt, nil)
+					virtualMachineScaleSetVMsClient.EXPECT().Reimage(ctx, testRg, "ss-master", *vm.InstanceID).Return(vFt, nil)
 				}
 				// 5. start
 				{
 					virtualMachineScaleSetVMsClient.EXPECT().Client().Return(arc)
 					vFt := compute.VirtualMachineScaleSetVMsStartFuture{Future: ft}
-					virtualMachineScaleSetVMsClient.EXPECT().Start(ctx, testRg, "ss-"+string(tt.app.Role), *vm.InstanceID).Return(vFt, nil)
+					virtualMachineScaleSetVMsClient.EXPECT().Start(ctx, testRg, "ss-master", *vm.InstanceID).Return(vFt, nil)
 				}
 				// 6. waitforready
 				client.EXPECT().WaitForReadyMaster(ctx, compName).Return(nil)
-				uBlob[instanceName(*vm.Name)] = tt.ssHashes[scalesetName("ss-"+string(tt.app.Role))]
+				uBlob[instanceName(*vm.Name)] = tt.ssHashes[scalesetName("ss-master")]
 
 				// write the updatehash
 				hashData, _ := uBlob.MarshalJSON()
@@ -519,7 +513,7 @@ func TestUpdateInPlace(t *testing.T) {
 				kubeclient:      client,
 				log:             logrus.NewEntry(logrus.StandardLogger()).WithField("test", tt.name),
 			}
-			if got := u.updateInPlace(ctx, tt.cs, tt.app, tt.ssHashes); !reflect.DeepEqual(got, tt.want) {
+			if got := u.updateMasterAgentPool(ctx, tt.cs, tt.ssHashes); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("simpleUpgrader.updateInPlace() = %v, want %v", got, tt.want)
 			}
 		})

@@ -42,10 +42,8 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 	}
-	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
-		if perr := u.updateInPlace(ctx, cs, &app, ssHashes); perr != nil {
-			return perr
-		}
+	if perr := u.updateMasterAgentPool(ctx, cs, ssHashes); perr != nil {
+		return perr
 	}
 	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
 		if perr := u.updatePlusOne(ctx, cs, &app, ssHashes); perr != nil {
@@ -241,16 +239,18 @@ func ssNameForVM(vm *compute.VirtualMachineScaleSetVM) scalesetName {
 	return scalesetName(hostname)
 }
 
-// updateInPlace updates one by one all the VMs of a scale set, in place.
-func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, ssHashes map[scalesetName]hash) *api.PluginError {
-	vms, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name))
+// updateMasterAgentPool updates one by one all the VMs of the master scale set, in place.
+func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName]hash) *api.PluginError {
+	scaleSetName := config.GetScalesetName(string(api.AgentPoolProfileRoleMaster))
+
+	vms, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, scaleSetName)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceListVMs}
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolListVMs}
 	}
 
 	blob, err := u.readUpdateBlob()
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReadBlob}
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReadBlob}
 	}
 
 	// range our vms in order, so that if we previously crashed half-way through
@@ -266,72 +266,72 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 		u.log.Infof("draining %s", computerName)
 		err = u.kubeclient.DeleteMaster(computerName)
 		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDrain}
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDrain}
 		}
 
 		{
 			u.log.Infof("deallocating %s (%s)", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, *vm.InstanceID)
-			future, err := u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), *vm.InstanceID)
+			future, err := u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, scaleSetName, *vm.InstanceID)
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDeallocate}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDeallocate}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDeallocate}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDeallocate}
 			}
 		}
 
 		{
 			u.log.Infof("updating %s", computerName)
-			future, err := u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
+			future, err := u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, scaleSetName, compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
 				InstanceIds: &[]string{*vm.InstanceID},
 			})
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceUpdateVMs}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateVMs}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.ssc.Client())
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceUpdateVMs}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateVMs}
 			}
 		}
 
 		{
 			u.log.Infof("reimaging %s", computerName)
-			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), *vm.InstanceID)
+			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, scaleSetName, *vm.InstanceID)
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReimage}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReimage}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
 			}
 		}
 
 		{
 			u.log.Infof("starting %s", computerName)
-			future, err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), *vm.InstanceID)
+			future, err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, scaleSetName, *vm.InstanceID)
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceStart}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolStart}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceStart}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolStart}
 			}
 		}
 
 		u.log.Infof("waiting for %s to be ready", computerName)
 		err = u.kubeclient.WaitForReadyMaster(ctx, computerName)
 		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceWaitForReady}
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolWaitForReady}
 		}
 
 		blob[instanceName(*vm.Name)] = ssHashes[ssNameForVM(&vm)]
 		if err := u.writeUpdateBlob(blob); err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceUpdateBlob}
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateBlob}
 		}
 	}
 
