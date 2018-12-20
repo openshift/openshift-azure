@@ -12,10 +12,8 @@ package arm
 import (
 	"context"
 	"encoding/json"
-	"text/template"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	util "github.com/openshift/openshift-azure/pkg/util/template"
 )
 
 type Generator interface {
@@ -28,6 +26,15 @@ type simpleGenerator struct {
 
 var _ Generator = &simpleGenerator{}
 
+type armTemplate struct {
+	Schema         string        `json:"$schema,omitempty"`
+	ContentVersion string        `json:"contentVersion,omitempty"`
+	Parameters     struct{}      `json:"parameters,omitempty"`
+	Variables      struct{}      `json:"variables,omitempty"`
+	Resources      []interface{} `json:"resources,omitempty"`
+	Outputs        struct{}      `json:"outputs,omitempty"`
+}
+
 // NewSimpleGenerator create a new SimpleGenerator
 func NewSimpleGenerator(pluginConfig *api.PluginConfig) Generator {
 	return &simpleGenerator{
@@ -36,49 +43,42 @@ func NewSimpleGenerator(pluginConfig *api.PluginConfig) Generator {
 }
 
 func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool) (map[string]interface{}, error) {
-	masterStartup, err := Asset("master-startup.sh")
-	if err != nil {
-		return nil, err
+	t := armTemplate{
+		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+		ContentVersion: "1.0.0.0",
+		Resources: []interface{}{
+			vnet(cs),
+			ipAPIServer(cs),
+			lbAPIServer(cs),
+			storageRegistry(cs),
+			storageConfig(cs),
+			nsgMaster(cs),
+		},
+	}
+	if !isUpdate {
+		t.Resources = append(t.Resources, nsgWorker(cs))
+	}
+	for _, app := range cs.Properties.AgentPoolProfiles {
+		vmss, err := Vmss(&g.pluginConfig, cs, &app, backupBlob)
+		if err != nil {
+			return nil, err
+		}
+		t.Resources = append(t.Resources, vmss)
 	}
 
-	nodeStartup, err := Asset("node-startup.sh")
-	if err != nil {
-		return nil, err
-	}
-
-	tmpl, err := Asset("azuredeploy.json")
-	if err != nil {
-		return nil, err
-	}
-	azuredeploy, err := util.Template(string(tmpl), template.FuncMap{
-		"Startup": func(role api.AgentPoolProfileRole) ([]byte, error) {
-			if role == api.AgentPoolProfileRoleMaster {
-				return util.Template(string(masterStartup), nil, cs, map[string]interface{}{
-					"IsRecovery":     len(backupBlob) > 0,
-					"BackupBlobName": backupBlob,
-					"Role":           role,
-					"TestConfig":     g.pluginConfig.TestConfig,
-				})
-			}
-			return util.Template(string(nodeStartup), nil, cs, map[string]interface{}{
-				"Role":       role,
-				"TestConfig": g.pluginConfig.TestConfig,
-			})
-		},
-		"IsUpgrade": func() bool {
-			return isUpdate
-		},
-	}, cs, map[string]interface{}{
-		"TestConfig": g.pluginConfig.TestConfig,
-	})
+	b, err := json.Marshal(t)
 	if err != nil {
 		return nil, err
 	}
 
 	var azuretemplate map[string]interface{}
-	err = json.Unmarshal(azuredeploy, &azuretemplate)
+	err = json.Unmarshal(b, &azuretemplate)
 	if err != nil {
 		return nil, err
 	}
+
+	fixupAPIVersions(azuretemplate)
+	fixupDepends(&cs.Properties.AzProfile, azuretemplate)
+
 	return azuretemplate, nil
 }

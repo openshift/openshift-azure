@@ -16,7 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
 
-func mockListVMs(ctx context.Context, gmc *gomock.Controller, virtualMachineScaleSetVMsClient *mock_azureclient.MockVirtualMachineScaleSetVMsClient, appName string, rg string, outVMS []compute.VirtualMachineScaleSetVM, outErr error) {
+func mockListVMs(ctx context.Context, gmc *gomock.Controller, virtualMachineScaleSetVMsClient *mock_azureclient.MockVirtualMachineScaleSetVMsClient, scalesetName string, rg string, outVMS []compute.VirtualMachineScaleSetVM, outErr error) {
 	mPage := mock_azureclient.NewMockVirtualMachineScaleSetVMListResultPage(gmc)
 	if len(outVMS) > 0 {
 		mPage.EXPECT().Values().Return(outVMS)
@@ -38,7 +38,6 @@ func mockListVMs(ctx context.Context, gmc *gomock.Controller, virtualMachineScal
 			return ret
 		})
 	}
-	scalesetName := config.GetScalesetName(appName)
 	if outErr != nil {
 		virtualMachineScaleSetVMsClient.EXPECT().List(ctx, rg, scalesetName, "", "", "").Return(nil, outErr)
 	} else {
@@ -171,16 +170,17 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			kubeclient := mock_kubeclient.NewMockKubeclient(gmc)
 			if tt.wantErr {
 				if tt.expectedErr == vmListErr {
-					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "master", testRg, nil, tt.expectedErr)
+					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("master"), testRg, nil, tt.expectedErr)
 				} else {
-					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "master", testRg, tt.expect["master"], nil)
-					kubeclient.EXPECT().WaitForReady(ctx, api.AgentPoolProfileRoleMaster, gomock.Any()).Return(nodeGetErr)
+					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("master"), testRg, tt.expect["master"], nil)
+					kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Return(nodeGetErr)
 				}
 			} else {
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "master", testRg, tt.expect["master"], nil)
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "infra", testRg, tt.expect["infra"], nil)
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "foo", testRg, tt.expect["compute"], nil)
-				kubeclient.EXPECT().WaitForReady(ctx, gomock.Any(), gomock.Any()).Times(len(tt.expect)).Return(nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("master"), testRg, tt.expect["master"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("infra"), testRg, tt.expect["infra"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("foo"), testRg, tt.expect["compute"], nil)
+				kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Times(len(tt.expect["master"])).Return(nil)
+				kubeclient.EXPECT().WaitForReadyWorker(ctx, gomock.Any()).Times(len(tt.expect["infra"]) + len(tt.expect["compute"])).Return(nil)
 			}
 
 			u := &simpleUpgrader{

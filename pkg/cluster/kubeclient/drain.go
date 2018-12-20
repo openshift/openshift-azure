@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/pkg/errors"
 	"k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -12,14 +11,11 @@ import (
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/util/retry"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-var errUnrecognisedRole = errors.New("unrecognised role")
-
-func (u *kubeclient) Drain(ctx context.Context, role api.AgentPoolProfileRole, computerName ComputerName) error {
-	_, err := u.client.CoreV1().Nodes().Get(computerName.toKubernetes(), metav1.GetOptions{})
+func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, computerName ComputerName) error {
+	err := u.setUnschedulable(computerName, true)
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
@@ -29,29 +25,19 @@ func (u *kubeclient) Drain(ctx context.Context, role api.AgentPoolProfileRole, c
 		return err
 	}
 
-	switch role {
-	case api.AgentPoolProfileRoleMaster:
-		// no-op for now
-
-	case api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute:
-		err := u.setUnschedulable(ctx, computerName, true)
-		if err != nil {
-			return err
-		}
-
-		err = u.deletePods(ctx, computerName)
-		if err != nil {
-			return err
-		}
-
-	default:
-		return errUnrecognisedRole
+	err = u.deletePods(ctx, computerName)
+	if err != nil {
+		return err
 	}
 
 	return u.client.CoreV1().Nodes().Delete(computerName.toKubernetes(), &metav1.DeleteOptions{})
 }
 
-func (u *kubeclient) setUnschedulable(ctx context.Context, computerName ComputerName, unschedulable bool) error {
+func (u *kubeclient) DeleteMaster(computerName ComputerName) error {
+	return u.client.CoreV1().Nodes().Delete(computerName.toKubernetes(), &metav1.DeleteOptions{})
+}
+
+func (u *kubeclient) setUnschedulable(computerName ComputerName, unschedulable bool) error {
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		node, err := u.client.CoreV1().Nodes().Get(computerName.toKubernetes(), metav1.GetOptions{})
 		if err != nil {

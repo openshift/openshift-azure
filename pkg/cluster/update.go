@@ -3,7 +3,6 @@ package cluster
 import (
 	"context"
 	"sort"
-	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -30,7 +29,7 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
-	ssHashes, err := hashScaleSets(azuretemplate)
+	ssHashes, err := u.hashScaleSets(cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepHashScaleSets}
 	}
@@ -42,10 +41,8 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 	}
-	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
-		if perr := u.updateInPlace(ctx, cs, &app, ssHashes); perr != nil {
-			return perr
-		}
+	if perr := u.updateMasterAgentPool(ctx, cs, ssHashes); perr != nil {
+		return perr
 	}
 	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
 		if perr := u.updatePlusOne(ctx, cs, &app, ssHashes); perr != nil {
@@ -64,7 +61,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 	vmsBefore := map[kubeclient.ComputerName]struct{}{}
 
 	for _, app := range cs.Properties.AgentPoolProfiles {
-		vms, err := u.listVMs(ctx, cs, &app)
+		vms, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name))
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +71,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 			if i < app.Count {
 				vmsBefore[computerName] = struct{}{}
 			} else {
-				err = u.delete(ctx, cs, &app, *vm.InstanceID, computerName)
+				err = u.deleteWorker(ctx, cs, &app, *vm.InstanceID, computerName)
 				if err != nil {
 					return nil, err
 				}
@@ -92,7 +89,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 
 	existingVMs := make(map[instanceName]struct{})
 	for _, app := range cs.Properties.AgentPoolProfiles {
-		vms, err := u.listVMs(ctx, cs, &app)
+		vms, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name))
 		if err != nil {
 			return err
 		}
@@ -102,11 +99,11 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 			computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 			if _, found := nodes[computerName]; !found {
 				u.log.Infof("waiting for %s to be ready", computerName)
-				err = u.kubeclient.WaitForReady(ctx, app.Role, computerName)
+				err = u.kubeclient.WaitForReadyWorker(ctx, computerName)
 				if err != nil {
 					return err
 				}
-				blob[instanceName(*vm.Name)] = ssHashes[ssNameForVM(&vm)]
+				blob[instanceName(*vm.Name)] = ssHashes[scalesetName(config.GetScalesetName(app.Name))]
 				if err := u.writeUpdateBlob(blob); err != nil {
 					return err
 				}
@@ -130,8 +127,8 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 	return nil
 }
 
-func (u *simpleUpgrader) listVMs(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]compute.VirtualMachineScaleSetVM, error) {
-	vmPages, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), "", "", "")
+func (u *simpleUpgrader) listVMs(ctx context.Context, resourceGroup, scalesetName string) ([]compute.VirtualMachineScaleSetVM, error) {
+	vmPages, err := u.vmc.List(ctx, resourceGroup, scalesetName, "", "", "")
 	if err != nil {
 		return nil, err
 	}
@@ -151,10 +148,12 @@ func (u *simpleUpgrader) listVMs(ctx context.Context, cs *api.OpenShiftManagedCl
 
 // updatePlusOne creates new VMs and removes old VMs one by one.
 func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, ssHashes map[scalesetName]hash) *api.PluginError {
+	ssName := config.GetScalesetName(app.Name)
+
 	// store a list of all the VM instances now, so that if we end up creating
 	// new ones (in the crash recovery case, we might not), we can detect which
 	// they are
-	oldVMs, err := u.listVMs(ctx, cs, app)
+	oldVMs, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneListVMs}
 	}
@@ -166,14 +165,13 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 
 	// Filter out VMs that do not need to get upgraded. Should speed
 	// up retrying failed upgrades.
-	oldVMs = u.filterOldVMs(oldVMs, blob, ssHashes)
+	oldVMs = u.filterOldVMs(oldVMs, blob, ssHashes[scalesetName(ssName)])
 	vmsBefore := map[string]struct{}{}
 	for _, vm := range oldVMs {
 		vmsBefore[*vm.InstanceID] = struct{}{}
 	}
 
 	for _, vm := range oldVMs {
-		ssName := config.GetScalesetName(app.Name)
 		u.log.Infof("setting %s capacity to %d", ssName, app.Count+1)
 		future, err := u.ssc.Update(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetUpdate{
 			Sku: &compute.Sku{
@@ -188,7 +186,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 		}
 
-		updatedList, err := u.listVMs(ctx, cs, app)
+		updatedList, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneListVMs}
 		}
@@ -200,19 +198,19 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			if _, found := vmsBefore[*updated.InstanceID]; !found {
 				computerName := kubeclient.ComputerName(*updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 				u.log.Infof("waiting for %s to be ready", computerName)
-				err = u.kubeclient.WaitForReady(ctx, app.Role, computerName)
+				err = u.kubeclient.WaitForReadyWorker(ctx, computerName)
 				if err != nil {
 					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 				}
 				vmsBefore[*updated.InstanceID] = struct{}{}
-				blob[instanceName(*updated.Name)] = ssHashes[ssNameForVM(&updated)]
+				blob[instanceName(*updated.Name)] = ssHashes[scalesetName(config.GetScalesetName(app.Name))]
 				if err := u.writeUpdateBlob(blob); err != nil {
 					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneUpdateBlob}
 				}
 			}
 		}
 
-		if err := u.delete(ctx, cs, app, *vm.InstanceID, kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)); err != nil {
+		if err := u.deleteWorker(ctx, cs, app, *vm.InstanceID, kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneDeleteVMs}
 		}
 		delete(blob, instanceName(*vm.Name))
@@ -224,10 +222,10 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 	return nil
 }
 
-func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob updateblob, ssHashes map[scalesetName]hash) []compute.VirtualMachineScaleSetVM {
+func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob updateblob, ssHash hash) []compute.VirtualMachineScaleSetVM {
 	var oldVMs []compute.VirtualMachineScaleSetVM
 	for _, vm := range vms {
-		if blob[instanceName(*vm.Name)] != ssHashes[ssNameForVM(&vm)] {
+		if blob[instanceName(*vm.Name)] != ssHash {
 			oldVMs = append(oldVMs, vm)
 		} else {
 			u.log.Infof("skipping vm %q since it's already updated", *vm.Name)
@@ -236,21 +234,18 @@ func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, bl
 	return oldVMs
 }
 
-func ssNameForVM(vm *compute.VirtualMachineScaleSetVM) scalesetName {
-	hostname := strings.Split(*vm.Name, "_")[0]
-	return scalesetName(hostname)
-}
+// updateMasterAgentPool updates one by one all the VMs of the master scale set, in place.
+func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName]hash) *api.PluginError {
+	ssName := config.GetScalesetName(string(api.AgentPoolProfileRoleMaster))
 
-// updateInPlace updates one by one all the VMs of a scale set, in place.
-func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, ssHashes map[scalesetName]hash) *api.PluginError {
-	vms, err := u.listVMs(ctx, cs, app)
+	vms, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceListVMs}
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolListVMs}
 	}
 
 	blob, err := u.readUpdateBlob()
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReadBlob}
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReadBlob}
 	}
 
 	// range our vms in order, so that if we previously crashed half-way through
@@ -260,87 +255,87 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 			*vms[j].VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
 	})
 
-	vms = u.filterOldVMs(vms, blob, ssHashes)
+	vms = u.filterOldVMs(vms, blob, ssHashes[scalesetName(ssName)])
 	for _, vm := range vms {
 		computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		u.log.Infof("draining %s", computerName)
-		err = u.kubeclient.Drain(ctx, app.Role, computerName)
+		err = u.kubeclient.DeleteMaster(computerName)
 		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDrain}
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDrain}
 		}
 
 		{
 			u.log.Infof("deallocating %s (%s)", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, *vm.InstanceID)
-			future, err := u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), *vm.InstanceID)
+			future, err := u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDeallocate}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDeallocate}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDeallocate}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDeallocate}
 			}
 		}
 
 		{
 			u.log.Infof("updating %s", computerName)
-			future, err := u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
+			future, err := u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
 				InstanceIds: &[]string{*vm.InstanceID},
 			})
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceUpdateVMs}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateVMs}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.ssc.Client())
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceUpdateVMs}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateVMs}
 			}
 		}
 
 		{
 			u.log.Infof("reimaging %s", computerName)
-			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), *vm.InstanceID)
+			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReimage}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReimage}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
 			}
 		}
 
 		{
 			u.log.Infof("starting %s", computerName)
-			future, err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), *vm.InstanceID)
+			future, err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceStart}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolStart}
 			}
 
 			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
 			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceStart}
+				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolStart}
 			}
 		}
 
 		u.log.Infof("waiting for %s to be ready", computerName)
-		err = u.kubeclient.WaitForReady(ctx, app.Role, computerName)
+		err = u.kubeclient.WaitForReadyMaster(ctx, computerName)
 		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceWaitForReady}
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolWaitForReady}
 		}
 
-		blob[instanceName(*vm.Name)] = ssHashes[ssNameForVM(&vm)]
+		blob[instanceName(*vm.Name)] = ssHashes[scalesetName(ssName)]
 		if err := u.writeUpdateBlob(blob); err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceUpdateBlob}
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateBlob}
 		}
 	}
 
 	return nil
 }
 
-func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, instanceID string, nodeName kubeclient.ComputerName) error {
+func (u *simpleUpgrader) deleteWorker(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, instanceID string, nodeName kubeclient.ComputerName) error {
 	u.log.Infof("draining %s", nodeName)
-	if err := u.kubeclient.Drain(ctx, app.Role, nodeName); err != nil {
+	if err := u.kubeclient.DrainAndDeleteWorker(ctx, nodeName); err != nil {
 		return err
 	}
 

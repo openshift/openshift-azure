@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
@@ -124,22 +122,11 @@ func (u *kubeclient) WaitForInfraServices(ctx context.Context) *api.PluginError 
 	return nil
 }
 
-func (u *kubeclient) WaitForReady(ctx context.Context, role api.AgentPoolProfileRole, computerName ComputerName) error {
-	switch role {
-	case api.AgentPoolProfileRoleMaster:
-		return u.masterWaitForReady(ctx, computerName)
-	case api.AgentPoolProfileRoleInfra, api.AgentPoolProfileRoleCompute:
-		return u.nodeWaitForReady(ctx, computerName)
-	default:
-		return errors.New("unrecognised role")
-	}
+func (u *kubeclient) WaitForReadyMaster(ctx context.Context, computerName ComputerName) error {
+	return wait.PollImmediateUntil(time.Second, func() (bool, error) { return u.masterIsReady(computerName) }, ctx.Done())
 }
 
-func (u *kubeclient) masterWaitForReady(ctx context.Context, computerName ComputerName) error {
-	return wait.PollImmediateUntil(time.Second, func() (bool, error) { return u.MasterIsReady(computerName) }, ctx.Done())
-}
-
-func (u *kubeclient) MasterIsReady(computerName ComputerName) (bool, error) {
+func (u *kubeclient) masterIsReady(computerName ComputerName) (bool, error) {
 	r, err := ready.NodeIsReady(u.client.CoreV1().Nodes(), computerName.toKubernetes())()
 	if !r || err != nil {
 		return r, err
@@ -158,11 +145,11 @@ func (u *kubeclient) MasterIsReady(computerName ComputerName) (bool, error) {
 	return ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "controllers-"+computerName.toKubernetes())()
 }
 
-func (u *kubeclient) nodeWaitForReady(ctx context.Context, computerName ComputerName) error {
+func (u *kubeclient) WaitForReadyWorker(ctx context.Context, computerName ComputerName) error {
 	err := wait.PollImmediateUntil(time.Second, ready.NodeIsReady(u.client.CoreV1().Nodes(), computerName.toKubernetes()), ctx.Done())
 	if err != nil {
 		return err
 	}
 
-	return u.setUnschedulable(ctx, computerName, false)
+	return u.setUnschedulable(computerName, false)
 }

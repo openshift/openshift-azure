@@ -39,7 +39,7 @@ aadClientSecret: client_secrett
 loadBalancerSku: standard
 location: eastus
 resourceGroup: rg
-securityGroupName: nsg-nonmaster
+securityGroupName: nsg-worker
 subscriptionId: sub
 tenantId: tenant
 vmType: vmss

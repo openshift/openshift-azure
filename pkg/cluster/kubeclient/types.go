@@ -20,10 +20,11 @@ import (
 
 // Kubeclient interface to utility kubenetes functions
 type Kubeclient interface {
-	Drain(ctx context.Context, role api.AgentPoolProfileRole, computerName ComputerName) error
+	DrainAndDeleteWorker(ctx context.Context, computerName ComputerName) error
+	DeleteMaster(computerName ComputerName) error
 	WaitForInfraServices(ctx context.Context) *api.PluginError
-	WaitForReady(ctx context.Context, role api.AgentPoolProfileRole, computerName ComputerName) error
-	MasterIsReady(computerName ComputerName) (bool, error)
+	WaitForReadyMaster(ctx context.Context, computerName ComputerName) error
+	WaitForReadyWorker(ctx context.Context, computerName ComputerName) error
 }
 
 type kubeclient struct {

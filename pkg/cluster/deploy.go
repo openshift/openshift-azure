@@ -6,9 +6,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
+
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
@@ -49,7 +51,7 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
-	ssHashes, err := hashScaleSets(azuretemplate)
+	ssHashes, err := u.hashScaleSets(cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepHashScaleSets}
 	}
@@ -72,50 +74,43 @@ type scalesetName string
 type instanceName string
 type hash string
 
-func hashScaleSets(azuretemplate map[string]interface{}) (map[scalesetName]hash, error) {
-	ssHashes := make(map[scalesetName]hash)
-	for _, r := range jsonpath.MustCompile("$.resources[?(@.type='Microsoft.Compute/virtualMachineScaleSets')]").Get(azuretemplate) {
-		original, ok := r.(map[string]interface{})
-		if !ok {
-			continue
-		}
+func hashVMSS(vmss *compute.VirtualMachineScaleSet) (hash, error) {
+	// cleanup capacity so that no unnecessary VM rotations are going to occur
+	// because of a scale up/down.
+	if vmss.Sku != nil {
+		vmss.Sku.Capacity = nil
+	}
 
-		// deep-copy the ARM template since we are mutating it below.
-		resource := deepCopy(original)
+	data, err := json.Marshal(vmss)
+	if err != nil {
+		return "", err
+	}
 
-		// cleanup capacity so that no unnecessary VM rotations are going
-		// to occur because of a scale up/down.
-		jsonpath.MustCompile("$.sku.capacity").Delete(resource)
+	hf := sha256.New()
+	hf.Write(data)
 
-		// filter out the nsg dependsOn entry since we remove it
-		// during upgrades due to an azure issue.
-		jsonpath.MustCompile("$.dependsOn").Delete(resource)
+	return hash(base64.StdEncoding.EncodeToString(hf.Sum(nil))), nil
+}
 
-		// hash scale set
-		data, err := json.Marshal(resource)
+// hashScaleSets returns the set of desired state scale set hashes
+func (u *simpleUpgrader) hashScaleSets(cs *api.OpenShiftManagedCluster) (map[scalesetName]hash, error) {
+	ssHashes := map[scalesetName]hash{}
+
+	for _, app := range cs.Properties.AgentPoolProfiles {
+		vmss, err := arm.Vmss(&u.pluginConfig, cs, &app, "") // TODO: backupBlob is rather a layering violation here
 		if err != nil {
 			return nil, err
 		}
-		hf := sha256.New()
-		hf.Write(data)
 
-		scaleSetName := jsonpath.MustCompile("$.name").MustGetString(resource)
-		ssHashes[scalesetName(scaleSetName)] = hash(base64.StdEncoding.EncodeToString(hf.Sum(nil)))
+		h, err := hashVMSS(vmss)
+		if err != nil {
+			return nil, err
+		}
+
+		ssHashes[scalesetName(*vmss.Name)] = h
 	}
+
 	return ssHashes, nil
-}
-
-func deepCopy(in map[string]interface{}) map[string]interface{} {
-	b, err := json.Marshal(in)
-	if err != nil {
-		panic(err)
-	}
-	var out map[string]interface{}
-	err = json.Unmarshal(b, &out)
-	if err != nil {
-		panic(err)
-	}
-	return out
 }
 
 func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName]hash) error {
