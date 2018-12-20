@@ -15,20 +15,20 @@ aadClientId: c
 aadClientSecret: d
 resourceGroup: e
 location: f
-loadBalancerSku: g
-securityGroupName: h
+securityGroupName: g
+primaryScaleSetName: h
 vmType: i`)
 
 	want := Config{
-		TenantID:          "a",
-		SubscriptionID:    "b",
-		AadClientID:       "c",
-		AadClientSecret:   "d",
-		ResourceGroup:     "e",
-		Location:          "f",
-		LoadBalancerSku:   "g",
-		SecurityGroupName: "h",
-		VMType:            "i",
+		TenantID:            "a",
+		SubscriptionID:      "b",
+		AadClientID:         "c",
+		AadClientSecret:     "d",
+		ResourceGroup:       "e",
+		Location:            "f",
+		SecurityGroupName:   "g",
+		PrimaryScaleSetName: "h",
+		VMType:              "i",
 	}
 
 	var got Config

@@ -92,16 +92,23 @@ func (derived) MasterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
 }
 
 func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	var primaryScaleSetName string
+	for _, app := range cs.Properties.AgentPoolProfiles {
+		if app.Role == api.AgentPoolProfileRoleCompute {
+			primaryScaleSetName = app.Name
+		}
+	}
+
 	return yaml.Marshal(cloudprovider.Config{
-		TenantID:          cs.Properties.AzProfile.TenantID,
-		SubscriptionID:    cs.Properties.AzProfile.SubscriptionID,
-		AadClientID:       cs.Properties.ServicePrincipalProfile.ClientID,
-		AadClientSecret:   cs.Properties.ServicePrincipalProfile.Secret,
-		ResourceGroup:     cs.Properties.AzProfile.ResourceGroup,
-		LoadBalancerSku:   "standard",
-		Location:          cs.Location,
-		SecurityGroupName: "nsg-worker",
-		VMType:            "vmss",
+		TenantID:            cs.Properties.AzProfile.TenantID,
+		SubscriptionID:      cs.Properties.AzProfile.SubscriptionID,
+		AadClientID:         cs.Properties.ServicePrincipalProfile.ClientID,
+		AadClientSecret:     cs.Properties.ServicePrincipalProfile.Secret,
+		ResourceGroup:       cs.Properties.AzProfile.ResourceGroup,
+		Location:            cs.Location,
+		SecurityGroupName:   "nsg-worker",
+		PrimaryScaleSetName: GetScalesetName(primaryScaleSetName),
+		VMType:              "vmss",
 	})
 }
 
