@@ -13,9 +13,13 @@ import (
 )
 
 var supportedRegions = []string{
-	"australiasoutheast",
+	//"australiaeast",
+	//"canadacentral",
+	//"canadaeast",
 	"eastus",
+	//"westcentralus",
 	"westeurope",
+	//"westus",
 }
 
 type Config struct {

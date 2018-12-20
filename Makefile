@@ -95,7 +95,7 @@ e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
 
 e2e-prod:
-	FOCUS="\[Real\]" ./hack/e2e.sh
+	FOCUS="\[Default\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
 
 e2e-etcdbackuprecovery:
 	FOCUS="\[EtcdRecovery\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
@@ -107,6 +107,6 @@ e2e-scaleupdown:
 	FOCUS="\[ScaleUpDown\]\[Fake\]" TIMEOUT=30m ./hack/e2e.sh
 
 e2e-vnet:
-	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=30m ./hack/e2e.sh
+	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
 
 .PHONY: clean sync-image sync-push verify unit e2e
