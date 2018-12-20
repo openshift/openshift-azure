@@ -519,28 +519,6 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.RegistryConsoleOAuthSecret }}",
 		},
 	},
-	"Group.user.openshift.io/osa-customer-admins": {
-		{
-			Path: jsonpath.MustCompile("$.users"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				if cs.Config.RunningUnderTest {
-					return []interface{}{"customer-cluster-admin"}, nil
-				}
-				return []interface{}{}, nil
-			},
-		},
-	},
-	"Group.user.openshift.io/osa-customer-readers": {
-		{
-			Path: jsonpath.MustCompile("$.users"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				if cs.Config.RunningUnderTest {
-					return []interface{}{"customer-cluster-reader"}, nil
-				}
-				return []interface{}{}, nil
-			},
-		},
-	},
 	"OAuthClient.oauth.openshift.io/openshift-console": {
 		{
 			Path:     jsonpath.MustCompile("$.redirectURIs[0]"),
