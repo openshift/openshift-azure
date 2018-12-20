@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
@@ -32,14 +33,11 @@ func createUserHtPassEntry(name string, passwd *string, htPasswd []byte) ([]byte
 	return htPassEntry, nil
 }
 
-func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) {
+func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pluginapi.Config) (err error) {
+	cs.Config = api.ConvertFromPlugin(*template)
 	c := &cs.Config
 
 	g.selectNodeImage(cs)
-
-	if err = g.selectContainerImages(cs); err != nil {
-		return err
-	}
 
 	// Generate CAs
 	cas := []struct {
@@ -477,18 +475,6 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) 
 	if uuid.Equal(c.ServiceCatalogClusterID, uuid.Nil) {
 		c.ServiceCatalogClusterID = uuid.NewV4()
 	}
-
-	// configure Geneva Metrics system (MDM) configuration
-	c.Certificates.GenevaLogging.Cert = g.pluginConfig.GenevaConfig.LoggingCert
-	c.Certificates.GenevaLogging.Key = g.pluginConfig.GenevaConfig.LoggingKey
-	c.Certificates.GenevaMetrics.Cert = g.pluginConfig.GenevaConfig.MetricsCert
-	c.Certificates.GenevaMetrics.Key = g.pluginConfig.GenevaConfig.MetricsKey
-	cs.Config.GenevaLoggingSector = g.pluginConfig.GenevaConfig.LoggingSector
-	cs.Config.GenevaLoggingAccount = g.pluginConfig.GenevaConfig.LoggingAccount
-	cs.Config.GenevaLoggingNamespace = g.pluginConfig.GenevaConfig.LoggingNamespace
-	cs.Config.GenevaLoggingControlPlaneAccount = g.pluginConfig.GenevaConfig.LoggingControlPlaneAccount
-	cs.Config.GenevaMetricsAccount = g.pluginConfig.GenevaConfig.MetricsAccount
-	cs.Config.GenevaMetricsEndpoint = g.pluginConfig.GenevaConfig.MetricsEndpoint
 
 	return
 }

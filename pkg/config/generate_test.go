@@ -1,11 +1,14 @@
 package config
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
 func TestGenerate(t *testing.T) {
@@ -21,15 +24,14 @@ func TestGenerate(t *testing.T) {
 		TestConfig: api.TestConfig{
 			RunningUnderTest: true,
 		},
-		GenevaConfig: api.GenevaConfig{
-			LoggingImage:  "loggingImage",
-			TDAgentImage:  "tdAgentImage",
-			MetricsBridge: "metricsBridge",
-		},
 	}
 
+	prepare := func(v reflect.Value) {}
+	var template *pluginapi.Config
+	populate.Walk(&template, prepare)
+
 	cg := simpleGenerator{pluginConfig: pc}
-	err := cg.Generate(cs)
+	err := cg.Generate(cs, template)
 	if err != nil {
 		t.Error(err)
 	}

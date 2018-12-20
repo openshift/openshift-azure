@@ -58,6 +58,21 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, kerrors.NewAggregate(errs)
 	}
 
+	template, err := GetPluginTemplate()
+	if err != nil {
+		return nil, err
+	}
+
+	// if running under test we can overwrite certain images from local env variables
+	if config.TestConfig.RunningUnderTest {
+		overridePluginTemplate(template)
+	}
+
+	errs = p.ValidatePluginTemplate(ctx, template)
+	if len(errs) > 0 {
+		return nil, kerrors.NewAggregate(errs)
+	}
+
 	// read in the OpenShift config blob if it exists (i.e. we're updating)
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
@@ -91,7 +106,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	}
 
 	// generate or update the OpenShift config blob
-	err := p.GenerateConfig(ctx, cs)
+	err = p.GenerateConfig(ctx, cs, template)
 	if err != nil {
 		return nil, err
 	}
