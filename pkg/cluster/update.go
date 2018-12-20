@@ -68,7 +68,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 
 		for i, vm := range vms {
 			computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			if i < app.Count {
+			if int64(i) < app.Count {
 				vmsBefore[computerName] = struct{}{}
 			} else {
 				err = u.deleteWorker(ctx, cs, &app, *vm.InstanceID, computerName)
@@ -175,7 +175,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 		u.log.Infof("setting %s capacity to %d", ssName, app.Count+1)
 		future, err := u.ssc.Update(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetUpdate{
 			Sku: &compute.Sku{
-				Capacity: to.Int64Ptr(int64(app.Count) + 1),
+				Capacity: to.Int64Ptr(app.Count + 1),
 			},
 		})
 		if err != nil {

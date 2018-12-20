@@ -149,7 +149,7 @@ func TestConvertFromV20180930preview(t *testing.T) {
 					AgentPoolProfiles: []v20180930preview.AgentPoolProfile{
 						{
 							Name:       to.StringPtr("NewName"),
-							Count:      to.IntPtr(2),
+							Count:      to.Int64Ptr(2),
 							VMSize:     (*v20180930preview.VMSize)(to.StringPtr("NewVMSize")),
 							SubnetCIDR: to.StringPtr("NewSubnetCIDR"),
 							OSType:     (*v20180930preview.OSType)(to.StringPtr("NewOSType")),
@@ -177,7 +177,7 @@ func TestConvertFromV20180930preview(t *testing.T) {
 				Properties: &v20180930preview.Properties{
 					AgentPoolProfiles: []v20180930preview.AgentPoolProfile{
 						{
-							Count:      to.IntPtr(2),
+							Count:      to.Int64Ptr(2),
 							VMSize:     (*v20180930preview.VMSize)(to.StringPtr("NewVMSize")),
 							SubnetCIDR: to.StringPtr("NewSubnetCIDR"),
 							OSType:     (*v20180930preview.OSType)(to.StringPtr("NewOSType")),

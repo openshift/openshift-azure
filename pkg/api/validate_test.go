@@ -571,8 +571,8 @@ properties:
 `)
 
 	tests := map[string]struct {
-		newAgentCount    int
-		oldAgentCount    int
+		newAgentCount    int64
+		oldAgentCount    int64
 		newHostNameValue string
 		wantErrs         []error
 	}{

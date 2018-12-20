@@ -377,7 +377,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		Sku: &compute.Sku{
 			Name:     to.StringPtr(string(app.VMSize)),
 			Tier:     to.StringPtr("Standard"),
-			Capacity: to.Int64Ptr(int64(app.Count)),
+			Capacity: to.Int64Ptr(app.Count),
 		},
 		Plan: &compute.Plan{
 			Name:      to.StringPtr(cs.Config.ImageSKU),

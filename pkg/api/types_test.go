@@ -331,7 +331,7 @@ func walk(t reflect.Type, imap map[string][]reflect.Type) []string {
 				(t.Elem() != reflect.TypeOf("") && t.Elem() != reflect.TypeOf(to.StringPtr(""))) {
 				panic(fmt.Sprintf("unimplemented map type %s", t))
 			}
-		case reflect.Bool, reflect.Int, reflect.String, reflect.Uint8:
+		case reflect.Bool, reflect.Int, reflect.Int64, reflect.String, reflect.Uint8:
 			fields = append(fields, path)
 		default:
 			panic(fmt.Sprintf("unimplemented kind %s", t.Kind()))
