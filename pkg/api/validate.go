@@ -211,6 +211,10 @@ func (v *Validator) isValidComputeVMSize(size VMSize) bool {
 // Validate validates a OpenShiftManagedCluster struct
 func (v *Validator) Validate(new, old *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	// TODO are these error messages confusing since they may not correspond with the external model?
+	if v.isAdmin && old == nil {
+		errs = append(errs, errors.New("admin requests cannot create clusters"))
+		return errs
+	}
 	if errs := v.validateContainerService(new, externalOnly); len(errs) > 0 {
 		return errs
 	}
@@ -220,10 +224,6 @@ func (v *Validator) Validate(new, old *OpenShiftManagedCluster, externalOnly boo
 		}
 	}
 	if v.isAdmin {
-		if old == nil {
-			errs = append(errs, errors.New("admin requests cannot create clusters"))
-			return errs
-		}
 		if errs := v.validateUpdateConfig(new.Config, old.Config); len(errs) > 0 {
 			return errs
 		}

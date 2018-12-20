@@ -12,14 +12,16 @@ mkdir -p _data/_out
 
 set -x
 
-USE_PROD_FLAG="-use-prod=false"
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
-    USE_PROD_FLAG="-use-prod=true"
+    TEST_IN_PRODUCTION="-use-prod=true"
 else
     go generate ./...
     go run cmd/fakerp/main.go &
 fi
+if [[ -n "$ADMIN_MANIFEST" ]]; then
+    ADMIN_MANIFEST="-admin-manifest=$ADMIN_MANIFEST"
+fi
 
 trap 'set +ex; return_id=$?; kill $(lsof -t -i :8080); wait; exit $return_id' EXIT
 
-go run cmd/createorupdate/createorupdate.go $USE_PROD_FLAG
+go run cmd/createorupdate/createorupdate.go ${TEST_IN_PRODUCTION:-} ${ADMIN_MANIFEST:-}

@@ -11,9 +11,8 @@ else
     export RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
 fi
 
-USE_PROD_FLAG="-use-prod=false"
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
-    USE_PROD_FLAG="-use-prod=true"
+    TEST_IN_PRODUCTION="-use-prod=true"
 else
     go generate ./...
     go run cmd/fakerp/main.go &
@@ -21,4 +20,4 @@ fi
 
 trap 'set +ex; return_id=$?; kill $(lsof -t -i :8080); wait; exit $return_id' EXIT
 
-go run cmd/createorupdate/createorupdate.go -request=DELETE $USE_PROD_FLAG
+go run cmd/createorupdate/createorupdate.go -request=DELETE ${TEST_IN_PRODUCTION:-}

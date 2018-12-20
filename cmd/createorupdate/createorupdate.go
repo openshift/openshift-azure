@@ -100,6 +100,9 @@ func createOrUpdatev20180930preview(ctx context.Context, log *logrus.Entry, rpc 
 
 func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, rpc admin.OpenShiftManagedClustersClient, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) error {
 	log.Info("creating/updating cluster")
+	if oc.Properties != nil {
+		oc.Properties.ProvisioningState = nil
+	}
 	resp, err := rpc.CreateOrUpdateAndWait(ctx, resourceGroup, resourceGroup, *oc)
 	if err != nil {
 		return err
@@ -176,15 +179,7 @@ func execute(
 		return err
 	}
 	defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
-	return wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
-		if err := createOrUpdatev20180930preview(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile); err != nil {
-			if isConnectionRefused(err) {
-				return false, nil
-			}
-			return false, err
-		}
-		return true, nil
-	})
+	return createOrUpdatev20180930preview(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile)
 }
 
 func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.Config) error {
@@ -298,7 +293,15 @@ func main() {
 		}
 	}
 
-	err = execute(ctx, log, adminClient, v20180930previewClient, conf, *adminManifest)
+	err = wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
+		if err := execute(ctx, log, adminClient, v20180930previewClient, conf, *adminManifest); err != nil {
+			if isConnectionRefused(err) {
+				return false, nil
+			}
+			return false, err
+		}
+		return true, nil
+	})
 	if err != nil {
 		log.Fatal(err)
 	}

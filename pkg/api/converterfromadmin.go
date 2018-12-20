@@ -146,6 +146,17 @@ func mergeAgentPoolProfilesAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShif
 		cs.Properties.AgentPoolProfiles = make([]AgentPoolProfile, 0, len(oc.Properties.AgentPoolProfiles)+1)
 	}
 
+	if p := oc.Properties.MasterPoolProfile; p != nil {
+		index := agentPoolProfileIndex(string(AgentPoolProfileRoleMaster), cs.Properties.AgentPoolProfiles)
+		// the master profile does not exist, add it as is
+		if index == -1 {
+			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, convertMasterPoolProfileAdmin(*p, nil))
+		} else {
+			head := append(cs.Properties.AgentPoolProfiles[:index], convertMasterPoolProfileAdmin(*p, &cs.Properties.AgentPoolProfiles[index]))
+			cs.Properties.AgentPoolProfiles = append(head, cs.Properties.AgentPoolProfiles[index+1:]...)
+		}
+	}
+
 	for _, in := range oc.Properties.AgentPoolProfiles {
 		if in.Name == nil || *in.Name == "" {
 			return errors.New("invalid agent pool profile - name is missing")
@@ -162,6 +173,25 @@ func mergeAgentPoolProfilesAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShif
 		}
 	}
 	return nil
+}
+
+func convertMasterPoolProfileAdmin(in admin.MasterPoolProfile, old *AgentPoolProfile) (out AgentPoolProfile) {
+	if old != nil {
+		out = *old
+	}
+	out.Name = string(AgentPoolProfileRoleMaster)
+	out.Role = AgentPoolProfileRoleMaster
+	out.OSType = OSTypeLinux
+	if in.Count != nil {
+		out.Count = *in.Count
+	}
+	if in.VMSize != nil {
+		out.VMSize = VMSize(*in.VMSize)
+	}
+	if in.SubnetCIDR != nil {
+		out.SubnetCIDR = *in.SubnetCIDR
+	}
+	return
 }
 
 func convertAgentPoolProfileAdmin(in admin.AgentPoolProfile, old *AgentPoolProfile) (out AgentPoolProfile) {
@@ -261,7 +291,7 @@ func convertIdentityProviderAdmin(in admin.IdentityProvider, old *IdentityProvid
 }
 
 func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) {
-	in, out := oc.Config, cs.Config
+	in, out := oc.Config, &cs.Config
 
 	if in.ImageOffer != nil {
 		out.ImageOffer = *in.ImageOffer
