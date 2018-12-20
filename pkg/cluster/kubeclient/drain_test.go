@@ -31,7 +31,6 @@ func TestDrainAndDeleteWorker(t *testing.T) {
 			computerName: "compute-000000",
 			expectedActions: [][]string{
 				{"get", "nodes"},
-				{"get", "nodes"},
 				{"update", "nodes"},
 				{"list", "pods"},
 				{"delete", "nodes"},
@@ -46,7 +45,6 @@ func TestDrainAndDeleteWorker(t *testing.T) {
 			name:         "compute-with-a-pod",
 			computerName: "kubernetes",
 			expectedActions: [][]string{
-				{"get", "nodes"},
 				{"get", "nodes"},
 				{"update", "nodes"},
 				{"list", "pods"},

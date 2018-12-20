@@ -15,18 +15,13 @@ import (
 )
 
 func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, computerName ComputerName) error {
-	_, err := u.client.CoreV1().Nodes().Get(computerName.toKubernetes(), metav1.GetOptions{})
+	err := u.setUnschedulable(ctx, computerName, true)
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
 		u.log.Info("drain: node not found, skipping")
 		return nil
 	default:
-		return err
-	}
-
-	err = u.setUnschedulable(ctx, computerName, true)
-	if err != nil {
 		return err
 	}
 
