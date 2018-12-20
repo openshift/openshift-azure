@@ -37,18 +37,32 @@ func (m *MockKubeclient) EXPECT() *MockKubeclientMockRecorder {
 	return m.recorder
 }
 
-// Drain mocks base method
-func (m *MockKubeclient) Drain(arg0 context.Context, arg1 api.AgentPoolProfileRole, arg2 kubeclient.ComputerName) error {
+// DeleteMaster mocks base method
+func (m *MockKubeclient) DeleteMaster(arg0 kubeclient.ComputerName) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Drain", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "DeleteMaster", arg0)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Drain indicates an expected call of Drain
-func (mr *MockKubeclientMockRecorder) Drain(arg0, arg1, arg2 interface{}) *gomock.Call {
+// DeleteMaster indicates an expected call of DeleteMaster
+func (mr *MockKubeclientMockRecorder) DeleteMaster(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Drain", reflect.TypeOf((*MockKubeclient)(nil).Drain), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMaster", reflect.TypeOf((*MockKubeclient)(nil).DeleteMaster), arg0)
+}
+
+// DrainAndDeleteWorker mocks base method
+func (m *MockKubeclient) DrainAndDeleteWorker(arg0 context.Context, arg1 kubeclient.ComputerName) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DrainAndDeleteWorker", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DrainAndDeleteWorker indicates an expected call of DrainAndDeleteWorker
+func (mr *MockKubeclientMockRecorder) DrainAndDeleteWorker(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DrainAndDeleteWorker", reflect.TypeOf((*MockKubeclient)(nil).DrainAndDeleteWorker), arg0, arg1)
 }
 
 // WaitForInfraServices mocks base method

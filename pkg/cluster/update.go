@@ -74,7 +74,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 			if i < app.Count {
 				vmsBefore[computerName] = struct{}{}
 			} else {
-				err = u.delete(ctx, cs, &app, *vm.InstanceID, computerName)
+				err = u.deleteWorker(ctx, cs, &app, *vm.InstanceID, computerName)
 				if err != nil {
 					return nil, err
 				}
@@ -212,7 +212,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			}
 		}
 
-		if err := u.delete(ctx, cs, app, *vm.InstanceID, kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)); err != nil {
+		if err := u.deleteWorker(ctx, cs, app, *vm.InstanceID, kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneDeleteVMs}
 		}
 		delete(blob, instanceName(*vm.Name))
@@ -264,7 +264,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 	for _, vm := range vms {
 		computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		u.log.Infof("draining %s", computerName)
-		err = u.kubeclient.Drain(ctx, app.Role, computerName)
+		err = u.kubeclient.DeleteMaster(computerName)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceDrain}
 		}
@@ -338,9 +338,9 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 	return nil
 }
 
-func (u *simpleUpgrader) delete(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, instanceID string, nodeName kubeclient.ComputerName) error {
+func (u *simpleUpgrader) deleteWorker(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, instanceID string, nodeName kubeclient.ComputerName) error {
 	u.log.Infof("draining %s", nodeName)
-	if err := u.kubeclient.Drain(ctx, app.Role, nodeName); err != nil {
+	if err := u.kubeclient.DrainAndDeleteWorker(ctx, nodeName); err != nil {
 		return err
 	}
 

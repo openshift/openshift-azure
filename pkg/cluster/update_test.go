@@ -226,7 +226,7 @@ func TestGetNodesAndDrain(t *testing.T) {
 			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, "compute", testRg, tt.vmsBefore["compute"], nil)
 
 			for comp, scalesetName := range tt.expectDrain {
-				kubeclient.EXPECT().Drain(ctx, gomock.Any(), comp)
+				kubeclient.EXPECT().DrainAndDeleteWorker(ctx, comp)
 				arc := autorest.NewClientWithUserAgent("unittest")
 				virtualMachineScaleSetVMsClient.EXPECT().Client().Return(arc)
 				req, _ := http.NewRequest("delete", "http://example.com", nil)
@@ -470,7 +470,7 @@ func TestUpdateInPlace(t *testing.T) {
 				compName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 
 				// 1 drain
-				client.EXPECT().Drain(ctx, tt.app.Role, compName).Return(nil)
+				client.EXPECT().DeleteMaster(compName).Return(nil)
 
 				// 2 deallocate
 				arc := autorest.NewClientWithUserAgent("unittest")
@@ -633,7 +633,7 @@ func TestUpdatePlusOne(t *testing.T) {
 			}
 			// delete the old node
 			victim := kubeclient.ComputerName(*tt.vmsList2[0].VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-			client.EXPECT().Drain(ctx, gomock.Any(), victim)
+			client.EXPECT().DrainAndDeleteWorker(ctx, victim)
 			vdFt := compute.VirtualMachineScaleSetVMsDeleteFuture{Future: ft}
 			vmc.EXPECT().Delete(ctx, testRg, "ss-compute", gomock.Any()).Return(vdFt, nil)
 			vmc.EXPECT().Client().Return(arc)
