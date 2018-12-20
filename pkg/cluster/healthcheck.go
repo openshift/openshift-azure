@@ -61,6 +61,11 @@ func (u *simpleUpgrader) doHealthCheck(ctx context.Context, cli wait.SimpleHTTPC
 
 // HealthCheck function to verify cluster health
 func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
-	u.log.Info("checking console health")
-	return u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://"+cs.Properties.FQDN+"/console/", 10*time.Second)
+	u.log.Info("checking developer console health")
+	err := u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://"+cs.Properties.FQDN+"/console/", 10*time.Second)
+	if err != nil {
+		return err
+	}
+	u.log.Info("checking admin console health")
+	return u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://console."+cs.Properties.RouterProfiles[0].PublicSubdomain, 10*time.Second)
 }
