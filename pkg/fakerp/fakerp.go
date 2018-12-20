@@ -277,6 +277,16 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 		return err
 	}
 
+	b, err = config.Derived.AadGroupSyncConf(cs)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(filepath.Join(dataDir, "_out/aad-group-sync.yaml"), b, 0600)
+	if err != nil {
+		return err
+	}
+
 	b, err = tls.PrivateKeyAsBytes(cs.Config.SSHKey)
 	if err != nil {
 		return err
