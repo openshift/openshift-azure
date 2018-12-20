@@ -45,12 +45,12 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 		return perr
 	}
 	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
-		if perr := u.updatePlusOne(ctx, cs, &app, ssHashes); perr != nil {
+		if perr := u.updateWorkerAgentPool(ctx, cs, &app, ssHashes); perr != nil {
 			return perr
 		}
 	}
 	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
-		if perr := u.updatePlusOne(ctx, cs, &app, ssHashes); perr != nil {
+		if perr := u.updateWorkerAgentPool(ctx, cs, &app, ssHashes); perr != nil {
 			return perr
 		}
 	}
@@ -146,8 +146,8 @@ func (u *simpleUpgrader) listVMs(ctx context.Context, resourceGroup, scalesetNam
 	return vms, nil
 }
 
-// updatePlusOne creates new VMs and removes old VMs one by one.
-func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, ssHashes map[scalesetName]hash) *api.PluginError {
+// updateWorkerAgentPool creates new VMs and removes old VMs one by one.
+func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, ssHashes map[scalesetName]hash) *api.PluginError {
 	ssName := config.GetScalesetName(app.Name)
 
 	// store a list of all the VM instances now, so that if we end up creating
@@ -155,12 +155,12 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 	// they are
 	oldVMs, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneListVMs}
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolListVMs}
 	}
 
 	blob, err := u.readUpdateBlob()
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneReadBlob}
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolReadBlob}
 	}
 
 	// Filter out VMs that do not need to get upgraded. Should speed
@@ -179,16 +179,16 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 			},
 		})
 		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolWaitForReady}
 		}
 
 		if err := future.WaitForCompletionRef(ctx, u.ssc.Client()); err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolWaitForReady}
 		}
 
 		updatedList, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
 		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneListVMs}
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolListVMs}
 		}
 
 		// wait for newly created VMs to reach readiness (n.b. one alternative to
@@ -200,22 +200,22 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 				u.log.Infof("waiting for %s to be ready", computerName)
 				err = u.kubeclient.WaitForReadyWorker(ctx, computerName)
 				if err != nil {
-					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
+					return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolWaitForReady}
 				}
 				vmsBefore[*updated.InstanceID] = struct{}{}
 				blob.InstanceHashes[instanceName(*updated.Name)] = ssHashes[scalesetName(config.GetScalesetName(app.Name))]
 				if err := u.writeUpdateBlob(blob); err != nil {
-					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneUpdateBlob}
+					return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateBlob}
 				}
 			}
 		}
 
 		if err := u.deleteWorker(ctx, cs, app, *vm.InstanceID, kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)); err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneDeleteVMs}
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolDeleteVMs}
 		}
 		delete(blob.InstanceHashes, instanceName(*vm.Name))
 		if err := u.writeUpdateBlob(blob); err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneUpdateBlob}
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateBlob}
 		}
 	}
 

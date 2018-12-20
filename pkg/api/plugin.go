@@ -42,11 +42,11 @@ const (
 	PluginStepUpdateMasterAgentPoolStart        PluginStep = "UpdateMasterAgentPoolStart"
 	PluginStepUpdateMasterAgentPoolWaitForReady PluginStep = "UpdateMasterAgentPoolWaitForReady"
 	PluginStepUpdateMasterAgentPoolUpdateBlob   PluginStep = "UpdateMasterAgentPoolUpdateBlob"
-	PluginStepUpdatePlusOneListVMs              PluginStep = "UpdatePlusOneListVMs"
-	PluginStepUpdatePlusOneReadBlob             PluginStep = "UpdatePlusOneReadBlob"
-	PluginStepUpdatePlusOneWaitForReady         PluginStep = "UpdatePlusOneWaitForReady"
-	PluginStepUpdatePlusOneUpdateBlob           PluginStep = "UpdatePlusOneUpdateBlob"
-	PluginStepUpdatePlusOneDeleteVMs            PluginStep = "UpdatePlusOneDeleteVMs"
+	PluginStepUpdateWorkerAgentPoolListVMs      PluginStep = "UpdateWorkerAgentPoolListVMs"
+	PluginStepUpdateWorkerAgentPoolReadBlob     PluginStep = "UpdateWorkerAgentPoolReadBlob"
+	PluginStepUpdateWorkerAgentPoolWaitForReady PluginStep = "UpdateWorkerAgentPoolWaitForReady"
+	PluginStepUpdateWorkerAgentPoolUpdateBlob   PluginStep = "UpdateWorkerAgentPoolUpdateBlob"
+	PluginStepUpdateWorkerAgentPoolDeleteVMs    PluginStep = "UpdateWorkerAgentPoolDeleteVMs"
 	PluginStepDeleteBlob                        PluginStep = "DeleteBlob"
 )
 

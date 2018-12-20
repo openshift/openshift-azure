@@ -522,7 +522,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 	}
 }
 
-func TestUpdatePlusOne(t *testing.T) {
+func TestUpdateWorkerAgentPool(t *testing.T) {
 	testRg := "testrg"
 	tests := []struct {
 		name     string
@@ -648,8 +648,8 @@ func TestUpdatePlusOne(t *testing.T) {
 				kubeclient:      client,
 				log:             logrus.NewEntry(logrus.StandardLogger()).WithField("test", tt.name),
 			}
-			if got := u.updatePlusOne(ctx, tt.cs, tt.app, tt.ssHashes); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("simpleUpgrader.updatePlusOne() = %v, want %v", got, tt.want)
+			if got := u.updateWorkerAgentPool(ctx, tt.cs, tt.app, tt.ssHashes); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("simpleUpgrader.updateWorkerAgentPool() = %v, want %v", got, tt.want)
 			}
 		})
 	}

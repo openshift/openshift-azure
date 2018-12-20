@@ -143,31 +143,31 @@ func TestCreateOrUpdate(t *testing.T) {
 			name:     "update plus one: list VMs error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdatePlusOneListVMs,
+			errStep:  api.PluginStepUpdateWorkerAgentPoolListVMs,
 		},
 		{
 			name:     "update plus one: read blob error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdatePlusOneReadBlob,
+			errStep:  api.PluginStepUpdateWorkerAgentPoolReadBlob,
 		},
 		{
 			name:     "update plus one: wait for ready error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdatePlusOneWaitForReady,
+			errStep:  api.PluginStepUpdateWorkerAgentPoolWaitForReady,
 		},
 		{
 			name:     "update plus one: update blob error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdatePlusOneUpdateBlob,
+			errStep:  api.PluginStepUpdateWorkerAgentPoolUpdateBlob,
 		},
 		{
 			name:     "update plus one: delete VMs error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdatePlusOneDeleteVMs,
+			errStep:  api.PluginStepUpdateWorkerAgentPoolDeleteVMs,
 		},
 		{
 			name:     "waitforinfra: daemon error",
@@ -201,9 +201,9 @@ func TestCreateOrUpdate(t *testing.T) {
 				api.PluginStepUpdateMasterAgentPoolDeallocate, api.PluginStepUpdateMasterAgentPoolUpdateVMs,
 				api.PluginStepUpdateMasterAgentPoolReimage, api.PluginStepUpdateMasterAgentPoolStart,
 				api.PluginStepUpdateMasterAgentPoolWaitForReady, api.PluginStepUpdateMasterAgentPoolUpdateBlob,
-				api.PluginStepUpdatePlusOneListVMs, api.PluginStepUpdatePlusOneReadBlob,
-				api.PluginStepUpdatePlusOneWaitForReady, api.PluginStepUpdatePlusOneUpdateBlob,
-				api.PluginStepUpdatePlusOneDeleteVMs:
+				api.PluginStepUpdateWorkerAgentPoolListVMs, api.PluginStepUpdateWorkerAgentPoolReadBlob,
+				api.PluginStepUpdateWorkerAgentPoolWaitForReady, api.PluginStepUpdateWorkerAgentPoolUpdateBlob,
+				api.PluginStepUpdateWorkerAgentPoolDeleteVMs:
 				if tt.isUpdate {
 					mockUp.EXPECT().Update(nil, nil, nil, nil).Return(err)
 				} else {
