@@ -92,7 +92,7 @@ cover: unit
 	go tool cover -html=coverage.out
 
 e2e:
-	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" ./hack/e2e.sh
+	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
 
 e2e-prod:
 	FOCUS="\[Real\]" ./hack/e2e.sh
