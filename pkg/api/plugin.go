@@ -130,11 +130,9 @@ type Plugin interface {
 	// for an Openshift cluster.
 	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster) error
 
-	GenerateARM(ctx context.Context, cs *OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error)
-
 	// CreateOrUpdate either deploys or runs the update depending on the isUpdate argument
 	// this will call the deployer.
-	CreateOrUpdate(ctx context.Context, cs *OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployer DeployFn) *PluginError
+	CreateOrUpdate(ctx context.Context, cs *OpenShiftManagedCluster, isUpdate bool, deployer DeployFn) *PluginError
 
 	// RecoverEtcdCluster recovers the cluster's etcd using the backup specified in the pluginConfig
 	RecoverEtcdCluster(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn, backupBlob string) *PluginError

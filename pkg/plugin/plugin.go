@@ -72,11 +72,6 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	return nil
 }
 
-func (p *plugin) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error) {
-	p.log.Info("generating arm templates")
-	return p.armGenerator.Generate(ctx, cs, "", isUpdate)
-}
-
 func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, backupBlob string) *api.PluginError {
 	err := p.clusterUpgrader.CreateClients(ctx, cs)
 	if err != nil {
@@ -119,8 +114,14 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	return nil
 }
 
-func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
-	err := p.clusterUpgrader.CreateClients(ctx, cs)
+func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
+	p.log.Info("generating arm templates")
+	azuretemplate, err := p.armGenerator.Generate(ctx, cs, "", isUpdate)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
+	}
+
+	err = p.clusterUpgrader.CreateClients(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}

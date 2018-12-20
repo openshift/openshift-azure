@@ -16,28 +16,6 @@ import (
 	"github.com/openshift/openshift-azure/test/util/tls"
 )
 
-func TestGenerateARM(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-
-	testData := map[string]interface{}{"test": "data"}
-	mockGen := mock_arm.NewMockGenerator(mockCtrl)
-	mockGen.EXPECT().Generate(nil, nil, "", true).Return(testData, nil)
-	p := &plugin{
-		armGenerator: mockGen,
-		log:          logrus.NewEntry(logrus.StandardLogger()),
-	}
-
-	got, err := p.GenerateARM(nil, nil, true)
-	if err != nil {
-		t.Errorf("plugin.GenerateARM() error = %v", err)
-		return
-	}
-	if !reflect.DeepEqual(got, testData) {
-		t.Errorf("plugin.GenerateARM() = %v, want %v", got, testData)
-	}
-}
-
 func TestCreateOrUpdate(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
@@ -211,6 +189,8 @@ func TestCreateOrUpdate(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		mockGen := mock_arm.NewMockGenerator(mockCtrl)
+		mockGen.EXPECT().Generate(nil, nil, "", tt.isUpdate).Return(nil, nil)
 		if tt.wantErr {
 			err := &api.PluginError{Err: fmt.Errorf("test error"), Step: tt.errStep}
 			switch tt.errStep {
@@ -257,9 +237,10 @@ func TestCreateOrUpdate(t *testing.T) {
 		mockUp.EXPECT().CreateClients(nil, nil).Return(nil)
 		p := &plugin{
 			clusterUpgrader: mockUp,
+			armGenerator:    mockGen,
 			log:             logrus.NewEntry(logrus.StandardLogger()),
 		}
-		if err := p.CreateOrUpdate(nil, nil, nil, tt.isUpdate, nil); (err != nil) != tt.wantErr {
+		if err := p.CreateOrUpdate(nil, nil, tt.isUpdate, nil); (err != nil) != tt.wantErr {
 			t.Errorf("plugin.CreateOrUpdate(%s) error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
 	}
