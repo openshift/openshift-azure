@@ -3,7 +3,6 @@ package cluster
 import (
 	"context"
 	"sort"
-	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -104,7 +103,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 				if err != nil {
 					return err
 				}
-				blob[instanceName(*vm.Name)] = ssHashes[ssNameForVM(&vm)]
+				blob[instanceName(*vm.Name)] = ssHashes[scalesetName(config.GetScalesetName(app.Name))]
 				if err := u.writeUpdateBlob(blob); err != nil {
 					return err
 				}
@@ -166,7 +165,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 
 	// Filter out VMs that do not need to get upgraded. Should speed
 	// up retrying failed upgrades.
-	oldVMs = u.filterOldVMs(oldVMs, blob, ssHashes)
+	oldVMs = u.filterOldVMs(oldVMs, blob, ssHashes[scalesetName(ssName)])
 	vmsBefore := map[string]struct{}{}
 	for _, vm := range oldVMs {
 		vmsBefore[*vm.InstanceID] = struct{}{}
@@ -204,7 +203,7 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneWaitForReady}
 				}
 				vmsBefore[*updated.InstanceID] = struct{}{}
-				blob[instanceName(*updated.Name)] = ssHashes[ssNameForVM(&updated)]
+				blob[instanceName(*updated.Name)] = ssHashes[scalesetName(config.GetScalesetName(app.Name))]
 				if err := u.writeUpdateBlob(blob); err != nil {
 					return &api.PluginError{Err: err, Step: api.PluginStepUpdatePlusOneUpdateBlob}
 				}
@@ -223,21 +222,16 @@ func (u *simpleUpgrader) updatePlusOne(ctx context.Context, cs *api.OpenShiftMan
 	return nil
 }
 
-func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob updateblob, ssHashes map[scalesetName]hash) []compute.VirtualMachineScaleSetVM {
+func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob updateblob, ssHash hash) []compute.VirtualMachineScaleSetVM {
 	var oldVMs []compute.VirtualMachineScaleSetVM
 	for _, vm := range vms {
-		if blob[instanceName(*vm.Name)] != ssHashes[ssNameForVM(&vm)] {
+		if blob[instanceName(*vm.Name)] != ssHash {
 			oldVMs = append(oldVMs, vm)
 		} else {
 			u.log.Infof("skipping vm %q since it's already updated", *vm.Name)
 		}
 	}
 	return oldVMs
-}
-
-func ssNameForVM(vm *compute.VirtualMachineScaleSetVM) scalesetName {
-	hostname := strings.Split(*vm.Name, "_")[0]
-	return scalesetName(hostname)
 }
 
 // updateMasterAgentPool updates one by one all the VMs of the master scale set, in place.
@@ -261,7 +255,7 @@ func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.Open
 			*vms[j].VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
 	})
 
-	vms = u.filterOldVMs(vms, blob, ssHashes)
+	vms = u.filterOldVMs(vms, blob, ssHashes[scalesetName(ssName)])
 	for _, vm := range vms {
 		computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		u.log.Infof("draining %s", computerName)
@@ -330,7 +324,7 @@ func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.Open
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolWaitForReady}
 		}
 
-		blob[instanceName(*vm.Name)] = ssHashes[ssNameForVM(&vm)]
+		blob[instanceName(*vm.Name)] = ssHashes[scalesetName(ssName)]
 		if err := u.writeUpdateBlob(blob); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateBlob}
 		}

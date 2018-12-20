@@ -27,11 +27,11 @@ import (
 
 func TestFilterOldVMs(t *testing.T) {
 	tests := []struct {
-		name     string
-		vms      []compute.VirtualMachineScaleSetVM
-		blob     updateblob
-		ssHashes map[scalesetName]hash
-		exp      []compute.VirtualMachineScaleSetVM
+		name   string
+		vms    []compute.VirtualMachineScaleSetVM
+		blob   updateblob
+		ssHash hash
+		exp    []compute.VirtualMachineScaleSetVM
 	}{
 		{
 			name: "one updated, two old vms",
@@ -51,9 +51,7 @@ func TestFilterOldVMs(t *testing.T) {
 				"ss-master_1": "oldhash",
 				"ss-master_2": "oldhash",
 			},
-			ssHashes: map[scalesetName]hash{
-				"ss-master": "newhash",
-			},
+			ssHash: "newhash",
 			exp: []compute.VirtualMachineScaleSetVM{
 				{
 					Name: to.StringPtr("ss-master_1"),
@@ -81,10 +79,8 @@ func TestFilterOldVMs(t *testing.T) {
 				"ss-master_1": "newhash",
 				"ss-master_2": "newhash",
 			},
-			ssHashes: map[scalesetName]hash{
-				"ss-master": "newhash",
-			},
-			exp: nil,
+			ssHash: "newhash",
+			exp:    nil,
 		},
 	}
 
@@ -93,7 +89,7 @@ func TestFilterOldVMs(t *testing.T) {
 			u := &simpleUpgrader{
 				log: logrus.NewEntry(logrus.StandardLogger()).WithField("test", test.name),
 			}
-			got := u.filterOldVMs(test.vms, test.blob, test.ssHashes)
+			got := u.filterOldVMs(test.vms, test.blob, test.ssHash)
 			if !reflect.DeepEqual(got, test.exp) {
 				t.Errorf("expected vms:\n%#v\ngot:\n%#v", test.exp, got)
 			}
