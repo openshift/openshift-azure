@@ -67,7 +67,7 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 type scalesetName string
 type instanceName string
 
-func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName]hash) error {
+func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName][]byte) error {
 	blob := newUpdateBlob()
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		for i := int64(0); i < app.Count; i++ {

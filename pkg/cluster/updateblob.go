@@ -6,14 +6,14 @@ import (
 	"sort"
 )
 
-type instanceHashMap map[instanceName]hash
+type instanceHashMap map[instanceName][]byte
 
 var _ json.Marshaler = &instanceHashMap{}
 var _ json.Unmarshaler = &instanceHashMap{}
 
 type instanceHash struct {
 	InstanceName instanceName `json:"instanceName,omitempty"`
-	Hash         hash         `json:"hash,omitempty"`
+	Hash         []byte       `json:"hash,omitempty"`
 }
 
 func (ihm instanceHashMap) MarshalJSON() ([]byte, error) {
@@ -48,14 +48,14 @@ func (ihm *instanceHashMap) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type scalesetHashMap map[scalesetName]hash
+type scalesetHashMap map[scalesetName][]byte
 
 var _ json.Marshaler = &scalesetHashMap{}
 var _ json.Unmarshaler = &scalesetHashMap{}
 
 type scalesetHash struct {
 	ScalesetName scalesetName `json:"scalesetName,omitempty"`
-	Hash         hash         `json:"hash,omitempty"`
+	Hash         []byte       `json:"hash,omitempty"`
 }
 
 func (shm scalesetHashMap) MarshalJSON() ([]byte, error) {

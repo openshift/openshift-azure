@@ -31,7 +31,7 @@ func TestFilterOldVMs(t *testing.T) {
 		name   string
 		vms    []compute.VirtualMachineScaleSetVM
 		blob   *updateblob
-		ssHash hash
+		ssHash []byte
 		exp    []compute.VirtualMachineScaleSetVM
 	}{
 		{
@@ -49,12 +49,12 @@ func TestFilterOldVMs(t *testing.T) {
 			},
 			blob: &updateblob{
 				InstanceHashes: instanceHashMap{
-					"ss-master_0": "newhash",
-					"ss-master_1": "oldhash",
-					"ss-master_2": "oldhash",
+					"ss-master_0": []byte("newhash"),
+					"ss-master_1": []byte("oldhash"),
+					"ss-master_2": []byte("oldhash"),
 				},
 			},
-			ssHash: "newhash",
+			ssHash: []byte("newhash"),
 			exp: []compute.VirtualMachineScaleSetVM{
 				{
 					Name: to.StringPtr("ss-master_1"),
@@ -79,12 +79,12 @@ func TestFilterOldVMs(t *testing.T) {
 			},
 			blob: &updateblob{
 				InstanceHashes: instanceHashMap{
-					"ss-master_0": "newhash",
-					"ss-master_1": "newhash",
-					"ss-master_2": "newhash",
+					"ss-master_0": []byte("newhash"),
+					"ss-master_1": []byte("newhash"),
+					"ss-master_2": []byte("newhash"),
 				},
 			},
-			ssHash: "newhash",
+			ssHash: []byte("newhash"),
 			exp:    nil,
 		},
 	}
@@ -262,14 +262,14 @@ func TestWaitForNewNodes(t *testing.T) {
 		cs                *api.OpenShiftManagedCluster
 		nodes             map[kubeclient.ComputerName]struct{}
 		vmsList           map[string][]compute.VirtualMachineScaleSetVM
-		ssHashes          map[scalesetName]hash
+		ssHashes          map[scalesetName][]byte
 		wantHashes        *updateblob
 		wantErr           error
 		initialUpdateBlob updateblob
 	}{
 		{
 			name:     "no new nodes",
-			ssHashes: map[scalesetName]hash{"ss-master": "hashish"},
+			ssHashes: map[scalesetName][]byte{"ss-master": []byte("hashish")},
 			nodes:    map[kubeclient.ComputerName]struct{}{"master-000000": {}},
 			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
 				"master": {
@@ -294,8 +294,8 @@ func TestWaitForNewNodes(t *testing.T) {
 		},
 		{
 			name:       "wait for new nodes",
-			ssHashes:   map[scalesetName]hash{"ss-master": "hashish"},
-			wantHashes: &updateblob{InstanceHashes: instanceHashMap{"ss-master_0": "hashish"}},
+			ssHashes:   map[scalesetName][]byte{"ss-master": []byte("hashish")},
+			wantHashes: &updateblob{InstanceHashes: instanceHashMap{"ss-master_0": []byte("hashish")}},
 			nodes:      map[kubeclient.ComputerName]struct{}{},
 			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
 				"master": {
@@ -320,10 +320,10 @@ func TestWaitForNewNodes(t *testing.T) {
 		},
 		{
 			name:              "clear blob of stale instances",
-			ssHashes:          map[scalesetName]hash{"ss-master": "hashish"},
+			ssHashes:          map[scalesetName][]byte{"ss-master": []byte("hashish")},
 			nodes:             map[kubeclient.ComputerName]struct{}{"master-000000": {}},
-			initialUpdateBlob: updateblob{InstanceHashes: instanceHashMap{"ss-master_0": "oldhash", "ss-master_1": "oldhash"}},
-			wantHashes:        &updateblob{InstanceHashes: instanceHashMap{"ss-master_0": "oldhash"}},
+			initialUpdateBlob: updateblob{InstanceHashes: instanceHashMap{"ss-master_0": []byte("oldhash"), "ss-master_1": []byte("oldhash")}},
+			wantHashes:        &updateblob{InstanceHashes: instanceHashMap{"ss-master_0": []byte("oldhash")}},
 			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
 				"master": {
 					{
@@ -348,7 +348,7 @@ func TestWaitForNewNodes(t *testing.T) {
 		{
 			name:     "new node not ready",
 			wantErr:  fmt.Errorf("node not ready test"),
-			ssHashes: map[scalesetName]hash{"ss-master": "hashish"},
+			ssHashes: map[scalesetName][]byte{"ss-master": []byte("hashish")},
 			nodes:    map[kubeclient.ComputerName]struct{}{},
 			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
 				"master": {
@@ -418,13 +418,13 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 	tests := []struct {
 		name     string
 		cs       *api.OpenShiftManagedCluster
-		ssHashes map[scalesetName]hash
+		ssHashes map[scalesetName][]byte
 		vmsList  []compute.VirtualMachineScaleSetVM
 		want     *api.PluginError
 	}{
 		{
 			name:     "basic coverage",
-			ssHashes: map[scalesetName]hash{"ss-master": "hashish"},
+			ssHashes: map[scalesetName][]byte{"ss-master": []byte("hashish")},
 			vmsList: []compute.VirtualMachineScaleSetVM{
 				{
 					Name:       to.StringPtr("ss-master_0"),
@@ -528,7 +528,7 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 		name     string
 		cs       *api.OpenShiftManagedCluster
 		app      *api.AgentPoolProfile
-		ssHashes map[scalesetName]hash
+		ssHashes map[scalesetName][]byte
 		want     *api.PluginError
 		vmsList1 []compute.VirtualMachineScaleSetVM
 		vmsList2 []compute.VirtualMachineScaleSetVM
@@ -540,7 +540,7 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 				Name:  "compute",
 				Count: 1,
 			},
-			ssHashes: map[scalesetName]hash{"ss-compute": "hashish"},
+			ssHashes: map[scalesetName][]byte{"ss-compute": []byte("hashish")},
 			vmsList1: []compute.VirtualMachineScaleSetVM{
 				{
 					Name:       to.StringPtr("ss-compute_0"),

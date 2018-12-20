@@ -26,11 +26,11 @@ func TestReadUpdateBlob(t *testing.T) {
 		},
 		{
 			name: "ok",
-			blob: `{"instanceHashes":[{"instanceName":"ss-compute_0","hash":"7x99="},{"instanceName":"ss-infra_0","hash":"45"}]}`,
+			blob: `{"instanceHashes":[{"instanceName":"ss-compute_0","hash":"N3g5OT0="},{"instanceName":"ss-infra_0","hash":"NDU="}]}`,
 			want: &updateblob{
 				InstanceHashes: instanceHashMap{
-					"ss-infra_0":   "45",
-					"ss-compute_0": "7x99=",
+					"ss-infra_0":   []byte("45"),
+					"ss-compute_0": []byte("7x99="),
 				},
 				ScalesetHashes: scalesetHashMap{},
 			},
@@ -78,11 +78,11 @@ func TestWriteUpdateBlob(t *testing.T) {
 			name: "valid",
 			blob: &updateblob{
 				InstanceHashes: instanceHashMap{
-					"ss-infra_0":   "45",
-					"ss-compute_0": "7x99=",
+					"ss-infra_0":   []byte("45"),
+					"ss-compute_0": []byte("7x99="),
 				},
 			},
-			want: `{"instanceHashes":[{"instanceName":"ss-compute_0","hash":"7x99="},{"instanceName":"ss-infra_0","hash":"45"}]}`,
+			want: `{"instanceHashes":[{"instanceName":"ss-compute_0","hash":"N3g5OT0="},{"instanceName":"ss-infra_0","hash":"NDU="}]}`,
 		},
 	}
 	gmc := gomock.NewController(t)

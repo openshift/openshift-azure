@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"bytes"
 	"context"
 	"sort"
 
@@ -81,7 +82,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 	return vmsBefore, nil
 }
 
-func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, nodes map[kubeclient.ComputerName]struct{}, ssHashes map[scalesetName]hash) error {
+func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, nodes map[kubeclient.ComputerName]struct{}, ssHashes map[scalesetName][]byte) error {
 	blob, err := u.readUpdateBlob()
 	if err != nil {
 		return err
@@ -147,7 +148,7 @@ func (u *simpleUpgrader) listVMs(ctx context.Context, resourceGroup, scalesetNam
 }
 
 // updateWorkerAgentPool creates new VMs and removes old VMs one by one.
-func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, ssHashes map[scalesetName]hash) *api.PluginError {
+func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, ssHashes map[scalesetName][]byte) *api.PluginError {
 	ssName := config.GetScalesetName(app.Name)
 
 	// store a list of all the VM instances now, so that if we end up creating
@@ -222,10 +223,10 @@ func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.Open
 	return nil
 }
 
-func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob *updateblob, ssHash hash) []compute.VirtualMachineScaleSetVM {
+func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob *updateblob, ssHash []byte) []compute.VirtualMachineScaleSetVM {
 	var oldVMs []compute.VirtualMachineScaleSetVM
 	for _, vm := range vms {
-		if blob.InstanceHashes[instanceName(*vm.Name)] != ssHash {
+		if !bytes.Equal(blob.InstanceHashes[instanceName(*vm.Name)], ssHash) {
 			oldVMs = append(oldVMs, vm)
 		} else {
 			u.log.Infof("skipping vm %q since it's already updated", *vm.Name)
@@ -235,7 +236,7 @@ func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, bl
 }
 
 // updateMasterAgentPool updates one by one all the VMs of the master scale set, in place.
-func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName]hash) *api.PluginError {
+func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName][]byte) *api.PluginError {
 	ssName := config.GetScalesetName(string(api.AgentPoolProfileRoleMaster))
 
 	vms, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
