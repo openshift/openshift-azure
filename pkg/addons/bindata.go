@@ -294,8 +294,6 @@
 // data/Deployment.apps/openshift-infra/customer-admin-controller.yaml
 // data/Deployment.apps/openshift-monitoring/cluster-monitoring-operator.yaml
 // data/Deployment.apps/openshift-web-console/webconsole.yaml
-// data/Group.user.openshift.io/osa-customer-admins.yaml
-// data/Group.user.openshift.io/osa-customer-readers.yaml
 // data/ImageStream.image.openshift.io/openshift/dotnet-runtime.yaml
 // data/ImageStream.image.openshift.io/openshift/dotnet.yaml
 // data/ImageStream.image.openshift.io/openshift/eap-cd-openshift.yaml
@@ -6627,46 +6625,6 @@ func deploymentAppsOpenshiftWebConsoleWebconsoleYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "Deployment.apps/openshift-web-console/webconsole.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _groupUserOpenshiftIoOsaCustomerAdminsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x14\xcc\xb1\x0d\x42\x41\x08\x00\xd0\x9e\x29\x58\xe0\x9f\xb1\x65\x01\x37\xb0\x31\x16\xc4\xc3\x48\x0c\x70\x01\xce\xf9\xcd\x5f\xe0\xf1\xd2\xbb\x64\x69\x38\xe1\x2e\xc9\x11\x4b\xbc\x3e\xfa\xee\xa1\x71\xf9\x5d\xe1\xab\x3e\x09\x6f\x19\x7b\x81\x49\xf3\xe4\x66\x02\x44\x67\x13\xc2\x28\x3e\x5e\xbb\x3a\x4c\xf2\xe0\x69\xea\x05\x27\x53\x84\x8f\x27\xfc\x03\x00\x00\xff\xff\x40\x34\xb6\xdd\x5d\x00\x00\x00")
-
-func groupUserOpenshiftIoOsaCustomerAdminsYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_groupUserOpenshiftIoOsaCustomerAdminsYaml,
-		"Group.user.openshift.io/osa-customer-admins.yaml",
-	)
-}
-
-func groupUserOpenshiftIoOsaCustomerAdminsYaml() (*asset, error) {
-	bytes, err := groupUserOpenshiftIoOsaCustomerAdminsYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "Group.user.openshift.io/osa-customer-admins.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _groupUserOpenshiftIoOsaCustomerReadersYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x14\xcc\xc1\x0d\x42\x31\x08\x06\xe0\x3b\x53\xb0\xc0\xab\xf1\xca\x02\x6e\xe0\xc5\x78\x20\xf6\x37\x12\xd3\xd2\x00\x75\x7e\xf3\x16\xf8\x74\xd9\x1d\x91\xe6\x53\x78\x27\xa2\xf9\xc2\xcc\x8f\xbd\xab\x99\x5f\x7e\x57\xfa\xda\xec\xc2\xb7\xf0\xbd\x68\xa0\xb4\x6b\xa9\x10\xf3\xd4\x01\x61\x4f\x3d\x5e\x3b\xcb\x07\xe2\x08\x68\x47\x24\x9d\x4e\x0a\x3f\x9e\xf4\x0f\x00\x00\xff\xff\xf3\xd9\x6d\x57\x5e\x00\x00\x00")
-
-func groupUserOpenshiftIoOsaCustomerReadersYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_groupUserOpenshiftIoOsaCustomerReadersYaml,
-		"Group.user.openshift.io/osa-customer-readers.yaml",
-	)
-}
-
-func groupUserOpenshiftIoOsaCustomerReadersYaml() (*asset, error) {
-	bytes, err := groupUserOpenshiftIoOsaCustomerReadersYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "Group.user.openshift.io/osa-customer-readers.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -14817,8 +14775,6 @@ var _bindata = map[string]func() (*asset, error){
 	"Deployment.apps/openshift-infra/customer-admin-controller.yaml":                                                             deploymentAppsOpenshiftInfraCustomerAdminControllerYaml,
 	"Deployment.apps/openshift-monitoring/cluster-monitoring-operator.yaml":                                                      deploymentAppsOpenshiftMonitoringClusterMonitoringOperatorYaml,
 	"Deployment.apps/openshift-web-console/webconsole.yaml":                                                                      deploymentAppsOpenshiftWebConsoleWebconsoleYaml,
-	"Group.user.openshift.io/osa-customer-admins.yaml":                                                                           groupUserOpenshiftIoOsaCustomerAdminsYaml,
-	"Group.user.openshift.io/osa-customer-readers.yaml":                                                                          groupUserOpenshiftIoOsaCustomerReadersYaml,
 	"ImageStream.image.openshift.io/openshift/dotnet-runtime.yaml":                                                               imagestreamImageOpenshiftIoOpenshiftDotnetRuntimeYaml,
 	"ImageStream.image.openshift.io/openshift/dotnet.yaml":                                                                       imagestreamImageOpenshiftIoOpenshiftDotnetYaml,
 	"ImageStream.image.openshift.io/openshift/eap-cd-openshift.yaml":                                                             imagestreamImageOpenshiftIoOpenshiftEapCdOpenshiftYaml,
@@ -15611,10 +15567,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"openshift-web-console": {nil, map[string]*bintree{
 			"webconsole.yaml": {deploymentAppsOpenshiftWebConsoleWebconsoleYaml, map[string]*bintree{}},
 		}},
-	}},
-	"Group.user.openshift.io": {nil, map[string]*bintree{
-		"osa-customer-admins.yaml":  {groupUserOpenshiftIoOsaCustomerAdminsYaml, map[string]*bintree{}},
-		"osa-customer-readers.yaml": {groupUserOpenshiftIoOsaCustomerReadersYaml, map[string]*bintree{}},
 	}},
 	"ImageStream.image.openshift.io": {nil, map[string]*bintree{
 		"openshift": {nil, map[string]*bintree{
