@@ -15,7 +15,7 @@ import (
 )
 
 func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, computerName ComputerName) error {
-	err := u.setUnschedulable(ctx, computerName, true)
+	err := u.setUnschedulable(computerName, true)
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
@@ -37,7 +37,7 @@ func (u *kubeclient) DeleteMaster(computerName ComputerName) error {
 	return u.client.CoreV1().Nodes().Delete(computerName.toKubernetes(), &metav1.DeleteOptions{})
 }
 
-func (u *kubeclient) setUnschedulable(ctx context.Context, computerName ComputerName, unschedulable bool) error {
+func (u *kubeclient) setUnschedulable(computerName ComputerName, unschedulable bool) error {
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		node, err := u.client.CoreV1().Nodes().Get(computerName.toKubernetes(), metav1.GetOptions{})
 		if err != nil {

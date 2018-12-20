@@ -151,5 +151,5 @@ func (u *kubeclient) WaitForReadyWorker(ctx context.Context, computerName Comput
 		return err
 	}
 
-	return u.setUnschedulable(ctx, computerName, false)
+	return u.setUnschedulable(computerName, false)
 }
