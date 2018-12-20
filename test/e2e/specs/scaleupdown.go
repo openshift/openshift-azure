@@ -26,9 +26,9 @@ import (
 )
 
 var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", func() {
-	manifestDir, err := shared.FindDirectory("manifests")
+	testDir, err := shared.FindDirectory("test")
 	if err != nil {
-		manifestDir = "../../test/manifests"
+		testDir = "../../test"
 	}
 	const (
 		sampleDeployment = "hello-openshift"
@@ -36,8 +36,8 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 	var (
 		azurecli          *azure.Client
 		occli             *openshift.Client
-		scaleUpManifest   = flag.String("scaleUpManifest", path.Join(manifestDir, "normal", "scaleup.yaml"), "Path to the scale up manifest to send in a partial update request to the RP")
-		scaleDownManifest = flag.String("scaleDownManifest", path.Join(manifestDir, "normal", "scaledown.yaml"), "Path to the scale down manifest to send in a partial update request to the RP")
+		scaleUpManifest   = flag.String("scaleUpManifest", path.Join(testDir, "manifests", "normal", "scaleup.yaml"), "Path to the scale up manifest to send in a partial update request to the RP")
+		scaleDownManifest = flag.String("scaleDownManifest", path.Join(testDir, "manifests", "normal", "scaledown.yaml"), "Path to the scale down manifest to send in a partial update request to the RP")
 		namespace         string
 	)
 
