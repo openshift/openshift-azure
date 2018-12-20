@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -17,6 +18,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/randomstring"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
@@ -24,14 +26,18 @@ import (
 )
 
 var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", func() {
+	manifestDir, err := shared.FindDirectory("manifests")
+	if err != nil {
+		manifestDir = "../../test/manifests"
+	}
 	const (
 		sampleDeployment = "hello-openshift"
 	)
 	var (
 		azurecli          *azure.Client
 		occli             *openshift.Client
-		scaleUpManifest   = flag.String("scaleUpManifest", "../../test/manifests/normal/scaleup.yaml", "Path to the scale up manifest to send in a partial update request to the RP")
-		scaleDownManifest = flag.String("scaleDownManifest", "../../test/manifests/normal/scaledown.yaml", "Path to the scale down manifest to send in a partial update request to the RP")
+		scaleUpManifest   = flag.String("scaleUpManifest", path.Join(manifestDir, "normal", "scaleup.yaml"), "Path to the scale up manifest to send in a partial update request to the RP")
+		scaleDownManifest = flag.String("scaleDownManifest", path.Join(manifestDir, "normal", "scaledown.yaml"), "Path to the scale down manifest to send in a partial update request to the RP")
 		namespace         string
 	)
 

@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"reflect"
 	"strings"
 	"time"
@@ -19,6 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
@@ -26,12 +28,16 @@ import (
 )
 
 var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]", func() {
+	dataDir, err := shared.FindDirectory(shared.DataDirectory)
+	if err != nil {
+		dataDir = "../../_data"
+	}
 	var (
 		cli *openshift.Client
 		// TODO: Unfortunately cannot use "manifest" because the flag name is already
 		// used by the key rotation test; Figure out whether we want to collapse these
 		// into a single flag and do it.
-		manifest = flag.String("request", "../../_data/manifest.yaml", "Path to the manifest to send to the RP")
+		manifest = flag.String("request", path.Join(dataDir, "manifest.yaml"), "Path to the manifest to send to the RP")
 	)
 
 	BeforeEach(func() {

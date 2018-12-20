@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"reflect"
 
 	. "github.com/onsi/ginkgo"
@@ -15,15 +16,20 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 )
 
 var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func() {
+	dataDir, err := shared.FindDirectory(shared.DataDirectory)
+	if err != nil {
+		dataDir = "../../_data"
+	}
 	var (
 		cli        *azure.Client
-		manifest   = flag.String("manifest", "../../_data/manifest.yaml", "Path to the manifest to send to the RP")
-		configBlob = flag.String("configBlob", "../../_data/containerservice.yaml", "Path to the OpenShift internal config blob")
+		manifest   = flag.String("manifest", path.Join(dataDir, "manifest.yaml"), "Path to the manifest to send to the RP")
+		configBlob = flag.String("configBlob", path.Join(dataDir, "containerservice.yaml"), "Path to the OpenShift internal config blob")
 	)
 
 	BeforeEach(func() {
