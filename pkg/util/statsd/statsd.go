@@ -1,29 +1,50 @@
+// Package statsd implements the modified statsd protocol documented at
+// https://genevamondocs.azurewebsites.net/collect/references/statsdref.html
 package statsd
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net"
-	"os"
-	"syscall"
-
-	"github.com/sirupsen/logrus"
+	"io"
+	"time"
 )
 
-// Gauge represents a statsd gauge
-type Gauge struct {
-	Namespace string
+// Float represents a statsd floating point number
+type Float struct {
 	Metric    string
+	Account   string
+	Namespace string
 	Dims      map[string]string
-	Value     float64 `json:"-"`
+	TS        time.Time
+	Value     float64
 }
 
-func (g *Gauge) marshal() ([]byte, error) {
+// MarshalJSON marshals a Float into JSON format.  You should probably call
+// Marshal() instead.
+func (f *Float) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Metric    string
+		Account   string `json:"Account,omitempty"`
+		Namespace string `json:"Namespace,omitempty"`
+		Dims      map[string]string
+		TS        string
+	}{
+		Metric:    f.Metric,
+		Account:   f.Account,
+		Namespace: f.Namespace,
+		Dims:      f.Dims,
+		TS:        f.TS.UTC().Format("2006-01-02T15:04:05.000"),
+	})
+}
+
+// Marshal a Float into its statsd format.  Call this instead of MarshalJSON().
+func (f *Float) Marshal() ([]byte, error) {
 	buf := &bytes.Buffer{}
 
 	e := json.NewEncoder(buf)
-	err := e.Encode(g)
+	err := e.Encode(f)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +54,7 @@ func (g *Gauge) marshal() ([]byte, error) {
 		buf.Truncate(buf.Len() - 1)
 	}
 
-	_, err = fmt.Fprintf(buf, ":%f|g\n", g.Value)
+	_, err = fmt.Fprintf(buf, ":%f|f\n", f.Value)
 	if err != nil {
 		return nil, err
 	}
@@ -43,61 +64,23 @@ func (g *Gauge) marshal() ([]byte, error) {
 
 // Client is a buffering statsd client
 type Client struct {
-	log        *logrus.Entry
-	conn       net.Conn
-	buf        bytes.Buffer
-	maxPayload int
+	w   io.WriteCloser
+	buf *bufio.Writer
 }
 
 // NewClient returns a new client
-func NewClient(log *logrus.Entry, address string) (*Client, error) {
-	conn, err := net.Dial("udp", address)
-	if err != nil {
-		return nil, err
-	}
-
-	c := &Client{log: log, conn: conn}
-
-	if err := c.setMaxPayload(); err != nil {
-		return nil, err
-	}
-
-	return c, nil
+func NewClient(w io.WriteCloser) *Client {
+	return &Client{w: w, buf: bufio.NewWriter(w)}
 }
 
 // Flush flushes the internal buffer
 func (c *Client) Flush() error {
-	_, err := c.buf.WriteTo(c.conn)
-	if err, ok := err.(*net.OpError); ok {
-		if err, ok := err.Err.(*os.SyscallError); ok {
-			if err.Err == syscall.EMSGSIZE {
-				err := c.setMaxPayload()
-				if err != nil {
-					c.log.Warn(err)
-				}
-				c.buf.Reset()
-			}
-		}
-	}
-
-	return err
+	return c.buf.Flush()
 }
 
-// Write writes a gauge to the internal buffer and possibly flushes
-func (c *Client) Write(g *Gauge) error {
-	b, err := g.marshal()
-	if err != nil {
-		return err
-	}
-
-	if c.buf.Len()+len(b) > c.maxPayload {
-		if err := c.Flush(); err != nil {
-			return err
-		}
-	}
-
-	_, err = c.buf.Write(b)
-	return err
+// Write writes to the internal buffer
+func (c *Client) Write(b []byte) (int, error) {
+	return c.buf.Write(b)
 }
 
 // Close flushes the internal buffer and closes the connection
@@ -106,30 +89,5 @@ func (c *Client) Close() error {
 		return err
 	}
 
-	return c.conn.Close()
-}
-
-func (c *Client) setMaxPayload() error {
-	f, err := c.conn.(*net.UDPConn).File()
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	fd := int(f.Fd())
-
-	mtu, err := syscall.GetsockoptInt(fd, syscall.IPPROTO_IP, syscall.IP_MTU)
-	if err != nil {
-		return err
-	}
-
-	c.maxPayload = mtu - 28 // len(typical IP header) + len(UDP header)
-
-	if c.maxPayload > 2048 {
-		c.maxPayload = 2048 // downstream reader may not be able to cope with larger packets *cough*
-	}
-
-	c.log.Infof("set maxPayload to %d", c.maxPayload)
-
-	return nil
+	return c.w.Close()
 }

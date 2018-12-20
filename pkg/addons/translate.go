@@ -231,6 +231,11 @@ var Translations = map[string][]struct {
 	"ConfigMap/openshift-azure-monitoring/metrics-bridge": {
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.account"),
+			Template:   "{{ .Config.GenevaMetricsAccount }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.region"),
 			Template:   "{{ .ContainerService.Location }}",
 		},
@@ -444,16 +449,10 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.GenevaStatsd }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].env[?(@.name='REGION')].value"),
-			Template: "{{ .ContainerService.Location }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].env[?(@.name='MDMENDPOINT')].value"),
-			Template: "{{ .Config.GenevaMetricsEndpoint }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].env[?(@.name='MDM_ACCOUNT')].value"),
-			Template: "{{ .Config.GenevaMetricsAccount }}",
+			Path: jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].args"),
+			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
+				return config.Derived.StatsdArgs(cs)
+			},
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='metricsbridge')].image"),

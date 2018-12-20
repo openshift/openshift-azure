@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/ghodss/yaml"
@@ -32,10 +33,11 @@ var (
 type config struct {
 	Interval                   time.Duration `json:"intervalNanoseconds,omitempty"`
 	PrometheusFederateEndpoint string        `json:"prometheusFederateEndpoint,omitempty"`
-	StatsdEndpoint             string        `json:"statsdEndpoint,omitempty"`
+	StatsdSocket               string        `json:"statsdSocket,omitempty"`
 
 	Series []string `json:"series,omitempty"`
 
+	Account   string `json:"account,omitempty"`
 	Namespace string `json:"namespace,omitempty"`
 	Region    string `json:"region,omitempty"`
 
@@ -87,8 +89,8 @@ func (c *config) validate() (errs []error) {
 	if _, err := url.Parse(c.PrometheusFederateEndpoint); err != nil {
 		errs = append(errs, fmt.Errorf("prometheusFederateEndpoint: %s", err))
 	}
-	if _, err := net.ResolveUDPAddr("udp", c.StatsdEndpoint); err != nil {
-		errs = append(errs, fmt.Errorf("statsdEndpoint: %s", err))
+	if _, err := net.ResolveUnixAddr("unix", c.StatsdSocket); err != nil {
+		errs = append(errs, fmt.Errorf("statsdSocket: %s", err))
 	}
 	if len(c.Series) == 0 {
 		errs = append(errs, fmt.Errorf("must configure at least one series"))
@@ -98,12 +100,26 @@ func (c *config) validate() (errs []error) {
 }
 
 func (c *config) init() error {
-	var err error
-
-	c.statsd, err = statsd.NewClient(c.log, c.StatsdEndpoint)
-	if err != nil {
+	var conn net.Conn
+	for {
+		var err error
+		conn, err = net.Dial("unix", c.StatsdSocket)
+		if err == nil {
+			break
+		}
+		if err, ok := err.(*net.OpError); ok {
+			if err, ok := err.Err.(*os.SyscallError); ok {
+				if err.Err == syscall.ENOENT {
+					c.log.Warn("socket not found, sleeping...")
+					time.Sleep(5 * time.Second)
+					continue
+				}
+			}
+		}
 		return err
 	}
+
+	c.statsd = statsd.NewClient(conn)
 
 	c.http = &http.Client{
 		Transport: &http.Transport{
@@ -136,6 +152,7 @@ func run(log *logrus.Entry, configpath string) error {
 	if err := c.init(); err != nil {
 		return err
 	}
+	defer c.statsd.Close()
 
 	return c.run()
 }
@@ -171,6 +188,8 @@ func (c *config) run() error {
 }
 
 func (c *config) runOnce(req *http.Request) error {
+	now := time.Now()
+
 	resp, err := c.http.Do(req)
 	if err != nil {
 		return err
@@ -195,19 +214,24 @@ func (c *config) runOnce(req *http.Request) error {
 		}
 
 		for _, m := range family.Metric {
-			gauge := &statsd.Gauge{
-				Namespace: c.Namespace,
+			f := &statsd.Float{
 				Metric:    *family.Name,
+				Account:   c.Account,
+				Namespace: c.Namespace,
 				Dims: map[string]string{
-					"Region":       c.Region,
-					"UnderlayName": "",
+					"Region": c.Region,
 				},
+				TS:    now,
 				Value: *m.Untyped.Value,
 			}
 			for _, label := range m.Label {
-				gauge.Dims[*label.Name] = *label.Value
+				f.Dims[*label.Name] = *label.Value
 			}
-			if err = c.statsd.Write(gauge); err != nil {
+			b, err := f.Marshal()
+			if err != nil {
+				return err
+			}
+			if _, err = c.statsd.Write(b); err != nil {
 				return err
 			}
 		}

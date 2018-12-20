@@ -31,8 +31,6 @@ spec:
           securityContext:
             privileged: true
             runAsUser: 0
-          ports:
-            - containerPort: 9102
           env:
            - name: FLUENTD_CONF
              value: config/fluent.conf
