@@ -146,10 +146,5 @@ func (u *kubeclient) masterIsReady(computerName ComputerName) (bool, error) {
 }
 
 func (u *kubeclient) WaitForReadyWorker(ctx context.Context, computerName ComputerName) error {
-	err := wait.PollImmediateUntil(time.Second, ready.NodeIsReady(u.client.CoreV1().Nodes(), computerName.toKubernetes()), ctx.Done())
-	if err != nil {
-		return err
-	}
-
-	return u.setUnschedulable(computerName, false)
+	return wait.PollImmediateUntil(time.Second, ready.NodeIsReady(u.client.CoreV1().Nodes(), computerName.toKubernetes()), ctx.Done())
 }
