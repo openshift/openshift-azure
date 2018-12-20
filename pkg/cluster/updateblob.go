@@ -6,61 +6,115 @@ import (
 	"sort"
 )
 
-type updateblob map[instanceName]hash
+type instanceHashMap map[instanceName]hash
 
-var _ json.Marshaler = &updateblob{}
-var _ json.Unmarshaler = &updateblob{}
+var _ json.Marshaler = &instanceHashMap{}
+var _ json.Unmarshaler = &instanceHashMap{}
 
-type vmInfo struct {
+type instanceHash struct {
 	InstanceName instanceName `json:"instanceName,omitempty"`
-	ScalesetHash hash         `json:"scalesetHash,omitempty"`
+	Hash         hash         `json:"hash,omitempty"`
 }
 
-func (blob updateblob) MarshalJSON() ([]byte, error) {
-	instancenames := make([]instanceName, 0, len(blob))
-	for instancename := range blob {
+func (ihm instanceHashMap) MarshalJSON() ([]byte, error) {
+	instancenames := make([]instanceName, 0, len(ihm))
+	for instancename := range ihm {
 		instancenames = append(instancenames, instancename)
 	}
 	sort.Slice(instancenames, func(i, j int) bool { return instancenames[i] < instancenames[j] })
 
-	slice := make([]vmInfo, 0, len(blob))
+	slice := make([]instanceHash, 0, len(ihm))
 	for _, instancename := range instancenames {
-		slice = append(slice, vmInfo{
+		slice = append(slice, instanceHash{
 			InstanceName: instancename,
-			ScalesetHash: blob[instancename],
+			Hash:         ihm[instancename],
 		})
 	}
 
 	return json.Marshal(slice)
 }
 
-func (blob *updateblob) UnmarshalJSON(data []byte) error {
-	var slice []vmInfo
+func (ihm *instanceHashMap) UnmarshalJSON(data []byte) error {
+	var slice []instanceHash
 	if err := json.Unmarshal(data, &slice); err != nil {
 		return err
 	}
 
-	*blob = updateblob{}
+	*ihm = instanceHashMap{}
 	for _, vi := range slice {
-		(*blob)[vi.InstanceName] = vi.ScalesetHash
+		(*ihm)[vi.InstanceName] = vi.Hash
 	}
 
 	return nil
 }
 
-func (u *simpleUpgrader) writeUpdateBlob(blob updateblob) error {
+type scalesetHashMap map[scalesetName]hash
+
+var _ json.Marshaler = &scalesetHashMap{}
+var _ json.Unmarshaler = &scalesetHashMap{}
+
+type scalesetHash struct {
+	ScalesetName scalesetName `json:"scalesetName,omitempty"`
+	Hash         hash         `json:"hash,omitempty"`
+}
+
+func (shm scalesetHashMap) MarshalJSON() ([]byte, error) {
+	scalesetnames := make([]scalesetName, 0, len(shm))
+	for scalesetname := range shm {
+		scalesetnames = append(scalesetnames, scalesetname)
+	}
+	sort.Slice(scalesetnames, func(i, j int) bool { return scalesetnames[i] < scalesetnames[j] })
+
+	slice := make([]scalesetHash, 0, len(shm))
+	for _, scalesetname := range scalesetnames {
+		slice = append(slice, scalesetHash{
+			ScalesetName: scalesetname,
+			Hash:         shm[scalesetname],
+		})
+	}
+
+	return json.Marshal(slice)
+}
+
+func (shm *scalesetHashMap) UnmarshalJSON(data []byte) error {
+	var slice []scalesetHash
+	if err := json.Unmarshal(data, &slice); err != nil {
+		return err
+	}
+
+	*shm = scalesetHashMap{}
+	for _, vi := range slice {
+		(*shm)[vi.ScalesetName] = vi.Hash
+	}
+
+	return nil
+}
+
+type updateblob struct {
+	ScalesetHashes scalesetHashMap `json:"scalesetHashes,omitempty"`
+	InstanceHashes instanceHashMap `json:"instanceHashes,omitempty"`
+}
+
+func newUpdateBlob() *updateblob {
+	return &updateblob{
+		ScalesetHashes: scalesetHashMap{},
+		InstanceHashes: instanceHashMap{},
+	}
+}
+
+func (u *simpleUpgrader) writeUpdateBlob(blob *updateblob) error {
 	data, err := json.Marshal(blob)
 	if err != nil {
 		return err
 	}
 
-	updateBlob := u.updateContainer.GetBlobReference(updateBlobName)
-	return updateBlob.CreateBlockBlobFromReader(bytes.NewReader(data), nil)
+	blobRef := u.updateContainer.GetBlobReference(updateBlobName)
+	return blobRef.CreateBlockBlobFromReader(bytes.NewReader(data), nil)
 }
 
-func (u *simpleUpgrader) readUpdateBlob() (updateblob, error) {
-	updateBlob := u.updateContainer.GetBlobReference(updateBlobName)
-	rc, err := updateBlob.Get(nil)
+func (u *simpleUpgrader) readUpdateBlob() (*updateblob, error) {
+	blobRef := u.updateContainer.GetBlobReference(updateBlobName)
+	rc, err := blobRef.Get(nil)
 	if err != nil {
 		return nil, err
 	}
@@ -68,12 +122,18 @@ func (u *simpleUpgrader) readUpdateBlob() (updateblob, error) {
 
 	d := json.NewDecoder(rc)
 
-	b := updateblob{}
+	var b updateblob
 	if err := d.Decode(&b); err != nil {
 		return nil, err
 	}
+	if b.ScalesetHashes == nil {
+		b.ScalesetHashes = scalesetHashMap{}
+	}
+	if b.InstanceHashes == nil {
+		b.InstanceHashes = instanceHashMap{}
+	}
 
-	return b, nil
+	return &b, nil
 }
 
 func (u *simpleUpgrader) deleteUpdateBlob() error {

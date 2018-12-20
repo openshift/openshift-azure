@@ -3,6 +3,7 @@ package cluster
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -29,7 +30,7 @@ func TestFilterOldVMs(t *testing.T) {
 	tests := []struct {
 		name   string
 		vms    []compute.VirtualMachineScaleSetVM
-		blob   updateblob
+		blob   *updateblob
 		ssHash hash
 		exp    []compute.VirtualMachineScaleSetVM
 	}{
@@ -46,10 +47,12 @@ func TestFilterOldVMs(t *testing.T) {
 					Name: to.StringPtr("ss-master_2"),
 				},
 			},
-			blob: updateblob{
-				"ss-master_0": "newhash",
-				"ss-master_1": "oldhash",
-				"ss-master_2": "oldhash",
+			blob: &updateblob{
+				InstanceHashes: instanceHashMap{
+					"ss-master_0": "newhash",
+					"ss-master_1": "oldhash",
+					"ss-master_2": "oldhash",
+				},
 			},
 			ssHash: "newhash",
 			exp: []compute.VirtualMachineScaleSetVM{
@@ -74,10 +77,12 @@ func TestFilterOldVMs(t *testing.T) {
 					Name: to.StringPtr("ss-master_2"),
 				},
 			},
-			blob: updateblob{
-				"ss-master_0": "newhash",
-				"ss-master_1": "newhash",
-				"ss-master_2": "newhash",
+			blob: &updateblob{
+				InstanceHashes: instanceHashMap{
+					"ss-master_0": "newhash",
+					"ss-master_1": "newhash",
+					"ss-master_2": "newhash",
+				},
 			},
 			ssHash: "newhash",
 			exp:    nil,
@@ -258,7 +263,7 @@ func TestWaitForNewNodes(t *testing.T) {
 		nodes             map[kubeclient.ComputerName]struct{}
 		vmsList           map[string][]compute.VirtualMachineScaleSetVM
 		ssHashes          map[scalesetName]hash
-		wantHashes        updateblob
+		wantHashes        *updateblob
 		wantErr           error
 		initialUpdateBlob updateblob
 	}{
@@ -290,7 +295,7 @@ func TestWaitForNewNodes(t *testing.T) {
 		{
 			name:       "wait for new nodes",
 			ssHashes:   map[scalesetName]hash{"ss-master": "hashish"},
-			wantHashes: updateblob{"ss-master_0": "hashish"},
+			wantHashes: &updateblob{InstanceHashes: instanceHashMap{"ss-master_0": "hashish"}},
 			nodes:      map[kubeclient.ComputerName]struct{}{},
 			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
 				"master": {
@@ -317,8 +322,8 @@ func TestWaitForNewNodes(t *testing.T) {
 			name:              "clear blob of stale instances",
 			ssHashes:          map[scalesetName]hash{"ss-master": "hashish"},
 			nodes:             map[kubeclient.ComputerName]struct{}{"master-000000": {}},
-			initialUpdateBlob: updateblob{"ss-master_0": "oldhash", "ss-master_1": "oldhash"},
-			wantHashes:        updateblob{"ss-master_0": "oldhash"},
+			initialUpdateBlob: updateblob{InstanceHashes: instanceHashMap{"ss-master_0": "oldhash", "ss-master_1": "oldhash"}},
+			wantHashes:        &updateblob{InstanceHashes: instanceHashMap{"ss-master_0": "oldhash"}},
 			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
 				"master": {
 					{
@@ -378,16 +383,16 @@ func TestWaitForNewNodes(t *testing.T) {
 			storageClient := mock_storage.NewMockClient(gmc)
 			updateContainer := mock_storage.NewMockContainer(gmc)
 			updateBlob := mock_storage.NewMockBlob(gmc)
-			blob, _ := tt.initialUpdateBlob.MarshalJSON()
+			blob, _ := json.Marshal(tt.initialUpdateBlob)
 			updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
 			updateBlob.EXPECT().Get(nil).Return(ioutil.NopCloser(bytes.NewReader(blob)), nil)
 
 			if len(tt.nodes) < len(tt.vmsList["master"]) {
 				client.EXPECT().WaitForReadyWorker(ctx, kubeclient.ComputerName("master-000000")).Return(tt.wantErr)
 			}
-			if tt.wantErr == nil && (len(tt.nodes) < len(tt.vmsList["master"]) || len(tt.initialUpdateBlob) > len(tt.vmsList["master"])) {
+			if tt.wantErr == nil && (len(tt.nodes) < len(tt.vmsList["master"]) || len(tt.initialUpdateBlob.InstanceHashes) > len(tt.vmsList["master"])) {
 				updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
-				hashData, _ := tt.wantHashes.MarshalJSON()
+				hashData, _ := json.Marshal(tt.wantHashes)
 				updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(hashData)), nil)
 			}
 			u := &simpleUpgrader{
@@ -450,13 +455,13 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			virtualMachineScaleSetsClient := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
 			virtualMachineScaleSetVMsClient := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 			storageClient := mock_storage.NewMockClient(gmc)
-			updateBlob := mock_storage.NewMockBlob(gmc)
+			mockUpdateBlob := mock_storage.NewMockBlob(gmc)
 			updateContainer := mock_storage.NewMockContainer(gmc)
-			updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
-			data := ioutil.NopCloser(strings.NewReader(`[]`))
-			updateBlob.EXPECT().Get(nil).Return(data, nil)
+			updateContainer.EXPECT().GetBlobReference("update").Return(mockUpdateBlob)
+			data := ioutil.NopCloser(strings.NewReader(`{}`))
+			mockUpdateBlob.EXPECT().Get(nil).Return(data, nil)
 			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("master"), testRg, tt.vmsList, nil)
-			uBlob := updateblob{}
+			uBlob := newUpdateBlob()
 			for _, vm := range tt.vmsList {
 				compName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 
@@ -495,12 +500,12 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				}
 				// 6. waitforready
 				client.EXPECT().WaitForReadyMaster(ctx, compName).Return(nil)
-				uBlob[instanceName(*vm.Name)] = tt.ssHashes[scalesetName("ss-master")]
+				uBlob.InstanceHashes[instanceName(*vm.Name)] = tt.ssHashes[scalesetName("ss-master")]
 
 				// write the updatehash
-				hashData, _ := uBlob.MarshalJSON()
-				updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(hashData)), nil)
-				updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
+				hashData, _ := json.Marshal(uBlob)
+				mockUpdateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(hashData)), nil)
+				updateContainer.EXPECT().GetBlobReference("update").Return(mockUpdateBlob)
 			}
 			u := &simpleUpgrader{
 				updateContainer: updateContainer,
@@ -585,10 +590,10 @@ func TestUpdatePlusOne(t *testing.T) {
 
 			// get updateBlob
 			updateContainer := mock_storage.NewMockContainer(gmc)
-			updateBlob := mock_storage.NewMockBlob(gmc)
-			updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
-			data := ioutil.NopCloser(strings.NewReader(`[]`))
-			updateBlob.EXPECT().Get(nil).Return(data, nil)
+			mockUpdateBlob := mock_storage.NewMockBlob(gmc)
+			updateContainer.EXPECT().GetBlobReference("update").Return(mockUpdateBlob)
+			data := ioutil.NopCloser(strings.NewReader(`{}`))
+			mockUpdateBlob.EXPECT().Get(nil).Return(data, nil)
 
 			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
@@ -611,16 +616,16 @@ func TestUpdatePlusOne(t *testing.T) {
 			mockListVMs(ctx, gmc, vmc, config.GetScalesetName(tt.app.Name), testRg, tt.vmsList2, nil)
 			// waitforready
 			client := mock_kubeclient.NewMockKubeclient(gmc)
-			uBlob := updateblob{}
+			uBlob := newUpdateBlob()
 			for _, vm := range tt.vmsList2 {
 				compName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 				client.EXPECT().WaitForReadyWorker(ctx, compName).Return(nil)
 
 				// write the updatehash
-				uBlob[instanceName(*vm.Name)] = tt.ssHashes[scalesetName("ss-"+string(tt.app.Role))]
-				updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
-				hashData, _ := uBlob.MarshalJSON()
-				updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(hashData)), nil)
+				uBlob.InstanceHashes[instanceName(*vm.Name)] = tt.ssHashes[scalesetName("ss-"+string(tt.app.Role))]
+				updateContainer.EXPECT().GetBlobReference("update").Return(mockUpdateBlob)
+				hashData, _ := json.Marshal(uBlob)
+				mockUpdateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(hashData)), nil)
 			}
 			// delete the old node
 			victim := kubeclient.ComputerName(*tt.vmsList2[0].VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
@@ -630,10 +635,10 @@ func TestUpdatePlusOne(t *testing.T) {
 			vmc.EXPECT().Client().Return(arc)
 
 			// final updateBlob write
-			delete(uBlob, instanceName(*tt.vmsList2[0].Name))
-			updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
-			hashData, _ := uBlob.MarshalJSON()
-			updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(hashData)), nil)
+			delete(uBlob.InstanceHashes, instanceName(*tt.vmsList2[0].Name))
+			updateContainer.EXPECT().GetBlobReference("update").Return(mockUpdateBlob)
+			hashData, _ := json.Marshal(uBlob)
+			mockUpdateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(hashData)), nil)
 
 			u := &simpleUpgrader{
 				updateContainer: updateContainer,

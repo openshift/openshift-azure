@@ -114,11 +114,11 @@ func (u *simpleUpgrader) hashScaleSets(cs *api.OpenShiftManagedCluster) (map[sca
 }
 
 func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName]hash) error {
-	blob := updateblob{}
+	blob := newUpdateBlob()
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		for i := 0; i < app.Count; i++ {
 			name := instanceName(config.GetInstanceName(app.Name, i))
-			blob[name] = ssHashes[scalesetName(config.GetScalesetName(app.Name))]
+			blob.InstanceHashes[name] = ssHashes[scalesetName(config.GetScalesetName(app.Name))]
 		}
 	}
 	return u.writeUpdateBlob(blob)

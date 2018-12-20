@@ -17,7 +17,7 @@ func TestReadUpdateBlob(t *testing.T) {
 	tests := []struct {
 		name    string
 		blob    string
-		want    updateblob
+		want    *updateblob
 		wantErr error
 	}{
 		{
@@ -26,10 +26,13 @@ func TestReadUpdateBlob(t *testing.T) {
 		},
 		{
 			name: "ok",
-			blob: `[{"instanceName":"ss-compute_0","scalesetHash":"7x99="},{"instanceName":"ss-infra_0","scalesetHash":"45"}]`,
-			want: updateblob{
-				"ss-infra_0":   "45",
-				"ss-compute_0": "7x99=",
+			blob: `{"instanceHashes":[{"instanceName":"ss-compute_0","hash":"7x99="},{"instanceName":"ss-infra_0","hash":"45"}]}`,
+			want: &updateblob{
+				InstanceHashes: instanceHashMap{
+					"ss-infra_0":   "45",
+					"ss-compute_0": "7x99=",
+				},
+				ScalesetHashes: scalesetHashMap{},
 			},
 		},
 	}
@@ -62,21 +65,24 @@ func TestReadUpdateBlob(t *testing.T) {
 func TestWriteUpdateBlob(t *testing.T) {
 	tests := []struct {
 		name    string
-		blob    updateblob
+		blob    *updateblob
 		want    string
 		wantErr string
 	}{
 		{
 			name: "empty",
-			want: "[]",
+			blob: newUpdateBlob(),
+			want: "{}",
 		},
 		{
 			name: "valid",
-			blob: updateblob{
-				"ss-infra_0":   "45",
-				"ss-compute_0": "7x99=",
+			blob: &updateblob{
+				InstanceHashes: instanceHashMap{
+					"ss-infra_0":   "45",
+					"ss-compute_0": "7x99=",
+				},
 			},
-			want: `[{"instanceName":"ss-compute_0","scalesetHash":"7x99="},{"instanceName":"ss-infra_0","scalesetHash":"45"}]`,
+			want: `{"instanceHashes":[{"instanceName":"ss-compute_0","hash":"7x99="},{"instanceName":"ss-infra_0","hash":"45"}]}`,
 		},
 	}
 	gmc := gomock.NewController(t)
