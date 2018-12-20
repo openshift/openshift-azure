@@ -21,7 +21,6 @@ type PluginStep string
 const (
 	PluginStepDeploy                            PluginStep = "Deploy"
 	PluginStepInitialize                        PluginStep = "Initialize"
-	PluginStepHashScaleSets                     PluginStep = "HashScaleSets"
 	PluginStepInitializeUpdateBlob              PluginStep = "InitializeUpdateBlob"
 	PluginStepClientCreation                    PluginStep = "ClientCreation"
 	PluginStepScaleSetDelete                    PluginStep = "ScaleSetDelete"
@@ -33,6 +32,7 @@ const (
 	PluginStepWaitForInfraDaemonSets            PluginStep = "WaitForInfraDaemonSets"
 	PluginStepWaitForInfraStatefulSets          PluginStep = "WaitForInfraStatefulSets"
 	PluginStepWaitForInfraDeployments           PluginStep = "WaitForInfraDeployments"
+	PluginStepUpdateMasterAgentPoolHashScaleSet PluginStep = "UpdateMasterAgentPoolHashScaleSet"
 	PluginStepUpdateMasterAgentPoolListVMs      PluginStep = "UpdateMasterAgentPoolListVMs"
 	PluginStepUpdateMasterAgentPoolReadBlob     PluginStep = "UpdateMasterAgentPoolReadBlob"
 	PluginStepUpdateMasterAgentPoolDrain        PluginStep = "UpdateMasterAgentPoolDrain"
@@ -42,6 +42,7 @@ const (
 	PluginStepUpdateMasterAgentPoolStart        PluginStep = "UpdateMasterAgentPoolStart"
 	PluginStepUpdateMasterAgentPoolWaitForReady PluginStep = "UpdateMasterAgentPoolWaitForReady"
 	PluginStepUpdateMasterAgentPoolUpdateBlob   PluginStep = "UpdateMasterAgentPoolUpdateBlob"
+	PluginStepUpdateWorkerAgentPoolHashScaleSet PluginStep = "UpdateWorkerAgentPoolHashScaleSet"
 	PluginStepUpdateWorkerAgentPoolListVMs      PluginStep = "UpdateWorkerAgentPoolListVMs"
 	PluginStepUpdateWorkerAgentPoolReadBlob     PluginStep = "UpdateWorkerAgentPoolReadBlob"
 	PluginStepUpdateWorkerAgentPoolWaitForReady PluginStep = "UpdateWorkerAgentPoolWaitForReady"

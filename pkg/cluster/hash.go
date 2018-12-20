@@ -1,5 +1,11 @@
 package cluster
 
+//go:generate go get github.com/golang/mock/gomock
+//go:generate go install github.com/golang/mock/mockgen
+//go:generate mockgen -destination=../util/mocks/mock_$GOPACKAGE/hash.go -package=mock_$GOPACKAGE -source hash.go
+//go:generate gofmt -s -l -w ../util/mocks/mock_$GOPACKAGE/hash.go
+//go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../util/mocks/mock_$GOPACKAGE/hash.go
+
 import (
 	"crypto/sha256"
 	"encoding/json"
@@ -9,6 +15,14 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 )
+
+type Hasher interface {
+	HashScaleSet(*api.OpenShiftManagedCluster, *api.AgentPoolProfile) ([]byte, error)
+}
+
+type hasher struct {
+	pluginConfig api.PluginConfig
+}
 
 func hashVMSS(vmss *compute.VirtualMachineScaleSet) ([]byte, error) {
 	// cleanup capacity so that no unnecessary VM rotations are going to occur
@@ -29,22 +43,11 @@ func hashVMSS(vmss *compute.VirtualMachineScaleSet) ([]byte, error) {
 }
 
 // hashScaleSets returns the set of desired state scale set hashes
-func (u *simpleUpgrader) hashScaleSets(cs *api.OpenShiftManagedCluster) (map[scalesetName][]byte, error) {
-	ssHashes := map[scalesetName][]byte{}
-
-	for _, app := range cs.Properties.AgentPoolProfiles {
-		vmss, err := arm.Vmss(&u.pluginConfig, cs, &app, "") // TODO: backupBlob is rather a layering violation here
-		if err != nil {
-			return nil, err
-		}
-
-		h, err := hashVMSS(vmss)
-		if err != nil {
-			return nil, err
-		}
-
-		ssHashes[scalesetName(*vmss.Name)] = h
+func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
+	vmss, err := arm.Vmss(&h.pluginConfig, cs, app, "") // TODO: backupBlob is rather a layering violation here
+	if err != nil {
+		return nil, err
 	}
 
-	return ssHashes, nil
+	return hashVMSS(vmss)
 }

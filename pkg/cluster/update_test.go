@@ -23,6 +23,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
 
@@ -262,15 +263,13 @@ func TestWaitForNewNodes(t *testing.T) {
 		cs                *api.OpenShiftManagedCluster
 		nodes             map[kubeclient.ComputerName]struct{}
 		vmsList           map[string][]compute.VirtualMachineScaleSetVM
-		ssHashes          map[scalesetName][]byte
 		wantHashes        *updateblob
 		wantErr           error
 		initialUpdateBlob updateblob
 	}{
 		{
-			name:     "no new nodes",
-			ssHashes: map[scalesetName][]byte{"ss-master": []byte("hashish")},
-			nodes:    map[kubeclient.ComputerName]struct{}{"master-000000": {}},
+			name:  "no new nodes",
+			nodes: map[kubeclient.ComputerName]struct{}{"master-000000": {}},
 			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
 				"master": {
 					{
@@ -294,7 +293,6 @@ func TestWaitForNewNodes(t *testing.T) {
 		},
 		{
 			name:       "wait for new nodes",
-			ssHashes:   map[scalesetName][]byte{"ss-master": []byte("hashish")},
 			wantHashes: &updateblob{InstanceHashes: instanceHashMap{"ss-master_0": []byte("hashish")}},
 			nodes:      map[kubeclient.ComputerName]struct{}{},
 			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
@@ -320,7 +318,6 @@ func TestWaitForNewNodes(t *testing.T) {
 		},
 		{
 			name:              "clear blob of stale instances",
-			ssHashes:          map[scalesetName][]byte{"ss-master": []byte("hashish")},
 			nodes:             map[kubeclient.ComputerName]struct{}{"master-000000": {}},
 			initialUpdateBlob: updateblob{InstanceHashes: instanceHashMap{"ss-master_0": []byte("oldhash"), "ss-master_1": []byte("oldhash")}},
 			wantHashes:        &updateblob{InstanceHashes: instanceHashMap{"ss-master_0": []byte("oldhash")}},
@@ -346,10 +343,9 @@ func TestWaitForNewNodes(t *testing.T) {
 			},
 		},
 		{
-			name:     "new node not ready",
-			wantErr:  fmt.Errorf("node not ready test"),
-			ssHashes: map[scalesetName][]byte{"ss-master": []byte("hashish")},
-			nodes:    map[kubeclient.ComputerName]struct{}{},
+			name:    "new node not ready",
+			wantErr: fmt.Errorf("node not ready test"),
+			nodes:   map[kubeclient.ComputerName]struct{}{},
 			vmsList: map[string][]compute.VirtualMachineScaleSetVM{
 				"master": {
 					{
@@ -386,6 +382,8 @@ func TestWaitForNewNodes(t *testing.T) {
 			blob, _ := json.Marshal(tt.initialUpdateBlob)
 			updateContainer.EXPECT().GetBlobReference("update").Return(updateBlob)
 			updateBlob.EXPECT().Get(nil).Return(ioutil.NopCloser(bytes.NewReader(blob)), nil)
+			hasher := mock_cluster.NewMockHasher(gmc)
+			hasher.EXPECT().HashScaleSet(gomock.Any(), gomock.Any()).Return([]byte("hashish"), nil)
 
 			if len(tt.nodes) < len(tt.vmsList["master"]) {
 				client.EXPECT().WaitForReadyWorker(ctx, kubeclient.ComputerName("master-000000")).Return(tt.wantErr)
@@ -402,10 +400,11 @@ func TestWaitForNewNodes(t *testing.T) {
 				storageClient:   storageClient,
 				kubeclient:      client,
 				log:             logrus.NewEntry(logrus.StandardLogger()).WithField("test", tt.name),
+				hasher:          hasher,
 			}
 			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("master"), testRg, tt.vmsList["master"], nil)
 
-			err := u.waitForNewNodes(ctx, tt.cs, tt.nodes, tt.ssHashes)
+			err := u.waitForNewNodes(ctx, tt.cs, tt.nodes)
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("simpleUpgrader.waitForNewNodes() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -417,6 +416,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 	testRg := "testrg"
 	tests := []struct {
 		name     string
+		app      *api.AgentPoolProfile
 		cs       *api.OpenShiftManagedCluster
 		ssHashes map[scalesetName][]byte
 		vmsList  []compute.VirtualMachineScaleSetVM
@@ -424,6 +424,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 	}{
 		{
 			name:     "basic coverage",
+			app:      &api.AgentPoolProfile{Role: api.AgentPoolProfileRoleMaster, Name: "master", Count: 1},
 			ssHashes: map[scalesetName][]byte{"ss-master": []byte("hashish")},
 			vmsList: []compute.VirtualMachineScaleSetVM{
 				{
@@ -462,6 +463,8 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			mockUpdateBlob.EXPECT().Get(nil).Return(data, nil)
 			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("master"), testRg, tt.vmsList, nil)
 			uBlob := newUpdateBlob()
+			hasher := mock_cluster.NewMockHasher(gmc)
+			hasher.EXPECT().HashScaleSet(gomock.Any(), gomock.Any()).Return(tt.ssHashes[scalesetName("ss-master")], nil)
 			for _, vm := range tt.vmsList {
 				compName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 
@@ -514,8 +517,9 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				storageClient:   storageClient,
 				kubeclient:      client,
 				log:             logrus.NewEntry(logrus.StandardLogger()).WithField("test", tt.name),
+				hasher:          hasher,
 			}
-			if got := u.updateMasterAgentPool(ctx, tt.cs, tt.ssHashes); !reflect.DeepEqual(got, tt.want) {
+			if got := u.updateMasterAgentPool(ctx, tt.cs, tt.app); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("simpleUpgrader.updateInPlace() = %v, want %v", got, tt.want)
 			}
 		})
@@ -640,6 +644,9 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 			hashData, _ := json.Marshal(uBlob)
 			mockUpdateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(hashData)), nil)
 
+			hasher := mock_cluster.NewMockHasher(gmc)
+			hasher.EXPECT().HashScaleSet(gomock.Any(), gomock.Any()).Return(tt.ssHashes[scalesetName("ss-compute")], nil)
+
 			u := &simpleUpgrader{
 				updateContainer: updateContainer,
 				vmc:             vmc,
@@ -647,8 +654,9 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 				storageClient:   mock_storage.NewMockClient(gmc),
 				kubeclient:      client,
 				log:             logrus.NewEntry(logrus.StandardLogger()).WithField("test", tt.name),
+				hasher:          hasher,
 			}
-			if got := u.updateWorkerAgentPool(ctx, tt.cs, tt.app, tt.ssHashes); !reflect.DeepEqual(got, tt.want) {
+			if got := u.updateWorkerAgentPool(ctx, tt.cs, tt.app); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("simpleUpgrader.updateWorkerAgentPool() = %v, want %v", got, tt.want)
 			}
 		})

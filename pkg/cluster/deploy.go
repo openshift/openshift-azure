@@ -45,11 +45,7 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
-	ssHashes, err := u.hashScaleSets(cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepHashScaleSets}
-	}
-	err = u.initializeUpdateBlob(cs, ssHashes)
+	err = u.initializeUpdateBlob(cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
 	}
@@ -67,12 +63,16 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 type scalesetName string
 type instanceName string
 
-func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName][]byte) error {
+func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster) error {
 	blob := newUpdateBlob()
 	for _, app := range cs.Properties.AgentPoolProfiles {
+		h, err := u.hasher.HashScaleSet(cs, &app)
+		if err != nil {
+			return err
+		}
 		for i := int64(0); i < app.Count; i++ {
 			name := instanceName(config.GetInstanceName(app.Name, int(i)))
-			blob.InstanceHashes[name] = ssHashes[scalesetName(config.GetScalesetName(app.Name))]
+			blob.InstanceHashes[name] = h
 		}
 	}
 	return u.writeUpdateBlob(blob)

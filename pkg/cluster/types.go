@@ -45,6 +45,7 @@ type simpleUpgrader struct {
 	ssc             azureclient.VirtualMachineScaleSetsClient
 	kubeclient      kubeclient.Kubeclient
 	log             *logrus.Entry
+	hasher          Hasher
 }
 
 var _ Upgrader = &simpleUpgrader{}
@@ -54,6 +55,7 @@ func NewSimpleUpgrader(log *logrus.Entry, pluginConfig *api.PluginConfig) Upgrad
 	return &simpleUpgrader{
 		pluginConfig: *pluginConfig,
 		log:          log,
+		hasher:       &hasher{pluginConfig: *pluginConfig},
 	}
 }
 
