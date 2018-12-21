@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 )
 
 func readEnv() map[string]string {
@@ -48,6 +49,33 @@ func GenerateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCl
 	}
 
 	oc := &v20180930preview.OpenShiftManagedCluster{}
+	if err = yaml.Unmarshal(b.Bytes(), oc); err != nil {
+		return nil, err
+	}
+
+	if oc.Properties != nil {
+		oc.Properties.ProvisioningState = nil
+	}
+	return oc, nil
+}
+
+// GenerateManifestAdmin accepts a manifest file and returns a typed
+// OSA admin struct that can be used to request OSA admin updates.
+// If the provided manifest is templatized, it will be parsed
+// appropriately.
+func GenerateManifestAdmin(manifestFile string) (*admin.OpenShiftManagedCluster, error) {
+	t, err := template.ParseFiles(manifestFile)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed parsing the manifest %s", manifestFile)
+	}
+
+	b := &bytes.Buffer{}
+	err = t.Execute(b, struct{ Env map[string]string }{Env: readEnv()})
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed templating the manifest")
+	}
+
+	oc := &admin.OpenShiftManagedCluster{}
 	if err = yaml.Unmarshal(b.Bytes(), oc); err != nil {
 		return nil, err
 	}

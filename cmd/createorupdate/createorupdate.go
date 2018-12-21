@@ -125,22 +125,20 @@ func execute(
 	conf *fakerp.Config,
 	adminManifest string,
 ) error {
-	if adminManifest != "" {
-		data, err := ioutil.ReadFile(adminManifest)
-		if err != nil {
-			return fmt.Errorf("failed reading admin manifest: %v", err)
-		}
-		var oc *admin.OpenShiftManagedCluster
-		if err := yaml.Unmarshal(data, &oc); err != nil {
-			return fmt.Errorf("failed unmarshaling admin manifest: %v", err)
-		}
-		return createOrUpdateAdmin(ctx, log, ac, conf.ResourceGroup, oc, adminManifest)
-	}
-
 	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
 		return fmt.Errorf("failed to find %s: %v", shared.DataDirectory, err)
 	}
+
+	if adminManifest != "" {
+		oc, err := fakerp.GenerateManifestAdmin(adminManifest)
+		if err != nil {
+			return fmt.Errorf("failed reading admin manifest: %v", err)
+		}
+		defaultAdminManifest := filepath.Join(dataDir, "manifest-admin.yaml")
+		return createOrUpdateAdmin(ctx, log, ac, conf.ResourceGroup, oc, defaultAdminManifest)
+	}
+
 	defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
 	// TODO: Configuring this is probably not needed
 	manifest := conf.Manifest
