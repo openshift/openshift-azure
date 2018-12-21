@@ -128,23 +128,23 @@ func execute(
 	if adminManifest != "" {
 		data, err := ioutil.ReadFile(adminManifest)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed reading admin manifest: %v", err)
 		}
 		var oc *admin.OpenShiftManagedCluster
 		if err := yaml.Unmarshal(data, &oc); err != nil {
-			return err
+			return fmt.Errorf("failed unmarshaling admin manifest: %v", err)
 		}
 		return createOrUpdateAdmin(ctx, log, ac, conf.ResourceGroup, oc, adminManifest)
 	}
 
 	oc, err := fakerp.LoadClusterConfigFromManifest(log, conf.Manifest)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed reading manifest: %v", err)
 	}
 	// simulate the API call to the RP
 	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to find %s: %v", shared.DataDirectory, err)
 	}
 	defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
 	return createOrUpdatev20180930preview(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile)
@@ -154,30 +154,31 @@ func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.C
 	if len(conf.AADClientID) > 0 && conf.AADClientID != conf.ClientID {
 		log.Info("updating the aad application")
 		if len(conf.Username) == 0 || len(conf.Password) == 0 {
-			log.Fatal("AZURE_USERNAME and AZURE_PASSWORD are required to when updating the aad application")
+			return errors.New("AZURE_USERNAME and AZURE_PASSWORD are required to when updating the aad application")
 		}
 		authorizer, err := azureclient.NewAuthorizerFromUsernamePassword(conf.Username, conf.Password, clientID, conf.TenantID, azure.PublicCloud.GraphEndpoint)
 		if err != nil {
-			return err
+			return fmt.Errorf("cannot get authorizer from username+password: %v", err)
 		}
 		aadClient := azureclient.NewRBACApplicationsClient(conf.TenantID, authorizer, []string{"en-us"})
 		callbackURL := fmt.Sprintf("https://%s.%s.cloudapp.azure.com/oauth2callback/Azure%%20AD", conf.ResourceGroup, conf.Region)
 		conf.AADClientSecret, err = fakerp.UpdateAADAppSecret(ctx, aadClient, conf.AADClientID, callbackURL)
 		if err != nil {
-			return err
+			return fmt.Errorf("cannot update aad app secret: %v", err)
 		}
 	} else {
+		log.Info("using dummy aad")
 		conf.AADClientID = conf.ClientID
 		conf.AADClientSecret = conf.ClientSecret
 	}
 	// set env variable so enrich() still works
 	err := os.Setenv("AZURE_AAD_CLIENT_ID", conf.AADClientID)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed setting AZURE_AAD_CLIENT_ID: %v", err)
 	}
 	err = os.Setenv("AZURE_AAD_CLIENT_SECRET", conf.AADClientSecret)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed setting AZURE_AAD_CLIENT_SECRET: %v", err)
 	}
 	return nil
 }
