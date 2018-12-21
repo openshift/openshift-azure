@@ -8,7 +8,6 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac"
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/Azure/go-autorest/autorest/to"
-	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
@@ -20,18 +19,18 @@ func UpdateAADAppSecret(ctx context.Context, appClient azureclient.RBACApplicati
 	azureAadClientSecretValue := uuid.NewV4().String()
 	pages, err := appClient.List(ctx, fmt.Sprintf("appid eq '%s'", appID))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed listing applications: %v", err)
 	}
 	var apps []graphrbac.Application
 	for pages.NotDone() {
 		apps = append(apps, pages.Values()...)
 		err = pages.Next()
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("failed iterating applications: %v", err)
 		}
 	}
 	if len(apps) != 1 {
-		return "", fmt.Errorf("error: found %d applications, should be 1", len(apps))
+		return "", fmt.Errorf("found %d applications, should be 1", len(apps))
 	}
 	app := apps[0]
 
@@ -53,7 +52,7 @@ func UpdateAADAppSecret(ctx context.Context, appClient azureclient.RBACApplicati
 		PasswordCredentials: &newPc,
 	})
 	if err != nil {
-		return "", errors.Wrap(err, "failed patching aad password and uris")
+		return "", fmt.Errorf("failed patching aad password and uris: %v", err)
 	}
 	return azureAadClientSecretValue, nil
 }
