@@ -17,7 +17,6 @@ import (
 	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/test/clients/azure"
-	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func() {
@@ -48,7 +47,7 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Parsing the external manifest")
-		external, err := fakerp.LoadClusterConfigFromManifest(log.GetTestLogger(), *manifest)
+		external, err := fakerp.GenerateManifest(*manifest)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
 

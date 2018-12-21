@@ -5,15 +5,13 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
+	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 )
 
 func readEnv() map[string]string {
@@ -25,24 +23,6 @@ func readEnv() map[string]string {
 	return env
 }
 
-// LoadClusterConfigFromManifest reads (and potentially template) the mainifest
-func LoadClusterConfigFromManifest(log *logrus.Entry, manifestTemplate string) (*v20180930preview.OpenShiftManagedCluster, error) {
-	if shared.IsUpdate() && manifestTemplate == "" {
-		dataDir, err := shared.FindDirectory(shared.DataDirectory)
-		if err != nil {
-			return nil, err
-		}
-		defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
-		log.Debugf("using manifest from %s", defaultManifestFile)
-		return loadManifestFromFile(defaultManifestFile)
-	}
-	if manifestTemplate == "" {
-		manifestTemplate = "test/manifests/normal/create.yaml"
-	}
-	log.Debugf("generating manifest from %s", manifestTemplate)
-	return generateManifest(manifestTemplate)
-}
-
 // WriteClusterConfigToManifest write to file
 func WriteClusterConfigToManifest(oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) error {
 	out, err := yaml.Marshal(oc)
@@ -52,7 +32,11 @@ func WriteClusterConfigToManifest(oc *v20180930preview.OpenShiftManagedCluster, 
 	return ioutil.WriteFile(manifestFile, out, 0666)
 }
 
-func generateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCluster, error) {
+// GenerateManifest accepts a manifest file and returns a typed OSA
+// v20180930preview struct that can be used to request OSA creates
+// and updates. If the provided manifest is templatized, it will be
+// parsed appropriately.
+func GenerateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCluster, error) {
 	t, err := template.ParseFiles(manifestFile)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed parsing the manifest %s", manifestFile)
@@ -75,18 +59,29 @@ func generateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCl
 	return oc, nil
 }
 
-func loadManifestFromFile(manifest string) (*v20180930preview.OpenShiftManagedCluster, error) {
-	in, err := ioutil.ReadFile(manifest)
+// GenerateManifestAdmin accepts a manifest file and returns a typed
+// OSA admin struct that can be used to request OSA admin updates.
+// If the provided manifest is templatized, it will be parsed
+// appropriately.
+func GenerateManifestAdmin(manifestFile string) (*admin.OpenShiftManagedCluster, error) {
+	t, err := template.ParseFiles(manifestFile)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed parsing the manifest %s", manifestFile)
 	}
-	var oc v20180930preview.OpenShiftManagedCluster
-	if err := yaml.Unmarshal(in, &oc); err != nil {
+
+	b := &bytes.Buffer{}
+	err = t.Execute(b, struct{ Env map[string]string }{Env: readEnv()})
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed templating the manifest")
+	}
+
+	oc := &admin.OpenShiftManagedCluster{}
+	if err = yaml.Unmarshal(b.Bytes(), oc); err != nil {
 		return nil, err
 	}
 
 	if oc.Properties != nil {
 		oc.Properties.ProvisioningState = nil
 	}
-	return &oc, nil
+	return oc, nil
 }

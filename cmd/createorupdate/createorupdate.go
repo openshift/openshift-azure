@@ -125,28 +125,38 @@ func execute(
 	conf *fakerp.Config,
 	adminManifest string,
 ) error {
-	if adminManifest != "" {
-		data, err := ioutil.ReadFile(adminManifest)
-		if err != nil {
-			return fmt.Errorf("failed reading admin manifest: %v", err)
-		}
-		var oc *admin.OpenShiftManagedCluster
-		if err := yaml.Unmarshal(data, &oc); err != nil {
-			return fmt.Errorf("failed unmarshaling admin manifest: %v", err)
-		}
-		return createOrUpdateAdmin(ctx, log, ac, conf.ResourceGroup, oc, adminManifest)
-	}
-
-	oc, err := fakerp.LoadClusterConfigFromManifest(log, conf.Manifest)
-	if err != nil {
-		return fmt.Errorf("failed reading manifest: %v", err)
-	}
-	// simulate the API call to the RP
 	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
 		return fmt.Errorf("failed to find %s: %v", shared.DataDirectory, err)
 	}
+
+	if adminManifest != "" {
+		oc, err := fakerp.GenerateManifestAdmin(adminManifest)
+		if err != nil {
+			return fmt.Errorf("failed reading admin manifest: %v", err)
+		}
+		defaultAdminManifest := filepath.Join(dataDir, "manifest-admin.yaml")
+		return createOrUpdateAdmin(ctx, log, ac, conf.ResourceGroup, oc, defaultAdminManifest)
+	}
+
 	defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
+	// TODO: Configuring this is probably not needed
+	manifest := conf.Manifest
+	// If no MANIFEST has been provided and this is a cluster
+	// creation, default to the test manifest.
+	if !shared.IsUpdate() && manifest == "" {
+		manifest = "test/manifests/normal/create.yaml"
+	}
+	// If this is a cluster upgrade, reuse the existing manifest.
+	if manifest == "" {
+		manifest = defaultManifestFile
+	}
+
+	oc, err := fakerp.GenerateManifest(manifest)
+	if err != nil {
+		return fmt.Errorf("failed reading manifest: %v", err)
+	}
+
 	return createOrUpdatev20180930preview(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile)
 }
 
