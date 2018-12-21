@@ -41,7 +41,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		By("creating an OSA cluster")
-		config, err := client.LoadClusterConfigFromManifest(log.GetTestLogger(), "../../test/manifests/normal/create.yaml")
+		config, err := client.GenerateManifest("../../test/manifests/normal/create.yaml")
 		Expect(err).ToNot(HaveOccurred())
 		deployCtx, cancelFn := context.WithTimeout(context.Background(), 30*time.Minute)
 		defer cancelFn()

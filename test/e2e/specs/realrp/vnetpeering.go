@@ -85,7 +85,7 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 		Expect(len(*vnet.VirtualNetworkPeerings)).To(Equal(0))
 
 		// load cluster config
-		config, err := client.LoadClusterConfigFromManifest(tlog.GetTestLogger(), "../../test/manifests/normal/create.yaml")
+		config, err := client.GenerateManifest("../../test/manifests/normal/create.yaml")
 		Expect(err).ToNot(HaveOccurred())
 
 		// Set pre-created peer vnetid in cluster config

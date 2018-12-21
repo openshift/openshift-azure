@@ -21,7 +21,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/clients/openshift"
-	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", func() {
@@ -57,7 +56,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 
 	It("should be possible to maintain a healthy cluster after scaling it out and in", func() {
 		By("Fetching the scale up manifest")
-		external, err := fakerp.LoadClusterConfigFromManifest(log.GetTestLogger(), *scaleUpManifest)
+		external, err := fakerp.GenerateManifest(*scaleUpManifest)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
 
@@ -138,7 +137,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		Expect(len(nodes)).To(Equal(2))
 
 		By("Fetching the scale down manifest")
-		external, err = fakerp.LoadClusterConfigFromManifest(log.GetTestLogger(), *scaleDownManifest)
+		external, err = fakerp.GenerateManifest(*scaleDownManifest)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
 

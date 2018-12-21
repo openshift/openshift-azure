@@ -23,7 +23,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/clients/openshift"
-	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]", func() {
@@ -158,7 +157,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 		Expect(err).ToNot(HaveOccurred())
 
 		By("ensuring the update blob has the right amount of entries")
-		external, err := fakerp.LoadClusterConfigFromManifest(log.GetTestLogger(), *manifest)
+		external, err := fakerp.GenerateManifest(*manifest)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
 		expectedEntries := *external.Properties.MasterPoolProfile.Count
