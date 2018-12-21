@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 	"reflect"
 
 	. "github.com/onsi/ginkgo"
@@ -28,8 +28,8 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 	}
 	var (
 		cli        *azure.Client
-		manifest   = flag.String("manifest", path.Join(dataDir, "manifest.yaml"), "Path to the manifest to send to the RP")
-		configBlob = flag.String("configBlob", path.Join(dataDir, "containerservice.yaml"), "Path to the OpenShift internal config blob")
+		manifest   = flag.String("manifest", filepath.Join(dataDir, "manifest.yaml"), "Path to the manifest to send to the RP")
+		configBlob = flag.String("configBlob", filepath.Join(dataDir, "containerservice.yaml"), "Path to the OpenShift internal config blob")
 	)
 
 	BeforeEach(func() {

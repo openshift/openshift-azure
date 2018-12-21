@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -36,8 +36,8 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 	var (
 		azurecli          *azure.Client
 		occli             *openshift.Client
-		scaleUpManifest   = flag.String("scaleUpManifest", path.Join(testDir, "manifests", "normal", "scaleup.yaml"), "Path to the scale up manifest to send in a partial update request to the RP")
-		scaleDownManifest = flag.String("scaleDownManifest", path.Join(testDir, "manifests", "normal", "scaledown.yaml"), "Path to the scale down manifest to send in a partial update request to the RP")
+		scaleUpManifest   = flag.String("scaleUpManifest", filepath.Join(testDir, "manifests", "normal", "scaleup.yaml"), "Path to the scale up manifest to send in a partial update request to the RP")
+		scaleDownManifest = flag.String("scaleDownManifest", filepath.Join(testDir, "manifests", "normal", "scaledown.yaml"), "Path to the scale down manifest to send in a partial update request to the RP")
 		namespace         string
 	)
 

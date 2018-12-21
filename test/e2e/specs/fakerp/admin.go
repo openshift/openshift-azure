@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"time"
@@ -37,7 +37,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 		// TODO: Unfortunately cannot use "manifest" because the flag name is already
 		// used by the key rotation test; Figure out whether we want to collapse these
 		// into a single flag and do it.
-		manifest = flag.String("request", path.Join(dataDir, "manifest.yaml"), "Path to the manifest to send to the RP")
+		manifest = flag.String("request", filepath.Join(dataDir, "manifest.yaml"), "Path to the manifest to send to the RP")
 	)
 
 	BeforeEach(func() {
