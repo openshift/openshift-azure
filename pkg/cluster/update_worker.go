@@ -3,6 +3,7 @@ package cluster
 import (
 	"bytes"
 	"context"
+	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -17,7 +18,7 @@ import (
 // "target".  We will work to get all our VMs running there.  Any other
 // scalesets are "sources".  We will work to get rid of VMs running in these.
 func (u *simpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string, app *api.AgentPoolProfile, blob *updateblob, desiredHash []byte) (*compute.VirtualMachineScaleSet, []compute.VirtualMachineScaleSet, error) {
-	scalesets, err := u.listScalesets(ctx, resourceGroup, config.GetScalesetName(app, ""))
+	scalesets, err := u.ssc.List(ctx, resourceGroup)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -25,7 +26,13 @@ func (u *simpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string
 	var target *compute.VirtualMachineScaleSet
 	var sources []compute.VirtualMachineScaleSet
 
+	prefix := config.GetScalesetName(app, "")
+
 	for i, ss := range scalesets {
+		if !strings.HasPrefix(*ss.Name, prefix) {
+			continue
+		}
+
 		// Note: we consult the blob to discover the persisted scaleset hash,
 		// rather than recalculating it on the fly.  This is because Kubernetes
 		// may have changed the scaleset object after we created it.  We

@@ -122,10 +122,10 @@ func (mr *MockVirtualMachineScaleSetsClientMockRecorder) Delete(arg0, arg1, arg2
 }
 
 // List mocks base method
-func (m *MockVirtualMachineScaleSetsClient) List(arg0 context.Context, arg1 string) (compute.VirtualMachineScaleSetListResultPage, error) {
+func (m *MockVirtualMachineScaleSetsClient) List(arg0 context.Context, arg1 string) ([]compute.VirtualMachineScaleSet, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0, arg1)
-	ret0, _ := ret[0].(compute.VirtualMachineScaleSetListResultPage)
+	ret0, _ := ret[0].([]compute.VirtualMachineScaleSet)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

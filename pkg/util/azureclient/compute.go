@@ -9,8 +9,8 @@ import (
 
 // VirtualMachineScaleSetsClient is a minimal interface for azure VirtualMachineScaleSetsClient
 type VirtualMachineScaleSetsClient interface {
+	VirtualMachineScaleSetsClientAddons
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, VMScaleSetName string, parameters compute.VirtualMachineScaleSet) (compute.VirtualMachineScaleSetsCreateOrUpdateFuture, error)
-	List(ctx context.Context, resourceGroupName string) (result compute.VirtualMachineScaleSetListResultPage, err error)
 	Update(ctx context.Context, resourceGroupName string, VMScaleSetName string, parameters compute.VirtualMachineScaleSetUpdate) (compute.VirtualMachineScaleSetsUpdateFuture, error)
 	UpdateInstances(ctx context.Context, resourceGroupName string, VMScaleSetName string, VMInstanceIDs compute.VirtualMachineScaleSetVMInstanceRequiredIDs) (compute.VirtualMachineScaleSetsUpdateInstancesFuture, error)
 	Delete(ctx context.Context, resourceGroupName string, VMScaleSetName string) (compute.VirtualMachineScaleSetsDeleteFuture, error)
