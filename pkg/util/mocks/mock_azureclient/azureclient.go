@@ -93,6 +93,21 @@ func (mr *MockVirtualMachineScaleSetsClientMockRecorder) Client() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockVirtualMachineScaleSetsClient)(nil).Client))
 }
 
+// CreateOrUpdate mocks base method
+func (m *MockVirtualMachineScaleSetsClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 string, arg3 compute.VirtualMachineScaleSet) (compute.VirtualMachineScaleSetsCreateOrUpdateFuture, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateOrUpdate", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(compute.VirtualMachineScaleSetsCreateOrUpdateFuture)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateOrUpdate indicates an expected call of CreateOrUpdate
+func (mr *MockVirtualMachineScaleSetsClientMockRecorder) CreateOrUpdate(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdate", reflect.TypeOf((*MockVirtualMachineScaleSetsClient)(nil).CreateOrUpdate), arg0, arg1, arg2, arg3)
+}
+
 // Delete mocks base method
 func (m *MockVirtualMachineScaleSetsClient) Delete(arg0 context.Context, arg1, arg2 string) (compute.VirtualMachineScaleSetsDeleteFuture, error) {
 	m.ctrl.T.Helper()
