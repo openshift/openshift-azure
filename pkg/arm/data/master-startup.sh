@@ -65,8 +65,8 @@ mkdir -p /etc/origin/master/named
 base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdCa.Cert | Base64Encode }} >/etc/origin/master/master.etcd-ca.crt
 base64 -d <<< {{ CertAsBytes .Config.Certificates.Ca.Cert | Base64Encode }} >/etc/origin/master/ca.crt
 base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.Ca.Key | Base64Encode }} >/etc/origin/master/ca.key
-base64 -d <<< {{ CertAsBytes .Config.Certificates.OpenshiftConsole.Cert | Base64Encode }} >/etc/origin/master/named/console.crt
-base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.OpenshiftConsole.Key | Base64Encode }} >/etc/origin/master/named/console.key
+base64 -d <<< {{ CertAsBytes .Config.Certificates.OpenShiftConsole.Cert | Base64Encode }} >/etc/origin/master/named/console.crt
+base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.OpenShiftConsole.Key | Base64Encode }} >/etc/origin/master/named/console.key
 base64 -d <<< {{ CertAsBytes .Config.Certificates.FrontProxyCa.Cert | Base64Encode }} >/etc/origin/master/front-proxy-ca.crt
 base64 -d <<< {{ CertAsBytes .Config.Certificates.ServiceSigningCa.Cert | Base64Encode }} >/etc/origin/master/service-signer.crt
 base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.ServiceSigningCa.Key | Base64Encode }} >/etc/origin/master/service-signer.key

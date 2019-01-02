@@ -223,7 +223,7 @@ func TestConvertFromAdmin(t *testing.T) {
 			input: &admin.OpenShiftManagedCluster{
 				Config: &admin.Config{
 					Certificates: &admin.CertificateConfig{
-						OpenshiftConsole: &admin.Certificate{
+						OpenShiftConsole: &admin.Certificate{
 							Cert: dummyCA,
 						},
 					},
@@ -231,7 +231,7 @@ func TestConvertFromAdmin(t *testing.T) {
 			},
 			base: internalManagedClusterAdmin(),
 			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
-				expectedCs.Config.Certificates.OpenshiftConsole.Cert = dummyCA
+				expectedCs.Config.Certificates.OpenShiftConsole.Cert = dummyCA
 			},
 		},
 	}

@@ -126,7 +126,7 @@ type CertificateConfig struct {
 
 	// control plane certificates
 	MasterServer         CertKeyPair `json:"masterServer,omitempty"`
-	OpenshiftConsole     CertKeyPair `json:"openshiftConsole,omitempty"`
+	OpenShiftConsole     CertKeyPair `json:"openShiftConsole,omitempty"`
 	Admin                CertKeyPair `json:"admin,omitempty"`
 	AggregatorFrontProxy CertKeyPair `json:"aggregatorFrontProxy,omitempty"`
 	MasterKubeletClient  CertKeyPair `json:"masterKubeletClient,omitempty"`

@@ -289,8 +289,8 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster) (err error) 
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			},
-			key:  &c.Certificates.OpenshiftConsole.Key,
-			cert: &c.Certificates.OpenshiftConsole.Cert,
+			key:  &c.Certificates.OpenShiftConsole.Key,
+			cert: &c.Certificates.OpenShiftConsole.Cert,
 		},
 	}
 	for _, cert := range certs {
