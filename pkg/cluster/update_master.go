@@ -32,14 +32,14 @@ func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.Open
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashScaleSet}
 	}
 
-	vms, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolListVMs}
-	}
-
 	blob, err := u.readUpdateBlob()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReadBlob}
+	}
+
+	vms, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolListVMs}
 	}
 
 	// range our vms in order, so that if we previously crashed half-way through

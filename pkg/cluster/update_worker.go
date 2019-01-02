@@ -19,17 +19,17 @@ func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.Open
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
 	}
 
+	blob, err := u.readUpdateBlob()
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolReadBlob}
+	}
+
 	// store a list of all the VM instances now, so that if we end up creating
 	// new ones (in the crash recovery case, we might not), we can detect which
 	// they are
 	oldVMs, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolListVMs}
-	}
-
-	blob, err := u.readUpdateBlob()
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolReadBlob}
 	}
 
 	// Filter out VMs that do not need to get upgraded. Should speed
