@@ -36,8 +36,8 @@ func TestDerivedCloudProviderConf(t *testing.T) {
 			},
 			want: []byte(`aadClientId: client_id
 aadClientSecret: client_secrett
+loadBalancerSku: standard
 location: eastus
-primaryScaleSetName: ss-computetest
 resourceGroup: rg
 securityGroupName: nsg-worker
 subscriptionId: sub
