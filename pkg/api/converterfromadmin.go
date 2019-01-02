@@ -369,8 +369,8 @@ func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig)
 	if in.MasterServer != nil {
 		mergeCertKeyPair(in.MasterServer, &out.MasterServer)
 	}
-	if in.OpenshiftConsole != nil {
-		mergeCertKeyPair(in.OpenshiftConsole, &out.OpenshiftConsole)
+	if in.OpenShiftConsole != nil {
+		mergeCertKeyPair(in.OpenShiftConsole, &out.OpenShiftConsole)
 	}
 	if in.Admin != nil {
 		mergeCertKeyPair(in.Admin, &out.Admin)

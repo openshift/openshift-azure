@@ -107,7 +107,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assertCert(c.Certificates.EtcdPeer, "EtcdPeer")
 	assertCert(c.Certificates.EtcdClient, "EtcdClient")
 	assertCert(c.Certificates.MasterServer, "MasterServer")
-	assertCert(c.Certificates.OpenshiftConsole, "OpenshiftConsole")
+	assertCert(c.Certificates.OpenShiftConsole, "OpenShiftConsole")
 	assertCert(c.Certificates.Admin, "Admin")
 	assertCert(c.Certificates.AggregatorFrontProxy, "AggregatorFrontProxy")
 	assertCert(c.Certificates.MasterKubeletClient, "MasterKubeletClient")

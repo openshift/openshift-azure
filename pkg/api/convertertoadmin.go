@@ -127,7 +127,7 @@ func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateCon
 		EtcdPeer:                convertCertKeyPairToAdmin(in.EtcdPeer),
 		EtcdClient:              convertCertKeyPairToAdmin(in.EtcdClient),
 		MasterServer:            convertCertKeyPairToAdmin(in.MasterServer),
-		OpenshiftConsole:        convertCertKeyPairToAdmin(in.OpenshiftConsole),
+		OpenShiftConsole:        convertCertKeyPairToAdmin(in.OpenShiftConsole),
 		Admin:                   convertCertKeyPairToAdmin(in.Admin),
 		AggregatorFrontProxy:    convertCertKeyPairToAdmin(in.AggregatorFrontProxy),
 		MasterKubeletClient:     convertCertKeyPairToAdmin(in.MasterKubeletClient),
