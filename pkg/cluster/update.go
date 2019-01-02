@@ -9,6 +9,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
@@ -58,7 +59,7 @@ func (u *simpleUpgrader) getNodesAndDrain(ctx context.Context, cs *api.OpenShift
 	vmsBefore := map[kubeclient.ComputerName]struct{}{}
 
 	for _, app := range cs.Properties.AgentPoolProfiles {
-		vms, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name))
+		vms, err := listVMs(ctx, u.vmc, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name))
 		if err != nil {
 			return nil, err
 		}
@@ -91,7 +92,7 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 			return err
 		}
 
-		vms, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name))
+		vms, err := listVMs(ctx, u.vmc, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name))
 		if err != nil {
 			return err
 		}
@@ -129,8 +130,8 @@ func (u *simpleUpgrader) waitForNewNodes(ctx context.Context, cs *api.OpenShiftM
 	return nil
 }
 
-func (u *simpleUpgrader) listVMs(ctx context.Context, resourceGroup, scalesetName string) ([]compute.VirtualMachineScaleSetVM, error) {
-	vmPages, err := u.vmc.List(ctx, resourceGroup, scalesetName, "", "", "")
+func listVMs(ctx context.Context, vmc azureclient.VirtualMachineScaleSetVMsClient, resourceGroup, scalesetName string) ([]compute.VirtualMachineScaleSetVM, error) {
+	vmPages, err := vmc.List(ctx, resourceGroup, scalesetName, "", "", "")
 	if err != nil {
 		return nil, err
 	}

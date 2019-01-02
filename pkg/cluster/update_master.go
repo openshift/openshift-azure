@@ -37,7 +37,7 @@ func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.Open
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReadBlob}
 	}
 
-	vms, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
+	vms, err := listVMs(ctx, u.vmc, cs.Properties.AzProfile.ResourceGroup, ssName)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolListVMs}
 	}

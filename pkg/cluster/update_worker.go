@@ -27,7 +27,7 @@ func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.Open
 	// store a list of all the VM instances now, so that if we end up creating
 	// new ones (in the crash recovery case, we might not), we can detect which
 	// they are
-	oldVMs, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
+	oldVMs, err := listVMs(ctx, u.vmc, cs.Properties.AzProfile.ResourceGroup, ssName)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolListVMs}
 	}
@@ -55,7 +55,7 @@ func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.Open
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolWaitForReady}
 		}
 
-		updatedList, err := u.listVMs(ctx, cs.Properties.AzProfile.ResourceGroup, ssName)
+		updatedList, err := listVMs(ctx, u.vmc, cs.Properties.AzProfile.ResourceGroup, ssName)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolListVMs}
 		}
