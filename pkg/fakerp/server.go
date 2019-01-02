@@ -146,51 +146,60 @@ func (s *Server) readAdminRequest(body io.ReadCloser) (*admin.OpenShiftManagedCl
 }
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
-	// TODO: Get the azure credentials from the request headers
-	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
-		return
-	}
-
-	// simulate Context with property bag
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-	defer cancel()
-	// TODO: Get the azure credentials from the request headers
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
-
-	// delete dns records
-	// TODO: get resource group from request path
-	err = DeleteOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to delete dns records: %v", err))
-		return
-	}
-
-	// TODO: Determine subscription ID from the request path
-	gc := resources.NewGroupsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
-	gc.Authorizer = authorizer
-
 	resourceGroup := filepath.Base(req.URL.Path)
 	s.log.Infof("deleting resource group %s", resourceGroup)
 
-	future, err := gc.Delete(ctx, resourceGroup)
-	if err != nil {
-		if autoRestErr, ok := err.(autorest.DetailedError); ok {
-			if original, ok := autoRestErr.Original.(*azure.RequestError); ok {
-				if original.StatusCode == http.StatusNotFound {
-					return
-				}
-			}
-		}
-		s.internalError(w, fmt.Sprintf("Failed to delete resource group: %v", err))
-		return
-	}
 	go func() {
+		defer func() {
+			// drain once we are done processing this request
+			<-s.inProgress
+		}()
+
+		// simulate Context with property bag
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 		defer cancel()
+		// TODO: Get the azure credentials from the request headers
+		ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
+		ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
+		ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
+
+		// delete dns records
+		// TODO: get resource group from request path
+		err := DeleteOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
+		if err != nil {
+			msg := fmt.Sprintf("500 Internal Error: Failed to delete dns records: %v", err)
+			s.log.Debug(msg)
+			s.deleteAsyncErr <- serverResponse{status: http.StatusInternalServerError, msg: msg}
+			return
+		}
+
+		// TODO: Get the azure credentials from the request headers
+		authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
+		if err != nil {
+			msg := fmt.Sprintf("500 Internal Error: Failed to determine request credentials: %v", err)
+			s.log.Debug(msg)
+			s.deleteAsyncErr <- serverResponse{status: http.StatusInternalServerError, msg: msg}
+			return
+		}
+		// TODO: Determine subscription ID from the request path
+		gc := resources.NewGroupsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
+		gc.Authorizer = authorizer
+
+		future, err := gc.Delete(ctx, resourceGroup)
+		if err != nil {
+			if autoRestErr, ok := err.(autorest.DetailedError); ok {
+				if original, ok := autoRestErr.Original.(*azure.RequestError); ok {
+					if original.StatusCode == http.StatusNotFound {
+						return
+					}
+				}
+			}
+			msg := fmt.Sprintf("500 Internal Error: Failed to delete resource group: %v", err)
+			s.log.Debug(msg)
+			s.deleteAsyncErr <- serverResponse{status: http.StatusInternalServerError, msg: msg}
+			return
+		}
+
 		if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
 			msg := fmt.Sprintf("500 Internal Error: Failed to wait for resource group deletion: %v", err)
 			s.log.Debug(msg)
@@ -212,6 +221,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 			s.write(nil)
 		}
 	}()
+
 	s.writeState(internalapi.Deleting)
 	// Update headers with Location so subsequent GET requests know the
 	// location to query.
