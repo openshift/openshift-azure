@@ -14,6 +14,13 @@ if [[ -z "$TIMEOUT" ]]; then
     TIMEOUT=20m
 fi
 
+# start the fake rp server if needed
+if [[ "$FOCUS" == *"\[Fake\]"* ]]; then
+    go generate ./...
+    go run cmd/fakerp/main.go &
+    trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT
+fi
+
 go test \
 -ldflags "-X github.com/openshift/openshift-azure/test/e2e.gitCommit=COMMIT" \
 ./test/e2e \
