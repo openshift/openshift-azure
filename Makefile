@@ -14,6 +14,12 @@ test: unit e2e
 generate:
 	go generate ./...
 
+create:
+	timeout 1h ./hack/create.sh ${RESOURCEGROUP}
+
+delete:
+	./hack/delete.sh ${RESOURCEGROUP}
+
 TAG ?= $(shell git rev-parse --short HEAD)
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
 AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
