@@ -8,7 +8,6 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError {
@@ -36,25 +35,6 @@ func (u *simpleUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedClu
 		}
 	}
 	return nil
-}
-
-func listVMs(ctx context.Context, vmc azureclient.VirtualMachineScaleSetVMsClient, resourceGroup, scalesetName string) ([]compute.VirtualMachineScaleSetVM, error) {
-	vmPages, err := vmc.List(ctx, resourceGroup, scalesetName, "", "", "")
-	if err != nil {
-		return nil, err
-	}
-
-	var vms []compute.VirtualMachineScaleSetVM
-	for vmPages.NotDone() {
-		vms = append(vms, vmPages.Values()...)
-
-		err = vmPages.Next()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return vms, nil
 }
 
 func (u *simpleUpgrader) listScalesets(ctx context.Context, resourceGroup, scalesetPrefix string) ([]compute.VirtualMachineScaleSet, error) {

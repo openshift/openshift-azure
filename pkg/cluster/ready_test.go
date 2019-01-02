@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
@@ -15,35 +15,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
-
-func mockListVMs(ctx context.Context, gmc *gomock.Controller, virtualMachineScaleSetVMsClient *mock_azureclient.MockVirtualMachineScaleSetVMsClient, scalesetName string, rg string, outVMS []compute.VirtualMachineScaleSetVM, outErr error) {
-	mPage := mock_azureclient.NewMockVirtualMachineScaleSetVMListResultPage(gmc)
-	if len(outVMS) > 0 {
-		mPage.EXPECT().Values().Return(outVMS)
-		mPage.EXPECT().Next()
-	}
-	callTimes := func(vms []compute.VirtualMachineScaleSetVM) int {
-		if len(vms) > 0 {
-			// NotDone gets called twice once for yes, there is data, and once more for no data
-			return 2
-		}
-		// NotDone gets called once for there is no data
-		return 1
-	}
-	if outErr == nil {
-		mNotDone := len(outVMS) > 0
-		mPage.EXPECT().NotDone().Times(callTimes(outVMS)).DoAndReturn(func() bool {
-			ret := mNotDone
-			mNotDone = false
-			return ret
-		})
-	}
-	if outErr != nil {
-		virtualMachineScaleSetVMsClient.EXPECT().List(ctx, rg, scalesetName, "", "", "").Return(nil, outErr)
-	} else {
-		virtualMachineScaleSetVMsClient.EXPECT().List(ctx, rg, scalesetName, "", "", "").Return(mPage, nil)
-	}
-}
 
 func TestUpgraderWaitForNodes(t *testing.T) {
 	vmListErr := fmt.Errorf("vm list failed")
@@ -170,15 +141,15 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			kubeclient := mock_kubeclient.NewMockKubeclient(gmc)
 			if tt.wantErr {
 				if tt.expectedErr == vmListErr {
-					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), testRg, nil, tt.expectedErr)
+					virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), "", "", "").Return(nil, tt.expectedErr)
 				} else {
-					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), testRg, tt.expect["master"], nil)
+					virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), "", "", "").Return(tt.expect["master"], nil)
 					kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Return(nodeGetErr)
 				}
 			} else {
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), testRg, tt.expect["master"], nil)
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName(&api.AgentPoolProfile{Name: "infra", Role: api.AgentPoolProfileRoleInfra}, ""), testRg, tt.expect["infra"], nil)
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName(&api.AgentPoolProfile{Name: "foo", Role: api.AgentPoolProfileRoleCompute}, ""), testRg, tt.expect["compute"], nil)
+				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), "", "", "").Return(tt.expect["master"], nil)
+				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&api.AgentPoolProfile{Name: "infra", Role: api.AgentPoolProfileRoleInfra}, ""), "", "", "").Return(tt.expect["infra"], nil)
+				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&api.AgentPoolProfile{Name: "foo", Role: api.AgentPoolProfileRoleCompute}, ""), "", "", "").Return(tt.expect["compute"], nil)
 				kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Times(len(tt.expect["master"])).Return(nil)
 				kubeclient.EXPECT().WaitForReadyWorker(ctx, gomock.Any()).Times(len(tt.expect["infra"]) + len(tt.expect["compute"])).Return(nil)
 			}

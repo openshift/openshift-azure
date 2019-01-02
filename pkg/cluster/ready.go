@@ -13,7 +13,7 @@ func (u *simpleUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenS
 }
 
 func (u *simpleUpgrader) waitForNodesInAgentPoolProfile(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) error {
-	vms, err := listVMs(ctx, u.vmc, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app, suffix))
+	vms, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app, suffix), "", "", "")
 	if err != nil {
 		return err
 	}

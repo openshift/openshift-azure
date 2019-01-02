@@ -39,9 +39,9 @@ func (c *virtualMachineScaleSetsClient) Client() autorest.Client {
 
 // VirtualMachineScaleSetVMsClient is a minimal interface for azure VirtualMachineScaleSetVMsClient
 type VirtualMachineScaleSetVMsClient interface {
+	VirtualMachineScaleSetVMsClientAddons
 	Delete(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (compute.VirtualMachineScaleSetVMsDeleteFuture, error)
 	Deallocate(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (compute.VirtualMachineScaleSetVMsDeallocateFuture, error)
-	List(ctx context.Context, resourceGroupName string, virtualMachineScaleSetName string, filter string, selectParameter string, expand string) (VirtualMachineScaleSetVMListResultPage, error)
 	Reimage(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (compute.VirtualMachineScaleSetVMsReimageFuture, error)
 	Restart(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (result compute.VirtualMachineScaleSetVMsRestartFuture, err error)
 	Start(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (compute.VirtualMachineScaleSetVMsStartFuture, error)
@@ -62,11 +62,6 @@ func NewVirtualMachineScaleSetVMsClient(subscriptionID string, authorizer autore
 	return &virtualMachineScaleSetVMsClient{
 		VirtualMachineScaleSetVMsClient: client,
 	}
-}
-
-func (c *virtualMachineScaleSetVMsClient) List(ctx context.Context, resourceGroupName string, virtualMachineScaleSetName string, filter string, selectParameter string, expand string) (VirtualMachineScaleSetVMListResultPage, error) {
-	vmRes, err := c.VirtualMachineScaleSetVMsClient.List(ctx, resourceGroupName, virtualMachineScaleSetName, filter, selectParameter, expand)
-	return &vmRes, err
 }
 
 func (c *virtualMachineScaleSetVMsClient) Client() autorest.Client {
@@ -100,16 +95,3 @@ func NewVirtualMachineScaleSetExtensionsClient(subscriptionID string, authorizer
 func (c *virtualMachineScaleSetExtensionsClient) Client() autorest.Client {
 	return c.VirtualMachineScaleSetExtensionsClient.Client
 }
-
-// VirtualMachineScaleSetVMListResultPage interface for same named compute struct
-type VirtualMachineScaleSetVMListResultPage interface {
-	Next() error
-	NotDone() bool
-	Values() []compute.VirtualMachineScaleSetVM
-}
-
-type virtualMachineScaleSetVMListResultPage struct {
-	compute.VirtualMachineScaleSetVMListResultPage
-}
-
-var _ VirtualMachineScaleSetVMListResultPage = &virtualMachineScaleSetVMListResultPage{}

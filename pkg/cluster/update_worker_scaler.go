@@ -36,7 +36,7 @@ func newWorkerScaler(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsC
 // initializeCache fetches the scale set's VMs from the Azure API and updates
 // the cache.
 func (ws *workerScaler) initializeCache(ctx context.Context) error {
-	vms, err := listVMs(ctx, ws.vmc, ws.resourceGroup, *ws.ss.Name)
+	vms, err := ws.vmc.List(ctx, ws.resourceGroup, *ws.ss.Name, "", "", "")
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (ws *workerScaler) scaleUp(ctx context.Context, count int64) *api.PluginErr
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateScaleSet}
 	}
 
-	vms, err := listVMs(ctx, ws.vmc, ws.resourceGroup, *ws.ss.Name)
+	vms, err := ws.vmc.List(ctx, ws.resourceGroup, *ws.ss.Name, "", "", "")
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolListVMs}
 	}

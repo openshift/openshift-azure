@@ -24,22 +24,3 @@ func (cli *Client) ListScaleSets(ctx context.Context, resourceGroup string) ([]c
 
 	return scaleSets, nil
 }
-
-func (cli *Client) ListScaleSetVMs(ctx context.Context, resourceGroup, scaleSet string) ([]compute.VirtualMachineScaleSetVM, error) {
-	pages, err := cli.VirtualMachineScaleSetVMs.List(ctx, resourceGroup, scaleSet, "", "", "")
-	if err != nil {
-		return nil, err
-	}
-
-	var vms []compute.VirtualMachineScaleSetVM
-	for pages.NotDone() {
-		vms = append(vms, pages.Values()...)
-
-		err = pages.Next()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return vms, nil
-}

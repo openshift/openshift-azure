@@ -151,7 +151,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			updateContainer.EXPECT().GetBlobReference("update").Return(mockUpdateBlob)
 			data := ioutil.NopCloser(strings.NewReader(`{}`))
 			mockUpdateBlob.EXPECT().Get(nil).Return(data, nil)
-			mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName(tt.app, ""), testRg, tt.vmsList, nil)
+			virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(tt.app, ""), "", "", "").Return(tt.vmsList, nil)
 			uBlob := newUpdateBlob()
 			hasher := mock_cluster.NewMockHasher(gmc)
 			hasher.EXPECT().HashScaleSet(gomock.Any(), gomock.Any()).Return(tt.ssHashes[scalesetName("ss-master")], nil)
