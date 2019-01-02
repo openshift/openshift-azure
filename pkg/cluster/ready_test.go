@@ -170,15 +170,15 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			kubeclient := mock_kubeclient.NewMockKubeclient(gmc)
 			if tt.wantErr {
 				if tt.expectedErr == vmListErr {
-					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("master"), testRg, nil, tt.expectedErr)
+					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), testRg, nil, tt.expectedErr)
 				} else {
-					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("master"), testRg, tt.expect["master"], nil)
+					mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), testRg, tt.expect["master"], nil)
 					kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Return(nodeGetErr)
 				}
 			} else {
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("master"), testRg, tt.expect["master"], nil)
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("infra"), testRg, tt.expect["infra"], nil)
-				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName("foo"), testRg, tt.expect["compute"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), testRg, tt.expect["master"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName(&api.AgentPoolProfile{Name: "infra", Role: api.AgentPoolProfileRoleInfra}, ""), testRg, tt.expect["infra"], nil)
+				mockListVMs(ctx, gmc, virtualMachineScaleSetVMsClient, config.GetScalesetName(&api.AgentPoolProfile{Name: "foo", Role: api.AgentPoolProfileRoleCompute}, ""), testRg, tt.expect["compute"], nil)
 				kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Times(len(tt.expect["master"])).Return(nil)
 				kubeclient.EXPECT().WaitForReadyWorker(ctx, gomock.Any()).Times(len(tt.expect["infra"]) + len(tt.expect["compute"])).Return(nil)
 			}
@@ -189,7 +189,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 				kubeclient: kubeclient,
 				log:        logrus.NewEntry(logrus.StandardLogger()),
 			}
-			err := u.waitForNodes(ctx, cs)
+			err := u.waitForNodes(ctx, cs, "")
 			if tt.wantErr && tt.expectedErr != err {
 				t.Errorf("simpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
 			}

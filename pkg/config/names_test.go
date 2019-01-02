@@ -2,36 +2,49 @@ package config
 
 import (
 	"testing"
+
+	"github.com/openshift/openshift-azure/pkg/api"
 )
 
 func TestGetNames(t *testing.T) {
 	tests := []struct {
-		instance     int
-		wantScaleset string
-		wantInstance string
 		name         string
+		app          *api.AgentPoolProfile
+		suffix       string
+		wantScaleset string
 	}{
 		{
-			name:         "master",
+			name: "master",
+			app: &api.AgentPoolProfile{
+				Role: api.AgentPoolProfileRoleMaster,
+			},
+			suffix:       "0",
 			wantScaleset: "ss-master",
-			wantInstance: "ss-master_2",
-			instance:     2,
 		},
 		{
-			name:         "thingy",
-			wantScaleset: "ss-thingy",
-			wantInstance: "ss-thingy_3",
-			instance:     3,
+			name: "thingy",
+			app: &api.AgentPoolProfile{
+				Role: api.AgentPoolProfileRoleCompute,
+				Name: "thingy",
+			},
+			suffix:       "foo",
+			wantScaleset: "ss-thingy-foo",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetScalesetName(tt.name); got != tt.wantScaleset {
+			if got := GetScalesetName(tt.app, tt.suffix); got != tt.wantScaleset {
 				t.Errorf("GetScalesetName() = %v, want %v", got, tt.wantScaleset)
 			}
-			if got := GetInstanceName(tt.name, tt.instance); got != tt.wantInstance {
-				t.Errorf("GetInstanceName() = %v, want %v", got, tt.wantInstance)
-			}
 		})
+	}
+}
+
+func TestGetMasterInstanceName(t *testing.T) {
+	if n := GetMasterInstanceName(0); n != "ss-master_0" {
+		t.Error(n)
+	}
+	if n := GetMasterInstanceName(10); n != "ss-master_10" {
+		t.Error(n)
 	}
 }

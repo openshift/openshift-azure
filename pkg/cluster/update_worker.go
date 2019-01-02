@@ -1,20 +1,60 @@
 package cluster
 
 import (
+	"bytes"
 	"context"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
+	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
 )
 
-// updateWorkerAgentPool creates new VMs and removes old VMs one by one.
-func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError {
-	ssName := config.GetScalesetName(app.Name)
-	ssHash, err := u.hasher.HashScaleSet(cs, app)
+// findScaleSets discovers all the scalesets that exist for a given agent pool.
+// The first scaleset which matches desiredHash, if one exists, is denoted the
+// "target".  We will work to get all our VMs running there.  Any other
+// scalesets are "sources".  We will work to get rid of VMs running in these.
+func (u *simpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string, app *api.AgentPoolProfile, blob *updateblob, desiredHash []byte) (*compute.VirtualMachineScaleSet, []compute.VirtualMachineScaleSet, error) {
+	scalesets, err := u.listScalesets(ctx, resourceGroup, config.GetScalesetName(app, ""))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var target *compute.VirtualMachineScaleSet
+	var sources []compute.VirtualMachineScaleSet
+
+	for i, ss := range scalesets {
+		// Note: we consult the blob to discover the persisted scaleset hash,
+		// rather than recalculating it on the fly.  This is because Kubernetes
+		// may have changed the scaleset object after we created it.  We
+		// consider any such changes irrelevant to our hashing scheme.  For any
+		// worker scale set, the scale set hash persisted in the blob is
+		// expected to be immutable.
+		if target == nil && bytes.Equal(blob.ScalesetHashes[scalesetName(*ss.Name)], desiredHash) {
+			u.log.Infof("found target scaleset %s", *ss.Name)
+			target = &scalesets[i]
+
+		} else {
+			u.log.Infof("found source scaleset %s", *ss.Name)
+			sources = append(sources, ss)
+		}
+	}
+
+	return target, sources, nil
+}
+
+// updateWorkerAgentPool updates one by one all the VMs of a worker agent pool.
+// It defines a "target" scale set, which is known to be up-to-date because its
+// hash matches desiredHash.  The goal is for the correct number of instances to
+// be running in the "target" scale set.  In update scenarios, there will be a
+// "source" scale set which contains out-of-date instances (in crash recovery
+// scenarios, there could be multiple of these).
+func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError {
+	u.log.Infof("updating worker agent pool %s", app.Name)
+
+	desiredHash, err := u.hasher.HashScaleSet(cs, app)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
 	}
@@ -24,84 +64,105 @@ func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.Open
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolReadBlob}
 	}
 
-	// store a list of all the VM instances now, so that if we end up creating
-	// new ones (in the crash recovery case, we might not), we can detect which
-	// they are
-	oldVMs, err := listVMs(ctx, u.vmc, cs.Properties.AzProfile.ResourceGroup, ssName)
+	target, sources, err := u.findScaleSets(ctx, cs.Properties.AzProfile.ResourceGroup, app, blob, desiredHash)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolListVMs}
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolListScaleSets}
 	}
 
-	// Filter out VMs that do not need to get upgraded. Should speed
-	// up retrying failed upgrades.
-	oldVMs = u.filterOldVMs(oldVMs, blob, ssHash)
-	vmsBefore := map[string]struct{}{}
-	for _, vm := range oldVMs {
-		vmsBefore[*vm.InstanceID] = struct{}{}
+	if target == nil {
+		// No pre-existing scaleset exists which matches desiredHash.  Create a
+		// new zero instance scaleset to be our target.  Clean scales should not
+		// hit this codepath.
+		var err *api.PluginError
+		target, err = u.createWorkerScaleSet(ctx, cs, app, suffix, blob)
+		if err != nil {
+			return err
+		}
 	}
 
-	for _, vm := range oldVMs {
-		u.log.Infof("setting %s capacity to %d", ssName, app.Count+1)
-		future, err := u.ssc.Update(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetUpdate{
-			Sku: &compute.Sku{
-				Capacity: to.Int64Ptr(app.Count + 1),
-			},
-		})
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolWaitForReady}
-		}
+	targetScaler := newWorkerScaler(u.log, u.ssc, u.vmc, u.kubeclient, cs.Properties.AzProfile.ResourceGroup, target)
 
-		if err := future.WaitForCompletionRef(ctx, u.ssc.Client()); err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolWaitForReady}
-		}
+	// One by one, get rid of instances in any "source" scalesets.  Clean scales
+	// should not hit this codepath.
+	for _, source := range sources {
+		sourceScaler := newWorkerScaler(u.log, u.ssc, u.vmc, u.kubeclient, cs.Properties.AzProfile.ResourceGroup, &source)
 
-		updatedList, err := listVMs(ctx, u.vmc, cs.Properties.AzProfile.ResourceGroup, ssName)
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolListVMs}
-		}
-
-		// wait for newly created VMs to reach readiness (n.b. one alternative to
-		// this approach would be for the CSE to not return until the node is
-		// ready, but that is also problematic)
-		for _, updated := range updatedList {
-			if _, found := vmsBefore[*updated.InstanceID]; !found {
-				computerName := kubeclient.ComputerName(*updated.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-				u.log.Infof("waiting for %s to be ready", computerName)
-				err = u.kubeclient.WaitForReadyWorker(ctx, computerName)
-				if err != nil {
-					return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolWaitForReady}
+		for *source.Sku.Capacity > 0 {
+			if *target.Sku.Capacity < app.Count {
+				if err := targetScaler.scaleUp(ctx, *target.Sku.Capacity+1); err != nil {
+					return err
 				}
-				vmsBefore[*updated.InstanceID] = struct{}{}
-				blob.InstanceHashes[instanceName(*updated.Name)] = ssHash
-				if err := u.writeUpdateBlob(blob); err != nil {
-					return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateBlob}
-				}
+			}
+
+			if err := sourceScaler.scaleDown(ctx, *source.Sku.Capacity-1); err != nil {
+				return err
 			}
 		}
 
-		if err := u.deleteWorker(ctx, cs, app, *vm.InstanceID, kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)); err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolDeleteVMs}
+		if err := u.deleteWorkerScaleSet(ctx, blob, &source, cs.Properties.AzProfile.ResourceGroup); err != nil {
+			return err
 		}
-		delete(blob.InstanceHashes, instanceName(*vm.Name))
-		if err := u.writeUpdateBlob(blob); err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateBlob}
-		}
+	}
+
+	// Finally, ensure our "target" scaleset is the right size.
+	return targetScaler.scale(ctx, app.Count)
+}
+
+// createWorkerScaleSet creates a new scaleset to be our target.  For now, for
+// simplicity, the scaleset has zero instances - we fix this up later.  TODO:
+// improve this.
+func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string, blob *updateblob) (*compute.VirtualMachineScaleSet, *api.PluginError) {
+	hash, err := u.hasher.HashScaleSet(cs, app)
+	if err != nil {
+		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
+	}
+
+	target, err := arm.Vmss(&u.pluginConfig, cs, app, "", suffix)
+	if err != nil {
+		return nil, &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
+	}
+	target.Sku.Capacity = to.Int64Ptr(0)
+
+	u.log.Infof("creating target scaleset %s", config.GetScalesetName(app, suffix))
+	future, err := u.ssc.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, *target.Name, *target)
+	if err != nil {
+		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolCreateScaleSet}
+	}
+
+	if err := future.WaitForCompletionRef(ctx, u.ssc.Client()); err != nil {
+		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolCreateScaleSet}
+	}
+
+	// Persist the scaleset's hash: this is expected to be immutable for the
+	// lifetime of the scaleset.  We do this *after* the scaleset is
+	// successfully created to avoid leaking blob entries.
+	blob.ScalesetHashes[scalesetName(*target.Name)] = hash
+	if err = u.writeUpdateBlob(blob); err != nil {
+		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateBlob}
+	}
+
+	return target, nil
+}
+
+// deleteWorkerScaleSet deletes a (presumably empty) scaleset.
+func (u *simpleUpgrader) deleteWorkerScaleSet(ctx context.Context, blob *updateblob, ss *compute.VirtualMachineScaleSet, resourceGroup string) *api.PluginError {
+	// Delete the persisted scaleset hash.  We do this *before* the scaleset is
+	// deleted to avoid leaking blob entries.
+	delete(blob.ScalesetHashes, scalesetName(*ss.Name))
+	if err := u.writeUpdateBlob(blob); err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateBlob}
+	}
+
+	u.log.Infof("deleting scaleset %s", *ss.Name)
+	future, err := u.ssc.Delete(ctx, resourceGroup, *ss.Name)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolDeleteScaleSet}
+	}
+
+	err = future.WaitForCompletionRef(ctx, u.vmc.Client())
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolDeleteScaleSet}
 	}
 
 	return nil
-}
-
-func (u *simpleUpgrader) deleteWorker(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, instanceID string, nodeName kubeclient.ComputerName) error {
-	u.log.Infof("draining %s", nodeName)
-	if err := u.kubeclient.DrainAndDeleteWorker(ctx, nodeName); err != nil {
-		return err
-	}
-
-	u.log.Infof("deleting %s", nodeName)
-	future, err := u.vmc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app.Name), instanceID)
-	if err != nil {
-		return err
-	}
-
-	return future.WaitForCompletionRef(ctx, u.vmc.Client())
 }

@@ -4,44 +4,48 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
-	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
-var masterHash = []byte{0x46, 0x62, 0x3, 0xf3, 0x62, 0xe1, 0x3e, 0x3b, 0x90,
-	0x6c, 0x21, 0x1d, 0x89, 0x56, 0xb9, 0x70, 0x60, 0x95, 0x12, 0x47, 0x4b,
-	0x18, 0x3e, 0xa2, 0x53, 0xaa, 0x33, 0x5f, 0x7b, 0xf1, 0x90, 0x3d}
+var masterHash = []byte{0x20, 0x3c, 0xd3, 0x78, 0xd9, 0x84, 0x73, 0x54, 0x1,
+	0x13, 0x6, 0x65, 0x1d, 0x7a, 0xaf, 0xd6, 0xaa, 0xcf, 0x7a, 0x4, 0x3f, 0xa,
+	0x40, 0x1a, 0x25, 0xab, 0x5, 0xc9, 0xb9, 0xaf, 0xd4, 0x4a}
 
-func TestHashScaleSets(t *testing.T) {
+func TestHashScaleSet(t *testing.T) {
 	tests := []struct {
 		name string
-		vmss *compute.VirtualMachineScaleSet
+		app  api.AgentPoolProfile
 		exp  []byte
 	}{
 		{
-			name: "expect a scale set",
-			vmss: &compute.VirtualMachineScaleSet{
-				Sku:  &compute.Sku{},
-				Name: to.StringPtr("ss-master"),
-				Type: to.StringPtr("Microsoft.Compute/virtualMachineScaleSets"),
-			},
-			exp: masterHash,
+			name: "hash shouldn't change over time",
+			exp:  masterHash,
 		},
 		{
-			name: "hash is invariant with capacity",
-			vmss: &compute.VirtualMachineScaleSet{
-				Sku: &compute.Sku{
-					Capacity: to.Int64Ptr(3),
-				},
-				Name: to.StringPtr("ss-master"),
-				Type: to.StringPtr("Microsoft.Compute/virtualMachineScaleSets"),
+			name: "hash is invariant with name and count",
+			app: api.AgentPoolProfile{
+				Name:  "foo",
+				Count: 1,
 			},
 			exp: masterHash,
 		},
 	}
 
+	prepare := func(v reflect.Value) {
+		switch v.Interface().(type) {
+		case []api.IdentityProvider:
+			// set the Provider to AADIdentityProvider
+			v.Set(reflect.ValueOf([]api.IdentityProvider{{Provider: &api.AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
+		}
+	}
+
+	var cs api.OpenShiftManagedCluster
+	populate.Walk(&cs, prepare)
+
+	var h hasher
 	for _, test := range tests {
-		got, err := hashVMSS(test.vmss)
+		got, err := h.HashScaleSet(&cs, &test.app)
 		if err != nil {
 			t.Errorf("%s: unexpected error: %v", test.name, err)
 		}

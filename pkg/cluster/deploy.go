@@ -9,9 +9,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
+// TODO: Evacuate is solely used by the etcd restore code.  It should probably
+// not be exactly here.
 func (u *simpleUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	// We may need/want to delete all the scalesets in the future
-	future, err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(string(api.AgentPoolProfileRoleMaster)))
+	future, err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.MasterScalesetName)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
 	}
@@ -36,7 +38,7 @@ func (u *simpleUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedC
 	return nil
 }
 
-func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
+func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError {
 	err := deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
@@ -45,7 +47,7 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
-	err = u.initializeUpdateBlob(cs)
+	err = u.initializeUpdateBlob(cs, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
 	}
@@ -53,7 +55,7 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 	}
-	err = u.waitForNodes(ctx, cs)
+	err = u.waitForNodes(ctx, cs, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 	}
@@ -63,16 +65,20 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 type scalesetName string
 type instanceName string
 
-func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster) error {
+func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error {
 	blob := newUpdateBlob()
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		h, err := u.hasher.HashScaleSet(cs, &app)
 		if err != nil {
 			return err
 		}
-		for i := int64(0); i < app.Count; i++ {
-			name := instanceName(config.GetInstanceName(app.Name, int(i)))
-			blob.InstanceHashes[name] = h
+		if app.Role == api.AgentPoolProfileRoleMaster {
+			for i := int64(0); i < app.Count; i++ {
+				name := instanceName(config.GetMasterInstanceName(i))
+				blob.InstanceHashes[name] = h
+			}
+		} else {
+			blob.ScalesetHashes[scalesetName(config.GetScalesetName(&app, suffix))] = h
 		}
 	}
 	return u.writeUpdateBlob(blob)

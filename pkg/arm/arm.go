@@ -17,7 +17,7 @@ import (
 )
 
 type Generator interface {
-	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool) (map[string]interface{}, error)
+	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error)
 }
 
 type simpleGenerator struct {
@@ -42,7 +42,7 @@ func NewSimpleGenerator(pluginConfig *api.PluginConfig) Generator {
 	}
 }
 
-func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool) (map[string]interface{}, error) {
+func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
 	t := armTemplate{
 		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 		ContentVersion: "1.0.0.0",
@@ -59,11 +59,13 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 		t.Resources = append(t.Resources, nsgWorker(cs))
 	}
 	for _, app := range cs.Properties.AgentPoolProfiles {
-		vmss, err := Vmss(&g.pluginConfig, cs, &app, backupBlob)
-		if err != nil {
-			return nil, err
+		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
+			vmss, err := Vmss(&g.pluginConfig, cs, &app, backupBlob, suffix)
+			if err != nil {
+				return nil, err
+			}
+			t.Resources = append(t.Resources, vmss)
 		}
-		t.Resources = append(t.Resources, vmss)
 	}
 
 	b, err := json.Marshal(t)

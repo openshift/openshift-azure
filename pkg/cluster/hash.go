@@ -25,12 +25,6 @@ type hasher struct {
 }
 
 func hashVMSS(vmss *compute.VirtualMachineScaleSet) ([]byte, error) {
-	// cleanup capacity so that no unnecessary VM rotations are going to occur
-	// because of a scale up/down.
-	if vmss.Sku != nil {
-		vmss.Sku.Capacity = nil
-	}
-
 	data, err := json.Marshal(vmss)
 	if err != nil {
 		return nil, err
@@ -44,7 +38,12 @@ func hashVMSS(vmss *compute.VirtualMachineScaleSet) ([]byte, error) {
 
 // hashScaleSets returns the set of desired state scale set hashes
 func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
-	vmss, err := arm.Vmss(&h.pluginConfig, cs, app, "") // TODO: backupBlob is rather a layering violation here
+	// the hash is invariant of name, suffix, count
+	appCopy := *app
+	appCopy.Count = 0
+	appCopy.Name = ""
+
+	vmss, err := arm.Vmss(&h.pluginConfig, cs, &appCopy, "", "") // TODO: backupBlob is rather a layering violation here
 	if err != nil {
 		return nil, err
 	}

@@ -29,8 +29,8 @@ const (
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
 	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError
-	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError
+	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError
+	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError
 	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	Evacuate(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
