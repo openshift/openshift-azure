@@ -14,6 +14,21 @@ if [[ -z "$TIMEOUT" ]]; then
     TIMEOUT=20m
 fi
 
-go test ./test/e2e -timeout "$TIMEOUT" -test.v -ginkgo.v "${FOCUS:-}" -ginkgo.noColor -tags e2e "${ARTIFACT_FLAG:-}"
+# start the fake rp server if needed
+if [[ "$FOCUS" == *"\[Fake\]"* ]]; then
+    go generate ./...
+    go run cmd/fakerp/main.go &
+    trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT
+fi
 
-# -ldflags "-X github.com/openshift/openshift-azure/test/e2e.gitCommit=COMMIT"
+go test \
+-ldflags "-X github.com/openshift/openshift-azure/test/e2e.gitCommit=COMMIT" \
+./test/e2e \
+-timeout "$TIMEOUT" \
+-v \
+-ginkgo.v \
+"${FOCUS:-}" \
+-ginkgo.noColor \
+-tags e2e \
+"${ARTIFACT_FLAG:-}" \
+"${EXTRA_FLAGS:-}"
