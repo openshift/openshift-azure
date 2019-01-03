@@ -659,7 +659,7 @@ tempBackDir=/var/lib/etcd/backup
 mkdir $tempBackDir
 while ! docker pull {{ .Config.Images.EtcdBackup }}; do sleep 10; done
 docker run --dns 8.8.8.8 -v /etc/origin/master:/etc/origin/master -v /etc/origin/cloudprovider/:/_data/_out -v $tempBackDir:/out:z {{ .Config.Images.EtcdBackup }} -blobname={{ .Extra.BackupBlobName }} -destination=/out/backup.db "download"
-logger -t master-startup.sh "backup downloaded to " $(ls $tempBackDir) ""
+logger -t master-startup.sh "backup downloaded to " $(ls $tempBackDir)
 
 # step 2 restore
 logger -t master-startup.sh "restoring snapshot"
