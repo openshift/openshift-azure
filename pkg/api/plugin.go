@@ -52,7 +52,6 @@ const (
 	PluginStepUpdateWorkerAgentPoolWaitForReady   PluginStep = "UpdateWorkerAgentPoolWaitForReady"
 	PluginStepUpdateWorkerAgentPoolUpdateBlob     PluginStep = "UpdateWorkerAgentPoolUpdateBlob"
 	PluginStepUpdateWorkerAgentPoolDeleteVM       PluginStep = "UpdateWorkerAgentPoolDeleteVM"
-	PluginStepDeleteBlob                          PluginStep = "DeleteBlob"
 )
 
 // PluginError error returned by CreateOrUpdate to specify the step that failed.

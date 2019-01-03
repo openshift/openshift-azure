@@ -44,7 +44,7 @@ func TestEvacuate(t *testing.T) {
 	updateCr.EXPECT().CreateIfNotExists(nil).Return(true, nil)
 	updateBlob := mock_storage.NewMockBlob(gmc)
 	updateCr.EXPECT().GetBlobReference(updateblob.UpdateBlobName).Return(updateBlob)
-	updateBlob.EXPECT().Delete(nil).Return(nil)
+	updateBlob.EXPECT().CreateBlockBlobFromReader(gomock.Any(), nil).Return(nil)
 
 	arc := autorest.NewClientWithUserAgent("unittest")
 	ssc.EXPECT().Client().Return(arc)

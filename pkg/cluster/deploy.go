@@ -38,9 +38,9 @@ func (u *simpleUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedC
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
-	err = u.updateBlobService.Delete()
+	err = u.updateBlobService.Write(updateblob.NewUpdateBlob())
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepDeleteBlob}
+		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
 	}
 	return nil
 }

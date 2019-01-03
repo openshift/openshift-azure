@@ -26,7 +26,6 @@ type blobService struct {
 type BlobService interface {
 	Read() (*UpdateBlob, error)
 	Write(*UpdateBlob) error
-	Delete() error
 }
 
 func NewBlobService(bsc storage.BlobStorageClient) (BlobService, error) {
@@ -71,9 +70,4 @@ func (u *blobService) Read() (*UpdateBlob, error) {
 	}
 
 	return &b, nil
-}
-
-func (u *blobService) Delete() error {
-	bc := u.updateContainer.GetBlobReference(UpdateBlobName)
-	return bc.Delete(nil)
 }
