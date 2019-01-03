@@ -83,7 +83,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err := p.clusterUpgrader.Evacuate(ctx, cs); err != nil {
 		return err
 	}
-	p.log.Info("starting update with recovery")
+	p.log.Infof("starting update with backup blob %s", backupBlob)
 	if err := p.createOrUpdate(ctx, cs, backupBlob, true, deployFn); err != nil {
 		return err
 	}
