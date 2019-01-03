@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -408,19 +407,15 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	testDataWithBackup := map[string]interface{}{"test": "backup"}
 	mockGen := mock_arm.NewMockGenerator(mockCtrl)
 	mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
-	firstGenerate := true
-	mockGen.EXPECT().Generate(nil, nil, gomock.Any(), true, gomock.Any()).Times(2).DoAndReturn(func(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
-		if firstGenerate {
-			firstGenerate = false
-			return testDataWithBackup, nil
-		}
-		return testData, nil
-	})
-	mockUp.EXPECT().CreateClients(nil, nil).Return(nil)
+	gomock.InOrder(
+		mockGen.EXPECT().Generate(nil, nil, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil),
+		mockGen.EXPECT().Generate(nil, nil, gomock.Any(), true, gomock.Any()).Return(testData, nil),
+	)
+	mockUp.EXPECT().CreateClients(nil, nil).Times(3).Return(nil)
 	mockUp.EXPECT().Evacuate(nil, nil).Return(nil)
-	mockUp.EXPECT().Deploy(nil, nil, testDataWithBackup, nil, gomock.Any()).Return(nil)
+	mockUp.EXPECT().Update(nil, nil, testDataWithBackup, nil, gomock.Any()).Return(nil)
 	mockUp.EXPECT().Update(nil, nil, testData, nil, gomock.Any()).Return(nil)
-	mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
+	mockUp.EXPECT().WaitForInfraServices(nil, nil).Times(2).Return(nil)
 	mockUp.EXPECT().HealthCheck(nil, nil).Times(2).Return(nil)
 	p := &plugin{
 		clusterUpgrader: mockUp,
