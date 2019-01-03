@@ -15,7 +15,7 @@ spec:
       webconsole: "true"
   strategy:
     rollingUpdate:
-      maxSurge: 25%
+      maxSurge: 0
       maxUnavailable: 100%
     type: RollingUpdate
   template:
@@ -25,6 +25,16 @@ spec:
         webconsole: "true"
       name: webconsole
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - openshift-web-console
+            topologyKey: kubernetes.io/hostname
       containers:
       - command:
         - /usr/bin/origin-web-console
