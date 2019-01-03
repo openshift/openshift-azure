@@ -3,7 +3,9 @@ package etcdbackup
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"sort"
 	"time"
@@ -120,7 +122,17 @@ func (b *etcdBackup) Delete(name string) error {
 func (b *etcdBackup) Retrieve(srcBlob, destPath string) error {
 	b.log.Printf("copy blob %v to filesystem %v", srcBlob, destPath)
 	blob := b.etcdContainer.GetBlobReference(srcBlob)
-	rc, err := blob.Get(&azstorage.GetBlobOptions{})
+	var rc io.ReadCloser
+	var err error
+	for {
+		rc, err = blob.Get(&azstorage.GetBlobOptions{})
+		if err, ok := err.(*url.Error); ok && err.Timeout() {
+			time.Sleep(time.Second)
+			fmt.Println("timeout: retrying")
+			continue
+		}
+		break
+	}
 	if err != nil {
 		return err
 	}
