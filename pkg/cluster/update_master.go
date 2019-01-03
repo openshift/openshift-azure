@@ -60,58 +60,30 @@ func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.Open
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDrain}
 		}
 
-		{
-			u.log.Infof("deallocating %s (%s)", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, *vm.InstanceID)
-			future, err := u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
-			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDeallocate}
-			}
-
-			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
-			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDeallocate}
-			}
+		u.log.Infof("deallocating %s (%s)", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName, *vm.InstanceID)
+		err = u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDeallocate}
 		}
 
-		{
-			u.log.Infof("updating %s", computerName)
-			future, err := u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
-				InstanceIds: &[]string{*vm.InstanceID},
-			})
-			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateVMs}
-			}
-
-			err = future.WaitForCompletionRef(ctx, u.ssc.Client())
-			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateVMs}
-			}
+		u.log.Infof("updating %s", computerName)
+		err = u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
+			InstanceIds: &[]string{*vm.InstanceID},
+		})
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateVMs}
 		}
 
-		{
-			u.log.Infof("reimaging %s", computerName)
-			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
-			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
-			}
-
-			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
-			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
-			}
+		u.log.Infof("reimaging %s", computerName)
+		err = u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
 		}
 
-		{
-			u.log.Infof("starting %s", computerName)
-			future, err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
-			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolStart}
-			}
-
-			err = future.WaitForCompletionRef(ctx, u.vmc.Client())
-			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolStart}
-			}
+		u.log.Infof("starting %s", computerName)
+		err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolStart}
 		}
 
 		u.log.Infof("waiting for %s to be ready", computerName)

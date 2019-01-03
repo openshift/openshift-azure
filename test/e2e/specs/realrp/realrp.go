@@ -102,7 +102,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			By("trying to update the scale set capacity")
-			_, err = cli.VirtualMachineScaleSets.Update(ctx, resourcegroup, *scaleSet.Name, compute.VirtualMachineScaleSetUpdate{
+			err = cli.VirtualMachineScaleSets.Update(ctx, resourcegroup, *scaleSet.Name, compute.VirtualMachineScaleSetUpdate{
 				Sku: &compute.Sku{
 					Capacity: to.Int64Ptr(int64(len(vms) + 1)),
 				},
@@ -110,7 +110,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 			Expect(err).To(HaveOccurred())
 
 			By("trying to update the scale set type")
-			_, err = cli.VirtualMachineScaleSets.Update(ctx, resourcegroup, *scaleSet.Name, compute.VirtualMachineScaleSetUpdate{
+			err = cli.VirtualMachineScaleSets.Update(ctx, resourcegroup, *scaleSet.Name, compute.VirtualMachineScaleSetUpdate{
 				Sku: &compute.Sku{
 					Name: to.StringPtr("Standard_DS1_v2"),
 				},
@@ -118,7 +118,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 			Expect(err).To(HaveOccurred())
 
 			By("trying to update the scale set SSH key")
-			_, err = cli.VirtualMachineScaleSets.Update(ctx, resourcegroup, *scaleSet.Name, compute.VirtualMachineScaleSetUpdate{
+			err = cli.VirtualMachineScaleSets.Update(ctx, resourcegroup, *scaleSet.Name, compute.VirtualMachineScaleSetUpdate{
 				VirtualMachineScaleSetUpdateProperties: &compute.VirtualMachineScaleSetUpdateProperties{
 					VirtualMachineProfile: &compute.VirtualMachineScaleSetUpdateVMProfile{
 						OsProfile: &compute.VirtualMachineScaleSetUpdateOSProfile{
@@ -150,7 +150,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 
 			for _, vm := range vms {
 				By("trying to restart scale set instance vm")
-				_, err = cli.VirtualMachineScaleSetVMs.Restart(ctx, resourcegroup, *scaleSet.Name, *vm.InstanceID)
+				err = cli.VirtualMachineScaleSetVMs.Restart(ctx, resourcegroup, *scaleSet.Name, *vm.InstanceID)
 				Expect(err).To(HaveOccurred())
 			}
 		}

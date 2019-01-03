@@ -83,16 +83,12 @@ func (ws *workerScaler) scaleUp(ctx context.Context, count int64) *api.PluginErr
 		}
 	}
 
-	future, err := ws.ssc.Update(ctx, ws.resourceGroup, *ws.ss.Name, compute.VirtualMachineScaleSetUpdate{
+	err := ws.ssc.Update(ctx, ws.resourceGroup, *ws.ss.Name, compute.VirtualMachineScaleSetUpdate{
 		Sku: &compute.Sku{
 			Capacity: to.Int64Ptr(count),
 		},
 	})
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateScaleSet}
-	}
-
-	if err := future.WaitForCompletionRef(ctx, ws.ssc.Client()); err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateScaleSet}
 	}
 
@@ -140,12 +136,8 @@ func (ws *workerScaler) scaleDown(ctx context.Context, count int64) *api.PluginE
 		}
 
 		ws.log.Infof("deleting %s", computerName)
-		future, err := ws.vmc.Delete(ctx, ws.resourceGroup, *ws.ss.Name, *vm.InstanceID)
+		err := ws.vmc.Delete(ctx, ws.resourceGroup, *ws.ss.Name, *vm.InstanceID)
 		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolDeleteVM}
-		}
-
-		if err = future.WaitForCompletionRef(ctx, ws.vmc.Client()); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolDeleteVM}
 		}
 	}

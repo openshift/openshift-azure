@@ -11,11 +11,7 @@ import (
 
 func (u *simpleUpgrader) EtcdRestore(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
 	// We may need/want to delete all the scalesets in the future
-	future, err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.MasterScalesetName)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
-	}
-	err = future.WaitForCompletionRef(ctx, u.ssc.Client())
+	err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.MasterScalesetName)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
 	}
