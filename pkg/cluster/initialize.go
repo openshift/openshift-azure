@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
@@ -34,9 +35,7 @@ func (u *simpleUpgrader) initialize(ctx context.Context, cs *api.OpenShiftManage
 		return err
 	}
 
-	// update tracking container
-	u.updateContainer = bsc.GetContainerReference(updateContainerName)
-	_, err = u.updateContainer.CreateIfNotExists(nil)
+	u.updateBlobService, err = updateblob.NewBlobService(bsc)
 	if err != nil {
 		return err
 	}

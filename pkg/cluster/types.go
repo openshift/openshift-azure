@@ -13,6 +13,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
@@ -21,8 +22,6 @@ import (
 const (
 	ConfigContainerName     = "config"
 	ConfigBlobName          = "config"
-	updateContainerName     = "update"
-	updateBlobName          = "update"
 	EtcdBackupContainerName = "etcd"
 )
 
@@ -37,15 +36,15 @@ type Upgrader interface {
 }
 
 type simpleUpgrader struct {
-	pluginConfig    api.PluginConfig
-	accountsClient  azureclient.AccountsClient
-	storageClient   storage.Client
-	updateContainer storage.Container
-	vmc             azureclient.VirtualMachineScaleSetVMsClient
-	ssc             azureclient.VirtualMachineScaleSetsClient
-	kubeclient      kubeclient.Kubeclient
-	log             *logrus.Entry
-	hasher          Hasher
+	pluginConfig      api.PluginConfig
+	accountsClient    azureclient.AccountsClient
+	storageClient     storage.Client
+	updateBlobService updateblob.BlobService
+	vmc               azureclient.VirtualMachineScaleSetVMsClient
+	ssc               azureclient.VirtualMachineScaleSetsClient
+	kubeclient        kubeclient.Kubeclient
+	log               *logrus.Entry
+	hasher            Hasher
 }
 
 var _ Upgrader = &simpleUpgrader{}

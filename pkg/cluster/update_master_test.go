@@ -1,13 +1,9 @@
 package cluster
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
@@ -19,18 +15,20 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_updateblob"
 )
 
 func TestFilterOldVMs(t *testing.T) {
 	tests := []struct {
 		name   string
 		vms    []compute.VirtualMachineScaleSetVM
-		blob   *updateblob
+		blob   *updateblob.UpdateBlob
 		ssHash []byte
 		exp    []compute.VirtualMachineScaleSetVM
 	}{
@@ -47,8 +45,8 @@ func TestFilterOldVMs(t *testing.T) {
 					Name: to.StringPtr("ss-master_2"),
 				},
 			},
-			blob: &updateblob{
-				InstanceHashes: instanceHashMap{
+			blob: &updateblob.UpdateBlob{
+				InstanceHashes: updateblob.InstanceHashes{
 					"ss-master_0": []byte("newhash"),
 					"ss-master_1": []byte("oldhash"),
 					"ss-master_2": []byte("oldhash"),
@@ -77,8 +75,8 @@ func TestFilterOldVMs(t *testing.T) {
 					Name: to.StringPtr("ss-master_2"),
 				},
 			},
-			blob: &updateblob{
-				InstanceHashes: instanceHashMap{
+			blob: &updateblob.UpdateBlob{
+				InstanceHashes: updateblob.InstanceHashes{
 					"ss-master_0": []byte("newhash"),
 					"ss-master_1": []byte("newhash"),
 					"ss-master_2": []byte("newhash"),
@@ -146,13 +144,10 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			virtualMachineScaleSetsClient := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
 			virtualMachineScaleSetVMsClient := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 			storageClient := mock_storage.NewMockClient(gmc)
-			mockUpdateBlob := mock_storage.NewMockBlob(gmc)
-			updateContainer := mock_storage.NewMockContainer(gmc)
-			updateContainer.EXPECT().GetBlobReference("update").Return(mockUpdateBlob)
-			data := ioutil.NopCloser(strings.NewReader(`{}`))
-			mockUpdateBlob.EXPECT().Get(nil).Return(data, nil)
+			ubs := mock_updateblob.NewMockBlobService(gmc)
+			ubs.EXPECT().Read().Return(updateblob.NewUpdateBlob(), nil)
 			virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(tt.app, ""), "", "", "").Return(tt.vmsList, nil)
-			uBlob := newUpdateBlob()
+			uBlob := updateblob.NewUpdateBlob()
 			hasher := mock_cluster.NewMockHasher(gmc)
 			hasher.EXPECT().HashScaleSet(gomock.Any(), gomock.Any()).Return(tt.ssHashes["ss-master"], nil)
 			for _, vm := range tt.vmsList {
@@ -196,18 +191,16 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				uBlob.InstanceHashes[*vm.Name] = tt.ssHashes["ss-master"]
 
 				// write the updatehash
-				hashData, _ := json.Marshal(uBlob)
-				mockUpdateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(hashData)), nil)
-				updateContainer.EXPECT().GetBlobReference("update").Return(mockUpdateBlob)
+				ubs.EXPECT().Write(uBlob).Return(nil)
 			}
 			u := &simpleUpgrader{
-				updateContainer: updateContainer,
-				vmc:             virtualMachineScaleSetVMsClient,
-				ssc:             virtualMachineScaleSetsClient,
-				storageClient:   storageClient,
-				kubeclient:      client,
-				log:             logrus.NewEntry(logrus.StandardLogger()).WithField("test", tt.name),
-				hasher:          hasher,
+				vmc:               virtualMachineScaleSetVMsClient,
+				ssc:               virtualMachineScaleSetsClient,
+				storageClient:     storageClient,
+				kubeclient:        client,
+				log:               logrus.NewEntry(logrus.StandardLogger()).WithField("test", tt.name),
+				hasher:            hasher,
+				updateBlobService: ubs,
 			}
 			if got := u.updateMasterAgentPool(ctx, tt.cs, tt.app); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("simpleUpgrader.updateInPlace() = %v, want %v", got, tt.want)

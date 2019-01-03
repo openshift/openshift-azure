@@ -11,12 +11,15 @@ import (
 	gomock "github.com/golang/mock/gomock"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 )
 
 func TestEvacuate(t *testing.T) {
 	gmc := gomock.NewController(t)
+	defer gmc.Finish()
+
 	ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
 	storageClient := mock_storage.NewMockClient(gmc)
 	u := &simpleUpgrader{
@@ -37,9 +40,10 @@ func TestEvacuate(t *testing.T) {
 	bsa := mock_storage.NewMockBlobStorageClient(gmc)
 	storageClient.EXPECT().GetBlobService().Return(bsa)
 	updateCr := mock_storage.NewMockContainer(gmc)
-	bsa.EXPECT().GetContainerReference("update").Return(updateCr)
+	bsa.EXPECT().GetContainerReference(updateblob.UpdateContainerName).Return(updateCr)
+	updateCr.EXPECT().CreateIfNotExists(nil).Return(true, nil)
 	updateBlob := mock_storage.NewMockBlob(gmc)
-	updateCr.EXPECT().GetBlobReference("update").Return(updateBlob)
+	updateCr.EXPECT().GetBlobReference(updateblob.UpdateBlobName).Return(updateBlob)
 	updateBlob.EXPECT().Delete(nil).Return(nil)
 
 	arc := autorest.NewClientWithUserAgent("unittest")

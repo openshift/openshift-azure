@@ -10,6 +10,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
 )
 
@@ -17,7 +18,7 @@ import (
 // The first scaleset which matches desiredHash, if one exists, is denoted the
 // "target".  We will work to get all our VMs running there.  Any other
 // scalesets are "sources".  We will work to get rid of VMs running in these.
-func (u *simpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string, app *api.AgentPoolProfile, blob *updateblob, desiredHash []byte) (*compute.VirtualMachineScaleSet, []compute.VirtualMachineScaleSet, error) {
+func (u *simpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string, app *api.AgentPoolProfile, blob *updateblob.UpdateBlob, desiredHash []byte) (*compute.VirtualMachineScaleSet, []compute.VirtualMachineScaleSet, error) {
 	scalesets, err := u.ssc.List(ctx, resourceGroup)
 	if err != nil {
 		return nil, nil, err
@@ -66,7 +67,7 @@ func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.Open
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
 	}
 
-	blob, err := u.readUpdateBlob()
+	blob, err := u.updateBlobService.Read()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolReadBlob}
 	}
@@ -118,7 +119,7 @@ func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.Open
 // createWorkerScaleSet creates a new scaleset to be our target.  For now, for
 // simplicity, the scaleset has zero instances - we fix this up later.  TODO:
 // improve this.
-func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string, blob *updateblob) (*compute.VirtualMachineScaleSet, *api.PluginError) {
+func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string, blob *updateblob.UpdateBlob) (*compute.VirtualMachineScaleSet, *api.PluginError) {
 	hash, err := u.hasher.HashScaleSet(cs, app)
 	if err != nil {
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
@@ -144,7 +145,7 @@ func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenS
 	// lifetime of the scaleset.  We do this *after* the scaleset is
 	// successfully created to avoid leaking blob entries.
 	blob.ScalesetHashes[*target.Name] = hash
-	if err = u.writeUpdateBlob(blob); err != nil {
+	if err = u.updateBlobService.Write(blob); err != nil {
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateBlob}
 	}
 
@@ -152,11 +153,11 @@ func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenS
 }
 
 // deleteWorkerScaleSet deletes a (presumably empty) scaleset.
-func (u *simpleUpgrader) deleteWorkerScaleSet(ctx context.Context, blob *updateblob, ss *compute.VirtualMachineScaleSet, resourceGroup string) *api.PluginError {
+func (u *simpleUpgrader) deleteWorkerScaleSet(ctx context.Context, blob *updateblob.UpdateBlob, ss *compute.VirtualMachineScaleSet, resourceGroup string) *api.PluginError {
 	// Delete the persisted scaleset hash.  We do this *before* the scaleset is
 	// deleted to avoid leaking blob entries.
 	delete(blob.ScalesetHashes, *ss.Name)
-	if err := u.writeUpdateBlob(blob); err != nil {
+	if err := u.updateBlobService.Write(blob); err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateBlob}
 	}
 

@@ -9,6 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 )
 
@@ -27,7 +28,7 @@ func TestInitialize(t *testing.T) {
 	etcdCr.EXPECT().CreateIfNotExists(nil).Return(true, nil)
 
 	updateCr := mock_storage.NewMockContainer(gmc)
-	bsa.EXPECT().GetContainerReference(updateContainerName).Return(updateCr)
+	bsa.EXPECT().GetContainerReference(updateblob.UpdateContainerName).Return(updateCr)
 	updateCr.EXPECT().CreateIfNotExists(nil).Return(true, nil)
 
 	configCr := mock_storage.NewMockContainer(gmc)

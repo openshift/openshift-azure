@@ -9,10 +9,11 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
 )
 
-func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob *updateblob, ssHash []byte) []compute.VirtualMachineScaleSetVM {
+func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob *updateblob.UpdateBlob, ssHash []byte) []compute.VirtualMachineScaleSetVM {
 	var oldVMs []compute.VirtualMachineScaleSetVM
 	for _, vm := range vms {
 		if !bytes.Equal(blob.InstanceHashes[*vm.Name], ssHash) {
@@ -33,7 +34,7 @@ func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.Open
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashScaleSet}
 	}
 
-	blob, err := u.readUpdateBlob()
+	blob, err := u.updateBlobService.Read()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReadBlob}
 	}
@@ -120,7 +121,7 @@ func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.Open
 		}
 
 		blob.InstanceHashes[*vm.Name] = ssHash
-		if err := u.writeUpdateBlob(blob); err != nil {
+		if err := u.updateBlobService.Write(blob); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateBlob}
 		}
 	}

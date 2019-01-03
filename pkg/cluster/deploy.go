@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
@@ -21,6 +22,7 @@ func (u *simpleUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedC
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
 	}
+	// TODO: this code should be rolled into initialize()
 	if u.storageClient == nil {
 		keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
 		if err != nil {
@@ -31,7 +33,12 @@ func (u *simpleUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedC
 			return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 		}
 	}
-	err = u.deleteUpdateBlob()
+	bsc := u.storageClient.GetBlobService()
+	u.updateBlobService, err = updateblob.NewBlobService(bsc)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+	err = u.updateBlobService.Delete()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeleteBlob}
 	}
@@ -63,7 +70,7 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 }
 
 func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error {
-	blob := newUpdateBlob()
+	blob := updateblob.NewUpdateBlob()
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		h, err := u.hasher.HashScaleSet(cs, &app)
 		if err != nil {
@@ -78,5 +85,5 @@ func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 			blob.ScalesetHashes[config.GetScalesetName(&app, suffix)] = h
 		}
 	}
-	return u.writeUpdateBlob(blob)
+	return u.updateBlobService.Write(blob)
 }
