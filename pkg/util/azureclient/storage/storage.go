@@ -84,6 +84,7 @@ type Blob interface {
 	PutBlockList(blocks []storage.Block, options *storage.PutBlockListOptions) error
 	Get(options *storage.GetBlobOptions) (io.ReadCloser, error)
 	Delete(options *storage.DeleteBlobOptions) error
+	Exists() (bool, error)
 }
 
 type blob struct {
