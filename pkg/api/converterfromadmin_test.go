@@ -96,7 +96,7 @@ func TestConvertFromAdmin(t *testing.T) {
 					AgentPoolProfiles: []admin.AgentPoolProfile{
 						{
 							Name:       to.StringPtr("NewName"),
-							Count:      to.IntPtr(2),
+							Count:      to.Int64Ptr(2),
 							VMSize:     (*admin.VMSize)(to.StringPtr("NewVMSize")),
 							SubnetCIDR: to.StringPtr("NewSubnetCIDR"),
 							OSType:     (*admin.OSType)(to.StringPtr("NewOSType")),
@@ -124,7 +124,7 @@ func TestConvertFromAdmin(t *testing.T) {
 				Properties: &admin.Properties{
 					AgentPoolProfiles: []admin.AgentPoolProfile{
 						{
-							Count:      to.IntPtr(2),
+							Count:      to.Int64Ptr(2),
 							VMSize:     (*admin.VMSize)(to.StringPtr("NewVMSize")),
 							SubnetCIDR: to.StringPtr("NewSubnetCIDR"),
 							OSType:     (*admin.OSType)(to.StringPtr("NewOSType")),

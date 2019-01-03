@@ -1,4 +1,4 @@
-package cluster
+package updateblob
 
 import (
 	"bytes"
@@ -17,7 +17,7 @@ func TestReadUpdateBlob(t *testing.T) {
 	tests := []struct {
 		name    string
 		blob    string
-		want    updateblob
+		want    *UpdateBlob
 		wantErr error
 	}{
 		{
@@ -26,10 +26,13 @@ func TestReadUpdateBlob(t *testing.T) {
 		},
 		{
 			name: "ok",
-			blob: `[{"instanceName":"ss-compute_0","scalesetHash":"7x99="},{"instanceName":"ss-infra_0","scalesetHash":"45"}]`,
-			want: updateblob{
-				"ss-infra_0":   "45",
-				"ss-compute_0": "7x99=",
+			blob: `{"instanceHashes":[{"instanceName":"ss-compute_0","hash":"N3g5OT0="},{"instanceName":"ss-infra_0","hash":"NDU="}]}`,
+			want: &UpdateBlob{
+				InstanceHashes: InstanceHashes{
+					"ss-infra_0":   []byte("45"),
+					"ss-compute_0": []byte("7x99="),
+				},
+				ScalesetHashes: ScalesetHashes{},
 			},
 		},
 	}
@@ -38,14 +41,14 @@ func TestReadUpdateBlob(t *testing.T) {
 	for _, tt := range tests {
 		updateCr := mock_storage.NewMockContainer(gmc)
 		updateBlob := mock_storage.NewMockBlob(gmc)
-		updateCr.EXPECT().GetBlobReference(updateBlobName).Return(updateBlob)
+		updateCr.EXPECT().GetBlobReference(UpdateBlobName).Return(updateBlob)
 		data := ioutil.NopCloser(strings.NewReader(tt.blob))
 		updateBlob.EXPECT().Get(nil).Return(data, nil)
-		u := &simpleUpgrader{
+		u := &blobService{
 			updateContainer: updateCr,
 		}
 
-		got, err := u.readUpdateBlob()
+		got, err := u.Read()
 		if (err != nil) != (tt.wantErr != nil) {
 			t.Errorf("simpleUpgrader.readUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
 			return
@@ -62,21 +65,24 @@ func TestReadUpdateBlob(t *testing.T) {
 func TestWriteUpdateBlob(t *testing.T) {
 	tests := []struct {
 		name    string
-		blob    updateblob
+		blob    *UpdateBlob
 		want    string
 		wantErr string
 	}{
 		{
 			name: "empty",
-			want: "[]",
+			blob: NewUpdateBlob(),
+			want: "{}",
 		},
 		{
 			name: "valid",
-			blob: updateblob{
-				"ss-infra_0":   "45",
-				"ss-compute_0": "7x99=",
+			blob: &UpdateBlob{
+				InstanceHashes: InstanceHashes{
+					"ss-infra_0":   []byte("45"),
+					"ss-compute_0": []byte("7x99="),
+				},
 			},
-			want: `[{"instanceName":"ss-compute_0","scalesetHash":"7x99="},{"instanceName":"ss-infra_0","scalesetHash":"45"}]`,
+			want: `{"instanceHashes":[{"instanceName":"ss-compute_0","hash":"N3g5OT0="},{"instanceName":"ss-infra_0","hash":"NDU="}]}`,
 		},
 	}
 	gmc := gomock.NewController(t)
@@ -86,11 +92,11 @@ func TestWriteUpdateBlob(t *testing.T) {
 		updateBlob := mock_storage.NewMockBlob(gmc)
 		updateCr.EXPECT().GetBlobReference("update").Return(updateBlob)
 		updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte(tt.want)), nil)
-		u := &simpleUpgrader{
+		u := &blobService{
 			updateContainer: updateCr,
 		}
 
-		if err := u.writeUpdateBlob(tt.blob); (err != nil) != (tt.wantErr != "") {
+		if err := u.Write(tt.blob); (err != nil) != (tt.wantErr != "") {
 			t.Errorf("simpleUpgrader.writeUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
 		}
 	}

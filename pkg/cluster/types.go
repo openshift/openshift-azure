@@ -13,6 +13,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
@@ -21,30 +22,29 @@ import (
 const (
 	ConfigContainerName     = "config"
 	ConfigBlobName          = "config"
-	updateContainerName     = "update"
-	updateBlobName          = "update"
 	EtcdBackupContainerName = "etcd"
 )
 
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
 	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError
-	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError
+	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError
+	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError
 	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	Evacuate(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 }
 
 type simpleUpgrader struct {
-	pluginConfig    api.PluginConfig
-	accountsClient  azureclient.AccountsClient
-	storageClient   storage.Client
-	updateContainer storage.Container
-	vmc             azureclient.VirtualMachineScaleSetVMsClient
-	ssc             azureclient.VirtualMachineScaleSetsClient
-	kubeclient      kubeclient.Kubeclient
-	log             *logrus.Entry
+	pluginConfig      api.PluginConfig
+	accountsClient    azureclient.AccountsClient
+	storageClient     storage.Client
+	updateBlobService updateblob.BlobService
+	vmc               azureclient.VirtualMachineScaleSetVMsClient
+	ssc               azureclient.VirtualMachineScaleSetsClient
+	kubeclient        kubeclient.Kubeclient
+	log               *logrus.Entry
+	hasher            Hasher
 }
 
 var _ Upgrader = &simpleUpgrader{}
@@ -54,6 +54,7 @@ func NewSimpleUpgrader(log *logrus.Entry, pluginConfig *api.PluginConfig) Upgrad
 	return &simpleUpgrader{
 		pluginConfig: *pluginConfig,
 		log:          log,
+		hasher:       &hasher{pluginConfig: *pluginConfig},
 	}
 }
 

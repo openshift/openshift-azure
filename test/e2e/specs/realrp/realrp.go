@@ -93,12 +93,12 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 		Expect(err).NotTo(HaveOccurred())
 		By(fmt.Sprintf("OSA resource group is %s", resourcegroup))
 
-		scaleSets, err := cli.ListScaleSets(ctx, resourcegroup)
+		scaleSets, err := cli.VirtualMachineScaleSets.List(ctx, resourcegroup)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(scaleSets).Should(HaveLen(3))
 
 		for _, scaleSet := range scaleSets {
-			vms, err := cli.ListScaleSetVMs(ctx, resourcegroup, *scaleSet.Name)
+			vms, err := cli.VirtualMachineScaleSetVMs.List(ctx, resourcegroup, *scaleSet.Name, "", "", "")
 			Expect(err).NotTo(HaveOccurred())
 
 			By("trying to update the scale set capacity")

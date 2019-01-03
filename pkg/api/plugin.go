@@ -19,35 +19,39 @@ const (
 type PluginStep string
 
 const (
-	PluginStepDeploy                            PluginStep = "Deploy"
-	PluginStepInitialize                        PluginStep = "Initialize"
-	PluginStepHashScaleSets                     PluginStep = "HashScaleSets"
-	PluginStepInitializeUpdateBlob              PluginStep = "InitializeUpdateBlob"
-	PluginStepClientCreation                    PluginStep = "ClientCreation"
-	PluginStepScaleSetDelete                    PluginStep = "ScaleSetDelete"
-	PluginStepDrain                             PluginStep = "Drain"
-	PluginStepGenerateARM                       PluginStep = "GenerateARM"
-	PluginStepWaitForWaitForOpenShiftAPI        PluginStep = "WaitForOpenShiftAPI"
-	PluginStepWaitForNodes                      PluginStep = "WaitForNodes"
-	PluginStepWaitForConsoleHealth              PluginStep = "WaitForConsoleHealth"
-	PluginStepWaitForInfraDaemonSets            PluginStep = "WaitForInfraDaemonSets"
-	PluginStepWaitForInfraStatefulSets          PluginStep = "WaitForInfraStatefulSets"
-	PluginStepWaitForInfraDeployments           PluginStep = "WaitForInfraDeployments"
-	PluginStepUpdateMasterAgentPoolListVMs      PluginStep = "UpdateMasterAgentPoolListVMs"
-	PluginStepUpdateMasterAgentPoolReadBlob     PluginStep = "UpdateMasterAgentPoolReadBlob"
-	PluginStepUpdateMasterAgentPoolDrain        PluginStep = "UpdateMasterAgentPoolDrain"
-	PluginStepUpdateMasterAgentPoolDeallocate   PluginStep = "UpdateMasterAgentPoolDeallocate"
-	PluginStepUpdateMasterAgentPoolUpdateVMs    PluginStep = "UpdateMasterAgentPoolUpdateVMs"
-	PluginStepUpdateMasterAgentPoolReimage      PluginStep = "UpdateMasterAgentPoolReimage"
-	PluginStepUpdateMasterAgentPoolStart        PluginStep = "UpdateMasterAgentPoolStart"
-	PluginStepUpdateMasterAgentPoolWaitForReady PluginStep = "UpdateMasterAgentPoolWaitForReady"
-	PluginStepUpdateMasterAgentPoolUpdateBlob   PluginStep = "UpdateMasterAgentPoolUpdateBlob"
-	PluginStepUpdatePlusOneListVMs              PluginStep = "UpdatePlusOneListVMs"
-	PluginStepUpdatePlusOneReadBlob             PluginStep = "UpdatePlusOneReadBlob"
-	PluginStepUpdatePlusOneWaitForReady         PluginStep = "UpdatePlusOneWaitForReady"
-	PluginStepUpdatePlusOneUpdateBlob           PluginStep = "UpdatePlusOneUpdateBlob"
-	PluginStepUpdatePlusOneDeleteVMs            PluginStep = "UpdatePlusOneDeleteVMs"
-	PluginStepDeleteBlob                        PluginStep = "DeleteBlob"
+	PluginStepDeploy                              PluginStep = "Deploy"
+	PluginStepInitialize                          PluginStep = "Initialize"
+	PluginStepInitializeUpdateBlob                PluginStep = "InitializeUpdateBlob"
+	PluginStepClientCreation                      PluginStep = "ClientCreation"
+	PluginStepScaleSetDelete                      PluginStep = "ScaleSetDelete"
+	PluginStepGenerateARM                         PluginStep = "GenerateARM"
+	PluginStepWaitForWaitForOpenShiftAPI          PluginStep = "WaitForOpenShiftAPI"
+	PluginStepWaitForNodes                        PluginStep = "WaitForNodes"
+	PluginStepWaitForConsoleHealth                PluginStep = "WaitForConsoleHealth"
+	PluginStepWaitForInfraDaemonSets              PluginStep = "WaitForInfraDaemonSets"
+	PluginStepWaitForInfraStatefulSets            PluginStep = "WaitForInfraStatefulSets"
+	PluginStepWaitForInfraDeployments             PluginStep = "WaitForInfraDeployments"
+	PluginStepUpdateMasterAgentPoolHashScaleSet   PluginStep = "UpdateMasterAgentPoolHashScaleSet"
+	PluginStepUpdateMasterAgentPoolListVMs        PluginStep = "UpdateMasterAgentPoolListVMs"
+	PluginStepUpdateMasterAgentPoolReadBlob       PluginStep = "UpdateMasterAgentPoolReadBlob"
+	PluginStepUpdateMasterAgentPoolDrain          PluginStep = "UpdateMasterAgentPoolDrain"
+	PluginStepUpdateMasterAgentPoolDeallocate     PluginStep = "UpdateMasterAgentPoolDeallocate"
+	PluginStepUpdateMasterAgentPoolUpdateVMs      PluginStep = "UpdateMasterAgentPoolUpdateVMs"
+	PluginStepUpdateMasterAgentPoolReimage        PluginStep = "UpdateMasterAgentPoolReimage"
+	PluginStepUpdateMasterAgentPoolStart          PluginStep = "UpdateMasterAgentPoolStart"
+	PluginStepUpdateMasterAgentPoolWaitForReady   PluginStep = "UpdateMasterAgentPoolWaitForReady"
+	PluginStepUpdateMasterAgentPoolUpdateBlob     PluginStep = "UpdateMasterAgentPoolUpdateBlob"
+	PluginStepUpdateWorkerAgentPoolHashScaleSet   PluginStep = "UpdateWorkerAgentPoolHashScaleSet"
+	PluginStepUpdateWorkerAgentPoolListVMs        PluginStep = "UpdateWorkerAgentPoolListVMs"
+	PluginStepUpdateWorkerAgentPoolListScaleSets  PluginStep = "UpdateWorkerAgentPoolListScaleSets"
+	PluginStepUpdateWorkerAgentPoolReadBlob       PluginStep = "UpdateWorkerAgentPoolReadBlob"
+	PluginStepUpdateWorkerAgentPoolDrain          PluginStep = "UpdateWorkerAgentPoolDrain"
+	PluginStepUpdateWorkerAgentPoolCreateScaleSet PluginStep = "UpdateWorkerAgentPoolCreateScaleSet"
+	PluginStepUpdateWorkerAgentPoolUpdateScaleSet PluginStep = "UpdateWorkerAgentPoolUpdateScaleSet"
+	PluginStepUpdateWorkerAgentPoolDeleteScaleSet PluginStep = "UpdateWorkerAgentPoolDeleteScaleSet"
+	PluginStepUpdateWorkerAgentPoolWaitForReady   PluginStep = "UpdateWorkerAgentPoolWaitForReady"
+	PluginStepUpdateWorkerAgentPoolUpdateBlob     PluginStep = "UpdateWorkerAgentPoolUpdateBlob"
+	PluginStepUpdateWorkerAgentPoolDeleteVM       PluginStep = "UpdateWorkerAgentPoolDeleteVM"
 )
 
 // PluginError error returned by CreateOrUpdate to specify the step that failed.
@@ -130,11 +134,9 @@ type Plugin interface {
 	// for an Openshift cluster.
 	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster) error
 
-	GenerateARM(ctx context.Context, cs *OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error)
-
 	// CreateOrUpdate either deploys or runs the update depending on the isUpdate argument
 	// this will call the deployer.
-	CreateOrUpdate(ctx context.Context, cs *OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployer DeployFn) *PluginError
+	CreateOrUpdate(ctx context.Context, cs *OpenShiftManagedCluster, isUpdate bool, deployer DeployFn) *PluginError
 
 	// RecoverEtcdCluster recovers the cluster's etcd using the backup specified in the pluginConfig
 	RecoverEtcdCluster(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn, backupBlob string) *PluginError

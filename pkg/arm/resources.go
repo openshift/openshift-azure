@@ -278,6 +278,7 @@ func storageConfig(cs *api.OpenShiftManagedCluster) *storage.Account {
 		Type:     to.StringPtr("Microsoft.Storage/storageAccounts"),
 		Location: to.StringPtr(cs.Location),
 		Tags: map[string]*string{
+			// TODO: these should be consts
 			"type": to.StringPtr("config"),
 		},
 	}
@@ -334,7 +335,7 @@ func nsgWorker(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
 	}
 }
 
-func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob string) (*compute.VirtualMachineScaleSet, error) {
+func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
 	sshPublicKey, err := tls.SSHPublicKeyAsString(&cs.Config.SSHKey.PublicKey)
 	if err != nil {
 		return nil, err
@@ -377,7 +378,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		Sku: &compute.Sku{
 			Name:     to.StringPtr(string(app.VMSize)),
 			Tier:     to.StringPtr("Standard"),
-			Capacity: to.Int64Ptr(int64(app.Count)),
+			Capacity: to.Int64Ptr(app.Count),
 		},
 		Plan: &compute.Plan{
 			Name:      to.StringPtr(cs.Config.ImageSKU),
@@ -390,7 +391,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 			},
 			VirtualMachineProfile: &compute.VirtualMachineScaleSetVMProfile{
 				OsProfile: &compute.VirtualMachineScaleSetOSProfile{
-					ComputerNamePrefix: to.StringPtr(app.Name + "-"),
+					ComputerNamePrefix: to.StringPtr(config.GetComputerNamePrefix(app, suffix)),
 					AdminUsername:      to.StringPtr(vmssAdminUsername),
 					LinuxConfiguration: &compute.LinuxConfiguration{
 						DisablePasswordAuthentication: to.BoolPtr(true),
@@ -466,7 +467,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 			},
 			Overprovision: to.BoolPtr(false),
 		},
-		Name:     to.StringPtr(config.GetScalesetName(app.Name)),
+		Name:     to.StringPtr(config.GetScalesetName(app, suffix)),
 		Type:     to.StringPtr("Microsoft.Compute/virtualMachineScaleSets"),
 		Location: to.StringPtr(cs.Location),
 	}

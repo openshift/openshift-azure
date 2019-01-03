@@ -2,7 +2,6 @@ package fakerp
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -117,15 +116,9 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
-	// generate the ARM template
-	azuretemplate, err := p.GenerateARM(ctx, cs, oldCs != nil)
-	if err != nil {
-		return nil, err
-	}
-
 	// write out development files
 	log.Info("write helpers")
-	err = writeHelpers(cs, azuretemplate)
+	err = writeHelpers(cs)
 	if err != nil {
 		return nil, err
 	}
@@ -134,8 +127,9 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	if err != nil {
 		return nil, err
 	}
+
 	deployer := GetDeployer(log, cs, config)
-	if err := p.CreateOrUpdate(ctx, cs, azuretemplate, oldCs != nil, deployer); err != nil {
+	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
 		return nil, err
 	}
 
@@ -208,7 +202,7 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}) error {
+func writeHelpers(c *api.OpenShiftManagedCluster) error {
 	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
 		return err
@@ -219,16 +213,6 @@ func writeHelpers(c *api.OpenShiftManagedCluster, azuretemplate map[string]inter
 	}
 
 	err = ioutil.WriteFile(filepath.Join(dataDir, "_out/azure.conf"), b, 0600)
-	if err != nil {
-		return err
-	}
-
-	azuredeploy, err := json.Marshal(azuretemplate)
-	if err != nil {
-		return err
-	}
-
-	err = ioutil.WriteFile(filepath.Join(dataDir, "_out/azuredeploy.json"), azuredeploy, 0600)
 	if err != nil {
 		return err
 	}

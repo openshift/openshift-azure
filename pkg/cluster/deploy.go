@@ -2,22 +2,19 @@ package cluster
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/base64"
-	"encoding/json"
-
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/arm"
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
+// TODO: Evacuate is solely used by the etcd restore code.  It should probably
+// not be exactly here.
 func (u *simpleUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	// We may need/want to delete all the scalesets in the future
-	future, err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(string(api.AgentPoolProfileRoleMaster)))
+	future, err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.MasterScalesetName)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
 	}
@@ -25,6 +22,7 @@ func (u *simpleUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedC
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
 	}
+	// TODO: this code should be rolled into initialize()
 	if u.storageClient == nil {
 		keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
 		if err != nil {
@@ -35,14 +33,19 @@ func (u *simpleUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedC
 			return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 		}
 	}
-	err = u.deleteUpdateBlob()
+	bsc := u.storageClient.GetBlobService()
+	u.updateBlobService, err = updateblob.NewBlobService(bsc)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepDeleteBlob}
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+	err = u.updateBlobService.Write(updateblob.NewUpdateBlob())
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
 	}
 	return nil
 }
 
-func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
+func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError {
 	err := deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
@@ -51,11 +54,7 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
-	ssHashes, err := u.hashScaleSets(cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepHashScaleSets}
-	}
-	err = u.initializeUpdateBlob(cs, ssHashes)
+	err = u.initializeUpdateBlob(cs, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
 	}
@@ -63,63 +62,28 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 	}
-	err = u.waitForNodes(ctx, cs)
+	err = u.waitForNodes(ctx, cs, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 	}
 	return nil
 }
 
-type scalesetName string
-type instanceName string
-type hash string
-
-func hashVMSS(vmss *compute.VirtualMachineScaleSet) (hash, error) {
-	// cleanup capacity so that no unnecessary VM rotations are going to occur
-	// because of a scale up/down.
-	if vmss.Sku != nil {
-		vmss.Sku.Capacity = nil
-	}
-
-	data, err := json.Marshal(vmss)
-	if err != nil {
-		return "", err
-	}
-
-	hf := sha256.New()
-	hf.Write(data)
-
-	return hash(base64.StdEncoding.EncodeToString(hf.Sum(nil))), nil
-}
-
-// hashScaleSets returns the set of desired state scale set hashes
-func (u *simpleUpgrader) hashScaleSets(cs *api.OpenShiftManagedCluster) (map[scalesetName]hash, error) {
-	ssHashes := map[scalesetName]hash{}
-
+func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error {
+	blob := updateblob.NewUpdateBlob()
 	for _, app := range cs.Properties.AgentPoolProfiles {
-		vmss, err := arm.Vmss(&u.pluginConfig, cs, &app, "") // TODO: backupBlob is rather a layering violation here
+		h, err := u.hasher.HashScaleSet(cs, &app)
 		if err != nil {
-			return nil, err
+			return err
 		}
-
-		h, err := hashVMSS(vmss)
-		if err != nil {
-			return nil, err
-		}
-
-		ssHashes[scalesetName(*vmss.Name)] = h
-	}
-
-	return ssHashes, nil
-}
-
-func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, ssHashes map[scalesetName]hash) error {
-	blob := updateblob{}
-	for _, app := range cs.Properties.AgentPoolProfiles {
-		for i := 0; i < app.Count; i++ {
-			name := instanceName(config.GetInstanceName(app.Name, i))
-			blob[name] = ssHashes[scalesetName(config.GetScalesetName(app.Name))]
+		if app.Role == api.AgentPoolProfileRoleMaster {
+			for i := int64(0); i < app.Count; i++ {
+				name := config.GetMasterInstanceName(i)
+				blob.InstanceHashes[name] = h
+			}
+		} else {
+			blob.ScalesetHashes[config.GetScalesetName(&app, suffix)] = h
 		}
 	}
-	return u.writeUpdateBlob(blob)
+	return u.updateBlobService.Write(blob)
 }

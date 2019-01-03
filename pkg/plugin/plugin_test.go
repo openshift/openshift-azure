@@ -1,7 +1,6 @@
 package plugin
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -15,28 +14,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/test/util/tls"
 )
-
-func TestGenerateARM(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-
-	testData := map[string]interface{}{"test": "data"}
-	mockGen := mock_arm.NewMockGenerator(mockCtrl)
-	mockGen.EXPECT().Generate(nil, nil, "", true).Return(testData, nil)
-	p := &plugin{
-		armGenerator: mockGen,
-		log:          logrus.NewEntry(logrus.StandardLogger()),
-	}
-
-	got, err := p.GenerateARM(nil, nil, true)
-	if err != nil {
-		t.Errorf("plugin.GenerateARM() error = %v", err)
-		return
-	}
-	if !reflect.DeepEqual(got, testData) {
-		t.Errorf("plugin.GenerateARM() = %v, want %v", got, testData)
-	}
-}
 
 func TestCreateOrUpdate(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -82,12 +59,6 @@ func TestCreateOrUpdate(t *testing.T) {
 			isUpdate: false,
 			wantErr:  true,
 			errStep:  api.PluginStepWaitForNodes,
-		},
-		{
-			name:     "update: drain error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepDrain,
 		},
 		{
 			name:     "update: deploy error",
@@ -165,31 +136,25 @@ func TestCreateOrUpdate(t *testing.T) {
 			name:     "update plus one: list VMs error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdatePlusOneListVMs,
+			errStep:  api.PluginStepUpdateWorkerAgentPoolListVMs,
 		},
 		{
 			name:     "update plus one: read blob error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdatePlusOneReadBlob,
+			errStep:  api.PluginStepUpdateWorkerAgentPoolReadBlob,
 		},
 		{
 			name:     "update plus one: wait for ready error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdatePlusOneWaitForReady,
+			errStep:  api.PluginStepUpdateWorkerAgentPoolWaitForReady,
 		},
 		{
 			name:     "update plus one: update blob error",
 			isUpdate: true,
 			wantErr:  true,
-			errStep:  api.PluginStepUpdatePlusOneUpdateBlob,
-		},
-		{
-			name:     "update plus one: delete VMs error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdatePlusOneDeleteVMs,
+			errStep:  api.PluginStepUpdateWorkerAgentPoolUpdateBlob,
 		},
 		{
 			name:     "waitforinfra: daemon error",
@@ -211,45 +176,46 @@ func TestCreateOrUpdate(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		mockGen := mock_arm.NewMockGenerator(mockCtrl)
+		mockGen.EXPECT().Generate(nil, nil, "", tt.isUpdate, gomock.Any()).Return(nil, nil)
 		if tt.wantErr {
 			err := &api.PluginError{Err: fmt.Errorf("test error"), Step: tt.errStep}
 			switch tt.errStep {
-			case api.PluginStepDrain, api.PluginStepDeploy, api.PluginStepInitialize,
+			case api.PluginStepDeploy, api.PluginStepInitialize,
 				api.PluginStepWaitForConsoleHealth, api.PluginStepWaitForNodes,
 				api.PluginStepUpdateMasterAgentPoolListVMs,
 				api.PluginStepUpdateMasterAgentPoolReadBlob, api.PluginStepUpdateMasterAgentPoolDrain,
 				api.PluginStepUpdateMasterAgentPoolDeallocate, api.PluginStepUpdateMasterAgentPoolUpdateVMs,
 				api.PluginStepUpdateMasterAgentPoolReimage, api.PluginStepUpdateMasterAgentPoolStart,
 				api.PluginStepUpdateMasterAgentPoolWaitForReady, api.PluginStepUpdateMasterAgentPoolUpdateBlob,
-				api.PluginStepUpdatePlusOneListVMs, api.PluginStepUpdatePlusOneReadBlob,
-				api.PluginStepUpdatePlusOneWaitForReady, api.PluginStepUpdatePlusOneUpdateBlob,
-				api.PluginStepUpdatePlusOneDeleteVMs:
+				api.PluginStepUpdateWorkerAgentPoolListVMs, api.PluginStepUpdateWorkerAgentPoolReadBlob,
+				api.PluginStepUpdateWorkerAgentPoolWaitForReady, api.PluginStepUpdateWorkerAgentPoolUpdateBlob:
 				if tt.isUpdate {
-					mockUp.EXPECT().Update(nil, nil, nil, nil).Return(err)
+					mockUp.EXPECT().Update(nil, nil, nil, nil, gomock.Any()).Return(err)
 				} else {
-					mockUp.EXPECT().Deploy(nil, nil, nil, nil).Return(err)
+					mockUp.EXPECT().Deploy(nil, nil, nil, nil, gomock.Any()).Return(err)
 				}
 			case api.PluginStepWaitForWaitForOpenShiftAPI:
 				if tt.isUpdate {
-					mockUp.EXPECT().Update(nil, nil, nil, nil).Return(nil)
+					mockUp.EXPECT().Update(nil, nil, nil, nil, gomock.Any()).Return(nil)
 				} else {
-					mockUp.EXPECT().Deploy(nil, nil, nil, nil).Return(nil)
+					mockUp.EXPECT().Deploy(nil, nil, nil, nil, gomock.Any()).Return(nil)
 				}
 				mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
 				mockUp.EXPECT().HealthCheck(nil, nil).Return(err)
 			case api.PluginStepWaitForInfraDaemonSets, api.PluginStepWaitForInfraDeployments:
 				if tt.isUpdate {
-					mockUp.EXPECT().Update(nil, nil, nil, nil).Return(nil)
+					mockUp.EXPECT().Update(nil, nil, nil, nil, gomock.Any()).Return(nil)
 				} else {
-					mockUp.EXPECT().Deploy(nil, nil, nil, nil).Return(nil)
+					mockUp.EXPECT().Deploy(nil, nil, nil, nil, gomock.Any()).Return(nil)
 				}
 				mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(err)
 			}
 		} else {
 			if tt.isUpdate {
-				mockUp.EXPECT().Update(nil, nil, nil, nil).Return(nil)
+				mockUp.EXPECT().Update(nil, nil, nil, nil, gomock.Any()).Return(nil)
 			} else {
-				mockUp.EXPECT().Deploy(nil, nil, nil, nil).Return(nil)
+				mockUp.EXPECT().Deploy(nil, nil, nil, nil, gomock.Any()).Return(nil)
 			}
 			mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
 			mockUp.EXPECT().HealthCheck(nil, nil).Return(nil)
@@ -257,9 +223,10 @@ func TestCreateOrUpdate(t *testing.T) {
 		mockUp.EXPECT().CreateClients(nil, nil).Return(nil)
 		p := &plugin{
 			clusterUpgrader: mockUp,
+			armGenerator:    mockGen,
 			log:             logrus.NewEntry(logrus.StandardLogger()),
 		}
-		if err := p.CreateOrUpdate(nil, nil, nil, tt.isUpdate, nil); (err != nil) != tt.wantErr {
+		if err := p.CreateOrUpdate(nil, nil, tt.isUpdate, nil); (err != nil) != tt.wantErr {
 			t.Errorf("plugin.CreateOrUpdate(%s) error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
 	}
@@ -440,19 +407,15 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	testDataWithBackup := map[string]interface{}{"test": "backup"}
 	mockGen := mock_arm.NewMockGenerator(mockCtrl)
 	mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
-	firstGenerate := true
-	mockGen.EXPECT().Generate(nil, nil, gomock.Any(), true).Times(2).DoAndReturn(func(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool) (map[string]interface{}, error) {
-		if firstGenerate {
-			firstGenerate = false
-			return testDataWithBackup, nil
-		}
-		return testData, nil
-	})
-	mockUp.EXPECT().CreateClients(nil, nil).Return(nil)
+	gomock.InOrder(
+		mockGen.EXPECT().Generate(nil, nil, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil),
+		mockGen.EXPECT().Generate(nil, nil, gomock.Any(), true, gomock.Any()).Return(testData, nil),
+	)
+	mockUp.EXPECT().CreateClients(nil, nil).Times(3).Return(nil)
 	mockUp.EXPECT().Evacuate(nil, nil).Return(nil)
-	mockUp.EXPECT().Deploy(nil, nil, testDataWithBackup, nil).Return(nil)
-	mockUp.EXPECT().Update(nil, nil, testData, nil).Return(nil)
-	mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
+	mockUp.EXPECT().Update(nil, nil, testDataWithBackup, nil, gomock.Any()).Return(nil)
+	mockUp.EXPECT().Update(nil, nil, testData, nil, gomock.Any()).Return(nil)
+	mockUp.EXPECT().WaitForInfraServices(nil, nil).Times(2).Return(nil)
 	mockUp.EXPECT().HealthCheck(nil, nil).Times(2).Return(nil)
 	p := &plugin{
 		clusterUpgrader: mockUp,

@@ -51,31 +51,31 @@ func (mr *MockUpgraderMockRecorder) CreateClients(ctx, cs interface{}) *gomock.C
 }
 
 // Deploy mocks base method
-func (m *MockUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
+func (m *MockUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Deploy", ctx, cs, azuretemplate, deployFn)
+	ret := m.ctrl.Call(m, "Deploy", ctx, cs, azuretemplate, deployFn, suffix)
 	ret0, _ := ret[0].(*api.PluginError)
 	return ret0
 }
 
 // Deploy indicates an expected call of Deploy
-func (mr *MockUpgraderMockRecorder) Deploy(ctx, cs, azuretemplate, deployFn interface{}) *gomock.Call {
+func (mr *MockUpgraderMockRecorder) Deploy(ctx, cs, azuretemplate, deployFn, suffix interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Deploy", reflect.TypeOf((*MockUpgrader)(nil).Deploy), ctx, cs, azuretemplate, deployFn)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Deploy", reflect.TypeOf((*MockUpgrader)(nil).Deploy), ctx, cs, azuretemplate, deployFn, suffix)
 }
 
 // Update mocks base method
-func (m *MockUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
+func (m *MockUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, cs, azuretemplate, deployFn)
+	ret := m.ctrl.Call(m, "Update", ctx, cs, azuretemplate, deployFn, suffix)
 	ret0, _ := ret[0].(*api.PluginError)
 	return ret0
 }
 
 // Update indicates an expected call of Update
-func (mr *MockUpgraderMockRecorder) Update(ctx, cs, azuretemplate, deployFn interface{}) *gomock.Call {
+func (mr *MockUpgraderMockRecorder) Update(ctx, cs, azuretemplate, deployFn, suffix interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUpgrader)(nil).Update), ctx, cs, azuretemplate, deployFn)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUpgrader)(nil).Update), ctx, cs, azuretemplate, deployFn, suffix)
 }
 
 // HealthCheck mocks base method

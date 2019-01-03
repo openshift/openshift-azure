@@ -3,6 +3,8 @@ package plugin
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -72,11 +74,6 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	return nil
 }
 
-func (p *plugin) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) (map[string]interface{}, error) {
-	p.log.Info("generating arm templates")
-	return p.armGenerator.Generate(ctx, cs, "", isUpdate)
-}
-
 func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, backupBlob string) *api.PluginError {
 	err := p.clusterUpgrader.CreateClients(ctx, cs)
 	if err != nil {
@@ -86,52 +83,42 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err := p.clusterUpgrader.Evacuate(ctx, cs); err != nil {
 		return err
 	}
-	p.log.Debugf("generating ARM with recovery from %s", backupBlob)
-	azuretemplate, err := p.armGenerator.Generate(ctx, cs, backupBlob, true)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
-	}
-	p.log.Info("starting deploy")
-	if err := p.clusterUpgrader.Deploy(ctx, cs, azuretemplate, deployFn); err != nil {
+	p.log.Info("starting update with recovery")
+	if err := p.createOrUpdate(ctx, cs, backupBlob, true, deployFn); err != nil {
 		return err
 	}
-	p.log.Info("starting health check")
-	if err := p.clusterUpgrader.HealthCheck(ctx, cs); err != nil {
-		return err
-	}
-	p.log.Debugf("generating ARM without recovery")
-	azuretemplate, err = p.armGenerator.Generate(ctx, cs, "", true)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
-	}
-	if err := p.clusterUpgrader.Update(ctx, cs, azuretemplate, deployFn); err != nil {
-		return err
-	}
-	// Wait for infrastructure services to be healthy
-	p.log.Info("waiting for infra services to be ready")
-	if err := p.clusterUpgrader.WaitForInfraServices(ctx, cs); err != nil {
-		return err
-	}
-	p.log.Info("starting health check")
-	if err := p.clusterUpgrader.HealthCheck(ctx, cs); err != nil {
+	p.log.Info("starting update")
+	if err := p.createOrUpdate(ctx, cs, "", true, deployFn); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
-	err := p.clusterUpgrader.CreateClients(ctx, cs)
+func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
+	return p.createOrUpdate(ctx, cs, "", isUpdate, deployFn)
+}
+
+func (p *plugin) createOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
+	suffix := fmt.Sprintf("%d", time.Now().Unix())
+
+	p.log.Info("generating arm templates")
+	azuretemplate, err := p.armGenerator.Generate(ctx, cs, backupBlob, isUpdate, suffix)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
+	}
+
+	err = p.clusterUpgrader.CreateClients(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 	if isUpdate {
 		p.log.Info("starting update")
-		if err := p.clusterUpgrader.Update(ctx, cs, azuretemplate, deployFn); err != nil {
+		if err := p.clusterUpgrader.Update(ctx, cs, azuretemplate, deployFn, suffix); err != nil {
 			return err
 		}
 	} else {
 		p.log.Info("starting deploy")
-		if err := p.clusterUpgrader.Deploy(ctx, cs, azuretemplate, deployFn); err != nil {
+		if err := p.clusterUpgrader.Deploy(ctx, cs, azuretemplate, deployFn, suffix); err != nil {
 			return err
 		}
 	}
