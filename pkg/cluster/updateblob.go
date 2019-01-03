@@ -6,18 +6,18 @@ import (
 	"sort"
 )
 
-type instanceHashMap map[instanceName][]byte
+type instanceHashMap map[string][]byte
 
 var _ json.Marshaler = &instanceHashMap{}
 var _ json.Unmarshaler = &instanceHashMap{}
 
 type instanceHash struct {
-	InstanceName instanceName `json:"instanceName,omitempty"`
-	Hash         []byte       `json:"hash,omitempty"`
+	InstanceName string `json:"instanceName,omitempty"`
+	Hash         []byte `json:"hash,omitempty"`
 }
 
 func (ihm instanceHashMap) MarshalJSON() ([]byte, error) {
-	instancenames := make([]instanceName, 0, len(ihm))
+	instancenames := make([]string, 0, len(ihm))
 	for instancename := range ihm {
 		instancenames = append(instancenames, instancename)
 	}
@@ -48,18 +48,18 @@ func (ihm *instanceHashMap) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type scalesetHashMap map[scalesetName][]byte
+type scalesetHashMap map[string][]byte
 
 var _ json.Marshaler = &scalesetHashMap{}
 var _ json.Unmarshaler = &scalesetHashMap{}
 
 type scalesetHash struct {
-	ScalesetName scalesetName `json:"scalesetName,omitempty"`
-	Hash         []byte       `json:"hash,omitempty"`
+	ScalesetName string `json:"scalesetName,omitempty"`
+	Hash         []byte `json:"hash,omitempty"`
 }
 
 func (shm scalesetHashMap) MarshalJSON() ([]byte, error) {
-	scalesetnames := make([]scalesetName, 0, len(shm))
+	scalesetnames := make([]string, 0, len(shm))
 	for scalesetname := range shm {
 		scalesetnames = append(scalesetnames, scalesetname)
 	}

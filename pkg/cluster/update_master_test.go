@@ -108,14 +108,14 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 		name     string
 		app      *api.AgentPoolProfile
 		cs       *api.OpenShiftManagedCluster
-		ssHashes map[scalesetName][]byte
+		ssHashes map[string][]byte
 		vmsList  []compute.VirtualMachineScaleSetVM
 		want     *api.PluginError
 	}{
 		{
 			name:     "basic coverage",
 			app:      &api.AgentPoolProfile{Role: api.AgentPoolProfileRoleMaster, Name: "master", Count: 1},
-			ssHashes: map[scalesetName][]byte{"ss-master": []byte("hashish")},
+			ssHashes: map[string][]byte{"ss-master": []byte("hashish")},
 			vmsList: []compute.VirtualMachineScaleSetVM{
 				{
 					Name:       to.StringPtr("ss-master_0"),
@@ -154,7 +154,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(tt.app, ""), "", "", "").Return(tt.vmsList, nil)
 			uBlob := newUpdateBlob()
 			hasher := mock_cluster.NewMockHasher(gmc)
-			hasher.EXPECT().HashScaleSet(gomock.Any(), gomock.Any()).Return(tt.ssHashes[scalesetName("ss-master")], nil)
+			hasher.EXPECT().HashScaleSet(gomock.Any(), gomock.Any()).Return(tt.ssHashes["ss-master"], nil)
 			for _, vm := range tt.vmsList {
 				compName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 
@@ -193,7 +193,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				}
 				// 6. waitforready
 				client.EXPECT().WaitForReadyMaster(ctx, compName).Return(nil)
-				uBlob.InstanceHashes[instanceName(*vm.Name)] = tt.ssHashes[scalesetName("ss-master")]
+				uBlob.InstanceHashes[*vm.Name] = tt.ssHashes["ss-master"]
 
 				// write the updatehash
 				hashData, _ := json.Marshal(uBlob)

@@ -62,9 +62,6 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	return nil
 }
 
-type scalesetName string
-type instanceName string
-
 func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error {
 	blob := newUpdateBlob()
 	for _, app := range cs.Properties.AgentPoolProfiles {
@@ -74,11 +71,11 @@ func (u *simpleUpgrader) initializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 		}
 		if app.Role == api.AgentPoolProfileRoleMaster {
 			for i := int64(0); i < app.Count; i++ {
-				name := instanceName(config.GetMasterInstanceName(i))
+				name := config.GetMasterInstanceName(i)
 				blob.InstanceHashes[name] = h
 			}
 		} else {
-			blob.ScalesetHashes[scalesetName(config.GetScalesetName(&app, suffix))] = h
+			blob.ScalesetHashes[config.GetScalesetName(&app, suffix)] = h
 		}
 	}
 	return u.writeUpdateBlob(blob)

@@ -39,7 +39,7 @@ func (u *simpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string
 		// consider any such changes irrelevant to our hashing scheme.  For any
 		// worker scale set, the scale set hash persisted in the blob is
 		// expected to be immutable.
-		if target == nil && bytes.Equal(blob.ScalesetHashes[scalesetName(*ss.Name)], desiredHash) {
+		if target == nil && bytes.Equal(blob.ScalesetHashes[*ss.Name], desiredHash) {
 			u.log.Infof("found target scaleset %s", *ss.Name)
 			target = &scalesets[i]
 
@@ -143,7 +143,7 @@ func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenS
 	// Persist the scaleset's hash: this is expected to be immutable for the
 	// lifetime of the scaleset.  We do this *after* the scaleset is
 	// successfully created to avoid leaking blob entries.
-	blob.ScalesetHashes[scalesetName(*target.Name)] = hash
+	blob.ScalesetHashes[*target.Name] = hash
 	if err = u.writeUpdateBlob(blob); err != nil {
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateBlob}
 	}
@@ -155,7 +155,7 @@ func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenS
 func (u *simpleUpgrader) deleteWorkerScaleSet(ctx context.Context, blob *updateblob, ss *compute.VirtualMachineScaleSet, resourceGroup string) *api.PluginError {
 	// Delete the persisted scaleset hash.  We do this *before* the scaleset is
 	// deleted to avoid leaking blob entries.
-	delete(blob.ScalesetHashes, scalesetName(*ss.Name))
+	delete(blob.ScalesetHashes, *ss.Name)
 	if err := u.writeUpdateBlob(blob); err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateBlob}
 	}
