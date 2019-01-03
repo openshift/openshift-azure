@@ -2,9 +2,7 @@ package fakerp
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"reflect"
@@ -18,6 +16,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
@@ -140,47 +139,29 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 		azurecli, err := azure.NewClientFromEnvironment(true)
 		Expect(err).ToNot(HaveOccurred())
 
-		type updateBlob struct {
-			InstanceName string
-			ScaleSetHash string
-		}
+		ubs, err := updateblob.NewBlobService(azurecli.BlobStorage)
+		Expect(err).ToNot(HaveOccurred())
 
 		By("reading the update blob before running an update")
-		bref := azurecli.BlobStorage.GetContainerReference("update")
-		brc, err := bref.GetBlobReference("update").Get(nil)
-		Expect(err).ToNot(HaveOccurred())
-		defer brc.Close()
-		data, err := ioutil.ReadAll(brc)
-		Expect(err).ToNot(HaveOccurred())
-		var before []updateBlob
-		err = json.Unmarshal(data, &before)
+		before, err := ubs.Read()
 		Expect(err).ToNot(HaveOccurred())
 
 		By("ensuring the update blob has the right amount of entries")
+		Expect(len(before.InstanceHashes)).To(BeEquivalentTo(3)) // one per master instance
+		Expect(len(before.ScalesetHashes)).To(BeEquivalentTo(2)) // one per worker scaleset
+
+		By("running an update")
 		external, err := fakerp.GenerateManifest(*manifest)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
-		expectedEntries := *external.Properties.MasterPoolProfile.Count
-		for _, app := range external.Properties.AgentPoolProfiles {
-			expectedEntries += *app.Count
-		}
-		Expect(len(before)).To(Equal(expectedEntries))
 
-		By("running an update")
 		updated, err := azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), *external)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updated.StatusCode).To(Equal(http.StatusOK))
 		Expect(updated).NotTo(BeNil())
 
 		By("reading the update blob after running an update")
-		bref = azurecli.BlobStorage.GetContainerReference("update")
-		arc, err := bref.GetBlobReference("update").Get(nil)
-		Expect(err).ToNot(HaveOccurred())
-		defer arc.Close()
-		data, err = ioutil.ReadAll(arc)
-		Expect(err).ToNot(HaveOccurred())
-		var after []updateBlob
-		err = json.Unmarshal(data, &after)
+		after, err := ubs.Read()
 		Expect(err).ToNot(HaveOccurred())
 
 		By("comparing the update blob before and after an update")
