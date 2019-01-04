@@ -8,6 +8,9 @@ package cluster
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"net/http"
 
 	"github.com/sirupsen/logrus"
 
@@ -45,6 +48,7 @@ type simpleUpgrader struct {
 	kubeclient        kubeclient.Kubeclient
 	log               *logrus.Entry
 	hasher            Hasher
+	rt                http.RoundTripper
 }
 
 var _ Upgrader = &simpleUpgrader{}
@@ -59,6 +63,15 @@ func NewSimpleUpgrader(log *logrus.Entry, pluginConfig *api.PluginConfig) Upgrad
 }
 
 func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	pool := x509.NewCertPool()
+	pool.AddCert(cs.Config.Certificates.Ca.Cert)
+
+	u.rt = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			RootCAs: pool,
+		},
+	}
+
 	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
 	if err != nil {
 		return err

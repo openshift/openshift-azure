@@ -6,7 +6,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError {
@@ -22,7 +22,7 @@ func (u *simpleUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
 	}
-	err = managedcluster.WaitForHealthz(ctx, u.log, cs)
+	_, err = wait.ForHTTPStatusOk(ctx, u.log, u.rt, "https://"+cs.Properties.FQDN+"/healthz")
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 	}
