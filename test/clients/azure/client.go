@@ -92,7 +92,7 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 	rpc := externalapi.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, subscriptionID)
 	rpc.Authorizer = authorizer
 
-	rpcAdmin := adminapi.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, subscriptionID)
+	rpcAdmin := adminapi.NewOpenShiftManagedClustersClientWithBaseURI(rpURL+shared.AdminContext, subscriptionID)
 	rpcAdmin.Authorizer = authorizer
 
 	return &Client{
