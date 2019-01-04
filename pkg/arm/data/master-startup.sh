@@ -658,7 +658,7 @@ rm -Rf /var/lib/etcd/*
 tempBackDir=/var/lib/etcd/backup
 mkdir $tempBackDir
 while ! docker pull {{ .Config.Images.EtcdBackup }}; do sleep 10; done
-docker run --dns 168.63.129.16 \
+docker run --rm --network host \
   -v /etc/origin/master:/etc/origin/master \
   -v /etc/origin/cloudprovider/:/_data/_out \
   -v $tempBackDir:/out:z \
@@ -670,7 +670,7 @@ logger -t master-startup.sh "backup downloaded to " $(ls $tempBackDir)
 # step 2 restore
 logger -t master-startup.sh "restoring snapshot"
 while ! docker pull {{ .Config.Images.MasterEtcd }}; do sleep 10; done
-docker run --network host  \
+docker run --rm --network host \
   -v /etc/etcd:/etc/etcd \
   -v /var/lib/etcd:/var/lib/etcd:z \
   -e ETCDCTL_API="3" \
