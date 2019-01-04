@@ -43,10 +43,9 @@ func TestInitialize(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var finalError error
-	configBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader(csj), nil).Return(finalError)
+	configBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader(csj), nil).Return(nil)
 
-	if err := u.initialize(context.Background(), cs); err != finalError {
+	if err := u.initialize(context.Background(), cs); err != nil {
 		t.Errorf("simpleUpgrader.initialize() error = %v", err)
 	}
 }

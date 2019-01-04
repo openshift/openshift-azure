@@ -32,12 +32,21 @@ func (u *simpleUpgrader) waitForNodesInAgentPoolProfile(ctx context.Context, cs 
 	return nil
 }
 
-func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, suffix string) error {
+func (u *simpleUpgrader) waitForMasters(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
-		err := u.waitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
+		err := u.waitForNodesInAgentPoolProfile(ctx, cs, &app, "")
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, suffix string) error {
+	err := u.waitForMasters(ctx, cs)
+	if err != nil {
+		return err
 	}
 
 	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {

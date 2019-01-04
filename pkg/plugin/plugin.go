@@ -75,34 +75,34 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 }
 
 func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, backupBlob string) *api.PluginError {
-	err := p.clusterUpgrader.CreateClients(ctx, cs)
+	suffix := fmt.Sprintf("%d", time.Now().Unix())
+
+	p.log.Info("generating arm templates")
+	azuretemplate, err := p.armGenerator.Generate(ctx, cs, backupBlob, true, suffix)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
+	}
+
+	err = p.clusterUpgrader.CreateClients(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
-	p.log.Info("evacuating the cluster")
-	if err := p.clusterUpgrader.Evacuate(ctx, cs); err != nil {
+	p.log.Info("restoring the cluster")
+	if err := p.clusterUpgrader.EtcdRestore(ctx, cs, azuretemplate, deployFn); err != nil {
 		return err
 	}
-	p.log.Info("starting update with recovery")
-	if err := p.createOrUpdate(ctx, cs, backupBlob, true, deployFn); err != nil {
-		return err
-	}
-	p.log.Info("starting update")
-	if err := p.createOrUpdate(ctx, cs, "", true, deployFn); err != nil {
+	p.log.Info("running CreateOrUpdate")
+	if err := p.CreateOrUpdate(ctx, cs, true, deployFn); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
-	return p.createOrUpdate(ctx, cs, "", isUpdate, deployFn)
-}
-
-func (p *plugin) createOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
 	suffix := fmt.Sprintf("%d", time.Now().Unix())
 
 	p.log.Info("generating arm templates")
-	azuretemplate, err := p.armGenerator.Generate(ctx, cs, backupBlob, isUpdate, suffix)
+	azuretemplate, err := p.armGenerator.Generate(ctx, cs, "", isUpdate, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}

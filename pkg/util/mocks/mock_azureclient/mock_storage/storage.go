@@ -235,6 +235,21 @@ func (mr *MockBlobMockRecorder) Delete(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockBlob)(nil).Delete), arg0)
 }
 
+// Exists mocks base method
+func (m *MockBlob) Exists() (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Exists")
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Exists indicates an expected call of Exists
+func (mr *MockBlobMockRecorder) Exists() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exists", reflect.TypeOf((*MockBlob)(nil).Exists))
+}
+
 // Get mocks base method
 func (m *MockBlob) Get(arg0 *storage.GetBlobOptions) (io.ReadCloser, error) {
 	m.ctrl.T.Helper()

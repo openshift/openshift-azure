@@ -78,6 +78,20 @@ func (mr *MockUpgraderMockRecorder) Update(ctx, cs, azuretemplate, deployFn, suf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUpgrader)(nil).Update), ctx, cs, azuretemplate, deployFn, suffix)
 }
 
+// EtcdRestore mocks base method
+func (m *MockUpgrader) EtcdRestore(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EtcdRestore", ctx, cs, azuretemplate, deployFn)
+	ret0, _ := ret[0].(*api.PluginError)
+	return ret0
+}
+
+// EtcdRestore indicates an expected call of EtcdRestore
+func (mr *MockUpgraderMockRecorder) EtcdRestore(ctx, cs, azuretemplate, deployFn interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EtcdRestore", reflect.TypeOf((*MockUpgrader)(nil).EtcdRestore), ctx, cs, azuretemplate, deployFn)
+}
+
 // HealthCheck mocks base method
 func (m *MockUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	m.ctrl.T.Helper()
@@ -104,18 +118,4 @@ func (m *MockUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenShi
 func (mr *MockUpgraderMockRecorder) WaitForInfraServices(ctx, cs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForInfraServices", reflect.TypeOf((*MockUpgrader)(nil).WaitForInfraServices), ctx, cs)
-}
-
-// Evacuate mocks base method
-func (m *MockUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Evacuate", ctx, cs)
-	ret0, _ := ret[0].(*api.PluginError)
-	return ret0
-}
-
-// Evacuate indicates an expected call of Evacuate
-func (mr *MockUpgraderMockRecorder) Evacuate(ctx, cs interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Evacuate", reflect.TypeOf((*MockUpgrader)(nil).Evacuate), ctx, cs)
 }

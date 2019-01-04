@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/etcdbackup"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
@@ -79,7 +80,7 @@ func main() {
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "could not find storage account"))
 	}
-	etcdContainer := bsc.GetContainerReference("etcd")
+	etcdContainer := bsc.GetContainerReference(cluster.EtcdBackupContainerName)
 
 	etcdcli, err := getEtcdClient()
 	if err != nil {

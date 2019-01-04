@@ -1,14 +1,9 @@
 package managedcluster
 
 import (
-	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"io/ioutil"
-	"net/http"
 
 	"github.com/ghodss/yaml"
-	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	kapi "k8s.io/client-go/tools/clientcmd/api"
@@ -16,7 +11,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 // ReadConfig returns a config object from a config file
@@ -44,21 +38,4 @@ func RestConfigFromV1Config(kc *v1.Config) (*rest.Config, error) {
 
 	kubeconfig := clientcmd.NewDefaultClientConfig(c, &clientcmd.ConfigOverrides{})
 	return kubeconfig.ClientConfig()
-}
-
-// WaitForHealthz takes a context, a OpenShiftManagedCluster, and a logrus.Entry
-// It waits for the cluster to respond to healthz requests.
-func WaitForHealthz(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster) error {
-	pool := x509.NewCertPool()
-	pool.AddCert(cs.Config.Certificates.Ca.Cert)
-
-	t := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			RootCAs: pool,
-		},
-	}
-
-	// Wait for the healthz to be 200 status
-	_, err := wait.ForHTTPStatusOk(ctx, log, t, "https://"+cs.Properties.FQDN+"/healthz")
-	return err
 }

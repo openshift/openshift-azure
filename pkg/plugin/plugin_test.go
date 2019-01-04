@@ -411,12 +411,11 @@ func TestRecoverEtcdCluster(t *testing.T) {
 		mockGen.EXPECT().Generate(nil, nil, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil),
 		mockGen.EXPECT().Generate(nil, nil, gomock.Any(), true, gomock.Any()).Return(testData, nil),
 	)
-	mockUp.EXPECT().CreateClients(nil, nil).Times(3).Return(nil)
-	mockUp.EXPECT().Evacuate(nil, nil).Return(nil)
-	mockUp.EXPECT().Update(nil, nil, testDataWithBackup, nil, gomock.Any()).Return(nil)
+	mockUp.EXPECT().CreateClients(nil, nil).Times(2).Return(nil)
+	mockUp.EXPECT().EtcdRestore(nil, nil, testDataWithBackup, nil).Return(nil)
 	mockUp.EXPECT().Update(nil, nil, testData, nil, gomock.Any()).Return(nil)
-	mockUp.EXPECT().WaitForInfraServices(nil, nil).Times(2).Return(nil)
-	mockUp.EXPECT().HealthCheck(nil, nil).Times(2).Return(nil)
+	mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
+	mockUp.EXPECT().HealthCheck(nil, nil).Return(nil)
 	p := &plugin{
 		clusterUpgrader: mockUp,
 		armGenerator:    mockGen,
