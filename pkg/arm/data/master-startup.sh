@@ -658,22 +658,29 @@ rm -Rf /var/lib/etcd/*
 tempBackDir=/var/lib/etcd/backup
 mkdir $tempBackDir
 while ! docker pull {{ .Config.Images.EtcdBackup }}; do sleep 10; done
-docker run --dns 168.63.129.16 -v /etc/origin/master:/etc/origin/master -v /etc/origin/cloudprovider/:/_data/_out -v $tempBackDir:/out:z {{ .Config.Images.EtcdBackup }} -blobname={{ .Extra.BackupBlobName }} -destination=/out/backup.db "download"
+docker run --dns 168.63.129.16 \
+  -v /etc/origin/master:/etc/origin/master \
+  -v /etc/origin/cloudprovider/:/_data/_out \
+  -v $tempBackDir:/out:z \
+  {{ .Config.Images.EtcdBackup }} \
+  -blobname={{ .Extra.BackupBlobName }} \
+  -destination=/out/backup.db "download"
 logger -t master-startup.sh "backup downloaded to " $(ls $tempBackDir)
 
 # step 2 restore
 logger -t master-startup.sh "restoring snapshot"
 while ! docker pull {{ .Config.Images.MasterEtcd }}; do sleep 10; done
 docker run --network host  \
-           -v /etc/etcd:/etc/etcd \
-           -v /var/lib/etcd:/var/lib/etcd:z \
-           -e ETCDCTL_API="3" {{ .Config.Images.MasterEtcd }} \
-           etcdctl snapshot restore $tempBackDir/backup.db \
-           --data-dir /var/lib/etcd/new \
-           --name $(hostname) \
-           --initial-cluster "master-000000=https://master-000000:2380,master-000001=https://master-000001:2380,master-000002=https://master-000002:2380" \
-           --initial-cluster-token etcd-for-azure \
-           --initial-advertise-peer-urls https://$(hostname):2380
+  -v /etc/etcd:/etc/etcd \
+  -v /var/lib/etcd:/var/lib/etcd:z \
+  -e ETCDCTL_API="3" \
+  {{ .Config.Images.MasterEtcd }} \
+  etcdctl snapshot restore $tempBackDir/backup.db \
+  --data-dir /var/lib/etcd/new \
+  --name $(hostname) \
+  --initial-cluster "master-000000=https://master-000000:2380,master-000001=https://master-000001:2380,master-000002=https://master-000002:2380" \
+  --initial-cluster-token etcd-for-azure \
+  --initial-advertise-peer-urls https://$(hostname):2380
 
 mv /var/lib/etcd/new/* /var/lib/etcd/
 rm -rf /var/lib/etcd/new
