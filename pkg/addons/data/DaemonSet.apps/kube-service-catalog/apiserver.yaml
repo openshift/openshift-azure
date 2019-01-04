@@ -47,6 +47,13 @@ spec:
         name: apiserver
         ports:
         - containerPort: 6443
+        readinessProbe:
+          httpGet:
+            failureThreshold: 2
+            path: /healthz
+            periodSeconds: 5
+            port: 6443
+            scheme: HTTPS
         volumeMounts:
         - mountPath: /var/run/kubernetes-service-catalog
           name: apiserver-ssl
