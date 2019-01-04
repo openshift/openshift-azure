@@ -20,23 +20,14 @@ spec:
         app: metrics-bridge
     spec:
       containers:
-      - env:
-        - name: MDMENDPOINT
-          value: '*** GENERATED ***'
-        - name: MDM_ACCOUNT
-          value: '*** GENERATED ***'
-        - name: MDM_LOG_LEVEL
-          value: Debug
-        - name: REGION
-          value: '*** GENERATED ***'
+      - args: '*** GENERATED ***'
+        command:
+        - /usr/sbin/MetricsExtension
         image: '*** GENERATED ***'
         name: statsd
-        ports:
-        - containerPort: 8125
-          protocol: UDP
         resources:
           limits:
-            cpu: 400m
+            cpu: 200m
             memory: 400Mi
           requests:
             cpu: 200m
@@ -44,6 +35,8 @@ spec:
         volumeMounts:
         - mountPath: /mdm/certs
           name: mdm-cert
+        - mountPath: /var/etw
+          name: socket
       - command:
         - /metricsbridge
         - /config/config.yaml
@@ -60,6 +53,8 @@ spec:
         - mountPath: /config
           name: metrics-bridge
           readOnly: true
+        - mountPath: /var/etw
+          name: socket
       imagePullSecrets:
       - name: azure-registry
       nodeSelector:
@@ -76,3 +71,5 @@ spec:
       - configMap:
           name: metrics-bridge
         name: metrics-bridge
+      - emptyDir: {}
+        name: socket
