@@ -12,6 +12,11 @@ spec:
     matchLabels:
       app: openshift-console
       component: ui
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -21,13 +26,14 @@ spec:
     spec:
       affinity:
         podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app: openshift-console
-              topologyKey: kubernetes.io/hostname
-            weight: 100
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - openshift-console
+            topologyKey: kubernetes.io/hostname
       containers:
       - command:
         - /opt/bridge/bin/bridge
