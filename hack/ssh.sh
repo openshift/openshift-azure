@@ -41,19 +41,19 @@ RESOURCEGROUP=$1
 
 trap cleanup EXIT
 
-ID_RSA=$(mktemp)
-chmod 0600 $ID_RSA
+eval "$(ssh-agent)"
 
 if [[ -z "$RESOURCEGROUP" ]]; then
     RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
-    cat _data/_out/id_rsa >$ID_RSA
+    ssh-add _data/_out/id_rsa 2>/dev/null
+	[[ -e _data/_out/id_rsa.old ]] && ssh-add _data/_out/id_rsa.old 2>/dev/null
 else
-    hack/config.sh get-config $RESOURCEGROUP | jq -r .config.sshKey | base64 -d >$ID_RSA
+	ID_RSA=$(mktemp)
+	chmod 0600 $ID_RSA
+	hack/config.sh get-config $RESOURCEGROUP | jq -r .config.sshKey | base64 -d >$ID_RSA
+	ssh-add $ID_RSA 2>/dev/null
 fi
 
 IP=$(az vmss list-instance-public-ips --subscription $AZURE_SUBSCRIPTION_ID -g $RESOURCEGROUP -n ss-master --query "[$ID].ipAddress" | tr -d '"')
-
-eval "$(ssh-agent)"
-ssh-add $ID_RSA 2>/dev/null
 
 ssh -A -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no cloud-user@$IP $COMMAND
