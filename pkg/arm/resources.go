@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
-	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2017-10-01/network"
+	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-02-01/network"
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2015-06-15/storage"
 	"github.com/Azure/go-autorest/autorest/to"
 
@@ -58,7 +58,7 @@ func fixupAPIVersions(template map[string]interface{}) {
 			"Microsoft.Network/networkSecurityGroups",
 			"Microsoft.Network/publicIPAddresses",
 			"Microsoft.Network/virtualNetworks":
-			apiVersion = "2017-10-01"
+			apiVersion = "2018-02-01"
 		case "Microsoft.Storage/storageAccounts":
 			apiVersion = "2015-06-15"
 		default:
@@ -261,10 +261,11 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 			Probes: &[]network.Probe{
 				{
 					ProbePropertiesFormat: &network.ProbePropertiesFormat{
-						Protocol:          network.ProbeProtocolTCP,
+						Protocol:          network.ProbeProtocolHTTPS,
 						Port:              to.Int32Ptr(443),
 						IntervalInSeconds: to.Int32Ptr(5),
 						NumberOfProbes:    to.Int32Ptr(2),
+						RequestPath:       to.StringPtr("/healthz/ready"),
 					},
 					Name: to.StringPtr(lbAPIServerProbeName),
 				},
