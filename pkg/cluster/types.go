@@ -33,9 +33,9 @@ type Upgrader interface {
 	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError
 	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError
+	EtcdRestore(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError
 	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
-	Evacuate(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 }
 
 type simpleUpgrader struct {
