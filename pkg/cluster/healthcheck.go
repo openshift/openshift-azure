@@ -48,7 +48,6 @@ func (u *simpleUpgrader) doHealthCheck(ctx context.Context, cli wait.SimpleHTTPC
 
 		switch resp.StatusCode {
 		case http.StatusOK:
-			u.log.Info("OK")
 			return nil
 		case http.StatusBadGateway:
 			time.Sleep(sleepDuration)
