@@ -98,6 +98,9 @@ endif
 cover: unit
 	go tool cover -html=coverage.out
 
+codecov: unit
+	./hack/codecov-report.sh
+
 e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
 
