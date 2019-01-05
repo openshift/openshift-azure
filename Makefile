@@ -89,7 +89,7 @@ verify:
 	go run ./hack/lint-addons/lint-addons.go -n
 
 unit: generate
-	go test ./... -coverprofile=coverage.out
+	go test ./... -coverprofile=coverage.out -covermode=atomic
 ifneq ($(ARTIFACT_DIR),)
 	mkdir -p $(ARTIFACT_DIR)
 	cp coverage.out $(ARTIFACT_DIR)
