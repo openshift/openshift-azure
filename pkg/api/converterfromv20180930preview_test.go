@@ -38,11 +38,11 @@ func internalManagedCluster() *OpenShiftManagedCluster {
 		ID:       "ID",
 		Location: "Location",
 		Name:     "Name",
-		Plan: ResourcePurchasePlan{
-			Name:          "Plan.Name",
-			Product:       "Plan.Product",
-			PromotionCode: "Plan.PromotionCode",
-			Publisher:     "Plan.Publisher",
+		Plan: &ResourcePurchasePlan{
+			Name:          to.StringPtr("Plan.Name"),
+			Product:       to.StringPtr("Plan.Product"),
+			PromotionCode: to.StringPtr("Plan.PromotionCode"),
+			Publisher:     to.StringPtr("Plan.Publisher"),
 		},
 		Tags: map[string]string{
 			"Tags.key": "Tags.val",
@@ -258,6 +258,15 @@ func TestConvertFromV20180930preview(t *testing.T) {
 			},
 			base: internalManagedCluster(),
 			err:  errors.New("invalid identity provider - name is missing"),
+		},
+		{
+			name: "nil ResourcePurchasPlan update",
+			input: &v20180930preview.OpenShiftManagedCluster{
+				Plan: nil,
+			},
+			base: internalManagedCluster(),
+			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
+			},
 		},
 	}
 

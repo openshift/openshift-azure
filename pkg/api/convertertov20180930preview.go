@@ -18,12 +18,13 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 		v := cs.Tags[k]
 		oc.Tags[k] = &v
 	}
-
-	oc.Plan = &v20180930preview.ResourcePurchasePlan{
-		Name:          &cs.Plan.Name,
-		Product:       &cs.Plan.Product,
-		PromotionCode: &cs.Plan.PromotionCode,
-		Publisher:     &cs.Plan.Publisher,
+	if cs.Plan != nil {
+		oc.Plan = &v20180930preview.ResourcePurchasePlan{
+			Name:          cs.Plan.Name,
+			Product:       cs.Plan.Product,
+			PromotionCode: cs.Plan.PromotionCode,
+			Publisher:     cs.Plan.Publisher,
+		}
 	}
 
 	provisioningState := v20180930preview.ProvisioningState(cs.Properties.ProvisioningState)

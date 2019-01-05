@@ -33,7 +33,7 @@ func ConvertFromAdmin(oc *admin.OpenShiftManagedCluster, old *OpenShiftManagedCl
 	}
 
 	if oc.Plan != nil {
-		mergeResourcePurchasePlanAdmin(oc, cs)
+		mergeFromResourcePurchasePlanAdmin(oc, cs)
 	}
 
 	if oc.Properties != nil {
@@ -49,18 +49,23 @@ func ConvertFromAdmin(oc *admin.OpenShiftManagedCluster, old *OpenShiftManagedCl
 	return cs, nil
 }
 
-func mergeResourcePurchasePlanAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) {
+// mergeFromResourcePurchasePlanAdmin merges filled out fields from the admin API to the internal representation, doesn't change fields which are nil in the input.
+// This reflects the behaviour of the external API.
+func mergeFromResourcePurchasePlanAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) {
+	if cs.Plan == nil {
+		cs.Plan = &ResourcePurchasePlan{}
+	}
 	if oc.Plan.Name != nil {
-		cs.Plan.Name = *oc.Plan.Name
+		cs.Plan.Name = oc.Plan.Name
 	}
 	if oc.Plan.Product != nil {
-		cs.Plan.Product = *oc.Plan.Product
+		cs.Plan.Product = oc.Plan.Product
 	}
 	if oc.Plan.PromotionCode != nil {
-		cs.Plan.PromotionCode = *oc.Plan.PromotionCode
+		cs.Plan.PromotionCode = oc.Plan.PromotionCode
 	}
 	if oc.Plan.Publisher != nil {
-		cs.Plan.Publisher = *oc.Plan.Publisher
+		cs.Plan.Publisher = oc.Plan.Publisher
 	}
 }
 
