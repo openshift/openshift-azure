@@ -7,76 +7,69 @@ metadata:
   namespace: openshift-azure-monitoring
 spec:
   replicas: 1
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
   selector:
     matchLabels:
       app: metrics-bridge
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   template:
     metadata:
       labels:
         app: metrics-bridge
     spec:
-      tolerations:
-        - key: CriticalAddonsOnly
-          operator: Exists
-        - operator: Exists
-      dnsPolicy: ClusterFirst
-      imagePullSecrets:
-        - name: azure-registry
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
       containers:
-        - name: statsd
-          args: "*** GENERATED ***"
-          command:
-          - /usr/sbin/MetricsExtension
-          image: "*** GENERATED ***"
-          imagePullPolicy: Always
-          resources:
-            limits:
-              cpu: 200m
-              memory: 400Mi
-            requests:
-              cpu: 200m
-              memory: 200Mi
-          terminationMessagePath: /dev/termination-log
-          volumeMounts:
-            - mountPath: /mdm/certs
-              name: mdm-cert
-            - mountPath: /var/etw
-              name: socket
-        - name: metricsbridge
-          image: "*** GENERATED ***"
-          command:
-          - /metricsbridge
-          - /config/config.yaml
-          imagePullPolicy: "Always"
-          volumeMounts:
-            - mountPath: /config
-              name: metrics-bridge
-              readOnly: true
-            - mountPath: /var/etw
-              name: socket
-          resources:
-            limits:
-              cpu: 400m
-              memory: 1Gi
-            requests:
-              cpu: 200m
-              memory: 500Mi
-      serviceAccountName: geneva
+      - args: '*** GENERATED ***'
+        command:
+        - /usr/sbin/MetricsExtension
+        image: '*** GENERATED ***'
+        name: statsd
+        resources:
+          limits:
+            cpu: 200m
+            memory: 400Mi
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        volumeMounts:
+        - mountPath: /mdm/certs
+          name: mdm-cert
+        - mountPath: /var/etw
+          name: socket
+      - command:
+        - /metricsbridge
+        - /config/config.yaml
+        image: '*** GENERATED ***'
+        name: metricsbridge
+        resources:
+          limits:
+            cpu: 400m
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+        volumeMounts:
+        - mountPath: /config
+          name: metrics-bridge
+          readOnly: true
+        - mountPath: /var/etw
+          name: socket
+      imagePullSecrets:
+      - name: azure-registry
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
+      serviceAccountName: geneva
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - operator: Exists
       volumes:
-        - name: mdm-cert
-          secret:
-            secretName: mdm-cert
-        - name: metrics-bridge
-          configMap:
-            name: metrics-bridge
-        - emptyDir: {}
-          name: socket
+      - name: mdm-cert
+        secret:
+          secretName: mdm-cert
+      - configMap:
+          name: metrics-bridge
+        name: metrics-bridge
+      - emptyDir: {}
+        name: socket

@@ -14,7 +14,6 @@ spec:
     rollingUpdate:
       maxSurge: 0
       maxUnavailable: 1
-    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -78,10 +77,6 @@ spec:
           name: docker-config
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: registry
       serviceAccountName: registry
       volumes:
       - name: registry-certificates

@@ -79,6 +79,12 @@ func Clean(o unstructured.Unstructured) error {
 	jsonpath.MustCompile("$.status").Delete(o.Object)
 
 	switch gk.String() {
+	case "CronJob.batch":
+		cleanMetadata(jsonpath.MustCompile("$.spec.jobTemplate").Get(o.Object)[0].(map[string]interface{}))
+		jsonpath.MustCompile("$.spec.jobTemplate.metadata").DeleteIfMatch(o.Object, map[string]interface{}{})
+		cleanMetadata(jsonpath.MustCompile("$.spec.jobTemplate.spec.template").Get(o.Object)[0].(map[string]interface{}))
+		jsonpath.MustCompile("$.spec.jobTemplate.spec.template.metadata").DeleteIfMatch(o.Object, map[string]interface{}{})
+
 	case "DaemonSet.apps":
 		jsonpath.MustCompile("$.metadata.annotations.'deprecated.daemonset.template.generation'").Delete(o.Object)
 		cleanPodTemplate(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
@@ -104,7 +110,8 @@ func Clean(o unstructured.Unstructured) error {
 		}
 
 	case "Secret":
-		if jsonpath.MustCompile("$.type").MustGetString(o.Object) == "kubernetes.io/service-account-token" {
+		typ := jsonpath.MustCompile("$.type").Get(o.Object)
+		if len(typ) == 1 && typ[0].(string) == "kubernetes.io/service-account-token" {
 			for _, k := range []string{
 				"$.data",
 				"$.metadata.annotations.'kubernetes.io/service-account.uid'",

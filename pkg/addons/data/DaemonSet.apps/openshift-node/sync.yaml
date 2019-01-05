@@ -168,4 +168,3 @@ spec:
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 50%
-    type: RollingUpdate

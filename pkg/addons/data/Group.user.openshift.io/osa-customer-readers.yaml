@@ -1,5 +1,5 @@
-kind: Group
 apiVersion: user.openshift.io/v1
+kind: Group
 metadata:
-   name: osa-customer-readers
+  name: osa-customer-readers
 users: []

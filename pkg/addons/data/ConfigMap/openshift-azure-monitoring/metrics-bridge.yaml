@@ -1,8 +1,4 @@
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: metrics-bridge
-  namespace: openshift-azure-monitoring
 data:
   config.yaml: |
     intervalNanoseconds: 30000000000 # every 30 seconds
@@ -20,3 +16,7 @@ data:
     account: '*** GENERATED ***'
     namespace: Prometheus
     region: '*** GENERATED ***'
+kind: ConfigMap
+metadata:
+  name: metrics-bridge
+  namespace: openshift-azure-monitoring
