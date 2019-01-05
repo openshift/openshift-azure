@@ -92,12 +92,11 @@ func (mr *MockVirtualMachineScaleSetsClientMockRecorder) Client() *gomock.Call {
 }
 
 // CreateOrUpdate mocks base method
-func (m *MockVirtualMachineScaleSetsClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 string, arg3 compute.VirtualMachineScaleSet) (compute.VirtualMachineScaleSetsCreateOrUpdateFuture, error) {
+func (m *MockVirtualMachineScaleSetsClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 string, arg3 compute.VirtualMachineScaleSet) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrUpdate", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(compute.VirtualMachineScaleSetsCreateOrUpdateFuture)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // CreateOrUpdate indicates an expected call of CreateOrUpdate
@@ -107,12 +106,11 @@ func (mr *MockVirtualMachineScaleSetsClientMockRecorder) CreateOrUpdate(arg0, ar
 }
 
 // Delete mocks base method
-func (m *MockVirtualMachineScaleSetsClient) Delete(arg0 context.Context, arg1, arg2 string) (compute.VirtualMachineScaleSetsDeleteFuture, error) {
+func (m *MockVirtualMachineScaleSetsClient) Delete(arg0 context.Context, arg1, arg2 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2)
-	ret0, _ := ret[0].(compute.VirtualMachineScaleSetsDeleteFuture)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Delete indicates an expected call of Delete
@@ -137,12 +135,11 @@ func (mr *MockVirtualMachineScaleSetsClientMockRecorder) List(arg0, arg1 interfa
 }
 
 // Update mocks base method
-func (m *MockVirtualMachineScaleSetsClient) Update(arg0 context.Context, arg1, arg2 string, arg3 compute.VirtualMachineScaleSetUpdate) (compute.VirtualMachineScaleSetsUpdateFuture, error) {
+func (m *MockVirtualMachineScaleSetsClient) Update(arg0 context.Context, arg1, arg2 string, arg3 compute.VirtualMachineScaleSetUpdate) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(compute.VirtualMachineScaleSetsUpdateFuture)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Update indicates an expected call of Update
@@ -152,12 +149,11 @@ func (mr *MockVirtualMachineScaleSetsClientMockRecorder) Update(arg0, arg1, arg2
 }
 
 // UpdateInstances mocks base method
-func (m *MockVirtualMachineScaleSetsClient) UpdateInstances(arg0 context.Context, arg1, arg2 string, arg3 compute.VirtualMachineScaleSetVMInstanceRequiredIDs) (compute.VirtualMachineScaleSetsUpdateInstancesFuture, error) {
+func (m *MockVirtualMachineScaleSetsClient) UpdateInstances(arg0 context.Context, arg1, arg2 string, arg3 compute.VirtualMachineScaleSetVMInstanceRequiredIDs) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateInstances", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(compute.VirtualMachineScaleSetsUpdateInstancesFuture)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // UpdateInstances indicates an expected call of UpdateInstances
@@ -189,27 +185,12 @@ func (m *MockVirtualMachineScaleSetVMsClient) EXPECT() *MockVirtualMachineScaleS
 	return m.recorder
 }
 
-// Client mocks base method
-func (m *MockVirtualMachineScaleSetVMsClient) Client() autorest.Client {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Client")
-	ret0, _ := ret[0].(autorest.Client)
-	return ret0
-}
-
-// Client indicates an expected call of Client
-func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Client() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Client))
-}
-
 // Deallocate mocks base method
-func (m *MockVirtualMachineScaleSetVMsClient) Deallocate(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsDeallocateFuture, error) {
+func (m *MockVirtualMachineScaleSetVMsClient) Deallocate(arg0 context.Context, arg1, arg2, arg3 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Deallocate", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsDeallocateFuture)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Deallocate indicates an expected call of Deallocate
@@ -219,12 +200,11 @@ func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Deallocate(arg0, arg1
 }
 
 // Delete mocks base method
-func (m *MockVirtualMachineScaleSetVMsClient) Delete(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsDeleteFuture, error) {
+func (m *MockVirtualMachineScaleSetVMsClient) Delete(arg0 context.Context, arg1, arg2, arg3 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsDeleteFuture)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Delete indicates an expected call of Delete
@@ -249,12 +229,11 @@ func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) List(arg0, arg1, arg2
 }
 
 // Reimage mocks base method
-func (m *MockVirtualMachineScaleSetVMsClient) Reimage(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsReimageFuture, error) {
+func (m *MockVirtualMachineScaleSetVMsClient) Reimage(arg0 context.Context, arg1, arg2, arg3 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Reimage", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsReimageFuture)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Reimage indicates an expected call of Reimage
@@ -264,12 +243,11 @@ func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Reimage(arg0, arg1, a
 }
 
 // Restart mocks base method
-func (m *MockVirtualMachineScaleSetVMsClient) Restart(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsRestartFuture, error) {
+func (m *MockVirtualMachineScaleSetVMsClient) Restart(arg0 context.Context, arg1, arg2, arg3 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Restart", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsRestartFuture)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Restart indicates an expected call of Restart
@@ -279,12 +257,11 @@ func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Restart(arg0, arg1, a
 }
 
 // Start mocks base method
-func (m *MockVirtualMachineScaleSetVMsClient) Start(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsStartFuture, error) {
+func (m *MockVirtualMachineScaleSetVMsClient) Start(arg0 context.Context, arg1, arg2, arg3 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Start", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsStartFuture)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Start indicates an expected call of Start

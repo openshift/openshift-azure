@@ -132,12 +132,8 @@ func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenS
 	target.Sku.Capacity = to.Int64Ptr(0)
 
 	u.log.Infof("creating target scaleset %s", config.GetScalesetName(app, suffix))
-	future, err := u.ssc.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, *target.Name, *target)
+	err = u.ssc.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, *target.Name, *target)
 	if err != nil {
-		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolCreateScaleSet}
-	}
-
-	if err := future.WaitForCompletionRef(ctx, u.ssc.Client()); err != nil {
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolCreateScaleSet}
 	}
 
@@ -162,12 +158,7 @@ func (u *simpleUpgrader) deleteWorkerScaleSet(ctx context.Context, blob *updateb
 	}
 
 	u.log.Infof("deleting scaleset %s", *ss.Name)
-	future, err := u.ssc.Delete(ctx, resourceGroup, *ss.Name)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolDeleteScaleSet}
-	}
-
-	err = future.WaitForCompletionRef(ctx, u.vmc.Client())
+	err := u.ssc.Delete(ctx, resourceGroup, *ss.Name)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolDeleteScaleSet}
 	}

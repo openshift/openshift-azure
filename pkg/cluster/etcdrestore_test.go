@@ -7,9 +7,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
-	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/azure"
 	gomock "github.com/golang/mock/gomock"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -96,18 +93,7 @@ func TestEtcdRestore(t *testing.T) {
 
 	vmc.EXPECT().List(ctx, "test-rg", "ss-master", "", "", "").Return(nil, nil)
 
-	arc := autorest.NewClientWithUserAgent("unittest")
-	ssc.EXPECT().Client().Return(arc)
-
-	req, _ := http.NewRequest("delete", "http://example.com", nil)
-	fakeResp := http.Response{
-		Request:    req,
-		StatusCode: 200,
-	}
-	ft, _ := azure.NewFutureFromResponse(&fakeResp)
-	sscFt := compute.VirtualMachineScaleSetsDeleteFuture{Future: ft}
-
-	ssc.EXPECT().Delete(ctx, "test-rg", "ss-master").Return(sscFt, nil)
+	ssc.EXPECT().Delete(ctx, "test-rg", "ss-master").Return(nil)
 	if got := u.EtcdRestore(ctx, cs, nil, func(context.Context, map[string]interface{}) error { return nil }); got != nil {
 		t.Errorf("simpleUpgrader.EtcdRestore() = %v", got)
 	}
