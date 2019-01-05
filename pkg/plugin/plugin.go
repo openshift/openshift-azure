@@ -12,6 +12,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
 type plugin struct {
@@ -132,6 +133,11 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	p.log.Info("starting health check")
 	if err := p.clusterUpgrader.HealthCheck(ctx, cs); err != nil {
 		return err
+	}
+
+	if cs != nil {
+		// setting VnetID based on VnetName
+		cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", arm.VnetName)
 	}
 
 	// explicitly return nil if all went well

@@ -85,6 +85,9 @@ func mergeProperties(oc *v20180930preview.OpenShiftManagedCluster, cs *OpenShift
 	}
 
 	if oc.Properties.NetworkProfile != nil {
+		if oc.Properties.NetworkProfile.VnetID != nil {
+			cs.Properties.NetworkProfile.VnetID = *oc.Properties.NetworkProfile.VnetID
+		}
 		if oc.Properties.NetworkProfile.VnetCIDR != nil {
 			cs.Properties.NetworkProfile.VnetCIDR = *oc.Properties.NetworkProfile.VnetCIDR
 		}

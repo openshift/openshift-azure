@@ -2,7 +2,6 @@ package arm
 
 import (
 	"encoding/base64"
-	"fmt"
 	"sort"
 	"strings"
 
@@ -15,11 +14,12 @@ import (
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 )
 
 const (
-	vnetName                              = "vnet"
+	VnetName                              = "vnet"
 	vnetSubnetName                        = "default"
 	ipAPIServerName                       = "ip-apiserver"
 	ipKubernetesName                      = "ip-kubernetes"
@@ -76,7 +76,7 @@ func fixupDepends(azProfile *api.AzProfile, template map[string]interface{}) {
 		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
 		name := jsonpath.MustCompile("$.name").MustGetString(resource)
 
-		myResources[resourceID(azProfile.SubscriptionID, azProfile.ResourceGroup, typ, name)] = struct{}{}
+		myResources[resourceid.ResourceID(azProfile.SubscriptionID, azProfile.ResourceGroup, typ, name)] = struct{}{}
 	}
 
 	var recurse func(myResourceID string, i interface{}, dependsMap map[string]struct{})
@@ -117,7 +117,7 @@ func fixupDepends(azProfile *api.AzProfile, template map[string]interface{}) {
 
 		dependsMap := map[string]struct{}{}
 
-		recurse(resourceID(azProfile.SubscriptionID, azProfile.ResourceGroup, typ, name), resource, dependsMap)
+		recurse(resourceid.ResourceID(azProfile.SubscriptionID, azProfile.ResourceGroup, typ, name), resource, dependsMap)
 
 		depends := make([]string, 0, len(dependsMap))
 		for k := range dependsMap {
@@ -132,10 +132,6 @@ func fixupDepends(azProfile *api.AzProfile, template map[string]interface{}) {
 			jsonpath.MustCompile("$.dependsOn").Set(resource, depends)
 		}
 	}
-}
-
-func resourceID(subscriptionID, resourceGroup, resourceProvider, resourceName string) string {
-	return fmt.Sprintf("/subscriptions/%s/resourceGroups/%s/providers/%s/%s", subscriptionID, resourceGroup, resourceProvider, resourceName)
 }
 
 func vnet(cs *api.OpenShiftManagedCluster) *network.VirtualNetwork {
@@ -155,7 +151,7 @@ func vnet(cs *api.OpenShiftManagedCluster) *network.VirtualNetwork {
 				},
 			},
 		},
-		Name:     to.StringPtr(vnetName),
+		Name:     to.StringPtr(VnetName),
 		Type:     to.StringPtr("Microsoft.Network/virtualNetworks"),
 		Location: to.StringPtr(cs.Location),
 	}
@@ -205,7 +201,7 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 					FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
 						PrivateIPAllocationMethod: network.Dynamic,
 						PublicIPAddress: &network.PublicIPAddress{
-							ID: to.StringPtr(resourceID(
+							ID: to.StringPtr(resourceid.ResourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/publicIPAddresses",
@@ -225,7 +221,7 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 				{
 					LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
 						FrontendIPConfiguration: &network.SubResource{
-							ID: to.StringPtr(resourceID(
+							ID: to.StringPtr(resourceid.ResourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
@@ -233,7 +229,7 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 							) + "/frontendIPConfigurations/" + lbAPIServerFrontendConfigurationName),
 						},
 						BackendAddressPool: &network.SubResource{
-							ID: to.StringPtr(resourceID(
+							ID: to.StringPtr(resourceid.ResourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
@@ -241,7 +237,7 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 							) + "/backendAddressPools/" + lbAPIServerBackendPoolName),
 						},
 						Probe: &network.SubResource{
-							ID: to.StringPtr(resourceID(
+							ID: to.StringPtr(resourceid.ResourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
@@ -291,7 +287,7 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 					FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
 						PrivateIPAllocationMethod: network.Dynamic,
 						PublicIPAddress: &network.PublicIPAddress{
-							ID: to.StringPtr(resourceID(
+							ID: to.StringPtr(resourceid.ResourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/publicIPAddresses",
@@ -311,7 +307,7 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 				{
 					LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
 						FrontendIPConfiguration: &network.SubResource{
-							ID: to.StringPtr(resourceID(
+							ID: to.StringPtr(resourceid.ResourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
@@ -319,7 +315,7 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 							) + "/frontendIPConfigurations/" + lbKubernetesFrontendConfigurationName),
 						},
 						BackendAddressPool: &network.SubResource{
-							ID: to.StringPtr(resourceID(
+							ID: to.StringPtr(resourceid.ResourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
@@ -327,7 +323,7 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 							) + "/backendAddressPools/" + lbKubernetesBackendPoolName),
 						},
 						Probe: &network.SubResource{
-							ID: to.StringPtr(resourceID(
+							ID: to.StringPtr(resourceid.ResourceID(
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
@@ -541,11 +537,11 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 										Name: to.StringPtr(vmssIPConfigurationName),
 										VirtualMachineScaleSetIPConfigurationProperties: &compute.VirtualMachineScaleSetIPConfigurationProperties{
 											Subnet: &compute.APIEntityReference{
-												ID: to.StringPtr(resourceID(
+												ID: to.StringPtr(resourceid.ResourceID(
 													cs.Properties.AzProfile.SubscriptionID,
 													cs.Properties.AzProfile.ResourceGroup,
 													"Microsoft.Network/virtualNetworks",
-													vnetName,
+													VnetName,
 												) + "/subnets/" + vnetSubnetName),
 											},
 											Primary: to.BoolPtr(true),
@@ -598,7 +594,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		}
 		(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].LoadBalancerBackendAddressPools = &[]compute.SubResource{
 			{
-				ID: to.StringPtr(resourceID(
+				ID: to.StringPtr(resourceid.ResourceID(
 					cs.Properties.AzProfile.SubscriptionID,
 					cs.Properties.AzProfile.ResourceGroup,
 					"Microsoft.Network/loadBalancers",
@@ -607,7 +603,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 			},
 		}
 		(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.NetworkSecurityGroup = &compute.SubResource{
-			ID: to.StringPtr(resourceID(
+			ID: to.StringPtr(resourceid.ResourceID(
 				cs.Properties.AzProfile.SubscriptionID,
 				cs.Properties.AzProfile.ResourceGroup,
 				"Microsoft.Network/networkSecurityGroups",
@@ -617,7 +613,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 	} else {
 		(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].LoadBalancerBackendAddressPools = &[]compute.SubResource{
 			{
-				ID: to.StringPtr(resourceID(
+				ID: to.StringPtr(resourceid.ResourceID(
 					cs.Properties.AzProfile.SubscriptionID,
 					cs.Properties.AzProfile.ResourceGroup,
 					"Microsoft.Network/loadBalancers",
@@ -626,7 +622,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 			},
 		}
 		(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.NetworkSecurityGroup = &compute.SubResource{
-			ID: to.StringPtr(resourceID(
+			ID: to.StringPtr(resourceid.ResourceID(
 				cs.Properties.AzProfile.SubscriptionID,
 				cs.Properties.AzProfile.ResourceGroup,
 				"Microsoft.Network/networkSecurityGroups",
@@ -638,7 +634,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 	if pc.TestConfig.ImageResourceName != "" {
 		vmss.Plan = nil
 		vmss.VirtualMachineScaleSetProperties.VirtualMachineProfile.StorageProfile.ImageReference = &compute.ImageReference{
-			ID: to.StringPtr(resourceID(
+			ID: to.StringPtr(resourceid.ResourceID(
 				cs.Properties.AzProfile.SubscriptionID,
 				pc.TestConfig.ImageResourceGroup,
 				"Microsoft.Compute/images",

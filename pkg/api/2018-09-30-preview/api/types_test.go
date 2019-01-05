@@ -26,6 +26,7 @@ var marshalled = []byte(`{
 		"fqdn": "Properties.FQDN",
 		"networkProfile": {
 			"vnetCidr": "Properties.NetworkProfile.VnetCIDR",
+			"vnetId": "Properties.NetworkProfile.VnetID",
 			"peerVnetId": "Properties.NetworkProfile.PeerVnetID"
 		},
 		"routerProfiles": [
