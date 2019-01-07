@@ -14,10 +14,7 @@ test: unit e2e
 generate:
 	go generate ./...
 
-populate-template:
-	go run ./hack/populate-template/populate-template.go
-
-create: populate-template
+create:
 	timeout 1h ./hack/create.sh ${RESOURCEGROUP}
 
 delete:

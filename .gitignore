@@ -16,5 +16,3 @@ coverage.out
 /secrets/*
 /fakerp
 /artifacts
-/test/templates/template.yaml
-!/test/templates/template.yaml.example*

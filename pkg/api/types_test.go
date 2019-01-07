@@ -506,7 +506,7 @@ func TestPluginTemplateAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Alert`),
 		regexp.MustCompile(`^\.Console`),
 		regexp.MustCompile(`^\.RunningUnderTest`),
-		regexp.MustCompile(`^\.Certificates.Ca\.`),
+		regexp.MustCompile(`^\.Certificates\.Ca\.`),
 		regexp.MustCompile(`^\.Certificates\.FrontProxyCa\.`),
 		regexp.MustCompile(`^\.Certificates\.Service`),
 		regexp.MustCompile(`^\.Certificates\.Etcd`),

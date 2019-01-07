@@ -37,8 +37,6 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 	cs.Config = api.ConvertFromPlugin(*template)
 	c := &cs.Config
 
-	g.selectNodeImage(cs)
-
 	// Generate CAs
 	cas := []struct {
 		cn   string

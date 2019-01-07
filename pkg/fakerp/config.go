@@ -1,6 +1,8 @@
 package fakerp
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -11,11 +13,13 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
+	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
 const (
-	SecretsDirectory   = "secrets/"
-	TemplatesDirectory = "/test/templates/"
+	SecretsDirectory      = "secrets/"
+	PluginConfigDirectory = "pluginconfig/"
+	TemplatesDirectory    = "/test/templates/"
 )
 
 func GetPluginConfig() (*api.PluginConfig, error) {
@@ -23,7 +27,6 @@ func GetPluginConfig() (*api.PluginConfig, error) {
 		RunningUnderTest:   os.Getenv("RUNNING_UNDER_TEST") == "true",
 		ImageResourceGroup: os.Getenv("IMAGE_RESOURCEGROUP"),
 		ImageResourceName:  os.Getenv("IMAGE_RESOURCENAME"),
-		DeployOS:           os.Getenv("DEPLOY_OS"),
 	}
 
 	return &api.PluginConfig{
@@ -33,11 +36,12 @@ func GetPluginConfig() (*api.PluginConfig, error) {
 }
 
 func GetPluginTemplate() (*pluginapi.Config, error) {
-	artifactDir, err := shared.FindDirectory(TemplatesDirectory)
+	// read template file without secrets
+	artifactDir, err := shared.FindDirectory(PluginConfigDirectory)
 	if err != nil {
 		return nil, err
 	}
-	data, err := readFile(filepath.Join(artifactDir, "template.yaml"))
+	data, err := readFile(filepath.Join(artifactDir, "pluginconfig-311.yaml"))
 	if err != nil {
 		return nil, err
 	}
@@ -45,6 +49,37 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	if err := yaml.Unmarshal(data, &template); err != nil {
 		return nil, err
 	}
+
+	// enrich template with secrets
+	artifactDir, err = shared.FindDirectory(SecretsDirectory)
+	if err != nil {
+		return nil, err
+	}
+	logCert, err := readCert(filepath.Join(artifactDir, "logging-int.cert"))
+	if err != nil {
+		return nil, err
+	}
+	logKey, err := readKey(filepath.Join(artifactDir, "logging-int.key"))
+	if err != nil {
+		return nil, err
+	}
+	metCert, err := readCert(filepath.Join(artifactDir, "metrics-int.cert"))
+	if err != nil {
+		return nil, err
+	}
+	metKey, err := readKey(filepath.Join(artifactDir, "metrics-int.key"))
+	if err != nil {
+		return nil, err
+	}
+	pullSecret, err := readFile(filepath.Join(artifactDir, ".dockerconfigjson"))
+	if err != nil {
+		return nil, err
+	}
+	template.Certificates.GenevaLogging.Cert = logCert
+	template.Certificates.GenevaLogging.Key = logKey
+	template.Certificates.GenevaMetrics.Cert = metCert
+	template.Certificates.GenevaMetrics.Key = metKey
+	template.Images.GenevaImagePullSecret = pullSecret
 
 	return template, nil
 }
@@ -83,4 +118,20 @@ func readFile(path string) ([]byte, error) {
 func fileExist(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
+}
+
+func readCert(path string) (*x509.Certificate, error) {
+	b, err := readFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return tls.ParseCert(b)
+}
+
+func readKey(path string) (*rsa.PrivateKey, error) {
+	b, err := readFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return tls.ParsePrivateKey(b)
 }

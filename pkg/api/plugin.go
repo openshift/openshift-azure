@@ -83,7 +83,6 @@ type TestConfig struct {
 	RunningUnderTest   bool
 	ImageResourceGroup string
 	ImageResourceName  string
-	DeployOS           string
 }
 
 // Plugin is the main interface to openshift-azure

@@ -8,7 +8,6 @@ import (
 )
 
 var (
-	// Image version format check x{3}.y{4}.z{8}
 	imageVersion = regexp.MustCompile(`^[0-9]{3}.[0-9]{1,4}.[0-9]{8}$`)
 )
 
@@ -57,21 +56,21 @@ func (v *Validator) ValidatePluginTemplate(t *pluginapi.Config) (errs []error) {
 
 func (v *Validator) validatePluginTemplateCertificates(c pluginapi.CertificateConfig) (errs []error) {
 	if c.GenevaLogging.Key == nil {
-		errs = append(errs, fmt.Errorf("invalid GenevaLogging key"))
+		errs = append(errs, fmt.Errorf("GenevaLogging key cannot be empty"))
 	} else if err := c.GenevaLogging.Key.Validate(); err != nil {
-		errs = append(errs, fmt.Errorf("invalid GenevaLogging key %q", err))
+		errs = append(errs, fmt.Errorf("invalid GenevaLogging key: %v", err))
 	}
 	if c.GenevaLogging.Cert == nil {
-		errs = append(errs, fmt.Errorf("invalid GenevaLogging certificate"))
+		errs = append(errs, fmt.Errorf("GenevaLogging certificate cannot be empty"))
 	}
 
 	if c.GenevaMetrics.Key == nil {
-		errs = append(errs, fmt.Errorf("invalid GenevaMetrics key"))
+		errs = append(errs, fmt.Errorf("GenevaMetrics key cannot be empty"))
 	} else if err := c.GenevaMetrics.Key.Validate(); err != nil {
-		errs = append(errs, fmt.Errorf("invalid GenevaMetrics key %q", err))
+		errs = append(errs, fmt.Errorf("invalid GenevaMetrics key: %v", err))
 	}
 	if c.GenevaMetrics.Cert == nil {
-		errs = append(errs, fmt.Errorf("invalid GenevaMetrics certificate"))
+		errs = append(errs, fmt.Errorf("GenevaMetrics certificate cannot be empty"))
 	}
 	return errs
 }

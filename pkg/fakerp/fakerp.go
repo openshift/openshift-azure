@@ -63,10 +63,8 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
-	// if running under test we can overwrite certain images from local env variables
-	if config.TestConfig.RunningUnderTest {
-		overridePluginTemplate(template)
-	}
+	// This should be executed only for fakeRP
+	overridePluginTemplate(template)
 
 	errs = p.ValidatePluginTemplate(ctx, template)
 	if len(errs) > 0 {

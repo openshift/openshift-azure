@@ -30,7 +30,7 @@ type plugin struct {
 var _ api.Plugin = &plugin{}
 
 // NewPlugin creates a new plugin instance
-func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig, skipValidate ...bool) (api.Plugin, []error) {
+func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) (api.Plugin, []error) {
 	return &plugin{
 		log:                     log,
 		config:                  *pluginConfig,
