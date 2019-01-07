@@ -13,5 +13,6 @@ reviewers:
 - makdaam
 - mjudeikis
 - thekad
+- y-cote
 labels:
 - sig/azure
