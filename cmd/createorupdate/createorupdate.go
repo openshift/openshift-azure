@@ -240,7 +240,7 @@ func main() {
 	}
 
 	// setup the osa clients
-	adminClient := admin.NewOpenShiftManagedClustersClientWithBaseURI(rpURL+"/admin", conf.SubscriptionID)
+	adminClient := admin.NewOpenShiftManagedClustersClientWithBaseURI(rpURL+shared.AdminContext, conf.SubscriptionID)
 	v20180930previewClient := v20180930preview.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
 	if err != nil {

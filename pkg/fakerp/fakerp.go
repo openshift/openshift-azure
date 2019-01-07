@@ -207,6 +207,18 @@ func writeHelpers(c *api.OpenShiftManagedCluster) error {
 	if err != nil {
 		return err
 	}
+	// ensure both the new key and the old key are on disk so
+	// you can SSH in regardless of the state of a VM after an update
+	if _, err = os.Stat(filepath.Join(dataDir, "_out/id_rsa")); err == nil {
+		b, err := ioutil.ReadFile(filepath.Join(dataDir, "_out/id_rsa"))
+		if err != nil {
+			return err
+		}
+		err = ioutil.WriteFile(filepath.Join(dataDir, "_out/id_rsa.old"), b, 0600)
+		if err != nil {
+			return err
+		}
+	}
 	b, err := config.Derived.CloudProviderConf(c)
 	if err != nil {
 		return err

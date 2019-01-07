@@ -6,6 +6,7 @@ import (
 )
 
 const (
+	AdminContext  = "/admin"
 	DataDirectory = "_data/"
 	LocalHttpAddr = "localhost:8080"
 )
