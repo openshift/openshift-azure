@@ -16,4 +16,6 @@ spec:
       containers:
       - image: '*** GENERATED ***'
         name: customer-admin-controller
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
       serviceAccountName: customer-admin-controller
