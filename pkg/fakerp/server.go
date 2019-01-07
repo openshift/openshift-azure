@@ -360,7 +360,8 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
 		// If the object is not found in memory then
-		// it must have been deleted. Exit successfully.
+		// it must have been deleted or never existed.
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 	state := s.readState()
