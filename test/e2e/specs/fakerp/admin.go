@@ -2,7 +2,6 @@ package fakerp
 
 import (
 	"context"
-	"flag"
 	"net/http"
 	"os"
 	"reflect"
@@ -17,7 +16,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
-	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
@@ -27,10 +25,6 @@ import (
 var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]", func() {
 	var (
 		cli *openshift.Client
-		// TODO: Unfortunately cannot use "manifest" because the flag name is already
-		// used by the key rotation test; Figure out whether we want to collapse these
-		// into a single flag and do it.
-		manifest = flag.String("request", "../../_data/manifest.yaml", "Path to the manifest to send to the RP")
 	)
 
 	BeforeEach(func() {
@@ -82,11 +76,6 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 
 	It("should start prometheus correctly", func() {
 		err := wait.Poll(2*time.Second, 20*time.Minute, ready.StatefulSetIsReady(cli.AppsV1.StatefulSets("openshift-monitoring"), "prometheus-k8s"))
-		Expect(err).ToNot(HaveOccurred())
-	})
-
-	It("should start alert manager correctly", func() {
-		err := wait.Poll(2*time.Second, 20*time.Minute, ready.StatefulSetIsReady(cli.AppsV1.StatefulSets("openshift-monitoring"), "alertmanager-main"))
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -156,11 +145,12 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 		Expect(len(before.ScalesetHashes)).To(BeEquivalentTo(2)) // one per worker scaleset
 
 		By("running an update")
-		external, err := fakerp.GenerateManifest(*manifest)
+		external, err := azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
+		external.Properties.ProvisioningState = nil
 
-		updated, err := azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), *external)
+		updated, err := azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updated.StatusCode).To(Equal(http.StatusOK))
 		Expect(updated).NotTo(BeNil())
