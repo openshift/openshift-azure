@@ -45,11 +45,19 @@ type Server struct {
 }
 
 func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
-	return &Server{
+	s := &Server{
 		inProgress: make(chan struct{}, 1),
 		log:        log,
 		address:    address,
 	}
+	// We need to restore the internal cluster state into memory for GETs
+	// and DELETEs to work appropriately.
+	if err := s.restore(); err != nil {
+		if _, ok := err.(*os.PathError); !ok {
+			s.log.Fatal(err)
+		}
+	}
+	return s
 }
 
 func (s *Server) ListenAndServe() {
@@ -151,15 +159,6 @@ func (s *Server) readAdminRequest(body io.ReadCloser) (*admin.OpenShiftManagedCl
 }
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
-	// We need to restore the internal cluster state into memory for GETs
-	// to work appropriately for the DELETE to complete.
-	if err := s.restore(); err != nil {
-		resp := fmt.Sprintf("500 Internal Error: Failed to restore internal cluster state: %v", err)
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusInternalServerError)
-		return
-	}
-
 	// simulate Context with property bag
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
