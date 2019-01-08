@@ -108,18 +108,6 @@ func overridePluginTemplate(template *pluginapi.Config) {
 	}
 }
 
-func readFile(path string) ([]byte, error) {
-	if fileExist(path) {
-		return ioutil.ReadFile(path)
-	}
-	return []byte{}, fmt.Errorf("file %s does not exist", path)
-}
-
-func fileExist(path string) bool {
-	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
-}
-
 func readCert(path string) (*x509.Certificate, error) {
 	b, err := readFile(path)
 	if err != nil {
@@ -134,4 +122,16 @@ func readKey(path string) (*rsa.PrivateKey, error) {
 		return nil, err
 	}
 	return tls.ParsePrivateKey(b)
+}
+
+func readFile(path string) ([]byte, error) {
+	if fileExist(path) {
+		return ioutil.ReadFile(path)
+	}
+	return []byte{}, fmt.Errorf("file %s does not exist", path)
+}
+
+func fileExist(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }

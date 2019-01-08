@@ -85,13 +85,12 @@ func internalPluginConfig() Config {
 
 func TestConvertFromPlugin(t *testing.T) {
 	// prepare external type
-	external := plugin.Config{}
+	var external plugin.Config
 	populate.Walk(&external, func(v reflect.Value) {})
 	// prepare internal type
 	internal := internalPluginConfig()
-
-	output := ConvertFromPlugin(external)
-	if !reflect.DeepEqual(output, internal) {
+	output := ConvertFromPlugin(&external, &internal)
+	if !reflect.DeepEqual(*output, internal) {
 		t.Errorf("unexpected diff %s", deep.Equal(output, internal))
 	}
 }

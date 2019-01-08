@@ -34,7 +34,8 @@ func createUserHtPassEntry(name string, passwd *string, htPasswd []byte) ([]byte
 }
 
 func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pluginapi.Config) (err error) {
-	cs.Config = api.ConvertFromPlugin(*template)
+	config := api.ConvertFromPlugin(template, &cs.Config)
+	cs.Config = *config
 	c := &cs.Config
 
 	// Generate CAs
