@@ -55,6 +55,7 @@ func GenerateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCl
 
 	if oc.Properties != nil {
 		oc.Properties.ProvisioningState = nil
+		oc.Properties.NetworkProfile.VnetID = nil
 	}
 	return oc, nil
 }
@@ -82,6 +83,7 @@ func GenerateManifestAdmin(manifestFile string) (*admin.OpenShiftManagedCluster,
 
 	if oc.Properties != nil {
 		oc.Properties.ProvisioningState = nil
+		oc.Properties.NetworkProfile.VnetID = nil
 	}
 	return oc, nil
 }
