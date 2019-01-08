@@ -54,18 +54,8 @@ The following are required for running all e2e tests against the fake RP
 | `File` | `secrets/metrics-int.cert` | Geneva metrics client certificate |
 | `File` | `secrets/metrics-int.key` |  Geneva metrics client key |
 | `File` | `secrets/.dockerconfigjson` |  Docker config allowing to pull geneva images |
-| `File` | `test/manifests/normal/scaleup.yaml` |  Scale-up manifest (required for scale up/down tests) |
-| `File` | `test/manifests/normal/scaledown.yaml` |  Scale-down manifest (required for scale up/down tests) |
 
 #### Special considerations
-
-##### Scale up/down
-The scale up/down e2e test accepts two flags for customizing its functionality
-
-* `scaleUpManifest`: Path to the scale up manifest (default: `test/manifests/normal/scaleup.yaml`)
-* `scaleDownManifest`: Path to the scale down manifest (default: `test/manifests/normal/scaleup.yaml`)
-
-Partial updates are supported. These flags are required for any test focus which includes the scale up/down test.
 
 ##### Key Rotation
 The key rotation up/down e2e test accepts two flags for customizing its functionality
@@ -74,15 +64,6 @@ The key rotation up/down e2e test accepts two flags for customizing its function
 * `configBlob`: Path to an internal config blob for the cluster in question (default: `_data/containerservice.yaml`)
 
 These flags are required for any test focus which includes the key rotation test.
-
-##### Reentrant Updates
-The reentrant updates e2e test accepts one flag for customizing its functionality
-
-* `request`: Path to a customer manifest specifying a cluster for which reentrant updates should be tested (default: `_data/manifest.yaml`)
-
-The `request` flag must refer to the same manifest which was used during cluster creation.
-
-These flags are required for any test focus which includes the reentrant updates test.
 
 ##### Etcd Recovery
 The etcd recovery e2e test depends on the following file for its functionality. This is currently not configurable

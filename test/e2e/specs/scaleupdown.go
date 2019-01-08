@@ -2,7 +2,6 @@ package specs
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"os"
 	"time"
@@ -16,7 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
+	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/pkg/util/randomstring"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
@@ -28,11 +27,9 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		sampleDeployment = "hello-openshift"
 	)
 	var (
-		azurecli          *azure.Client
-		occli             *openshift.Client
-		scaleUpManifest   = flag.String("scaleUpManifest", "../../test/manifests/normal/scaleup.yaml", "Path to the scale up manifest to send in a partial update request to the RP")
-		scaleDownManifest = flag.String("scaleDownManifest", "../../test/manifests/normal/scaledown.yaml", "Path to the scale down manifest to send in a partial update request to the RP")
-		namespace         string
+		azurecli  *azure.Client
+		occli     *openshift.Client
+		namespace string
 	)
 
 	BeforeEach(func() {
@@ -56,12 +53,14 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 
 	It("should be possible to maintain a healthy cluster after scaling it out and in", func() {
 		By("Fetching the scale up manifest")
-		external, err := fakerp.GenerateManifest(*scaleUpManifest)
+		external, err := azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
+		external.Properties.ProvisioningState = nil
+		scaleUp(&external)
 
 		By("Calling CreateOrUpdate on the rp with the scale up manifest")
-		updated, err := azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), *external)
+		updated, err := azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updated).NotTo(BeNil())
 
@@ -137,12 +136,14 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		Expect(len(nodes)).To(Equal(2))
 
 		By("Fetching the scale down manifest")
-		external, err = fakerp.GenerateManifest(*scaleDownManifest)
+		external, err = azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
+		external.Properties.ProvisioningState = nil
+		scaleDown(&external)
 
 		By("Calling CreateOrUpdate on the rp with the scale down manifest")
-		updated, err = azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), *external)
+		updated, err = azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updated).NotTo(BeNil())
 
@@ -163,3 +164,19 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		Expect(len(nodes)).To(Equal(1))
 	})
 })
+
+func scaleUp(oc *v20180930preview.OpenShiftManagedCluster) {
+	for _, p := range oc.Properties.AgentPoolProfiles {
+		if *p.Role == v20180930preview.AgentPoolProfileRoleCompute {
+			*p.Count++
+		}
+	}
+}
+
+func scaleDown(oc *v20180930preview.OpenShiftManagedCluster) {
+	for _, p := range oc.Properties.AgentPoolProfiles {
+		if *p.Role == v20180930preview.AgentPoolProfileRoleCompute {
+			*p.Count--
+		}
+	}
+}
