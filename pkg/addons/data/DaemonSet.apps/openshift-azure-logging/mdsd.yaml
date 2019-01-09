@@ -1,22 +1,51 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  labels:
-    app: mdsd
   name: mdsd
   namespace: openshift-azure-logging
 spec:
   selector:
     matchLabels:
-      app: mdsd-shard
+      app: mdsd
   template:
     metadata:
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ""
       labels:
-        app: mdsd-shard
+        app: mdsd
     spec:
       containers:
+      - env:
+        - name: FLUENTD_CONF
+          value: config/fluent.conf
+        image: '*** GENERATED ***'
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - /td-agent/liveness-probe.sh
+          failureThreshold: 5
+          initialDelaySeconds: 60
+          periodSeconds: 60
+        name: td-agent
+        resources:
+          limits:
+            cpu: 200m
+            memory: 800Mi
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /var/run/mdsd/
+          name: socket
+          readOnly: true
+        - mountPath: /td-agent/config
+          name: fluentd-config
+        - mountPath: /var/log
+          name: hostlog
       - args:
         - -c
         - ./bootstrap.sh
@@ -51,7 +80,7 @@ spec:
           runAsUser: 0
         volumeMounts:
         - mountPath: /var/run/mdsd/
-          name: mdsd-sockets
+          name: socket
         - mountPath: /etc/mdsd.d/secret
           name: gcs-cert
         - mountPath: /etc/mdsd.d/template
@@ -67,19 +96,16 @@ spec:
         operator: Exists
       volumes:
       - hostPath:
-          path: /var/run/mdsd/
-        name: mdsd-sockets
+          path: /var/log
+        name: hostlog
       - configMap:
-          items:
-          - key: mdsd.xml
-            path: mdsd.xml
           name: mdsd-config
         name: mdsd-config
+      - configMap:
+          name: fluentd-config
+        name: fluentd-config
       - name: gcs-cert
         secret:
-          items:
-          - key: gcscert.pem
-            path: gcscert.pem
-          - key: gcskey.pem
-            path: gcskey.pem
           secretName: gcs-cert
+      - emptyDir: {}
+        name: socket
