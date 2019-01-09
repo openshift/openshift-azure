@@ -91,9 +91,6 @@ func syncWorkloadsConfig(db map[string]unstructured.Unstructured) error {
 		configToHash[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = getHash(&o)
 	}
 
-	secretGk := schema.GroupKind{Kind: "Secret"}
-	configMapGk := schema.GroupKind{Kind: "ConfigMap"}
-
 	// iterate over all workload controllers and add annotations with the hashes
 	// of every config map or secret appropriately to force redeployments on config
 	// updates.
@@ -106,23 +103,26 @@ func syncWorkloadsConfig(db map[string]unstructured.Unstructured) error {
 			continue
 		}
 
-		volumes := jsonpath.MustCompile("$.spec.template.spec.volumes.*").MustGetObject(o.Object)
+		volumes := jsonpath.MustCompile("$.spec.template.spec.volumes.*").Get(o.Object)
+		for _, v := range volumes {
+			v := v.(map[string]interface{})
 
-		if secretData, found := volumes["secret"]; found {
-			secretName := jsonpath.MustCompile("$.secretName").MustGetString(secretData)
-			key := fmt.Sprintf("checksum/secret-%s", secretName)
-			secretKey := KeyFunc(secretGk, o.GetNamespace(), secretName)
-			if hash, found := configToHash[secretKey]; found {
-				setPodTemplateAnnotation(key, hash, o)
+			if secretData, found := v["secret"]; found {
+				secretName := jsonpath.MustCompile("$.secretName").MustGetString(secretData)
+				key := fmt.Sprintf("checksum/secret-%s", secretName)
+				secretKey := KeyFunc(schema.GroupKind{Kind: "Secret"}, o.GetNamespace(), secretName)
+				if hash, found := configToHash[secretKey]; found {
+					setPodTemplateAnnotation(key, hash, o)
+				}
 			}
-		}
 
-		if configMapData, found := volumes["configMap"]; found {
-			configMapName := jsonpath.MustCompile("$.name").MustGetString(configMapData)
-			key := fmt.Sprintf("checksum/configmap-%s", configMapName)
-			configMapKey := KeyFunc(configMapGk, o.GetNamespace(), configMapName)
-			if hash, found := configToHash[configMapKey]; found {
-				setPodTemplateAnnotation(key, hash, o)
+			if configMapData, found := v["configMap"]; found {
+				configMapName := jsonpath.MustCompile("$.name").MustGetString(configMapData)
+				key := fmt.Sprintf("checksum/configmap-%s", configMapName)
+				configMapKey := KeyFunc(schema.GroupKind{Kind: "ConfigMap"}, o.GetNamespace(), configMapName)
+				if hash, found := configToHash[configMapKey]; found {
+					setPodTemplateAnnotation(key, hash, o)
+				}
 			}
 		}
 	}
