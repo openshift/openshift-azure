@@ -51,7 +51,7 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	}
 	// We need to restore the internal cluster state into memory for GETs
 	// and DELETEs to work appropriately.
-	if _, err := s.restore(); err != nil {
+	if _, err := s.load(); err != nil {
 		s.log.Fatal(err)
 	}
 	return s
@@ -59,31 +59,44 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 
 func (s *Server) ListenAndServe() {
 	// TODO: match the request path the real RP would use
-	http.Handle("/", s)
-	http.Handle("/admin", s)
-	httpServer := &http.Server{Addr: s.address}
+	http.HandleFunc("/", s.handleFunc)
+
 	s.log.Infof("starting server on %s", s.address)
+	httpServer := &http.Server{Addr: s.address}
 	s.log.WithError(httpServer.ListenAndServe()).Warn("Server exited.")
 }
 
-// ServeHTTP handles an incoming request to the server.
-func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	defer req.Body.Close()
+// handleFunc dispatches the request to the right path.
+func (s *Server) handleFunc(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 
+	switch filepath.Base(r.URL.Path) {
+	// TODO: Ensure the base path is not the resource group
+	case "restore":
+		s.handleRestore(w, r)
+	default:
+		s.handle(w, r)
+	}
+}
+
+// handle handles an incoming request to the server.
+// This is the normal RP path where all customer and
+// simple admin requests should be routed to.
+func (s *Server) handle(w http.ResponseWriter, r *http.Request) {
 	// validate the request
-	ok := s.validate(w, req)
+	ok := s.validate(w, r)
 	if !ok {
 		return
 	}
 
 	// process the request
-	switch req.Method {
+	switch r.Method {
 	case http.MethodDelete:
-		s.handleDelete(w, req)
+		s.handleDelete(w, r)
 	case http.MethodGet:
-		s.handleGet(w, req)
+		s.handleGet(w, r)
 	case http.MethodPut:
-		s.handlePut(w, req)
+		s.handlePut(w, r)
 	}
 }
 
@@ -115,7 +128,7 @@ func (s *Server) validate(w http.ResponseWriter, r *http.Request) bool {
 // to restore the internal state of the cluster from the
 // filesystem. Whether the file that holds the state exists or
 // not is returned and any other error that was encountered.
-func (s *Server) restore() (bool, error) {
+func (s *Server) load() (bool, error) {
 	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
 		return false, err
@@ -172,9 +185,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	// TODO: Get the azure credentials from the request headers
 	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
 	if err != nil {
-		resp := fmt.Sprintf("500 Internal Error: Failed to determine request credentials: %v", err)
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusInternalServerError)
+		s.internalError(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
 		return
 	}
 
@@ -182,9 +193,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	// TODO: get resource group from request path
 	err = DeleteOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
 	if err != nil {
-		resp := fmt.Sprintf("500 Internal Error: Failed to delete dns records: %v", err)
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusInternalServerError)
+		s.internalError(w, fmt.Sprintf("Failed to delete dns records: %v", err))
 		return
 	}
 
@@ -204,23 +213,19 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 				}
 			}
 		}
-		resp := fmt.Sprintf("500 Internal Error: Failed to delete resource group: %v", err)
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusInternalServerError)
+		s.internalError(w, fmt.Sprintf("Failed to delete resource group: %v", err))
 		return
 	}
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 		defer cancel()
 		if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
-			resp := "500 Internal Error: Failed to wait for resource group deletion"
-			s.log.Debugf("%s: %v", resp, err)
+			s.internalError(w, fmt.Sprintf("Failed to wait for resource group deletion: %v", err))
 			return
 		}
 		resp, err := future.Result(gc)
 		if err != nil {
-			resp := "500 Internal Error: Failed to get resource group deletion response"
-			s.log.Debugf("%s: %v", resp, err)
+			s.internalError(w, fmt.Sprintf("Failed to get resource group deletion response: %v", err))
 			return
 		}
 		// If the resource group deletion is successful, cleanup the object
@@ -260,9 +265,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		s.log.Info("read old config")
 		oldCs = s.read()
 		if oldCs == nil {
-			resp := "500 Internal Error: Failed to read old config: internal state does not exist"
-			s.log.Debug(resp)
-			http.Error(w, resp, http.StatusInternalServerError)
+			s.internalError(w, "Failed to read old config: internal state does not exist")
 			return
 		}
 		s.writeState(internalapi.Updating)
@@ -288,9 +291,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 	if err != nil {
-		resp := fmt.Sprintf("400 Bad Request: Failed to convert to internal type: %v", err)
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusBadRequest)
+		s.badRequest(w, fmt.Sprintf("Failed to convert to internal type: %v", err))
 		return
 	}
 	s.write(cs)
@@ -298,9 +299,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	// populate plugin configuration
 	config, err := GetPluginConfig()
 	if err != nil {
-		resp := fmt.Sprintf("400 Bad Request: Failed to configure plugin: %v", err)
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusBadRequest)
+		s.internalError(w, fmt.Sprintf("Failed to configure plugin: %v", err))
 		return
 	}
 
@@ -316,9 +315,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, config, isAdminRequest)
 	if err != nil {
 		s.writeState(internalapi.Failed)
-		resp := fmt.Sprintf("400 Bad Request: Failed to apply request: %v", err)
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusBadRequest)
+		s.badRequest(w, fmt.Sprintf("Failed to apply request: %v", err))
 		return
 	}
 	s.write(cs)
@@ -372,9 +369,7 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 		res, err = json.Marshal(oc)
 	}
 	if err != nil {
-		resp := fmt.Sprintf("500 Internal Server Error: Failed to marshal response: %v", err)
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusInternalServerError)
+		s.internalError(w, fmt.Sprintf("Failed to marshal response: %v", err))
 		return
 	}
 	w.Write(res)

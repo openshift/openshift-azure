@@ -2,7 +2,9 @@ package fakerp
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"path"
 	"time"
@@ -10,21 +12,16 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/sirupsen/logrus"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
-	"github.com/openshift/openshift-azure/pkg/plugin"
-	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/randomstring"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
+	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/clients/openshift"
 )
 
@@ -35,6 +32,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 	var (
 		cli       *openshift.Client
 		admincli  *openshift.Client
+		azurecli  *azure.Client
 		backup    string
 		namespace string
 	)
@@ -44,6 +42,8 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		admincli, err = openshift.NewAdminClient()
 		Expect(err).ToNot(HaveOccurred())
 		cli, err = openshift.NewEndUserClient()
+		Expect(err).ToNot(HaveOccurred())
+		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).ToNot(HaveOccurred())
 
 		backup, err = randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
@@ -63,6 +63,10 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 	})
 
 	It("should be possible to recover etcd from a backup", func() {
+		resourceGroup := os.Getenv("RESOURCEGROUP")
+		if resourceGroup == "" {
+			Expect(errors.New("RESOURCEGROUP is not set")).NotTo(BeNil())
+		}
 		dataDir, err := shared.FindDirectory(shared.DataDirectory)
 		Expect(err).NotTo(HaveOccurred())
 		cs, err := managedcluster.ReadConfig(path.Join(dataDir, "containerservice.yaml"))
@@ -154,42 +158,16 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cm2.Data).To(HaveKeyWithValue("value", "after-backup"))
 
-		By("Run the Recovery")
+		By("Restore from the backup")
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
 		defer cancel()
-		ctx = context.WithValue(ctx, api.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
-		ctx = context.WithValue(ctx, api.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-		ctx = context.WithValue(ctx, api.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
-		logrus.SetLevel(log.SanitizeLogLevel("Debug"))
-		logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-		logrus.SetOutput(GinkgoWriter)
-		log := logrus.NewEntry(logrus.StandardLogger())
-
-		err = recover(ctx, log, backup, cs)
+		resp, err := azurecli.OpenShiftManagedClustersAdmin.RestoreAndWait(ctx, resourceGroup, resourceGroup, backup)
 		Expect(err).NotTo(HaveOccurred())
+		Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
-		By("confirm the state of the backup")
+		By("Confirm the state of the backup")
 		final, err := cli.CoreV1.ConfigMaps(namespace).Get(configMapName, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(final.Data).To(HaveKeyWithValue("value", "before-backup"))
 	})
 })
-
-func recover(ctx context.Context, log *logrus.Entry, blobName string, cs *api.OpenShiftManagedCluster) error {
-	config, err := fakerp.GetPluginConfig()
-	if err != nil {
-		return err
-	}
-
-	p, errs := plugin.NewPlugin(log, config)
-	if len(errs) > 0 {
-		return kerrors.NewAggregate(errs)
-	}
-	deployer := fakerp.GetDeployer(log, cs, config)
-	if err := p.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
-		fmt.Fprintf(GinkgoWriter, "RecoverEtcdCluster error: %v", err)
-		return err
-	}
-
-	return nil
-}
