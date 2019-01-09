@@ -519,10 +519,10 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 						Version:   to.StringPtr(cs.Config.ImageVersion),
 					},
 					OsDisk: &compute.VirtualMachineScaleSetOSDisk{
-						Caching:      compute.ReadWrite,
-						CreateOption: compute.FromImage,
+						Caching:      compute.CachingTypesReadWrite,
+						CreateOption: compute.DiskCreateOptionTypesFromImage,
 						ManagedDisk: &compute.VirtualMachineScaleSetManagedDiskParameters{
-							StorageAccountType: compute.PremiumLRS,
+							StorageAccountType: compute.StorageAccountTypesPremiumLRS,
 						},
 					},
 				},
@@ -582,7 +582,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		vmss.VirtualMachineProfile.StorageProfile.DataDisks = &[]compute.VirtualMachineScaleSetDataDisk{
 			{
 				Lun:          to.Int32Ptr(0),
-				CreateOption: compute.Empty,
+				CreateOption: compute.DiskCreateOptionTypesEmpty,
 				DiskSizeGB:   to.Int32Ptr(32),
 			},
 		}
