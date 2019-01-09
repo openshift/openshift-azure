@@ -81,8 +81,10 @@ func syncWorkloadsConfig(db map[string]unstructured.Unstructured) error {
 	// map config resources to their hashed content
 	configToHash := make(map[string]string)
 	for _, o := range db {
-		if o.GroupVersionKind().Kind != "Secret" &&
-			o.GroupVersionKind().Kind != "ConfigMap" {
+		gk := o.GroupVersionKind().GroupKind()
+
+		if gk.String() != "Secret" &&
+			gk.String() != "ConfigMap" {
 			continue
 		}
 
@@ -96,9 +98,11 @@ func syncWorkloadsConfig(db map[string]unstructured.Unstructured) error {
 	// of every config map or secret appropriately to force redeployments on config
 	// updates.
 	for _, o := range db {
-		if o.GroupVersionKind().Kind != "DaemonSet" &&
-			o.GroupVersionKind().Kind != "Deployment" &&
-			o.GroupVersionKind().Kind != "StatefulSet" {
+		gk := o.GroupVersionKind().GroupKind()
+
+		if gk.String() != "DaemonSet.apps" &&
+			gk.String() != "Deployment.apps" &&
+			gk.String() != "StatefulSet.apps" {
 			continue
 		}
 
