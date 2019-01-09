@@ -58,3 +58,5 @@ import:
   version: ^1.2.0
   subpackages:
   - proto
+- package: github.com/go-chi/chi
+  version: v3
