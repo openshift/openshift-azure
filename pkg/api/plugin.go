@@ -14,6 +14,7 @@ const (
 	ContextKeyClientID     ContextKey = "ClientID"
 	ContextKeyClientSecret ContextKey = "ClientSecret"
 	ContextKeyTenantID     ContextKey = "TenantID"
+	ContextAcceptLanguages ContextKey = "AcceptLanguages"
 )
 
 type PluginStep string
@@ -73,8 +74,6 @@ type DeployFn func(context.Context, map[string]interface{}) error
 
 // PluginConfig is passed into NewPlugin
 type PluginConfig struct {
-	AcceptLanguages []string
-
 	TestConfig TestConfig
 }
 

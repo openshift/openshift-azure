@@ -30,7 +30,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api
 			return err
 		}
 
-		deployments := azureclient.NewDeploymentsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, config.AcceptLanguages)
+		deployments := azureclient.NewDeploymentsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
 		future, err := deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
 			Properties: &resources.DeploymentProperties{
 				Template: azuretemplate,
@@ -161,7 +161,7 @@ func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.
 		return err
 	}
 
-	marketPlaceAgreements := azureclient.NewMarketPlaceAgreementsClient(cs.Properties.AzProfile.SubscriptionID, authorizer, pluginConfig.AcceptLanguages)
+	marketPlaceAgreements := azureclient.NewMarketPlaceAgreementsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
 	log.Info("checking marketplace agreement")
 	terms, err := marketPlaceAgreements.Get(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU)
 	if err != nil {

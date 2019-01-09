@@ -21,9 +21,9 @@ type deploymentsClient struct {
 var _ DeploymentsClient = &deploymentsClient{}
 
 // NewDeploymentsClient creates a new DeploymentsClient
-func NewDeploymentsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) DeploymentsClient {
+func NewDeploymentsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) DeploymentsClient {
 	client := resources.NewDeploymentsClient(subscriptionID)
-	setupClient(&client.Client, authorizer, languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &deploymentsClient{
 		DeploymentsClient: client,
@@ -51,9 +51,9 @@ type resourcesClient struct {
 var _ ResourcesClient = &resourcesClient{}
 
 // NewResourcesClient creates a new ResourcesClient
-func NewResourcesClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) ResourcesClient {
+func NewResourcesClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) ResourcesClient {
 	client := resources.NewClient(subscriptionID)
-	setupClient(&client.Client, authorizer, languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &resourcesClient{
 		Client: client,
@@ -76,10 +76,9 @@ type groupsClient struct {
 var _ GroupsClient = &groupsClient{}
 
 // NewGroupsClient creates a new ResourcesClient
-func NewGroupsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) GroupsClient {
+func NewGroupsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) GroupsClient {
 	client := resources.NewGroupsClient(subscriptionID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &groupsClient{
 		GroupsClient: client,

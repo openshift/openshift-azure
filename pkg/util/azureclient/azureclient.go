@@ -57,7 +57,13 @@ func (ls *loggingSender) Do(req *http.Request) (*http.Response, error) {
 	return resp, err
 }
 
-func setupClient(client *autorest.Client, authorizer autorest.Authorizer, languages []string) {
+func setupClient(ctx context.Context, client *autorest.Client, authorizer autorest.Authorizer) {
+	// if context does not provide languages (sync pod, tests) - use default
+	var languages []string
+	if ctx.Value(api.ContextAcceptLanguages) != nil {
+		languages = ctx.Value(api.ContextAcceptLanguages).([]string)
+	}
+
 	client.Authorizer = authorizer
 	client.RequestInspector = addAcceptLanguages(languages)
 	client.PollingDelay = 10 * time.Second

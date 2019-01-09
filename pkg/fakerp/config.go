@@ -1,6 +1,7 @@
 package fakerp
 
 import (
+	"context"
 	"crypto/rsa"
 	"crypto/x509"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/tls"
@@ -30,8 +32,7 @@ func GetPluginConfig() (*api.PluginConfig, error) {
 	}
 
 	return &api.PluginConfig{
-		AcceptLanguages: []string{"en-us"},
-		TestConfig:      tc,
+		TestConfig: tc,
 	}, nil
 }
 
@@ -82,6 +83,16 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	template.Images.GenevaImagePullSecret = pullSecret
 
 	return template, nil
+}
+
+// enrichContext returns enriched context for plugin initiation
+func enrichContext(ctx context.Context) context.Context {
+	// simulate Context with property bag
+	// TODO: Get the azure credentials from the request headers
+	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
+	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
+	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
+	return ctx
 }
 
 func overridePluginTemplate(template *pluginapi.Config) {

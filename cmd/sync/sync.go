@@ -50,7 +50,7 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
-	s.azs = azureclient.NewAccountsClient(cpc.SubscriptionID, authorizer, nil)
+	s.azs = azureclient.NewAccountsClient(ctx, cpc.SubscriptionID, authorizer)
 
 	bsc, err := configblob.GetService(ctx, cpc)
 	if err != nil {
