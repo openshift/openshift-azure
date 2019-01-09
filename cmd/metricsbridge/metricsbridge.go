@@ -25,6 +25,13 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/statsd"
 )
 
+/*
+curl -Gks \
+  -H "Authorization: Bearer $(oc serviceaccounts get-token -n openshift-monitoring prometheus-k8s)" \
+  --data-urlencode 'match[]={__name__=~".+"}' \
+  https://prometheus-k8s.openshift-monitoring.svc:9091/federate
+*/
+
 var (
 	logLevel  = flag.String("loglevel", "Debug", "Valid values are Debug, Info, Warning, Error")
 	gitCommit = "unknown"

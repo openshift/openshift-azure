@@ -126,6 +126,7 @@ func (derived) ClusterMonitoringOperatorArgs(cs *api.OpenShiftManagedCluster) ([
 
 func (derived) StatsdArgs(cs *api.OpenShiftManagedCluster) ([]interface{}, error) {
 	return []interface{}{
+		// "-Dbg", // enable debugging
 		"-StopEvent", "MDMEvent",
 		"-FrontEndUrl", cs.Config.GenevaMetricsEndpoint,
 		"-MonitoringAccount", cs.Config.GenevaMetricsAccount,
