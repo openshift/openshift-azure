@@ -47,7 +47,7 @@ type config struct {
 	log     *logrus.Entry
 	rootCAs *x509.CertPool
 	http    *http.Client
-	statsd  *statsd.Client
+	conn    net.Conn
 }
 
 func (c *config) load(path string) error {
@@ -100,10 +100,9 @@ func (c *config) validate() (errs []error) {
 }
 
 func (c *config) init() error {
-	var conn net.Conn
 	for {
 		var err error
-		conn, err = net.Dial("unix", c.StatsdSocket)
+		c.conn, err = net.Dial("unix", c.StatsdSocket)
 		if err == nil {
 			break
 		}
@@ -118,8 +117,6 @@ func (c *config) init() error {
 		}
 		return err
 	}
-
-	c.statsd = statsd.NewClient(conn)
 
 	c.http = &http.Client{
 		Transport: &http.Transport{
@@ -152,7 +149,7 @@ func run(log *logrus.Entry, configpath string) error {
 	if err := c.init(); err != nil {
 		return err
 	}
-	defer c.statsd.Close()
+	defer c.conn.Close()
 
 	return c.run()
 }
@@ -231,13 +228,13 @@ func (c *config) runOnce(req *http.Request) error {
 			if err != nil {
 				return err
 			}
-			if _, err = c.statsd.Write(b); err != nil {
+			if _, err = c.conn.Write(b); err != nil {
 				return err
 			}
 		}
 	}
 
-	return c.statsd.Flush()
+	return nil
 }
 
 func main() {

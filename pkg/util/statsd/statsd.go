@@ -3,11 +3,9 @@
 package statsd
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"time"
 )
 
@@ -60,34 +58,4 @@ func (f *Float) Marshal() ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
-}
-
-// Client is a buffering statsd client
-type Client struct {
-	w   io.WriteCloser
-	buf *bufio.Writer
-}
-
-// NewClient returns a new client
-func NewClient(w io.WriteCloser) *Client {
-	return &Client{w: w, buf: bufio.NewWriter(w)}
-}
-
-// Flush flushes the internal buffer
-func (c *Client) Flush() error {
-	return c.buf.Flush()
-}
-
-// Write writes to the internal buffer
-func (c *Client) Write(b []byte) (int, error) {
-	return c.buf.Write(b)
-}
-
-// Close flushes the internal buffer and closes the connection
-func (c *Client) Close() error {
-	if err := c.Flush(); err != nil {
-		return err
-	}
-
-	return c.w.Close()
 }
