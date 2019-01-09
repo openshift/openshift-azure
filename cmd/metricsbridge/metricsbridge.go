@@ -39,7 +39,10 @@ type config struct {
 
 	Account   string `json:"account,omitempty"`
 	Namespace string `json:"namespace,omitempty"`
-	Region    string `json:"region,omitempty"`
+
+	Region            string `json:"region,omitempty"`
+	SubscriptionID    string `json:"subscriptionId,omitempty"`
+	ResourceGroupName string `json:"resourceGroupName,omitempty"`
 
 	Token              string `json:"token,omitempty"`
 	InsecureSkipVerify bool   `json:"insecureSkipVerify,omitempty"`
@@ -223,14 +226,21 @@ func (c *config) runOnce(req *http.Request) error {
 				Metric:    *family.Name,
 				Account:   c.Account,
 				Namespace: c.Namespace,
-				Dims: map[string]string{
-					"Region": c.Region,
-				},
-				TS:    now,
-				Value: *m.Untyped.Value,
+				Dims:      map[string]string{},
+				TS:        now,
+				Value:     *m.Untyped.Value,
 			}
 			for _, label := range m.Label {
 				f.Dims[*label.Name] = *label.Value
+			}
+			if c.Region != "" {
+				f.Dims["region"] = c.Region
+			}
+			if c.SubscriptionID != "" {
+				f.Dims["subscriptionId"] = c.SubscriptionID
+			}
+			if c.ResourceGroupName != "" {
+				f.Dims["resourceGroupName"] = c.ResourceGroupName
 			}
 			b, err := f.Marshal()
 			if err != nil {
