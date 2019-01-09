@@ -72,13 +72,6 @@ func delete(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShi
 		if err := future.WaitForCompletionRef(ctx, rpc.Client); err != nil {
 			return err
 		}
-		resp, err := future.Result(rpc)
-		if err != nil {
-			return err
-		}
-		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("unexpected response: %s", resp.Status)
-		}
 		log.Info("deleted cluster")
 	}
 	return nil

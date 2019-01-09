@@ -24,7 +24,6 @@ import (
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 var once sync.Once
@@ -52,10 +51,8 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	}
 	// We need to restore the internal cluster state into memory for GETs
 	// and DELETEs to work appropriately.
-	if err := s.restore(); err != nil {
-		if _, ok := err.(*os.PathError); !ok {
-			s.log.Fatal(err)
-		}
+	if _, err := s.restore(); err != nil {
+		s.log.Fatal(err)
 	}
 	return s
 }
@@ -116,22 +113,27 @@ func (s *Server) validate(w http.ResponseWriter, r *http.Request) bool {
 // The way we run the fake RP during development cannot really
 // be consistent with how the RP runs in production so we need
 // to restore the internal state of the cluster from the
-// filesystem.
-func (s *Server) restore() error {
+// filesystem. Whether the file that holds the state exists or
+// not is returned and any other error that was encountered.
+func (s *Server) restore() (bool, error) {
 	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
-		return err
+		return false, err
 	}
-	data, err := ioutil.ReadFile(filepath.Join(dataDir, "containerservice.yaml"))
+	csFile := filepath.Join(dataDir, "containerservice.yaml")
+	if _, err = os.Stat(csFile); err != nil {
+		return false, nil
+	}
+	data, err := ioutil.ReadFile(csFile)
 	if err != nil {
-		return err
+		return true, err
 	}
 	var cs *internalapi.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(data, &cs); err != nil {
-		return err
+		return true, err
 	}
 	s.write(cs)
-	return nil
+	return true, nil
 }
 
 func (s *Server) read20180930previewRequest(body io.ReadCloser) (*v20180930preview.OpenShiftManagedCluster, error) {
@@ -256,16 +258,9 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		s.writeState(internalapi.Creating)
 	} else {
 		s.log.Info("read old config")
-		dataDir, err := shared.FindDirectory(shared.DataDirectory)
-		if err != nil {
-			resp := fmt.Sprintf("500 Internal Error: Failed to read old config: %v", err)
-			s.log.Debug(resp)
-			http.Error(w, resp, http.StatusInternalServerError)
-			return
-		}
-		oldCs, err = managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
-		if err != nil {
-			resp := fmt.Sprintf("500 Internal Error: Failed to read old config: %v", err)
+		oldCs = s.read()
+		if oldCs == nil {
+			resp := "500 Internal Error: Failed to read old config: internal state does not exist"
 			s.log.Debug(resp)
 			http.Error(w, resp, http.StatusInternalServerError)
 			return
@@ -360,7 +355,8 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
 		// If the object is not found in memory then
-		// it must have been deleted. Exit successfully.
+		// it must have been deleted or never existed.
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 	state := s.readState()
