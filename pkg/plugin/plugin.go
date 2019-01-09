@@ -10,6 +10,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	validate "github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/config"
@@ -17,14 +18,11 @@ import (
 )
 
 type plugin struct {
-	log                     *logrus.Entry
-	config                  api.PluginConfig
-	clusterUpgrader         cluster.Upgrader
-	armGenerator            arm.Generator
-	configGenerator         config.Generator
-	apiValidator            *api.Validator
-	adminValidator          *api.Validator
-	pluginTemplateValidator *api.Validator
+	log             *logrus.Entry
+	config          api.PluginConfig
+	clusterUpgrader cluster.Upgrader
+	armGenerator    arm.Generator
+	configGenerator config.Generator
 }
 
 var _ api.Plugin = &plugin{}
@@ -32,30 +30,30 @@ var _ api.Plugin = &plugin{}
 // NewPlugin creates a new plugin instance
 func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) (api.Plugin, []error) {
 	return &plugin{
-		log:                     log,
-		config:                  *pluginConfig,
-		clusterUpgrader:         cluster.NewSimpleUpgrader(log, pluginConfig),
-		armGenerator:            arm.NewSimpleGenerator(pluginConfig),
-		configGenerator:         config.NewSimpleGenerator(pluginConfig),
-		apiValidator:            api.NewValidator(pluginConfig.TestConfig.RunningUnderTest),
-		pluginTemplateValidator: api.NewValidator(pluginConfig.TestConfig.RunningUnderTest),
-		adminValidator:          api.NewAdminValidator(pluginConfig.TestConfig.RunningUnderTest),
+		log:             log,
+		config:          *pluginConfig,
+		clusterUpgrader: cluster.NewSimpleUpgrader(log, pluginConfig),
+		armGenerator:    arm.NewSimpleGenerator(pluginConfig),
+		configGenerator: config.NewSimpleGenerator(pluginConfig),
 	}, nil
 }
 
 func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) []error {
 	p.log.Info("validating internal data models")
-	return p.apiValidator.Validate(new, old, externalOnly)
+	validator := validate.NewAPIValidator(p.config.TestConfig.RunningUnderTest)
+	return validator.Validate(new, old, externalOnly)
 }
 
 func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManagedCluster) []error {
 	p.log.Info("validating internal admin data models")
-	return p.adminValidator.Validate(new, old, false)
+	validator := validate.NewAdminValidator(p.config.TestConfig.RunningUnderTest)
+	return validator.Validate(new, old, false)
 }
 
 func (p *plugin) ValidatePluginTemplate(ctx context.Context, template *pluginapi.Config) []error {
 	p.log.Info("validating external plugin api data models")
-	return p.pluginTemplateValidator.ValidatePluginTemplate(template)
+	validator := validate.NewPluginAPIValidator()
+	return validator.Validate(template)
 }
 
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster, template *pluginapi.Config) error {
