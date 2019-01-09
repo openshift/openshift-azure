@@ -1,4 +1,4 @@
-package api
+package validate
 
 import (
 	"errors"
@@ -54,8 +54,8 @@ func TestPluginTemplateValidate(t *testing.T) {
 		}
 
 	template := pluginapi.Config{}
-	v := Validator{}
-	errs := v.ValidatePluginTemplate(&template)
+	v := PluginAPIValidator{}
+	errs := v.Validate(&template)
 	if !reflect.DeepEqual(errs, expectedErrs) {
 		t.Errorf("expected errors:")
 		for _, err := range expectedErrs {

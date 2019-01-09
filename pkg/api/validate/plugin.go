@@ -1,18 +1,13 @@
-package api
+package validate
 
 import (
 	"fmt"
-	"regexp"
 
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 )
 
-var (
-	imageVersion = regexp.MustCompile(`^[0-9]{3}.[0-9]{1,4}.[0-9]{8}$`)
-)
-
-// ValidatePluginTemplate validates an Plugin API external template/config struct
-func (v *Validator) ValidatePluginTemplate(t *pluginapi.Config) (errs []error) {
+// Validate validates an Plugin API external template/config struct
+func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 	if t.ImageOffer != "osa" {
 		errs = append(errs, fmt.Errorf("imageOffer should be osa"))
 	}
@@ -49,12 +44,12 @@ func (v *Validator) ValidatePluginTemplate(t *pluginapi.Config) (errs []error) {
 		errs = append(errs, fmt.Errorf("genevaMetricsEndpoint cannot be empty"))
 	}
 	// validate certificates
-	errs = append(errs, v.validatePluginTemplateCertificates(t.Certificates)...)
-	errs = append(errs, v.validatePluginTemplateImages(t.Images)...)
+	errs = append(errs, v.validatePluginTemplateCertificates(&t.Certificates)...)
+	errs = append(errs, v.validatePluginTemplateImages(&t.Images)...)
 	return errs
 }
 
-func (v *Validator) validatePluginTemplateCertificates(c pluginapi.CertificateConfig) (errs []error) {
+func (v *PluginAPIValidator) validatePluginTemplateCertificates(c *pluginapi.CertificateConfig) (errs []error) {
 	if c.GenevaLogging.Key == nil {
 		errs = append(errs, fmt.Errorf("GenevaLogging key cannot be empty"))
 	} else if err := c.GenevaLogging.Key.Validate(); err != nil {
@@ -75,7 +70,7 @@ func (v *Validator) validatePluginTemplateCertificates(c pluginapi.CertificateCo
 	return errs
 }
 
-func (v *Validator) validatePluginTemplateImages(i pluginapi.ImageConfig) (errs []error) {
+func (v *PluginAPIValidator) validatePluginTemplateImages(i *pluginapi.ImageConfig) (errs []error) {
 	if i.Format == "" {
 		errs = append(errs, fmt.Errorf("images.Format cannot be empty"))
 	}
