@@ -8,30 +8,50 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/ghodss/yaml"
+
 	"github.com/openshift/openshift-azure/pkg/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
 
 const (
-	LoggingSecretsDirectory = "secrets/"
+	SecretsDirectory      = "secrets/"
+	PluginConfigDirectory = "pluginconfig/"
+	TemplatesDirectory    = "/test/templates/"
 )
 
 func GetPluginConfig() (*api.PluginConfig, error) {
 	tc := api.TestConfig{
-		RunningUnderTest:      os.Getenv("RUNNING_UNDER_TEST") == "true",
-		ImageResourceGroup:    os.Getenv("IMAGE_RESOURCEGROUP"),
-		ImageResourceName:     os.Getenv("IMAGE_RESOURCENAME"),
-		DeployOS:              os.Getenv("DEPLOY_OS"),
-		ImageOffer:            os.Getenv("IMAGE_OFFER"),
-		ImageVersion:          os.Getenv("IMAGE_VERSION"),
-		ORegURL:               os.Getenv("OREG_URL"),
-		EtcdBackupImage:       os.Getenv("ETCDBACKUP_IMAGE"),
-		AzureControllersImage: os.Getenv("AZURE_CONTROLLERS_IMAGE"),
+		RunningUnderTest:   os.Getenv("RUNNING_UNDER_TEST") == "true",
+		ImageResourceGroup: os.Getenv("IMAGE_RESOURCEGROUP"),
+		ImageResourceName:  os.Getenv("IMAGE_RESOURCENAME"),
 	}
 
-	// populate geneva artifacts
-	artifactDir, err := shared.FindDirectory(LoggingSecretsDirectory)
+	return &api.PluginConfig{
+		AcceptLanguages: []string{"en-us"},
+		TestConfig:      tc,
+	}, nil
+}
+
+func GetPluginTemplate() (*pluginapi.Config, error) {
+	// read template file without secrets
+	artifactDir, err := shared.FindDirectory(PluginConfigDirectory)
+	if err != nil {
+		return nil, err
+	}
+	data, err := readFile(filepath.Join(artifactDir, "pluginconfig-311.yaml"))
+	if err != nil {
+		return nil, err
+	}
+	var template *pluginapi.Config
+	if err := yaml.Unmarshal(data, &template); err != nil {
+		return nil, err
+	}
+
+	// enrich template with secrets
+	artifactDir, err = shared.FindDirectory(SecretsDirectory)
 	if err != nil {
 		return nil, err
 	}
@@ -55,44 +75,37 @@ func GetPluginConfig() (*api.PluginConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	template.Certificates.GenevaLogging.Cert = logCert
+	template.Certificates.GenevaLogging.Key = logKey
+	template.Certificates.GenevaMetrics.Cert = metCert
+	template.Certificates.GenevaMetrics.Key = metKey
+	template.Images.GenevaImagePullSecret = pullSecret
 
-	var syncImage, metricsBridge string
-	if os.Getenv("SYNC_IMAGE") == "" {
-		syncImage = "quay.io/openshift-on-azure/sync:latest"
-	} else {
-		syncImage = os.Getenv("SYNC_IMAGE")
+	return template, nil
+}
+
+func overridePluginTemplate(template *pluginapi.Config) {
+	if os.Getenv("SYNC_IMAGE") != "" {
+		template.Images.Sync = os.Getenv("SYNC_IMAGE")
 	}
-	if os.Getenv("METRICSBRIDGE_IMAGE") == "" {
-		metricsBridge = "quay.io/openshift-on-azure/metricsbridge:latest"
-	} else {
-		metricsBridge = os.Getenv("METRICSBRIDGE_IMAGE")
+	if os.Getenv("METRICSBRIDGE_IMAGE") != "" {
+		template.Images.MetricsBridge = os.Getenv("METRICSBRIDGE_IMAGE")
 	}
-
-	genevaConfig := api.GenevaConfig{
-		ImagePullSecret: pullSecret,
-
-		LoggingCert:                logCert,
-		LoggingKey:                 logKey,
-		LoggingSector:              "US-Test",
-		LoggingAccount:             "ccpopenshiftdiag",
-		LoggingNamespace:           "CCPOpenShift",
-		LoggingControlPlaneAccount: "RPOpenShiftAccount",
-		LoggingImage:               "osarpint.azurecr.io/acs/mdsd:12051806",
-		TDAgentImage:               "osarpint.azurecr.io/acs/td-agent:latest",
-
-		MetricsCert:     metCert,
-		MetricsKey:      metKey,
-		MetricsBridge:   metricsBridge,
-		StatsdImage:     "osarpint.azurecr.io/acs/mdm:git-a909a2e76",
-		MetricsAccount:  "RPOpenShift",
-		MetricsEndpoint: "https://az-int.metrics.nsatc.net/",
+	if os.Getenv("ETCDBACKUP_IMAGE") != "" {
+		template.Images.EtcdBackup = os.Getenv("ETCDBACKUP_IMAGE")
 	}
-	return &api.PluginConfig{
-		SyncImage:       syncImage,
-		AcceptLanguages: []string{"en-us"},
-		TestConfig:      tc,
-		GenevaConfig:    genevaConfig,
-	}, nil
+	if os.Getenv("AZURE_CONTROLLERS_IMAGE") != "" {
+		template.Images.AzureControllers = os.Getenv("AZURE_CONTROLLERS_IMAGE")
+	}
+	if os.Getenv("OREG_URL") != "" {
+		template.Images.Format = os.Getenv("OREG_URL")
+	}
+	if os.Getenv("IMAGE_VERSION") != "" {
+		template.ImageVersion = os.Getenv("IMAGE_VERSION")
+	}
+	if os.Getenv("IMAGE_OFFER") != "" {
+		template.ImageOffer = os.Getenv("IMAGE_OFFER")
+	}
 }
 
 func readCert(path string) (*x509.Certificate, error) {

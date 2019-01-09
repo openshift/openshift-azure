@@ -3,8 +3,8 @@ package api
 
 import (
 	"context"
-	"crypto/rsa"
-	"crypto/x509"
+
+	plugin "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 )
 
 // ContextKey is a type for context property bag payload keys
@@ -73,48 +73,16 @@ type DeployFn func(context.Context, map[string]interface{}) error
 
 // PluginConfig is passed into NewPlugin
 type PluginConfig struct {
-	SyncImage       string
 	AcceptLanguages []string
-	GenevaConfig    GenevaConfig
 
 	TestConfig TestConfig
 }
 
-// TestConfig holds all testing variables.  It should be empty in production.
+// TestConfig holds all testing variables. It should be empty in production.
 type TestConfig struct {
-	RunningUnderTest      bool
-	ImageResourceGroup    string
-	ImageResourceName     string
-	ImageOffer            string
-	ImageVersion          string
-	DeployOS              string
-	ORegURL               string
-	EtcdBackupImage       string
-	AzureControllersImage string
-}
-
-// GenevaConfig holds all configuration for Plugin integration with Azure
-type GenevaConfig struct {
-	// Azure image pull secret
-	ImagePullSecret []byte
-
-	// Geneva Metric System (MDM) logging configration
-	LoggingCert                *x509.Certificate
-	LoggingKey                 *rsa.PrivateKey
-	LoggingSector              string
-	LoggingControlPlaneAccount string
-	LoggingAccount             string
-	LoggingNamespace           string
-	LoggingImage               string
-	TDAgentImage               string
-
-	// Geneva Metric System (MDM) metrics configration
-	MetricsCert     *x509.Certificate
-	MetricsKey      *rsa.PrivateKey
-	StatsdImage     string
-	MetricsBridge   string
-	MetricsEndpoint string
-	MetricsAccount  string
+	RunningUnderTest   bool
+	ImageResourceGroup string
+	ImageResourceName  string
 }
 
 // Plugin is the main interface to openshift-azure
@@ -130,9 +98,12 @@ type Plugin interface {
 	// ValidateAdmin is used for validating admin API requests.
 	ValidateAdmin(ctx context.Context, new, old *OpenShiftManagedCluster) []error
 
+	// ValidatePluginTemplate validates external config request
+	ValidatePluginTemplate(ctx context.Context, template *plugin.Config) []error
+
 	// GenerateConfig ensures all the necessary in-cluster config is generated
 	// for an Openshift cluster.
-	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster) error
+	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster, template *plugin.Config) error
 
 	// CreateOrUpdate either deploys or runs the update depending on the isUpdate argument
 	// this will call the deployer.

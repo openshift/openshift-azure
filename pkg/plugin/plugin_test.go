@@ -1,9 +1,7 @@
 package plugin
 
 import (
-	"errors"
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -12,7 +10,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
-	"github.com/openshift/openshift-azure/test/util/tls"
 )
 
 func TestCreateOrUpdate(t *testing.T) {
@@ -230,173 +227,6 @@ func TestCreateOrUpdate(t *testing.T) {
 			t.Errorf("plugin.CreateOrUpdate(%s) error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
 	}
-}
-
-func TestNewPlugin(t *testing.T) {
-	log := logrus.NewEntry(logrus.New())
-	tests := map[string]struct {
-		f            func(*api.PluginConfig)
-		expectedErrs []error
-	}{
-		"empty syncImage": {
-			f: func(p *api.PluginConfig) {
-				p.SyncImage = ""
-			},
-			expectedErrs: []error{
-				errors.New(`syncImage cannot be empty`),
-			},
-		},
-		"empty imagePullSecret": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.ImagePullSecret = []byte{}
-			},
-			expectedErrs: []error{
-				errors.New(`imagePullSecret cannot be empty`),
-			},
-		},
-		"empty LoggingSector": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.LoggingSector = ""
-			},
-			expectedErrs: []error{
-				errors.New(`loggingSector cannot be empty`),
-			},
-		},
-		"empty LoggingImage": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.LoggingImage = ""
-			},
-			expectedErrs: []error{
-				errors.New(`loggingImage cannot be empty`),
-			},
-		},
-		"empty tdAgentImage": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.TDAgentImage = ""
-			},
-			expectedErrs: []error{
-				errors.New(`tdAgentImage cannot be empty`),
-			},
-		},
-		"nil loggingKey": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.LoggingKey = nil
-			},
-			expectedErrs: []error{
-				errors.New(`loggingKey cannot be nil`),
-			},
-		},
-		"nil loggingCert": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.LoggingCert = nil
-			},
-			expectedErrs: []error{
-				errors.New(`loggingCert cannot be nil`),
-			},
-		},
-		"empty loggingControlPlaneAccount": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.LoggingControlPlaneAccount = ""
-			},
-			expectedErrs: []error{
-				errors.New(`loggingControlPlaneAccount cannot be empty`),
-			},
-		},
-		"nil metricsCert": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.MetricsCert = nil
-			},
-			expectedErrs: []error{
-				errors.New(`metricsCert cannot be nil`),
-			},
-		},
-		"nil metricsKey": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.MetricsKey = nil
-			},
-			expectedErrs: []error{
-				errors.New(`metricsKey cannot be nil`),
-			},
-		},
-		"empty metricsBridge": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.MetricsBridge = ""
-			},
-			expectedErrs: []error{
-				errors.New(`metricsBridge cannot be empty`),
-			},
-		},
-		"empty statsdImage": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.StatsdImage = ""
-			},
-			expectedErrs: []error{
-				errors.New(`statsdImage cannot be empty`),
-			},
-		},
-		"empty metricsEndpoint": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.MetricsEndpoint = ""
-			},
-			expectedErrs: []error{
-				errors.New(`metricsEndpoint cannot be empty`),
-			},
-		},
-		"empty metricsAccount": {
-			f: func(p *api.PluginConfig) {
-				p.GenevaConfig.MetricsAccount = ""
-			},
-			expectedErrs: []error{
-				errors.New(`metricsAccount cannot be empty`),
-			},
-		},
-	}
-
-	for name, test := range tests {
-		pCfg, err := getDummyPluginConfig()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		test.f(pCfg)
-		_, errs := NewPlugin(log, pCfg)
-		if !reflect.DeepEqual(errs, test.expectedErrs) {
-			t.Errorf("%s expected errors:", name)
-			for _, err := range test.expectedErrs {
-				t.Errorf("\t%v", err)
-			}
-			t.Error("received errors:")
-			for _, err := range errs {
-				t.Errorf("\t%v", err)
-			}
-		}
-	}
-}
-
-func getDummyPluginConfig() (*api.PluginConfig, error) {
-	// dummy config
-	return &api.PluginConfig{
-		SyncImage: "syncImage",
-		GenevaConfig: api.GenevaConfig{
-			ImagePullSecret: []byte("imagePullSecret"),
-
-			LoggingSector:              "loggingSector",
-			LoggingAccount:             "loggingAccount",
-			LoggingNamespace:           "loggingNamespace",
-			LoggingControlPlaneAccount: "loggingControlPlaneAccount",
-			LoggingCert:                tls.GetDummyCertificate(),
-			LoggingKey:                 tls.GetDummyPrivateKey(),
-			TDAgentImage:               "tdAgentImage",
-			LoggingImage:               "loggingImage",
-
-			MetricsCert:     tls.GetDummyCertificate(),
-			MetricsKey:      tls.GetDummyPrivateKey(),
-			MetricsBridge:   "metricsBridge",
-			StatsdImage:     "statsdImage",
-			MetricsAccount:  "metricsAccount",
-			MetricsEndpoint: "metricsEndpoint",
-		},
-	}, nil
 }
 
 func TestRecoverEtcdCluster(t *testing.T) {
