@@ -239,6 +239,16 @@ var Translations = map[string][]struct {
 			NestedPath: jsonpath.MustCompile("$.region"),
 			Template:   "{{ .ContainerService.Location }}",
 		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.resourceGroupName"),
+			Template:   "{{ .ContainerService.Properties.AzProfile.ResourceGroup }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.subscriptionId"),
+			Template:   "{{ .ContainerService.Properties.AzProfile.SubscriptionID }}",
+		},
 	},
 	"ConfigMap/openshift-node/node-config-compute": {
 		{

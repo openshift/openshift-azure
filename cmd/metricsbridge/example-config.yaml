@@ -1,4 +1,4 @@
-intervalNanoseconds: 30000000000 # every 30 seconds
+# intervalNanoseconds: 10000000000 # every 10 seconds
 prometheusFederateEndpoint: https://prometheus-k8s.openshift-monitoring.svc:9091/federate
 statsdSocket: mdm_statsd.socket # nc -U -l mdm_statsd.socket
 series:
@@ -10,9 +10,11 @@ series:
 - kube_pod_info
 - kube_pod_status_phase
 - kube_pod_status_ready
-account: RPOpenShift
-namespace: Prometheus
-region: eastus
+# account: RPOpenShift
+# namespace: Prometheus
+# region: eastus
+# subscriptionId: 95a188ab-74f7-4d5e-829b-18179a23ff93
+# resourceGroupName: resourcegroup
 
 ## for testing outside of the cluster:
 # prometheusFederateEndpoint: https://prometheus-k8s-openshift-monitoring.$RESOURCEGROUP.osadev.cloud/federate

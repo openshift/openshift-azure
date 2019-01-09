@@ -25,9 +25,27 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/statsd"
 )
 
+/*
+curl -Gks \
+  -H "Authorization: Bearer $(oc serviceaccounts get-token -n openshift-monitoring prometheus-k8s)" \
+  --data-urlencode 'match[]={__name__=~".+"}' \
+  https://prometheus-k8s.openshift-monitoring.svc:9091/federate
+*/
+
 var (
 	logLevel  = flag.String("loglevel", "Debug", "Valid values are Debug, Info, Warning, Error")
 	gitCommit = "unknown"
+
+	omitLabels = map[string]struct{}{ // these must be lower case
+		"cluster":            {},
+		"prometheus":         {},
+		"prometheus_replica": {},
+
+		// we populate these
+		"region":            {},
+		"subscriptionid":    {},
+		"resourcegroupname": {},
+	}
 )
 
 type config struct {
@@ -39,7 +57,10 @@ type config struct {
 
 	Account   string `json:"account,omitempty"`
 	Namespace string `json:"namespace,omitempty"`
-	Region    string `json:"region,omitempty"`
+
+	Region            string `json:"region,omitempty"`
+	SubscriptionID    string `json:"subscriptionId,omitempty"`
+	ResourceGroupName string `json:"resourceGroupName,omitempty"`
 
 	Token              string `json:"token,omitempty"`
 	InsecureSkipVerify bool   `json:"insecureSkipVerify,omitempty"`
@@ -47,7 +68,7 @@ type config struct {
 	log     *logrus.Entry
 	rootCAs *x509.CertPool
 	http    *http.Client
-	statsd  *statsd.Client
+	conn    net.Conn
 }
 
 func (c *config) load(path string) error {
@@ -82,9 +103,13 @@ func (c *config) load(path string) error {
 	return nil
 }
 
-func (c *config) validate() (errs []error) {
+func (c *config) defaultAndValidate() (errs []error) {
+	if c.Interval == 0 {
+		c.Interval = time.Minute
+	}
+
 	if c.Interval < time.Second {
-		errs = append(errs, fmt.Errorf("intervalNanoseconds %q too small", c.Interval))
+		errs = append(errs, fmt.Errorf("intervalNanoseconds %q too small", int64(c.Interval)))
 	}
 	if _, err := url.Parse(c.PrometheusFederateEndpoint); err != nil {
 		errs = append(errs, fmt.Errorf("prometheusFederateEndpoint: %s", err))
@@ -100,10 +125,9 @@ func (c *config) validate() (errs []error) {
 }
 
 func (c *config) init() error {
-	var conn net.Conn
 	for {
 		var err error
-		conn, err = net.Dial("unix", c.StatsdSocket)
+		c.conn, err = net.Dial("unix", c.StatsdSocket)
 		if err == nil {
 			break
 		}
@@ -118,8 +142,6 @@ func (c *config) init() error {
 		}
 		return err
 	}
-
-	c.statsd = statsd.NewClient(conn)
 
 	c.http = &http.Client{
 		Transport: &http.Transport{
@@ -140,7 +162,7 @@ func run(log *logrus.Entry, configpath string) error {
 		return err
 	}
 
-	if errs := c.validate(); len(errs) > 0 {
+	if errs := c.defaultAndValidate(); len(errs) > 0 {
 		var sb strings.Builder
 		for _, err := range errs {
 			sb.WriteString(err.Error())
@@ -149,10 +171,14 @@ func run(log *logrus.Entry, configpath string) error {
 		return errors.New(sb.String())
 	}
 
+	if c.Interval != time.Minute {
+		log.Warnf("intervalNanoseconds is set to %q.  It must be set to %q in production", int64(c.Interval), int64(time.Minute))
+	}
+
 	if err := c.init(); err != nil {
 		return err
 	}
-	defer c.statsd.Close()
+	defer c.conn.Close()
 
 	return c.run()
 }
@@ -218,26 +244,36 @@ func (c *config) runOnce(req *http.Request) error {
 				Metric:    *family.Name,
 				Account:   c.Account,
 				Namespace: c.Namespace,
-				Dims: map[string]string{
-					"Region": c.Region,
-				},
-				TS:    now,
-				Value: *m.Untyped.Value,
+				Dims:      map[string]string{},
+				TS:        now,
+				Value:     *m.Untyped.Value,
 			}
 			for _, label := range m.Label {
+				if _, found := omitLabels[strings.ToLower(*label.Name)]; found {
+					continue
+				}
 				f.Dims[*label.Name] = *label.Value
+			}
+			if c.Region != "" {
+				f.Dims["region"] = c.Region
+			}
+			if c.SubscriptionID != "" {
+				f.Dims["subscriptionId"] = c.SubscriptionID
+			}
+			if c.ResourceGroupName != "" {
+				f.Dims["resourceGroupName"] = c.ResourceGroupName
 			}
 			b, err := f.Marshal()
 			if err != nil {
 				return err
 			}
-			if _, err = c.statsd.Write(b); err != nil {
+			if _, err = c.conn.Write(b); err != nil {
 				return err
 			}
 		}
 	}
 
-	return c.statsd.Flush()
+	return nil
 }
 
 func main() {
