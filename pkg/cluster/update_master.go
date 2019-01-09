@@ -25,9 +25,9 @@ func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, bl
 	return oldVMs
 }
 
-// updateMasterAgentPool updates one by one all the VMs of the master scale set,
+// UpdateMasterAgentPool updates one by one all the VMs of the master scale set,
 // in place.
-func (u *simpleUpgrader) updateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError {
+func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError {
 	ssName := config.MasterScalesetName
 	ssHash, err := u.hasher.HashScaleSet(cs, app)
 	if err != nil {

@@ -59,7 +59,7 @@ func (u *simpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string
 // be running in the "target" scale set.  In update scenarios, there will be a
 // "source" scale set which contains out-of-date instances (in crash recovery
 // scenarios, there could be multiple of these).
-func (u *simpleUpgrader) updateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError {
+func (u *simpleUpgrader) UpdateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError {
 	u.log.Infof("updating worker agent pool %s", app.Name)
 
 	desiredHash, err := u.hasher.HashScaleSet(cs, app)

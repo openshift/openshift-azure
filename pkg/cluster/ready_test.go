@@ -160,7 +160,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 				kubeclient: kubeclient,
 				log:        logrus.NewEntry(logrus.StandardLogger()),
 			}
-			err := u.waitForNodes(ctx, cs, "")
+			err := u.WaitForNodes(ctx, cs, "")
 			if tt.wantErr && tt.expectedErr != err {
 				t.Errorf("simpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
 			}

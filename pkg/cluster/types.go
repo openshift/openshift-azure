@@ -31,11 +31,18 @@ const (
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
 	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError
-	Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError
-	EtcdRestore(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError
+	Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error
+	WriteUpdateBlob(ublob *updateblob.UpdateBlob) error
+	ReadUpdateBlob() (*updateblob.UpdateBlob, error)
+	InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error
+	WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	WaitForInfraServices(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
+	WaitForMasters(ctx context.Context, cs *api.OpenShiftManagedCluster) error
+	WaitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, suffix string) error
+	UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError
+	UpdateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError
+	Evacuate(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 }
 
 type simpleUpgrader struct {

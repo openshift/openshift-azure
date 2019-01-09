@@ -11,6 +11,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
+	updateblob "github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 )
 
 // MockUpgrader is a mock of Upgrader interface
@@ -50,46 +51,75 @@ func (mr *MockUpgraderMockRecorder) CreateClients(ctx, cs interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClients", reflect.TypeOf((*MockUpgrader)(nil).CreateClients), ctx, cs)
 }
 
-// Deploy mocks base method
-func (m *MockUpgrader) Deploy(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError {
+// Initialize mocks base method
+func (m *MockUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Deploy", ctx, cs, azuretemplate, deployFn, suffix)
-	ret0, _ := ret[0].(*api.PluginError)
+	ret := m.ctrl.Call(m, "Initialize", ctx, cs)
+	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Deploy indicates an expected call of Deploy
-func (mr *MockUpgraderMockRecorder) Deploy(ctx, cs, azuretemplate, deployFn, suffix interface{}) *gomock.Call {
+// Initialize indicates an expected call of Initialize
+func (mr *MockUpgraderMockRecorder) Initialize(ctx, cs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Deploy", reflect.TypeOf((*MockUpgrader)(nil).Deploy), ctx, cs, azuretemplate, deployFn, suffix)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Initialize", reflect.TypeOf((*MockUpgrader)(nil).Initialize), ctx, cs)
 }
 
-// Update mocks base method
-func (m *MockUpgrader) Update(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn, suffix string) *api.PluginError {
+// WriteUpdateBlob mocks base method
+func (m *MockUpgrader) WriteUpdateBlob(ublob *updateblob.UpdateBlob) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", ctx, cs, azuretemplate, deployFn, suffix)
-	ret0, _ := ret[0].(*api.PluginError)
+	ret := m.ctrl.Call(m, "WriteUpdateBlob", ublob)
+	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Update indicates an expected call of Update
-func (mr *MockUpgraderMockRecorder) Update(ctx, cs, azuretemplate, deployFn, suffix interface{}) *gomock.Call {
+// WriteUpdateBlob indicates an expected call of WriteUpdateBlob
+func (mr *MockUpgraderMockRecorder) WriteUpdateBlob(ublob interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUpgrader)(nil).Update), ctx, cs, azuretemplate, deployFn, suffix)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteUpdateBlob", reflect.TypeOf((*MockUpgrader)(nil).WriteUpdateBlob), ublob)
 }
 
-// EtcdRestore mocks base method
-func (m *MockUpgrader) EtcdRestore(ctx context.Context, cs *api.OpenShiftManagedCluster, azuretemplate map[string]interface{}, deployFn api.DeployFn) *api.PluginError {
+// ReadUpdateBlob mocks base method
+func (m *MockUpgrader) ReadUpdateBlob() (*updateblob.UpdateBlob, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EtcdRestore", ctx, cs, azuretemplate, deployFn)
-	ret0, _ := ret[0].(*api.PluginError)
+	ret := m.ctrl.Call(m, "ReadUpdateBlob")
+	ret0, _ := ret[0].(*updateblob.UpdateBlob)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ReadUpdateBlob indicates an expected call of ReadUpdateBlob
+func (mr *MockUpgraderMockRecorder) ReadUpdateBlob() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadUpdateBlob", reflect.TypeOf((*MockUpgrader)(nil).ReadUpdateBlob))
+}
+
+// InitializeUpdateBlob mocks base method
+func (m *MockUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InitializeUpdateBlob", cs, suffix)
+	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// EtcdRestore indicates an expected call of EtcdRestore
-func (mr *MockUpgraderMockRecorder) EtcdRestore(ctx, cs, azuretemplate, deployFn interface{}) *gomock.Call {
+// InitializeUpdateBlob indicates an expected call of InitializeUpdateBlob
+func (mr *MockUpgraderMockRecorder) InitializeUpdateBlob(cs, suffix interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EtcdRestore", reflect.TypeOf((*MockUpgrader)(nil).EtcdRestore), ctx, cs, azuretemplate, deployFn)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InitializeUpdateBlob", reflect.TypeOf((*MockUpgrader)(nil).InitializeUpdateBlob), cs, suffix)
+}
+
+// WaitForHealthzStatusOk mocks base method
+func (m *MockUpgrader) WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForHealthzStatusOk", ctx, cs)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForHealthzStatusOk indicates an expected call of WaitForHealthzStatusOk
+func (mr *MockUpgraderMockRecorder) WaitForHealthzStatusOk(ctx, cs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForHealthzStatusOk", reflect.TypeOf((*MockUpgrader)(nil).WaitForHealthzStatusOk), ctx, cs)
 }
 
 // HealthCheck mocks base method
@@ -118,4 +148,74 @@ func (m *MockUpgrader) WaitForInfraServices(ctx context.Context, cs *api.OpenShi
 func (mr *MockUpgraderMockRecorder) WaitForInfraServices(ctx, cs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForInfraServices", reflect.TypeOf((*MockUpgrader)(nil).WaitForInfraServices), ctx, cs)
+}
+
+// WaitForMasters mocks base method
+func (m *MockUpgrader) WaitForMasters(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForMasters", ctx, cs)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForMasters indicates an expected call of WaitForMasters
+func (mr *MockUpgraderMockRecorder) WaitForMasters(ctx, cs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForMasters", reflect.TypeOf((*MockUpgrader)(nil).WaitForMasters), ctx, cs)
+}
+
+// WaitForNodes mocks base method
+func (m *MockUpgrader) WaitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, suffix string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForNodes", ctx, cs, suffix)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForNodes indicates an expected call of WaitForNodes
+func (mr *MockUpgraderMockRecorder) WaitForNodes(ctx, cs, suffix interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForNodes", reflect.TypeOf((*MockUpgrader)(nil).WaitForNodes), ctx, cs, suffix)
+}
+
+// UpdateMasterAgentPool mocks base method
+func (m *MockUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMasterAgentPool", ctx, cs, app)
+	ret0, _ := ret[0].(*api.PluginError)
+	return ret0
+}
+
+// UpdateMasterAgentPool indicates an expected call of UpdateMasterAgentPool
+func (mr *MockUpgraderMockRecorder) UpdateMasterAgentPool(ctx, cs, app interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMasterAgentPool", reflect.TypeOf((*MockUpgrader)(nil).UpdateMasterAgentPool), ctx, cs, app)
+}
+
+// UpdateWorkerAgentPool mocks base method
+func (m *MockUpgrader) UpdateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateWorkerAgentPool", ctx, cs, app, suffix)
+	ret0, _ := ret[0].(*api.PluginError)
+	return ret0
+}
+
+// UpdateWorkerAgentPool indicates an expected call of UpdateWorkerAgentPool
+func (mr *MockUpgraderMockRecorder) UpdateWorkerAgentPool(ctx, cs, app, suffix interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateWorkerAgentPool", reflect.TypeOf((*MockUpgrader)(nil).UpdateWorkerAgentPool), ctx, cs, app, suffix)
+}
+
+// Evacuate mocks base method
+func (m *MockUpgrader) Evacuate(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Evacuate", ctx, cs)
+	ret0, _ := ret[0].(*api.PluginError)
+	return ret0
+}
+
+// Evacuate indicates an expected call of Evacuate
+func (mr *MockUpgraderMockRecorder) Evacuate(ctx, cs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Evacuate", reflect.TypeOf((*MockUpgrader)(nil).Evacuate), ctx, cs)
 }

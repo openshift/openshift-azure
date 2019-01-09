@@ -68,3 +68,8 @@ func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManag
 	u.log.Info("checking admin console health")
 	return u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://console."+cs.Properties.RouterProfiles[0].PublicSubdomain, 10*time.Second)
 }
+
+func (u *simpleUpgrader) WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	_, err := wait.ForHTTPStatusOk(ctx, u.log, u.rt, "https://"+cs.Properties.FQDN+"/healthz")
+	return err
+}

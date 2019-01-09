@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"context"
+	"sort"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
@@ -32,8 +33,20 @@ func (u *simpleUpgrader) waitForNodesInAgentPoolProfile(ctx context.Context, cs 
 	return nil
 }
 
-func (u *simpleUpgrader) waitForMasters(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+// SortedAgentPoolProfilesForRole returns a shallow copy of the
+// AgentPoolProfiles of a given role, sorted by name
+func SortedAgentPoolProfilesForRole(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) (apps []api.AgentPoolProfile) {
+	for _, app := range cs.Properties.AgentPoolProfiles {
+		if app.Role == role {
+			apps = append(apps, app)
+		}
+	}
+	sort.Slice(apps, func(i, j int) bool { return apps[i].Name < apps[j].Name })
+	return apps
+}
+
+func (u *simpleUpgrader) WaitForMasters(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	for _, app := range SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
 		err := u.waitForNodesInAgentPoolProfile(ctx, cs, &app, "")
 		if err != nil {
 			return err
@@ -43,20 +56,20 @@ func (u *simpleUpgrader) waitForMasters(ctx context.Context, cs *api.OpenShiftMa
 	return nil
 }
 
-func (u *simpleUpgrader) waitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, suffix string) error {
-	err := u.waitForMasters(ctx, cs)
+func (u *simpleUpgrader) WaitForNodes(ctx context.Context, cs *api.OpenShiftManagedCluster, suffix string) error {
+	err := u.WaitForMasters(ctx, cs)
 	if err != nil {
 		return err
 	}
 
-	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
+	for _, app := range SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
 		err := u.waitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
 		if err != nil {
 			return err
 		}
 	}
 
-	for _, app := range sortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
+	for _, app := range SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
 		err := u.waitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
 		if err != nil {
 			return err

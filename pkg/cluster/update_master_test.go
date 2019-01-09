@@ -199,7 +199,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 
 				c = ubs.EXPECT().Write(uBlob).Return(nil).After(c)
 			}
-			if got := u.updateMasterAgentPool(ctx, tt.cs, &tt.cs.Properties.AgentPoolProfiles[0]); !reflect.DeepEqual(got, tt.want) {
+			if got := u.UpdateMasterAgentPool(ctx, tt.cs, &tt.cs.Properties.AgentPoolProfiles[0]); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("simpleUpgrader.updateInPlace() = %v, want %v", got, tt.want)
 			}
 		})
