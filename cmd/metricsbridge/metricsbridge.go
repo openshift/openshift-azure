@@ -28,6 +28,17 @@ import (
 var (
 	logLevel  = flag.String("loglevel", "Debug", "Valid values are Debug, Info, Warning, Error")
 	gitCommit = "unknown"
+
+	omitLabels = map[string]struct{}{ // these must be lower case
+		"cluster":            {},
+		"prometheus":         {},
+		"prometheus_replica": {},
+
+		// we populate these
+		"region":            {},
+		"subscriptionid":    {},
+		"resourcegroupname": {},
+	}
 )
 
 type config struct {
@@ -231,6 +242,9 @@ func (c *config) runOnce(req *http.Request) error {
 				Value:     *m.Untyped.Value,
 			}
 			for _, label := range m.Label {
+				if _, found := omitLabels[strings.ToLower(*label.Name)]; found {
+					continue
+				}
 				f.Dims[*label.Name] = *label.Value
 			}
 			if c.Region != "" {
