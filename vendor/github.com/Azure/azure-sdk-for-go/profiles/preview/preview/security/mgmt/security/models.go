@@ -21,6 +21,7 @@ package security
 
 import original "github.com/Azure/azure-sdk-for-go/services/preview/security/mgmt/2017-08-01-preview/security"
 
+type AdvancedThreatProtectionClient = original.AdvancedThreatProtectionClient
 type AlertsClient = original.AlertsClient
 type AutoProvisioningSettingsClient = original.AutoProvisioningSettingsClient
 
@@ -84,10 +85,17 @@ const (
 type KindEnum = original.KindEnum
 
 const (
-	KindAAD                      KindEnum = original.KindAAD
-	KindATA                      KindEnum = original.KindATA
-	KindCEF                      KindEnum = original.KindCEF
-	KindExternalSecuritySolution KindEnum = original.KindExternalSecuritySolution
+	KindDataExportSetting KindEnum = original.KindDataExportSetting
+	KindSetting           KindEnum = original.KindSetting
+)
+
+type KindEnum1 = original.KindEnum1
+
+const (
+	KindAAD                      KindEnum1 = original.KindAAD
+	KindATA                      KindEnum1 = original.KindATA
+	KindCEF                      KindEnum1 = original.KindCEF
+	KindExternalSecuritySolution KindEnum1 = original.KindExternalSecuritySolution
 )
 
 type PricingTier = original.PricingTier
@@ -103,6 +111,12 @@ const (
 	All Protocol = original.All
 	TCP Protocol = original.TCP
 	UDP Protocol = original.UDP
+)
+
+type SettingKind = original.SettingKind
+
+const (
+	SettingKindDataExportSetting SettingKind = original.SettingKindDataExportSetting
 )
 
 type Status = original.Status
@@ -123,6 +137,8 @@ const (
 type AadConnectivityState1 = original.AadConnectivityState1
 type AadExternalSecuritySolution = original.AadExternalSecuritySolution
 type AadSolutionProperties = original.AadSolutionProperties
+type AdvancedThreatProtectionProperties = original.AdvancedThreatProtectionProperties
+type AdvancedThreatProtectionSetting = original.AdvancedThreatProtectionSetting
 type Alert = original.Alert
 type AlertConfidenceReason = original.AlertConfidenceReason
 type AlertEntity = original.AlertEntity
@@ -157,6 +173,8 @@ type ContactList = original.ContactList
 type ContactListIterator = original.ContactListIterator
 type ContactListPage = original.ContactListPage
 type ContactProperties = original.ContactProperties
+type DataExportSetting = original.DataExportSetting
+type DataExportSettingProperties = original.DataExportSettingProperties
 type DiscoveredSecuritySolution = original.DiscoveredSecuritySolution
 type DiscoveredSecuritySolutionList = original.DiscoveredSecuritySolutionList
 type DiscoveredSecuritySolutionListIterator = original.DiscoveredSecuritySolutionListIterator
@@ -196,6 +214,13 @@ type PricingListIterator = original.PricingListIterator
 type PricingListPage = original.PricingListPage
 type PricingProperties = original.PricingProperties
 type Resource = original.Resource
+type BasicSetting = original.BasicSetting
+type Setting = original.Setting
+type SettingKind1 = original.SettingKind1
+type SettingModel = original.SettingModel
+type SettingsList = original.SettingsList
+type SettingsListIterator = original.SettingsListIterator
+type SettingsListPage = original.SettingsListPage
 type Task = original.Task
 type TaskList = original.TaskList
 type TaskListIterator = original.TaskListIterator
@@ -209,9 +234,16 @@ type WorkspaceSettingListPage = original.WorkspaceSettingListPage
 type WorkspaceSettingProperties = original.WorkspaceSettingProperties
 type OperationsClient = original.OperationsClient
 type PricingsClient = original.PricingsClient
+type SettingsClient = original.SettingsClient
 type TasksClient = original.TasksClient
 type WorkspaceSettingsClient = original.WorkspaceSettingsClient
 
+func NewAdvancedThreatProtectionClient(subscriptionID string, ascLocation string) AdvancedThreatProtectionClient {
+	return original.NewAdvancedThreatProtectionClient(subscriptionID, ascLocation)
+}
+func NewAdvancedThreatProtectionClientWithBaseURI(baseURI string, subscriptionID string, ascLocation string) AdvancedThreatProtectionClient {
+	return original.NewAdvancedThreatProtectionClientWithBaseURI(baseURI, subscriptionID, ascLocation)
+}
 func NewAlertsClient(subscriptionID string, ascLocation string) AlertsClient {
 	return original.NewAlertsClient(subscriptionID, ascLocation)
 }
@@ -287,11 +319,17 @@ func PossibleFamilyValues() []Family {
 func PossibleKindEnumValues() []KindEnum {
 	return original.PossibleKindEnumValues()
 }
+func PossibleKindEnum1Values() []KindEnum1 {
+	return original.PossibleKindEnum1Values()
+}
 func PossiblePricingTierValues() []PricingTier {
 	return original.PossiblePricingTierValues()
 }
 func PossibleProtocolValues() []Protocol {
 	return original.PossibleProtocolValues()
+}
+func PossibleSettingKindValues() []SettingKind {
+	return original.PossibleSettingKindValues()
 }
 func PossibleStatusValues() []Status {
 	return original.PossibleStatusValues()
@@ -310,6 +348,12 @@ func NewPricingsClient(subscriptionID string, ascLocation string) PricingsClient
 }
 func NewPricingsClientWithBaseURI(baseURI string, subscriptionID string, ascLocation string) PricingsClient {
 	return original.NewPricingsClientWithBaseURI(baseURI, subscriptionID, ascLocation)
+}
+func NewSettingsClient(subscriptionID string, ascLocation string) SettingsClient {
+	return original.NewSettingsClient(subscriptionID, ascLocation)
+}
+func NewSettingsClientWithBaseURI(baseURI string, subscriptionID string, ascLocation string) SettingsClient {
+	return original.NewSettingsClientWithBaseURI(baseURI, subscriptionID, ascLocation)
 }
 func NewTasksClient(subscriptionID string, ascLocation string) TasksClient {
 	return original.NewTasksClient(subscriptionID, ascLocation)

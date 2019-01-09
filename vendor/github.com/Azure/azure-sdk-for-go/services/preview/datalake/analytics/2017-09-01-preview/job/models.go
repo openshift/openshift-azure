@@ -310,8 +310,10 @@ func (future *CancelFuture) Result(client Client) (ar autorest.Response, err err
 type CreateJobParameters struct {
 	// Name - The friendly name of the job to submit.
 	Name *string `json:"name,omitempty"`
-	// DegreeOfParallelism - The degree of parallelism to use for this job. This must be greater than 0, if set to less than 0 it will default to 1.
+	// DegreeOfParallelism - The degree of parallelism to use for this job. At most one of degreeOfParallelism and degreeOfParallelismPercent should be specified. If none, a default value of 1 will be used for degreeOfParallelism.
 	DegreeOfParallelism *int32 `json:"degreeOfParallelism,omitempty"`
+	// DegreeOfParallelismPercent - the degree of parallelism in percentage used for this job. At most one of degreeOfParallelism and degreeOfParallelismPercent should be specified. If none, a default value of 1 will be used for degreeOfParallelism.
+	DegreeOfParallelismPercent *float64 `json:"degreeOfParallelismPercent,omitempty"`
 	// Priority - The priority value to use for the current job. Lower numbers have a higher priority. By default, a job has a priority of 1000. This must be greater than 0.
 	Priority *int32 `json:"priority,omitempty"`
 	// LogFilePatterns - The list of log file name patterns to find in the logFolder. '*' is the only matching character allowed. Example format: jobExecution*.log or *mylog*.txt
@@ -350,6 +352,15 @@ func (cjp *CreateJobParameters) UnmarshalJSON(body []byte) error {
 					return err
 				}
 				cjp.DegreeOfParallelism = &degreeOfParallelism
+			}
+		case "degreeOfParallelismPercent":
+			if v != nil {
+				var degreeOfParallelismPercent float64
+				err = json.Unmarshal(*v, &degreeOfParallelismPercent)
+				if err != nil {
+					return err
+				}
+				cjp.DegreeOfParallelismPercent = &degreeOfParallelismPercent
 			}
 		case "priority":
 			if v != nil {
@@ -502,8 +513,10 @@ type CreateScopeJobParameters struct {
 	Tags map[string]*string `json:"tags"`
 	// Name - The friendly name of the job to submit.
 	Name *string `json:"name,omitempty"`
-	// DegreeOfParallelism - The degree of parallelism to use for this job. This must be greater than 0, if set to less than 0 it will default to 1.
+	// DegreeOfParallelism - The degree of parallelism to use for this job. At most one of degreeOfParallelism and degreeOfParallelismPercent should be specified. If none, a default value of 1 will be used for degreeOfParallelism.
 	DegreeOfParallelism *int32 `json:"degreeOfParallelism,omitempty"`
+	// DegreeOfParallelismPercent - the degree of parallelism in percentage used for this job. At most one of degreeOfParallelism and degreeOfParallelismPercent should be specified. If none, a default value of 1 will be used for degreeOfParallelism.
+	DegreeOfParallelismPercent *float64 `json:"degreeOfParallelismPercent,omitempty"`
 	// Priority - The priority value to use for the current job. Lower numbers have a higher priority. By default, a job has a priority of 1000. This must be greater than 0.
 	Priority *int32 `json:"priority,omitempty"`
 	// LogFilePatterns - The list of log file name patterns to find in the logFolder. '*' is the only matching character allowed. Example format: jobExecution*.log or *mylog*.txt
@@ -527,6 +540,9 @@ func (csjp CreateScopeJobParameters) MarshalJSON() ([]byte, error) {
 	}
 	if csjp.DegreeOfParallelism != nil {
 		objectMap["degreeOfParallelism"] = csjp.DegreeOfParallelism
+	}
+	if csjp.DegreeOfParallelismPercent != nil {
+		objectMap["degreeOfParallelismPercent"] = csjp.DegreeOfParallelismPercent
 	}
 	if csjp.Priority != nil {
 		objectMap["priority"] = csjp.Priority
@@ -579,6 +595,15 @@ func (csjp *CreateScopeJobParameters) UnmarshalJSON(body []byte) error {
 					return err
 				}
 				csjp.DegreeOfParallelism = &degreeOfParallelism
+			}
+		case "degreeOfParallelismPercent":
+			if v != nil {
+				var degreeOfParallelismPercent float64
+				err = json.Unmarshal(*v, &degreeOfParallelismPercent)
+				if err != nil {
+					return err
+				}
+				csjp.DegreeOfParallelismPercent = &degreeOfParallelismPercent
 			}
 		case "priority":
 			if v != nil {
@@ -987,8 +1012,10 @@ type Information struct {
 	Type TypeEnum `json:"type,omitempty"`
 	// Submitter - The user or account that submitted the job.
 	Submitter *string `json:"submitter,omitempty"`
-	// DegreeOfParallelism - The degree of parallelism used for this job. This must be greater than 0, if set to less than 0 it will default to 1.
+	// DegreeOfParallelism - The degree of parallelism used for this job.
 	DegreeOfParallelism *int32 `json:"degreeOfParallelism,omitempty"`
+	// DegreeOfParallelismPercent - the degree of parallelism in percentage used for this job.
+	DegreeOfParallelismPercent *float64 `json:"degreeOfParallelismPercent,omitempty"`
 	// Priority - The priority value for the current job. Lower numbers have a higher priority. By default, a job has a priority of 1000. This must be greater than 0.
 	Priority *int32 `json:"priority,omitempty"`
 	// SubmitTime - The time the job was submitted to the service.
@@ -1009,6 +1036,8 @@ type Information struct {
 	Related *RelationshipProperties `json:"related,omitempty"`
 	// Tags - The key-value pairs used to add additional metadata to the job information. (Only for use internally with Scope job type.)
 	Tags map[string]*string `json:"tags"`
+	// HierarchyQueueNode - the name of hierarchy queue node this job is assigned to, Null if job has not been assigned yet or the account doesn't have hierarchy queue.
+	HierarchyQueueNode *string `json:"hierarchyQueueNode,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for Information.
@@ -1035,6 +1064,9 @@ func (i Information) MarshalJSON() ([]byte, error) {
 	}
 	if i.DegreeOfParallelism != nil {
 		objectMap["degreeOfParallelism"] = i.DegreeOfParallelism
+	}
+	if i.DegreeOfParallelismPercent != nil {
+		objectMap["degreeOfParallelismPercent"] = i.DegreeOfParallelismPercent
 	}
 	if i.Priority != nil {
 		objectMap["priority"] = i.Priority
@@ -1065,6 +1097,9 @@ func (i Information) MarshalJSON() ([]byte, error) {
 	}
 	if i.Tags != nil {
 		objectMap["tags"] = i.Tags
+	}
+	if i.HierarchyQueueNode != nil {
+		objectMap["hierarchyQueueNode"] = i.HierarchyQueueNode
 	}
 	return json.Marshal(objectMap)
 }
@@ -1148,6 +1183,15 @@ func (i *Information) UnmarshalJSON(body []byte) error {
 					return err
 				}
 				i.DegreeOfParallelism = &degreeOfParallelism
+			}
+		case "degreeOfParallelismPercent":
+			if v != nil {
+				var degreeOfParallelismPercent float64
+				err = json.Unmarshal(*v, &degreeOfParallelismPercent)
+				if err != nil {
+					return err
+				}
+				i.DegreeOfParallelismPercent = &degreeOfParallelismPercent
 			}
 		case "priority":
 			if v != nil {
@@ -1239,6 +1283,15 @@ func (i *Information) UnmarshalJSON(body []byte) error {
 				}
 				i.Tags = tags
 			}
+		case "hierarchyQueueNode":
+			if v != nil {
+				var hierarchyQueueNode string
+				err = json.Unmarshal(*v, &hierarchyQueueNode)
+				if err != nil {
+					return err
+				}
+				i.HierarchyQueueNode = &hierarchyQueueNode
+			}
 		}
 	}
 
@@ -1255,8 +1308,10 @@ type InformationBasic struct {
 	Type TypeEnum `json:"type,omitempty"`
 	// Submitter - The user or account that submitted the job.
 	Submitter *string `json:"submitter,omitempty"`
-	// DegreeOfParallelism - The degree of parallelism used for this job. This must be greater than 0, if set to less than 0 it will default to 1.
+	// DegreeOfParallelism - The degree of parallelism used for this job.
 	DegreeOfParallelism *int32 `json:"degreeOfParallelism,omitempty"`
+	// DegreeOfParallelismPercent - the degree of parallelism in percentage used for this job.
+	DegreeOfParallelismPercent *float64 `json:"degreeOfParallelismPercent,omitempty"`
 	// Priority - The priority value for the current job. Lower numbers have a higher priority. By default, a job has a priority of 1000. This must be greater than 0.
 	Priority *int32 `json:"priority,omitempty"`
 	// SubmitTime - The time the job was submitted to the service.
@@ -1277,6 +1332,8 @@ type InformationBasic struct {
 	Related *RelationshipProperties `json:"related,omitempty"`
 	// Tags - The key-value pairs used to add additional metadata to the job information. (Only for use internally with Scope job type.)
 	Tags map[string]*string `json:"tags"`
+	// HierarchyQueueNode - the name of hierarchy queue node this job is assigned to, Null if job has not been assigned yet or the account doesn't have hierarchy queue.
+	HierarchyQueueNode *string `json:"hierarchyQueueNode,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for InformationBasic.
@@ -1296,6 +1353,9 @@ func (ib InformationBasic) MarshalJSON() ([]byte, error) {
 	}
 	if ib.DegreeOfParallelism != nil {
 		objectMap["degreeOfParallelism"] = ib.DegreeOfParallelism
+	}
+	if ib.DegreeOfParallelismPercent != nil {
+		objectMap["degreeOfParallelismPercent"] = ib.DegreeOfParallelismPercent
 	}
 	if ib.Priority != nil {
 		objectMap["priority"] = ib.Priority
@@ -1326,6 +1386,9 @@ func (ib InformationBasic) MarshalJSON() ([]byte, error) {
 	}
 	if ib.Tags != nil {
 		objectMap["tags"] = ib.Tags
+	}
+	if ib.HierarchyQueueNode != nil {
+		objectMap["hierarchyQueueNode"] = ib.HierarchyQueueNode
 	}
 	return json.Marshal(objectMap)
 }
@@ -2005,8 +2068,10 @@ func (future *UpdateFuture) Result(client Client) (i Information, err error) {
 // UpdateJobParameters the parameters that can be used to update existing Data Lake Analytics job information
 // properties. (Only for use internally with Scope job type.)
 type UpdateJobParameters struct {
-	// DegreeOfParallelism - The degree of parallelism used for this job. This must be greater than 0, if set to less than 0 it will default to 1.
+	// DegreeOfParallelism - The degree of parallelism used for this job.
 	DegreeOfParallelism *int32 `json:"degreeOfParallelism,omitempty"`
+	// DegreeOfParallelismPercent - the degree of parallelism in percentage used for this job.
+	DegreeOfParallelismPercent *float64 `json:"degreeOfParallelismPercent,omitempty"`
 	// Priority - The priority value for the current job. Lower numbers have a higher priority. By default, a job has a priority of 1000. This must be greater than 0.
 	Priority *int32 `json:"priority,omitempty"`
 	// Tags - The key-value pairs used to add additional metadata to the job information.
@@ -2018,6 +2083,9 @@ func (ujp UpdateJobParameters) MarshalJSON() ([]byte, error) {
 	objectMap := make(map[string]interface{})
 	if ujp.DegreeOfParallelism != nil {
 		objectMap["degreeOfParallelism"] = ujp.DegreeOfParallelism
+	}
+	if ujp.DegreeOfParallelismPercent != nil {
+		objectMap["degreeOfParallelismPercent"] = ujp.DegreeOfParallelismPercent
 	}
 	if ujp.Priority != nil {
 		objectMap["priority"] = ujp.Priority

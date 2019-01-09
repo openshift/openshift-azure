@@ -1,21 +1,24 @@
-hash: cf5adf3a57ac800a4b5a3eab3c5c627a1f7acf34e1a0762fe03afcc75c93ee42
-updated: 2018-12-10T09:00:57.339592467+10:00
+hash: d0fb924f51ed51ddf9e063ad34f937c9f21ba9f55103d4ac4c9b7903aa0742d0
+updated: 2019-01-08T20:45:30.318702029-06:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
-  version: 4e8cbbfb1aeab140cd0fa97fd16b64ee18c3ca6a
+  version: d3bcaa706ac10b18784811ff31e43be635159013
   subpackages:
   - profiles/preview/resources/mgmt/managedapplications
   - services/compute/mgmt/2018-06-01/compute
   - services/dns/mgmt/2017-10-01/dns
   - services/graphrbac/1.6/graphrbac
   - services/marketplaceordering/mgmt/2015-06-01/marketplaceordering
+  - services/network/mgmt/2018-02-01/network
+  - services/network/mgmt/2018-06-01/network
   - services/resources/mgmt/2018-05-01/resources
   - services/resources/mgmt/2018-06-01/managedapplications
+  - services/storage/mgmt/2015-06-15/storage
   - services/storage/mgmt/2018-02-01/storage
   - storage
   - version
 - name: github.com/Azure/go-autorest
-  version: bca49d5b51a50dc5bb17bbf6204c711c6dbded06
+  version: a88c19ef2016e095f0b6c3b451074b4663f53bed
   subpackages:
   - autorest
   - autorest/adal
@@ -24,6 +27,7 @@ imports:
   - autorest/date
   - autorest/to
   - autorest/validation
+  - logger
   - version
 - name: github.com/coreos/etcd
   version: 135cf9b40738d17886f499b40bc176fc892ba5e9
