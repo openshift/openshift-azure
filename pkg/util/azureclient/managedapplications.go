@@ -22,9 +22,9 @@ type applicationsClient struct {
 var _ ApplicationsClient = &applicationsClient{}
 
 // NewApplicationsClient creates a new ApplicationsClient
-func NewApplicationsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) ApplicationsClient {
+func NewApplicationsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) ApplicationsClient {
 	client := managedapplications.NewApplicationsClient(subscriptionID)
-	setupClient(&client.Client, authorizer, languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &applicationsClient{
 		ApplicationsClient: client,

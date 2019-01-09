@@ -23,10 +23,9 @@ type virtualNetworksClient struct {
 var _ VirtualNetworksClient = &virtualNetworksClient{}
 
 // NewVirtualNetworkClient creates a new VirtualNetworkClient
-func NewVirtualNetworkClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) VirtualNetworksClient {
+func NewVirtualNetworkClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualNetworksClient {
 	client := network.NewVirtualNetworksClient(subscriptionID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &virtualNetworksClient{
 		VirtualNetworksClient: client,
@@ -51,10 +50,9 @@ type virtualNetworkPeeringsClient struct {
 var _ VirtualNetworksPeeringsClient = &virtualNetworkPeeringsClient{}
 
 // NewVirtualNetworksPeeringsClient creates a new VirtualMachineScaleSetVMsClient
-func NewVirtualNetworksPeeringsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) VirtualNetworksPeeringsClient {
+func NewVirtualNetworksPeeringsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualNetworksPeeringsClient {
 	client := network.NewVirtualNetworkPeeringsClient(subscriptionID)
-	client.Authorizer = authorizer
-	client.RequestInspector = addAcceptLanguages(languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &virtualNetworkPeeringsClient{
 		VirtualNetworkPeeringsClient: client,

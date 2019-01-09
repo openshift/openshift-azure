@@ -44,7 +44,6 @@ const (
 var (
 	method  = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
 	useProd = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
-	timeout = flag.Duration("timeout", 30*time.Minute, "Timeout of the request to the OpenShift resource provider.")
 
 	adminManifest   = flag.String("admin-manifest", "", "If set, use the admin API to send this request.")
 	restoreFromBlob = flag.String("restore-from-blob", "", "If set, request a restore of the cluster from the provided blob name.")
@@ -173,7 +172,7 @@ func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.C
 		if err != nil {
 			return fmt.Errorf("cannot get authorizer from username+password: %v", err)
 		}
-		aadClient := azureclient.NewRBACApplicationsClient(conf.TenantID, authorizer, []string{"en-us"})
+		aadClient := azureclient.NewRBACApplicationsClient(ctx, conf.TenantID, authorizer)
 		callbackURL := fmt.Sprintf("https://%s.%s.cloudapp.azure.com/oauth2callback/Azure%%20AD", conf.ResourceGroup, conf.Region)
 		conf.AADClientSecret, err = fakerp.UpdateAADAppSecret(ctx, aadClient, conf.AADClientID, callbackURL)
 		if err != nil {
@@ -252,8 +251,7 @@ func main() {
 	adminClient.Authorizer = authorizer
 	v20180930previewClient.Authorizer = authorizer
 
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-	defer cancel()
+	ctx := context.Background()
 	if isDelete {
 		if err := wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
 			if err := delete(ctx, log, v20180930previewClient, conf.ResourceGroup, conf.NoWait); err != nil {

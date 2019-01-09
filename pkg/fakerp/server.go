@@ -135,12 +135,7 @@ func (s *Server) readAdminRequest(body io.ReadCloser) (*admin.OpenShiftManagedCl
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	// simulate Context with property bag
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-	defer cancel()
-	// TODO: Get the azure credentials from the request headers
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
+	ctx := enrichContext(context.Background())
 
 	// TODO: Get the azure credentials from the request headers
 	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
@@ -259,12 +254,8 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// simulate Context with property bag
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
-	defer cancel()
-	// TODO: Get the azure credentials from the request headers
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
+	// TODO: Populate context from request header
+	ctx := enrichContext(context.Background())
 
 	// apply the request
 	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, config, isAdminRequest)

@@ -20,9 +20,9 @@ type marketPlaceAgreementsClient struct {
 var _ MarketPlaceAgreementsClient = &marketPlaceAgreementsClient{}
 
 // NewMarketPlaceAgreementsClient creates a new MarketPlaceAgreementsClient
-func NewMarketPlaceAgreementsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) MarketPlaceAgreementsClient {
+func NewMarketPlaceAgreementsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) MarketPlaceAgreementsClient {
 	client := marketplaceordering.NewMarketplaceAgreementsClient(subscriptionID)
-	setupClient(&client.Client, authorizer, languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &marketPlaceAgreementsClient{
 		MarketplaceAgreementsClient: client,

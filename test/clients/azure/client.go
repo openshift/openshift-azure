@@ -95,18 +95,20 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 	rpcAdmin := adminapi.NewOpenShiftManagedClustersClientWithBaseURI(rpURL+shared.AdminContext, subscriptionID)
 	rpcAdmin.Authorizer = authorizer
 
+	ctx := context.Background()
+
 	return &Client{
-		Accounts:                         azureclient.NewAccountsClient(subscriptionID, authorizer, nil),
-		Applications:                     azureclient.NewApplicationsClient(subscriptionID, authorizer, nil),
+		Accounts:                         azureclient.NewAccountsClient(ctx, subscriptionID, authorizer),
+		Applications:                     azureclient.NewApplicationsClient(ctx, subscriptionID, authorizer),
 		BlobStorage:                      storageClient,
 		OpenShiftManagedClusters:         rpc,
 		OpenShiftManagedClustersAdmin:    rpcAdmin,
-		VirtualMachineScaleSets:          azureclient.NewVirtualMachineScaleSetsClient(subscriptionID, authorizer, nil),
-		VirtualMachineScaleSetExtensions: azureclient.NewVirtualMachineScaleSetExtensionsClient(subscriptionID, authorizer, nil),
-		VirtualMachineScaleSetVMs:        azureclient.NewVirtualMachineScaleSetVMsClient(subscriptionID, authorizer, nil),
-		Resources:                        azureclient.NewResourcesClient(subscriptionID, authorizer, nil),
-		VirtualNetworks:                  azureclient.NewVirtualNetworkClient(subscriptionID, authorizer, nil),
-		VirtualNetworksPeerings:          azureclient.NewVirtualNetworksPeeringsClient(subscriptionID, authorizer, nil),
-		Groups:                           azureclient.NewGroupsClient(subscriptionID, authorizer, nil),
+		VirtualMachineScaleSets:          azureclient.NewVirtualMachineScaleSetsClient(ctx, subscriptionID, authorizer),
+		VirtualMachineScaleSetExtensions: azureclient.NewVirtualMachineScaleSetExtensionsClient(ctx, subscriptionID, authorizer),
+		VirtualMachineScaleSetVMs:        azureclient.NewVirtualMachineScaleSetVMsClient(ctx, subscriptionID, authorizer),
+		Resources:                        azureclient.NewResourcesClient(ctx, subscriptionID, authorizer),
+		VirtualNetworks:                  azureclient.NewVirtualNetworkClient(ctx, subscriptionID, authorizer),
+		VirtualNetworksPeerings:          azureclient.NewVirtualNetworksPeeringsClient(ctx, subscriptionID, authorizer),
+		Groups:                           azureclient.NewGroupsClient(ctx, subscriptionID, authorizer),
 	}, nil
 }
