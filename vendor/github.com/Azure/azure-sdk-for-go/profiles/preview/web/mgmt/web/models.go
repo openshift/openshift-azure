@@ -70,6 +70,21 @@ const (
 	Website        AzureResourceType = original.Website
 )
 
+type AzureStorageState = original.AzureStorageState
+
+const (
+	InvalidCredentials AzureStorageState = original.InvalidCredentials
+	InvalidShare       AzureStorageState = original.InvalidShare
+	Ok                 AzureStorageState = original.Ok
+)
+
+type AzureStorageType = original.AzureStorageType
+
+const (
+	AzureBlob  AzureStorageType = original.AzureBlob
+	AzureFiles AzureStorageType = original.AzureFiles
+)
+
 type BackupItemStatus = original.BackupItemStatus
 
 const (
@@ -700,6 +715,8 @@ type AppsRestoreFuture = original.AppsRestoreFuture
 type AppsRestoreSlotFuture = original.AppsRestoreSlotFuture
 type AppsRestoreSnapshotFuture = original.AppsRestoreSnapshotFuture
 type AppsRestoreSnapshotSlotFuture = original.AppsRestoreSnapshotSlotFuture
+type AppsStartWebSiteNetworkTraceOperationFuture = original.AppsStartWebSiteNetworkTraceOperationFuture
+type AppsStartWebSiteNetworkTraceOperationSlotFuture = original.AppsStartWebSiteNetworkTraceOperationSlotFuture
 type AppsSwapSlotSlotFuture = original.AppsSwapSlotSlotFuture
 type AppsSwapSlotWithProductionFuture = original.AppsSwapSlotWithProductionFuture
 type AutoHealActions = original.AutoHealActions
@@ -708,6 +725,8 @@ type AutoHealRules = original.AutoHealRules
 type AutoHealTriggers = original.AutoHealTriggers
 type AzureBlobStorageApplicationLogsConfig = original.AzureBlobStorageApplicationLogsConfig
 type AzureBlobStorageHTTPLogsConfig = original.AzureBlobStorageHTTPLogsConfig
+type AzureStorageInfoValue = original.AzureStorageInfoValue
+type AzureStoragePropertyDictionaryResource = original.AzureStoragePropertyDictionaryResource
 type AzureTableStorageApplicationLogsConfig = original.AzureTableStorageApplicationLogsConfig
 type BackupItem = original.BackupItem
 type BackupItemCollection = original.BackupItemCollection
@@ -771,6 +790,7 @@ type DefaultErrorResponseErrorDetailsItem = original.DefaultErrorResponseErrorDe
 type DeletedAppRestoreRequest = original.DeletedAppRestoreRequest
 type DeletedAppRestoreRequestProperties = original.DeletedAppRestoreRequestProperties
 type DeletedSite = original.DeletedSite
+type DeletedSiteProperties = original.DeletedSiteProperties
 type DeletedWebAppCollection = original.DeletedWebAppCollection
 type DeletedWebAppCollectionIterator = original.DeletedWebAppCollectionIterator
 type DeletedWebAppCollectionPage = original.DeletedWebAppCollectionPage
@@ -879,6 +899,7 @@ type ListCapability = original.ListCapability
 type ListCertificateEmail = original.ListCertificateEmail
 type ListCertificateOrderAction = original.ListCertificateOrderAction
 type ListHostingEnvironmentDiagnostics = original.ListHostingEnvironmentDiagnostics
+type ListNetworkTrace = original.ListNetworkTrace
 type ListOperation = original.ListOperation
 type ListVnetInfo = original.ListVnetInfo
 type ListVnetRoute = original.ListVnetRoute
@@ -909,6 +930,7 @@ type NameValuePair = original.NameValuePair
 type NetworkAccessControlEntry = original.NetworkAccessControlEntry
 type NetworkFeatures = original.NetworkFeatures
 type NetworkFeaturesProperties = original.NetworkFeaturesProperties
+type NetworkTrace = original.NetworkTrace
 type Operation = original.Operation
 type PerfMonCounterCollection = original.PerfMonCounterCollection
 type PerfMonCounterCollectionIterator = original.PerfMonCounterCollectionIterator
@@ -973,6 +995,11 @@ type Resource = original.Resource
 type ResourceCollection = original.ResourceCollection
 type ResourceCollectionIterator = original.ResourceCollectionIterator
 type ResourceCollectionPage = original.ResourceCollectionPage
+type ResourceHealthMetadata = original.ResourceHealthMetadata
+type ResourceHealthMetadataCollection = original.ResourceHealthMetadataCollection
+type ResourceHealthMetadataCollectionIterator = original.ResourceHealthMetadataCollectionIterator
+type ResourceHealthMetadataCollectionPage = original.ResourceHealthMetadataCollectionPage
+type ResourceHealthMetadataProperties = original.ResourceHealthMetadataProperties
 type ResourceMetric = original.ResourceMetric
 type ResourceMetricAvailability = original.ResourceMetricAvailability
 type ResourceMetricCollection = original.ResourceMetricCollection
@@ -1129,6 +1156,7 @@ type WorkerPoolCollectionPage = original.WorkerPoolCollectionPage
 type WorkerPoolResource = original.WorkerPoolResource
 type ProviderClient = original.ProviderClient
 type RecommendationsClient = original.RecommendationsClient
+type ResourceHealthMetadataClient = original.ResourceHealthMetadataClient
 type TopLevelDomainsClient = original.TopLevelDomainsClient
 
 func NewAppsClient(subscriptionID string) AppsClient {
@@ -1208,6 +1236,12 @@ func PossibleAutoHealActionTypeValues() []AutoHealActionType {
 }
 func PossibleAzureResourceTypeValues() []AzureResourceType {
 	return original.PossibleAzureResourceTypeValues()
+}
+func PossibleAzureStorageStateValues() []AzureStorageState {
+	return original.PossibleAzureStorageStateValues()
+}
+func PossibleAzureStorageTypeValues() []AzureStorageType {
+	return original.PossibleAzureStorageTypeValues()
 }
 func PossibleBackupItemStatusValues() []BackupItemStatus {
 	return original.PossibleBackupItemStatusValues()
@@ -1391,6 +1425,12 @@ func NewRecommendationsClient(subscriptionID string) RecommendationsClient {
 }
 func NewRecommendationsClientWithBaseURI(baseURI string, subscriptionID string) RecommendationsClient {
 	return original.NewRecommendationsClientWithBaseURI(baseURI, subscriptionID)
+}
+func NewResourceHealthMetadataClient(subscriptionID string) ResourceHealthMetadataClient {
+	return original.NewResourceHealthMetadataClient(subscriptionID)
+}
+func NewResourceHealthMetadataClientWithBaseURI(baseURI string, subscriptionID string) ResourceHealthMetadataClient {
+	return original.NewResourceHealthMetadataClientWithBaseURI(baseURI, subscriptionID)
 }
 func NewTopLevelDomainsClient(subscriptionID string) TopLevelDomainsClient {
 	return original.NewTopLevelDomainsClient(subscriptionID)

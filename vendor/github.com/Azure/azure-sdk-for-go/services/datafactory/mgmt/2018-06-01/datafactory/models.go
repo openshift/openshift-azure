@@ -46,6 +46,23 @@ func PossibleAuthenticationTypeValues() []AuthenticationType {
 	return []AuthenticationType{AuthenticationTypeAnonymous, AuthenticationTypeBasic, AuthenticationTypeClientCertificate, AuthenticationTypeWebLinkedServiceTypeProperties}
 }
 
+// AuthorizationType enumerates the values for authorization type.
+type AuthorizationType string
+
+const (
+	// AuthorizationTypeKey ...
+	AuthorizationTypeKey AuthorizationType = "Key"
+	// AuthorizationTypeLinkedIntegrationRuntimeType ...
+	AuthorizationTypeLinkedIntegrationRuntimeType AuthorizationType = "LinkedIntegrationRuntimeType"
+	// AuthorizationTypeRBAC ...
+	AuthorizationTypeRBAC AuthorizationType = "RBAC"
+)
+
+// PossibleAuthorizationTypeValues returns an array of possible values for the AuthorizationType const type.
+func PossibleAuthorizationTypeValues() []AuthorizationType {
+	return []AuthorizationType{AuthorizationTypeKey, AuthorizationTypeLinkedIntegrationRuntimeType, AuthorizationTypeRBAC}
+}
+
 // AzureSearchIndexWriteBehaviorType enumerates the values for azure search index write behavior type.
 type AzureSearchIndexWriteBehaviorType string
 
@@ -476,6 +493,8 @@ func PossibleIntegrationRuntimeSsisCatalogPricingTierValues() []IntegrationRunti
 type IntegrationRuntimeState string
 
 const (
+	// AccessDenied ...
+	AccessDenied IntegrationRuntimeState = "AccessDenied"
 	// Initial ...
 	Initial IntegrationRuntimeState = "Initial"
 	// Limited ...
@@ -498,7 +517,7 @@ const (
 
 // PossibleIntegrationRuntimeStateValues returns an array of possible values for the IntegrationRuntimeState const type.
 func PossibleIntegrationRuntimeStateValues() []IntegrationRuntimeState {
-	return []IntegrationRuntimeState{Initial, Limited, NeedRegistration, Offline, Online, Started, Starting, Stopped, Stopping}
+	return []IntegrationRuntimeState{AccessDenied, Initial, Limited, NeedRegistration, Offline, Online, Started, Starting, Stopped, Stopping}
 }
 
 // IntegrationRuntimeType enumerates the values for integration runtime type.
@@ -520,15 +539,17 @@ func PossibleIntegrationRuntimeTypeValues() []IntegrationRuntimeType {
 type IntegrationRuntimeUpdateResult string
 
 const (
-	// Fail ...
-	Fail IntegrationRuntimeUpdateResult = "Fail"
-	// Succeed ...
-	Succeed IntegrationRuntimeUpdateResult = "Succeed"
+	// IntegrationRuntimeUpdateResultFail ...
+	IntegrationRuntimeUpdateResultFail IntegrationRuntimeUpdateResult = "Fail"
+	// IntegrationRuntimeUpdateResultNone ...
+	IntegrationRuntimeUpdateResultNone IntegrationRuntimeUpdateResult = "None"
+	// IntegrationRuntimeUpdateResultSucceed ...
+	IntegrationRuntimeUpdateResultSucceed IntegrationRuntimeUpdateResult = "Succeed"
 )
 
 // PossibleIntegrationRuntimeUpdateResultValues returns an array of possible values for the IntegrationRuntimeUpdateResult const type.
 func PossibleIntegrationRuntimeUpdateResultValues() []IntegrationRuntimeUpdateResult {
-	return []IntegrationRuntimeUpdateResult{Fail, Succeed}
+	return []IntegrationRuntimeUpdateResult{IntegrationRuntimeUpdateResultFail, IntegrationRuntimeUpdateResultNone, IntegrationRuntimeUpdateResultSucceed}
 }
 
 // JSONFormatFilePattern enumerates the values for json format file pattern.
@@ -1107,6 +1128,10 @@ const (
 	TypeCustom TypeBasicActivity = "Custom"
 	// TypeDatabricksNotebook ...
 	TypeDatabricksNotebook TypeBasicActivity = "DatabricksNotebook"
+	// TypeDatabricksSparkJar ...
+	TypeDatabricksSparkJar TypeBasicActivity = "DatabricksSparkJar"
+	// TypeDatabricksSparkPython ...
+	TypeDatabricksSparkPython TypeBasicActivity = "DatabricksSparkPython"
 	// TypeDataLakeAnalyticsUSQL ...
 	TypeDataLakeAnalyticsUSQL TypeBasicActivity = "DataLakeAnalyticsU-SQL"
 	// TypeExecutePipeline ...
@@ -1147,7 +1172,7 @@ const (
 
 // PossibleTypeBasicActivityValues returns an array of possible values for the TypeBasicActivity const type.
 func PossibleTypeBasicActivityValues() []TypeBasicActivity {
-	return []TypeBasicActivity{TypeActivity, TypeAzureMLBatchExecution, TypeAzureMLUpdateResource, TypeContainer, TypeCopy, TypeCustom, TypeDatabricksNotebook, TypeDataLakeAnalyticsUSQL, TypeExecutePipeline, TypeExecuteSSISPackage, TypeExecution, TypeFilter, TypeForEach, TypeGetMetadata, TypeHDInsightHive, TypeHDInsightMapReduce, TypeHDInsightPig, TypeHDInsightSpark, TypeHDInsightStreaming, TypeIfCondition, TypeLookup, TypeSQLServerStoredProcedure, TypeUntil, TypeWait, TypeWebActivity}
+	return []TypeBasicActivity{TypeActivity, TypeAzureMLBatchExecution, TypeAzureMLUpdateResource, TypeContainer, TypeCopy, TypeCustom, TypeDatabricksNotebook, TypeDatabricksSparkJar, TypeDatabricksSparkPython, TypeDataLakeAnalyticsUSQL, TypeExecutePipeline, TypeExecuteSSISPackage, TypeExecution, TypeFilter, TypeForEach, TypeGetMetadata, TypeHDInsightHive, TypeHDInsightMapReduce, TypeHDInsightPig, TypeHDInsightSpark, TypeHDInsightStreaming, TypeIfCondition, TypeLookup, TypeSQLServerStoredProcedure, TypeUntil, TypeWait, TypeWebActivity}
 }
 
 // TypeBasicCopySink enumerates the values for type basic copy sink.
@@ -1482,12 +1507,31 @@ func PossibleTypeBasicDatasetStorageFormatValues() []TypeBasicDatasetStorageForm
 	return []TypeBasicDatasetStorageFormat{TypeAvroFormat, TypeDatasetStorageFormat, TypeJSONFormat, TypeOrcFormat, TypeParquetFormat, TypeTextFormat}
 }
 
+// TypeBasicDependencyReference enumerates the values for type basic dependency reference.
+type TypeBasicDependencyReference string
+
+const (
+	// TypeDependencyReference ...
+	TypeDependencyReference TypeBasicDependencyReference = "DependencyReference"
+	// TypeSelfDependencyTumblingWindowTriggerReference ...
+	TypeSelfDependencyTumblingWindowTriggerReference TypeBasicDependencyReference = "SelfDependencyTumblingWindowTriggerReference"
+	// TypeTriggerDependencyReference ...
+	TypeTriggerDependencyReference TypeBasicDependencyReference = "TriggerDependencyReference"
+	// TypeTumblingWindowTriggerDependencyReference ...
+	TypeTumblingWindowTriggerDependencyReference TypeBasicDependencyReference = "TumblingWindowTriggerDependencyReference"
+)
+
+// PossibleTypeBasicDependencyReferenceValues returns an array of possible values for the TypeBasicDependencyReference const type.
+func PossibleTypeBasicDependencyReferenceValues() []TypeBasicDependencyReference {
+	return []TypeBasicDependencyReference{TypeDependencyReference, TypeSelfDependencyTumblingWindowTriggerReference, TypeTriggerDependencyReference, TypeTumblingWindowTriggerDependencyReference}
+}
+
 // TypeBasicFactoryRepoConfiguration enumerates the values for type basic factory repo configuration.
 type TypeBasicFactoryRepoConfiguration string
 
 const (
-	// TypeFactoryGithubConfiguration ...
-	TypeFactoryGithubConfiguration TypeBasicFactoryRepoConfiguration = "FactoryGithubConfiguration"
+	// TypeFactoryGitHubConfiguration ...
+	TypeFactoryGitHubConfiguration TypeBasicFactoryRepoConfiguration = "FactoryGitHubConfiguration"
 	// TypeFactoryRepoConfiguration ...
 	TypeFactoryRepoConfiguration TypeBasicFactoryRepoConfiguration = "FactoryRepoConfiguration"
 	// TypeFactoryVSTSConfiguration ...
@@ -1496,7 +1540,7 @@ const (
 
 // PossibleTypeBasicFactoryRepoConfigurationValues returns an array of possible values for the TypeBasicFactoryRepoConfiguration const type.
 func PossibleTypeBasicFactoryRepoConfigurationValues() []TypeBasicFactoryRepoConfiguration {
-	return []TypeBasicFactoryRepoConfiguration{TypeFactoryGithubConfiguration, TypeFactoryRepoConfiguration, TypeFactoryVSTSConfiguration}
+	return []TypeBasicFactoryRepoConfiguration{TypeFactoryGitHubConfiguration, TypeFactoryRepoConfiguration, TypeFactoryVSTSConfiguration}
 }
 
 // TypeBasicIntegrationRuntime enumerates the values for type basic integration runtime.
@@ -1545,6 +1589,8 @@ const (
 	TypeAmazonS3 TypeBasicLinkedService = "AmazonS3"
 	// TypeAzureBatch ...
 	TypeAzureBatch TypeBasicLinkedService = "AzureBatch"
+	// TypeAzureBlobStorage ...
+	TypeAzureBlobStorage TypeBasicLinkedService = "AzureBlobStorage"
 	// TypeAzureDatabricks ...
 	TypeAzureDatabricks TypeBasicLinkedService = "AzureDatabricks"
 	// TypeAzureDataLakeAnalytics ...
@@ -1567,6 +1613,8 @@ const (
 	TypeAzureSQLDW TypeBasicLinkedService = "AzureSqlDW"
 	// TypeAzureStorage ...
 	TypeAzureStorage TypeBasicLinkedService = "AzureStorage"
+	// TypeAzureTableStorage ...
+	TypeAzureTableStorage TypeBasicLinkedService = "AzureTableStorage"
 	// TypeCassandra ...
 	TypeCassandra TypeBasicLinkedService = "Cassandra"
 	// TypeConcur ...
@@ -1683,7 +1731,7 @@ const (
 
 // PossibleTypeBasicLinkedServiceValues returns an array of possible values for the TypeBasicLinkedService const type.
 func PossibleTypeBasicLinkedServiceValues() []TypeBasicLinkedService {
-	return []TypeBasicLinkedService{TypeAmazonMWS, TypeAmazonRedshift, TypeAmazonS3, TypeAzureBatch, TypeAzureDatabricks, TypeAzureDataLakeAnalytics, TypeAzureDataLakeStore, TypeAzureKeyVault, TypeAzureML, TypeAzureMySQL, TypeAzurePostgreSQL, TypeAzureSearch, TypeAzureSQLDatabase, TypeAzureSQLDW, TypeAzureStorage, TypeCassandra, TypeConcur, TypeCosmosDb, TypeCouchbase, TypeCustomDataSource, TypeDb2, TypeDrill, TypeDynamics, TypeEloqua, TypeFileServer, TypeFtpServer, TypeGoogleBigQuery, TypeGreenplum, TypeHBase, TypeHdfs, TypeHDInsight, TypeHDInsightOnDemand, TypeHive, TypeHTTPServer, TypeHubspot, TypeImpala, TypeJira, TypeLinkedService, TypeMagento, TypeMariaDB, TypeMarketo, TypeMongoDb, TypeMySQL, TypeNetezza, TypeOData, TypeOdbc, TypeOracle, TypePaypal, TypePhoenix, TypePostgreSQL, TypePresto, TypeQuickBooks, TypeResponsys, TypeSalesforce, TypeSalesforceMarketingCloud, TypeSapBW, TypeSapCloudForCustomer, TypeSapEcc, TypeSapHana, TypeServiceNow, TypeSftp, TypeShopify, TypeSpark, TypeSQLServer, TypeSquare, TypeSybase, TypeTeradata, TypeVertica, TypeWeb, TypeXero, TypeZoho}
+	return []TypeBasicLinkedService{TypeAmazonMWS, TypeAmazonRedshift, TypeAmazonS3, TypeAzureBatch, TypeAzureBlobStorage, TypeAzureDatabricks, TypeAzureDataLakeAnalytics, TypeAzureDataLakeStore, TypeAzureKeyVault, TypeAzureML, TypeAzureMySQL, TypeAzurePostgreSQL, TypeAzureSearch, TypeAzureSQLDatabase, TypeAzureSQLDW, TypeAzureStorage, TypeAzureTableStorage, TypeCassandra, TypeConcur, TypeCosmosDb, TypeCouchbase, TypeCustomDataSource, TypeDb2, TypeDrill, TypeDynamics, TypeEloqua, TypeFileServer, TypeFtpServer, TypeGoogleBigQuery, TypeGreenplum, TypeHBase, TypeHdfs, TypeHDInsight, TypeHDInsightOnDemand, TypeHive, TypeHTTPServer, TypeHubspot, TypeImpala, TypeJira, TypeLinkedService, TypeMagento, TypeMariaDB, TypeMarketo, TypeMongoDb, TypeMySQL, TypeNetezza, TypeOData, TypeOdbc, TypeOracle, TypePaypal, TypePhoenix, TypePostgreSQL, TypePresto, TypeQuickBooks, TypeResponsys, TypeSalesforce, TypeSalesforceMarketingCloud, TypeSapBW, TypeSapCloudForCustomer, TypeSapEcc, TypeSapHana, TypeServiceNow, TypeSftp, TypeShopify, TypeSpark, TypeSQLServer, TypeSquare, TypeSybase, TypeTeradata, TypeVertica, TypeWeb, TypeXero, TypeZoho}
 }
 
 // TypeBasicTrigger enumerates the values for type basic trigger.
@@ -1730,6 +1778,8 @@ func PossibleWebActivityMethodValues() []WebActivityMethod {
 
 // BasicActivity a pipeline activity.
 type BasicActivity interface {
+	AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool)
+	AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool)
 	AsDatabricksNotebookActivity() (*DatabricksNotebookActivity, bool)
 	AsDataLakeAnalyticsUSQLActivity() (*DataLakeAnalyticsUSQLActivity, bool)
 	AsAzureMLUpdateResourceActivity() (*AzureMLUpdateResourceActivity, bool)
@@ -1770,8 +1820,8 @@ type Activity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -1783,6 +1833,14 @@ func unmarshalBasicActivity(body []byte) (BasicActivity, error) {
 	}
 
 	switch m["type"] {
+	case string(TypeDatabricksSparkPython):
+		var dspa DatabricksSparkPythonActivity
+		err := json.Unmarshal(body, &dspa)
+		return dspa, err
+	case string(TypeDatabricksSparkJar):
+		var dsja DatabricksSparkJarActivity
+		err := json.Unmarshal(body, &dsja)
+		return dsja, err
 	case string(TypeDatabricksNotebook):
 		var dna DatabricksNotebookActivity
 		err := json.Unmarshal(body, &dna)
@@ -1929,6 +1987,16 @@ func (a Activity) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for Activity.
+func (a Activity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for Activity.
+func (a Activity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
+}
+
 // AsDatabricksNotebookActivity is the BasicActivity implementation for Activity.
 func (a Activity) AsDatabricksNotebookActivity() (*DatabricksNotebookActivity, bool) {
 	return nil, false
@@ -2069,6 +2137,78 @@ func (a Activity) AsBasicActivity() (BasicActivity, bool) {
 	return &a, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for Activity struct.
+func (a *Activity) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if a.AdditionalProperties == nil {
+					a.AdditionalProperties = make(map[string]interface{})
+				}
+				a.AdditionalProperties[k] = additionalProperties
+			}
+		case "name":
+			if v != nil {
+				var name string
+				err = json.Unmarshal(*v, &name)
+				if err != nil {
+					return err
+				}
+				a.Name = &name
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				a.Description = &description
+			}
+		case "dependsOn":
+			if v != nil {
+				var dependsOn []ActivityDependency
+				err = json.Unmarshal(*v, &dependsOn)
+				if err != nil {
+					return err
+				}
+				a.DependsOn = &dependsOn
+			}
+		case "userProperties":
+			if v != nil {
+				var userProperties []UserProperty
+				err = json.Unmarshal(*v, &userProperties)
+				if err != nil {
+					return err
+				}
+				a.UserProperties = &userProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicActivity
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				a.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // ActivityDependency activity dependency information.
 type ActivityDependency struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -2094,6 +2234,51 @@ func (ad ActivityDependency) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for ActivityDependency struct.
+func (ad *ActivityDependency) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ad.AdditionalProperties == nil {
+					ad.AdditionalProperties = make(map[string]interface{})
+				}
+				ad.AdditionalProperties[k] = additionalProperties
+			}
+		case "activity":
+			if v != nil {
+				var activity string
+				err = json.Unmarshal(*v, &activity)
+				if err != nil {
+					return err
+				}
+				ad.Activity = &activity
+			}
+		case "dependencyConditions":
+			if v != nil {
+				var dependencyConditions []DependencyCondition
+				err = json.Unmarshal(*v, &dependencyConditions)
+				if err != nil {
+					return err
+				}
+				ad.DependencyConditions = &dependencyConditions
+			}
+		}
+	}
+
+	return nil
+}
+
 // ActivityPolicy execution policy for an activity.
 type ActivityPolicy struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -2104,6 +2289,8 @@ type ActivityPolicy struct {
 	Retry interface{} `json:"retry,omitempty"`
 	// RetryIntervalInSeconds - Interval between each retry attempt (in seconds). The default is 30 sec.
 	RetryIntervalInSeconds *int32 `json:"retryIntervalInSeconds,omitempty"`
+	// SecureInput - When set to true, Input from activity is considered as secure and will not be logged to monitoring.
+	SecureInput *bool `json:"secureInput,omitempty"`
 	// SecureOutput - When set to true, Output from activity is considered as secure and will not be logged to monitoring.
 	SecureOutput *bool `json:"secureOutput,omitempty"`
 }
@@ -2116,6 +2303,9 @@ func (ap ActivityPolicy) MarshalJSON() ([]byte, error) {
 	if ap.RetryIntervalInSeconds != nil {
 		objectMap["retryIntervalInSeconds"] = ap.RetryIntervalInSeconds
 	}
+	if ap.SecureInput != nil {
+		objectMap["secureInput"] = ap.SecureInput
+	}
 	if ap.SecureOutput != nil {
 		objectMap["secureOutput"] = ap.SecureOutput
 	}
@@ -2123,6 +2313,78 @@ func (ap ActivityPolicy) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for ActivityPolicy struct.
+func (ap *ActivityPolicy) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ap.AdditionalProperties == nil {
+					ap.AdditionalProperties = make(map[string]interface{})
+				}
+				ap.AdditionalProperties[k] = additionalProperties
+			}
+		case "timeout":
+			if v != nil {
+				var timeout interface{}
+				err = json.Unmarshal(*v, &timeout)
+				if err != nil {
+					return err
+				}
+				ap.Timeout = timeout
+			}
+		case "retry":
+			if v != nil {
+				var retry interface{}
+				err = json.Unmarshal(*v, &retry)
+				if err != nil {
+					return err
+				}
+				ap.Retry = retry
+			}
+		case "retryIntervalInSeconds":
+			if v != nil {
+				var retryIntervalInSeconds int32
+				err = json.Unmarshal(*v, &retryIntervalInSeconds)
+				if err != nil {
+					return err
+				}
+				ap.RetryIntervalInSeconds = &retryIntervalInSeconds
+			}
+		case "secureInput":
+			if v != nil {
+				var secureInput bool
+				err = json.Unmarshal(*v, &secureInput)
+				if err != nil {
+					return err
+				}
+				ap.SecureInput = &secureInput
+			}
+		case "secureOutput":
+			if v != nil {
+				var secureOutput bool
+				err = json.Unmarshal(*v, &secureOutput)
+				if err != nil {
+					return err
+				}
+				ap.SecureOutput = &secureOutput
+			}
+		}
+	}
+
+	return nil
 }
 
 // ActivityRun information about an activity run in a pipeline.
@@ -2199,6 +2461,150 @@ func (ar ActivityRun) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for ActivityRun struct.
+func (ar *ActivityRun) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ar.AdditionalProperties == nil {
+					ar.AdditionalProperties = make(map[string]interface{})
+				}
+				ar.AdditionalProperties[k] = additionalProperties
+			}
+		case "pipelineName":
+			if v != nil {
+				var pipelineName string
+				err = json.Unmarshal(*v, &pipelineName)
+				if err != nil {
+					return err
+				}
+				ar.PipelineName = &pipelineName
+			}
+		case "pipelineRunId":
+			if v != nil {
+				var pipelineRunID string
+				err = json.Unmarshal(*v, &pipelineRunID)
+				if err != nil {
+					return err
+				}
+				ar.PipelineRunID = &pipelineRunID
+			}
+		case "activityName":
+			if v != nil {
+				var activityName string
+				err = json.Unmarshal(*v, &activityName)
+				if err != nil {
+					return err
+				}
+				ar.ActivityName = &activityName
+			}
+		case "activityType":
+			if v != nil {
+				var activityType string
+				err = json.Unmarshal(*v, &activityType)
+				if err != nil {
+					return err
+				}
+				ar.ActivityType = &activityType
+			}
+		case "activityRunId":
+			if v != nil {
+				var activityRunID string
+				err = json.Unmarshal(*v, &activityRunID)
+				if err != nil {
+					return err
+				}
+				ar.ActivityRunID = &activityRunID
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName string
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				ar.LinkedServiceName = &linkedServiceName
+			}
+		case "status":
+			if v != nil {
+				var status string
+				err = json.Unmarshal(*v, &status)
+				if err != nil {
+					return err
+				}
+				ar.Status = &status
+			}
+		case "activityRunStart":
+			if v != nil {
+				var activityRunStart date.Time
+				err = json.Unmarshal(*v, &activityRunStart)
+				if err != nil {
+					return err
+				}
+				ar.ActivityRunStart = &activityRunStart
+			}
+		case "activityRunEnd":
+			if v != nil {
+				var activityRunEnd date.Time
+				err = json.Unmarshal(*v, &activityRunEnd)
+				if err != nil {
+					return err
+				}
+				ar.ActivityRunEnd = &activityRunEnd
+			}
+		case "durationInMs":
+			if v != nil {
+				var durationInMs int32
+				err = json.Unmarshal(*v, &durationInMs)
+				if err != nil {
+					return err
+				}
+				ar.DurationInMs = &durationInMs
+			}
+		case "input":
+			if v != nil {
+				var input interface{}
+				err = json.Unmarshal(*v, &input)
+				if err != nil {
+					return err
+				}
+				ar.Input = input
+			}
+		case "output":
+			if v != nil {
+				var output interface{}
+				err = json.Unmarshal(*v, &output)
+				if err != nil {
+					return err
+				}
+				ar.Output = output
+			}
+		case "error":
+			if v != nil {
+				var errorVar interface{}
+				err = json.Unmarshal(*v, &errorVar)
+				if err != nil {
+					return err
+				}
+				ar.Error = errorVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // ActivityRunsQueryResponse a list activity runs.
 type ActivityRunsQueryResponse struct {
 	autorest.Response `json:"-"`
@@ -2222,7 +2628,7 @@ type AmazonMWSLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -2599,6 +3005,16 @@ func (amls AmazonMWSLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinke
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AmazonMWSLinkedService.
+func (amls AmazonMWSLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AmazonMWSLinkedService.
+func (amls AmazonMWSLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AmazonMWSLinkedService.
 func (amls AmazonMWSLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -2836,6 +3252,8 @@ type AmazonMWSObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -2856,6 +3274,9 @@ func (amod AmazonMWSObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if amod.Annotations != nil {
 		objectMap["annotations"] = amod.Annotations
+	}
+	if amod.Folder != nil {
+		objectMap["folder"] = amod.Folder
 	}
 	if amod.Type != "" {
 		objectMap["type"] = amod.Type
@@ -3139,6 +3560,96 @@ func (amod AmazonMWSObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for AmazonMWSObjectDataset.
 func (amod AmazonMWSObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &amod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for AmazonMWSObjectDataset struct.
+func (amod *AmazonMWSObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if amod.AdditionalProperties == nil {
+					amod.AdditionalProperties = make(map[string]interface{})
+				}
+				amod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				amod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				amod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				amod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				amod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				amod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				amod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				amod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // AmazonMWSSource a copy activity Amazon Marketplace Web Service source.
@@ -3431,6 +3942,69 @@ func (ams AmazonMWSSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ams, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for AmazonMWSSource struct.
+func (ams *AmazonMWSSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ams.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ams.AdditionalProperties == nil {
+					ams.AdditionalProperties = make(map[string]interface{})
+				}
+				ams.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ams.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ams.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ams.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // AmazonRedshiftLinkedService linked service for Amazon Redshift.
 type AmazonRedshiftLinkedService struct {
 	// AmazonRedshiftLinkedServiceTypeProperties - Amazon Redshift linked service properties.
@@ -3445,7 +4019,7 @@ type AmazonRedshiftLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -3819,6 +4393,16 @@ func (arls AmazonRedshiftLinkedService) AsSQLServerLinkedService() (*SQLServerLi
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for AmazonRedshiftLinkedService.
 func (arls AmazonRedshiftLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AmazonRedshiftLinkedService.
+func (arls AmazonRedshiftLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AmazonRedshiftLinkedService.
+func (arls AmazonRedshiftLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -4297,6 +4881,78 @@ func (ars AmazonRedshiftSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ars, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for AmazonRedshiftSource struct.
+func (ars *AmazonRedshiftSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ars.Query = query
+			}
+		case "redshiftUnloadSettings":
+			if v != nil {
+				var redshiftUnloadSettings RedshiftUnloadSettings
+				err = json.Unmarshal(*v, &redshiftUnloadSettings)
+				if err != nil {
+					return err
+				}
+				ars.RedshiftUnloadSettings = &redshiftUnloadSettings
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ars.AdditionalProperties == nil {
+					ars.AdditionalProperties = make(map[string]interface{})
+				}
+				ars.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ars.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ars.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ars.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // AmazonS3Dataset a single Amazon Simple Storage Service (S3) object or a set of S3 objects.
 type AmazonS3Dataset struct {
 	// AmazonS3DatasetTypeProperties - Amazon S3 dataset properties.
@@ -4313,6 +4969,8 @@ type AmazonS3Dataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -4336,6 +4994,9 @@ func (asd AmazonS3Dataset) MarshalJSON() ([]byte, error) {
 	}
 	if asd.Annotations != nil {
 		objectMap["annotations"] = asd.Annotations
+	}
+	if asd.Folder != nil {
+		objectMap["folder"] = asd.Folder
 	}
 	if asd.Type != "" {
 		objectMap["type"] = asd.Type
@@ -4696,6 +5357,15 @@ func (asd *AmazonS3Dataset) UnmarshalJSON(body []byte) error {
 				}
 				asd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				asd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -4808,7 +5478,7 @@ type AmazonS3LinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -5185,6 +5855,16 @@ func (asls AmazonS3LinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinked
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AmazonS3LinkedService.
+func (asls AmazonS3LinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AmazonS3LinkedService.
+func (asls AmazonS3LinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AmazonS3LinkedService.
 func (asls AmazonS3LinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -5394,6 +6074,60 @@ func (af AvroFormat) AsBasicDatasetStorageFormat() (BasicDatasetStorageFormat, b
 	return &af, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for AvroFormat struct.
+func (af *AvroFormat) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if af.AdditionalProperties == nil {
+					af.AdditionalProperties = make(map[string]interface{})
+				}
+				af.AdditionalProperties[k] = additionalProperties
+			}
+		case "serializer":
+			if v != nil {
+				var serializer interface{}
+				err = json.Unmarshal(*v, &serializer)
+				if err != nil {
+					return err
+				}
+				af.Serializer = serializer
+			}
+		case "deserializer":
+			if v != nil {
+				var deserializer interface{}
+				err = json.Unmarshal(*v, &deserializer)
+				if err != nil {
+					return err
+				}
+				af.Deserializer = deserializer
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDatasetStorageFormat
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				af.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // AzureBatchLinkedService azure Batch linked service.
 type AzureBatchLinkedService struct {
 	// AzureBatchLinkedServiceTypeProperties - Azure Batch linked service properties.
@@ -5408,7 +6142,7 @@ type AzureBatchLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -5785,6 +6519,16 @@ func (abls AzureBatchLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLink
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureBatchLinkedService.
+func (abls AzureBatchLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureBatchLinkedService.
+func (abls AzureBatchLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureBatchLinkedService.
 func (abls AzureBatchLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -5981,6 +6725,8 @@ type AzureBlobDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -6004,6 +6750,9 @@ func (abd AzureBlobDataset) MarshalJSON() ([]byte, error) {
 	}
 	if abd.Annotations != nil {
 		objectMap["annotations"] = abd.Annotations
+	}
+	if abd.Folder != nil {
+		objectMap["folder"] = abd.Folder
 	}
 	if abd.Type != "" {
 		objectMap["type"] = abd.Type
@@ -6364,6 +7113,15 @@ func (abd *AzureBlobDataset) UnmarshalJSON(body []byte) error {
 				}
 				abd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				abd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -6451,6 +7209,597 @@ func (abdtp *AzureBlobDatasetTypeProperties) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
+// AzureBlobStorageLinkedService the azure blob storage linked service.
+type AzureBlobStorageLinkedService struct {
+	// AzureBlobStorageLinkedServiceTypeProperties - Azure Blob Storage linked service properties.
+	*AzureBlobStorageLinkedServiceTypeProperties `json:"typeProperties,omitempty"`
+	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
+	AdditionalProperties map[string]interface{} `json:""`
+	// ConnectVia - The integration runtime reference.
+	ConnectVia *IntegrationRuntimeReference `json:"connectVia,omitempty"`
+	// Description - Linked service description.
+	Description *string `json:"description,omitempty"`
+	// Parameters - Parameters for linked service.
+	Parameters map[string]*ParameterSpecification `json:"parameters"`
+	// Annotations - List of tags that can be used for describing the Dataset.
+	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
+	Type TypeBasicLinkedService `json:"type,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) MarshalJSON() ([]byte, error) {
+	absls.Type = TypeAzureBlobStorage
+	objectMap := make(map[string]interface{})
+	if absls.AzureBlobStorageLinkedServiceTypeProperties != nil {
+		objectMap["typeProperties"] = absls.AzureBlobStorageLinkedServiceTypeProperties
+	}
+	if absls.ConnectVia != nil {
+		objectMap["connectVia"] = absls.ConnectVia
+	}
+	if absls.Description != nil {
+		objectMap["description"] = absls.Description
+	}
+	if absls.Parameters != nil {
+		objectMap["parameters"] = absls.Parameters
+	}
+	if absls.Annotations != nil {
+		objectMap["annotations"] = absls.Annotations
+	}
+	if absls.Type != "" {
+		objectMap["type"] = absls.Type
+	}
+	for k, v := range absls.AdditionalProperties {
+		objectMap[k] = v
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsResponsysLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsResponsysLinkedService() (*ResponsysLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureDatabricksLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureDatabricksLinkedService() (*AzureDatabricksLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureDataLakeAnalyticsLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureDataLakeAnalyticsLinkedService() (*AzureDataLakeAnalyticsLinkedService, bool) {
+	return nil, false
+}
+
+// AsHDInsightOnDemandLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsHDInsightOnDemandLinkedService() (*HDInsightOnDemandLinkedService, bool) {
+	return nil, false
+}
+
+// AsSalesforceMarketingCloudLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsSalesforceMarketingCloudLinkedService() (*SalesforceMarketingCloudLinkedService, bool) {
+	return nil, false
+}
+
+// AsNetezzaLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsNetezzaLinkedService() (*NetezzaLinkedService, bool) {
+	return nil, false
+}
+
+// AsVerticaLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsVerticaLinkedService() (*VerticaLinkedService, bool) {
+	return nil, false
+}
+
+// AsZohoLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsZohoLinkedService() (*ZohoLinkedService, bool) {
+	return nil, false
+}
+
+// AsXeroLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsXeroLinkedService() (*XeroLinkedService, bool) {
+	return nil, false
+}
+
+// AsSquareLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsSquareLinkedService() (*SquareLinkedService, bool) {
+	return nil, false
+}
+
+// AsSparkLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsSparkLinkedService() (*SparkLinkedService, bool) {
+	return nil, false
+}
+
+// AsShopifyLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsShopifyLinkedService() (*ShopifyLinkedService, bool) {
+	return nil, false
+}
+
+// AsServiceNowLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsServiceNowLinkedService() (*ServiceNowLinkedService, bool) {
+	return nil, false
+}
+
+// AsQuickBooksLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsQuickBooksLinkedService() (*QuickBooksLinkedService, bool) {
+	return nil, false
+}
+
+// AsPrestoLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsPrestoLinkedService() (*PrestoLinkedService, bool) {
+	return nil, false
+}
+
+// AsPhoenixLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsPhoenixLinkedService() (*PhoenixLinkedService, bool) {
+	return nil, false
+}
+
+// AsPaypalLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsPaypalLinkedService() (*PaypalLinkedService, bool) {
+	return nil, false
+}
+
+// AsMarketoLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsMarketoLinkedService() (*MarketoLinkedService, bool) {
+	return nil, false
+}
+
+// AsMariaDBLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsMariaDBLinkedService() (*MariaDBLinkedService, bool) {
+	return nil, false
+}
+
+// AsMagentoLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsMagentoLinkedService() (*MagentoLinkedService, bool) {
+	return nil, false
+}
+
+// AsJiraLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsJiraLinkedService() (*JiraLinkedService, bool) {
+	return nil, false
+}
+
+// AsImpalaLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsImpalaLinkedService() (*ImpalaLinkedService, bool) {
+	return nil, false
+}
+
+// AsHubspotLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsHubspotLinkedService() (*HubspotLinkedService, bool) {
+	return nil, false
+}
+
+// AsHiveLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsHiveLinkedService() (*HiveLinkedService, bool) {
+	return nil, false
+}
+
+// AsHBaseLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsHBaseLinkedService() (*HBaseLinkedService, bool) {
+	return nil, false
+}
+
+// AsGreenplumLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsGreenplumLinkedService() (*GreenplumLinkedService, bool) {
+	return nil, false
+}
+
+// AsGoogleBigQueryLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsGoogleBigQueryLinkedService() (*GoogleBigQueryLinkedService, bool) {
+	return nil, false
+}
+
+// AsEloquaLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsEloquaLinkedService() (*EloquaLinkedService, bool) {
+	return nil, false
+}
+
+// AsDrillLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsDrillLinkedService() (*DrillLinkedService, bool) {
+	return nil, false
+}
+
+// AsCouchbaseLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsCouchbaseLinkedService() (*CouchbaseLinkedService, bool) {
+	return nil, false
+}
+
+// AsConcurLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsConcurLinkedService() (*ConcurLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzurePostgreSQLLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzurePostgreSQLLinkedService() (*AzurePostgreSQLLinkedService, bool) {
+	return nil, false
+}
+
+// AsAmazonMWSLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAmazonMWSLinkedService() (*AmazonMWSLinkedService, bool) {
+	return nil, false
+}
+
+// AsSapHanaLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsSapHanaLinkedService() (*SapHanaLinkedService, bool) {
+	return nil, false
+}
+
+// AsSapBWLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsSapBWLinkedService() (*SapBWLinkedService, bool) {
+	return nil, false
+}
+
+// AsSftpServerLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsSftpServerLinkedService() (*SftpServerLinkedService, bool) {
+	return nil, false
+}
+
+// AsFtpServerLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsFtpServerLinkedService() (*FtpServerLinkedService, bool) {
+	return nil, false
+}
+
+// AsHTTPLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsHTTPLinkedService() (*HTTPLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureSearchLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureSearchLinkedService() (*AzureSearchLinkedService, bool) {
+	return nil, false
+}
+
+// AsCustomDataSourceLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsCustomDataSourceLinkedService() (*CustomDataSourceLinkedService, bool) {
+	return nil, false
+}
+
+// AsAmazonRedshiftLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAmazonRedshiftLinkedService() (*AmazonRedshiftLinkedService, bool) {
+	return nil, false
+}
+
+// AsAmazonS3LinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAmazonS3LinkedService() (*AmazonS3LinkedService, bool) {
+	return nil, false
+}
+
+// AsSapEccLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsSapEccLinkedService() (*SapEccLinkedService, bool) {
+	return nil, false
+}
+
+// AsSapCloudForCustomerLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsSapCloudForCustomerLinkedService() (*SapCloudForCustomerLinkedService, bool) {
+	return nil, false
+}
+
+// AsSalesforceLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsSalesforceLinkedService() (*SalesforceLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureDataLakeStoreLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureDataLakeStoreLinkedService() (*AzureDataLakeStoreLinkedService, bool) {
+	return nil, false
+}
+
+// AsMongoDbLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsMongoDbLinkedService() (*MongoDbLinkedService, bool) {
+	return nil, false
+}
+
+// AsCassandraLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsCassandraLinkedService() (*CassandraLinkedService, bool) {
+	return nil, false
+}
+
+// AsWebLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsWebLinkedService() (*WebLinkedService, bool) {
+	return nil, false
+}
+
+// AsODataLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsODataLinkedService() (*ODataLinkedService, bool) {
+	return nil, false
+}
+
+// AsHdfsLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsHdfsLinkedService() (*HdfsLinkedService, bool) {
+	return nil, false
+}
+
+// AsOdbcLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsOdbcLinkedService() (*OdbcLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureMLLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureMLLinkedService() (*AzureMLLinkedService, bool) {
+	return nil, false
+}
+
+// AsTeradataLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsTeradataLinkedService() (*TeradataLinkedService, bool) {
+	return nil, false
+}
+
+// AsDb2LinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsDb2LinkedService() (*Db2LinkedService, bool) {
+	return nil, false
+}
+
+// AsSybaseLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsSybaseLinkedService() (*SybaseLinkedService, bool) {
+	return nil, false
+}
+
+// AsPostgreSQLLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsPostgreSQLLinkedService() (*PostgreSQLLinkedService, bool) {
+	return nil, false
+}
+
+// AsMySQLLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsMySQLLinkedService() (*MySQLLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureMySQLLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureMySQLLinkedService() (*AzureMySQLLinkedService, bool) {
+	return nil, false
+}
+
+// AsOracleLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsOracleLinkedService() (*OracleLinkedService, bool) {
+	return nil, false
+}
+
+// AsFileServerLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsFileServerLinkedService() (*FileServerLinkedService, bool) {
+	return nil, false
+}
+
+// AsHDInsightLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsHDInsightLinkedService() (*HDInsightLinkedService, bool) {
+	return nil, false
+}
+
+// AsDynamicsLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsDynamicsLinkedService() (*DynamicsLinkedService, bool) {
+	return nil, false
+}
+
+// AsCosmosDbLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsCosmosDbLinkedService() (*CosmosDbLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureKeyVaultLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureKeyVaultLinkedService() (*AzureKeyVaultLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBatchLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureBatchLinkedService() (*AzureBatchLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureSQLDatabaseLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureSQLDatabaseLinkedService() (*AzureSQLDatabaseLinkedService, bool) {
+	return nil, false
+}
+
+// AsSQLServerLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureSQLDWLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return &absls, true
+}
+
+// AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsLinkedService() (*LinkedService, bool) {
+	return nil, false
+}
+
+// AsBasicLinkedService is the BasicLinkedService implementation for AzureBlobStorageLinkedService.
+func (absls AzureBlobStorageLinkedService) AsBasicLinkedService() (BasicLinkedService, bool) {
+	return &absls, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for AzureBlobStorageLinkedService struct.
+func (absls *AzureBlobStorageLinkedService) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "typeProperties":
+			if v != nil {
+				var azureBlobStorageLinkedServiceTypeProperties AzureBlobStorageLinkedServiceTypeProperties
+				err = json.Unmarshal(*v, &azureBlobStorageLinkedServiceTypeProperties)
+				if err != nil {
+					return err
+				}
+				absls.AzureBlobStorageLinkedServiceTypeProperties = &azureBlobStorageLinkedServiceTypeProperties
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if absls.AdditionalProperties == nil {
+					absls.AdditionalProperties = make(map[string]interface{})
+				}
+				absls.AdditionalProperties[k] = additionalProperties
+			}
+		case "connectVia":
+			if v != nil {
+				var connectVia IntegrationRuntimeReference
+				err = json.Unmarshal(*v, &connectVia)
+				if err != nil {
+					return err
+				}
+				absls.ConnectVia = &connectVia
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				absls.Description = &description
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				absls.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				absls.Annotations = &annotations
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicLinkedService
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				absls.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// AzureBlobStorageLinkedServiceTypeProperties azure Blob Storage linked service properties.
+type AzureBlobStorageLinkedServiceTypeProperties struct {
+	// ConnectionString - The connection string. It is mutually exclusive with sasUri, serviceEndpoint property. Type: string, SecureString or AzureKeyVaultSecretReference.
+	ConnectionString interface{} `json:"connectionString,omitempty"`
+	// SasURI - SAS URI of the Azure Blob Storage resource. It is mutually exclusive with connectionString, serviceEndpoint property.
+	SasURI BasicSecretBase `json:"sasUri,omitempty"`
+	// ServiceEndpoint - Blob service endpoint of the Azure Blob Storage resource. It is mutually exclusive with connectionString, sasUri property.
+	ServiceEndpoint *string `json:"serviceEndpoint,omitempty"`
+	// ServicePrincipalID - The ID of the service principal used to authenticate against Azure SQL Data Warehouse. Type: string (or Expression with resultType string).
+	ServicePrincipalID interface{} `json:"servicePrincipalId,omitempty"`
+	// ServicePrincipalKey - The key of the service principal used to authenticate against Azure SQL Data Warehouse.
+	ServicePrincipalKey BasicSecretBase `json:"servicePrincipalKey,omitempty"`
+	// Tenant - The name or ID of the tenant to which the service principal belongs. Type: string (or Expression with resultType string).
+	Tenant interface{} `json:"tenant,omitempty"`
+	// EncryptedCredential - The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string (or Expression with resultType string).
+	EncryptedCredential *string `json:"encryptedCredential,omitempty"`
+}
+
+// UnmarshalJSON is the custom unmarshaler for AzureBlobStorageLinkedServiceTypeProperties struct.
+func (abslstp *AzureBlobStorageLinkedServiceTypeProperties) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "connectionString":
+			if v != nil {
+				var connectionString interface{}
+				err = json.Unmarshal(*v, &connectionString)
+				if err != nil {
+					return err
+				}
+				abslstp.ConnectionString = connectionString
+			}
+		case "sasUri":
+			if v != nil {
+				sasURI, err := unmarshalBasicSecretBase(*v)
+				if err != nil {
+					return err
+				}
+				abslstp.SasURI = sasURI
+			}
+		case "serviceEndpoint":
+			if v != nil {
+				var serviceEndpoint string
+				err = json.Unmarshal(*v, &serviceEndpoint)
+				if err != nil {
+					return err
+				}
+				abslstp.ServiceEndpoint = &serviceEndpoint
+			}
+		case "servicePrincipalId":
+			if v != nil {
+				var servicePrincipalID interface{}
+				err = json.Unmarshal(*v, &servicePrincipalID)
+				if err != nil {
+					return err
+				}
+				abslstp.ServicePrincipalID = servicePrincipalID
+			}
+		case "servicePrincipalKey":
+			if v != nil {
+				servicePrincipalKey, err := unmarshalBasicSecretBase(*v)
+				if err != nil {
+					return err
+				}
+				abslstp.ServicePrincipalKey = servicePrincipalKey
+			}
+		case "tenant":
+			if v != nil {
+				var tenant interface{}
+				err = json.Unmarshal(*v, &tenant)
+				if err != nil {
+					return err
+				}
+				abslstp.Tenant = tenant
+			}
+		case "encryptedCredential":
+			if v != nil {
+				var encryptedCredential string
+				err = json.Unmarshal(*v, &encryptedCredential)
+				if err != nil {
+					return err
+				}
+				abslstp.EncryptedCredential = &encryptedCredential
+			}
+		}
+	}
+
+	return nil
+}
+
 // AzureDatabricksLinkedService azure Databricks linked service.
 type AzureDatabricksLinkedService struct {
 	// AzureDatabricksLinkedServiceTypeProperties - Azure Databricks linked service properties.
@@ -6465,7 +7814,7 @@ type AzureDatabricksLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -6842,6 +8191,16 @@ func (adls AzureDatabricksLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLD
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureDatabricksLinkedService.
+func (adls AzureDatabricksLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureDatabricksLinkedService.
+func (adls AzureDatabricksLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureDatabricksLinkedService.
 func (adls AzureDatabricksLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -6952,8 +8311,12 @@ type AzureDatabricksLinkedServiceTypeProperties struct {
 	NewClusterNumOfWorker interface{} `json:"newClusterNumOfWorker,omitempty"`
 	// NewClusterNodeType - The node types of new cluster. Type: string (or Expression with resultType string).
 	NewClusterNodeType interface{} `json:"newClusterNodeType,omitempty"`
-	// NewClusterSparkConf - a set of optional, user-specified Spark configuration key-value pairs.
+	// NewClusterSparkConf - A set of optional, user-specified Spark configuration key-value pairs.
 	NewClusterSparkConf map[string]interface{} `json:"newClusterSparkConf"`
+	// NewClusterSparkEnvVars - A set of optional, user-specified Spark environment variables key-value pairs.
+	NewClusterSparkEnvVars map[string]interface{} `json:"newClusterSparkEnvVars"`
+	// NewClusterCustomTags - Additional tags for cluster resources.
+	NewClusterCustomTags map[string]interface{} `json:"newClusterCustomTags"`
 	// EncryptedCredential - The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string (or Expression with resultType string).
 	EncryptedCredential interface{} `json:"encryptedCredential,omitempty"`
 }
@@ -6969,6 +8332,12 @@ func (adlstp AzureDatabricksLinkedServiceTypeProperties) MarshalJSON() ([]byte, 
 	objectMap["newClusterNodeType"] = adlstp.NewClusterNodeType
 	if adlstp.NewClusterSparkConf != nil {
 		objectMap["newClusterSparkConf"] = adlstp.NewClusterSparkConf
+	}
+	if adlstp.NewClusterSparkEnvVars != nil {
+		objectMap["newClusterSparkEnvVars"] = adlstp.NewClusterSparkEnvVars
+	}
+	if adlstp.NewClusterCustomTags != nil {
+		objectMap["newClusterCustomTags"] = adlstp.NewClusterCustomTags
 	}
 	objectMap["encryptedCredential"] = adlstp.EncryptedCredential
 	return json.Marshal(objectMap)
@@ -7045,6 +8414,24 @@ func (adlstp *AzureDatabricksLinkedServiceTypeProperties) UnmarshalJSON(body []b
 				}
 				adlstp.NewClusterSparkConf = newClusterSparkConf
 			}
+		case "newClusterSparkEnvVars":
+			if v != nil {
+				var newClusterSparkEnvVars map[string]interface{}
+				err = json.Unmarshal(*v, &newClusterSparkEnvVars)
+				if err != nil {
+					return err
+				}
+				adlstp.NewClusterSparkEnvVars = newClusterSparkEnvVars
+			}
+		case "newClusterCustomTags":
+			if v != nil {
+				var newClusterCustomTags map[string]interface{}
+				err = json.Unmarshal(*v, &newClusterCustomTags)
+				if err != nil {
+					return err
+				}
+				adlstp.NewClusterCustomTags = newClusterCustomTags
+			}
 		case "encryptedCredential":
 			if v != nil {
 				var encryptedCredential interface{}
@@ -7074,7 +8461,7 @@ type AzureDataLakeAnalyticsLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -7451,6 +8838,16 @@ func (adlals AzureDataLakeAnalyticsLinkedService) AsAzureSQLDWLinkedService() (*
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureDataLakeAnalyticsLinkedService.
+func (adlals AzureDataLakeAnalyticsLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureDataLakeAnalyticsLinkedService.
+func (adlals AzureDataLakeAnalyticsLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureDataLakeAnalyticsLinkedService.
 func (adlals AzureDataLakeAnalyticsLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -7669,6 +9066,8 @@ type AzureDataLakeStoreDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -7692,6 +9091,9 @@ func (adlsd AzureDataLakeStoreDataset) MarshalJSON() ([]byte, error) {
 	}
 	if adlsd.Annotations != nil {
 		objectMap["annotations"] = adlsd.Annotations
+	}
+	if adlsd.Folder != nil {
+		objectMap["folder"] = adlsd.Folder
 	}
 	if adlsd.Type != "" {
 		objectMap["type"] = adlsd.Type
@@ -8052,6 +9454,15 @@ func (adlsd *AzureDataLakeStoreDataset) UnmarshalJSON(body []byte) error {
 				}
 				adlsd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				adlsd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -8142,7 +9553,7 @@ type AzureDataLakeStoreLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -8519,6 +9930,16 @@ func (adlsls AzureDataLakeStoreLinkedService) AsAzureSQLDWLinkedService() (*Azur
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureDataLakeStoreLinkedService.
+func (adlsls AzureDataLakeStoreLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureDataLakeStoreLinkedService.
+func (adlsls AzureDataLakeStoreLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureDataLakeStoreLinkedService.
 func (adlsls AzureDataLakeStoreLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -8839,6 +10260,87 @@ func (adlss AzureDataLakeStoreSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &adlss, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for AzureDataLakeStoreSink struct.
+func (adlss *AzureDataLakeStoreSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "copyBehavior":
+			if v != nil {
+				var copyBehavior CopyBehaviorType
+				err = json.Unmarshal(*v, &copyBehavior)
+				if err != nil {
+					return err
+				}
+				adlss.CopyBehavior = copyBehavior
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if adlss.AdditionalProperties == nil {
+					adlss.AdditionalProperties = make(map[string]interface{})
+				}
+				adlss.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				adlss.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				adlss.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				adlss.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				adlss.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				adlss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // AzureDataLakeStoreSource a copy activity Azure Data Lake source.
 type AzureDataLakeStoreSource struct {
 	// Recursive - If true, files under the folder path will be read recursively. Default is true. Type: boolean (or Expression with resultType boolean).
@@ -9129,6 +10631,69 @@ func (adlss AzureDataLakeStoreSource) AsBasicCopySource() (BasicCopySource, bool
 	return &adlss, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for AzureDataLakeStoreSource struct.
+func (adlss *AzureDataLakeStoreSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "recursive":
+			if v != nil {
+				var recursive interface{}
+				err = json.Unmarshal(*v, &recursive)
+				if err != nil {
+					return err
+				}
+				adlss.Recursive = recursive
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if adlss.AdditionalProperties == nil {
+					adlss.AdditionalProperties = make(map[string]interface{})
+				}
+				adlss.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				adlss.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				adlss.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				adlss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // AzureKeyVaultLinkedService azure Key Vault linked service.
 type AzureKeyVaultLinkedService struct {
 	// AzureKeyVaultLinkedServiceTypeProperties - Azure Key Vault linked service properties.
@@ -9143,7 +10708,7 @@ type AzureKeyVaultLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -9520,6 +11085,16 @@ func (akvls AzureKeyVaultLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDW
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureKeyVaultLinkedService.
+func (akvls AzureKeyVaultLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureKeyVaultLinkedService.
+func (akvls AzureKeyVaultLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureKeyVaultLinkedService.
 func (akvls AzureKeyVaultLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -9686,8 +11261,8 @@ type AzureMLBatchExecutionActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -9723,6 +11298,16 @@ func (ambea AzureMLBatchExecutionActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for AzureMLBatchExecutionActivity.
+func (ambea AzureMLBatchExecutionActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for AzureMLBatchExecutionActivity.
+func (ambea AzureMLBatchExecutionActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for AzureMLBatchExecutionActivity.
@@ -9942,12 +11527,12 @@ func (ambea *AzureMLBatchExecutionActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				ambea.UserProperties = userProperties
+				ambea.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -10003,7 +11588,7 @@ type AzureMLLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -10380,6 +11965,16 @@ func (amls AzureMLLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedS
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureMLLinkedService.
+func (amls AzureMLLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureMLLinkedService.
+func (amls AzureMLLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureMLLinkedService.
 func (amls AzureMLLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -10587,8 +12182,8 @@ type AzureMLUpdateResourceActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -10624,6 +12219,16 @@ func (amura AzureMLUpdateResourceActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for AzureMLUpdateResourceActivity.
+func (amura AzureMLUpdateResourceActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for AzureMLUpdateResourceActivity.
+func (amura AzureMLUpdateResourceActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for AzureMLUpdateResourceActivity.
@@ -10843,12 +12448,12 @@ func (amura *AzureMLUpdateResourceActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				amura.UserProperties = userProperties
+				amura.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -10897,7 +12502,7 @@ type AzureMySQLLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -11271,6 +12876,16 @@ func (amsls AzureMySQLLinkedService) AsSQLServerLinkedService() (*SQLServerLinke
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for AzureMySQLLinkedService.
 func (amsls AzureMySQLLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureMySQLLinkedService.
+func (amsls AzureMySQLLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureMySQLLinkedService.
+func (amsls AzureMySQLLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -11668,6 +13283,69 @@ func (amss AzureMySQLSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &amss, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for AzureMySQLSource struct.
+func (amss *AzureMySQLSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				amss.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if amss.AdditionalProperties == nil {
+					amss.AdditionalProperties = make(map[string]interface{})
+				}
+				amss.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				amss.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				amss.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				amss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // AzureMySQLTableDataset the Azure MySQL database dataset.
 type AzureMySQLTableDataset struct {
 	// AzureMySQLTableDatasetTypeProperties - Azure MySQL database dataset properties.
@@ -11684,6 +13362,8 @@ type AzureMySQLTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -11707,6 +13387,9 @@ func (amstd AzureMySQLTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if amstd.Annotations != nil {
 		objectMap["annotations"] = amstd.Annotations
+	}
+	if amstd.Folder != nil {
+		objectMap["folder"] = amstd.Folder
 	}
 	if amstd.Type != "" {
 		objectMap["type"] = amstd.Type
@@ -12067,6 +13750,15 @@ func (amstd *AzureMySQLTableDataset) UnmarshalJSON(body []byte) error {
 				}
 				amstd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				amstd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -12102,7 +13794,7 @@ type AzurePostgreSQLLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -12476,6 +14168,16 @@ func (apsls AzurePostgreSQLLinkedService) AsSQLServerLinkedService() (*SQLServer
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for AzurePostgreSQLLinkedService.
 func (apsls AzurePostgreSQLLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzurePostgreSQLLinkedService.
+func (apsls AzurePostgreSQLLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzurePostgreSQLLinkedService.
+func (apsls AzurePostgreSQLLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -12873,6 +14575,69 @@ func (apss AzurePostgreSQLSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &apss, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for AzurePostgreSQLSource struct.
+func (apss *AzurePostgreSQLSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				apss.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if apss.AdditionalProperties == nil {
+					apss.AdditionalProperties = make(map[string]interface{})
+				}
+				apss.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				apss.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				apss.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				apss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // AzurePostgreSQLTableDataset azure PostgreSQL dataset.
 type AzurePostgreSQLTableDataset struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -12887,6 +14652,8 @@ type AzurePostgreSQLTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -12907,6 +14674,9 @@ func (apstd AzurePostgreSQLTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if apstd.Annotations != nil {
 		objectMap["annotations"] = apstd.Annotations
+	}
+	if apstd.Folder != nil {
+		objectMap["folder"] = apstd.Folder
 	}
 	if apstd.Type != "" {
 		objectMap["type"] = apstd.Type
@@ -13192,6 +14962,96 @@ func (apstd AzurePostgreSQLTableDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &apstd, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for AzurePostgreSQLTableDataset struct.
+func (apstd *AzurePostgreSQLTableDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if apstd.AdditionalProperties == nil {
+					apstd.AdditionalProperties = make(map[string]interface{})
+				}
+				apstd.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				apstd.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				apstd.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				apstd.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				apstd.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				apstd.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				apstd.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				apstd.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // AzureQueueSink a copy activity Azure Queue sink.
 type AzureQueueSink struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -13305,6 +15165,78 @@ func (aqs AzureQueueSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &aqs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for AzureQueueSink struct.
+func (aqs *AzureQueueSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if aqs.AdditionalProperties == nil {
+					aqs.AdditionalProperties = make(map[string]interface{})
+				}
+				aqs.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				aqs.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				aqs.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				aqs.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				aqs.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				aqs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // AzureSearchIndexDataset the Azure Search Index.
 type AzureSearchIndexDataset struct {
 	// AzureSearchIndexDatasetTypeProperties - Properties specific to this dataset type.
@@ -13321,6 +15253,8 @@ type AzureSearchIndexDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -13344,6 +15278,9 @@ func (asid AzureSearchIndexDataset) MarshalJSON() ([]byte, error) {
 	}
 	if asid.Annotations != nil {
 		objectMap["annotations"] = asid.Annotations
+	}
+	if asid.Folder != nil {
+		objectMap["folder"] = asid.Folder
 	}
 	if asid.Type != "" {
 		objectMap["type"] = asid.Type
@@ -13704,6 +15641,15 @@ func (asid *AzureSearchIndexDataset) UnmarshalJSON(body []byte) error {
 				}
 				asid.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				asid.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -13843,6 +15789,87 @@ func (asis AzureSearchIndexSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &asis, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for AzureSearchIndexSink struct.
+func (asis *AzureSearchIndexSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "writeBehavior":
+			if v != nil {
+				var writeBehavior AzureSearchIndexWriteBehaviorType
+				err = json.Unmarshal(*v, &writeBehavior)
+				if err != nil {
+					return err
+				}
+				asis.WriteBehavior = writeBehavior
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if asis.AdditionalProperties == nil {
+					asis.AdditionalProperties = make(map[string]interface{})
+				}
+				asis.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				asis.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				asis.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				asis.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				asis.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				asis.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // AzureSearchLinkedService linked service for Windows Azure Search Service.
 type AzureSearchLinkedService struct {
 	// AzureSearchLinkedServiceTypeProperties - Windows Azure Search Service linked service properties.
@@ -13857,7 +15884,7 @@ type AzureSearchLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -14234,6 +16261,16 @@ func (asls AzureSearchLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLin
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureSearchLinkedService.
+func (asls AzureSearchLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureSearchLinkedService.
+func (asls AzureSearchLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureSearchLinkedService.
 func (asls AzureSearchLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -14395,7 +16432,7 @@ type AzureSQLDatabaseLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -14772,6 +16809,16 @@ func (asdls AzureSQLDatabaseLinkedService) AsAzureSQLDWLinkedService() (*AzureSQ
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureSQLDatabaseLinkedService.
+func (asdls AzureSQLDatabaseLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureSQLDatabaseLinkedService.
+func (asdls AzureSQLDatabaseLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureSQLDatabaseLinkedService.
 func (asdls AzureSQLDatabaseLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -14955,7 +17002,7 @@ type AzureSQLDWLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -15332,6 +17379,16 @@ func (asdls AzureSQLDWLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLin
 	return &asdls, true
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureSQLDWLinkedService.
+func (asdls AzureSQLDWLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureSQLDWLinkedService.
+func (asdls AzureSQLDWLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureSQLDWLinkedService.
 func (asdls AzureSQLDWLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -15517,6 +17574,8 @@ type AzureSQLDWTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -15540,6 +17599,9 @@ func (asdtd AzureSQLDWTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if asdtd.Annotations != nil {
 		objectMap["annotations"] = asdtd.Annotations
+	}
+	if asdtd.Folder != nil {
+		objectMap["folder"] = asdtd.Folder
 	}
 	if asdtd.Type != "" {
 		objectMap["type"] = asdtd.Type
@@ -15900,6 +17962,15 @@ func (asdtd *AzureSQLDWTableDataset) UnmarshalJSON(body []byte) error {
 				}
 				asdtd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				asdtd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -15937,6 +18008,8 @@ type AzureSQLTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -15960,6 +18033,9 @@ func (astd AzureSQLTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if astd.Annotations != nil {
 		objectMap["annotations"] = astd.Annotations
+	}
+	if astd.Folder != nil {
+		objectMap["folder"] = astd.Folder
 	}
 	if astd.Type != "" {
 		objectMap["type"] = astd.Type
@@ -16320,6 +18396,15 @@ func (astd *AzureSQLTableDataset) UnmarshalJSON(body []byte) error {
 				}
 				astd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				astd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -16355,7 +18440,7 @@ type AzureStorageLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -16732,6 +18817,16 @@ func (asls AzureStorageLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLi
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureStorageLinkedService.
+func (asls AzureStorageLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureStorageLinkedService.
+func (asls AzureStorageLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureStorageLinkedService.
 func (asls AzureStorageLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return &asls, true
@@ -16835,7 +18930,7 @@ type AzureStorageLinkedServiceTypeProperties struct {
 	// SasURI - SAS URI of the Azure Storage resource. It is mutually exclusive with connectionString property.
 	SasURI BasicSecretBase `json:"sasUri,omitempty"`
 	// EncryptedCredential - The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string (or Expression with resultType string).
-	EncryptedCredential interface{} `json:"encryptedCredential,omitempty"`
+	EncryptedCredential *string `json:"encryptedCredential,omitempty"`
 }
 
 // UnmarshalJSON is the custom unmarshaler for AzureStorageLinkedServiceTypeProperties struct.
@@ -16866,12 +18961,12 @@ func (aslstp *AzureStorageLinkedServiceTypeProperties) UnmarshalJSON(body []byte
 			}
 		case "encryptedCredential":
 			if v != nil {
-				var encryptedCredential interface{}
+				var encryptedCredential string
 				err = json.Unmarshal(*v, &encryptedCredential)
 				if err != nil {
 					return err
 				}
-				aslstp.EncryptedCredential = encryptedCredential
+				aslstp.EncryptedCredential = &encryptedCredential
 			}
 		}
 	}
@@ -16895,6 +18990,8 @@ type AzureTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -16918,6 +19015,9 @@ func (atd AzureTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if atd.Annotations != nil {
 		objectMap["annotations"] = atd.Annotations
+	}
+	if atd.Folder != nil {
+		objectMap["folder"] = atd.Folder
 	}
 	if atd.Type != "" {
 		objectMap["type"] = atd.Type
@@ -17278,6 +19378,15 @@ func (atd *AzureTableDataset) UnmarshalJSON(body []byte) error {
 				}
 				atd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				atd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -17422,6 +19531,114 @@ func (ats AzureTableSink) AsCopySink() (*CopySink, bool) {
 // AsBasicCopySink is the BasicCopySink implementation for AzureTableSink.
 func (ats AzureTableSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &ats, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for AzureTableSink struct.
+func (ats *AzureTableSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "azureTableDefaultPartitionKeyValue":
+			if v != nil {
+				var azureTableDefaultPartitionKeyValue interface{}
+				err = json.Unmarshal(*v, &azureTableDefaultPartitionKeyValue)
+				if err != nil {
+					return err
+				}
+				ats.AzureTableDefaultPartitionKeyValue = azureTableDefaultPartitionKeyValue
+			}
+		case "azureTablePartitionKeyName":
+			if v != nil {
+				var azureTablePartitionKeyName interface{}
+				err = json.Unmarshal(*v, &azureTablePartitionKeyName)
+				if err != nil {
+					return err
+				}
+				ats.AzureTablePartitionKeyName = azureTablePartitionKeyName
+			}
+		case "azureTableRowKeyName":
+			if v != nil {
+				var azureTableRowKeyName interface{}
+				err = json.Unmarshal(*v, &azureTableRowKeyName)
+				if err != nil {
+					return err
+				}
+				ats.AzureTableRowKeyName = azureTableRowKeyName
+			}
+		case "azureTableInsertType":
+			if v != nil {
+				var azureTableInsertType interface{}
+				err = json.Unmarshal(*v, &azureTableInsertType)
+				if err != nil {
+					return err
+				}
+				ats.AzureTableInsertType = azureTableInsertType
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ats.AdditionalProperties == nil {
+					ats.AdditionalProperties = make(map[string]interface{})
+				}
+				ats.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				ats.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				ats.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				ats.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				ats.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ats.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // AzureTableSource a copy activity Azure Table source.
@@ -17717,6 +19934,575 @@ func (ats AzureTableSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ats, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for AzureTableSource struct.
+func (ats *AzureTableSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "azureTableSourceQuery":
+			if v != nil {
+				var azureTableSourceQuery interface{}
+				err = json.Unmarshal(*v, &azureTableSourceQuery)
+				if err != nil {
+					return err
+				}
+				ats.AzureTableSourceQuery = azureTableSourceQuery
+			}
+		case "azureTableSourceIgnoreTableNotFound":
+			if v != nil {
+				var azureTableSourceIgnoreTableNotFound interface{}
+				err = json.Unmarshal(*v, &azureTableSourceIgnoreTableNotFound)
+				if err != nil {
+					return err
+				}
+				ats.AzureTableSourceIgnoreTableNotFound = azureTableSourceIgnoreTableNotFound
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ats.AdditionalProperties == nil {
+					ats.AdditionalProperties = make(map[string]interface{})
+				}
+				ats.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ats.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ats.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ats.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// AzureTableStorageLinkedService the azure table storage linked service.
+type AzureTableStorageLinkedService struct {
+	// AzureStorageLinkedServiceTypeProperties - Azure Table Storage linked service properties.
+	*AzureStorageLinkedServiceTypeProperties `json:"typeProperties,omitempty"`
+	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
+	AdditionalProperties map[string]interface{} `json:""`
+	// ConnectVia - The integration runtime reference.
+	ConnectVia *IntegrationRuntimeReference `json:"connectVia,omitempty"`
+	// Description - Linked service description.
+	Description *string `json:"description,omitempty"`
+	// Parameters - Parameters for linked service.
+	Parameters map[string]*ParameterSpecification `json:"parameters"`
+	// Annotations - List of tags that can be used for describing the Dataset.
+	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
+	Type TypeBasicLinkedService `json:"type,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) MarshalJSON() ([]byte, error) {
+	atsls.Type = TypeAzureTableStorage
+	objectMap := make(map[string]interface{})
+	if atsls.AzureStorageLinkedServiceTypeProperties != nil {
+		objectMap["typeProperties"] = atsls.AzureStorageLinkedServiceTypeProperties
+	}
+	if atsls.ConnectVia != nil {
+		objectMap["connectVia"] = atsls.ConnectVia
+	}
+	if atsls.Description != nil {
+		objectMap["description"] = atsls.Description
+	}
+	if atsls.Parameters != nil {
+		objectMap["parameters"] = atsls.Parameters
+	}
+	if atsls.Annotations != nil {
+		objectMap["annotations"] = atsls.Annotations
+	}
+	if atsls.Type != "" {
+		objectMap["type"] = atsls.Type
+	}
+	for k, v := range atsls.AdditionalProperties {
+		objectMap[k] = v
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsResponsysLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsResponsysLinkedService() (*ResponsysLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureDatabricksLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureDatabricksLinkedService() (*AzureDatabricksLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureDataLakeAnalyticsLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureDataLakeAnalyticsLinkedService() (*AzureDataLakeAnalyticsLinkedService, bool) {
+	return nil, false
+}
+
+// AsHDInsightOnDemandLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsHDInsightOnDemandLinkedService() (*HDInsightOnDemandLinkedService, bool) {
+	return nil, false
+}
+
+// AsSalesforceMarketingCloudLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsSalesforceMarketingCloudLinkedService() (*SalesforceMarketingCloudLinkedService, bool) {
+	return nil, false
+}
+
+// AsNetezzaLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsNetezzaLinkedService() (*NetezzaLinkedService, bool) {
+	return nil, false
+}
+
+// AsVerticaLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsVerticaLinkedService() (*VerticaLinkedService, bool) {
+	return nil, false
+}
+
+// AsZohoLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsZohoLinkedService() (*ZohoLinkedService, bool) {
+	return nil, false
+}
+
+// AsXeroLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsXeroLinkedService() (*XeroLinkedService, bool) {
+	return nil, false
+}
+
+// AsSquareLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsSquareLinkedService() (*SquareLinkedService, bool) {
+	return nil, false
+}
+
+// AsSparkLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsSparkLinkedService() (*SparkLinkedService, bool) {
+	return nil, false
+}
+
+// AsShopifyLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsShopifyLinkedService() (*ShopifyLinkedService, bool) {
+	return nil, false
+}
+
+// AsServiceNowLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsServiceNowLinkedService() (*ServiceNowLinkedService, bool) {
+	return nil, false
+}
+
+// AsQuickBooksLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsQuickBooksLinkedService() (*QuickBooksLinkedService, bool) {
+	return nil, false
+}
+
+// AsPrestoLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsPrestoLinkedService() (*PrestoLinkedService, bool) {
+	return nil, false
+}
+
+// AsPhoenixLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsPhoenixLinkedService() (*PhoenixLinkedService, bool) {
+	return nil, false
+}
+
+// AsPaypalLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsPaypalLinkedService() (*PaypalLinkedService, bool) {
+	return nil, false
+}
+
+// AsMarketoLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsMarketoLinkedService() (*MarketoLinkedService, bool) {
+	return nil, false
+}
+
+// AsMariaDBLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsMariaDBLinkedService() (*MariaDBLinkedService, bool) {
+	return nil, false
+}
+
+// AsMagentoLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsMagentoLinkedService() (*MagentoLinkedService, bool) {
+	return nil, false
+}
+
+// AsJiraLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsJiraLinkedService() (*JiraLinkedService, bool) {
+	return nil, false
+}
+
+// AsImpalaLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsImpalaLinkedService() (*ImpalaLinkedService, bool) {
+	return nil, false
+}
+
+// AsHubspotLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsHubspotLinkedService() (*HubspotLinkedService, bool) {
+	return nil, false
+}
+
+// AsHiveLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsHiveLinkedService() (*HiveLinkedService, bool) {
+	return nil, false
+}
+
+// AsHBaseLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsHBaseLinkedService() (*HBaseLinkedService, bool) {
+	return nil, false
+}
+
+// AsGreenplumLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsGreenplumLinkedService() (*GreenplumLinkedService, bool) {
+	return nil, false
+}
+
+// AsGoogleBigQueryLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsGoogleBigQueryLinkedService() (*GoogleBigQueryLinkedService, bool) {
+	return nil, false
+}
+
+// AsEloquaLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsEloquaLinkedService() (*EloquaLinkedService, bool) {
+	return nil, false
+}
+
+// AsDrillLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsDrillLinkedService() (*DrillLinkedService, bool) {
+	return nil, false
+}
+
+// AsCouchbaseLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsCouchbaseLinkedService() (*CouchbaseLinkedService, bool) {
+	return nil, false
+}
+
+// AsConcurLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsConcurLinkedService() (*ConcurLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzurePostgreSQLLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzurePostgreSQLLinkedService() (*AzurePostgreSQLLinkedService, bool) {
+	return nil, false
+}
+
+// AsAmazonMWSLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAmazonMWSLinkedService() (*AmazonMWSLinkedService, bool) {
+	return nil, false
+}
+
+// AsSapHanaLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsSapHanaLinkedService() (*SapHanaLinkedService, bool) {
+	return nil, false
+}
+
+// AsSapBWLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsSapBWLinkedService() (*SapBWLinkedService, bool) {
+	return nil, false
+}
+
+// AsSftpServerLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsSftpServerLinkedService() (*SftpServerLinkedService, bool) {
+	return nil, false
+}
+
+// AsFtpServerLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsFtpServerLinkedService() (*FtpServerLinkedService, bool) {
+	return nil, false
+}
+
+// AsHTTPLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsHTTPLinkedService() (*HTTPLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureSearchLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureSearchLinkedService() (*AzureSearchLinkedService, bool) {
+	return nil, false
+}
+
+// AsCustomDataSourceLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsCustomDataSourceLinkedService() (*CustomDataSourceLinkedService, bool) {
+	return nil, false
+}
+
+// AsAmazonRedshiftLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAmazonRedshiftLinkedService() (*AmazonRedshiftLinkedService, bool) {
+	return nil, false
+}
+
+// AsAmazonS3LinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAmazonS3LinkedService() (*AmazonS3LinkedService, bool) {
+	return nil, false
+}
+
+// AsSapEccLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsSapEccLinkedService() (*SapEccLinkedService, bool) {
+	return nil, false
+}
+
+// AsSapCloudForCustomerLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsSapCloudForCustomerLinkedService() (*SapCloudForCustomerLinkedService, bool) {
+	return nil, false
+}
+
+// AsSalesforceLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsSalesforceLinkedService() (*SalesforceLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureDataLakeStoreLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureDataLakeStoreLinkedService() (*AzureDataLakeStoreLinkedService, bool) {
+	return nil, false
+}
+
+// AsMongoDbLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsMongoDbLinkedService() (*MongoDbLinkedService, bool) {
+	return nil, false
+}
+
+// AsCassandraLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsCassandraLinkedService() (*CassandraLinkedService, bool) {
+	return nil, false
+}
+
+// AsWebLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsWebLinkedService() (*WebLinkedService, bool) {
+	return nil, false
+}
+
+// AsODataLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsODataLinkedService() (*ODataLinkedService, bool) {
+	return nil, false
+}
+
+// AsHdfsLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsHdfsLinkedService() (*HdfsLinkedService, bool) {
+	return nil, false
+}
+
+// AsOdbcLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsOdbcLinkedService() (*OdbcLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureMLLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureMLLinkedService() (*AzureMLLinkedService, bool) {
+	return nil, false
+}
+
+// AsTeradataLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsTeradataLinkedService() (*TeradataLinkedService, bool) {
+	return nil, false
+}
+
+// AsDb2LinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsDb2LinkedService() (*Db2LinkedService, bool) {
+	return nil, false
+}
+
+// AsSybaseLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsSybaseLinkedService() (*SybaseLinkedService, bool) {
+	return nil, false
+}
+
+// AsPostgreSQLLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsPostgreSQLLinkedService() (*PostgreSQLLinkedService, bool) {
+	return nil, false
+}
+
+// AsMySQLLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsMySQLLinkedService() (*MySQLLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureMySQLLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureMySQLLinkedService() (*AzureMySQLLinkedService, bool) {
+	return nil, false
+}
+
+// AsOracleLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsOracleLinkedService() (*OracleLinkedService, bool) {
+	return nil, false
+}
+
+// AsFileServerLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsFileServerLinkedService() (*FileServerLinkedService, bool) {
+	return nil, false
+}
+
+// AsHDInsightLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsHDInsightLinkedService() (*HDInsightLinkedService, bool) {
+	return nil, false
+}
+
+// AsDynamicsLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsDynamicsLinkedService() (*DynamicsLinkedService, bool) {
+	return nil, false
+}
+
+// AsCosmosDbLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsCosmosDbLinkedService() (*CosmosDbLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureKeyVaultLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureKeyVaultLinkedService() (*AzureKeyVaultLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBatchLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureBatchLinkedService() (*AzureBatchLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureSQLDatabaseLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureSQLDatabaseLinkedService() (*AzureSQLDatabaseLinkedService, bool) {
+	return nil, false
+}
+
+// AsSQLServerLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureSQLDWLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return &atsls, true
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureStorageLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsLinkedService() (*LinkedService, bool) {
+	return nil, false
+}
+
+// AsBasicLinkedService is the BasicLinkedService implementation for AzureTableStorageLinkedService.
+func (atsls AzureTableStorageLinkedService) AsBasicLinkedService() (BasicLinkedService, bool) {
+	return &atsls, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for AzureTableStorageLinkedService struct.
+func (atsls *AzureTableStorageLinkedService) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "typeProperties":
+			if v != nil {
+				var azureStorageLinkedServiceTypeProperties AzureStorageLinkedServiceTypeProperties
+				err = json.Unmarshal(*v, &azureStorageLinkedServiceTypeProperties)
+				if err != nil {
+					return err
+				}
+				atsls.AzureStorageLinkedServiceTypeProperties = &azureStorageLinkedServiceTypeProperties
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if atsls.AdditionalProperties == nil {
+					atsls.AdditionalProperties = make(map[string]interface{})
+				}
+				atsls.AdditionalProperties[k] = additionalProperties
+			}
+		case "connectVia":
+			if v != nil {
+				var connectVia IntegrationRuntimeReference
+				err = json.Unmarshal(*v, &connectVia)
+				if err != nil {
+					return err
+				}
+				atsls.ConnectVia = &connectVia
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				atsls.Description = &description
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				atsls.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				atsls.Annotations = &annotations
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicLinkedService
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				atsls.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // BlobEventsTrigger trigger that runs everytime a Blob event occurs.
 type BlobEventsTrigger struct {
 	// BlobEventsTriggerTypeProperties - Blob Events Trigger properties.
@@ -18007,6 +20793,114 @@ func (bs BlobSink) AsCopySink() (*CopySink, bool) {
 // AsBasicCopySink is the BasicCopySink implementation for BlobSink.
 func (bs BlobSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &bs, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for BlobSink struct.
+func (bs *BlobSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "blobWriterOverwriteFiles":
+			if v != nil {
+				var blobWriterOverwriteFiles interface{}
+				err = json.Unmarshal(*v, &blobWriterOverwriteFiles)
+				if err != nil {
+					return err
+				}
+				bs.BlobWriterOverwriteFiles = blobWriterOverwriteFiles
+			}
+		case "blobWriterDateTimeFormat":
+			if v != nil {
+				var blobWriterDateTimeFormat interface{}
+				err = json.Unmarshal(*v, &blobWriterDateTimeFormat)
+				if err != nil {
+					return err
+				}
+				bs.BlobWriterDateTimeFormat = blobWriterDateTimeFormat
+			}
+		case "blobWriterAddHeader":
+			if v != nil {
+				var blobWriterAddHeader interface{}
+				err = json.Unmarshal(*v, &blobWriterAddHeader)
+				if err != nil {
+					return err
+				}
+				bs.BlobWriterAddHeader = blobWriterAddHeader
+			}
+		case "copyBehavior":
+			if v != nil {
+				var copyBehavior CopyBehaviorType
+				err = json.Unmarshal(*v, &copyBehavior)
+				if err != nil {
+					return err
+				}
+				bs.CopyBehavior = copyBehavior
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if bs.AdditionalProperties == nil {
+					bs.AdditionalProperties = make(map[string]interface{})
+				}
+				bs.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				bs.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				bs.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				bs.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				bs.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				bs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // BlobSource a copy activity Azure Blob source.
@@ -18305,6 +21199,87 @@ func (bs BlobSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &bs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for BlobSource struct.
+func (bs *BlobSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "treatEmptyAsNull":
+			if v != nil {
+				var treatEmptyAsNull interface{}
+				err = json.Unmarshal(*v, &treatEmptyAsNull)
+				if err != nil {
+					return err
+				}
+				bs.TreatEmptyAsNull = treatEmptyAsNull
+			}
+		case "skipHeaderLineCount":
+			if v != nil {
+				var skipHeaderLineCount interface{}
+				err = json.Unmarshal(*v, &skipHeaderLineCount)
+				if err != nil {
+					return err
+				}
+				bs.SkipHeaderLineCount = skipHeaderLineCount
+			}
+		case "recursive":
+			if v != nil {
+				var recursive interface{}
+				err = json.Unmarshal(*v, &recursive)
+				if err != nil {
+					return err
+				}
+				bs.Recursive = recursive
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if bs.AdditionalProperties == nil {
+					bs.AdditionalProperties = make(map[string]interface{})
+				}
+				bs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				bs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				bs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				bs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // BlobTrigger trigger that runs everytime the selected Blob container changes.
 type BlobTrigger struct {
 	// BlobTriggerTypeProperties - Blob Trigger properties.
@@ -18482,7 +21457,7 @@ type CassandraLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -18856,6 +21831,16 @@ func (cls CassandraLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedSe
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for CassandraLinkedService.
 func (cls CassandraLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for CassandraLinkedService.
+func (cls CassandraLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for CassandraLinkedService.
+func (cls CassandraLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -19334,6 +22319,78 @@ func (cs CassandraSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &cs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for CassandraSource struct.
+func (cs *CassandraSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				cs.Query = query
+			}
+		case "consistencyLevel":
+			if v != nil {
+				var consistencyLevel CassandraSourceReadConsistencyLevels
+				err = json.Unmarshal(*v, &consistencyLevel)
+				if err != nil {
+					return err
+				}
+				cs.ConsistencyLevel = consistencyLevel
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if cs.AdditionalProperties == nil {
+					cs.AdditionalProperties = make(map[string]interface{})
+				}
+				cs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				cs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				cs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				cs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // CassandraTableDataset the Cassandra database dataset.
 type CassandraTableDataset struct {
 	// CassandraTableDatasetTypeProperties - Cassandra dataset properties.
@@ -19350,6 +22407,8 @@ type CassandraTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -19373,6 +22432,9 @@ func (ctd CassandraTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if ctd.Annotations != nil {
 		objectMap["annotations"] = ctd.Annotations
+	}
+	if ctd.Folder != nil {
+		objectMap["folder"] = ctd.Folder
 	}
 	if ctd.Type != "" {
 		objectMap["type"] = ctd.Type
@@ -19733,6 +22795,15 @@ func (ctd *CassandraTableDataset) UnmarshalJSON(body []byte) error {
 				}
 				ctd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				ctd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -19821,7 +22892,7 @@ type ConcurLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -20198,6 +23269,16 @@ func (cls ConcurLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for ConcurLinkedService.
+func (cls ConcurLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for ConcurLinkedService.
+func (cls ConcurLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for ConcurLinkedService.
 func (cls ConcurLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -20403,6 +23484,8 @@ type ConcurObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -20423,6 +23506,9 @@ func (cod ConcurObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if cod.Annotations != nil {
 		objectMap["annotations"] = cod.Annotations
+	}
+	if cod.Folder != nil {
+		objectMap["folder"] = cod.Folder
 	}
 	if cod.Type != "" {
 		objectMap["type"] = cod.Type
@@ -20706,6 +23792,96 @@ func (cod ConcurObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for ConcurObjectDataset.
 func (cod ConcurObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &cod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for ConcurObjectDataset struct.
+func (cod *ConcurObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if cod.AdditionalProperties == nil {
+					cod.AdditionalProperties = make(map[string]interface{})
+				}
+				cod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				cod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				cod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				cod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				cod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				cod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				cod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				cod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // ConcurSource a copy activity Concur Serivce source.
@@ -20998,6 +24174,69 @@ func (cs ConcurSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &cs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for ConcurSource struct.
+func (cs *ConcurSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				cs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if cs.AdditionalProperties == nil {
+					cs.AdditionalProperties = make(map[string]interface{})
+				}
+				cs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				cs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				cs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				cs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // BasicControlActivity base class for all control activities like IfCondition, ForEach , Until.
 type BasicControlActivity interface {
 	AsFilterActivity() (*FilterActivity, bool)
@@ -21020,8 +24259,8 @@ type ControlActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -21105,6 +24344,16 @@ func (ca ControlActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for ControlActivity.
+func (ca ControlActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for ControlActivity.
+func (ca ControlActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for ControlActivity.
@@ -21247,6 +24496,78 @@ func (ca ControlActivity) AsBasicActivity() (BasicActivity, bool) {
 	return &ca, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for ControlActivity struct.
+func (ca *ControlActivity) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ca.AdditionalProperties == nil {
+					ca.AdditionalProperties = make(map[string]interface{})
+				}
+				ca.AdditionalProperties[k] = additionalProperties
+			}
+		case "name":
+			if v != nil {
+				var name string
+				err = json.Unmarshal(*v, &name)
+				if err != nil {
+					return err
+				}
+				ca.Name = &name
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				ca.Description = &description
+			}
+		case "dependsOn":
+			if v != nil {
+				var dependsOn []ActivityDependency
+				err = json.Unmarshal(*v, &dependsOn)
+				if err != nil {
+					return err
+				}
+				ca.DependsOn = &dependsOn
+			}
+		case "userProperties":
+			if v != nil {
+				var userProperties []UserProperty
+				err = json.Unmarshal(*v, &userProperties)
+				if err != nil {
+					return err
+				}
+				ca.UserProperties = &userProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicActivity
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ca.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // CopyActivity copy activity.
 type CopyActivity struct {
 	// CopyActivityTypeProperties - Copy activity properties.
@@ -21268,8 +24589,8 @@ type CopyActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -21311,6 +24632,16 @@ func (ca CopyActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for CopyActivity.
+func (ca CopyActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for CopyActivity.
+func (ca CopyActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for CopyActivity.
@@ -21548,12 +24879,12 @@ func (ca *CopyActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				ca.UserProperties = userProperties
+				ca.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -21904,6 +25235,78 @@ func (cs CopySink) AsCopySink() (*CopySink, bool) {
 // AsBasicCopySink is the BasicCopySink implementation for CopySink.
 func (cs CopySink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &cs, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for CopySink struct.
+func (cs *CopySink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if cs.AdditionalProperties == nil {
+					cs.AdditionalProperties = make(map[string]interface{})
+				}
+				cs.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				cs.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				cs.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				cs.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				cs.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				cs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // BasicCopySource a copy activity source.
@@ -22481,6 +25884,60 @@ func (cs CopySource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &cs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for CopySource struct.
+func (cs *CopySource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if cs.AdditionalProperties == nil {
+					cs.AdditionalProperties = make(map[string]interface{})
+				}
+				cs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				cs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				cs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				cs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // BasicCopyTranslator a copy activity translator.
 type BasicCopyTranslator interface {
 	AsTabularTranslator() (*TabularTranslator, bool)
@@ -22560,6 +26017,42 @@ func (ct CopyTranslator) AsBasicCopyTranslator() (BasicCopyTranslator, bool) {
 	return &ct, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for CopyTranslator struct.
+func (ct *CopyTranslator) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ct.AdditionalProperties == nil {
+					ct.AdditionalProperties = make(map[string]interface{})
+				}
+				ct.AdditionalProperties[k] = additionalProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopyTranslator
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ct.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // CosmosDbLinkedService microsoft Azure Cosmos Database (CosmosDB) linked service.
 type CosmosDbLinkedService struct {
 	// CosmosDbLinkedServiceTypeProperties - CosmosDB linked service properties.
@@ -22574,7 +26067,7 @@ type CosmosDbLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -22951,6 +26444,16 @@ func (cdls CosmosDbLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinked
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for CosmosDbLinkedService.
+func (cdls CosmosDbLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for CosmosDbLinkedService.
+func (cdls CosmosDbLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for CosmosDbLinkedService.
 func (cdls CosmosDbLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -23069,7 +26572,7 @@ type CouchbaseLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -23443,6 +26946,16 @@ func (cls CouchbaseLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedSe
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for CouchbaseLinkedService.
 func (cls CouchbaseLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for CouchbaseLinkedService.
+func (cls CouchbaseLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for CouchbaseLinkedService.
+func (cls CouchbaseLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -23840,6 +27353,69 @@ func (cs CouchbaseSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &cs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for CouchbaseSource struct.
+func (cs *CouchbaseSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				cs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if cs.AdditionalProperties == nil {
+					cs.AdditionalProperties = make(map[string]interface{})
+				}
+				cs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				cs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				cs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				cs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // CouchbaseTableDataset couchbase server dataset.
 type CouchbaseTableDataset struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -23854,6 +27430,8 @@ type CouchbaseTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -23874,6 +27452,9 @@ func (ctd CouchbaseTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if ctd.Annotations != nil {
 		objectMap["annotations"] = ctd.Annotations
+	}
+	if ctd.Folder != nil {
+		objectMap["folder"] = ctd.Folder
 	}
 	if ctd.Type != "" {
 		objectMap["type"] = ctd.Type
@@ -24159,6 +27740,108 @@ func (ctd CouchbaseTableDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &ctd, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for CouchbaseTableDataset struct.
+func (ctd *CouchbaseTableDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ctd.AdditionalProperties == nil {
+					ctd.AdditionalProperties = make(map[string]interface{})
+				}
+				ctd.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				ctd.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				ctd.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				ctd.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				ctd.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				ctd.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				ctd.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ctd.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// CreateLinkedIntegrationRuntimeRequest the linked integration runtime information.
+type CreateLinkedIntegrationRuntimeRequest struct {
+	// Name - The name of the linked integration runtime.
+	Name *string `json:"name,omitempty"`
+	// SubscriptionID - The ID of the subscription that the linked integration runtime belongs to.
+	SubscriptionID *string `json:"subscriptionId,omitempty"`
+	// DataFactoryName - The name of the data factory that the linked integration runtime belongs to.
+	DataFactoryName *string `json:"dataFactoryName,omitempty"`
+	// DataFactoryLocation - The location of the data factory that the linked integration runtime belongs to.
+	DataFactoryLocation *string `json:"dataFactoryLocation,omitempty"`
+}
+
 // CreateRunResponse response body with a run identifier.
 type CreateRunResponse struct {
 	autorest.Response `json:"-"`
@@ -24183,8 +27866,8 @@ type CustomActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -24220,6 +27903,16 @@ func (ca CustomActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for CustomActivity.
+func (ca CustomActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for CustomActivity.
+func (ca CustomActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for CustomActivity.
@@ -24439,12 +28132,12 @@ func (ca *CustomActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				ca.UserProperties = userProperties
+				ca.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -24516,6 +28209,8 @@ type CustomDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -24537,6 +28232,9 @@ func (cd CustomDataset) MarshalJSON() ([]byte, error) {
 	}
 	if cd.Annotations != nil {
 		objectMap["annotations"] = cd.Annotations
+	}
+	if cd.Folder != nil {
+		objectMap["folder"] = cd.Folder
 	}
 	if cd.Type != "" {
 		objectMap["type"] = cd.Type
@@ -24822,6 +28520,105 @@ func (cd CustomDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &cd, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for CustomDataset struct.
+func (cd *CustomDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "typeProperties":
+			if v != nil {
+				var typeProperties interface{}
+				err = json.Unmarshal(*v, &typeProperties)
+				if err != nil {
+					return err
+				}
+				cd.TypeProperties = typeProperties
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if cd.AdditionalProperties == nil {
+					cd.AdditionalProperties = make(map[string]interface{})
+				}
+				cd.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				cd.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				cd.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				cd.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				cd.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				cd.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				cd.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				cd.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // CustomDataSourceLinkedService custom linked service.
 type CustomDataSourceLinkedService struct {
 	// TypeProperties - Custom linked service properties.
@@ -24836,7 +28633,7 @@ type CustomDataSourceLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -25211,6 +29008,16 @@ func (cdsls CustomDataSourceLinkedService) AsAzureSQLDWLinkedService() (*AzureSQ
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for CustomDataSourceLinkedService.
+func (cdsls CustomDataSourceLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for CustomDataSourceLinkedService.
+func (cdsls CustomDataSourceLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for CustomDataSourceLinkedService.
 func (cdsls CustomDataSourceLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -25224,6 +29031,87 @@ func (cdsls CustomDataSourceLinkedService) AsLinkedService() (*LinkedService, bo
 // AsBasicLinkedService is the BasicLinkedService implementation for CustomDataSourceLinkedService.
 func (cdsls CustomDataSourceLinkedService) AsBasicLinkedService() (BasicLinkedService, bool) {
 	return &cdsls, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for CustomDataSourceLinkedService struct.
+func (cdsls *CustomDataSourceLinkedService) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "typeProperties":
+			if v != nil {
+				var typeProperties interface{}
+				err = json.Unmarshal(*v, &typeProperties)
+				if err != nil {
+					return err
+				}
+				cdsls.TypeProperties = typeProperties
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if cdsls.AdditionalProperties == nil {
+					cdsls.AdditionalProperties = make(map[string]interface{})
+				}
+				cdsls.AdditionalProperties[k] = additionalProperties
+			}
+		case "connectVia":
+			if v != nil {
+				var connectVia IntegrationRuntimeReference
+				err = json.Unmarshal(*v, &connectVia)
+				if err != nil {
+					return err
+				}
+				cdsls.ConnectVia = &connectVia
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				cdsls.Description = &description
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				cdsls.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				cdsls.Annotations = &annotations
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicLinkedService
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				cdsls.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // DatabricksNotebookActivity databricksNotebook activity.
@@ -25243,8 +29131,8 @@ type DatabricksNotebookActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -25280,6 +29168,16 @@ func (dna DatabricksNotebookActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for DatabricksNotebookActivity.
+func (dna DatabricksNotebookActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for DatabricksNotebookActivity.
+func (dna DatabricksNotebookActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for DatabricksNotebookActivity.
@@ -25499,12 +29397,12 @@ func (dna *DatabricksNotebookActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				dna.UserProperties = userProperties
+				dna.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -25527,6 +29425,8 @@ type DatabricksNotebookActivityTypeProperties struct {
 	NotebookPath interface{} `json:"notebookPath,omitempty"`
 	// BaseParameters - Base parameters to be used for each run of this job.If the notebook takes a parameter that is not specified, the default value from the notebook will be used.
 	BaseParameters map[string]interface{} `json:"baseParameters"`
+	// Libraries - A list of libraries to be installed on the cluster that will execute the job.
+	Libraries *[]map[string]interface{} `json:"libraries,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for DatabricksNotebookActivityTypeProperties.
@@ -25536,7 +29436,640 @@ func (dnatp DatabricksNotebookActivityTypeProperties) MarshalJSON() ([]byte, err
 	if dnatp.BaseParameters != nil {
 		objectMap["baseParameters"] = dnatp.BaseParameters
 	}
+	if dnatp.Libraries != nil {
+		objectMap["libraries"] = dnatp.Libraries
+	}
 	return json.Marshal(objectMap)
+}
+
+// DatabricksSparkJarActivity databricksSparkJar activity.
+type DatabricksSparkJarActivity struct {
+	// DatabricksSparkJarActivityTypeProperties - Databricks SparkJar activity properties.
+	*DatabricksSparkJarActivityTypeProperties `json:"typeProperties,omitempty"`
+	// LinkedServiceName - Linked service reference.
+	LinkedServiceName *LinkedServiceReference `json:"linkedServiceName,omitempty"`
+	// Policy - Activity policy.
+	Policy *ActivityPolicy `json:"policy,omitempty"`
+	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
+	AdditionalProperties map[string]interface{} `json:""`
+	// Name - Activity name.
+	Name *string `json:"name,omitempty"`
+	// Description - Activity description.
+	Description *string `json:"description,omitempty"`
+	// DependsOn - Activity depends on condition.
+	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
+	// UserProperties - Activity user properties.
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	Type TypeBasicActivity `json:"type,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) MarshalJSON() ([]byte, error) {
+	dsja.Type = TypeDatabricksSparkJar
+	objectMap := make(map[string]interface{})
+	if dsja.DatabricksSparkJarActivityTypeProperties != nil {
+		objectMap["typeProperties"] = dsja.DatabricksSparkJarActivityTypeProperties
+	}
+	if dsja.LinkedServiceName != nil {
+		objectMap["linkedServiceName"] = dsja.LinkedServiceName
+	}
+	if dsja.Policy != nil {
+		objectMap["policy"] = dsja.Policy
+	}
+	if dsja.Name != nil {
+		objectMap["name"] = dsja.Name
+	}
+	if dsja.Description != nil {
+		objectMap["description"] = dsja.Description
+	}
+	if dsja.DependsOn != nil {
+		objectMap["dependsOn"] = dsja.DependsOn
+	}
+	if dsja.UserProperties != nil {
+		objectMap["userProperties"] = dsja.UserProperties
+	}
+	if dsja.Type != "" {
+		objectMap["type"] = dsja.Type
+	}
+	for k, v := range dsja.AdditionalProperties {
+		objectMap[k] = v
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return &dsja, true
+}
+
+// AsDatabricksNotebookActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsDatabricksNotebookActivity() (*DatabricksNotebookActivity, bool) {
+	return nil, false
+}
+
+// AsDataLakeAnalyticsUSQLActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsDataLakeAnalyticsUSQLActivity() (*DataLakeAnalyticsUSQLActivity, bool) {
+	return nil, false
+}
+
+// AsAzureMLUpdateResourceActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsAzureMLUpdateResourceActivity() (*AzureMLUpdateResourceActivity, bool) {
+	return nil, false
+}
+
+// AsAzureMLBatchExecutionActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsAzureMLBatchExecutionActivity() (*AzureMLBatchExecutionActivity, bool) {
+	return nil, false
+}
+
+// AsGetMetadataActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsGetMetadataActivity() (*GetMetadataActivity, bool) {
+	return nil, false
+}
+
+// AsWebActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsWebActivity() (*WebActivity, bool) {
+	return nil, false
+}
+
+// AsLookupActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsLookupActivity() (*LookupActivity, bool) {
+	return nil, false
+}
+
+// AsSQLServerStoredProcedureActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsSQLServerStoredProcedureActivity() (*SQLServerStoredProcedureActivity, bool) {
+	return nil, false
+}
+
+// AsCustomActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsCustomActivity() (*CustomActivity, bool) {
+	return nil, false
+}
+
+// AsExecuteSSISPackageActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsExecuteSSISPackageActivity() (*ExecuteSSISPackageActivity, bool) {
+	return nil, false
+}
+
+// AsHDInsightSparkActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsHDInsightSparkActivity() (*HDInsightSparkActivity, bool) {
+	return nil, false
+}
+
+// AsHDInsightStreamingActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsHDInsightStreamingActivity() (*HDInsightStreamingActivity, bool) {
+	return nil, false
+}
+
+// AsHDInsightMapReduceActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsHDInsightMapReduceActivity() (*HDInsightMapReduceActivity, bool) {
+	return nil, false
+}
+
+// AsHDInsightPigActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsHDInsightPigActivity() (*HDInsightPigActivity, bool) {
+	return nil, false
+}
+
+// AsHDInsightHiveActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsHDInsightHiveActivity() (*HDInsightHiveActivity, bool) {
+	return nil, false
+}
+
+// AsCopyActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsCopyActivity() (*CopyActivity, bool) {
+	return nil, false
+}
+
+// AsExecutionActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsExecutionActivity() (*ExecutionActivity, bool) {
+	return nil, false
+}
+
+// AsBasicExecutionActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsBasicExecutionActivity() (BasicExecutionActivity, bool) {
+	return &dsja, true
+}
+
+// AsFilterActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsFilterActivity() (*FilterActivity, bool) {
+	return nil, false
+}
+
+// AsUntilActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsUntilActivity() (*UntilActivity, bool) {
+	return nil, false
+}
+
+// AsWaitActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsWaitActivity() (*WaitActivity, bool) {
+	return nil, false
+}
+
+// AsForEachActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsForEachActivity() (*ForEachActivity, bool) {
+	return nil, false
+}
+
+// AsIfConditionActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsIfConditionActivity() (*IfConditionActivity, bool) {
+	return nil, false
+}
+
+// AsExecutePipelineActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsExecutePipelineActivity() (*ExecutePipelineActivity, bool) {
+	return nil, false
+}
+
+// AsControlActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsControlActivity() (*ControlActivity, bool) {
+	return nil, false
+}
+
+// AsBasicControlActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsBasicControlActivity() (BasicControlActivity, bool) {
+	return nil, false
+}
+
+// AsActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsActivity() (*Activity, bool) {
+	return nil, false
+}
+
+// AsBasicActivity is the BasicActivity implementation for DatabricksSparkJarActivity.
+func (dsja DatabricksSparkJarActivity) AsBasicActivity() (BasicActivity, bool) {
+	return &dsja, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for DatabricksSparkJarActivity struct.
+func (dsja *DatabricksSparkJarActivity) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "typeProperties":
+			if v != nil {
+				var databricksSparkJarActivityTypeProperties DatabricksSparkJarActivityTypeProperties
+				err = json.Unmarshal(*v, &databricksSparkJarActivityTypeProperties)
+				if err != nil {
+					return err
+				}
+				dsja.DatabricksSparkJarActivityTypeProperties = &databricksSparkJarActivityTypeProperties
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				dsja.LinkedServiceName = &linkedServiceName
+			}
+		case "policy":
+			if v != nil {
+				var policy ActivityPolicy
+				err = json.Unmarshal(*v, &policy)
+				if err != nil {
+					return err
+				}
+				dsja.Policy = &policy
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if dsja.AdditionalProperties == nil {
+					dsja.AdditionalProperties = make(map[string]interface{})
+				}
+				dsja.AdditionalProperties[k] = additionalProperties
+			}
+		case "name":
+			if v != nil {
+				var name string
+				err = json.Unmarshal(*v, &name)
+				if err != nil {
+					return err
+				}
+				dsja.Name = &name
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				dsja.Description = &description
+			}
+		case "dependsOn":
+			if v != nil {
+				var dependsOn []ActivityDependency
+				err = json.Unmarshal(*v, &dependsOn)
+				if err != nil {
+					return err
+				}
+				dsja.DependsOn = &dependsOn
+			}
+		case "userProperties":
+			if v != nil {
+				var userProperties []UserProperty
+				err = json.Unmarshal(*v, &userProperties)
+				if err != nil {
+					return err
+				}
+				dsja.UserProperties = &userProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicActivity
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				dsja.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// DatabricksSparkJarActivityTypeProperties databricks SparkJar activity properties.
+type DatabricksSparkJarActivityTypeProperties struct {
+	// MainClassName - The full name of the class containing the main method to be executed. This class must be contained in a JAR provided as a library. Type: string (or Expression with resultType string).
+	MainClassName interface{} `json:"mainClassName,omitempty"`
+	// Parameters - Parameters that will be passed to the main method.
+	Parameters *[]interface{} `json:"parameters,omitempty"`
+	// Libraries - A list of libraries to be installed on the cluster that will execute the job.
+	Libraries *[]map[string]interface{} `json:"libraries,omitempty"`
+}
+
+// DatabricksSparkPythonActivity databricksSparkPython activity.
+type DatabricksSparkPythonActivity struct {
+	// DatabricksSparkPythonActivityTypeProperties - Databricks SparkPython activity properties.
+	*DatabricksSparkPythonActivityTypeProperties `json:"typeProperties,omitempty"`
+	// LinkedServiceName - Linked service reference.
+	LinkedServiceName *LinkedServiceReference `json:"linkedServiceName,omitempty"`
+	// Policy - Activity policy.
+	Policy *ActivityPolicy `json:"policy,omitempty"`
+	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
+	AdditionalProperties map[string]interface{} `json:""`
+	// Name - Activity name.
+	Name *string `json:"name,omitempty"`
+	// Description - Activity description.
+	Description *string `json:"description,omitempty"`
+	// DependsOn - Activity depends on condition.
+	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
+	// UserProperties - Activity user properties.
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	Type TypeBasicActivity `json:"type,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) MarshalJSON() ([]byte, error) {
+	dspa.Type = TypeDatabricksSparkPython
+	objectMap := make(map[string]interface{})
+	if dspa.DatabricksSparkPythonActivityTypeProperties != nil {
+		objectMap["typeProperties"] = dspa.DatabricksSparkPythonActivityTypeProperties
+	}
+	if dspa.LinkedServiceName != nil {
+		objectMap["linkedServiceName"] = dspa.LinkedServiceName
+	}
+	if dspa.Policy != nil {
+		objectMap["policy"] = dspa.Policy
+	}
+	if dspa.Name != nil {
+		objectMap["name"] = dspa.Name
+	}
+	if dspa.Description != nil {
+		objectMap["description"] = dspa.Description
+	}
+	if dspa.DependsOn != nil {
+		objectMap["dependsOn"] = dspa.DependsOn
+	}
+	if dspa.UserProperties != nil {
+		objectMap["userProperties"] = dspa.UserProperties
+	}
+	if dspa.Type != "" {
+		objectMap["type"] = dspa.Type
+	}
+	for k, v := range dspa.AdditionalProperties {
+		objectMap[k] = v
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return &dspa, true
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksNotebookActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsDatabricksNotebookActivity() (*DatabricksNotebookActivity, bool) {
+	return nil, false
+}
+
+// AsDataLakeAnalyticsUSQLActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsDataLakeAnalyticsUSQLActivity() (*DataLakeAnalyticsUSQLActivity, bool) {
+	return nil, false
+}
+
+// AsAzureMLUpdateResourceActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsAzureMLUpdateResourceActivity() (*AzureMLUpdateResourceActivity, bool) {
+	return nil, false
+}
+
+// AsAzureMLBatchExecutionActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsAzureMLBatchExecutionActivity() (*AzureMLBatchExecutionActivity, bool) {
+	return nil, false
+}
+
+// AsGetMetadataActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsGetMetadataActivity() (*GetMetadataActivity, bool) {
+	return nil, false
+}
+
+// AsWebActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsWebActivity() (*WebActivity, bool) {
+	return nil, false
+}
+
+// AsLookupActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsLookupActivity() (*LookupActivity, bool) {
+	return nil, false
+}
+
+// AsSQLServerStoredProcedureActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsSQLServerStoredProcedureActivity() (*SQLServerStoredProcedureActivity, bool) {
+	return nil, false
+}
+
+// AsCustomActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsCustomActivity() (*CustomActivity, bool) {
+	return nil, false
+}
+
+// AsExecuteSSISPackageActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsExecuteSSISPackageActivity() (*ExecuteSSISPackageActivity, bool) {
+	return nil, false
+}
+
+// AsHDInsightSparkActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsHDInsightSparkActivity() (*HDInsightSparkActivity, bool) {
+	return nil, false
+}
+
+// AsHDInsightStreamingActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsHDInsightStreamingActivity() (*HDInsightStreamingActivity, bool) {
+	return nil, false
+}
+
+// AsHDInsightMapReduceActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsHDInsightMapReduceActivity() (*HDInsightMapReduceActivity, bool) {
+	return nil, false
+}
+
+// AsHDInsightPigActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsHDInsightPigActivity() (*HDInsightPigActivity, bool) {
+	return nil, false
+}
+
+// AsHDInsightHiveActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsHDInsightHiveActivity() (*HDInsightHiveActivity, bool) {
+	return nil, false
+}
+
+// AsCopyActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsCopyActivity() (*CopyActivity, bool) {
+	return nil, false
+}
+
+// AsExecutionActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsExecutionActivity() (*ExecutionActivity, bool) {
+	return nil, false
+}
+
+// AsBasicExecutionActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsBasicExecutionActivity() (BasicExecutionActivity, bool) {
+	return &dspa, true
+}
+
+// AsFilterActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsFilterActivity() (*FilterActivity, bool) {
+	return nil, false
+}
+
+// AsUntilActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsUntilActivity() (*UntilActivity, bool) {
+	return nil, false
+}
+
+// AsWaitActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsWaitActivity() (*WaitActivity, bool) {
+	return nil, false
+}
+
+// AsForEachActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsForEachActivity() (*ForEachActivity, bool) {
+	return nil, false
+}
+
+// AsIfConditionActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsIfConditionActivity() (*IfConditionActivity, bool) {
+	return nil, false
+}
+
+// AsExecutePipelineActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsExecutePipelineActivity() (*ExecutePipelineActivity, bool) {
+	return nil, false
+}
+
+// AsControlActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsControlActivity() (*ControlActivity, bool) {
+	return nil, false
+}
+
+// AsBasicControlActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsBasicControlActivity() (BasicControlActivity, bool) {
+	return nil, false
+}
+
+// AsActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsActivity() (*Activity, bool) {
+	return nil, false
+}
+
+// AsBasicActivity is the BasicActivity implementation for DatabricksSparkPythonActivity.
+func (dspa DatabricksSparkPythonActivity) AsBasicActivity() (BasicActivity, bool) {
+	return &dspa, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for DatabricksSparkPythonActivity struct.
+func (dspa *DatabricksSparkPythonActivity) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "typeProperties":
+			if v != nil {
+				var databricksSparkPythonActivityTypeProperties DatabricksSparkPythonActivityTypeProperties
+				err = json.Unmarshal(*v, &databricksSparkPythonActivityTypeProperties)
+				if err != nil {
+					return err
+				}
+				dspa.DatabricksSparkPythonActivityTypeProperties = &databricksSparkPythonActivityTypeProperties
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				dspa.LinkedServiceName = &linkedServiceName
+			}
+		case "policy":
+			if v != nil {
+				var policy ActivityPolicy
+				err = json.Unmarshal(*v, &policy)
+				if err != nil {
+					return err
+				}
+				dspa.Policy = &policy
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if dspa.AdditionalProperties == nil {
+					dspa.AdditionalProperties = make(map[string]interface{})
+				}
+				dspa.AdditionalProperties[k] = additionalProperties
+			}
+		case "name":
+			if v != nil {
+				var name string
+				err = json.Unmarshal(*v, &name)
+				if err != nil {
+					return err
+				}
+				dspa.Name = &name
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				dspa.Description = &description
+			}
+		case "dependsOn":
+			if v != nil {
+				var dependsOn []ActivityDependency
+				err = json.Unmarshal(*v, &dependsOn)
+				if err != nil {
+					return err
+				}
+				dspa.DependsOn = &dependsOn
+			}
+		case "userProperties":
+			if v != nil {
+				var userProperties []UserProperty
+				err = json.Unmarshal(*v, &userProperties)
+				if err != nil {
+					return err
+				}
+				dspa.UserProperties = &userProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicActivity
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				dspa.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// DatabricksSparkPythonActivityTypeProperties databricks SparkPython activity properties.
+type DatabricksSparkPythonActivityTypeProperties struct {
+	// PythonFile - The URI of the Python file to be executed. DBFS paths are supported. Type: string (or Expression with resultType string).
+	PythonFile interface{} `json:"pythonFile,omitempty"`
+	// Parameters - Command line parameters that will be passed to the Python file.
+	Parameters *[]interface{} `json:"parameters,omitempty"`
+	// Libraries - A list of libraries to be installed on the cluster that will execute the job.
+	Libraries *[]map[string]interface{} `json:"libraries,omitempty"`
 }
 
 // DataLakeAnalyticsUSQLActivity data Lake Analytics U-SQL activity.
@@ -25556,8 +30089,8 @@ type DataLakeAnalyticsUSQLActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -25593,6 +30126,16 @@ func (dlaua DataLakeAnalyticsUSQLActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for DataLakeAnalyticsUSQLActivity.
+func (dlaua DataLakeAnalyticsUSQLActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for DataLakeAnalyticsUSQLActivity.
+func (dlaua DataLakeAnalyticsUSQLActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for DataLakeAnalyticsUSQLActivity.
@@ -25812,12 +30355,12 @@ func (dlaua *DataLakeAnalyticsUSQLActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				dlaua.UserProperties = userProperties
+				dlaua.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -25943,6 +30486,8 @@ type Dataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -26208,6 +30753,9 @@ func (d Dataset) MarshalJSON() ([]byte, error) {
 	}
 	if d.Annotations != nil {
 		objectMap["annotations"] = d.Annotations
+	}
+	if d.Folder != nil {
+		objectMap["folder"] = d.Folder
 	}
 	if d.Type != "" {
 		objectMap["type"] = d.Type
@@ -26493,6 +31041,96 @@ func (d Dataset) AsBasicDataset() (BasicDataset, bool) {
 	return &d, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for Dataset struct.
+func (d *Dataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if d.AdditionalProperties == nil {
+					d.AdditionalProperties = make(map[string]interface{})
+				}
+				d.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				d.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				d.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				d.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				d.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				d.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				d.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				d.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // DatasetBZip2Compression the BZip2 compression method used on a dataset.
 type DatasetBZip2Compression struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -26542,6 +31180,42 @@ func (dbz2c DatasetBZip2Compression) AsDatasetCompression() (*DatasetCompression
 // AsBasicDatasetCompression is the BasicDatasetCompression implementation for DatasetBZip2Compression.
 func (dbz2c DatasetBZip2Compression) AsBasicDatasetCompression() (BasicDatasetCompression, bool) {
 	return &dbz2c, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for DatasetBZip2Compression struct.
+func (dbz2c *DatasetBZip2Compression) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if dbz2c.AdditionalProperties == nil {
+					dbz2c.AdditionalProperties = make(map[string]interface{})
+				}
+				dbz2c.AdditionalProperties[k] = additionalProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDatasetCompression
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				dbz2c.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // BasicDatasetCompression the compression method used on a dataset.
@@ -26653,6 +31327,42 @@ func (dc DatasetCompression) AsBasicDatasetCompression() (BasicDatasetCompressio
 	return &dc, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for DatasetCompression struct.
+func (dc *DatasetCompression) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if dc.AdditionalProperties == nil {
+					dc.AdditionalProperties = make(map[string]interface{})
+				}
+				dc.AdditionalProperties[k] = additionalProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDatasetCompression
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				dc.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // DatasetDeflateCompression the Deflate compression method used on a dataset.
 type DatasetDeflateCompression struct {
 	// Level - The Deflate compression level. Possible values include: 'Optimal', 'Fastest'
@@ -26709,6 +31419,57 @@ func (ddc DatasetDeflateCompression) AsBasicDatasetCompression() (BasicDatasetCo
 	return &ddc, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for DatasetDeflateCompression struct.
+func (ddc *DatasetDeflateCompression) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "level":
+			if v != nil {
+				var level DatasetCompressionLevel
+				err = json.Unmarshal(*v, &level)
+				if err != nil {
+					return err
+				}
+				ddc.Level = level
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ddc.AdditionalProperties == nil {
+					ddc.AdditionalProperties = make(map[string]interface{})
+				}
+				ddc.AdditionalProperties[k] = additionalProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDatasetCompression
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ddc.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// DatasetFolder the folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+type DatasetFolder struct {
+	// Name - The name of the folder that this Dataset is in.
+	Name *string `json:"name,omitempty"`
+}
+
 // DatasetGZipCompression the GZip compression method used on a dataset.
 type DatasetGZipCompression struct {
 	// Level - The GZip compression level. Possible values include: 'Optimal', 'Fastest'
@@ -26763,6 +31524,51 @@ func (dgzc DatasetGZipCompression) AsDatasetCompression() (*DatasetCompression, 
 // AsBasicDatasetCompression is the BasicDatasetCompression implementation for DatasetGZipCompression.
 func (dgzc DatasetGZipCompression) AsBasicDatasetCompression() (BasicDatasetCompression, bool) {
 	return &dgzc, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for DatasetGZipCompression struct.
+func (dgzc *DatasetGZipCompression) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "level":
+			if v != nil {
+				var level DatasetCompressionLevel
+				err = json.Unmarshal(*v, &level)
+				if err != nil {
+					return err
+				}
+				dgzc.Level = level
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if dgzc.AdditionalProperties == nil {
+					dgzc.AdditionalProperties = make(map[string]interface{})
+				}
+				dgzc.AdditionalProperties[k] = additionalProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDatasetCompression
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				dgzc.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // DatasetListResponse a list of dataset resources.
@@ -27091,6 +31897,60 @@ func (dsf DatasetStorageFormat) AsBasicDatasetStorageFormat() (BasicDatasetStora
 	return &dsf, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for DatasetStorageFormat struct.
+func (dsf *DatasetStorageFormat) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if dsf.AdditionalProperties == nil {
+					dsf.AdditionalProperties = make(map[string]interface{})
+				}
+				dsf.AdditionalProperties[k] = additionalProperties
+			}
+		case "serializer":
+			if v != nil {
+				var serializer interface{}
+				err = json.Unmarshal(*v, &serializer)
+				if err != nil {
+					return err
+				}
+				dsf.Serializer = serializer
+			}
+		case "deserializer":
+			if v != nil {
+				var deserializer interface{}
+				err = json.Unmarshal(*v, &deserializer)
+				if err != nil {
+					return err
+				}
+				dsf.Deserializer = deserializer
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDatasetStorageFormat
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				dsf.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // DatasetZipDeflateCompression the ZipDeflate compression method used on a dataset.
 type DatasetZipDeflateCompression struct {
 	// Level - The ZipDeflate compression level. Possible values include: 'Optimal', 'Fastest'
@@ -27147,6 +32007,51 @@ func (dzdc DatasetZipDeflateCompression) AsBasicDatasetCompression() (BasicDatas
 	return &dzdc, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for DatasetZipDeflateCompression struct.
+func (dzdc *DatasetZipDeflateCompression) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "level":
+			if v != nil {
+				var level DatasetCompressionLevel
+				err = json.Unmarshal(*v, &level)
+				if err != nil {
+					return err
+				}
+				dzdc.Level = level
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if dzdc.AdditionalProperties == nil {
+					dzdc.AdditionalProperties = make(map[string]interface{})
+				}
+				dzdc.AdditionalProperties[k] = additionalProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDatasetCompression
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				dzdc.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // Db2LinkedService linked service for DB2 data source.
 type Db2LinkedService struct {
 	// Db2LinkedServiceTypeProperties - DB2 linked service properties.
@@ -27161,7 +32066,7 @@ type Db2LinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -27538,6 +32443,16 @@ func (d2ls Db2LinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedServi
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for Db2LinkedService.
+func (d2ls Db2LinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for Db2LinkedService.
+func (d2ls Db2LinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for Db2LinkedService.
 func (d2ls Db2LinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -27718,6 +32633,106 @@ func (d2lstp *Db2LinkedServiceTypeProperties) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
+// BasicDependencyReference referenced dependency.
+type BasicDependencyReference interface {
+	AsSelfDependencyTumblingWindowTriggerReference() (*SelfDependencyTumblingWindowTriggerReference, bool)
+	AsTumblingWindowTriggerDependencyReference() (*TumblingWindowTriggerDependencyReference, bool)
+	AsTriggerDependencyReference() (*TriggerDependencyReference, bool)
+	AsBasicTriggerDependencyReference() (BasicTriggerDependencyReference, bool)
+	AsDependencyReference() (*DependencyReference, bool)
+}
+
+// DependencyReference referenced dependency.
+type DependencyReference struct {
+	// Type - Possible values include: 'TypeDependencyReference', 'TypeSelfDependencyTumblingWindowTriggerReference', 'TypeTumblingWindowTriggerDependencyReference', 'TypeTriggerDependencyReference'
+	Type TypeBasicDependencyReference `json:"type,omitempty"`
+}
+
+func unmarshalBasicDependencyReference(body []byte) (BasicDependencyReference, error) {
+	var m map[string]interface{}
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return nil, err
+	}
+
+	switch m["type"] {
+	case string(TypeSelfDependencyTumblingWindowTriggerReference):
+		var sdtwtr SelfDependencyTumblingWindowTriggerReference
+		err := json.Unmarshal(body, &sdtwtr)
+		return sdtwtr, err
+	case string(TypeTumblingWindowTriggerDependencyReference):
+		var twtdr TumblingWindowTriggerDependencyReference
+		err := json.Unmarshal(body, &twtdr)
+		return twtdr, err
+	case string(TypeTriggerDependencyReference):
+		var tdr TriggerDependencyReference
+		err := json.Unmarshal(body, &tdr)
+		return tdr, err
+	default:
+		var dr DependencyReference
+		err := json.Unmarshal(body, &dr)
+		return dr, err
+	}
+}
+func unmarshalBasicDependencyReferenceArray(body []byte) ([]BasicDependencyReference, error) {
+	var rawMessages []*json.RawMessage
+	err := json.Unmarshal(body, &rawMessages)
+	if err != nil {
+		return nil, err
+	}
+
+	drArray := make([]BasicDependencyReference, len(rawMessages))
+
+	for index, rawMessage := range rawMessages {
+		dr, err := unmarshalBasicDependencyReference(*rawMessage)
+		if err != nil {
+			return nil, err
+		}
+		drArray[index] = dr
+	}
+	return drArray, nil
+}
+
+// MarshalJSON is the custom marshaler for DependencyReference.
+func (dr DependencyReference) MarshalJSON() ([]byte, error) {
+	dr.Type = TypeDependencyReference
+	objectMap := make(map[string]interface{})
+	if dr.Type != "" {
+		objectMap["type"] = dr.Type
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsSelfDependencyTumblingWindowTriggerReference is the BasicDependencyReference implementation for DependencyReference.
+func (dr DependencyReference) AsSelfDependencyTumblingWindowTriggerReference() (*SelfDependencyTumblingWindowTriggerReference, bool) {
+	return nil, false
+}
+
+// AsTumblingWindowTriggerDependencyReference is the BasicDependencyReference implementation for DependencyReference.
+func (dr DependencyReference) AsTumblingWindowTriggerDependencyReference() (*TumblingWindowTriggerDependencyReference, bool) {
+	return nil, false
+}
+
+// AsTriggerDependencyReference is the BasicDependencyReference implementation for DependencyReference.
+func (dr DependencyReference) AsTriggerDependencyReference() (*TriggerDependencyReference, bool) {
+	return nil, false
+}
+
+// AsBasicTriggerDependencyReference is the BasicDependencyReference implementation for DependencyReference.
+func (dr DependencyReference) AsBasicTriggerDependencyReference() (BasicTriggerDependencyReference, bool) {
+	return nil, false
+}
+
+// AsDependencyReference is the BasicDependencyReference implementation for DependencyReference.
+func (dr DependencyReference) AsDependencyReference() (*DependencyReference, bool) {
+	return &dr, true
+}
+
+// AsBasicDependencyReference is the BasicDependencyReference implementation for DependencyReference.
+func (dr DependencyReference) AsBasicDependencyReference() (BasicDependencyReference, bool) {
+	return &dr, true
+}
+
 // DistcpSettings distcp settings.
 type DistcpSettings struct {
 	// ResourceManagerEndpoint - Specifies the Yarn ResourceManager endpoint. Type: string (or Expression with resultType string).
@@ -27744,6 +32759,8 @@ type DocumentDbCollectionDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -27767,6 +32784,9 @@ func (ddcd DocumentDbCollectionDataset) MarshalJSON() ([]byte, error) {
 	}
 	if ddcd.Annotations != nil {
 		objectMap["annotations"] = ddcd.Annotations
+	}
+	if ddcd.Folder != nil {
+		objectMap["folder"] = ddcd.Folder
 	}
 	if ddcd.Type != "" {
 		objectMap["type"] = ddcd.Type
@@ -28127,6 +33147,15 @@ func (ddcd *DocumentDbCollectionDataset) UnmarshalJSON(body []byte) error {
 				}
 				ddcd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				ddcd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -28262,6 +33291,87 @@ func (ddcs DocumentDbCollectionSink) AsCopySink() (*CopySink, bool) {
 // AsBasicCopySink is the BasicCopySink implementation for DocumentDbCollectionSink.
 func (ddcs DocumentDbCollectionSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &ddcs, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for DocumentDbCollectionSink struct.
+func (ddcs *DocumentDbCollectionSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "nestingSeparator":
+			if v != nil {
+				var nestingSeparator interface{}
+				err = json.Unmarshal(*v, &nestingSeparator)
+				if err != nil {
+					return err
+				}
+				ddcs.NestingSeparator = nestingSeparator
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ddcs.AdditionalProperties == nil {
+					ddcs.AdditionalProperties = make(map[string]interface{})
+				}
+				ddcs.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				ddcs.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				ddcs.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				ddcs.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				ddcs.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ddcs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // DocumentDbCollectionSource a copy activity Document Database Collection source.
@@ -28557,6 +33667,78 @@ func (ddcs DocumentDbCollectionSource) AsBasicCopySource() (BasicCopySource, boo
 	return &ddcs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for DocumentDbCollectionSource struct.
+func (ddcs *DocumentDbCollectionSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ddcs.Query = query
+			}
+		case "nestingSeparator":
+			if v != nil {
+				var nestingSeparator interface{}
+				err = json.Unmarshal(*v, &nestingSeparator)
+				if err != nil {
+					return err
+				}
+				ddcs.NestingSeparator = nestingSeparator
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ddcs.AdditionalProperties == nil {
+					ddcs.AdditionalProperties = make(map[string]interface{})
+				}
+				ddcs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ddcs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ddcs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ddcs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // DrillLinkedService drill server linked service.
 type DrillLinkedService struct {
 	// DrillLinkedServiceTypeProperties - Drill server linked service properties.
@@ -28571,7 +33753,7 @@ type DrillLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -28945,6 +34127,16 @@ func (dls DrillLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedServic
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for DrillLinkedService.
 func (dls DrillLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for DrillLinkedService.
+func (dls DrillLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for DrillLinkedService.
+func (dls DrillLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -29342,6 +34534,69 @@ func (ds DrillSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ds, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for DrillSource struct.
+func (ds *DrillSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ds.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ds.AdditionalProperties == nil {
+					ds.AdditionalProperties = make(map[string]interface{})
+				}
+				ds.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ds.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ds.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ds.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // DrillTableDataset drill server dataset.
 type DrillTableDataset struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -29356,6 +34611,8 @@ type DrillTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -29376,6 +34633,9 @@ func (dtd DrillTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if dtd.Annotations != nil {
 		objectMap["annotations"] = dtd.Annotations
+	}
+	if dtd.Folder != nil {
+		objectMap["folder"] = dtd.Folder
 	}
 	if dtd.Type != "" {
 		objectMap["type"] = dtd.Type
@@ -29661,6 +34921,96 @@ func (dtd DrillTableDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &dtd, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for DrillTableDataset struct.
+func (dtd *DrillTableDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if dtd.AdditionalProperties == nil {
+					dtd.AdditionalProperties = make(map[string]interface{})
+				}
+				dtd.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				dtd.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				dtd.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				dtd.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				dtd.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				dtd.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				dtd.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				dtd.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // DynamicsEntityDataset the Dynamics entity dataset.
 type DynamicsEntityDataset struct {
 	// DynamicsEntityDatasetTypeProperties - Dynamics entity dataset properties.
@@ -29677,6 +35027,8 @@ type DynamicsEntityDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -29700,6 +35052,9 @@ func (ded DynamicsEntityDataset) MarshalJSON() ([]byte, error) {
 	}
 	if ded.Annotations != nil {
 		objectMap["annotations"] = ded.Annotations
+	}
+	if ded.Folder != nil {
+		objectMap["folder"] = ded.Folder
 	}
 	if ded.Type != "" {
 		objectMap["type"] = ded.Type
@@ -30060,6 +35415,15 @@ func (ded *DynamicsEntityDataset) UnmarshalJSON(body []byte) error {
 				}
 				ded.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				ded.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -30095,7 +35459,7 @@ type DynamicsLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -30472,6 +35836,16 @@ func (dls DynamicsLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedS
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for DynamicsLinkedService.
+func (dls DynamicsLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for DynamicsLinkedService.
+func (dls DynamicsLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for DynamicsLinkedService.
 func (dls DynamicsLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -30806,6 +36180,96 @@ func (ds DynamicsSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &ds, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for DynamicsSink struct.
+func (ds *DynamicsSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "writeBehavior":
+			if v != nil {
+				var writeBehavior string
+				err = json.Unmarshal(*v, &writeBehavior)
+				if err != nil {
+					return err
+				}
+				ds.WriteBehavior = &writeBehavior
+			}
+		case "ignoreNullValues":
+			if v != nil {
+				var ignoreNullValues interface{}
+				err = json.Unmarshal(*v, &ignoreNullValues)
+				if err != nil {
+					return err
+				}
+				ds.IgnoreNullValues = ignoreNullValues
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ds.AdditionalProperties == nil {
+					ds.AdditionalProperties = make(map[string]interface{})
+				}
+				ds.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				ds.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				ds.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				ds.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				ds.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ds.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // DynamicsSource a copy activity Dynamics source.
 type DynamicsSource struct {
 	// Query - FetchXML is a proprietary query language that is used in Microsoft Dynamics (online & on-premises). Type: string (or Expression with resultType string).
@@ -31096,6 +36560,69 @@ func (ds DynamicsSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ds, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for DynamicsSource struct.
+func (ds *DynamicsSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ds.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ds.AdditionalProperties == nil {
+					ds.AdditionalProperties = make(map[string]interface{})
+				}
+				ds.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ds.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ds.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ds.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // EloquaLinkedService eloqua server linked service.
 type EloquaLinkedService struct {
 	// EloquaLinkedServiceTypeProperties - Eloqua server linked service properties.
@@ -31110,7 +36637,7 @@ type EloquaLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -31487,6 +37014,16 @@ func (els EloquaLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for EloquaLinkedService.
+func (els EloquaLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for EloquaLinkedService.
+func (els EloquaLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for EloquaLinkedService.
 func (els EloquaLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -31692,6 +37229,8 @@ type EloquaObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -31712,6 +37251,9 @@ func (eod EloquaObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if eod.Annotations != nil {
 		objectMap["annotations"] = eod.Annotations
+	}
+	if eod.Folder != nil {
+		objectMap["folder"] = eod.Folder
 	}
 	if eod.Type != "" {
 		objectMap["type"] = eod.Type
@@ -31995,6 +37537,96 @@ func (eod EloquaObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for EloquaObjectDataset.
 func (eod EloquaObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &eod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for EloquaObjectDataset struct.
+func (eod *EloquaObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if eod.AdditionalProperties == nil {
+					eod.AdditionalProperties = make(map[string]interface{})
+				}
+				eod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				eod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				eod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				eod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				eod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				eod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				eod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				eod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // EloquaSource a copy activity Eloqua server source.
@@ -32287,6 +37919,69 @@ func (es EloquaSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &es, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for EloquaSource struct.
+func (es *EloquaSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				es.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if es.AdditionalProperties == nil {
+					es.AdditionalProperties = make(map[string]interface{})
+				}
+				es.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				es.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				es.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				es.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // ExecutePipelineActivity execute pipeline activity.
 type ExecutePipelineActivity struct {
 	// ExecutePipelineActivityTypeProperties - Execute pipeline activity properties.
@@ -32300,8 +37995,8 @@ type ExecutePipelineActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -32331,6 +38026,16 @@ func (epa ExecutePipelineActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for ExecutePipelineActivity.
+func (epa ExecutePipelineActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for ExecutePipelineActivity.
+func (epa ExecutePipelineActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for ExecutePipelineActivity.
@@ -32532,12 +38237,12 @@ func (epa *ExecutePipelineActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				epa.UserProperties = userProperties
+				epa.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -32596,8 +38301,8 @@ type ExecuteSSISPackageActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -32633,6 +38338,16 @@ func (espa ExecuteSSISPackageActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for ExecuteSSISPackageActivity.
+func (espa ExecuteSSISPackageActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for ExecuteSSISPackageActivity.
+func (espa ExecuteSSISPackageActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for ExecuteSSISPackageActivity.
@@ -32852,12 +38567,12 @@ func (espa *ExecuteSSISPackageActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				espa.UserProperties = userProperties
+				espa.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -32936,6 +38651,8 @@ func (espatp ExecuteSSISPackageActivityTypeProperties) MarshalJSON() ([]byte, er
 
 // BasicExecutionActivity base class for all execution activities.
 type BasicExecutionActivity interface {
+	AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool)
+	AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool)
 	AsDatabricksNotebookActivity() (*DatabricksNotebookActivity, bool)
 	AsDataLakeAnalyticsUSQLActivity() (*DataLakeAnalyticsUSQLActivity, bool)
 	AsAzureMLUpdateResourceActivity() (*AzureMLUpdateResourceActivity, bool)
@@ -32970,8 +38687,8 @@ type ExecutionActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -32983,6 +38700,14 @@ func unmarshalBasicExecutionActivity(body []byte) (BasicExecutionActivity, error
 	}
 
 	switch m["type"] {
+	case string(TypeDatabricksSparkPython):
+		var dspa DatabricksSparkPythonActivity
+		err := json.Unmarshal(body, &dspa)
+		return dspa, err
+	case string(TypeDatabricksSparkJar):
+		var dsja DatabricksSparkJarActivity
+		err := json.Unmarshal(body, &dsja)
+		return dsja, err
 	case string(TypeDatabricksNotebook):
 		var dna DatabricksNotebookActivity
 		err := json.Unmarshal(body, &dna)
@@ -33101,6 +38826,16 @@ func (ea ExecutionActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for ExecutionActivity.
+func (ea ExecutionActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for ExecutionActivity.
+func (ea ExecutionActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for ExecutionActivity.
@@ -33241,6 +38976,96 @@ func (ea ExecutionActivity) AsActivity() (*Activity, bool) {
 // AsBasicActivity is the BasicActivity implementation for ExecutionActivity.
 func (ea ExecutionActivity) AsBasicActivity() (BasicActivity, bool) {
 	return &ea, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for ExecutionActivity struct.
+func (ea *ExecutionActivity) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				ea.LinkedServiceName = &linkedServiceName
+			}
+		case "policy":
+			if v != nil {
+				var policy ActivityPolicy
+				err = json.Unmarshal(*v, &policy)
+				if err != nil {
+					return err
+				}
+				ea.Policy = &policy
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ea.AdditionalProperties == nil {
+					ea.AdditionalProperties = make(map[string]interface{})
+				}
+				ea.AdditionalProperties[k] = additionalProperties
+			}
+		case "name":
+			if v != nil {
+				var name string
+				err = json.Unmarshal(*v, &name)
+				if err != nil {
+					return err
+				}
+				ea.Name = &name
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				ea.Description = &description
+			}
+		case "dependsOn":
+			if v != nil {
+				var dependsOn []ActivityDependency
+				err = json.Unmarshal(*v, &dependsOn)
+				if err != nil {
+					return err
+				}
+				ea.DependsOn = &dependsOn
+			}
+		case "userProperties":
+			if v != nil {
+				var userProperties []UserProperty
+				err = json.Unmarshal(*v, &userProperties)
+				if err != nil {
+					return err
+				}
+				ea.UserProperties = &userProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicActivity
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ea.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // Expression azure Data Factory expression definition.
@@ -33408,7 +39233,7 @@ func (f *Factory) UnmarshalJSON(body []byte) error {
 
 // FactoryGitHubConfiguration factory's GitHub repo information.
 type FactoryGitHubConfiguration struct {
-	// HostName - GitHub repo host name.
+	// HostName - GitHub Enterprise host name. For example: https://github.mydomain.com
 	HostName *string `json:"hostName,omitempty"`
 	// AccountName - Account name.
 	AccountName *string `json:"accountName,omitempty"`
@@ -33420,13 +39245,13 @@ type FactoryGitHubConfiguration struct {
 	RootFolder *string `json:"rootFolder,omitempty"`
 	// LastCommitID - Last commit id.
 	LastCommitID *string `json:"lastCommitId,omitempty"`
-	// Type - Possible values include: 'TypeFactoryRepoConfiguration', 'TypeFactoryVSTSConfiguration', 'TypeFactoryGithubConfiguration'
+	// Type - Possible values include: 'TypeFactoryRepoConfiguration', 'TypeFactoryVSTSConfiguration', 'TypeFactoryGitHubConfiguration'
 	Type TypeBasicFactoryRepoConfiguration `json:"type,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for FactoryGitHubConfiguration.
 func (fghc FactoryGitHubConfiguration) MarshalJSON() ([]byte, error) {
-	fghc.Type = TypeFactoryGithubConfiguration
+	fghc.Type = TypeFactoryGitHubConfiguration
 	objectMap := make(map[string]interface{})
 	if fghc.HostName != nil {
 		objectMap["hostName"] = fghc.HostName
@@ -33665,7 +39490,7 @@ type FactoryRepoConfiguration struct {
 	RootFolder *string `json:"rootFolder,omitempty"`
 	// LastCommitID - Last commit id.
 	LastCommitID *string `json:"lastCommitId,omitempty"`
-	// Type - Possible values include: 'TypeFactoryRepoConfiguration', 'TypeFactoryVSTSConfiguration', 'TypeFactoryGithubConfiguration'
+	// Type - Possible values include: 'TypeFactoryRepoConfiguration', 'TypeFactoryVSTSConfiguration', 'TypeFactoryGitHubConfiguration'
 	Type TypeBasicFactoryRepoConfiguration `json:"type,omitempty"`
 }
 
@@ -33681,7 +39506,7 @@ func unmarshalBasicFactoryRepoConfiguration(body []byte) (BasicFactoryRepoConfig
 		var fvc FactoryVSTSConfiguration
 		err := json.Unmarshal(body, &fvc)
 		return fvc, err
-	case string(TypeFactoryGithubConfiguration):
+	case string(TypeFactoryGitHubConfiguration):
 		var fghc FactoryGitHubConfiguration
 		err := json.Unmarshal(body, &fghc)
 		return fghc, err
@@ -33831,7 +39656,7 @@ type FactoryVSTSConfiguration struct {
 	RootFolder *string `json:"rootFolder,omitempty"`
 	// LastCommitID - Last commit id.
 	LastCommitID *string `json:"lastCommitId,omitempty"`
-	// Type - Possible values include: 'TypeFactoryRepoConfiguration', 'TypeFactoryVSTSConfiguration', 'TypeFactoryGithubConfiguration'
+	// Type - Possible values include: 'TypeFactoryRepoConfiguration', 'TypeFactoryVSTSConfiguration', 'TypeFactoryGitHubConfiguration'
 	Type TypeBasicFactoryRepoConfiguration `json:"type,omitempty"`
 }
 
@@ -33900,7 +39725,7 @@ type FileServerLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -34277,6 +40102,16 @@ func (fsls FileServerLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLink
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for FileServerLinkedService.
+func (fsls FileServerLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for FileServerLinkedService.
+func (fsls FileServerLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for FileServerLinkedService.
 func (fsls FileServerLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -34451,6 +40286,8 @@ type FileShareDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -34474,6 +40311,9 @@ func (fsd FileShareDataset) MarshalJSON() ([]byte, error) {
 	}
 	if fsd.Annotations != nil {
 		objectMap["annotations"] = fsd.Annotations
+	}
+	if fsd.Folder != nil {
+		objectMap["folder"] = fsd.Folder
 	}
 	if fsd.Type != "" {
 		objectMap["type"] = fsd.Type
@@ -34834,6 +40674,15 @@ func (fsd *FileShareDataset) UnmarshalJSON(body []byte) error {
 				}
 				fsd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				fsd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -35037,6 +40886,87 @@ func (fss FileSystemSink) AsCopySink() (*CopySink, bool) {
 // AsBasicCopySink is the BasicCopySink implementation for FileSystemSink.
 func (fss FileSystemSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &fss, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for FileSystemSink struct.
+func (fss *FileSystemSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "copyBehavior":
+			if v != nil {
+				var copyBehavior CopyBehaviorType
+				err = json.Unmarshal(*v, &copyBehavior)
+				if err != nil {
+					return err
+				}
+				fss.CopyBehavior = copyBehavior
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if fss.AdditionalProperties == nil {
+					fss.AdditionalProperties = make(map[string]interface{})
+				}
+				fss.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				fss.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				fss.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				fss.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				fss.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				fss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // FileSystemSource a copy activity file system source.
@@ -35329,6 +41259,69 @@ func (fss FileSystemSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &fss, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for FileSystemSource struct.
+func (fss *FileSystemSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "recursive":
+			if v != nil {
+				var recursive interface{}
+				err = json.Unmarshal(*v, &recursive)
+				if err != nil {
+					return err
+				}
+				fss.Recursive = recursive
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if fss.AdditionalProperties == nil {
+					fss.AdditionalProperties = make(map[string]interface{})
+				}
+				fss.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				fss.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				fss.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				fss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // FilterActivity filter and return results from input array based on the conditions.
 type FilterActivity struct {
 	// FilterActivityTypeProperties - Filter activity properties.
@@ -35342,8 +41335,8 @@ type FilterActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -35373,6 +41366,16 @@ func (fa FilterActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for FilterActivity.
+func (fa FilterActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for FilterActivity.
+func (fa FilterActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for FilterActivity.
@@ -35574,12 +41577,12 @@ func (fa *FilterActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				fa.UserProperties = userProperties
+				fa.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -35596,7 +41599,7 @@ func (fa *FilterActivity) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
-// FilterActivityTypeProperties fitler activity properties.
+// FilterActivityTypeProperties filter activity properties.
 type FilterActivityTypeProperties struct {
 	// Items - Input array on which filter should be applied.
 	Items *Expression `json:"items,omitempty"`
@@ -35617,8 +41620,8 @@ type ForEachActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -35648,6 +41651,16 @@ func (fea ForEachActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for ForEachActivity.
+func (fea ForEachActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for ForEachActivity.
+func (fea ForEachActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for ForEachActivity.
@@ -35849,12 +41862,12 @@ func (fea *ForEachActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				fea.UserProperties = userProperties
+				fea.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -35947,7 +41960,7 @@ type FtpServerLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -36324,6 +42337,16 @@ func (fsls FtpServerLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinke
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for FtpServerLinkedService.
+func (fsls FtpServerLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for FtpServerLinkedService.
+func (fsls FtpServerLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for FtpServerLinkedService.
 func (fsls FtpServerLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -36543,8 +42566,8 @@ type GetMetadataActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -36580,6 +42603,16 @@ func (gma GetMetadataActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for GetMetadataActivity.
+func (gma GetMetadataActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for GetMetadataActivity.
+func (gma GetMetadataActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for GetMetadataActivity.
@@ -36799,12 +42832,12 @@ func (gma *GetMetadataActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				gma.UserProperties = userProperties
+				gma.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -36829,6 +42862,23 @@ type GetMetadataActivityTypeProperties struct {
 	FieldList *[]interface{} `json:"fieldList,omitempty"`
 }
 
+// GitHubAccessTokenRequest get GitHub access token request definition.
+type GitHubAccessTokenRequest struct {
+	// GitHubAccessCode - GitHub access code.
+	GitHubAccessCode *string `json:"gitHubAccessCode,omitempty"`
+	// GitHubClientID - GitHub application client ID.
+	GitHubClientID *string `json:"gitHubClientId,omitempty"`
+	// GitHubAccessTokenBaseURL - GitHub access token base URL.
+	GitHubAccessTokenBaseURL *string `json:"gitHubAccessTokenBaseUrl,omitempty"`
+}
+
+// GitHubAccessTokenResponse get GitHub access token response definition.
+type GitHubAccessTokenResponse struct {
+	autorest.Response `json:"-"`
+	// GitHubAccessToken - GitHub access token.
+	GitHubAccessToken *string `json:"gitHubAccessToken,omitempty"`
+}
+
 // GoogleBigQueryLinkedService google BigQuery service linked service.
 type GoogleBigQueryLinkedService struct {
 	// GoogleBigQueryLinkedServiceTypeProperties - Google BigQuery service linked service properties.
@@ -36843,7 +42893,7 @@ type GoogleBigQueryLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -37220,6 +43270,16 @@ func (gbqls GoogleBigQueryLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLD
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for GoogleBigQueryLinkedService.
+func (gbqls GoogleBigQueryLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for GoogleBigQueryLinkedService.
+func (gbqls GoogleBigQueryLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for GoogleBigQueryLinkedService.
 func (gbqls GoogleBigQueryLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -37478,6 +43538,8 @@ type GoogleBigQueryObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -37498,6 +43560,9 @@ func (gbqod GoogleBigQueryObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if gbqod.Annotations != nil {
 		objectMap["annotations"] = gbqod.Annotations
+	}
+	if gbqod.Folder != nil {
+		objectMap["folder"] = gbqod.Folder
 	}
 	if gbqod.Type != "" {
 		objectMap["type"] = gbqod.Type
@@ -37781,6 +43846,96 @@ func (gbqod GoogleBigQueryObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for GoogleBigQueryObjectDataset.
 func (gbqod GoogleBigQueryObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &gbqod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for GoogleBigQueryObjectDataset struct.
+func (gbqod *GoogleBigQueryObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if gbqod.AdditionalProperties == nil {
+					gbqod.AdditionalProperties = make(map[string]interface{})
+				}
+				gbqod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				gbqod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				gbqod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				gbqod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				gbqod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				gbqod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				gbqod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				gbqod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // GoogleBigQuerySource a copy activity Google BigQuery service source.
@@ -38073,6 +44228,69 @@ func (gbqs GoogleBigQuerySource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &gbqs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for GoogleBigQuerySource struct.
+func (gbqs *GoogleBigQuerySource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				gbqs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if gbqs.AdditionalProperties == nil {
+					gbqs.AdditionalProperties = make(map[string]interface{})
+				}
+				gbqs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				gbqs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				gbqs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				gbqs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // GreenplumLinkedService greenplum Database linked service.
 type GreenplumLinkedService struct {
 	// GreenplumLinkedServiceTypeProperties - Greenplum Database linked service properties.
@@ -38087,7 +44305,7 @@ type GreenplumLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -38461,6 +44679,16 @@ func (gls GreenplumLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedSe
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for GreenplumLinkedService.
 func (gls GreenplumLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for GreenplumLinkedService.
+func (gls GreenplumLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for GreenplumLinkedService.
+func (gls GreenplumLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -38858,6 +45086,69 @@ func (gs GreenplumSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &gs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for GreenplumSource struct.
+func (gs *GreenplumSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				gs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if gs.AdditionalProperties == nil {
+					gs.AdditionalProperties = make(map[string]interface{})
+				}
+				gs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				gs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				gs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				gs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // GreenplumTableDataset greenplum Database dataset.
 type GreenplumTableDataset struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -38872,6 +45163,8 @@ type GreenplumTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -38892,6 +45185,9 @@ func (gtd GreenplumTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if gtd.Annotations != nil {
 		objectMap["annotations"] = gtd.Annotations
+	}
+	if gtd.Folder != nil {
+		objectMap["folder"] = gtd.Folder
 	}
 	if gtd.Type != "" {
 		objectMap["type"] = gtd.Type
@@ -39177,6 +45473,96 @@ func (gtd GreenplumTableDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &gtd, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for GreenplumTableDataset struct.
+func (gtd *GreenplumTableDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if gtd.AdditionalProperties == nil {
+					gtd.AdditionalProperties = make(map[string]interface{})
+				}
+				gtd.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				gtd.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				gtd.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				gtd.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				gtd.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				gtd.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				gtd.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				gtd.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // HBaseLinkedService hBase server linked service.
 type HBaseLinkedService struct {
 	// HBaseLinkedServiceTypeProperties - HBase server linked service properties.
@@ -39191,7 +45577,7 @@ type HBaseLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -39568,6 +45954,16 @@ func (hbls HBaseLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for HBaseLinkedService.
+func (hbls HBaseLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for HBaseLinkedService.
+func (hbls HBaseLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for HBaseLinkedService.
 func (hbls HBaseLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -39817,6 +46213,8 @@ type HBaseObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -39837,6 +46235,9 @@ func (hbod HBaseObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if hbod.Annotations != nil {
 		objectMap["annotations"] = hbod.Annotations
+	}
+	if hbod.Folder != nil {
+		objectMap["folder"] = hbod.Folder
 	}
 	if hbod.Type != "" {
 		objectMap["type"] = hbod.Type
@@ -40120,6 +46521,96 @@ func (hbod HBaseObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for HBaseObjectDataset.
 func (hbod HBaseObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &hbod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for HBaseObjectDataset struct.
+func (hbod *HBaseObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if hbod.AdditionalProperties == nil {
+					hbod.AdditionalProperties = make(map[string]interface{})
+				}
+				hbod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				hbod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				hbod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				hbod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				hbod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				hbod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				hbod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				hbod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // HBaseSource a copy activity HBase server source.
@@ -40412,6 +46903,69 @@ func (hbs HBaseSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &hbs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for HBaseSource struct.
+func (hbs *HBaseSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				hbs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if hbs.AdditionalProperties == nil {
+					hbs.AdditionalProperties = make(map[string]interface{})
+				}
+				hbs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				hbs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				hbs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				hbs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // HdfsLinkedService hadoop Distributed File System (HDFS) linked service.
 type HdfsLinkedService struct {
 	// HdfsLinkedServiceTypeProperties - HDFS linked service properties.
@@ -40426,7 +46980,7 @@ type HdfsLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -40800,6 +47354,16 @@ func (hls HdfsLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedService
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for HdfsLinkedService.
 func (hls HdfsLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for HdfsLinkedService.
+func (hls HdfsLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for HdfsLinkedService.
+func (hls HdfsLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -41267,6 +47831,78 @@ func (hs HdfsSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &hs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for HdfsSource struct.
+func (hs *HdfsSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "recursive":
+			if v != nil {
+				var recursive interface{}
+				err = json.Unmarshal(*v, &recursive)
+				if err != nil {
+					return err
+				}
+				hs.Recursive = recursive
+			}
+		case "distcpSettings":
+			if v != nil {
+				var distcpSettings DistcpSettings
+				err = json.Unmarshal(*v, &distcpSettings)
+				if err != nil {
+					return err
+				}
+				hs.DistcpSettings = &distcpSettings
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if hs.AdditionalProperties == nil {
+					hs.AdditionalProperties = make(map[string]interface{})
+				}
+				hs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				hs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				hs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				hs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // HDInsightHiveActivity hDInsight Hive activity type.
 type HDInsightHiveActivity struct {
 	// HDInsightHiveActivityTypeProperties - HDInsight Hive activity properties.
@@ -41284,8 +47920,8 @@ type HDInsightHiveActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -41321,6 +47957,16 @@ func (hiha HDInsightHiveActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for HDInsightHiveActivity.
+func (hiha HDInsightHiveActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for HDInsightHiveActivity.
+func (hiha HDInsightHiveActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for HDInsightHiveActivity.
@@ -41540,12 +48186,12 @@ func (hiha *HDInsightHiveActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				hiha.UserProperties = userProperties
+				hiha.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -41614,7 +48260,7 @@ type HDInsightLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -41991,6 +48637,16 @@ func (hils HDInsightLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinke
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for HDInsightLinkedService.
+func (hils HDInsightLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for HDInsightLinkedService.
+func (hils HDInsightLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for HDInsightLinkedService.
 func (hils HDInsightLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -42188,8 +48844,8 @@ type HDInsightMapReduceActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -42225,6 +48881,16 @@ func (himra HDInsightMapReduceActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for HDInsightMapReduceActivity.
+func (himra HDInsightMapReduceActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for HDInsightMapReduceActivity.
+func (himra HDInsightMapReduceActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for HDInsightMapReduceActivity.
@@ -42444,12 +49110,12 @@ func (himra *HDInsightMapReduceActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				himra.UserProperties = userProperties
+				himra.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -42526,7 +49192,7 @@ type HDInsightOnDemandLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -42900,6 +49566,16 @@ func (hiodls HDInsightOnDemandLinkedService) AsSQLServerLinkedService() (*SQLSer
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for HDInsightOnDemandLinkedService.
 func (hiodls HDInsightOnDemandLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for HDInsightOnDemandLinkedService.
+func (hiodls HDInsightOnDemandLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for HDInsightOnDemandLinkedService.
+func (hiodls HDInsightOnDemandLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -43362,8 +50038,8 @@ type HDInsightPigActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -43399,6 +50075,16 @@ func (hipa HDInsightPigActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for HDInsightPigActivity.
+func (hipa HDInsightPigActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for HDInsightPigActivity.
+func (hipa HDInsightPigActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for HDInsightPigActivity.
@@ -43618,12 +50304,12 @@ func (hipa *HDInsightPigActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				hipa.UserProperties = userProperties
+				hipa.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -43695,8 +50381,8 @@ type HDInsightSparkActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -43732,6 +50418,16 @@ func (hisa HDInsightSparkActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for HDInsightSparkActivity.
+func (hisa HDInsightSparkActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for HDInsightSparkActivity.
+func (hisa HDInsightSparkActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for HDInsightSparkActivity.
@@ -43951,12 +50647,12 @@ func (hisa *HDInsightSparkActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				hisa.UserProperties = userProperties
+				hisa.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -44034,8 +50730,8 @@ type HDInsightStreamingActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -44071,6 +50767,16 @@ func (hisa HDInsightStreamingActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for HDInsightStreamingActivity.
+func (hisa HDInsightStreamingActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for HDInsightStreamingActivity.
+func (hisa HDInsightStreamingActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for HDInsightStreamingActivity.
@@ -44290,12 +50996,12 @@ func (hisa *HDInsightStreamingActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				hisa.UserProperties = userProperties
+				hisa.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -44386,7 +51092,7 @@ type HiveLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -44763,6 +51469,16 @@ func (hls HiveLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedServi
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for HiveLinkedService.
+func (hls HiveLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for HiveLinkedService.
+func (hls HiveLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for HiveLinkedService.
 func (hls HiveLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -45078,6 +51794,8 @@ type HiveObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -45098,6 +51816,9 @@ func (hod HiveObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if hod.Annotations != nil {
 		objectMap["annotations"] = hod.Annotations
+	}
+	if hod.Folder != nil {
+		objectMap["folder"] = hod.Folder
 	}
 	if hod.Type != "" {
 		objectMap["type"] = hod.Type
@@ -45381,6 +52102,96 @@ func (hod HiveObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for HiveObjectDataset.
 func (hod HiveObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &hod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for HiveObjectDataset struct.
+func (hod *HiveObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if hod.AdditionalProperties == nil {
+					hod.AdditionalProperties = make(map[string]interface{})
+				}
+				hod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				hod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				hod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				hod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				hod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				hod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				hod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				hod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // HiveSource a copy activity Hive Server source.
@@ -45673,6 +52484,69 @@ func (hs HiveSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &hs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for HiveSource struct.
+func (hs *HiveSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				hs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if hs.AdditionalProperties == nil {
+					hs.AdditionalProperties = make(map[string]interface{})
+				}
+				hs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				hs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				hs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				hs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // HTTPDataset a file in an HTTP web server.
 type HTTPDataset struct {
 	// HTTPDatasetTypeProperties - Properties specific to this dataset type.
@@ -45689,6 +52563,8 @@ type HTTPDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -45712,6 +52588,9 @@ func (hd HTTPDataset) MarshalJSON() ([]byte, error) {
 	}
 	if hd.Annotations != nil {
 		objectMap["annotations"] = hd.Annotations
+	}
+	if hd.Folder != nil {
+		objectMap["folder"] = hd.Folder
 	}
 	if hd.Type != "" {
 		objectMap["type"] = hd.Type
@@ -46072,6 +52951,15 @@ func (hd *HTTPDataset) UnmarshalJSON(body []byte) error {
 				}
 				hd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				hd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -46186,7 +53074,7 @@ type HTTPLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -46560,6 +53448,16 @@ func (hls HTTPLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedService
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for HTTPLinkedService.
 func (hls HTTPLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for HTTPLinkedService.
+func (hls HTTPLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for HTTPLinkedService.
+func (hls HTTPLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -47055,6 +53953,69 @@ func (hs HTTPSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &hs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for HTTPSource struct.
+func (hs *HTTPSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "httpRequestTimeout":
+			if v != nil {
+				var HTTPRequestTimeout interface{}
+				err = json.Unmarshal(*v, &HTTPRequestTimeout)
+				if err != nil {
+					return err
+				}
+				hs.HTTPRequestTimeout = HTTPRequestTimeout
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if hs.AdditionalProperties == nil {
+					hs.AdditionalProperties = make(map[string]interface{})
+				}
+				hs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				hs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				hs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				hs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // HubspotLinkedService hubspot Serivce linked service.
 type HubspotLinkedService struct {
 	// HubspotLinkedServiceTypeProperties - Hubspot Serivce linked service properties.
@@ -47069,7 +54030,7 @@ type HubspotLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -47446,6 +54407,16 @@ func (hls HubspotLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSe
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for HubspotLinkedService.
+func (hls HubspotLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for HubspotLinkedService.
+func (hls HubspotLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for HubspotLinkedService.
 func (hls HubspotLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -47660,6 +54631,8 @@ type HubspotObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -47680,6 +54653,9 @@ func (hod HubspotObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if hod.Annotations != nil {
 		objectMap["annotations"] = hod.Annotations
+	}
+	if hod.Folder != nil {
+		objectMap["folder"] = hod.Folder
 	}
 	if hod.Type != "" {
 		objectMap["type"] = hod.Type
@@ -47963,6 +54939,96 @@ func (hod HubspotObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for HubspotObjectDataset.
 func (hod HubspotObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &hod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for HubspotObjectDataset struct.
+func (hod *HubspotObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if hod.AdditionalProperties == nil {
+					hod.AdditionalProperties = make(map[string]interface{})
+				}
+				hod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				hod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				hod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				hod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				hod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				hod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				hod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				hod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // HubspotSource a copy activity Hubspot Serivce source.
@@ -48255,6 +55321,69 @@ func (hs HubspotSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &hs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for HubspotSource struct.
+func (hs *HubspotSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				hs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if hs.AdditionalProperties == nil {
+					hs.AdditionalProperties = make(map[string]interface{})
+				}
+				hs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				hs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				hs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				hs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // IfConditionActivity this activity evaluates a boolean expression and executes either the activities under the
 // ifTrueActivities property or the ifFalseActivities property depending on the result of the expression.
 type IfConditionActivity struct {
@@ -48269,8 +55398,8 @@ type IfConditionActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -48300,6 +55429,16 @@ func (ica IfConditionActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for IfConditionActivity.
+func (ica IfConditionActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for IfConditionActivity.
+func (ica IfConditionActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for IfConditionActivity.
@@ -48501,12 +55640,12 @@ func (ica *IfConditionActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				ica.UserProperties = userProperties
+				ica.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -48587,7 +55726,7 @@ type ImpalaLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -48964,6 +56103,16 @@ func (ils ImpalaLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for ImpalaLinkedService.
+func (ils ImpalaLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for ImpalaLinkedService.
+func (ils ImpalaLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for ImpalaLinkedService.
 func (ils ImpalaLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -49213,6 +56362,8 @@ type ImpalaObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -49233,6 +56384,9 @@ func (iod ImpalaObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if iod.Annotations != nil {
 		objectMap["annotations"] = iod.Annotations
+	}
+	if iod.Folder != nil {
+		objectMap["folder"] = iod.Folder
 	}
 	if iod.Type != "" {
 		objectMap["type"] = iod.Type
@@ -49516,6 +56670,96 @@ func (iod ImpalaObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for ImpalaObjectDataset.
 func (iod ImpalaObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &iod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for ImpalaObjectDataset struct.
+func (iod *ImpalaObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if iod.AdditionalProperties == nil {
+					iod.AdditionalProperties = make(map[string]interface{})
+				}
+				iod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				iod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				iod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				iod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				iod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				iod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				iod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				iod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // ImpalaSource a copy activity Impala server source.
@@ -49808,6 +57052,69 @@ func (is ImpalaSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &is, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for ImpalaSource struct.
+func (is *ImpalaSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				is.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if is.AdditionalProperties == nil {
+					is.AdditionalProperties = make(map[string]interface{})
+				}
+				is.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				is.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				is.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				is.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // BasicIntegrationRuntime azure Data Factory nested object which serves as a compute resource for activities.
 type BasicIntegrationRuntime interface {
 	AsSelfHostedIntegrationRuntime() (*SelfHostedIntegrationRuntime, bool)
@@ -49902,6 +57209,51 @@ func (ir IntegrationRuntime) AsBasicIntegrationRuntime() (BasicIntegrationRuntim
 	return &ir, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for IntegrationRuntime struct.
+func (ir *IntegrationRuntime) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ir.AdditionalProperties == nil {
+					ir.AdditionalProperties = make(map[string]interface{})
+				}
+				ir.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				ir.Description = &description
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicIntegrationRuntime
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ir.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // IntegrationRuntimeAuthKeys the integration runtime authentication keys.
 type IntegrationRuntimeAuthKeys struct {
 	autorest.Response `json:"-"`
@@ -49951,6 +57303,78 @@ func (ircp IntegrationRuntimeComputeProperties) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for IntegrationRuntimeComputeProperties struct.
+func (ircp *IntegrationRuntimeComputeProperties) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ircp.AdditionalProperties == nil {
+					ircp.AdditionalProperties = make(map[string]interface{})
+				}
+				ircp.AdditionalProperties[k] = additionalProperties
+			}
+		case "location":
+			if v != nil {
+				var location string
+				err = json.Unmarshal(*v, &location)
+				if err != nil {
+					return err
+				}
+				ircp.Location = &location
+			}
+		case "nodeSize":
+			if v != nil {
+				var nodeSize string
+				err = json.Unmarshal(*v, &nodeSize)
+				if err != nil {
+					return err
+				}
+				ircp.NodeSize = &nodeSize
+			}
+		case "numberOfNodes":
+			if v != nil {
+				var numberOfNodes int32
+				err = json.Unmarshal(*v, &numberOfNodes)
+				if err != nil {
+					return err
+				}
+				ircp.NumberOfNodes = &numberOfNodes
+			}
+		case "maxParallelExecutionsPerNode":
+			if v != nil {
+				var maxParallelExecutionsPerNode int32
+				err = json.Unmarshal(*v, &maxParallelExecutionsPerNode)
+				if err != nil {
+					return err
+				}
+				ircp.MaxParallelExecutionsPerNode = &maxParallelExecutionsPerNode
+			}
+		case "vNetProperties":
+			if v != nil {
+				var vNetProperties IntegrationRuntimeVNetProperties
+				err = json.Unmarshal(*v, &vNetProperties)
+				if err != nil {
+					return err
+				}
+				ircp.VNetProperties = &vNetProperties
+			}
+		}
+	}
+
+	return nil
+}
+
 // IntegrationRuntimeConnectionInfo connection information for encrypting the on-premises data source credentials.
 type IntegrationRuntimeConnectionInfo struct {
 	autorest.Response `json:"-"`
@@ -49995,6 +57419,87 @@ func (irci IntegrationRuntimeConnectionInfo) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for IntegrationRuntimeConnectionInfo struct.
+func (irci *IntegrationRuntimeConnectionInfo) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if irci.AdditionalProperties == nil {
+					irci.AdditionalProperties = make(map[string]interface{})
+				}
+				irci.AdditionalProperties[k] = additionalProperties
+			}
+		case "serviceToken":
+			if v != nil {
+				var serviceToken string
+				err = json.Unmarshal(*v, &serviceToken)
+				if err != nil {
+					return err
+				}
+				irci.ServiceToken = &serviceToken
+			}
+		case "identityCertThumbprint":
+			if v != nil {
+				var identityCertThumbprint string
+				err = json.Unmarshal(*v, &identityCertThumbprint)
+				if err != nil {
+					return err
+				}
+				irci.IdentityCertThumbprint = &identityCertThumbprint
+			}
+		case "hostServiceUri":
+			if v != nil {
+				var hostServiceURI string
+				err = json.Unmarshal(*v, &hostServiceURI)
+				if err != nil {
+					return err
+				}
+				irci.HostServiceURI = &hostServiceURI
+			}
+		case "version":
+			if v != nil {
+				var version string
+				err = json.Unmarshal(*v, &version)
+				if err != nil {
+					return err
+				}
+				irci.Version = &version
+			}
+		case "publicKey":
+			if v != nil {
+				var publicKey string
+				err = json.Unmarshal(*v, &publicKey)
+				if err != nil {
+					return err
+				}
+				irci.PublicKey = &publicKey
+			}
+		case "isIdentityCertExprired":
+			if v != nil {
+				var isIdentityCertExprired bool
+				err = json.Unmarshal(*v, &isIdentityCertExprired)
+				if err != nil {
+					return err
+				}
+				irci.IsIdentityCertExprired = &isIdentityCertExprired
+			}
+		}
+	}
+
+	return nil
 }
 
 // IntegrationRuntimeCustomSetupScriptProperties custom setup script properties for a managed dedicated integration
@@ -50180,6 +57685,105 @@ func (irnmd IntegrationRuntimeNodeMonitoringData) MarshalJSON() ([]byte, error) 
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for IntegrationRuntimeNodeMonitoringData struct.
+func (irnmd *IntegrationRuntimeNodeMonitoringData) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if irnmd.AdditionalProperties == nil {
+					irnmd.AdditionalProperties = make(map[string]interface{})
+				}
+				irnmd.AdditionalProperties[k] = additionalProperties
+			}
+		case "nodeName":
+			if v != nil {
+				var nodeName string
+				err = json.Unmarshal(*v, &nodeName)
+				if err != nil {
+					return err
+				}
+				irnmd.NodeName = &nodeName
+			}
+		case "availableMemoryInMB":
+			if v != nil {
+				var availableMemoryInMB int32
+				err = json.Unmarshal(*v, &availableMemoryInMB)
+				if err != nil {
+					return err
+				}
+				irnmd.AvailableMemoryInMB = &availableMemoryInMB
+			}
+		case "cpuUtilization":
+			if v != nil {
+				var CPUUtilization int32
+				err = json.Unmarshal(*v, &CPUUtilization)
+				if err != nil {
+					return err
+				}
+				irnmd.CPUUtilization = &CPUUtilization
+			}
+		case "concurrentJobsLimit":
+			if v != nil {
+				var concurrentJobsLimit int32
+				err = json.Unmarshal(*v, &concurrentJobsLimit)
+				if err != nil {
+					return err
+				}
+				irnmd.ConcurrentJobsLimit = &concurrentJobsLimit
+			}
+		case "concurrentJobsRunning":
+			if v != nil {
+				var concurrentJobsRunning int32
+				err = json.Unmarshal(*v, &concurrentJobsRunning)
+				if err != nil {
+					return err
+				}
+				irnmd.ConcurrentJobsRunning = &concurrentJobsRunning
+			}
+		case "maxConcurrentJobs":
+			if v != nil {
+				var maxConcurrentJobs int32
+				err = json.Unmarshal(*v, &maxConcurrentJobs)
+				if err != nil {
+					return err
+				}
+				irnmd.MaxConcurrentJobs = &maxConcurrentJobs
+			}
+		case "sentBytes":
+			if v != nil {
+				var sentBytes float64
+				err = json.Unmarshal(*v, &sentBytes)
+				if err != nil {
+					return err
+				}
+				irnmd.SentBytes = &sentBytes
+			}
+		case "receivedBytes":
+			if v != nil {
+				var receivedBytes float64
+				err = json.Unmarshal(*v, &receivedBytes)
+				if err != nil {
+					return err
+				}
+				irnmd.ReceivedBytes = &receivedBytes
+			}
+		}
+	}
+
+	return nil
+}
+
 // IntegrationRuntimeReference integration runtime reference type.
 type IntegrationRuntimeReference struct {
 	// Type - Type of integration runtime.
@@ -50320,6 +57924,69 @@ func (irsci IntegrationRuntimeSsisCatalogInfo) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for IntegrationRuntimeSsisCatalogInfo struct.
+func (irsci *IntegrationRuntimeSsisCatalogInfo) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if irsci.AdditionalProperties == nil {
+					irsci.AdditionalProperties = make(map[string]interface{})
+				}
+				irsci.AdditionalProperties[k] = additionalProperties
+			}
+		case "catalogServerEndpoint":
+			if v != nil {
+				var catalogServerEndpoint string
+				err = json.Unmarshal(*v, &catalogServerEndpoint)
+				if err != nil {
+					return err
+				}
+				irsci.CatalogServerEndpoint = &catalogServerEndpoint
+			}
+		case "catalogAdminUserName":
+			if v != nil {
+				var catalogAdminUserName string
+				err = json.Unmarshal(*v, &catalogAdminUserName)
+				if err != nil {
+					return err
+				}
+				irsci.CatalogAdminUserName = &catalogAdminUserName
+			}
+		case "catalogAdminPassword":
+			if v != nil {
+				var catalogAdminPassword SecureString
+				err = json.Unmarshal(*v, &catalogAdminPassword)
+				if err != nil {
+					return err
+				}
+				irsci.CatalogAdminPassword = &catalogAdminPassword
+			}
+		case "catalogPricingTier":
+			if v != nil {
+				var catalogPricingTier IntegrationRuntimeSsisCatalogPricingTier
+				err = json.Unmarshal(*v, &catalogPricingTier)
+				if err != nil {
+					return err
+				}
+				irsci.CatalogPricingTier = catalogPricingTier
+			}
+		}
+	}
+
+	return nil
+}
+
 // IntegrationRuntimeSsisProperties SSIS properties for managed integration runtime.
 type IntegrationRuntimeSsisProperties struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -50353,6 +58020,69 @@ func (irsp IntegrationRuntimeSsisProperties) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for IntegrationRuntimeSsisProperties struct.
+func (irsp *IntegrationRuntimeSsisProperties) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if irsp.AdditionalProperties == nil {
+					irsp.AdditionalProperties = make(map[string]interface{})
+				}
+				irsp.AdditionalProperties[k] = additionalProperties
+			}
+		case "catalogInfo":
+			if v != nil {
+				var catalogInfo IntegrationRuntimeSsisCatalogInfo
+				err = json.Unmarshal(*v, &catalogInfo)
+				if err != nil {
+					return err
+				}
+				irsp.CatalogInfo = &catalogInfo
+			}
+		case "licenseType":
+			if v != nil {
+				var licenseType IntegrationRuntimeLicenseType
+				err = json.Unmarshal(*v, &licenseType)
+				if err != nil {
+					return err
+				}
+				irsp.LicenseType = licenseType
+			}
+		case "customSetupScriptProperties":
+			if v != nil {
+				var customSetupScriptProperties IntegrationRuntimeCustomSetupScriptProperties
+				err = json.Unmarshal(*v, &customSetupScriptProperties)
+				if err != nil {
+					return err
+				}
+				irsp.CustomSetupScriptProperties = &customSetupScriptProperties
+			}
+		case "edition":
+			if v != nil {
+				var edition IntegrationRuntimeEdition
+				err = json.Unmarshal(*v, &edition)
+				if err != nil {
+					return err
+				}
+				irsp.Edition = edition
+			}
+		}
+	}
+
+	return nil
 }
 
 // IntegrationRuntimesStartFuture an abstraction for monitoring and retrieving the results of a long-running
@@ -50420,7 +58150,7 @@ type IntegrationRuntimeStatus struct {
 	AdditionalProperties map[string]interface{} `json:""`
 	// DataFactoryName - The data factory name which the integration runtime belong to.
 	DataFactoryName *string `json:"dataFactoryName,omitempty"`
-	// State - The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
+	// State - The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline', 'AccessDenied'
 	State IntegrationRuntimeState `json:"state,omitempty"`
 	// Type - Possible values include: 'TypeBasicIntegrationRuntimeStatusTypeIntegrationRuntimeStatus', 'TypeBasicIntegrationRuntimeStatusTypeSelfHosted', 'TypeBasicIntegrationRuntimeStatusTypeManaged'
 	Type TypeBasicIntegrationRuntimeStatus `json:"type,omitempty"`
@@ -50506,6 +58236,60 @@ func (irs IntegrationRuntimeStatus) AsBasicIntegrationRuntimeStatus() (BasicInte
 	return &irs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for IntegrationRuntimeStatus struct.
+func (irs *IntegrationRuntimeStatus) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if irs.AdditionalProperties == nil {
+					irs.AdditionalProperties = make(map[string]interface{})
+				}
+				irs.AdditionalProperties[k] = additionalProperties
+			}
+		case "dataFactoryName":
+			if v != nil {
+				var dataFactoryName string
+				err = json.Unmarshal(*v, &dataFactoryName)
+				if err != nil {
+					return err
+				}
+				irs.DataFactoryName = &dataFactoryName
+			}
+		case "state":
+			if v != nil {
+				var state IntegrationRuntimeState
+				err = json.Unmarshal(*v, &state)
+				if err != nil {
+					return err
+				}
+				irs.State = state
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicIntegrationRuntimeStatus
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				irs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // IntegrationRuntimeStatusListResponse a list of integration runtime status.
 type IntegrationRuntimeStatusListResponse struct {
 	// Value - List of integration runtime status.
@@ -50580,6 +58364,51 @@ func (irvnp IntegrationRuntimeVNetProperties) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for IntegrationRuntimeVNetProperties struct.
+func (irvnp *IntegrationRuntimeVNetProperties) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if irvnp.AdditionalProperties == nil {
+					irvnp.AdditionalProperties = make(map[string]interface{})
+				}
+				irvnp.AdditionalProperties[k] = additionalProperties
+			}
+		case "vNetId":
+			if v != nil {
+				var vNetID string
+				err = json.Unmarshal(*v, &vNetID)
+				if err != nil {
+					return err
+				}
+				irvnp.VNetID = &vNetID
+			}
+		case "subnet":
+			if v != nil {
+				var subnet string
+				err = json.Unmarshal(*v, &subnet)
+				if err != nil {
+					return err
+				}
+				irvnp.Subnet = &subnet
+			}
+		}
+	}
+
+	return nil
+}
+
 // JiraLinkedService jira Serivce linked service.
 type JiraLinkedService struct {
 	// JiraLinkedServiceTypeProperties - Jira Serivce linked service properties.
@@ -50594,7 +58423,7 @@ type JiraLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -50971,6 +58800,16 @@ func (jls JiraLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedServi
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for JiraLinkedService.
+func (jls JiraLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for JiraLinkedService.
+func (jls JiraLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for JiraLinkedService.
 func (jls JiraLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -51187,6 +59026,8 @@ type JiraObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -51207,6 +59048,9 @@ func (jod JiraObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if jod.Annotations != nil {
 		objectMap["annotations"] = jod.Annotations
+	}
+	if jod.Folder != nil {
+		objectMap["folder"] = jod.Folder
 	}
 	if jod.Type != "" {
 		objectMap["type"] = jod.Type
@@ -51490,6 +59334,96 @@ func (jod JiraObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for JiraObjectDataset.
 func (jod JiraObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &jod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for JiraObjectDataset struct.
+func (jod *JiraObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if jod.AdditionalProperties == nil {
+					jod.AdditionalProperties = make(map[string]interface{})
+				}
+				jod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				jod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				jod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				jod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				jod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				jod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				jod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				jod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // JiraSource a copy activity Jira Serivce source.
@@ -51782,6 +59716,69 @@ func (js JiraSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &js, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for JiraSource struct.
+func (js *JiraSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				js.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if js.AdditionalProperties == nil {
+					js.AdditionalProperties = make(map[string]interface{})
+				}
+				js.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				js.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				js.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				js.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // JSONFormat the data stored in JSON format.
 type JSONFormat struct {
 	// FilePattern - File pattern of JSON. To be more specific, the way of separating a collection of JSON objects. The default value is 'setOfObjects'. It is case-sensitive. Possible values include: 'SetOfObjects', 'ArrayOfObjects'
@@ -51861,6 +59858,292 @@ func (jf JSONFormat) AsBasicDatasetStorageFormat() (BasicDatasetStorageFormat, b
 	return &jf, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for JSONFormat struct.
+func (jf *JSONFormat) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "filePattern":
+			if v != nil {
+				var filePattern JSONFormatFilePattern
+				err = json.Unmarshal(*v, &filePattern)
+				if err != nil {
+					return err
+				}
+				jf.FilePattern = filePattern
+			}
+		case "nestingSeparator":
+			if v != nil {
+				var nestingSeparator interface{}
+				err = json.Unmarshal(*v, &nestingSeparator)
+				if err != nil {
+					return err
+				}
+				jf.NestingSeparator = nestingSeparator
+			}
+		case "encodingName":
+			if v != nil {
+				var encodingName interface{}
+				err = json.Unmarshal(*v, &encodingName)
+				if err != nil {
+					return err
+				}
+				jf.EncodingName = encodingName
+			}
+		case "jsonNodeReference":
+			if v != nil {
+				var JSONNodeReference interface{}
+				err = json.Unmarshal(*v, &JSONNodeReference)
+				if err != nil {
+					return err
+				}
+				jf.JSONNodeReference = JSONNodeReference
+			}
+		case "jsonPathDefinition":
+			if v != nil {
+				var JSONPathDefinition interface{}
+				err = json.Unmarshal(*v, &JSONPathDefinition)
+				if err != nil {
+					return err
+				}
+				jf.JSONPathDefinition = JSONPathDefinition
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if jf.AdditionalProperties == nil {
+					jf.AdditionalProperties = make(map[string]interface{})
+				}
+				jf.AdditionalProperties[k] = additionalProperties
+			}
+		case "serializer":
+			if v != nil {
+				var serializer interface{}
+				err = json.Unmarshal(*v, &serializer)
+				if err != nil {
+					return err
+				}
+				jf.Serializer = serializer
+			}
+		case "deserializer":
+			if v != nil {
+				var deserializer interface{}
+				err = json.Unmarshal(*v, &deserializer)
+				if err != nil {
+					return err
+				}
+				jf.Deserializer = deserializer
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDatasetStorageFormat
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				jf.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// LinkedIntegrationRuntime the linked integration runtime information.
+type LinkedIntegrationRuntime struct {
+	// Name - The name of the linked integration runtime.
+	Name *string `json:"name,omitempty"`
+	// SubscriptionID - The subscription ID for which the linked integration runtime belong to.
+	SubscriptionID *string `json:"subscriptionId,omitempty"`
+	// DataFactoryName - The name of the data factory for which the linked integration runtime belong to.
+	DataFactoryName *string `json:"dataFactoryName,omitempty"`
+	// DataFactoryLocation - The location of the data factory for which the linked integration runtime belong to.
+	DataFactoryLocation *string `json:"dataFactoryLocation,omitempty"`
+	// CreateTime - The creating time of the linked integration runtime.
+	CreateTime *date.Time `json:"createTime,omitempty"`
+}
+
+// LinkedIntegrationRuntimeKeyAuthorization the key authorization type integration runtime.
+type LinkedIntegrationRuntimeKeyAuthorization struct {
+	// Key - The key used for authorization.
+	Key *SecureString `json:"key,omitempty"`
+	// AuthorizationType - Possible values include: 'AuthorizationTypeLinkedIntegrationRuntimeType', 'AuthorizationTypeRBAC', 'AuthorizationTypeKey'
+	AuthorizationType AuthorizationType `json:"authorizationType,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for LinkedIntegrationRuntimeKeyAuthorization.
+func (lirka LinkedIntegrationRuntimeKeyAuthorization) MarshalJSON() ([]byte, error) {
+	lirka.AuthorizationType = AuthorizationTypeKey
+	objectMap := make(map[string]interface{})
+	if lirka.Key != nil {
+		objectMap["key"] = lirka.Key
+	}
+	if lirka.AuthorizationType != "" {
+		objectMap["authorizationType"] = lirka.AuthorizationType
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsLinkedIntegrationRuntimeRbacAuthorization is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeKeyAuthorization.
+func (lirka LinkedIntegrationRuntimeKeyAuthorization) AsLinkedIntegrationRuntimeRbacAuthorization() (*LinkedIntegrationRuntimeRbacAuthorization, bool) {
+	return nil, false
+}
+
+// AsLinkedIntegrationRuntimeKeyAuthorization is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeKeyAuthorization.
+func (lirka LinkedIntegrationRuntimeKeyAuthorization) AsLinkedIntegrationRuntimeKeyAuthorization() (*LinkedIntegrationRuntimeKeyAuthorization, bool) {
+	return &lirka, true
+}
+
+// AsLinkedIntegrationRuntimeType is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeKeyAuthorization.
+func (lirka LinkedIntegrationRuntimeKeyAuthorization) AsLinkedIntegrationRuntimeType() (*LinkedIntegrationRuntimeType, bool) {
+	return nil, false
+}
+
+// AsBasicLinkedIntegrationRuntimeType is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeKeyAuthorization.
+func (lirka LinkedIntegrationRuntimeKeyAuthorization) AsBasicLinkedIntegrationRuntimeType() (BasicLinkedIntegrationRuntimeType, bool) {
+	return &lirka, true
+}
+
+// LinkedIntegrationRuntimeRbacAuthorization the role based access control (RBAC) authorization type integration
+// runtime.
+type LinkedIntegrationRuntimeRbacAuthorization struct {
+	// ResourceID - The resource identifier of the integration runtime to be shared.
+	ResourceID *string `json:"resourceId,omitempty"`
+	// AuthorizationType - Possible values include: 'AuthorizationTypeLinkedIntegrationRuntimeType', 'AuthorizationTypeRBAC', 'AuthorizationTypeKey'
+	AuthorizationType AuthorizationType `json:"authorizationType,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for LinkedIntegrationRuntimeRbacAuthorization.
+func (lirra LinkedIntegrationRuntimeRbacAuthorization) MarshalJSON() ([]byte, error) {
+	lirra.AuthorizationType = AuthorizationTypeRBAC
+	objectMap := make(map[string]interface{})
+	if lirra.ResourceID != nil {
+		objectMap["resourceId"] = lirra.ResourceID
+	}
+	if lirra.AuthorizationType != "" {
+		objectMap["authorizationType"] = lirra.AuthorizationType
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsLinkedIntegrationRuntimeRbacAuthorization is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeRbacAuthorization.
+func (lirra LinkedIntegrationRuntimeRbacAuthorization) AsLinkedIntegrationRuntimeRbacAuthorization() (*LinkedIntegrationRuntimeRbacAuthorization, bool) {
+	return &lirra, true
+}
+
+// AsLinkedIntegrationRuntimeKeyAuthorization is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeRbacAuthorization.
+func (lirra LinkedIntegrationRuntimeRbacAuthorization) AsLinkedIntegrationRuntimeKeyAuthorization() (*LinkedIntegrationRuntimeKeyAuthorization, bool) {
+	return nil, false
+}
+
+// AsLinkedIntegrationRuntimeType is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeRbacAuthorization.
+func (lirra LinkedIntegrationRuntimeRbacAuthorization) AsLinkedIntegrationRuntimeType() (*LinkedIntegrationRuntimeType, bool) {
+	return nil, false
+}
+
+// AsBasicLinkedIntegrationRuntimeType is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeRbacAuthorization.
+func (lirra LinkedIntegrationRuntimeRbacAuthorization) AsBasicLinkedIntegrationRuntimeType() (BasicLinkedIntegrationRuntimeType, bool) {
+	return &lirra, true
+}
+
+// LinkedIntegrationRuntimeRequest data factory name for linked integration runtime request.
+type LinkedIntegrationRuntimeRequest struct {
+	// LinkedFactoryName - The data factory name for linked integration runtime.
+	LinkedFactoryName *string `json:"factoryName,omitempty"`
+}
+
+// BasicLinkedIntegrationRuntimeType the base definition of a linked integration runtime.
+type BasicLinkedIntegrationRuntimeType interface {
+	AsLinkedIntegrationRuntimeRbacAuthorization() (*LinkedIntegrationRuntimeRbacAuthorization, bool)
+	AsLinkedIntegrationRuntimeKeyAuthorization() (*LinkedIntegrationRuntimeKeyAuthorization, bool)
+	AsLinkedIntegrationRuntimeType() (*LinkedIntegrationRuntimeType, bool)
+}
+
+// LinkedIntegrationRuntimeType the base definition of a linked integration runtime.
+type LinkedIntegrationRuntimeType struct {
+	// AuthorizationType - Possible values include: 'AuthorizationTypeLinkedIntegrationRuntimeType', 'AuthorizationTypeRBAC', 'AuthorizationTypeKey'
+	AuthorizationType AuthorizationType `json:"authorizationType,omitempty"`
+}
+
+func unmarshalBasicLinkedIntegrationRuntimeType(body []byte) (BasicLinkedIntegrationRuntimeType, error) {
+	var m map[string]interface{}
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return nil, err
+	}
+
+	switch m["authorizationType"] {
+	case string(AuthorizationTypeRBAC):
+		var lirra LinkedIntegrationRuntimeRbacAuthorization
+		err := json.Unmarshal(body, &lirra)
+		return lirra, err
+	case string(AuthorizationTypeKey):
+		var lirka LinkedIntegrationRuntimeKeyAuthorization
+		err := json.Unmarshal(body, &lirka)
+		return lirka, err
+	default:
+		var lirt LinkedIntegrationRuntimeType
+		err := json.Unmarshal(body, &lirt)
+		return lirt, err
+	}
+}
+func unmarshalBasicLinkedIntegrationRuntimeTypeArray(body []byte) ([]BasicLinkedIntegrationRuntimeType, error) {
+	var rawMessages []*json.RawMessage
+	err := json.Unmarshal(body, &rawMessages)
+	if err != nil {
+		return nil, err
+	}
+
+	lirtArray := make([]BasicLinkedIntegrationRuntimeType, len(rawMessages))
+
+	for index, rawMessage := range rawMessages {
+		lirt, err := unmarshalBasicLinkedIntegrationRuntimeType(*rawMessage)
+		if err != nil {
+			return nil, err
+		}
+		lirtArray[index] = lirt
+	}
+	return lirtArray, nil
+}
+
+// MarshalJSON is the custom marshaler for LinkedIntegrationRuntimeType.
+func (lirt LinkedIntegrationRuntimeType) MarshalJSON() ([]byte, error) {
+	lirt.AuthorizationType = AuthorizationTypeLinkedIntegrationRuntimeType
+	objectMap := make(map[string]interface{})
+	if lirt.AuthorizationType != "" {
+		objectMap["authorizationType"] = lirt.AuthorizationType
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsLinkedIntegrationRuntimeRbacAuthorization is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeType.
+func (lirt LinkedIntegrationRuntimeType) AsLinkedIntegrationRuntimeRbacAuthorization() (*LinkedIntegrationRuntimeRbacAuthorization, bool) {
+	return nil, false
+}
+
+// AsLinkedIntegrationRuntimeKeyAuthorization is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeType.
+func (lirt LinkedIntegrationRuntimeType) AsLinkedIntegrationRuntimeKeyAuthorization() (*LinkedIntegrationRuntimeKeyAuthorization, bool) {
+	return nil, false
+}
+
+// AsLinkedIntegrationRuntimeType is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeType.
+func (lirt LinkedIntegrationRuntimeType) AsLinkedIntegrationRuntimeType() (*LinkedIntegrationRuntimeType, bool) {
+	return &lirt, true
+}
+
+// AsBasicLinkedIntegrationRuntimeType is the BasicLinkedIntegrationRuntimeType implementation for LinkedIntegrationRuntimeType.
+func (lirt LinkedIntegrationRuntimeType) AsBasicLinkedIntegrationRuntimeType() (BasicLinkedIntegrationRuntimeType, bool) {
+	return &lirt, true
+}
+
 // BasicLinkedService the Azure Data Factory nested object which contains the information and credential which can be
 // used to connect with related store or compute resource.
 type BasicLinkedService interface {
@@ -51933,6 +60216,8 @@ type BasicLinkedService interface {
 	AsAzureSQLDatabaseLinkedService() (*AzureSQLDatabaseLinkedService, bool)
 	AsSQLServerLinkedService() (*SQLServerLinkedService, bool)
 	AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool)
+	AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool)
+	AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool)
 	AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool)
 	AsLinkedService() (*LinkedService, bool)
 }
@@ -51950,7 +60235,7 @@ type LinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -52238,6 +60523,14 @@ func unmarshalBasicLinkedService(body []byte) (BasicLinkedService, error) {
 		var asdls AzureSQLDWLinkedService
 		err := json.Unmarshal(body, &asdls)
 		return asdls, err
+	case string(TypeAzureTableStorage):
+		var atsls AzureTableStorageLinkedService
+		err := json.Unmarshal(body, &atsls)
+		return atsls, err
+	case string(TypeAzureBlobStorage):
+		var absls AzureBlobStorageLinkedService
+		err := json.Unmarshal(body, &absls)
+		return absls, err
 	case string(TypeAzureStorage):
 		var asls AzureStorageLinkedService
 		err := json.Unmarshal(body, &asls)
@@ -52637,6 +60930,16 @@ func (ls LinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, b
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for LinkedService.
+func (ls LinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for LinkedService.
+func (ls LinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for LinkedService.
 func (ls LinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -52650,6 +60953,78 @@ func (ls LinkedService) AsLinkedService() (*LinkedService, bool) {
 // AsBasicLinkedService is the BasicLinkedService implementation for LinkedService.
 func (ls LinkedService) AsBasicLinkedService() (BasicLinkedService, bool) {
 	return &ls, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for LinkedService struct.
+func (ls *LinkedService) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ls.AdditionalProperties == nil {
+					ls.AdditionalProperties = make(map[string]interface{})
+				}
+				ls.AdditionalProperties[k] = additionalProperties
+			}
+		case "connectVia":
+			if v != nil {
+				var connectVia IntegrationRuntimeReference
+				err = json.Unmarshal(*v, &connectVia)
+				if err != nil {
+					return err
+				}
+				ls.ConnectVia = &connectVia
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				ls.Description = &description
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				ls.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				ls.Annotations = &annotations
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicLinkedService
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ls.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // LinkedServiceListResponse a list of linked service resources.
@@ -52870,8 +61245,8 @@ type LookupActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -52907,6 +61282,16 @@ func (la LookupActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for LookupActivity.
+func (la LookupActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for LookupActivity.
+func (la LookupActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for LookupActivity.
@@ -53126,12 +61511,12 @@ func (la *LookupActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				la.UserProperties = userProperties
+				la.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -53213,7 +61598,7 @@ type MagentoLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -53590,6 +61975,16 @@ func (mls MagentoLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSe
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for MagentoLinkedService.
+func (mls MagentoLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for MagentoLinkedService.
+func (mls MagentoLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for MagentoLinkedService.
 func (mls MagentoLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -53784,6 +62179,8 @@ type MagentoObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -53804,6 +62201,9 @@ func (mod MagentoObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if mod.Annotations != nil {
 		objectMap["annotations"] = mod.Annotations
+	}
+	if mod.Folder != nil {
+		objectMap["folder"] = mod.Folder
 	}
 	if mod.Type != "" {
 		objectMap["type"] = mod.Type
@@ -54087,6 +62487,96 @@ func (mod MagentoObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for MagentoObjectDataset.
 func (mod MagentoObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &mod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for MagentoObjectDataset struct.
+func (mod *MagentoObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if mod.AdditionalProperties == nil {
+					mod.AdditionalProperties = make(map[string]interface{})
+				}
+				mod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				mod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				mod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				mod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				mod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				mod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				mod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				mod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // MagentoSource a copy activity Magento server source.
@@ -54379,10 +62869,73 @@ func (ms MagentoSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ms, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for MagentoSource struct.
+func (ms *MagentoSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ms.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ms.AdditionalProperties == nil {
+					ms.AdditionalProperties = make(map[string]interface{})
+				}
+				ms.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ms.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ms.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ms.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // ManagedIntegrationRuntime managed integration runtime, including managed elastic and managed dedicated
 // integration runtimes.
 type ManagedIntegrationRuntime struct {
-	// State - Integration runtime state, only valid for managed dedicated integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
+	// State - Integration runtime state, only valid for managed dedicated integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline', 'AccessDenied'
 	State IntegrationRuntimeState `json:"state,omitempty"`
 	// ManagedIntegrationRuntimeTypeProperties - Managed integration runtime properties.
 	*ManagedIntegrationRuntimeTypeProperties `json:"typeProperties,omitempty"`
@@ -54545,7 +63098,7 @@ type ManagedIntegrationRuntimeStatus struct {
 	AdditionalProperties map[string]interface{} `json:""`
 	// DataFactoryName - The data factory name which the integration runtime belong to.
 	DataFactoryName *string `json:"dataFactoryName,omitempty"`
-	// State - The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
+	// State - The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline', 'AccessDenied'
 	State IntegrationRuntimeState `json:"state,omitempty"`
 	// Type - Possible values include: 'TypeBasicIntegrationRuntimeStatusTypeIntegrationRuntimeStatus', 'TypeBasicIntegrationRuntimeStatusTypeSelfHosted', 'TypeBasicIntegrationRuntimeStatusTypeManaged'
 	Type TypeBasicIntegrationRuntimeStatus `json:"type,omitempty"`
@@ -54690,7 +63243,7 @@ type MariaDBLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -55064,6 +63617,16 @@ func (mdls MariaDBLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedSer
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for MariaDBLinkedService.
 func (mdls MariaDBLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for MariaDBLinkedService.
+func (mdls MariaDBLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for MariaDBLinkedService.
+func (mdls MariaDBLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -55461,6 +64024,69 @@ func (mds MariaDBSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &mds, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for MariaDBSource struct.
+func (mds *MariaDBSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				mds.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if mds.AdditionalProperties == nil {
+					mds.AdditionalProperties = make(map[string]interface{})
+				}
+				mds.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				mds.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				mds.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				mds.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // MariaDBTableDataset mariaDB server dataset.
 type MariaDBTableDataset struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -55475,6 +64101,8 @@ type MariaDBTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -55495,6 +64123,9 @@ func (mdtd MariaDBTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if mdtd.Annotations != nil {
 		objectMap["annotations"] = mdtd.Annotations
+	}
+	if mdtd.Folder != nil {
+		objectMap["folder"] = mdtd.Folder
 	}
 	if mdtd.Type != "" {
 		objectMap["type"] = mdtd.Type
@@ -55780,6 +64411,96 @@ func (mdtd MariaDBTableDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &mdtd, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for MariaDBTableDataset struct.
+func (mdtd *MariaDBTableDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if mdtd.AdditionalProperties == nil {
+					mdtd.AdditionalProperties = make(map[string]interface{})
+				}
+				mdtd.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				mdtd.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				mdtd.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				mdtd.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				mdtd.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				mdtd.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				mdtd.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				mdtd.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // MarketoLinkedService marketo server linked service.
 type MarketoLinkedService struct {
 	// MarketoLinkedServiceTypeProperties - Marketo server linked service properties.
@@ -55794,7 +64515,7 @@ type MarketoLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -56171,6 +64892,16 @@ func (mls MarketoLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSe
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for MarketoLinkedService.
+func (mls MarketoLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for MarketoLinkedService.
+func (mls MarketoLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for MarketoLinkedService.
 func (mls MarketoLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -56376,6 +65107,8 @@ type MarketoObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -56396,6 +65129,9 @@ func (mod MarketoObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if mod.Annotations != nil {
 		objectMap["annotations"] = mod.Annotations
+	}
+	if mod.Folder != nil {
+		objectMap["folder"] = mod.Folder
 	}
 	if mod.Type != "" {
 		objectMap["type"] = mod.Type
@@ -56679,6 +65415,96 @@ func (mod MarketoObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for MarketoObjectDataset.
 func (mod MarketoObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &mod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for MarketoObjectDataset struct.
+func (mod *MarketoObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if mod.AdditionalProperties == nil {
+					mod.AdditionalProperties = make(map[string]interface{})
+				}
+				mod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				mod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				mod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				mod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				mod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				mod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				mod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				mod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // MarketoSource a copy activity Marketo server source.
@@ -56971,6 +65797,69 @@ func (ms MarketoSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ms, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for MarketoSource struct.
+func (ms *MarketoSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ms.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ms.AdditionalProperties == nil {
+					ms.AdditionalProperties = make(map[string]interface{})
+				}
+				ms.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ms.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ms.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ms.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // MongoDbCollectionDataset the MongoDB database dataset.
 type MongoDbCollectionDataset struct {
 	// MongoDbCollectionDatasetTypeProperties - MongoDB database dataset properties.
@@ -56987,6 +65876,8 @@ type MongoDbCollectionDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -57010,6 +65901,9 @@ func (mdcd MongoDbCollectionDataset) MarshalJSON() ([]byte, error) {
 	}
 	if mdcd.Annotations != nil {
 		objectMap["annotations"] = mdcd.Annotations
+	}
+	if mdcd.Folder != nil {
+		objectMap["folder"] = mdcd.Folder
 	}
 	if mdcd.Type != "" {
 		objectMap["type"] = mdcd.Type
@@ -57370,6 +66264,15 @@ func (mdcd *MongoDbCollectionDataset) UnmarshalJSON(body []byte) error {
 				}
 				mdcd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				mdcd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -57405,7 +66308,7 @@ type MongoDbLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -57779,6 +66682,16 @@ func (mdls MongoDbLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedSer
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for MongoDbLinkedService.
 func (mdls MongoDbLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for MongoDbLinkedService.
+func (mdls MongoDbLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for MongoDbLinkedService.
+func (mdls MongoDbLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -58296,6 +67209,69 @@ func (mds MongoDbSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &mds, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for MongoDbSource struct.
+func (mds *MongoDbSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				mds.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if mds.AdditionalProperties == nil {
+					mds.AdditionalProperties = make(map[string]interface{})
+				}
+				mds.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				mds.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				mds.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				mds.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // BasicMultiplePipelineTrigger base class for all triggers that support one to many model for trigger to pipeline.
 type BasicMultiplePipelineTrigger interface {
 	AsBlobEventsTrigger() (*BlobEventsTrigger, bool)
@@ -58425,6 +67401,69 @@ func (mpt MultiplePipelineTrigger) AsBasicTrigger() (BasicTrigger, bool) {
 	return &mpt, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for MultiplePipelineTrigger struct.
+func (mpt *MultiplePipelineTrigger) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "pipelines":
+			if v != nil {
+				var pipelines []TriggerPipelineReference
+				err = json.Unmarshal(*v, &pipelines)
+				if err != nil {
+					return err
+				}
+				mpt.Pipelines = &pipelines
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if mpt.AdditionalProperties == nil {
+					mpt.AdditionalProperties = make(map[string]interface{})
+				}
+				mpt.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				mpt.Description = &description
+			}
+		case "runtimeState":
+			if v != nil {
+				var runtimeState TriggerRuntimeState
+				err = json.Unmarshal(*v, &runtimeState)
+				if err != nil {
+					return err
+				}
+				mpt.RuntimeState = runtimeState
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicTrigger
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				mpt.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // MySQLLinkedService linked service for MySQL data source.
 type MySQLLinkedService struct {
 	// MySQLLinkedServiceTypeProperties - MySQL linked service properties.
@@ -58439,7 +67478,7 @@ type MySQLLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -58816,6 +67855,16 @@ func (msls MySQLLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for MySQLLinkedService.
+func (msls MySQLLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for MySQLLinkedService.
+func (msls MySQLLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for MySQLLinkedService.
 func (msls MySQLLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -58966,7 +68015,7 @@ type NetezzaLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -59340,6 +68389,16 @@ func (nls NetezzaLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedServ
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for NetezzaLinkedService.
 func (nls NetezzaLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for NetezzaLinkedService.
+func (nls NetezzaLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for NetezzaLinkedService.
+func (nls NetezzaLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -59737,6 +68796,69 @@ func (ns NetezzaSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ns, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for NetezzaSource struct.
+func (ns *NetezzaSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ns.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ns.AdditionalProperties == nil {
+					ns.AdditionalProperties = make(map[string]interface{})
+				}
+				ns.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ns.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ns.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ns.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // NetezzaTableDataset netezza dataset.
 type NetezzaTableDataset struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -59751,6 +68873,8 @@ type NetezzaTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -59771,6 +68895,9 @@ func (ntd NetezzaTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if ntd.Annotations != nil {
 		objectMap["annotations"] = ntd.Annotations
+	}
+	if ntd.Folder != nil {
+		objectMap["folder"] = ntd.Folder
 	}
 	if ntd.Type != "" {
 		objectMap["type"] = ntd.Type
@@ -60056,6 +69183,96 @@ func (ntd NetezzaTableDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &ntd, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for NetezzaTableDataset struct.
+func (ntd *NetezzaTableDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ntd.AdditionalProperties == nil {
+					ntd.AdditionalProperties = make(map[string]interface{})
+				}
+				ntd.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				ntd.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				ntd.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				ntd.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				ntd.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				ntd.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				ntd.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ntd.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // ODataLinkedService open Data Protocol (OData) linked service.
 type ODataLinkedService struct {
 	// ODataLinkedServiceTypeProperties - OData linked service properties.
@@ -60070,7 +69287,7 @@ type ODataLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -60447,6 +69664,16 @@ func (odls ODataLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for ODataLinkedService.
+func (odls ODataLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for ODataLinkedService.
+func (odls ODataLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for ODataLinkedService.
 func (odls ODataLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -60632,6 +69859,8 @@ type ODataResourceDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -60655,6 +69884,9 @@ func (odrd ODataResourceDataset) MarshalJSON() ([]byte, error) {
 	}
 	if odrd.Annotations != nil {
 		objectMap["annotations"] = odrd.Annotations
+	}
+	if odrd.Folder != nil {
+		objectMap["folder"] = odrd.Folder
 	}
 	if odrd.Type != "" {
 		objectMap["type"] = odrd.Type
@@ -61015,6 +70247,15 @@ func (odrd *ODataResourceDataset) UnmarshalJSON(body []byte) error {
 				}
 				odrd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				odrd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -61050,7 +70291,7 @@ type OdbcLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -61427,6 +70668,16 @@ func (ols OdbcLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedServi
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for OdbcLinkedService.
+func (ols OdbcLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for OdbcLinkedService.
+func (ols OdbcLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for OdbcLinkedService.
 func (ols OdbcLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -61722,6 +70973,87 @@ func (osVar OdbcSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &osVar, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for OdbcSink struct.
+func (osVar *OdbcSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "preCopyScript":
+			if v != nil {
+				var preCopyScript interface{}
+				err = json.Unmarshal(*v, &preCopyScript)
+				if err != nil {
+					return err
+				}
+				osVar.PreCopyScript = preCopyScript
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if osVar.AdditionalProperties == nil {
+					osVar.AdditionalProperties = make(map[string]interface{})
+				}
+				osVar.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				osVar.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				osVar.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				osVar.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				osVar.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				osVar.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // Operation azure Data Factory API operation definition.
 type Operation struct {
 	// Name - Operation name: {provider}/{resource}/{operation}
@@ -61997,7 +71329,7 @@ type OracleLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -62374,6 +71706,16 @@ func (ols OracleLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for OracleLinkedService.
+func (ols OracleLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for OracleLinkedService.
+func (ols OracleLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for OracleLinkedService.
 func (ols OracleLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -62592,6 +71934,87 @@ func (osVar OracleSink) AsCopySink() (*CopySink, bool) {
 // AsBasicCopySink is the BasicCopySink implementation for OracleSink.
 func (osVar OracleSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &osVar, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for OracleSink struct.
+func (osVar *OracleSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "preCopyScript":
+			if v != nil {
+				var preCopyScript interface{}
+				err = json.Unmarshal(*v, &preCopyScript)
+				if err != nil {
+					return err
+				}
+				osVar.PreCopyScript = preCopyScript
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if osVar.AdditionalProperties == nil {
+					osVar.AdditionalProperties = make(map[string]interface{})
+				}
+				osVar.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				osVar.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				osVar.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				osVar.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				osVar.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				osVar.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // OracleSource a copy activity Oracle source.
@@ -62887,6 +72310,78 @@ func (osVar OracleSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &osVar, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for OracleSource struct.
+func (osVar *OracleSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "oracleReaderQuery":
+			if v != nil {
+				var oracleReaderQuery interface{}
+				err = json.Unmarshal(*v, &oracleReaderQuery)
+				if err != nil {
+					return err
+				}
+				osVar.OracleReaderQuery = oracleReaderQuery
+			}
+		case "queryTimeout":
+			if v != nil {
+				var queryTimeout interface{}
+				err = json.Unmarshal(*v, &queryTimeout)
+				if err != nil {
+					return err
+				}
+				osVar.QueryTimeout = queryTimeout
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if osVar.AdditionalProperties == nil {
+					osVar.AdditionalProperties = make(map[string]interface{})
+				}
+				osVar.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				osVar.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				osVar.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				osVar.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // OracleTableDataset the on-premises Oracle database dataset.
 type OracleTableDataset struct {
 	// OracleTableDatasetTypeProperties - On-premises Oracle dataset properties.
@@ -62903,6 +72398,8 @@ type OracleTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -62926,6 +72423,9 @@ func (otd OracleTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if otd.Annotations != nil {
 		objectMap["annotations"] = otd.Annotations
+	}
+	if otd.Folder != nil {
+		objectMap["folder"] = otd.Folder
 	}
 	if otd.Type != "" {
 		objectMap["type"] = otd.Type
@@ -63286,6 +72786,15 @@ func (otd *OracleTableDataset) UnmarshalJSON(body []byte) error {
 				}
 				otd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				otd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -63369,6 +72878,60 @@ func (of OrcFormat) AsBasicDatasetStorageFormat() (BasicDatasetStorageFormat, bo
 	return &of, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for OrcFormat struct.
+func (of *OrcFormat) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if of.AdditionalProperties == nil {
+					of.AdditionalProperties = make(map[string]interface{})
+				}
+				of.AdditionalProperties[k] = additionalProperties
+			}
+		case "serializer":
+			if v != nil {
+				var serializer interface{}
+				err = json.Unmarshal(*v, &serializer)
+				if err != nil {
+					return err
+				}
+				of.Serializer = serializer
+			}
+		case "deserializer":
+			if v != nil {
+				var deserializer interface{}
+				err = json.Unmarshal(*v, &deserializer)
+				if err != nil {
+					return err
+				}
+				of.Deserializer = deserializer
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDatasetStorageFormat
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				of.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // ParameterSpecification definition of a single parameter for an entity.
 type ParameterSpecification struct {
 	// Type - Parameter type. Possible values include: 'ParameterTypeObject', 'ParameterTypeString', 'ParameterTypeInt', 'ParameterTypeFloat', 'ParameterTypeBool', 'ParameterTypeArray', 'ParameterTypeSecureString'
@@ -63439,6 +73002,60 @@ func (pf ParquetFormat) AsBasicDatasetStorageFormat() (BasicDatasetStorageFormat
 	return &pf, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for ParquetFormat struct.
+func (pf *ParquetFormat) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if pf.AdditionalProperties == nil {
+					pf.AdditionalProperties = make(map[string]interface{})
+				}
+				pf.AdditionalProperties[k] = additionalProperties
+			}
+		case "serializer":
+			if v != nil {
+				var serializer interface{}
+				err = json.Unmarshal(*v, &serializer)
+				if err != nil {
+					return err
+				}
+				pf.Serializer = serializer
+			}
+		case "deserializer":
+			if v != nil {
+				var deserializer interface{}
+				err = json.Unmarshal(*v, &deserializer)
+				if err != nil {
+					return err
+				}
+				pf.Deserializer = deserializer
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDatasetStorageFormat
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				pf.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // PaypalLinkedService paypal Serivce linked service.
 type PaypalLinkedService struct {
 	// PaypalLinkedServiceTypeProperties - Paypal Serivce linked service properties.
@@ -63453,7 +73070,7 @@ type PaypalLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -63830,6 +73447,16 @@ func (pls PaypalLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for PaypalLinkedService.
+func (pls PaypalLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for PaypalLinkedService.
+func (pls PaypalLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for PaypalLinkedService.
 func (pls PaypalLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -64035,6 +73662,8 @@ type PaypalObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -64055,6 +73684,9 @@ func (pod PaypalObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if pod.Annotations != nil {
 		objectMap["annotations"] = pod.Annotations
+	}
+	if pod.Folder != nil {
+		objectMap["folder"] = pod.Folder
 	}
 	if pod.Type != "" {
 		objectMap["type"] = pod.Type
@@ -64338,6 +73970,96 @@ func (pod PaypalObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for PaypalObjectDataset.
 func (pod PaypalObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &pod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for PaypalObjectDataset struct.
+func (pod *PaypalObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if pod.AdditionalProperties == nil {
+					pod.AdditionalProperties = make(map[string]interface{})
+				}
+				pod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				pod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				pod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				pod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				pod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				pod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				pod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				pod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // PaypalSource a copy activity Paypal Serivce source.
@@ -64630,6 +74352,69 @@ func (ps PaypalSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ps, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for PaypalSource struct.
+func (ps *PaypalSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ps.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ps.AdditionalProperties == nil {
+					ps.AdditionalProperties = make(map[string]interface{})
+				}
+				ps.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ps.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ps.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ps.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // PhoenixLinkedService phoenix server linked service.
 type PhoenixLinkedService struct {
 	// PhoenixLinkedServiceTypeProperties - Phoenix server linked service properties.
@@ -64644,7 +74429,7 @@ type PhoenixLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -65021,6 +74806,16 @@ func (pls PhoenixLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSe
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for PhoenixLinkedService.
+func (pls PhoenixLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for PhoenixLinkedService.
+func (pls PhoenixLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for PhoenixLinkedService.
 func (pls PhoenixLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -65281,6 +75076,8 @@ type PhoenixObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -65301,6 +75098,9 @@ func (pod PhoenixObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if pod.Annotations != nil {
 		objectMap["annotations"] = pod.Annotations
+	}
+	if pod.Folder != nil {
+		objectMap["folder"] = pod.Folder
 	}
 	if pod.Type != "" {
 		objectMap["type"] = pod.Type
@@ -65584,6 +75384,96 @@ func (pod PhoenixObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for PhoenixObjectDataset.
 func (pod PhoenixObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &pod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for PhoenixObjectDataset struct.
+func (pod *PhoenixObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if pod.AdditionalProperties == nil {
+					pod.AdditionalProperties = make(map[string]interface{})
+				}
+				pod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				pod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				pod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				pod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				pod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				pod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				pod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				pod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // PhoenixSource a copy activity Phoenix server source.
@@ -65876,6 +75766,69 @@ func (ps PhoenixSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ps, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for PhoenixSource struct.
+func (ps *PhoenixSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ps.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ps.AdditionalProperties == nil {
+					ps.AdditionalProperties = make(map[string]interface{})
+				}
+				ps.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ps.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ps.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ps.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // Pipeline a data factory pipeline.
 type Pipeline struct {
 	// Description - The description of the pipeline.
@@ -65888,6 +75841,8 @@ type Pipeline struct {
 	Concurrency *int32 `json:"concurrency,omitempty"`
 	// Annotations - List of tags that can be used for describing the Pipeline.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Pipeline is in. If not specified, Pipeline will appear at the root level.
+	Folder *PipelineFolder `json:"folder,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for Pipeline.
@@ -65907,6 +75862,9 @@ func (p Pipeline) MarshalJSON() ([]byte, error) {
 	}
 	if p.Annotations != nil {
 		objectMap["annotations"] = p.Annotations
+	}
+	if p.Folder != nil {
+		objectMap["folder"] = p.Folder
 	}
 	return json.Marshal(objectMap)
 }
@@ -65964,10 +75922,25 @@ func (p *Pipeline) UnmarshalJSON(body []byte) error {
 				}
 				p.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder PipelineFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				p.Folder = &folder
+			}
 		}
 	}
 
 	return nil
+}
+
+// PipelineFolder the folder that this Pipeline is in. If not specified, Pipeline will appear at the root level.
+type PipelineFolder struct {
+	// Name - The name of the folder that this Pipeline is in.
+	Name *string `json:"name,omitempty"`
 }
 
 // PipelineListResponse a list of pipeline resources.
@@ -66261,6 +76234,123 @@ func (pr PipelineRun) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for PipelineRun struct.
+func (pr *PipelineRun) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if pr.AdditionalProperties == nil {
+					pr.AdditionalProperties = make(map[string]interface{})
+				}
+				pr.AdditionalProperties[k] = additionalProperties
+			}
+		case "runId":
+			if v != nil {
+				var runID string
+				err = json.Unmarshal(*v, &runID)
+				if err != nil {
+					return err
+				}
+				pr.RunID = &runID
+			}
+		case "pipelineName":
+			if v != nil {
+				var pipelineName string
+				err = json.Unmarshal(*v, &pipelineName)
+				if err != nil {
+					return err
+				}
+				pr.PipelineName = &pipelineName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*string
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				pr.Parameters = parameters
+			}
+		case "invokedBy":
+			if v != nil {
+				var invokedBy PipelineRunInvokedBy
+				err = json.Unmarshal(*v, &invokedBy)
+				if err != nil {
+					return err
+				}
+				pr.InvokedBy = &invokedBy
+			}
+		case "lastUpdated":
+			if v != nil {
+				var lastUpdated date.Time
+				err = json.Unmarshal(*v, &lastUpdated)
+				if err != nil {
+					return err
+				}
+				pr.LastUpdated = &lastUpdated
+			}
+		case "runStart":
+			if v != nil {
+				var runStart date.Time
+				err = json.Unmarshal(*v, &runStart)
+				if err != nil {
+					return err
+				}
+				pr.RunStart = &runStart
+			}
+		case "runEnd":
+			if v != nil {
+				var runEnd date.Time
+				err = json.Unmarshal(*v, &runEnd)
+				if err != nil {
+					return err
+				}
+				pr.RunEnd = &runEnd
+			}
+		case "durationInMs":
+			if v != nil {
+				var durationInMs int32
+				err = json.Unmarshal(*v, &durationInMs)
+				if err != nil {
+					return err
+				}
+				pr.DurationInMs = &durationInMs
+			}
+		case "status":
+			if v != nil {
+				var status string
+				err = json.Unmarshal(*v, &status)
+				if err != nil {
+					return err
+				}
+				pr.Status = &status
+			}
+		case "message":
+			if v != nil {
+				var message string
+				err = json.Unmarshal(*v, &message)
+				if err != nil {
+					return err
+				}
+				pr.Message = &message
+			}
+		}
+	}
+
+	return nil
+}
+
 // PipelineRunInvokedBy provides entity name and id that started the pipeline run.
 type PipelineRunInvokedBy struct {
 	// Name - Name of the entity that started the pipeline run.
@@ -66309,6 +76399,69 @@ func (ps PolybaseSettings) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for PolybaseSettings struct.
+func (ps *PolybaseSettings) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ps.AdditionalProperties == nil {
+					ps.AdditionalProperties = make(map[string]interface{})
+				}
+				ps.AdditionalProperties[k] = additionalProperties
+			}
+		case "rejectType":
+			if v != nil {
+				var rejectType PolybaseSettingsRejectType
+				err = json.Unmarshal(*v, &rejectType)
+				if err != nil {
+					return err
+				}
+				ps.RejectType = rejectType
+			}
+		case "rejectValue":
+			if v != nil {
+				var rejectValue interface{}
+				err = json.Unmarshal(*v, &rejectValue)
+				if err != nil {
+					return err
+				}
+				ps.RejectValue = rejectValue
+			}
+		case "rejectSampleValue":
+			if v != nil {
+				var rejectSampleValue interface{}
+				err = json.Unmarshal(*v, &rejectSampleValue)
+				if err != nil {
+					return err
+				}
+				ps.RejectSampleValue = rejectSampleValue
+			}
+		case "useTypeDefault":
+			if v != nil {
+				var useTypeDefault interface{}
+				err = json.Unmarshal(*v, &useTypeDefault)
+				if err != nil {
+					return err
+				}
+				ps.UseTypeDefault = useTypeDefault
+			}
+		}
+	}
+
+	return nil
+}
+
 // PostgreSQLLinkedService linked service for PostgreSQL data source.
 type PostgreSQLLinkedService struct {
 	// PostgreSQLLinkedServiceTypeProperties - PostgreSQL linked service properties.
@@ -66323,7 +76476,7 @@ type PostgreSQLLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -66700,6 +76853,16 @@ func (psls PostgreSQLLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLink
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for PostgreSQLLinkedService.
+func (psls PostgreSQLLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for PostgreSQLLinkedService.
+func (psls PostgreSQLLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for PostgreSQLLinkedService.
 func (psls PostgreSQLLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -66850,7 +77013,7 @@ type PrestoLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -67227,6 +77390,16 @@ func (pls PrestoLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for PrestoLinkedService.
+func (pls PrestoLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for PrestoLinkedService.
+func (pls PrestoLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for PrestoLinkedService.
 func (pls PrestoLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -67509,6 +77682,8 @@ type PrestoObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -67529,6 +77704,9 @@ func (pod PrestoObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if pod.Annotations != nil {
 		objectMap["annotations"] = pod.Annotations
+	}
+	if pod.Folder != nil {
+		objectMap["folder"] = pod.Folder
 	}
 	if pod.Type != "" {
 		objectMap["type"] = pod.Type
@@ -67812,6 +77990,96 @@ func (pod PrestoObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for PrestoObjectDataset.
 func (pod PrestoObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &pod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for PrestoObjectDataset struct.
+func (pod *PrestoObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if pod.AdditionalProperties == nil {
+					pod.AdditionalProperties = make(map[string]interface{})
+				}
+				pod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				pod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				pod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				pod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				pod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				pod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				pod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				pod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // PrestoSource a copy activity Presto server source.
@@ -68104,6 +78372,69 @@ func (ps PrestoSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ps, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for PrestoSource struct.
+func (ps *PrestoSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ps.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ps.AdditionalProperties == nil {
+					ps.AdditionalProperties = make(map[string]interface{})
+				}
+				ps.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ps.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ps.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ps.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // QuickBooksLinkedService quickBooks server linked service.
 type QuickBooksLinkedService struct {
 	// QuickBooksLinkedServiceTypeProperties - QuickBooks server linked service properties.
@@ -68118,7 +78449,7 @@ type QuickBooksLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -68495,6 +78826,16 @@ func (qbls QuickBooksLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLink
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for QuickBooksLinkedService.
+func (qbls QuickBooksLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for QuickBooksLinkedService.
+func (qbls QuickBooksLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for QuickBooksLinkedService.
 func (qbls QuickBooksLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -68709,6 +79050,8 @@ type QuickBooksObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -68729,6 +79072,9 @@ func (qbod QuickBooksObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if qbod.Annotations != nil {
 		objectMap["annotations"] = qbod.Annotations
+	}
+	if qbod.Folder != nil {
+		objectMap["folder"] = qbod.Folder
 	}
 	if qbod.Type != "" {
 		objectMap["type"] = qbod.Type
@@ -69012,6 +79358,96 @@ func (qbod QuickBooksObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for QuickBooksObjectDataset.
 func (qbod QuickBooksObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &qbod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for QuickBooksObjectDataset struct.
+func (qbod *QuickBooksObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if qbod.AdditionalProperties == nil {
+					qbod.AdditionalProperties = make(map[string]interface{})
+				}
+				qbod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				qbod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				qbod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				qbod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				qbod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				qbod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				qbod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				qbod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // QuickBooksSource a copy activity QuickBooks server source.
@@ -69304,6 +79740,69 @@ func (qbs QuickBooksSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &qbs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for QuickBooksSource struct.
+func (qbs *QuickBooksSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				qbs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if qbs.AdditionalProperties == nil {
+					qbs.AdditionalProperties = make(map[string]interface{})
+				}
+				qbs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				qbs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				qbs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				qbs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // RecurrenceSchedule the recurrence schedule.
 type RecurrenceSchedule struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -69344,6 +79843,78 @@ func (rs RecurrenceSchedule) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for RecurrenceSchedule struct.
+func (rs *RecurrenceSchedule) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if rs.AdditionalProperties == nil {
+					rs.AdditionalProperties = make(map[string]interface{})
+				}
+				rs.AdditionalProperties[k] = additionalProperties
+			}
+		case "minutes":
+			if v != nil {
+				var minutes []int32
+				err = json.Unmarshal(*v, &minutes)
+				if err != nil {
+					return err
+				}
+				rs.Minutes = &minutes
+			}
+		case "hours":
+			if v != nil {
+				var hours []int32
+				err = json.Unmarshal(*v, &hours)
+				if err != nil {
+					return err
+				}
+				rs.Hours = &hours
+			}
+		case "weekDays":
+			if v != nil {
+				var weekDays []DaysOfWeek
+				err = json.Unmarshal(*v, &weekDays)
+				if err != nil {
+					return err
+				}
+				rs.WeekDays = &weekDays
+			}
+		case "monthDays":
+			if v != nil {
+				var monthDays []int32
+				err = json.Unmarshal(*v, &monthDays)
+				if err != nil {
+					return err
+				}
+				rs.MonthDays = &monthDays
+			}
+		case "monthlyOccurrences":
+			if v != nil {
+				var monthlyOccurrences []RecurrenceScheduleOccurrence
+				err = json.Unmarshal(*v, &monthlyOccurrences)
+				if err != nil {
+					return err
+				}
+				rs.MonthlyOccurrences = &monthlyOccurrences
+			}
+		}
+	}
+
+	return nil
+}
+
 // RecurrenceScheduleOccurrence the recurrence schedule occurence.
 type RecurrenceScheduleOccurrence struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -69369,6 +79940,51 @@ func (rso RecurrenceScheduleOccurrence) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for RecurrenceScheduleOccurrence struct.
+func (rso *RecurrenceScheduleOccurrence) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if rso.AdditionalProperties == nil {
+					rso.AdditionalProperties = make(map[string]interface{})
+				}
+				rso.AdditionalProperties[k] = additionalProperties
+			}
+		case "day":
+			if v != nil {
+				var day DayOfWeek
+				err = json.Unmarshal(*v, &day)
+				if err != nil {
+					return err
+				}
+				rso.Day = day
+			}
+		case "occurrence":
+			if v != nil {
+				var occurrence int32
+				err = json.Unmarshal(*v, &occurrence)
+				if err != nil {
+					return err
+				}
+				rso.Occurrence = &occurrence
+			}
+		}
+	}
+
+	return nil
+}
+
 // RedirectIncompatibleRowSettings redirect incompatible row settings
 type RedirectIncompatibleRowSettings struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -69388,6 +80004,51 @@ func (rirs RedirectIncompatibleRowSettings) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for RedirectIncompatibleRowSettings struct.
+func (rirs *RedirectIncompatibleRowSettings) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if rirs.AdditionalProperties == nil {
+					rirs.AdditionalProperties = make(map[string]interface{})
+				}
+				rirs.AdditionalProperties[k] = additionalProperties
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName interface{}
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				rirs.LinkedServiceName = linkedServiceName
+			}
+		case "path":
+			if v != nil {
+				var pathVar interface{}
+				err = json.Unmarshal(*v, &pathVar)
+				if err != nil {
+					return err
+				}
+				rirs.Path = pathVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // RedshiftUnloadSettings the Amazon S3 settings needed for the interim Amazon S3 when copying from Amazon Redshift
@@ -69690,6 +80351,69 @@ func (rs RelationalSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &rs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for RelationalSource struct.
+func (rs *RelationalSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				rs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if rs.AdditionalProperties == nil {
+					rs.AdditionalProperties = make(map[string]interface{})
+				}
+				rs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				rs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				rs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				rs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // RelationalTableDataset the relational table dataset.
 type RelationalTableDataset struct {
 	// RelationalTableDatasetTypeProperties - Relational table dataset properties.
@@ -69706,6 +80430,8 @@ type RelationalTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -69729,6 +80455,9 @@ func (rtd RelationalTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if rtd.Annotations != nil {
 		objectMap["annotations"] = rtd.Annotations
+	}
+	if rtd.Folder != nil {
+		objectMap["folder"] = rtd.Folder
 	}
 	if rtd.Type != "" {
 		objectMap["type"] = rtd.Type
@@ -70089,6 +80818,15 @@ func (rtd *RelationalTableDataset) UnmarshalJSON(body []byte) error {
 				}
 				rtd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				rtd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -70164,7 +80902,7 @@ type ResponsysLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -70541,6 +81279,16 @@ func (rls ResponsysLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinked
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for ResponsysLinkedService.
+func (rls ResponsysLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for ResponsysLinkedService.
+func (rls ResponsysLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for ResponsysLinkedService.
 func (rls ResponsysLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -70746,6 +81494,8 @@ type ResponsysObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -70766,6 +81516,9 @@ func (rod ResponsysObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if rod.Annotations != nil {
 		objectMap["annotations"] = rod.Annotations
+	}
+	if rod.Folder != nil {
+		objectMap["folder"] = rod.Folder
 	}
 	if rod.Type != "" {
 		objectMap["type"] = rod.Type
@@ -71049,6 +81802,96 @@ func (rod ResponsysObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for ResponsysObjectDataset.
 func (rod ResponsysObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &rod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for ResponsysObjectDataset struct.
+func (rod *ResponsysObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if rod.AdditionalProperties == nil {
+					rod.AdditionalProperties = make(map[string]interface{})
+				}
+				rod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				rod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				rod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				rod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				rod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				rod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				rod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				rod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // ResponsysSource a copy activity Responsys source.
@@ -71341,6 +82184,69 @@ func (rs ResponsysSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &rs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for ResponsysSource struct.
+func (rs *ResponsysSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				rs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if rs.AdditionalProperties == nil {
+					rs.AdditionalProperties = make(map[string]interface{})
+				}
+				rs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				rs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				rs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				rs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // RetryPolicy execution policy for an activity.
 type RetryPolicy struct {
 	// Count - Maximum ordinary retry attempts. Default is 0. Type: integer (or Expression with resultType integer), minimum: 0.
@@ -71395,7 +82301,7 @@ type SalesforceLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -71772,6 +82678,16 @@ func (sls SalesforceLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinke
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for SalesforceLinkedService.
+func (sls SalesforceLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for SalesforceLinkedService.
+func (sls SalesforceLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for SalesforceLinkedService.
 func (sls SalesforceLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -71954,7 +82870,7 @@ type SalesforceMarketingCloudLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -72331,6 +83247,16 @@ func (smcls SalesforceMarketingCloudLinkedService) AsAzureSQLDWLinkedService() (
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for SalesforceMarketingCloudLinkedService.
+func (smcls SalesforceMarketingCloudLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for SalesforceMarketingCloudLinkedService.
+func (smcls SalesforceMarketingCloudLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for SalesforceMarketingCloudLinkedService.
 func (smcls SalesforceMarketingCloudLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -72525,6 +83451,8 @@ type SalesforceMarketingCloudObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -72545,6 +83473,9 @@ func (smcod SalesforceMarketingCloudObjectDataset) MarshalJSON() ([]byte, error)
 	}
 	if smcod.Annotations != nil {
 		objectMap["annotations"] = smcod.Annotations
+	}
+	if smcod.Folder != nil {
+		objectMap["folder"] = smcod.Folder
 	}
 	if smcod.Type != "" {
 		objectMap["type"] = smcod.Type
@@ -72828,6 +83759,96 @@ func (smcod SalesforceMarketingCloudObjectDataset) AsDataset() (*Dataset, bool) 
 // AsBasicDataset is the BasicDataset implementation for SalesforceMarketingCloudObjectDataset.
 func (smcod SalesforceMarketingCloudObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &smcod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for SalesforceMarketingCloudObjectDataset struct.
+func (smcod *SalesforceMarketingCloudObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if smcod.AdditionalProperties == nil {
+					smcod.AdditionalProperties = make(map[string]interface{})
+				}
+				smcod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				smcod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				smcod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				smcod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				smcod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				smcod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				smcod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				smcod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // SalesforceMarketingCloudSource a copy activity Salesforce Marketing Cloud source.
@@ -73120,6 +84141,69 @@ func (smcs SalesforceMarketingCloudSource) AsBasicCopySource() (BasicCopySource,
 	return &smcs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for SalesforceMarketingCloudSource struct.
+func (smcs *SalesforceMarketingCloudSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				smcs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if smcs.AdditionalProperties == nil {
+					smcs.AdditionalProperties = make(map[string]interface{})
+				}
+				smcs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				smcs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				smcs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				smcs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // SalesforceObjectDataset the Salesforce object dataset.
 type SalesforceObjectDataset struct {
 	// SalesforceObjectDatasetTypeProperties - Salesforce object dataset properties.
@@ -73136,6 +84220,8 @@ type SalesforceObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -73159,6 +84245,9 @@ func (sod SalesforceObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if sod.Annotations != nil {
 		objectMap["annotations"] = sod.Annotations
+	}
+	if sod.Folder != nil {
+		objectMap["folder"] = sod.Folder
 	}
 	if sod.Type != "" {
 		objectMap["type"] = sod.Type
@@ -73519,6 +84608,15 @@ func (sod *SalesforceObjectDataset) UnmarshalJSON(body []byte) error {
 				}
 				sod.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				sod.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -73662,6 +84760,105 @@ func (ss SalesforceSink) AsCopySink() (*CopySink, bool) {
 // AsBasicCopySink is the BasicCopySink implementation for SalesforceSink.
 func (ss SalesforceSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &ss, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for SalesforceSink struct.
+func (ss *SalesforceSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "writeBehavior":
+			if v != nil {
+				var writeBehavior SalesforceSinkWriteBehavior
+				err = json.Unmarshal(*v, &writeBehavior)
+				if err != nil {
+					return err
+				}
+				ss.WriteBehavior = writeBehavior
+			}
+		case "externalIdFieldName":
+			if v != nil {
+				var externalIDFieldName interface{}
+				err = json.Unmarshal(*v, &externalIDFieldName)
+				if err != nil {
+					return err
+				}
+				ss.ExternalIDFieldName = externalIDFieldName
+			}
+		case "ignoreNullValues":
+			if v != nil {
+				var ignoreNullValues interface{}
+				err = json.Unmarshal(*v, &ignoreNullValues)
+				if err != nil {
+					return err
+				}
+				ss.IgnoreNullValues = ignoreNullValues
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ss.AdditionalProperties == nil {
+					ss.AdditionalProperties = make(map[string]interface{})
+				}
+				ss.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				ss.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				ss.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				ss.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				ss.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // SalesforceSource a copy activity Salesforce source.
@@ -73959,6 +85156,78 @@ func (ss SalesforceSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ss, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for SalesforceSource struct.
+func (ss *SalesforceSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ss.Query = query
+			}
+		case "readBehavior":
+			if v != nil {
+				var readBehavior SalesforceSourceReadBehavior
+				err = json.Unmarshal(*v, &readBehavior)
+				if err != nil {
+					return err
+				}
+				ss.ReadBehavior = readBehavior
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ss.AdditionalProperties == nil {
+					ss.AdditionalProperties = make(map[string]interface{})
+				}
+				ss.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ss.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ss.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // SapBWLinkedService SAP Business Warehouse Linked Service.
 type SapBWLinkedService struct {
 	// SapBWLinkedServiceTypeProperties - Properties specific to this linked service type.
@@ -73973,7 +85242,7 @@ type SapBWLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -74350,6 +85619,16 @@ func (sbls SapBWLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for SapBWLinkedService.
+func (sbls SapBWLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for SapBWLinkedService.
+func (sbls SapBWLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for SapBWLinkedService.
 func (sbls SapBWLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -74544,7 +85823,7 @@ type SapCloudForCustomerLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -74921,6 +86200,16 @@ func (scfcls SapCloudForCustomerLinkedService) AsAzureSQLDWLinkedService() (*Azu
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for SapCloudForCustomerLinkedService.
+func (scfcls SapCloudForCustomerLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for SapCloudForCustomerLinkedService.
+func (scfcls SapCloudForCustomerLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for SapCloudForCustomerLinkedService.
 func (scfcls SapCloudForCustomerLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -75095,6 +86384,8 @@ type SapCloudForCustomerResourceDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -75118,6 +86409,9 @@ func (scfcrd SapCloudForCustomerResourceDataset) MarshalJSON() ([]byte, error) {
 	}
 	if scfcrd.Annotations != nil {
 		objectMap["annotations"] = scfcrd.Annotations
+	}
+	if scfcrd.Folder != nil {
+		objectMap["folder"] = scfcrd.Folder
 	}
 	if scfcrd.Type != "" {
 		objectMap["type"] = scfcrd.Type
@@ -75478,6 +86772,15 @@ func (scfcrd *SapCloudForCustomerResourceDataset) UnmarshalJSON(body []byte) err
 				}
 				scfcrd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				scfcrd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -75615,6 +86918,87 @@ func (scfcs SapCloudForCustomerSink) AsCopySink() (*CopySink, bool) {
 // AsBasicCopySink is the BasicCopySink implementation for SapCloudForCustomerSink.
 func (scfcs SapCloudForCustomerSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &scfcs, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for SapCloudForCustomerSink struct.
+func (scfcs *SapCloudForCustomerSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "writeBehavior":
+			if v != nil {
+				var writeBehavior SapCloudForCustomerSinkWriteBehavior
+				err = json.Unmarshal(*v, &writeBehavior)
+				if err != nil {
+					return err
+				}
+				scfcs.WriteBehavior = writeBehavior
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if scfcs.AdditionalProperties == nil {
+					scfcs.AdditionalProperties = make(map[string]interface{})
+				}
+				scfcs.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				scfcs.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				scfcs.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				scfcs.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				scfcs.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				scfcs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // SapCloudForCustomerSource a copy activity source for SAP Cloud for Customer source.
@@ -75907,6 +87291,69 @@ func (scfcs SapCloudForCustomerSource) AsBasicCopySource() (BasicCopySource, boo
 	return &scfcs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for SapCloudForCustomerSource struct.
+func (scfcs *SapCloudForCustomerSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				scfcs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if scfcs.AdditionalProperties == nil {
+					scfcs.AdditionalProperties = make(map[string]interface{})
+				}
+				scfcs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				scfcs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				scfcs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				scfcs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // SapEccLinkedService linked service for SAP ERP Central Component(SAP ECC).
 type SapEccLinkedService struct {
 	// SapEccLinkedServiceTypeProperties - SAP ECC linked service properties.
@@ -75921,7 +87368,7 @@ type SapEccLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -76298,6 +87745,16 @@ func (sels SapEccLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSe
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for SapEccLinkedService.
+func (sels SapEccLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for SapEccLinkedService.
+func (sels SapEccLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for SapEccLinkedService.
 func (sels SapEccLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -76472,6 +87929,8 @@ type SapEccResourceDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -76495,6 +87954,9 @@ func (serd SapEccResourceDataset) MarshalJSON() ([]byte, error) {
 	}
 	if serd.Annotations != nil {
 		objectMap["annotations"] = serd.Annotations
+	}
+	if serd.Folder != nil {
+		objectMap["folder"] = serd.Folder
 	}
 	if serd.Type != "" {
 		objectMap["type"] = serd.Type
@@ -76855,6 +88317,15 @@ func (serd *SapEccResourceDataset) UnmarshalJSON(body []byte) error {
 				}
 				serd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				serd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -77168,6 +88639,69 @@ func (ses SapEccSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ses, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for SapEccSource struct.
+func (ses *SapEccSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query string
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ses.Query = &query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ses.AdditionalProperties == nil {
+					ses.AdditionalProperties = make(map[string]interface{})
+				}
+				ses.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ses.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ses.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ses.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // SapHanaLinkedService SAP HANA Linked Service.
 type SapHanaLinkedService struct {
 	// SapHanaLinkedServiceProperties - Properties specific to this linked service type.
@@ -77182,7 +88716,7 @@ type SapHanaLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -77559,6 +89093,16 @@ func (shls SapHanaLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedS
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for SapHanaLinkedService.
+func (shls SapHanaLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for SapHanaLinkedService.
+func (shls SapHanaLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for SapHanaLinkedService.
 func (shls SapHanaLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -77926,6 +89470,87 @@ func (str ScheduleTriggerRecurrence) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for ScheduleTriggerRecurrence struct.
+func (str *ScheduleTriggerRecurrence) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if str.AdditionalProperties == nil {
+					str.AdditionalProperties = make(map[string]interface{})
+				}
+				str.AdditionalProperties[k] = additionalProperties
+			}
+		case "frequency":
+			if v != nil {
+				var frequency RecurrenceFrequency
+				err = json.Unmarshal(*v, &frequency)
+				if err != nil {
+					return err
+				}
+				str.Frequency = frequency
+			}
+		case "interval":
+			if v != nil {
+				var interval int32
+				err = json.Unmarshal(*v, &interval)
+				if err != nil {
+					return err
+				}
+				str.Interval = &interval
+			}
+		case "startTime":
+			if v != nil {
+				var startTime date.Time
+				err = json.Unmarshal(*v, &startTime)
+				if err != nil {
+					return err
+				}
+				str.StartTime = &startTime
+			}
+		case "endTime":
+			if v != nil {
+				var endTime date.Time
+				err = json.Unmarshal(*v, &endTime)
+				if err != nil {
+					return err
+				}
+				str.EndTime = &endTime
+			}
+		case "timeZone":
+			if v != nil {
+				var timeZone string
+				err = json.Unmarshal(*v, &timeZone)
+				if err != nil {
+					return err
+				}
+				str.TimeZone = &timeZone
+			}
+		case "schedule":
+			if v != nil {
+				var schedule RecurrenceSchedule
+				err = json.Unmarshal(*v, &schedule)
+				if err != nil {
+					return err
+				}
+				str.Schedule = &schedule
+			}
+		}
+	}
+
+	return nil
+}
+
 // ScheduleTriggerTypeProperties schedule Trigger properties.
 type ScheduleTriggerTypeProperties struct {
 	// Recurrence - Recurrence schedule configuration.
@@ -78058,8 +89683,66 @@ func (ss SecureString) AsBasicSecretBase() (BasicSecretBase, bool) {
 	return &ss, true
 }
 
+// SelfDependencyTumblingWindowTriggerReference self referenced tumbling window trigger dependency.
+type SelfDependencyTumblingWindowTriggerReference struct {
+	// Offset - Timespan applied to the start time of a tumbling window when evaluating dependency.
+	Offset *string `json:"offset,omitempty"`
+	// Size - The size of the window when evaluating the dependency. If undefined the frequency of the tumbling window will be used.
+	Size *string `json:"size,omitempty"`
+	// Type - Possible values include: 'TypeDependencyReference', 'TypeSelfDependencyTumblingWindowTriggerReference', 'TypeTumblingWindowTriggerDependencyReference', 'TypeTriggerDependencyReference'
+	Type TypeBasicDependencyReference `json:"type,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for SelfDependencyTumblingWindowTriggerReference.
+func (sdtwtr SelfDependencyTumblingWindowTriggerReference) MarshalJSON() ([]byte, error) {
+	sdtwtr.Type = TypeSelfDependencyTumblingWindowTriggerReference
+	objectMap := make(map[string]interface{})
+	if sdtwtr.Offset != nil {
+		objectMap["offset"] = sdtwtr.Offset
+	}
+	if sdtwtr.Size != nil {
+		objectMap["size"] = sdtwtr.Size
+	}
+	if sdtwtr.Type != "" {
+		objectMap["type"] = sdtwtr.Type
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsSelfDependencyTumblingWindowTriggerReference is the BasicDependencyReference implementation for SelfDependencyTumblingWindowTriggerReference.
+func (sdtwtr SelfDependencyTumblingWindowTriggerReference) AsSelfDependencyTumblingWindowTriggerReference() (*SelfDependencyTumblingWindowTriggerReference, bool) {
+	return &sdtwtr, true
+}
+
+// AsTumblingWindowTriggerDependencyReference is the BasicDependencyReference implementation for SelfDependencyTumblingWindowTriggerReference.
+func (sdtwtr SelfDependencyTumblingWindowTriggerReference) AsTumblingWindowTriggerDependencyReference() (*TumblingWindowTriggerDependencyReference, bool) {
+	return nil, false
+}
+
+// AsTriggerDependencyReference is the BasicDependencyReference implementation for SelfDependencyTumblingWindowTriggerReference.
+func (sdtwtr SelfDependencyTumblingWindowTriggerReference) AsTriggerDependencyReference() (*TriggerDependencyReference, bool) {
+	return nil, false
+}
+
+// AsBasicTriggerDependencyReference is the BasicDependencyReference implementation for SelfDependencyTumblingWindowTriggerReference.
+func (sdtwtr SelfDependencyTumblingWindowTriggerReference) AsBasicTriggerDependencyReference() (BasicTriggerDependencyReference, bool) {
+	return nil, false
+}
+
+// AsDependencyReference is the BasicDependencyReference implementation for SelfDependencyTumblingWindowTriggerReference.
+func (sdtwtr SelfDependencyTumblingWindowTriggerReference) AsDependencyReference() (*DependencyReference, bool) {
+	return nil, false
+}
+
+// AsBasicDependencyReference is the BasicDependencyReference implementation for SelfDependencyTumblingWindowTriggerReference.
+func (sdtwtr SelfDependencyTumblingWindowTriggerReference) AsBasicDependencyReference() (BasicDependencyReference, bool) {
+	return &sdtwtr, true
+}
+
 // SelfHostedIntegrationRuntime self-hosted integration runtime.
 type SelfHostedIntegrationRuntime struct {
+	// SelfHostedIntegrationRuntimeTypeProperties - When this property is not null, means this is a linked integration runtime. The property is used to access original integration runtime.
+	*SelfHostedIntegrationRuntimeTypeProperties `json:"typeProperties,omitempty"`
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
 	AdditionalProperties map[string]interface{} `json:""`
 	// Description - Integration runtime description.
@@ -78072,6 +89755,9 @@ type SelfHostedIntegrationRuntime struct {
 func (shir SelfHostedIntegrationRuntime) MarshalJSON() ([]byte, error) {
 	shir.Type = TypeSelfHosted
 	objectMap := make(map[string]interface{})
+	if shir.SelfHostedIntegrationRuntimeTypeProperties != nil {
+		objectMap["typeProperties"] = shir.SelfHostedIntegrationRuntimeTypeProperties
+	}
 	if shir.Description != nil {
 		objectMap["description"] = shir.Description
 	}
@@ -78104,6 +89790,60 @@ func (shir SelfHostedIntegrationRuntime) AsBasicIntegrationRuntime() (BasicInteg
 	return &shir, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for SelfHostedIntegrationRuntime struct.
+func (shir *SelfHostedIntegrationRuntime) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "typeProperties":
+			if v != nil {
+				var selfHostedIntegrationRuntimeTypeProperties SelfHostedIntegrationRuntimeTypeProperties
+				err = json.Unmarshal(*v, &selfHostedIntegrationRuntimeTypeProperties)
+				if err != nil {
+					return err
+				}
+				shir.SelfHostedIntegrationRuntimeTypeProperties = &selfHostedIntegrationRuntimeTypeProperties
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if shir.AdditionalProperties == nil {
+					shir.AdditionalProperties = make(map[string]interface{})
+				}
+				shir.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				shir.Description = &description
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicIntegrationRuntime
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				shir.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // SelfHostedIntegrationRuntimeNode properties of Self-hosted integration runtime node.
 type SelfHostedIntegrationRuntimeNode struct {
 	autorest.Response `json:"-"`
@@ -78131,7 +89871,7 @@ type SelfHostedIntegrationRuntimeNode struct {
 	LastStartTime *date.Time `json:"lastStartTime,omitempty"`
 	// LastStopTime - The integration runtime node last stop time.
 	LastStopTime *date.Time `json:"lastStopTime,omitempty"`
-	// LastUpdateResult - The result of the last integration runtime node update. Possible values include: 'Succeed', 'Fail'
+	// LastUpdateResult - The result of the last integration runtime node update. Possible values include: 'IntegrationRuntimeUpdateResultNone', 'IntegrationRuntimeUpdateResultSucceed', 'IntegrationRuntimeUpdateResultFail'
 	LastUpdateResult IntegrationRuntimeUpdateResult `json:"lastUpdateResult,omitempty"`
 	// LastStartUpdateTime - The last time for the integration runtime node update start.
 	LastStartUpdateTime *date.Time `json:"lastStartUpdateTime,omitempty"`
@@ -78213,7 +89953,7 @@ type SelfHostedIntegrationRuntimeStatus struct {
 	AdditionalProperties map[string]interface{} `json:""`
 	// DataFactoryName - The data factory name which the integration runtime belong to.
 	DataFactoryName *string `json:"dataFactoryName,omitempty"`
-	// State - The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline'
+	// State - The state of integration runtime. Possible values include: 'Initial', 'Stopped', 'Started', 'Starting', 'Stopping', 'NeedRegistration', 'Online', 'Limited', 'Offline', 'AccessDenied'
 	State IntegrationRuntimeState `json:"state,omitempty"`
 	// Type - Possible values include: 'TypeBasicIntegrationRuntimeStatusTypeIntegrationRuntimeStatus', 'TypeBasicIntegrationRuntimeStatusTypeSelfHosted', 'TypeBasicIntegrationRuntimeStatusTypeManaged'
 	Type TypeBasicIntegrationRuntimeStatus `json:"type,omitempty"`
@@ -78350,10 +90090,14 @@ type SelfHostedIntegrationRuntimeStatusTypeProperties struct {
 	AutoUpdate IntegrationRuntimeAutoUpdate `json:"autoUpdate,omitempty"`
 	// VersionStatus - Status of the integration runtime version.
 	VersionStatus *string `json:"versionStatus,omitempty"`
+	// Links - The list of linked integration runtimes that are created to share with this integration runtime.
+	Links *[]LinkedIntegrationRuntime `json:"links,omitempty"`
 	// PushedVersion - The version that the integration runtime is going to update to.
 	PushedVersion *string `json:"pushedVersion,omitempty"`
 	// LatestVersion - The latest version on download center.
 	LatestVersion *string `json:"latestVersion,omitempty"`
+	// AutoUpdateETA - The estimated time when the self-hosted integration runtime will be updated.
+	AutoUpdateETA *date.Time `json:"autoUpdateETA,omitempty"`
 }
 
 // MarshalJSON is the custom marshaler for SelfHostedIntegrationRuntimeStatusTypeProperties.
@@ -78395,13 +90139,47 @@ func (shirstp SelfHostedIntegrationRuntimeStatusTypeProperties) MarshalJSON() ([
 	if shirstp.VersionStatus != nil {
 		objectMap["versionStatus"] = shirstp.VersionStatus
 	}
+	if shirstp.Links != nil {
+		objectMap["links"] = shirstp.Links
+	}
 	if shirstp.PushedVersion != nil {
 		objectMap["pushedVersion"] = shirstp.PushedVersion
 	}
 	if shirstp.LatestVersion != nil {
 		objectMap["latestVersion"] = shirstp.LatestVersion
 	}
+	if shirstp.AutoUpdateETA != nil {
+		objectMap["autoUpdateETA"] = shirstp.AutoUpdateETA
+	}
 	return json.Marshal(objectMap)
+}
+
+// SelfHostedIntegrationRuntimeTypeProperties the self-hosted integration runtime properties.
+type SelfHostedIntegrationRuntimeTypeProperties struct {
+	LinkedInfo BasicLinkedIntegrationRuntimeType `json:"linkedInfo,omitempty"`
+}
+
+// UnmarshalJSON is the custom unmarshaler for SelfHostedIntegrationRuntimeTypeProperties struct.
+func (shirtp *SelfHostedIntegrationRuntimeTypeProperties) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "linkedInfo":
+			if v != nil {
+				linkedInfo, err := unmarshalBasicLinkedIntegrationRuntimeType(*v)
+				if err != nil {
+					return err
+				}
+				shirtp.LinkedInfo = linkedInfo
+			}
+		}
+	}
+
+	return nil
 }
 
 // ServiceNowLinkedService serviceNow server linked service.
@@ -78418,7 +90196,7 @@ type ServiceNowLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -78795,6 +90573,16 @@ func (snls ServiceNowLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLink
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for ServiceNowLinkedService.
+func (snls ServiceNowLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for ServiceNowLinkedService.
+func (snls ServiceNowLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for ServiceNowLinkedService.
 func (snls ServiceNowLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -79032,6 +90820,8 @@ type ServiceNowObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -79052,6 +90842,9 @@ func (snod ServiceNowObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if snod.Annotations != nil {
 		objectMap["annotations"] = snod.Annotations
+	}
+	if snod.Folder != nil {
+		objectMap["folder"] = snod.Folder
 	}
 	if snod.Type != "" {
 		objectMap["type"] = snod.Type
@@ -79335,6 +91128,96 @@ func (snod ServiceNowObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for ServiceNowObjectDataset.
 func (snod ServiceNowObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &snod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for ServiceNowObjectDataset struct.
+func (snod *ServiceNowObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if snod.AdditionalProperties == nil {
+					snod.AdditionalProperties = make(map[string]interface{})
+				}
+				snod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				snod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				snod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				snod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				snod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				snod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				snod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				snod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // ServiceNowSource a copy activity ServiceNow server source.
@@ -79627,6 +91510,69 @@ func (sns ServiceNowSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &sns, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for ServiceNowSource struct.
+func (sns *ServiceNowSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				sns.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if sns.AdditionalProperties == nil {
+					sns.AdditionalProperties = make(map[string]interface{})
+				}
+				sns.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				sns.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				sns.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				sns.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // SftpServerLinkedService a linked service for an SSH File Transfer Protocol (SFTP) server.
 type SftpServerLinkedService struct {
 	// SftpServerLinkedServiceTypeProperties - Properties specific to this linked service type.
@@ -79641,7 +91587,7 @@ type SftpServerLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -80018,6 +91964,16 @@ func (ssls SftpServerLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLink
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for SftpServerLinkedService.
+func (ssls SftpServerLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for SftpServerLinkedService.
+func (ssls SftpServerLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for SftpServerLinkedService.
 func (ssls SftpServerLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -80265,7 +92221,7 @@ type ShopifyLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -80642,6 +92598,16 @@ func (sls ShopifyLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSe
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for ShopifyLinkedService.
+func (sls ShopifyLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for ShopifyLinkedService.
+func (sls ShopifyLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for ShopifyLinkedService.
 func (sls ShopifyLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -80836,6 +92802,8 @@ type ShopifyObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -80856,6 +92824,9 @@ func (sod ShopifyObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if sod.Annotations != nil {
 		objectMap["annotations"] = sod.Annotations
+	}
+	if sod.Folder != nil {
+		objectMap["folder"] = sod.Folder
 	}
 	if sod.Type != "" {
 		objectMap["type"] = sod.Type
@@ -81139,6 +93110,96 @@ func (sod ShopifyObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for ShopifyObjectDataset.
 func (sod ShopifyObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &sod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for ShopifyObjectDataset struct.
+func (sod *ShopifyObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if sod.AdditionalProperties == nil {
+					sod.AdditionalProperties = make(map[string]interface{})
+				}
+				sod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				sod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				sod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				sod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				sod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				sod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				sod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				sod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // ShopifySource a copy activity Shopify Serivce source.
@@ -81431,6 +93492,69 @@ func (ss ShopifySource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ss, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for ShopifySource struct.
+func (ss *ShopifySource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ss.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ss.AdditionalProperties == nil {
+					ss.AdditionalProperties = make(map[string]interface{})
+				}
+				ss.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ss.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ss.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // SparkLinkedService spark Server linked service.
 type SparkLinkedService struct {
 	// SparkLinkedServiceTypeProperties - Spark Server linked service properties.
@@ -81445,7 +93569,7 @@ type SparkLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -81822,6 +93946,16 @@ func (sls SparkLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedServ
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for SparkLinkedService.
+func (sls SparkLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for SparkLinkedService.
+func (sls SparkLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for SparkLinkedService.
 func (sls SparkLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -82104,6 +94238,8 @@ type SparkObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -82124,6 +94260,9 @@ func (sod SparkObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if sod.Annotations != nil {
 		objectMap["annotations"] = sod.Annotations
+	}
+	if sod.Folder != nil {
+		objectMap["folder"] = sod.Folder
 	}
 	if sod.Type != "" {
 		objectMap["type"] = sod.Type
@@ -82407,6 +94546,96 @@ func (sod SparkObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for SparkObjectDataset.
 func (sod SparkObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &sod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for SparkObjectDataset struct.
+func (sod *SparkObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if sod.AdditionalProperties == nil {
+					sod.AdditionalProperties = make(map[string]interface{})
+				}
+				sod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				sod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				sod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				sod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				sod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				sod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				sod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				sod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // SparkSource a copy activity Spark Server source.
@@ -82699,6 +94928,69 @@ func (ss SparkSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ss, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for SparkSource struct.
+func (ss *SparkSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ss.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ss.AdditionalProperties == nil {
+					ss.AdditionalProperties = make(map[string]interface{})
+				}
+				ss.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ss.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ss.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // SQLDWSink a copy activity SQL Data Warehouse sink.
 type SQLDWSink struct {
 	// PreCopyScript - SQL pre-copy script. Type: string (or Expression with resultType string).
@@ -82821,6 +95113,105 @@ func (sds SQLDWSink) AsCopySink() (*CopySink, bool) {
 // AsBasicCopySink is the BasicCopySink implementation for SQLDWSink.
 func (sds SQLDWSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &sds, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for SQLDWSink struct.
+func (sds *SQLDWSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "preCopyScript":
+			if v != nil {
+				var preCopyScript interface{}
+				err = json.Unmarshal(*v, &preCopyScript)
+				if err != nil {
+					return err
+				}
+				sds.PreCopyScript = preCopyScript
+			}
+		case "allowPolyBase":
+			if v != nil {
+				var allowPolyBase interface{}
+				err = json.Unmarshal(*v, &allowPolyBase)
+				if err != nil {
+					return err
+				}
+				sds.AllowPolyBase = allowPolyBase
+			}
+		case "polyBaseSettings":
+			if v != nil {
+				var polyBaseSettings PolybaseSettings
+				err = json.Unmarshal(*v, &polyBaseSettings)
+				if err != nil {
+					return err
+				}
+				sds.PolyBaseSettings = &polyBaseSettings
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if sds.AdditionalProperties == nil {
+					sds.AdditionalProperties = make(map[string]interface{})
+				}
+				sds.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				sds.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				sds.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				sds.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				sds.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				sds.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // SQLDWSource a copy activity SQL Data Warehouse source.
@@ -83119,6 +95510,87 @@ func (sds SQLDWSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &sds, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for SQLDWSource struct.
+func (sds *SQLDWSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "sqlReaderQuery":
+			if v != nil {
+				var SQLReaderQuery interface{}
+				err = json.Unmarshal(*v, &SQLReaderQuery)
+				if err != nil {
+					return err
+				}
+				sds.SQLReaderQuery = SQLReaderQuery
+			}
+		case "sqlReaderStoredProcedureName":
+			if v != nil {
+				var SQLReaderStoredProcedureName interface{}
+				err = json.Unmarshal(*v, &SQLReaderStoredProcedureName)
+				if err != nil {
+					return err
+				}
+				sds.SQLReaderStoredProcedureName = SQLReaderStoredProcedureName
+			}
+		case "storedProcedureParameters":
+			if v != nil {
+				var storedProcedureParameters interface{}
+				err = json.Unmarshal(*v, &storedProcedureParameters)
+				if err != nil {
+					return err
+				}
+				sds.StoredProcedureParameters = storedProcedureParameters
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if sds.AdditionalProperties == nil {
+					sds.AdditionalProperties = make(map[string]interface{})
+				}
+				sds.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				sds.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				sds.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				sds.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // SQLServerLinkedService SQL Server linked service.
 type SQLServerLinkedService struct {
 	// SQLServerLinkedServiceTypeProperties - SQL Server linked service properties.
@@ -83133,7 +95605,7 @@ type SQLServerLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -83510,6 +95982,16 @@ func (ssls SQLServerLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinke
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for SQLServerLinkedService.
+func (ssls SQLServerLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for SQLServerLinkedService.
+func (ssls SQLServerLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for SQLServerLinkedService.
 func (ssls SQLServerLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -83685,8 +96167,8 @@ type SQLServerStoredProcedureActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -83722,6 +96204,16 @@ func (ssspa SQLServerStoredProcedureActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for SQLServerStoredProcedureActivity.
+func (ssspa SQLServerStoredProcedureActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for SQLServerStoredProcedureActivity.
+func (ssspa SQLServerStoredProcedureActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for SQLServerStoredProcedureActivity.
@@ -83941,12 +96433,12 @@ func (ssspa *SQLServerStoredProcedureActivity) UnmarshalJSON(body []byte) error 
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				ssspa.UserProperties = userProperties
+				ssspa.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -83997,6 +96489,8 @@ type SQLServerTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -84020,6 +96514,9 @@ func (sstd SQLServerTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if sstd.Annotations != nil {
 		objectMap["annotations"] = sstd.Annotations
+	}
+	if sstd.Folder != nil {
+		objectMap["folder"] = sstd.Folder
 	}
 	if sstd.Type != "" {
 		objectMap["type"] = sstd.Type
@@ -84380,6 +96877,15 @@ func (sstd *SQLServerTableDataset) UnmarshalJSON(body []byte) error {
 				}
 				sstd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				sstd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -84526,6 +97032,114 @@ func (ss SQLSink) AsCopySink() (*CopySink, bool) {
 // AsBasicCopySink is the BasicCopySink implementation for SQLSink.
 func (ss SQLSink) AsBasicCopySink() (BasicCopySink, bool) {
 	return &ss, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for SQLSink struct.
+func (ss *SQLSink) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "sqlWriterStoredProcedureName":
+			if v != nil {
+				var SQLWriterStoredProcedureName interface{}
+				err = json.Unmarshal(*v, &SQLWriterStoredProcedureName)
+				if err != nil {
+					return err
+				}
+				ss.SQLWriterStoredProcedureName = SQLWriterStoredProcedureName
+			}
+		case "sqlWriterTableType":
+			if v != nil {
+				var SQLWriterTableType interface{}
+				err = json.Unmarshal(*v, &SQLWriterTableType)
+				if err != nil {
+					return err
+				}
+				ss.SQLWriterTableType = SQLWriterTableType
+			}
+		case "preCopyScript":
+			if v != nil {
+				var preCopyScript interface{}
+				err = json.Unmarshal(*v, &preCopyScript)
+				if err != nil {
+					return err
+				}
+				ss.PreCopyScript = preCopyScript
+			}
+		case "storedProcedureParameters":
+			if v != nil {
+				var storedProcedureParameters map[string]*StoredProcedureParameter
+				err = json.Unmarshal(*v, &storedProcedureParameters)
+				if err != nil {
+					return err
+				}
+				ss.StoredProcedureParameters = storedProcedureParameters
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ss.AdditionalProperties == nil {
+					ss.AdditionalProperties = make(map[string]interface{})
+				}
+				ss.AdditionalProperties[k] = additionalProperties
+			}
+		case "writeBatchSize":
+			if v != nil {
+				var writeBatchSize interface{}
+				err = json.Unmarshal(*v, &writeBatchSize)
+				if err != nil {
+					return err
+				}
+				ss.WriteBatchSize = writeBatchSize
+			}
+		case "writeBatchTimeout":
+			if v != nil {
+				var writeBatchTimeout interface{}
+				err = json.Unmarshal(*v, &writeBatchTimeout)
+				if err != nil {
+					return err
+				}
+				ss.WriteBatchTimeout = writeBatchTimeout
+			}
+		case "sinkRetryCount":
+			if v != nil {
+				var sinkRetryCount interface{}
+				err = json.Unmarshal(*v, &sinkRetryCount)
+				if err != nil {
+					return err
+				}
+				ss.SinkRetryCount = sinkRetryCount
+			}
+		case "sinkRetryWait":
+			if v != nil {
+				var sinkRetryWait interface{}
+				err = json.Unmarshal(*v, &sinkRetryWait)
+				if err != nil {
+					return err
+				}
+				ss.SinkRetryWait = sinkRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySink
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // SQLSource a copy activity SQL source.
@@ -84826,6 +97440,87 @@ func (ss SQLSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ss, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for SQLSource struct.
+func (ss *SQLSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "sqlReaderQuery":
+			if v != nil {
+				var SQLReaderQuery interface{}
+				err = json.Unmarshal(*v, &SQLReaderQuery)
+				if err != nil {
+					return err
+				}
+				ss.SQLReaderQuery = SQLReaderQuery
+			}
+		case "sqlReaderStoredProcedureName":
+			if v != nil {
+				var SQLReaderStoredProcedureName interface{}
+				err = json.Unmarshal(*v, &SQLReaderStoredProcedureName)
+				if err != nil {
+					return err
+				}
+				ss.SQLReaderStoredProcedureName = SQLReaderStoredProcedureName
+			}
+		case "storedProcedureParameters":
+			if v != nil {
+				var storedProcedureParameters map[string]*StoredProcedureParameter
+				err = json.Unmarshal(*v, &storedProcedureParameters)
+				if err != nil {
+					return err
+				}
+				ss.StoredProcedureParameters = storedProcedureParameters
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ss.AdditionalProperties == nil {
+					ss.AdditionalProperties = make(map[string]interface{})
+				}
+				ss.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ss.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ss.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // SquareLinkedService square Serivce linked service.
 type SquareLinkedService struct {
 	// SquareLinkedServiceTypeProperties - Square Serivce linked service properties.
@@ -84840,7 +97535,7 @@ type SquareLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -85217,6 +97912,16 @@ func (sls SquareLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for SquareLinkedService.
+func (sls SquareLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for SquareLinkedService.
+func (sls SquareLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for SquareLinkedService.
 func (sls SquareLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -85433,6 +98138,8 @@ type SquareObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -85453,6 +98160,9 @@ func (sod SquareObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if sod.Annotations != nil {
 		objectMap["annotations"] = sod.Annotations
+	}
+	if sod.Folder != nil {
+		objectMap["folder"] = sod.Folder
 	}
 	if sod.Type != "" {
 		objectMap["type"] = sod.Type
@@ -85736,6 +98446,96 @@ func (sod SquareObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for SquareObjectDataset.
 func (sod SquareObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &sod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for SquareObjectDataset struct.
+func (sod *SquareObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if sod.AdditionalProperties == nil {
+					sod.AdditionalProperties = make(map[string]interface{})
+				}
+				sod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				sod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				sod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				sod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				sod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				sod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				sod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				sod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // SquareSource a copy activity Square Serivce source.
@@ -86028,6 +98828,69 @@ func (ss SquareSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ss, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for SquareSource struct.
+func (ss *SquareSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				ss.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ss.AdditionalProperties == nil {
+					ss.AdditionalProperties = make(map[string]interface{})
+				}
+				ss.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ss.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ss.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ss.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // SSISExecutionParameter SSIS execution parameter.
 type SSISExecutionParameter struct {
 	// Value - SSIS package execution parameter value. Type: string (or Expression with resultType string).
@@ -86074,6 +98937,60 @@ func (ss StagingSettings) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
+// UnmarshalJSON is the custom unmarshaler for StagingSettings struct.
+func (ss *StagingSettings) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ss.AdditionalProperties == nil {
+					ss.AdditionalProperties = make(map[string]interface{})
+				}
+				ss.AdditionalProperties[k] = additionalProperties
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				ss.LinkedServiceName = &linkedServiceName
+			}
+		case "path":
+			if v != nil {
+				var pathVar interface{}
+				err = json.Unmarshal(*v, &pathVar)
+				if err != nil {
+					return err
+				}
+				ss.Path = pathVar
+			}
+		case "enableCompression":
+			if v != nil {
+				var enableCompression interface{}
+				err = json.Unmarshal(*v, &enableCompression)
+				if err != nil {
+					return err
+				}
+				ss.EnableCompression = enableCompression
+			}
+		}
+	}
+
+	return nil
+}
+
 // StoredProcedureParameter SQL stored procedure parameter.
 type StoredProcedureParameter struct {
 	// Value - Stored procedure parameter value. Type: string (or Expression with resultType string).
@@ -86108,7 +99025,7 @@ type SybaseLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -86485,6 +99402,16 @@ func (sls SybaseLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedSer
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for SybaseLinkedService.
+func (sls SybaseLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for SybaseLinkedService.
+func (sls SybaseLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for SybaseLinkedService.
 func (sls SybaseLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -86718,6 +99645,60 @@ func (tt TabularTranslator) AsBasicCopyTranslator() (BasicCopyTranslator, bool) 
 	return &tt, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for TabularTranslator struct.
+func (tt *TabularTranslator) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "columnMappings":
+			if v != nil {
+				var columnMappings interface{}
+				err = json.Unmarshal(*v, &columnMappings)
+				if err != nil {
+					return err
+				}
+				tt.ColumnMappings = columnMappings
+			}
+		case "schemaMapping":
+			if v != nil {
+				var schemaMapping interface{}
+				err = json.Unmarshal(*v, &schemaMapping)
+				if err != nil {
+					return err
+				}
+				tt.SchemaMapping = schemaMapping
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if tt.AdditionalProperties == nil {
+					tt.AdditionalProperties = make(map[string]interface{})
+				}
+				tt.AdditionalProperties[k] = additionalProperties
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopyTranslator
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				tt.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // TeradataLinkedService linked service for Teradata data source.
 type TeradataLinkedService struct {
 	// TeradataLinkedServiceTypeProperties - Teradata linked service properties.
@@ -86732,7 +99713,7 @@ type TeradataLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -87109,6 +100090,16 @@ func (TLSVar TeradataLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLink
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for TeradataLinkedService.
+func (TLSVar TeradataLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for TeradataLinkedService.
+func (TLSVar TeradataLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for TeradataLinkedService.
 func (TLSVar TeradataLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -87367,6 +100358,141 @@ func (tf TextFormat) AsBasicDatasetStorageFormat() (BasicDatasetStorageFormat, b
 	return &tf, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for TextFormat struct.
+func (tf *TextFormat) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "columnDelimiter":
+			if v != nil {
+				var columnDelimiter interface{}
+				err = json.Unmarshal(*v, &columnDelimiter)
+				if err != nil {
+					return err
+				}
+				tf.ColumnDelimiter = columnDelimiter
+			}
+		case "rowDelimiter":
+			if v != nil {
+				var rowDelimiter interface{}
+				err = json.Unmarshal(*v, &rowDelimiter)
+				if err != nil {
+					return err
+				}
+				tf.RowDelimiter = rowDelimiter
+			}
+		case "escapeChar":
+			if v != nil {
+				var escapeChar interface{}
+				err = json.Unmarshal(*v, &escapeChar)
+				if err != nil {
+					return err
+				}
+				tf.EscapeChar = escapeChar
+			}
+		case "quoteChar":
+			if v != nil {
+				var quoteChar interface{}
+				err = json.Unmarshal(*v, &quoteChar)
+				if err != nil {
+					return err
+				}
+				tf.QuoteChar = quoteChar
+			}
+		case "nullValue":
+			if v != nil {
+				var nullValue interface{}
+				err = json.Unmarshal(*v, &nullValue)
+				if err != nil {
+					return err
+				}
+				tf.NullValue = nullValue
+			}
+		case "encodingName":
+			if v != nil {
+				var encodingName interface{}
+				err = json.Unmarshal(*v, &encodingName)
+				if err != nil {
+					return err
+				}
+				tf.EncodingName = encodingName
+			}
+		case "treatEmptyAsNull":
+			if v != nil {
+				var treatEmptyAsNull interface{}
+				err = json.Unmarshal(*v, &treatEmptyAsNull)
+				if err != nil {
+					return err
+				}
+				tf.TreatEmptyAsNull = treatEmptyAsNull
+			}
+		case "skipLineCount":
+			if v != nil {
+				var skipLineCount interface{}
+				err = json.Unmarshal(*v, &skipLineCount)
+				if err != nil {
+					return err
+				}
+				tf.SkipLineCount = skipLineCount
+			}
+		case "firstRowAsHeader":
+			if v != nil {
+				var firstRowAsHeader interface{}
+				err = json.Unmarshal(*v, &firstRowAsHeader)
+				if err != nil {
+					return err
+				}
+				tf.FirstRowAsHeader = firstRowAsHeader
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if tf.AdditionalProperties == nil {
+					tf.AdditionalProperties = make(map[string]interface{})
+				}
+				tf.AdditionalProperties[k] = additionalProperties
+			}
+		case "serializer":
+			if v != nil {
+				var serializer interface{}
+				err = json.Unmarshal(*v, &serializer)
+				if err != nil {
+					return err
+				}
+				tf.Serializer = serializer
+			}
+		case "deserializer":
+			if v != nil {
+				var deserializer interface{}
+				err = json.Unmarshal(*v, &deserializer)
+				if err != nil {
+					return err
+				}
+				tf.Deserializer = deserializer
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDatasetStorageFormat
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				tf.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // BasicTrigger azure data factory nested object which contains information about creating pipeline run
 type BasicTrigger interface {
 	AsTumblingWindowTrigger() (*TumblingWindowTrigger, bool)
@@ -87502,6 +100628,154 @@ func (t Trigger) AsBasicTrigger() (BasicTrigger, bool) {
 	return &t, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for Trigger struct.
+func (t *Trigger) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if t.AdditionalProperties == nil {
+					t.AdditionalProperties = make(map[string]interface{})
+				}
+				t.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				t.Description = &description
+			}
+		case "runtimeState":
+			if v != nil {
+				var runtimeState TriggerRuntimeState
+				err = json.Unmarshal(*v, &runtimeState)
+				if err != nil {
+					return err
+				}
+				t.RuntimeState = runtimeState
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicTrigger
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				t.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// BasicTriggerDependencyReference trigger referenced dependency.
+type BasicTriggerDependencyReference interface {
+	AsTumblingWindowTriggerDependencyReference() (*TumblingWindowTriggerDependencyReference, bool)
+	AsTriggerDependencyReference() (*TriggerDependencyReference, bool)
+}
+
+// TriggerDependencyReference trigger referenced dependency.
+type TriggerDependencyReference struct {
+	// ReferenceTrigger - Referenced trigger.
+	ReferenceTrigger *TriggerReference `json:"referenceTrigger,omitempty"`
+	// Type - Possible values include: 'TypeDependencyReference', 'TypeSelfDependencyTumblingWindowTriggerReference', 'TypeTumblingWindowTriggerDependencyReference', 'TypeTriggerDependencyReference'
+	Type TypeBasicDependencyReference `json:"type,omitempty"`
+}
+
+func unmarshalBasicTriggerDependencyReference(body []byte) (BasicTriggerDependencyReference, error) {
+	var m map[string]interface{}
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return nil, err
+	}
+
+	switch m["type"] {
+	case string(TypeTumblingWindowTriggerDependencyReference):
+		var twtdr TumblingWindowTriggerDependencyReference
+		err := json.Unmarshal(body, &twtdr)
+		return twtdr, err
+	default:
+		var tdr TriggerDependencyReference
+		err := json.Unmarshal(body, &tdr)
+		return tdr, err
+	}
+}
+func unmarshalBasicTriggerDependencyReferenceArray(body []byte) ([]BasicTriggerDependencyReference, error) {
+	var rawMessages []*json.RawMessage
+	err := json.Unmarshal(body, &rawMessages)
+	if err != nil {
+		return nil, err
+	}
+
+	tdrArray := make([]BasicTriggerDependencyReference, len(rawMessages))
+
+	for index, rawMessage := range rawMessages {
+		tdr, err := unmarshalBasicTriggerDependencyReference(*rawMessage)
+		if err != nil {
+			return nil, err
+		}
+		tdrArray[index] = tdr
+	}
+	return tdrArray, nil
+}
+
+// MarshalJSON is the custom marshaler for TriggerDependencyReference.
+func (tdr TriggerDependencyReference) MarshalJSON() ([]byte, error) {
+	tdr.Type = TypeTriggerDependencyReference
+	objectMap := make(map[string]interface{})
+	if tdr.ReferenceTrigger != nil {
+		objectMap["referenceTrigger"] = tdr.ReferenceTrigger
+	}
+	if tdr.Type != "" {
+		objectMap["type"] = tdr.Type
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsSelfDependencyTumblingWindowTriggerReference is the BasicDependencyReference implementation for TriggerDependencyReference.
+func (tdr TriggerDependencyReference) AsSelfDependencyTumblingWindowTriggerReference() (*SelfDependencyTumblingWindowTriggerReference, bool) {
+	return nil, false
+}
+
+// AsTumblingWindowTriggerDependencyReference is the BasicDependencyReference implementation for TriggerDependencyReference.
+func (tdr TriggerDependencyReference) AsTumblingWindowTriggerDependencyReference() (*TumblingWindowTriggerDependencyReference, bool) {
+	return nil, false
+}
+
+// AsTriggerDependencyReference is the BasicDependencyReference implementation for TriggerDependencyReference.
+func (tdr TriggerDependencyReference) AsTriggerDependencyReference() (*TriggerDependencyReference, bool) {
+	return &tdr, true
+}
+
+// AsBasicTriggerDependencyReference is the BasicDependencyReference implementation for TriggerDependencyReference.
+func (tdr TriggerDependencyReference) AsBasicTriggerDependencyReference() (BasicTriggerDependencyReference, bool) {
+	return &tdr, true
+}
+
+// AsDependencyReference is the BasicDependencyReference implementation for TriggerDependencyReference.
+func (tdr TriggerDependencyReference) AsDependencyReference() (*DependencyReference, bool) {
+	return nil, false
+}
+
+// AsBasicDependencyReference is the BasicDependencyReference implementation for TriggerDependencyReference.
+func (tdr TriggerDependencyReference) AsBasicDependencyReference() (BasicDependencyReference, bool) {
+	return &tdr, true
+}
+
 // TriggerListResponse a list of trigger resources.
 type TriggerListResponse struct {
 	autorest.Response `json:"-"`
@@ -87622,6 +100896,14 @@ func (tpr TriggerPipelineReference) MarshalJSON() ([]byte, error) {
 		objectMap["parameters"] = tpr.Parameters
 	}
 	return json.Marshal(objectMap)
+}
+
+// TriggerReference trigger reference type.
+type TriggerReference struct {
+	// Type - Trigger reference type.
+	Type *string `json:"type,omitempty"`
+	// ReferenceName - Reference trigger name.
+	ReferenceName *string `json:"referenceName,omitempty"`
 }
 
 // TriggerResource trigger resource type.
@@ -87751,6 +101033,105 @@ func (tr TriggerRun) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for TriggerRun struct.
+func (tr *TriggerRun) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if tr.AdditionalProperties == nil {
+					tr.AdditionalProperties = make(map[string]interface{})
+				}
+				tr.AdditionalProperties[k] = additionalProperties
+			}
+		case "triggerRunId":
+			if v != nil {
+				var triggerRunID string
+				err = json.Unmarshal(*v, &triggerRunID)
+				if err != nil {
+					return err
+				}
+				tr.TriggerRunID = &triggerRunID
+			}
+		case "triggerName":
+			if v != nil {
+				var triggerName string
+				err = json.Unmarshal(*v, &triggerName)
+				if err != nil {
+					return err
+				}
+				tr.TriggerName = &triggerName
+			}
+		case "triggerType":
+			if v != nil {
+				var triggerType string
+				err = json.Unmarshal(*v, &triggerType)
+				if err != nil {
+					return err
+				}
+				tr.TriggerType = &triggerType
+			}
+		case "triggerRunTimestamp":
+			if v != nil {
+				var triggerRunTimestamp date.Time
+				err = json.Unmarshal(*v, &triggerRunTimestamp)
+				if err != nil {
+					return err
+				}
+				tr.TriggerRunTimestamp = &triggerRunTimestamp
+			}
+		case "status":
+			if v != nil {
+				var status TriggerRunStatus
+				err = json.Unmarshal(*v, &status)
+				if err != nil {
+					return err
+				}
+				tr.Status = status
+			}
+		case "message":
+			if v != nil {
+				var message string
+				err = json.Unmarshal(*v, &message)
+				if err != nil {
+					return err
+				}
+				tr.Message = &message
+			}
+		case "properties":
+			if v != nil {
+				var properties map[string]*string
+				err = json.Unmarshal(*v, &properties)
+				if err != nil {
+					return err
+				}
+				tr.Properties = properties
+			}
+		case "triggeredPipelines":
+			if v != nil {
+				var triggeredPipelines map[string]*string
+				err = json.Unmarshal(*v, &triggeredPipelines)
+				if err != nil {
+					return err
+				}
+				tr.TriggeredPipelines = triggeredPipelines
+			}
+		}
+	}
+
+	return nil
 }
 
 // TriggerRunsQueryResponse a list of trigger runs.
@@ -87960,6 +101341,67 @@ func (twt *TumblingWindowTrigger) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
+// TumblingWindowTriggerDependencyReference referenced tumbling window trigger dependency.
+type TumblingWindowTriggerDependencyReference struct {
+	// Offset - Timespan applied to the start time of a tumbling window when evaluating dependency.
+	Offset *string `json:"offset,omitempty"`
+	// Size - The size of the window when evaluating the dependency. If undefined the frequency of the tumbling window will be used.
+	Size *string `json:"size,omitempty"`
+	// ReferenceTrigger - Referenced trigger.
+	ReferenceTrigger *TriggerReference `json:"referenceTrigger,omitempty"`
+	// Type - Possible values include: 'TypeDependencyReference', 'TypeSelfDependencyTumblingWindowTriggerReference', 'TypeTumblingWindowTriggerDependencyReference', 'TypeTriggerDependencyReference'
+	Type TypeBasicDependencyReference `json:"type,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for TumblingWindowTriggerDependencyReference.
+func (twtdr TumblingWindowTriggerDependencyReference) MarshalJSON() ([]byte, error) {
+	twtdr.Type = TypeTumblingWindowTriggerDependencyReference
+	objectMap := make(map[string]interface{})
+	if twtdr.Offset != nil {
+		objectMap["offset"] = twtdr.Offset
+	}
+	if twtdr.Size != nil {
+		objectMap["size"] = twtdr.Size
+	}
+	if twtdr.ReferenceTrigger != nil {
+		objectMap["referenceTrigger"] = twtdr.ReferenceTrigger
+	}
+	if twtdr.Type != "" {
+		objectMap["type"] = twtdr.Type
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsSelfDependencyTumblingWindowTriggerReference is the BasicDependencyReference implementation for TumblingWindowTriggerDependencyReference.
+func (twtdr TumblingWindowTriggerDependencyReference) AsSelfDependencyTumblingWindowTriggerReference() (*SelfDependencyTumblingWindowTriggerReference, bool) {
+	return nil, false
+}
+
+// AsTumblingWindowTriggerDependencyReference is the BasicDependencyReference implementation for TumblingWindowTriggerDependencyReference.
+func (twtdr TumblingWindowTriggerDependencyReference) AsTumblingWindowTriggerDependencyReference() (*TumblingWindowTriggerDependencyReference, bool) {
+	return &twtdr, true
+}
+
+// AsTriggerDependencyReference is the BasicDependencyReference implementation for TumblingWindowTriggerDependencyReference.
+func (twtdr TumblingWindowTriggerDependencyReference) AsTriggerDependencyReference() (*TriggerDependencyReference, bool) {
+	return nil, false
+}
+
+// AsBasicTriggerDependencyReference is the BasicDependencyReference implementation for TumblingWindowTriggerDependencyReference.
+func (twtdr TumblingWindowTriggerDependencyReference) AsBasicTriggerDependencyReference() (BasicTriggerDependencyReference, bool) {
+	return &twtdr, true
+}
+
+// AsDependencyReference is the BasicDependencyReference implementation for TumblingWindowTriggerDependencyReference.
+func (twtdr TumblingWindowTriggerDependencyReference) AsDependencyReference() (*DependencyReference, bool) {
+	return nil, false
+}
+
+// AsBasicDependencyReference is the BasicDependencyReference implementation for TumblingWindowTriggerDependencyReference.
+func (twtdr TumblingWindowTriggerDependencyReference) AsBasicDependencyReference() (BasicDependencyReference, bool) {
+	return &twtdr, true
+}
+
 // TumblingWindowTriggerTypeProperties tumbling Window Trigger properties.
 type TumblingWindowTriggerTypeProperties struct {
 	// Frequency - The frequency of the time windows. Possible values include: 'TumblingWindowFrequencyMinute', 'TumblingWindowFrequencyHour'
@@ -87976,6 +101418,94 @@ type TumblingWindowTriggerTypeProperties struct {
 	MaxConcurrency *int32 `json:"maxConcurrency,omitempty"`
 	// RetryPolicy - Retry policy that will be applied for failed pipeline runs.
 	RetryPolicy *RetryPolicy `json:"retryPolicy,omitempty"`
+	// DependsOn - Triggers that this trigger depends on. Only tumbling window triggers are supported.
+	DependsOn *[]BasicDependencyReference `json:"dependsOn,omitempty"`
+}
+
+// UnmarshalJSON is the custom unmarshaler for TumblingWindowTriggerTypeProperties struct.
+func (twtP *TumblingWindowTriggerTypeProperties) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "frequency":
+			if v != nil {
+				var frequency TumblingWindowFrequency
+				err = json.Unmarshal(*v, &frequency)
+				if err != nil {
+					return err
+				}
+				twtP.Frequency = frequency
+			}
+		case "interval":
+			if v != nil {
+				var interval int32
+				err = json.Unmarshal(*v, &interval)
+				if err != nil {
+					return err
+				}
+				twtP.Interval = &interval
+			}
+		case "startTime":
+			if v != nil {
+				var startTime date.Time
+				err = json.Unmarshal(*v, &startTime)
+				if err != nil {
+					return err
+				}
+				twtP.StartTime = &startTime
+			}
+		case "endTime":
+			if v != nil {
+				var endTime date.Time
+				err = json.Unmarshal(*v, &endTime)
+				if err != nil {
+					return err
+				}
+				twtP.EndTime = &endTime
+			}
+		case "delay":
+			if v != nil {
+				var delay interface{}
+				err = json.Unmarshal(*v, &delay)
+				if err != nil {
+					return err
+				}
+				twtP.Delay = delay
+			}
+		case "maxConcurrency":
+			if v != nil {
+				var maxConcurrency int32
+				err = json.Unmarshal(*v, &maxConcurrency)
+				if err != nil {
+					return err
+				}
+				twtP.MaxConcurrency = &maxConcurrency
+			}
+		case "retryPolicy":
+			if v != nil {
+				var retryPolicy RetryPolicy
+				err = json.Unmarshal(*v, &retryPolicy)
+				if err != nil {
+					return err
+				}
+				twtP.RetryPolicy = &retryPolicy
+			}
+		case "dependsOn":
+			if v != nil {
+				dependsOn, err := unmarshalBasicDependencyReferenceArray(*v)
+				if err != nil {
+					return err
+				}
+				twtP.DependsOn = &dependsOn
+			}
+		}
+	}
+
+	return nil
 }
 
 // UntilActivity this activity executes inner activities until the specified boolean expression results to true or
@@ -87992,8 +101522,8 @@ type UntilActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -88023,6 +101553,16 @@ func (ua UntilActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for UntilActivity.
+func (ua UntilActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for UntilActivity.
+func (ua UntilActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for UntilActivity.
@@ -88224,12 +101764,12 @@ func (ua *UntilActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				ua.UserProperties = userProperties
+				ua.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -88311,6 +101851,14 @@ type UpdateIntegrationRuntimeRequest struct {
 	UpdateDelayOffset *string `json:"updateDelayOffset,omitempty"`
 }
 
+// UserProperty user property.
+type UserProperty struct {
+	// Name - User proprety name.
+	Name *string `json:"name,omitempty"`
+	// Value - User proprety value. Type: string (or Expression with resultType string).
+	Value interface{} `json:"value,omitempty"`
+}
+
 // VerticaLinkedService vertica linked service.
 type VerticaLinkedService struct {
 	// VerticaLinkedServiceTypeProperties - Vertica linked service properties.
@@ -88325,7 +101873,7 @@ type VerticaLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -88699,6 +102247,16 @@ func (vls VerticaLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedServ
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for VerticaLinkedService.
 func (vls VerticaLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for VerticaLinkedService.
+func (vls VerticaLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for VerticaLinkedService.
+func (vls VerticaLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -89096,6 +102654,69 @@ func (vs VerticaSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &vs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for VerticaSource struct.
+func (vs *VerticaSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				vs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if vs.AdditionalProperties == nil {
+					vs.AdditionalProperties = make(map[string]interface{})
+				}
+				vs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				vs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				vs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				vs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // VerticaTableDataset vertica dataset.
 type VerticaTableDataset struct {
 	// AdditionalProperties - Unmatched properties from the message are deserialized this collection
@@ -89110,6 +102731,8 @@ type VerticaTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -89130,6 +102753,9 @@ func (vtd VerticaTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if vtd.Annotations != nil {
 		objectMap["annotations"] = vtd.Annotations
+	}
+	if vtd.Folder != nil {
+		objectMap["folder"] = vtd.Folder
 	}
 	if vtd.Type != "" {
 		objectMap["type"] = vtd.Type
@@ -89415,6 +103041,96 @@ func (vtd VerticaTableDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &vtd, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for VerticaTableDataset struct.
+func (vtd *VerticaTableDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if vtd.AdditionalProperties == nil {
+					vtd.AdditionalProperties = make(map[string]interface{})
+				}
+				vtd.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				vtd.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				vtd.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				vtd.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				vtd.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				vtd.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				vtd.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				vtd.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // WaitActivity this activity suspends pipeline execution for the specified interval.
 type WaitActivity struct {
 	// WaitActivityTypeProperties - Wait activity properties.
@@ -89428,8 +103144,8 @@ type WaitActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -89459,6 +103175,16 @@ func (wa WaitActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for WaitActivity.
+func (wa WaitActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for WaitActivity.
+func (wa WaitActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for WaitActivity.
@@ -89660,12 +103386,12 @@ func (wa *WaitActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				wa.UserProperties = userProperties
+				wa.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -89705,8 +103431,8 @@ type WebActivity struct {
 	// DependsOn - Activity depends on condition.
 	DependsOn *[]ActivityDependency `json:"dependsOn,omitempty"`
 	// UserProperties - Activity user properties.
-	UserProperties map[string]*string `json:"userProperties"`
-	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
+	UserProperties *[]UserProperty `json:"userProperties,omitempty"`
+	// Type - Possible values include: 'TypeActivity', 'TypeDatabricksSparkPython', 'TypeDatabricksSparkJar', 'TypeDatabricksNotebook', 'TypeDataLakeAnalyticsUSQL', 'TypeAzureMLUpdateResource', 'TypeAzureMLBatchExecution', 'TypeGetMetadata', 'TypeWebActivity', 'TypeLookup', 'TypeSQLServerStoredProcedure', 'TypeCustom', 'TypeExecuteSSISPackage', 'TypeHDInsightSpark', 'TypeHDInsightStreaming', 'TypeHDInsightMapReduce', 'TypeHDInsightPig', 'TypeHDInsightHive', 'TypeCopy', 'TypeExecution', 'TypeFilter', 'TypeUntil', 'TypeWait', 'TypeForEach', 'TypeIfCondition', 'TypeExecutePipeline', 'TypeContainer'
 	Type TypeBasicActivity `json:"type,omitempty"`
 }
 
@@ -89742,6 +103468,16 @@ func (wa WebActivity) MarshalJSON() ([]byte, error) {
 		objectMap[k] = v
 	}
 	return json.Marshal(objectMap)
+}
+
+// AsDatabricksSparkPythonActivity is the BasicActivity implementation for WebActivity.
+func (wa WebActivity) AsDatabricksSparkPythonActivity() (*DatabricksSparkPythonActivity, bool) {
+	return nil, false
+}
+
+// AsDatabricksSparkJarActivity is the BasicActivity implementation for WebActivity.
+func (wa WebActivity) AsDatabricksSparkJarActivity() (*DatabricksSparkJarActivity, bool) {
+	return nil, false
 }
 
 // AsDatabricksNotebookActivity is the BasicActivity implementation for WebActivity.
@@ -89961,12 +103697,12 @@ func (wa *WebActivity) UnmarshalJSON(body []byte) error {
 			}
 		case "userProperties":
 			if v != nil {
-				var userProperties map[string]*string
+				var userProperties []UserProperty
 				err = json.Unmarshal(*v, &userProperties)
 				if err != nil {
 					return err
 				}
-				wa.UserProperties = userProperties
+				wa.UserProperties = &userProperties
 			}
 		case "type":
 			if v != nil {
@@ -90275,7 +104011,7 @@ type WebLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -90647,6 +104383,16 @@ func (wls WebLinkedService) AsSQLServerLinkedService() (*SQLServerLinkedService,
 
 // AsAzureSQLDWLinkedService is the BasicLinkedService implementation for WebLinkedService.
 func (wls WebLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for WebLinkedService.
+func (wls WebLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for WebLinkedService.
+func (wls WebLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
 	return nil, false
 }
 
@@ -91131,6 +104877,60 @@ func (ws WebSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &ws, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for WebSource struct.
+func (ws *WebSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if ws.AdditionalProperties == nil {
+					ws.AdditionalProperties = make(map[string]interface{})
+				}
+				ws.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				ws.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				ws.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				ws.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // WebTableDataset the dataset points to a HTML table in the web page.
 type WebTableDataset struct {
 	// WebTableDatasetTypeProperties - Web table dataset properties.
@@ -91147,6 +104947,8 @@ type WebTableDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -91170,6 +104972,9 @@ func (wtd WebTableDataset) MarshalJSON() ([]byte, error) {
 	}
 	if wtd.Annotations != nil {
 		objectMap["annotations"] = wtd.Annotations
+	}
+	if wtd.Folder != nil {
+		objectMap["folder"] = wtd.Folder
 	}
 	if wtd.Type != "" {
 		objectMap["type"] = wtd.Type
@@ -91530,6 +105335,15 @@ func (wtd *WebTableDataset) UnmarshalJSON(body []byte) error {
 				}
 				wtd.Annotations = &annotations
 			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				wtd.Folder = &folder
+			}
 		case "type":
 			if v != nil {
 				var typeVar TypeBasicDataset
@@ -91567,7 +105381,7 @@ type XeroLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -91944,6 +105758,16 @@ func (xls XeroLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedServi
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for XeroLinkedService.
+func (xls XeroLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for XeroLinkedService.
+func (xls XeroLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for XeroLinkedService.
 func (xls XeroLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -92149,6 +105973,8 @@ type XeroObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -92169,6 +105995,9 @@ func (xod XeroObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if xod.Annotations != nil {
 		objectMap["annotations"] = xod.Annotations
+	}
+	if xod.Folder != nil {
+		objectMap["folder"] = xod.Folder
 	}
 	if xod.Type != "" {
 		objectMap["type"] = xod.Type
@@ -92452,6 +106281,96 @@ func (xod XeroObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for XeroObjectDataset.
 func (xod XeroObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &xod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for XeroObjectDataset struct.
+func (xod *XeroObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if xod.AdditionalProperties == nil {
+					xod.AdditionalProperties = make(map[string]interface{})
+				}
+				xod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				xod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				xod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				xod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				xod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				xod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				xod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				xod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // XeroSource a copy activity Xero Serivce source.
@@ -92744,6 +106663,69 @@ func (xs XeroSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &xs, true
 }
 
+// UnmarshalJSON is the custom unmarshaler for XeroSource struct.
+func (xs *XeroSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				xs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if xs.AdditionalProperties == nil {
+					xs.AdditionalProperties = make(map[string]interface{})
+				}
+				xs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				xs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				xs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				xs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
 // ZohoLinkedService zoho server linked service.
 type ZohoLinkedService struct {
 	// ZohoLinkedServiceTypeProperties - Zoho server linked service properties.
@@ -92758,7 +106740,7 @@ type ZohoLinkedService struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
-	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureStorage'
+	// Type - Possible values include: 'TypeLinkedService', 'TypeResponsys', 'TypeAzureDatabricks', 'TypeAzureDataLakeAnalytics', 'TypeHDInsightOnDemand', 'TypeSalesforceMarketingCloud', 'TypeNetezza', 'TypeVertica', 'TypeZoho', 'TypeXero', 'TypeSquare', 'TypeSpark', 'TypeShopify', 'TypeServiceNow', 'TypeQuickBooks', 'TypePresto', 'TypePhoenix', 'TypePaypal', 'TypeMarketo', 'TypeMariaDB', 'TypeMagento', 'TypeJira', 'TypeImpala', 'TypeHubspot', 'TypeHive', 'TypeHBase', 'TypeGreenplum', 'TypeGoogleBigQuery', 'TypeEloqua', 'TypeDrill', 'TypeCouchbase', 'TypeConcur', 'TypeAzurePostgreSQL', 'TypeAmazonMWS', 'TypeSapHana', 'TypeSapBW', 'TypeSftp', 'TypeFtpServer', 'TypeHTTPServer', 'TypeAzureSearch', 'TypeCustomDataSource', 'TypeAmazonRedshift', 'TypeAmazonS3', 'TypeSapEcc', 'TypeSapCloudForCustomer', 'TypeSalesforce', 'TypeAzureDataLakeStore', 'TypeMongoDb', 'TypeCassandra', 'TypeWeb', 'TypeOData', 'TypeHdfs', 'TypeOdbc', 'TypeAzureML', 'TypeTeradata', 'TypeDb2', 'TypeSybase', 'TypePostgreSQL', 'TypeMySQL', 'TypeAzureMySQL', 'TypeOracle', 'TypeFileServer', 'TypeHDInsight', 'TypeDynamics', 'TypeCosmosDb', 'TypeAzureKeyVault', 'TypeAzureBatch', 'TypeAzureSQLDatabase', 'TypeSQLServer', 'TypeAzureSQLDW', 'TypeAzureTableStorage', 'TypeAzureBlobStorage', 'TypeAzureStorage'
 	Type TypeBasicLinkedService `json:"type,omitempty"`
 }
 
@@ -93135,6 +107117,16 @@ func (zls ZohoLinkedService) AsAzureSQLDWLinkedService() (*AzureSQLDWLinkedServi
 	return nil, false
 }
 
+// AsAzureTableStorageLinkedService is the BasicLinkedService implementation for ZohoLinkedService.
+func (zls ZohoLinkedService) AsAzureTableStorageLinkedService() (*AzureTableStorageLinkedService, bool) {
+	return nil, false
+}
+
+// AsAzureBlobStorageLinkedService is the BasicLinkedService implementation for ZohoLinkedService.
+func (zls ZohoLinkedService) AsAzureBlobStorageLinkedService() (*AzureBlobStorageLinkedService, bool) {
+	return nil, false
+}
+
 // AsAzureStorageLinkedService is the BasicLinkedService implementation for ZohoLinkedService.
 func (zls ZohoLinkedService) AsAzureStorageLinkedService() (*AzureStorageLinkedService, bool) {
 	return nil, false
@@ -93329,6 +107321,8 @@ type ZohoObjectDataset struct {
 	Parameters map[string]*ParameterSpecification `json:"parameters"`
 	// Annotations - List of tags that can be used for describing the Dataset.
 	Annotations *[]interface{} `json:"annotations,omitempty"`
+	// Folder - The folder that this Dataset is in. If not specified, Dataset will appear at the root level.
+	Folder *DatasetFolder `json:"folder,omitempty"`
 	// Type - Possible values include: 'TypeDataset', 'TypeResponsysObject', 'TypeSalesforceMarketingCloudObject', 'TypeVerticaTable', 'TypeNetezzaTable', 'TypeZohoObject', 'TypeXeroObject', 'TypeSquareObject', 'TypeSparkObject', 'TypeShopifyObject', 'TypeServiceNowObject', 'TypeQuickBooksObject', 'TypePrestoObject', 'TypePhoenixObject', 'TypePaypalObject', 'TypeMarketoObject', 'TypeMariaDBTable', 'TypeMagentoObject', 'TypeJiraObject', 'TypeImpalaObject', 'TypeHubspotObject', 'TypeHiveObject', 'TypeHBaseObject', 'TypeGreenplumTable', 'TypeGoogleBigQueryObject', 'TypeEloquaObject', 'TypeDrillTable', 'TypeCouchbaseTable', 'TypeConcurObject', 'TypeAzurePostgreSQLTable', 'TypeAmazonMWSObject', 'TypeHTTPFile', 'TypeAzureSearchIndex', 'TypeWebTable', 'TypeSQLServerTable', 'TypeSapEccResource', 'TypeSapCloudForCustomerResource', 'TypeSalesforceObject', 'TypeRelationalTable', 'TypeAzureMySQLTable', 'TypeOracleTable', 'TypeODataResource', 'TypeMongoDbCollection', 'TypeFileShare', 'TypeAzureDataLakeStoreFile', 'TypeDynamicsEntity', 'TypeDocumentDbCollection', 'TypeCustomDataset', 'TypeCassandraTable', 'TypeAzureSQLDWTable', 'TypeAzureSQLTable', 'TypeAzureTable', 'TypeAzureBlob', 'TypeAmazonS3Object'
 	Type TypeBasicDataset `json:"type,omitempty"`
 }
@@ -93349,6 +107343,9 @@ func (zod ZohoObjectDataset) MarshalJSON() ([]byte, error) {
 	}
 	if zod.Annotations != nil {
 		objectMap["annotations"] = zod.Annotations
+	}
+	if zod.Folder != nil {
+		objectMap["folder"] = zod.Folder
 	}
 	if zod.Type != "" {
 		objectMap["type"] = zod.Type
@@ -93632,6 +107629,96 @@ func (zod ZohoObjectDataset) AsDataset() (*Dataset, bool) {
 // AsBasicDataset is the BasicDataset implementation for ZohoObjectDataset.
 func (zod ZohoObjectDataset) AsBasicDataset() (BasicDataset, bool) {
 	return &zod, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for ZohoObjectDataset struct.
+func (zod *ZohoObjectDataset) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if zod.AdditionalProperties == nil {
+					zod.AdditionalProperties = make(map[string]interface{})
+				}
+				zod.AdditionalProperties[k] = additionalProperties
+			}
+		case "description":
+			if v != nil {
+				var description string
+				err = json.Unmarshal(*v, &description)
+				if err != nil {
+					return err
+				}
+				zod.Description = &description
+			}
+		case "structure":
+			if v != nil {
+				var structure interface{}
+				err = json.Unmarshal(*v, &structure)
+				if err != nil {
+					return err
+				}
+				zod.Structure = structure
+			}
+		case "linkedServiceName":
+			if v != nil {
+				var linkedServiceName LinkedServiceReference
+				err = json.Unmarshal(*v, &linkedServiceName)
+				if err != nil {
+					return err
+				}
+				zod.LinkedServiceName = &linkedServiceName
+			}
+		case "parameters":
+			if v != nil {
+				var parameters map[string]*ParameterSpecification
+				err = json.Unmarshal(*v, &parameters)
+				if err != nil {
+					return err
+				}
+				zod.Parameters = parameters
+			}
+		case "annotations":
+			if v != nil {
+				var annotations []interface{}
+				err = json.Unmarshal(*v, &annotations)
+				if err != nil {
+					return err
+				}
+				zod.Annotations = &annotations
+			}
+		case "folder":
+			if v != nil {
+				var folder DatasetFolder
+				err = json.Unmarshal(*v, &folder)
+				if err != nil {
+					return err
+				}
+				zod.Folder = &folder
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicDataset
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				zod.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
 
 // ZohoSource a copy activity Zoho server source.
@@ -93922,4 +108009,67 @@ func (zs ZohoSource) AsCopySource() (*CopySource, bool) {
 // AsBasicCopySource is the BasicCopySource implementation for ZohoSource.
 func (zs ZohoSource) AsBasicCopySource() (BasicCopySource, bool) {
 	return &zs, true
+}
+
+// UnmarshalJSON is the custom unmarshaler for ZohoSource struct.
+func (zs *ZohoSource) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "query":
+			if v != nil {
+				var query interface{}
+				err = json.Unmarshal(*v, &query)
+				if err != nil {
+					return err
+				}
+				zs.Query = query
+			}
+		default:
+			if v != nil {
+				var additionalProperties interface{}
+				err = json.Unmarshal(*v, &additionalProperties)
+				if err != nil {
+					return err
+				}
+				if zs.AdditionalProperties == nil {
+					zs.AdditionalProperties = make(map[string]interface{})
+				}
+				zs.AdditionalProperties[k] = additionalProperties
+			}
+		case "sourceRetryCount":
+			if v != nil {
+				var sourceRetryCount interface{}
+				err = json.Unmarshal(*v, &sourceRetryCount)
+				if err != nil {
+					return err
+				}
+				zs.SourceRetryCount = sourceRetryCount
+			}
+		case "sourceRetryWait":
+			if v != nil {
+				var sourceRetryWait interface{}
+				err = json.Unmarshal(*v, &sourceRetryWait)
+				if err != nil {
+					return err
+				}
+				zs.SourceRetryWait = sourceRetryWait
+			}
+		case "type":
+			if v != nil {
+				var typeVar TypeBasicCopySource
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				zs.Type = typeVar
+			}
+		}
+	}
+
+	return nil
 }
