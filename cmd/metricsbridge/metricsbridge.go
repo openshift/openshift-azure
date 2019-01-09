@@ -82,9 +82,13 @@ func (c *config) load(path string) error {
 	return nil
 }
 
-func (c *config) validate() (errs []error) {
+func (c *config) defaultAndValidate() (errs []error) {
+	if c.Interval == 0 {
+		c.Interval = time.Minute
+	}
+
 	if c.Interval < time.Second {
-		errs = append(errs, fmt.Errorf("intervalNanoseconds %q too small", c.Interval))
+		errs = append(errs, fmt.Errorf("intervalNanoseconds %q too small", int64(c.Interval)))
 	}
 	if _, err := url.Parse(c.PrometheusFederateEndpoint); err != nil {
 		errs = append(errs, fmt.Errorf("prometheusFederateEndpoint: %s", err))
@@ -137,13 +141,17 @@ func run(log *logrus.Entry, configpath string) error {
 		return err
 	}
 
-	if errs := c.validate(); len(errs) > 0 {
+	if errs := c.defaultAndValidate(); len(errs) > 0 {
 		var sb strings.Builder
 		for _, err := range errs {
 			sb.WriteString(err.Error())
 			sb.WriteByte('\n')
 		}
 		return errors.New(sb.String())
+	}
+
+	if c.Interval != time.Minute {
+		log.Warnf("intervalNanoseconds is set to %q.  It must be set to %q in production", int64(c.Interval), int64(time.Minute))
 	}
 
 	if err := c.init(); err != nil {

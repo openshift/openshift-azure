@@ -1,4 +1,4 @@
-intervalNanoseconds: 30000000000 # every 30 seconds
+# intervalNanoseconds: 10000000000 # every 10 seconds
 prometheusFederateEndpoint: https://prometheus-k8s.openshift-monitoring.svc:9091/federate
 statsdSocket: mdm_statsd.socket # nc -U -l mdm_statsd.socket
 series:
