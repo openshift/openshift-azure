@@ -31,5 +31,5 @@ data:
     </MonitoringManagement>
 kind: ConfigMap
 metadata:
-  name: mdsd-customerdata-config
+  name: mdsd-config
   namespace: openshift-azure-logging

@@ -38,7 +38,7 @@ spec:
         - name: MONITORING_GCS_ACCOUNT
           value: '*** GENERATED ***'
         image: '*** GENERATED ***'
-        name: mdsd-customerdata
+        name: mdsd
         resources:
           limits:
             cpu: 200m
@@ -51,11 +51,11 @@ spec:
           runAsUser: 0
         volumeMounts:
         - mountPath: /var/run/mdsd/
-          name: customerdata-mdsd-sockets
+          name: mdsd-sockets
         - mountPath: /etc/mdsd.d/secret
           name: gcs-cert
         - mountPath: /etc/mdsd.d/template
-          name: customerdata-mdsd-config
+          name: mdsd-config
       hostPID: true
       imagePullSecrets:
       - name: azure-registry
@@ -67,14 +67,14 @@ spec:
         operator: Exists
       volumes:
       - hostPath:
-          path: /var/run/customerDataMdsdContainer/
-        name: customerdata-mdsd-sockets
+          path: /var/run/mdsd/
+        name: mdsd-sockets
       - configMap:
           items:
           - key: mdsd.xml
             path: mdsd.xml
-          name: mdsd-customerdata-config
-        name: customerdata-mdsd-config
+          name: mdsd-config
+        name: mdsd-config
       - name: gcs-cert
         secret:
           items:

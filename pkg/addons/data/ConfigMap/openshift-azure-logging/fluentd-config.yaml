@@ -11,7 +11,7 @@ data:
     </source>
     <match journald>
       @type mdsd
-      djsonsocket /var/run/mdsdcustomerdata/default_djson.socket
+      djsonsocket /var/run/mdsd/default_djson.socket
       acktimeoutms 5000
       buffer_chunk_limit 1000k
       buffer_type file

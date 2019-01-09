@@ -43,8 +43,8 @@ spec:
           privileged: true
           runAsUser: 0
         volumeMounts:
-        - mountPath: /var/run/mdsdcustomerdata/
-          name: customerdata-mdsd-sockets
+        - mountPath: /var/run/mdsd/
+          name: mdsd-sockets
           readOnly: true
         - mountPath: /td-agent/config
           name: fluentd-config
@@ -61,8 +61,8 @@ spec:
         operator: Exists
       volumes:
       - hostPath:
-          path: /var/run/customerDataMdsdContainer/
-        name: customerdata-mdsd-sockets
+          path: /var/run/mdsd/
+        name: mdsd-sockets
       - hostPath:
           path: /var/log
         name: hostlog
