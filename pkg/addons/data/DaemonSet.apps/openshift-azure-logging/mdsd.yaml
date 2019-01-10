@@ -11,6 +11,8 @@ spec:
       app: mdsd-shard
   template:
     metadata:
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
       labels:
         app: mdsd-shard
     spec:
@@ -37,6 +39,13 @@ spec:
           value: '*** GENERATED ***'
         image: '*** GENERATED ***'
         name: mdsd-customerdata
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 200m
+            memory: 200Mi
         securityContext:
           privileged: true
           runAsUser: 0
