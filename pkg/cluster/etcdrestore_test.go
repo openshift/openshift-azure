@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"testing"
 
@@ -75,7 +76,9 @@ func TestEtcdRestore(t *testing.T) {
 
 	updateBlob := mock_storage.NewMockBlob(gmc)
 	updateCr.EXPECT().GetBlobReference(updateblob.UpdateContainerName).Return(updateBlob)
-
+	rc := ioutil.NopCloser(bytes.NewReader([]byte("{}")))
+	updateBlob.EXPECT().Get(nil).Return(rc, nil)
+	updateCr.EXPECT().GetBlobReference(updateblob.UpdateContainerName).Return(updateBlob)
 	updateBlob.EXPECT().CreateBlockBlobFromReader(bytes.NewReader([]byte("{}")), nil).Return(nil)
 
 	configCr := mock_storage.NewMockContainer(gmc)
