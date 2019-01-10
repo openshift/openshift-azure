@@ -98,7 +98,7 @@ type NetworkProfile struct {
 	VnetID *string `json:"vnetId,omitempty"`
 
 	// PeerVnetID (in, optional): ID of a Vnet with which the OSA cluster Vnet should be peered.
-	// If non-empty, this should match
+	// If specified, this should match
 	// `^/subscriptions/[^/]+
 	//   /resourceGroups/[^/]+
 	//   /providers/Microsoft.Network

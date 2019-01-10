@@ -460,8 +460,8 @@ func (v *Validator) validateNetworkProfile(np *NetworkProfile) (errs []error) {
 	if !isValidIPV4CIDR(np.VnetCIDR) {
 		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetCidr %q", np.VnetCIDR))
 	}
-	if np.PeerVnetID != "" && !rxVNetID.MatchString(np.PeerVnetID) {
-		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.peerVnetId %q", np.PeerVnetID))
+	if np.PeerVnetID != nil && !rxVNetID.MatchString(*np.PeerVnetID) {
+		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.peerVnetId %q", *np.PeerVnetID))
 	}
 	return
 }
