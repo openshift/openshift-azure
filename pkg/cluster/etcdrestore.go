@@ -23,7 +23,14 @@ func (u *simpleUpgrader) EtcdRestore(ctx context.Context, cs *api.OpenShiftManag
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
-	err = u.updateBlobService.Write(updateblob.NewUpdateBlob())
+	updateBlob, err := u.updateBlobService.Read()
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
+	}
+	// delete only the master entries from the blob in order to
+	// avoid unnecessary infra and compute rotations.
+	updateBlob.InstanceHashes = updateblob.InstanceHashes{}
+	err = u.updateBlobService.Write(updateBlob)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
 	}
