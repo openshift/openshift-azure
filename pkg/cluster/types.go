@@ -16,6 +16,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
+	"github.com/openshift/openshift-azure/pkg/cluster/scaler"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
@@ -52,6 +53,7 @@ type simpleUpgrader struct {
 	ssc               azureclient.VirtualMachineScaleSetsClient
 	kubeclient        kubeclient.Kubeclient
 	log               *logrus.Entry
+	scalerFactory     scaler.Factory
 	hasher            Hasher
 	rt                http.RoundTripper
 }
@@ -61,9 +63,10 @@ var _ Upgrader = &simpleUpgrader{}
 // NewSimpleUpgrader creates a new upgrader instance
 func NewSimpleUpgrader(log *logrus.Entry, pluginConfig *api.PluginConfig) Upgrader {
 	return &simpleUpgrader{
-		pluginConfig: *pluginConfig,
-		log:          log,
-		hasher:       &hasher{pluginConfig: *pluginConfig},
+		pluginConfig:  *pluginConfig,
+		log:           log,
+		scalerFactory: scaler.NewFactory(),
+		hasher:        &hasher{pluginConfig: *pluginConfig},
 	}
 }
 

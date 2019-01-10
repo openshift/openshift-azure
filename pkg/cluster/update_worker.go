@@ -88,21 +88,21 @@ func (u *simpleUpgrader) UpdateWorkerAgentPool(ctx context.Context, cs *api.Open
 		}
 	}
 
-	targetScaler := newWorkerScaler(u.log, u.ssc, u.vmc, u.kubeclient, cs.Properties.AzProfile.ResourceGroup, target)
+	targetScaler := u.scalerFactory.New(u.log, u.ssc, u.vmc, u.kubeclient, cs.Properties.AzProfile.ResourceGroup, target)
 
 	// One by one, get rid of instances in any "source" scalesets.  Clean scales
 	// should not hit this codepath.
 	for _, source := range sources {
-		sourceScaler := newWorkerScaler(u.log, u.ssc, u.vmc, u.kubeclient, cs.Properties.AzProfile.ResourceGroup, &source)
+		sourceScaler := u.scalerFactory.New(u.log, u.ssc, u.vmc, u.kubeclient, cs.Properties.AzProfile.ResourceGroup, &source)
 
 		for *source.Sku.Capacity > 0 {
 			if *target.Sku.Capacity < app.Count {
-				if err := targetScaler.scaleUp(ctx, *target.Sku.Capacity+1); err != nil {
+				if err := targetScaler.Scale(ctx, *target.Sku.Capacity+1); err != nil {
 					return err
 				}
 			}
 
-			if err := sourceScaler.scaleDown(ctx, *source.Sku.Capacity-1); err != nil {
+			if err := sourceScaler.Scale(ctx, *source.Sku.Capacity-1); err != nil {
 				return err
 			}
 		}
@@ -113,7 +113,7 @@ func (u *simpleUpgrader) UpdateWorkerAgentPool(ctx context.Context, cs *api.Open
 	}
 
 	// Finally, ensure our "target" scaleset is the right size.
-	return targetScaler.scale(ctx, app.Count)
+	return targetScaler.Scale(ctx, app.Count)
 }
 
 // createWorkerScaleSet creates a new scaleset to be our target.  For now, for
