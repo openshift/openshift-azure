@@ -525,9 +525,47 @@ func (v *Validator) validateProvisioningState(ps ProvisioningState) (errs []erro
 	return
 }
 
-func (v *Validator) validateUpdateConfig(internalConfig, adminConfig Config) (errs []error) {
-	if !reflect.DeepEqual(internalConfig, adminConfig) {
-		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(internalConfig, adminConfig)))
+func (v *Validator) validateUpdateConfig(newConfig, oldConfig Config) (errs []error) {
+	old := (&oldConfig).DeepCopy()
+
+	old.Certificates.ServiceSigningCa.Cert = newConfig.Certificates.ServiceSigningCa.Cert
+	old.Certificates.ServiceCatalogCa.Cert = newConfig.Certificates.ServiceCatalogCa.Cert
+	old.Certificates.FrontProxyCa.Cert = newConfig.Certificates.FrontProxyCa.Cert
+	old.Certificates.EtcdCa.Cert = newConfig.Certificates.EtcdCa.Cert
+	old.Certificates.Ca.Cert = newConfig.Certificates.Ca.Cert
+
+	old.Certificates.EtcdServer = newConfig.Certificates.EtcdServer
+	old.Certificates.EtcdPeer = newConfig.Certificates.EtcdPeer
+	old.Certificates.EtcdClient = newConfig.Certificates.EtcdClient
+	old.Certificates.MasterServer = newConfig.Certificates.MasterServer
+	old.Certificates.OpenShiftConsole = newConfig.Certificates.OpenShiftConsole
+	old.Certificates.Admin = newConfig.Certificates.Admin
+	old.Certificates.AggregatorFrontProxy = newConfig.Certificates.AggregatorFrontProxy
+	old.Certificates.MasterKubeletClient = newConfig.Certificates.MasterKubeletClient
+	old.Certificates.MasterProxyClient = newConfig.Certificates.MasterProxyClient
+	old.Certificates.OpenShiftMaster = newConfig.Certificates.OpenShiftMaster
+	old.Certificates.NodeBootstrap = newConfig.Certificates.NodeBootstrap
+	old.Certificates.Registry = newConfig.Certificates.Registry
+	old.Certificates.Router = newConfig.Certificates.Router
+	old.Certificates.ServiceCatalogServer = newConfig.Certificates.ServiceCatalogServer
+	old.Certificates.ServiceCatalogAPIClient = newConfig.Certificates.ServiceCatalogAPIClient
+	old.Certificates.AzureClusterReader = newConfig.Certificates.AzureClusterReader
+	old.Certificates.GenevaLogging = newConfig.Certificates.GenevaLogging
+	old.Certificates.GenevaMetrics = newConfig.Certificates.GenevaMetrics
+
+	old.SSHKey = newConfig.SSHKey
+	old.RegistryHTTPSecret = newConfig.RegistryHTTPSecret
+	old.RegistryConsoleOAuthSecret = newConfig.RegistryConsoleOAuthSecret
+	old.ConsoleOAuthSecret = newConfig.ConsoleOAuthSecret
+	old.AlertManagerProxySessionSecret = newConfig.AlertManagerProxySessionSecret
+	old.AlertsProxySessionSecret = newConfig.AlertsProxySessionSecret
+	old.PrometheusProxySessionSecret = newConfig.PrometheusProxySessionSecret
+	old.SessionSecretAuth = newConfig.SessionSecretAuth
+	old.SessionSecretEnc = newConfig.SessionSecretEnc
+	old.Images.GenevaImagePullSecret = newConfig.Images.GenevaImagePullSecret
+
+	if !reflect.DeepEqual(newConfig, *old) {
+		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(newConfig, *old)))
 	}
 	return
 }
