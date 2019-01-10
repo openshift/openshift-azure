@@ -582,6 +582,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		vmss.VirtualMachineProfile.StorageProfile.DataDisks = &[]compute.VirtualMachineScaleSetDataDisk{
 			{
 				Lun:          to.Int32Ptr(0),
+				Caching:      compute.CachingTypesReadOnly,
 				CreateOption: compute.DiskCreateOptionTypesEmpty,
 				DiskSizeGB:   to.Int32Ptr(32),
 			},
