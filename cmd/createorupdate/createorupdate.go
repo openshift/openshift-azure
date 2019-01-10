@@ -43,18 +43,26 @@ var (
 	method  = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
 	useProd = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
 	timeout = flag.Duration("timeout", 30*time.Minute, "Timeout of the request to the OpenShift resource provider.")
-	// if set, use the admin api to send this request
-	adminManifest = flag.String("admin-manifest", "", "If set, use the admin API to send this request.")
+
+	adminManifest   = flag.String("admin-manifest", "", "If set, use the admin API to send this request.")
+	restoreFromBlob = flag.String("restore-from-blob", "", "If set, request a restore of the cluster from the provided blob name.")
 )
 
 func validate() error {
-	switch strings.ToUpper(*method) {
+	m := strings.ToUpper(*method)
+	switch m {
 	case http.MethodPut, http.MethodDelete:
 	default:
 		return fmt.Errorf("invalid request: %s, Supported methods are PUT and DELETE", strings.ToUpper(*method))
 	}
 	if *adminManifest != "" && *useProd {
 		return errors.New("sending requests to the Admin API is not supported yet in the production RP")
+	}
+	if *restoreFromBlob != "" && *useProd {
+		return errors.New("restoring clusters is not supported yet in the production RP")
+	}
+	if *restoreFromBlob != "" && m == http.MethodDelete {
+		return errors.New("cannot restore a cluster while requesting a DELETE?")
 	}
 	return nil
 }
@@ -257,6 +265,25 @@ func main() {
 			log.Fatal(err)
 		}
 		return
+	}
+
+	if *restoreFromBlob != "" {
+		err = wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
+			resp, err := adminClient.RestoreAndWait(ctx, conf.ResourceGroup, conf.ResourceGroup, *restoreFromBlob)
+			if isConnectionRefused(err) {
+				return false, nil
+			}
+			if err != nil {
+				return false, err
+			}
+			if resp.StatusCode != http.StatusOK {
+				return false, fmt.Errorf("expected 200 OK, got %v", resp.Status)
+			}
+			return true, nil
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	if !shared.IsUpdate() {

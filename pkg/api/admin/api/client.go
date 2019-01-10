@@ -319,6 +319,97 @@ func (client OpenShiftManagedClustersClient) GetResponder(resp *http.Response) (
 	return
 }
 
+// RestoreAndWait restores an openshift managed cluster and waits for the
+// request to complete before returning.
+func (client OpenShiftManagedClustersClient) RestoreAndWait(ctx context.Context, resourceGroupName, resourceName string, blobName string) (result autorest.Response, err error) {
+	var future OpenShiftManagedClustersRestoreFuture
+	future, err = client.Restore(ctx, resourceGroupName, resourceName, blobName)
+	if err != nil {
+		return
+	}
+	if err = future.WaitForCompletionRef(ctx, client.Client); err != nil {
+		return
+	}
+	return future.Result(client)
+}
+
+// Restore restores an openshift managed cluster with the specified configuration for agents and
+// OpenShift version.
+// Parameters:
+// resourceGroupName - the name of the resource group.
+// resourceName - the name of the openshift managed cluster resource.
+// blobName - the name of the blob from where to restore the cluster.
+func (client OpenShiftManagedClustersClient) Restore(ctx context.Context, resourceGroupName, resourceName, blobName string) (result OpenShiftManagedClustersRestoreFuture, err error) {
+	if blobName == "" {
+		return result, validation.NewError("containerservice.OpenShiftManagedClustersClient", "Restore", "blob name cannot be empty")
+	}
+
+	req, err := client.RestorePreparer(ctx, resourceGroupName, resourceName, blobName)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "Restore", nil, "Failure preparing request")
+		return
+	}
+
+	result, err = client.RestoreSender(req)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "Restore", result.Response(), "Failure sending request")
+		return
+	}
+
+	return
+}
+
+// RestorePreparer prepares the Restore request.
+func (client OpenShiftManagedClustersClient) RestorePreparer(ctx context.Context, resourceGroupName string, resourceName string, blobName string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsContentType("application/json; charset=utf-8"),
+		autorest.AsPut(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/restore", pathParameters),
+		autorest.WithJSON(blobName),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// RestoreSender sends the Restore request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) RestoreSender(req *http.Request) (future OpenShiftManagedClustersRestoreFuture, err error) {
+	var resp *http.Response
+	resp, err = autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+	if err != nil {
+		return
+	}
+	err = autorest.Respond(resp, azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusCreated))
+	if err != nil {
+		return
+	}
+	future.Future, err = azure.NewFutureFromResponse(resp)
+	return
+}
+
+// RestoreResponder handles the response to the Restore request. The method always
+// closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) RestoreResponder(resp *http.Response) (result autorest.Response, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
+		autorest.ByClosing())
+	result.Response = resp
+	return
+}
+
 // UpdateTags updates an openshift managed cluster with the specified tags.
 // Parameters:
 // resourceGroupName - the name of the resource group.
@@ -438,6 +529,29 @@ func (future *OpenShiftManagedClustersDeleteFuture) Result(client OpenShiftManag
 	}
 	if !done {
 		err = azure.NewAsyncOpIncompleteError("containerservice.OpenShiftManagedClustersDeleteFuture")
+		return
+	}
+	ar.Response = future.Response()
+	return
+}
+
+// OpenShiftManagedClustersRestoreFuture an abstraction for monitoring and retrieving the results of a
+// long-running operation.
+type OpenShiftManagedClustersRestoreFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *OpenShiftManagedClustersRestoreFuture) Result(client OpenShiftManagedClustersClient) (ar autorest.Response, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersRestoreFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("containerservice.OpenShiftManagedClustersRestoreFuture")
 		return
 	}
 	ar.Response = future.Response()

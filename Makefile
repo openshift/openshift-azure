@@ -1,13 +1,13 @@
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain --ignored) = "" ]] && echo -clean || echo -dirty)
 
 # all is the default target to build everything
-all: clean build azure-controllers etcdbackup sync recoveretcdcluster metricsbridge e2e-bin
+all: clean build azure-controllers etcdbackup sync metricsbridge e2e-bin
 
 build: generate
 	go build ./...
 
 clean:
-	rm -f coverage.out azure-controllers etcdbackup sync recoveretcdcluster metricsbridge e2e
+	rm -f coverage.out azure-controllers etcdbackup sync metricsbridge e2e
 
 test: unit e2e
 
