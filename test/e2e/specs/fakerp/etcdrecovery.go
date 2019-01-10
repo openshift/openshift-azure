@@ -78,7 +78,13 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cm1.Data).To(HaveKeyWithValue("value", "before-backup"))
 
-		By("Run an etcd backup")
+		backupImage := "quay.io/openshift-on-azure/etcdbackup:latest"
+		// Enable backup code PR testing with the ETCDBACKUP_IMAGE variable.
+		if os.Getenv("ETCDBACKUP_IMAGE") != "" {
+			backupImage = os.Getenv("ETCDBACKUP_IMAGE")
+		}
+
+		By(fmt.Sprintf("Run an etcd backup using %s", backupImage))
 		bk, err := admincli.BatchV1.Jobs("openshift-etcd").Create(&batchv1.Job{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "e2e-test-etcdbackup",
@@ -93,7 +99,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 						Containers: []v1.Container{
 							{
 								Name:            "etcdbackup",
-								Image:           "quay.io/openshift-on-azure/etcdbackup:latest",
+								Image:           backupImage,
 								ImagePullPolicy: "Always",
 								Args:            []string{fmt.Sprintf("-blobname=%s", backup), "save"},
 								VolumeMounts: []v1.VolumeMount{
