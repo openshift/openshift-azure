@@ -76,7 +76,8 @@ func (s *Server) Run() {
 	s.router.Delete(filepath.Join("/admin", s.basePath), s.handleDelete)
 	s.router.Get(filepath.Join("/admin", s.basePath), s.handleGet)
 	s.router.Put(filepath.Join("/admin", s.basePath), s.handlePut)
-	s.router.Put(filepath.Join("/admin", s.basePath, "restore"), s.handleRestore)
+	s.router.Put(filepath.Join("/admin", s.basePath, "/restore"), s.handleRestore)
+	s.router.Put(filepath.Join("/admin", s.basePath, "/rotate/secrets"), s.handleRotateSecrets)
 
 	s.log.Infof("starting server on %s", s.address)
 	s.log.WithError(http.ListenAndServe(s.address, s.router)).Warn("Server exited.")
