@@ -412,6 +412,91 @@ func (client OpenShiftManagedClustersClient) RestoreResponder(resp *http.Respons
 	return
 }
 
+// RotateSecretsAndWait rotates the keys of an openshift managed cluster and waits
+// for the request to complete before returning.
+func (client OpenShiftManagedClustersClient) RotateSecretsAndWait(ctx context.Context, resourceGroupName, resourceName string) (result autorest.Response, err error) {
+	var future OpenShiftManagedClustersRotateSecretsFuture
+	future, err = client.RotateSecrets(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		return
+	}
+	if err = future.WaitForCompletionRef(ctx, client.Client); err != nil {
+		return
+	}
+	return future.Result(client)
+}
+
+// RotateSecrets rotates the secrets of an openshift managed cluster with the specified
+// configuration for agents and OpenShift version.
+// Parameters:
+// resourceGroupName - the name of the resource group.
+// resourceName - the name of the openshift managed cluster resource.
+func (client OpenShiftManagedClustersClient) RotateSecrets(ctx context.Context, resourceGroupName, resourceName string) (result OpenShiftManagedClustersRotateSecretsFuture, err error) {
+	req, err := client.RotateSecretsPreparer(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "RotateSecrets", nil, "Failure preparing request")
+		return
+	}
+
+	result, err = client.RotateSecretsSender(req)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "RotateSecrets", result.Response(), "Failure sending request")
+		return
+	}
+
+	return
+}
+
+// RotateSecretsPreparer prepares the secrets rotation request.
+func (client OpenShiftManagedClustersClient) RotateSecretsPreparer(ctx context.Context, resourceGroupName string, resourceName string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": api.APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsContentType("application/json; charset=utf-8"),
+		autorest.AsPut(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/rotate/secrets", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// RotateSecretsSender sends the secrets rotation request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) RotateSecretsSender(req *http.Request) (future OpenShiftManagedClustersRotateSecretsFuture, err error) {
+	var resp *http.Response
+	resp, err = autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+	if err != nil {
+		return
+	}
+	err = autorest.Respond(resp, azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusCreated))
+	if err != nil {
+		return
+	}
+	future.Future, err = azure.NewFutureFromResponse(resp)
+	return
+}
+
+// RotateSecretsResponder handles the response to the secrets rotation request. The method
+// always closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) RotateSecretsResponder(resp *http.Response) (result autorest.Response, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
+		autorest.ByClosing())
+	result.Response = resp
+	return
+}
+
 // UpdateTags updates an openshift managed cluster with the specified tags.
 // Parameters:
 // resourceGroupName - the name of the resource group.
@@ -554,6 +639,29 @@ func (future *OpenShiftManagedClustersRestoreFuture) Result(client OpenShiftMana
 	}
 	if !done {
 		err = azure.NewAsyncOpIncompleteError("containerservice.OpenShiftManagedClustersRestoreFuture")
+		return
+	}
+	ar.Response = future.Response()
+	return
+}
+
+// OpenShiftManagedClustersRotateSecretsFuture an abstraction for monitoring and retrieving the results of a
+// long-running key rotation operation.
+type OpenShiftManagedClustersRotateSecretsFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *OpenShiftManagedClustersRotateSecretsFuture) Result(client OpenShiftManagedClustersClient) (ar autorest.Response, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersKeyRotationFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("containerservice.OpenShiftManagedClustersKeyRotationFuture")
 		return
 	}
 	ar.Response = future.Response()
