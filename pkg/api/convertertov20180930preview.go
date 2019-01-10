@@ -37,7 +37,7 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 
 	oc.Properties.NetworkProfile = &v20180930preview.NetworkProfile{
 		VnetCIDR:   &cs.Properties.NetworkProfile.VnetCIDR,
-		PeerVnetID: &cs.Properties.NetworkProfile.PeerVnetID,
+		PeerVnetID: cs.Properties.NetworkProfile.PeerVnetID,
 	}
 
 	oc.Properties.RouterProfiles = make([]v20180930preview.RouterProfile, len(cs.Properties.RouterProfiles))

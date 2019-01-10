@@ -93,7 +93,7 @@ type NetworkProfile struct {
 	//   /resourceGroups/[^/]+
 	//   /providers/Microsoft.Network
 	//   /virtualNetworks/[^/]+$`
-	PeerVnetID string `json:"peerVnetId,omitempty"`
+	PeerVnetID *string `json:"peerVnetId,omitempty"`
 }
 
 // RouterProfile represents an OpenShift router.
