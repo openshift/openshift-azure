@@ -26,6 +26,8 @@ import (
 	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	v20180930previewclient "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2018-09-30-preview"
+	adminclient "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
 )
 
 const (
@@ -67,7 +69,7 @@ func validate() error {
 	return nil
 }
 
-func delete(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShiftManagedClustersClient, resourceGroup string, noWait bool) error {
+func delete(ctx context.Context, log *logrus.Entry, rpc v20180930previewclient.OpenShiftManagedClustersClient, resourceGroup string, noWait bool) error {
 	log.Info("deleting cluster")
 	future, err := rpc.Delete(ctx, resourceGroup, resourceGroup)
 	if err != nil {
@@ -85,7 +87,7 @@ func delete(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShi
 	return nil
 }
 
-func createOrUpdatev20180930preview(ctx context.Context, log *logrus.Entry, rpc v20180930preview.OpenShiftManagedClustersClient, resourceGroup string, oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) error {
+func createOrUpdatev20180930preview(ctx context.Context, log *logrus.Entry, rpc v20180930previewclient.OpenShiftManagedClustersClient, resourceGroup string, oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) error {
 	log.Info("creating/updating cluster")
 	resp, err := rpc.CreateOrUpdateAndWait(ctx, resourceGroup, resourceGroup, *oc)
 	if err != nil {
@@ -98,7 +100,7 @@ func createOrUpdatev20180930preview(ctx context.Context, log *logrus.Entry, rpc 
 	return fakerp.WriteClusterConfigToManifest(&resp, manifestFile)
 }
 
-func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, rpc admin.OpenShiftManagedClustersClient, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) error {
+func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, rpc adminclient.OpenShiftManagedClustersClient, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) error {
 	log.Info("creating/updating cluster")
 	if oc.Properties != nil {
 		oc.Properties.ProvisioningState = nil
@@ -121,8 +123,8 @@ func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, rpc admin.OpenS
 func execute(
 	ctx context.Context,
 	log *logrus.Entry,
-	ac admin.OpenShiftManagedClustersClient,
-	rpc v20180930preview.OpenShiftManagedClustersClient,
+	ac adminclient.OpenShiftManagedClustersClient,
+	rpc v20180930previewclient.OpenShiftManagedClustersClient,
 	conf *fakerp.Config,
 	adminManifest string,
 ) error {
@@ -235,14 +237,14 @@ func main() {
 	}
 
 	// simulate the RP
-	rpURL := v20180930preview.DefaultBaseURI
+	rpURL := v20180930previewclient.DefaultBaseURI
 	if !*useProd {
 		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
 	}
 
 	// setup the osa clients
-	adminClient := admin.NewOpenShiftManagedClustersClientWithBaseURI(rpURL+shared.AdminContext, conf.SubscriptionID)
-	v20180930previewClient := v20180930preview.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
+	adminClient := adminclient.NewOpenShiftManagedClustersClientWithBaseURI(rpURL+shared.AdminContext, conf.SubscriptionID)
+	v20180930previewClient := v20180930previewclient.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
 	if err != nil {
 		log.Fatal(err)
