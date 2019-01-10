@@ -1,12 +1,11 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   labels:
     docker-registry: default
   name: docker-registry
   namespace: default
 spec:
-  replicas: 2
   selector:
     matchLabels:
       docker-registry: default

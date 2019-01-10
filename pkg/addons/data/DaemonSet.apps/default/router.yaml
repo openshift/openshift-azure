@@ -1,12 +1,11 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   labels:
     router: router
   name: router
   namespace: default
 spec:
-  replicas: 2
   selector:
     matchLabels:
       router: router

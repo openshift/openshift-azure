@@ -14,14 +14,6 @@ var deploymentWhitelist = []struct {
 	Namespace string
 }{
 	{
-		Name:      "docker-registry",
-		Namespace: "default",
-	},
-	{
-		Name:      "router",
-		Namespace: "default",
-	},
-	{
 		Name:      "registry-console",
 		Namespace: "default",
 	},
@@ -47,6 +39,14 @@ var daemonsetWhitelist = []struct {
 	Name      string
 	Namespace string
 }{
+	{
+		Name:      "docker-registry",
+		Namespace: "default",
+	},
+	{
+		Name:      "router",
+		Namespace: "default",
+	},
 	{
 		Name:      "sync",
 		Namespace: "openshift-node",
