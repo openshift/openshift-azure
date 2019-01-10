@@ -90,9 +90,7 @@ func mergePropertiesAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManage
 		if oc.Properties.NetworkProfile.VnetCIDR != nil {
 			cs.Properties.NetworkProfile.VnetCIDR = *oc.Properties.NetworkProfile.VnetCIDR
 		}
-		if oc.Properties.NetworkProfile.PeerVnetID != nil {
-			cs.Properties.NetworkProfile.PeerVnetID = *oc.Properties.NetworkProfile.PeerVnetID
-		}
+		cs.Properties.NetworkProfile.PeerVnetID = oc.Properties.NetworkProfile.PeerVnetID
 	}
 
 	if err := mergeRouterProfilesAdmin(oc, cs); err != nil {

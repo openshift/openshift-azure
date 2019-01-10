@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
@@ -192,14 +193,19 @@ func TestValidate(t *testing.T) {
 				errors.New(`invalid properties.agentPoolProfiles["mycompute"].subnetCidr "10.0.0.0/24": not contained in properties.networkProfile.vnetCidr "192.168.0.0/16"`),
 			},
 		},
+		"network profile nil peerVnetId": {
+			f: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.NetworkProfile.PeerVnetID = nil
+			},
+		},
 		"network profile valid peerVnetId": {
 			f: func(oc *OpenShiftManagedCluster) {
-				oc.Properties.NetworkProfile.PeerVnetID = "/subscriptions/b07e8fae-2f3f-4769-8fa8-8570b426ba13/resourceGroups/test/providers/Microsoft.Network/virtualNetworks/vnet"
+				oc.Properties.NetworkProfile.PeerVnetID = to.StringPtr("/subscriptions/b07e8fae-2f3f-4769-8fa8-8570b426ba13/resourceGroups/test/providers/Microsoft.Network/virtualNetworks/vnet")
 			},
 		},
 		"network profile invalid peerVnetId": {
 			f: func(oc *OpenShiftManagedCluster) {
-				oc.Properties.NetworkProfile.PeerVnetID = "foo"
+				oc.Properties.NetworkProfile.PeerVnetID = to.StringPtr("foo")
 			},
 			expectedErrs: []error{errors.New(`invalid properties.networkProfile.peerVnetId "foo"`)},
 		},

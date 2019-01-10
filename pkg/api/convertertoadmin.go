@@ -37,7 +37,7 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 	oc.Properties.NetworkProfile = &admin.NetworkProfile{
 		VnetID:     &cs.Properties.NetworkProfile.VnetID,
 		VnetCIDR:   &cs.Properties.NetworkProfile.VnetCIDR,
-		PeerVnetID: &cs.Properties.NetworkProfile.PeerVnetID,
+		PeerVnetID: cs.Properties.NetworkProfile.PeerVnetID,
 	}
 
 	oc.Properties.RouterProfiles = make([]admin.RouterProfile, len(cs.Properties.RouterProfiles))

@@ -76,7 +76,7 @@ func internalManagedCluster() *OpenShiftManagedCluster {
 			NetworkProfile: NetworkProfile{
 				VnetID:     "Properties.NetworkProfile.VnetID",
 				VnetCIDR:   "Properties.NetworkProfile.VnetCIDR",
-				PeerVnetID: "Properties.NetworkProfile.PeerVnetID",
+				PeerVnetID: to.StringPtr("Properties.NetworkProfile.PeerVnetID"),
 			},
 			AgentPoolProfiles: []AgentPoolProfile{
 				{
