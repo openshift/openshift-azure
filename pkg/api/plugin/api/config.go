@@ -23,8 +23,10 @@ type Config struct {
 	GenevaLoggingAccount string `json:"genevaLoggingAccount,omitempty"`
 	// Geneva Metrics System (MDM) logging namespace
 	GenevaLoggingNamespace string `json:"genevaLoggingNamespace,omitempty"`
-	// Geneva Metrics System (MDM) logging control plane account
-	GenevaLoggingControlPlaneAccount string `json:"genevaLoggingControlPlaneAccount,omitempty"`
+	// Geneva Metrics System (MDM) logging control plane parameters
+	GenevaLoggingControlPlaneAccount     string `json:"genevaLoggingControlPlaneAccount,omitempty"`
+	GenevaLoggingControlPlaneEnvironment string `json:"genevaLoggingControlPlaneEnvironment,omitempty"`
+	GenevaLoggingControlPlaneRegion      string `json:"genevaLoggingControlPlaneRegion,omitempty"`
 	// Geneva Metrics System (MDM) account name for metrics
 	GenevaMetricsAccount string `json:"genevaMetricsAccount,omitempty"`
 	// Geneva Metrics System (MDM) endpoint for metrics

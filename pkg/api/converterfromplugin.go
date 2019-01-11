@@ -24,6 +24,8 @@ func ConvertFromPlugin(in *plugin.Config, old *Config) *Config {
 	cs.GenevaMetricsAccount = in.GenevaMetricsAccount
 	cs.GenevaMetricsEndpoint = in.GenevaMetricsEndpoint
 	cs.GenevaLoggingControlPlaneAccount = in.GenevaLoggingControlPlaneAccount
+	cs.GenevaLoggingControlPlaneEnvironment = in.GenevaLoggingControlPlaneEnvironment
+	cs.GenevaLoggingControlPlaneRegion = in.GenevaLoggingControlPlaneRegion
 	cs.Certificates.GenevaLogging.Cert = in.Certificates.GenevaLogging.Cert
 	cs.Certificates.GenevaLogging.Key = in.Certificates.GenevaLogging.Key
 	cs.Certificates.GenevaMetrics.Cert = in.Certificates.GenevaMetrics.Cert
