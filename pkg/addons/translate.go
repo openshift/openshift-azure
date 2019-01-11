@@ -409,7 +409,7 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.TemplateServiceBroker }}",
 		},
 	},
-	"Deployment.apps/default/docker-registry": {
+	"DaemonSet.apps/default/docker-registry": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HTTP_SECRET')].value"),
 			Template: "{{ Base64Encode .Config.RegistryHTTPSecret }}",
@@ -421,6 +421,16 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.initContainers[0].env[?(@.name='REGISTRY_STORAGE_ACCOUNT_NAME')].value"),
 			Template: "{{ .Config.RegistryStorageAccount }}",
+		},
+	},
+	"DaemonSet.apps/default/router": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.Router }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='STATS_PASSWORD')].value"),
+			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
 	"Deployment.apps/default/registry-console": {
@@ -435,16 +445,6 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.RegistryConsole }}",
-		},
-	},
-	"Deployment.apps/default/router": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.Router }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='STATS_PASSWORD')].value"),
-			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
 	"Deployment.apps/openshift-ansible-service-broker/asb": {

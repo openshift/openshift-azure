@@ -1,12 +1,11 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   labels:
     docker-registry: default
   name: docker-registry
   namespace: default
 spec:
-  replicas: 2
   selector:
     matchLabels:
       docker-registry: default
@@ -19,16 +18,6 @@ spec:
       labels:
         docker-registry: default
     spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: docker-registry
-                operator: In
-                values:
-                - default
-            topologyKey: kubernetes.io/hostname
       containers:
       - env:
         - name: REGISTRY_HTTP_ADDR
