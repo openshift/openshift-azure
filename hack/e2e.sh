@@ -25,6 +25,7 @@ fi
 if [[ "$FOCUS" == *"\[Fake\]"* ]]; then
     go generate ./...
     go run cmd/fakerp/main.go &
+    while [[ "$(curl -s -o /dev/null -w '%{http_code}' localhost:8080)" == "000" ]]; do sleep 2; done
 fi
 
 go test \
