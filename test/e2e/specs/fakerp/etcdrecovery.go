@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -17,8 +16,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/randomstring"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
@@ -67,11 +64,6 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		if resourceGroup == "" {
 			Expect(errors.New("RESOURCEGROUP is not set")).NotTo(BeNil())
 		}
-		dataDir, err := shared.FindDirectory(shared.DataDirectory)
-		Expect(err).NotTo(HaveOccurred())
-		cs, err := managedcluster.ReadConfig(path.Join(dataDir, "containerservice.yaml"))
-		Expect(cs).NotTo(BeNil())
-		cs.Properties.ProvisioningState = ""
 
 		By("Create a test configmap with value=first")
 		cm1, err := cli.CoreV1.ConfigMaps(namespace).Create(&v1.ConfigMap{
@@ -86,7 +78,13 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cm1.Data).To(HaveKeyWithValue("value", "before-backup"))
 
-		By("Run an etcd backup")
+		backupImage := "quay.io/openshift-on-azure/etcdbackup:latest"
+		// Enable backup code PR testing with the ETCDBACKUP_IMAGE variable.
+		if os.Getenv("ETCDBACKUP_IMAGE") != "" {
+			backupImage = os.Getenv("ETCDBACKUP_IMAGE")
+		}
+
+		By(fmt.Sprintf("Run an etcd backup using %s", backupImage))
 		bk, err := admincli.BatchV1.Jobs("openshift-etcd").Create(&batchv1.Job{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "e2e-test-etcdbackup",
@@ -101,7 +99,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 						Containers: []v1.Container{
 							{
 								Name:            "etcdbackup",
-								Image:           cs.Config.Images.EtcdBackup,
+								Image:           backupImage,
 								ImagePullPolicy: "Always",
 								Args:            []string{fmt.Sprintf("-blobname=%s", backup), "save"},
 								VolumeMounts: []v1.VolumeMount{

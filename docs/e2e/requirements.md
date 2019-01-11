@@ -64,8 +64,3 @@ The key rotation up/down e2e test accepts two flags for customizing its function
 * `configBlob`: Path to an internal config blob for the cluster in question (default: `_data/containerservice.yaml`)
 
 These flags are required for any test focus which includes the key rotation test.
-
-##### Etcd Recovery
-The etcd recovery e2e test depends on the following file for its functionality. This is currently not configurable
-
-* `_data/containerservice.yaml`: Path to an internal config blob for the cluster in question
