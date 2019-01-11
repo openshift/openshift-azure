@@ -3,6 +3,7 @@ package plugin
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	validate "github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
+	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
@@ -23,6 +25,7 @@ type plugin struct {
 	clusterUpgrader cluster.Upgrader
 	armGenerator    arm.Generator
 	configGenerator config.Generator
+	kubeclient      kubeclient.Kubeclient
 }
 
 var _ api.Plugin = &plugin{}
@@ -213,4 +216,27 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 		return err
 	}
 	return nil
+}
+
+func (p *plugin) initialize(ctx context.Context, oc *api.OpenShiftManagedCluster) error {
+	var err error
+	if p.kubeclient == nil {
+		p.kubeclient, err = kubeclient.NewKubeclient(p.log, oc.Config.AdminKubeconfig, &p.config)
+	}
+	return err
+}
+
+func (p *plugin) GetControlPlanePods(ctx context.Context, oc *api.OpenShiftManagedCluster) ([]byte, error) {
+	p.log.Info("generating admin kubeclient")
+	err := p.initialize(ctx, oc)
+	if err != nil {
+		return nil, err
+	}
+
+	p.log.Infof("querying control plane pods")
+	pods, err := p.kubeclient.GetControlPlanePods(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(pods)
 }

@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/sirupsen/logrus"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
@@ -22,6 +23,7 @@ import (
 type Kubeclient interface {
 	DrainAndDeleteWorker(ctx context.Context, computerName ComputerName) error
 	DeleteMaster(computerName ComputerName) error
+	GetControlPlanePods(ctx context.Context) ([]corev1.Pod, error)
 	WaitForInfraServices(ctx context.Context) *api.PluginError
 	WaitForReadyMaster(ctx context.Context, computerName ComputerName) error
 	WaitForReadyWorker(ctx context.Context, computerName ComputerName) error

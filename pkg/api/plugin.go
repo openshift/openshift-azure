@@ -115,4 +115,7 @@ type Plugin interface {
 
 	// RotateClusterSecrets rotates the secrets in a cluster's config blob and then updates the cluster
 	RotateClusterSecrets(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn, template *plugin.Config) *PluginError
+
+	// GetControlPlanePods fetches a consolidated list of the control plane pods in the cluster
+	GetControlPlanePods(ctx context.Context, oc *OpenShiftManagedCluster) ([]byte, error)
 }
