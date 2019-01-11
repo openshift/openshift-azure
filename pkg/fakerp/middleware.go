@@ -6,7 +6,7 @@ import (
 
 func (s *Server) logger(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s.log.Debugf("%s %s %s", r.RemoteAddr, r.Method, r.URL)
+		s.log.Debugf("%s %s %s (%s)", r.RemoteAddr, r.Method, r.URL, r.UserAgent())
 		handler.ServeHTTP(w, r)
 	})
 }
@@ -24,6 +24,10 @@ func (s *Server) validator(handler http.Handler) http.Handler {
 				http.Error(w, resp, http.StatusLocked)
 				return
 			}
+			defer func() {
+				// drain once we are done processing this request
+				<-s.inProgress
+			}()
 		}
 		handler.ServeHTTP(w, r)
 	})
