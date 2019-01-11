@@ -11,11 +11,6 @@ import (
 
 // handleRotateSecrets handles admin requests for the rotation of cluster secrets
 func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
-	defer func() {
-		// drain once we are done processing this request
-		<-s.inProgress
-	}()
-
 	cs := s.read()
 	if cs == nil {
 		s.internalError(w, "Failed to read the internal config")
