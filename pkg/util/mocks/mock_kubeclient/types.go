@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	v1 "k8s.io/api/core/v1"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
 	kubeclient "github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
@@ -63,6 +64,21 @@ func (m *MockKubeclient) DrainAndDeleteWorker(arg0 context.Context, arg1 kubecli
 func (mr *MockKubeclientMockRecorder) DrainAndDeleteWorker(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DrainAndDeleteWorker", reflect.TypeOf((*MockKubeclient)(nil).DrainAndDeleteWorker), arg0, arg1)
+}
+
+// GetControlPlanePods mocks base method
+func (m *MockKubeclient) GetControlPlanePods(arg0 context.Context) ([]v1.Pod, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetControlPlanePods", arg0)
+	ret0, _ := ret[0].([]v1.Pod)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetControlPlanePods indicates an expected call of GetControlPlanePods
+func (mr *MockKubeclientMockRecorder) GetControlPlanePods(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetControlPlanePods", reflect.TypeOf((*MockKubeclient)(nil).GetControlPlanePods), arg0)
 }
 
 // WaitForInfraServices mocks base method
