@@ -7,14 +7,11 @@ data:
             <Account moniker="_ACCOUNT_" isDefault="true" autoKey="false" />
         </Accounts>
         <Management eventVolume="Large" defaultRetentionInDays="90" >
-            <Identity tenantNameAlias="RPTenant" roleNameAlias="Service" roleInstanceNameAlias="Host">
-                <IdentityComponent name="RPSector">_SECTOR_</IdentityComponent>
-                <IdentityComponent name="RPTenant">_REGION_</IdentityComponent>
-                <IdentityComponent name="Service">OSA</IdentityComponent>
-                <IdentityComponent name="Host" useComputerName="true" />
+            <Identity tenantNameAlias="ResourceName" roleNameAlias="ResourceGroupName" roleInstanceNameAlias="SubscriptionId">
+                <IdentityComponent name="Region">_REGION_</IdentityComponent>
                 <IdentityComponent name="SubscriptionId">_SUBSCRIPTIONID_</IdentityComponent>
-                <IdentityComponent name="ResourceName">_RESOURCENAME_</IdentityComponent>
                 <IdentityComponent name="ResourceGroupName">_RESOURCEGROUPNAME_</IdentityComponent>
+                <IdentityComponent name="ResourceName">_RESOURCENAME_</IdentityComponent>
             </Identity>
             <AgentResourceUsage diskQuotaInMB="50000" />
         </Management>

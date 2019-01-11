@@ -246,6 +246,11 @@ var Translations = map[string][]struct {
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.resourceName"),
+			Template:   "{{ .ContainerService.Name }}",
+		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.subscriptionId"),
 			Template:   "{{ .ContainerService.Properties.AzProfile.SubscriptionID }}",
 		},
@@ -351,10 +356,6 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.GenevaLogging }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='SECTOR')].value"),
-			Template: "{{ .Config.GenevaLoggingSector }}",
-		},
-		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='REGION')].value"),
 			Template: "{{ .ContainerService.Location }}",
 		},
@@ -363,12 +364,12 @@ var Translations = map[string][]struct {
 			Template: "{{ .ContainerService.Properties.AzProfile.SubscriptionID }}",
 		},
 		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='RESOURCE_NAME')].value"),
-			Template: "{{ .ContainerService.Name }}",
-		},
-		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='RESOURCE_GROUP_NAME')].value"),
 			Template: "{{ .ContainerService.Properties.AzProfile.ResourceGroup }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='RESOURCE_NAME')].value"),
+			Template: "{{ .ContainerService.Name }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='ACCOUNT')].value"),
@@ -381,6 +382,14 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='MONITORING_GCS_ACCOUNT')].value"),
 			Template: "{{ .Config.GenevaLoggingControlPlaneAccount }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='MONITORING_GCS_ENVIRONMENT')].value"),
+			Template: "{{ .Config.GenevaLoggingControlPlaneEnvironment }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='MONITORING_GCS_REGION')].value"),
+			Template: "{{ .Config.GenevaLoggingControlPlaneRegion }}",
 		},
 	},
 	"DaemonSet.apps/openshift-node/sync": {
