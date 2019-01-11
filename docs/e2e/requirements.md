@@ -47,20 +47,9 @@ The following are required for running all e2e tests against the fake RP
 | `Environment Variable` | `AZURE_TENANT_ID` | Required for authentication against the RP |
 | `Environment Variable` | `AZURE_SUBSCRIPTION_ID` | The subscription id for an existing cluster |
 | `Environment Variable` | `RESOURCEGROUP` | The resource group for an existing cluster |
-| `File` | `_data/containerservice.yaml` | Allows the test to retrieve credentials as well as to decide if it is a `create` vs `update` |
-| `File` | `_data/manifest.yaml` | The external cluster manifest (required for key rotation and reentrant updates tests) |
+| `File` | `_data/containerservice.yaml` | Required for openshift client setup |
 | `File` | `secrets/logging-int.cert` | Geneva logging client certificate |
 | `File` | `secrets/logging-int.key` | Geneva logging client key |
 | `File` | `secrets/metrics-int.cert` | Geneva metrics client certificate |
 | `File` | `secrets/metrics-int.key` |  Geneva metrics client key |
 | `File` | `secrets/.dockerconfigjson` |  Docker config allowing to pull geneva images |
-
-#### Special considerations
-
-##### Key Rotation
-The key rotation up/down e2e test accepts two flags for customizing its functionality
-
-* `manifest`: Path to a customer manifest specifying a cluster for which keys should be rotated (default: `_data/manifest.yaml`)
-* `configBlob`: Path to an internal config blob for the cluster in question (default: `_data/containerservice.yaml`)
-
-These flags are required for any test focus which includes the key rotation test.
