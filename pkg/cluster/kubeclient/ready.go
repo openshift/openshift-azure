@@ -75,10 +75,6 @@ var daemonsetWhitelist = []struct {
 		Name:      "mdsd",
 		Namespace: "openshift-azure-logging",
 	},
-	{
-		Name:      "td-agent",
-		Namespace: "openshift-azure-logging",
-	},
 }
 
 var statefulsetWhitelist = []struct {

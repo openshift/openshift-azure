@@ -19,15 +19,11 @@ data:
             <AgentResourceUsage diskQuotaInMB="50000" />
         </Management>
         <Sources>
-            <Source name="mdsd.controlplane" dynamic_schema="true" />
-            <Source name="mdsd.syslog" dynamic_schema="true" />
+            <Source name="journald" dynamic_schema="true" />
         </Sources>
         <Events>
             <MdsdEvents>
-                <MdsdEventSource source="mdsd.controlplane">
-                    <RouteEvent eventName="CustomerControlPlaneEvents" storeType="CentralBond" priority="Normal"/>
-                </MdsdEventSource>
-                <MdsdEventSource source="mdsd.syslog">
+                <MdsdEventSource source="journald">
                     <RouteEvent eventName="CustomerSyslogEvents" storeType="CentralBond" priority="Normal"/>
                 </MdsdEventSource>
             </MdsdEvents>
@@ -35,5 +31,5 @@ data:
     </MonitoringManagement>
 kind: ConfigMap
 metadata:
-  name: mdsd-customerdata-config
+  name: mdsd-config
   namespace: openshift-azure-logging
