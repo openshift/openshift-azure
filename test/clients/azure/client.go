@@ -9,10 +9,10 @@ import (
 
 	"github.com/onsi/ginkgo/config"
 
-	externalapi "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
-	adminapi "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	externalapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2018-09-30-preview"
+	adminapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
