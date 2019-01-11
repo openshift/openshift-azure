@@ -17,6 +17,8 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/ghodss/yaml"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/sirupsen/logrus"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
@@ -29,6 +31,7 @@ import (
 var once sync.Once
 
 type Server struct {
+	router *chi.Mux
 	// the server will not process more than a single
 	// PUT request at all times.
 	inProgress chan struct{}
@@ -39,15 +42,18 @@ type Server struct {
 	state internalapi.ProvisioningState
 	cs    *internalapi.OpenShiftManagedCluster
 
-	log     *logrus.Entry
-	address string
+	log      *logrus.Entry
+	address  string
+	basePath string
 }
 
 func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	s := &Server{
+		router:     chi.NewRouter(),
 		inProgress: make(chan struct{}, 1),
 		log:        log,
 		address:    address,
+		basePath:   "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{provider}/openShiftManagedClusters/{resourceName}",
 	}
 	// We need to restore the internal cluster state into memory for GETs
 	// and DELETEs to work appropriately.
@@ -57,70 +63,25 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	return s
 }
 
-func (s *Server) ListenAndServe() {
-	// TODO: match the request path the real RP would use
-	http.HandleFunc("/", s.handleFunc)
+func (s *Server) Run() {
+	s.router.Use(middleware.DefaultCompress)
+	s.router.Use(middleware.RedirectSlashes)
+	s.router.Use(middleware.Recoverer)
+	s.router.Use(s.logger)
+	s.router.Use(s.validator)
+
+	s.router.Get("/", s.handleGet)
+	s.router.Delete(s.basePath, s.handleDelete)
+	s.router.Get(s.basePath, s.handleGet)
+	s.router.Put(s.basePath, s.handlePut)
+	s.router.Get("/admin", s.handleGet)
+	s.router.Delete(filepath.Join("/admin", s.basePath), s.handleDelete)
+	s.router.Get(filepath.Join("/admin", s.basePath), s.handleGet)
+	s.router.Put(filepath.Join("/admin", s.basePath), s.handlePut)
+	s.router.Put(filepath.Join("/admin", s.basePath, "restore"), s.handleRestore)
 
 	s.log.Infof("starting server on %s", s.address)
-	httpServer := &http.Server{Addr: s.address}
-	s.log.WithError(httpServer.ListenAndServe()).Warn("Server exited.")
-}
-
-// handleFunc dispatches the request to the right path.
-func (s *Server) handleFunc(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-
-	switch filepath.Base(r.URL.Path) {
-	// TODO: Ensure the base path is not the resource group
-	case "restore":
-		s.handleRestore(w, r)
-	default:
-		s.handle(w, r)
-	}
-}
-
-// handle handles an incoming request to the server.
-// This is the normal RP path where all customer and
-// simple admin requests should be routed to.
-func (s *Server) handle(w http.ResponseWriter, r *http.Request) {
-	// validate the request
-	ok := s.validate(w, r)
-	if !ok {
-		return
-	}
-
-	// process the request
-	switch r.Method {
-	case http.MethodDelete:
-		s.handleDelete(w, r)
-	case http.MethodGet:
-		s.handleGet(w, r)
-	case http.MethodPut:
-		s.handlePut(w, r)
-	}
-}
-
-func (s *Server) validate(w http.ResponseWriter, r *http.Request) bool {
-	if r.Method != http.MethodPut && r.Method != http.MethodGet && r.Method != http.MethodDelete {
-		resp := fmt.Sprintf("405 Method not allowed: %s", r.Method)
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusMethodNotAllowed)
-		return false
-	}
-
-	if r.Method == http.MethodPut {
-		select {
-		case s.inProgress <- struct{}{}:
-			// continue
-		default:
-			// did not get the lock
-			resp := "423 Locked: Processing another in-flight request"
-			s.log.Debug(resp)
-			http.Error(w, resp, http.StatusLocked)
-			return false
-		}
-	}
-	return true
+	s.log.WithError(http.ListenAndServe(s.address, s.router)).Warn("Server exited.")
 }
 
 // The way we run the fake RP during development cannot really

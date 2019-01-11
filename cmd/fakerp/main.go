@@ -18,5 +18,5 @@ func main() {
 
 	log.Info("starting the fake resource provider")
 	s := fakerp.NewServer(log, os.Getenv("RESOURCEGROUP"), shared.LocalHttpAddr)
-	s.ListenAndServe()
+	s.Run()
 }

@@ -16,39 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 )
 
-// handleRestore handles admin requests for restoring etcd.
-func (s *Server) handleRestore(w http.ResponseWriter, r *http.Request) {
-	// validate the request
-	ok := s.validateRestore(w, r)
-	if !ok {
-		return
-	}
-
-	s.restore(w, r)
-}
-
-func (s *Server) validateRestore(w http.ResponseWriter, r *http.Request) bool {
-	if r.Method != http.MethodPut {
-		resp := fmt.Sprintf("405 Method not allowed: %s", r.Method)
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusMethodNotAllowed)
-		return false
-	}
-
-	select {
-	case s.inProgress <- struct{}{}:
-		// continue
-	default:
-		// did not get the lock
-		resp := "423 Locked: Processing another in-flight request"
-		s.log.Debug(resp)
-		http.Error(w, resp, http.StatusLocked)
-		return false
-	}
-	return true
-}
-
-func (s *Server) restore(w http.ResponseWriter, req *http.Request) {
+func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 	defer func() {
 		// drain once we are done processing this request
 		<-s.inProgress

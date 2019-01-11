@@ -149,3 +149,6 @@ properties:
     subnetCidr: 10.0.0.0/24
     osType: Linux
 ```
+
+#### Dependency management
+To add a new dependency to the project, add the package information to glide.yaml and execute `glide up -v`
