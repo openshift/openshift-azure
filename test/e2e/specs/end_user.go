@@ -12,7 +12,9 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/sirupsen/logrus"
+	apiappsv1 "k8s.io/api/apps/v1"
 	"k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	policy "k8s.io/api/policy/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -219,6 +221,48 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake]", func()
 		// hit it again, will hit 3 times as specified initially
 		By(fmt.Sprintf("hitting the route again, expecting counter to increment from last (%v)", time.Now()))
 		err = loopHTTPGet(url, regex, 3)
+		Expect(err).NotTo(HaveOccurred())
+	})
+
+	It("should be able to deploy a registry.redhat.io image", func() {
+		// nginx 1.14 is in private registry only (so far)
+		deploymentName := "redis-32-rhel7"
+		privateImage := fmt.Sprintf("registry.redhat.io/rhscl/%s", deploymentName)
+		By(fmt.Sprintf("building deployment spec for %s (%v)", privateImage, time.Now()))
+		deployment := &apiappsv1.Deployment{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      deploymentName,
+				Namespace: namespace,
+			},
+			Spec: apiappsv1.DeploymentSpec{
+				Selector: &metav1.LabelSelector{
+					MatchLabels: map[string]string{
+						"app": deploymentName,
+					},
+				},
+				Template: corev1.PodTemplateSpec{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: deploymentName,
+						Labels: map[string]string{
+							"app": deploymentName,
+						},
+					},
+					Spec: corev1.PodSpec{
+						Containers: []corev1.Container{
+							{
+								Name:  deploymentName,
+								Image: privateImage,
+							},
+						},
+					},
+				},
+			},
+		}
+		By(fmt.Sprintf("creating deployment (%v)", time.Now()))
+		_, err := cli.AppsV1.Deployments(namespace).Create(deployment)
+		Expect(err).NotTo(HaveOccurred())
+		By(fmt.Sprintf("waiting for deployment to be ready (%v)", time.Now()))
+		err = wait.PollImmediate(2*time.Second, 5*time.Minute, ready.DeploymentIsReady(cli.AppsV1.Deployments(namespace), deploymentName))
 		Expect(err).NotTo(HaveOccurred())
 	})
 })

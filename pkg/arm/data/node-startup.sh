@@ -27,6 +27,13 @@ EOF
   systemctl start docker.service
 fi
 
+# file should be /root/.docker/config.json, but actually need it in
+# /var/lib/origin thanks to https://github.com/kubernetes/kubernetes/issues/45487
+DPATH=/var/lib/origin/.docker
+mkdir -p $DPATH
+base64 -d <<< {{ .Config.Images.ImagePullSecret | Base64Encode }} >${DPATH}/config.json
+chmod 0600 ${DPATH}/config.json
+
 echo 'BOOTSTRAP_CONFIG_NAME=node-config-{{ .Extra.Role }}' >>/etc/sysconfig/${SERVICE_TYPE}-node
 
 {{- if $.Extra.TestConfig.RunningUnderTest }}

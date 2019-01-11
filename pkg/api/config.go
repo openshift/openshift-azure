@@ -108,6 +108,9 @@ type ImageConfig struct {
 	GenevaTDAgent string `json:"genevaTDAgent,omitempty"`
 	GenevaStatsd  string `json:"genevaStatsd,omitempty"`
 	MetricsBridge string `json:"metricsBridge,omitempty"`
+
+	// ImagePullSecret defines the secret used to pull from the private registries, used system-wide
+	ImagePullSecret []byte `json:"imagePullSecret,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.
