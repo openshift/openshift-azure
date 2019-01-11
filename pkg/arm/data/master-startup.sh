@@ -25,6 +25,13 @@ EOF
   systemctl start docker.service
 fi
 
+# file should be /root/.docker/config.json, but actually need it in
+# /var/lib/origin thanks to https://github.com/kubernetes/kubernetes/issues/45487
+DPATH=/var/lib/origin/.docker
+mkdir -p $DPATH
+base64 -d <<< {{ .Config.Images.ImagePullSecret | Base64Encode }} >${DPATH}/config.json
+chmod 0600 ${DPATH}/config.json
+
 # TODO: consider fact that /dev/disk/azure/scsi1/lun0 is currently hardcoded;
 # partition /dev/disk/azure/scsi1/lun0; consider future strategy for resizes if
 # needed

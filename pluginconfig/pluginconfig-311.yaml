@@ -57,3 +57,5 @@ images:
   webConsole: registry.access.redhat.com/openshift3/ose-web-console:v3.11.43
 ## Gevena image pull secret is used to access private components images. Format: base64 encoded .docker/config.json file "{auths:{osarpint.azurecr.io:{username:username,password:notthepasswordyouarelookingfor,email:openshift@example.com,auth:dXNlcm5hbWU6bm90dGhlcGFzc3dvcmR5b3VhcmVsb29raW5nZm9yCg==}}}"
   #genevaImagePullSecret: <base64 string of .docker/config.json file>
+## Image pull secret is used to pull images from private registries, used system-wide
+  #imagePullSecret: <base64 string of /var/lib/origin/.docker/config.json file>

@@ -48,6 +48,7 @@ func internalPluginConfig() Config {
 		},
 		// Container images configuration
 		Images: ImageConfig{
+			ImagePullSecret:              []byte("Images.ImagePullSecret"),
 			GenevaImagePullSecret:        []byte("Images.GenevaImagePullSecret"),
 			Format:                       "Images.Format",
 			ClusterMonitoringOperator:    "Images.ClusterMonitoringOperator",

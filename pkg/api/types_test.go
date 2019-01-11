@@ -215,7 +215,8 @@ var marshalled = []byte(`{
 			"genevaLogging": "Config.Images.GenevaLogging",
 			"genevaTDAgent": "Config.Images.GenevaTDAgent",
 			"genevaStatsd": "Config.Images.GenevaStatsd",
-			"metricsBridge": "Config.Images.MetricsBridge"
+			"metricsBridge": "Config.Images.MetricsBridge",
+			"imagePullSecret": "Q29uZmlnLkltYWdlcy5JbWFnZVB1bGxTZWNyZXQ="
 		},
 		"adminKubeconfig": "eyJwcmVmZXJlbmNlcyI6e30sImNsdXN0ZXJzIjpudWxsLCJ1c2VycyI6bnVsbCwiY29udGV4dHMiOm51bGwsImN1cnJlbnQtY29udGV4dCI6IiJ9",
 		"masterKubeconfig": "eyJwcmVmZXJlbmNlcyI6e30sImNsdXN0ZXJzIjpudWxsLCJ1c2VycyI6bnVsbCwiY29udGV4dHMiOm51bGwsImN1cnJlbnQtY29udGV4dCI6IiJ9",
@@ -373,6 +374,7 @@ func TestAdminAPIParity(t *testing.T) {
 	// TODO: why don't we just include all of these in the admin type?
 	notInAdmin := []*regexp.Regexp{
 		regexp.MustCompile(`^\.Config\.RunningUnderTest$`),
+		regexp.MustCompile(`^\.Config\.Images\.ImagePullSecret$`),
 		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
 		regexp.MustCompile(`^\.Properties\.ServicePrincipalProfile\.`),
 	}

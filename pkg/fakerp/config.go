@@ -75,11 +75,16 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	imagePullSecret, err := readFile(filepath.Join(artifactDir, "system-docker-config.json"))
+	if err != nil {
+		return nil, err
+	}
 	template.Certificates.GenevaLogging.Cert = logCert
 	template.Certificates.GenevaLogging.Key = logKey
 	template.Certificates.GenevaMetrics.Cert = metCert
 	template.Certificates.GenevaMetrics.Key = metKey
 	template.Images.GenevaImagePullSecret = pullSecret
+	template.Images.ImagePullSecret = imagePullSecret
 
 	return template, nil
 }
