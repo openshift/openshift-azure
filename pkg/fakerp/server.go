@@ -70,11 +70,9 @@ func (s *Server) Run() {
 	s.router.Use(s.logger)
 	s.router.Use(s.validator)
 
-	s.router.Get("/", s.handleGet)
 	s.router.Delete(s.basePath, s.handleDelete)
 	s.router.Get(s.basePath, s.handleGet)
 	s.router.Put(s.basePath, s.handlePut)
-	s.router.Get("/admin", s.handleGet)
 	s.router.Delete(filepath.Join("/admin", s.basePath), s.handleDelete)
 	s.router.Get(filepath.Join("/admin", s.basePath), s.handleGet)
 	s.router.Put(filepath.Join("/admin", s.basePath), s.handlePut)
@@ -201,7 +199,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	// Update headers with Location so subsequent GET requests know the
 	// location to query.
 	headers := w.Header()
-	headers.Add(autorest.HeaderLocation, fmt.Sprintf("http://%s", s.address))
+	headers.Add(autorest.HeaderLocation, fmt.Sprintf("http://%s%s", s.address, req.URL.Path))
 	// And last but not least, we have accepted this DELETE request
 	// and are processing it in the background.
 	w.WriteHeader(http.StatusAccepted)
