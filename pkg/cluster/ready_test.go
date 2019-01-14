@@ -16,92 +16,83 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
 
-func TestUpgraderWaitForNodes(t *testing.T) {
+func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 	vmListErr := fmt.Errorf("vm list failed")
 	nodeGetErr := fmt.Errorf("node get failed")
 	testRg := "myrg"
 	tests := []struct {
 		name        string
-		expect      map[string][]compute.VirtualMachineScaleSetVM
+		expect      []compute.VirtualMachineScaleSetVM
+		appIndex    int
 		wantErr     bool
 		expectedErr error
 	}{
 		{
-			name:    "nothing to wait for",
-			wantErr: false,
+			name:     "nothing to wait for",
+			appIndex: 1,
+			wantErr:  false,
 		},
 		{
 			name:        "list vm error",
+			appIndex:    1,
 			wantErr:     true,
 			expectedErr: vmListErr,
 		},
 		{
 			name:        "node get error",
 			wantErr:     true,
+			appIndex:    0,
 			expectedErr: nodeGetErr,
-			expect: map[string][]compute.VirtualMachineScaleSetVM{
-				"master": {
-					{
-						Name: to.StringPtr("ss-master"),
-						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
-							OsProfile: &compute.OSProfile{
-								ComputerName: to.StringPtr("master-000000"),
-							},
-						},
-					},
-				},
-				"infra": {
-					{
-						Name: to.StringPtr("ss-infra"),
-						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
-							OsProfile: &compute.OSProfile{
-								ComputerName: to.StringPtr("infra-000000"),
-							},
-						},
-					},
-				},
-				"compute": {
-					{
-						Name: to.StringPtr("ss-compute"),
-						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
-							OsProfile: &compute.OSProfile{
-								ComputerName: to.StringPtr("compute-000000"),
-							},
+			expect: []compute.VirtualMachineScaleSetVM{
+				{
+					Name: to.StringPtr("ss-master"),
+					VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+						OsProfile: &compute.OSProfile{
+							ComputerName: to.StringPtr("master-000000"),
 						},
 					},
 				},
 			},
 		},
 		{
-			name: "all ready",
-			expect: map[string][]compute.VirtualMachineScaleSetVM{
-				"master": {
-					{
-						Name: to.StringPtr("ss-master"),
-						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
-							OsProfile: &compute.OSProfile{
-								ComputerName: to.StringPtr("master-00000A"),
-							},
+			name:     "masters ready",
+			appIndex: 0,
+			expect: []compute.VirtualMachineScaleSetVM{
+				{
+					Name: to.StringPtr("ss-master"),
+					VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+						OsProfile: &compute.OSProfile{
+							ComputerName: to.StringPtr("master-00000A"),
 						},
 					},
 				},
-				"infra": {
-					{
-						Name: to.StringPtr("ss-infra"),
-						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
-							OsProfile: &compute.OSProfile{
-								ComputerName: to.StringPtr("infra-000000"),
-							},
+			},
+			wantErr: false,
+		},
+		{
+			name:     "infra ready",
+			appIndex: 1,
+			expect: []compute.VirtualMachineScaleSetVM{
+				{
+					Name: to.StringPtr("ss-infra"),
+					VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+						OsProfile: &compute.OSProfile{
+							ComputerName: to.StringPtr("infra-00000A"),
 						},
 					},
 				},
-				"compute": {
-					{
-						Name: to.StringPtr("ss-compute"),
-						VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
-							OsProfile: &compute.OSProfile{
-								ComputerName: to.StringPtr("compute-000000"),
-							},
+			},
+			wantErr: false,
+		},
+		{
+			name:     "computes ready",
+			appIndex: 2,
+			expect: []compute.VirtualMachineScaleSetVM{
+				{
+					Name: to.StringPtr("ss-compute"),
+					VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
+						OsProfile: &compute.OSProfile{
+							ComputerName: to.StringPtr("compute-00000A"),
 						},
 					},
 				},
@@ -117,16 +108,16 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 					AzProfile: api.AzProfile{ResourceGroup: testRg},
 					AgentPoolProfiles: []api.AgentPoolProfile{
 						{
-							Name: "foo",
-							Role: api.AgentPoolProfileRoleCompute,
+							Name: "master",
+							Role: api.AgentPoolProfileRoleMaster,
 						},
 						{
 							Name: "infra",
 							Role: api.AgentPoolProfileRoleInfra,
 						},
 						{
-							Name: "master",
-							Role: api.AgentPoolProfileRoleMaster,
+							Name: "foo",
+							Role: api.AgentPoolProfileRoleCompute,
 						},
 					},
 				},
@@ -141,17 +132,22 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 			kubeclient := mock_kubeclient.NewMockKubeclient(gmc)
 			if tt.wantErr {
 				if tt.expectedErr == vmListErr {
-					virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), "", "", "").Return(nil, tt.expectedErr)
+					virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(nil, tt.expectedErr)
 				} else {
-					virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), "", "", "").Return(tt.expect["master"], nil)
-					kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Return(nodeGetErr)
+					virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(tt.expect, nil)
+					if cs.Properties.AgentPoolProfiles[tt.appIndex].Role == api.AgentPoolProfileRoleMaster {
+						kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Return(nodeGetErr)
+					} else {
+						kubeclient.EXPECT().WaitForReadyWorker(ctx, gomock.Any()).Return(nodeGetErr)
+					}
 				}
 			} else {
-				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&api.AgentPoolProfile{Name: "master", Role: api.AgentPoolProfileRoleMaster}, ""), "", "", "").Return(tt.expect["master"], nil)
-				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&api.AgentPoolProfile{Name: "infra", Role: api.AgentPoolProfileRoleInfra}, ""), "", "", "").Return(tt.expect["infra"], nil)
-				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&api.AgentPoolProfile{Name: "foo", Role: api.AgentPoolProfileRoleCompute}, ""), "", "", "").Return(tt.expect["compute"], nil)
-				kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Times(len(tt.expect["master"])).Return(nil)
-				kubeclient.EXPECT().WaitForReadyWorker(ctx, gomock.Any()).Times(len(tt.expect["infra"]) + len(tt.expect["compute"])).Return(nil)
+				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(tt.expect, nil)
+				if cs.Properties.AgentPoolProfiles[tt.appIndex].Role == api.AgentPoolProfileRoleMaster {
+					kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Times(len(tt.expect)).Return(nil)
+				} else {
+					kubeclient.EXPECT().WaitForReadyWorker(ctx, gomock.Any()).Times(len(tt.expect)).Return(nil)
+				}
 			}
 
 			u := &simpleUpgrader{
@@ -160,7 +156,7 @@ func TestUpgraderWaitForNodes(t *testing.T) {
 				kubeclient: kubeclient,
 				log:        logrus.NewEntry(logrus.StandardLogger()),
 			}
-			err := u.WaitForNodes(ctx, cs, "")
+			err := u.WaitForNodesInAgentPoolProfile(ctx, cs, &cs.Properties.AgentPoolProfiles[tt.appIndex], "")
 			if tt.wantErr && tt.expectedErr != err {
 				t.Errorf("simpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
 			}

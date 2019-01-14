@@ -12,7 +12,6 @@ import (
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
-	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
@@ -83,7 +82,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 	p.log.Info("restoring the cluster")
-	if err := p.clusterUpgrader.Evacuate(ctx, cs); err != nil {
+	if err := p.clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx, cs); err != nil {
 		return err
 	}
 	err = deployFn(ctx, azuretemplate)
@@ -94,24 +93,18 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
-	uBlob, err := p.clusterUpgrader.ReadUpdateBlob()
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
-	}
-	// delete only the master entries from the blob in order to
-	// avoid unnecessary infra and compute rotations.
-	uBlob.InstanceHashes = updateblob.InstanceHashes{}
-	err = p.clusterUpgrader.WriteUpdateBlob(uBlob)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
+	if err := p.clusterUpgrader.EtcdRestoreDeleteMasterScaleSetHashes(ctx, cs); err != nil {
+		return err
 	}
 	err = p.clusterUpgrader.WaitForHealthzStatusOk(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 	}
-	err = p.clusterUpgrader.WaitForMasters(ctx, cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+	for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+		err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, "")
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+		}
 	}
 
 	p.log.Info("running CreateOrUpdate")
@@ -147,17 +140,17 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
 	if isUpdate {
-		for _, app := range cluster.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
 			if perr := p.clusterUpgrader.UpdateMasterAgentPool(ctx, cs, &app); perr != nil {
 				return perr
 			}
 		}
-		for _, app := range cluster.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
 			if perr := p.clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
 				return perr
 			}
 		}
-		for _, app := range cluster.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
 			if perr := p.clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
 				return perr
 			}
@@ -171,19 +164,28 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 		}
-		err = p.clusterUpgrader.WaitForNodes(ctx, cs, suffix)
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+			err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, "")
+			if err != nil {
+				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+			}
+		}
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
+			err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
+			if err != nil {
+				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+			}
+		}
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
+			err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
+			if err != nil {
+				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+			}
 		}
 	}
 
 	// Wait for infrastructure services to be healthy
-	p.log.Info("waiting for infra services to be ready")
-	if err := p.clusterUpgrader.WaitForInfraServices(ctx, cs); err != nil {
-		return err
-	}
-
-	p.log.Info("starting health check")
 	if err := p.clusterUpgrader.HealthCheck(ctx, cs); err != nil {
 		return err
 	}

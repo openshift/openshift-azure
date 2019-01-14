@@ -76,11 +76,3 @@ func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 	}
 	return u.updateBlobService.Write(blob)
 }
-
-func (u *simpleUpgrader) WriteUpdateBlob(blob *updateblob.UpdateBlob) error {
-	return u.updateBlobService.Write(blob)
-}
-
-func (u *simpleUpgrader) ReadUpdateBlob() (*updateblob.UpdateBlob, error) {
-	return u.updateBlobService.Read()
-}
