@@ -1,4 +1,10 @@
-package cluster
+package scaler
+
+//go:generate go get github.com/golang/mock/gomock
+//go:generate go install github.com/golang/mock/mockgen
+//go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/scaler.go -package=mock_$GOPACKAGE  -source scaler.go
+//go:generate gofmt -s -l -w ../../util/mocks/mock_$GOPACKAGE/scaler.go
+//go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../../util/mocks/mock_$GOPACKAGE/scaler.go
 
 import (
 	"context"
@@ -11,6 +17,25 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
+
+// Factory interface is to create new Scaler instances.
+type Factory interface {
+	New(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Kubeclient, resourceGroup string, ss *compute.VirtualMachineScaleSet) Scaler
+}
+
+type scalerFactory struct{}
+
+// NewFactory create a new Factory instance.
+func NewFactory() Factory {
+	return &scalerFactory{}
+}
+
+// Scaler is an interface that changes the number of VMs in a scaleset until they meet
+// the 'count' argument. Scale function simply checks which direction
+// to scale up or down.
+type Scaler interface {
+	Scale(ctx context.Context, count int64) *api.PluginError
+}
 
 // workerScaler implements the logic to scale up and down worker scale sets.  It
 // caches the objects associated with the scale set and its VMs to avoid Azure
@@ -29,7 +54,9 @@ type workerScaler struct {
 	vmMap map[string]struct{}
 }
 
-func newWorkerScaler(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Kubeclient, resourceGroup string, ss *compute.VirtualMachineScaleSet) *workerScaler {
+var _ Scaler = &workerScaler{}
+
+func (sf *scalerFactory) New(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Kubeclient, resourceGroup string, ss *compute.VirtualMachineScaleSet) Scaler {
 	return &workerScaler{log: log, ssc: ssc, vmc: vmc, kubeclient: kubeclient, resourceGroup: resourceGroup, ss: ss}
 }
 
@@ -60,8 +87,8 @@ func (ws *workerScaler) updateCache(vms []compute.VirtualMachineScaleSetVM) {
 	ws.ss.Sku.Capacity = to.Int64Ptr(int64(len(vms)))
 }
 
-// scale sets the scale set capacity to count.
-func (ws *workerScaler) scale(ctx context.Context, count int64) *api.PluginError {
+// Scale sets the scale set capacity to count.
+func (ws *workerScaler) Scale(ctx context.Context, count int64) *api.PluginError {
 	switch {
 	case *ws.ss.Sku.Capacity < count:
 		return ws.scaleUp(ctx, count)
