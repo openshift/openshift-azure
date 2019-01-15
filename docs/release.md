@@ -60,9 +60,13 @@ Config file examples can be found in `pluginconfig/pluginconfig-{version}.yaml`.
 
 1. Hourly image sync job should be smart enough to detect tags and build "sync list" based on those.
 2. CI infrastructure should be able to rebuild all container images retrospectively in case of CI cluster rebuild.
+   Q: How we can build container images using git tags instead of branches using CI-Operator?
+   Looks like this is not possible, and we might need to develope way to do this using OpenShift build
+
 3. We should publish fakeRP images with same semantic versioning as part of release. These images will be used to 
    test all possible update/upgrade scenarios.
 4. Test should stop using emptyDir for passing configuration around and download it from azure. This will enable 
    update tests
 5. Prow configuration for testing the releases should be generated automatically using reference file with test
    matrix.
+
