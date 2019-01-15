@@ -89,7 +89,7 @@ verify:
 	go run ./hack/lint-addons/lint-addons.go -n
 
 unit: generate
-	go test ./... -coverprofile=coverage.out
+	go test ./... -coverprofile=coverage.out -covermode=atomic
 ifneq ($(ARTIFACT_DIR),)
 	mkdir -p $(ARTIFACT_DIR)
 	cp coverage.out $(ARTIFACT_DIR)
@@ -97,6 +97,9 @@ endif
 
 cover: unit
 	go tool cover -html=coverage.out
+
+codecov: unit
+	./hack/codecov-report.sh
 
 e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
