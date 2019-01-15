@@ -1,4 +1,4 @@
-COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain --ignored) = "" ]] && echo -clean || echo -dirty)
+COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
 
 # all is the default target to build everything
 all: clean build azure-controllers etcdbackup sync metricsbridge e2e-bin
@@ -116,4 +116,4 @@ e2e-scaleupdown:
 e2e-vnet:
 	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
 
-.PHONY: clean sync-image sync-push verify unit e2e
+.PHONY: clean metricsbridge metricsbridge-image metricsbridge-push sync-image sync-push verify unit e2e
