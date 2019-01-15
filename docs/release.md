@@ -5,7 +5,7 @@ OSA Release process consist of multiple dimensions:
 * Config release
 * VM image release
 
-Update might be one or any combination of all dimensions.
+Update might be one or any combination of all dimensions. But individual upgrade path is validated using adminAPI. 
 Plugin code release is a new branch and considered a major release. Any VM image or config change is a minor release.
 
 # Versioning
@@ -18,6 +18,7 @@ Major release creation flow:
 3. Git tag major release version (`v3.0`)
 4. Build release images (sync, metricsbridge, etc)
 5. Make sure VM image is released and is available to be used by plugin code.
+6. Update docs & release notes
 
 ## Minor releases
 
@@ -32,9 +33,9 @@ Minor release creation flow:
 Branching model:
 ```
 -------master--*----------*-----------------------
-                \          \
+               \          \
+                \           \-release-v4----T(v4.0)-----T(v4.1)-
                  \-release-v3------T(v3.0)----
-                             \-release-v4----T(v4.0)-----T(v4.1)-
 ```
 Note: Branch creation doesn't correspond to release, tags does.
 
@@ -56,17 +57,21 @@ images:
 
 Config file examples can be found in `pluginconfig/pluginconfig-{version}.yaml`. A config file is used to simplify production configuration change without new binary rollout. Struct contains secrets and it may not be wanted to store these in a yaml file.
 
-# Testing architecture consideration
+#  Architecture consideration / Topics
 
 1. Hourly image sync job should be smart enough to detect tags and build "sync list" based on those.
+   
 2. CI infrastructure should be able to rebuild all container images retrospectively in case of CI cluster rebuild.
    Q: How we can build container images using git tags instead of branches using CI-Operator?
    Looks like this is not possible, and we might need to develope way to do this using OpenShift build
+   Potentially customer build generator to generate build based on tags. 
 
 3. We should publish fakeRP images with same semantic versioning as part of release. These images will be used to 
    test all possible update/upgrade scenarios.
+
 4. Test should stop using emptyDir for passing configuration around and download it from azure. This will enable 
    update tests
+
 5. Prow configuration for testing the releases should be generated automatically using reference file with test
    matrix.
 
