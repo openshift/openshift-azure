@@ -2,6 +2,13 @@
 
 set -eo pipefail
 
+cleanup() {
+    kill $(jobs -p) &>/dev/null || true
+    wait
+}
+
+trap cleanup EXIT
+
 if [[ -n "$ARTIFACT_DIR" ]]; then
   ARTIFACT_FLAG="-artifact-dir=$ARTIFACT_DIR"
 fi
@@ -18,7 +25,6 @@ fi
 if [[ "$FOCUS" == *"\[Fake\]"* ]]; then
     go generate ./...
     go run cmd/fakerp/main.go &
-    trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT
 fi
 
 go test \
