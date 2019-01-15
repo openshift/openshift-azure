@@ -1,7 +1,7 @@
 package plugin
 
 import (
-	"fmt"
+	"context"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -16,215 +16,63 @@ func TestCreateOrUpdate(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
 	tests := []struct {
 		name     string
 		isUpdate bool
-		wantErr  bool
-		errStep  api.PluginStep
 	}{
 		{
 			name:     "deploy",
 			isUpdate: false,
-			wantErr:  false,
 		},
 		{
 			name:     "update",
 			isUpdate: true,
-			wantErr:  false,
-		},
-		{
-			name:     "deploy: deploy error",
-			isUpdate: false,
-			wantErr:  true,
-			errStep:  api.PluginStepDeploy,
-		},
-		{
-			name:     "deploy: initialize error",
-			isUpdate: false,
-			wantErr:  true,
-			errStep:  api.PluginStepInitialize,
-		},
-		{
-			name:     "deploy: openshift healthz error",
-			isUpdate: false,
-			wantErr:  true,
-			errStep:  api.PluginStepWaitForWaitForOpenShiftAPI,
-		},
-		{
-			name:     "deploy: nodes error",
-			isUpdate: false,
-			wantErr:  true,
-			errStep:  api.PluginStepWaitForNodes,
-		},
-		{
-			name:     "update: deploy error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepDeploy,
-		},
-		{
-			name:     "update: initialize error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepInitialize,
-		},
-		{
-			name:     "update: nodes error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepWaitForNodes,
-		},
-		{
-			name:     "update in place: list VMs error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateMasterAgentPoolListVMs,
-		},
-		{
-			name:     "update in place: read blob error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateMasterAgentPoolReadBlob,
-		},
-		{
-			name:     "update in place: drain error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateMasterAgentPoolDrain,
-		},
-		{
-			name:     "update in place: deallocate error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateMasterAgentPoolDeallocate,
-		},
-		{
-			name:     "update in place: update VMs error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateMasterAgentPoolUpdateVMs,
-		},
-		{
-			name:     "update in place: reimage error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateMasterAgentPoolReimage,
-		},
-		{
-			name:     "update in place: start error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateMasterAgentPoolStart,
-		},
-		{
-			name:     "update in place: wait for ready error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateMasterAgentPoolWaitForReady,
-		},
-		{
-			name:     "update in place: update blob error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateMasterAgentPoolUpdateBlob,
-		},
-		{
-			name:     "update plus one: list VMs error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateWorkerAgentPoolListVMs,
-		},
-		{
-			name:     "update plus one: read blob error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateWorkerAgentPoolReadBlob,
-		},
-		{
-			name:     "update plus one: wait for ready error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateWorkerAgentPoolWaitForReady,
-		},
-		{
-			name:     "update plus one: update blob error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepUpdateWorkerAgentPoolUpdateBlob,
-		},
-		{
-			name:     "waitforinfra: daemon error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepWaitForInfraDaemonSets,
-		},
-		{
-			name:     "waitforinfra: deployments error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepWaitForInfraDeployments,
-		},
-		{
-			name:     "ConsoleHealth: error",
-			isUpdate: true,
-			wantErr:  true,
-			errStep:  api.PluginStepWaitForConsoleHealth,
 		},
 	}
+	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
+		return nil
+	}
+	cs := &api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			AgentPoolProfiles: []api.AgentPoolProfile{
+				{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
+				{Role: api.AgentPoolProfileRoleCompute, Name: "compute"},
+				{Role: api.AgentPoolProfileRoleInfra, Name: "infra"},
+			},
+		},
+	}
+
 	for _, tt := range tests {
-		mockGen := mock_arm.NewMockGenerator(mockCtrl)
-		mockGen.EXPECT().Generate(nil, nil, "", tt.isUpdate, gomock.Any()).Return(nil, nil)
-		if tt.wantErr {
-			err := &api.PluginError{Err: fmt.Errorf("test error"), Step: tt.errStep}
-			switch tt.errStep {
-			case api.PluginStepDeploy, api.PluginStepInitialize,
-				api.PluginStepWaitForConsoleHealth, api.PluginStepWaitForNodes,
-				api.PluginStepUpdateMasterAgentPoolListVMs,
-				api.PluginStepUpdateMasterAgentPoolReadBlob, api.PluginStepUpdateMasterAgentPoolDrain,
-				api.PluginStepUpdateMasterAgentPoolDeallocate, api.PluginStepUpdateMasterAgentPoolUpdateVMs,
-				api.PluginStepUpdateMasterAgentPoolReimage, api.PluginStepUpdateMasterAgentPoolStart,
-				api.PluginStepUpdateMasterAgentPoolWaitForReady, api.PluginStepUpdateMasterAgentPoolUpdateBlob,
-				api.PluginStepUpdateWorkerAgentPoolListVMs, api.PluginStepUpdateWorkerAgentPoolReadBlob,
-				api.PluginStepUpdateWorkerAgentPoolWaitForReady, api.PluginStepUpdateWorkerAgentPoolUpdateBlob:
-				if tt.isUpdate {
-					mockUp.EXPECT().Update(nil, nil, nil, nil, gomock.Any()).Return(err)
-				} else {
-					mockUp.EXPECT().Deploy(nil, nil, nil, nil, gomock.Any()).Return(err)
-				}
-			case api.PluginStepWaitForWaitForOpenShiftAPI:
-				if tt.isUpdate {
-					mockUp.EXPECT().Update(nil, nil, nil, nil, gomock.Any()).Return(nil)
-				} else {
-					mockUp.EXPECT().Deploy(nil, nil, nil, nil, gomock.Any()).Return(nil)
-				}
-				mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
-				mockUp.EXPECT().HealthCheck(nil, nil).Return(err)
-			case api.PluginStepWaitForInfraDaemonSets, api.PluginStepWaitForInfraDeployments:
-				if tt.isUpdate {
-					mockUp.EXPECT().Update(nil, nil, nil, nil, gomock.Any()).Return(nil)
-				} else {
-					mockUp.EXPECT().Deploy(nil, nil, nil, nil, gomock.Any()).Return(nil)
-				}
-				mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(err)
-			}
+		armGenerator := mock_arm.NewMockGenerator(mockCtrl)
+		armGenerator.EXPECT().Generate(nil, cs, "", tt.isUpdate, gomock.Any()).Return(nil, nil)
+		clusterUpgrader := mock_cluster.NewMockUpgrader(mockCtrl)
+		c := clusterUpgrader.EXPECT().CreateClients(nil, cs).Return(nil)
+		c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
+		if tt.isUpdate {
+			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+			c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
+			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+			c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+			c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
 		} else {
-			if tt.isUpdate {
-				mockUp.EXPECT().Update(nil, nil, nil, nil, gomock.Any()).Return(nil)
-			} else {
-				mockUp.EXPECT().Deploy(nil, nil, nil, nil, gomock.Any()).Return(nil)
-			}
-			mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
-			mockUp.EXPECT().HealthCheck(nil, nil).Return(nil)
+			c = clusterUpgrader.EXPECT().InitializeUpdateBlob(cs, gomock.Any()).Return(nil).After(c)
+			c = clusterUpgrader.EXPECT().WaitForHealthzStatusOk(nil, cs).Return(nil).After(c)
+			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+			c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], gomock.Any()).Return(nil).After(c)
+			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+			c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+			c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
 		}
-		mockUp.EXPECT().CreateClients(nil, nil).Return(nil)
+		c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 		p := &plugin{
-			clusterUpgrader: mockUp,
-			armGenerator:    mockGen,
+			clusterUpgrader: clusterUpgrader,
+			armGenerator:    armGenerator,
 			log:             logrus.NewEntry(logrus.StandardLogger()),
 		}
-		if err := p.CreateOrUpdate(nil, nil, tt.isUpdate, nil); (err != nil) != tt.wantErr {
-			t.Errorf("plugin.CreateOrUpdate(%s) error = %v, wantErr %v", tt.name, err, tt.wantErr)
+		if err := p.CreateOrUpdate(nil, cs, tt.isUpdate, deployer); err != nil {
+			t.Errorf("plugin.CreateOrUpdate(%s) error = %v", tt.name, err)
 		}
 	}
 }
@@ -233,26 +81,54 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
+	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
+		return nil
+	}
+	cs := &api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			AgentPoolProfiles: []api.AgentPoolProfile{
+				{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
+				{Role: api.AgentPoolProfileRoleCompute, Name: "compute"},
+				{Role: api.AgentPoolProfileRoleInfra, Name: "infra"},
+			},
+		},
+	}
+
 	testData := map[string]interface{}{"test": "data"}
 	testDataWithBackup := map[string]interface{}{"test": "backup"}
-	mockGen := mock_arm.NewMockGenerator(mockCtrl)
-	mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
+	armGenerator := mock_arm.NewMockGenerator(mockCtrl)
+	clusterUpgrader := mock_cluster.NewMockUpgrader(mockCtrl)
 	gomock.InOrder(
-		mockGen.EXPECT().Generate(nil, nil, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil),
-		mockGen.EXPECT().Generate(nil, nil, gomock.Any(), true, gomock.Any()).Return(testData, nil),
+		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil),
+		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testData, nil),
 	)
-	mockUp.EXPECT().CreateClients(nil, nil).Times(2).Return(nil)
-	mockUp.EXPECT().EtcdRestore(nil, nil, testDataWithBackup, nil).Return(nil)
-	mockUp.EXPECT().Update(nil, nil, testData, nil, gomock.Any()).Return(nil)
-	mockUp.EXPECT().WaitForInfraServices(nil, nil).Return(nil)
-	mockUp.EXPECT().HealthCheck(nil, nil).Return(nil)
+	c := clusterUpgrader.EXPECT().CreateClients(nil, cs).Return(nil)
+	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil, cs).Return(nil).After(c)
+
+	// deploy masters
+	c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSetHashes(nil, cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().WaitForHealthzStatusOk(nil, cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+	c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], "").Return(nil).After(c)
+	// update
+	c = clusterUpgrader.EXPECT().CreateClients(nil, cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
+
 	p := &plugin{
-		clusterUpgrader: mockUp,
-		armGenerator:    mockGen,
+		clusterUpgrader: clusterUpgrader,
+		armGenerator:    armGenerator,
 		log:             logrus.NewEntry(logrus.StandardLogger()),
 	}
 
-	if err := p.RecoverEtcdCluster(nil, nil, nil, "test-backup"); err != nil {
+	if err := p.RecoverEtcdCluster(nil, cs, deployer, "test-backup"); err != nil {
 		t.Errorf("plugin.RecoverEtcdCluster error = %v", err)
 	}
 }

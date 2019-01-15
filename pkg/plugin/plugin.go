@@ -82,9 +82,31 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 	p.log.Info("restoring the cluster")
-	if err := p.clusterUpgrader.EtcdRestore(ctx, cs, azuretemplate, deployFn); err != nil {
+	if err := p.clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx, cs); err != nil {
 		return err
 	}
+	err = deployFn(ctx, azuretemplate)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
+	}
+	err = p.clusterUpgrader.Initialize(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
+	}
+	if err := p.clusterUpgrader.EtcdRestoreDeleteMasterScaleSetHashes(ctx, cs); err != nil {
+		return err
+	}
+	err = p.clusterUpgrader.WaitForHealthzStatusOk(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
+	}
+	for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+		err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, "")
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+		}
+	}
+
 	p.log.Info("running CreateOrUpdate")
 	if err := p.CreateOrUpdate(ctx, cs, true, deployFn); err != nil {
 		return err
@@ -100,30 +122,70 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
-
 	err = p.clusterUpgrader.CreateClients(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 	if isUpdate {
 		p.log.Info("starting update")
-		if err := p.clusterUpgrader.Update(ctx, cs, azuretemplate, deployFn, suffix); err != nil {
-			return err
-		}
 	} else {
 		p.log.Info("starting deploy")
-		if err := p.clusterUpgrader.Deploy(ctx, cs, azuretemplate, deployFn, suffix); err != nil {
-			return err
+	}
+	err = deployFn(ctx, azuretemplate)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
+	}
+	err = p.clusterUpgrader.Initialize(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
+	}
+	if isUpdate {
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+			if perr := p.clusterUpgrader.UpdateMasterAgentPool(ctx, cs, &app); perr != nil {
+				return perr
+			}
+		}
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
+			if perr := p.clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
+				return perr
+			}
+		}
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
+			if perr := p.clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
+				return perr
+			}
+		}
+	} else {
+		err = p.clusterUpgrader.InitializeUpdateBlob(cs, suffix)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
+		}
+		err = p.clusterUpgrader.WaitForHealthzStatusOk(ctx, cs)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
+		}
+
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+			err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, "")
+			if err != nil {
+				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+			}
+		}
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
+			err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
+			if err != nil {
+				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+			}
+		}
+		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
+			err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
+			if err != nil {
+				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
+			}
 		}
 	}
 
 	// Wait for infrastructure services to be healthy
-	p.log.Info("waiting for infra services to be ready")
-	if err := p.clusterUpgrader.WaitForInfraServices(ctx, cs); err != nil {
-		return err
-	}
-
-	p.log.Info("starting health check")
 	if err := p.clusterUpgrader.HealthCheck(ctx, cs); err != nil {
 		return err
 	}

@@ -60,11 +60,21 @@ func (u *simpleUpgrader) doHealthCheck(ctx context.Context, cli wait.SimpleHTTPC
 
 // HealthCheck function to verify cluster health
 func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
+	err := u.kubeclient.WaitForInfraServices(ctx)
+	if err != nil {
+		return err
+	}
+
 	u.log.Info("checking developer console health")
-	err := u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://"+cs.Properties.FQDN+"/console/", 10*time.Second)
+	err = u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://"+cs.Properties.FQDN+"/console/", 10*time.Second)
 	if err != nil {
 		return err
 	}
 	u.log.Info("checking admin console health")
 	return u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://console."+cs.Properties.RouterProfiles[0].PublicSubdomain, 10*time.Second)
+}
+
+func (u *simpleUpgrader) WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	_, err := wait.ForHTTPStatusOk(ctx, u.log, u.rt, "https://"+cs.Properties.FQDN+"/healthz")
+	return err
 }
