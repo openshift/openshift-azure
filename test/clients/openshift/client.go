@@ -1,6 +1,7 @@
 package openshift
 
 import (
+	"os"
 	"path/filepath"
 
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
@@ -66,7 +67,18 @@ func newClientFromKubeConfig(kc *api.Config) (*Client, error) {
 	return newClientFromRestConfig(restconfig), nil
 }
 
+func clientFromEnv() (*Client, error) {
+	restconfig, err := clientcmd.BuildConfigFromFlags("", os.Getenv("KUBECONFIG"))
+	if err != nil {
+		return nil, err
+	}
+	return newClientFromRestConfig(restconfig), nil
+}
+
 func NewAzureClusterReaderClient() (*Client, error) {
+	if os.Getenv("KUBECONFIG") != "" {
+		return clientFromEnv()
+	}
 	dataDir, err := fakerp.FindDirectory(fakerp.DataDirectory)
 	if err != nil {
 		return nil, err
@@ -86,6 +98,9 @@ func NewAzureClusterReaderClient() (*Client, error) {
 }
 
 func NewCustomerReaderClient() (*Client, error) {
+	if os.Getenv("KUBECONFIG") != "" {
+		return clientFromEnv()
+	}
 	kc, err := login("customer-cluster-reader")
 	if err != nil {
 		return nil, err
@@ -95,6 +110,9 @@ func NewCustomerReaderClient() (*Client, error) {
 }
 
 func NewAdminClient() (*Client, error) {
+	if os.Getenv("KUBECONFIG") != "" {
+		return clientFromEnv()
+	}
 	kc, err := login("admin")
 	if err != nil {
 		return nil, err
@@ -104,6 +122,9 @@ func NewAdminClient() (*Client, error) {
 }
 
 func NewCustomerAdminClient() (*Client, error) {
+	if os.Getenv("KUBECONFIG") != "" {
+		return clientFromEnv()
+	}
 	kc, err := login("customer-cluster-admin")
 	if err != nil {
 		return nil, err
@@ -113,6 +134,9 @@ func NewCustomerAdminClient() (*Client, error) {
 }
 
 func NewEndUserClient() (*Client, error) {
+	if os.Getenv("KUBECONFIG") != "" {
+		return clientFromEnv()
+	}
 	kc, err := login("enduser")
 	if err != nil {
 		return nil, err
