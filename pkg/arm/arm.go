@@ -56,7 +56,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 		},
 	}
 	if !isUpdate {
-		t.Resources = append(t.Resources, ipKubernetes(cs), lbKubernetes(cs), nsgWorker(cs))
+		t.Resources = append(t.Resources, ipOutbound(cs), lbKubernetes(cs), nsgWorker(cs))
 	}
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {

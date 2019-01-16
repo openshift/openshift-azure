@@ -19,28 +19,28 @@ import (
 )
 
 const (
-	VnetName                              = "vnet"
-	vnetSubnetName                        = "default"
-	ipAPIServerName                       = "ip-apiserver"
-	ipKubernetesName                      = "ip-kubernetes"
-	lbAPIServerName                       = "lb-apiserver"
-	lbAPIServerFrontendConfigurationName  = "frontend"
-	lbAPIServerBackendPoolName            = "backend"
-	lbAPIServerLoadBalancingRuleName      = "port-443"
-	lbAPIServerProbeName                  = "port-443"
-	lbKubernetesName                      = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
-	lbKubernetesFrontendConfigurationName = "outbound"
-	lbKubernetesOutboundRuleName          = "outbound"
-	lbKubernetesBackendPoolName           = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
-	nsgMasterName                         = "nsg-master"
-	nsgMasterAllowSSHRuleName             = "allow_ssh"
-	nsgMasterAllowHTTPSRuleName           = "allow_https"
-	nsgWorkerName                         = "nsg-worker"
-	vmssNicName                           = "nic"
-	vmssNicPublicIPConfigurationName      = "ip"
-	vmssIPConfigurationName               = "ipconfig"
-	vmssCSEName                           = "cse"
-	vmssAdminUsername                     = "cloud-user"
+	VnetName                                      = "vnet"
+	vnetSubnetName                                = "default"
+	ipAPIServerName                               = "ip-apiserver"
+	ipOutboundName                                = "ip-outbound"
+	lbAPIServerName                               = "lb-apiserver"
+	lbAPIServerFrontendConfigurationName          = "frontend"
+	lbAPIServerBackendPoolName                    = "backend"
+	lbAPIServerLoadBalancingRuleName              = "port-443"
+	lbAPIServerProbeName                          = "port-443"
+	lbKubernetesName                              = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
+	lbKubernetesOutboundFrontendConfigurationName = "outbound"
+	lbKubernetesOutboundRuleName                  = "outbound"
+	lbKubernetesBackendPoolName                   = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
+	nsgMasterName                                 = "nsg-master"
+	nsgMasterAllowSSHRuleName                     = "allow_ssh"
+	nsgMasterAllowHTTPSRuleName                   = "allow_https"
+	nsgWorkerName                                 = "nsg-worker"
+	vmssNicName                                   = "nic"
+	vmssNicPublicIPConfigurationName              = "ip"
+	vmssIPConfigurationName                       = "ipconfig"
+	vmssCSEName                                   = "cse"
+	vmssAdminUsername                             = "cloud-user"
 )
 
 // fixupAPIVersions inserts an apiVersion field into the ARM template for each
@@ -174,7 +174,7 @@ func ipAPIServer(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 	}
 }
 
-func ipKubernetes(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
+func ipOutbound(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 	return &network.PublicIPAddress{
 		Sku: &network.PublicIPAddressSku{
 			Name: network.PublicIPAddressSkuNameStandard,
@@ -183,7 +183,7 @@ func ipKubernetes(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 			PublicIPAllocationMethod: network.Static,
 			IdleTimeoutInMinutes:     to.Int32Ptr(15),
 		},
-		Name:     to.StringPtr(ipKubernetesName),
+		Name:     to.StringPtr(ipOutboundName),
 		Type:     to.StringPtr("Microsoft.Network/publicIPAddresses"),
 		Location: to.StringPtr(cs.Location),
 	}
@@ -290,11 +290,11 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/publicIPAddresses",
-								ipKubernetesName,
+								ipOutboundName,
 							)),
 						},
 					},
-					Name: to.StringPtr(lbKubernetesFrontendConfigurationName),
+					Name: to.StringPtr(lbKubernetesOutboundFrontendConfigurationName),
 				},
 			},
 			BackendAddressPools: &[]network.BackendAddressPool{
@@ -313,7 +313,7 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 									cs.Properties.AzProfile.ResourceGroup,
 									"Microsoft.Network/loadBalancers",
 									lbKubernetesName,
-								) + "/frontendIPConfigurations/" + lbKubernetesFrontendConfigurationName),
+								) + "/frontendIPConfigurations/" + lbKubernetesOutboundFrontendConfigurationName),
 							},
 						},
 						BackendAddressPool: &network.SubResource{
