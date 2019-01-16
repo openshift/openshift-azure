@@ -1,11 +1,10 @@
 package openshift
 
 import (
-	"crypto/tls"
+	"crypto/rsa"
 	"crypto/x509"
+	"crypto/x509/pkix"
 	"fmt"
-	"net/http"
-	"net/url"
 	"path/filepath"
 	"strings"
 
@@ -27,14 +26,14 @@ func login(username string) (*api.Config, error) {
 		return nil, err
 	}
 
-	var password string
+	var organization []string
 	switch username {
 	case "customer-cluster-admin":
-		password = cs.Config.CustomerAdminPasswd
+		organization = []string{"osa-customer-admins"}
 	case "customer-cluster-reader":
-		password = cs.Config.CustomerReaderPasswd
+		organization = []string{"osa-customer-readers"}
 	case "enduser":
-		password = cs.Config.EndUserPasswd
+		organization = []string{"system:authenticated", "system:authenticated:oauth"}
 	case "admin":
 		var c api.Config
 		err := latest.Scheme.Convert(cs.Config.AdminKubeconfig, &c, nil)
@@ -46,53 +45,50 @@ func login(username string) (*api.Config, error) {
 		return nil, fmt.Errorf("unknown username %q", username)
 	}
 
-	pool := x509.NewCertPool()
-	pool.AddCert(cs.Config.Certificates.Ca.Cert)
-
-	cli := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs: pool,
-			},
+	params := azuretls.CertParams{
+		Subject: pkix.Name{
+			CommonName:   username,
+			Organization: organization,
 		},
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+		SigningCert: cs.Config.Certificates.Ca.Cert,
+		SigningKey:  cs.Config.Certificates.Ca.Key,
 	}
-
-	req, err := http.NewRequest(http.MethodGet, "https://"+cs.Properties.FQDN+"/oauth/authorize?response_type=token&client_id=openshift-challenging-client", nil)
-	req.Header.Add("X-Csrf-Token", "1")
-	req.SetBasicAuth(username, password)
-
-	resp, err := cli.Do(req)
+	key, cert, err := azuretls.NewCert(&params)
 	if err != nil {
 		return nil, err
 	}
 
-	location, err := resp.Location()
+	kc, err := makeKubeConfig(key, cert, cs.Config.Certificates.Ca.Cert, cs.Properties.FQDN, username, "default")
+	var c api.Config
+	err = latest.Scheme.Convert(kc, &c, nil)
 	if err != nil {
 		return nil, err
 	}
-
-	fragment, err := url.ParseQuery(location.Fragment)
-	if err != nil {
-		return nil, err
-	}
-
-	return makeKubeConfig(cs.Config.Certificates.Ca.Cert, cs.Properties.FQDN, username, fragment.Get("access_token"))
+	return &c, nil
 }
 
-func makeKubeConfig(caCert *x509.Certificate, endpoint, username, token string) (*api.Config, error) {
+func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certificate, endpoint, username, namespace string) (*api.Config, error) {
 	clustername := strings.Replace(endpoint, ".", "-", -1)
 	authinfoname := username + "/" + clustername
-	contextname := "default/" + clustername + "/" + username
+	contextname := namespace + "/" + clustername + "/" + username
 
 	caCertBytes, err := azuretls.CertAsBytes(caCert)
 	if err != nil {
 		return nil, err
 	}
+	clientCertBytes, err := azuretls.CertAsBytes(clientCert)
+	if err != nil {
+		return nil, err
+	}
+	clientKeyBytes, err := azuretls.PrivateKeyAsBytes(clientKey)
+	if err != nil {
+		return nil, err
+	}
 
 	return &api.Config{
+		APIVersion: "v1",
+		Kind:       "Config",
 		Clusters: map[string]*api.Cluster{
 			clustername: {
 				Server:                   "https://" + endpoint,
@@ -101,13 +97,14 @@ func makeKubeConfig(caCert *x509.Certificate, endpoint, username, token string) 
 		},
 		AuthInfos: map[string]*api.AuthInfo{
 			authinfoname: {
-				Token: token,
+				ClientCertificateData: clientCertBytes,
+				ClientKeyData:         clientKeyBytes,
 			},
 		},
 		Contexts: map[string]*api.Context{
 			contextname: {
 				Cluster:   clustername,
-				Namespace: "default",
+				Namespace: namespace,
 				AuthInfo:  authinfoname,
 			},
 		},
