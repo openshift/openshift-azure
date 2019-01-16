@@ -234,7 +234,7 @@ func TestConvertFromV20180930preview(t *testing.T) {
 							{
 								Name: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Name"),
 								Provider: &v20180930preview.AADIdentityProvider{
-									Kind: to.StringPtr("HtPasswd"),
+									Kind: to.StringPtr("Kind"),
 								},
 							},
 						},
@@ -252,7 +252,7 @@ func TestConvertFromV20180930preview(t *testing.T) {
 						IdentityProviders: []v20180930preview.IdentityProvider{
 							{
 								Provider: &v20180930preview.AADIdentityProvider{
-									Kind: to.StringPtr("HtPasswd"),
+									Kind: to.StringPtr("Kind"),
 								},
 							},
 						},

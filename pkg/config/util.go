@@ -7,7 +7,6 @@ import (
 	"io"
 	"strings"
 
-	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/tls"
@@ -65,21 +64,6 @@ func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certific
 		},
 		CurrentContext: contextname,
 	}, nil
-}
-
-func makeHtPasswd(username, password string) ([]byte, error) {
-	b, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-	htpasswd := append([]byte(username+":"), b...)
-	htpasswd = append(htpasswd, []byte("\n")...)
-
-	return htpasswd, nil
-}
-
-func getHashFromHtPasswd(record []byte) []byte {
-	return []byte(strings.Split(string(record), ":")[1])
 }
 
 func randomBytes(n int) ([]byte, error) {
