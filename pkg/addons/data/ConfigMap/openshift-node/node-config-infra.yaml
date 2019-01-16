@@ -33,7 +33,7 @@ data:
       enable-controller-attach-detach:
       - "true"
       feature-gates:
-      - RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true
+      - RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true,AttachVolumeLimit=true
       node-labels:
       - node-role.kubernetes.io/infra=true
       pod-manifest-path:
