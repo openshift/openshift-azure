@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
-	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-02-01/network"
+	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-07-01/network"
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2015-06-15/storage"
 	"github.com/Azure/go-autorest/autorest/to"
 
@@ -58,7 +58,7 @@ func fixupAPIVersions(template map[string]interface{}) {
 			"Microsoft.Network/networkSecurityGroups",
 			"Microsoft.Network/publicIPAddresses",
 			"Microsoft.Network/virtualNetworks":
-			apiVersion = "2018-02-01"
+			apiVersion = "2018-07-01"
 		case "Microsoft.Storage/storageAccounts":
 			apiVersion = "2015-06-15"
 		default:
@@ -266,9 +266,9 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 					Name: to.StringPtr(lbAPIServerProbeName),
 				},
 			},
-			InboundNatRules:  &[]network.InboundNatRule{},
-			InboundNatPools:  &[]network.InboundNatPool{},
-			OutboundNatRules: &[]network.OutboundNatRule{},
+			InboundNatRules: &[]network.InboundNatRule{},
+			InboundNatPools: &[]network.InboundNatPool{},
+			OutboundRules:   &[]network.OutboundRule{},
 		},
 		Name:     to.StringPtr(lbAPIServerName),
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
@@ -351,9 +351,9 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 					Name: to.StringPtr(lbKubernetesProbeName),
 				},
 			},
-			InboundNatRules:  &[]network.InboundNatRule{},
-			InboundNatPools:  &[]network.InboundNatPool{},
-			OutboundNatRules: &[]network.OutboundNatRule{},
+			InboundNatRules: &[]network.InboundNatRule{},
+			InboundNatPools: &[]network.InboundNatPool{},
+			OutboundRules:   &[]network.OutboundRule{},
 		},
 		Name:     to.StringPtr(lbKubernetesName),
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
