@@ -189,8 +189,8 @@ func ipOutbound(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 	}
 }
 
-func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
-	return &network.LoadBalancer{
+func lbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
+	lb := &network.LoadBalancer{
 		Sku: &network.LoadBalancerSku{
 			Name: network.LoadBalancerSkuNameStandard,
 		},
@@ -273,10 +273,16 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
 		Location: to.StringPtr(cs.Location),
 	}
+
+	if pc.TestConfig.RunningUnderTest {
+		(*lb.LoadBalancingRules)[0].EnableTCPReset = to.BoolPtr(true)
+	}
+
+	return lb
 }
 
-func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
-	return &network.LoadBalancer{
+func lbKubernetes(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
+	lb := &network.LoadBalancer{
 		Sku: &network.LoadBalancerSku{
 			Name: network.LoadBalancerSkuNameStandard,
 		},
@@ -334,6 +340,12 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
 		Location: to.StringPtr(cs.Location),
 	}
+
+	if pc.TestConfig.RunningUnderTest {
+		(*lb.OutboundRules)[0].EnableTCPReset = to.BoolPtr(true)
+	}
+
+	return lb
 }
 
 func storageRegistry(cs *api.OpenShiftManagedCluster) *storage.Account {
