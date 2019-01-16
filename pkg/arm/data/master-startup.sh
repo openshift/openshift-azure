@@ -582,6 +582,9 @@ spec:
 {{- end }}
     command:
     - openshift
+    env:
+    - name: KUBE_MAX_PD_VOLS
+      value: {{ .Derived.MaxDataDisksPerVM .ContainerService | quote }}
     image: {{ .Config.Images.ControlPlane | quote }}
     imagePullPolicy: Always
     livenessProbe:

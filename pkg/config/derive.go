@@ -139,3 +139,87 @@ func (derived) StatsdArgs(cs *api.OpenShiftManagedCluster) ([]interface{}, error
 		"-SourceRoleInstance", "OSA",
 	}, nil
 }
+
+// MaxDataDisksPerVM is a stopgap until k8s 1.12.  It requires that a cluster
+// has only one compute AgentPoolProfile and that no infra VM will require more
+// mounted disks than the maximum number allowed by the compute agent pool.
+// https://docs.microsoft.com/en-us/azure/virtual-machines/windows/sizes
+func (derived) MaxDataDisksPerVM(cs *api.OpenShiftManagedCluster) (string, error) {
+	var app *api.AgentPoolProfile
+	for i := range cs.Properties.AgentPoolProfiles {
+		if cs.Properties.AgentPoolProfiles[i].Role != api.AgentPoolProfileRoleCompute {
+			continue
+		}
+
+		if app != nil {
+			return "", fmt.Errorf("found multiple compute agentPoolProfiles")
+		}
+
+		app = &cs.Properties.AgentPoolProfiles[i]
+	}
+
+	if app == nil {
+		return "", fmt.Errorf("couldn't find compute agentPoolProfile")
+	}
+
+	switch app.VMSize {
+	case api.StandardD2sV3:
+		return "4", nil
+	case api.StandardD4sV3:
+		return "8", nil
+	case api.StandardD8sV3:
+		return "16", nil
+	case api.StandardD16sV3, api.StandardD32sV3, api.StandardD64sV3:
+		return "32", nil
+
+	case api.StandardDS4V2:
+		return "32", nil
+	case api.StandardDS5V2:
+		return "64", nil
+
+	// Compute optimized VMs
+	case api.StandardF8sV2:
+		return "16", nil
+	case api.StandardF16sV2, api.StandardF32sV2, api.StandardF64sV2,
+		api.StandardF72sV2:
+		return "32", nil
+
+	case api.StandardF8s:
+		return "32", nil
+	case api.StandardF16s:
+		return "64", nil
+
+	// Memory optimized VMs
+	case api.StandardE4sV3:
+		return "8", nil
+	case api.StandardE8sV3:
+		return "16", nil
+	case api.StandardE16sV3, api.StandardE20sV3, api.StandardE32sV3,
+		api.StandardE64sV3:
+		return "32", nil
+
+	case api.StandardGS2:
+		return "16", nil
+	case api.StandardGS3:
+		return "32", nil
+	case api.StandardGS4, api.StandardGS5:
+		return "64", nil
+
+	case api.StandardDS12V2:
+		return "16", nil
+	case api.StandardDS13V2:
+		return "32", nil
+	case api.StandardDS14V2, api.StandardDS15V2:
+		return "64", nil
+
+	// Storage optimized VMs
+	case api.StandardL4s:
+		return "16", nil
+	case api.StandardL8s:
+		return "32", nil
+	case api.StandardL16s, api.StandardL32s:
+		return "64", nil
+	}
+
+	return "", fmt.Errorf("unknown VMSize %q", app.VMSize)
+}
