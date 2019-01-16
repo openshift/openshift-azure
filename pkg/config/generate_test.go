@@ -87,11 +87,6 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 
 	assert(c.ServiceAccountKey != nil, "service account key")
 
-	assert(len(c.HtPasswd) != 0, "htpassword")
-	assert(len(c.CustomerAdminPasswd) != 0, "customer-cluster-admin password")
-	assert(len(c.CustomerReaderPasswd) != 0, "customer-cluster-reader password")
-	assert(len(c.EndUserPasswd) != 0, "end user password")
-
 	assert(c.SSHKey != nil, "ssh key")
 
 	assert(len(c.RegistryStorageAccount) != 0, "registry storage account")

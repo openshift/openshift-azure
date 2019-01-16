@@ -27,11 +27,11 @@ func TestDeepCopy(t *testing.T) {
 		t.Errorf("OpenShiftManagedCluster differed after DeepCopy: %s", deep.Equal(cs, copy))
 	}
 	copy.Tags["test"] = "updated"
-	copy.Config.HtPasswd[0] = 0
+	copy.Config.ImageVersion = "1"
 	if _, found := cs.Tags["test"]; found {
 		t.Error("unexpectedly found test tag")
 	}
-	if !bytes.Equal(cs.Config.HtPasswd, []byte("Config.HtPasswd")) {
-		t.Error("cs.Config.HtPasswd unexpectedly changed")
+	if !bytes.Equal([]byte(cs.Config.ImageVersion), []byte("Config.ImageVersion")) {
+		t.Error("cs.Config.ImageVersion unexpectedly changed")
 	}
 }

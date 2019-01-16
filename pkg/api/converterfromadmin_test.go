@@ -214,7 +214,7 @@ func TestConvertFromAdmin(t *testing.T) {
 							{
 								Name: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Name"),
 								Provider: &admin.AADIdentityProvider{
-									Kind: to.StringPtr("HtPasswd"),
+									Kind: to.StringPtr("Kind"),
 								},
 							},
 						},
@@ -232,7 +232,7 @@ func TestConvertFromAdmin(t *testing.T) {
 						IdentityProviders: []admin.IdentityProvider{
 							{
 								Provider: &admin.AADIdentityProvider{
-									Kind: to.StringPtr("HtPasswd"),
+									Kind: to.StringPtr("Kind"),
 								},
 							},
 						},
