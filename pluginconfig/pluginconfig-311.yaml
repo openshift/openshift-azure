@@ -12,6 +12,7 @@
   #  key: <Geveva metrics key value. Base64 in YAML, rsa.PrivateKey in struct>
   #  cert: <Geveva metrics certificate value. Format: Base64 in YAML, x509.Certificate struct>
 ## Geneva integration other details
+clusterVersion: v0.0
 genevaLoggingAccount: ccpopenshiftdiag
 genevaLoggingControlPlaneAccount: RPOpenShiftAccount
 genevaLoggingNamespace: CCPOpenShift
