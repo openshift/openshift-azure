@@ -90,12 +90,12 @@
 1. Run `./hack/create.sh $RESOURCEGROUP` to deploy a cluster.
 
 1. To inspect pods running on the OpenShift cluster, run
-   `KUBECONFIG=_data/_out/admin.kubeconfig oc get pods -n $RESOURCEGROUP`.
+   `KUBECONFIG=_data/_out/admin.kubeconfig oc get pods`.
 
-1. To ssh into an OpenShift node (vm-infra-0 or vm-compute-0), run
-   `./hack/ssh.sh hostname`.
+1. To ssh into any OpenShift master node, run
+   `./hack/ssh.sh`. You will be able to jump to ther hosts from there.
 
-1. Run `./hack/delete.sh $RESOURCEGROUP` to delete the deployed cluster.
+1. Run `./hack/delete.sh` to delete the deployed cluster.
 
 ##### Access the cluster
 A cluster can be accessed via the `UI` or `CLI`. If it was created using AAD
