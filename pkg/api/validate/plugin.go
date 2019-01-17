@@ -2,8 +2,14 @@ package validate
 
 import (
 	"fmt"
+	"regexp"
 
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+)
+
+var (
+	imageVersion   = regexp.MustCompile(`^[0-9]{3}.[0-9]{1,4}.[0-9]{8}$`)
+	clusterVersion = regexp.MustCompile(`^v\d+\.\d+$`)
 )
 
 // Validate validates an Plugin API external template/config struct
@@ -19,6 +25,10 @@ func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 	case "osa_311":
 	default:
 		errs = append(errs, fmt.Errorf("invalid ImageSKU %q", t.ImageSKU))
+	}
+	// validate ClusterVersion
+	if !clusterVersion.MatchString(t.ClusterVersion) {
+		errs = append(errs, fmt.Errorf("invalid ClusterVersion %q", t.ClusterVersion))
 	}
 	// validate ImageVersion
 	if !imageVersion.MatchString(t.ImageVersion) {

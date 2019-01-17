@@ -10,7 +10,8 @@ import (
 
 func TestPluginTemplateValidate(t *testing.T) {
 	expectedErrs :=
-		[]error{errors.New(`imageOffer should be osa`),
+		[]error{errors.New(`invalid ClusterVersion ""`),
+			errors.New(`imageOffer should be osa`),
 			errors.New(`imagePublisher should be redhat`),
 			errors.New(`invalid ImageSKU ""`),
 			errors.New(`invalid ImageVersion ""`),
