@@ -1,4 +1,12 @@
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
+CLUSTER_VERSION=$(shell cat pluginconfig/pluginconfig-311.yaml | grep "clusterVersion: " | tr -d "clusterVersion: ")
+TAG=$(shell if [[ ${CLUSTER_VERSION} == "v0.0" ]]; then echo "latest"; else echo ${CLUSTER_VERSION}; fi)
+LDFLAGS="-X main.gitCommit=$(COMMIT)"
+E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
+AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
+ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
+METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
+SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 
 # all is the default target to build everything
 all: clean build azure-controllers etcdbackup sync metricsbridge e2e-bin
@@ -20,15 +28,10 @@ create:
 delete:
 	./hack/delete.sh ${RESOURCEGROUP}
 
-TAG ?= $(shell git rev-parse --short HEAD)
-E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
-AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
-ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
-METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
-SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
+publish: sync-push azure-controllers-push etcdbackup-push metricsbridge-push e2e-push
 
 azure-controllers: generate
-	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/azure-controllers
+	go build -ldflags ${LDFLAGS} ./cmd/azure-controllers
 
 azure-controllers-image: azure-controllers
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
@@ -38,7 +41,7 @@ azure-controllers-push: azure-controllers-image
 	docker push $(AZURE_CONTROLLERS_IMAGE)
 
 e2e-bin: generate
-	go test -ldflags "-X main.gitCommit=$(COMMIT)" -tags e2e -c -o ./e2e ./test/e2e
+	go test -ldflags ${LDFLAGS} -tags e2e -c -o ./e2e ./test/e2e
 
 e2e-image: e2e-bin
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
@@ -48,10 +51,10 @@ e2e-push: e2e-image
 	docker push $(E2E_IMAGE)
 
 recoveretcdcluster: generate
-	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/recoveretcdcluster
+	go build -ldflags ${LDFLAGS} ./cmd/recoveretcdcluster
 
 etcdbackup: generate
-	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/etcdbackup
+	go build -ldflags ${LDFLAGS} ./cmd/etcdbackup
 
 etcdbackup-image: etcdbackup
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
@@ -61,7 +64,7 @@ etcdbackup-push: etcdbackup-image
 	docker push $(ETCDBACKUP_IMAGE)
 
 metricsbridge:
-	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/metricsbridge
+	go build -ldflags ${LDFLAGS} ./cmd/metricsbridge
 
 metricsbridge-image: metricsbridge
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
@@ -71,7 +74,7 @@ metricsbridge-push: metricsbridge-image
 	docker push $(METRICSBRIDGE_IMAGE)
 
 sync: generate
-	go build -ldflags "-X main.gitCommit=$(COMMIT)" ./cmd/sync
+	go build -ldflags ${LDFLAGS} ./cmd/sync
 
 sync-image: sync
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
@@ -85,6 +88,7 @@ verify:
 	go vet ./...
 	./hack/verify-code-format.sh
 	./hack/validate-util.sh
+	./hack/validate-release.sh pluginconfig-311.yaml
 	go run ./hack/validate-imports/validate-imports.go cmd hack pkg test
 	go run ./hack/lint-addons/lint-addons.go -n
 
