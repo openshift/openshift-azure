@@ -28,6 +28,7 @@ func ConvertFromPlugin(in *plugin.Config, old *Config) *Config {
 	cs.Certificates.GenevaMetrics.Cert = in.Certificates.GenevaMetrics.Cert
 	cs.Certificates.GenevaMetrics.Key = in.Certificates.GenevaMetrics.Key
 	// Container images configuration
+	cs.Images.ImagePullSecret = in.Images.ImagePullSecret
 	cs.Images.GenevaImagePullSecret = in.Images.GenevaImagePullSecret
 	cs.Images.Format = in.Images.Format
 	cs.Images.ClusterMonitoringOperator = in.Images.ClusterMonitoringOperator
