@@ -93,7 +93,7 @@
    `KUBECONFIG=_data/_out/admin.kubeconfig oc get pods`.
 
 1. To ssh into any OpenShift master node, run
-   `./hack/ssh.sh`. You will be able to jump to ther hosts from there.
+   `./hack/ssh.sh`. You will be able to jump to other hosts from there.
 
 1. Run `./hack/delete.sh` to delete the deployed cluster.
 
