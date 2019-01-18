@@ -1,5 +1,5 @@
-hash: d0fb924f51ed51ddf9e063ad34f937c9f21ba9f55103d4ac4c9b7903aa0742d0
-updated: 2019-01-08T20:45:30.318702029-06:00
+hash: 3a617adc001e614307c81c9241bf51a5a2eb81e48829b0cfdcaa73ca6126cb45
+updated: 2019-01-14T19:55:23.981093039+10:00
 imports:
 - name: github.com/Azure/azure-sdk-for-go
   version: d3bcaa706ac10b18784811ff31e43be635159013
@@ -116,6 +116,8 @@ imports:
   version: f2b4162afba35581b6d4a50d3b8f34e33c144682
 - name: github.com/kelseyhightower/envconfig
   version: f611eb38b3875cc3bd991ca91c51d06446afa14c
+- name: github.com/konsorten/go-windows-terminal-sequences
+  version: 5c8c8bd35d3832f5d134ae1e1e375b69a4d25242
 - name: github.com/marstr/guid
   version: 8bd9a64bf37eb297b492a4101fb28e80ac0b290f
 - name: github.com/matttproud/golang_protobuf_extensions
@@ -199,7 +201,7 @@ imports:
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/sirupsen/logrus
-  version: 3e01752db0189b9157070a0e1668a620f9a85da2
+  version: e1e72e9de974bd926e5c56f83753fba2df402ce5
 - name: github.com/spf13/pflag
   version: 583c0c0531f06d5278b7d917446061adc344b5cd
 - name: go.uber.org/atomic

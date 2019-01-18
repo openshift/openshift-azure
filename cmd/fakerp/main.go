@@ -12,6 +12,7 @@ import (
 func main() {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+	logrus.SetReportCaller(true)
 	log := logrus.NewEntry(logrus.StandardLogger())
 
 	// TODO: Validate all required env variables are in place
