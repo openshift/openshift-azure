@@ -161,7 +161,7 @@ const (
 // VMSize represents supported VMSizes
 type VMSize string
 
-// VMSizes
+// VMSizes.  Keep in sync with MaxDataDisksPerVM()
 const (
 	// General purpose VMs
 	StandardD2sV3  VMSize = "Standard_D2s_v3"
