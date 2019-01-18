@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
-	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-02-01/network"
+	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-07-01/network"
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2015-06-15/storage"
 	"github.com/Azure/go-autorest/autorest/to"
 
@@ -19,29 +19,28 @@ import (
 )
 
 const (
-	VnetName                              = "vnet"
-	vnetSubnetName                        = "default"
-	ipAPIServerName                       = "ip-apiserver"
-	ipKubernetesName                      = "ip-kubernetes"
-	lbAPIServerName                       = "lb-apiserver"
-	lbAPIServerFrontendConfigurationName  = "frontend"
-	lbAPIServerBackendPoolName            = "backend"
-	lbAPIServerLoadBalancingRuleName      = "port-443"
-	lbAPIServerProbeName                  = "port-443"
-	lbKubernetesName                      = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
-	lbKubernetesFrontendConfigurationName = "outbound"
-	lbKubernetesBackendPoolName           = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
-	lbKubernetesLoadBalancingRuleName     = "dummy"
-	lbKubernetesProbeName                 = "dummy"
-	nsgMasterName                         = "nsg-master"
-	nsgMasterAllowSSHRuleName             = "allow_ssh"
-	nsgMasterAllowHTTPSRuleName           = "allow_https"
-	nsgWorkerName                         = "nsg-worker"
-	vmssNicName                           = "nic"
-	vmssNicPublicIPConfigurationName      = "ip"
-	vmssIPConfigurationName               = "ipconfig"
-	vmssCSEName                           = "cse"
-	vmssAdminUsername                     = "cloud-user"
+	VnetName                                      = "vnet"
+	vnetSubnetName                                = "default"
+	ipAPIServerName                               = "ip-apiserver"
+	ipOutboundName                                = "ip-outbound"
+	lbAPIServerName                               = "lb-apiserver"
+	lbAPIServerFrontendConfigurationName          = "frontend"
+	lbAPIServerBackendPoolName                    = "backend"
+	lbAPIServerLoadBalancingRuleName              = "port-443"
+	lbAPIServerProbeName                          = "port-443"
+	lbKubernetesName                              = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
+	lbKubernetesOutboundFrontendConfigurationName = "outbound"
+	lbKubernetesOutboundRuleName                  = "outbound"
+	lbKubernetesBackendPoolName                   = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
+	nsgMasterName                                 = "nsg-master"
+	nsgMasterAllowSSHRuleName                     = "allow_ssh"
+	nsgMasterAllowHTTPSRuleName                   = "allow_https"
+	nsgWorkerName                                 = "nsg-worker"
+	vmssNicName                                   = "nic"
+	vmssNicPublicIPConfigurationName              = "ip"
+	vmssIPConfigurationName                       = "ipconfig"
+	vmssCSEName                                   = "cse"
+	vmssAdminUsername                             = "cloud-user"
 )
 
 // fixupAPIVersions inserts an apiVersion field into the ARM template for each
@@ -58,7 +57,7 @@ func fixupAPIVersions(template map[string]interface{}) {
 			"Microsoft.Network/networkSecurityGroups",
 			"Microsoft.Network/publicIPAddresses",
 			"Microsoft.Network/virtualNetworks":
-			apiVersion = "2018-02-01"
+			apiVersion = "2018-07-01"
 		case "Microsoft.Storage/storageAccounts":
 			apiVersion = "2015-06-15"
 		default:
@@ -175,7 +174,7 @@ func ipAPIServer(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 	}
 }
 
-func ipKubernetes(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
+func ipOutbound(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 	return &network.PublicIPAddress{
 		Sku: &network.PublicIPAddressSku{
 			Name: network.PublicIPAddressSkuNameStandard,
@@ -184,14 +183,14 @@ func ipKubernetes(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 			PublicIPAllocationMethod: network.Static,
 			IdleTimeoutInMinutes:     to.Int32Ptr(15),
 		},
-		Name:     to.StringPtr(ipKubernetesName),
+		Name:     to.StringPtr(ipOutboundName),
 		Type:     to.StringPtr("Microsoft.Network/publicIPAddresses"),
 		Location: to.StringPtr(cs.Location),
 	}
 }
 
-func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
-	return &network.LoadBalancer{
+func lbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
+	lb := &network.LoadBalancer{
 		Sku: &network.LoadBalancerSku{
 			Name: network.LoadBalancerSkuNameStandard,
 		},
@@ -266,18 +265,24 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 					Name: to.StringPtr(lbAPIServerProbeName),
 				},
 			},
-			InboundNatRules:  &[]network.InboundNatRule{},
-			InboundNatPools:  &[]network.InboundNatPool{},
-			OutboundNatRules: &[]network.OutboundNatRule{},
+			InboundNatRules: &[]network.InboundNatRule{},
+			InboundNatPools: &[]network.InboundNatPool{},
+			OutboundRules:   &[]network.OutboundRule{},
 		},
 		Name:     to.StringPtr(lbAPIServerName),
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
 		Location: to.StringPtr(cs.Location),
 	}
+
+	if pc.TestConfig.RunningUnderTest {
+		(*lb.LoadBalancingRules)[0].EnableTCPReset = to.BoolPtr(true)
+	}
+
+	return lb
 }
 
-func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
-	return &network.LoadBalancer{
+func lbKubernetes(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
+	lb := &network.LoadBalancer{
 		Sku: &network.LoadBalancerSku{
 			Name: network.LoadBalancerSkuNameStandard,
 		},
@@ -291,11 +296,11 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/publicIPAddresses",
-								ipKubernetesName,
+								ipOutboundName,
 							)),
 						},
 					},
-					Name: to.StringPtr(lbKubernetesFrontendConfigurationName),
+					Name: to.StringPtr(lbKubernetesOutboundFrontendConfigurationName),
 				},
 			},
 			BackendAddressPools: &[]network.BackendAddressPool{
@@ -303,16 +308,19 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 					Name: to.StringPtr(lbKubernetesBackendPoolName),
 				},
 			},
-			LoadBalancingRules: &[]network.LoadBalancingRule{
+			OutboundRules: &[]network.OutboundRule{
 				{
-					LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
-						FrontendIPConfiguration: &network.SubResource{
-							ID: to.StringPtr(resourceid.ResourceID(
-								cs.Properties.AzProfile.SubscriptionID,
-								cs.Properties.AzProfile.ResourceGroup,
-								"Microsoft.Network/loadBalancers",
-								lbKubernetesName,
-							) + "/frontendIPConfigurations/" + lbKubernetesFrontendConfigurationName),
+					Name: to.StringPtr(lbKubernetesOutboundRuleName),
+					OutboundRulePropertiesFormat: &network.OutboundRulePropertiesFormat{
+						FrontendIPConfigurations: &[]network.SubResource{
+							{
+								ID: to.StringPtr(resourceid.ResourceID(
+									cs.Properties.AzProfile.SubscriptionID,
+									cs.Properties.AzProfile.ResourceGroup,
+									"Microsoft.Network/loadBalancers",
+									lbKubernetesName,
+								) + "/frontendIPConfigurations/" + lbKubernetesOutboundFrontendConfigurationName),
+							},
 						},
 						BackendAddressPool: &network.SubResource{
 							ID: to.StringPtr(resourceid.ResourceID(
@@ -322,43 +330,22 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 								lbKubernetesName,
 							) + "/backendAddressPools/" + lbKubernetesBackendPoolName),
 						},
-						Probe: &network.SubResource{
-							ID: to.StringPtr(resourceid.ResourceID(
-								cs.Properties.AzProfile.SubscriptionID,
-								cs.Properties.AzProfile.ResourceGroup,
-								"Microsoft.Network/loadBalancers",
-								lbKubernetesName,
-							) + "/probes/" + lbKubernetesProbeName),
-						},
-						Protocol:             network.TransportProtocolTCP,
-						LoadDistribution:     network.Default,
-						FrontendPort:         to.Int32Ptr(1),
-						BackendPort:          to.Int32Ptr(1),
+						Protocol:             network.Protocol1All,
 						IdleTimeoutInMinutes: to.Int32Ptr(15),
-						EnableFloatingIP:     to.BoolPtr(false),
 					},
-					Name: to.StringPtr(lbKubernetesLoadBalancingRuleName),
 				},
 			},
-			Probes: &[]network.Probe{
-				{
-					ProbePropertiesFormat: &network.ProbePropertiesFormat{
-						Protocol:          network.ProbeProtocolTCP,
-						Port:              to.Int32Ptr(1),
-						IntervalInSeconds: to.Int32Ptr(5),
-						NumberOfProbes:    to.Int32Ptr(2),
-					},
-					Name: to.StringPtr(lbKubernetesProbeName),
-				},
-			},
-			InboundNatRules:  &[]network.InboundNatRule{},
-			InboundNatPools:  &[]network.InboundNatPool{},
-			OutboundNatRules: &[]network.OutboundNatRule{},
 		},
 		Name:     to.StringPtr(lbKubernetesName),
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
 		Location: to.StringPtr(cs.Location),
 	}
+
+	if pc.TestConfig.RunningUnderTest {
+		(*lb.OutboundRules)[0].EnableTCPReset = to.BoolPtr(true)
+	}
+
+	return lb
 }
 
 func storageRegistry(cs *api.OpenShiftManagedCluster) *storage.Account {

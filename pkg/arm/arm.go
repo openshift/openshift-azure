@@ -49,14 +49,14 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 		Resources: []interface{}{
 			vnet(cs),
 			ipAPIServer(cs),
-			lbAPIServer(cs),
+			lbAPIServer(&g.pluginConfig, cs),
 			storageRegistry(cs),
 			storageConfig(cs),
 			nsgMaster(cs),
 		},
 	}
 	if !isUpdate {
-		t.Resources = append(t.Resources, ipKubernetes(cs), lbKubernetes(cs), nsgWorker(cs))
+		t.Resources = append(t.Resources, ipOutbound(cs), lbKubernetes(&g.pluginConfig, cs), nsgWorker(cs))
 	}
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
