@@ -374,7 +374,6 @@ func TestAdminAPIParity(t *testing.T) {
 
 	// TODO: why don't we just include all of these in the admin type?
 	notInAdmin := []*regexp.Regexp{
-		regexp.MustCompile(`^\.Config\.ClusterVersion$`),
 		regexp.MustCompile(`^\.Config\.RunningUnderTest$`),
 		regexp.MustCompile(`^\.Config\.Images\.ImagePullSecret$`),
 		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
