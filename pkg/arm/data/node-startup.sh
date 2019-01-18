@@ -58,3 +58,10 @@ systemctl start ${SERVICE_TYPE}-node.service &
 # disabling rsyslog since we manage everything through journald
 systemctl disable rsyslog.service
 systemctl stop rsyslog.service
+
+#load the tuned profile which is recommended the host joins the cluster
+{{- if eq .Extra.Role "infra" }}
+tuned-adm profile openshift-control-plane
+{{- else }}
+tuned-adm profile openshift-node
+{{- end }}
