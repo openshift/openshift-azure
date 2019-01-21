@@ -1,12 +1,5 @@
 #!/bin/bash -x
 
-cleanup() {
-    kill $(jobs -p) &>/dev/null || true
-    wait
-}
-
-trap cleanup EXIT
-
 if [[ $# -eq 0 && ! -e _data/containerservice.yaml ]]; then
     echo error: _data/containerservice.yaml must exist
     exit 1
@@ -24,5 +17,7 @@ else
     go generate ./...
     go run cmd/fakerp/main.go &
 fi
+
+trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT
 
 go run cmd/createorupdate/createorupdate.go -request=DELETE ${TEST_IN_PRODUCTION:-}
