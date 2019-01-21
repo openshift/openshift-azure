@@ -1,10 +1,10 @@
-## openshift-azure
+# openshift-azure
 
 [![Coverage Status](https://codecov.io/gh/openshift/openshift-azure/branch/master/graph/badge.svg)](https://codecov.io/gh/openshift/openshift-azure)
 [![Go Report Card](https://goreportcard.com/badge/github.com/openshift/openshift-azure)](https://goreportcard.com/report/github.com/openshift/openshift-azure)
 [![GoDoc](https://godoc.org/github.com/openshift/openshift-azure?status.svg)](https://godoc.org/github.com/openshift/openshift-azure)
 
-### Prerequisites
+## Prerequisites
 
 1. **Utilities**.  You'll need recent versions of [Azure
    CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) and
@@ -82,7 +82,7 @@
   Once you have application with approved/granted permissions it can be re-used
   for all future clusters.
 
-### Deploy an OpenShift cluster
+## Deploy an OpenShift cluster
 
 1. Copy the `env.example` file to `env` and edit according to your requirements.
    Source the `env` file: `. ./env`.
@@ -97,7 +97,7 @@
 
 1. Run `./hack/delete.sh` to delete the deployed cluster.
 
-##### Access the cluster
+## Access the cluster
 A cluster can be accessed via the `UI` or `CLI`. If it was created using AAD
 integration ([Pre-requisites](#prerequisites) 7.iv), you can login using Azure AD. Another option,
 which will be deprecated in the future, is `htpasswd`. The username that is used
@@ -151,5 +151,12 @@ properties:
     osType: Linux
 ```
 
-#### Dependency management
+## Dependency management
 To add a new dependency to the project, add the package information to glide.yaml and execute `glide up -v`
+
+## CI infrastructure
+Read more about how to work with our CI system [here](https://github.com/openshift/release/blob/master/projects/azure/README.md).
+
+For any infrastructure-related issues, make sure to contact the Developer Productivity
+team who is responsible for managing the OpenShift CI Infrastructure at #forum-testplatform
+in [Slack](https://coreos.slack.com/).
