@@ -17,6 +17,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	azureclientstorage "github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
@@ -107,7 +108,7 @@ func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
 		return false, err
 	}
 
-	v := api.NewValidator(cs.Config.RunningUnderTest)
+	v := validate.NewAPIValidator(cs.Config.RunningUnderTest)
 	if errs := v.Validate(cs, nil, false); len(errs) > 0 {
 		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}

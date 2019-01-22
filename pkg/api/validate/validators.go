@@ -1,133 +1,12 @@
-package api
+package validate
 
 import (
-	"errors"
 	"fmt"
 	"net"
-	"reflect"
-	"regexp"
 	"strings"
 
-	"github.com/go-test/deep"
+	"github.com/openshift/openshift-azure/pkg/api"
 )
-
-var (
-	rxRfc1123 = regexp.MustCompile(`(?i)^` +
-		`([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9])` +
-		`(\.([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9]))*` +
-		`$`)
-
-	rxVNetID = regexp.MustCompile(`(?i)^` +
-		`/subscriptions/[^/]+` +
-		`/resourceGroups/[^/]+` +
-		`/providers/Microsoft\.Network` +
-		`/virtualNetworks/[^/]+` +
-		`$`)
-
-	rxAgentPoolProfileName = regexp.MustCompile(`^[a-z0-9]{1,12}$`)
-
-	// This regexp is to guard against InvalidDomainNameLabel for hostname validation
-	rxCloudDomainLabel = regexp.MustCompile(`^[a-z][a-z0-9-]{1,61}[a-z0-9]\.`)
-
-	validMasterAndInfraVMSizes = map[VMSize]struct{}{
-		// Rationale here is: a highly limited set of modern general purpose
-		// offerings which we can reason about and test for now.
-
-		// GENERAL PURPOSE VMS
-
-		StandardD4sV3:  {},
-		StandardD8sV3:  {},
-		StandardD16sV3: {},
-		StandardD32sV3: {},
-		StandardD64sV3: {},
-
-		// TODO: consider enabling storage optimized (Ls) series for masters and
-		// moving the etcd onto the VM SSD storage.
-
-		// TODO: enable vertical scaling of existing OSA clusters.
-	}
-
-	validComputeVMSizes = map[VMSize]struct{}{
-		// Rationale here is: modern offerings per (general purpose /
-		// memory-optimized / compute-optimized / storage-optimized) family,
-		// with at least 16GiB RAM, 32GiB SSD, 8 data disks, premium storage
-		// support.  GPU and HPC use cases are probably blocked for now on
-		// drivers / multiple agent pool support.
-
-		// GENERAL PURPOSE VMS
-
-		// Skiping StandardB* (burstable) VMs for now as they could be hard to
-		// reason about performance-wise.
-
-		StandardD4sV3:  {},
-		StandardD8sV3:  {},
-		StandardD16sV3: {},
-		StandardD32sV3: {},
-		StandardD64sV3: {},
-
-		StandardDS4V2: {},
-		StandardDS5V2: {},
-
-		// COMPUTE OPTIMIZED VMS
-
-		StandardF8sV2:  {},
-		StandardF16sV2: {},
-		StandardF32sV2: {},
-		StandardF64sV2: {},
-		StandardF72sV2: {},
-
-		StandardF8s:  {},
-		StandardF16s: {},
-
-		// MEMORY OPTIMIZED VMS
-
-		StandardE4sV3:  {},
-		StandardE8sV3:  {},
-		StandardE16sV3: {},
-		StandardE20sV3: {},
-		StandardE32sV3: {},
-		StandardE64sV3: {},
-
-		// Skipping StandardM* for now as they may require significant extra
-		// effort/spend to certify and support.
-
-		StandardGS2: {},
-		StandardGS3: {},
-		StandardGS4: {},
-		StandardGS5: {},
-
-		StandardDS12V2: {},
-		StandardDS13V2: {},
-		StandardDS14V2: {},
-		StandardDS15V2: {},
-
-		// STORAGE OPTIMIZED VMS
-
-		StandardL4s:  {},
-		StandardL8s:  {},
-		StandardL16s: {},
-		StandardL32s: {},
-	}
-)
-
-var (
-	clusterNetworkCIDR *net.IPNet
-	serviceNetworkCIDR *net.IPNet
-)
-
-// Validator shares objects between validation methods
-type Validator struct {
-	runningUnderTest bool
-	isAdmin          bool
-}
-
-func NewValidator(runningUnderTest bool) *Validator {
-	return &Validator{runningUnderTest: runningUnderTest}
-}
-
-func NewAdminValidator(runningUnderTest bool) *Validator {
-	return &Validator{runningUnderTest: runningUnderTest, isAdmin: true}
-}
 
 func init() {
 	var err error
@@ -144,10 +23,10 @@ func init() {
 	}
 }
 
-var validAgentPoolProfileRoles = map[AgentPoolProfileRole]struct{}{
-	AgentPoolProfileRoleCompute: {},
-	AgentPoolProfileRoleInfra:   {},
-	AgentPoolProfileRoleMaster:  {},
+var validAgentPoolProfileRoles = map[api.AgentPoolProfileRole]struct{}{
+	api.AgentPoolProfileRoleCompute: {},
+	api.AgentPoolProfileRoleInfra:   {},
+	api.AgentPoolProfileRoleMaster:  {},
 }
 
 var validRouterProfileNames = map[string]struct{}{
@@ -190,48 +69,7 @@ func vnetContainsSubnet(vnet, subnet *net.IPNet) bool {
 	return vnet.IP.Equal(subnet.IP.Mask(vnet.Mask))
 }
 
-func (v *Validator) isValidMasterAndInfraVMSize(size VMSize) bool {
-	if v.runningUnderTest && size == StandardD2sV3 {
-		return true
-	}
-
-	_, found := validMasterAndInfraVMSizes[size]
-	return found
-}
-
-func (v *Validator) isValidComputeVMSize(size VMSize) bool {
-	if v.runningUnderTest && size == StandardD2sV3 {
-		return true
-	}
-
-	_, found := validComputeVMSizes[size]
-	return found
-}
-
-// Validate validates a OpenShiftManagedCluster struct
-func (v *Validator) Validate(new, old *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
-	// TODO are these error messages confusing since they may not correspond with the external model?
-	if v.isAdmin && old == nil {
-		errs = append(errs, errors.New("admin requests cannot create clusters"))
-		return errs
-	}
-	if errs := v.validateContainerService(new, externalOnly); len(errs) > 0 {
-		return errs
-	}
-	if old != nil {
-		if errs := v.validateUpdateContainerService(new, old, externalOnly); len(errs) > 0 {
-			return errs
-		}
-	}
-	if v.isAdmin {
-		if errs := v.validateUpdateConfig(new.Config, old.Config); len(errs) > 0 {
-			return errs
-		}
-	}
-	return nil
-}
-
-func (v *Validator) validateContainerService(c *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	if c == nil {
 		errs = append(errs, fmt.Errorf("openShiftManagedCluster cannot be nil"))
 		return
@@ -245,46 +83,17 @@ func (v *Validator) validateContainerService(c *OpenShiftManagedCluster, externa
 		errs = append(errs, fmt.Errorf("invalid name %q", c.Name))
 	}
 
-	errs = append(errs, v.validateProperties(&c.Properties, c.Location, externalOnly)...)
+	errs = append(errs, validateProperties(&c.Properties, c.Location, externalOnly)...)
 	return
 }
 
-func (v *Validator) validateUpdateContainerService(cs, oldCs *OpenShiftManagedCluster, externalOnly bool) (errs []error) {
-	if cs == nil || oldCs == nil {
-		errs = append(errs, fmt.Errorf("openShiftManagedCluster cannot be nil"))
-		return
-	}
-
-	newAgents := make(map[string]*AgentPoolProfile)
-	for i := range cs.Properties.AgentPoolProfiles {
-		newAgent := cs.Properties.AgentPoolProfiles[i]
-		newAgents[newAgent.Name] = &newAgent
-	}
-
-	old := oldCs.DeepCopy()
-
-	for i, o := range old.Properties.AgentPoolProfiles {
-		new, ok := newAgents[o.Name]
-		if !ok {
-			continue // we know we are going to fail the DeepEqual test below.
-		}
-		old.Properties.AgentPoolProfiles[i].Count = new.Count
-	}
-
-	if !reflect.DeepEqual(cs, old) {
-		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
-	}
-
-	return
-}
-
-func (v *Validator) validateProperties(p *Properties, location string, externalOnly bool) (errs []error) {
+func validateProperties(p *api.Properties, location string, externalOnly bool) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("properties cannot be nil"))
 		return
 	}
 
-	errs = append(errs, v.validateProvisioningState(p.ProvisioningState)...)
+	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
 	switch p.OpenShiftVersion {
 	case "v3.11":
 	default:
@@ -294,20 +103,20 @@ func (v *Validator) validateProperties(p *Properties, location string, externalO
 	if p.PublicHostname != "" { // TODO: relax after private preview (&& !isValidHostname(p.PublicHostname))
 		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
 	}
-	errs = append(errs, v.validateNetworkProfile(&p.NetworkProfile)...)
+	errs = append(errs, validateNetworkProfile(&p.NetworkProfile)...)
 
-	errs = append(errs, v.validateRouterProfiles(p.RouterProfiles, location, externalOnly)...)
+	errs = append(errs, validateRouterProfiles(p.RouterProfiles, location, externalOnly)...)
 
-	errs = append(errs, v.validateFQDN(p, location)...)
+	errs = append(errs, validateFQDN(p, location)...)
 	// we can disregard any error below because we are already going to fail
 	// validation if VnetCIDR does not parse correctly.
 	_, vnet, _ := net.ParseCIDR(p.NetworkProfile.VnetCIDR)
-	errs = append(errs, v.validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
-	errs = append(errs, v.validateAuthProfile(&p.AuthProfile)...)
+	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
+	errs = append(errs, validateAuthProfile(&p.AuthProfile)...)
 	return
 }
 
-func (v *Validator) validateAuthProfile(ap *AuthProfile) (errs []error) {
+func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 	if ap == nil {
 		errs = append(errs, fmt.Errorf("properties.authProfile cannot be nil"))
 		return
@@ -319,7 +128,7 @@ func (v *Validator) validateAuthProfile(ap *AuthProfile) (errs []error) {
 	//check supported identity providers
 	for _, ip := range ap.IdentityProviders {
 		switch provider := ip.Provider.(type) {
-		case (*AADIdentityProvider):
+		case (*api.AADIdentityProvider):
 			if ip.Name != "Azure AD" {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders name"))
 			}
@@ -337,8 +146,8 @@ func (v *Validator) validateAuthProfile(ap *AuthProfile) (errs []error) {
 	return
 }
 
-func (v *Validator) validateAgentPoolProfiles(apps []AgentPoolProfile, vnet *net.IPNet) (errs []error) {
-	appmap := map[AgentPoolProfileRole]AgentPoolProfile{}
+func validateAgentPoolProfiles(apps []api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {
+	appmap := map[api.AgentPoolProfileRole]api.AgentPoolProfile{}
 
 	for i, app := range apps {
 		if _, found := validAgentPoolProfileRoles[app.Role]; !found {
@@ -354,7 +163,7 @@ func (v *Validator) validateAgentPoolProfiles(apps []AgentPoolProfile, vnet *net
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.subnetCidr %q: all subnetCidrs must match", app.SubnetCIDR))
 		}
 
-		errs = append(errs, v.validateAgentPoolProfile(app, vnet)...)
+		errs = append(errs, validateAgentPoolProfile(app, vnet)...)
 	}
 
 	for role := range validAgentPoolProfileRoles {
@@ -363,18 +172,18 @@ func (v *Validator) validateAgentPoolProfiles(apps []AgentPoolProfile, vnet *net
 		}
 	}
 
-	if appmap[AgentPoolProfileRoleMaster].VMSize != appmap[AgentPoolProfileRoleInfra].VMSize {
-		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.vmSize %q: master and infra vmSizes must match", appmap[AgentPoolProfileRoleInfra].VMSize))
+	if appmap[api.AgentPoolProfileRoleMaster].VMSize != appmap[api.AgentPoolProfileRoleInfra].VMSize {
+		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.vmSize %q: master and infra vmSizes must match", appmap[api.AgentPoolProfileRoleInfra].VMSize))
 	}
 
 	return
 }
 
-func (v *Validator) validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPNet) (errs []error) {
+func validateAgentPoolProfile(app api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {
 	switch app.Role {
-	case AgentPoolProfileRoleCompute:
+	case api.AgentPoolProfileRoleCompute:
 		switch app.Name {
-		case string(AgentPoolProfileRoleMaster), string(AgentPoolProfileRoleInfra):
+		case string(api.AgentPoolProfileRoleMaster), string(api.AgentPoolProfileRoleInfra):
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 		}
 		if !rxAgentPoolProfileName.MatchString(app.Name) {
@@ -383,30 +192,21 @@ func (v *Validator) validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPN
 		if app.Count < 1 || app.Count > 20 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
-		if !v.isValidComputeVMSize(app.VMSize) {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
-		}
 
-	case AgentPoolProfileRoleInfra:
+	case api.AgentPoolProfileRoleInfra:
 		if app.Name != string(app.Role) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 		}
 		if app.Count != 2 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
-		if !v.isValidMasterAndInfraVMSize(app.VMSize) {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
-		}
 
-	case AgentPoolProfileRoleMaster:
+	case api.AgentPoolProfileRoleMaster:
 		if app.Name != string(app.Role) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 		}
 		if app.Count != 3 {
 			errs = append(errs, fmt.Errorf("invalid properties.masterPoolProfile.count %d", app.Count))
-		}
-		if !v.isValidMasterAndInfraVMSize(app.VMSize) {
-			errs = append(errs, fmt.Errorf("invalid properties.masterPoolProfile.vmSize %q", app.VMSize))
 		}
 	}
 
@@ -430,7 +230,7 @@ func (v *Validator) validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPN
 	}
 
 	switch app.OSType {
-	case OSTypeLinux:
+	case api.OSTypeLinux:
 	default:
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].osType %q", app.Name, app.OSType))
 	}
@@ -438,7 +238,7 @@ func (v *Validator) validateAgentPoolProfile(app AgentPoolProfile, vnet *net.IPN
 	return
 }
 
-func (v *Validator) validateFQDN(p *Properties, location string) (errs []error) {
+func validateFQDN(p *api.Properties, location string) (errs []error) {
 	if p == nil {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
 		return
@@ -449,7 +249,7 @@ func (v *Validator) validateFQDN(p *Properties, location string) (errs []error) 
 	return
 }
 
-func (v *Validator) validateNetworkProfile(np *NetworkProfile) (errs []error) {
+func validateNetworkProfile(np *api.NetworkProfile) (errs []error) {
 	if np == nil {
 		errs = append(errs, fmt.Errorf("networkProfile cannot be nil"))
 		return
@@ -466,8 +266,8 @@ func (v *Validator) validateNetworkProfile(np *NetworkProfile) (errs []error) {
 	return
 }
 
-func (v *Validator) validateRouterProfiles(rps []RouterProfile, location string, externalOnly bool) (errs []error) {
-	rpmap := map[string]RouterProfile{}
+func validateRouterProfiles(rps []api.RouterProfile, location string, externalOnly bool) (errs []error) {
+	rpmap := map[string]api.RouterProfile{}
 
 	for _, rp := range rps {
 		if _, found := validRouterProfileNames[rp.Name]; !found {
@@ -479,7 +279,7 @@ func (v *Validator) validateRouterProfiles(rps []RouterProfile, location string,
 		}
 		rpmap[rp.Name] = rp
 
-		errs = append(errs, v.validateRouterProfile(rp, location, externalOnly)...)
+		errs = append(errs, validateRouterProfile(rp, location, externalOnly)...)
 	}
 	if !externalOnly {
 		for name := range validRouterProfileNames {
@@ -491,7 +291,7 @@ func (v *Validator) validateRouterProfiles(rps []RouterProfile, location string,
 	return
 }
 
-func (v *Validator) validateRouterProfile(rp RouterProfile, location string, externalOnly bool) (errs []error) {
+func validateRouterProfile(rp api.RouterProfile, location string, externalOnly bool) (errs []error) {
 	if rp.Name == "" {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
 	}
@@ -509,25 +309,54 @@ func (v *Validator) validateRouterProfile(rp RouterProfile, location string, ext
 	return
 }
 
-func (v *Validator) validateProvisioningState(ps ProvisioningState) (errs []error) {
+func validateProvisioningState(ps api.ProvisioningState) (errs []error) {
 	switch ps {
 	case "",
-		Creating,
-		Updating,
-		Failed,
-		Succeeded,
-		Deleting,
-		Migrating,
-		Upgrading:
+		api.Creating,
+		api.Updating,
+		api.Failed,
+		api.Succeeded,
+		api.Deleting,
+		api.Migrating,
+		api.Upgrading:
 	default:
 		errs = append(errs, fmt.Errorf("invalid properties.provisioningState %q", ps))
 	}
 	return
 }
 
-func (v *Validator) validateUpdateConfig(internalConfig, adminConfig Config) (errs []error) {
-	if !reflect.DeepEqual(internalConfig, adminConfig) {
-		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(internalConfig, adminConfig)))
+func validateVMSize(app api.AgentPoolProfile, runningUnderTest bool) (errs []error) {
+	switch app.Role {
+	case api.AgentPoolProfileRoleMaster:
+		if !isValidMasterAndInfraVMSize(app.VMSize, runningUnderTest) {
+			errs = append(errs, fmt.Errorf("invalid properties.masterPoolProfile.vmSize %q", app.VMSize))
+		}
+	case api.AgentPoolProfileRoleInfra:
+		if !isValidMasterAndInfraVMSize(app.VMSize, runningUnderTest) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
+		}
+	case api.AgentPoolProfileRoleCompute:
+		if !isValidComputeVMSize(app.VMSize, runningUnderTest) {
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
+		}
 	}
-	return
+	return errs
+}
+
+func isValidMasterAndInfraVMSize(size api.VMSize, runningUnderTest bool) bool {
+	if runningUnderTest && size == api.StandardD2sV3 {
+		return true
+	}
+
+	_, found := validMasterAndInfraVMSizes[size]
+	return found
+}
+
+func isValidComputeVMSize(size api.VMSize, runningUnderTest bool) bool {
+	if runningUnderTest && size == api.StandardD2sV3 {
+		return true
+	}
+
+	_, found := validComputeVMSizes[size]
+	return found
 }
