@@ -20,9 +20,9 @@ type rbacApplicationsClient struct {
 var _ RBACApplicationsClient = &rbacApplicationsClient{}
 
 // NewRBACApplicationsClient creates a new ApplicationsClient
-func NewRBACApplicationsClient(tenantID string, authorizer autorest.Authorizer, languages []string) RBACApplicationsClient {
+func NewRBACApplicationsClient(ctx context.Context, tenantID string, authorizer autorest.Authorizer) RBACApplicationsClient {
 	client := graphrbac.NewApplicationsClient(tenantID)
-	setupClient(&client.Client, authorizer, languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &rbacApplicationsClient{
 		ApplicationsClient: client,

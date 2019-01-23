@@ -20,9 +20,9 @@ type accountsClient struct {
 var _ AccountsClient = &accountsClient{}
 
 // NewAccountsClient returns a new AccountsClient
-func NewAccountsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) AccountsClient {
+func NewAccountsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) AccountsClient {
 	client := storage.NewAccountsClient(subscriptionID)
-	setupClient(&client.Client, authorizer, languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &accountsClient{
 		AccountsClient: client,

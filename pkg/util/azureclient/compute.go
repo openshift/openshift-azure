@@ -20,9 +20,9 @@ type virtualMachineScaleSetsClient struct {
 var _ VirtualMachineScaleSetsClient = &virtualMachineScaleSetsClient{}
 
 // NewVirtualMachineScaleSetsClient creates a new VirtualMachineScaleSetsClient
-func NewVirtualMachineScaleSetsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) VirtualMachineScaleSetsClient {
+func NewVirtualMachineScaleSetsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetsClient {
 	client := compute.NewVirtualMachineScaleSetsClient(subscriptionID)
-	setupClient(&client.Client, authorizer, languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &virtualMachineScaleSetsClient{
 		VirtualMachineScaleSetsClient: client,
@@ -45,9 +45,9 @@ type virtualMachineScaleSetVMsClient struct {
 var _ VirtualMachineScaleSetVMsClient = &virtualMachineScaleSetVMsClient{}
 
 // NewVirtualMachineScaleSetVMsClient creates a new VirtualMachineScaleSetVMsClient
-func NewVirtualMachineScaleSetVMsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) VirtualMachineScaleSetVMsClient {
+func NewVirtualMachineScaleSetVMsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetVMsClient {
 	client := compute.NewVirtualMachineScaleSetVMsClient(subscriptionID)
-	setupClient(&client.Client, authorizer, languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &virtualMachineScaleSetVMsClient{
 		VirtualMachineScaleSetVMsClient: client,
@@ -73,9 +73,9 @@ type virtualMachineScaleSetExtensionsClient struct {
 var _ VirtualMachineScaleSetExtensionsClient = &virtualMachineScaleSetExtensionsClient{}
 
 // NewVirtualMachineScaleSetExtensionsClient creates a new VirtualMachineScaleSetExtensionsClient
-func NewVirtualMachineScaleSetExtensionsClient(subscriptionID string, authorizer autorest.Authorizer, languages []string) VirtualMachineScaleSetExtensionsClient {
+func NewVirtualMachineScaleSetExtensionsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetExtensionsClient {
 	client := compute.NewVirtualMachineScaleSetExtensionsClient(subscriptionID)
-	setupClient(&client.Client, authorizer, languages)
+	setupClient(ctx, &client.Client, authorizer)
 
 	return &virtualMachineScaleSetExtensionsClient{
 		VirtualMachineScaleSetExtensionsClient: client,

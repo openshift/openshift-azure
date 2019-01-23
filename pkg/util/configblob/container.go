@@ -20,7 +20,7 @@ func GetService(ctx context.Context, cpc *cloudprovider.Config) (azureclientstor
 		return nil, err
 	}
 
-	acctsCli := azureclient.NewAccountsClient(cpc.SubscriptionID, authorizer, nil)
+	acctsCli := azureclient.NewAccountsClient(ctx, cpc.SubscriptionID, authorizer)
 
 	accts, err := acctsCli.ListByResourceGroup(ctx, cpc.ResourceGroup)
 	if err != nil {
