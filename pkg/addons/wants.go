@@ -7,6 +7,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
+	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 )
 
@@ -27,12 +28,8 @@ func Wants(o unstructured.Unstructured) bool {
 	}
 
 	// skip non-infrastructure namespaces.
-	switch ns {
-	case "", "default", "openshift":
-	default:
-		if !strings.HasPrefix(ns, "kube-") && !strings.HasPrefix(ns, "openshift-") {
-			return false
-		}
+	if !kubeclient.IsControlPlaneNamespace(ns) {
+		return false
 	}
 
 	switch gk.String() {
@@ -65,12 +62,8 @@ func Wants(o unstructured.Unstructured) bool {
 
 	case "Namespace":
 		// skip non-infrastructure namespaces.
-		switch ns {
-		case "", "default", "openshift":
-		default:
-			if !strings.HasPrefix(ns, "kube-") && !strings.HasPrefix(ns, "openshift-") {
-				return false
-			}
+		if !kubeclient.IsControlPlaneNamespace(ns) {
+			return false
 		}
 
 	case "OAuthClient.oauth.openshift.io":
