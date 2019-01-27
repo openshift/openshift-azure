@@ -16,10 +16,12 @@ import:
   version: kubernetes-1.10.6
 - package: github.com/davecgh/go-spew
   version: ^1.1.0
+- package: google.golang.org/grpc
+  version: 1.18.0
 - package: github.com/Azure/azure-sdk-for-go
-  version: v21.0.0
+  version: v24.0.0
 - package: github.com/Azure/go-autorest
-  version: 10.15.4
+  version: 11.2.7
 - package: github.com/sirupsen/logrus
   version: v1.3.0
 - package: github.com/ghodss/yaml

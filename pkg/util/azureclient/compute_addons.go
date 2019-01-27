@@ -118,7 +118,7 @@ func (c *virtualMachineScaleSetVMsClient) List(ctx context.Context, resourceGrou
 }
 
 func (c *virtualMachineScaleSetVMsClient) Reimage(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string) error {
-	future, err := c.VirtualMachineScaleSetVMsClient.Reimage(ctx, resourceGroupName, VMScaleSetName, instanceID)
+	future, err := c.VirtualMachineScaleSetVMsClient.Reimage(ctx, resourceGroupName, VMScaleSetName, instanceID, nil)
 	if err != nil {
 		return err
 	}
