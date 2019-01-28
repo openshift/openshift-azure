@@ -111,6 +111,7 @@ codecov: unit
 
 release-test: version publish
 	ls -la  /usr/local/e2e-secrets/azure
+	oc new-app https://github.com/sclorg/cakephp-ex
 
 e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
