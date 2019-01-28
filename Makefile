@@ -1,6 +1,7 @@
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
 CLUSTER_VERSION=$(shell cat pluginconfig/pluginconfig-311.yaml | grep "clusterVersion: " | tr -d "clusterVersion: ")
-TAG=$(shell if [[ ${CLUSTER_VERSION} == "v0.0" ]]; then echo "latest"; else echo ${CLUSTER_VERSION}; fi)
+# if we are on master branch we should always use dev tag
+TAG=$(shell if [[ ${CLUSTER_VERSION} == "v0.0" ]]; then echo "dev"; else echo ${CLUSTER_VERSION}; fi)
 LDFLAGS="-X main.gitCommit=$(COMMIT)"
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
 AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
@@ -10,6 +11,9 @@ SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 
 # all is the default target to build everything
 all: clean build azure-controllers etcdbackup sync metricsbridge e2e-bin
+
+version:
+	echo ${TAG}
 
 build: generate
 	go build ./...
@@ -28,7 +32,10 @@ create:
 delete:
 	./hack/delete.sh ${RESOURCEGROUP}
 
-publish: sync-push azure-controllers-push etcdbackup-push metricsbridge-push e2e-push
+publish: unit verify build sync-push azure-controllers-push etcdbackup-push metricsbridge-push e2e-push
+
+release-test: 
+	sleep 360
 
 azure-controllers: generate
 	go build -ldflags ${LDFLAGS} ./cmd/azure-controllers
