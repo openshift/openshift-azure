@@ -21,12 +21,8 @@ package runtime
 
 import original "github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v2.0/luis/runtime"
 
-const (
-	DefaultBaseURI = original.DefaultBaseURI
-)
-
-type BaseClient = original.BaseClient
 type APIError = original.APIError
+type BaseClient = original.BaseClient
 type CompositeChildModel = original.CompositeChildModel
 type CompositeEntityModel = original.CompositeEntityModel
 type EntityModel = original.EntityModel
@@ -34,20 +30,17 @@ type EntityWithResolution = original.EntityWithResolution
 type EntityWithScore = original.EntityWithScore
 type IntentModel = original.IntentModel
 type LuisResult = original.LuisResult
-type Sentiment = original.Sentiment
 type PredictionClient = original.PredictionClient
+type Sentiment = original.Sentiment
 
-func New() BaseClient {
-	return original.New()
+func New(endpoint string) BaseClient {
+	return original.New(endpoint)
 }
-func NewWithBaseURI(baseURI string) BaseClient {
-	return original.NewWithBaseURI(baseURI)
+func NewPredictionClient(endpoint string) PredictionClient {
+	return original.NewPredictionClient(endpoint)
 }
-func NewPredictionClient() PredictionClient {
-	return original.NewPredictionClient()
-}
-func NewPredictionClientWithBaseURI(baseURI string) PredictionClient {
-	return original.NewPredictionClientWithBaseURI(baseURI)
+func NewWithoutDefaults(endpoint string) BaseClient {
+	return original.NewWithoutDefaults(endpoint)
 }
 func UserAgent() string {
 	return original.UserAgent() + " profiles/latest"

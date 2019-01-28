@@ -17,9 +17,9 @@ import:
 - package: github.com/davecgh/go-spew
   version: ^1.1.0
 - package: github.com/Azure/azure-sdk-for-go
-  version: v19.1.0
+  version: v24.0.0
 - package: github.com/Azure/go-autorest
-  version: 10.14.0
+  version: v11.2.7
 - package: github.com/sirupsen/logrus
   version: v1.0.6
 - package: github.com/ghodss/yaml
@@ -58,3 +58,7 @@ import:
   version: ^1.2.0
   subpackages:
   - proto
+- package: google.golang.org/grpc
+  version: v1.16.0
+- package: golang.org/x/sys
+  version: d69651ed3497faee15a5363a89578e9991f6d5e2
