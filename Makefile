@@ -109,7 +109,8 @@ cover: unit
 codecov: unit
 	./hack/codecov-report.sh
 
-release-test: unit verify build version
+release-test: version
+	ls -la  /usr/local/e2e-secrets/azure
 
 e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
