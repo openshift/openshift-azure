@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/Azure/go-autorest/autorest"
@@ -318,6 +319,72 @@ func (client OpenShiftManagedClustersClient) GetResponder(resp *http.Response) (
 		autorest.ByUnmarshallingJSON(&result),
 		autorest.ByClosing())
 	result.Response = autorest.Response{Response: resp}
+	return
+}
+
+// GetControlPlanePods gets the details of the managed openshift cluster with a specified resource group and name.
+// Parameters:
+// resourceGroupName - the name of the resource group.
+// resourceName - the name of the openshift managed cluster resource.
+func (client OpenShiftManagedClustersClient) GetControlPlanePods(ctx context.Context, resourceGroupName string, resourceName string) (result OpenShiftManagedClustersControlPlanePods, err error) {
+	req, err := client.GetControlPlanePodsPreparer(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "GetControlPlanePods", nil, "Failure preparing request")
+		return
+	}
+
+	resp, err := client.GetControlPlanePodsSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "GetControlPlanePods", resp, "Failure sending request")
+		return
+	}
+
+	result, err = client.GetControlPlanePodsResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "GetControlPlanePods", resp, "Failure responding to request")
+	}
+
+	return
+}
+
+// GetControlPlanePodsPreparer prepares the GetControlPlanePods request.
+func (client OpenShiftManagedClustersClient) GetControlPlanePodsPreparer(ctx context.Context, resourceGroupName string, resourceName string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": api.APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsGet(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/status", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// GetControlPlanePodsSender sends the GetControlPlanePods request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) GetControlPlanePodsSender(req *http.Request) (*http.Response, error) {
+	return autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+}
+
+// GetControlPlanePodsResponder handles the response to the GetControlPlanePods request. The method always
+// closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) GetControlPlanePodsResponder(resp *http.Response) (result OpenShiftManagedClustersControlPlanePods, err error) {
+	defer resp.Body.Close()
+	status, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	result.Response = autorest.Response{Response: resp}
+	result.Items = status
 	return
 }
 
@@ -666,4 +733,32 @@ func (future *OpenShiftManagedClustersRotateSecretsFuture) Result(client OpenShi
 	}
 	ar.Response = future.Response()
 	return
+}
+
+// OpenShiftManagedClustersGetControlPlanePodsFuture an abstraction for monitoring and retrieving the results of a
+// cluster status operation.
+type OpenShiftManagedClustersGetControlPlanePodsFuture struct {
+	azure.Future
+}
+
+func (future *OpenShiftManagedClustersGetControlPlanePodsFuture) Result(client OpenShiftManagedClustersClient) (ar autorest.Response, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersGetControlPlanePodsFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("containerservice.OpenShiftManagedClustersGetControlPlanePodsFuture")
+		return
+	}
+	ar.Response = future.Response()
+	return
+}
+
+// OpenShiftManagedClustersControlPlanePods contains the status of the control plane pods
+type OpenShiftManagedClustersControlPlanePods struct {
+	autorest.Response `json:"-"`
+
+	Items []byte `json:"-"`
 }
