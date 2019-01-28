@@ -9,9 +9,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/storage"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster"
-	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 )
@@ -67,23 +65,9 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	config, err := GetPluginConfig()
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to configure plugin: %v", err))
-		return
-	}
-	p, errs := plugin.NewPlugin(s.log, config)
-	if len(errs) > 0 {
-		s.internalError(w, fmt.Sprintf("Failed to configure plugin: %v", err))
-		return
-	}
-
-	ctx = context.WithValue(ctx, api.ContextKeyClientID, cs.Properties.ServicePrincipalProfile.ClientID)
-	ctx = context.WithValue(ctx, api.ContextKeyClientSecret, cs.Properties.ServicePrincipalProfile.Secret)
-	ctx = context.WithValue(ctx, api.ContextKeyTenantID, cs.Properties.AzProfile.TenantID)
-
-	deployer := GetDeployer(s.log, cs, config)
-	if err := p.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
+	ctx = enrichContext(context.Background())
+	deployer := GetDeployer(s.log, cs, s.pluginConfig)
+	if err := s.plugin.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to recover cluster: %v", err))
 		return
 	}
