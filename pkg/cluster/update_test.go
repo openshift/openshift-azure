@@ -491,7 +491,7 @@ func TestUpdateInPlace(t *testing.T) {
 				{
 					virtualMachineScaleSetVMsClient.EXPECT().Client().Return(arc)
 					vFt := compute.VirtualMachineScaleSetVMsReimageFuture{Future: ft}
-					virtualMachineScaleSetVMsClient.EXPECT().Reimage(ctx, testRg, "ss-"+string(tt.role), *vm.InstanceID).Return(vFt, nil)
+					virtualMachineScaleSetVMsClient.EXPECT().Reimage(ctx, testRg, "ss-"+string(tt.role), *vm.InstanceID, &compute.VirtualMachineScaleSetVMReimageParameters{TempDisk: to.BoolPtr(true)}).Return(vFt, nil)
 				}
 				// 5. start
 				{

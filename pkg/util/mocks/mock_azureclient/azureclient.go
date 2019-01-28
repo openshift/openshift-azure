@@ -236,18 +236,18 @@ func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) List(arg0, arg1, arg2
 }
 
 // Reimage mocks base method
-func (m *MockVirtualMachineScaleSetVMsClient) Reimage(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsReimageFuture, error) {
+func (m *MockVirtualMachineScaleSetVMsClient) Reimage(arg0 context.Context, arg1, arg2, arg3 string, arg4 *compute.VirtualMachineScaleSetVMReimageParameters) (compute.VirtualMachineScaleSetVMsReimageFuture, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Reimage", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "Reimage", arg0, arg1, arg2, arg3, arg4)
 	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsReimageFuture)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Reimage indicates an expected call of Reimage
-func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Reimage(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Reimage(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reimage", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Reimage), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reimage", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Reimage), arg0, arg1, arg2, arg3, arg4)
 }
 
 // Restart mocks base method
