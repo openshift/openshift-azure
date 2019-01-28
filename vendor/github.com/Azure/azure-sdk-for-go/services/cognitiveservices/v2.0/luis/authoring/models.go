@@ -25,6 +25,9 @@ import (
 	"io"
 )
 
+// The package's fully qualified name.
+const fqdn = "github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v2.0/luis/authoring"
+
 // OperationStatusType enumerates the values for operation status type.
 type OperationStatusType string
 
@@ -520,6 +523,16 @@ type AvailablePrebuiltEntityModel struct {
 	Examples *string `json:"examples,omitempty"`
 }
 
+// AzureAccountInfoObject defines the azure account information object.
+type AzureAccountInfoObject struct {
+	// AzureSubscriptionID - The id for the azure subscription.
+	AzureSubscriptionID *string `json:"azureSubscriptionId,omitempty"`
+	// ResourceGroup - The azure resource group name.
+	ResourceGroup *string `json:"resourceGroup,omitempty"`
+	// AccountName - The azure account name.
+	AccountName *string `json:"accountName,omitempty"`
+}
+
 // BatchLabelExample response when adding a batch of labeled examples.
 type BatchLabelExample struct {
 	Value    *LabelExampleResponse `json:"value,omitempty"`
@@ -648,6 +661,8 @@ type EndpointInfo struct {
 	AssignedEndpointKey *string `json:"assignedEndpointKey,omitempty"`
 	// EndpointRegion - The endpoint's region.
 	EndpointRegion *string `json:"endpointRegion,omitempty"`
+	// FailedRegions - Regions where publishing failed.
+	FailedRegions *string `json:"failedRegions,omitempty"`
 	// PublishedDateTime - Timestamp when was last published.
 	PublishedDateTime *string `json:"publishedDateTime,omitempty"`
 }
@@ -816,9 +831,9 @@ func (er *ErrorResponse) UnmarshalJSON(body []byte) error {
 type ExampleLabelObject struct {
 	// Text - The sample's utterance.
 	Text *string `json:"text,omitempty"`
-	// EntityLabels - The idenfied entities within the utterance.
+	// EntityLabels - The identified entities within the utterance.
 	EntityLabels *[]EntityLabelObject `json:"entityLabels,omitempty"`
-	// IntentName - The idenfitied intent representing the utterance.
+	// IntentName - The identified intent representing the utterance.
 	IntentName *string `json:"intentName,omitempty"`
 }
 
@@ -1057,6 +1072,12 @@ type ListAvailableCulture struct {
 type ListAvailablePrebuiltEntityModel struct {
 	autorest.Response `json:"-"`
 	Value             *[]AvailablePrebuiltEntityModel `json:"value,omitempty"`
+}
+
+// ListAzureAccountInfoObject ...
+type ListAzureAccountInfoObject struct {
+	autorest.Response `json:"-"`
+	Value             *[]AzureAccountInfoObject `json:"value,omitempty"`
 }
 
 // ListBatchLabelExample ...
@@ -1645,8 +1666,8 @@ type PatternUpdateObject struct {
 	IsActive *bool `json:"isActive,omitempty"`
 }
 
-// PersonalAssistantsResponse response containing user's endpoint keys and the endpoint URLs of the prebuilt
-// Cortana applications.
+// PersonalAssistantsResponse response containing user's endpoint keys and the endpoint URLs of the
+// prebuilt Cortana applications.
 type PersonalAssistantsResponse struct {
 	autorest.Response `json:"-"`
 	EndpointKeys      *[]uuid.UUID       `json:"endpointKeys,omitempty"`
@@ -1712,14 +1733,15 @@ type PrebuiltDomain struct {
 	Entities    *[]PrebuiltDomainItem `json:"entities,omitempty"`
 }
 
-// PrebuiltDomainCreateBaseObject a model object containing the name of the custom prebuilt entity and the name of
-// the domain to which this model belongs.
+// PrebuiltDomainCreateBaseObject a model object containing the name of the custom prebuilt entity and the
+// name of the domain to which this model belongs.
 type PrebuiltDomainCreateBaseObject struct {
 	// DomainName - The domain name.
 	DomainName *string `json:"domainName,omitempty"`
 }
 
-// PrebuiltDomainCreateObject a prebuilt domain create object containing the name and culture of the domain.
+// PrebuiltDomainCreateObject a prebuilt domain create object containing the name and culture of the
+// domain.
 type PrebuiltDomainCreateObject struct {
 	// DomainName - The domain name.
 	DomainName *string `json:"domainName,omitempty"`
@@ -1734,8 +1756,8 @@ type PrebuiltDomainItem struct {
 	Examples    *string `json:"examples,omitempty"`
 }
 
-// PrebuiltDomainModelCreateObject a model object containing the name of the custom prebuilt intent or entity and
-// the name of the domain to which this model belongs.
+// PrebuiltDomainModelCreateObject a model object containing the name of the custom prebuilt intent or
+// entity and the name of the domain to which this model belongs.
 type PrebuiltDomainModelCreateObject struct {
 	// DomainName - The domain name.
 	DomainName *string `json:"domainName,omitempty"`
@@ -1784,6 +1806,8 @@ type ProductionOrStagingEndpointInfo struct {
 	AssignedEndpointKey *string `json:"assignedEndpointKey,omitempty"`
 	// EndpointRegion - The endpoint's region.
 	EndpointRegion *string `json:"endpointRegion,omitempty"`
+	// FailedRegions - Regions where publishing failed.
+	FailedRegions *string `json:"failedRegions,omitempty"`
 	// PublishedDateTime - Timestamp when was last published.
 	PublishedDateTime *string `json:"publishedDateTime,omitempty"`
 }
@@ -1793,7 +1817,7 @@ type PublishSettings struct {
 	autorest.Response `json:"-"`
 	// ID - The application ID.
 	ID *uuid.UUID `json:"id,omitempty"`
-	// IsSentimentAnalysisEnabled - Setting sentiment analysis as true returns the Sentiment of the input utterance along with the resopnse
+	// IsSentimentAnalysisEnabled - Setting sentiment analysis as true returns the Sentiment of the input utterance along with the response
 	IsSentimentAnalysisEnabled *bool `json:"sentimentAnalysis,omitempty"`
 	// IsSpeechEnabled - Setting speech as public enables speech priming in your app
 	IsSpeechEnabled *bool `json:"speech,omitempty"`
@@ -1803,7 +1827,7 @@ type PublishSettings struct {
 
 // PublishSettingUpdateObject object model for updating an application's publish settings.
 type PublishSettingUpdateObject struct {
-	// SentimentAnalysis - Setting sentiment analysis as true returns the Sentiment of the input utterance along with the resopnse
+	// SentimentAnalysis - Setting sentiment analysis as true returns the Sentiment of the input utterance along with the response
 	SentimentAnalysis *bool `json:"sentimentAnalysis,omitempty"`
 	// Speech - Setting speech as public enables speech priming in your app
 	Speech *bool `json:"speech,omitempty"`
@@ -1974,7 +1998,9 @@ func (vi VersionInfo) MarshalJSON() ([]byte, error) {
 	if vi.AssignedEndpointKey != nil {
 		objectMap["assignedEndpointKey"] = vi.AssignedEndpointKey
 	}
-	objectMap["externalApiKeys"] = vi.ExternalAPIKeys
+	if vi.ExternalAPIKeys != nil {
+		objectMap["externalApiKeys"] = vi.ExternalAPIKeys
+	}
 	if vi.IntentsCount != nil {
 		objectMap["intentsCount"] = vi.IntentsCount
 	}

@@ -18,13 +18,18 @@ package databox
 // Changes may cause incorrect behavior and will be lost if the code is regenerated.
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/Azure/go-autorest/tracing"
 	"net/http"
 )
+
+// The package's fully qualified name.
+const fqdn = "github.com/Azure/azure-sdk-for-go/services/databox/mgmt/2018-01-01/databox"
 
 // AccessProtocol enumerates the values for access protocol.
 type AccessProtocol string
@@ -108,13 +113,30 @@ const (
 	InProgress CopyStatus = "InProgress"
 	// NotReturned No copy triggered as device was not returned.
 	NotReturned CopyStatus = "NotReturned"
-	// NotStarted Data copy hasnt started yet.
+	// NotStarted Data copy hasn't started yet.
 	NotStarted CopyStatus = "NotStarted"
 )
 
 // PossibleCopyStatusValues returns an array of possible values for the CopyStatus const type.
 func PossibleCopyStatusValues() []CopyStatus {
 	return []CopyStatus{Completed, CompletedWithErrors, Failed, InProgress, NotReturned, NotStarted}
+}
+
+// DataDestinationType enumerates the values for data destination type.
+type DataDestinationType string
+
+const (
+	// DataDestinationTypeDestinationAccountDetails ...
+	DataDestinationTypeDestinationAccountDetails DataDestinationType = "DestinationAccountDetails"
+	// DataDestinationTypeManagedDisk ...
+	DataDestinationTypeManagedDisk DataDestinationType = "ManagedDisk"
+	// DataDestinationTypeStorageAccount ...
+	DataDestinationTypeStorageAccount DataDestinationType = "StorageAccount"
+)
+
+// PossibleDataDestinationTypeValues returns an array of possible values for the DataDestinationType const type.
+func PossibleDataDestinationTypeValues() []DataDestinationType {
+	return []DataDestinationType{DataDestinationTypeDestinationAccountDetails, DataDestinationTypeManagedDisk, DataDestinationTypeStorageAccount}
 }
 
 // JobDetailsTypeEnum enumerates the values for job details type enum.
@@ -186,8 +208,10 @@ const (
 	AzureFile ShareDestinationFormatType = "AzureFile"
 	// BlockBlob Azure storage block blob format.
 	BlockBlob ShareDestinationFormatType = "BlockBlob"
-	// HCS Storsimple data format.
+	// HCS StorSimple data format.
 	HCS ShareDestinationFormatType = "HCS"
+	// ManagedDisk Azure Compute Disk.
+	ManagedDisk ShareDestinationFormatType = "ManagedDisk"
 	// PageBlob Azure storage page blob format.
 	PageBlob ShareDestinationFormatType = "PageBlob"
 	// UnknownType Unknown format.
@@ -196,7 +220,7 @@ const (
 
 // PossibleShareDestinationFormatTypeValues returns an array of possible values for the ShareDestinationFormatType const type.
 func PossibleShareDestinationFormatTypeValues() []ShareDestinationFormatType {
-	return []ShareDestinationFormatType{AzureFile, BlockBlob, HCS, PageBlob, UnknownType}
+	return []ShareDestinationFormatType{AzureFile, BlockBlob, HCS, ManagedDisk, PageBlob, UnknownType}
 }
 
 // SkuDisabledReason enumerates the values for sku disabled reason.
@@ -209,26 +233,29 @@ const (
 	SkuDisabledReasonFeature SkuDisabledReason = "Feature"
 	// SkuDisabledReasonNone SKU is not disabled.
 	SkuDisabledReasonNone SkuDisabledReason = "None"
+	// SkuDisabledReasonNoSubscriptionInfo Subscription has not registered to Microsoft.DataBox and Service
+	// does not have the subscription notification.
+	SkuDisabledReasonNoSubscriptionInfo SkuDisabledReason = "NoSubscriptionInfo"
 	// SkuDisabledReasonOfferType Subscription does not have required offer types for the SKU.
 	SkuDisabledReasonOfferType SkuDisabledReason = "OfferType"
-	// SkuDisabledReasonRegion SKU is not available to push data to the requested storage account region.
+	// SkuDisabledReasonRegion SKU is not available to push data to the requested Azure region.
 	SkuDisabledReasonRegion SkuDisabledReason = "Region"
 )
 
 // PossibleSkuDisabledReasonValues returns an array of possible values for the SkuDisabledReason const type.
 func PossibleSkuDisabledReasonValues() []SkuDisabledReason {
-	return []SkuDisabledReason{SkuDisabledReasonCountry, SkuDisabledReasonFeature, SkuDisabledReasonNone, SkuDisabledReasonOfferType, SkuDisabledReasonRegion}
+	return []SkuDisabledReason{SkuDisabledReasonCountry, SkuDisabledReasonFeature, SkuDisabledReasonNone, SkuDisabledReasonNoSubscriptionInfo, SkuDisabledReasonOfferType, SkuDisabledReasonRegion}
 }
 
 // SkuName enumerates the values for sku name.
 type SkuName string
 
 const (
-	// DataBox Databox.
+	// DataBox DataBox.
 	DataBox SkuName = "DataBox"
-	// DataBoxDisk DataboxDisk.
+	// DataBoxDisk DataBoxDisk.
 	DataBoxDisk SkuName = "DataBoxDisk"
-	// DataBoxHeavy DataboxHeavy.
+	// DataBoxHeavy DataBoxHeavy.
 	DataBoxHeavy SkuName = "DataBoxHeavy"
 )
 
@@ -453,20 +480,37 @@ type AvailableSkusResultIterator struct {
 	page AvailableSkusResultPage
 }
 
-// Next advances to the next value.  If there was an error making
+// NextWithContext advances to the next value.  If there was an error making
 // the request the iterator does not advance and the error is returned.
-func (iter *AvailableSkusResultIterator) Next() error {
+func (iter *AvailableSkusResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/AvailableSkusResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	iter.i++
 	if iter.i < len(iter.page.Values()) {
 		return nil
 	}
-	err := iter.page.Next()
+	err = iter.page.NextWithContext(ctx)
 	if err != nil {
 		iter.i--
 		return err
 	}
 	iter.i = 0
 	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *AvailableSkusResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the enumeration should be started or is not yet complete.
@@ -488,6 +532,11 @@ func (iter AvailableSkusResultIterator) Value() SkuInformation {
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the AvailableSkusResultIterator type.
+func NewAvailableSkusResultIterator(page AvailableSkusResultPage) AvailableSkusResultIterator {
+	return AvailableSkusResultIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (asr AvailableSkusResult) IsEmpty() bool {
 	return asr.Value == nil || len(*asr.Value) == 0
@@ -495,11 +544,11 @@ func (asr AvailableSkusResult) IsEmpty() bool {
 
 // availableSkusResultPreparer prepares a request to retrieve the next set of results.
 // It returns nil if no more results exist.
-func (asr AvailableSkusResult) availableSkusResultPreparer() (*http.Request, error) {
+func (asr AvailableSkusResult) availableSkusResultPreparer(ctx context.Context) (*http.Request, error) {
 	if asr.NextLink == nil || len(to.String(asr.NextLink)) < 1 {
 		return nil, nil
 	}
-	return autorest.Prepare(&http.Request{},
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
 		autorest.AsJSON(),
 		autorest.AsGet(),
 		autorest.WithBaseURL(to.String(asr.NextLink)))
@@ -507,19 +556,36 @@ func (asr AvailableSkusResult) availableSkusResultPreparer() (*http.Request, err
 
 // AvailableSkusResultPage contains a page of SkuInformation values.
 type AvailableSkusResultPage struct {
-	fn  func(AvailableSkusResult) (AvailableSkusResult, error)
+	fn  func(context.Context, AvailableSkusResult) (AvailableSkusResult, error)
 	asr AvailableSkusResult
 }
 
-// Next advances to the next page of values.  If there was an error making
+// NextWithContext advances to the next page of values.  If there was an error making
 // the request the page does not advance and the error is returned.
-func (page *AvailableSkusResultPage) Next() error {
-	next, err := page.fn(page.asr)
+func (page *AvailableSkusResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/AvailableSkusResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.asr)
 	if err != nil {
 		return err
 	}
 	page.asr = next
 	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *AvailableSkusResultPage) Next() error {
+	return page.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the page enumeration should be started or is not yet complete.
@@ -538,6 +604,11 @@ func (page AvailableSkusResultPage) Values() []SkuInformation {
 		return nil
 	}
 	return *page.asr.Value
+}
+
+// Creates a new instance of the AvailableSkusResultPage type.
+func NewAvailableSkusResultPage(getNextPage func(context.Context, AvailableSkusResult) (AvailableSkusResult, error)) AvailableSkusResultPage {
+	return AvailableSkusResultPage{fn: getNextPage}
 }
 
 // CancellationReason reason for cancellation.
@@ -666,12 +737,196 @@ type CopyProgress struct {
 	BytesSentToCloud *int64 `json:"bytesSentToCloud,omitempty"`
 	// TotalBytesToProcess - Total amount of data to be processed by the job.
 	TotalBytesToProcess *int64 `json:"totalBytesToProcess,omitempty"`
+	// FilesProcessed - Number of files processed by the job as of now.
+	FilesProcessed *int64 `json:"filesProcessed,omitempty"`
+	// TotalFilesToProcess - Total number of files to be processed by the job.
+	TotalFilesToProcess *int64 `json:"totalFilesToProcess,omitempty"`
 }
 
-// DestinationAccountDetails details for the destination account.
+// BasicDestinationAccountDetails details of the destination of the data
+type BasicDestinationAccountDetails interface {
+	AsDestinationManagedDiskDetails() (*DestinationManagedDiskDetails, bool)
+	AsDestinationStorageAccountDetails() (*DestinationStorageAccountDetails, bool)
+	AsDestinationAccountDetails() (*DestinationAccountDetails, bool)
+}
+
+// DestinationAccountDetails details of the destination of the data
 type DestinationAccountDetails struct {
-	// AccountID - Destination storage account id.
+	// AccountID - Arm Id of the destination where the data has to be moved.
 	AccountID *string `json:"accountId,omitempty"`
+	// DataDestinationType - Possible values include: 'DataDestinationTypeDestinationAccountDetails', 'DataDestinationTypeManagedDisk', 'DataDestinationTypeStorageAccount'
+	DataDestinationType DataDestinationType `json:"dataDestinationType,omitempty"`
+}
+
+func unmarshalBasicDestinationAccountDetails(body []byte) (BasicDestinationAccountDetails, error) {
+	var m map[string]interface{}
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return nil, err
+	}
+
+	switch m["dataDestinationType"] {
+	case string(DataDestinationTypeManagedDisk):
+		var dmdd DestinationManagedDiskDetails
+		err := json.Unmarshal(body, &dmdd)
+		return dmdd, err
+	case string(DataDestinationTypeStorageAccount):
+		var dsad DestinationStorageAccountDetails
+		err := json.Unmarshal(body, &dsad)
+		return dsad, err
+	default:
+		var dad DestinationAccountDetails
+		err := json.Unmarshal(body, &dad)
+		return dad, err
+	}
+}
+func unmarshalBasicDestinationAccountDetailsArray(body []byte) ([]BasicDestinationAccountDetails, error) {
+	var rawMessages []*json.RawMessage
+	err := json.Unmarshal(body, &rawMessages)
+	if err != nil {
+		return nil, err
+	}
+
+	dadArray := make([]BasicDestinationAccountDetails, len(rawMessages))
+
+	for index, rawMessage := range rawMessages {
+		dad, err := unmarshalBasicDestinationAccountDetails(*rawMessage)
+		if err != nil {
+			return nil, err
+		}
+		dadArray[index] = dad
+	}
+	return dadArray, nil
+}
+
+// MarshalJSON is the custom marshaler for DestinationAccountDetails.
+func (dad DestinationAccountDetails) MarshalJSON() ([]byte, error) {
+	dad.DataDestinationType = DataDestinationTypeDestinationAccountDetails
+	objectMap := make(map[string]interface{})
+	if dad.AccountID != nil {
+		objectMap["accountId"] = dad.AccountID
+	}
+	if dad.DataDestinationType != "" {
+		objectMap["dataDestinationType"] = dad.DataDestinationType
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsDestinationManagedDiskDetails is the BasicDestinationAccountDetails implementation for DestinationAccountDetails.
+func (dad DestinationAccountDetails) AsDestinationManagedDiskDetails() (*DestinationManagedDiskDetails, bool) {
+	return nil, false
+}
+
+// AsDestinationStorageAccountDetails is the BasicDestinationAccountDetails implementation for DestinationAccountDetails.
+func (dad DestinationAccountDetails) AsDestinationStorageAccountDetails() (*DestinationStorageAccountDetails, bool) {
+	return nil, false
+}
+
+// AsDestinationAccountDetails is the BasicDestinationAccountDetails implementation for DestinationAccountDetails.
+func (dad DestinationAccountDetails) AsDestinationAccountDetails() (*DestinationAccountDetails, bool) {
+	return &dad, true
+}
+
+// AsBasicDestinationAccountDetails is the BasicDestinationAccountDetails implementation for DestinationAccountDetails.
+func (dad DestinationAccountDetails) AsBasicDestinationAccountDetails() (BasicDestinationAccountDetails, bool) {
+	return &dad, true
+}
+
+// DestinationManagedDiskDetails details for the destination compute disks.
+type DestinationManagedDiskDetails struct {
+	// ResourceGroupID - Destination Resource Group Id where the Compute disks should be created.
+	ResourceGroupID *string `json:"resourceGroupId,omitempty"`
+	// StagingStorageAccountID - Arm Id of the storage account that can be used to copy the vhd for staging.
+	StagingStorageAccountID *string `json:"stagingStorageAccountId,omitempty"`
+	// AccountID - Arm Id of the destination where the data has to be moved.
+	AccountID *string `json:"accountId,omitempty"`
+	// DataDestinationType - Possible values include: 'DataDestinationTypeDestinationAccountDetails', 'DataDestinationTypeManagedDisk', 'DataDestinationTypeStorageAccount'
+	DataDestinationType DataDestinationType `json:"dataDestinationType,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for DestinationManagedDiskDetails.
+func (dmdd DestinationManagedDiskDetails) MarshalJSON() ([]byte, error) {
+	dmdd.DataDestinationType = DataDestinationTypeManagedDisk
+	objectMap := make(map[string]interface{})
+	if dmdd.ResourceGroupID != nil {
+		objectMap["resourceGroupId"] = dmdd.ResourceGroupID
+	}
+	if dmdd.StagingStorageAccountID != nil {
+		objectMap["stagingStorageAccountId"] = dmdd.StagingStorageAccountID
+	}
+	if dmdd.AccountID != nil {
+		objectMap["accountId"] = dmdd.AccountID
+	}
+	if dmdd.DataDestinationType != "" {
+		objectMap["dataDestinationType"] = dmdd.DataDestinationType
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsDestinationManagedDiskDetails is the BasicDestinationAccountDetails implementation for DestinationManagedDiskDetails.
+func (dmdd DestinationManagedDiskDetails) AsDestinationManagedDiskDetails() (*DestinationManagedDiskDetails, bool) {
+	return &dmdd, true
+}
+
+// AsDestinationStorageAccountDetails is the BasicDestinationAccountDetails implementation for DestinationManagedDiskDetails.
+func (dmdd DestinationManagedDiskDetails) AsDestinationStorageAccountDetails() (*DestinationStorageAccountDetails, bool) {
+	return nil, false
+}
+
+// AsDestinationAccountDetails is the BasicDestinationAccountDetails implementation for DestinationManagedDiskDetails.
+func (dmdd DestinationManagedDiskDetails) AsDestinationAccountDetails() (*DestinationAccountDetails, bool) {
+	return nil, false
+}
+
+// AsBasicDestinationAccountDetails is the BasicDestinationAccountDetails implementation for DestinationManagedDiskDetails.
+func (dmdd DestinationManagedDiskDetails) AsBasicDestinationAccountDetails() (BasicDestinationAccountDetails, bool) {
+	return &dmdd, true
+}
+
+// DestinationStorageAccountDetails details for the destination storage account.
+type DestinationStorageAccountDetails struct {
+	// StorageAccountID - Destination Storage Account Arm Id.
+	StorageAccountID *string `json:"storageAccountId,omitempty"`
+	// AccountID - Arm Id of the destination where the data has to be moved.
+	AccountID *string `json:"accountId,omitempty"`
+	// DataDestinationType - Possible values include: 'DataDestinationTypeDestinationAccountDetails', 'DataDestinationTypeManagedDisk', 'DataDestinationTypeStorageAccount'
+	DataDestinationType DataDestinationType `json:"dataDestinationType,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for DestinationStorageAccountDetails.
+func (dsad DestinationStorageAccountDetails) MarshalJSON() ([]byte, error) {
+	dsad.DataDestinationType = DataDestinationTypeStorageAccount
+	objectMap := make(map[string]interface{})
+	if dsad.StorageAccountID != nil {
+		objectMap["storageAccountId"] = dsad.StorageAccountID
+	}
+	if dsad.AccountID != nil {
+		objectMap["accountId"] = dsad.AccountID
+	}
+	if dsad.DataDestinationType != "" {
+		objectMap["dataDestinationType"] = dsad.DataDestinationType
+	}
+	return json.Marshal(objectMap)
+}
+
+// AsDestinationManagedDiskDetails is the BasicDestinationAccountDetails implementation for DestinationStorageAccountDetails.
+func (dsad DestinationStorageAccountDetails) AsDestinationManagedDiskDetails() (*DestinationManagedDiskDetails, bool) {
+	return nil, false
+}
+
+// AsDestinationStorageAccountDetails is the BasicDestinationAccountDetails implementation for DestinationStorageAccountDetails.
+func (dsad DestinationStorageAccountDetails) AsDestinationStorageAccountDetails() (*DestinationStorageAccountDetails, bool) {
+	return &dsad, true
+}
+
+// AsDestinationAccountDetails is the BasicDestinationAccountDetails implementation for DestinationStorageAccountDetails.
+func (dsad DestinationStorageAccountDetails) AsDestinationAccountDetails() (*DestinationAccountDetails, bool) {
+	return nil, false
+}
+
+// AsBasicDestinationAccountDetails is the BasicDestinationAccountDetails implementation for DestinationStorageAccountDetails.
+func (dsad DestinationStorageAccountDetails) AsBasicDestinationAccountDetails() (BasicDestinationAccountDetails, bool) {
+	return &dsad, true
 }
 
 // DestinationToServiceLocationMap map of destination location to service location
@@ -760,7 +1015,7 @@ type DiskJobDetails struct {
 	DisksAndSizeDetails map[string]*int32 `json:"disksAndSizeDetails"`
 	// Passkey - User entered passkey for DataBox Disk job.
 	Passkey *string `json:"passkey,omitempty"`
-	// ExpectedDataSizeInTeraBytes - The expected size of the data, which needs to be transfered in this job, in tera bytes.
+	// ExpectedDataSizeInTeraBytes - The expected size of the data, which needs to be transferred in this job, in terabytes.
 	ExpectedDataSizeInTeraBytes *int32 `json:"expectedDataSizeInTeraBytes,omitempty"`
 	// JobStages - List of stages that run in the job.
 	JobStages *[]JobStages `json:"jobStages,omitempty"`
@@ -773,7 +1028,7 @@ type DiskJobDetails struct {
 	// ReturnPackage - Return package shipping details.
 	ReturnPackage *PackageShippingDetails `json:"returnPackage,omitempty"`
 	// DestinationAccountDetails - Destination account details.
-	DestinationAccountDetails *[]DestinationAccountDetails `json:"destinationAccountDetails,omitempty"`
+	DestinationAccountDetails *[]BasicDestinationAccountDetails `json:"destinationAccountDetails,omitempty"`
 	// ErrorDetails - Error details for failure. This is optional.
 	ErrorDetails *[]JobErrorDetails `json:"errorDetails,omitempty"`
 	// Preferences - Preferences for the order.
@@ -972,8 +1227,7 @@ func (djd *DiskJobDetails) UnmarshalJSON(body []byte) error {
 			}
 		case "destinationAccountDetails":
 			if v != nil {
-				var destinationAccountDetails []DestinationAccountDetails
-				err = json.Unmarshal(*v, &destinationAccountDetails)
+				destinationAccountDetails, err := unmarshalBasicDestinationAccountDetailsArray(*v)
 				if err != nil {
 					return err
 				}
@@ -1110,7 +1364,7 @@ type Error struct {
 	Message *string `json:"message,omitempty"`
 }
 
-// HeavyAccountCopyLogDetails copy log details for a storage account for Databox heavy
+// HeavyAccountCopyLogDetails copy log details for a storage account for DataBoxHeavy
 type HeavyAccountCopyLogDetails struct {
 	// AccountName - Destination account name.
 	AccountName *string `json:"accountName,omitempty"`
@@ -1161,11 +1415,11 @@ func (hacld HeavyAccountCopyLogDetails) AsBasicCopyLogDetails() (BasicCopyLogDet
 	return &hacld, true
 }
 
-// HeavyJobDetails databox Heavy Device Job Details
+// HeavyJobDetails dataBoxHeavy Device Job Details
 type HeavyJobDetails struct {
 	// CopyProgress - Copy progress per account.
 	CopyProgress *[]CopyProgress `json:"copyProgress,omitempty"`
-	// ExpectedDataSizeInTeraBytes - The expected size of the data, which needs to be transfered in this job, in tera bytes.
+	// ExpectedDataSizeInTeraBytes - The expected size of the data, which needs to be transferred in this job, in terabytes.
 	ExpectedDataSizeInTeraBytes *int32 `json:"expectedDataSizeInTeraBytes,omitempty"`
 	// JobStages - List of stages that run in the job.
 	JobStages *[]JobStages `json:"jobStages,omitempty"`
@@ -1178,7 +1432,7 @@ type HeavyJobDetails struct {
 	// ReturnPackage - Return package shipping details.
 	ReturnPackage *PackageShippingDetails `json:"returnPackage,omitempty"`
 	// DestinationAccountDetails - Destination account details.
-	DestinationAccountDetails *[]DestinationAccountDetails `json:"destinationAccountDetails,omitempty"`
+	DestinationAccountDetails *[]BasicDestinationAccountDetails `json:"destinationAccountDetails,omitempty"`
 	// ErrorDetails - Error details for failure. This is optional.
 	ErrorDetails *[]JobErrorDetails `json:"errorDetails,omitempty"`
 	// Preferences - Preferences for the order.
@@ -1341,8 +1595,7 @@ func (hjd *HeavyJobDetails) UnmarshalJSON(body []byte) error {
 			}
 		case "destinationAccountDetails":
 			if v != nil {
-				var destinationAccountDetails []DestinationAccountDetails
-				err = json.Unmarshal(*v, &destinationAccountDetails)
+				destinationAccountDetails, err := unmarshalBasicDestinationAccountDetailsArray(*v)
 				if err != nil {
 					return err
 				}
@@ -1407,9 +1660,9 @@ func (hjd *HeavyJobDetails) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
-// HeavyJobSecrets the secrets related to a databox heavy job.
+// HeavyJobSecrets the secrets related to a DataBoxHeavy job.
 type HeavyJobSecrets struct {
-	// CabinetPodSecrets - Contains the list of secret objects for a databox heavy job.
+	// CabinetPodSecrets - Contains the list of secret objects for a DataBoxHeavy job.
 	CabinetPodSecrets *[]HeavySecret `json:"cabinetPodSecrets,omitempty"`
 	// JobSecretsType - Possible values include: 'JobSecretsTypeJobSecrets', 'JobSecretsTypeDataBoxDisk', 'JobSecretsTypeDataBoxHeavy', 'JobSecretsTypeDataBox'
 	JobSecretsType JobSecretsTypeEnum `json:"jobSecretsType,omitempty"`
@@ -1453,7 +1706,7 @@ func (hjs HeavyJobSecrets) AsBasicJobSecrets() (BasicJobSecrets, bool) {
 	return &hjs, true
 }
 
-// HeavySecret the secrets related to a databox heavy.
+// HeavySecret the secrets related to a DataBoxHeavy.
 type HeavySecret struct {
 	// DeviceSerialNumber - Serial number of the assigned device.
 	DeviceSerialNumber *string `json:"deviceSerialNumber,omitempty"`
@@ -1477,7 +1730,7 @@ type BasicJobDetails interface {
 
 // JobDetails job details.
 type JobDetails struct {
-	// ExpectedDataSizeInTeraBytes - The expected size of the data, which needs to be transfered in this job, in tera bytes.
+	// ExpectedDataSizeInTeraBytes - The expected size of the data, which needs to be transferred in this job, in terabytes.
 	ExpectedDataSizeInTeraBytes *int32 `json:"expectedDataSizeInTeraBytes,omitempty"`
 	// JobStages - List of stages that run in the job.
 	JobStages *[]JobStages `json:"jobStages,omitempty"`
@@ -1490,7 +1743,7 @@ type JobDetails struct {
 	// ReturnPackage - Return package shipping details.
 	ReturnPackage *PackageShippingDetails `json:"returnPackage,omitempty"`
 	// DestinationAccountDetails - Destination account details.
-	DestinationAccountDetails *[]DestinationAccountDetails `json:"destinationAccountDetails,omitempty"`
+	DestinationAccountDetails *[]BasicDestinationAccountDetails `json:"destinationAccountDetails,omitempty"`
 	// ErrorDetails - Error details for failure. This is optional.
 	ErrorDetails *[]JobErrorDetails `json:"errorDetails,omitempty"`
 	// Preferences - Preferences for the order.
@@ -1686,8 +1939,7 @@ func (jd *JobDetails) UnmarshalJSON(body []byte) error {
 			}
 		case "destinationAccountDetails":
 			if v != nil {
-				var destinationAccountDetails []DestinationAccountDetails
-				err = json.Unmarshal(*v, &destinationAccountDetails)
+				destinationAccountDetails, err := unmarshalBasicDestinationAccountDetailsArray(*v)
 				if err != nil {
 					return err
 				}
@@ -1752,11 +2004,11 @@ func (jd *JobDetails) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
-// JobDetailsType databox Job Details
+// JobDetailsType dataBox Job Details
 type JobDetailsType struct {
 	// CopyProgress - Copy progress per storage account.
 	CopyProgress *[]CopyProgress `json:"copyProgress,omitempty"`
-	// ExpectedDataSizeInTeraBytes - The expected size of the data, which needs to be transfered in this job, in tera bytes.
+	// ExpectedDataSizeInTeraBytes - The expected size of the data, which needs to be transferred in this job, in terabytes.
 	ExpectedDataSizeInTeraBytes *int32 `json:"expectedDataSizeInTeraBytes,omitempty"`
 	// JobStages - List of stages that run in the job.
 	JobStages *[]JobStages `json:"jobStages,omitempty"`
@@ -1769,7 +2021,7 @@ type JobDetailsType struct {
 	// ReturnPackage - Return package shipping details.
 	ReturnPackage *PackageShippingDetails `json:"returnPackage,omitempty"`
 	// DestinationAccountDetails - Destination account details.
-	DestinationAccountDetails *[]DestinationAccountDetails `json:"destinationAccountDetails,omitempty"`
+	DestinationAccountDetails *[]BasicDestinationAccountDetails `json:"destinationAccountDetails,omitempty"`
 	// ErrorDetails - Error details for failure. This is optional.
 	ErrorDetails *[]JobErrorDetails `json:"errorDetails,omitempty"`
 	// Preferences - Preferences for the order.
@@ -1932,8 +2184,7 @@ func (jdt *JobDetailsType) UnmarshalJSON(body []byte) error {
 			}
 		case "destinationAccountDetails":
 			if v != nil {
-				var destinationAccountDetails []DestinationAccountDetails
-				err = json.Unmarshal(*v, &destinationAccountDetails)
+				destinationAccountDetails, err := unmarshalBasicDestinationAccountDetailsArray(*v)
 				if err != nil {
 					return err
 				}
@@ -2255,20 +2506,37 @@ type JobResourceListIterator struct {
 	page JobResourceListPage
 }
 
-// Next advances to the next value.  If there was an error making
+// NextWithContext advances to the next value.  If there was an error making
 // the request the iterator does not advance and the error is returned.
-func (iter *JobResourceListIterator) Next() error {
+func (iter *JobResourceListIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/JobResourceListIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	iter.i++
 	if iter.i < len(iter.page.Values()) {
 		return nil
 	}
-	err := iter.page.Next()
+	err = iter.page.NextWithContext(ctx)
 	if err != nil {
 		iter.i--
 		return err
 	}
 	iter.i = 0
 	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *JobResourceListIterator) Next() error {
+	return iter.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the enumeration should be started or is not yet complete.
@@ -2290,6 +2558,11 @@ func (iter JobResourceListIterator) Value() JobResource {
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the JobResourceListIterator type.
+func NewJobResourceListIterator(page JobResourceListPage) JobResourceListIterator {
+	return JobResourceListIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (jrl JobResourceList) IsEmpty() bool {
 	return jrl.Value == nil || len(*jrl.Value) == 0
@@ -2297,11 +2570,11 @@ func (jrl JobResourceList) IsEmpty() bool {
 
 // jobResourceListPreparer prepares a request to retrieve the next set of results.
 // It returns nil if no more results exist.
-func (jrl JobResourceList) jobResourceListPreparer() (*http.Request, error) {
+func (jrl JobResourceList) jobResourceListPreparer(ctx context.Context) (*http.Request, error) {
 	if jrl.NextLink == nil || len(to.String(jrl.NextLink)) < 1 {
 		return nil, nil
 	}
-	return autorest.Prepare(&http.Request{},
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
 		autorest.AsJSON(),
 		autorest.AsGet(),
 		autorest.WithBaseURL(to.String(jrl.NextLink)))
@@ -2309,19 +2582,36 @@ func (jrl JobResourceList) jobResourceListPreparer() (*http.Request, error) {
 
 // JobResourceListPage contains a page of JobResource values.
 type JobResourceListPage struct {
-	fn  func(JobResourceList) (JobResourceList, error)
+	fn  func(context.Context, JobResourceList) (JobResourceList, error)
 	jrl JobResourceList
 }
 
-// Next advances to the next page of values.  If there was an error making
+// NextWithContext advances to the next page of values.  If there was an error making
 // the request the page does not advance and the error is returned.
-func (page *JobResourceListPage) Next() error {
-	next, err := page.fn(page.jrl)
+func (page *JobResourceListPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/JobResourceListPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.jrl)
 	if err != nil {
 		return err
 	}
 	page.jrl = next
 	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *JobResourceListPage) Next() error {
+	return page.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the page enumeration should be started or is not yet complete.
@@ -2340,6 +2630,11 @@ func (page JobResourceListPage) Values() []JobResource {
 		return nil
 	}
 	return *page.jrl.Value
+}
+
+// Creates a new instance of the JobResourceListPage type.
+func NewJobResourceListPage(getNextPage func(context.Context, JobResourceList) (JobResourceList, error)) JobResourceListPage {
+	return JobResourceListPage{fn: getNextPage}
 }
 
 // JobResourceUpdateParameter the JobResourceUpdateParameter.
@@ -2539,7 +2834,7 @@ func (js JobSecrets) AsBasicJobSecrets() (BasicJobSecrets, bool) {
 	return &js, true
 }
 
-// JobSecretsType the secrets related to a databox job.
+// JobSecretsType the secrets related to a DataBox job.
 type JobSecretsType struct {
 	// PodSecrets - Contains the list of secret objects for a job.
 	PodSecrets *[]Secret `json:"podSecrets,omitempty"`
@@ -2676,20 +2971,37 @@ type OperationListIterator struct {
 	page OperationListPage
 }
 
-// Next advances to the next value.  If there was an error making
+// NextWithContext advances to the next value.  If there was an error making
 // the request the iterator does not advance and the error is returned.
-func (iter *OperationListIterator) Next() error {
+func (iter *OperationListIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/OperationListIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	iter.i++
 	if iter.i < len(iter.page.Values()) {
 		return nil
 	}
-	err := iter.page.Next()
+	err = iter.page.NextWithContext(ctx)
 	if err != nil {
 		iter.i--
 		return err
 	}
 	iter.i = 0
 	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *OperationListIterator) Next() error {
+	return iter.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the enumeration should be started or is not yet complete.
@@ -2711,6 +3023,11 @@ func (iter OperationListIterator) Value() Operation {
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the OperationListIterator type.
+func NewOperationListIterator(page OperationListPage) OperationListIterator {
+	return OperationListIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (ol OperationList) IsEmpty() bool {
 	return ol.Value == nil || len(*ol.Value) == 0
@@ -2718,11 +3035,11 @@ func (ol OperationList) IsEmpty() bool {
 
 // operationListPreparer prepares a request to retrieve the next set of results.
 // It returns nil if no more results exist.
-func (ol OperationList) operationListPreparer() (*http.Request, error) {
+func (ol OperationList) operationListPreparer(ctx context.Context) (*http.Request, error) {
 	if ol.NextLink == nil || len(to.String(ol.NextLink)) < 1 {
 		return nil, nil
 	}
-	return autorest.Prepare(&http.Request{},
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
 		autorest.AsJSON(),
 		autorest.AsGet(),
 		autorest.WithBaseURL(to.String(ol.NextLink)))
@@ -2730,19 +3047,36 @@ func (ol OperationList) operationListPreparer() (*http.Request, error) {
 
 // OperationListPage contains a page of Operation values.
 type OperationListPage struct {
-	fn func(OperationList) (OperationList, error)
+	fn func(context.Context, OperationList) (OperationList, error)
 	ol OperationList
 }
 
-// Next advances to the next page of values.  If there was an error making
+// NextWithContext advances to the next page of values.  If there was an error making
 // the request the page does not advance and the error is returned.
-func (page *OperationListPage) Next() error {
-	next, err := page.fn(page.ol)
+func (page *OperationListPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/OperationListPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.ol)
 	if err != nil {
 		return err
 	}
 	page.ol = next
 	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *OperationListPage) Next() error {
+	return page.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the page enumeration should be started or is not yet complete.
@@ -2761,6 +3095,11 @@ func (page OperationListPage) Values() []Operation {
 		return nil
 	}
 	return *page.ol.Value
+}
+
+// Creates a new instance of the OperationListPage type.
+func NewOperationListPage(getNextPage func(context.Context, OperationList) (OperationList, error)) OperationListPage {
+	return OperationListPage{fn: getNextPage}
 }
 
 // PackageShippingDetails shipping details.
@@ -2821,7 +3160,7 @@ type Secret struct {
 type ShareCredentialDetails struct {
 	// ShareName - Name of the share.
 	ShareName *string `json:"shareName,omitempty"`
-	// ShareType - Type of the share. Possible values include: 'UnknownType', 'HCS', 'BlockBlob', 'PageBlob', 'AzureFile'
+	// ShareType - Type of the share. Possible values include: 'UnknownType', 'HCS', 'BlockBlob', 'PageBlob', 'AzureFile', 'ManagedDisk'
 	ShareType ShareDestinationFormatType `json:"shareType,omitempty"`
 	// UserName - User name for the share.
 	UserName *string `json:"userName,omitempty"`
@@ -2977,7 +3316,7 @@ type SkuProperties struct {
 	Costs *[]SkuCost `json:"costs,omitempty"`
 	// APIVersions - Api versions that support this Sku.
 	APIVersions *[]string `json:"apiVersions,omitempty"`
-	// DisabledReason - Reason why the Sku is disabled. Possible values include: 'SkuDisabledReasonNone', 'SkuDisabledReasonCountry', 'SkuDisabledReasonRegion', 'SkuDisabledReasonFeature', 'SkuDisabledReasonOfferType'
+	// DisabledReason - Reason why the Sku is disabled. Possible values include: 'SkuDisabledReasonNone', 'SkuDisabledReasonCountry', 'SkuDisabledReasonRegion', 'SkuDisabledReasonFeature', 'SkuDisabledReasonOfferType', 'SkuDisabledReasonNoSubscriptionInfo'
 	DisabledReason SkuDisabledReason `json:"disabledReason,omitempty"`
 	// DisabledReasonMessage - Message for why the Sku is disabled.
 	DisabledReasonMessage *string `json:"disabledReasonMessage,omitempty"`
@@ -3047,7 +3386,39 @@ type UpdateJobProperties struct {
 	// Details - Details of a job to be updated.
 	Details *UpdateJobDetails `json:"details,omitempty"`
 	// DestinationAccountDetails - Destination account details.
-	DestinationAccountDetails *[]DestinationAccountDetails `json:"destinationAccountDetails,omitempty"`
+	DestinationAccountDetails *[]BasicDestinationAccountDetails `json:"destinationAccountDetails,omitempty"`
+}
+
+// UnmarshalJSON is the custom unmarshaler for UpdateJobProperties struct.
+func (ujp *UpdateJobProperties) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "details":
+			if v != nil {
+				var details UpdateJobDetails
+				err = json.Unmarshal(*v, &details)
+				if err != nil {
+					return err
+				}
+				ujp.Details = &details
+			}
+		case "destinationAccountDetails":
+			if v != nil {
+				destinationAccountDetails, err := unmarshalBasicDestinationAccountDetailsArray(*v)
+				if err != nil {
+					return err
+				}
+				ujp.DestinationAccountDetails = &destinationAccountDetails
+			}
+		}
+	}
+
+	return nil
 }
 
 // ValidateAddress the requirements to validate customer address where the device needs to be shipped.
