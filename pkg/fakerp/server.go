@@ -21,10 +21,13 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/sirupsen/logrus"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
+	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
@@ -45,6 +48,10 @@ type Server struct {
 	log      *logrus.Entry
 	address  string
 	basePath string
+
+	plugin         internalapi.Plugin
+	pluginConfig   *api.PluginConfig
+	pluginTemplate *pluginapi.Config
 }
 
 func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
@@ -54,6 +61,20 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 		log:        log,
 		address:    address,
 		basePath:   "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{provider}/openShiftManagedClusters/{resourceName}",
+	}
+	var err error
+	var errs []error
+	s.pluginConfig, err = GetPluginConfig()
+	if err != nil {
+		s.log.Fatal(err)
+	}
+	s.plugin, errs = plugin.NewPlugin(s.log, s.pluginConfig)
+	if len(errs) > 0 {
+		s.log.Fatal(errs)
+	}
+	s.pluginTemplate, err = GetPluginTemplate()
+	if err != nil {
+		s.log.Fatal(err)
 	}
 	// We need to restore the internal cluster state into memory for GETs
 	// and DELETEs to work appropriately.
@@ -246,19 +267,12 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	}
 	s.write(cs)
 
-	// populate plugin configuration
-	config, err := GetPluginConfig()
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to configure plugin: %v", err))
-		return
-	}
-
 	// simulate Context with property bag
 	// TODO: Populate context from request header
 	ctx := enrichContext(context.Background())
 
 	// apply the request
-	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, config, isAdminRequest)
+	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, s.pluginConfig, isAdminRequest)
 	if err != nil {
 		s.writeState(internalapi.Failed)
 		s.badRequest(w, fmt.Sprintf("Failed to apply request: %v", err))
