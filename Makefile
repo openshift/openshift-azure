@@ -3,11 +3,11 @@ CLUSTER_VERSION=$(shell cat pluginconfig/pluginconfig-311.yaml | grep "clusterVe
 # if we are on master branch we should always use dev tag
 TAG=$(shell if [[ ${CLUSTER_VERSION} == "v0.0" ]]; then echo "dev"; else echo ${CLUSTER_VERSION}; fi)
 LDFLAGS="-X main.gitCommit=$(COMMIT)"
-E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
-AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
-ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
-METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
-SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
+E2E_IMAGE ?= quay.io/openshift-on-azure-dev/e2e-tests:$(TAG)
+AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure-dev/azure-controllers:$(TAG)
+ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure-dev/etcdbackup:$(TAG)
+METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure-dev/metricsbridge:$(TAG)
+SYNC_IMAGE ?= quay.io/openshift-on-azure-dev/sync:$(TAG)
 
 # all is the default target to build everything
 all: clean build azure-controllers etcdbackup sync metricsbridge e2e-bin
@@ -109,7 +109,7 @@ cover: unit
 codecov: unit
 	./hack/codecov-report.sh
 
-release-test: version
+release-test: version publish
 	ls -la  /usr/local/e2e-secrets/azure
 
 e2e:
