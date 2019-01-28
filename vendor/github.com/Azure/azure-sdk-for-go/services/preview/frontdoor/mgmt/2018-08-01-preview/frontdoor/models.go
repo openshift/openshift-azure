@@ -18,12 +18,17 @@ package frontdoor
 // Changes may cause incorrect behavior and will be lost if the code is regenerated.
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/Azure/go-autorest/tracing"
 	"net/http"
 )
+
+// The package's fully qualified name.
+const fqdn = "github.com/Azure/azure-sdk-for-go/services/preview/frontdoor/mgmt/2018-08-01-preview/frontdoor"
 
 // Action enumerates the values for action.
 type Action string
@@ -479,11 +484,11 @@ func PossibleWebApplicationFirewallPolicyValues() []WebApplicationFirewallPolicy
 }
 
 // AzureAsyncOperationResult the response body contains the status of the specified asynchronous operation,
-// indicating whether it has succeeded, is in progress, or has failed. Note that this status is distinct from the
-// HTTP status code returned for the Get Operation Status operation itself. If the asynchronous operation
-// succeeded, the response body includes the HTTP status code for the successful request. If the asynchronous
-// operation failed, the response body includes the HTTP status code for the failed request and error information
-// regarding the failure.
+// indicating whether it has succeeded, is in progress, or has failed. Note that this status is distinct
+// from the HTTP status code returned for the Get Operation Status operation itself. If the asynchronous
+// operation succeeded, the response body includes the HTTP status code for the successful request. If the
+// asynchronous operation failed, the response body includes the HTTP status code for the failed request
+// and error information regarding the failure.
 type AzureAsyncOperationResult struct {
 	// Status - Status of the Azure async operation. Possible values are: 'InProgress', 'Succeeded', and 'Failed'. Possible values include: 'NetworkOperationStatusInProgress', 'NetworkOperationStatusSucceeded', 'NetworkOperationStatusFailed'
 	Status NetworkOperationStatus `json:"status,omitempty"`
@@ -492,7 +497,7 @@ type AzureAsyncOperationResult struct {
 
 // AzureManagedOverrideRuleGroup defines contents of a web application rule
 type AzureManagedOverrideRuleGroup struct {
-	// RuleGroupOverride - Describes overrideruleGroup. Possible values include: 'SQLInjection', 'XSS'
+	// RuleGroupOverride - Describes override rule group. Possible values include: 'SQLInjection', 'XSS'
 	RuleGroupOverride RuleGroupOverride `json:"ruleGroupOverride,omitempty"`
 	// Action - Type of Actions. Possible values include: 'Allow', 'Block', 'Log'
 	Action Action `json:"action,omitempty"`
@@ -504,7 +509,7 @@ type AzureManagedRuleSet struct {
 	RuleGroupOverrides *[]AzureManagedOverrideRuleGroup `json:"ruleGroupOverrides,omitempty"`
 	// Priority - Describes priority of the rule
 	Priority *int32 `json:"priority,omitempty"`
-	// Version - defines version of the ruleset
+	// Version - defines version of the rule set
 	Version *int32 `json:"version,omitempty"`
 	// RuleSetType - Possible values include: 'RuleSetTypeUnknown', 'RuleSetTypeAzureManagedRuleSet'
 	RuleSetType RuleSetType `json:"ruleSetType,omitempty"`
@@ -644,8 +649,8 @@ func (bp *BackendPool) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
-// BackendPoolListResult result of the request to list Backend Pools. It contains a list of Backend Pools objects
-// and a URL link to get the the next set of results.
+// BackendPoolListResult result of the request to list Backend Pools. It contains a list of Backend Pools
+// objects and a URL link to get the next set of results.
 type BackendPoolListResult struct {
 	autorest.Response `json:"-"`
 	// Value - List of Backend Pools within a Front Door.
@@ -660,20 +665,37 @@ type BackendPoolListResultIterator struct {
 	page BackendPoolListResultPage
 }
 
-// Next advances to the next value.  If there was an error making
+// NextWithContext advances to the next value.  If there was an error making
 // the request the iterator does not advance and the error is returned.
-func (iter *BackendPoolListResultIterator) Next() error {
+func (iter *BackendPoolListResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/BackendPoolListResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	iter.i++
 	if iter.i < len(iter.page.Values()) {
 		return nil
 	}
-	err := iter.page.Next()
+	err = iter.page.NextWithContext(ctx)
 	if err != nil {
 		iter.i--
 		return err
 	}
 	iter.i = 0
 	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *BackendPoolListResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the enumeration should be started or is not yet complete.
@@ -695,6 +717,11 @@ func (iter BackendPoolListResultIterator) Value() BackendPool {
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the BackendPoolListResultIterator type.
+func NewBackendPoolListResultIterator(page BackendPoolListResultPage) BackendPoolListResultIterator {
+	return BackendPoolListResultIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (bplr BackendPoolListResult) IsEmpty() bool {
 	return bplr.Value == nil || len(*bplr.Value) == 0
@@ -702,11 +729,11 @@ func (bplr BackendPoolListResult) IsEmpty() bool {
 
 // backendPoolListResultPreparer prepares a request to retrieve the next set of results.
 // It returns nil if no more results exist.
-func (bplr BackendPoolListResult) backendPoolListResultPreparer() (*http.Request, error) {
+func (bplr BackendPoolListResult) backendPoolListResultPreparer(ctx context.Context) (*http.Request, error) {
 	if bplr.NextLink == nil || len(to.String(bplr.NextLink)) < 1 {
 		return nil, nil
 	}
-	return autorest.Prepare(&http.Request{},
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
 		autorest.AsJSON(),
 		autorest.AsGet(),
 		autorest.WithBaseURL(to.String(bplr.NextLink)))
@@ -714,19 +741,36 @@ func (bplr BackendPoolListResult) backendPoolListResultPreparer() (*http.Request
 
 // BackendPoolListResultPage contains a page of BackendPool values.
 type BackendPoolListResultPage struct {
-	fn   func(BackendPoolListResult) (BackendPoolListResult, error)
+	fn   func(context.Context, BackendPoolListResult) (BackendPoolListResult, error)
 	bplr BackendPoolListResult
 }
 
-// Next advances to the next page of values.  If there was an error making
+// NextWithContext advances to the next page of values.  If there was an error making
 // the request the page does not advance and the error is returned.
-func (page *BackendPoolListResultPage) Next() error {
-	next, err := page.fn(page.bplr)
+func (page *BackendPoolListResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/BackendPoolListResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.bplr)
 	if err != nil {
 		return err
 	}
 	page.bplr = next
 	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *BackendPoolListResultPage) Next() error {
+	return page.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the page enumeration should be started or is not yet complete.
@@ -747,6 +791,11 @@ func (page BackendPoolListResultPage) Values() []BackendPool {
 	return *page.bplr.Value
 }
 
+// Creates a new instance of the BackendPoolListResultPage type.
+func NewBackendPoolListResultPage(getNextPage func(context.Context, BackendPoolListResult) (BackendPoolListResult, error)) BackendPoolListResultPage {
+	return BackendPoolListResultPage{fn: getNextPage}
+}
+
 // BackendPoolProperties the JSON object that contains the properties required to create a routing rule.
 type BackendPoolProperties struct {
 	// ResourceState - Resource status. Possible values include: 'ResourceStateCreating', 'ResourceStateEnabling', 'ResourceStateEnabled', 'ResourceStateDisabling', 'ResourceStateDisabled', 'ResourceStateDeleting'
@@ -759,8 +808,8 @@ type BackendPoolProperties struct {
 	HealthProbeSettings *SubResource `json:"healthProbeSettings,omitempty"`
 }
 
-// BackendPoolsCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a long-running
-// operation.
+// BackendPoolsCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a
+// long-running operation.
 type BackendPoolsCreateOrUpdateFuture struct {
 	azure.Future
 }
@@ -788,7 +837,8 @@ func (future *BackendPoolsCreateOrUpdateFuture) Result(client BackendPoolsClient
 	return
 }
 
-// BackendPoolsDeleteFuture an abstraction for monitoring and retrieving the results of a long-running operation.
+// BackendPoolsDeleteFuture an abstraction for monitoring and retrieving the results of a long-running
+// operation.
 type BackendPoolsDeleteFuture struct {
 	azure.Future
 }
@@ -947,7 +997,7 @@ type CustomRule struct {
 	RuleType RuleType `json:"ruleType,omitempty"`
 	// RateLimitDurationInMinutes - Defines rate limit duration. Default - 1 minute
 	RateLimitDurationInMinutes *int32 `json:"rateLimitDurationInMinutes,omitempty"`
-	// RateLimitThreshold - Defines rate limit thresold
+	// RateLimitThreshold - Defines rate limit threshold
 	RateLimitThreshold *int32 `json:"rateLimitThreshold,omitempty"`
 	// MatchConditions - List of match conditions
 	MatchConditions *[]MatchCondition1 `json:"matchConditions,omitempty"`
@@ -1002,8 +1052,8 @@ type ErrorDetails struct {
 	Message *string `json:"message,omitempty"`
 }
 
-// ErrorResponse error reponse indicates Front Door service is not able to process the incoming request. The reason
-// is provided in the error message.
+// ErrorResponse error response indicates Front Door service is not able to process the incoming request.
+// The reason is provided in the error message.
 type ErrorResponse struct {
 	// Code - Error code.
 	Code *string `json:"code,omitempty"`
@@ -1011,8 +1061,8 @@ type ErrorResponse struct {
 	Message *string `json:"message,omitempty"`
 }
 
-// FrontDoor front Door represents a collection of backend endpoints to route traffic to along with rules that
-// specify how traffic is sent there.
+// FrontDoor front Door represents a collection of backend endpoints to route traffic to along with rules
+// that specify how traffic is sent there.
 type FrontDoor struct {
 	autorest.Response `json:"-"`
 	// Properties - Properties of the Front Door Load Balancer
@@ -1122,8 +1172,8 @@ func (fd *FrontDoor) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
-// FrontDoorsCreateOrUpdateFutureType an abstraction for monitoring and retrieving the results of a long-running
-// operation.
+// FrontDoorsCreateOrUpdateFutureType an abstraction for monitoring and retrieving the results of a
+// long-running operation.
 type FrontDoorsCreateOrUpdateFutureType struct {
 	azure.Future
 }
@@ -1151,7 +1201,8 @@ func (future *FrontDoorsCreateOrUpdateFutureType) Result(client FrontDoorsClient
 	return
 }
 
-// FrontDoorsDeleteFutureType an abstraction for monitoring and retrieving the results of a long-running operation.
+// FrontDoorsDeleteFutureType an abstraction for monitoring and retrieving the results of a long-running
+// operation.
 type FrontDoorsDeleteFutureType struct {
 	azure.Future
 }
@@ -1255,7 +1306,8 @@ func (fe *FrontendEndpoint) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
-// FrontendEndpointProperties the JSON object that contains the properties required to create a frontend endpoint.
+// FrontendEndpointProperties the JSON object that contains the properties required to create a frontend
+// endpoint.
 type FrontendEndpointProperties struct {
 	// ResourceState - Resource status. Possible values include: 'ResourceStateCreating', 'ResourceStateEnabling', 'ResourceStateEnabled', 'ResourceStateDisabling', 'ResourceStateDisabled', 'ResourceStateDeleting'
 	ResourceState ResourceState `json:"resourceState,omitempty"`
@@ -1275,8 +1327,8 @@ type FrontendEndpointProperties struct {
 	WebApplicationFirewallPolicyLink *FrontendEndpointUpdateParametersWebApplicationFirewallPolicyLink `json:"webApplicationFirewallPolicyLink,omitempty"`
 }
 
-// FrontendEndpointsCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a long-running
-// operation.
+// FrontendEndpointsCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a
+// long-running operation.
 type FrontendEndpointsCreateOrUpdateFuture struct {
 	azure.Future
 }
@@ -1327,8 +1379,8 @@ func (future *FrontendEndpointsDeleteFuture) Result(client FrontendEndpointsClie
 	return
 }
 
-// FrontendEndpointsDisableHTTPSFuture an abstraction for monitoring and retrieving the results of a long-running
-// operation.
+// FrontendEndpointsDisableHTTPSFuture an abstraction for monitoring and retrieving the results of a
+// long-running operation.
 type FrontendEndpointsDisableHTTPSFuture struct {
 	azure.Future
 }
@@ -1350,8 +1402,8 @@ func (future *FrontendEndpointsDisableHTTPSFuture) Result(client FrontendEndpoin
 	return
 }
 
-// FrontendEndpointsEnableHTTPSFuture an abstraction for monitoring and retrieving the results of a long-running
-// operation.
+// FrontendEndpointsEnableHTTPSFuture an abstraction for monitoring and retrieving the results of a
+// long-running operation.
 type FrontendEndpointsEnableHTTPSFuture struct {
 	azure.Future
 }
@@ -1373,8 +1425,8 @@ func (future *FrontendEndpointsEnableHTTPSFuture) Result(client FrontendEndpoint
 	return
 }
 
-// FrontendEndpointsListResult result of the request to list frontend endpoints. It contains a list of Frontend
-// endpoint objects and a URL link to get the the next set of results.
+// FrontendEndpointsListResult result of the request to list frontend endpoints. It contains a list of
+// Frontend endpoint objects and a URL link to get the next set of results.
 type FrontendEndpointsListResult struct {
 	autorest.Response `json:"-"`
 	// Value - List of Frontend endpoints within a Front Door.
@@ -1389,20 +1441,37 @@ type FrontendEndpointsListResultIterator struct {
 	page FrontendEndpointsListResultPage
 }
 
-// Next advances to the next value.  If there was an error making
+// NextWithContext advances to the next value.  If there was an error making
 // the request the iterator does not advance and the error is returned.
-func (iter *FrontendEndpointsListResultIterator) Next() error {
+func (iter *FrontendEndpointsListResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/FrontendEndpointsListResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	iter.i++
 	if iter.i < len(iter.page.Values()) {
 		return nil
 	}
-	err := iter.page.Next()
+	err = iter.page.NextWithContext(ctx)
 	if err != nil {
 		iter.i--
 		return err
 	}
 	iter.i = 0
 	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *FrontendEndpointsListResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the enumeration should be started or is not yet complete.
@@ -1424,6 +1493,11 @@ func (iter FrontendEndpointsListResultIterator) Value() FrontendEndpoint {
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the FrontendEndpointsListResultIterator type.
+func NewFrontendEndpointsListResultIterator(page FrontendEndpointsListResultPage) FrontendEndpointsListResultIterator {
+	return FrontendEndpointsListResultIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (felr FrontendEndpointsListResult) IsEmpty() bool {
 	return felr.Value == nil || len(*felr.Value) == 0
@@ -1431,11 +1505,11 @@ func (felr FrontendEndpointsListResult) IsEmpty() bool {
 
 // frontendEndpointsListResultPreparer prepares a request to retrieve the next set of results.
 // It returns nil if no more results exist.
-func (felr FrontendEndpointsListResult) frontendEndpointsListResultPreparer() (*http.Request, error) {
+func (felr FrontendEndpointsListResult) frontendEndpointsListResultPreparer(ctx context.Context) (*http.Request, error) {
 	if felr.NextLink == nil || len(to.String(felr.NextLink)) < 1 {
 		return nil, nil
 	}
-	return autorest.Prepare(&http.Request{},
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
 		autorest.AsJSON(),
 		autorest.AsGet(),
 		autorest.WithBaseURL(to.String(felr.NextLink)))
@@ -1443,19 +1517,36 @@ func (felr FrontendEndpointsListResult) frontendEndpointsListResultPreparer() (*
 
 // FrontendEndpointsListResultPage contains a page of FrontendEndpoint values.
 type FrontendEndpointsListResultPage struct {
-	fn   func(FrontendEndpointsListResult) (FrontendEndpointsListResult, error)
+	fn   func(context.Context, FrontendEndpointsListResult) (FrontendEndpointsListResult, error)
 	felr FrontendEndpointsListResult
 }
 
-// Next advances to the next page of values.  If there was an error making
+// NextWithContext advances to the next page of values.  If there was an error making
 // the request the page does not advance and the error is returned.
-func (page *FrontendEndpointsListResultPage) Next() error {
-	next, err := page.fn(page.felr)
+func (page *FrontendEndpointsListResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/FrontendEndpointsListResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.felr)
 	if err != nil {
 		return err
 	}
 	page.felr = next
 	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *FrontendEndpointsListResultPage) Next() error {
+	return page.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the page enumeration should be started or is not yet complete.
@@ -1476,6 +1567,11 @@ func (page FrontendEndpointsListResultPage) Values() []FrontendEndpoint {
 	return *page.felr.Value
 }
 
+// Creates a new instance of the FrontendEndpointsListResultPage type.
+func NewFrontendEndpointsListResultPage(getNextPage func(context.Context, FrontendEndpointsListResult) (FrontendEndpointsListResult, error)) FrontendEndpointsListResultPage {
+	return FrontendEndpointsListResultPage{fn: getNextPage}
+}
+
 // FrontendEndpointUpdateParameters frontend endpoint used in routing rule
 type FrontendEndpointUpdateParameters struct {
 	// HostName - The host name of the frontendEndpoint. Must be a domain name.
@@ -1488,8 +1584,8 @@ type FrontendEndpointUpdateParameters struct {
 	WebApplicationFirewallPolicyLink *FrontendEndpointUpdateParametersWebApplicationFirewallPolicyLink `json:"webApplicationFirewallPolicyLink,omitempty"`
 }
 
-// FrontendEndpointUpdateParametersWebApplicationFirewallPolicyLink defines the Web Application Firewall policy for
-// each host (if applicable)
+// FrontendEndpointUpdateParametersWebApplicationFirewallPolicyLink defines the Web Application Firewall
+// policy for each host (if applicable)
 type FrontendEndpointUpdateParametersWebApplicationFirewallPolicyLink struct {
 	// ID - Resource ID.
 	ID *string `json:"id,omitempty"`
@@ -1524,8 +1620,8 @@ func (future *HealthProbeSettingsCreateOrUpdateFuture) Result(client HealthProbe
 	return
 }
 
-// HealthProbeSettingsDeleteFuture an abstraction for monitoring and retrieving the results of a long-running
-// operation.
+// HealthProbeSettingsDeleteFuture an abstraction for monitoring and retrieving the results of a
+// long-running operation.
 type HealthProbeSettingsDeleteFuture struct {
 	azure.Future
 }
@@ -1548,7 +1644,7 @@ func (future *HealthProbeSettingsDeleteFuture) Result(client HealthProbeSettings
 }
 
 // HealthProbeSettingsListResult result of the request to list HealthProbeSettings. It contains a list of
-// HealthProbeSettings objects and a URL link to get the the next set of results.
+// HealthProbeSettings objects and a URL link to get the next set of results.
 type HealthProbeSettingsListResult struct {
 	autorest.Response `json:"-"`
 	// Value - List of HealthProbeSettings within a Front Door.
@@ -1557,26 +1653,44 @@ type HealthProbeSettingsListResult struct {
 	NextLink *string `json:"nextLink,omitempty"`
 }
 
-// HealthProbeSettingsListResultIterator provides access to a complete listing of HealthProbeSettingsModel values.
+// HealthProbeSettingsListResultIterator provides access to a complete listing of HealthProbeSettingsModel
+// values.
 type HealthProbeSettingsListResultIterator struct {
 	i    int
 	page HealthProbeSettingsListResultPage
 }
 
-// Next advances to the next value.  If there was an error making
+// NextWithContext advances to the next value.  If there was an error making
 // the request the iterator does not advance and the error is returned.
-func (iter *HealthProbeSettingsListResultIterator) Next() error {
+func (iter *HealthProbeSettingsListResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/HealthProbeSettingsListResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	iter.i++
 	if iter.i < len(iter.page.Values()) {
 		return nil
 	}
-	err := iter.page.Next()
+	err = iter.page.NextWithContext(ctx)
 	if err != nil {
 		iter.i--
 		return err
 	}
 	iter.i = 0
 	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *HealthProbeSettingsListResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the enumeration should be started or is not yet complete.
@@ -1598,6 +1712,11 @@ func (iter HealthProbeSettingsListResultIterator) Value() HealthProbeSettingsMod
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the HealthProbeSettingsListResultIterator type.
+func NewHealthProbeSettingsListResultIterator(page HealthProbeSettingsListResultPage) HealthProbeSettingsListResultIterator {
+	return HealthProbeSettingsListResultIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (hpslr HealthProbeSettingsListResult) IsEmpty() bool {
 	return hpslr.Value == nil || len(*hpslr.Value) == 0
@@ -1605,11 +1724,11 @@ func (hpslr HealthProbeSettingsListResult) IsEmpty() bool {
 
 // healthProbeSettingsListResultPreparer prepares a request to retrieve the next set of results.
 // It returns nil if no more results exist.
-func (hpslr HealthProbeSettingsListResult) healthProbeSettingsListResultPreparer() (*http.Request, error) {
+func (hpslr HealthProbeSettingsListResult) healthProbeSettingsListResultPreparer(ctx context.Context) (*http.Request, error) {
 	if hpslr.NextLink == nil || len(to.String(hpslr.NextLink)) < 1 {
 		return nil, nil
 	}
-	return autorest.Prepare(&http.Request{},
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
 		autorest.AsJSON(),
 		autorest.AsGet(),
 		autorest.WithBaseURL(to.String(hpslr.NextLink)))
@@ -1617,19 +1736,36 @@ func (hpslr HealthProbeSettingsListResult) healthProbeSettingsListResultPreparer
 
 // HealthProbeSettingsListResultPage contains a page of HealthProbeSettingsModel values.
 type HealthProbeSettingsListResultPage struct {
-	fn    func(HealthProbeSettingsListResult) (HealthProbeSettingsListResult, error)
+	fn    func(context.Context, HealthProbeSettingsListResult) (HealthProbeSettingsListResult, error)
 	hpslr HealthProbeSettingsListResult
 }
 
-// Next advances to the next page of values.  If there was an error making
+// NextWithContext advances to the next page of values.  If there was an error making
 // the request the page does not advance and the error is returned.
-func (page *HealthProbeSettingsListResultPage) Next() error {
-	next, err := page.fn(page.hpslr)
+func (page *HealthProbeSettingsListResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/HealthProbeSettingsListResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.hpslr)
 	if err != nil {
 		return err
 	}
 	page.hpslr = next
 	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *HealthProbeSettingsListResultPage) Next() error {
+	return page.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the page enumeration should be started or is not yet complete.
@@ -1648,6 +1784,11 @@ func (page HealthProbeSettingsListResultPage) Values() []HealthProbeSettingsMode
 		return nil
 	}
 	return *page.hpslr.Value
+}
+
+// Creates a new instance of the HealthProbeSettingsListResultPage type.
+func NewHealthProbeSettingsListResultPage(getNextPage func(context.Context, HealthProbeSettingsListResult) (HealthProbeSettingsListResult, error)) HealthProbeSettingsListResultPage {
+	return HealthProbeSettingsListResultPage{fn: getNextPage}
 }
 
 // HealthProbeSettingsModel load balancing settings for a backend pool
@@ -1732,8 +1873,8 @@ func (hpsm *HealthProbeSettingsModel) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
-// HealthProbeSettingsProperties the JSON object that contains the properties required to create a health probe
-// settings.
+// HealthProbeSettingsProperties the JSON object that contains the properties required to create a health
+// probe settings.
 type HealthProbeSettingsProperties struct {
 	// ResourceState - Resource status. Possible values include: 'ResourceStateCreating', 'ResourceStateEnabling', 'ResourceStateEnabled', 'ResourceStateDisabling', 'ResourceStateDisabled', 'ResourceStateDeleting'
 	ResourceState ResourceState `json:"resourceState,omitempty"`
@@ -1771,8 +1912,8 @@ type KeyVaultCertificateSourceParametersVault struct {
 	ID *string `json:"id,omitempty"`
 }
 
-// ListResult result of the request to list Front Doors. It contains a list of Front Door objects and a URL link to
-// get the the next set of results.
+// ListResult result of the request to list Front Doors. It contains a list of Front Door objects and a URL
+// link to get the next set of results.
 type ListResult struct {
 	autorest.Response `json:"-"`
 	// Value - List of Front Doors within a resource group.
@@ -1787,20 +1928,37 @@ type ListResultIterator struct {
 	page ListResultPage
 }
 
-// Next advances to the next value.  If there was an error making
+// NextWithContext advances to the next value.  If there was an error making
 // the request the iterator does not advance and the error is returned.
-func (iter *ListResultIterator) Next() error {
+func (iter *ListResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/ListResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	iter.i++
 	if iter.i < len(iter.page.Values()) {
 		return nil
 	}
-	err := iter.page.Next()
+	err = iter.page.NextWithContext(ctx)
 	if err != nil {
 		iter.i--
 		return err
 	}
 	iter.i = 0
 	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *ListResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the enumeration should be started or is not yet complete.
@@ -1822,6 +1980,11 @@ func (iter ListResultIterator) Value() FrontDoor {
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the ListResultIterator type.
+func NewListResultIterator(page ListResultPage) ListResultIterator {
+	return ListResultIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (lr ListResult) IsEmpty() bool {
 	return lr.Value == nil || len(*lr.Value) == 0
@@ -1829,11 +1992,11 @@ func (lr ListResult) IsEmpty() bool {
 
 // listResultPreparer prepares a request to retrieve the next set of results.
 // It returns nil if no more results exist.
-func (lr ListResult) listResultPreparer() (*http.Request, error) {
+func (lr ListResult) listResultPreparer(ctx context.Context) (*http.Request, error) {
 	if lr.NextLink == nil || len(to.String(lr.NextLink)) < 1 {
 		return nil, nil
 	}
-	return autorest.Prepare(&http.Request{},
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
 		autorest.AsJSON(),
 		autorest.AsGet(),
 		autorest.WithBaseURL(to.String(lr.NextLink)))
@@ -1841,19 +2004,36 @@ func (lr ListResult) listResultPreparer() (*http.Request, error) {
 
 // ListResultPage contains a page of FrontDoor values.
 type ListResultPage struct {
-	fn func(ListResult) (ListResult, error)
+	fn func(context.Context, ListResult) (ListResult, error)
 	lr ListResult
 }
 
-// Next advances to the next page of values.  If there was an error making
+// NextWithContext advances to the next page of values.  If there was an error making
 // the request the page does not advance and the error is returned.
-func (page *ListResultPage) Next() error {
-	next, err := page.fn(page.lr)
+func (page *ListResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/ListResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.lr)
 	if err != nil {
 		return err
 	}
 	page.lr = next
 	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *ListResultPage) Next() error {
+	return page.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the page enumeration should be started or is not yet complete.
@@ -1872,6 +2052,11 @@ func (page ListResultPage) Values() []FrontDoor {
 		return nil
 	}
 	return *page.lr.Value
+}
+
+// Creates a new instance of the ListResultPage type.
+func NewListResultPage(getNextPage func(context.Context, ListResult) (ListResult, error)) ListResultPage {
+	return ListResultPage{fn: getNextPage}
 }
 
 // LoadBalancingSettingsCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a
@@ -1903,8 +2088,8 @@ func (future *LoadBalancingSettingsCreateOrUpdateFuture) Result(client LoadBalan
 	return
 }
 
-// LoadBalancingSettingsDeleteFuture an abstraction for monitoring and retrieving the results of a long-running
-// operation.
+// LoadBalancingSettingsDeleteFuture an abstraction for monitoring and retrieving the results of a
+// long-running operation.
 type LoadBalancingSettingsDeleteFuture struct {
 	azure.Future
 }
@@ -1926,8 +2111,8 @@ func (future *LoadBalancingSettingsDeleteFuture) Result(client LoadBalancingSett
 	return
 }
 
-// LoadBalancingSettingsListResult result of the request to list load balancing settings. It contains a list of
-// load balancing settings objects and a URL link to get the the next set of results.
+// LoadBalancingSettingsListResult result of the request to list load balancing settings. It contains a
+// list of load balancing settings objects and a URL link to get the next set of results.
 type LoadBalancingSettingsListResult struct {
 	autorest.Response `json:"-"`
 	// Value - List of Backend Pools within a Front Door.
@@ -1936,27 +2121,44 @@ type LoadBalancingSettingsListResult struct {
 	NextLink *string `json:"nextLink,omitempty"`
 }
 
-// LoadBalancingSettingsListResultIterator provides access to a complete listing of LoadBalancingSettingsModel
-// values.
+// LoadBalancingSettingsListResultIterator provides access to a complete listing of
+// LoadBalancingSettingsModel values.
 type LoadBalancingSettingsListResultIterator struct {
 	i    int
 	page LoadBalancingSettingsListResultPage
 }
 
-// Next advances to the next value.  If there was an error making
+// NextWithContext advances to the next value.  If there was an error making
 // the request the iterator does not advance and the error is returned.
-func (iter *LoadBalancingSettingsListResultIterator) Next() error {
+func (iter *LoadBalancingSettingsListResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/LoadBalancingSettingsListResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	iter.i++
 	if iter.i < len(iter.page.Values()) {
 		return nil
 	}
-	err := iter.page.Next()
+	err = iter.page.NextWithContext(ctx)
 	if err != nil {
 		iter.i--
 		return err
 	}
 	iter.i = 0
 	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *LoadBalancingSettingsListResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the enumeration should be started or is not yet complete.
@@ -1978,6 +2180,11 @@ func (iter LoadBalancingSettingsListResultIterator) Value() LoadBalancingSetting
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the LoadBalancingSettingsListResultIterator type.
+func NewLoadBalancingSettingsListResultIterator(page LoadBalancingSettingsListResultPage) LoadBalancingSettingsListResultIterator {
+	return LoadBalancingSettingsListResultIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (lbslr LoadBalancingSettingsListResult) IsEmpty() bool {
 	return lbslr.Value == nil || len(*lbslr.Value) == 0
@@ -1985,11 +2192,11 @@ func (lbslr LoadBalancingSettingsListResult) IsEmpty() bool {
 
 // loadBalancingSettingsListResultPreparer prepares a request to retrieve the next set of results.
 // It returns nil if no more results exist.
-func (lbslr LoadBalancingSettingsListResult) loadBalancingSettingsListResultPreparer() (*http.Request, error) {
+func (lbslr LoadBalancingSettingsListResult) loadBalancingSettingsListResultPreparer(ctx context.Context) (*http.Request, error) {
 	if lbslr.NextLink == nil || len(to.String(lbslr.NextLink)) < 1 {
 		return nil, nil
 	}
-	return autorest.Prepare(&http.Request{},
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
 		autorest.AsJSON(),
 		autorest.AsGet(),
 		autorest.WithBaseURL(to.String(lbslr.NextLink)))
@@ -1997,19 +2204,36 @@ func (lbslr LoadBalancingSettingsListResult) loadBalancingSettingsListResultPrep
 
 // LoadBalancingSettingsListResultPage contains a page of LoadBalancingSettingsModel values.
 type LoadBalancingSettingsListResultPage struct {
-	fn    func(LoadBalancingSettingsListResult) (LoadBalancingSettingsListResult, error)
+	fn    func(context.Context, LoadBalancingSettingsListResult) (LoadBalancingSettingsListResult, error)
 	lbslr LoadBalancingSettingsListResult
 }
 
-// Next advances to the next page of values.  If there was an error making
+// NextWithContext advances to the next page of values.  If there was an error making
 // the request the page does not advance and the error is returned.
-func (page *LoadBalancingSettingsListResultPage) Next() error {
-	next, err := page.fn(page.lbslr)
+func (page *LoadBalancingSettingsListResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/LoadBalancingSettingsListResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.lbslr)
 	if err != nil {
 		return err
 	}
 	page.lbslr = next
 	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *LoadBalancingSettingsListResultPage) Next() error {
+	return page.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the page enumeration should be started or is not yet complete.
@@ -2028,6 +2252,11 @@ func (page LoadBalancingSettingsListResultPage) Values() []LoadBalancingSettings
 		return nil
 	}
 	return *page.lbslr.Value
+}
+
+// Creates a new instance of the LoadBalancingSettingsListResultPage type.
+func NewLoadBalancingSettingsListResultPage(getNextPage func(context.Context, LoadBalancingSettingsListResult) (LoadBalancingSettingsListResult, error)) LoadBalancingSettingsListResultPage {
+	return LoadBalancingSettingsListResultPage{fn: getNextPage}
 }
 
 // LoadBalancingSettingsModel load balancing settings for a backend pool
@@ -2112,8 +2341,8 @@ func (lbsm *LoadBalancingSettingsModel) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
-// LoadBalancingSettingsProperties the JSON object that contains the properties required to create load balancing
-// settings
+// LoadBalancingSettingsProperties the JSON object that contains the properties required to create load
+// balancing settings
 type LoadBalancingSettingsProperties struct {
 	// ResourceState - Resource status. Possible values include: 'ResourceStateCreating', 'ResourceStateEnabling', 'ResourceStateEnabled', 'ResourceStateDisabling', 'ResourceStateDisabled', 'ResourceStateDeleting'
 	ResourceState ResourceState `json:"resourceState,omitempty"`
@@ -2145,7 +2374,7 @@ type BasicManagedRuleSet interface {
 type ManagedRuleSet struct {
 	// Priority - Describes priority of the rule
 	Priority *int32 `json:"priority,omitempty"`
-	// Version - defines version of the ruleset
+	// Version - defines version of the rule set
 	Version *int32 `json:"version,omitempty"`
 	// RuleSetType - Possible values include: 'RuleSetTypeUnknown', 'RuleSetTypeAzureManagedRuleSet'
 	RuleSetType RuleSetType `json:"ruleSetType,omitempty"`
@@ -2262,7 +2491,8 @@ type MatchCondition1 struct {
 	MatchValue *[]string `json:"matchValue,omitempty"`
 }
 
-// PoliciesDeleteFuture an abstraction for monitoring and retrieving the results of a long-running operation.
+// PoliciesDeleteFuture an abstraction for monitoring and retrieving the results of a long-running
+// operation.
 type PoliciesDeleteFuture struct {
 	azure.Future
 }
@@ -2357,8 +2587,8 @@ func (r Resource) MarshalJSON() ([]byte, error) {
 	return json.Marshal(objectMap)
 }
 
-// RoutingRule a routing rule represents a specification for traffic to treat and where to send it, along with
-// health probe information.
+// RoutingRule a routing rule represents a specification for traffic to treat and where to send it, along
+// with health probe information.
 type RoutingRule struct {
 	autorest.Response `json:"-"`
 	// RoutingRuleProperties - Properties of the Front Door Routing Rule
@@ -2440,8 +2670,8 @@ func (rr *RoutingRule) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
-// RoutingRuleListResult result of the request to list Routing Rules. It contains a list of Routing Rule objects
-// and a URL link to get the the next set of results.
+// RoutingRuleListResult result of the request to list Routing Rules. It contains a list of Routing Rule
+// objects and a URL link to get the next set of results.
 type RoutingRuleListResult struct {
 	autorest.Response `json:"-"`
 	// Value - List of Routing Rules within a Front Door.
@@ -2456,20 +2686,37 @@ type RoutingRuleListResultIterator struct {
 	page RoutingRuleListResultPage
 }
 
-// Next advances to the next value.  If there was an error making
+// NextWithContext advances to the next value.  If there was an error making
 // the request the iterator does not advance and the error is returned.
-func (iter *RoutingRuleListResultIterator) Next() error {
+func (iter *RoutingRuleListResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/RoutingRuleListResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	iter.i++
 	if iter.i < len(iter.page.Values()) {
 		return nil
 	}
-	err := iter.page.Next()
+	err = iter.page.NextWithContext(ctx)
 	if err != nil {
 		iter.i--
 		return err
 	}
 	iter.i = 0
 	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *RoutingRuleListResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the enumeration should be started or is not yet complete.
@@ -2491,6 +2738,11 @@ func (iter RoutingRuleListResultIterator) Value() RoutingRule {
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the RoutingRuleListResultIterator type.
+func NewRoutingRuleListResultIterator(page RoutingRuleListResultPage) RoutingRuleListResultIterator {
+	return RoutingRuleListResultIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (rrlr RoutingRuleListResult) IsEmpty() bool {
 	return rrlr.Value == nil || len(*rrlr.Value) == 0
@@ -2498,11 +2750,11 @@ func (rrlr RoutingRuleListResult) IsEmpty() bool {
 
 // routingRuleListResultPreparer prepares a request to retrieve the next set of results.
 // It returns nil if no more results exist.
-func (rrlr RoutingRuleListResult) routingRuleListResultPreparer() (*http.Request, error) {
+func (rrlr RoutingRuleListResult) routingRuleListResultPreparer(ctx context.Context) (*http.Request, error) {
 	if rrlr.NextLink == nil || len(to.String(rrlr.NextLink)) < 1 {
 		return nil, nil
 	}
-	return autorest.Prepare(&http.Request{},
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
 		autorest.AsJSON(),
 		autorest.AsGet(),
 		autorest.WithBaseURL(to.String(rrlr.NextLink)))
@@ -2510,19 +2762,36 @@ func (rrlr RoutingRuleListResult) routingRuleListResultPreparer() (*http.Request
 
 // RoutingRuleListResultPage contains a page of RoutingRule values.
 type RoutingRuleListResultPage struct {
-	fn   func(RoutingRuleListResult) (RoutingRuleListResult, error)
+	fn   func(context.Context, RoutingRuleListResult) (RoutingRuleListResult, error)
 	rrlr RoutingRuleListResult
 }
 
-// Next advances to the next page of values.  If there was an error making
+// NextWithContext advances to the next page of values.  If there was an error making
 // the request the page does not advance and the error is returned.
-func (page *RoutingRuleListResultPage) Next() error {
-	next, err := page.fn(page.rrlr)
+func (page *RoutingRuleListResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/RoutingRuleListResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.rrlr)
 	if err != nil {
 		return err
 	}
 	page.rrlr = next
 	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *RoutingRuleListResultPage) Next() error {
+	return page.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the page enumeration should be started or is not yet complete.
@@ -2541,6 +2810,11 @@ func (page RoutingRuleListResultPage) Values() []RoutingRule {
 		return nil
 	}
 	return *page.rrlr.Value
+}
+
+// Creates a new instance of the RoutingRuleListResultPage type.
+func NewRoutingRuleListResultPage(getNextPage func(context.Context, RoutingRuleListResult) (RoutingRuleListResult, error)) RoutingRuleListResultPage {
+	return RoutingRuleListResultPage{fn: getNextPage}
 }
 
 // RoutingRuleProperties the JSON object that contains the properties required to create a routing rule.
@@ -2565,8 +2839,8 @@ type RoutingRuleProperties struct {
 	EnabledState EnabledStateEnum `json:"enabledState,omitempty"`
 }
 
-// RoutingRulesCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a long-running
-// operation.
+// RoutingRulesCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a
+// long-running operation.
 type RoutingRulesCreateOrUpdateFuture struct {
 	azure.Future
 }
@@ -2594,7 +2868,8 @@ func (future *RoutingRulesCreateOrUpdateFuture) Result(client RoutingRulesClient
 	return
 }
 
-// RoutingRulesDeleteFuture an abstraction for monitoring and retrieving the results of a long-running operation.
+// RoutingRulesDeleteFuture an abstraction for monitoring and retrieving the results of a long-running
+// operation.
 type RoutingRulesDeleteFuture struct {
 	azure.Future
 }
@@ -2816,8 +3091,8 @@ func (wafp1 *WebApplicationFirewallPolicy1) UnmarshalJSON(body []byte) error {
 	return nil
 }
 
-// WebApplicationFirewallPolicyListResult result of the request to list WebApplicationFirewallPolicies. It contains
-// a list of WebApplicationFirewallPolicy objects and a URL link to get the the next set of results.
+// WebApplicationFirewallPolicyListResult result of the request to list WebApplicationFirewallPolicies. It
+// contains a list of WebApplicationFirewallPolicy objects and a URL link to get the next set of results.
 type WebApplicationFirewallPolicyListResult struct {
 	autorest.Response `json:"-"`
 	// Value - List of WebApplicationFirewallPolicies within a resource group.
@@ -2833,20 +3108,37 @@ type WebApplicationFirewallPolicyListResultIterator struct {
 	page WebApplicationFirewallPolicyListResultPage
 }
 
-// Next advances to the next value.  If there was an error making
+// NextWithContext advances to the next value.  If there was an error making
 // the request the iterator does not advance and the error is returned.
-func (iter *WebApplicationFirewallPolicyListResultIterator) Next() error {
+func (iter *WebApplicationFirewallPolicyListResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/WebApplicationFirewallPolicyListResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	iter.i++
 	if iter.i < len(iter.page.Values()) {
 		return nil
 	}
-	err := iter.page.Next()
+	err = iter.page.NextWithContext(ctx)
 	if err != nil {
 		iter.i--
 		return err
 	}
 	iter.i = 0
 	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *WebApplicationFirewallPolicyListResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the enumeration should be started or is not yet complete.
@@ -2868,6 +3160,11 @@ func (iter WebApplicationFirewallPolicyListResultIterator) Value() WebApplicatio
 	return iter.page.Values()[iter.i]
 }
 
+// Creates a new instance of the WebApplicationFirewallPolicyListResultIterator type.
+func NewWebApplicationFirewallPolicyListResultIterator(page WebApplicationFirewallPolicyListResultPage) WebApplicationFirewallPolicyListResultIterator {
+	return WebApplicationFirewallPolicyListResultIterator{page: page}
+}
+
 // IsEmpty returns true if the ListResult contains no values.
 func (wafplr WebApplicationFirewallPolicyListResult) IsEmpty() bool {
 	return wafplr.Value == nil || len(*wafplr.Value) == 0
@@ -2875,11 +3172,11 @@ func (wafplr WebApplicationFirewallPolicyListResult) IsEmpty() bool {
 
 // webApplicationFirewallPolicyListResultPreparer prepares a request to retrieve the next set of results.
 // It returns nil if no more results exist.
-func (wafplr WebApplicationFirewallPolicyListResult) webApplicationFirewallPolicyListResultPreparer() (*http.Request, error) {
+func (wafplr WebApplicationFirewallPolicyListResult) webApplicationFirewallPolicyListResultPreparer(ctx context.Context) (*http.Request, error) {
 	if wafplr.NextLink == nil || len(to.String(wafplr.NextLink)) < 1 {
 		return nil, nil
 	}
-	return autorest.Prepare(&http.Request{},
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
 		autorest.AsJSON(),
 		autorest.AsGet(),
 		autorest.WithBaseURL(to.String(wafplr.NextLink)))
@@ -2887,19 +3184,36 @@ func (wafplr WebApplicationFirewallPolicyListResult) webApplicationFirewallPolic
 
 // WebApplicationFirewallPolicyListResultPage contains a page of WebApplicationFirewallPolicy1 values.
 type WebApplicationFirewallPolicyListResultPage struct {
-	fn     func(WebApplicationFirewallPolicyListResult) (WebApplicationFirewallPolicyListResult, error)
+	fn     func(context.Context, WebApplicationFirewallPolicyListResult) (WebApplicationFirewallPolicyListResult, error)
 	wafplr WebApplicationFirewallPolicyListResult
 }
 
-// Next advances to the next page of values.  If there was an error making
+// NextWithContext advances to the next page of values.  If there was an error making
 // the request the page does not advance and the error is returned.
-func (page *WebApplicationFirewallPolicyListResultPage) Next() error {
-	next, err := page.fn(page.wafplr)
+func (page *WebApplicationFirewallPolicyListResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/WebApplicationFirewallPolicyListResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.wafplr)
 	if err != nil {
 		return err
 	}
 	page.wafplr = next
 	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *WebApplicationFirewallPolicyListResultPage) Next() error {
+	return page.NextWithContext(context.Background())
 }
 
 // NotDone returns true if the page enumeration should be started or is not yet complete.
@@ -2918,6 +3232,11 @@ func (page WebApplicationFirewallPolicyListResultPage) Values() []WebApplication
 		return nil
 	}
 	return *page.wafplr.Value
+}
+
+// Creates a new instance of the WebApplicationFirewallPolicyListResultPage type.
+func NewWebApplicationFirewallPolicyListResultPage(getNextPage func(context.Context, WebApplicationFirewallPolicyListResult) (WebApplicationFirewallPolicyListResult, error)) WebApplicationFirewallPolicyListResultPage {
+	return WebApplicationFirewallPolicyListResultPage{fn: getNextPage}
 }
 
 // WebApplicationFirewallPolicyPropertiesFormat defines web application firewall policy properties

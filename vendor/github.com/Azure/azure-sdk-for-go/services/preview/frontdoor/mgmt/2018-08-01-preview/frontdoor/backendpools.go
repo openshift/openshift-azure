@@ -22,10 +22,11 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/validation"
+	"github.com/Azure/go-autorest/tracing"
 	"net/http"
 )
 
-// BackendPoolsClient is the frontdoor Client
+// BackendPoolsClient is the frontDoor Client
 type BackendPoolsClient struct {
 	BaseClient
 }
@@ -47,15 +48,25 @@ func NewBackendPoolsClientWithBaseURI(baseURI string, subscriptionID string) Bac
 // backendPoolName - name of the Backend Pool which is unique within the Front Door.
 // backendPoolParameters - backend Pool properties needed to create a new Pool.
 func (client BackendPoolsClient) CreateOrUpdate(ctx context.Context, resourceGroupName string, frontDoorName string, backendPoolName string, backendPoolParameters BackendPool) (result BackendPoolsCreateOrUpdateFuture, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/BackendPoolsClient.CreateOrUpdate")
+		defer func() {
+			sc := -1
+			if result.Response() != nil {
+				sc = result.Response().StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: resourceGroupName,
 			Constraints: []validation.Constraint{{Target: "resourceGroupName", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "resourceGroupName", Name: validation.MinLength, Rule: 1, Chain: nil},
 				{Target: "resourceGroupName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9_\-\(\)\.]*[^\.]$`, Chain: nil}}},
 		{TargetValue: frontDoorName,
-			Constraints: []validation.Constraint{{Target: "frontDoorName", Name: validation.MaxLength, Rule: 74, Chain: nil},
+			Constraints: []validation.Constraint{{Target: "frontDoorName", Name: validation.MaxLength, Rule: 64, Chain: nil},
 				{Target: "frontDoorName", Name: validation.MinLength, Rule: 5, Chain: nil},
-				{Target: "frontDoorName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9]+([-a-zA-Z0-9][a-zA-Z0-9])$`, Chain: nil}}},
+				{Target: "frontDoorName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9]+([-a-zA-Z0-9]?[a-zA-Z0-9])*$`, Chain: nil}}},
 		{TargetValue: backendPoolName,
 			Constraints: []validation.Constraint{{Target: "backendPoolName", Name: validation.MaxLength, Rule: 90, Chain: nil},
 				{Target: "backendPoolName", Name: validation.MinLength, Rule: 1, Chain: nil},
@@ -111,10 +122,6 @@ func (client BackendPoolsClient) CreateOrUpdateSender(req *http.Request) (future
 	if err != nil {
 		return
 	}
-	err = autorest.Respond(resp, azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusCreated, http.StatusAccepted))
-	if err != nil {
-		return
-	}
 	future.Future, err = azure.NewFutureFromResponse(resp)
 	return
 }
@@ -138,15 +145,25 @@ func (client BackendPoolsClient) CreateOrUpdateResponder(resp *http.Response) (r
 // frontDoorName - name of the Front Door which is globally unique.
 // backendPoolName - name of the Backend Pool which is unique within the Front Door.
 func (client BackendPoolsClient) Delete(ctx context.Context, resourceGroupName string, frontDoorName string, backendPoolName string) (result BackendPoolsDeleteFuture, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/BackendPoolsClient.Delete")
+		defer func() {
+			sc := -1
+			if result.Response() != nil {
+				sc = result.Response().StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: resourceGroupName,
 			Constraints: []validation.Constraint{{Target: "resourceGroupName", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "resourceGroupName", Name: validation.MinLength, Rule: 1, Chain: nil},
 				{Target: "resourceGroupName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9_\-\(\)\.]*[^\.]$`, Chain: nil}}},
 		{TargetValue: frontDoorName,
-			Constraints: []validation.Constraint{{Target: "frontDoorName", Name: validation.MaxLength, Rule: 74, Chain: nil},
+			Constraints: []validation.Constraint{{Target: "frontDoorName", Name: validation.MaxLength, Rule: 64, Chain: nil},
 				{Target: "frontDoorName", Name: validation.MinLength, Rule: 5, Chain: nil},
-				{Target: "frontDoorName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9]+([-a-zA-Z0-9][a-zA-Z0-9])$`, Chain: nil}}},
+				{Target: "frontDoorName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9]+([-a-zA-Z0-9]?[a-zA-Z0-9])*$`, Chain: nil}}},
 		{TargetValue: backendPoolName,
 			Constraints: []validation.Constraint{{Target: "backendPoolName", Name: validation.MaxLength, Rule: 90, Chain: nil},
 				{Target: "backendPoolName", Name: validation.MinLength, Rule: 1, Chain: nil},
@@ -200,10 +217,6 @@ func (client BackendPoolsClient) DeleteSender(req *http.Request) (future Backend
 	if err != nil {
 		return
 	}
-	err = autorest.Respond(resp, azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted, http.StatusNoContent))
-	if err != nil {
-		return
-	}
 	future.Future, err = azure.NewFutureFromResponse(resp)
 	return
 }
@@ -226,15 +239,25 @@ func (client BackendPoolsClient) DeleteResponder(resp *http.Response) (result au
 // frontDoorName - name of the Front Door which is globally unique.
 // backendPoolName - name of the Backend Pool which is unique within the Front Door.
 func (client BackendPoolsClient) Get(ctx context.Context, resourceGroupName string, frontDoorName string, backendPoolName string) (result BackendPool, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/BackendPoolsClient.Get")
+		defer func() {
+			sc := -1
+			if result.Response.Response != nil {
+				sc = result.Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: resourceGroupName,
 			Constraints: []validation.Constraint{{Target: "resourceGroupName", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "resourceGroupName", Name: validation.MinLength, Rule: 1, Chain: nil},
 				{Target: "resourceGroupName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9_\-\(\)\.]*[^\.]$`, Chain: nil}}},
 		{TargetValue: frontDoorName,
-			Constraints: []validation.Constraint{{Target: "frontDoorName", Name: validation.MaxLength, Rule: 74, Chain: nil},
+			Constraints: []validation.Constraint{{Target: "frontDoorName", Name: validation.MaxLength, Rule: 64, Chain: nil},
 				{Target: "frontDoorName", Name: validation.MinLength, Rule: 5, Chain: nil},
-				{Target: "frontDoorName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9]+([-a-zA-Z0-9][a-zA-Z0-9])$`, Chain: nil}}},
+				{Target: "frontDoorName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9]+([-a-zA-Z0-9]?[a-zA-Z0-9])*$`, Chain: nil}}},
 		{TargetValue: backendPoolName,
 			Constraints: []validation.Constraint{{Target: "backendPoolName", Name: validation.MaxLength, Rule: 90, Chain: nil},
 				{Target: "backendPoolName", Name: validation.MinLength, Rule: 1, Chain: nil},
@@ -310,15 +333,25 @@ func (client BackendPoolsClient) GetResponder(resp *http.Response) (result Backe
 // resourceGroupName - name of the Resource group within the Azure subscription.
 // frontDoorName - name of the Front Door which is globally unique.
 func (client BackendPoolsClient) ListByFrontDoor(ctx context.Context, resourceGroupName string, frontDoorName string) (result BackendPoolListResultPage, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/BackendPoolsClient.ListByFrontDoor")
+		defer func() {
+			sc := -1
+			if result.bplr.Response.Response != nil {
+				sc = result.bplr.Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: resourceGroupName,
 			Constraints: []validation.Constraint{{Target: "resourceGroupName", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "resourceGroupName", Name: validation.MinLength, Rule: 1, Chain: nil},
 				{Target: "resourceGroupName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9_\-\(\)\.]*[^\.]$`, Chain: nil}}},
 		{TargetValue: frontDoorName,
-			Constraints: []validation.Constraint{{Target: "frontDoorName", Name: validation.MaxLength, Rule: 74, Chain: nil},
+			Constraints: []validation.Constraint{{Target: "frontDoorName", Name: validation.MaxLength, Rule: 64, Chain: nil},
 				{Target: "frontDoorName", Name: validation.MinLength, Rule: 5, Chain: nil},
-				{Target: "frontDoorName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9]+([-a-zA-Z0-9][a-zA-Z0-9])$`, Chain: nil}}}}); err != nil {
+				{Target: "frontDoorName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9]+([-a-zA-Z0-9]?[a-zA-Z0-9])*$`, Chain: nil}}}}); err != nil {
 		return result, validation.NewError("frontdoor.BackendPoolsClient", "ListByFrontDoor", err.Error())
 	}
 
@@ -386,8 +419,8 @@ func (client BackendPoolsClient) ListByFrontDoorResponder(resp *http.Response) (
 }
 
 // listByFrontDoorNextResults retrieves the next set of results, if any.
-func (client BackendPoolsClient) listByFrontDoorNextResults(lastResults BackendPoolListResult) (result BackendPoolListResult, err error) {
-	req, err := lastResults.backendPoolListResultPreparer()
+func (client BackendPoolsClient) listByFrontDoorNextResults(ctx context.Context, lastResults BackendPoolListResult) (result BackendPoolListResult, err error) {
+	req, err := lastResults.backendPoolListResultPreparer(ctx)
 	if err != nil {
 		return result, autorest.NewErrorWithError(err, "frontdoor.BackendPoolsClient", "listByFrontDoorNextResults", nil, "Failure preparing next results request")
 	}
@@ -408,6 +441,16 @@ func (client BackendPoolsClient) listByFrontDoorNextResults(lastResults BackendP
 
 // ListByFrontDoorComplete enumerates all values, automatically crossing page boundaries as required.
 func (client BackendPoolsClient) ListByFrontDoorComplete(ctx context.Context, resourceGroupName string, frontDoorName string) (result BackendPoolListResultIterator, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/BackendPoolsClient.ListByFrontDoor")
+		defer func() {
+			sc := -1
+			if result.Response().Response.Response != nil {
+				sc = result.page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	result.page, err = client.ListByFrontDoor(ctx, resourceGroupName, frontDoorName)
 	return
 }

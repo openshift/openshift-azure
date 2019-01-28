@@ -1,16 +1,18 @@
-hash: 3a617adc001e614307c81c9241bf51a5a2eb81e48829b0cfdcaa73ca6126cb45
-updated: 2019-01-14T19:55:23.981093039+10:00
+hash: b3b9b1b3d47a8a33316d56b56763bf236be407bbe012113b8278c2ed3c3ff002
+updated: 2019-01-28T11:59:53.99969814-06:00
 imports:
+- name: contrib.go.opencensus.io/exporter/ocagent
+  version: 00af367e65149ff1f2f4b93bbfbb84fd9297170d
 - name: github.com/Azure/azure-sdk-for-go
-  version: d3bcaa706ac10b18784811ff31e43be635159013
+  version: 1951233eb944a49aa5f7278cba8e3e32a8c958af
   subpackages:
   - profiles/preview/resources/mgmt/managedapplications
   - services/compute/mgmt/2018-06-01/compute
   - services/dns/mgmt/2017-10-01/dns
   - services/graphrbac/1.6/graphrbac
   - services/marketplaceordering/mgmt/2015-06-01/marketplaceordering
-  - services/network/mgmt/2018-02-01/network
   - services/network/mgmt/2018-06-01/network
+  - services/network/mgmt/2018-07-01/network
   - services/resources/mgmt/2018-05-01/resources
   - services/resources/mgmt/2018-06-01/managedapplications
   - services/storage/mgmt/2015-06-15/storage
@@ -18,17 +20,25 @@ imports:
   - storage
   - version
 - name: github.com/Azure/go-autorest
-  version: a88c19ef2016e095f0b6c3b451074b4663f53bed
+  version: 528b76fd0ebec0682f3e3da7c808cd472b999615
   subpackages:
   - autorest
   - autorest/adal
   - autorest/azure
   - autorest/azure/auth
+  - autorest/azure/cli
   - autorest/date
   - autorest/to
   - autorest/validation
   - logger
+  - tracing
   - version
+- name: github.com/census-instrumentation/opencensus-proto
+  version: 24333298e36590ea0716598caacc8959fc393c48
+  subpackages:
+  - gen-go/agent/common/v1
+  - gen-go/agent/trace/v1
+  - gen-go/trace/v1
 - name: github.com/coreos/etcd
   version: 135cf9b40738d17886f499b40bc176fc892ba5e9
   repo: https://github.com/openshift/coreos-etcd.git
@@ -87,6 +97,7 @@ imports:
   - ptypes/any
   - ptypes/duration
   - ptypes/timestamp
+  - ptypes/wrappers
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/google/uuid
@@ -124,6 +135,8 @@ imports:
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
   - pbutil
+- name: github.com/mitchellh/go-homedir
+  version: b8bc1bf767474819792c23f32d8286a45736f1c6
 - name: github.com/modern-go/concurrent
   version: bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94
 - name: github.com/modern-go/reflect2
@@ -189,7 +202,7 @@ imports:
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/prometheus/client_model
-  version: 5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f
+  version: 56726106282f1985ea77d5305743db7231b0c0a8
   subpackages:
   - go
 - name: github.com/prometheus/common
@@ -204,6 +217,23 @@ imports:
   version: e1e72e9de974bd926e5c56f83753fba2df402ce5
 - name: github.com/spf13/pflag
   version: 583c0c0531f06d5278b7d917446061adc344b5cd
+- name: go.opencensus.io
+  version: 3abc75f40a2357dfd55e20f1631a181c31cacb04
+  subpackages:
+  - exemplar
+  - internal
+  - internal/tagencoding
+  - plugin/ochttp
+  - plugin/ochttp/propagation/b3
+  - plugin/ochttp/propagation/tracecontext
+  - stats
+  - stats/internal
+  - stats/view
+  - tag
+  - trace
+  - trace/internal
+  - trace/propagation
+  - trace/tracestate
 - name: go.uber.org/atomic
   version: 1ea20fb1cbb1cc08cbd0d913a96dead89aa18289
 - name: go.uber.org/multierr
@@ -242,8 +272,12 @@ imports:
   - lex/httplex
   - trace
   - websocket
+- name: golang.org/x/sync
+  version: 37e7f081c4d4c64e13b10787722085407fe5d15f
+  subpackages:
+  - semaphore
 - name: golang.org/x/sys
-  version: e48874b42435b4347fc52bdee0424a52abc974d7
+  version: d69651ed3497faee15a5363a89578e9991f6d5e2
   subpackages:
   - unix
   - windows
@@ -272,32 +306,44 @@ imports:
   version: c06e80d9300e4443158a03817b8a8cb37d230320
   subpackages:
   - rate
+- name: google.golang.org/api
+  version: 59f8eae6bc597bfd5d5b292134c4b19d8955ed8a
+  subpackages:
+  - support/bundler
 - name: google.golang.org/genproto
   version: 09f6ed296fc66555a25fe4ce95173148778dfa85
   subpackages:
   - googleapis/api/annotations
   - googleapis/rpc/status
 - name: google.golang.org/grpc
-  version: 5b3c4e850e90a4cf6a20ebd46c8b32a0a3afcb9e
+  version: 2e463a05d100327ca47ac218281906921038fd95
   subpackages:
   - balancer
+  - balancer/base
+  - balancer/roundrobin
   - codes
   - connectivity
   - credentials
-  - grpclb/grpc_lb_v1/messages
+  - encoding
+  - encoding/proto
   - grpclog
-  - health
   - health/grpc_health_v1
   - internal
+  - internal/backoff
+  - internal/channelz
+  - internal/envconfig
+  - internal/grpcrand
+  - internal/transport
   - keepalive
   - metadata
   - naming
   - peer
   - resolver
+  - resolver/dns
+  - resolver/passthrough
   - stats
   - status
   - tap
-  - transport
 - name: gopkg.in/fsnotify/fsnotify.v1
   version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
 - name: gopkg.in/inf.v0
