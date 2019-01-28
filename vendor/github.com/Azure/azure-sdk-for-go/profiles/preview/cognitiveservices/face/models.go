@@ -21,9 +21,6 @@ package face
 
 import original "github.com/Azure/azure-sdk-for-go/services/cognitiveservices/v1.0/face"
 
-type BaseClient = original.BaseClient
-type Client = original.Client
-type ListClient = original.ListClient
 type AccessoryType = original.AccessoryType
 
 const (
@@ -49,27 +46,6 @@ const (
 	AttributeTypeNoise       AttributeType = original.AttributeTypeNoise
 	AttributeTypeOcclusion   AttributeType = original.AttributeTypeOcclusion
 	AttributeTypeSmile       AttributeType = original.AttributeTypeSmile
-)
-
-type AzureRegions = original.AzureRegions
-
-const (
-	Australiaeast  AzureRegions = original.Australiaeast
-	Brazilsouth    AzureRegions = original.Brazilsouth
-	Canadacentral  AzureRegions = original.Canadacentral
-	Centralindia   AzureRegions = original.Centralindia
-	Eastasia       AzureRegions = original.Eastasia
-	Eastus         AzureRegions = original.Eastus
-	Eastus2        AzureRegions = original.Eastus2
-	Japaneast      AzureRegions = original.Japaneast
-	Northeurope    AzureRegions = original.Northeurope
-	Southcentralus AzureRegions = original.Southcentralus
-	Southeastasia  AzureRegions = original.Southeastasia
-	Uksouth        AzureRegions = original.Uksouth
-	Westcentralus  AzureRegions = original.Westcentralus
-	Westeurope     AzureRegions = original.Westeurope
-	Westus         AzureRegions = original.Westus
-	Westus2        AzureRegions = original.Westus2
 )
 
 type BlurLevel = original.BlurLevel
@@ -142,10 +118,12 @@ const (
 	Succeeded  TrainingStatusType = original.Succeeded
 )
 
-type Accessory = original.Accessory
 type APIError = original.APIError
+type Accessory = original.Accessory
 type Attributes = original.Attributes
+type BaseClient = original.BaseClient
 type Blur = original.Blur
+type Client = original.Client
 type Coordinate = original.Coordinate
 type DetectedFace = original.DetectedFace
 type Emotion = original.Emotion
@@ -163,10 +141,19 @@ type IdentifyRequest = original.IdentifyRequest
 type IdentifyResult = original.IdentifyResult
 type ImageURL = original.ImageURL
 type Landmarks = original.Landmarks
+type LargeFaceList = original.LargeFaceList
+type LargeFaceListClient = original.LargeFaceListClient
+type LargePersonGroup = original.LargePersonGroup
+type LargePersonGroupClient = original.LargePersonGroupClient
+type LargePersonGroupPersonClient = original.LargePersonGroupPersonClient
 type List = original.List
+type ListClient = original.ListClient
 type ListDetectedFace = original.ListDetectedFace
 type ListIdentifyResult = original.ListIdentifyResult
+type ListLargeFaceList = original.ListLargeFaceList
+type ListLargePersonGroup = original.ListLargePersonGroup
 type ListList = original.ListList
+type ListPersistedFace = original.ListPersistedFace
 type ListPerson = original.ListPerson
 type ListPersonGroup = original.ListPersonGroup
 type ListSimilarFace = original.ListSimilarFace
@@ -177,36 +164,48 @@ type Occlusion = original.Occlusion
 type PersistedFace = original.PersistedFace
 type Person = original.Person
 type PersonGroup = original.PersonGroup
+type PersonGroupClient = original.PersonGroupClient
+type PersonGroupPersonClient = original.PersonGroupPersonClient
 type Rectangle = original.Rectangle
 type SimilarFace = original.SimilarFace
 type TrainingStatus = original.TrainingStatus
-type UpdatePersonFaceRequest = original.UpdatePersonFaceRequest
+type UpdateFaceRequest = original.UpdateFaceRequest
 type VerifyFaceToFaceRequest = original.VerifyFaceToFaceRequest
 type VerifyFaceToPersonRequest = original.VerifyFaceToPersonRequest
 type VerifyResult = original.VerifyResult
-type PersonGroupClient = original.PersonGroupClient
-type PersonGroupPersonClient = original.PersonGroupPersonClient
 
-func New(azureRegion AzureRegions) BaseClient {
-	return original.New(azureRegion)
+func New(endpoint string) BaseClient {
+	return original.New(endpoint)
 }
-func NewWithoutDefaults(azureRegion AzureRegions) BaseClient {
-	return original.NewWithoutDefaults(azureRegion)
+func NewClient(endpoint string) Client {
+	return original.NewClient(endpoint)
 }
-func NewClient(azureRegion AzureRegions) Client {
-	return original.NewClient(azureRegion)
+func NewLargeFaceListClient(endpoint string) LargeFaceListClient {
+	return original.NewLargeFaceListClient(endpoint)
 }
-func NewListClient(azureRegion AzureRegions) ListClient {
-	return original.NewListClient(azureRegion)
+func NewLargePersonGroupClient(endpoint string) LargePersonGroupClient {
+	return original.NewLargePersonGroupClient(endpoint)
+}
+func NewLargePersonGroupPersonClient(endpoint string) LargePersonGroupPersonClient {
+	return original.NewLargePersonGroupPersonClient(endpoint)
+}
+func NewListClient(endpoint string) ListClient {
+	return original.NewListClient(endpoint)
+}
+func NewPersonGroupClient(endpoint string) PersonGroupClient {
+	return original.NewPersonGroupClient(endpoint)
+}
+func NewPersonGroupPersonClient(endpoint string) PersonGroupPersonClient {
+	return original.NewPersonGroupPersonClient(endpoint)
+}
+func NewWithoutDefaults(endpoint string) BaseClient {
+	return original.NewWithoutDefaults(endpoint)
 }
 func PossibleAccessoryTypeValues() []AccessoryType {
 	return original.PossibleAccessoryTypeValues()
 }
 func PossibleAttributeTypeValues() []AttributeType {
 	return original.PossibleAttributeTypeValues()
-}
-func PossibleAzureRegionsValues() []AzureRegions {
-	return original.PossibleAzureRegionsValues()
 }
 func PossibleBlurLevelValues() []BlurLevel {
 	return original.PossibleBlurLevelValues()
@@ -231,12 +230,6 @@ func PossibleNoiseLevelValues() []NoiseLevel {
 }
 func PossibleTrainingStatusTypeValues() []TrainingStatusType {
 	return original.PossibleTrainingStatusTypeValues()
-}
-func NewPersonGroupClient(azureRegion AzureRegions) PersonGroupClient {
-	return original.NewPersonGroupClient(azureRegion)
-}
-func NewPersonGroupPersonClient(azureRegion AzureRegions) PersonGroupPersonClient {
-	return original.NewPersonGroupPersonClient(azureRegion)
 }
 func UserAgent() string {
 	return original.UserAgent() + " profiles/preview"

@@ -488,7 +488,7 @@ func TestPollPutTrackerSuccessNoHeaders(t *testing.T) {
 	}
 	sender := mocks.NewSender()
 	sender.AppendResponse(newProvisioningStatusResponse("InProgress"))
-	err = pt.pollForStatus(sender)
+	err = pt.pollForStatus(context.Background(), sender)
 	if err != nil {
 		t.Fatalf("failed to poll for status: %v", err)
 	}
@@ -506,7 +506,7 @@ func TestPollPutTrackerFailNoHeadersEmptyBody(t *testing.T) {
 	}
 	sender := mocks.NewSender()
 	sender.AppendResponse(mocks.NewResponseWithBodyAndStatus(&mocks.Body{}, http.StatusOK, "status ok"))
-	err = pt.pollForStatus(sender)
+	err = pt.pollForStatus(context.Background(), sender)
 	if err != nil {
 		t.Fatalf("failed to poll for status: %v", err)
 	}
@@ -526,9 +526,9 @@ func TestAsyncPollingReturnsWrappedError(t *testing.T) {
 	}
 	sender := mocks.NewSender()
 	sender.AppendResponse(newOperationResourceErrorResponse("Failed"))
-	err = pt.pollForStatus(sender)
-	if err != nil {
-		t.Fatalf("failed to poll for status: %v", err)
+	err = pt.pollForStatus(context.Background(), sender)
+	if err == nil {
+		t.Fatal("unexpected nil polling error")
 	}
 	err = pt.pollingError()
 	if err == nil {
@@ -551,9 +551,9 @@ func TestLocationPollingReturnsWrappedError(t *testing.T) {
 	}
 	sender := mocks.NewSender()
 	sender.AppendResponse(newProvisioningStatusErrorResponse("Failed"))
-	err = pt.pollForStatus(sender)
-	if err != nil {
-		t.Fatalf("failed to poll for status: %v", err)
+	err = pt.pollForStatus(context.Background(), sender)
+	if err == nil {
+		t.Fatal("unexpected nil polling error")
 	}
 	err = pt.pollingError()
 	if err == nil {
@@ -576,9 +576,9 @@ func TestLocationPollingReturnsUnwrappedError(t *testing.T) {
 	}
 	sender := mocks.NewSender()
 	sender.AppendResponse(newProvisioningStatusUnwrappedErrorResponse("Failed"))
-	err = pt.pollForStatus(sender)
-	if err != nil {
-		t.Fatalf("failed to poll for status: %v", err)
+	err = pt.pollForStatus(context.Background(), sender)
+	if err == nil {
+		t.Fatal("unexpected nil polling error")
 	}
 	err = pt.pollingError()
 	if err == nil {
@@ -684,6 +684,7 @@ func TestFuture_PollsUntilProvisioningStatusSucceeds(t *testing.T) {
 	r3 := newOperationResourceResponse(operationSucceeded)
 
 	sender := mocks.NewSender()
+	ctx := context.Background()
 	sender.AppendAndRepeatResponse(r2, 2)
 	sender.AppendResponse(r3)
 
@@ -692,7 +693,7 @@ func TestFuture_PollsUntilProvisioningStatusSucceeds(t *testing.T) {
 		t.Fatalf("failed to create future: %v", err)
 	}
 
-	for done, err := future.Done(sender); !done; done, err = future.Done(sender) {
+	for done, err := future.DoneWithContext(ctx, sender); !done; done, err = future.DoneWithContext(ctx, sender) {
 		if future.PollingMethod() != PollingAsyncOperation {
 			t.Fatalf("wrong future polling method: %s", future.PollingMethod())
 		}
@@ -744,9 +745,28 @@ func TestFuture_MarshallingSuccess(t *testing.T) {
 }
 
 func TestFuture_MarshallingWithError(t *testing.T) {
-	future, err := NewFutureFromResponse(newAsyncResponseWithError(http.MethodPut))
+	r2 := newOperationResourceResponse("busy")
+	r3 := newOperationResourceErrorResponse(operationFailed)
+
+	sender := mocks.NewSender()
+	sender.AppendAndRepeatResponse(r2, 2)
+	sender.AppendResponse(r3)
+	client := autorest.Client{
+		PollingDelay:    1 * time.Second,
+		PollingDuration: autorest.DefaultPollingDuration,
+		RetryAttempts:   autorest.DefaultRetryAttempts,
+		RetryDuration:   1 * time.Second,
+		Sender:          sender,
+	}
+
+	future, err := NewFutureFromResponse(newSimpleAsyncResp())
 	if err != nil {
 		t.Fatalf("failed to create future: %v", err)
+	}
+
+	err = future.WaitForCompletion(context.Background(), client)
+	if err == nil {
+		t.Fatal("expected non-nil error")
 	}
 
 	data, err := json.Marshal(future)
@@ -773,16 +793,9 @@ func TestFuture_MarshallingWithError(t *testing.T) {
 }
 
 func TestFuture_CreateFromFailedOperation(t *testing.T) {
-	future, err := NewFutureFromResponse(newAsyncResponseWithError(http.MethodPut))
-	if err != nil {
-		t.Fatalf("failed to create future: %v", err)
-	}
-	done, err := future.Done(mocks.NewSender())
+	_, err := NewFutureFromResponse(newAsyncResponseWithError(http.MethodPut))
 	if err == nil {
-		t.Fatalf("Done should have returned an error")
-	}
-	if !done {
-		t.Fatalf("should be done")
+		t.Fatal("expected non-nil error")
 	}
 }
 
@@ -943,7 +956,7 @@ func TestFuture_GetResultFromNonAsyncOperation(t *testing.T) {
 	if pm := future.PollingMethod(); pm != PollingUnknown {
 		t.Fatalf("wrong polling method: %s", pm)
 	}
-	done, err := future.Done(nil)
+	done, err := future.DoneWithContext(context.Background(), nil)
 	if err != nil {
 		t.Fatalf("failed to check status: %v", err)
 	}
