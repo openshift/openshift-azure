@@ -45,10 +45,7 @@ import:
 - package: github.com/pborman/uuid
   version: ^1.2.0
 - package: github.com/coreos/etcd
-  version: origin-3.10-etcd-v3.2.16
-  repo: https://github.com/openshift/coreos-etcd.git
-  subpackages:
-  - clientv3
+  version: v3.2.24
 - package: sigs.k8s.io/controller-runtime
   version: v0.1.1
 - package: github.com/prometheus/client_model
@@ -64,3 +61,5 @@ import:
   version: v1.16.0
 - package: golang.org/x/sys
   version: d69651ed3497faee15a5363a89578e9991f6d5e2
+- package: go.uber.org/zap
+  version: v1.8.0

@@ -71,7 +71,7 @@ func TestFieldAddingError(t *testing.T) {
 		t    FieldType
 		want interface{}
 	}{
-		{ArrayMarshalerType, []interface{}{}},
+		{ArrayMarshalerType, []interface{}(nil)},
 		{ObjectMarshalerType, map[string]interface{}{}},
 	}
 	for _, tt := range tests {
