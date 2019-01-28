@@ -2,14 +2,8 @@ package validate
 
 import (
 	"fmt"
-	"regexp"
 
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
-)
-
-var (
-	imageVersion   = regexp.MustCompile(`^[0-9]{3}.[0-9]{1,4}.[0-9]{8}$`)
-	clusterVersion = regexp.MustCompile(`^v\d+\.\d+$`)
 )
 
 // Validate validates an Plugin API external template/config struct
