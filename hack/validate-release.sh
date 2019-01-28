@@ -20,10 +20,10 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 # This runs only on release branches 
 if [[ "$(git branch | grep \* | cut -d ' ' -f2)" =~ "release-" ]]; then
 	echo "validating release branch "$(git branch | grep \* | cut -d ' ' -f2)
-	RELEASE_TAG=$(git describe --abbrev=0 --tags)
 	CONFIG_VERSION=$(cat ${DIR}/../pluginconfig/${PLUGINCONFIG} | grep "clusterVersion:" | awk '{ print $2}')
-	if [[ ${RELEASE_TAG} != ${CONFIG_VERSION} ]]; then
-		echo "release tag ${RELEASE_TAG} does not match plugin config version ${CONFIG_VERSION}"
+	git tag -l | grep $CONFIG_VERSION
+	if [ $? != 0 ]; then
+		echo "plugin config release version ${CONFIG_VERSION} does not exist as tag"
 		exit 1
 	fi
 else 
