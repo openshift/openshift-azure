@@ -181,7 +181,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				}).Return(nil).After(c)
 
 				// 4. reimage
-				c = vmc.EXPECT().Reimage(ctx, tt.cs.Properties.AzProfile.ResourceGroup, "ss-master", *vm.InstanceID).Return(nil).After(c)
+				c = vmc.EXPECT().Reimage(ctx, tt.cs.Properties.AzProfile.ResourceGroup, "ss-master", *vm.InstanceID, &compute.VirtualMachineScaleSetVMReimageParameters{TempDisk: to.BoolPtr(true)}).Return(nil).After(c)
 
 				// 5. start
 				c = vmc.EXPECT().Start(ctx, tt.cs.Properties.AzProfile.ResourceGroup, "ss-master", *vm.InstanceID).Return(nil).After(c)
