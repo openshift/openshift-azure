@@ -32,10 +32,7 @@ create:
 delete:
 	./hack/delete.sh ${RESOURCEGROUP}
 
-publish: unit verify build sync-push azure-controllers-push etcdbackup-push metricsbridge-push e2e-push
-
-release-test: 
-	sleep 360
+publish: sync-push azure-controllers-push etcdbackup-push metricsbridge-push e2e-push
 
 azure-controllers: generate
 	go build -ldflags ${LDFLAGS} ./cmd/azure-controllers
@@ -111,6 +108,8 @@ cover: unit
 
 codecov: unit
 	./hack/codecov-report.sh
+
+release-test: unit verify build version
 
 e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
