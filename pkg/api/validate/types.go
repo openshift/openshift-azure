@@ -25,6 +25,12 @@ var (
 	// This regexp is to guard against InvalidDomainNameLabel for hostname validation
 	rxCloudDomainLabel = regexp.MustCompile(`^[a-z][a-z0-9-]{1,61}[a-z0-9]\.`)
 
+	// This regexp is to check image version format
+	imageVersion = regexp.MustCompile(`^[0-9]{3}.[0-9]{1,4}.[0-9]{8}$`)
+
+	// This regexp is to check cluster version (plugin) format
+	clusterVersion = regexp.MustCompile(`^v\d+\.\d+$`)
+
 	validMasterAndInfraVMSizes = map[api.VMSize]struct{}{
 		// Rationale here is: a highly limited set of modern general purpose
 		// offerings which we can reason about and test for now.
