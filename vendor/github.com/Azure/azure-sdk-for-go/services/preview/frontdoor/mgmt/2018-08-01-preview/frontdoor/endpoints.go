@@ -22,10 +22,11 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/validation"
+	"github.com/Azure/go-autorest/tracing"
 	"net/http"
 )
 
-// EndpointsClient is the frontdoor Client
+// EndpointsClient is the frontDoor Client
 type EndpointsClient struct {
 	BaseClient
 }
@@ -48,15 +49,25 @@ func NewEndpointsClientWithBaseURI(baseURI string, subscriptionID string) Endpoi
 // which removes a single file, or a directory with a wildcard, e.g. '/pictures/*' which removes all folders
 // and files in the directory.
 func (client EndpointsClient) PurgeContent(ctx context.Context, resourceGroupName string, frontDoorName string, contentFilePaths PurgeParameters) (result EndpointsPurgeContentFuture, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/EndpointsClient.PurgeContent")
+		defer func() {
+			sc := -1
+			if result.Response() != nil {
+				sc = result.Response().StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: resourceGroupName,
 			Constraints: []validation.Constraint{{Target: "resourceGroupName", Name: validation.MaxLength, Rule: 80, Chain: nil},
 				{Target: "resourceGroupName", Name: validation.MinLength, Rule: 1, Chain: nil},
 				{Target: "resourceGroupName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9_\-\(\)\.]*[^\.]$`, Chain: nil}}},
 		{TargetValue: frontDoorName,
-			Constraints: []validation.Constraint{{Target: "frontDoorName", Name: validation.MaxLength, Rule: 74, Chain: nil},
+			Constraints: []validation.Constraint{{Target: "frontDoorName", Name: validation.MaxLength, Rule: 64, Chain: nil},
 				{Target: "frontDoorName", Name: validation.MinLength, Rule: 5, Chain: nil},
-				{Target: "frontDoorName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9]+([-a-zA-Z0-9][a-zA-Z0-9])$`, Chain: nil}}},
+				{Target: "frontDoorName", Name: validation.Pattern, Rule: `^[a-zA-Z0-9]+([-a-zA-Z0-9]?[a-zA-Z0-9])*$`, Chain: nil}}},
 		{TargetValue: contentFilePaths,
 			Constraints: []validation.Constraint{{Target: "contentFilePaths.ContentPaths", Name: validation.Null, Rule: true, Chain: nil}}}}); err != nil {
 		return result, validation.NewError("frontdoor.EndpointsClient", "PurgeContent", err.Error())
@@ -106,10 +117,6 @@ func (client EndpointsClient) PurgeContentSender(req *http.Request) (future Endp
 	var resp *http.Response
 	resp, err = autorest.SendWithSender(client, req,
 		azure.DoRetryWithRegistration(client.Client))
-	if err != nil {
-		return
-	}
-	err = autorest.Respond(resp, azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted))
 	if err != nil {
 		return
 	}

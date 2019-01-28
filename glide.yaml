@@ -17,9 +17,9 @@ import:
 - package: github.com/davecgh/go-spew
   version: ^1.1.0
 - package: github.com/Azure/azure-sdk-for-go
-  version: v21.0.0
+  version: v24.0.0
 - package: github.com/Azure/go-autorest
-  version: 10.15.4
+  version: v11.2.7
 - package: github.com/sirupsen/logrus
   version: v1.3.0
 - package: github.com/ghodss/yaml
@@ -45,10 +45,7 @@ import:
 - package: github.com/pborman/uuid
   version: ^1.2.0
 - package: github.com/coreos/etcd
-  version: origin-3.10-etcd-v3.2.16
-  repo: https://github.com/openshift/coreos-etcd.git
-  subpackages:
-  - clientv3
+  version: v3.2.24
 - package: sigs.k8s.io/controller-runtime
   version: v0.1.1
 - package: github.com/prometheus/client_model
@@ -60,3 +57,9 @@ import:
   - proto
 - package: github.com/go-chi/chi
   version: v3
+- package: google.golang.org/grpc
+  version: v1.16.0
+- package: golang.org/x/sys
+  version: d69651ed3497faee15a5363a89578e9991f6d5e2
+- package: go.uber.org/zap
+  version: v1.8.0
