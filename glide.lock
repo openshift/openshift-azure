@@ -1,5 +1,5 @@
-hash: b3b9b1b3d47a8a33316d56b56763bf236be407bbe012113b8278c2ed3c3ff002
-updated: 2019-01-28T11:59:53.99969814-06:00
+hash: 9a3e99740a8976ab446a6e7e655b7256e41cdb10ffbd15e0690fe58c933e1973
+updated: 2019-01-28T12:10:58.824918356-06:00
 imports:
 - name: contrib.go.opencensus.io/exporter/ocagent
   version: 00af367e65149ff1f2f4b93bbfbb84fd9297170d
@@ -40,8 +40,7 @@ imports:
   - gen-go/agent/trace/v1
   - gen-go/trace/v1
 - name: github.com/coreos/etcd
-  version: 135cf9b40738d17886f499b40bc176fc892ba5e9
-  repo: https://github.com/openshift/coreos-etcd.git
+  version: 420a452267a7ce45b3fcbed04d54030d69964fc1
   subpackages:
   - auth/authpb
   - clientv3
@@ -239,7 +238,7 @@ imports:
 - name: go.uber.org/multierr
   version: 3c4937480c32f4c13a875a1829af76c98ca3d40a
 - name: go.uber.org/zap
-  version: ff33455a0e382e8a81d14dd7c922020b6b5e7982
+  version: eeedf312bc6c57391d84767a4cd413f02a917974
   subpackages:
   - buffer
   - internal/bufferpool
