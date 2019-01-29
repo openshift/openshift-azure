@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
 CLUSTER_VERSION=$(shell cat pluginconfig/pluginconfig-311.yaml | grep "clusterVersion: " | tr -d "clusterVersion: ")
 # if we are on master branch we should always use dev tag
