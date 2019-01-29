@@ -34,6 +34,7 @@ if [[ -f /usr/local/e2e-secrets/azure/secret ]] ;then
     export DNS_RESOURCEGROUP=dns
     export DEPLOY_VERSION=v3.11
 
+     trap "./hack/delete.sh $RESOURCEGROUP" EXIT
     echo "Create source cluster"
     ./hack/create.sh $RESOURCEGROUP
 
