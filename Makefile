@@ -114,7 +114,7 @@ codecov: unit
 # Call upgrade flow with syntax: make upgrade SOURCE=source_version [TARGET=target_version]
 # If target not specified master is used
 upgrade:
-	./hack/upgrade-e2e.sh ${RESOURCEGROUP} ${SOURCE} ${TARGET}
+	./hack/upgrade-e2e.sh ${RESOURCEGROUP}
 
 e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh

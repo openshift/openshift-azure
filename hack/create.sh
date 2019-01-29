@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
 if [[ $# -ne 1 ]]; then
-    echo error: $0 resourcegroup
+    echo usage: $0 resourcegroup
     exit 1
 fi
 
