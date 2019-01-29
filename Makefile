@@ -8,6 +8,7 @@ AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure-dev/azure-controllers:$(TA
 ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure-dev/etcdbackup:$(TAG)
 METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure-dev/metricsbridge:$(TAG)
 SYNC_IMAGE ?= quay.io/openshift-on-azure-dev/sync:$(TAG)
+RESOURCEGROUP ?= mjudeikis-$(COMMIT)
 
 # all is the default target to build everything
 all: clean build azure-controllers etcdbackup sync metricsbridge e2e-bin
@@ -109,9 +110,13 @@ cover: unit
 codecov: unit
 	./hack/codecov-report.sh
 
-release-test: version
-	ls -la  /usr/local/e2e-secrets/azure
-	oc new-app https://github.com/sclorg/cakephp-ex
+# Call upgrade flow with syntax: make upgrade SOURCE=source_version [TARGET=target_version]
+# If target not specified master is used
+release-test:
+	./hack/init.sh ${SOURCE}
+	./hack/create.sh
+	echo "copy the configs"
+	echo "get blobl and upgrade"
 
 e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh

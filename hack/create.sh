@@ -1,11 +1,14 @@
 #!/bin/bash -ex
 
-if [[ $# -ne 1 ]]; then
+if [[ $1 -ne "" ]] || [[ -z $RESOURCEGROUP ]]; then
     echo usage: $0 resourcegroup
     exit 1
 fi
 
-export RESOURCEGROUP=$1
+if [ -z "$RESOURCEGROUP" ]
+then
+    export RESOURCEGROUP=$1
+fi
 
 rm -rf _data
 mkdir -p _data/_out
