@@ -113,10 +113,12 @@ codecov: unit
 # Call upgrade flow with syntax: make upgrade SOURCE=source_version [TARGET=target_version]
 # If target not specified master is used
 upgrade:
+	source /usr/local/e2e-secrets/azure/secret
 	./hack/init.sh ${SOURCE}
 	./hack/create.sh ${RESOURCEGROUP}
 	echo "copy the configs"
-	echo "get blobl and upgrade"
+	pwd
+	echo "get blob and upgrade"
 
 e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
