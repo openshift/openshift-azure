@@ -76,7 +76,7 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 		}
 
 		u.log.Infof("reimaging %s", computerName)
-		err = u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID, &compute.VirtualMachineScaleSetVMReimageParameters{TempDisk: to.BoolPtr(true)})
+		err = u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID, &compute.VirtualMachineScaleSetVMReimageParameters{TempDisk: to.BoolPtr(false)})
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
 		}
