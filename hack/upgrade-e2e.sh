@@ -5,6 +5,8 @@ if [[ $# -ne 1  ]]; then
     exit 1
 fi
 
+export RESOURCEGROUP=$1
+
 if [[ -f /usr/local/e2e-secrets/azure/secret ]] ;then
     set +x
     source /usr/local/e2e-secrets/azure/secret
