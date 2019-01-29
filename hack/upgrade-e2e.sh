@@ -33,8 +33,9 @@ if [[ -f /usr/local/e2e-secrets/azure/secret ]] ;then
     export DNS_DOMAIN=osadev.cloud
     export DNS_RESOURCEGROUP=dns
     export DEPLOY_VERSION=v3.11
+    export NO_WAIT=true
 
-     trap "./hack/delete.sh $RESOURCEGROUP" EXIT
+    trap "./hack/delete.sh $RESOURCEGROUP" EXIT
     echo "Create source cluster"
     ./hack/create.sh $RESOURCEGROUP
 
@@ -45,8 +46,8 @@ if [[ -f /usr/local/e2e-secrets/azure/secret ]] ;then
 
     # copy manifest files
     # TODO: fakeRP should read config blob so this should be removed
-    cp ${S}/src/github.com/openshift/openshift-azure/_data ${GOPATH}/src/github.com/openshift/openshift-azure/
-
+    cp -r ${S}/src/github.com/openshift/openshift-azure/_data ${GOPATH}/src/github.com/openshift/openshift-azure/
+    ls -la
     ./hack/upgrade.sh $RESOURCEGROUP
 
 else
