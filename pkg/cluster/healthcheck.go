@@ -67,11 +67,18 @@ func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManag
 
 	u.log.Info("checking developer console health")
 	err = u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://"+cs.Properties.FQDN+"/console/", 10*time.Second)
-	if err != nil {
-		return err
-	}
-	u.log.Info("checking admin console health")
-	return u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://console."+cs.Properties.RouterProfiles[0].PublicSubdomain, 10*time.Second)
+	return err
+
+	// currently this makes a tcp connection to console.publicsubdomain:443 then
+	// issues a GET with Host header console.publicsubdomain
+
+	// in the future when we enable vanity domains, the end user won't have
+	// created the publicsubdomain record yet, so this will need to make a tcp
+	// connection to console.fqdn:443 with an SNI header set to
+	// console.publicsubdomain,then issue a GET with Host header
+	// console.publicsubdomain
+	// u.log.Info("checking admin console health")
+	// return u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://console."+cs.Properties.RouterProfiles[0].PublicSubdomain, 10*time.Second)
 }
 
 func (u *simpleUpgrader) WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
