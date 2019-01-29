@@ -3,6 +3,7 @@ package fakerp
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
@@ -11,7 +12,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, dnsResourceGroup, dnsDomain string, noTags bool) error {
+// CreateOCPDNS creates the dns zone for the cluster, updates the main zone in dnsResourceGroup and returns
+// the generated publicSubdomain, routerPrefix
+func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, dnsResourceGroup, dnsDomain, zoneName, routerCName string, noTags bool) error {
 	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
@@ -33,8 +36,9 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, 
 		z.Tags["ttl"] = &ttl
 		z.Tags["now"] = &now
 	}
-	zoneName := fmt.Sprintf("%s.%s", resourceGroup, dnsDomain)
-	zone, err := zc.CreateOrUpdate(ctx, dnsResourceGroup, zoneName, z, "", "")
+
+	// This creates creates the new zone
+	zone, err := zc.CreateOrUpdate(ctx, resourceGroup, zoneName, z, "", "")
 	if err != nil {
 		return err
 	}
@@ -67,7 +71,7 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, 
 		},
 	}
 	defaultRecordName := "@"
-	_, err = rsc.CreateOrUpdate(ctx, dnsResourceGroup, zoneName, defaultRecordName, dns.SOA, soa, "", "")
+	_, err = rsc.CreateOrUpdate(ctx, resourceGroup, zoneName, defaultRecordName, dns.SOA, soa, "", "")
 	if err != nil {
 		return err
 	}
@@ -80,13 +84,11 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, 
 			NsRecords: &nsServerList,
 		},
 	}
-	_, err = rsc.CreateOrUpdate(ctx, dnsResourceGroup, zoneName, defaultRecordName, dns.NS, ns, "", "")
+	_, err = rsc.CreateOrUpdate(ctx, resourceGroup, zoneName, defaultRecordName, dns.NS, ns, "", "")
 	if err != nil {
 		return err
 	}
 
-	// create router wildcard DNS CName record
-	routerCName := fmt.Sprintf("%s-router.%s.%s", resourceGroup, location, "cloudapp.azure.com")
 	cn := dns.RecordSet{
 		Etag: zone.Etag,
 		RecordSetProperties: &dns.RecordSetProperties{
@@ -96,7 +98,7 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, 
 			TTL: to.Int64Ptr(3600),
 		},
 	}
-	_, err = rsc.CreateOrUpdate(ctx, dnsResourceGroup, zoneName, "*", dns.CNAME, cn, "", "")
+	_, err = rsc.CreateOrUpdate(ctx, resourceGroup, zoneName, "*", dns.CNAME, cn, "", "")
 	if err != nil {
 		return err
 	}
@@ -108,7 +110,7 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, 
 			NsRecords: &nsServerList,
 		},
 	}
-	_, err = rsc.CreateOrUpdate(ctx, dnsResourceGroup, dnsDomain, resourceGroup, dns.NS, ns, "", "")
+	_, err = rsc.CreateOrUpdate(ctx, dnsResourceGroup, dnsDomain, strings.Split(zoneName, ".")[0], dns.NS, ns, "", "")
 	return err
 }
 
@@ -123,18 +125,29 @@ func DeleteOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 	zc.Authorizer = authorizer
 	rsc := dns.NewRecordSetsClient(subscriptionID)
 	rsc.Authorizer = authorizer
+	zoneResults, err := zc.ListByResourceGroup(ctx, resourceGroup, to.Int32Ptr(100))
+	for _, z := range zoneResults.Values() {
+		zoneName := to.String(z.Name)
+		// delete main zone NS record
+		rscDelete, err := rsc.Delete(ctx, dnsResourceGroup, dnsDomain, zoneName, dns.NS, "")
+		if err != nil {
+			return err
+		}
 
-	zoneName := fmt.Sprintf("%s.%s", resourceGroup, dnsDomain)
-	future, err := zc.Delete(ctx, dnsResourceGroup, zoneName, "")
-	if err != nil {
-		return err
+		if rscDelete.StatusCode != 204 {
+			return fmt.Errorf("error(%d) removing %v from %v in %v", rscDelete.StatusCode, strings.Split(zoneName, ".")[0], dnsDomain, dnsResourceGroup)
+		}
+
+		future, err := zc.Delete(ctx, dnsResourceGroup, zoneName, "")
+		if err != nil {
+			return err
+		}
+
+		if err := future.WaitForCompletionRef(ctx, zc.Client); err != nil {
+			return err
+		}
+
 	}
 
-	if err := future.WaitForCompletionRef(ctx, zc.Client); err != nil {
-		return err
-	}
-
-	// delete main zone NS record
-	_, err = rsc.Delete(ctx, dnsResourceGroup, dnsDomain, resourceGroup, dns.NS, "")
-	return err
+	return nil
 }

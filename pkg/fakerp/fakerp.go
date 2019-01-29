@@ -19,6 +19,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	utilrs "github.com/openshift/openshift-azure/pkg/util/randomstring"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
@@ -77,10 +78,37 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	// API representation for comparison.
 	if !shared.IsUpdate() {
 		// If containerservice.yaml does not exist - it is Create call
-		// create DNS records only on first call
-		err := CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"), os.Getenv("NOGROUPTAGS") == "true")
-		if err != nil {
-			return nil, err
+		// create DNS records only on first call and when user does not supply them
+		if cs.Properties.RouterProfiles[0].PublicSubdomain == "" {
+			log.Info("routeprofiles[0].publicsubdomain was empty, randomizing publicSubdomain and routerCName")
+
+			// generate a random domain string
+			rDomain, err := utilrs.RandomString("abcdefghijklmnopqrstuvxyz0123456789", 20)
+			if err != nil {
+				return nil, err
+			}
+			publicSubdomain := fmt.Sprintf("%s.%s", rDomain, os.Getenv("DNS_DOMAIN"))
+
+			rrCName, err := utilrs.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 20)
+			if err != nil {
+				return nil, err
+			}
+			// create router wildcard DNS CName
+			routerCName := fmt.Sprintf("osa%s.%s.%s", rrCName, cs.Location, "cloudapp.azure.com")
+
+			log.Info("routeprofiles[0].publicsubdomain was empty, creating dns")
+			err = CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"), publicSubdomain, routerCName, os.Getenv("NOGROUPTAGS") == "true")
+			if err != nil {
+				return nil, err
+			}
+
+			cs.Properties.RouterProfiles = []api.RouterProfile{
+				{
+					Name:            "default",
+					PublicSubdomain: publicSubdomain,
+					FQDN:            routerCName,
+				},
+			}
 		}
 		// the RP will enrich the internal API representation with data not included
 		// in the original request
@@ -142,6 +170,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
+	log.Info("plugin createorupdate")
 	deployer := GetDeployer(log, cs, config)
 	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
 		return nil, err
@@ -198,14 +227,6 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 		TenantID:       os.Getenv("AZURE_TENANT_ID"),
 		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
 		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
-	}
-
-	cs.Properties.RouterProfiles = []api.RouterProfile{
-		{
-			Name:            "default",
-			PublicSubdomain: fmt.Sprintf("%s.%s", os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_DOMAIN")),
-			FQDN:            fmt.Sprintf("%s-router.%s.cloudapp.azure.com", cs.Properties.AzProfile.ResourceGroup, cs.Location),
-		},
 	}
 
 	cs.Properties.ServicePrincipalProfile = api.ServicePrincipalProfile{

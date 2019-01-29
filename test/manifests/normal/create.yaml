@@ -15,6 +15,8 @@ properties:
     vnetCidr: 10.0.0.0/8
   routerProfiles:
   - name: default
+    publicSubdomain: "{{ .Env.ROUTER_SUBDOMAIN }}"
+    fqdn: "{{ .Env.ROUTER_FQDN }}"
   masterPoolProfile:
     count: 3
     vmSize: {{if eq (index .Env "RUNNING_UNDER_TEST") "true" }}Standard_D2s_v3{{else}}Standard_D4s_v3{{end}}
