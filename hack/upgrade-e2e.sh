@@ -6,7 +6,11 @@ if [[ $# < 2 ]]; then
 fi
 
 if [[ -f /usr/local/e2e-secrets/azure/secret ]] ;then
-    source /usr/local/e2e-secrets/azure/secret 2>&1 >/dev/null
+    set +x
+    source /usr/local/e2e-secrets/azure/secret
+    export AZURE_AAD_CLIENT_ID=$AZURE_CLIENT_ID
+    export AZURE_AAD_CLIENT_SECRET=$AZURE_CLIENT_SECRET
+    set -x
 
     export RESOURCEGROUP=$1
     export SOURCE=tags/$2
@@ -26,8 +30,6 @@ if [[ -f /usr/local/e2e-secrets/azure/secret ]] ;then
 
     # if we run in CI default location for ci-secret exist
     ln -s /usr/local/e2e-secrets/azure $PWD/secrets
-    export AZURE_AAD_CLIENT_ID=$AZURE_CLIENT_ID
-    export AZURE_AAD_CLIENT_SECRET=$AZURE_CLIENT_SECRET
     export DNS_DOMAIN=osadev.cloud
     export DNS_RESOURCEGROUP=dns
     export DEPLOY_VERSION=v3.11
