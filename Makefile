@@ -109,7 +109,7 @@ cover: unit
 codecov: unit
 	./hack/codecov-report.sh
 
-release-test: version publish
+release-test: version
 	ls -la  /usr/local/e2e-secrets/azure
 	oc new-app https://github.com/sclorg/cakephp-ex
 
