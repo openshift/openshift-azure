@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-if [[ $1 -ne "" ]] || [[ -z $RESOURCEGROUP ]]; then
+if [[ $1 -ne "" ]]; then
     echo usage: $0 resourcegroup
     exit 1
 fi

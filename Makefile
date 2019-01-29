@@ -114,7 +114,7 @@ codecov: unit
 # If target not specified master is used
 upgrade:
 	./hack/init.sh ${SOURCE}
-	./hack/create.sh
+	./hack/create.sh ${RESOURCEGROUP}
 	echo "copy the configs"
 	echo "get blobl and upgrade"
 
