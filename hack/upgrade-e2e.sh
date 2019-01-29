@@ -32,8 +32,7 @@ if [[ -f /usr/local/e2e-secrets/azure/secret ]] ;then
     export AZURE_AAD_CLIENT_SECRET=$AZURE_CLIENT_SECRET
     export DNS_DOMAIN=osadev.cloud
     export DNS_RESOURCEGROUP=dns
-
-
+    export DEPLOY_VERSION=v3.11
 
     echo "Create source cluster"
     ./hack/create.sh $RESOURCEGROUP
