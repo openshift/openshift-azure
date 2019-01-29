@@ -24,9 +24,4 @@ fi
 
 trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT
 
-# default location for ci-secrets
-if [[ -f /usr/local/e2e-secrets/azure/secret ]] ;then
-    source /usr/local/e2e-secrets/azure/secret
-fi
-
 go run cmd/createorupdate/createorupdate.go ${TEST_IN_PRODUCTION:-} ${ADMIN_MANIFEST:-}
