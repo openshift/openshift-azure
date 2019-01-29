@@ -112,7 +112,7 @@ codecov: unit
 
 # Call upgrade flow with syntax: make upgrade SOURCE=source_version [TARGET=target_version]
 # If target not specified master is used
-release-test:
+upgrade:
 	./hack/init.sh ${SOURCE}
 	./hack/create.sh
 	echo "copy the configs"

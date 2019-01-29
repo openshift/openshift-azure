@@ -1,7 +1,6 @@
 #!/bin/bash -ex
 
-if [[ $# -ne 1 ]]; then
-else
+if [[ $? -ne "" ]]; then
     export SOURCE=tags/$1
 fi
 
