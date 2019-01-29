@@ -572,7 +572,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 				Lun:          to.Int32Ptr(0),
 				Caching:      compute.CachingTypesReadOnly,
 				CreateOption: compute.DiskCreateOptionTypesEmpty,
-				DiskSizeGB:   to.Int32Ptr(32),
+				DiskSizeGB:   to.Int32Ptr(256),
 			},
 		}
 		(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].PublicIPAddressConfiguration = &compute.VirtualMachineScaleSetPublicIPAddressConfiguration{
