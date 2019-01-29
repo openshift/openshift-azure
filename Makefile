@@ -114,7 +114,6 @@ codecov: unit
 # Call upgrade flow with syntax: make upgrade SOURCE=source_version [TARGET=target_version]
 # If target not specified master is used
 upgrade:
-	source /usr/local/e2e-secrets/azure/secret
 	./hack/init.sh ${SOURCE}
 	./hack/create.sh ${RESOURCEGROUP}
 	echo "copy the configs"
