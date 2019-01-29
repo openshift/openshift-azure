@@ -301,7 +301,7 @@ func (u *simpleUpgrader) updateInPlace(ctx context.Context, cs *api.OpenShiftMan
 
 		{
 			u.log.Infof("reimaging %s", computerName)
-			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID, &compute.VirtualMachineScaleSetVMReimageParameters{TempDisk: to.BoolPtr(true)})
+			future, err := u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, "ss-"+string(role), *vm.InstanceID, nil)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepUpdateInPlaceReimage}
 			}
