@@ -13,4 +13,4 @@ go run cmd/fakerp/main.go &
 
 trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT
 
-go run cmd/createorupdate/createorupdate.go -timeout 1h -restore-from-blob=$BLOBNAME
+go run cmd/createorupdate/createorupdate.go -restore-from-blob=$BLOBNAME
