@@ -6,10 +6,8 @@ if [[ $# < 2 ]]; then
 fi
 
 if [[ -f /usr/local/e2e-secrets/azure/secret ]] ;then
-    set +x
-    source /usr/local/e2e-secrets/azure/secret
-    set -x
-    
+    source /usr/local/e2e-secrets/azure/secret 2>&1 >/dev/null
+
     export RESOURCEGROUP=$1
     export SOURCE=tags/$2
     if [[ -n "$3" ]]; then
@@ -41,6 +39,12 @@ if [[ -f /usr/local/e2e-secrets/azure/secret ]] ;then
     GOPATH="/home/prow/go/"
     cd ${GOPATH}/src/github.com/openshift/openshift-azure
     ln -s /usr/local/e2e-secrets/azure $PWD/secrets
+
+    # copy manifest files
+    # TODO: fakeRP should read config blob so this should be removed
+    cp ${S}/src/github.com/openshift/openshift-azure/_data ${GOPATH}/src/github.com/openshift/openshift-azure/
+
+    ./hack/upgrade.sh $RESOURCEGROUP
 
 else
     echo "This scipt can only be ran inside CI pod"
