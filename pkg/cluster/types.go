@@ -24,6 +24,8 @@ import (
 
 // here follow well known container and blob names
 const (
+	ConfigContainerName     = "config"
+	ConfigBlobName          = "config"
 	EtcdBackupContainerName = "etcd"
 )
 
