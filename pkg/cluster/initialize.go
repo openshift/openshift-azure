@@ -1,7 +1,9 @@
 package cluster
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
@@ -35,7 +37,25 @@ func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManage
 	}
 
 	u.updateBlobService, err = updateblob.NewBlobService(bsc)
-	return err
+	if err != nil {
+		return err
+	}
+
+	// cluster config container
+	c = bsc.GetContainerReference(ConfigContainerName)
+	_, err = c.CreateIfNotExists(nil)
+	if err != nil {
+		return err
+	}
+
+	b := c.GetBlobReference(ConfigBlobName)
+
+	csj, err := json.Marshal(cs)
+	if err != nil {
+		return err
+	}
+
+	return b.CreateBlockBlobFromReader(bytes.NewReader(csj), nil)
 }
 
 func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error {

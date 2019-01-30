@@ -99,7 +99,16 @@
 
 ## Access the cluster
 A cluster can be accessed via the `UI` or `CLI`. If it was created using AAD
-integration ([Pre-requisites](#prerequisites) 7.iv), you can login using Azure AD.
+integration ([Pre-requisites](#prerequisites) 7.iv), you can login using Azure AD. Another option,
+which will be deprecated in the future, is `htpasswd`. The username that is used
+is `osadmin` and the password is randomly generated. To get the password execute:
+```console
+./hack/config.sh get-config $RESOURCEGROUP | jq -r .config.adminPasswd
+```
+You can also get the admin kubeconfig with:
+```console
+./hack/config.sh get-config $RESOURCEGROUP | jq -r .config.adminKubeconfig
+```
 
 ### Examples
 
