@@ -59,6 +59,11 @@ iptables-save >/etc/sysconfig/iptables
 
 rm -rf /etc/etcd/* /etc/origin/master/*
 
+mkdir -p /etc/origin/cloudprovider
+cat >/etc/origin/cloudprovider/containerservice.json <<'EOF'
+{{ .Derived.ClusterConfig .ContainerService | String }}
+EOF
+
 base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdCa.Cert | Base64Encode }} >/etc/etcd/ca.crt
 base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdServer.Cert | Base64Encode }} >/etc/etcd/server.crt
 base64 -d <<< {{ PrivateKeyAsBytes .Config.Certificates.EtcdServer.Key | Base64Encode }} >/etc/etcd/server.key
@@ -430,7 +435,6 @@ cat >/etc/origin/master/scheduler.json <<'EOF'
 EOF
 
 echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
-mkdir -p /etc/origin/cloudprovider
 
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
 {{ .Derived.CloudProviderConf .ContainerService | String }}

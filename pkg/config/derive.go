@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -89,6 +90,10 @@ func (derived) RouterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
 
 func (derived) MasterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
 	return strings.Split(cs.Properties.FQDN, ".")[0]
+}
+
+func (derived) ClusterConfig(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	return json.Marshal(cs)
 }
 
 func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {

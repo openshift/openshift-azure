@@ -430,8 +430,10 @@ func nsgWorker(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
 func gzipBytes(data []byte) ([]byte, error) {
 	var bufOut bytes.Buffer
 	gw, err := gzip.NewWriterLevel(&bufOut, gzip.BestCompression)
-	defer gw.Close()
 	gw.Write(data)
+	if err := gw.Close(); err != nil {
+		return nil, err
+	}
 	return bufOut.Bytes(), err
 }
 
