@@ -26,3 +26,8 @@ func readBlobName(req *http.Request) (string, error) {
 	}
 	return strings.Trim(string(data), "\""), nil
 }
+
+func (s *Server) isAdminRequest(req *http.Request) bool {
+	// TODO: Align with the production RP once it supports the admin API
+	return strings.HasPrefix(req.URL.Path, "/admin")
+}
