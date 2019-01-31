@@ -314,6 +314,7 @@ func validateProvisioningState(ps api.ProvisioningState) (errs []error) {
 	case "",
 		api.Creating,
 		api.Updating,
+		api.AdminUpdating,
 		api.Failed,
 		api.Succeeded,
 		api.Deleting,
