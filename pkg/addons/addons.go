@@ -23,6 +23,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
+const ownedBySyncPodAnnotationKey = "azure.openshift.io/owned-by-sync-pod"
+
 type extra struct {
 	RegistryStorageAccountKey string
 	ConfigStorageAccountKey   string
@@ -295,5 +297,10 @@ func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluste
 		return nil
 	}
 
-	return writeDB(log, client, db)
+	err = writeDB(log, client, db)
+	if err != nil {
+		return err
+	}
+
+	return client.DeleteOrphans(db)
 }

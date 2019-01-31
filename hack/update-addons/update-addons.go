@@ -56,6 +56,10 @@ func readDB() (map[string]unstructured.Unstructured, error) {
 			return nil, err
 		}
 
+		if gv.Group == "extensions" {
+			continue
+		}
+
 		for _, resource := range gr.VersionedResources[gr.Group.PreferredVersion.Version] {
 			if strings.ContainsRune(resource.Name, '/') { // no subresources
 				continue

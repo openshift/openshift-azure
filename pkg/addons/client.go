@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"reflect"
+	"strings"
 
 	"github.com/go-test/deep"
 	"github.com/sirupsen/logrus"
@@ -34,6 +35,7 @@ type Interface interface {
 	UpdateDynamicClient() error
 	ServiceCatalogExists() (bool, error)
 	GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error)
+	DeleteOrphans(db map[string]unstructured.Unstructured) error
 }
 
 // client implements Interface
@@ -141,6 +143,73 @@ func (c *client) ApplyResources(filter func(unstructured.Unstructured) bool, db 
 	return nil
 }
 
+// DeleteOrphans looks for the "belongs-to-syncpod: yes" annotation, if found and object not in current db, remove it.
+func (c *client) DeleteOrphans(db map[string]unstructured.Unstructured) error {
+	c.log.Info("Deleting Orphan Objects from the running cluster")
+	for _, gr := range c.grs {
+		gv, err := schema.ParseGroupVersion(gr.Group.PreferredVersion.GroupVersion)
+		if err != nil {
+			return err
+		}
+
+		if gv.Group == "extensions" {
+			continue
+		}
+
+		for _, resource := range gr.VersionedResources[gr.Group.PreferredVersion.Version] {
+			if strings.ContainsRune(resource.Name, '/') { // no subresources
+				continue
+			}
+
+			if !contains(resource.Verbs, "list") {
+				continue
+			}
+
+			dc, err := c.dyn.ClientForGroupVersionKind(gv.WithKind(resource.Kind))
+			if err != nil {
+				return err
+			}
+
+			o, err := dc.Resource(&resource, "").List(metav1.ListOptions{})
+			if err != nil {
+				return err
+			}
+
+			l, ok := o.(*unstructured.UnstructuredList)
+			if !ok {
+				continue
+			}
+
+			for _, i := range l.Items {
+				// check that the object is marked by the sync pod
+				a := i.GetAnnotations()
+				if av, ok := a[ownedBySyncPodAnnotationKey]; ok && av == "yes" {
+					// if object is marked, but not in current DB, remove it
+					if _, ok := db[KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())]; !ok {
+						c.log.Info("Delete " + KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName()))
+						err = dc.Resource(&resource, i.GetNamespace()).Delete(i.GetName(), nil)
+						if err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// contains returns true if haystack contains needle
+func contains(haystack []string, needle string) bool {
+	for _, s := range haystack {
+		if s == needle {
+			return true
+		}
+	}
+	return false
+}
+
 // write synchronises a single object with the API server.
 func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstructured.Unstructured) error {
 	dc, err := dyn.ClientForGroupVersionKind(o.GroupVersionKind())
@@ -180,6 +249,7 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 		existing, err = dc.Resource(res, o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
 		if kerrors.IsNotFound(err) {
 			log.Info("Create " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+			markSyncPodOwned(o)
 			_, err = dc.Resource(res, o.GetNamespace()).Create(o)
 			if kerrors.IsAlreadyExists(err) {
 				// The "hot path" in write() is Get, check, then maybe Update.
@@ -209,12 +279,24 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 		}
 		printDiff(log, existing, o)
 
+		markSyncPodOwned(o)
+
 		o.SetResourceVersion(rv)
 		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
 		return
 	})
 
 	return err
+}
+
+// mark object as sync pod owned
+func markSyncPodOwned(o *unstructured.Unstructured) {
+	a := o.GetAnnotations()
+	if a == nil {
+		a = map[string]string{}
+	}
+	a[ownedBySyncPodAnnotationKey] = "yes"
+	o.SetAnnotations(a)
 }
 
 func needsUpdate(log *logrus.Entry, existing, o *unstructured.Unstructured) bool {
@@ -265,3 +347,4 @@ func (c *dryClient) ServiceCatalogExists() (bool, error) { return true, nil }
 func (c *dryClient) GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error) {
 	return "", nil
 }
+func (c *dryClient) DeleteOrphans(db map[string]unstructured.Unstructured) error { return nil }
