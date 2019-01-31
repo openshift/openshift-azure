@@ -20,6 +20,10 @@ func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 	default:
 		errs = append(errs, fmt.Errorf("invalid ImageSKU %q", t.ImageSKU))
 	}
+	// validate ClusterVersion
+	if !clusterVersion.MatchString(t.ClusterVersion) {
+		errs = append(errs, fmt.Errorf("invalid ClusterVersion %q", t.ClusterVersion))
+	}
 	// validate ImageVersion
 	if !imageVersion.MatchString(t.ImageVersion) {
 		errs = append(errs, fmt.Errorf("invalid ImageVersion %q", t.ImageVersion))
