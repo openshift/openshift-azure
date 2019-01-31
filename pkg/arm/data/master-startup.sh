@@ -48,8 +48,7 @@ echo "BOOTSTRAP_CONFIG_NAME=node-config-master" >>/etc/sysconfig/${SERVICE_TYPE}
 sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-node
 {{- end }}
 
-for dst in tcp,2380 tcp,444; do
-#for dst in tcp,2379 tcp,2380 tcp,8443 tcp,8444 tcp,8053 udp,8053 tcp,9090; do
+for dst in tcp,8444; do
 	proto=${dst%%,*}
 	port=${dst##*,}
 	iptables -A OS_FIREWALL_ALLOW -p $proto -m state --state NEW -m $proto --dport $port -j ACCEPT
@@ -578,6 +577,9 @@ kind: Pod
 metadata:
   name: controllers
   namespace: kube-system
+  labels:
+    openshift.io/component: controllers
+    openshift.io/control-plane: "true"
 spec:
   containers:
   - args:
@@ -585,7 +587,7 @@ spec:
     - master
     - controllers
     - --config=/etc/origin/master/master-config.yaml
-    - --listen=https://0.0.0.0:444
+    - --listen=https://0.0.0.0:8444
 {{- if $.Extra.TestConfig.RunningUnderTest }}
     - --loglevel=4
 {{- else }}
@@ -601,7 +603,7 @@ spec:
     livenessProbe:
       httpGet:
         path: healthz
-        port: 444
+        port: 8444
         scheme: HTTPS
     name: controllers
     securityContext:
