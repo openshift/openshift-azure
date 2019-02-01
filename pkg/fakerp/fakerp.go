@@ -218,11 +218,22 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func writeHelpers(c *api.OpenShiftManagedCluster) error {
+func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
 		return err
 	}
+
+	b, err := config.Derived.ClusterConfig(cs)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(filepath.Join(dataDir, "_out/containerservice.json"), b, 0600)
+	if err != nil {
+		return err
+	}
+
 	// ensure both the new key and the old key are on disk so
 	// you can SSH in regardless of the state of a VM after an update
 	if _, err = os.Stat(filepath.Join(dataDir, "_out/id_rsa")); err == nil {
@@ -235,7 +246,7 @@ func writeHelpers(c *api.OpenShiftManagedCluster) error {
 			return err
 		}
 	}
-	b, err := config.Derived.CloudProviderConf(c)
+	b, err = config.Derived.CloudProviderConf(cs)
 	if err != nil {
 		return err
 	}
@@ -245,7 +256,7 @@ func writeHelpers(c *api.OpenShiftManagedCluster) error {
 		return err
 	}
 
-	b, err = tls.PrivateKeyAsBytes(c.Config.SSHKey)
+	b, err = tls.PrivateKeyAsBytes(cs.Config.SSHKey)
 	if err != nil {
 		return err
 	}
@@ -254,7 +265,7 @@ func writeHelpers(c *api.OpenShiftManagedCluster) error {
 		return err
 	}
 
-	b, err = yaml.Marshal(c.Config.AdminKubeconfig)
+	b, err = yaml.Marshal(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return err
 	}
