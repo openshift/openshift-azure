@@ -430,11 +430,18 @@ func nsgWorker(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
 func gzipBytes(data []byte) ([]byte, error) {
 	var bufOut bytes.Buffer
 	gw, err := gzip.NewWriterLevel(&bufOut, gzip.BestCompression)
-	gw.Write(data)
-	if err := gw.Close(); err != nil {
+	if err != nil {
 		return nil, err
 	}
-	return bufOut.Bytes(), err
+	_, err = gw.Write(data)
+	if err != nil {
+		return nil, err
+	}
+	err = gw.Close()
+	if err != nil {
+		return nil, err
+	}
+	return bufOut.Bytes(), nil
 }
 
 func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
