@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2017-03-30/compute"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/validation"
@@ -388,6 +389,354 @@ func (client OpenShiftManagedClustersClient) GetControlPlanePodsResponder(resp *
 	return
 }
 
+// VirtualMachineScaleSetVMsRestartDockerFuture is an abstraction for monitoring and retrieving the results of a
+// long-running operation.
+type VirtualMachineScaleSetVMsRestartDockerFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *VirtualMachineScaleSetVMsRestartDockerFuture) Result(client OpenShiftManagedClustersClient) (rcr compute.RunCommandResult, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.VirtualMachineScaleSetVMsRestartDockerFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("containerservice.VirtualMachineScaleSetVMsRestartDockerFuture")
+		return
+	}
+	sender := autorest.DecorateSender(client, autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	if rcr.Response.Response, err = future.GetResult(sender); err == nil && rcr.Response.Response.StatusCode != http.StatusNoContent {
+		rcr, err = client.RestartDockerResponder(rcr.Response.Response)
+		if err != nil {
+			err = autorest.NewErrorWithError(err, "containerservice.VirtualMachineScaleSetVMsRestartDockerFuture", "Result", rcr.Response.Response, "Failure responding to request")
+		}
+	}
+	return
+}
+
+// RestartDockerAndWait restarts docker on a VirtualMachine within a VirtualMachineScaleSet in an
+// OpenshiftManagedCluster and waits for the request to complete before returning.
+func (client OpenShiftManagedClustersClient) RestartDockerAndWait(ctx context.Context, resourceGroupName, resourceName, scaleSetName, virtualMachine string) (result compute.RunCommandResult, err error) {
+	var future VirtualMachineScaleSetVMsRestartDockerFuture
+	future, err = client.RestartDocker(ctx, resourceGroupName, resourceName, scaleSetName, virtualMachine)
+	if err != nil {
+		return
+	}
+	if err = future.WaitForCompletionRef(ctx, client.Client); err != nil {
+		return
+	}
+	return future.Result(client)
+}
+
+// RestartDocker restarts docker on a VirtualMachine within a VirtualMachineScaleSet in an
+// OpenshiftManagedCluster with the following parameters
+// Parameters:
+// resourceGroupName - the name of the resource group.
+// resourceName - the name of the openshift managed cluster resource.
+// scaleSetName - the name of the scale set.
+// virtualMachine - the name of the virtual machine within the scale set.
+// command - the command to execute on the virtual machine within the scale set.
+func (client OpenShiftManagedClustersClient) RestartDocker(ctx context.Context, resourceGroupName, resourceName, scaleSetName, virtualMachine string) (result VirtualMachineScaleSetVMsRestartDockerFuture, err error) {
+	req, err := client.RestartDockerPreparer(ctx, resourceGroupName, resourceName, scaleSetName, virtualMachine)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "RestartDocker", nil, "Failure preparing request")
+		return
+	}
+
+	result, err = client.RestartDockerSender(req)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "RestartDocker", result.Response(), "Failure sending request")
+		return
+	}
+
+	return
+}
+
+// RestartDockerPreparer prepares the restart docker request.
+func (client OpenShiftManagedClustersClient) RestartDockerPreparer(ctx context.Context, resourceGroupName, resourceName, scaleSetName, instanceId string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+		"scaleSetName":      autorest.Encode("path", scaleSetName),
+		"instanceId":        autorest.Encode("path", instanceId),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": api.APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsContentType("application/json; charset=utf-8"),
+		autorest.AsPut(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/restartDocker/{scaleSetName}/{instanceId}", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// RestartDockerSender sends the restart docker request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) RestartDockerSender(req *http.Request) (future VirtualMachineScaleSetVMsRestartDockerFuture, err error) {
+	var resp *http.Response
+	resp, err = autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+	if err != nil {
+		return
+	}
+	future.Future, err = azure.NewFutureFromResponse(resp)
+	return
+}
+
+// RestartDockerResponder handles the response to the restart docker request. The method
+// always closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) RestartDockerResponder(resp *http.Response) (result compute.RunCommandResult, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
+		autorest.ByUnmarshallingJSON(&result),
+		autorest.ByClosing())
+	result.Response = autorest.Response{Response: resp}
+	return
+}
+
+// VirtualMachineScaleSetVMsRestartKubeletFuture is an abstraction for monitoring and retrieving the results of a
+// long-running operation.
+type VirtualMachineScaleSetVMsRestartKubeletFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *VirtualMachineScaleSetVMsRestartKubeletFuture) Result(client OpenShiftManagedClustersClient) (rcr compute.RunCommandResult, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.VirtualMachineScaleSetVMsRestartKubeletFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("containerservice.VirtualMachineScaleSetVMsRestartKubeletFuture")
+		return
+	}
+	sender := autorest.DecorateSender(client, autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	if rcr.Response.Response, err = future.GetResult(sender); err == nil && rcr.Response.Response.StatusCode != http.StatusNoContent {
+		rcr, err = client.RestartKubeletResponder(rcr.Response.Response)
+		if err != nil {
+			err = autorest.NewErrorWithError(err, "containerservice.VirtualMachineScaleSetVMsRestartKubeletFuture", "Result", rcr.Response.Response, "Failure responding to request")
+		}
+	}
+	return
+}
+
+// RestartKubeletAndWait restarts the kubelet on a VirtualMachine within a VirtualMachineScaleSet in an
+// OpenshiftManagedCluster and waits for the request to complete before returning.
+func (client OpenShiftManagedClustersClient) RestartKubeletAndWait(ctx context.Context, resourceGroupName, resourceName, scaleSetName, virtualMachine string) (result compute.RunCommandResult, err error) {
+	var future VirtualMachineScaleSetVMsRestartKubeletFuture
+	future, err = client.RestartKubelet(ctx, resourceGroupName, resourceName, scaleSetName, virtualMachine)
+	if err != nil {
+		return
+	}
+	if err = future.WaitForCompletionRef(ctx, client.Client); err != nil {
+		return
+	}
+	return future.Result(client)
+}
+
+// RestartKubelet restarts the kubelet on a VirtualMachine within a VirtualMachineScaleSet in an
+// OpenshiftManagedCluster with the following parameters
+// Parameters:
+// resourceGroupName - the name of the resource group.
+// resourceName - the name of the openshift managed cluster resource.
+// scaleSetName - the name of the scale set.
+// virtualMachine - the name of the virtual machine within the scale set.
+// command - the command to execute on the virtual machine within the scale set.
+func (client OpenShiftManagedClustersClient) RestartKubelet(ctx context.Context, resourceGroupName, resourceName, scaleSetName, virtualMachine string) (result VirtualMachineScaleSetVMsRestartKubeletFuture, err error) {
+	req, err := client.RestartKubeletPreparer(ctx, resourceGroupName, resourceName, scaleSetName, virtualMachine)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "RestartKubelet", nil, "Failure preparing request")
+		return
+	}
+
+	result, err = client.RestartKubeletSender(req)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "RestartKubelet", result.Response(), "Failure sending request")
+		return
+	}
+
+	return
+}
+
+// RestartKubeletPreparer prepares the restart kubelet request.
+func (client OpenShiftManagedClustersClient) RestartKubeletPreparer(ctx context.Context, resourceGroupName, resourceName, scaleSetName, instanceId string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+		"scaleSetName":      autorest.Encode("path", scaleSetName),
+		"instanceId":        autorest.Encode("path", instanceId),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": api.APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsContentType("application/json; charset=utf-8"),
+		autorest.AsPut(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/restartKubelet/{scaleSetName}/{instanceId}", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// RestartKubeletSender sends the restart kubelet request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) RestartKubeletSender(req *http.Request) (future VirtualMachineScaleSetVMsRestartKubeletFuture, err error) {
+	var resp *http.Response
+	resp, err = autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+	if err != nil {
+		return
+	}
+	future.Future, err = azure.NewFutureFromResponse(resp)
+	return
+}
+
+// RestartKubeletResponder handles the response to the restart kubelet request. The method
+// always closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) RestartKubeletResponder(resp *http.Response) (result compute.RunCommandResult, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
+		autorest.ByUnmarshallingJSON(&result),
+		autorest.ByClosing())
+	result.Response = autorest.Response{Response: resp}
+	return
+}
+
+// VirtualMachineScaleSetVMsRestartNetworkManagerFuture is an abstraction for monitoring and retrieving the results of a
+// long-running operation.
+type VirtualMachineScaleSetVMsRestartNetworkManagerFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *VirtualMachineScaleSetVMsRestartNetworkManagerFuture) Result(client OpenShiftManagedClustersClient) (rcr compute.RunCommandResult, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.VirtualMachineScaleSetVMsRestartNetworkManagerFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("containerservice.VirtualMachineScaleSetVMsRestartNetworkManagerFuture")
+		return
+	}
+	sender := autorest.DecorateSender(client, autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	if rcr.Response.Response, err = future.GetResult(sender); err == nil && rcr.Response.Response.StatusCode != http.StatusNoContent {
+		rcr, err = client.RestartNetworkManagerResponder(rcr.Response.Response)
+		if err != nil {
+			err = autorest.NewErrorWithError(err, "containerservice.VirtualMachineScaleSetVMsRestartNetworkManagerFuture", "Result", rcr.Response.Response, "Failure responding to request")
+		}
+	}
+	return
+}
+
+// RestartNetworkManagerAndWait restarts network manager on a VirtualMachine within a VirtualMachineScaleSet in an
+// OpenshiftManagedCluster and waits for the request to complete before returning.
+func (client OpenShiftManagedClustersClient) RestartNetworkManagerAndWait(ctx context.Context, resourceGroupName, resourceName, scaleSetName, virtualMachine string) (result compute.RunCommandResult, err error) {
+	var future VirtualMachineScaleSetVMsRestartNetworkManagerFuture
+	future, err = client.RestartNetworkManager(ctx, resourceGroupName, resourceName, scaleSetName, virtualMachine)
+	if err != nil {
+		return
+	}
+	if err = future.WaitForCompletionRef(ctx, client.Client); err != nil {
+		return
+	}
+	return future.Result(client)
+}
+
+// RestartNetworkManager restarts network manager on a VirtualMachine within a VirtualMachineScaleSet in an
+// OpenshiftManagedCluster with the following parameters
+// Parameters:
+// resourceGroupName - the name of the resource group.
+// resourceName - the name of the openshift managed cluster resource.
+// scaleSetName - the name of the scale set.
+// virtualMachine - the name of the virtual machine within the scale set.
+// command - the command to execute on the virtual machine within the scale set.
+func (client OpenShiftManagedClustersClient) RestartNetworkManager(ctx context.Context, resourceGroupName, resourceName, scaleSetName, virtualMachine string) (result VirtualMachineScaleSetVMsRestartNetworkManagerFuture, err error) {
+	req, err := client.RestartNetworkManagerPreparer(ctx, resourceGroupName, resourceName, scaleSetName, virtualMachine)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "RestartNetworkManager", nil, "Failure preparing request")
+		return
+	}
+
+	result, err = client.RestartNetworkManagerSender(req)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "RestartNetworkManager", result.Response(), "Failure sending request")
+		return
+	}
+
+	return
+}
+
+// RestartNetworkManagerPreparer prepares the restart network manager request.
+func (client OpenShiftManagedClustersClient) RestartNetworkManagerPreparer(ctx context.Context, resourceGroupName, resourceName, scaleSetName, instanceId string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+		"scaleSetName":      autorest.Encode("path", scaleSetName),
+		"instanceId":        autorest.Encode("path", instanceId),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": api.APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsContentType("application/json; charset=utf-8"),
+		autorest.AsPut(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/restartNetworkManager/{scaleSetName}/{instanceId}", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// RestartNetworkManagerSender sends the restart network manager request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) RestartNetworkManagerSender(req *http.Request) (future VirtualMachineScaleSetVMsRestartNetworkManagerFuture, err error) {
+	var resp *http.Response
+	resp, err = autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+	if err != nil {
+		return
+	}
+	future.Future, err = azure.NewFutureFromResponse(resp)
+	return
+}
+
+// RestartNetworkManagerResponder handles the response to the restart network manager request. The method
+// always closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) RestartNetworkManagerResponder(resp *http.Response) (result compute.RunCommandResult, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
+		autorest.ByUnmarshallingJSON(&result),
+		autorest.ByClosing())
+	result.Response = autorest.Response{Response: resp}
+	return
+}
+
 // RestoreAndWait restores an openshift managed cluster and waits for the
 // request to complete before returning.
 func (client OpenShiftManagedClustersClient) RestoreAndWait(ctx context.Context, resourceGroupName, resourceName string, blobName string) (result autorest.Response, err error) {
@@ -561,6 +910,128 @@ func (client OpenShiftManagedClustersClient) RotateSecretsResponder(resp *http.R
 		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
 		autorest.ByClosing())
 	result.Response = resp
+	return
+}
+
+// VirtualMachineScaleSetVMsRunGenericCommandFuture is an abstraction for monitoring and retrieving the results of a
+// long-running operation.
+type VirtualMachineScaleSetVMsRunGenericCommandFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *VirtualMachineScaleSetVMsRunGenericCommandFuture) Result(client OpenShiftManagedClustersClient) (rcr compute.RunCommandResult, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.VirtualMachineScaleSetVMsRunGenericCommandFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("containerservice.VirtualMachineScaleSetVMsRunGenericCommandFuture")
+		return
+	}
+	sender := autorest.DecorateSender(client, autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	if rcr.Response.Response, err = future.GetResult(sender); err == nil && rcr.Response.Response.StatusCode != http.StatusNoContent {
+		rcr, err = client.RunGenericCommandResponder(rcr.Response.Response)
+		if err != nil {
+			err = autorest.NewErrorWithError(err, "containerservice.VirtualMachineScaleSetVMsRunGenericCommandFuture", "Result", rcr.Response.Response, "Failure responding to request")
+		}
+	}
+	return
+}
+
+// RunGenericCommandAndWait runs a generic command on a VirtualMachine within a VirtualMachineScaleSet in an
+// OpenshiftManagedCluster and waits for the request to complete before returning.
+func (client OpenShiftManagedClustersClient) RunGenericCommandAndWait(ctx context.Context, resourceGroupName, resourceName, scaleSetName, virtualMachine string, parameters compute.RunCommandInput) (result compute.RunCommandResult, err error) {
+	var future VirtualMachineScaleSetVMsRunGenericCommandFuture
+	future, err = client.RunGenericCommand(ctx, resourceGroupName, resourceName, scaleSetName, virtualMachine, parameters)
+	if err != nil {
+		return
+	}
+	if err = future.WaitForCompletionRef(ctx, client.Client); err != nil {
+		return
+	}
+	return future.Result(client)
+}
+
+// RunGenericCommand runs a generic command on a VirtualMachine within a VirtualMachineScaleSet in an
+// OpenshiftManagedCluster with the following parameters
+// Parameters:
+// resourceGroupName - the name of the resource group.
+// resourceName - the name of the openshift managed cluster resource.
+// scaleSetName - the name of the scale set.
+// virtualMachine - the name of the virtual machine within the scale set.
+// command - the command to execute on the virtual machine within the scale set.
+func (client OpenShiftManagedClustersClient) RunGenericCommand(ctx context.Context, resourceGroupName, resourceName, scaleSetName, virtualMachine string, parameters compute.RunCommandInput) (result VirtualMachineScaleSetVMsRunGenericCommandFuture, err error) {
+	if err := validation.Validate([]validation.Validation{
+		{TargetValue: parameters,
+			Constraints: []validation.Constraint{{Target: "parameters.CommandID", Name: validation.Null, Rule: true, Chain: nil}}}}); err != nil {
+		return result, validation.NewError("containerservice.OpenShiftManagedClustersClient", "RunGenericCommand", err.Error())
+	}
+	req, err := client.RunGenericCommandPreparer(ctx, resourceGroupName, resourceName, scaleSetName, virtualMachine, parameters)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "RunGenericCommand", nil, "Failure preparing request")
+		return
+	}
+
+	result, err = client.RunGenericCommandSender(req)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "RunGenericCommand", result.Response(), "Failure sending request")
+		return
+	}
+
+	return
+}
+
+// RunGenericCommandPreparer prepares the run command request.
+func (client OpenShiftManagedClustersClient) RunGenericCommandPreparer(ctx context.Context, resourceGroupName, resourceName, scaleSetName, instanceId string, parameters compute.RunCommandInput) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+		"scaleSetName":      autorest.Encode("path", scaleSetName),
+		"instanceId":        autorest.Encode("path", instanceId),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": api.APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsContentType("application/json; charset=utf-8"),
+		autorest.AsPut(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/runCommand/{scaleSetName}/{instanceId}", pathParameters),
+		autorest.WithJSON(parameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// RunGenericCommandSender sends the run command request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) RunGenericCommandSender(req *http.Request) (future VirtualMachineScaleSetVMsRunGenericCommandFuture, err error) {
+	var resp *http.Response
+	resp, err = autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+	if err != nil {
+		return
+	}
+	future.Future, err = azure.NewFutureFromResponse(resp)
+	return
+}
+
+// RunGenericCommandResponder handles the response to the run command request. The method
+// always closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) RunGenericCommandResponder(resp *http.Response) (result compute.RunCommandResult, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
+		autorest.ByUnmarshallingJSON(&result),
+		autorest.ByClosing())
+	result.Response = autorest.Response{Response: resp}
 	return
 }
 
