@@ -22,4 +22,8 @@ func (s *Server) SetupRoutes() {
 	s.router.Put(filepath.Join("/admin", s.basePath, "/restore"), s.handleRestore)
 	s.router.Put(filepath.Join("/admin", s.basePath, "/rotate/secrets"), s.handleRotateSecrets)
 	s.router.Get(filepath.Join("/admin", s.basePath, "/status"), s.handleGetControlPlanePods)
+	s.router.Put(filepath.Join("/admin", s.basePath, "/restartDocker/{scaleSetName}/{instanceId}"), s.handleRestartDocker)
+	s.router.Put(filepath.Join("/admin", s.basePath, "/restartKubelet/{scaleSetName}/{instanceId}"), s.handleRestartKubelet)
+	s.router.Put(filepath.Join("/admin", s.basePath, "/restartNetworkManager/{scaleSetName}/{instanceId}"), s.handleRestartNetworkManager)
+	s.router.Put(filepath.Join("/admin", s.basePath, "/runCommand/{scaleSetName}/{instanceId}"), s.handleRunCommand)
 }

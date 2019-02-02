@@ -1,10 +1,13 @@
 package fakerp
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 )
 
 func (s *Server) badRequest(w http.ResponseWriter, msg string) {
@@ -25,6 +28,16 @@ func readBlobName(req *http.Request) (string, error) {
 		return "", fmt.Errorf("failed to read request body: %v", err)
 	}
 	return strings.Trim(string(data), "\""), nil
+}
+
+func readCommandInput(req *http.Request) (*compute.RunCommandInput, error) {
+	data, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read request body: %v", err)
+	}
+	var params *compute.RunCommandInput
+	err = json.Unmarshal(data, params)
+	return params, err
 }
 
 func (s *Server) isAdminRequest(req *http.Request) bool {

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/Azure/azure-sdk-for-go/storage"
+	"github.com/go-chi/chi"
 
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
@@ -119,4 +120,114 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	s.log.Info("rotated cluster secrets")
+}
+
+// handleRestartDocker handles restarting docker on a given vm within a scaleset in the cluster
+func (s *Server) handleRestartDocker(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+
+	vm := chi.URLParam(req, "instanceId")
+	ss := chi.URLParam(req, "scaleSetName")
+
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
+	result, err := s.plugin.RestartDocker(ctx, cs, ss, vm)
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to restart docker: %v", err))
+		return
+	}
+
+	w.Write(result)
+	s.log.Infof("restarted docker on %s in %s", vm, ss)
+}
+
+// handleRestartKubelet handles restarting the kubelet on a given vm within a scaleset in the cluster
+func (s *Server) handleRestartKubelet(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+
+	vm := chi.URLParam(req, "instanceId")
+	ss := chi.URLParam(req, "scaleSetName")
+
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
+	result, err := s.plugin.RestartKubelet(ctx, cs, ss, vm)
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to restart kubelet: %v", err))
+		return
+	}
+
+	w.Write(result)
+	s.log.Infof("restarted kubelet on %s in %s", vm, ss)
+}
+
+// handleRestartNetworkManager handles restarting network manager on a given vm within a scaleset in the cluster
+func (s *Server) handleRestartNetworkManager(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+
+	vm := chi.URLParam(req, "instanceId")
+	ss := chi.URLParam(req, "scaleSetName")
+
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
+	result, err := s.plugin.RestartNetworkManager(ctx, cs, ss, vm)
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to restart network manager: %v", err))
+		return
+	}
+
+	w.Write(result)
+	s.log.Infof("restarted network manager on %s in %s", vm, ss)
+}
+
+// handleRunCommand handles running generic commands on a given vm within a scaleset in the cluster
+func (s *Server) handleRunCommand(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+
+	vm := chi.URLParam(req, "instanceId")
+	ss := chi.URLParam(req, "scaleSetName")
+
+	command, err := readCommandInput(req)
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to read command input: %v", err))
+		return
+	}
+
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
+	result, err := s.plugin.RunGenericCommand(ctx, cs, ss, vm, *command)
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to run command: %v", err))
+		return
+	}
+
+	w.Write(result)
+	s.log.Infof("ran command on %s in %s", vm, ss)
 }
