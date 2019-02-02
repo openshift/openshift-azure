@@ -76,9 +76,9 @@ type VirtualMachineScaleSetVMsClientAddons interface {
 	Delete(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string) error
 	List(ctx context.Context, resourceGroupName, virtualMachineScaleSetName, filter, selectParameter, expand string) ([]compute.VirtualMachineScaleSetVM, error)
 	Reimage(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string, VMScaleSetVMReimageInput *compute.VirtualMachineScaleSetVMReimageParameters) error
-	ReimageAll(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (result compute.VirtualMachineScaleSetVMsReimageAllFuture, err error)
 	Restart(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string) error
 	Start(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string) error
+	RunCommand(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string, parameters compute.RunCommandInput) (compute.RunCommandResult, error)
 }
 
 func (c *virtualMachineScaleSetVMsClient) Deallocate(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string) error {
@@ -143,4 +143,18 @@ func (c *virtualMachineScaleSetVMsClient) Start(ctx context.Context, resourceGro
 	}
 
 	return future.WaitForCompletionRef(ctx, c.VirtualMachineScaleSetVMsClient.Client)
+}
+
+func (c *virtualMachineScaleSetVMsClient) RunCommand(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string, parameters compute.RunCommandInput) (compute.RunCommandResult, error) {
+	var result compute.RunCommandResult
+	future, err := c.VirtualMachineScaleSetVMsClient.RunCommand(ctx, resourceGroupName, VMScaleSetName, instanceID, parameters)
+	if err != nil {
+		return result, err
+	}
+	err = future.WaitForCompletionRef(ctx, c.VirtualMachineScaleSetVMsClient.Client)
+
+	if err != nil {
+		return result, err
+	}
+	return future.Result(c.VirtualMachineScaleSetVMsClient)
 }

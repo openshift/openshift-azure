@@ -12,6 +12,7 @@ import (
 	"crypto/x509"
 	"net/http"
 
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -42,6 +43,10 @@ type Upgrader interface {
 	UpdateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError
 	EtcdRestoreDeleteMasterScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
+	RunCommand(ctx context.Context, oc *api.OpenShiftManagedCluster, scaleSetName, instanceId string, parameters compute.RunCommandInput) (compute.RunCommandResult, *api.PluginError)
+	RestartDocker(ctx context.Context, oc *api.OpenShiftManagedCluster, scaleSetName, instanceId string) (compute.RunCommandResult, *api.PluginError)
+	RestartKubelet(ctx context.Context, oc *api.OpenShiftManagedCluster, scaleSetName, instanceId string) (compute.RunCommandResult, *api.PluginError)
+	RestartNetworkManager(ctx context.Context, oc *api.OpenShiftManagedCluster, scaleSetName, instanceId string) (compute.RunCommandResult, *api.PluginError)
 }
 
 type simpleUpgrader struct {

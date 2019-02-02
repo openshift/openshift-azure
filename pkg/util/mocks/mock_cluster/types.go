@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	gomock "github.com/golang/mock/gomock"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
@@ -188,4 +189,64 @@ func (m *MockUpgrader) EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context
 func (mr *MockUpgraderMockRecorder) EtcdRestoreDeleteMasterScaleSetHashes(ctx, cs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EtcdRestoreDeleteMasterScaleSetHashes", reflect.TypeOf((*MockUpgrader)(nil).EtcdRestoreDeleteMasterScaleSetHashes), ctx, cs)
+}
+
+// RunCommand mocks base method
+func (m *MockUpgrader) RunCommand(ctx context.Context, oc *api.OpenShiftManagedCluster, scaleSetName, instanceId string, parameters compute.RunCommandInput) (compute.RunCommandResult, *api.PluginError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RunCommand", ctx, oc, scaleSetName, instanceId, parameters)
+	ret0, _ := ret[0].(compute.RunCommandResult)
+	ret1, _ := ret[1].(*api.PluginError)
+	return ret0, ret1
+}
+
+// RunCommand indicates an expected call of RunCommand
+func (mr *MockUpgraderMockRecorder) RunCommand(ctx, oc, scaleSetName, instanceId, parameters interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunCommand", reflect.TypeOf((*MockUpgrader)(nil).RunCommand), ctx, oc, scaleSetName, instanceId, parameters)
+}
+
+// RestartDocker mocks base method
+func (m *MockUpgrader) RestartDocker(ctx context.Context, oc *api.OpenShiftManagedCluster, scaleSetName, instanceId string) (compute.RunCommandResult, *api.PluginError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RestartDocker", ctx, oc, scaleSetName, instanceId)
+	ret0, _ := ret[0].(compute.RunCommandResult)
+	ret1, _ := ret[1].(*api.PluginError)
+	return ret0, ret1
+}
+
+// RestartDocker indicates an expected call of RestartDocker
+func (mr *MockUpgraderMockRecorder) RestartDocker(ctx, oc, scaleSetName, instanceId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RestartDocker", reflect.TypeOf((*MockUpgrader)(nil).RestartDocker), ctx, oc, scaleSetName, instanceId)
+}
+
+// RestartKubelet mocks base method
+func (m *MockUpgrader) RestartKubelet(ctx context.Context, oc *api.OpenShiftManagedCluster, scaleSetName, instanceId string) (compute.RunCommandResult, *api.PluginError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RestartKubelet", ctx, oc, scaleSetName, instanceId)
+	ret0, _ := ret[0].(compute.RunCommandResult)
+	ret1, _ := ret[1].(*api.PluginError)
+	return ret0, ret1
+}
+
+// RestartKubelet indicates an expected call of RestartKubelet
+func (mr *MockUpgraderMockRecorder) RestartKubelet(ctx, oc, scaleSetName, instanceId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RestartKubelet", reflect.TypeOf((*MockUpgrader)(nil).RestartKubelet), ctx, oc, scaleSetName, instanceId)
+}
+
+// RestartNetworkManager mocks base method
+func (m *MockUpgrader) RestartNetworkManager(ctx context.Context, oc *api.OpenShiftManagedCluster, scaleSetName, instanceId string) (compute.RunCommandResult, *api.PluginError) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RestartNetworkManager", ctx, oc, scaleSetName, instanceId)
+	ret0, _ := ret[0].(compute.RunCommandResult)
+	ret1, _ := ret[1].(*api.PluginError)
+	return ret0, ret1
+}
+
+// RestartNetworkManager indicates an expected call of RestartNetworkManager
+func (mr *MockUpgraderMockRecorder) RestartNetworkManager(ctx, oc, scaleSetName, instanceId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RestartNetworkManager", reflect.TypeOf((*MockUpgrader)(nil).RestartNetworkManager), ctx, oc, scaleSetName, instanceId)
 }

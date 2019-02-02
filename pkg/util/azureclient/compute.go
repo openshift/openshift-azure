@@ -36,6 +36,7 @@ func (c *virtualMachineScaleSetsClient) Client() autorest.Client {
 // VirtualMachineScaleSetVMsClient is a minimal interface for azure VirtualMachineScaleSetVMsClient
 type VirtualMachineScaleSetVMsClient interface {
 	VirtualMachineScaleSetVMsClientAddons
+	Client
 }
 
 type virtualMachineScaleSetVMsClient struct {

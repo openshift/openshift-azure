@@ -4,6 +4,8 @@ package api
 import (
 	"context"
 
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
+
 	plugin "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 )
 
@@ -121,4 +123,16 @@ type GenevaActions interface {
 
 	// GetControlPlanePods fetches a consolidated list of the control plane pods in the cluster
 	GetControlPlanePods(ctx context.Context, oc *OpenShiftManagedCluster) ([]byte, error)
+
+	// RunGenericCommand runs a generic command on a specific VM in a given scale set in the cluster
+	RunGenericCommand(ctx context.Context, oc *OpenShiftManagedCluster, scalesetName, instanceId string, parameters compute.RunCommandInput) ([]byte, error)
+
+	// RestartDocker restarts docker on a specific VM in a given scale set in the cluster
+	RestartDocker(ctx context.Context, oc *OpenShiftManagedCluster, scalesetName, instanceId string) ([]byte, error)
+
+	// RestartKubelet restarts the kubelet on a specific VM in a given scale set in the cluster
+	RestartKubelet(ctx context.Context, oc *OpenShiftManagedCluster, scalesetName, instanceId string) ([]byte, error)
+
+	// RestartNetworkManager restarts network manager on a specific VM in a given scale set in the cluster
+	RestartNetworkManager(ctx context.Context, oc *OpenShiftManagedCluster, scalesetName, instanceId string) ([]byte, error)
 }

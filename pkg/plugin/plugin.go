@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -239,4 +240,60 @@ func (p *plugin) GetControlPlanePods(ctx context.Context, oc *api.OpenShiftManag
 		return nil, err
 	}
 	return json.Marshal(pods)
+}
+
+func (p *plugin) RunGenericCommand(ctx context.Context, oc *api.OpenShiftManagedCluster, scalesetName, instanceId string, parameters compute.RunCommandInput) ([]byte, error) {
+	p.log.Info("creating clients")
+	err := p.clusterUpgrader.CreateClients(ctx, oc, true)
+	if err != nil {
+		return nil, err
+	}
+	p.log.Infof("running command %v on %s in %s", parameters, instanceId, scalesetName)
+	result, err := p.clusterUpgrader.RunCommand(ctx, oc, scalesetName, instanceId, parameters)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(result)
+}
+
+func (p *plugin) RestartDocker(ctx context.Context, oc *api.OpenShiftManagedCluster, scalesetName, instanceId string) ([]byte, error) {
+	p.log.Info("creating clients")
+	err := p.clusterUpgrader.CreateClients(ctx, oc, true)
+	if err != nil {
+		return nil, err
+	}
+	p.log.Infof("restarting docker on %s in %s", instanceId, scalesetName)
+	result, err := p.clusterUpgrader.RestartDocker(ctx, oc, scalesetName, instanceId)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(result)
+}
+
+func (p *plugin) RestartKubelet(ctx context.Context, oc *api.OpenShiftManagedCluster, scalesetName, instanceId string) ([]byte, error) {
+	p.log.Info("creating clients")
+	err := p.clusterUpgrader.CreateClients(ctx, oc, true)
+	if err != nil {
+		return nil, err
+	}
+	p.log.Infof("restarting kubelet on %s in %s", instanceId, scalesetName)
+	result, err := p.clusterUpgrader.RestartKubelet(ctx, oc, scalesetName, instanceId)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(result)
+}
+
+func (p *plugin) RestartNetworkManager(ctx context.Context, oc *api.OpenShiftManagedCluster, scalesetName, instanceId string) ([]byte, error) {
+	p.log.Info("creating clients")
+	err := p.clusterUpgrader.CreateClients(ctx, oc, true)
+	if err != nil {
+		return nil, err
+	}
+	p.log.Infof("restarting network manager on %s in %s", instanceId, scalesetName)
+	result, err := p.clusterUpgrader.RestartNetworkManager(ctx, oc, scalesetName, instanceId)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(result)
 }
