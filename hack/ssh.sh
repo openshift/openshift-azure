@@ -38,17 +38,16 @@ fi
 
 shift $((OPTIND-1))
 RESOURCEGROUP=$1
+if [[ -z "$RESOURCEGROUP" ]]; then
+     RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
+fi
 
 trap cleanup EXIT
 
 eval "$(ssh-agent)"
 
-if [[ -z "$RESOURCEGROUP" ]]; then
-    RESOURCEGROUP=$(awk '/^    resourceGroup:/ { print $2 }' <_data/containerservice.yaml)
-    ssh-add _data/_out/id_rsa 2>/dev/null
-	[[ -e _data/_out/id_rsa.old ]] && ssh-add _data/_out/id_rsa.old 2>/dev/null
-fi
+ssh-add _data/_out/id_rsa 2>/dev/null
+[[ -e _data/_out/id_rsa.old ]] && ssh-add _data/_out/id_rsa.old 2>/dev/null
 
 IP=$(az vmss list-instance-public-ips --subscription $AZURE_SUBSCRIPTION_ID -g $RESOURCEGROUP -n ss-master --query "[$ID].ipAddress" | tr -d '"')
-
 ssh -A -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no cloud-user@$IP $COMMAND
