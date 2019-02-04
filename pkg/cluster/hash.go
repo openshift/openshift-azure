@@ -17,7 +17,7 @@ import (
 )
 
 type Hasher interface {
-	HashScaleSet(*api.OpenShiftManagedCluster, *api.AgentPoolProfile) ([]byte, error)
+	HashScaleSet(*api.OpenShiftManagedCluster, *api.AgentPoolProfile, map[string]string) ([]byte, error)
 }
 
 type hasher struct {
@@ -37,13 +37,13 @@ func hashVMSS(vmss *compute.VirtualMachineScaleSet) ([]byte, error) {
 }
 
 // hashScaleSets returns the set of desired state scale set hashes
-func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
+func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, storageAccountKey map[string]string) ([]byte, error) {
 	// the hash is invariant of name, suffix, count
 	appCopy := *app
 	appCopy.Count = 0
 	appCopy.Name = ""
 
-	vmss, err := arm.Vmss(&h.pluginConfig, cs, &appCopy, "", "") // TODO: backupBlob is rather a layering violation here
+	vmss, err := arm.Vmss(&h.pluginConfig, cs, &appCopy, "", "", storageAccountKey) // TODO: backupBlob is rather a layering violation here
 	if err != nil {
 		return nil, err
 	}

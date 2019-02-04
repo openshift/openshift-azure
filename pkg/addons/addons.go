@@ -20,7 +20,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 const ownedBySyncPodLabelKey = "azure.openshift.io/owned-by-sync-pod"
@@ -251,16 +250,16 @@ func writeDB(log *logrus.Entry, client Interface, db map[string]unstructured.Uns
 	return client.ApplyResources(scFilter, db, keys)
 }
 
-func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) error {
-	client, err := newClient(ctx, log, cs, azs, dryRun)
+func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, dryRun bool) error {
+	client, err := newClient(ctx, log, cs, dryRun)
 	if err != nil {
 		return err
 	}
-	keyRegistry, err := client.GetStorageAccountKey(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
+	keyRegistry, err := client.GetStorageAccountKey("registry")
 	if err != nil {
 		return err
 	}
-	keyConfig, err := client.GetStorageAccountKey(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+	keyConfig, err := client.GetStorageAccountKey("config")
 	if err != nil {
 		return err
 	}

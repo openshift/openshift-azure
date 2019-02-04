@@ -39,7 +39,7 @@ func TestHashScaleSet(t *testing.T) {
 	var h hasher
 	var exp []byte
 	for _, test := range tests {
-		got, err := h.HashScaleSet(&cs, &test.app)
+		got, err := h.HashScaleSet(&cs, &test.app, map[string]string{"config": "", "registry": ""})
 		if err != nil {
 			t.Errorf("%s: unexpected error: %v", test.name, err)
 		}

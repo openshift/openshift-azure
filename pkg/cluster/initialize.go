@@ -2,6 +2,10 @@ package cluster
 
 import (
 	"context"
+	"time"
+
+	azstorage "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
+	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
@@ -16,11 +20,8 @@ import (
 // - populates the config blob
 func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	if u.storageClient == nil {
-		keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
-		if err != nil {
-			return err
-		}
-		u.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, *(*keys.Keys)[0].Value, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
+		var err error
+		u.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, u.storageAccountKey[cs.Config.ConfigStorageAccount], storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
 		if err != nil {
 			return err
 		}
@@ -38,10 +39,51 @@ func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManage
 	return err
 }
 
+func (u *simpleUpgrader) GetStorageAccountKey(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, accountName string) (string, error) {
+	if !isUpdate {
+		parameters := azstorage.AccountCreateParameters{
+			Sku: &azstorage.Sku{
+				Name: azstorage.StandardLRS,
+			},
+			Kind:     azstorage.Storage,
+			Location: &cs.Location,
+		}
+		if accountName == cs.Config.ConfigStorageAccount {
+			parameters.Tags = map[string]*string{
+				"type": to.StringPtr("config"),
+			}
+		}
+		future, err := u.accountsClient.Create(ctx, cs.Properties.AzProfile.ResourceGroup, accountName, parameters)
+		if err != nil {
+			return "", err
+		}
+
+		err = future.WaitForCompletionRef(ctx, u.accountsClient.Client())
+		if err != nil {
+			return "", err
+		}
+	}
+
+	for found := false; !found; _, found = u.storageAccountKey[accountName] {
+		keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, accountName)
+		if err != nil {
+			return "", err
+		}
+		if len(*keys.Keys) == 0 {
+			// The WaitForCompletionRef above should be enough, but I have seen
+			// this return an empty list the first time.
+			time.Sleep(1)
+			continue
+		}
+		u.storageAccountKey[accountName] = *(*keys.Keys)[0].Value
+	}
+	return u.storageAccountKey[accountName], nil
+}
+
 func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error {
 	blob := updateblob.NewUpdateBlob()
 	for _, app := range cs.Properties.AgentPoolProfiles {
-		h, err := u.hasher.HashScaleSet(cs, &app)
+		h, err := u.hasher.HashScaleSet(cs, &app, u.storageAccountKey)
 		if err != nil {
 			return err
 		}

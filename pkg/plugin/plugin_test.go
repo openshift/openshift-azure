@@ -34,6 +34,7 @@ func TestCreateOrUpdate(t *testing.T) {
 		return nil
 	}
 	cs := &api.OpenShiftManagedCluster{
+		Config: api.Config{ConfigStorageAccount: "config", RegistryStorageAccount: "registry"},
 		Properties: api.Properties{
 			AgentPoolProfiles: []api.AgentPoolProfile{
 				{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
@@ -43,11 +44,14 @@ func TestCreateOrUpdate(t *testing.T) {
 		},
 	}
 
+	accountKeyMap := map[string]string{"config": "123456", "registry": "654321"}
 	for _, tt := range tests {
 		armGenerator := mock_arm.NewMockGenerator(mockCtrl)
-		armGenerator.EXPECT().Generate(nil, cs, "", tt.isUpdate, gomock.Any()).Return(nil, nil)
 		clusterUpgrader := mock_cluster.NewMockUpgrader(mockCtrl)
 		c := clusterUpgrader.EXPECT().CreateClients(nil, cs).Return(nil)
+		c = clusterUpgrader.EXPECT().GetStorageAccountKey(nil, cs, tt.isUpdate, "config").Return(accountKeyMap["config"], nil).After(c)
+		c = clusterUpgrader.EXPECT().GetStorageAccountKey(nil, cs, tt.isUpdate, "registry").Return(accountKeyMap["registry"], nil).After(c)
+		c = armGenerator.EXPECT().Generate(nil, cs, "", tt.isUpdate, gomock.Any(), accountKeyMap).Return(nil, nil).After(c)
 		c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 		if tt.isUpdate {
 			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
@@ -86,6 +90,7 @@ func TestRecoverEtcdCluster(t *testing.T) {
 		return nil
 	}
 	cs := &api.OpenShiftManagedCluster{
+		Config: api.Config{ConfigStorageAccount: "config", RegistryStorageAccount: "registry"},
 		Properties: api.Properties{
 			AgentPoolProfiles: []api.AgentPoolProfile{
 				{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
@@ -95,15 +100,18 @@ func TestRecoverEtcdCluster(t *testing.T) {
 		},
 	}
 
+	accountKeyMap := map[string]string{"config": "123456", "registry": "654321"}
 	testData := map[string]interface{}{"test": "data"}
 	testDataWithBackup := map[string]interface{}{"test": "backup"}
 	armGenerator := mock_arm.NewMockGenerator(mockCtrl)
 	clusterUpgrader := mock_cluster.NewMockUpgrader(mockCtrl)
-	gomock.InOrder(
-		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil),
-		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testData, nil),
-	)
 	c := clusterUpgrader.EXPECT().CreateClients(nil, cs).Return(nil)
+	c = clusterUpgrader.EXPECT().GetStorageAccountKey(nil, cs, true, "config").Return(accountKeyMap["config"], nil).After(c)
+	c = clusterUpgrader.EXPECT().GetStorageAccountKey(nil, cs, true, "registry").Return(accountKeyMap["registry"], nil).After(c)
+	gomock.InOrder(
+		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any(), accountKeyMap).Return(testDataWithBackup, nil),
+		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any(), accountKeyMap).Return(testData, nil),
+	)
 	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil, cs).Return(nil).After(c)
 
 	// deploy masters
@@ -114,6 +122,8 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], "").Return(nil).After(c)
 	// update
 	c = clusterUpgrader.EXPECT().CreateClients(nil, cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().GetStorageAccountKey(nil, cs, true, "config").Return(accountKeyMap["config"], nil).After(c)
+	c = clusterUpgrader.EXPECT().GetStorageAccountKey(nil, cs, true, "registry").Return(accountKeyMap["registry"], nil).After(c)
 	c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
@@ -142,6 +152,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 		return nil
 	}
 	cs := &api.OpenShiftManagedCluster{
+		Config: api.Config{ConfigStorageAccount: "config", RegistryStorageAccount: "registry"},
 		Properties: api.Properties{
 			AgentPoolProfiles: []api.AgentPoolProfile{
 				{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
@@ -151,14 +162,17 @@ func TestRotateClusterSecrets(t *testing.T) {
 		},
 	}
 
+	accountKeyMap := map[string]string{"config": "123456", "registry": "654321"}
 	mockGen := mock_config.NewMockGenerator(mockCtrl)
 	mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
 	mockArm := mock_arm.NewMockGenerator(mockCtrl)
 
 	c := mockGen.EXPECT().InvalidateSecrets(cs).Return(nil)
 	c = mockGen.EXPECT().Generate(cs, nil).Return(nil).After(c)
-	c = mockArm.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = mockUp.EXPECT().CreateClients(nil, cs).Return(nil).After(c)
+	c = mockUp.EXPECT().GetStorageAccountKey(nil, cs, true, "config").Return(accountKeyMap["config"], nil).After(c)
+	c = mockUp.EXPECT().GetStorageAccountKey(nil, cs, true, "registry").Return(accountKeyMap["registry"], nil).After(c)
+	c = mockArm.EXPECT().Generate(nil, cs, "", true, gomock.Any(), accountKeyMap).Return(nil, nil).After(c)
 	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = mockUp.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)

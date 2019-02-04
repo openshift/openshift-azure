@@ -14,8 +14,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/api/validate"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
@@ -28,31 +26,12 @@ var (
 )
 
 type sync struct {
-	azs azureclient.AccountsClient
 	log *logrus.Entry
-}
-
-func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
-	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
-	if err != nil {
-		return err
-	}
-
-	authorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID)
-	if err != nil {
-		return err
-	}
-
-	s.azs = azureclient.NewAccountsClient(ctx, cpc.SubscriptionID, authorizer)
-
-	s.log = log
-
-	return nil
 }
 
 // sync syncs the current state of the cluster with the
 // desired state that is kept in a file in local storage.
-func (s *sync) sync(ctx context.Context, log *logrus.Entry) error {
+func (s *sync) sync(ctx context.Context) error {
 	s.log.Print("Sync process started")
 
 	s.log.Print("reading config")
@@ -71,7 +50,7 @@ func (s *sync) sync(ctx context.Context, log *logrus.Entry) error {
 		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 
-	if err := addons.Main(ctx, s.log, cs, s.azs, *dryRun); err != nil {
+	if err := addons.Main(ctx, s.log, cs, *dryRun); err != nil {
 		return errors.Wrap(err, "cannot sync cluster config")
 	}
 
@@ -88,14 +67,11 @@ func main() {
 	log.Printf("sync pod starting, git commit %s", gitCommit)
 
 	s := new(sync)
+	s.log = log
 	ctx := context.Background()
 
-	if err := s.init(ctx, log); err != nil {
-		log.Fatalf("Cannot initialize sync: %v", err)
-	}
-
 	for {
-		err := s.sync(ctx, log)
+		err := s.sync(ctx)
 		if err != nil {
 			log.Printf("Error while syncing: %v", err)
 		}

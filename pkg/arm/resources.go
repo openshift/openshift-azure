@@ -4,18 +4,19 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/base64"
+	"encoding/json"
 	"sort"
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-07-01/network"
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2015-06-15/storage"
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/configblob"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 )
@@ -350,32 +351,6 @@ func lbKubernetes(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *networ
 	return lb
 }
 
-func storageRegistry(cs *api.OpenShiftManagedCluster) *storage.Account {
-	return &storage.Account{
-		AccountProperties: &storage.AccountProperties{
-			AccountType: storage.StandardLRS,
-		},
-		Name:     to.StringPtr(cs.Config.RegistryStorageAccount),
-		Type:     to.StringPtr("Microsoft.Storage/storageAccounts"),
-		Location: to.StringPtr(cs.Location),
-	}
-}
-
-func storageConfig(cs *api.OpenShiftManagedCluster) *storage.Account {
-	return &storage.Account{
-		AccountProperties: &storage.AccountProperties{
-			AccountType: storage.StandardLRS,
-		},
-		Name:     to.StringPtr(cs.Config.ConfigStorageAccount),
-		Type:     to.StringPtr("Microsoft.Storage/storageAccounts"),
-		Location: to.StringPtr(cs.Location),
-		Tags: map[string]*string{
-			// TODO: these should be consts
-			"type": to.StringPtr("config"),
-		},
-	}
-}
-
 func nsgMaster(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
 	return &network.SecurityGroup{
 		SecurityGroupPropertiesFormat: &network.SecurityGroupPropertiesFormat{
@@ -444,7 +419,7 @@ func gzipBytes(data []byte) ([]byte, error) {
 	return bufOut.Bytes(), nil
 }
 
-func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
+func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string, storageAccountKey map[string]string) (*compute.VirtualMachineScaleSet, error) {
 	sshPublicKey, err := tls.SSHPublicKeyAsString(&cs.Config.SSHKey.PublicKey)
 	if err != nil {
 		return nil, err
@@ -460,13 +435,32 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		return nil, err
 	}
 
+	configStorageKey := configblob.StorageKey{
+		Name: cs.Config.ConfigStorageAccount,
+		Key:  storageAccountKey[cs.Config.ConfigStorageAccount],
+	}
+	configStorageKeyJSON, err := json.Marshal(configStorageKey)
+	if err != nil {
+		return nil, err
+	}
+	registryStorageKey := configblob.StorageKey{
+		Name: cs.Config.RegistryStorageAccount,
+		Key:  storageAccountKey[cs.Config.RegistryStorageAccount],
+	}
+	registryStorageKeyJSON, err := json.Marshal(registryStorageKey)
+	if err != nil {
+		return nil, err
+	}
+
 	var script string
 	if app.Role == api.AgentPoolProfileRoleMaster {
 		b, err := template.Template(string(masterStartup), nil, cs, map[string]interface{}{
-			"IsRecovery":     len(backupBlob) > 0,
-			"BackupBlobName": backupBlob,
-			"Role":           app.Role,
-			"TestConfig":     pc.TestConfig,
+			"IsRecovery":         len(backupBlob) > 0,
+			"BackupBlobName":     backupBlob,
+			"Role":               app.Role,
+			"TestConfig":         pc.TestConfig,
+			"ConfigStorageKey":   string(configStorageKeyJSON),
+			"RegistryStorageKey": string(registryStorageKeyJSON),
 		})
 		if err != nil {
 			return nil, err

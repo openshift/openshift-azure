@@ -62,6 +62,12 @@ mkdir -p /etc/origin/cloudprovider
 cat >/etc/origin/cloudprovider/containerservice.json <<'EOF'
 {{ .Derived.ClusterConfig .ContainerService | String }}
 EOF
+cat >/etc/origin/cloudprovider/configstoragekey.json <<'EOF'
+{{ .Extra.ConfigStorageKey }}
+EOF
+cat >/etc/origin/cloudprovider/registrystoragekey.json <<'EOF'
+{{ .Extra.RegistryStorageKey }}
+EOF
 
 base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdCa.Cert | Base64Encode }} >/etc/etcd/ca.crt
 base64 -d <<< {{ CertAsBytes .Config.Certificates.EtcdServer.Cert | Base64Encode }} >/etc/etcd/server.crt

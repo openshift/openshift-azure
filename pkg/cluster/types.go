@@ -30,6 +30,7 @@ const (
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
 	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error
+	GetStorageAccountKey(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, accountName string) (string, error)
 	Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error
 	WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error
@@ -46,6 +47,7 @@ type simpleUpgrader struct {
 	pluginConfig      api.PluginConfig
 	accountsClient    azureclient.AccountsClient
 	storageClient     storage.Client
+	storageAccountKey map[string]string
 	updateBlobService updateblob.BlobService
 	vmc               azureclient.VirtualMachineScaleSetVMsClient
 	ssc               azureclient.VirtualMachineScaleSetsClient
@@ -61,10 +63,11 @@ var _ Upgrader = &simpleUpgrader{}
 // NewSimpleUpgrader creates a new upgrader instance
 func NewSimpleUpgrader(log *logrus.Entry, pluginConfig *api.PluginConfig) Upgrader {
 	return &simpleUpgrader{
-		pluginConfig:  *pluginConfig,
-		log:           log,
-		scalerFactory: scaler.NewFactory(),
-		hasher:        &hasher{pluginConfig: *pluginConfig},
+		pluginConfig:      *pluginConfig,
+		log:               log,
+		scalerFactory:     scaler.NewFactory(),
+		hasher:            &hasher{pluginConfig: *pluginConfig},
+		storageAccountKey: map[string]string{},
 	}
 }
 

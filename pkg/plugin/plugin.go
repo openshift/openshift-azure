@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -16,6 +18,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
+	"github.com/openshift/openshift-azure/pkg/util/configblob"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
@@ -72,16 +76,28 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, backupBlob string) *api.PluginError {
 	suffix := fmt.Sprintf("%d", time.Now().Unix())
 
+	err := p.clusterUpgrader.CreateClients(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+	configStorageAccountKey, err := p.clusterUpgrader.GetStorageAccountKey(ctx, cs, true, cs.Config.ConfigStorageAccount)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginCreateConfigStorageAccount}
+	}
+	registryStorageAccountKey, err := p.clusterUpgrader.GetStorageAccountKey(ctx, cs, true, cs.Config.RegistryStorageAccount)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginCreateConfigStorageAccount}
+	}
+	keyMap := map[string]string{
+		cs.Config.ConfigStorageAccount:   configStorageAccountKey,
+		cs.Config.RegistryStorageAccount: registryStorageAccountKey,
+	}
 	p.log.Info("generating arm templates")
-	azuretemplate, err := p.armGenerator.Generate(ctx, cs, backupBlob, true, suffix)
+	azuretemplate, err := p.armGenerator.Generate(ctx, cs, backupBlob, true, suffix, keyMap)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
 
-	err = p.clusterUpgrader.CreateClients(ctx, cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
-	}
 	p.log.Info("restoring the cluster")
 	if err := p.clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx, cs); err != nil {
 		return err
@@ -118,14 +134,56 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
 	suffix := fmt.Sprintf("%d", time.Now().Unix())
 
-	p.log.Info("generating arm templates")
-	azuretemplate, err := p.armGenerator.Generate(ctx, cs, "", isUpdate, suffix)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
-	}
-	err = p.clusterUpgrader.CreateClients(ctx, cs)
+	err := p.clusterUpgrader.CreateClients(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+
+	configStorageAccountKey, err := p.clusterUpgrader.GetStorageAccountKey(ctx, cs, isUpdate, cs.Config.ConfigStorageAccount)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginCreateConfigStorageAccount}
+	}
+	registryStorageAccountKey, err := p.clusterUpgrader.GetStorageAccountKey(ctx, cs, isUpdate, cs.Config.RegistryStorageAccount)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginCreateConfigStorageAccount}
+	}
+
+	if isUpdate && p.config.TestConfig.RunningUnderTest {
+		// this is so that sync pod can be run locally during development
+		dataDir, err := shared.FindDirectory(shared.DataDirectory)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginCreateConfigStorageAccount}
+		}
+
+		configStorageKey := configblob.StorageKey{
+			Name: cs.Config.ConfigStorageAccount,
+			Key:  configStorageAccountKey,
+		}
+		configStorageKeyJSON, err := json.Marshal(configStorageKey)
+		err = ioutil.WriteFile(filepath.Join(dataDir, "_out/configstoragekey.json"), configStorageKeyJSON, 0600)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginCreateConfigStorageAccount}
+		}
+
+		registryStorageKey := configblob.StorageKey{
+			Name: cs.Config.RegistryStorageAccount,
+			Key:  registryStorageAccountKey,
+		}
+		registryStorageKeyJSON, err := json.Marshal(registryStorageKey)
+		err = ioutil.WriteFile(filepath.Join(dataDir, "_out/registrystoragekey.json"), []byte(registryStorageKeyJSON), 0600)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginCreateConfigStorageAccount}
+		}
+	}
+	keyMap := map[string]string{
+		cs.Config.ConfigStorageAccount:   configStorageAccountKey,
+		cs.Config.RegistryStorageAccount: registryStorageAccountKey,
+	}
+
+	p.log.Info("generating arm templates")
+	azuretemplate, err := p.armGenerator.Generate(ctx, cs, "", isUpdate, suffix, keyMap)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
 	if isUpdate {
 		p.log.Info("starting update")

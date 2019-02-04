@@ -29,7 +29,7 @@ func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, bl
 // in place.
 func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError {
 	ssName := config.MasterScalesetName
-	ssHash, err := u.hasher.HashScaleSet(cs, app)
+	ssHash, err := u.hasher.HashScaleSet(cs, app, u.storageAccountKey)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashScaleSet}
 	}

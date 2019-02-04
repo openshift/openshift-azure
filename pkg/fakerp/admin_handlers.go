@@ -62,7 +62,7 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 	}
 
 	ctx := context.Background()
-	bsc, err := configblob.GetService(ctx, cpc)
+	bsc, err := configblob.GetServiceFromPlugin(ctx, cpc)
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to configure blob client: %v", err))
 		return

@@ -62,7 +62,7 @@ func (u *simpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string
 func (u *simpleUpgrader) UpdateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError {
 	u.log.Infof("updating worker agent pool %s", app.Name)
 
-	desiredHash, err := u.hasher.HashScaleSet(cs, app)
+	desiredHash, err := u.hasher.HashScaleSet(cs, app, u.storageAccountKey)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
 	}
@@ -120,12 +120,12 @@ func (u *simpleUpgrader) UpdateWorkerAgentPool(ctx context.Context, cs *api.Open
 // simplicity, the scaleset has zero instances - we fix this up later.  TODO:
 // improve this.
 func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string, blob *updateblob.UpdateBlob) (*compute.VirtualMachineScaleSet, *api.PluginError) {
-	hash, err := u.hasher.HashScaleSet(cs, app)
+	hash, err := u.hasher.HashScaleSet(cs, app, u.storageAccountKey)
 	if err != nil {
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
 	}
 
-	target, err := arm.Vmss(&u.pluginConfig, cs, app, "", suffix)
+	target, err := arm.Vmss(&u.pluginConfig, cs, app, "", suffix, u.storageAccountKey)
 	if err != nil {
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}

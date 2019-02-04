@@ -50,6 +50,21 @@ func (mr *MockUpgraderMockRecorder) CreateClients(ctx, cs interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClients", reflect.TypeOf((*MockUpgrader)(nil).CreateClients), ctx, cs)
 }
 
+// GetStorageAccountKey mocks base method
+func (m *MockUpgrader) GetStorageAccountKey(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, accountName string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetStorageAccountKey", ctx, cs, isUpdate, accountName)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetStorageAccountKey indicates an expected call of GetStorageAccountKey
+func (mr *MockUpgraderMockRecorder) GetStorageAccountKey(ctx, cs, isUpdate, accountName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStorageAccountKey", reflect.TypeOf((*MockUpgrader)(nil).GetStorageAccountKey), ctx, cs, isUpdate, accountName)
+}
+
 // Initialize mocks base method
 func (m *MockUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	m.ctrl.T.Helper()

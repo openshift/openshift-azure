@@ -105,6 +105,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 		{
 			name: "basic coverage",
 			cs: &api.OpenShiftManagedCluster{
+				Config: api.Config{ConfigStorageAccount: "config", RegistryStorageAccount: "registry"},
 				Properties: api.Properties{
 					AgentPoolProfiles: []api.AgentPoolProfile{
 						{
@@ -151,8 +152,10 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			kclient := mock_kubeclient.NewMockKubeclient(gmc)
 			hasher := mock_cluster.NewMockHasher(gmc)
 
+			storageAccountKey := map[string]string{"config": "x", "registry": "y"}
 			u := &simpleUpgrader{
 				updateBlobService: ubs,
+				storageAccountKey: storageAccountKey,
 				vmc:               vmc,
 				ssc:               ssc,
 				kubeclient:        kclient,
@@ -161,8 +164,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			}
 
 			instanceHashes := map[string][]byte{}
-
-			c := hasher.EXPECT().HashScaleSet(tt.cs, &tt.cs.Properties.AgentPoolProfiles[0]).Return([]byte("updated"), nil)
+			c := hasher.EXPECT().HashScaleSet(tt.cs, &tt.cs.Properties.AgentPoolProfiles[0], storageAccountKey).Return([]byte("updated"), nil)
 			c = ubs.EXPECT().Read().Return(updateblob.NewUpdateBlob(), nil).After(c)
 			c = vmc.EXPECT().List(ctx, tt.cs.Properties.AzProfile.ResourceGroup, "ss-master", "", "", "").Return(tt.vms, nil).After(c)
 

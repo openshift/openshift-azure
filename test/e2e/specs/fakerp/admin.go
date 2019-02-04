@@ -164,6 +164,12 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 		Expect(err).ToNot(HaveOccurred())
 
 		By("comparing the update blob before and after an update")
-		Expect(reflect.DeepEqual(before, after)).To(Equal(true))
+		for inst, hash := range before.InstanceHashes {
+			// the config is stored on-disk on the master so it will be rotated
+			// on config changes, such as this.
+			if !strings.Contains(inst, "master-") {
+				Expect(reflect.DeepEqual(hash, after.InstanceHashes[inst])).To(Equal(true))
+			}
+		}
 	})
 })

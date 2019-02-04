@@ -14,7 +14,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/etcdbackup"
-	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
@@ -71,12 +70,7 @@ func main() {
 
 	ctx := context.Background()
 
-	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
-	if err != nil {
-		log.Fatal(errors.Wrap(err, "could not read azure.conf"))
-	}
-
-	bsc, err := configblob.GetService(ctx, cpc)
+	bsc, err := configblob.GetService()
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "could not find storage account"))
 	}

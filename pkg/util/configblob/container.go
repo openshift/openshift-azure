@@ -2,7 +2,9 @@ package configblob
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 
@@ -11,10 +13,34 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 )
 
+type StorageKey struct {
+	Name string `json:"name"`
+	Key  string `json:"key"`
+}
+
 // GetService is a helper function called by code running outside of the plugin.
 // It returns the blob storage interface to the storage account containing the
 // config blob, etcd backups, etc.
-func GetService(ctx context.Context, cpc *cloudprovider.Config) (azureclientstorage.BlobStorageClient, error) {
+func GetService() (azureclientstorage.BlobStorageClient, error) {
+	b, err := ioutil.ReadFile("_data/_out/configstoragekey.json")
+	if err != nil {
+		return nil, err
+	}
+	var configStorageKey StorageKey
+	err = json.Unmarshal(b, configStorageKey)
+	if err != nil {
+		return nil, err
+	}
+
+	storageCli, err := azureclientstorage.NewClient(configStorageKey.Name, configStorageKey.Key, azureclientstorage.DefaultBaseURL, azureclientstorage.DefaultAPIVersion, true)
+	if err != nil {
+		return nil, err
+	}
+
+	return storageCli.GetBlobService(), nil
+}
+
+func GetServiceFromPlugin(ctx context.Context, cpc *cloudprovider.Config) (azureclientstorage.BlobStorageClient, error) {
 	authorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID)
 	if err != nil {
 		return nil, err
