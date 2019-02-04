@@ -104,6 +104,8 @@ func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error
 		SecurityGroupName:   "nsg-compute",
 		PrimaryScaleSetName: "ss-compute",
 		VMType:              "vmss",
+		SubnetName:          "default",
+		VnetName:            "vnet",
 	})
 }
 

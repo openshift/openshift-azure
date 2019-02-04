@@ -32,9 +32,11 @@ location: eastus
 primaryScaleSetName: ss-compute
 resourceGroup: rg
 securityGroupName: nsg-compute
+subnetName: default
 subscriptionId: sub
 tenantId: tenant
 vmType: vmss
+vnetName: vnet
 `),
 		},
 	}
