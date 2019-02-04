@@ -5,27 +5,16 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/tools/clientcmd/api/latest"
 
-	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/shared"
+	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	azuretls "github.com/openshift/openshift-azure/pkg/tls"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
-func login(username string) (*api.Config, error) {
-	dataDir, err := fakerp.FindDirectory(fakerp.DataDirectory)
-	if err != nil {
-		return nil, err
-	}
-	cs, err := managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
-	if err != nil {
-		return nil, err
-	}
-
+func login(username string, cs *internalapi.OpenShiftManagedCluster) (*api.Config, error) {
 	var organization []string
 	switch username {
 	case "customer-cluster-admin":

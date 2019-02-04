@@ -14,7 +14,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
-	"github.com/openshift/openshift-azure/test/clients/openshift"
+	"github.com/openshift/openshift-azure/test/e2e/standard"
 )
 
 type target struct {
@@ -36,14 +36,15 @@ type targetsResponse struct {
 
 var _ = Describe("Prometheus E2E tests [Prometheus][EveryPR]", func() {
 	var (
-		cli *openshift.Client
+		cli *standard.SanityChecker
 		cs  *api.OpenShiftManagedCluster
 	)
 
 	BeforeEach(func() {
 		var err error
-		cli, err = openshift.NewAdminClient()
+		cli, err = standard.NewDefaultSanityChecker()
 		Expect(err).NotTo(HaveOccurred())
+		Expect(cli).NotTo(BeNil())
 
 		dataDir, err := shared.FindDirectory(shared.DataDirectory)
 		Expect(err).NotTo(HaveOccurred())
@@ -52,10 +53,10 @@ var _ = Describe("Prometheus E2E tests [Prometheus][EveryPR]", func() {
 	})
 
 	It("should register all the necessary prometheus targets", func() {
-		token, err := cli.GetServiceAccountToken("openshift-monitoring", "prometheus-k8s")
+		token, err := cli.Client.Admin.GetServiceAccountToken("openshift-monitoring", "prometheus-k8s")
 		Expect(err).NotTo(HaveOccurred())
 
-		route, err := cli.RouteV1.Routes("openshift-monitoring").Get("prometheus-k8s", meta_v1.GetOptions{})
+		route, err := cli.Client.Admin.RouteV1.Routes("openshift-monitoring").Get("prometheus-k8s", meta_v1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 
 		req, err := http.NewRequest(http.MethodGet, "https://"+route.Spec.Host+"/api/v1/targets", nil)
