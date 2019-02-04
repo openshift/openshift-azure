@@ -40,9 +40,11 @@ loadBalancerSku: standard
 location: eastus
 resourceGroup: rg
 securityGroupName: nsg-worker
+subnetName: default
 subscriptionId: sub
 tenantId: tenant
 vmType: vmss
+vnetName: vnet
 `),
 		},
 	}
