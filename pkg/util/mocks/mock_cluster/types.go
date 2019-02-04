@@ -11,6 +11,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
+	kubeclient "github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 )
 
 // MockUpgrader is a mock of Upgrader interface
@@ -216,4 +217,18 @@ func (m *MockUpgrader) ResetUpdateBlob(cs *api.OpenShiftManagedCluster) error {
 func (mr *MockUpgraderMockRecorder) ResetUpdateBlob(cs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetUpdateBlob", reflect.TypeOf((*MockUpgrader)(nil).ResetUpdateBlob), cs)
+}
+
+// Reimage mocks base method
+func (m *MockUpgrader) Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, computerName kubeclient.ComputerName) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Reimage", ctx, cs, computerName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Reimage indicates an expected call of Reimage
+func (mr *MockUpgraderMockRecorder) Reimage(ctx, cs, computerName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reimage", reflect.TypeOf((*MockUpgrader)(nil).Reimage), ctx, cs, computerName)
 }

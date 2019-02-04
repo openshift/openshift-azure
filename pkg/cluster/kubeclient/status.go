@@ -8,6 +8,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	MasterNodeRoleLabel = "node-role.kubernetes.io/master"
+)
+
 func (u *kubeclient) GetControlPlanePods(ctx context.Context) ([]v1.Pod, error) {
 	namespaces, err := u.client.CoreV1().Namespaces().List(metav1.ListOptions{})
 	if err != nil {
@@ -34,4 +38,15 @@ func IsControlPlaneNamespace(namespace string) bool {
 		return true
 	}
 	return false
+}
+
+func (u *kubeclient) IsMaster(computerName ComputerName) (bool, error) {
+	node, err := u.client.CoreV1().Nodes().Get(computerName.toKubernetes(), metav1.GetOptions{})
+	if err != nil {
+		return false, err
+	}
+	if node.Labels[MasterNodeRoleLabel] == "true" {
+		return true, nil
+	}
+	return false, nil
 }

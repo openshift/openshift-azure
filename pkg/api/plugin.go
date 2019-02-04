@@ -123,7 +123,9 @@ type GenevaActions interface {
 
 	// GetControlPlanePods fetches a consolidated list of the control plane pods in the cluster
 	GetControlPlanePods(ctx context.Context, oc *OpenShiftManagedCluster) ([]byte, error)
-
 	// ForceUpdate forces rotates all vms in a cluster
 	ForceUpdate(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
+
+	// Reimage reimages a virtual machine in the cluster
+	Reimage(ctx context.Context, oc *OpenShiftManagedCluster, hostname string) error
 }

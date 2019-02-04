@@ -134,3 +134,89 @@ func TestGetControlPlanePods(t *testing.T) {
 		}
 	}
 }
+
+func TestIsMaster(t *testing.T) {
+	tests := []struct {
+		testName   string
+		nodeName   string
+		kc         kubernetes.Interface
+		wantResult bool
+		wantErr    bool
+	}{
+		{
+			testName: "no nodes",
+			nodeName: "master-000000",
+			wantErr:  true,
+			kc:       fake.NewSimpleClientset(),
+		},
+		{
+			testName:   "no master nodes",
+			nodeName:   "master-000000",
+			wantErr:    false,
+			wantResult: false,
+			kc: fake.NewSimpleClientset(&corev1.Node{
+				TypeMeta: metav1.TypeMeta{
+					Kind: "node",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "master-000000",
+				},
+				Status: corev1.NodeStatus{
+					Phase: corev1.NodeRunning,
+				},
+			}, &corev1.Node{
+				TypeMeta: metav1.TypeMeta{
+					Kind: "node",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "compute-000000",
+				},
+				Status: corev1.NodeStatus{
+					Phase: corev1.NodeRunning,
+				},
+			}),
+		},
+		{
+			testName:   "master nodes exist",
+			nodeName:   "master-000000",
+			wantErr:    false,
+			wantResult: true,
+			kc: fake.NewSimpleClientset(&corev1.Node{
+				TypeMeta: metav1.TypeMeta{
+					Kind: "node",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "master-000000",
+					Labels: map[string]string{
+						"node-role.kubernetes.io/master": "true",
+					},
+				},
+				Status: corev1.NodeStatus{
+					Phase: corev1.NodeRunning,
+				},
+			}, &corev1.Node{
+				TypeMeta: metav1.TypeMeta{
+					Kind: "node",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "compute-000000",
+				},
+				Status: corev1.NodeStatus{
+					Phase: corev1.NodeRunning,
+				},
+			}),
+		},
+	}
+	for _, tt := range tests {
+		u := &kubeclient{client: tt.kc}
+		computerName := ComputerName(tt.nodeName)
+		got, err := u.IsMaster(computerName)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("IsMaster() error = %v, wantErr %v. Test: %v", err, tt.wantErr, tt.testName)
+			return
+		}
+		if !reflect.DeepEqual(got, tt.wantResult) {
+			t.Errorf("IsMaster() = %v, want %v. Test: %v", got, tt.wantResult, tt.testName)
+		}
+	}
+}

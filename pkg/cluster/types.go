@@ -44,6 +44,7 @@ type Upgrader interface {
 	EtcdRestoreDeleteMasterScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	ResetUpdateBlob(cs *api.OpenShiftManagedCluster) error
+	Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, computerName kubeclient.ComputerName) error
 }
 
 type simpleUpgrader struct {

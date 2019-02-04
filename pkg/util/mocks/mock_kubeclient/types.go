@@ -81,6 +81,21 @@ func (mr *MockKubeclientMockRecorder) GetControlPlanePods(arg0 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetControlPlanePods", reflect.TypeOf((*MockKubeclient)(nil).GetControlPlanePods), arg0)
 }
 
+// IsMaster mocks base method
+func (m *MockKubeclient) IsMaster(arg0 kubeclient.ComputerName) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsMaster", arg0)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsMaster indicates an expected call of IsMaster
+func (mr *MockKubeclientMockRecorder) IsMaster(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsMaster", reflect.TypeOf((*MockKubeclient)(nil).IsMaster), arg0)
+}
+
 // WaitForInfraServices mocks base method
 func (m *MockKubeclient) WaitForInfraServices(arg0 context.Context) *api.PluginError {
 	m.ctrl.T.Helper()

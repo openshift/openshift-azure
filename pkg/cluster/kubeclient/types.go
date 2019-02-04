@@ -25,6 +25,7 @@ type Kubeclient interface {
 	DrainAndDeleteWorker(ctx context.Context, computerName ComputerName) error
 	DeleteMaster(computerName ComputerName) error
 	GetControlPlanePods(ctx context.Context) ([]corev1.Pod, error)
+	IsMaster(computerName ComputerName) (bool, error)
 	WaitForInfraServices(ctx context.Context) *api.PluginError
 	WaitForReadyMaster(ctx context.Context, computerName ComputerName) error
 	WaitForReadyWorker(ctx context.Context, computerName ComputerName) error

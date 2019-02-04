@@ -11,7 +11,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
-	validate "github.com/openshift/openshift-azure/pkg/api/validate"
+	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
@@ -271,4 +271,34 @@ func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluste
 	}
 	p.log.Info("force updates successful")
 	return nil
+}
+
+func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, hostname string) error {
+	p.log.Info("generating cluster upgrader clients")
+	err := p.clusterUpgrader.CreateClients(ctx, oc, true)
+	if err != nil {
+		return err
+	}
+	p.log.Info("generating admin kubeclient")
+	err = p.initialize(ctx, oc)
+	if err != nil {
+		return err
+	}
+	computerName := kubeclient.ComputerName(hostname)
+	isMaster, err := p.kubeclient.IsMaster(computerName)
+	if err != nil {
+		return err
+	}
+	p.log.Infof("reimaging %s", computerName)
+	err = p.clusterUpgrader.Reimage(ctx, oc, computerName)
+	if err != nil {
+		return err
+	}
+	p.log.Infof("waiting for %s to be ready", computerName)
+	if isMaster {
+		err = p.kubeclient.WaitForReadyMaster(ctx, computerName)
+	} else {
+		err = p.kubeclient.WaitForReadyWorker(ctx, computerName)
+	}
+	return err
 }
