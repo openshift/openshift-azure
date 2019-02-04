@@ -19,7 +19,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/randomstring"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
-	"github.com/openshift/openshift-azure/test/clients/openshift"
+	"github.com/openshift/openshift-azure/test/e2e/standard"
 )
 
 var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", func() {
@@ -28,7 +28,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 	)
 	var (
 		azurecli  *azure.Client
-		occli     *openshift.Client
+		occli     *standard.SanityChecker
 		namespace string
 	)
 
@@ -36,19 +36,21 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		var err error
 		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
-		occli, err = openshift.NewEndUserClient()
+		Expect(azurecli).NotTo(BeNil())
+		occli, err = standard.NewDefaultSanityChecker()
 		Expect(err).NotTo(HaveOccurred())
+		Expect(occli).NotTo(BeNil())
 
 		namespace, err = randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
 		Expect(err).ToNot(HaveOccurred())
 		namespace = "e2e-test-" + namespace
 		fmt.Fprintln(GinkgoWriter, "Using namespace", namespace)
-		err = occli.CreateProject(namespace)
+		err = occli.Client.EndUser.CreateProject(namespace)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
-		occli.CleanupProject(namespace)
+		occli.Client.EndUser.CleanupProject(namespace)
 	})
 
 	It("should be possible to maintain a healthy cluster after scaling it out and in", func() {
@@ -106,14 +108,14 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 				},
 			},
 		}
-		_, err = occli.AppsV1.Deployments(namespace).Create(deployment)
+		_, err = occli.Client.EndUser.AppsV1.Deployments(namespace).Create(deployment)
 		Expect(err).NotTo(HaveOccurred())
-		err = wait.PollImmediate(2*time.Second, 1*time.Minute, ready.DeploymentIsReady(occli.AppsV1.Deployments(namespace), sampleDeployment))
+		err = wait.PollImmediate(2*time.Second, 1*time.Minute, ready.DeploymentIsReady(occli.Client.EndUser.AppsV1.Deployments(namespace), sampleDeployment))
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Verifying that the deployment's pods are spread across 2 nodes...")
 		By(fmt.Sprintf("Getting deployment %s.%s", namespace, sampleDeployment))
-		dep, err := occli.AppsV1.Deployments(namespace).Get(sampleDeployment, metav1.GetOptions{})
+		dep, err := occli.Client.EndUser.AppsV1.Deployments(namespace).Get(sampleDeployment, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(dep).NotTo(BeNil())
 
@@ -122,7 +124,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		listOptions := metav1.ListOptions{LabelSelector: set.AsSelector().String()}
 
 		By(fmt.Sprintf("Listing pods matching deployment's labels %+v", set))
-		poditems, err := occli.CoreV1.Pods(namespace).List(listOptions)
+		poditems, err := occli.Client.EndUser.CoreV1.Pods(namespace).List(listOptions)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(poditems).NotTo(BeNil())
 		pods := poditems.Items
@@ -134,6 +136,10 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 			nodes[pod.Spec.NodeName] = true
 		}
 		Expect(len(nodes)).To(Equal(2))
+
+		By("Validating the cluster")
+		errs := occli.ValidateCluster(context.Background())
+		Expect(len(errs)).To(Equal(0))
 
 		By("Fetching the scale down manifest")
 		external, err = azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
@@ -149,7 +155,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 
 		By("Verifying that the deployment's pods are all on 1 node...")
 		By(fmt.Sprintf("Listing pods matching deployment's labels %+v", set))
-		poditems, err = occli.CoreV1.Pods(namespace).List(listOptions)
+		poditems, err = occli.Client.EndUser.CoreV1.Pods(namespace).List(listOptions)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(poditems).NotTo(BeNil())
 		pods = poditems.Items
@@ -162,6 +168,10 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 			Expect(pod.Status.Phase).To(Equal(corev1.PodRunning))
 		}
 		Expect(len(nodes)).To(Equal(1))
+
+		By("Validating the cluster")
+		errs = occli.ValidateCluster(context.Background())
+		Expect(len(errs)).To(Equal(0))
 	})
 })
 

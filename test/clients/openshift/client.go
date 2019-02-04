@@ -1,9 +1,6 @@
 package openshift
 
 import (
-	"os"
-	"path/filepath"
-
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	projectv1client "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
@@ -20,8 +17,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/tools/clientcmd/api/latest"
 
-	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/shared"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
+	internalapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 )
 
 type Client struct {
@@ -67,29 +64,9 @@ func newClientFromKubeConfig(kc *api.Config) (*Client, error) {
 	return newClientFromRestConfig(restconfig), nil
 }
 
-func clientFromEnv() (*Client, error) {
-	restconfig, err := clientcmd.BuildConfigFromFlags("", os.Getenv("KUBECONFIG"))
-	if err != nil {
-		return nil, err
-	}
-	return newClientFromRestConfig(restconfig), nil
-}
-
-func NewAzureClusterReaderClient() (*Client, error) {
-	if os.Getenv("KUBECONFIG") != "" {
-		return clientFromEnv()
-	}
-	dataDir, err := fakerp.FindDirectory(fakerp.DataDirectory)
-	if err != nil {
-		return nil, err
-	}
-	cs, err := managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
-	if err != nil {
-		return nil, err
-	}
-
+func NewAzureClusterReaderClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
 	var kc api.Config
-	err = latest.Scheme.Convert(cs.Config.AzureClusterReaderKubeconfig, &kc, nil)
+	err := latest.Scheme.Convert(cs.Config.AzureClusterReaderKubeconfig, &kc, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -97,11 +74,8 @@ func NewAzureClusterReaderClient() (*Client, error) {
 	return newClientFromKubeConfig(&kc)
 }
 
-func NewCustomerReaderClient() (*Client, error) {
-	if os.Getenv("KUBECONFIG") != "" {
-		return clientFromEnv()
-	}
-	kc, err := login("customer-cluster-reader")
+func NewCustomerReaderClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
+	kc, err := login("customer-cluster-reader", cs)
 	if err != nil {
 		return nil, err
 	}
@@ -109,11 +83,8 @@ func NewCustomerReaderClient() (*Client, error) {
 	return newClientFromKubeConfig(kc)
 }
 
-func NewAdminClient() (*Client, error) {
-	if os.Getenv("KUBECONFIG") != "" {
-		return clientFromEnv()
-	}
-	kc, err := login("admin")
+func NewAdminClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
+	kc, err := login("admin", cs)
 	if err != nil {
 		return nil, err
 	}
@@ -121,11 +92,8 @@ func NewAdminClient() (*Client, error) {
 	return newClientFromKubeConfig(kc)
 }
 
-func NewCustomerAdminClient() (*Client, error) {
-	if os.Getenv("KUBECONFIG") != "" {
-		return clientFromEnv()
-	}
-	kc, err := login("customer-cluster-admin")
+func NewCustomerAdminClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
+	kc, err := login("customer-cluster-admin", cs)
 	if err != nil {
 		return nil, err
 	}
@@ -133,14 +101,55 @@ func NewCustomerAdminClient() (*Client, error) {
 	return newClientFromKubeConfig(kc)
 }
 
-func NewEndUserClient() (*Client, error) {
-	if os.Getenv("KUBECONFIG") != "" {
-		return clientFromEnv()
-	}
-	kc, err := login("enduser")
+func NewEndUserClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
+	kc, err := login("enduser", cs)
 	if err != nil {
 		return nil, err
 	}
 
 	return newClientFromKubeConfig(kc)
+}
+
+type ClientSet struct {
+	AzureClusterReader *Client
+	CustomerReader     *Client
+	Admin              *Client
+	CustomerAdmin      *Client
+	EndUser            *Client
+}
+
+// NewClientSet creates a new set of openshift clients scoped for different levels
+// of access
+func NewClientSet(cs *internalapi.OpenShiftManagedCluster) (*ClientSet, error) {
+	c := &ClientSet{}
+	var err error
+	c.Admin, err = NewAdminClient(cs)
+	if err != nil {
+		return nil, err
+	}
+	c.AzureClusterReader, err = NewAzureClusterReaderClient(cs)
+	if err != nil {
+		return nil, err
+	}
+	c.CustomerAdmin, err = NewCustomerAdminClient(cs)
+	if err != nil {
+		return nil, err
+	}
+	c.CustomerReader, err = NewCustomerReaderClient(cs)
+	if err != nil {
+		return nil, err
+	}
+	c.EndUser, err = NewEndUserClient(cs)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+func NewDefaultClientSet() (*ClientSet, error) {
+	cs, err := shared.DiscoverInternalConfig()
+	if err != nil {
+		return nil, err
+	}
+	return NewClientSet(cs)
 }

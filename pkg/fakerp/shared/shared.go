@@ -3,6 +3,9 @@ package shared
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 const (
@@ -21,4 +24,13 @@ func IsUpdate() bool {
 		return true
 	}
 	return false
+}
+
+// DiscoverInternalConfig discover and returns the internal config struct
+func DiscoverInternalConfig() (*api.OpenShiftManagedCluster, error) {
+	dataDir, err := FindDirectory(DataDirectory)
+	if err != nil {
+		return nil, err
+	}
+	return managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
 }

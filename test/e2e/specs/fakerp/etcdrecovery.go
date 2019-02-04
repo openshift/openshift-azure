@@ -19,7 +19,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/randomstring"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
-	"github.com/openshift/openshift-azure/test/clients/openshift"
+	"github.com/openshift/openshift-azure/test/e2e/standard"
 )
 
 var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", func() {
@@ -27,8 +27,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		configMapName = "recovery-test-data"
 	)
 	var (
-		cli       *openshift.Client
-		admincli  *openshift.Client
+		cli       *standard.SanityChecker
 		azurecli  *azure.Client
 		backup    string
 		namespace string
@@ -36,10 +35,8 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 
 	BeforeEach(func() {
 		var err error
-		admincli, err = openshift.NewAdminClient()
-		Expect(err).ToNot(HaveOccurred())
-		cli, err = openshift.NewEndUserClient()
-		Expect(err).ToNot(HaveOccurred())
+		cli, err = standard.NewDefaultSanityChecker()
+		Expect(cli).ToNot(BeNil())
 		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -50,13 +47,13 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		Expect(err).ToNot(HaveOccurred())
 		namespace = "e2e-test-" + namespace
 		fmt.Fprintln(GinkgoWriter, "Using namespace", namespace)
-		err = cli.CreateProject(namespace)
+		err = cli.Client.EndUser.CreateProject(namespace)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
-		cli.CoreV1.Namespaces().Delete(namespace, nil)
-		admincli.BatchV1.Jobs("openshift-etcd").Delete("e2e-test-etcdbackup", nil)
+		cli.Client.EndUser.CleanupProject(namespace)
+		cli.Client.Admin.BatchV1.Jobs("openshift-etcd").Delete("e2e-test-etcdbackup", nil)
 	})
 
 	It("should be possible to recover etcd from a backup", func() {
@@ -66,7 +63,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		}
 
 		By("Create a test configmap with value=first")
-		cm1, err := cli.CoreV1.ConfigMaps(namespace).Create(&v1.ConfigMap{
+		cm1, err := cli.Client.EndUser.CoreV1.ConfigMaps(namespace).Create(&v1.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      configMapName,
 				Namespace: namespace,
@@ -85,7 +82,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		}
 
 		By(fmt.Sprintf("Run an etcd backup using %s", backupImage))
-		bk, err := admincli.BatchV1.Jobs("openshift-etcd").Create(&batchv1.Job{
+		bk, err := cli.Client.Admin.BatchV1.Jobs("openshift-etcd").Create(&batchv1.Job{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "e2e-test-etcdbackup",
 				Namespace: "openshift-etcd",
@@ -139,12 +136,12 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 			},
 		})
 		Expect(err).NotTo(HaveOccurred())
-		err = wait.Poll(2*time.Second, 5*time.Minute, ready.BatchIsReady(admincli.BatchV1.Jobs(bk.Namespace), bk.Name))
+		err = wait.Poll(2*time.Second, 5*time.Minute, ready.BatchIsReady(cli.Client.Admin.BatchV1.Jobs(bk.Namespace), bk.Name))
 		Expect(err).NotTo(HaveOccurred())
 
 		// wait for it to exist
 		By("Overwrite the test configmap with value=second")
-		cm2, err := cli.CoreV1.ConfigMaps(namespace).Update(&v1.ConfigMap{
+		cm2, err := cli.Client.EndUser.CoreV1.ConfigMaps(namespace).Update(&v1.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      configMapName,
 				Namespace: namespace,
@@ -164,8 +161,12 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
 		By("Confirm the state of the backup")
-		final, err := cli.CoreV1.ConfigMaps(namespace).Get(configMapName, metav1.GetOptions{})
+		final, err := cli.Client.EndUser.CoreV1.ConfigMaps(namespace).Get(configMapName, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(final.Data).To(HaveKeyWithValue("value", "before-backup"))
+
+		By("Validating the cluster")
+		errs := cli.ValidateCluster(context.Background())
+		Expect(len(errs)).To(Equal(0))
 	})
 })
