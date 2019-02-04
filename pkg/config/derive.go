@@ -107,6 +107,8 @@ func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error
 		Location:          cs.Location,
 		SecurityGroupName: "nsg-worker",
 		VMType:            "vmss",
+		SubnetName:        "default",
+		VnetName:          "vnet",
 	})
 }
 
