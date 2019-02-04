@@ -17,6 +17,8 @@ type Config struct {
 	SecurityGroupName   string `json:"securityGroupName,omitempty"`
 	PrimaryScaleSetName string `json:"primaryScaleSetName,omitempty"`
 	VMType              string `json:"vmType,omitempty"`
+	SubnetName          string `json:"subnetName,omitempty"`
+	VnetName            string `json:"vnetName,omitempty"`
 }
 
 // Load returns Config unmarshalled from the file provided
