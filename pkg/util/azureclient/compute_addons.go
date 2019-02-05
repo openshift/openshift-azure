@@ -76,6 +76,7 @@ type VirtualMachineScaleSetVMsClientAddons interface {
 	Delete(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string) error
 	List(ctx context.Context, resourceGroupName, virtualMachineScaleSetName, filter, selectParameter, expand string) ([]compute.VirtualMachineScaleSetVM, error)
 	Reimage(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string, VMScaleSetVMReimageInput *compute.VirtualMachineScaleSetVMReimageParameters) error
+	ReimageAll(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) (result compute.VirtualMachineScaleSetVMsReimageAllFuture, err error)
 	Restart(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string) error
 	Start(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string) error
 }
