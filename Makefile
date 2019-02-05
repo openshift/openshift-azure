@@ -2,7 +2,11 @@ COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain) 
 CLUSTER_VERSION=$(shell awk '/^clusterVersion: /{ print $$2 }' <pluginconfig/pluginconfig-311.yaml)
 # if we are on master branch we should always use dev tag
 $(info CLUSTER_VERSION is ${CLUSTER_VERSION})
-TAG=$(shell if [[ "${CLUSTER_VERSION}" == "v0.0" ]]; then echo "dev"; else echo ${CLUSTER_VERSION}; fi)
+ifeq ($(CLUSTER_VERSION),v0.0)
+  TAG := dev
+else
+  TAG := ${CLUSTER_VERSION}
+endif
 $(info TAG set to ${TAG})
 LDFLAGS="-X main.gitCommit=$(COMMIT)"
 E2E_IMAGE ?= quay.io/openshift-on-azure-dev/e2e-tests:$(TAG)
