@@ -109,7 +109,7 @@ codecov: unit
 	./hack/codecov-report.sh
 
 upgrade:
-	./hack/upgrade-e2e.sh release-test-${COMMIT} ${SOURCE}
+	./hack/upgrade-e2e.sh release-test-${TAG}-${COMMIT} ${SOURCE}
 
 e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
