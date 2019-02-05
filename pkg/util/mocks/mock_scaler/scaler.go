@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
+	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	gomock "github.com/golang/mock/gomock"
 	logrus "github.com/sirupsen/logrus"
 

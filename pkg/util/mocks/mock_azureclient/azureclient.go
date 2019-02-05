@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
+	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	marketplaceordering "github.com/Azure/azure-sdk-for-go/services/marketplaceordering/mgmt/2015-06-01/marketplaceordering"
 	resources "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	managedapplications "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-06-01/managedapplications"
