@@ -3,7 +3,7 @@ package azureclient
 import (
 	"context"
 
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 )
 
 // NOTE: we should be very sparing and have a high bar for these kind of hacks.
