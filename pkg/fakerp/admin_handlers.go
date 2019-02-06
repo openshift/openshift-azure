@@ -3,17 +3,37 @@ package fakerp
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/storage"
 
+	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 )
 
+// handleGetControlPlanePods handles admin requests for the list of control plane pods
+func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+	s.writeState(internalapi.AdminUpdating)
+	ctx := enrichContext(context.Background())
+	pods, err := s.plugin.GetControlPlanePods(ctx, cs)
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to fetch control plane pods: %v", err))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Write(pods)
+	s.log.Info("fetched control plane pods")
+}
+
+// handleRestore handles admin requests to restore an etcd cluster from a backup
 func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
@@ -65,6 +85,7 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	s.writeState(internalapi.AdminUpdating)
 	ctx = enrichContext(context.Background())
 	deployer := GetDeployer(s.log, cs, s.pluginConfig)
 	if err := s.plugin.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
@@ -75,10 +96,19 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 	s.log.Info("recovered cluster")
 }
 
-func readBlobName(req *http.Request) (string, error) {
-	data, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		return "", fmt.Errorf("failed to read request body: %v", err)
+// handleRotateSecrets handles admin requests for the rotation of cluster secrets
+func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
 	}
-	return strings.Trim(string(data), "\""), nil
+	s.writeState(internalapi.AdminUpdating)
+	ctx := enrichContext(context.Background())
+	deployer := GetDeployer(s.log, cs, s.pluginConfig)
+	if err := s.plugin.RotateClusterSecrets(ctx, cs, deployer, s.pluginTemplate); err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to rotate cluster secrets: %v", err))
+		return
+	}
+	s.log.Info("rotated cluster secrets")
 }

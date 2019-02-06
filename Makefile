@@ -2,14 +2,18 @@ COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain) 
 CLUSTER_VERSION=$(shell awk '/^clusterVersion: /{ print $$2 }' <pluginconfig/pluginconfig-311.yaml)
 # if we are on master branch we should always use dev tag
 $(info CLUSTER_VERSION is ${CLUSTER_VERSION})
-TAG=$(shell if [[ "${CLUSTER_VERSION}" == "v0.0" ]]; then echo "dev"; else echo ${CLUSTER_VERSION}; fi)
+ifeq ($(CLUSTER_VERSION),v0.0)
+  TAG := dev
+else
+  TAG := ${CLUSTER_VERSION}
+endif
 $(info TAG set to ${TAG})
 LDFLAGS="-X main.gitCommit=$(COMMIT)"
-E2E_IMAGE ?= quay.io/openshift-on-azure-dev/e2e-tests:$(TAG)
-AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure-dev/azure-controllers:$(TAG)
-ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure-dev/etcdbackup:$(TAG)
-METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure-dev/metricsbridge:$(TAG)
-SYNC_IMAGE ?= quay.io/openshift-on-azure-dev/sync:$(TAG)
+E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
+AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
+ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
+METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
+SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 
 # all is the default target to build everything
 all: clean build azure-controllers etcdbackup sync metricsbridge e2e-bin
@@ -109,7 +113,7 @@ codecov: unit
 	./hack/codecov-report.sh
 
 upgrade:
-	./hack/upgrade-e2e.sh release-test-${COMMIT} ${SOURCE}
+	./hack/upgrade-e2e.sh release-test-${TAG}-${COMMIT} ${SOURCE}
 
 e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
