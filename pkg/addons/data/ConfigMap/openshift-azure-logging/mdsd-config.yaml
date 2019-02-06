@@ -20,11 +20,15 @@ data:
         </Management>
         <Sources>
             <Source name="journald" dynamic_schema="true" />
+            <Source name="audit" dynamic_schema="true" />
         </Sources>
         <Events>
             <MdsdEvents>
                 <MdsdEventSource source="journald">
                     <RouteEvent eventName="CustomerSyslogEvents" storeType="CentralBond" priority="Normal"/>
+                </MdsdEventSource>
+                <MdsdEventSource source="audit">
+                    <RouteEvent eventName="CustomerAuditLogEvents" storeType="CentralBond" priority="Normal"/>
                 </MdsdEventSource>
             </MdsdEvents>
         </Events>

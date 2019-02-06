@@ -7,9 +7,22 @@ data:
         @type local
         path /var/log/journald.pos
       </storage>
-      tag journald
+      tag logs
     </source>
-    <match journald>
+    <match logs>
+      @type rewrite_tag_filter
+      <rule>
+        key MESSAGE
+        pattern audit\.k8s\.io
+        tag audit
+      </rule>
+      <rule>
+        key MESSAGE
+        pattern .+
+        tag journald
+      </rule>
+    </match>
+    <match **>
       @type mdsd
       djsonsocket /var/run/mdsd/default_djson.socket
       acktimeoutms 5000
