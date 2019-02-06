@@ -1,4 +1,3 @@
-FROM centos:7
-RUN yum -y update
+FROM rhel7
 COPY azure-controllers .
 ENTRYPOINT [ "/azure-controllers" ]
