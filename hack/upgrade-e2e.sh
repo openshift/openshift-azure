@@ -25,7 +25,7 @@ if [[ -f /usr/secrets/secret ]] ;then
     trap "rm -rf ${T}" EXIT
     mkdir -p "${T}/src/github.com/openshift/"
     cd "${T}/src/github.com/openshift/"
-    git clone https://github.com/mjudeikis/openshift-azure 
+    git clone https://github.com/openshift/openshift-azure 
     cd openshift-azure
     git checkout $SOURCE
     # link shared secrets
