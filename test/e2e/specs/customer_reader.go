@@ -72,7 +72,13 @@ var _ = Describe("Openshift on Azure customer-reader e2e tests [CustomerAdmin][F
 	})
 
 	It("should not list infra namespace secrets", func() {
-		// list all namespaces. should not see default
+		// list all secrets in a namespace. should not see any in openshift-azure-logging
+		_, err := readercli.CoreV1.Secrets("openshift-azure-logging").List(metav1.ListOptions{})
+		Expect(kerrors.IsForbidden(err)).To(Equal(true))
+	})
+
+	It("should not list default namespace secrets", func() {
+		// list all secrets in a namespace. should not see any in default
 		_, err := readercli.CoreV1.Secrets("default").List(metav1.ListOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 	})
