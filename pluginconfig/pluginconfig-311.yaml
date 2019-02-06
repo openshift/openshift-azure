@@ -23,16 +23,16 @@ genevaMetricsEndpoint: https://az-int.metrics.nsatc.net/
 imageOffer: osa
 imagePublisher: redhat
 imageSku: osa_311
-imageVersion: 311.43.20181121
+imageVersion: 311.51.20190104
 ## Container images used for specific OSA Cluster version
 images:
   alertManagerBase: registry.access.redhat.com/openshift3/prometheus-alertmanager
-  ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.43
+  ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.51
   azureControllers: quay.io/openshift-on-azure/azure-controllers:v3.11
-  clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.43
+  clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.51
   configReloaderBase: registry.access.redhat.com/openshift3/ose-configmap-reloader
-  console: registry.access.redhat.com/openshift3/ose-console:v3.11.43
-  controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.43
+  console: registry.access.redhat.com/openshift3/ose-console:v3.11.51
+  controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.51
   etcdBackup: quay.io/openshift-on-azure/etcdbackup:latest
   format: registry.access.redhat.com/openshift3/ose-${component}:${version}
   genevaLogging: osarpint.azurecr.io/acs/mdsd:12051806
@@ -43,19 +43,19 @@ images:
   kubeStateMetricsBase: registry.access.redhat.com/openshift3/ose-kube-state-metrics
   masterEtcd: registry.access.redhat.com/rhel7/etcd:3.2.22
   metricsBridge: quay.io/openshift-on-azure/metricsbridge:latest
-  node: registry.access.redhat.com/openshift3/ose-node:v3.11.43
+  node: registry.access.redhat.com/openshift3/ose-node:v3.11.51
   nodeExporterBase: registry.access.redhat.com/openshift3/prometheus-node-exporter
   oAuthProxyBase: registry.access.redhat.com/openshift3/oauth-proxy
   prometheusBase: registry.access.redhat.com/openshift3/prometheus
   prometheusConfigReloaderBase: registry.access.redhat.com/openshift3/ose-prometheus-config-reloader
   prometheusOperatorBase: registry.access.redhat.com/openshift3/ose-prometheus-operator
-  registry: registry.access.redhat.com/openshift3/ose-docker-registry:v3.11.43
-  registryConsole: registry.access.redhat.com/openshift3/registry-console:v3.11.43
-  router: registry.access.redhat.com/openshift3/ose-haproxy-router:v3.11.43
-  serviceCatalog: registry.access.redhat.com/openshift3/ose-service-catalog:v3.11.43
+  registry: registry.access.redhat.com/openshift3/ose-docker-registry:v3.11.51
+  registryConsole: registry.access.redhat.com/openshift3/registry-console:v3.11.51
+  router: registry.access.redhat.com/openshift3/ose-haproxy-router:v3.11.51
+  serviceCatalog: registry.access.redhat.com/openshift3/ose-service-catalog:v3.11.51
   sync: quay.io/openshift-on-azure/sync:latest
-  templateServiceBroker: registry.access.redhat.com/openshift3/ose-template-service-broker:v3.11.43
-  webConsole: registry.access.redhat.com/openshift3/ose-web-console:v3.11.43
+  templateServiceBroker: registry.access.redhat.com/openshift3/ose-template-service-broker:v3.11.51
+  webConsole: registry.access.redhat.com/openshift3/ose-web-console:v3.11.51
 ## Gevena image pull secret is used to access private components images. Format: base64 encoded .docker/config.json file "{auths:{osarpint.azurecr.io:{username:username,password:notthepasswordyouarelookingfor,email:openshift@example.com,auth:dXNlcm5hbWU6bm90dGhlcGFzc3dvcmR5b3VhcmVsb29raW5nZm9yCg==}}}"
   #genevaImagePullSecret: <base64 string of .docker/config.json file>
 ## Image pull secret is used to pull images from private registries, used system-wide
