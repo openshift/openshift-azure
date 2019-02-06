@@ -5,11 +5,11 @@ $(info CLUSTER_VERSION is ${CLUSTER_VERSION})
 TAG=$(shell if [[ "${CLUSTER_VERSION}" == "v0.0" ]]; then echo "dev"; else echo ${CLUSTER_VERSION}; fi)
 $(info TAG set to ${TAG})
 LDFLAGS="-X main.gitCommit=$(COMMIT)"
-E2E_IMAGE ?= quay.io/openshift-on-azure-dev/e2e-tests:$(TAG)
-AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure-dev/azure-controllers:$(TAG)
-ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure-dev/etcdbackup:$(TAG)
-METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure-dev/metricsbridge:$(TAG)
-SYNC_IMAGE ?= quay.io/openshift-on-azure-dev/sync:$(TAG)
+E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
+AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
+ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
+METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
+SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 
 # all is the default target to build everything
 all: clean build azure-controllers etcdbackup sync metricsbridge e2e-bin
