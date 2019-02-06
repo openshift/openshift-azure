@@ -1,3 +1,5 @@
+
+
 # openshift-azure
 
 [![Coverage Status](https://codecov.io/gh/openshift/openshift-azure/branch/master/graph/badge.svg)](https://codecov.io/gh/openshift/openshift-azure)
