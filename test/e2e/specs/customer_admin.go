@@ -40,7 +40,9 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 		namespace, err := randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
 		Expect(err).ToNot(HaveOccurred())
 		namespace = "e2e-test-" + namespace
-		cli.CreateProject(namespace)
+		err = cli.CreateProject(namespace)
+		Expect(err).ToNot(HaveOccurred())
+		defer cli.CleanupProject(namespace)
 
 		err = wait.PollImmediate(2*time.Second, 5*time.Minute, func() (bool, error) {
 			rb, err := admincli.RbacV1.RoleBindings(namespace).Get("osa-customer-admin", metav1.GetOptions{})
@@ -72,7 +74,13 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 	})
 
 	It("should not list infra namespace secrets", func() {
-		// list all namespaces. should not see default
+		// list all secrets in a namespace. should not see any in openshift-azure-logging
+		_, err := admincli.CoreV1.Secrets("openshift-azure-logging").List(metav1.ListOptions{})
+		Expect(kerrors.IsForbidden(err)).To(Equal(true))
+	})
+
+	It("should not list default namespace secrets", func() {
+		// list all secrets in a namespace. should not see any in default
 		_, err := admincli.CoreV1.Secrets("default").List(metav1.ListOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 	})
