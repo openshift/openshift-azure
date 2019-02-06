@@ -7,6 +7,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/storage"
 
+	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
@@ -19,6 +20,7 @@ func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Requ
 		s.internalError(w, "Failed to read the internal config")
 		return
 	}
+	s.writeState(internalapi.AdminUpdating)
 	ctx := enrichContext(context.Background())
 	pods, err := s.plugin.GetControlPlanePods(ctx, cs)
 	if err != nil {
@@ -83,6 +85,7 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	s.writeState(internalapi.AdminUpdating)
 	ctx = enrichContext(context.Background())
 	deployer := GetDeployer(s.log, cs, s.pluginConfig)
 	if err := s.plugin.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
@@ -100,6 +103,7 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		s.internalError(w, "Failed to read the internal config")
 		return
 	}
+	s.writeState(internalapi.AdminUpdating)
 	ctx := enrichContext(context.Background())
 	deployer := GetDeployer(s.log, cs, s.pluginConfig)
 	if err := s.plugin.RotateClusterSecrets(ctx, cs, deployer, s.pluginTemplate); err != nil {

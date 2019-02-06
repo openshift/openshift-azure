@@ -74,6 +74,8 @@ const (
 	Creating ProvisioningState = "Creating"
 	// Updating means the existing OSA resource is being updated.
 	Updating ProvisioningState = "Updating"
+	// AdminUpdating means the existing OSA resource is being updated with admin privileges.
+	AdminUpdating ProvisioningState = "AdminUpdating"
 	// Failed means the OSA resource is in failed state.
 	Failed ProvisioningState = "Failed"
 	// Succeeded means the last create/update succeeded.
