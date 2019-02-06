@@ -11,6 +11,7 @@ package azureclient
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -83,7 +84,15 @@ func NewAuthorizerFromUsernamePassword(username, password, clientID, tenantID, r
 }
 
 func NewAuthorizerFromContext(ctx context.Context) (autorest.Authorizer, error) {
-	return NewAuthorizer(ctx.Value(api.ContextKeyClientID).(string), ctx.Value(api.ContextKeyClientSecret).(string), ctx.Value(api.ContextKeyTenantID).(string))
+	return NewAuthorizer(ctx.Value(api.ContextKeyCloudProviderClientID).(string), ctx.Value(api.ContextKeyCloudProviderClientSecret).(string), ctx.Value(api.ContextKeyCloudProviderTenantID).(string))
+}
+
+func GetAuthorizerFromContext(ctx context.Context) (autorest.Authorizer, error) {
+	authorizer, ok := ctx.Value(api.ContextKeyClientAuthorizer).(autorest.Authorizer)
+	if !ok {
+		return nil, fmt.Errorf("failed to get authorizer, not found within context")
+	}
+	return authorizer, nil
 }
 
 func NewAuthorizerFromEnvironment() (autorest.Authorizer, error) {

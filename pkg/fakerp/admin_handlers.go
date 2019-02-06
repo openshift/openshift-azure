@@ -19,7 +19,11 @@ func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Requ
 		s.internalError(w, "Failed to read the internal config")
 		return
 	}
-	ctx := enrichContext(context.Background())
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
 	pods, err := s.plugin.GetControlPlanePods(ctx, cs)
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to fetch control plane pods: %v", err))
@@ -83,7 +87,11 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	ctx = enrichContext(context.Background())
+	ctx, err = enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
 	deployer := GetDeployer(s.log, cs, s.pluginConfig)
 	if err := s.plugin.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to recover cluster: %v", err))
@@ -100,7 +108,11 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		s.internalError(w, "Failed to read the internal config")
 		return
 	}
-	ctx := enrichContext(context.Background())
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
 	deployer := GetDeployer(s.log, cs, s.pluginConfig)
 	if err := s.plugin.RotateClusterSecrets(ctx, cs, deployer, s.pluginTemplate); err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to rotate cluster secrets: %v", err))

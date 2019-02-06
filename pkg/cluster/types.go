@@ -78,7 +78,7 @@ func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftMan
 		},
 	}
 
-	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
 	}

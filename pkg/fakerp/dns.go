@@ -15,7 +15,7 @@ import (
 // CreateOCPDNS creates the dns zone for the cluster, updates the main zone in dnsResourceGroup and returns
 // the generated publicSubdomain, routerPrefix
 func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, dnsResourceGroup, dnsDomain, zoneName, routerCName string, noTags bool) error {
-	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -115,7 +115,7 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, 
 }
 
 func DeleteOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourceGroup, dnsDomain string) error {
-	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
 	}

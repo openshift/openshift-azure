@@ -26,7 +26,7 @@ import (
 func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api.PluginConfig) api.DeployFn {
 	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
 		log.Info("applying arm template deployment")
-		authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+		authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
 		if err != nil {
 			return err
 		}
@@ -185,7 +185,7 @@ func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.
 		return nil
 	}
 
-	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
 	if err != nil {
 		return err
 	}

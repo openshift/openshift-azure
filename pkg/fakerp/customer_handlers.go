@@ -23,10 +23,13 @@ import (
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	// simulate Context with property bag
-	ctx := enrichContext(context.Background())
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
 
-	// TODO: Get the azure credentials from the request headers
-	authorizer, err := azureclient.NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
 		return
@@ -136,7 +139,11 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 
 	// simulate Context with property bag
 	// TODO: Populate context from request header
-	ctx := enrichContext(context.Background())
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
 
 	// apply the request
 	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, s.pluginConfig, isAdminRequest)

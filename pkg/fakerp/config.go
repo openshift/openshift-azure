@@ -16,6 +16,7 @@ import (
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 const (
@@ -91,13 +92,20 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 }
 
 // enrichContext returns enriched context for plugin initiation
-func enrichContext(ctx context.Context) context.Context {
+func enrichContext(ctx context.Context) (context.Context, error) {
 	// simulate Context with property bag
 	// TODO: Get the azure credentials from the request headers
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientID, os.Getenv("AZURE_CLIENT_ID"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyTenantID, os.Getenv("AZURE_TENANT_ID"))
-	return ctx
+	ctx = context.WithValue(ctx, internalapi.ContextKeyCloudProviderClientID, os.Getenv("AZURE_CLIENT_ID"))
+	ctx = context.WithValue(ctx, internalapi.ContextKeyCloudProviderClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
+	ctx = context.WithValue(ctx, internalapi.ContextKeyCloudProviderTenantID, os.Getenv("AZURE_TENANT_ID"))
+
+	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ctx = context.WithValue(ctx, internalapi.ContextKeyClientAuthorizer, authorizer)
+
+	return ctx, nil
 }
 
 func overridePluginTemplate(template *pluginapi.Config) {

@@ -11,10 +11,11 @@ import (
 type ContextKey string
 
 const (
-	ContextKeyClientID     ContextKey = "ClientID"
-	ContextKeyClientSecret ContextKey = "ClientSecret"
-	ContextKeyTenantID     ContextKey = "TenantID"
-	ContextAcceptLanguages ContextKey = "AcceptLanguages"
+	ContextKeyCloudProviderClientID     ContextKey = "ClientID"
+	ContextKeyCloudProviderClientSecret ContextKey = "ClientSecret"
+	ContextKeyCloudProviderTenantID     ContextKey = "TenantID"
+	ContextKeyClientAuthorizer          ContextKey = "ClientAuthorizer"
+	ContextAcceptLanguages              ContextKey = "AcceptLanguages"
 )
 
 type PluginStep string
