@@ -154,6 +154,8 @@ admissionConfig:
           reject: true
           skipOnResolutionFailure: true
         kind: ImagePolicyConfig
+auditConfig:
+  enabled: true
 aggregatorConfig:
   proxyClientInfo:
     certFile: aggregator-front-proxy.crt
