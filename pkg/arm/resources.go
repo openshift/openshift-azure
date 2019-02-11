@@ -41,6 +41,13 @@ const (
 	vmssIPConfigurationName                       = "ipconfig"
 	vmssCSEName                                   = "cse"
 	vmssAdminUsername                             = "cloud-user"
+
+	// The additional data disk have different purposes on master
+	// and infra/compute nodes, but they are both the same size: master's
+	// hold the etcd data and take advantage of IOPs for that disk size,
+	// infra/compute nodes also take advantage of that plus size matches
+	// what OCD uses for docker drives
+	additionalDataDiskSizeGB = 256
 )
 
 // fixupAPIVersions inserts an apiVersion field into the ARM template for each
@@ -508,7 +515,14 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 							StorageAccountType: compute.StorageAccountTypesPremiumLRS,
 						},
 					},
-				},
+					DataDisks: &[]compute.VirtualMachineScaleSetDataDisk{
+						{
+							Lun:          to.Int32Ptr(0),
+							Caching:      compute.CachingTypesReadOnly,
+							CreateOption: compute.DiskCreateOptionTypesEmpty,
+							DiskSizeGB:   to.Int32Ptr(additionalDataDiskSizeGB),
+						},
+					}},
 				NetworkProfile: &compute.VirtualMachineScaleSetNetworkProfile{
 					NetworkInterfaceConfigurations: &[]compute.VirtualMachineScaleSetNetworkConfiguration{
 						{
@@ -562,16 +576,6 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		Location: to.StringPtr(cs.Location),
 	}
 
-	// The additional data disk have different purposes on master
-	// and infra/compute nodes, but they are both the same size
-	vmss.VirtualMachineProfile.StorageProfile.DataDisks = &[]compute.VirtualMachineScaleSetDataDisk{
-		{
-			Lun:          to.Int32Ptr(0),
-			Caching:      compute.CachingTypesReadOnly,
-			CreateOption: compute.DiskCreateOptionTypesEmpty,
-			DiskSizeGB:   to.Int32Ptr(256),
-		},
-	}
 	if app.Role == api.AgentPoolProfileRoleMaster {
 		(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].PublicIPAddressConfiguration = &compute.VirtualMachineScaleSetPublicIPAddressConfiguration{
 			Name: to.StringPtr(vmssNicPublicIPConfigurationName),
