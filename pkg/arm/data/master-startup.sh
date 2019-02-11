@@ -32,6 +32,7 @@ mkdir -p $DPATH
 base64 -d <<< {{ .Config.Images.ImagePullSecret | Base64Encode }} >${DPATH}/config.json
 chmod 0600 ${DPATH}/config.json
 
+# The additional data disk holds the etcd data in master nodes
 # TODO: consider fact that /dev/disk/azure/scsi1/lun0 is currently hardcoded;
 # partition /dev/disk/azure/scsi1/lun0; consider future strategy for resizes if
 # needed

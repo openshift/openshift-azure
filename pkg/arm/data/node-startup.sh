@@ -11,10 +11,11 @@ fi
 # remove registry certificate softlink from docker
 unlink /etc/docker/certs.d/registry.access.redhat.com/redhat-ca.crt 
 
+# The additional data disk holds the docker data in infra/compute nodes
 if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker.service
-  mkfs.xfs -f /dev/disk/azure/resource-part1
-  echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
+  mkfs.xfs -f /dev/disk/azure/scsi1/lun0
+  echo '/dev/disk/azure/scsi1/lun0  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
   mount /var/lib/docker
   restorecon -R /var/lib/docker
 {{- if eq .Extra.Role "infra" }}

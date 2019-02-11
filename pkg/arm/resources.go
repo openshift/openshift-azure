@@ -562,15 +562,17 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		Location: to.StringPtr(cs.Location),
 	}
 
+	// The additional data disk have different purposes on master
+	// and infra/compute nodes, but they are both the same size
+	vmss.VirtualMachineProfile.StorageProfile.DataDisks = &[]compute.VirtualMachineScaleSetDataDisk{
+		{
+			Lun:          to.Int32Ptr(0),
+			Caching:      compute.CachingTypesReadOnly,
+			CreateOption: compute.DiskCreateOptionTypesEmpty,
+			DiskSizeGB:   to.Int32Ptr(256),
+		},
+	}
 	if app.Role == api.AgentPoolProfileRoleMaster {
-		vmss.VirtualMachineProfile.StorageProfile.DataDisks = &[]compute.VirtualMachineScaleSetDataDisk{
-			{
-				Lun:          to.Int32Ptr(0),
-				Caching:      compute.CachingTypesReadOnly,
-				CreateOption: compute.DiskCreateOptionTypesEmpty,
-				DiskSizeGB:   to.Int32Ptr(256),
-			},
-		}
 		(*(*vmss.VirtualMachineProfile.NetworkProfile.NetworkInterfaceConfigurations)[0].VirtualMachineScaleSetNetworkConfigurationProperties.IPConfigurations)[0].PublicIPAddressConfiguration = &compute.VirtualMachineScaleSetPublicIPAddressConfiguration{
 			Name: to.StringPtr(vmssNicPublicIPConfigurationName),
 			VirtualMachineScaleSetPublicIPAddressConfigurationProperties: &compute.VirtualMachineScaleSetPublicIPAddressConfigurationProperties{
