@@ -16,6 +16,14 @@ spec:
       containers:
       - image: '*** GENERATED ***'
         name: customer-admin-controller
+        volumeMounts:
+        - mountPath: /_data/_out
+          name: aad-group-sync-config
+          readOnly: true
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
       serviceAccountName: customer-admin-controller
+      volumes:
+      - name: aad-group-sync-config
+        secret:
+          secretName: aad-group-sync-config

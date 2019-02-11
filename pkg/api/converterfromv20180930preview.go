@@ -314,6 +314,8 @@ func convertIdentityProvider(in v20180930preview.IdentityProvider, old *Identity
 			if provider.TenantID != nil {
 				p.TenantID = *provider.TenantID
 			}
+			p.CustomerAdminGroupID = provider.CustomerAdminGroupID
+			p.CustomerReaderGroupID = provider.CustomerReaderGroupID
 			out.Provider = p
 
 		default:

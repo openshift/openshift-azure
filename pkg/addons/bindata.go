@@ -294,8 +294,6 @@
 // data/Deployment.apps/openshift-infra/customer-admin-controller.yaml
 // data/Deployment.apps/openshift-monitoring/cluster-monitoring-operator.yaml
 // data/Deployment.apps/openshift-web-console/webconsole.yaml
-// data/Group.user.openshift.io/osa-customer-admins.yaml
-// data/Group.user.openshift.io/osa-customer-readers.yaml
 // data/ImageStream.image.openshift.io/openshift/dotnet-runtime.yaml
 // data/ImageStream.image.openshift.io/openshift/dotnet.yaml
 // data/ImageStream.image.openshift.io/openshift/eap-cd-openshift.yaml
@@ -422,6 +420,7 @@
 // data/Secret/openshift-azure-monitoring/azure-registry.yaml
 // data/Secret/openshift-azure-monitoring/mdm-cert.yaml
 // data/Secret/openshift-console/console-oauth-config.yaml
+// data/Secret/openshift-infra/aad-group-sync-config.yaml
 // data/Secret/openshift-template-service-broker/templateservicebroker-client.yaml
 // data/SecurityContextConstraints.security.openshift.io/anyuid.yaml
 // data/SecurityContextConstraints.security.openshift.io/hostaccess.yaml
@@ -990,7 +989,7 @@ func clusterroleRbacAuthorizationK8sIoCustomerAdminClusterYaml() (*asset, error)
 	return a, nil
 }
 
-var _clusterroleRbacAuthorizationK8sIoCustomerAdminControllerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x74\x8f\x31\x6e\xc3\x30\x0c\x45\x77\x9d\x82\xc8\x6e\x17\xdd\x0a\xad\x1d\xba\x77\xe8\x4e\x4b\x44\x42\x44\x16\x05\x92\x4a\x80\x9e\xbe\x88\x6a\x77\xa8\x91\x49\x0f\x22\x3f\xde\x27\x36\xfe\x22\x35\x96\x1a\x41\x17\x4c\x33\x76\xbf\x88\xf2\x37\x3a\x4b\x9d\xaf\x6f\x36\xb3\xbc\xdc\x5e\xc3\x95\x6b\x8e\xf0\x5e\xba\x39\xe9\xa7\x14\x0a\x2b\x39\x66\x74\x8c\x01\xa0\xe2\x4a\x11\x52\x37\x97\x95\x74\xc2\xbc\x72\x9d\x92\x54\x57\x29\x85\x34\x68\x2f\x64\x31\x4c\x80\x8d\x3f\x54\x7a\xb3\x47\x6a\x7a\xae\x0c\x00\x4a\x26\x5d\x13\xed\xab\x52\x68\xe1\x9a\xb9\x9e\x2d\x00\xdc\x48\x97\x6d\x92\x94\xd0\x69\x60\xa6\x42\x1b\x9e\xc9\xc7\x5b\xd8\x7e\xa1\xa1\xa7\xcb\xa0\xde\xf2\x1e\xb8\x8f\xcf\x43\xaf\xd3\xe9\x58\xe0\x71\xa3\x35\x4c\xf4\x4f\x7f\x10\xdd\xff\x44\x5b\xb3\x9f\x00\x00\x00\xff\xff\xb0\x89\x5f\x17\x65\x01\x00\x00")
+var _clusterroleRbacAuthorizationK8sIoCustomerAdminControllerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x74\x8f\xb1\x4e\xc4\x30\x0c\x86\xf7\x3c\x85\x75\x7b\x8b\xd8\x50\x57\x06\x76\x06\x76\x5f\x62\x5a\xeb\xd2\x38\xb2\x9d\x3b\x89\xa7\x47\x17\x5a\x06\xca\x4d\xf9\x95\xd8\xf9\xfe\x0f\x2b\x7f\x90\x1a\x4b\x99\x40\xcf\x18\x47\x6c\xbe\x88\xf2\x17\x3a\x4b\x19\x2f\x2f\x36\xb2\x3c\x5d\x9f\xc3\x85\x4b\x9a\xe0\x35\x37\x73\xd2\x77\xc9\x14\x56\x72\x4c\xe8\x38\x05\x80\x82\x2b\x4d\x10\x9b\xb9\xac\xa4\x03\xa6\x95\xcb\x10\xa5\xb8\x4a\xce\xa4\x41\x5b\x26\x9b\xc2\x00\x58\xf9\x4d\xa5\x55\xbb\x6f\x0d\x8f\x91\x01\x40\xc9\xa4\x69\xa4\x7d\x54\x32\x9d\xb9\x24\x2e\xb3\x05\x80\x2b\xe9\x79\x7b\x89\x4a\xe8\xd4\x63\xa2\x4c\x5b\x9c\xc9\xfb\x99\xd9\x7e\x42\x45\x8f\x4b\x4f\xad\xa6\x7d\xe1\xd6\x2f\x0f\xbd\x4e\xa7\x63\x81\xbb\xa3\x55\x8c\xf4\x07\x7f\x00\xdd\x7e\x41\x5b\xb3\xc3\xf7\xcd\x48\x47\xa9\x54\x6c\xe1\x4f\xff\x57\x77\xee\xe3\x0f\x45\x77\xe8\xa6\xf2\x1d\x00\x00\xff\xff\x46\xc1\x59\x4f\xc7\x01\x00\x00")
 
 func clusterroleRbacAuthorizationK8sIoCustomerAdminControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
@@ -6570,7 +6569,7 @@ func deploymentAppsOpenshiftConsoleConsoleYaml() (*asset, error) {
 	return a, nil
 }
 
-var _deploymentAppsOpenshiftInfraCustomerAdminControllerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x90\xcf\x6a\x32\x41\x10\xc4\xef\xfb\x14\x8d\x17\x61\x60\x15\xaf\x73\x13\x5c\xbe\xcb\x87\x87\x24\xe4\xde\xce\x96\x71\x70\xfe\xd1\xd3\x2b\xe4\xed\xc3\x98\x55\xe2\x25\xa6\x8f\xdd\xc5\xaf\xaa\x8b\x8b\x7f\x87\x54\x9f\x93\x25\x2e\xa5\xae\x2f\x9b\xee\xec\xd3\x68\x69\x87\x12\xf2\x67\x44\xd2\x2e\x42\x79\x64\x65\xdb\x11\x25\x8e\xb0\xe4\xa6\xaa\x39\x42\x7a\x1e\xa3\x4f\xbd\xcb\x49\x25\x87\x00\x99\x15\xb5\xb0\x83\xa5\x5c\x90\xea\xc9\x1f\xb5\xf7\xe9\x28\xdc\xd5\x02\xd7\x20\x82\x12\xbc\xe3\x6a\x69\xd3\x11\x55\x04\x38\xcd\xd2\x2e\x44\x91\xd5\x9d\xfe\xf3\x01\xa1\x7e\x2f\xa8\x05\xfb\xdd\x52\x11\x4b\x60\xc5\x4c\xf8\x11\xb7\x4d\x78\x80\xfd\x01\x47\x74\x0b\xda\xa6\x9d\xd8\x27\xc8\x1d\xd1\x93\x8f\xfc\x01\x4b\x4b\x63\x0c\xfd\x1b\xf6\xc3\xcb\xf6\x6d\xd8\x91\x31\x66\x79\x77\x79\x5e\xd4\x55\x95\x47\xbc\x3e\xfc\x7f\xdb\xf6\x92\x03\x56\xe7\xe9\x00\x49\x50\xd4\x95\xcf\xeb\x6b\x8b\x96\x16\x2a\x13\x16\xb3\xba\x42\x2e\xde\x61\xeb\x5c\x9e\x92\xee\x9f\xb8\x7e\x05\x00\x00\xff\xff\x0c\xa1\xe7\xc4\xf0\x01\x00\x00")
+var _deploymentAppsOpenshiftInfraCustomerAdminControllerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x51\x4d\x0b\x1a\x31\x10\xbd\xef\xaf\x18\xbc\x08\x0b\x71\xf1\x9a\x9b\xa0\xf4\xd2\xda\xd2\x96\x5e\x65\xcc\x3e\x35\x98\x2f\x92\x59\xc1\x7f\x5f\xd2\x5d\x65\xbd\x58\xe7\xf8\xe6\xe5\x7d\x4c\x38\xd9\x3f\xc8\xc5\xc6\xa0\x89\x53\x2a\xdd\x6d\xdd\x5c\x6d\xe8\x35\x6d\x91\x5c\xbc\x7b\x04\x69\x3c\x84\x7b\x16\xd6\x0d\x51\x60\x0f\x4d\x66\x28\x12\x3d\xb2\xe2\xde\xdb\xa0\x4c\x0c\x92\xa3\x73\xc8\x13\xa3\x24\x36\xd0\x14\x13\x42\xb9\xd8\x93\x28\x1b\x4e\x99\x9b\x92\x60\xaa\x48\x46\x72\xd6\x70\xd1\xb4\x6e\x88\x0a\x1c\x8c\xc4\x5c\x37\x44\x9e\xc5\x5c\xbe\xf2\x11\xae\x8c\x00\xd5\x60\xef\x2d\x05\x3e\x39\x16\x4c\x0a\xb3\xb8\x75\xdc\x8b\xd8\x07\x72\x44\x8f\xa0\x75\xea\x8a\x6d\x40\x7e\x4a\x28\xb2\x9e\xcf\xd0\xb4\x6c\xdb\x96\xbe\xec\xf6\xbb\x9f\x9b\xdf\xbb\x2d\xb5\x6d\xbb\x7c\xba\xfc\xff\x50\xe3\xdc\xa2\x1b\x3c\xbe\xc5\x21\xc8\x2c\xa3\x22\x5f\x91\x1f\x2c\x17\x4d\xdd\xa1\xd6\xe9\x0e\x71\x90\x27\xe1\x61\xc0\xdc\xab\x73\x8e\x43\x52\xe5\x1e\x4c\x35\x38\xd9\xf3\x8c\x95\xc1\xfd\xf7\xe0\xee\x9a\x24\x0f\x98\x16\x21\xf6\xf8\xf5\x72\xf5\x07\xaa\x72\x74\x58\x5d\x87\x23\x72\x80\xa0\xac\x6c\xec\xfe\xfd\x9d\xa6\x45\x15\x58\x4c\xec\x82\x7c\xb3\x06\x1b\x63\x6a\xcc\xfd\x47\x5d\xc7\xa6\xb3\x2b\x7e\xd2\xa0\xc0\x64\x88\x9e\x35\x1a\x91\xfd\x9b\xb7\x7f\x03\x00\x00\xff\xff\x44\x06\xf4\xb1\xd5\x02\x00\x00")
 
 func deploymentAppsOpenshiftInfraCustomerAdminControllerYamlBytes() ([]byte, error) {
 	return bindataRead(
@@ -6626,46 +6625,6 @@ func deploymentAppsOpenshiftWebConsoleWebconsoleYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "Deployment.apps/openshift-web-console/webconsole.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _groupUserOpenshiftIoOsaCustomerAdminsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x14\xcc\xb1\x0d\x42\x41\x08\x00\xd0\x9e\x29\x58\xe0\x9f\xb1\x65\x01\x37\xb0\x31\x16\xc4\xc3\x48\x0c\x70\x01\xce\xf9\xcd\x5f\xe0\xf1\xd2\xbb\x64\x69\x38\xe1\x2e\xc9\x11\x4b\xbc\x3e\xfa\xee\xa1\x71\xf9\x5d\xe1\xab\x3e\x09\x6f\x19\x7b\x81\x49\xf3\xe4\x66\x02\x44\x67\x13\xc2\x28\x3e\x5e\xbb\x3a\x4c\xf2\xe0\x69\xea\x05\x27\x53\x84\x8f\x27\xfc\x03\x00\x00\xff\xff\x40\x34\xb6\xdd\x5d\x00\x00\x00")
-
-func groupUserOpenshiftIoOsaCustomerAdminsYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_groupUserOpenshiftIoOsaCustomerAdminsYaml,
-		"Group.user.openshift.io/osa-customer-admins.yaml",
-	)
-}
-
-func groupUserOpenshiftIoOsaCustomerAdminsYaml() (*asset, error) {
-	bytes, err := groupUserOpenshiftIoOsaCustomerAdminsYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "Group.user.openshift.io/osa-customer-admins.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _groupUserOpenshiftIoOsaCustomerReadersYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x14\xcc\xc1\x0d\x42\x31\x08\x06\xe0\x3b\x53\xb0\xc0\xab\xf1\xca\x02\x6e\xe0\xc5\x78\x20\xf6\x37\x12\xd3\xd2\x00\x75\x7e\xf3\x16\xf8\x74\xd9\x1d\x91\xe6\x53\x78\x27\xa2\xf9\xc2\xcc\x8f\xbd\xab\x99\x5f\x7e\x57\xfa\xda\xec\xc2\xb7\xf0\xbd\x68\xa0\xb4\x6b\xa9\x10\xf3\xd4\x01\x61\x4f\x3d\x5e\x3b\xcb\x07\xe2\x08\x68\x47\x24\x9d\x4e\x0a\x3f\x9e\xf4\x0f\x00\x00\xff\xff\xf3\xd9\x6d\x57\x5e\x00\x00\x00")
-
-func groupUserOpenshiftIoOsaCustomerReadersYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_groupUserOpenshiftIoOsaCustomerReadersYaml,
-		"Group.user.openshift.io/osa-customer-readers.yaml",
-	)
-}
-
-func groupUserOpenshiftIoOsaCustomerReadersYaml() (*asset, error) {
-	bytes, err := groupUserOpenshiftIoOsaCustomerReadersYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "Group.user.openshift.io/osa-customer-readers.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -9186,6 +9145,26 @@ func secretOpenshiftConsoleConsoleOauthConfigYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "Secret/openshift-console/console-oauth-config.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _secretOpenshiftInfraAadGroupSyncConfigYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x54\xcc\xb1\x0a\x02\x31\x0c\x00\xd0\xbd\x5f\x91\xed\x20\x50\xc1\x35\x9b\x70\x87\x9b\x83\x8a\x7b\xe8\xa5\x35\x68\xd3\xd2\x56\xe1\xfe\xde\xe5\x16\xe7\x07\x8f\xab\x3e\xa4\x75\x2d\x46\xf0\x3d\xba\x97\xda\x4a\x70\x93\xd0\x64\xb8\x2c\x83\x57\x1e\x4c\x0e\xc0\x38\x0b\x01\xf3\xea\x53\x2b\x9f\xea\xfb\x66\xc1\x87\x62\x51\xd3\xae\xbd\x72\x10\x82\x52\xc5\xfa\x53\xe3\xf0\x6a\xb1\xb1\xeb\xa3\xa9\xa5\x79\x6f\xfe\x83\xc3\xc6\xf9\x4d\x30\x21\x22\x9c\x97\xcb\x72\x3d\xdd\x97\x19\x10\x71\x72\xbf\x00\x00\x00\xff\xff\x0c\xb4\xb0\x4c\x98\x00\x00\x00")
+
+func secretOpenshiftInfraAadGroupSyncConfigYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_secretOpenshiftInfraAadGroupSyncConfigYaml,
+		"Secret/openshift-infra/aad-group-sync-config.yaml",
+	)
+}
+
+func secretOpenshiftInfraAadGroupSyncConfigYaml() (*asset, error) {
+	bytes, err := secretOpenshiftInfraAadGroupSyncConfigYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Secret/openshift-infra/aad-group-sync-config.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -14796,8 +14775,6 @@ var _bindata = map[string]func() (*asset, error){
 	"Deployment.apps/openshift-infra/customer-admin-controller.yaml":                                                             deploymentAppsOpenshiftInfraCustomerAdminControllerYaml,
 	"Deployment.apps/openshift-monitoring/cluster-monitoring-operator.yaml":                                                      deploymentAppsOpenshiftMonitoringClusterMonitoringOperatorYaml,
 	"Deployment.apps/openshift-web-console/webconsole.yaml":                                                                      deploymentAppsOpenshiftWebConsoleWebconsoleYaml,
-	"Group.user.openshift.io/osa-customer-admins.yaml":                                                                           groupUserOpenshiftIoOsaCustomerAdminsYaml,
-	"Group.user.openshift.io/osa-customer-readers.yaml":                                                                          groupUserOpenshiftIoOsaCustomerReadersYaml,
 	"ImageStream.image.openshift.io/openshift/dotnet-runtime.yaml":                                                               imagestreamImageOpenshiftIoOpenshiftDotnetRuntimeYaml,
 	"ImageStream.image.openshift.io/openshift/dotnet.yaml":                                                                       imagestreamImageOpenshiftIoOpenshiftDotnetYaml,
 	"ImageStream.image.openshift.io/openshift/eap-cd-openshift.yaml":                                                             imagestreamImageOpenshiftIoOpenshiftEapCdOpenshiftYaml,
@@ -14924,6 +14901,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Secret/openshift-azure-monitoring/azure-registry.yaml":                                                                              secretOpenshiftAzureMonitoringAzureRegistryYaml,
 	"Secret/openshift-azure-monitoring/mdm-cert.yaml":                                                                                    secretOpenshiftAzureMonitoringMdmCertYaml,
 	"Secret/openshift-console/console-oauth-config.yaml":                                                                                 secretOpenshiftConsoleConsoleOauthConfigYaml,
+	"Secret/openshift-infra/aad-group-sync-config.yaml":                                                                                  secretOpenshiftInfraAadGroupSyncConfigYaml,
 	"Secret/openshift-template-service-broker/templateservicebroker-client.yaml":                                                         secretOpenshiftTemplateServiceBrokerTemplateservicebrokerClientYaml,
 	"SecurityContextConstraints.security.openshift.io/anyuid.yaml":                                                                       securitycontextconstraintsSecurityOpenshiftIoAnyuidYaml,
 	"SecurityContextConstraints.security.openshift.io/hostaccess.yaml":                                                                   securitycontextconstraintsSecurityOpenshiftIoHostaccessYaml,
@@ -15590,10 +15568,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"webconsole.yaml": {deploymentAppsOpenshiftWebConsoleWebconsoleYaml, map[string]*bintree{}},
 		}},
 	}},
-	"Group.user.openshift.io": {nil, map[string]*bintree{
-		"osa-customer-admins.yaml":  {groupUserOpenshiftIoOsaCustomerAdminsYaml, map[string]*bintree{}},
-		"osa-customer-readers.yaml": {groupUserOpenshiftIoOsaCustomerReadersYaml, map[string]*bintree{}},
-	}},
 	"ImageStream.image.openshift.io": {nil, map[string]*bintree{
 		"openshift": {nil, map[string]*bintree{
 			"dotnet-runtime.yaml":                               {imagestreamImageOpenshiftIoOpenshiftDotnetRuntimeYaml, map[string]*bintree{}},
@@ -15784,6 +15758,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"openshift-console": {nil, map[string]*bintree{
 			"console-oauth-config.yaml": {secretOpenshiftConsoleConsoleOauthConfigYaml, map[string]*bintree{}},
+		}},
+		"openshift-infra": {nil, map[string]*bintree{
+			"aad-group-sync-config.yaml": {secretOpenshiftInfraAadGroupSyncConfigYaml, map[string]*bintree{}},
 		}},
 		"openshift-template-service-broker": {nil, map[string]*bintree{
 			"templateservicebroker-client.yaml": {secretOpenshiftTemplateServiceBrokerTemplateservicebrokerClientYaml, map[string]*bintree{}},

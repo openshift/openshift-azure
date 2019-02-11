@@ -39,13 +39,6 @@ type Config struct {
 
 	RunningUnderTest bool `json:"runningUnderTest,omitempty"`
 
-	// This section defines local test users to be created via htpasswd file.
-	// Must define environment variable RUNNING_UNDER_TEST to create.
-	HtPasswd             []byte `json:"htPasswd,omitempty"`             //Only enabled during test
-	CustomerAdminPasswd  string `json:"customerAdminPasswd,omitempty"`  //Only enabled during test
-	CustomerReaderPasswd string `json:"customerReaderPasswd,omitempty"` //Only enabled during test
-	EndUserPasswd        string `json:"endUserPasswd,omitempty"`        //Only enabled during test
-
 	// misc infra configurables
 	RegistryHTTPSecret             []byte    `json:"registryHttpSecret,omitempty"`
 	PrometheusProxySessionSecret   []byte    `json:"prometheusProxySessionSecret,omitempty"`

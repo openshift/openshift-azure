@@ -65,10 +65,12 @@ func internalManagedCluster() *OpenShiftManagedCluster {
 					{
 						Name: "Properties.AuthProfile.IdentityProviders[0].Name",
 						Provider: &AADIdentityProvider{
-							Kind:     "AADIdentityProvider",
-							ClientID: "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
-							Secret:   "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
-							TenantID: "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
+							Kind:                  "AADIdentityProvider",
+							ClientID:              "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
+							Secret:                "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
+							TenantID:              "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
+							CustomerAdminGroupID:  to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Provider.CustomerAdminGroupID"),
+							CustomerReaderGroupID: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Provider.CustomerReaderGroupID"),
 						},
 					},
 				},
@@ -232,7 +234,7 @@ func TestConvertFromV20180930preview(t *testing.T) {
 							{
 								Name: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Name"),
 								Provider: &v20180930preview.AADIdentityProvider{
-									Kind: to.StringPtr("HtPasswd"),
+									Kind: to.StringPtr("Kind"),
 								},
 							},
 						},
@@ -250,7 +252,7 @@ func TestConvertFromV20180930preview(t *testing.T) {
 						IdentityProviders: []v20180930preview.IdentityProvider{
 							{
 								Provider: &v20180930preview.AADIdentityProvider{
-									Kind: to.StringPtr("HtPasswd"),
+									Kind: to.StringPtr("Kind"),
 								},
 							},
 						},

@@ -8,30 +8,12 @@ import (
 	"net"
 
 	"github.com/satori/go.uuid"
-	"golang.org/x/crypto/bcrypt"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
-
-func createUserHtPassEntry(name string, passwd *string, htPasswd []byte) ([]byte, error) {
-	var err error
-	var htPassEntry []byte
-	if len(*passwd) == 0 {
-		if *passwd, err = randomString(10); err != nil {
-			return nil, err
-		}
-	}
-	if len(htPasswd) == 0 || bcrypt.CompareHashAndPassword(getHashFromHtPasswd(htPasswd), []byte(*passwd)) != nil {
-		htPassEntry, err = makeHtPasswd(name, *passwd)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return htPassEntry, nil
-}
 
 func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pluginapi.Config) (err error) {
 	config := api.ConvertFromPlugin(template, &cs.Config)
@@ -392,45 +374,8 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		}
 	}
 
-	// set config objects when testing
 	if g.pluginConfig.TestConfig.RunningUnderTest {
 		c.RunningUnderTest = true
-
-		users := []struct {
-			username string
-			passwd   *string
-		}{
-			{
-				username: "customer-cluster-admin",
-				passwd:   &c.CustomerAdminPasswd,
-			},
-			{
-				username: "customer-cluster-reader",
-				passwd:   &c.CustomerReaderPasswd,
-			},
-			{
-				username: "enduser",
-				passwd:   &c.EndUserPasswd,
-			},
-		}
-
-		for _, user := range users {
-			if user.passwd != nil && *user.passwd != "" {
-				continue
-			}
-			htPassEntry, err := createUserHtPassEntry(user.username, user.passwd, c.HtPasswd)
-			if err != nil {
-				return err
-			}
-			if len(htPassEntry) == 0 {
-				continue
-			}
-			if len(c.HtPasswd) == 0 {
-				c.HtPasswd = htPassEntry
-			} else {
-				c.HtPasswd = append(c.HtPasswd, htPassEntry...)
-			}
-		}
 	}
 
 	if c.SSHKey == nil {

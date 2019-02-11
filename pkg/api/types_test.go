@@ -60,7 +60,9 @@ var marshalled = []byte(`{
 						"kind": "AADIdentityProvider",
 						"clientId": "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
 						"secret": "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
-						"tenantId": "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID"
+						"tenantId": "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
+						"customerAdminGroupId": "Properties.AuthProfile.IdentityProviders[0].Provider.CustomerAdminGroupID",
+						"customerReaderGroupId": "Properties.AuthProfile.IdentityProviders[0].Provider.CustomerReaderGroupID"
 					}
 				}
 			]
@@ -227,10 +229,6 @@ var marshalled = []byte(`{
 		"sessionSecretAuth": "Q29uZmlnLlNlc3Npb25TZWNyZXRBdXRo",
 		"sessionSecretEnc": "Q29uZmlnLlNlc3Npb25TZWNyZXRFbmM=",
 		"runningUnderTest": true,
-		"htPasswd": "Q29uZmlnLkh0UGFzc3dk",
-		"customerAdminPasswd": "Config.CustomerAdminPasswd",
-		"customerReaderPasswd": "Config.CustomerReaderPasswd",
-		"endUserPasswd": "Config.EndUserPasswd",
 		"registryHttpSecret": "Q29uZmlnLlJlZ2lzdHJ5SFRUUFNlY3JldA==",
 		"prometheusProxySessionSecret": "Q29uZmlnLlByb21ldGhldXNQcm94eVNlc3Npb25TZWNyZXQ=",
 		"alertManagerProxySessionSecret": "Q29uZmlnLkFsZXJ0TWFuYWdlclByb3h5U2Vzc2lvblNlY3JldA==",

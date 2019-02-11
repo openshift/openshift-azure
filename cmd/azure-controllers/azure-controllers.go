@@ -38,10 +38,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := customeradmin.AddToManager(log, m); err != nil {
+	stopCh := signals.SetupSignalHandler()
+
+	if err := customeradmin.AddToManager(log, m, stopCh); err != nil {
 		log.Fatal(err)
 	}
 
 	log.Print("starting manager")
-	log.Fatal(m.Start(signals.SetupSignalHandler()))
+	log.Fatal(m.Start(stopCh))
 }
