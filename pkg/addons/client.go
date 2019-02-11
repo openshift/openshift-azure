@@ -274,12 +274,12 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 		}
 		Default(*existing)
 
+		markSyncPodOwned(o)
+
 		if !needsUpdate(log, existing, o) {
 			return
 		}
 		printDiff(log, existing, o)
-
-		markSyncPodOwned(o)
 
 		o.SetResourceVersion(rv)
 		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
