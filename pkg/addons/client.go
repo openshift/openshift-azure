@@ -152,10 +152,6 @@ func (c *client) DeleteOrphans(db map[string]unstructured.Unstructured) error {
 			return err
 		}
 
-		if gv.Group == "extensions" {
-			continue
-		}
-
 		for _, resource := range gr.VersionedResources[gr.Group.PreferredVersion.Version] {
 			if strings.ContainsRune(resource.Name, '/') { // no subresources
 				continue
@@ -165,7 +161,17 @@ func (c *client) DeleteOrphans(db map[string]unstructured.Unstructured) error {
 				continue
 			}
 
-			dc, err := c.dyn.ClientForGroupVersionKind(gv.WithKind(resource.Kind))
+			gvk := gv.WithKind(resource.Kind)
+			gk := gvk.GroupKind()
+			if IsDouble(gk) {
+				continue
+			}
+
+			if gk.String() == "Endpoints" { // Services transfer their labels to Endpoints; ignore the latter
+				continue
+			}
+
+			dc, err := c.dyn.ClientForGroupVersionKind(gvk)
 			if err != nil {
 				return err
 			}
