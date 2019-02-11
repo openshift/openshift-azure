@@ -15,7 +15,6 @@
 // data/ClusterRole.rbac.authorization.k8s.io/customer-admin-controller.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/customer-admin-project.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/edit.yaml
-// data/ClusterRole.rbac.authorization.k8s.io/group-sync.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/namespace-viewer.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/registry-admin.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/registry-editor.yaml
@@ -163,7 +162,6 @@
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-status-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-cluster-group.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-admin.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-group-sync-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-project-admin.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-sa.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/geneva-cluster-reader.yaml
@@ -1047,26 +1045,6 @@ func clusterroleRbacAuthorizationK8sIoEditYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/edit.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _clusterroleRbacAuthorizationK8sIoGroupSyncYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x2c\xcc\x31\x6e\xc3\x30\x0c\x85\xe1\x9d\xa7\xe0\x05\xac\xa2\x5b\xa1\xb5\x43\xf7\x0e\xd9\x69\x99\x89\x09\xdb\xa2\x40\x52\x06\x92\xd3\x07\x8e\xbd\x7e\xef\xe1\xa7\x26\x37\x36\x17\xad\x19\x6d\xa4\x92\xa8\xc7\xac\x26\x2f\x0a\xd1\x9a\x96\x1f\x4f\xa2\x5f\xfb\x37\x2c\x52\xa7\x8c\xbf\x6b\xf7\x60\xfb\xd7\x95\x61\xe3\xa0\x89\x82\x32\x20\x56\xda\x38\xe3\xc3\xb4\xb7\xc1\x9f\xb5\x80\xf5\x95\x3d\xc3\x80\xd4\xe4\xef\x60\x3f\x6e\x03\x76\x67\x4b\xda\xb8\xfa\x2c\xf7\x48\xa2\x80\x68\xec\xda\xad\xf0\x75\xf9\x54\x1c\x10\x77\xb6\xf1\xb2\x62\x4c\xc1\xe7\xcc\x71\x96\xda\x74\xd0\x3b\x00\x00\xff\xff\xc4\x57\xf0\x21\xc1\x00\x00\x00")
-
-func clusterroleRbacAuthorizationK8sIoGroupSyncYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_clusterroleRbacAuthorizationK8sIoGroupSyncYaml,
-		"ClusterRole.rbac.authorization.k8s.io/group-sync.yaml",
-	)
-}
-
-func clusterroleRbacAuthorizationK8sIoGroupSyncYaml() (*asset, error) {
-	bytes, err := clusterroleRbacAuthorizationK8sIoGroupSyncYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/group-sync.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4007,26 +3985,6 @@ func clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerAdminYaml() 
 	}
 
 	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-admin.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerGroupSyncBindingYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\xce\xb1\x4a\x04\x41\x0c\xc6\xf1\x7e\x9e\x62\x5e\x60\x4e\xec\x64\x3a\xb5\xb0\x3f\xc1\x3e\x9b\xcd\xee\xc5\x9b\x4d\x86\x24\x73\xa0\x4f\x2f\x87\xcb\x29\x08\xf6\xdf\x3f\xf9\x41\xe7\x37\x32\x67\x95\x9a\x6d\x02\x3c\xc0\x88\x93\x1a\x7f\x42\xb0\xca\xe1\xfc\xe0\x07\xd6\xbb\xcb\x7d\x3a\xb3\xcc\x35\x3f\xb7\xe1\x41\x76\xd4\x46\x4f\x2c\x33\xcb\x9a\x36\x0a\x98\x21\xa0\xa6\x9c\x05\x36\xaa\xd9\xc9\x2e\x8c\x54\x10\x02\x9a\xae\x05\x55\xc2\xb4\x35\xb2\xb2\x9a\x8e\x5e\xfc\x43\xb0\x4c\x7b\x6f\xda\xe8\x48\xcb\x35\x87\xce\x2f\xd7\xc1\x3f\x94\x94\xf3\x1f\xc9\xed\xf1\xcf\xf5\xe4\x63\x7a\x27\x0c\xaf\xa9\xec\xc1\xeb\xb7\xea\x11\x51\x87\xc4\xad\xc1\xe1\xa1\x1b\x59\x81\x79\x63\xf9\x65\xdd\x17\xde\x01\xa9\x66\xed\x24\x7e\xe2\x25\x0a\xcb\x62\x90\xbe\x02\x00\x00\xff\xff\xa8\xa9\x20\x1a\x38\x01\x00\x00")
-
-func clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerGroupSyncBindingYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerGroupSyncBindingYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-group-sync-binding.yaml",
-	)
-}
-
-func clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerGroupSyncBindingYaml() (*asset, error) {
-	bytes, err := clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerGroupSyncBindingYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-group-sync-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -14538,7 +14496,6 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRole.rbac.authorization.k8s.io/customer-admin-controller.yaml":                                                       clusterroleRbacAuthorizationK8sIoCustomerAdminControllerYaml,
 	"ClusterRole.rbac.authorization.k8s.io/customer-admin-project.yaml":                                                          clusterroleRbacAuthorizationK8sIoCustomerAdminProjectYaml,
 	"ClusterRole.rbac.authorization.k8s.io/edit.yaml":                                                                            clusterroleRbacAuthorizationK8sIoEditYaml,
-	"ClusterRole.rbac.authorization.k8s.io/group-sync.yaml":                                                                      clusterroleRbacAuthorizationK8sIoGroupSyncYaml,
 	"ClusterRole.rbac.authorization.k8s.io/namespace-viewer.yaml":                                                                clusterroleRbacAuthorizationK8sIoNamespaceViewerYaml,
 	"ClusterRole.rbac.authorization.k8s.io/registry-admin.yaml":                                                                  clusterroleRbacAuthorizationK8sIoRegistryAdminYaml,
 	"ClusterRole.rbac.authorization.k8s.io/registry-editor.yaml":                                                                 clusterroleRbacAuthorizationK8sIoRegistryEditorYaml,
@@ -14686,7 +14643,6 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-status-binding.yaml":                                                   clusterrolebindingRbacAuthorizationK8sIoClusterStatusBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-cluster-group.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoCustomerAdminClusterGroupYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-admin.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerAdminYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-group-sync-binding.yaml":                             clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerGroupSyncBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-project-admin.yaml":                                  clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerProjectAdminYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-sa.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerSaYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/geneva-cluster-reader.yaml":                                                    clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYaml,
@@ -15270,7 +15226,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"customer-admin-controller.yaml":             {clusterroleRbacAuthorizationK8sIoCustomerAdminControllerYaml, map[string]*bintree{}},
 		"customer-admin-project.yaml":                {clusterroleRbacAuthorizationK8sIoCustomerAdminProjectYaml, map[string]*bintree{}},
 		"edit.yaml":                                  {clusterroleRbacAuthorizationK8sIoEditYaml, map[string]*bintree{}},
-		"group-sync.yaml":                            {clusterroleRbacAuthorizationK8sIoGroupSyncYaml, map[string]*bintree{}},
 		"namespace-viewer.yaml":                      {clusterroleRbacAuthorizationK8sIoNamespaceViewerYaml, map[string]*bintree{}},
 		"registry-admin.yaml":                        {clusterroleRbacAuthorizationK8sIoRegistryAdminYaml, map[string]*bintree{}},
 		"registry-editor.yaml":                       {clusterroleRbacAuthorizationK8sIoRegistryEditorYaml, map[string]*bintree{}},
@@ -15420,7 +15375,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"cluster-status-binding.yaml":                                                   {clusterrolebindingRbacAuthorizationK8sIoClusterStatusBindingYaml, map[string]*bintree{}},
 		"customer-admin-cluster-group.yaml":                                             {clusterrolebindingRbacAuthorizationK8sIoCustomerAdminClusterGroupYaml, map[string]*bintree{}},
 		"customer-admin-controller-admin.yaml":                                          {clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerAdminYaml, map[string]*bintree{}},
-		"customer-admin-controller-group-sync-binding.yaml":                             {clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerGroupSyncBindingYaml, map[string]*bintree{}},
 		"customer-admin-controller-project-admin.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerProjectAdminYaml, map[string]*bintree{}},
 		"customer-admin-controller-sa.yaml":                                             {clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerSaYaml, map[string]*bintree{}},
 		"geneva-cluster-reader.yaml":                                                    {clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYaml, map[string]*bintree{}},
