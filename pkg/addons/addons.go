@@ -23,7 +23,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-const ownedBySyncPodAnnotationKey = "azure.openshift.io/owned-by-sync-pod"
+const ownedBySyncPodLabelKey = "azure.openshift.io/owned-by-sync-pod"
 
 type extra struct {
 	RegistryStorageAccountKey string

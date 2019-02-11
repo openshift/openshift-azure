@@ -182,8 +182,8 @@ func (c *client) DeleteOrphans(db map[string]unstructured.Unstructured) error {
 
 			for _, i := range l.Items {
 				// check that the object is marked by the sync pod
-				a := i.GetAnnotations()
-				if av, ok := a[ownedBySyncPodAnnotationKey]; ok && av == "yes" {
+				l := i.GetLabels()
+				if l[ownedBySyncPodLabelKey] == "true" {
 					// if object is marked, but not in current DB, remove it
 					if _, ok := db[KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())]; !ok {
 						c.log.Info("Delete " + KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName()))
@@ -291,12 +291,12 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 
 // mark object as sync pod owned
 func markSyncPodOwned(o *unstructured.Unstructured) {
-	a := o.GetAnnotations()
-	if a == nil {
-		a = map[string]string{}
+	l := o.GetLabels()
+	if l == nil {
+		l = map[string]string{}
 	}
-	a[ownedBySyncPodAnnotationKey] = "yes"
-	o.SetAnnotations(a)
+	l[ownedBySyncPodLabelKey] = "true"
+	o.SetLabels(l)
 }
 
 func needsUpdate(log *logrus.Entry, existing, o *unstructured.Unstructured) bool {
