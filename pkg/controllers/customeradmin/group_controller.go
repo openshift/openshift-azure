@@ -34,7 +34,7 @@ type reconcileGroup struct {
 
 var _ reconcile.Reconciler = &reconcileGroup{}
 
-func addGroupController(log *logrus.Entry, m manager.Manager) error {
+func addGroupController(log *logrus.Entry, m manager.Manager, stopCh <-chan struct{}) error {
 	r := &reconcileGroup{
 		log:      log,
 		groupMap: map[string]string{},
@@ -59,14 +59,13 @@ func addGroupController(log *logrus.Entry, m manager.Manager) error {
 	events := make(chan event.GenericEvent)
 	timerSource := source.Channel{Source: events}
 	ticker := time.NewTicker(60 * time.Second)
-	quit := make(chan struct{})
-	timerSource.InjectStopChannel(quit)
+	timerSource.InjectStopChannel(stopCh)
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
 				events <- event.GenericEvent{}
-			case <-quit:
+			case <-stopCh:
 				log.Info("shutting down ticker")
 				ticker.Stop()
 				return
