@@ -38,6 +38,7 @@ func updateKubeGroup(log *logrus.Entry, userV1 userv1client.UserV1Interface, kub
 func reconcileGroups(log *logrus.Entry, gc *graphrbac.GroupsClient, userV1 userv1client.UserV1Interface, groupMap map[string]string) error {
 	aadGroupID, have := groupMap[osaCustomerAdmins]
 	if !have {
+		// CustomerAdminGroupID not configured: ensure the group is empty
 		err := updateKubeGroup(log, userV1, osaCustomerAdmins, []graphrbac.User{})
 		if err != nil {
 			return err
@@ -55,6 +56,7 @@ func reconcileGroups(log *logrus.Entry, gc *graphrbac.GroupsClient, userV1 userv
 
 	aadGroupID, have = groupMap[osaCustomerReaders]
 	if !have {
+		// CustomerReaderGroupID not configured: ensure the group is empty
 		err := updateKubeGroup(log, userV1, osaCustomerReaders, []graphrbac.User{})
 		if err != nil {
 			return err
