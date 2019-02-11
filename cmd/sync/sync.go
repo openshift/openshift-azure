@@ -51,9 +51,7 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 }
 
 // sync syncs the current state of the cluster with the
-// desired state that is kept in a blob in an Azure storage
-// account. It returns whether it managed to access the
-// config blob or not and any error that occured.
+// desired state that is kept in a file in local storage.
 func (s *sync) sync(ctx context.Context, log *logrus.Entry) error {
 	s.log.Print("Sync process started")
 

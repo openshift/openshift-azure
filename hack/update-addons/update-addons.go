@@ -65,7 +65,13 @@ func readDB() (map[string]unstructured.Unstructured, error) {
 				continue
 			}
 
-			dc, err := dyn.ClientForGroupVersionKind(gv.WithKind(resource.Kind))
+			gvk := gv.WithKind(resource.Kind)
+			gk := gvk.GroupKind()
+			if addons.IsDouble(gk) {
+				continue
+			}
+
+			dc, err := dyn.ClientForGroupVersionKind(gvk)
 			if err != nil {
 				return nil, err
 			}
