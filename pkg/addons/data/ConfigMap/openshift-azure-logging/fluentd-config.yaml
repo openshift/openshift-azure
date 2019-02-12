@@ -9,6 +9,13 @@ data:
       </storage>
       tag logs
     </source>
+    <source>
+      @type exec
+      command /bin/sh -c 'date +%s'
+      tag heartbeat
+      keys last_heartbeat_time
+      run_interval 60s
+    </source>
     <match logs>
       @type rewrite_tag_filter
       <rule>
@@ -34,6 +41,12 @@ data:
       flush_interval 10s
       retry_limit 3
       retry_wait 10s
+    </match>
+    <match heartbeat>
+      @type file
+      path /var/log/td-agent/heartbeat/hb
+      time_slice_format %Y%m%d%H%M
+      append true
     </match>
 kind: ConfigMap
 metadata:
