@@ -444,7 +444,7 @@ func gzipBytes(data []byte) ([]byte, error) {
 	return bufOut.Bytes(), nil
 }
 
-func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
+func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string, canCompress bool) (*compute.VirtualMachineScaleSet, error) {
 	sshPublicKey, err := tls.SSHPublicKeyAsString(&cs.Config.SSHKey.PublicKey)
 	if err != nil {
 		return nil, err
@@ -471,13 +471,16 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		if err != nil {
 			return nil, err
 		}
+		if canCompress {
+			compressed, err := gzipBytes(b)
+			if err != nil {
+				return nil, err
+			}
 
-		compressed, err := gzipBytes(b)
-		if err != nil {
-			return nil, err
+			script = base64.StdEncoding.EncodeToString(compressed)
+		} else {
+			script = base64.StdEncoding.EncodeToString(b)
 		}
-
-		script = base64.StdEncoding.EncodeToString(compressed)
 	} else {
 		b, err := template.Template(string(nodeStartup), nil, cs, map[string]interface{}{
 			"Role":       app.Role,

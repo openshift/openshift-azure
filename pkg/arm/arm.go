@@ -60,7 +60,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 	}
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
-			vmss, err := Vmss(&g.pluginConfig, cs, &app, backupBlob, suffix)
+			vmss, err := Vmss(&g.pluginConfig, cs, &app, backupBlob, suffix, true)
 			if err != nil {
 				return nil, err
 			}

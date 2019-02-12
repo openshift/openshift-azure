@@ -43,7 +43,7 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 	appCopy.Count = 0
 	appCopy.Name = ""
 
-	vmss, err := arm.Vmss(&h.pluginConfig, cs, &appCopy, "", "") // TODO: backupBlob is rather a layering violation here
+	vmss, err := arm.Vmss(&h.pluginConfig, cs, &appCopy, "", "", false) // TODO: backupBlob is rather a layering violation here
 	if err != nil {
 		return nil, err
 	}
