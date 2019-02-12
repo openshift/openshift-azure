@@ -29,7 +29,7 @@ func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, bl
 // in place.
 func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError {
 	ssName := config.MasterScalesetName
-	ssHash, err := u.hasher.HashScaleSet(cs, app)
+	desiredHash, err := u.hasher.HashScaleSet(cs, app)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashScaleSet}
 	}
@@ -51,7 +51,7 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 			*vms[j].VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
 	})
 
-	vms = u.filterOldVMs(vms, blob, ssHash)
+	vms = u.filterOldVMs(vms, blob, desiredHash)
 	for _, vm := range vms {
 		computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		u.log.Infof("draining %s", computerName)
@@ -92,7 +92,7 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolWaitForReady}
 		}
 
-		blob.InstanceHashes[*vm.Name] = ssHash
+		blob.InstanceHashes[*vm.Name] = desiredHash
 		if err := u.updateBlobService.Write(blob); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateBlob}
 		}

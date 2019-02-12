@@ -15,7 +15,9 @@ type scalesetHashes struct {
 }
 
 type UpdateBlob struct {
+	// ScalesetHashes stores the config hash for each worker scaleset
 	ScalesetHashes ScalesetHashes `json:"scalesetHashes,omitempty"`
+	// InstanceHases stores the config hash for each master instance
 	InstanceHashes InstanceHashes `json:"instanceHashes,omitempty"`
 }
 
