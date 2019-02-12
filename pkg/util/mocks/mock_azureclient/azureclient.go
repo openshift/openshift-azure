@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
+	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	marketplaceordering "github.com/Azure/azure-sdk-for-go/services/marketplaceordering/mgmt/2015-06-01/marketplaceordering"
 	resources "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	managedapplications "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-06-01/managedapplications"
@@ -240,6 +240,21 @@ func (m *MockVirtualMachineScaleSetVMsClient) Reimage(arg0 context.Context, arg1
 func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Reimage(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reimage", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Reimage), arg0, arg1, arg2, arg3, arg4)
+}
+
+// ReimageAll mocks base method
+func (m *MockVirtualMachineScaleSetVMsClient) ReimageAll(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsReimageAllFuture, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReimageAll", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsReimageAllFuture)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ReimageAll indicates an expected call of ReimageAll
+func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) ReimageAll(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReimageAll", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).ReimageAll), arg0, arg1, arg2, arg3)
 }
 
 // Restart mocks base method

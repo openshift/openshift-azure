@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-06-01/compute"
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-07-01/network"
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2015-06-15/storage"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -54,7 +54,7 @@ func fixupAPIVersions(template map[string]interface{}) {
 		var apiVersion string
 		switch typ {
 		case "Microsoft.Compute/virtualMachineScaleSets":
-			apiVersion = "2018-06-01"
+			apiVersion = "2018-10-01"
 		case "Microsoft.Network/loadBalancers",
 			"Microsoft.Network/networkSecurityGroups",
 			"Microsoft.Network/publicIPAddresses",
@@ -502,8 +502,8 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		},
 		VirtualMachineScaleSetProperties: &compute.VirtualMachineScaleSetProperties{
 			UpgradePolicy: &compute.UpgradePolicy{
-				AutoOSUpgradePolicy: &compute.AutoOSUpgradePolicy{
-					DisableAutoRollback: to.BoolPtr(false),
+				AutomaticOSUpgradePolicy: &compute.AutomaticOSUpgradePolicy{
+					DisableAutomaticRollback: to.BoolPtr(false),
 				},
 				Mode: compute.Manual,
 			},
