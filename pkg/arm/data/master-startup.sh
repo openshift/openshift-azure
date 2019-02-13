@@ -222,7 +222,6 @@ kubernetesMasterConfig:
     - /etc/origin/master/ca.crt
     cluster-signing-key-file:
     - /etc/origin/master/ca.key
-  masterCount: 3
   masterIP: 127.0.0.1
   proxyClientInfo:
     certFile: master.proxy-client.crt
