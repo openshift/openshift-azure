@@ -78,7 +78,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
 
-	err = p.clusterUpgrader.CreateClients(ctx, cs)
+	err = p.clusterUpgrader.CreateClients(ctx, cs, true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
@@ -123,7 +123,7 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
-	err = p.clusterUpgrader.CreateClients(ctx, cs)
+	err = p.clusterUpgrader.CreateClients(ctx, cs, isUpdate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
@@ -221,7 +221,7 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 func (p *plugin) initialize(ctx context.Context, oc *api.OpenShiftManagedCluster) error {
 	var err error
 	if p.kubeclient == nil {
-		p.kubeclient, err = kubeclient.NewKubeclient(p.log, oc.Config.AdminKubeconfig, &p.config)
+		p.kubeclient, err = kubeclient.NewKubeclient(p.log, oc.Config.AdminKubeconfig, &p.config, false)
 	}
 	return err
 }
