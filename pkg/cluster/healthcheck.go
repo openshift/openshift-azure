@@ -67,7 +67,9 @@ func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManag
 
 	u.log.Info("checking developer console health")
 	err = u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://"+cs.Properties.FQDN+"/console/", 10*time.Second)
-	return err
+	if err != nil {
+		return err
+	}
 
 	// currently this makes a tcp connection to console.publicsubdomain:443 then
 	// issues a GET with Host header console.publicsubdomain
@@ -77,8 +79,8 @@ func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManag
 	// connection to console.fqdn:443 with an SNI header set to
 	// console.publicsubdomain,then issue a GET with Host header
 	// console.publicsubdomain
-	// u.log.Info("checking admin console health")
-	// return u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://console."+cs.Properties.RouterProfiles[0].PublicSubdomain, 10*time.Second)
+	u.log.Info("checking admin console health")
+	return u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://console."+cs.Properties.RouterProfiles[0].PublicSubdomain, 10*time.Second)
 }
 
 func (u *simpleUpgrader) WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
