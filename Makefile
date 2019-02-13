@@ -128,6 +128,9 @@ e2e-etcdbackuprecovery:
 e2e-keyrotation:
 	FOCUS="\[KeyRotation\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
 
+e2e-updatecluster:
+	FOCUS="\[UpdateCluster\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
+
 e2e-scaleupdown:
 	FOCUS="\[ScaleUpDown\]\[Fake\]" TIMEOUT=30m ./hack/e2e.sh
 
