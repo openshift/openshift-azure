@@ -25,4 +25,5 @@ func (s *Server) SetupRoutes() {
 	s.router.Put(filepath.Join("/admin", s.basePath, "/forceUpdate"), s.handleForceUpdate)
 	s.router.Get(filepath.Join("/admin", s.basePath, "/listClusterVMs"), s.handleListClusterVMs)
 	s.router.Put(filepath.Join("/admin", s.basePath, "/reimage/{hostname}"), s.handleReimage)
+	s.router.Put(filepath.Join("/admin", s.basePath, "/backup/{backupName}"), s.handleBackup)
 }
