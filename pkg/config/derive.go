@@ -93,7 +93,13 @@ func (derived) MasterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
 }
 
 func (derived) ClusterConfig(cs *api.OpenShiftManagedCluster) ([]byte, error) {
-	return json.Marshal(cs)
+	csCopy := cs.DeepCopy()
+	cs.Properties.ProvisioningState = ""
+	for i := range csCopy.Properties.AgentPoolProfiles {
+		app := csCopy.Properties.AgentPoolProfiles[i]
+		app.Count = 0
+	}
+	return json.Marshal(csCopy)
 }
 
 func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
