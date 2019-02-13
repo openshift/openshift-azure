@@ -37,17 +37,17 @@ func (m *MockUpgrader) EXPECT() *MockUpgraderMockRecorder {
 }
 
 // CreateClients mocks base method
-func (m *MockUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (m *MockUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, disableKeepAlives bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateClients", ctx, cs)
+	ret := m.ctrl.Call(m, "CreateClients", ctx, cs, disableKeepAlives)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateClients indicates an expected call of CreateClients
-func (mr *MockUpgraderMockRecorder) CreateClients(ctx, cs interface{}) *gomock.Call {
+func (mr *MockUpgraderMockRecorder) CreateClients(ctx, cs, disableKeepAlives interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClients", reflect.TypeOf((*MockUpgrader)(nil).CreateClients), ctx, cs)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClients", reflect.TypeOf((*MockUpgrader)(nil).CreateClients), ctx, cs, disableKeepAlives)
 }
 
 // Initialize mocks base method
