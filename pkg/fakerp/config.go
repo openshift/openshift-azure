@@ -95,11 +95,7 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 func enrichContext(ctx context.Context) (context.Context, error) {
 	// simulate Context with property bag
 	// TODO: Get the azure credentials from the request headers
-	ctx = context.WithValue(ctx, internalapi.ContextKeyCloudProviderClientID, os.Getenv("AZURE_CLIENT_ID"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyCloudProviderClientSecret, os.Getenv("AZURE_CLIENT_SECRET"))
-	ctx = context.WithValue(ctx, internalapi.ContextKeyCloudProviderTenantID, os.Getenv("AZURE_TENANT_ID"))
-
-	authorizer, err := azureclient.NewAuthorizerFromContext(ctx)
+	authorizer, err := azureclient.NewAuthorizerFromEnvironment()
 	if err != nil {
 		return nil, err
 	}
