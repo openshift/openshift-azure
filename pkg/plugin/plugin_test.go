@@ -310,3 +310,32 @@ func TestReimage(t *testing.T) {
 		})
 	}
 }
+func TestBackupEtcdCluster(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	backupName := "etcd-backup"
+	cs := &api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			AgentPoolProfiles: []api.AgentPoolProfile{
+				{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
+				{Role: api.AgentPoolProfileRoleCompute, Name: "compute"},
+				{Role: api.AgentPoolProfileRoleInfra, Name: "infra"},
+			},
+		},
+	}
+
+	mockKube := mock_kubeclient.NewMockKubeclient(mockCtrl)
+
+	_ = mockKube.EXPECT().BackupCluster(nil, backupName).Return(nil)
+
+	p := &plugin{
+		kubeclient: mockKube,
+		log:        logrus.NewEntry(logrus.StandardLogger()),
+	}
+
+	err := p.BackupEtcdCluster(nil, cs, backupName)
+	if err != nil {
+		t.Errorf("plugin.BackupEtcdCluster error = %v", err)
+	}
+}

@@ -328,3 +328,17 @@ func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, h
 	}
 	return err
 }
+
+func (p *plugin) BackupEtcdCluster(ctx context.Context, oc *api.OpenShiftManagedCluster, backupName string) error {
+	p.log.Info("generating admin kubeclient")
+	err := p.initialize(ctx, oc)
+	if err != nil {
+		return err
+	}
+	p.log.Infof("backing up cluster")
+	err = p.kubeclient.BackupCluster(ctx, backupName)
+	if err != nil {
+		return err
+	}
+	return nil
+}

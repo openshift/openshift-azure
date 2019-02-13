@@ -37,7 +37,7 @@ var validRouterProfileNames = map[string]struct{}{
 }
 
 func isValidHostname(h string) bool {
-	return len(h) <= 255 && rxRfc1123.MatchString(h)
+	return len(h) <= 255 && RxRfc1123.MatchString(h)
 }
 
 func isValidCloudAppHostname(h, location string) bool {
