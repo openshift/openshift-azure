@@ -343,10 +343,6 @@ func lbKubernetes(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *networ
 		Location: to.StringPtr(cs.Location),
 	}
 
-	if pc.TestConfig.RunningUnderTest {
-		(*lb.OutboundRules)[0].EnableTCPReset = to.BoolPtr(true)
-	}
-
 	return lb
 }
 
