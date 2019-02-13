@@ -83,10 +83,6 @@ func NewAuthorizerFromUsernamePassword(username, password, clientID, tenantID, r
 	return config.Authorizer()
 }
 
-func NewAuthorizerFromContext(ctx context.Context) (autorest.Authorizer, error) {
-	return NewAuthorizer(ctx.Value(api.ContextKeyCloudProviderClientID).(string), ctx.Value(api.ContextKeyCloudProviderClientSecret).(string), ctx.Value(api.ContextKeyCloudProviderTenantID).(string))
-}
-
 func GetAuthorizerFromContext(ctx context.Context) (autorest.Authorizer, error) {
 	authorizer, ok := ctx.Value(api.ContextKeyClientAuthorizer).(autorest.Authorizer)
 	if !ok {
