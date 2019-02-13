@@ -108,6 +108,11 @@ type Plugin interface {
 	// this will call the deployer.
 	CreateOrUpdate(ctx context.Context, cs *OpenShiftManagedCluster, isUpdate bool, deployer DeployFn) *PluginError
 
+	GenevaActions
+}
+
+// GenevaActions is the interface for all geneva actions
+type GenevaActions interface {
 	// RecoverEtcdCluster recovers the cluster's etcd using the backup specified in the pluginConfig
 	RecoverEtcdCluster(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn, backupBlob string) *PluginError
 
