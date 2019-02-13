@@ -256,6 +256,109 @@ func (client OpenShiftManagedClustersClient) DeleteResponder(resp *http.Response
 	return
 }
 
+// OpenShiftManagedClustersForceUpdateFuture is an abstraction for monitoring and retrieving the results of a
+// long-running operation.
+type OpenShiftManagedClustersForceUpdateFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *OpenShiftManagedClustersForceUpdateFuture) Result(client OpenShiftManagedClustersClient) (ar autorest.Response, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersForceUpdateFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("containerservice.OpenShiftManagedClustersForceUpdateFuture")
+		return
+	}
+	ar.Response = future.Response()
+	return
+}
+
+// ForceUpdateAndWait zeroes the update hash to force an update to an OpenShiftManagedCluster
+// and waits for the request to complete before returning.
+func (client OpenShiftManagedClustersClient) ForceUpdateAndWait(ctx context.Context, resourceGroupName, resourceName string) (result autorest.Response, err error) {
+	var future OpenShiftManagedClustersForceUpdateFuture
+	future, err = client.ForceUpdate(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		return
+	}
+	if err = future.WaitForCompletionRef(ctx, client.Client); err != nil {
+		return
+	}
+	return future.Result(client)
+}
+
+// ForceUpdate zeroes the update hash to force an update to an OpenShiftManagedCluster
+// Parameters:
+// resourceGroupName - the name of the Resource group.
+// resourceName - the name of the OpenShiftManagedCluster
+func (client OpenShiftManagedClustersClient) ForceUpdate(ctx context.Context, resourceGroupName, resourceName string) (result OpenShiftManagedClustersForceUpdateFuture, err error) {
+	req, err := client.ForceUpdatePreparer(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "ForceUpdate", nil, "Failure preparing request")
+		return
+	}
+
+	result, err = client.ForceUpdateSender(req)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "ForceUpdate", result.Response(), "Failure sending request")
+		return
+	}
+
+	return
+}
+
+// ForceUpdatePreparer prepares the ForceUpdate request.
+func (client OpenShiftManagedClustersClient) ForceUpdatePreparer(ctx context.Context, resourceGroupName, resourceName string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": api.APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsContentType("application/json; charset=utf-8"),
+		autorest.AsPut(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/forceUpdate", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// ForceUpdateSender sends the ForceUpdate request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) ForceUpdateSender(req *http.Request) (future OpenShiftManagedClustersForceUpdateFuture, err error) {
+	var resp *http.Response
+	resp, err = autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+	if err != nil {
+		return
+	}
+	future.Future, err = azure.NewFutureFromResponse(resp)
+	return
+}
+
+// ForceUpdateResponder handles the response to the ForceUpdate request. The method
+// always closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) ForceUpdateResponder(resp *http.Response) (result autorest.Response, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
+		autorest.ByClosing())
+	result.Response = resp
+	return
+}
+
 // Get gets the details of the managed openshift cluster with a specified resource group and name.
 // Parameters:
 // resourceGroupName - the name of the resource group.
