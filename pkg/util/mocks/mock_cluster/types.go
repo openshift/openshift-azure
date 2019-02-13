@@ -189,3 +189,17 @@ func (mr *MockUpgraderMockRecorder) EtcdRestoreDeleteMasterScaleSetHashes(ctx, c
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EtcdRestoreDeleteMasterScaleSetHashes", reflect.TypeOf((*MockUpgrader)(nil).EtcdRestoreDeleteMasterScaleSetHashes), ctx, cs)
 }
+
+// ResetUpdateBlob mocks base method
+func (m *MockUpgrader) ResetUpdateBlob(cs *api.OpenShiftManagedCluster) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResetUpdateBlob", cs)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ResetUpdateBlob indicates an expected call of ResetUpdateBlob
+func (mr *MockUpgraderMockRecorder) ResetUpdateBlob(cs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetUpdateBlob", reflect.TypeOf((*MockUpgrader)(nil).ResetUpdateBlob), cs)
+}

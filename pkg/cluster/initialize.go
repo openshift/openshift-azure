@@ -76,3 +76,8 @@ func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 	}
 	return u.updateBlobService.Write(blob)
 }
+
+func (u *simpleUpgrader) ResetUpdateBlob(cs *api.OpenShiftManagedCluster) error {
+	blob := updateblob.NewUpdateBlob()
+	return u.updateBlobService.Write(blob)
+}

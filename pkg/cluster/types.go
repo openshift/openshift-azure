@@ -42,6 +42,7 @@ type Upgrader interface {
 	UpdateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError
 	EtcdRestoreDeleteMasterScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
+	ResetUpdateBlob(cs *api.OpenShiftManagedCluster) error
 }
 
 type simpleUpgrader struct {

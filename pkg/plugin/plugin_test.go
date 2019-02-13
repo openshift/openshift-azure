@@ -179,3 +179,48 @@ func TestRotateClusterSecrets(t *testing.T) {
 		t.Errorf("plugin.RotateClusterSecrets error = %v", err)
 	}
 }
+
+func TestForceUpdate(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	deployer := func(ctx context.Context, azuretemplate map[string]interface{}) error {
+		return nil
+	}
+	cs := &api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			AgentPoolProfiles: []api.AgentPoolProfile{
+				{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
+				{Role: api.AgentPoolProfileRoleCompute, Name: "compute"},
+				{Role: api.AgentPoolProfileRoleInfra, Name: "infra"},
+			},
+		},
+	}
+
+	mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
+	mockArm := mock_arm.NewMockGenerator(mockCtrl)
+
+	c := mockUp.EXPECT().CreateClients(nil, cs, true).Return(nil)
+	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
+	c = mockUp.EXPECT().ResetUpdateBlob(cs).Return(nil).After(c)
+	c = mockArm.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
+	c = mockUp.EXPECT().CreateClients(nil, cs, true).Return(nil).After(c)
+	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
+	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+	c = mockUp.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
+	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+	c = mockUp.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+	c = mockUp.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = mockUp.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
+
+	p := &plugin{
+		armGenerator:    mockArm,
+		clusterUpgrader: mockUp,
+		log:             logrus.NewEntry(logrus.StandardLogger()),
+	}
+
+	if err := p.ForceUpdate(nil, cs, deployer); err != nil {
+		t.Errorf("plugin.ForceUpdate error = %v", err)
+	}
+}
