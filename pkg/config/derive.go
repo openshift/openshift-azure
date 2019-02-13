@@ -1,9 +1,12 @@
 package config
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"strings"
+	"text/template"
 
 	"github.com/ghodss/yaml"
 
@@ -234,4 +237,60 @@ func (derived) MaxDataDisksPerVM(cs *api.OpenShiftManagedCluster) (string, error
 	}
 
 	return "", fmt.Errorf("unknown VMSize %q", app.VMSize)
+}
+
+func (derived) MDSDConfig(cs *api.OpenShiftManagedCluster) (string, error) {
+	var tmpl = `<?xml version="1.0" encoding="utf-8"?>
+    <MonitoringManagement version="1.0" namespace="{{ .Namespace | Escape }}" eventVersion="1" timestamp="2017-08-01T00:00:00.000Z">
+        <Accounts>
+            <Account moniker="{{ .Account | Escape }}" isDefault="true" autoKey="false" />
+        </Accounts>
+        <Management eventVolume="Large" defaultRetentionInDays="90" >
+            <Identity tenantNameAlias="ResourceName" roleNameAlias="ResourceGroupName" roleInstanceNameAlias="SubscriptionId">
+                <IdentityComponent name="Region">{{ .Region | Escape }}</IdentityComponent>
+                <IdentityComponent name="SubscriptionId">{{ .SubscriptionId | Escape }}</IdentityComponent>
+                <IdentityComponent name="ResourceGroupName">{{ .ResourceGroupName | Escape }}</IdentityComponent>
+                <IdentityComponent name="ResourceName">{{ .ResourceName | Escape }}</IdentityComponent>
+            </Identity>
+            <AgentResourceUsage diskQuotaInMB="50000" />
+        </Management>
+        <Sources>
+            <Source name="journald" dynamic_schema="true" />
+            <Source name="audit" dynamic_schema="true" />
+        </Sources>
+        <Events>
+            <MdsdEvents>
+                <MdsdEventSource source="journald">
+                    <RouteEvent eventName="CustomerSyslogEvents" storeType="CentralBond" priority="Normal"/>
+                </MdsdEventSource>
+                <MdsdEventSource source="audit">
+                <RouteEvent eventName="CustomerAuditLogEvents" storeType="CentralBond" priority="Normal"/>
+            </MdsdEventSource>
+            </MdsdEvents>
+        </Events>
+	</MonitoringManagement>`
+
+	t := template.Must(template.New("").Funcs(map[string]interface{}{
+		"Escape": func(s string) (string, error) {
+			var b bytes.Buffer
+			err := xml.EscapeText(&b, []byte(s))
+			return b.String(), err
+		},
+	}).Parse(tmpl))
+
+	b := &bytes.Buffer{}
+
+	err := t.Execute(b, map[string]string{
+		"Namespace":         cs.Config.GenevaLoggingNamespace,
+		"Account":           cs.Config.GenevaLoggingAccount,
+		"Region":            cs.Location,
+		"SubscriptionId":    cs.Properties.AzProfile.SubscriptionID,
+		"ResourceName":      cs.Name,
+		"ResourceGroupName": cs.Properties.AzProfile.ResourceGroup,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return string(b.Bytes()), nil
 }

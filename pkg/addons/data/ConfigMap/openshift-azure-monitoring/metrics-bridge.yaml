@@ -16,6 +16,7 @@ data:
     namespace: Prometheus
     region: '*** GENERATED ***'
     resourceGroupName: '*** GENERATED ***'
+    resourceName: '*** GENERATED ***'
     subscriptionId: '*** GENERATED ***'
 kind: ConfigMap
 metadata:

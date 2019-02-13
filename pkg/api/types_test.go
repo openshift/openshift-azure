@@ -241,6 +241,8 @@ var marshalled = []byte(`{
 		"genevaLoggingAccount": "Config.GenevaLoggingAccount",
 		"genevaLoggingNamespace": "Config.GenevaLoggingNamespace",
 		"genevaLoggingControlPlaneAccount": "Config.GenevaLoggingControlPlaneAccount",
+		"genevaLoggingControlPlaneEnvironment": "Config.GenevaLoggingControlPlaneEnvironment",
+		"genevaLoggingControlPlaneRegion": "Config.GenevaLoggingControlPlaneRegion",
 		"genevaMetricsAccount": "Config.GenevaMetricsAccount",
 		"genevaMetricsEndpoint": "Config.GenevaMetricsEndpoint"
 	}

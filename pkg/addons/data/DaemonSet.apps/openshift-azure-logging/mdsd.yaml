@@ -47,25 +47,23 @@ spec:
         - mountPath: /var/log
           name: hostlog
       - args:
+        - -D
+        - -R
         - -c
-        - ./bootstrap.sh
+        - /etc/mdsd.d/config/mdsd.xml
+        command:
+        - mdsd
         env:
-        - name: SECTOR
-          value: '*** GENERATED ***'
-        - name: REGION
-          value: '*** GENERATED ***'
-        - name: SUBSCRIPTION_ID
-          value: '*** GENERATED ***'
-        - name: RESOURCE_NAME
-          value: '*** GENERATED ***'
-        - name: RESOURCE_GROUP_NAME
-          value: '*** GENERATED ***'
-        - name: ACCOUNT
-          value: '*** GENERATED ***'
-        - name: NAMESPACE
-          value: '*** GENERATED ***'
         - name: MONITORING_GCS_ACCOUNT
           value: '*** GENERATED ***'
+        - name: MONITORING_GCS_ENVIRONMENT
+          value: '*** GENERATED ***'
+        - name: MONITORING_GCS_REGION
+          value: '*** GENERATED ***'
+        - name: MONITORING_GCS_CERT_CERTFILE
+          value: /etc/mdsd.d/secret/gcscert.pem
+        - name: MONITORING_GCS_CERT_KEYFILE
+          value: /etc/mdsd.d/secret/gcskey.pem
         image: '*** GENERATED ***'
         name: mdsd
         resources:
@@ -83,7 +81,7 @@ spec:
           name: socket
         - mountPath: /etc/mdsd.d/secret
           name: gcs-cert
-        - mountPath: /etc/mdsd.d/template
+        - mountPath: /etc/mdsd.d/config
           name: mdsd-config
       hostPID: true
       imagePullSecrets:

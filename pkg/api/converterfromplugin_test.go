@@ -31,12 +31,14 @@ func internalPluginConfig() Config {
 		ImageSKU:       "ImageSKU",
 		ImageVersion:   "ImageVersion",
 		// Geneva intergration configuration
-		GenevaLoggingSector:              "GenevaLoggingSector",
-		GenevaLoggingNamespace:           "GenevaLoggingNamespace",
-		GenevaLoggingAccount:             "GenevaLoggingAccount",
-		GenevaMetricsAccount:             "GenevaMetricsAccount",
-		GenevaMetricsEndpoint:            "GenevaMetricsEndpoint",
-		GenevaLoggingControlPlaneAccount: "GenevaLoggingControlPlaneAccount",
+		GenevaLoggingSector:                  "GenevaLoggingSector",
+		GenevaLoggingNamespace:               "GenevaLoggingNamespace",
+		GenevaLoggingAccount:                 "GenevaLoggingAccount",
+		GenevaMetricsAccount:                 "GenevaMetricsAccount",
+		GenevaMetricsEndpoint:                "GenevaMetricsEndpoint",
+		GenevaLoggingControlPlaneAccount:     "GenevaLoggingControlPlaneAccount",
+		GenevaLoggingControlPlaneEnvironment: "GenevaLoggingControlPlaneEnvironment",
+		GenevaLoggingControlPlaneRegion:      "GenevaLoggingControlPlaneRegion",
 		Certificates: CertificateConfig{
 			GenevaLogging: CertKeyPair{
 				Cert: tls.GetDummyCertificate(),

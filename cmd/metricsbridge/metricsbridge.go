@@ -45,6 +45,7 @@ var (
 		"region":            {},
 		"subscriptionid":    {},
 		"resourcegroupname": {},
+		"resourcename":      {},
 	}
 )
 
@@ -61,6 +62,7 @@ type config struct {
 	Region            string `json:"region,omitempty"`
 	SubscriptionID    string `json:"subscriptionId,omitempty"`
 	ResourceGroupName string `json:"resourceGroupName,omitempty"`
+	ResourceName      string `json:"resourceName,omitempty"`
 
 	Token              string `json:"token,omitempty"`
 	InsecureSkipVerify bool   `json:"insecureSkipVerify,omitempty"`
@@ -262,6 +264,9 @@ func (c *config) runOnce(req *http.Request) error {
 			}
 			if c.ResourceGroupName != "" {
 				f.Dims["resourceGroupName"] = c.ResourceGroupName
+			}
+			if c.ResourceName != "" {
+				f.Dims["resourceName"] = c.ResourceName
 			}
 			b, err := f.Marshal()
 			if err != nil {
