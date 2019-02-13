@@ -667,6 +667,109 @@ func (client OpenShiftManagedClustersClient) RotateSecretsResponder(resp *http.R
 	return
 }
 
+// OpenShiftManagedClustersUpdateClusterFuture is an abstraction for monitoring and retrieving the results of a
+// long-running operation.
+type OpenShiftManagedClustersUpdateClusterFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *OpenShiftManagedClustersUpdateClusterFuture) Result(client OpenShiftManagedClustersClient) (ar autorest.Response, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersUpdateClusterFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("containerservice.OpenShiftManagedClustersUpdateClusterFuture")
+		return
+	}
+	ar.Response = future.Response()
+	return
+}
+
+// UpdateClusterAndWait updates an OpenShiftManagedCluster with the latest plugin config known to the plugin
+// and waits for the request to complete before returning.
+func (client OpenShiftManagedClustersClient) UpdateClusterAndWait(ctx context.Context, resourceGroupName, resourceName string) (result autorest.Response, err error) {
+	var future OpenShiftManagedClustersUpdateClusterFuture
+	future, err = client.UpdateCluster(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		return
+	}
+	if err = future.WaitForCompletionRef(ctx, client.Client); err != nil {
+		return
+	}
+	return future.Result(client)
+}
+
+// UpdateCluster updates an OpenShiftManagedCluster with the latest plugin config known to the plugin
+// Parameters:
+// resourceGroupName - the name of the Resource group.
+// resourceName - the name of the OpenShiftManagedCluster
+func (client OpenShiftManagedClustersClient) UpdateCluster(ctx context.Context, resourceGroupName, resourceName string) (result OpenShiftManagedClustersUpdateClusterFuture, err error) {
+	req, err := client.UpdateClusterPreparer(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "UpdateCluster", nil, "Failure preparing request")
+		return
+	}
+
+	result, err = client.UpdateClusterSender(req)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "UpdateCluster", result.Response(), "Failure sending request")
+		return
+	}
+
+	return
+}
+
+// UpdateClusterPreparer prepares the UpdateCluster request.
+func (client OpenShiftManagedClustersClient) UpdateClusterPreparer(ctx context.Context, resourceGroupName, resourceName string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": api.APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsContentType("application/json; charset=utf-8"),
+		autorest.AsPut(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/updateCluster", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// UpdateClusterSender sends the UpdateCluster request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) UpdateClusterSender(req *http.Request) (future OpenShiftManagedClustersUpdateClusterFuture, err error) {
+	var resp *http.Response
+	resp, err = autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+	if err != nil {
+		return
+	}
+	future.Future, err = azure.NewFutureFromResponse(resp)
+	return
+}
+
+// UpdateClusterResponder handles the response to the UpdateCluster request. The method
+// always closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) UpdateClusterResponder(resp *http.Response) (result autorest.Response, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
+		autorest.ByClosing())
+	result.Response = resp
+	return
+}
+
 // UpdateTags updates an openshift managed cluster with the specified tags.
 // Parameters:
 // resourceGroupName - the name of the resource group.
