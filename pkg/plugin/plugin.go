@@ -209,7 +209,7 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 	p.log.Info("regenerating config including private keys and secrets")
 	err = p.GenerateConfig(ctx, cs, pluginTemplate)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepRegenerateClusterSecrets}
+		return &api.PluginError{Err: err, Step: api.PluginStepRegenerateClusterConfig}
 	}
 	p.log.Info("running CreateOrUpdate")
 	if err := p.CreateOrUpdate(ctx, cs, true, deployFn); err != nil {
@@ -262,5 +262,14 @@ func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluste
 		return err
 	}
 	p.log.Info("force updates successful")
+	return nil
+}
+
+func (p *plugin) UpdateCluster(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
+	p.log.Info("running CreateOrUpdate")
+	if err := p.CreateOrUpdate(ctx, cs, true, deployFn); err != nil {
+		return err
+	}
+	p.log.Info("update cluster with plugin config successful")
 	return nil
 }

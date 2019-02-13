@@ -53,7 +53,7 @@ const (
 	PluginStepUpdateWorkerAgentPoolUpdateBlob     PluginStep = "UpdateWorkerAgentPoolUpdateBlob"
 	PluginStepUpdateWorkerAgentPoolDeleteVM       PluginStep = "UpdateWorkerAgentPoolDeleteVM"
 	PluginStepInvalidateClusterSecrets            PluginStep = "InvalidateClusterSecrets"
-	PluginStepRegenerateClusterSecrets            PluginStep = "RegenerateClusterSecrets"
+	PluginStepRegenerateClusterConfig             PluginStep = "RegenerateClusterConfig"
 )
 
 // PluginError error returned by CreateOrUpdate to specify the step that failed.
@@ -125,4 +125,7 @@ type GenevaActions interface {
 
 	// ForceUpdate forces rotates all vms in a cluster
 	ForceUpdate(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
+
+	// UpdateCluster updates a cluster using the latest plugin config known to plugin
+	UpdateCluster(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
 }

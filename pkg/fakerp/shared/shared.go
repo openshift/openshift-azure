@@ -3,6 +3,7 @@ package shared
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
@@ -24,6 +25,24 @@ func IsUpdate() bool {
 		return true
 	}
 	return false
+}
+
+// IsScaleOperation return whether or not this is a scale up/down operation
+func IsScaleOperation(cs, oldCs *api.OpenShiftManagedCluster) bool {
+	var agentCountChanged bool
+	for i, pool := range cs.Properties.AgentPoolProfiles {
+		if pool.Count != oldCs.Properties.AgentPoolProfiles[i].Count {
+			agentCountChanged = agentCountChanged || true
+		}
+	}
+	if !agentCountChanged {
+		return false
+	}
+	deepCs := cs.DeepCopy()
+	for i, pool := range oldCs.Properties.AgentPoolProfiles {
+		deepCs.Properties.AgentPoolProfiles[i].Count = pool.Count
+	}
+	return reflect.DeepEqual(deepCs, oldCs)
 }
 
 // DiscoverInternalConfig discover and returns the internal config struct

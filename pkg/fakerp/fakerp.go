@@ -14,11 +14,13 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	utilrs "github.com/openshift/openshift-azure/pkg/util/randomstring"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
@@ -60,9 +62,17 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, kerrors.NewAggregate(errs)
 	}
 
-	template, err := GetPluginTemplate()
-	if err != nil {
-		return nil, err
+	var err error
+	var template *pluginapi.Config
+	if shared.IsUpdate() && shared.IsScaleOperation(cs, oldCs) {
+		log.Info("using previous plugin template (scale)")
+		template = managedcluster.PluginTemplate(cs)
+	} else {
+		log.Info("using latest plugin template (create/upgrade)")
+		template, err = GetPluginTemplate()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// This should be executed only for fakeRP
