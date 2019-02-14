@@ -4,8 +4,6 @@ metadata:
   annotations:
     prometheus.io/port: "1936"
     prometheus.io/scrape: "true"
-    prometheus.openshift.io/password: '*** GENERATED ***'
-    prometheus.openshift.io/username: admin
   labels:
     router: router-stats
   name: router-stats

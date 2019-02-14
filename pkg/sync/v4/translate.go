@@ -356,10 +356,6 @@ var translations = map[string][]struct {
 	},
 	"DaemonSet.apps/default/docker-registry": {
 		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HTTP_SECRET')].value"),
-			Template: "{{ Base64Encode .Config.RegistryHTTPSecret }}",
-		},
-		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.Registry }}",
 		},
@@ -372,10 +368,6 @@ var translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
 			Template: "{{ .Config.Images.Router }}",
-		},
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='STATS_PASSWORD')].value"),
-			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
 	"DaemonSet.apps/openshift-azure-monitoring/etcd-metrics": {
@@ -544,6 +536,18 @@ var translations = map[string][]struct {
 			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.Router.Key) }}",
 		},
 	},
+	"Secret/default/docker-registry-http": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.password"),
+			Template: "{{ Base64Encode .Config.RegistryHTTPSecret }}",
+		},
+	},
+	"Secret/default/router-stats": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.password"),
+			Template: "{{ .Config.RouterStatsPassword }}",
+		},
+	},
 	"Secret/openshift-infra/aad-group-sync-config": {
 		{
 			Path: jsonpath.MustCompile("$.stringData.'aad-group-sync.yaml'"),
@@ -633,12 +637,6 @@ var translations = map[string][]struct {
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
 				return config.Derived.RouterLBCNamePrefix(cs), nil
 			},
-		},
-	},
-	"Service/default/router-stats": {
-		{
-			Path:     jsonpath.MustCompile("$.metadata.annotations['prometheus.openshift.io/password']"),
-			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
 	"StatefulSet.apps/openshift-infra/bootstrap-autoapprover": {

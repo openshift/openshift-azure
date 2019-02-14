@@ -37,7 +37,10 @@ spec:
         - name: ROUTER_SERVICE_NAMESPACE
           value: default
         - name: STATS_PASSWORD
-          value: '*** GENERATED ***'
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: router-stats
         - name: STATS_PORT
           value: "1936"
         - name: STATS_USERNAME
