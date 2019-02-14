@@ -31,7 +31,7 @@ const (
 
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
-	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error
+	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, disableKeepAlives bool) error
 	Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error
 	WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error
@@ -70,7 +70,7 @@ func NewSimpleUpgrader(log *logrus.Entry, pluginConfig *api.PluginConfig) Upgrad
 	}
 }
 
-func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, disableKeepAlives bool) error {
 	pool := x509.NewCertPool()
 	pool.AddCert(cs.Config.Certificates.Ca.Cert)
 
@@ -88,6 +88,6 @@ func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftMan
 	u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
 	u.ssc = azureclient.NewVirtualMachineScaleSetsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
 
-	u.kubeclient, err = kubeclient.NewKubeclient(u.log, cs.Config.AdminKubeconfig, &u.pluginConfig)
+	u.kubeclient, err = kubeclient.NewKubeclient(u.log, cs.Config.AdminKubeconfig, &u.pluginConfig, disableKeepAlives)
 	return err
 }

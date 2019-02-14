@@ -445,21 +445,25 @@ spec:
     command:
     - /bin/sh
     - -c
+    env:
+    - name: ETCDCTL_API
+      value: "3"
     image: {{ .Config.Images.MasterEtcd | quote }}
     imagePullPolicy: Always
     livenessProbe:
       exec:
         command:
         - etcdctl
-        - --ca-file
+        - --cacert
         - /etc/etcd/ca.crt
-        - --cert-file
+        - --cert
         - /etc/etcd/peer.crt
-        - --key-file
+        - --key
         - /etc/etcd/peer.key
         - --endpoints
         - https://$(hostname):2379
-        - cluster-health
+        - endpoint
+        - health
       initialDelaySeconds: 45
     name: etcd
     securityContext:
@@ -472,6 +476,12 @@ spec:
       name: etcd-data
     workingDir: /var/lib/etcd
   hostNetwork: true
+  dnsPolicy: "None"
+  dnsConfig:
+    nameservers:
+      - 168.63.129.16
+    searches:
+      - $(hostname -d)
   priorityClassName: system-node-critical
   volumes:
   - hostPath:
