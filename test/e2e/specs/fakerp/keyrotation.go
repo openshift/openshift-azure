@@ -10,33 +10,39 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/openshift/openshift-azure/test/clients/azure"
+	"github.com/openshift/openshift-azure/test/e2e/standard"
 )
 
 var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func() {
 	var (
-		cli *azure.Client
+		azurecli *azure.Client
+		cli      *standard.SanityChecker
 	)
 
 	BeforeEach(func() {
 		var err error
-		cli, err = azure.NewClientFromEnvironment(false)
+		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
+		Expect(azurecli).NotTo(BeNil())
+		cli, err = standard.NewDefaultSanityChecker()
+		Expect(err).NotTo(HaveOccurred())
+		Expect(cli).NotTo(BeNil())
 	})
 
 	It("should be possible to maintain a healthy cluster after rotating all credentials", func() {
 		By("Reading the cluster state")
-		before, err := cli.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		before, err := azurecli.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(before).NotTo(BeNil())
 
 		By("Executing key rotation on the cluster.")
-		update, err := cli.OpenShiftManagedClustersAdmin.RotateSecretsAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		update, err := azurecli.OpenShiftManagedClustersAdmin.RotateSecretsAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(update.StatusCode).To(Equal(http.StatusOK))
 		Expect(update).NotTo(BeNil())
 
 		By("Reading the cluster state after the update")
-		after, err := cli.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		after, err := azurecli.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(after).NotTo(BeNil())
 
@@ -69,5 +75,9 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 		By("Verifying that certain non-ca public certificates have not been updated")
 		Expect(reflect.DeepEqual(before.Config.Certificates.GenevaLogging.Cert, after.Config.Certificates.GenevaLogging.Cert)).To(BeTrue())
 		Expect(reflect.DeepEqual(before.Config.Certificates.GenevaMetrics.Cert, after.Config.Certificates.GenevaMetrics.Cert)).To(BeTrue())
+
+		By("Validating the cluster")
+		errs := cli.ValidateCluster(context.Background())
+		Expect(len(errs)).To(Equal(0))
 	})
 })
