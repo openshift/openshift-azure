@@ -1,8 +1,6 @@
 package arm
 
 import (
-	"bytes"
-	"compress/gzip"
 	"encoding/base64"
 	"sort"
 	"strings"
@@ -423,23 +421,6 @@ func nsgWorker(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
 	}
 }
 
-func gzipBytes(data []byte) ([]byte, error) {
-	var bufOut bytes.Buffer
-	gw, err := gzip.NewWriterLevel(&bufOut, gzip.BestCompression)
-	if err != nil {
-		return nil, err
-	}
-	_, err = gw.Write(data)
-	if err != nil {
-		return nil, err
-	}
-	err = gw.Close()
-	if err != nil {
-		return nil, err
-	}
-	return bufOut.Bytes(), nil
-}
-
 func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
 	sshPublicKey, err := tls.SSHPublicKeyAsString(&cs.Config.SSHKey.PublicKey)
 	if err != nil {
@@ -467,13 +448,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		if err != nil {
 			return nil, err
 		}
-
-		compressed, err := gzipBytes(b)
-		if err != nil {
-			return nil, err
-		}
-
-		script = base64.StdEncoding.EncodeToString(compressed)
+		script = base64.StdEncoding.EncodeToString(b)
 	} else {
 		b, err := template.Template(string(nodeStartup), nil, cs, map[string]interface{}{
 			"Role":       app.Role,
