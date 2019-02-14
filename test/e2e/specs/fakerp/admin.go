@@ -2,7 +2,6 @@ package fakerp
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"os"
 	"reflect"
@@ -68,9 +67,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 	})
 
 	It("should ensure no unnecessary VM rotations occured", func() {
-		if os.Getenv("RESOURCEGROUP") == "" {
-			Expect(errors.New("RESOURCEGROUP is not set")).ToNot(HaveOccurred())
-		}
+		Expect(os.Getenv("RESOURCEGROUP")).ToNot(BeEmpty())
 		azurecli, err := azure.NewClientFromEnvironment(true)
 		Expect(err).ToNot(HaveOccurred())
 
