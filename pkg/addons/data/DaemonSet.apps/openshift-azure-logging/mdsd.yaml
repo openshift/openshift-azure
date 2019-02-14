@@ -22,10 +22,17 @@ spec:
         livenessProbe:
           exec:
             command:
-            - /bin/bash
-            - /td-agent/liveness-probe.sh
-          failureThreshold: 5
-          initialDelaySeconds: 60
+            - /bin/sh
+            - -c
+            - "LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300}; \nSTUCK_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-900};
+              \nif [ ! -e /var/log/td-agent/buffer ]; then\n  exit 1;\nfi; \ntouch
+              -d \"${STUCK_THRESHOLD_SECONDS} seconds ago\" /tmp/marker-stuck; \nif
+              [[ -z \"$(find /var/log/td-agent/buffer -type f -newer /tmp/marker-stuck
+              -print -quit)\" ]]; then\n  rm -rf /var/log/td-agent/buffer;\n  exit
+              1;\nfi; \ntouch -d \"${LIVENESS_THRESHOLD_SECONDS} seconds ago\" /tmp/marker-liveness;
+              \nif [[ -z \"$(find /var/log/td-agent/buffer -type f -newer /tmp/marker-liveness
+              -print -quit)\" ]]; then\n  exit 1;\nfi;\n"
+          initialDelaySeconds: 30
           periodSeconds: 60
         name: td-agent
         resources:
@@ -69,7 +76,7 @@ spec:
         resources:
           limits:
             cpu: 200m
-            memory: 200Mi
+            memory: 400Mi
           requests:
             cpu: 200m
             memory: 200Mi
