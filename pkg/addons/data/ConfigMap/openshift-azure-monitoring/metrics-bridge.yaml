@@ -4,14 +4,26 @@ data:
     prometheusFederateEndpoint: https://prometheus-k8s.openshift-monitoring.svc:9091/federate
     statsdSocket: /var/etw/mdm_statsd.socket
     series:
-    - kube_node_info
-    - kube_node_status_allocatable_cpu_cores
-    - kube_node_status_allocatable_memory_bytes
-    - kube_node_status_condition
-    - kube_pod_container_status_restarts_total
-    - kube_pod_info
-    - kube_pod_status_phase
-    - kube_pod_status_ready
+    - '{__name__=~"container_.+",namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+    - '{__name__=~"kube_.+",namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+    - '{__name__=~"pod_.+",namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+    - '{__name__=~"storage_.+",namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+    - '{__name__=~"apiserver_request_.+"}'
+    - '{__name__=~"cloudprovider_.+"}'
+    - '{__name__="up",namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+    - '{__name__="ALERTS",namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+    - '{__name__="kubelet_runtime_operations_errors",namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+    - '{__name__="kubelet_docker_operations_errors",namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+    - '{__name__="process_cpu_seconds_total",namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+    - '{__name__="process_open_fds",namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+    - '{__name__="process_max_fds",namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+    - '{__name__=~"node_cpu.*"}'
+    - '{__name__=~"node_disk.*"}'
+    - '{__name__=~"node_file.*"}'
+    - '{__name__=~"node_load.*"}'
+    - '{__name__=~"node_memory.*"}'
+    - '{__name__=~"node_net.*"}'
+    - '{__name__=~"node_vmstat.*"}'
     account: '*** GENERATED ***'
     namespace: Prometheus
     region: '*** GENERATED ***'
