@@ -19,19 +19,11 @@ spec:
         - name: FLUENTD_CONF
           value: config/fluent.conf
         image: '*** GENERATED ***'
-        livenessProbe:
-          exec:
-            command:
-            - /bin/bash
-            - /td-agent/liveness-probe.sh
-          failureThreshold: 5
-          initialDelaySeconds: 60
-          periodSeconds: 60
         name: td-agent
         resources:
           limits:
             cpu: 200m
-            memory: 800Mi
+            memory: 200Mi
           requests:
             cpu: 200m
             memory: 200Mi
@@ -69,10 +61,10 @@ spec:
         resources:
           limits:
             cpu: 200m
-            memory: 200Mi
+            memory: 400Mi
           requests:
             cpu: 200m
-            memory: 200Mi
+            memory: 400Mi
         securityContext:
           privileged: true
           runAsUser: 0
