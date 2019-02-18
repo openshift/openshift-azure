@@ -118,5 +118,9 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		s.internalError(w, fmt.Sprintf("Failed to rotate cluster secrets: %v", err))
 		return
 	}
+	err = writeHelpers(cs)
+	if err != nil {
+		s.log.Warnf("could not write helpers: %v", err)
+	}
 	s.log.Info("rotated cluster secrets")
 }
