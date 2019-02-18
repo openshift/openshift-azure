@@ -2,6 +2,7 @@ package ready
 
 import (
 	"fmt"
+	"net"
 
 	templatev1 "github.com/openshift/api/template/v1"
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
@@ -203,6 +204,34 @@ func TemplateInstanceIsReady(cli templatev1client.TemplateInstanceInterface, nam
 			}
 		}
 
+		return false, nil
+	}
+}
+
+func ServiceIsReady(cli corev1client.ServiceInterface, name string) func() (bool, error) {
+	return func() (bool, error) {
+		ti, err := cli.Get(name, metav1.GetOptions{})
+		switch {
+		case errors.IsNotFound(err):
+			return false, nil
+		case err != nil:
+			return false, err
+		}
+
+		switch lbType := ti.Spec.Type; lbType {
+		// Service type LoadBalancer in azure can be external and internal
+		// both populates IP address into the ingress field
+		case corev1.ServiceTypeLoadBalancer:
+			if len(ti.Status.LoadBalancer.Ingress) > 0 {
+				return true, nil
+			}
+		case corev1.ServiceTypeClusterIP:
+			if net.ParseIP(ti.Spec.ClusterIP) != nil {
+				return true, nil
+			}
+		default:
+			return false, fmt.Errorf("unknown service type")
+		}
 		return false, nil
 	}
 }

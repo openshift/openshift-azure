@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/sirupsen/logrus"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	shared "github.com/openshift/openshift-azure/pkg/fakerp/shared"
@@ -121,6 +123,12 @@ func (sc *SanityChecker) ValidateCluster(ctx context.Context) (errs []*TestError
 		sc.log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanDeployRedhatIoImages"})
 	}
+	sc.log.Debugf("validating that the cluster can create ELB and ILB")
+	err = sc.checkCanCreateLB(ctx)
+	if err != nil {
+		sc.log.Error(err)
+		errs = append(errs, &TestError{Err: err, Bucket: "checkCanCreateLB"})
+	}
 	return
 }
 
@@ -150,6 +158,30 @@ func (sc *SanityChecker) createProject(ctx context.Context) (string, error) {
 
 func (sc *SanityChecker) deleteProject(ctx context.Context, namespace string) error {
 	err := sc.Client.EndUser.CleanupProject(namespace)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (sc *SanityChecker) createService(name, namespace string, lbType corev1.ServiceType, annotations map[string]string) error {
+	lb := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        name,
+			Namespace:   namespace,
+			Annotations: annotations,
+		},
+		Spec: corev1.ServiceSpec{
+			Ports: []corev1.ServicePort{
+				{
+					Name: "port",
+					Port: 8080,
+				},
+			},
+			Type: lbType,
+		},
+	}
+	_, err := sc.Client.EndUser.CoreV1.Services(namespace).Create(lb)
 	if err != nil {
 		return err
 	}
