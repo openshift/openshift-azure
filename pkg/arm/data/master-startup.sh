@@ -422,6 +422,11 @@ cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
 {{ .Derived.CloudProviderConf .ContainerService | String }}
 EOF
 
+
+# when starting node waagent and network utilities goes into race condition.
+# if waagent runs before dns is known to the node we end up with empty string
+while [[ $(hostname -d) == "" ]]; do sleep 1; done
+
 # TODO: investigate the --manifest-url Kubelet parameter and see if it might
 # help us at all
 cat >/etc/origin/node/pods/etcd.yaml <<EOF
