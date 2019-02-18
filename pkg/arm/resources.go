@@ -355,21 +355,6 @@ func storageRegistry(cs *api.OpenShiftManagedCluster) *storage.Account {
 	}
 }
 
-func storageConfig(cs *api.OpenShiftManagedCluster) *storage.Account {
-	return &storage.Account{
-		AccountProperties: &storage.AccountProperties{
-			AccountType: storage.StandardLRS,
-		},
-		Name:     to.StringPtr(cs.Config.ConfigStorageAccount),
-		Type:     to.StringPtr("Microsoft.Storage/storageAccounts"),
-		Location: to.StringPtr(cs.Location),
-		Tags: map[string]*string{
-			// TODO: these should be consts
-			"type": to.StringPtr("config"),
-		},
-	}
-}
-
 func nsgMaster(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
 	return &network.SecurityGroup{
 		SecurityGroupPropertiesFormat: &network.SecurityGroupPropertiesFormat{

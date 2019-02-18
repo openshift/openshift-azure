@@ -51,7 +51,6 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 			ipAPIServer(cs),
 			lbAPIServer(&g.pluginConfig, cs),
 			storageRegistry(cs),
-			storageConfig(cs),
 			nsgMaster(cs),
 		},
 	}

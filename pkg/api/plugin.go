@@ -24,6 +24,7 @@ const (
 	PluginStepResetUpdateBlob                     PluginStep = "ResetUpdateBlob"
 	PluginStepClientCreation                      PluginStep = "ClientCreation"
 	PluginStepScaleSetDelete                      PluginStep = "ScaleSetDelete"
+	PluginCreateConfigStorageAccount              PluginStep = "CreateConfigStorageAccount"
 	PluginStepGenerateARM                         PluginStep = "GenerateARM"
 	PluginStepWaitForWaitForOpenShiftAPI          PluginStep = "WaitForOpenShiftAPI"
 	PluginStepWaitForNodes                        PluginStep = "WaitForNodes"

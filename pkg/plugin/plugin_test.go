@@ -34,6 +34,7 @@ func TestCreateOrUpdate(t *testing.T) {
 		return nil
 	}
 	cs := &api.OpenShiftManagedCluster{
+		Config: api.Config{ConfigStorageAccount: "config"},
 		Properties: api.Properties{
 			AgentPoolProfiles: []api.AgentPoolProfile{
 				{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
@@ -44,37 +45,42 @@ func TestCreateOrUpdate(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		armGenerator := mock_arm.NewMockGenerator(mockCtrl)
-		armGenerator.EXPECT().Generate(nil, cs, "", tt.isUpdate, gomock.Any()).Return(nil, nil)
-		clusterUpgrader := mock_cluster.NewMockUpgrader(mockCtrl)
-		c := clusterUpgrader.EXPECT().CreateClients(nil, cs, tt.isUpdate).Return(nil)
-		c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
-		if tt.isUpdate {
-			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
-			c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
-			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
-			c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
-			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
-			c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
-		} else {
-			c = clusterUpgrader.EXPECT().InitializeUpdateBlob(cs, gomock.Any()).Return(nil).After(c)
-			c = clusterUpgrader.EXPECT().WaitForHealthzStatusOk(nil, cs).Return(nil).After(c)
-			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
-			c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], gomock.Any()).Return(nil).After(c)
-			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
-			c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
-			c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
-			c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
-		}
-		c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
-		p := &plugin{
-			clusterUpgrader: clusterUpgrader,
-			armGenerator:    armGenerator,
-			log:             logrus.NewEntry(logrus.StandardLogger()),
-		}
-		if err := p.CreateOrUpdate(nil, cs, tt.isUpdate, deployer); err != nil {
-			t.Errorf("plugin.CreateOrUpdate(%s) error = %v", tt.name, err)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			armGenerator := mock_arm.NewMockGenerator(mockCtrl)
+			clusterUpgrader := mock_cluster.NewMockUpgrader(mockCtrl)
+			c := clusterUpgrader.EXPECT().CreateClients(nil, cs, tt.isUpdate).Return(nil)
+			if !tt.isUpdate {
+				c = clusterUpgrader.EXPECT().CreateConfigStorageAccount(nil, cs).Return(nil).After(c)
+			}
+			c = armGenerator.EXPECT().Generate(nil, cs, "", tt.isUpdate, gomock.Any()).Return(nil, nil).After(c)
+			c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
+			if tt.isUpdate {
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+				c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+				c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+				c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+			} else {
+				c = clusterUpgrader.EXPECT().InitializeUpdateBlob(cs, gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().WaitForHealthzStatusOk(nil, cs).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+			}
+			c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
+			p := &plugin{
+				clusterUpgrader: clusterUpgrader,
+				armGenerator:    armGenerator,
+				log:             logrus.NewEntry(logrus.StandardLogger()),
+			}
+			if err := p.CreateOrUpdate(nil, cs, tt.isUpdate, deployer); err != nil {
+				t.Errorf("plugin.CreateOrUpdate(%s) error = %v", tt.name, err)
+			}
+		})
 	}
 }
 
@@ -157,8 +163,8 @@ func TestRotateClusterSecrets(t *testing.T) {
 
 	c := mockGen.EXPECT().InvalidateSecrets(cs).Return(nil)
 	c = mockGen.EXPECT().Generate(cs, nil).Return(nil).After(c)
-	c = mockArm.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = mockUp.EXPECT().CreateClients(nil, cs, true).Return(nil).After(c)
+	c = mockArm.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = mockUp.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
@@ -203,8 +209,8 @@ func TestForceUpdate(t *testing.T) {
 	c := mockUp.EXPECT().CreateClients(nil, cs, true).Return(nil)
 	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().ResetUpdateBlob(cs).Return(nil).After(c)
-	c = mockArm.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = mockUp.EXPECT().CreateClients(nil, cs, true).Return(nil).After(c)
+	c = mockArm.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = mockUp.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
