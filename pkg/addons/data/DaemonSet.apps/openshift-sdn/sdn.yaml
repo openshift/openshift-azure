@@ -175,3 +175,5 @@ spec:
       - hostPath:
           path: /var/lib/cni/networks/openshift-sdn
         name: host-var-lib-cni-networks-openshift-sdn
+  updateStrategy:
+    type: OnDelete
