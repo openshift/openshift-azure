@@ -9,8 +9,8 @@ import (
 	. "github.com/onsi/ginkgo"
 
 	apiappsv1 "k8s.io/api/apps/v1"
-	"k8s.io/api/core/v1"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	policy "k8s.io/api/policy/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -225,5 +225,36 @@ func (sc *SanityChecker) checkCanDeployRedhatIoImages(ctx context.Context) error
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (sc *SanityChecker) checkCanCreateLB(ctx context.Context) error {
+	namespace, err := sc.createProject(ctx)
+	if err != nil {
+		return err
+	}
+	defer sc.deleteProject(ctx, namespace)
+
+	// create standard external loadbalancer
+	err = sc.createService("elb", namespace, corev1.ServiceTypeLoadBalancer, map[string]string{})
+	if err != nil {
+		return err
+	}
+	// create azure internal loadbalancer
+	err = sc.createService("ilb", namespace, corev1.ServiceTypeLoadBalancer, map[string]string{
+		"service.beta.kubernetes.io/azure-load-balancer-internal": "true",
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, lb := range []string{"elb", "ilb"} {
+		By(fmt.Sprintf("waiting for %s to be ready (%v)", lb, time.Now()))
+		err = wait.PollImmediate(2*time.Second, 5*time.Minute, ready.ServiceIsReady(sc.Client.EndUser.CoreV1.Services(namespace), lb))
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
