@@ -511,6 +511,9 @@ func mergeImageConfig(in *admin.ImageConfig, out *ImageConfig) {
 	if in.EtcdBackup != nil {
 		out.EtcdBackup = *in.EtcdBackup
 	}
+	if in.Startup != nil {
+		out.Startup = *in.Startup
+	}
 	if in.GenevaLogging != nil {
 		out.GenevaLogging = *in.GenevaLogging
 	}

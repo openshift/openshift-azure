@@ -1,0 +1,1 @@
+{{ CertFromVault "PublicHostname" | String }}

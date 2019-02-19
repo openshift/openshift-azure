@@ -25,7 +25,7 @@ if [[ -f /usr/secrets/secret ]] ;then
     trap "rm -rf ${T}" EXIT
     mkdir -p "${T}/src/github.com/openshift/"
     cd "${T}/src/github.com/openshift/"
-    git clone https://github.com/openshift/openshift-azure 
+    git clone https://github.com/openshift/openshift-azure
     cd openshift-azure
     git checkout $SOURCE
     # link shared secrets
@@ -42,7 +42,7 @@ if [[ -f /usr/secrets/secret ]] ;then
     ## copy manifest files
     ## TODO: fakeRP should read config blob so this should be removed
     cp -r ${T}/src/github.com/openshift/openshift-azure/_data /go/src/github.com/openshift/openshift-azure/
-    
+
     cd /go/src/github.com/openshift/openshift-azure
 
     # set ci namespace images for cluster creation
@@ -51,6 +51,7 @@ if [[ -f /usr/secrets/secret ]] ;then
     export ETCDBACKUP_IMAGE=${REGISTRY}/${OPENSHIFT_BUILD_NAMESPACE}/stable:etcdbackup
     export AZURE_CONTROLLERS_IMAGE=${REGISTRY}/${OPENSHIFT_BUILD_NAMESPACE}/stable:azure-controllers
     export METRICSBRIDGE_IMAGE=${REGISTRY}/${OPENSHIFT_BUILD_NAMESPACE}/stable:metricsbridge
+    export STARTUP_IMAGE=${REGISTRY}/${OPENSHIFT_BUILD_NAMESPACE}/stable:startup
     echo "Upgrade cluster to master"
     ./hack/upgrade.sh $RESOURCEGROUP
 

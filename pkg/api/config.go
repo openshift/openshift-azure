@@ -92,6 +92,7 @@ type ImageConfig struct {
 	Node                  string `json:"node,omitempty"`
 	ServiceCatalog        string `json:"serviceCatalog,omitempty"`
 	Sync                  string `json:"sync,omitempty"`
+	Startup               string `json:"startup,omitempty"`
 	TemplateServiceBroker string `json:"templateServiceBroker,omitempty"`
 	Registry              string `json:"registry,omitempty"`
 	Router                string `json:"router,omitempty"`

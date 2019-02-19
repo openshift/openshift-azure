@@ -44,6 +44,7 @@ func TestPluginTemplateValidate(t *testing.T) {
 			errors.New(`images.Node cannot be empty`),
 			errors.New(`images.ServiceCatalog cannot be empty`),
 			errors.New(`images.Sync cannot be empty`),
+			errors.New(`images.Startup cannot be empty`),
 			errors.New(`images.TemplateServiceBroker cannot be empty`),
 			errors.New(`images.Registry cannot be empty`),
 			errors.New(`images.Router cannot be empty`),
