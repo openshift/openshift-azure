@@ -72,6 +72,15 @@ git checkout -b release-vx
 git push upstream release-vx
 ```
 
+If it is minor release:
+```
+git checkout release-vx
+git checkout -b release-vx.y-fix
+git cherry-pick <git commit id>
+```
+
+Open a PR into release branch.
+
 2. Configure testing for release branch in `openshift/release` repository
 
 ```
@@ -117,13 +126,15 @@ Merge this PR into `release-vx` branch. Test should be using test infrastructure
 
 4. Tag release for the release you just merged in step 3.
 
+This step requires elevated right on git repo. You might need to ask somebody else to execute these commands.
+
 ```
 git checkout upstream/release-vx
-git tag vx.y
+git tag -a vx.y -m 'reason' # where reason is release summary in one sentence
 git push upstream tags/vx.y
 ```
 
-5. Build release images from release tags
+1. Build release images from release tags
 
 This step should be executed only when PR from step 3 is merged and 4 is pushed.
 
@@ -162,6 +173,8 @@ docker pull registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest
 docker run -it -v $(pwd)/ci-operator:/ci-operator:z registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest --from-dir /ci-operator/config/ --to-dir /ci-operator/jobs
 ```
 
-Change generated jobs to `always_run: false`
+Change generated jobs to `always_run: false` and `optional: true`
+We not gonna use automatic generated jobs with `e2e-upgrade-vx.y` because of lack of targets.
 
-Merge the PR. After this test command `/test e2e-upgrade-vx.y` should work on PR's.
+Copy existing `upgrade` jobs and create new job with `upgrade-vx.y` syntax.
+Merge the PR. After this test command `/test upgrade-vx.y` should work on PR's.
