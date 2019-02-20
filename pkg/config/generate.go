@@ -199,16 +199,6 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{
-					CommonName: "system:serviceaccount:kube-service-catalog:service-catalog-apiserver",
-				},
-				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			},
-			key:  &c.Certificates.ServiceCatalogAPIClient.Key,
-			cert: &c.Certificates.ServiceCatalogAPIClient.Cert,
-		},
-		{
-			params: tls.CertParams{
-				Subject: pkix.Name{
 					CommonName: "system:serviceaccount:openshift-infra:node-bootstrapper",
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
@@ -410,7 +400,6 @@ func (g *simpleGenerator) InvalidateSecrets(cs *api.OpenShiftManagedCluster) (er
 	cs.Config.Certificates.NodeBootstrap = api.CertKeyPair{}
 	cs.Config.Certificates.OpenShiftMaster = api.CertKeyPair{}
 	cs.Config.Certificates.Registry = api.CertKeyPair{}
-	cs.Config.Certificates.ServiceCatalogAPIClient = api.CertKeyPair{}
 	cs.Config.Certificates.ServiceCatalogServer = api.CertKeyPair{}
 
 	cs.Config.SSHKey = nil

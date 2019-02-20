@@ -113,7 +113,6 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assertCert(c.Certificates.NodeBootstrap, "NodeBootstrap")
 	assertCert(c.Certificates.Registry, "Registry")
 	assertCert(c.Certificates.ServiceCatalogServer, "ServiceCatalogServer")
-	assertCert(c.Certificates.ServiceCatalogAPIClient, "ServiceCatalogAPIClient")
 	assertCert(c.Certificates.AzureClusterReader, "AzureClusterReader")
 
 	assert(len(c.SessionSecretAuth) != 0, "SessionSecretAuth")
@@ -186,9 +185,6 @@ func TestInvalidateSecrets(t *testing.T) {
 	if reflect.DeepEqual(saved.Config.Certificates.Registry, cs.Config.Certificates.Registry) {
 		t.Errorf("expected change to Registry certificates after secret invalidation")
 	}
-	if reflect.DeepEqual(saved.Config.Certificates.ServiceCatalogAPIClient, cs.Config.Certificates.ServiceCatalogAPIClient) {
-		t.Errorf("expected change to ServiceCatalogAPIClient certificates after secret invalidation")
-	}
 	if reflect.DeepEqual(saved.Config.Certificates.ServiceCatalogServer, cs.Config.Certificates.ServiceCatalogServer) {
 		t.Errorf("expected change to ServiceCatalogServer certificates after secret invalidation")
 	}
@@ -244,7 +240,6 @@ func TestInvalidateSecrets(t *testing.T) {
 	cs.Config.Certificates.NodeBootstrap = saved.Config.Certificates.NodeBootstrap
 	cs.Config.Certificates.OpenShiftMaster = saved.Config.Certificates.OpenShiftMaster
 	cs.Config.Certificates.Registry = saved.Config.Certificates.Registry
-	cs.Config.Certificates.ServiceCatalogAPIClient = saved.Config.Certificates.ServiceCatalogAPIClient
 	cs.Config.Certificates.ServiceCatalogServer = saved.Config.Certificates.ServiceCatalogServer
 	cs.Config.Certificates.GenevaLogging = saved.Config.Certificates.GenevaLogging
 	cs.Config.Certificates.GenevaMetrics = saved.Config.Certificates.GenevaMetrics

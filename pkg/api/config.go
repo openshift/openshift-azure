@@ -139,10 +139,9 @@ type CertificateConfig struct {
 	NodeBootstrap        CertKeyPair `json:"nodeBootstrap,omitempty"`
 
 	// infra certificates
-	Registry                CertKeyPair `json:"registry,omitempty"`
-	Router                  CertKeyPair `json:"-"`
-	ServiceCatalogServer    CertKeyPair `json:"serviceCatalogServer,omitempty"`
-	ServiceCatalogAPIClient CertKeyPair `json:"serviceCatalogAPIClient,omitempty"`
+	Registry             CertKeyPair `json:"registry,omitempty"`
+	Router               CertKeyPair `json:"-"`
+	ServiceCatalogServer CertKeyPair `json:"serviceCatalogServer,omitempty"`
 
 	// misc certificates
 	AzureClusterReader CertKeyPair `json:"azureClusterReader,omitempty"`

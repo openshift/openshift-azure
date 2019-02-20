@@ -409,9 +409,6 @@ func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig)
 	if in.ServiceCatalogServer != nil {
 		mergeCertKeyPair(in.ServiceCatalogServer, &out.ServiceCatalogServer)
 	}
-	if in.ServiceCatalogAPIClient != nil {
-		mergeCertKeyPair(in.ServiceCatalogAPIClient, &out.ServiceCatalogAPIClient)
-	}
 	if in.AzureClusterReader != nil {
 		mergeCertKeyPair(in.AzureClusterReader, &out.AzureClusterReader)
 	}
