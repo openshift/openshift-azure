@@ -26,6 +26,10 @@ imageOffer: osa
 imagePublisher: redhat
 imageSku: osa_311
 imageVersion: 311.69.20190214
+## Change this for an address range using CIDR notation (e.g. 192.168.99.0/24); an IP address (e.g. 192.168.99.0);
+## or a list of address ranges or IP addresses (e.g. 192.168.99.0/24,10.0.0.0/24,44.66.0.0/24)
+## having access to system nodes: default (any ip address)
+sshSourceAddressPrefixes: ['0.0.0.0/0']
 ## Container images used for specific OSA Cluster version
 images:
   alertManagerBase: registry.access.redhat.com/openshift3/prometheus-alertmanager

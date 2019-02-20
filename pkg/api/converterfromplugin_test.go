@@ -26,10 +26,11 @@ func internalPluginConfig() Config {
 
 		ClusterVersion: "ClusterVersion",
 		// generic Offering configuration
-		ImageOffer:     "ImageOffer",
-		ImagePublisher: "ImagePublisher",
-		ImageSKU:       "ImageSKU",
-		ImageVersion:   "ImageVersion",
+		ImageOffer:               "ImageOffer",
+		ImagePublisher:           "ImagePublisher",
+		ImageSKU:                 "ImageSKU",
+		ImageVersion:             "ImageVersion",
+		SSHSourceAddressPrefixes: []string{"SSHSourceAddressPrefixes[0]"},
 		// Geneva intergration configuration
 		GenevaLoggingSector:                  "GenevaLoggingSector",
 		GenevaLoggingNamespace:               "GenevaLoggingNamespace",

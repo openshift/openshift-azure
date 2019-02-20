@@ -15,6 +15,9 @@ type Config struct {
 	ImageSKU       *string `json:"imageSku,omitempty"`
 	ImageVersion   *string `json:"imageVersion,omitempty"`
 
+	// SSH to system nodes allowed IP ranges
+	SSHSourceAddressPrefixes *[]string `json:"sshSourceAddressPrefixes,omitempty"`
+
 	// configuration of other ARM resources
 	ConfigStorageAccount   *string `json:"configStorageAccount,omitempty"`
 	RegistryStorageAccount *string `json:"registryStorageAccount,omitempty"`

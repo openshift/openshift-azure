@@ -81,6 +81,9 @@ var marshalled = []byte(`{
 		"imagePublisher": "Config.ImagePublisher",
 		"imageSku": "Config.ImageSKU",
 		"imageVersion": "Config.ImageVersion",
+		"sshSourceAddressPrefixes": [
+			"Config.SSHSourceAddressPrefixes[0]"
+		],
 		"configStorageAccount": "Config.ConfigStorageAccount",
 		"registryStorageAccount": "Config.RegistryStorageAccount",
 		"certificates": {
