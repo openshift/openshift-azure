@@ -6,9 +6,18 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+// ComponentsLogLevel represents the log levels for the various components of a cluster
+type ComponentsLogLevel struct {
+	ApiServer         *int `json:"apiServer,omitempty"`
+	ControllerManager *int `json:"controllerManager,omitempty"`
+	Node              *int `json:"node,omitempty"`
+}
+
 type Config struct {
 	// ClusterVersion (out) defines release version of the plugin used to build the cluster
 	ClusterVersion *string `json:"clusterVersion,omitempty"`
+	// ClusterLogLevel specifies the log levels for the various openshift components
+	ClusterLogLevel *ComponentsLogLevel `json:"clusterLogLevel,omitempty"`
 	// configuration of VMs in ARM template
 	ImageOffer     *string `json:"imageOffer,omitempty"`
 	ImagePublisher *string `json:"imagePublisher,omitempty"`

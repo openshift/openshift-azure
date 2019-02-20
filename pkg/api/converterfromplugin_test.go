@@ -25,6 +25,11 @@ func internalPluginConfig() Config {
 	return Config{
 
 		ClusterVersion: "ClusterVersion",
+		ClusterLogLevel: ComponentsLogLevel{
+			ApiServer:         1,
+			ControllerManager: 1,
+			Node:              1,
+		},
 		// generic Offering configuration
 		ImageOffer:               "ImageOffer",
 		ImagePublisher:           "ImagePublisher",

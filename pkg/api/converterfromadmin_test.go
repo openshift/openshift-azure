@@ -289,3 +289,15 @@ func TestConvertFromAdmin(t *testing.T) {
 		}
 	}
 }
+
+func TestParityConvertFromAndToAdmin(t *testing.T) {
+	start := adminManagedCluster()
+	internal, err := ConvertFromAdmin(start, nil)
+	if err != nil {
+		t.Error(err)
+	}
+	end := ConvertToAdmin(internal)
+	if !reflect.DeepEqual(start, end) {
+		t.Errorf("unexpected diff %s", deep.Equal(start, end))
+	}
+}

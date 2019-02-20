@@ -300,7 +300,12 @@ func convertIdentityProviderAdmin(in admin.IdentityProvider, old *IdentityProvid
 
 func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) {
 	in, out := oc.Config, &cs.Config
-
+	if in.ClusterVersion != nil {
+		out.ClusterVersion = *in.ClusterVersion
+	}
+	if in.ClusterLogLevel != nil {
+		mergeClusterLogLevel(in.ClusterLogLevel, &out.ClusterLogLevel)
+	}
 	if in.ImageOffer != nil {
 		out.ImageOffer = *in.ImageOffer
 	}
@@ -349,7 +354,25 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	if in.GenevaLoggingControlPlaneAccount != nil {
 		out.GenevaLoggingControlPlaneAccount = *in.GenevaLoggingControlPlaneAccount
 	}
+	if in.GenevaLoggingControlPlaneEnvironment != nil {
+		out.GenevaLoggingControlPlaneEnvironment = *in.GenevaLoggingControlPlaneEnvironment
+	}
+	if in.GenevaLoggingControlPlaneRegion != nil {
+		out.GenevaLoggingControlPlaneRegion = *in.GenevaLoggingControlPlaneRegion
+	}
 	return
+}
+
+func mergeClusterLogLevel(in *admin.ComponentsLogLevel, out *ComponentsLogLevel) {
+	if in.ApiServer != nil {
+		out.ApiServer = *in.ApiServer
+	}
+	if in.ControllerManager != nil {
+		out.ControllerManager = *in.ControllerManager
+	}
+	if in.Node != nil {
+		out.Node = *in.Node
+	}
 }
 
 func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig) {

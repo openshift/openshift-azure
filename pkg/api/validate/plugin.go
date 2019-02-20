@@ -24,6 +24,8 @@ func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 	if !clusterVersion.MatchString(t.ClusterVersion) {
 		errs = append(errs, fmt.Errorf("invalid ClusterVersion %q", t.ClusterVersion))
 	}
+	// validate ClusterLogLevel
+	errs = append(errs, v.validatePluginTemplateComponentLogLevels(&t.ClusterLogLevel)...)
 	// validate ImageVersion
 	if !imageVersion.MatchString(t.ImageVersion) {
 		errs = append(errs, fmt.Errorf("invalid ImageVersion %q", t.ImageVersion))
@@ -50,6 +52,19 @@ func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 	// validate certificates
 	errs = append(errs, v.validatePluginTemplateCertificates(&t.Certificates)...)
 	errs = append(errs, v.validatePluginTemplateImages(&t.Images)...)
+	return errs
+}
+
+func (v *PluginAPIValidator) validatePluginTemplateComponentLogLevels(c *pluginapi.ComponentsLogLevel) (errs []error) {
+	if c.ApiServer%2 != 0 || (c.ApiServer < 0 || c.ApiServer > 8) {
+		errs = append(errs, fmt.Errorf("invalid ComponentsLogLevel.ApiServer %d", c.ApiServer))
+	}
+	if c.ControllerManager%2 != 0 || (c.ControllerManager < 0 || c.ControllerManager > 8) {
+		errs = append(errs, fmt.Errorf("invalid ComponentsLogLevel.ControllerManager %d", c.ControllerManager))
+	}
+	if c.Node%2 != 0 || (c.Node < 0 || c.Node > 8) {
+		errs = append(errs, fmt.Errorf("invalid ComponentsLogLevel.Node %d", c.Node))
+	}
 	return errs
 }
 
