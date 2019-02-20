@@ -662,7 +662,7 @@
       }
     }
   },
-  "revision": "20190110",
+  "revision": "20190212",
   "rootUrl": "https://jobs.googleapis.com/",
   "schemas": {
     "ApplicationInfo": {
@@ -782,18 +782,24 @@
           "enum": [
             "COMMUTE_METHOD_UNSPECIFIED",
             "DRIVING",
-            "TRANSIT"
+            "TRANSIT",
+            "WALKING",
+            "CYCLING",
+            "TRANSIT_ACCESSIBLE"
           ],
           "enumDescriptions": [
             "Commute method is not specified.",
             "Commute time is calculated based on driving time.",
-            "Commute time is calculated based on public transit including bus, metro,\nsubway, etc."
+            "Commute time is calculated based on public transit including bus, metro,\nsubway, etc.",
+            "Commute time is calculated based on walking time.",
+            "Commute time is calculated based on biking time.",
+            "Commute time is calculated based on public transit that is wheelchair\naccessible."
           ],
           "type": "string"
         },
         "departureTime": {
           "$ref": "TimeOfDay",
-          "description": "Optional.\n\nThe departure time used to calculate traffic impact, represented as\n.google.type.TimeOfDay in local time zone.\n\nCurrently traffic model is restricted to hour level resolution."
+          "description": "Optional.\n\nThe departure time used to calculate traffic impact, represented as\ngoogle.type.TimeOfDay in local time zone.\n\nCurrently traffic model is restricted to hour level resolution."
         },
         "roadTraffic": {
           "description": "Optional.\n\nSpecifies the traffic density to use when calculating commute time.",
@@ -1759,7 +1765,7 @@
           "type": "string"
         },
         "postingRegion": {
-          "description": "Optional.\n\nThe job PostingRegion (for example, state, country) throughout which\nthe job is available. If this field is set, a\nLocationFilter in a search query within the job region\nfinds this job posting if an exact location match is not specified.\nIf this field is set to PostingRegion.NATION_WIDE or\n[PostingRegion.ADMINISTRATIVE_AREA], setting job addresses\nto the same location level as this field is strongly recommended.",
+          "description": "Optional.\n\nThe job PostingRegion (for example, state, country) throughout which\nthe job is available. If this field is set, a\nLocationFilter in a search query within the job region\nfinds this job posting if an exact location match isn't specified.\nIf this field is set to PostingRegion.NATION or\nPostingRegion.ADMINISTRATIVE_AREA, setting job Job.addresses\nto the same location level as this field is strongly recommended.",
           "enum": [
             "POSTING_REGION_UNSPECIFIED",
             "ADMINISTRATIVE_AREA",

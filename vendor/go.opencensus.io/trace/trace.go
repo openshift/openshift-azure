@@ -39,13 +39,23 @@ type Span struct {
 	// It will be non-nil if we are exporting the span or recording events for it.
 	// Otherwise, data is nil, and the Span is simply a carrier for the
 	// SpanContext, so that the trace ID is propagated.
-	data        *SpanData
-	mu          sync.Mutex // protects the contents of *data (but not the pointer value.)
-	spanContext SpanContext
+	data            *SpanData
+	mu              sync.Mutex // protects the contents of *data (but not the pointer value.)
+	spanContext     SpanContext
+	localRootSpanID SpanID
 
 	// lruAttributes are capped at configured limit. When the capacity is reached an oldest entry
 	// is removed to create room for a new entry.
 	lruAttributes *lruMap
+
+	// annotations are stored in FIFO queue capped by configured limit.
+	annotations *evictedQueue
+
+	// messageEvents are stored in FIFO queue capped by configured limit.
+	messageEvents *evictedQueue
+
+	// links are stored in FIFO queue capped by configured limit.
+	links *evictedQueue
 
 	// spanStore is the spanStore this span belongs to, if any, otherwise it is nil.
 	*spanStore
@@ -160,13 +170,16 @@ func WithSampler(sampler Sampler) StartOption {
 func StartSpan(ctx context.Context, name string, o ...StartOption) (context.Context, *Span) {
 	var opts StartOptions
 	var parent SpanContext
+	var localRoot SpanID
 	if p := FromContext(ctx); p != nil {
+		p.addChild()
 		parent = p.spanContext
+		localRoot = p.localRootSpanID
 	}
 	for _, op := range o {
 		op(&opts)
 	}
-	span := startSpanInternal(name, parent != SpanContext{}, parent, false, opts)
+	span := startSpanInternal(name, parent != SpanContext{}, parent, localRoot, false, opts)
 
 	ctx, end := startExecutionTracerTask(ctx, name)
 	span.executionTracerTaskEnd = end
@@ -185,15 +198,16 @@ func StartSpanWithRemoteParent(ctx context.Context, name string, parent SpanCont
 	for _, op := range o {
 		op(&opts)
 	}
-	span := startSpanInternal(name, parent != SpanContext{}, parent, true, opts)
+	span := startSpanInternal(name, parent != SpanContext{}, parent, SpanID{}, true, opts)
 	ctx, end := startExecutionTracerTask(ctx, name)
 	span.executionTracerTaskEnd = end
 	return NewContext(ctx, span), span
 }
 
-func startSpanInternal(name string, hasParent bool, parent SpanContext, remoteParent bool, o StartOptions) *Span {
+func startSpanInternal(name string, hasParent bool, parent SpanContext, localRoot SpanID, remoteParent bool, o StartOptions) *Span {
 	span := &Span{}
 	span.spanContext = parent
+	span.localRootSpanID = localRoot
 
 	cfg := config.Load().(*Config)
 
@@ -202,6 +216,10 @@ func startSpanInternal(name string, hasParent bool, parent SpanContext, remotePa
 	}
 	span.spanContext.SpanID = cfg.IDGenerator.NewSpanID()
 	sampler := cfg.DefaultSampler
+
+	if localRoot == (SpanID{}) {
+		span.localRootSpanID = span.spanContext.SpanID
+	}
 
 	if !hasParent || remoteParent || o.Sampler != nil {
 		// If this span is the child of a local span and no Sampler is set in the
@@ -226,12 +244,17 @@ func startSpanInternal(name string, hasParent bool, parent SpanContext, remotePa
 
 	span.data = &SpanData{
 		SpanContext:     span.spanContext,
+		LocalRootSpanID: span.localRootSpanID,
 		StartTime:       time.Now(),
 		SpanKind:        o.SpanKind,
 		Name:            name,
 		HasRemoteParent: remoteParent,
 	}
 	span.lruAttributes = newLruMap(cfg.MaxAttributesPerSpan)
+	span.annotations = newEvictedQueue(cfg.MaxAnnotationEventsPerSpan)
+	span.messageEvents = newEvictedQueue(cfg.MaxMessageEventsPerSpan)
+	span.links = newEvictedQueue(cfg.MaxLinksPerSpan)
+
 	if hasParent {
 		span.data.ParentSpanID = parent.SpanID
 	}
@@ -286,6 +309,18 @@ func (s *Span) makeSpanData() *SpanData {
 		sd.Attributes = s.lruAttributesToAttributeMap()
 		sd.DroppedAttributeCount = s.lruAttributes.droppedCount
 	}
+	if len(s.annotations.queue) > 0 {
+		sd.Annotations = s.interfaceArrayToAnnotationArray()
+		sd.DroppedAnnotationCount = s.annotations.droppedCount
+	}
+	if len(s.messageEvents.queue) > 0 {
+		sd.MessageEvents = s.interfaceArrayToMessageEventArray()
+		sd.DroppedMessageEventCount = s.messageEvents.droppedCount
+	}
+	if len(s.links.queue) > 0 {
+		sd.Links = s.interfaceArrayToLinksArray()
+		sd.DroppedLinkCount = s.links.droppedCount
+	}
 	s.mu.Unlock()
 	return &sd
 }
@@ -318,6 +353,30 @@ func (s *Span) SetStatus(status Status) {
 	s.mu.Unlock()
 }
 
+func (s *Span) interfaceArrayToLinksArray() []Link {
+	linksArr := make([]Link, 0)
+	for _, value := range s.links.queue {
+		linksArr = append(linksArr, value.(Link))
+	}
+	return linksArr
+}
+
+func (s *Span) interfaceArrayToMessageEventArray() []MessageEvent {
+	messageEventArr := make([]MessageEvent, 0)
+	for _, value := range s.messageEvents.queue {
+		messageEventArr = append(messageEventArr, value.(MessageEvent))
+	}
+	return messageEventArr
+}
+
+func (s *Span) interfaceArrayToAnnotationArray() []Annotation {
+	annotationArr := make([]Annotation, 0)
+	for _, value := range s.annotations.queue {
+		annotationArr = append(annotationArr, value.(Annotation))
+	}
+	return annotationArr
+}
+
 func (s *Span) lruAttributesToAttributeMap() map[string]interface{} {
 	attributes := make(map[string]interface{})
 	for _, key := range s.lruAttributes.simpleLruMap.Keys() {
@@ -334,6 +393,15 @@ func (s *Span) copyToCappedAttributes(attributes []Attribute) {
 	for _, a := range attributes {
 		s.lruAttributes.add(a.key, a.value)
 	}
+}
+
+func (s *Span) addChild() {
+	if !s.IsRecordingEvents() {
+		return
+	}
+	s.mu.Lock()
+	s.data.ChildSpanCount++
+	s.mu.Unlock()
 }
 
 // AddAttributes sets attributes in the span.
@@ -364,7 +432,7 @@ func (s *Span) lazyPrintfInternal(attributes []Attribute, format string, a ...in
 		m = make(map[string]interface{})
 		copyAttributes(m, attributes)
 	}
-	s.data.Annotations = append(s.data.Annotations, Annotation{
+	s.annotations.add(Annotation{
 		Time:       now,
 		Message:    msg,
 		Attributes: m,
@@ -380,7 +448,7 @@ func (s *Span) printStringInternal(attributes []Attribute, str string) {
 		a = make(map[string]interface{})
 		copyAttributes(a, attributes)
 	}
-	s.data.Annotations = append(s.data.Annotations, Annotation{
+	s.annotations.add(Annotation{
 		Time:       now,
 		Message:    str,
 		Attributes: a,
@@ -417,7 +485,7 @@ func (s *Span) AddMessageSendEvent(messageID, uncompressedByteSize, compressedBy
 	}
 	now := time.Now()
 	s.mu.Lock()
-	s.data.MessageEvents = append(s.data.MessageEvents, MessageEvent{
+	s.messageEvents.add(MessageEvent{
 		Time:                 now,
 		EventType:            MessageEventTypeSent,
 		MessageID:            messageID,
@@ -439,7 +507,7 @@ func (s *Span) AddMessageReceiveEvent(messageID, uncompressedByteSize, compresse
 	}
 	now := time.Now()
 	s.mu.Lock()
-	s.data.MessageEvents = append(s.data.MessageEvents, MessageEvent{
+	s.messageEvents.add(MessageEvent{
 		Time:                 now,
 		EventType:            MessageEventTypeRecv,
 		MessageID:            messageID,
@@ -455,7 +523,7 @@ func (s *Span) AddLink(l Link) {
 		return
 	}
 	s.mu.Lock()
-	s.data.Links = append(s.data.Links, l)
+	s.links.add(l)
 	s.mu.Unlock()
 }
 

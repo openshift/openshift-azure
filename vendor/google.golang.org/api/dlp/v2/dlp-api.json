@@ -1183,6 +1183,34 @@
         },
         "jobTriggers": {
           "methods": {
+            "activate": {
+              "description": "Activate a job trigger. Causes the immediate execute of a trigger\ninstead of waiting on the trigger event to occur.",
+              "flatPath": "v2/projects/{projectsId}/jobTriggers/{jobTriggersId}:activate",
+              "httpMethod": "POST",
+              "id": "dlp.projects.jobTriggers.activate",
+              "parameterOrder": [
+                "name"
+              ],
+              "parameters": {
+                "name": {
+                  "description": "Resource name of the trigger to activate, for example\n`projects/dlp-test-project/jobTriggers/53234423`.",
+                  "location": "path",
+                  "pattern": "^projects/[^/]+/jobTriggers/[^/]+$",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "path": "v2/{+name}:activate",
+              "request": {
+                "$ref": "GooglePrivacyDlpV2ActivateJobTriggerRequest"
+              },
+              "response": {
+                "$ref": "GooglePrivacyDlpV2DlpJob"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ]
+            },
             "create": {
               "description": "Creates a job trigger to run DLP actions such as scanning storage for\nsensitive information on a set schedule.\nSee https://cloud.google.com/dlp/docs/creating-job-triggers to learn more.",
               "flatPath": "v2/projects/{projectsId}/jobTriggers",
@@ -1270,8 +1298,13 @@
                 "parent"
               ],
               "parameters": {
+                "filter": {
+                  "description": "Optional. Allows filtering.\n\nSupported syntax:\n\n* Filter expressions are made up of one or more restrictions.\n* Restrictions can be combined by `AND` or `OR` logical operators. A\nsequence of restrictions implicitly uses `AND`.\n* A restriction has the form of `\u003cfield\u003e \u003coperator\u003e \u003cvalue\u003e`.\n* Supported fields/values for inspect jobs:\n    - `status` - HEALTHY|PAUSED|CANCELLED\n    - `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY\n    - 'last_run_time` - RFC 3339 formatted timestamp, surrounded by\n    quotation marks. Nanoseconds are ignored.\n    - 'error_count' - Number of errors that have occurred while running.\n* The operator must be `=` or `!=` for status and inspected_storage.\n\nExamples:\n\n* inspected_storage = cloud_storage AND status = HEALTHY\n* inspected_storage = cloud_storage OR inspected_storage = bigquery\n* inspected_storage = cloud_storage AND (state = PAUSED OR state = HEALTHY)\n* last_run_time \u003e \\\"2017-12-12T00:00:00+00:00\\\"\n\nThe length of this field should be no more than 500 characters.",
+                  "location": "query",
+                  "type": "string"
+                },
                 "orderBy": {
-                  "description": "Optional comma separated list of triggeredJob fields to order by,\nfollowed by `asc` or `desc` postfix. This list is case-insensitive,\ndefault sorting order is ascending, redundant space characters are\ninsignificant.\n\nExample: `name asc,update_time, create_time desc`\n\nSupported fields are:\n\n- `create_time`: corresponds to time the JobTrigger was created.\n- `update_time`: corresponds to time the JobTrigger was last updated.\n- `name`: corresponds to JobTrigger's name.\n- `display_name`: corresponds to JobTrigger's display name.\n- `status`: corresponds to JobTrigger's status.",
+                  "description": "Optional comma separated list of triggeredJob fields to order by,\nfollowed by `asc` or `desc` postfix. This list is case-insensitive,\ndefault sorting order is ascending, redundant space characters are\ninsignificant.\n\nExample: `name asc,update_time, create_time desc`\n\nSupported fields are:\n\n- `create_time`: corresponds to time the JobTrigger was created.\n- `update_time`: corresponds to time the JobTrigger was last updated.\n- `last_run_time`: corresponds to the last time the JobTrigger ran.\n- `name`: corresponds to JobTrigger's name.\n- `display_name`: corresponds to JobTrigger's display name.\n- `status`: corresponds to JobTrigger's status.",
                   "location": "query",
                   "type": "string"
                 },
@@ -1486,13 +1519,17 @@
       }
     }
   },
-  "revision": "20181229",
+  "revision": "20190212",
   "rootUrl": "https://dlp.googleapis.com/",
   "schemas": {
     "GooglePrivacyDlpV2Action": {
       "description": "A task to execute on the completion of a job.\nSee https://cloud.google.com/dlp/docs/concepts-actions to learn more.",
       "id": "GooglePrivacyDlpV2Action",
       "properties": {
+        "jobNotificationEmails": {
+          "$ref": "GooglePrivacyDlpV2JobNotificationEmails",
+          "description": "Enable email notification to project owners and editors on job‘s\ncompletion/failure."
+        },
         "pubSub": {
           "$ref": "GooglePrivacyDlpV2PublishToPubSub",
           "description": "Publish a notification to a pubsub topic."
@@ -1506,6 +1543,12 @@
           "description": "Save resulting findings in a provided location."
         }
       },
+      "type": "object"
+    },
+    "GooglePrivacyDlpV2ActivateJobTriggerRequest": {
+      "description": "Request message for ActivateJobTrigger.",
+      "id": "GooglePrivacyDlpV2ActivateJobTriggerRequest",
+      "properties": {},
       "type": "object"
     },
     "GooglePrivacyDlpV2AnalyzeDataSourceRiskDetails": {
@@ -1909,13 +1952,15 @@
           "enumDescriptions": [
             "Includes all files.",
             "Includes all file extensions not covered by text file types.",
-            "Included file extensions:\n  asc, brf, c, cc, cpp, csv, cxx, c++, cs, css, dart, eml, go, h, hh, hpp,\n  hxx, h++, hs, html, htm, shtml, shtm, xhtml, lhs, ini, java, js, json,\n  ocaml, md, mkd, markdown, m, ml, mli, pl, pm, php, phtml, pht, py, pyw,\n  rb, rbw, rs, rc, scala, sh, sql, tex, txt, text, tsv, vcard, vcs, wml,\n  xml, xsl, xsd, yml, yaml."
+            "Included file extensions:\n  asc, brf, c, cc, cpp, csv, cxx, c++, cs, css, dart, eml, go, h, hh, hpp,\n  hxx, h++, hs, html, htm, shtml, shtm, xhtml, lhs, ini, java, js, json,\n  ocaml, md, mkd, markdown, m, ml, mli, pl, pm, php, phtml, pht, py, pyw,\n  rb, rbw, rs, rc, scala, sh, sql, tex, txt, text, tsv, vcard, vcs, wml,\n  xml, xsl, xsd, yml, yaml.",
+            "Included file extensions:\n  bmp, gif, jpg, jpeg, jpe, png.\nbytes_limit_per_file has no effect on image files."
           ],
           "items": {
             "enum": [
               "FILE_TYPE_UNSPECIFIED",
               "BINARY_FILE",
-              "TEXT_FILE"
+              "TEXT_FILE",
+              "IMAGE"
             ],
             "type": "string"
           },
@@ -3018,6 +3063,10 @@
       "description": "InfoType description.",
       "id": "GooglePrivacyDlpV2InfoTypeDescription",
       "properties": {
+        "description": {
+          "description": "Description of the infotype. Translated when language is provided in the\nrequest.",
+          "type": "string"
+        },
         "displayName": {
           "description": "Human readable form of the infoType name.",
           "type": "string"
@@ -3341,6 +3390,12 @@
           "type": "array"
         }
       },
+      "type": "object"
+    },
+    "GooglePrivacyDlpV2JobNotificationEmails": {
+      "description": "Enable email notification to project owners and editors on jobs's\ncompletion/failure.",
+      "id": "GooglePrivacyDlpV2JobNotificationEmails",
+      "properties": {},
       "type": "object"
     },
     "GooglePrivacyDlpV2JobTrigger": {
@@ -4314,6 +4369,14 @@
       "description": "Message defining a custom regular expression.",
       "id": "GooglePrivacyDlpV2Regex",
       "properties": {
+        "groupIndexes": {
+          "description": "The index of the submatch to extract as findings. When not\nspecified, the entire match is returned. No more than 3 may be included.",
+          "items": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "type": "array"
+        },
         "pattern": {
           "description": "Pattern defining the regular expression. Its syntax\n(https://github.com/google/re2/wiki/Syntax) can be found under the\ngoogle/re2 repository on GitHub.",
           "type": "string"

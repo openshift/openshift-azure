@@ -152,7 +152,6 @@ func (s *AccountWarning) MarshalJSON() ([]byte, error) {
 }
 
 // Alert: An alert affecting a customer.
-// All fields are read-only once created.
 type Alert struct {
 	// AlertId: Output only. The unique identifier for the alert.
 	AlertId string `json:"alertId,omitempty"`
@@ -186,6 +185,7 @@ type Alert struct {
 
 	// Source: Required. A unique identifier for the system that reported
 	// the alert.
+	// This is output only after alert is created.
 	//
 	// Supported sources are any of the following:
 	//
@@ -203,6 +203,7 @@ type Alert struct {
 	StartTime string `json:"startTime,omitempty"`
 
 	// Type: Required. The type of the alert.
+	// This is output only after alert is created.
 	// For a list of available alert types see
 	// [G Suite Alert types](/admin-sdk/alertcenter/reference/alert-types).
 	Type string `json:"type,omitempty"`
@@ -1336,7 +1337,9 @@ type AlertsGetCall struct {
 	header_      http.Header
 }
 
-// Get: Gets the specified alert.
+// Get: Gets the specified alert. Attempting to get a nonexistent alert
+// returns
+// `NOT_FOUND` error.
 func (r *AlertsService) Get(alertId string) *AlertsGetCall {
 	c := &AlertsGetCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.alertId = alertId
@@ -1450,7 +1453,7 @@ func (c *AlertsGetCall) Do(opts ...googleapi.CallOption) (*Alert, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Gets the specified alert.",
+	//   "description": "Gets the specified alert. Attempting to get a nonexistent alert returns\n`NOT_FOUND` error.",
 	//   "flatPath": "v1beta1/alerts/{alertId}",
 	//   "httpMethod": "GET",
 	//   "id": "alertcenter.alerts.get",
@@ -1459,7 +1462,7 @@ func (c *AlertsGetCall) Do(opts ...googleapi.CallOption) (*Alert, error) {
 	//   ],
 	//   "parameters": {
 	//     "alertId": {
-	//       "description": "Required. The identifier of the alert to retrieve.\nReturns a NOT_FOUND error if no such alert.",
+	//       "description": "Required. The identifier of the alert to retrieve.",
 	//       "location": "path",
 	//       "required": true,
 	//       "type": "string"
@@ -1870,7 +1873,9 @@ type AlertsFeedbackCreateCall struct {
 	header_       http.Header
 }
 
-// Create: Creates new feedback for an alert.
+// Create: Creates new feedback for an alert. Attempting to create a
+// feedback for
+// a non-existent alert returns `NOT_FOUND` error.
 func (r *AlertsFeedbackService) Create(alertId string, alertfeedback *AlertFeedback) *AlertsFeedbackCreateCall {
 	c := &AlertsFeedbackCreateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.alertId = alertId
@@ -1977,7 +1982,7 @@ func (c *AlertsFeedbackCreateCall) Do(opts ...googleapi.CallOption) (*AlertFeedb
 	}
 	return ret, nil
 	// {
-	//   "description": "Creates new feedback for an alert.",
+	//   "description": "Creates new feedback for an alert. Attempting to create a feedback for\na non-existent alert returns `NOT_FOUND` error.",
 	//   "flatPath": "v1beta1/alerts/{alertId}/feedback",
 	//   "httpMethod": "POST",
 	//   "id": "alertcenter.alerts.feedback.create",
@@ -1986,7 +1991,7 @@ func (c *AlertsFeedbackCreateCall) Do(opts ...googleapi.CallOption) (*AlertFeedb
 	//   ],
 	//   "parameters": {
 	//     "alertId": {
-	//       "description": "Required. The identifier of the alert this feedback belongs to.\nReturns a `NOT_FOUND` error if no such alert.",
+	//       "description": "Required. The identifier of the alert this feedback belongs to.",
 	//       "location": "path",
 	//       "required": true,
 	//       "type": "string"
@@ -2022,7 +2027,9 @@ type AlertsFeedbackListCall struct {
 	header_      http.Header
 }
 
-// List: Lists all the feedback for an alert.
+// List: Lists all the feedback for an alert. Attempting to list
+// feedbacks for
+// a non-existent alert returns `NOT_FOUND` error.
 func (r *AlertsFeedbackService) List(alertId string) *AlertsFeedbackListCall {
 	c := &AlertsFeedbackListCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.alertId = alertId
@@ -2151,7 +2158,7 @@ func (c *AlertsFeedbackListCall) Do(opts ...googleapi.CallOption) (*ListAlertFee
 	}
 	return ret, nil
 	// {
-	//   "description": "Lists all the feedback for an alert.",
+	//   "description": "Lists all the feedback for an alert. Attempting to list feedbacks for\na non-existent alert returns `NOT_FOUND` error.",
 	//   "flatPath": "v1beta1/alerts/{alertId}/feedback",
 	//   "httpMethod": "GET",
 	//   "id": "alertcenter.alerts.feedback.list",
@@ -2160,7 +2167,7 @@ func (c *AlertsFeedbackListCall) Do(opts ...googleapi.CallOption) (*ListAlertFee
 	//   ],
 	//   "parameters": {
 	//     "alertId": {
-	//       "description": "Required. The alert identifier.\nThe \"-\" wildcard could be used to represent all alerts.\nIf alert does not exist returns a `NOT_FOUND` error.",
+	//       "description": "Required. The alert identifier.\nThe \"-\" wildcard could be used to represent all alerts.",
 	//       "location": "path",
 	//       "required": true,
 	//       "type": "string"
@@ -2340,7 +2347,7 @@ type V1beta1UpdateSettingsCall struct {
 	header_    http.Header
 }
 
-// UpdateSettings: Update the customer-level settings.
+// UpdateSettings: Updates the customer-level settings.
 func (r *V1beta1Service) UpdateSettings(settings *Settings) *V1beta1UpdateSettingsCall {
 	c := &V1beta1UpdateSettingsCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.settings = settings
@@ -2443,7 +2450,7 @@ func (c *V1beta1UpdateSettingsCall) Do(opts ...googleapi.CallOption) (*Settings,
 	}
 	return ret, nil
 	// {
-	//   "description": "Update the customer-level settings.",
+	//   "description": "Updates the customer-level settings.",
 	//   "flatPath": "v1beta1/settings",
 	//   "httpMethod": "PATCH",
 	//   "id": "alertcenter.updateSettings",
