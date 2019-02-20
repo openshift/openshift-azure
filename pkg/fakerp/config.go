@@ -94,6 +94,9 @@ func overridePluginTemplate(template *pluginapi.Config) {
 	if os.Getenv("ETCDBACKUP_IMAGE") != "" {
 		template.Images.EtcdBackup = os.Getenv("ETCDBACKUP_IMAGE")
 	}
+	if os.Getenv("TLSPROXY_IMAGE") != "" {
+		template.Images.TLSProxy = os.Getenv("TLSPROXY_IMAGE")
+	}
 	if os.Getenv("AZURE_CONTROLLERS_IMAGE") != "" {
 		template.Images.AzureControllers = os.Getenv("AZURE_CONTROLLERS_IMAGE")
 	}

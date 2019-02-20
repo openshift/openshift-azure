@@ -244,6 +244,9 @@ func validateImageConfig(i *pluginapi.ImageConfig) (errs []error) {
 	if len(i.ImagePullSecret) == 0 {
 		errs = append(errs, fmt.Errorf("invalid images.imagePullSecret %q", i.ImagePullSecret))
 	}
+	if i.TLSProxy == "" {
+		errs = append(errs, fmt.Errorf("invalid images.TLSProxy %q", i.TLSProxy))
+	}
 
 	return
 }

@@ -52,6 +52,7 @@ if [[ -f /usr/secrets/secret ]] ;then
     export AZURE_CONTROLLERS_IMAGE=${REGISTRY}/${OPENSHIFT_BUILD_NAMESPACE}/stable:azure-controllers
     export METRICSBRIDGE_IMAGE=${REGISTRY}/${OPENSHIFT_BUILD_NAMESPACE}/stable:metricsbridge
     export STARTUP_IMAGE=${REGISTRY}/${OPENSHIFT_BUILD_NAMESPACE}/stable:startup
+    export TLSPROXY_IMAGE=${REGISTRY}/${OPENSHIFT_BUILD_NAMESPACE}/stable:tlsproxy
     echo "Upgrade cluster to master"
     ./hack/upgrade.sh $RESOURCEGROUP
 

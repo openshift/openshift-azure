@@ -447,6 +447,12 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
+	"DaemonSet.apps/openshift-azure-monitoring/etcd-metrics": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.TLSProxy }}",
+		},
+	},
 	"Deployment.apps/default/registry-console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='OPENSHIFT_OAUTH_PROVIDER_URL')].value"),

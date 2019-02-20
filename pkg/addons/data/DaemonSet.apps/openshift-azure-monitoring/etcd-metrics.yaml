@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: etcd-metrics
+  name: etcd-metrics
+  namespace: openshift-azure-monitoring
+spec:
+  selector:
+    matchLabels:
+      app: etcd-metrics
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+  template:
+    metadata:
+      labels:
+        app: etcd-metrics
+    spec:
+      containers:
+      - args:
+        - -cacert
+        - /etc/etcd/ca.crt
+        - -cert
+        - /etc/etcd/peer.crt
+        - -key
+        - /etc/etcd/peer.key
+        - -whitelist
+        - /metrics*
+        - -hostname
+        - "https://$(HOSTNAME):2379"
+        - -servingkey
+        - /var/serving-cert/tls.key
+        - -servingcert
+        - /var/serving-cert/tls.crt
+        - -reencrypt
+        - "true"
+        command:
+        - /tlsproxy
+        imagePullPolicy: Always
+        volumeMounts:
+          mountPath: /etc/etcd
+          name: etcd-config
+          readOnly: true
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        image: '*** GENERATED ***'
+        name: etcd-metrics
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        volumeMounts:
+        - mountPath: /etc/etcd
+          name: etcd-config
+          readOnly: true
+        - mountPath: /var/serving-cert
+          name: serving-cert
+          readOnly: true
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+      serviceAccountName: etcd-metrics
+      volumes:
+      - hostPath:
+          path: /etc/etcd
+        name: etcd-config
+      - name: serving-cert
+        secret:
+          defaultMode: 288
+          secretName: etcd-metrics-serving-cert

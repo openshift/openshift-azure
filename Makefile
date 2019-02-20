@@ -12,6 +12,7 @@ LDFLAGS="-X main.gitCommit=$(COMMIT)"
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
 AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
 ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
+TLSPROXY_IMAGE ?= quay.io/openshift-on-azure/tlsproxy:$(TAG)
 METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 STARTUP_IMAGE ?= quay.io/openshift-on-azure/startup:$(TAG)
@@ -80,6 +81,17 @@ etcdbackup-image: etcdbackup $(IMAGEBUILDER) pullregistry
 
 etcdbackup-push: etcdbackup-image
 	docker push $(ETCDBACKUP_IMAGE)
+
+tlsproxy: generate
+	go build -ldflags ${LDFLAGS} ./cmd/tlsproxy
+
+tlsproxy-image: tlsproxy
+	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+	imagebuilder -f Dockerfile.tlsproxy -t $(TLSPROXY_IMAGE) .
+
+tlsproxy-push: tlsproxy-image
+	docker push $(TLSPROXY_IMAGE)
+
 
 metricsbridge:
 	go build -ldflags ${LDFLAGS} ./cmd/$@

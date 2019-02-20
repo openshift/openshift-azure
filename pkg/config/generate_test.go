@@ -67,6 +67,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.Images.Startup != "", "startup image")
 	assert(c.Images.EtcdBackup != "", "etcdbackup image")
 	assert(c.Images.Httpd != "", "httpd image")
+	assert(c.Images.TLSProxy != "", "tlsProxy image")
 	assert(c.Images.ClusterMonitoringOperator != "", "cluster monitoring operator image")
 	assert(c.Images.PrometheusOperator != "", "cluster monitoring operator image")
 	assert(c.Images.PrometheusConfigReloader != "", "prometheus config reloader image")
