@@ -36,9 +36,7 @@ chmod 0600 ${DPATH}/config.json
 
 echo 'BOOTSTRAP_CONFIG_NAME=node-config-{{ .Extra.Role }}' >>/etc/sysconfig/${SERVICE_TYPE}-node
 
-{{- if $.Extra.TestConfig.RunningUnderTest }}
-sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-node
-{{- end }}
+sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL={{ .Config.ClusterLogLevel.Node }}#" /etc/sysconfig/${SERVICE_TYPE}-node
 
 rm -rf /etc/etcd/* /etc/origin/master/*
 
