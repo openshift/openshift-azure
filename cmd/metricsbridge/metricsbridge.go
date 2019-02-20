@@ -1,12 +1,12 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -17,8 +17,9 @@ import (
 	"time"
 
 	"github.com/ghodss/yaml"
-	"github.com/prometheus/client_model/go"
-	"github.com/prometheus/common/expfmt"
+	"github.com/prometheus/client_golang/api"
+	"github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/util/log"
@@ -35,26 +36,27 @@ curl -Gks \
 var (
 	logLevel  = flag.String("loglevel", "Debug", "Valid values are Debug, Info, Warning, Error")
 	gitCommit = "unknown"
-
-	omitLabels = map[string]struct{}{ // these must be lower case
-		"cluster":            {},
-		"prometheus":         {},
-		"prometheus_replica": {},
-
-		// we populate these
-		"region":            {},
-		"subscriptionid":    {},
-		"resourcegroupname": {},
-		"resourcename":      {},
-	}
 )
 
-type config struct {
-	Interval                   time.Duration `json:"intervalNanoseconds,omitempty"`
-	PrometheusFederateEndpoint string        `json:"prometheusFederateEndpoint,omitempty"`
-	StatsdSocket               string        `json:"statsdSocket,omitempty"`
+type authorizingRoundTripper struct {
+	http.RoundTripper
+	token string
+}
 
-	Series []string `json:"series,omitempty"`
+func (rt authorizingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.Header.Set("Authorization", "Bearer "+rt.token)
+	return rt.RoundTripper.RoundTrip(req)
+}
+
+type config struct {
+	Interval           time.Duration `json:"intervalNanoseconds,omitempty"`
+	PrometheusEndpoint string        `json:"prometheusEndpoint,omitempty"`
+	StatsdSocket       string        `json:"statsdSocket,omitempty"`
+
+	Queries []struct {
+		Name  string `json:"name,omitempty"`
+		Query string `json:"query,omitempty"`
+	} `json:"queries,omitempty"`
 
 	Account   string `json:"account,omitempty"`
 	Namespace string `json:"namespace,omitempty"`
@@ -67,10 +69,11 @@ type config struct {
 	Token              string `json:"token,omitempty"`
 	InsecureSkipVerify bool   `json:"insecureSkipVerify,omitempty"`
 
-	log     *logrus.Entry
-	rootCAs *x509.CertPool
-	http    *http.Client
-	conn    net.Conn
+	log        *logrus.Entry
+	rootCAs    *x509.CertPool
+	prometheus v1.API
+	rt         http.RoundTripper
+	conn       net.Conn
 }
 
 func (c *config) load(path string) error {
@@ -113,14 +116,14 @@ func (c *config) defaultAndValidate() (errs []error) {
 	if c.Interval < time.Second {
 		errs = append(errs, fmt.Errorf("intervalNanoseconds %q too small", int64(c.Interval)))
 	}
-	if _, err := url.Parse(c.PrometheusFederateEndpoint); err != nil {
-		errs = append(errs, fmt.Errorf("prometheusFederateEndpoint: %s", err))
+	if _, err := url.Parse(c.PrometheusEndpoint); err != nil {
+		errs = append(errs, fmt.Errorf("prometheusEndpoint: %s", err))
 	}
 	if _, err := net.ResolveUnixAddr("unix", c.StatsdSocket); err != nil {
 		errs = append(errs, fmt.Errorf("statsdSocket: %s", err))
 	}
-	if len(c.Series) == 0 {
-		errs = append(errs, fmt.Errorf("must configure at least one series"))
+	if len(c.Queries) == 0 {
+		errs = append(errs, fmt.Errorf("must configure at least one query"))
 	}
 
 	return
@@ -145,14 +148,23 @@ func (c *config) init() error {
 		return err
 	}
 
-	c.http = &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs:            c.rootCAs,
-				InsecureSkipVerify: c.InsecureSkipVerify,
+	cli, err := api.NewClient(api.Config{
+		Address: c.PrometheusEndpoint,
+		RoundTripper: &authorizingRoundTripper{
+			RoundTripper: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs:            c.rootCAs,
+					InsecureSkipVerify: c.InsecureSkipVerify,
+				},
 			},
+			token: c.Token,
 		},
+	})
+	if err != nil {
+		return err
 	}
+
+	c.prometheus = v1.NewAPI(cli)
 
 	return nil
 }
@@ -186,75 +198,42 @@ func run(log *logrus.Entry, configpath string) error {
 }
 
 func (c *config) run() error {
-	prometheusURL, err := url.Parse(c.PrometheusFederateEndpoint)
-	if err != nil {
-		return err
-	}
-
-	v := url.Values{}
-	for _, s := range c.Series {
-		v.Add("match[]", s)
-	}
-	prometheusURL.RawQuery = v.Encode()
-
-	req, err := http.NewRequest(http.MethodGet, prometheusURL.String(), nil)
-	if err != nil {
-		return err
-	}
-	req.Header.Add("Authorization", "Bearer "+c.Token)
-	req.Header.Add("Accept", string(expfmt.FmtText))
-
 	t := time.NewTicker(c.Interval)
 	defer t.Stop()
 
 	for {
-		if err := c.runOnce(req); err != nil {
+		if err := c.runOnce(context.Background()); err != nil {
 			c.log.Warn(err)
 		}
 		<-t.C
 	}
 }
 
-func (c *config) runOnce(req *http.Request) error {
-	now := time.Now()
+func (c *config) runOnce(ctx context.Context) error {
+	var metricsCount int
 
-	resp, err := c.http.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("prometheus returned status code %d", resp.StatusCode)
-	}
-
-	d := expfmt.NewDecoder(resp.Body, expfmt.FmtText)
-
-	for {
-		var family io_prometheus_client.MetricFamily
-
-		err = d.Decode(&family)
-		if err == io.EOF {
-			break
-		}
+	for _, query := range c.Queries {
+		value, err := c.prometheus.Query(ctx, query.Query, time.Time{})
 		if err != nil {
 			return err
 		}
 
-		for _, m := range family.Metric {
+		for _, sample := range value.(model.Vector) {
 			f := &statsd.Float{
-				Metric:    *family.Name,
+				Metric:    string(sample.Metric[model.MetricNameLabel]),
 				Account:   c.Account,
 				Namespace: c.Namespace,
 				Dims:      map[string]string{},
-				TS:        now,
-				Value:     *m.Untyped.Value,
+				TS:        sample.Timestamp.Time(),
+				Value:     float64(sample.Value),
 			}
-			for _, label := range m.Label {
-				if _, found := omitLabels[strings.ToLower(*label.Name)]; found {
-					continue
+			if query.Name != "" {
+				f.Metric = query.Name
+			}
+			for k, v := range sample.Metric {
+				if k != model.MetricNameLabel {
+					f.Dims[string(k)] = string(v)
 				}
-				f.Dims[*label.Name] = *label.Value
 			}
 			if c.Region != "" {
 				f.Dims["region"] = c.Region
@@ -275,8 +254,12 @@ func (c *config) runOnce(req *http.Request) error {
 			if _, err = c.conn.Write(b); err != nil {
 				return err
 			}
+
+			metricsCount++
 		}
 	}
+
+	c.log.Infof("sent %d metrics", metricsCount)
 
 	return nil
 }

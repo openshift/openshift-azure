@@ -1631,7 +1631,7 @@ type GoogleDevtoolsRemotebuildexecutionAdminV1alphaCreateInstanceRequest struct 
 	// InstanceId: ID of the created instance.
 	// A valid `instance_id` must:
 	// be 6-50 characters long,
-	// contains only lowercase letters, digits, hyphens and
+	// contain only lowercase letters, digits, hyphens and
 	// underscores,
 	// start with a lowercase letter, and
 	// end with a lowercase letter or a digit.
@@ -2083,10 +2083,12 @@ type GoogleDevtoolsRemotebuildexecutionAdminV1alphaWorkerConfig struct {
 	DiskType string `json:"diskType,omitempty"`
 
 	// MachineType: Required. Machine type of the worker, such as
-	// n1-standard-2.
+	// `n1-standard-2`.
 	// See https://cloud.google.com/compute/docs/machine-types for a list
 	// of
-	// supported machine types.
+	// supported machine types. Note that `f1-micro` and `g1-small` are not
+	// yet
+	// supported.
 	MachineType string `json:"machineType,omitempty"`
 
 	// MinCpuPlatform: Minimum CPU platform to use when creating the
