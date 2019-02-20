@@ -173,7 +173,7 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{CommonName: "system:openshift-master",
-					Organization: []string{"system:cluster-admins", "system:masters"},
+					Organization: []string{"system:masters"},
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 			},
