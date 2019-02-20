@@ -72,7 +72,9 @@ func (s *startup) writeTemplatedFiles() error {
 			return errors.Wrapf(err, "MkdirAll(%s)", parentDir)
 		}
 		var perm os.FileMode = 0666
-		if path.Ext(destination) == ".key" || path.Ext(destination) == ".kubeconfig" {
+		if path.Ext(destination) == ".key" ||
+			path.Ext(destination) == ".kubeconfig" ||
+			path.Base(destination) == "session-secrets.yaml" {
 			perm = 0600
 		}
 
