@@ -141,6 +141,9 @@ e2e-keyrotation:
 e2e-reimagevm:
 	FOCUS="\[ReimageVM\]\[Fake\]" TIMEOUT=10m ./hack/e2e.sh
 
+e2e-changeloglevel:
+	FOCUS="\[ChangeLogLevel\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
+
 e2e-scaleupdown:
 	FOCUS="\[ScaleUpDown\]\[Fake\]" TIMEOUT=30m ./hack/e2e.sh
 
