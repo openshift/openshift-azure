@@ -183,11 +183,11 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{
-					CommonName: "servicecatalog-api",
+					CommonName: "apiserver.kube-service-catalog.svc",
 				},
 				DNSNames: []string{
-					"servicecatalog-api",
-					"apiserver.kube-service-catalog.svc", // TODO: unclear how safe this is
+					"apiserver.kube-service-catalog.svc",
+					"apiserver.kube-service-catalog.svc.cluster.local",
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 				SigningKey:  c.Certificates.ServiceCatalogCa.Key,
