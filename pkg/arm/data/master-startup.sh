@@ -60,7 +60,7 @@ rm -rf /etc/etcd/* /etc/origin/master/*
 
 mkdir -p /etc/origin/cloudprovider
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
-{{ .Derived.CloudProviderConf .ContainerService | String }}
+{{ .Derived.MasterCloudProviderConf .ContainerService | String }}
 EOF
 
 # when starting node waagent and network utilities goes into race condition.

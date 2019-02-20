@@ -114,8 +114,8 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 	cpc := &cloudprovider.Config{
 		TenantID:        cs.Properties.AzProfile.TenantID,
 		SubscriptionID:  cs.Properties.AzProfile.SubscriptionID,
-		AadClientID:     cs.Properties.ServicePrincipalProfile.ClientID,
-		AadClientSecret: cs.Properties.ServicePrincipalProfile.Secret,
+		AadClientID:     cs.Properties.MasterServicePrincipalProfile.ClientID,
+		AadClientSecret: cs.Properties.MasterServicePrincipalProfile.Secret,
 		ResourceGroup:   cs.Properties.AzProfile.ResourceGroup,
 	}
 

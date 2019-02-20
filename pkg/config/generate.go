@@ -229,20 +229,6 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{
-					CommonName: cs.Properties.RouterProfiles[0].PublicSubdomain,
-				},
-				DNSNames: []string{
-					cs.Properties.RouterProfiles[0].PublicSubdomain,
-					"*." + cs.Properties.RouterProfiles[0].PublicSubdomain,
-				},
-				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			},
-			key:  &c.Certificates.Router.Key,
-			cert: &c.Certificates.Router.Cert,
-		},
-		{
-			params: tls.CertParams{
-				Subject: pkix.Name{
 					CommonName: "docker-registry-default." + cs.Properties.RouterProfiles[0].PublicSubdomain,
 				},
 				DNSNames: []string{
@@ -254,22 +240,6 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 			},
 			key:  &c.Certificates.Registry.Key,
 			cert: &c.Certificates.Registry.Cert,
-		},
-		// Do not attempt to make the OpenShift console certificate self-signed
-		// if cs.Properties == cs.FQDN:
-		// https://github.com/openshift/openshift-azure/issues/307
-		{
-			params: tls.CertParams{
-				Subject: pkix.Name{
-					CommonName: Derived.PublicHostname(cs),
-				},
-				DNSNames: []string{
-					Derived.PublicHostname(cs),
-				},
-				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-			},
-			key:  &c.Certificates.OpenShiftConsole.Key,
-			cert: &c.Certificates.OpenShiftConsole.Cert,
 		},
 	}
 	for _, cert := range certs {
@@ -438,10 +408,8 @@ func (g *simpleGenerator) InvalidateSecrets(cs *api.OpenShiftManagedCluster) (er
 	cs.Config.Certificates.MasterProxyClient = api.CertKeyPair{}
 	cs.Config.Certificates.MasterServer = api.CertKeyPair{}
 	cs.Config.Certificates.NodeBootstrap = api.CertKeyPair{}
-	cs.Config.Certificates.OpenShiftConsole = api.CertKeyPair{}
 	cs.Config.Certificates.OpenShiftMaster = api.CertKeyPair{}
 	cs.Config.Certificates.Registry = api.CertKeyPair{}
-	cs.Config.Certificates.Router = api.CertKeyPair{}
 	cs.Config.Certificates.ServiceCatalogAPIClient = api.CertKeyPair{}
 	cs.Config.Certificates.ServiceCatalogServer = api.CertKeyPair{}
 

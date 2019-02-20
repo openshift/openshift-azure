@@ -94,12 +94,28 @@ func (derived) MasterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
 	return strings.Split(cs.Properties.FQDN, ".")[0]
 }
 
-func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+func (derived) MasterCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
 	return yaml.Marshal(cloudprovider.Config{
 		TenantID:          cs.Properties.AzProfile.TenantID,
 		SubscriptionID:    cs.Properties.AzProfile.SubscriptionID,
-		AadClientID:       cs.Properties.ServicePrincipalProfile.ClientID,
-		AadClientSecret:   cs.Properties.ServicePrincipalProfile.Secret,
+		AadClientID:       cs.Properties.MasterServicePrincipalProfile.ClientID,
+		AadClientSecret:   cs.Properties.MasterServicePrincipalProfile.Secret,
+		ResourceGroup:     cs.Properties.AzProfile.ResourceGroup,
+		LoadBalancerSku:   "standard",
+		Location:          cs.Location,
+		SecurityGroupName: "nsg-worker",
+		VMType:            "vmss",
+		SubnetName:        "default",
+		VnetName:          "vnet",
+	})
+}
+
+func (derived) WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	return yaml.Marshal(cloudprovider.Config{
+		TenantID:          cs.Properties.AzProfile.TenantID,
+		SubscriptionID:    cs.Properties.AzProfile.SubscriptionID,
+		AadClientID:       cs.Properties.WorkerServicePrincipalProfile.ClientID,
+		AadClientSecret:   cs.Properties.WorkerServicePrincipalProfile.Secret,
 		ResourceGroup:     cs.Properties.AzProfile.ResourceGroup,
 		LoadBalancerSku:   "standard",
 		Location:          cs.Location,

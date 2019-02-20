@@ -1,1 +1,1 @@
-{{ CertFromVault "PublicHostname" | String }}
+{{ SecretFromVault "CERTIFICATE" .ContainerService.Properties.APICertProfile.KeyVaultSecretURL }}

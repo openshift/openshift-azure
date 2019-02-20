@@ -138,6 +138,36 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
+	if !shared.IsUpdate() {
+		// call after GenerateConfig() as we need the certifcates created
+		cfg := azureclient.NewClientCredentialsConfigFromEnvironment()
+		vc, err := azureclient.NewVaultMgmtClient(cfg, os.Getenv("AZURE_SUBSCRIPTION_ID"))
+		if err != nil {
+			return nil, err
+		}
+		spc, err := azureclient.NewServicePrincipalsClient(cfg, os.Getenv("AZURE_TENANT_ID"))
+		if err != nil {
+			return nil, err
+		}
+		objID, err := spc.ObjectIDforApplicationID(ctx, os.Getenv("AZURE_CLIENT_ID"))
+		if err != nil {
+			return nil, err
+		}
+		vaultURL, err := vc.CreateVault(ctx, objID, os.Getenv("AZURE_SUBSCRIPTION_ID"),
+			os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
+		if err != nil {
+			return nil, err
+		}
+		kvc, err := azureclient.NewKeyVaultClient(cfg, vaultURL)
+		if err != nil {
+			return nil, err
+		}
+		err = WriteTLSCertsToVault(ctx, kvc, cs, vaultURL)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// persist the OpenShift container service
 	log.Info("persist config")
 	bytes, err := yaml.Marshal(cs)
@@ -229,7 +259,12 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
 	}
 
-	cs.Properties.ServicePrincipalProfile = api.ServicePrincipalProfile{
+	// TODO these should be different
+	cs.Properties.MasterServicePrincipalProfile = api.ServicePrincipalProfile{
+		ClientID: os.Getenv("AZURE_CLIENT_ID"),
+		Secret:   os.Getenv("AZURE_CLIENT_SECRET"),
+	}
+	cs.Properties.WorkerServicePrincipalProfile = api.ServicePrincipalProfile{
 		ClientID: os.Getenv("AZURE_CLIENT_ID"),
 		Secret:   os.Getenv("AZURE_CLIENT_SECRET"),
 	}
@@ -256,7 +291,8 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 			return err
 		}
 	}
-	b, err := config.Derived.CloudProviderConf(cs)
+	// TODO check this
+	b, err := config.Derived.MasterCloudProviderConf(cs)
 	if err != nil {
 		return err
 	}

@@ -29,6 +29,7 @@ var (
 
 type sync struct {
 	azs  azureclient.AccountsClient
+	cpc  *cloudprovider.Config
 	blob azureclientstorage.Blob
 	log  *logrus.Entry
 }
@@ -38,6 +39,7 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 	if err != nil {
 		return err
 	}
+	s.cpc = cpc
 
 	authorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID, "")
 	if err != nil {
@@ -73,7 +75,7 @@ func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
 		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 
-	if err := addons.Main(ctx, s.log, cs, s.azs, *dryRun); err != nil {
+	if err := addons.Main(ctx, s.log, cs, s.azs, s.cpc, *dryRun); err != nil {
 		return true, errors.Wrap(err, "cannot sync cluster config")
 	}
 

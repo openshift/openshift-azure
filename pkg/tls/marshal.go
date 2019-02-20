@@ -97,6 +97,43 @@ func ParseCert(b []byte) (*x509.Certificate, error) {
 	return cert, err
 }
 
+// GetPemBlock extracts the requested block out of the data and returns it as a string
+func GetPemBlock(data []byte, blockType string) (string, error) {
+	for block, remainder := pem.Decode(data); block != nil; block, remainder = pem.Decode(remainder) {
+		if block.Type != blockType {
+			continue
+		}
+		switch block.Type {
+		case "PRIVATE KEY":
+			key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+			if err != nil {
+				return "", err
+			}
+			switch key := key.(type) {
+			case *rsa.PrivateKey:
+				b, err := PrivateKeyAsBytes(key)
+				if err != nil {
+					return "", err
+				}
+				return string(b), nil
+			default:
+				return "", errors.New("found unknown private key type in PKCS#8 wrapping")
+			}
+		case "CERTIFICATE":
+			cert, err := x509.ParseCertificate(block.Bytes)
+			if err != nil {
+				return "", err
+			}
+			b, err := CertAsBytes(cert)
+			if err != nil {
+				return "", err
+			}
+			return string(b), nil
+		}
+	}
+	return "", fmt.Errorf("failed to find block %s", blockType)
+}
+
 func ParsePrivateKey(b []byte) (*rsa.PrivateKey, error) {
 	block, rest := pem.Decode(b)
 	if len(rest) > 0 {

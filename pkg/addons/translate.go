@@ -1,8 +1,11 @@
 package addons
 
 import (
+	"context"
 	"encoding/base64"
+	"text/template"
 
+	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -10,6 +13,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	util "github.com/openshift/openshift-azure/pkg/util/template"
 )
 
@@ -29,7 +35,30 @@ const (
 	NestedFlagsBase64 NestedFlags = (1 << iota)
 )
 
-func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster, ext *extra) (unstructured.Unstructured, error) {
+type authenticatedCall struct {
+	cpc *cloudprovider.Config
+}
+
+func (a *authenticatedCall) getSecretFromVault(blockType, kvURL string) (string, error) {
+	vaultURL, certName, err := azureclient.GetURLCertNameFromFullURL(kvURL)
+	if err != nil {
+		return "", err
+	}
+	cfg := auth.NewClientCredentialsConfig(a.cpc.AadClientID, a.cpc.AadClientSecret, a.cpc.TenantID)
+	kvc, err := azureclient.NewKeyVaultClient(cfg, vaultURL)
+	if err != nil {
+		return "", err
+	}
+	bundle, err := kvc.GetSecret(context.Background(), vaultURL, certName, "")
+	if err != nil {
+		return "", err
+	}
+	return tls.GetPemBlock([]byte(*bundle.Value), blockType)
+}
+
+func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster, ext *extra, cpc *cloudprovider.Config) (unstructured.Unstructured, error) {
+	ac := authenticatedCall{cpc: cpc}
+
 	ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
 	for _, tr := range ts {
 		var s interface{}
@@ -40,7 +69,10 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 				return unstructured.Unstructured{}, err
 			}
 		} else {
-			b, err := util.Template(tr.Template, nil, cs, ext)
+			b, err := util.Template(tr.Template,
+				template.FuncMap{
+					"SecretFromVault": ac.getSecretFromVault,
+				}, cs, ext)
 			s = string(b)
 			if err != nil {
 				return unstructured.Unstructured{}, err
@@ -596,7 +628,7 @@ var Translations = map[string][]struct {
 		{
 			Path: jsonpath.MustCompile("$.stringData.'azure.conf'"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				b, err := config.Derived.CloudProviderConf(cs)
+				b, err := config.Derived.WorkerCloudProviderConf(cs)
 				return string(b), err
 			},
 		},
@@ -604,11 +636,11 @@ var Translations = map[string][]struct {
 	"Secret/default/router-certs": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),
-			Template: "{{ String (CertAsBytes .Config.Certificates.Router.Cert) }}\n{{ String (CertAsBytes .Config.Certificates.Ca.Cert) }}\n{{ String (PrivateKeyAsBytes .Config.Certificates.Router.Key) }}",
+			Template: "{{ SecretFromVault \"CERTIFICATE\" (index .ContainerService.Properties.RouterProfiles 0).RouterCertProfile.KeyVaultSecretURL }}\n{{ String (CertAsBytes .Config.Certificates.Ca.Cert) }}\n{{ SecretFromVault \"PRIVATE KEY\" (index .ContainerService.Properties.RouterProfiles 0).RouterCertProfile.KeyVaultSecretURL }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.key'"),
-			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.Router.Key) }}",
+			Template: "{{ SecretFromVault \"PRIVATE KEY\" (index .ContainerService.Properties.RouterProfiles 0).RouterCertProfile.KeyVaultSecretURL }}",
 		},
 	},
 	"Secret/openshift-infra/aad-group-sync-config": {

@@ -10,6 +10,7 @@ import (
 	"strings"
 	texttemplate "text/template"
 
+	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
@@ -19,6 +20,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 	"github.com/openshift/openshift-azure/pkg/util/log"
@@ -33,20 +35,24 @@ var (
 type startup struct {
 	log *logrus.Entry
 	cs  *api.OpenShiftManagedCluster
+	cpc *cloudprovider.Config
 }
 
-func (s *startup) certFromVault(name string) ([]byte, error) {
-	if name == "PublicHostname" {
-		return tls.CertAsBytes(s.cs.Config.Certificates.OpenShiftConsole.Cert)
+func (s *startup) getSecretFromVault(blockType, kvURL string) (string, error) {
+	vaultURL, certName, err := azureclient.GetURLCertNameFromFullURL(kvURL)
+	if err != nil {
+		return "", err
 	}
-	return []byte{}, nil
-}
-
-func (s *startup) privateKeyFromVault(name string) ([]byte, error) {
-	if name == "PublicHostname" {
-		return tls.PrivateKeyAsBytes(s.cs.Config.Certificates.OpenShiftConsole.Key)
+	cfg := auth.NewClientCredentialsConfig(s.cpc.AadClientID, s.cpc.AadClientSecret, s.cpc.TenantID)
+	kvc, err := azureclient.NewKeyVaultClient(cfg, vaultURL)
+	if err != nil {
+		return "", err
 	}
-	return []byte{}, nil
+	bundle, err := kvc.GetSecret(context.Background(), vaultURL, certName, "")
+	if err != nil {
+		return "", err
+	}
+	return tls.GetPemBlock([]byte(*bundle.Value), blockType)
 }
 
 func (s *startup) writeTemplatedFiles() error {
@@ -70,8 +76,7 @@ func (s *startup) writeTemplatedFiles() error {
 
 		b, err := template.Template(string(templateFile),
 			texttemplate.FuncMap{
-				"CertFromVault":       s.certFromVault,
-				"PrivateKeyFromVault": s.privateKeyFromVault,
+				"SecretFromVault": s.getSecretFromVault,
 			}, s.cs, map[string]interface{}{
 				"Hostname":    hostname,
 				"DNSHostname": domainname,
@@ -104,6 +109,7 @@ func (s *startup) startup(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	s.cpc = cpc
 
 	bsc, err := configblob.GetService(ctx, cpc)
 	if err != nil {

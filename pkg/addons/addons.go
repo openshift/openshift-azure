@@ -21,6 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 )
 
 const ownedBySyncPodLabelKey = "azure.openshift.io/owned-by-sync-pod"
@@ -51,7 +52,7 @@ func Unmarshal(b []byte) (unstructured.Unstructured, error) {
 
 // readDB reads previously exported objects into a map via go-bindata as well as
 // populating configuration items via Translate().
-func readDB(cs *api.OpenShiftManagedCluster, ext *extra) (map[string]unstructured.Unstructured, error) {
+func readDB(cs *api.OpenShiftManagedCluster, ext *extra, cpc *cloudprovider.Config) (map[string]unstructured.Unstructured, error) {
 	db := map[string]unstructured.Unstructured{}
 
 	for _, asset := range AssetNames() {
@@ -65,7 +66,7 @@ func readDB(cs *api.OpenShiftManagedCluster, ext *extra) (map[string]unstructure
 			return nil, err
 		}
 
-		o, err = translateAsset(o, cs, ext)
+		o, err = translateAsset(o, cs, ext, cpc)
 		if err != nil {
 			return nil, err
 		}
@@ -251,7 +252,7 @@ func writeDB(log *logrus.Entry, client Interface, db map[string]unstructured.Uns
 	return client.ApplyResources(scFilter, db, keys)
 }
 
-func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) error {
+func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, azs azureclient.AccountsClient, cpc *cloudprovider.Config, dryRun bool) error {
 	client, err := newClient(ctx, log, cs, azs, dryRun)
 	if err != nil {
 		return err
@@ -268,7 +269,7 @@ func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluste
 	db, err := readDB(cs, &extra{
 		RegistryStorageAccountKey: keyRegistry,
 		ConfigStorageAccountKey:   keyConfig,
-	})
+	}, cpc)
 	if err != nil {
 		return err
 	}

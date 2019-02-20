@@ -2,7 +2,7 @@ package azureclient
 
 //go:generate go get github.com/golang/mock/gomock
 //go:generate go install github.com/golang/mock/mockgen
-//go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/azureclient.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE Client,VirtualMachineScaleSetsClient,VirtualMachineScaleSetVMsClient,VirtualMachineScaleSetExtensionsClient,ApplicationsClient,MarketPlaceAgreementsClient,DeploymentsClient,AccountsClient
+//go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/azureclient.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE Client,VirtualMachineScaleSetsClient,VirtualMachineScaleSetVMsClient,VirtualMachineScaleSetExtensionsClient,ApplicationsClient,MarketPlaceAgreementsClient,DeploymentsClient,AccountsClient,KeyVaultClient
 //go:generate gofmt -s -l -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
 //go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
 //go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE/storage Client,BlobStorageClient,Container,Blob
@@ -89,4 +89,8 @@ func GetAuthorizerFromContext(ctx context.Context) (autorest.Authorizer, error) 
 
 func NewAuthorizerFromEnvironment() (autorest.Authorizer, error) {
 	return NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"), "")
+}
+
+func NewClientCredentialsConfigFromEnvironment() auth.ClientCredentialsConfig {
+	return auth.NewClientCredentialsConfig(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"))
 }
