@@ -406,8 +406,6 @@
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml
 // data/Route.route.openshift.io/default/docker-registry.yaml
 // data/Route.route.openshift.io/default/registry-console.yaml
-// data/Route.route.openshift.io/kube-service-catalog/apiserver.yaml
-// data/Route.route.openshift.io/openshift-ansible-service-broker/asb-1338.yaml
 // data/Route.route.openshift.io/openshift-console/console.yaml
 // data/Secret/default/registry-certificates.yaml
 // data/Secret/default/registry-config.yaml
@@ -8868,46 +8866,6 @@ func routeRouteOpenshiftIoDefaultRegistryConsoleYaml() (*asset, error) {
 	return a, nil
 }
 
-var _routeRouteOpenshiftIoKubeServiceCatalogApiserverYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x64\x8f\x4f\x6b\x32\x41\x0c\xc6\xef\xf3\x29\x1e\xbc\x08\x0b\xfa\xea\x75\x6e\x2f\x54\x7a\x13\xb1\xa5\xf7\x74\x36\xdd\x0d\xae\x93\x21\x93\x55\xfa\xed\xcb\xb8\x5e\x4a\x8f\xcf\x9f\x24\xbf\x50\x91\x0f\xb6\x2a\x9a\x23\x4c\x67\xe7\xad\x16\xce\x75\x94\x2f\xdf\x8a\xfe\xbb\xed\xc3\x45\x72\x1f\x71\x6e\x59\xb8\xb2\x53\x4f\x4e\x31\x00\x94\xb3\x3a\xb9\x68\xae\x4d\x02\xbf\x06\x47\xad\xbe\x1d\x38\xb3\x91\x73\x1f\xb1\x72\x9b\x79\x15\x80\x4c\x57\x8e\xa0\x22\x95\xed\xc6\xf6\x74\x6a\xa1\xc4\x11\x97\xf9\x93\x37\x2d\x90\xc4\x9b\x44\x4e\x93\x0e\xa1\x16\x4e\xed\x42\x5b\x19\xb1\xee\xba\x0e\xaf\x87\xe3\xe1\xfc\xff\xfd\xf0\x82\xae\xeb\xd6\x01\x28\x6a\xbe\x50\x38\xd9\xc0\x7e\x6a\x1a\x95\xd3\x6c\x1c\x00\x9f\x9e\x8c\xce\x76\x95\xfc\xa0\x8e\x28\x54\xab\x8f\xa6\xf3\x30\xb6\x8e\x2e\x95\xe5\xdf\xb7\x05\xe2\xe1\xfc\x45\x06\xee\x2c\xc3\xe8\x11\xfb\xdd\x2e\x00\x77\x99\xfa\x44\xd6\x9f\x74\x92\xf4\x1d\x71\xd4\xcc\xe1\x27\x00\x00\xff\xff\x7a\xff\xaa\xc0\x5b\x01\x00\x00")
-
-func routeRouteOpenshiftIoKubeServiceCatalogApiserverYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_routeRouteOpenshiftIoKubeServiceCatalogApiserverYaml,
-		"Route.route.openshift.io/kube-service-catalog/apiserver.yaml",
-	)
-}
-
-func routeRouteOpenshiftIoKubeServiceCatalogApiserverYaml() (*asset, error) {
-	bytes, err := routeRouteOpenshiftIoKubeServiceCatalogApiserverYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "Route.route.openshift.io/kube-service-catalog/apiserver.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _routeRouteOpenshiftIoOpenshiftAnsibleServiceBrokerAsb1338Yaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x84\x50\xc1\x6a\xeb\x40\x0c\xbc\xef\x57\x88\x5c\x02\x06\xe7\x25\xe4\xf2\xd8\x5b\xa1\xa1\xb7\x10\xd2\xd2\xbb\x6c\xab\x89\x88\x2d\x2d\x5a\x25\x21\x7f\x5f\xd6\x76\x5b\x7a\xea\x6d\x67\x76\x46\x33\x0c\x26\x7e\x27\xcb\xac\x12\xc1\xf4\xea\xb4\xd2\x44\x92\xcf\xfc\xe1\x2b\xd6\x7f\xb7\x4d\xb8\xb0\x74\x11\x8e\xe5\x2f\x0c\xe4\xd8\xa1\x63\x0c\x00\x28\xa2\x8e\xce\x2a\xb9\x40\x80\x5f\xc6\xb3\x66\x5f\x9d\x48\xc8\xd0\xa9\x8b\xb0\x70\xbb\xd2\x22\x00\xf4\xd8\x50\x3f\x3b\x30\xa5\xf8\x63\xab\x51\x32\x37\x3d\xd5\x99\xec\xc6\x2d\xd5\x8d\xe9\x85\x6c\x54\xce\x54\x04\xcc\x4d\x00\x10\x1c\xa6\x77\xbd\xd9\x6e\xff\xcf\x44\x4e\x58\x14\x7f\xde\xcb\x89\xda\x92\x5f\x2a\x46\x58\x56\x55\x05\x2f\xbb\xfd\xee\xf8\xf4\xb6\x7b\x86\xaa\xaa\x96\x01\x20\xa9\xf9\xd4\xd1\xd1\x4e\xe4\x87\x82\x61\x0e\xf3\xaf\xfe\x4e\x36\xb0\x8c\x1b\x44\x30\x22\x69\xed\x91\xbc\x28\x74\x12\x4c\xdb\xbd\x4e\xf9\x23\xf3\xdd\x7c\x44\x77\xe2\xd3\xb9\x1c\x5e\xaf\x03\xc0\x9d\xfb\xae\x45\xeb\x0e\xda\x73\xfb\x88\xb0\x57\xa1\xf0\x19\x00\x00\xff\xff\x5d\xe8\xbe\x1a\xa1\x01\x00\x00")
-
-func routeRouteOpenshiftIoOpenshiftAnsibleServiceBrokerAsb1338YamlBytes() ([]byte, error) {
-	return bindataRead(
-		_routeRouteOpenshiftIoOpenshiftAnsibleServiceBrokerAsb1338Yaml,
-		"Route.route.openshift.io/openshift-ansible-service-broker/asb-1338.yaml",
-	)
-}
-
-func routeRouteOpenshiftIoOpenshiftAnsibleServiceBrokerAsb1338Yaml() (*asset, error) {
-	bytes, err := routeRouteOpenshiftIoOpenshiftAnsibleServiceBrokerAsb1338YamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "Route.route.openshift.io/openshift-ansible-service-broker/asb-1338.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _routeRouteOpenshiftIoOpenshiftConsoleConsoleYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x90\xc1\x6a\x33\x31\x0c\x84\xef\x7e\x8a\xb9\x05\x0c\x7f\xfe\xe4\xea\x5b\xa1\x4b\x6f\x21\x6c\x43\xef\xae\xad\xee\x8a\xee\x5a\x46\x56\x12\xf2\xf6\x65\xbb\xa4\xa5\xa5\x37\x8f\x47\xfa\x46\x52\xac\xfc\x42\xda\x58\x4a\x80\xca\xd9\x68\x2b\x95\x4a\x1b\xf9\xcd\xb6\x2c\xff\x2f\x7b\xf7\xce\x25\x07\xf4\x8b\xe7\x66\xb2\x98\xa3\xc5\xe0\x80\x29\xbe\xd2\xd4\x96\x17\x10\x6b\x0d\xf8\x6a\xfc\x97\xa4\x34\x99\xc8\x01\x25\xce\x14\xf0\x53\xb7\x1a\x13\xfd\x55\xde\x2a\xa5\x85\x37\x4a\xb3\x80\x8d\xf7\x1e\x4f\xdd\xa1\xeb\x1f\x4e\xdd\x23\xbc\xf7\x1b\x07\x54\x51\x5b\x33\x2d\xea\x40\x76\x5c\x34\x46\xb3\xda\x1c\x60\xf7\x81\xb8\x34\x4a\x67\xa5\x2e\x0f\x74\x22\x9d\xb9\x44\x63\x29\x47\x99\x38\xdd\x02\x7a\xca\xac\x94\x6c\x05\x7d\xfb\x01\x4a\x54\x92\xde\xea\x62\x99\xac\xb0\xf5\x02\xcf\xa4\x17\x4e\xf4\xf9\xf3\x7b\x2d\xe0\x4a\x3c\x8c\x16\xb0\xdf\xed\x1c\x70\xe5\x29\xa7\xa8\xf9\x9e\x77\x90\x42\xee\x23\x00\x00\xff\xff\xab\x85\xf8\x3c\x6b\x01\x00\x00")
 
 func routeRouteOpenshiftIoOpenshiftConsoleConsoleYamlBytes() ([]byte, error) {
@@ -14866,8 +14824,6 @@ var _bindata = map[string]func() (*asset, error){
 	"RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                     rolebindingRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
 	"Route.route.openshift.io/default/docker-registry.yaml":                                                                              routeRouteOpenshiftIoDefaultDockerRegistryYaml,
 	"Route.route.openshift.io/default/registry-console.yaml":                                                                             routeRouteOpenshiftIoDefaultRegistryConsoleYaml,
-	"Route.route.openshift.io/kube-service-catalog/apiserver.yaml":                                                                       routeRouteOpenshiftIoKubeServiceCatalogApiserverYaml,
-	"Route.route.openshift.io/openshift-ansible-service-broker/asb-1338.yaml":                                                            routeRouteOpenshiftIoOpenshiftAnsibleServiceBrokerAsb1338Yaml,
 	"Route.route.openshift.io/openshift-console/console.yaml":                                                                            routeRouteOpenshiftIoOpenshiftConsoleConsoleYaml,
 	"Secret/default/registry-certificates.yaml":                                                                                          secretDefaultRegistryCertificatesYaml,
 	"Secret/default/registry-config.yaml":                                                                                                secretDefaultRegistryConfigYaml,
@@ -15702,12 +15658,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"default": {nil, map[string]*bintree{
 			"docker-registry.yaml":  {routeRouteOpenshiftIoDefaultDockerRegistryYaml, map[string]*bintree{}},
 			"registry-console.yaml": {routeRouteOpenshiftIoDefaultRegistryConsoleYaml, map[string]*bintree{}},
-		}},
-		"kube-service-catalog": {nil, map[string]*bintree{
-			"apiserver.yaml": {routeRouteOpenshiftIoKubeServiceCatalogApiserverYaml, map[string]*bintree{}},
-		}},
-		"openshift-ansible-service-broker": {nil, map[string]*bintree{
-			"asb-1338.yaml": {routeRouteOpenshiftIoOpenshiftAnsibleServiceBrokerAsb1338Yaml, map[string]*bintree{}},
 		}},
 		"openshift-console": {nil, map[string]*bintree{
 			"console.yaml": {routeRouteOpenshiftIoOpenshiftConsoleConsoleYaml, map[string]*bintree{}},
