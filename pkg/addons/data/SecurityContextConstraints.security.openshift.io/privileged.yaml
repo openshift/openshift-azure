@@ -42,7 +42,6 @@ users:
 - system:serviceaccount:openshift-node:sync
 - system:serviceaccount:openshift-etcd:etcd-backup
 - system:serviceaccount:openshift-azure-logging:geneva
-- system:serviceaccount:openshift-azure-monitoring:etcd-metrics
 - system:serviceaccount:openshift-sdn:sdn
 volumes:
 - '*'

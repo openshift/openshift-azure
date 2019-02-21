@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: etcd-metrics-reader
+  namespace: openshift-azure-monitoring
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  - svc
+  verbs:
+  - get
+  - list

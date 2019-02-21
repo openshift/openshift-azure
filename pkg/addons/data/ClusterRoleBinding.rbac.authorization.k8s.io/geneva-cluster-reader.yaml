@@ -13,3 +13,6 @@ subjects:
 - kind: ServiceAccount
   name: geneva
   namespace: openshift-azure-monitoring
+- kind: ServiceAccount
+  name: prometheus-k8s
+  namespace: openshift-monitoring

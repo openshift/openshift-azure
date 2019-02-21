@@ -47,7 +47,7 @@ images:
   etcdBackup: quay.io/openshift-on-azure/etcdbackup:latest
   httpd: registry.access.redhat.com/rhscl/httpd-24-rhel7:2.4-85
   startup: quay.io/openshift-on-azure/startup:latest
-  tlsProxy: quay.io/openshift-on-azure/tlsproxy:dev
+  tlsProxy: quay.io/openshift-on-azure/tlsproxy:latest
   format: registry.access.redhat.com/openshift3/ose-${component}:${version}
   genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
   genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76

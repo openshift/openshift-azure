@@ -79,6 +79,10 @@ var daemonsetWhitelist = []struct {
 		Name:      "mdsd",
 		Namespace: "openshift-azure-logging",
 	},
+	{
+		Name:      "etcd-metrics",
+		Namespace: "openshift-azure-monitoring",
+	},
 }
 
 var statefulsetWhitelist = []struct {

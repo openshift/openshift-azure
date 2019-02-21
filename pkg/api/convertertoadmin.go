@@ -198,6 +198,7 @@ func convertImageConfigToAdmin(in ImageConfig) *admin.ImageConfig {
 		Sync:                      &in.Sync,
 		Startup:                   &in.Startup,
 		TemplateServiceBroker:     &in.TemplateServiceBroker,
+		TLSProxy:                  &in.TLSProxy,
 		Registry:                  &in.Registry,
 		Router:                    &in.Router,
 		RegistryConsole:           &in.RegistryConsole,
@@ -205,11 +206,7 @@ func convertImageConfigToAdmin(in ImageConfig) *admin.ImageConfig {
 		WebConsole:                &in.WebConsole,
 		Console:                   &in.Console,
 		EtcdBackup:                &in.EtcdBackup,
-<<<<<<< HEAD
 		Httpd:                     &in.Httpd,
-=======
-		TLSProxy:                  &in.TLSProxy,
->>>>>>> etcd metrics shim with tlsproxy
 		GenevaLogging:             &in.GenevaLogging,
 		GenevaTDAgent:             &in.GenevaTDAgent,
 		GenevaStatsd:              &in.GenevaStatsd,

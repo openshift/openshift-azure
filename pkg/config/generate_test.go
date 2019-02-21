@@ -57,6 +57,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.Images.ServiceCatalog != "", "service catalog image")
 	assert(c.Images.AnsibleServiceBroker != "", "ansible service broker image")
 	assert(c.Images.TemplateServiceBroker != "", "template service broker image")
+	assert(c.Images.TLSProxy != "", "tlsProxy image")
 	assert(c.Images.Registry != "", "registry image")
 	assert(c.Images.Router != "", "router image")
 	assert(c.Images.WebConsole != "", "web console image")
@@ -67,7 +68,6 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.Images.Startup != "", "startup image")
 	assert(c.Images.EtcdBackup != "", "etcdbackup image")
 	assert(c.Images.Httpd != "", "httpd image")
-	assert(c.Images.TLSProxy != "", "tlsProxy image")
 	assert(c.Images.ClusterMonitoringOperator != "", "cluster monitoring operator image")
 	assert(c.Images.PrometheusOperator != "", "cluster monitoring operator image")
 	assert(c.Images.PrometheusConfigReloader != "", "prometheus config reloader image")
@@ -90,6 +90,8 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(len(c.RegistryStorageAccount) != 0, "registry storage account")
 	assert(len(c.RegistryConsoleOAuthSecret) != 0, "registry console oauth secret")
 	assert(len(c.RouterStatsPassword) != 0, "router stats password")
+	assert(len(c.EtcdMetricsPassword) != 0, "etcd metrics password")
+	assert(len(c.EtcdMetricsUsername) != 0, "etcd metrics username")
 
 	assert(c.ServiceCatalogClusterID != uuid.Nil, "service catalog cluster id")
 

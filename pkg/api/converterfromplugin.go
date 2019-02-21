@@ -56,6 +56,7 @@ func ConvertFromPlugin(in *plugin.Config, old *Config) *Config {
 	cs.Images.ServiceCatalog = in.Images.ServiceCatalog
 	cs.Images.Sync = in.Images.Sync
 	cs.Images.TemplateServiceBroker = in.Images.TemplateServiceBroker
+	cs.Images.TLSProxy = in.Images.TLSProxy
 	cs.Images.Registry = in.Images.Registry
 	cs.Images.Router = in.Images.Router
 	cs.Images.RegistryConsole = in.Images.RegistryConsole
@@ -65,7 +66,6 @@ func ConvertFromPlugin(in *plugin.Config, old *Config) *Config {
 	cs.Images.EtcdBackup = in.Images.EtcdBackup
 	cs.Images.Httpd = in.Images.Httpd
 	cs.Images.Startup = in.Images.Startup
-	cs.Images.TLSProxy = in.Images.TLSProxy
 	cs.Images.GenevaLogging = in.Images.GenevaLogging
 	cs.Images.GenevaTDAgent = in.Images.GenevaTDAgent
 	cs.Images.GenevaStatsd = in.Images.GenevaStatsd

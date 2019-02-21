@@ -86,12 +86,10 @@ tlsproxy: generate
 	go build -ldflags ${LDFLAGS} ./cmd/tlsproxy
 
 tlsproxy-image: tlsproxy
-	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-	imagebuilder -f Dockerfile.tlsproxy -t $(TLSPROXY_IMAGE) .
+	$(IMAGEBUILDER) -f images/tlsproxy/Dockerfile -t $(TLSPROXY_IMAGE) .
 
 tlsproxy-push: tlsproxy-image
 	docker push $(TLSPROXY_IMAGE)
-
 
 metricsbridge:
 	go build -ldflags ${LDFLAGS} ./cmd/$@

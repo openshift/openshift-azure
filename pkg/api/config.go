@@ -56,6 +56,8 @@ type Config struct {
 	RegistryConsoleOAuthSecret     string    `json:"registryConsoleOAuthSecret,omitempty"`
 	ConsoleOAuthSecret             string    `json:"consoleOAuthSecret,omitempty"`
 	RouterStatsPassword            string    `json:"routerStatsPassword,omitempty"`
+	EtcdMetricsPassword            string    `json:"etcdMetricsPassword,omitempty"`
+	EtcdMetricsUsername            string    `json:"etcdMetricsUsername,omitempty"`
 	ServiceCatalogClusterID        uuid.UUID `json:"serviceCatalogClusterId,omitempty"`
 
 	// Geneva Metrics System (MDM) sector used for logging
@@ -108,6 +110,7 @@ type ImageConfig struct {
 	Sync                  string `json:"sync,omitempty"`
 	Startup               string `json:"startup,omitempty"`
 	TemplateServiceBroker string `json:"templateServiceBroker,omitempty"`
+	TLSProxy              string `json:"tlsProxy,omitempty"`
 	Registry              string `json:"registry,omitempty"`
 	Router                string `json:"router,omitempty"`
 	RegistryConsole       string `json:"registryConsole,omitempty"`
@@ -116,7 +119,6 @@ type ImageConfig struct {
 	Console               string `json:"console,omitempty"`
 	EtcdBackup            string `json:"etcdBackup,omitempty"`
 	Httpd                 string `json:"httpd,omitempty"`
-	TLSProxy              string `json:"tlsProxy,omitempty"`
 
 	// GenevaImagePullSecret defines secret used to pull private Azure images
 	GenevaImagePullSecret []byte `json:"genevaImagePullSecret,omitempty"`

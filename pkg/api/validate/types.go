@@ -17,6 +17,10 @@ var (
 		`(\.([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9]))*` +
 		`$`)
 
+	rxRfc3986 = regexp.MustCompile(`^(([^:/?#]+):)?` +
+		`(//([^/?#]*))?([^?#]*)` +
+		`(\?([^#]*))?(#(.*))?`)
+
 	rxVNetID = regexp.MustCompile(`(?i)^` +
 		`/subscriptions/[^/]+` +
 		`/resourceGroups/[^/]+` +
@@ -112,6 +116,10 @@ func init() {
 
 func isValidHostname(h string) bool {
 	return len(h) <= 255 && rxRfc1123.MatchString(h)
+}
+
+func IsValidURI(h string) bool {
+	return len(h) <= 255 && rxRfc3986.MatchString(h)
 }
 
 func isValidCloudAppHostname(h, location string) bool {

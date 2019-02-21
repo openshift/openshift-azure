@@ -178,14 +178,20 @@ var (
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "Secret"} ||
 			o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "ConfigMap"}
 	}
-	nonScFilter = func(o unstructured.Unstructured) bool {
-		return o.GroupVersionKind().Group != "servicecatalog.k8s.io"
+	nonCRDFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().Group != "servicecatalog.k8s.io" &&
+			o.GroupVersionKind().Group != "monitoring.coreos.com"
 	}
+
 	scFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().Group == "servicecatalog.k8s.io"
 	}
 	crdFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "apiextensions.k8s.io", Kind: "CustomResourceDefinition"}
+	}
+	// targeted filter is used to target specific CRDs, which are managed not by sync pod
+	targetedCrdFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "monitoring.coreos.com", Kind: "ServiceMonitor"}
 	}
 	storageClassFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "storage.k8s.io", Kind: "StorageClass"}
@@ -229,8 +235,8 @@ func writeDB(log *logrus.Entry, client Interface, db map[string]unstructured.Uns
 		return err
 	}
 
-	// create all non-service catalog resources
-	if err := client.ApplyResources(nonScFilter, db, keys); err != nil {
+	// create all, except targeted CRDs resources
+	if err := client.ApplyResources(nonCRDFilter, db, keys); err != nil {
 		return err
 	}
 
@@ -248,7 +254,25 @@ func writeDB(log *logrus.Entry, client Interface, db map[string]unstructured.Uns
 	}
 
 	// now write the servicecatalog configurables.
-	return client.ApplyResources(scFilter, db, keys)
+	if err := client.ApplyResources(scFilter, db, keys); err != nil {
+		return err
+	}
+
+	log.Debug("Waiting for the targeted CRDs to get ready")
+	if err := wait.PollImmediateInfinite(time.Second, func() (bool, error) {
+		return client.CRDReady("servicemonitors.monitoring.coreos.com")
+	}); err != nil {
+		return err
+	}
+	log.Debug("ServiceMonitors CRDs apis ready")
+
+	// refresh dynamic client
+	if err := client.UpdateDynamicClient(); err != nil {
+		return err
+	}
+
+	// write all post boostrap objects depending on targeted CRDs, managed by operators
+	return client.ApplyResources(targetedCrdFilter, db, keys)
 }
 
 // Main loop

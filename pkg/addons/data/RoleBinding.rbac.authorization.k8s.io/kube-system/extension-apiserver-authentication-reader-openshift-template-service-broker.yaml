@@ -9,5 +9,5 @@ roleRef:
   name: extension-apiserver-authentication-reader
 subjects:
 - kind: ServiceAccount
-  name: apiserver
-  namespace: openshift-template-service-broker
+  name: prometheus-k8s
+  namespace: openshift-monitoring
