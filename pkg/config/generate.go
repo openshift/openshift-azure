@@ -219,10 +219,9 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{
-					CommonName: "docker-registry-default." + cs.Properties.RouterProfiles[0].PublicSubdomain,
+					CommonName: "docker-registry.default.svc",
 				},
 				DNSNames: []string{
-					"docker-registry-default." + cs.Properties.RouterProfiles[0].PublicSubdomain,
 					"docker-registry.default.svc",
 					"docker-registry.default.svc.cluster.local",
 				},

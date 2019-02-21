@@ -8,7 +8,7 @@ metadata:
 spec:
   host: '*** GENERATED ***'
   tls:
-    termination: passthrough
+    termination: reencrypt
   to:
     kind: Service
     name: docker-registry
