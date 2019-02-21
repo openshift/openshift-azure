@@ -31,7 +31,7 @@ images:
   alertManagerBase: registry.access.redhat.com/openshift3/prometheus-alertmanager
   ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.69
   azureControllers: quay.io/openshift-on-azure/azure-controllers:latest
-  clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.69
+  clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.82
   configReloaderBase: registry.access.redhat.com/openshift3/ose-configmap-reloader
   console: registry.access.redhat.com/openshift3/ose-console:v3.11.69
   controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.69
