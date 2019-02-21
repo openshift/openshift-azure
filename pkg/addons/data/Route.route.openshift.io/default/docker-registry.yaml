@@ -1,13 +1,12 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  annotations:
-    openshift.io/host.generated: "true"
   name: docker-registry
   namespace: default
 spec:
   host: '*** GENERATED ***'
   tls:
+    insecureEdgeTerminationPolicy: Redirect
     termination: reencrypt
   to:
     kind: Service
