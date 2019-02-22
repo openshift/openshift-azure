@@ -84,6 +84,30 @@ func TestValidate(t *testing.T) {
 			},
 			simulateProd: true,
 		},
+		"simulating prod, master and infra nodes don't match": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[0].VMSize = "Standard_D4s_v3"
+				oc.Properties.AgentPoolProfiles[1].VMSize = "Standard_D8s_v3"
+				oc.Properties.AgentPoolProfiles[2].VMSize = "Standard_D8s_v3"
+			},
+			simulateProd: true,
+			expectedErrs: []error{
+				errors.New(`invalid properties.agentPoolProfiles.vmSize "Standard_D8s_v3": master and infra vmSizes must match`),
+			},
+		},
+		"simulating prod, all sizes outside the valid types": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[0].VMSize = "Standard_D64s_v3"
+				oc.Properties.AgentPoolProfiles[1].VMSize = "Standard_D64s_v3"
+				oc.Properties.AgentPoolProfiles[2].VMSize = "Standard_F64s_v3"
+			},
+			simulateProd: true,
+			expectedErrs: []error{
+				errors.New(`invalid properties.masterPoolProfile.vmSize "Standard_D64s_v3"`),
+				errors.New(`invalid properties.agentPoolProfiles["infra"].vmSize "Standard_D64s_v3"`),
+				errors.New(`invalid properties.agentPoolProfiles["mycompute"].vmSize "Standard_F64s_v3"`),
+			},
+		},
 		"running under test, Standard_D8s_v3": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				for i := range oc.Properties.AgentPoolProfiles {

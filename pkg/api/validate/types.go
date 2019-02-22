@@ -41,7 +41,6 @@ var (
 		api.StandardD8sV3:  {},
 		api.StandardD16sV3: {},
 		api.StandardD32sV3: {},
-		api.StandardD64sV3: {},
 
 		// TODO: consider enabling storage optimized (Ls) series for masters and
 		// moving the etcd onto the VM SSD storage.
@@ -65,50 +64,12 @@ var (
 		api.StandardD8sV3:  {},
 		api.StandardD16sV3: {},
 		api.StandardD32sV3: {},
-		api.StandardD64sV3: {},
-
-		api.StandardDS4V2: {},
-		api.StandardDS5V2: {},
 
 		// COMPUTE OPTIMIZED VMS
 
 		api.StandardF8sV2:  {},
 		api.StandardF16sV2: {},
 		api.StandardF32sV2: {},
-		api.StandardF64sV2: {},
-		api.StandardF72sV2: {},
-
-		api.StandardF8s:  {},
-		api.StandardF16s: {},
-
-		// MEMORY OPTIMIZED VMS
-
-		api.StandardE4sV3:  {},
-		api.StandardE8sV3:  {},
-		api.StandardE16sV3: {},
-		api.StandardE20sV3: {},
-		api.StandardE32sV3: {},
-		api.StandardE64sV3: {},
-
-		// Skipping StandardM* for now as they may require significant extra
-		// effort/spend to certify and support.
-
-		api.StandardGS2: {},
-		api.StandardGS3: {},
-		api.StandardGS4: {},
-		api.StandardGS5: {},
-
-		api.StandardDS12V2: {},
-		api.StandardDS13V2: {},
-		api.StandardDS14V2: {},
-		api.StandardDS15V2: {},
-
-		// STORAGE OPTIMIZED VMS
-
-		api.StandardL4s:  {},
-		api.StandardL8s:  {},
-		api.StandardL16s: {},
-		api.StandardL32s: {},
 	}
 )
 
