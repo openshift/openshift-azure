@@ -328,3 +328,12 @@ func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, h
 	}
 	return err
 }
+
+func (p *plugin) GetPluginVersion(ctx context.Context, pluginTemplate *pluginapi.Config) ([]byte, error) {
+	pluginVersion := &struct {
+		Version string `json:"version,omitempty"`
+	}{
+		Version: pluginTemplate.ClusterVersion,
+	}
+	return json.Marshal(pluginVersion)
+}

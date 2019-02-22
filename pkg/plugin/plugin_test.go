@@ -2,12 +2,14 @@ package plugin
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
@@ -308,5 +310,28 @@ func TestReimage(t *testing.T) {
 				t.Errorf("plugin.Reimage(%s) error = %v", tt.hostname, err)
 			}
 		})
+	}
+}
+
+func TestGetPluginVersion(t *testing.T) {
+	pluginTemplate := &pluginapi.Config{
+		ClusterVersion: "v0.0",
+	}
+	p := &plugin{
+		log: logrus.NewEntry(logrus.StandardLogger()),
+	}
+	b, err := p.GetPluginVersion(nil, pluginTemplate)
+	if err != nil {
+		t.Errorf("plugin.GetPluginVersion error = %v", err)
+	}
+	var result struct {
+		Version string `json:"version,omitempty"`
+	}
+	err = json.Unmarshal(b, &result)
+	if err != nil {
+		t.Errorf("json.Unmarshall error = %v", err)
+	}
+	if result.Version != pluginTemplate.ClusterVersion {
+		t.Errorf("expected plugin version %s, got %s", pluginTemplate.ClusterVersion, result.Version)
 	}
 }

@@ -132,4 +132,7 @@ type GenevaActions interface {
 
 	// Reimage reimages a virtual machine in the cluster
 	Reimage(ctx context.Context, oc *OpenShiftManagedCluster, hostname string) error
+
+	// GetPluginVersion fetches the RP plugin version
+	GetPluginVersion(ctx context.Context, template *plugin.Config) ([]byte, error)
 }
