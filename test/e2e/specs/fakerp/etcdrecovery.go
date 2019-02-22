@@ -167,6 +167,6 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 
 		By("Validating the cluster")
 		errs := cli.ValidateCluster(context.Background())
-		Expect(len(errs)).To(Equal(0))
+		Expect(errs).To(BeEmpty())
 	})
 })
