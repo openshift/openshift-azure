@@ -14,6 +14,9 @@ type Config struct {
 	ImageSKU       string `json:"imageSku,omitempty"`
 	ImageVersion   string `json:"imageVersion,omitempty"`
 
+	// SSH to system nodes allowed IP ranges
+	SSHSourceAddressPrefixes []string `json:"sshSourceAddressPrefixes,omitempty"`
+
 	Certificates CertificateConfig `json:"certificates,omitempty"`
 	Images       ImageConfig       `json:"images,omitempty"`
 

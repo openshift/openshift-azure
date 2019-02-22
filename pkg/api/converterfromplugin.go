@@ -17,6 +17,7 @@ func ConvertFromPlugin(in *plugin.Config, old *Config) *Config {
 	cs.ImagePublisher = in.ImagePublisher
 	cs.ImageSKU = in.ImageSKU
 	cs.ImageVersion = in.ImageVersion
+	cs.SSHSourceAddressPrefixes = in.SSHSourceAddressPrefixes
 	// Geneva integration configurables
 	cs.GenevaLoggingSector = in.GenevaLoggingSector
 	cs.GenevaLoggingNamespace = in.GenevaLoggingNamespace

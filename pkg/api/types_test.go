@@ -90,6 +90,9 @@ var marshalled = []byte(`{
 		"imagePublisher": "Config.ImagePublisher",
 		"imageSku": "Config.ImageSKU",
 		"imageVersion": "Config.ImageVersion",
+		"sshSourceAddressPrefixes": [
+			"Config.SSHSourceAddressPrefixes[0]"
+		],
 		"sshKey": "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlCT1FJQkFBSkJBTko2cWhjWmlBK0tsUURETlZqQTY0TVRJbSt3WGFWUnZ6Q2Zwbm9ya0Y0OVJHMVYvVm5mClZCTmVPNTBvb3E1ZGNpcElOM284bmVwY09QQU5Ybk5vVkVNQ0F3RUFBUUpBSFNIclR2MHlydXdBaWJWN09jaWkKRUdkaW1kRHdkVVJtVVNXWDFrc1hWV09uTXFxeFk4c1ZEZTQrOVNqbW1uMHRpZjc3UDRHWE0zUWxKSjFXa0tvQQo4UUloQVBPWjhjRDd0NTNBazIzOWh1bytMR1FnNUZZaVdVM0JGWTJ1VUQ0RG1EL0xBaUVBM1RFbHdFcC8ybXN5CkVlaXNlc3B6ZlBqQXVSME16clRoS3FEcTEwa3BQbWtDSUdFaThORElUd2FicE81R0cwZEt0WDdUMHRrNTV5eG4KSXdZVkRUQTlWTGVUQWlBd2dhcXB0S3k5Rld6eGlIanFwS01XOE9ZeXNqQXcxSEhjaTFWMHlOS0dvUUlnWlZiVQpNZU1kQVdVdkVJbXowY0RnQ3BLTCtqNDAySm1iZFZ1dkhNNyt3QVU9Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==",
 		"configStorageAccount": "Config.ConfigStorageAccount",
 		"registryStorageAccount": "Config.RegistryStorageAccount",

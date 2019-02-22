@@ -313,6 +313,9 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	if in.ImageVersion != nil {
 		out.ImageVersion = *in.ImageVersion
 	}
+	if in.SSHSourceAddressPrefixes != nil {
+		out.SSHSourceAddressPrefixes = *in.SSHSourceAddressPrefixes
+	}
 	if in.ConfigStorageAccount != nil {
 		out.ConfigStorageAccount = *in.ConfigStorageAccount
 	}
