@@ -37,6 +37,7 @@ create:
 
 delete:
 	./hack/delete.sh ${RESOURCEGROUP}
+	rm -rf _data
 
 azure-controllers: generate
 	go build -ldflags ${LDFLAGS} ./cmd/azure-controllers
