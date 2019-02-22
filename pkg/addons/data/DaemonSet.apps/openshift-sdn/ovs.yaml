@@ -110,3 +110,5 @@ spec:
       - hostPath:
           path: /etc/origin/openvswitch
         name: host-config-openvswitch
+  updateStrategy:
+    type: OnDelete
