@@ -78,6 +78,6 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 
 		By("Validating the cluster")
 		errs := cli.ValidateCluster(context.Background())
-		Expect(len(errs)).To(Equal(0))
+		Expect(errs).To(BeEmpty())
 	})
 })

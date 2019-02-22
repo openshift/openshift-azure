@@ -139,7 +139,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 
 		By("Validating the cluster")
 		errs := occli.ValidateCluster(context.Background())
-		Expect(len(errs)).To(Equal(0))
+		Expect(errs).To(BeEmpty())
 
 		By("Fetching the scale down manifest")
 		external, err = azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
@@ -171,7 +171,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 
 		By("Validating the cluster")
 		errs = occli.ValidateCluster(context.Background())
-		Expect(len(errs)).To(Equal(0))
+		Expect(errs).To(BeEmpty())
 	})
 })
 

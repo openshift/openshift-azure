@@ -25,7 +25,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake]", func()
 		ctx := context.Background()
 		By("creating test app")
 		namespace, errs := cli.CreateTestApp(ctx)
-		Expect(len(errs)).To(Equal(0))
+		Expect(errs).To(BeEmpty())
 		defer func() {
 			By("deleting test app")
 			_ = cli.DeleteTestApp(ctx, namespace)
@@ -33,11 +33,11 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake]", func()
 
 		By("validating test app")
 		errs = cli.ValidateTestApp(ctx, namespace)
-		Expect(len(errs)).To(Equal(0))
+		Expect(errs).To(BeEmpty())
 	})
 
 	It("should validate the cluster", func() {
 		errs := cli.ValidateCluster(context.Background())
-		Expect(len(errs)).To(Equal(0))
+		Expect(errs).To(BeEmpty())
 	})
 })
