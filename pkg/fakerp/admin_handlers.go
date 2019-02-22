@@ -190,3 +190,19 @@ func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 	}
 	s.log.Info("force-updated cluster")
 }
+
+// handleGetPluginVersion handles admin requests to get the RP plugin version for OpenShiftManagedClusters
+func (s *Server) handleGetPluginVersion(w http.ResponseWriter, req *http.Request) {
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
+	var version []byte
+	if version, err = s.plugin.GetPluginVersion(ctx, s.pluginTemplate); err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to get plugin version: %v", err))
+		return
+	}
+	w.Write(version)
+	s.log.Info("fetched plugin version")
+}
