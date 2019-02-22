@@ -669,6 +669,103 @@ func (client OpenShiftManagedClustersClient) ReimageResponder(resp *http.Respons
 	return
 }
 
+// OpenShiftManagedClustersPluginVersion contains the rp plugin version
+type OpenShiftManagedClustersPluginVersion struct {
+	autorest.Response `json:"-"`
+
+	Version string `json:"version"`
+}
+
+// OpenShiftManagedClustersGetPluginVersionFuture an abstraction for monitoring and retrieving the results of a
+// get rp plugin versions.
+type OpenShiftManagedClustersGetPluginVersionFuture struct {
+	azure.Future
+}
+
+func (future *OpenShiftManagedClustersGetPluginVersionFuture) Result(client OpenShiftManagedClustersClient) (ar autorest.Response, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersGetPluginVersionFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("containerservice.OpenShiftManagedClustersGetPluginVersionFuture")
+		return
+	}
+	ar.Response = future.Response()
+	return
+}
+
+// GetPluginVersion gets the RP plugin version
+// Parameters:
+// resourceGroupName - the name of the resource group.
+// resourceName - the name of the openshift managed cluster resource.
+func (client OpenShiftManagedClustersClient) GetPluginVersion(ctx context.Context, resourceGroupName string, resourceName string) (result OpenShiftManagedClustersPluginVersion, err error) {
+	req, err := client.GetPluginVersionPreparer(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "GetPluginVersion", nil, "Failure preparing request")
+		return
+	}
+
+	resp, err := client.GetPluginVersionSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "GetPluginVersion", resp, "Failure sending request")
+		return
+	}
+
+	result, err = client.GetPluginVersionResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "GetPluginVersion", resp, "Failure responding to request")
+	}
+
+	return
+}
+
+// GetPluginVersionPreparer prepares the GetPluginVersion request.
+func (client OpenShiftManagedClustersClient) GetPluginVersionPreparer(ctx context.Context, resourceGroupName string, resourceName string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": api.APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsGet(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/pluginVersion", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// GetPluginVersionSender sends the GetPluginVersion request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) GetPluginVersionSender(req *http.Request) (*http.Response, error) {
+	return autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+}
+
+// GetPluginVersionResponder handles the response to the GetPluginVersion request. The method always
+// closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) GetPluginVersionResponder(resp *http.Response) (result OpenShiftManagedClustersPluginVersion, err error) {
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return
+	}
+	result.Response = autorest.Response{Response: resp}
+	return
+}
+
 // RestoreAndWait restores an openshift managed cluster and waits for the
 // request to complete before returning.
 func (client OpenShiftManagedClustersClient) RestoreAndWait(ctx context.Context, resourceGroupName, resourceName string, blobName string) (result autorest.Response, err error) {
