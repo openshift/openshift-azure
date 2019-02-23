@@ -87,6 +87,10 @@ sync-image: sync imagebuilder
 sync-push: sync-image
 	docker push $(SYNC_IMAGE)
 
+all-image: azure-controllers-image e2e-image etcdbackup-image metrics-image sync-image
+
+all-push: azure-controllers-push e2e-push etcdbackup-push metrics-push sync-push
+
 verify:
 	./hack/validate-generated.sh
 	go vet ./...
@@ -136,4 +140,4 @@ imagebuilder:
 	docker pull registry.access.redhat.com/rhel7:latest
 	go get -u github.com/openshift/imagebuilder/cmd/imagebuilder
 
-.PHONY: clean metricsbridge metricsbridge-image metricsbridge-push sync-image sync-push verify unit e2e imagebuilder
+.PHONY: clean metricsbridge metricsbridge-image metricsbridge-push sync-image sync-push verify unit e2e imagebuilder all-image all-push
