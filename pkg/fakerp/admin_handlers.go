@@ -124,3 +124,23 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 	}
 	s.log.Info("rotated cluster secrets")
 }
+
+// handleForceUpdate handles admin requests for the force updates of clusters
+func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
+	deployer := GetDeployer(s.log, cs, s.pluginConfig)
+	if err := s.plugin.ForceUpdate(ctx, cs, deployer); err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to force update cluster: %v", err))
+		return
+	}
+	s.log.Info("force-updated cluster")
+}

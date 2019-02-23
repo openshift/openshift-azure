@@ -240,3 +240,27 @@ func (p *plugin) GetControlPlanePods(ctx context.Context, oc *api.OpenShiftManag
 	}
 	return json.Marshal(pods)
 }
+
+func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
+	p.log.Info("creating clients")
+	err := p.clusterUpgrader.CreateClients(ctx, cs, true)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+	p.log.Info("initializing cluster upgrader")
+	err = p.clusterUpgrader.Initialize(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
+	}
+	p.log.Info("resetting the clusters update blob")
+	err = p.clusterUpgrader.ResetUpdateBlob(cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepResetUpdateBlob}
+	}
+	p.log.Info("running CreateOrUpdate")
+	if err := p.CreateOrUpdate(ctx, cs, true, deployFn); err != nil {
+		return err
+	}
+	p.log.Info("force updates successful")
+	return nil
+}
