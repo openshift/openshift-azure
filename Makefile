@@ -87,7 +87,7 @@ sync-image: sync imagebuilder
 sync-push: sync-image
 	docker push $(SYNC_IMAGE)
 
-all-image: azure-controllers-image e2e-image etcdbackup-image metrics-image sync-image
+all-image: azure-controllers-image e2e-image etcdbackup-image metricsbridge-image sync-image
 
 all-push: azure-controllers-push e2e-push etcdbackup-push metrics-push sync-push
 
