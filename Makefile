@@ -42,8 +42,7 @@ delete:
 azure-controllers: generate
 	go build -ldflags ${LDFLAGS} ./cmd/azure-controllers
 
-azure-controllers-image: azure-controllers
-	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+azure-controllers-image: azure-controllers imagebuilder
 	imagebuilder -f Dockerfile.azure-controllers -t $(AZURE_CONTROLLERS_IMAGE) .
 
 azure-controllers-push: azure-controllers-image
@@ -52,8 +51,7 @@ azure-controllers-push: azure-controllers-image
 e2e-bin: generate
 	go test -ldflags ${LDFLAGS} -tags e2e -c -o ./e2e ./test/e2e
 
-e2e-image: e2e-bin
-	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+e2e-image: e2e-bin imagebuilder
 	imagebuilder -f Dockerfile.e2e -t $(E2E_IMAGE) .
 
 e2e-push: e2e-image
@@ -65,8 +63,7 @@ recoveretcdcluster: generate
 etcdbackup: generate
 	go build -ldflags ${LDFLAGS} ./cmd/etcdbackup
 
-etcdbackup-image: etcdbackup
-	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+etcdbackup-image: etcdbackup imagebuilder
 	imagebuilder -f Dockerfile.etcdbackup -t $(ETCDBACKUP_IMAGE) .
 
 etcdbackup-push: etcdbackup-image
@@ -75,8 +72,7 @@ etcdbackup-push: etcdbackup-image
 metricsbridge:
 	go build -ldflags ${LDFLAGS} ./cmd/metricsbridge
 
-metricsbridge-image: metricsbridge
-	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+metricsbridge-image: metricsbridge imagebuilder
 	imagebuilder -f Dockerfile.metricsbridge -t $(METRICSBRIDGE_IMAGE) .
 
 metricsbridge-push: metricsbridge-image
@@ -85,12 +81,15 @@ metricsbridge-push: metricsbridge-image
 sync: generate
 	go build -ldflags ${LDFLAGS} ./cmd/sync
 
-sync-image: sync
-	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+sync-image: sync imagebuilder
 	imagebuilder -f Dockerfile.sync -t $(SYNC_IMAGE) .
 
 sync-push: sync-image
 	docker push $(SYNC_IMAGE)
+
+all-image: azure-controllers-image e2e-image etcdbackup-image metrics-image sync-image
+
+all-push: azure-controllers-push e2e-push etcdbackup-push metrics-push sync-push
 
 verify:
 	./hack/validate-generated.sh
@@ -137,4 +136,8 @@ e2e-forceupdate:
 e2e-vnet:
 	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
 
-.PHONY: clean metricsbridge metricsbridge-image metricsbridge-push sync-image sync-push verify unit e2e
+imagebuilder:
+	docker pull registry.access.redhat.com/rhel7:latest
+	go get -u github.com/openshift/imagebuilder/cmd/imagebuilder
+
+.PHONY: clean metricsbridge metricsbridge-image metricsbridge-push sync-image sync-push verify unit e2e imagebuilder all-image all-push
