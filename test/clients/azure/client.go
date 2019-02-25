@@ -35,6 +35,7 @@ func (tf rpFocus) match(focusString string) bool {
 // Client is the main controller for azure client objects
 type Client struct {
 	Accounts                         azureclient.AccountsClient
+	ActivityLogs                     azureclient.ActivityLogsClient
 	Applications                     azureclient.ApplicationsClient
 	BlobStorage                      storage.BlobStorageClient
 	OpenShiftManagedClusters         externalapi.OpenShiftManagedClustersClient
@@ -99,6 +100,7 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 
 	return &Client{
 		Accounts:                         azureclient.NewAccountsClient(ctx, subscriptionID, authorizer),
+		ActivityLogs:                     azureclient.NewActivityLogsClient(ctx, subscriptionID, authorizer),
 		Applications:                     azureclient.NewApplicationsClient(ctx, subscriptionID, authorizer),
 		BlobStorage:                      storageClient,
 		OpenShiftManagedClusters:         rpc,
