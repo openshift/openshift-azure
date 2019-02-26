@@ -38,7 +38,7 @@ const (
 	//   Delegated permissions:
 	//      Sign in and read user profile
 	//      Access the directory as the signed-in user
-	clientID = "5935b8e2-3915-409c-bfb2-865b7a9291e0"
+	clientID = "643f441c-3ce4-4b9d-8a8f-577a3a738bfa"
 )
 
 var (
