@@ -75,7 +75,7 @@
       right permissions)
       2. Add `$AZURE_AAD_CLIENT_ID` variable with application ID to `env` file.
       3. Create the cluster. `create.sh` script will update your application with
-      required details. This can be done manually with `./hack/aad.sh app-update`
+      required details.
       4. Get your application permissions approved by organization administrator.
       Without approval cluster will start, just login will not work.
 

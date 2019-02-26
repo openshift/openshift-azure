@@ -5,14 +5,9 @@ usage() {
 usage:
 
 $0 app-create name callbackurl
-$0 app-delete appId
-$0 app-update appId callbackurl
 
 Examples:
 aad.sh app-create test-app https://openshift.test.osadev.cloud/oauth2callback/Azure%20AD
-aad.sh app-delete 76a604b8-0896-4ab7-9ef4-xxxxxxxxxx
-aad.sh app-update 76a604b8-0896-4ab7-9ef4-xxxxxxxxxx https://openshift.newtest.osadev.cloud/oauth2callback/Azure%20AD
-
 
 EOF
     exit 1
@@ -68,22 +63,6 @@ Note: For the application to work, an Organization Administrator needs to grant 
       To use this AAD application with OpenShift cluster value below must be present in your env before creating the cluster
       export AZURE_AAD_CLIENT_ID=$AZURE_AAD_CLIENT_ID
 EOF
-    ;;
-
-app-update)
-    if [[ "$#" -ne 3 ]]; then usage; fi
-    AZURE_AAD_CLIENT_SECRET=$(uuidgen)
-    az ad app update --id $2 --reply-urls "$3" --key-type password --password $AZURE_AAD_CLIENT_SECRET
-
-cat <<EOF
-AZURE_AAD_CLIENT_ID=$2
-AZURE_AAD_CLIENT_SECRET=$AZURE_AAD_CLIENT_SECRET
-EOF
-    ;;
-
-app-delete)
-    if [[ "$#" -ne 2 ]]; then usage; fi
-    az ad app delete --id $2
     ;;
 
 *)
