@@ -7,12 +7,12 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac"
 	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/openshift/api/user/v1"
 	"github.com/sirupsen/logrus"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 // fromMSGraphGroup syncs the values from the given aad group into kubeGroup
@@ -44,10 +44,7 @@ func fromMSGraphGroup(log *logrus.Entry, kubeGroup *v1.Group, kubeGroupName stri
 //   Application permissions:
 //      Read all groups
 func newAADGroupsClient(config api.AADIdentityProvider) (*graphrbac.GroupsClient, error) {
-	c := auth.NewClientCredentialsConfig(config.ClientID, config.Secret, config.TenantID)
-	c.Resource = azure.PublicCloud.GraphEndpoint
-
-	authorizer, err := c.Authorizer()
+	authorizer, err := azureclient.NewAuthorizer(config.ClientID, config.Secret, config.TenantID, azure.PublicCloud.GraphEndpoint)
 	if err != nil {
 		return nil, err
 	}

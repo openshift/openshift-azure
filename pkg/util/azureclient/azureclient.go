@@ -71,12 +71,8 @@ func setupClient(ctx context.Context, client *autorest.Client, authorizer autore
 	// client.Sender = &loggingSender{client.Sender}
 }
 
-func NewAuthorizer(clientID, clientSecret, tenantID string) (autorest.Authorizer, error) {
-	return auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID).Authorizer()
-}
-
-func NewAuthorizerFromUsernamePassword(username, password, clientID, tenantID, resource string) (autorest.Authorizer, error) {
-	config := auth.NewUsernamePasswordConfig(username, password, clientID, tenantID)
+func NewAuthorizer(clientID, clientSecret, tenantID, resource string) (autorest.Authorizer, error) {
+	config := auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID)
 	if resource != "" {
 		config.Resource = resource
 	}
@@ -92,5 +88,5 @@ func GetAuthorizerFromContext(ctx context.Context) (autorest.Authorizer, error) 
 }
 
 func NewAuthorizerFromEnvironment() (autorest.Authorizer, error) {
-	return auth.NewClientCredentialsConfig(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID")).Authorizer()
+	return NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"), "")
 }

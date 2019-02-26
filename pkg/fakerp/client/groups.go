@@ -13,7 +13,7 @@ import (
 // CreateResourceGroup creates a resource group and returns whether the
 // resource group was actually created or not and any error encountered.
 func CreateResourceGroup(conf *Config) (bool, error) {
-	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
+	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID, "")
 	if err != nil {
 		return false, err
 	}

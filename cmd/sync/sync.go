@@ -39,7 +39,7 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
-	authorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID)
+	authorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID, "")
 	if err != nil {
 		return err
 	}
