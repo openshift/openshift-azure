@@ -179,6 +179,7 @@ func convertImageConfigToAdmin(in ImageConfig) *admin.ImageConfig {
 		Node:                         &in.Node,
 		ServiceCatalog:               &in.ServiceCatalog,
 		Sync:                         &in.Sync,
+		Startup:                      &in.Startup,
 		TemplateServiceBroker:        &in.TemplateServiceBroker,
 		Registry:                     &in.Registry,
 		Router:                       &in.Router,

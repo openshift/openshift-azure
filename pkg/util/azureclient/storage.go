@@ -11,6 +11,12 @@ import (
 type AccountsClient interface {
 	ListKeys(context context.Context, resourceGroup, accountName string) (storage.AccountListKeysResult, error)
 	ListByResourceGroup(context context.Context, resourceGroup string) (storage.AccountListResult, error)
+	AccountsClientAddons
+	Client
+}
+
+func (a *accountsClient) Client() autorest.Client {
+	return a.AccountsClient.Client
 }
 
 type accountsClient struct {

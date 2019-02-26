@@ -118,14 +118,26 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
 	suffix := fmt.Sprintf("%d", time.Now().Unix())
 
+	err := p.clusterUpgrader.CreateClients(ctx, cs, isUpdate)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+
+	if !isUpdate {
+		err = p.clusterUpgrader.CreateConfigStorageAccount(ctx, cs)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginCreateConfigStorageAccount}
+		}
+	}
+
 	p.log.Info("generating arm templates")
 	azuretemplate, err := p.armGenerator.Generate(ctx, cs, "", isUpdate, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
-	err = p.clusterUpgrader.CreateClients(ctx, cs, isUpdate)
+	err = p.clusterUpgrader.Initialize(ctx, cs)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
 	if isUpdate {
 		p.log.Info("starting update")
@@ -135,10 +147,6 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
-	}
-	err = p.clusterUpgrader.Initialize(ctx, cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
 	if isUpdate {
 		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {

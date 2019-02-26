@@ -14,9 +14,10 @@ AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
 ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
 METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
+STARTUP_IMAGE ?= quay.io/openshift-on-azure/startup:$(TAG)
 
 # all is the default target to build everything
-all: clean build azure-controllers etcdbackup sync metricsbridge e2e-bin
+all: clean build azure-controllers etcdbackup sync metricsbridge startup e2e-bin
 
 version:
 	echo ${TAG}
@@ -25,7 +26,7 @@ build: generate
 	go build ./...
 
 clean:
-	rm -f coverage.out azure-controllers etcdbackup sync metricsbridge e2e
+	rm -f coverage.out azure-controllers etcdbackup sync metricsbridge startup e2e
 
 test: unit e2e
 
@@ -87,9 +88,19 @@ sync-image: sync imagebuilder
 sync-push: sync-image
 	docker push $(SYNC_IMAGE)
 
-all-image: azure-controllers-image e2e-image etcdbackup-image metricsbridge-image sync-image
+all-image: azure-controllers-image e2e-image etcdbackup-image metricsbridge-image sync-image startup-image
 
-all-push: azure-controllers-push e2e-push etcdbackup-push metrics-push sync-push
+all-push: azure-controllers-push e2e-push etcdbackup-push metrics-push sync-push startup-push
+
+startup: generate
+	go build -ldflags ${LDFLAGS} ./cmd/startup
+
+startup-image: startup
+	go get github.com/openshift/imagebuilder/cmd/imagebuilder
+	imagebuilder -f Dockerfile.startup -t $(STARTUP_IMAGE) .
+
+startup-push: startup-image
+	docker push $(STARTUP_IMAGE)
 
 verify:
 	./hack/validate-generated.sh

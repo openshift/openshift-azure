@@ -69,6 +69,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.Images.MasterEtcd != "", "master etcd image")
 	assert(c.Images.RegistryConsole != "", "registry console image")
 	assert(c.Images.Sync != "", "sync image")
+	assert(c.Images.Startup != "", "startup image")
 	assert(c.Images.EtcdBackup != "", "etcdbackup image")
 	assert(c.Images.ClusterMonitoringOperator != "", "cluster monitoring operator image")
 	assert(c.Images.PrometheusOperatorBase != "", "cluster monitoring operator image")

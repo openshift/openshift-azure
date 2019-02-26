@@ -117,6 +117,9 @@ func overridePluginTemplate(template *pluginapi.Config) {
 	if os.Getenv("AZURE_CONTROLLERS_IMAGE") != "" {
 		template.Images.AzureControllers = os.Getenv("AZURE_CONTROLLERS_IMAGE")
 	}
+	if os.Getenv("STARTUP_IMAGE") != "" {
+		template.Images.Startup = os.Getenv("STARTUP_IMAGE")
+	}
 	if os.Getenv("OREG_URL") != "" {
 		template.Images.Format = os.Getenv("OREG_URL")
 	}

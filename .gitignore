@@ -6,6 +6,7 @@
 /e2e
 /kubeconfig*
 /sync
+/startup
 /etcdbackup
 /azure-controllers
 /metricsbridge

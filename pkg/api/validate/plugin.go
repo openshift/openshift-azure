@@ -132,6 +132,9 @@ func (v *PluginAPIValidator) validatePluginTemplateImages(i *pluginapi.ImageConf
 	if i.Sync == "" {
 		errs = append(errs, fmt.Errorf("images.Sync cannot be empty"))
 	}
+	if i.Startup == "" {
+		errs = append(errs, fmt.Errorf("images.Startup cannot be empty"))
+	}
 	if i.TemplateServiceBroker == "" {
 		errs = append(errs, fmt.Errorf("images.TemplateServiceBroker cannot be empty"))
 	}

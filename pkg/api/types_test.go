@@ -209,6 +209,7 @@ var marshalled = []byte(`{
 			"node": "Config.Images.Node",
 			"serviceCatalog": "Config.Images.ServiceCatalog",
 			"sync": "Config.Images.Sync",
+			"startup": "Config.Images.Startup",
 			"templateServiceBroker": "Config.Images.TemplateServiceBroker",
 			"registry": "Config.Images.Registry",
 			"router": "Config.Images.Router",

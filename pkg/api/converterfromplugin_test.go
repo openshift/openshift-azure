@@ -72,6 +72,7 @@ func internalPluginConfig() Config {
 			Node:                         "Images.Node",
 			ServiceCatalog:               "Images.ServiceCatalog",
 			Sync:                         "Images.Sync",
+			Startup:                      "Images.Startup",
 			TemplateServiceBroker:        "Images.TemplateServiceBroker",
 			Registry:                     "Images.Registry",
 			Router:                       "Images.Router",

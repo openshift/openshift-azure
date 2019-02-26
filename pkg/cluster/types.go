@@ -32,6 +32,7 @@ const (
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
 	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, disableKeepAlives bool) error
+	CreateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error
 	WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error

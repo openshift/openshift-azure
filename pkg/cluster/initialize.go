@@ -5,6 +5,9 @@ import (
 	"context"
 	"encoding/json"
 
+	azstorage "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
+	"github.com/Azure/go-autorest/autorest/to"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
@@ -56,6 +59,20 @@ func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManage
 	}
 
 	return b.CreateBlockBlobFromReader(bytes.NewReader(csj), nil)
+}
+
+func (u *simpleUpgrader) CreateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	parameters := azstorage.AccountCreateParameters{
+		Sku: &azstorage.Sku{
+			Name: azstorage.StandardLRS,
+		},
+		Kind:     azstorage.Storage,
+		Location: &cs.Location,
+	}
+	parameters.Tags = map[string]*string{
+		"type": to.StringPtr("config"),
+	}
+	return u.accountsClient.Create(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount, parameters)
 }
 
 func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error {

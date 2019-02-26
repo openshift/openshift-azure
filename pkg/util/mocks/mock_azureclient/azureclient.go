@@ -591,6 +591,34 @@ func (m *MockAccountsClient) EXPECT() *MockAccountsClientMockRecorder {
 	return m.recorder
 }
 
+// Client mocks base method
+func (m *MockAccountsClient) Client() autorest.Client {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Client")
+	ret0, _ := ret[0].(autorest.Client)
+	return ret0
+}
+
+// Client indicates an expected call of Client
+func (mr *MockAccountsClientMockRecorder) Client() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockAccountsClient)(nil).Client))
+}
+
+// Create mocks base method
+func (m *MockAccountsClient) Create(arg0 context.Context, arg1, arg2 string, arg3 storage.AccountCreateParameters) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create
+func (mr *MockAccountsClientMockRecorder) Create(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockAccountsClient)(nil).Create), arg0, arg1, arg2, arg3)
+}
+
 // ListByResourceGroup mocks base method
 func (m *MockAccountsClient) ListByResourceGroup(arg0 context.Context, arg1 string) (storage.AccountListResult, error) {
 	m.ctrl.T.Helper()
