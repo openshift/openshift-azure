@@ -1702,7 +1702,7 @@ func (s *Field) MarshalJSON() ([]byte, error) {
 // HttpRule, each specifying the mapping of an RPC method
 // to one or more HTTP REST API methods.
 type Http struct {
-	// FullyDecodeReservedExpansion: When set to true, URL path parmeters
+	// FullyDecodeReservedExpansion: When set to true, URL path parameters
 	// will be fully URI-decoded except in
 	// cases of single segment matches in reserved expansion, where "%2F"
 	// will be
@@ -6532,6 +6532,8 @@ type ServicesTenancyUnitsRemoveProjectCall struct {
 // It will then attempt to delete the project. If that operation fails,
 // this
 // method fails.
+// Calls to remove already removed or non-existent tenant project
+// will succeed.
 // After the project has been deleted, or if was already in DELETED
 // state,
 // resource metadata is permanently removed from the tenancy
@@ -6634,7 +6636,7 @@ func (c *ServicesTenancyUnitsRemoveProjectCall) Do(opts ...googleapi.CallOption)
 	}
 	return ret, nil
 	// {
-	//   "description": "Removes specified project resource identified by tenant resource tag.\nIt will remove project lien with 'TenantManager' origin if that was added.\nIt will then attempt to delete the project. If that operation fails, this\nmethod fails.\nAfter the project has been deleted, or if was already in DELETED state,\nresource metadata is permanently removed from the tenancy unit.\nOperation\u003cresponse: Empty\u003e.",
+	//   "description": "Removes specified project resource identified by tenant resource tag.\nIt will remove project lien with 'TenantManager' origin if that was added.\nIt will then attempt to delete the project. If that operation fails, this\nmethod fails.\nCalls to remove already removed or non-existent tenant project\nwill succeed.\nAfter the project has been deleted, or if was already in DELETED state,\nresource metadata is permanently removed from the tenancy unit.\nOperation\u003cresponse: Empty\u003e.",
 	//   "flatPath": "v1/services/{servicesId}/{servicesId1}/{servicesId2}/tenancyUnits/{tenancyUnitsId}:removeProject",
 	//   "httpMethod": "POST",
 	//   "id": "serviceconsumermanagement.services.tenancyUnits.removeProject",

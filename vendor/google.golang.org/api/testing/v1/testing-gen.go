@@ -160,21 +160,21 @@ func (s *Account) MarshalJSON() ([]byte, error) {
 type AndroidDevice struct {
 	// AndroidModelId: Required. The id of the Android device to be
 	// used.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	AndroidModelId string `json:"androidModelId,omitempty"`
 
 	// AndroidVersionId: Required. The id of the Android OS version to be
 	// used.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	AndroidVersionId string `json:"androidVersionId,omitempty"`
 
 	// Locale: Required. The locale the test device used for testing.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	Locale string `json:"locale,omitempty"`
 
 	// Orientation: Required. How the device is oriented during the
 	// test.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	Orientation string `json:"orientation,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AndroidModelId") to
@@ -383,21 +383,21 @@ func (s *AndroidInstrumentationTest) MarshalJSON() ([]byte, error) {
 type AndroidMatrix struct {
 	// AndroidModelIds: Required. The ids of the set of Android device to be
 	// used.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	AndroidModelIds []string `json:"androidModelIds,omitempty"`
 
 	// AndroidVersionIds: Required. The ids of the set of Android OS version
 	// to be used.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	AndroidVersionIds []string `json:"androidVersionIds,omitempty"`
 
 	// Locales: Required. The set of locales the test device will enable for
 	// testing.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	Locales []string `json:"locales,omitempty"`
 
 	// Orientations: Required. The set of orientations to test with.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	Orientations []string `json:"orientations,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AndroidModelIds") to
@@ -1425,21 +1425,21 @@ func (s *IntentFilter) MarshalJSON() ([]byte, error) {
 // IosDevice: A single iOS device.
 type IosDevice struct {
 	// IosModelId: Required. The id of the iOS device to be used.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	IosModelId string `json:"iosModelId,omitempty"`
 
 	// IosVersionId: Required. The id of the iOS major software version to
 	// be used.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	IosVersionId string `json:"iosVersionId,omitempty"`
 
 	// Locale: Required. The locale the test device used for testing.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	Locale string `json:"locale,omitempty"`
 
 	// Orientation: Required. How the device is oriented during the
 	// test.
-	// Use the EnvironmentDiscoveryService to get supported options.
+	// Use the TestEnvironmentDiscoveryService to get supported options.
 	Orientation string `json:"orientation,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "IosModelId") to
@@ -1732,7 +1732,7 @@ type IosXcTest struct {
 	TestsZip *FileReference `json:"testsZip,omitempty"`
 
 	// XcodeVersion: The Xcode version that should be used for the test.
-	// Use the EnvironmentDiscoveryService to get supported
+	// Use the TestEnvironmentDiscoveryService to get supported
 	// options.
 	// Defaults to the latest Xcode version Firebase Test Lab supports.
 	XcodeVersion string `json:"xcodeVersion,omitempty"`
@@ -2100,6 +2100,8 @@ type RoboDirective struct {
 	//   "ENTER_TEXT" - Direct Robo to enter text on the specified element.
 	// No-op if specified
 	// element is not enabled or does not allow text entry.
+	//   "IGNORE" - Direct Robo to ignore interactions with a specific
+	// element.
 	ActionType string `json:"actionType,omitempty"`
 
 	// InputText: The text that Robo is directed to set. If left empty, the
@@ -2148,6 +2150,9 @@ type RoboStartingIntent struct {
 	LauncherActivity *LauncherActivityIntent `json:"launcherActivity,omitempty"`
 
 	StartActivity *StartActivityIntent `json:"startActivity,omitempty"`
+
+	// Timeout: Timeout in seconds for each intent.
+	Timeout string `json:"timeout,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "LauncherActivity") to
 	// unconditionally include in API requests. By default, fields with
@@ -2431,6 +2436,10 @@ type TestMatrix struct {
 	//   "NO_MANIFEST" - The AndroidManifest.xml could not be found.
 	//   "NO_PACKAGE_NAME" - The APK manifest does not declare a package
 	// name.
+	//   "INVALID_PACKAGE_NAME" - The APK application ID (aka package name)
+	// is invalid.
+	// See also
+	// https://developer.android.com/studio/build/application-id
 	//   "TEST_SAME_AS_APP" - The test package and app package are the same.
 	//   "NO_INSTRUMENTATION" - The test apk does not declare an
 	// instrumentation.

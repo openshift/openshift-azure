@@ -230,6 +230,32 @@ func TestStartSpanWithRemoteParent(t *testing.T) {
 	}
 }
 
+func TestLocalRootSpanID(t *testing.T) {
+	ctx, span1 := StartSpan(context.Background(), "span1")
+	if span1.localRootSpanID == (SpanID{}) {
+		t.Errorf("exporting root span: expected nonzero localRootSpanID")
+	}
+
+	_, span2 := StartSpan(ctx, "span2")
+	if err := checkChild(span1.spanContext, span2); err != nil {
+		t.Error(err)
+	}
+	if got, want := span2.localRootSpanID, span1.localRootSpanID; got != want {
+		t.Errorf("span2.localRootSpanID=%q; want %q (span1.localRootSpanID)", got, want)
+	}
+
+	_, span3 := StartSpanWithRemoteParent(context.Background(), "span3", span2.SpanContext())
+	if err := checkChild(span3.spanContext, span2); err != nil {
+		t.Error(err)
+	}
+	if span3.localRootSpanID == (SpanID{}) {
+		t.Errorf("exporting span with remote parent: expected nonzero localRootSpanID")
+	}
+	if got, want := span3.localRootSpanID, span2.localRootSpanID; got == want {
+		t.Errorf("span3.localRootSpanID=%q; expected different value to span2.localRootSpanID, got same", got)
+	}
+}
+
 // startSpan returns a context with a new Span that is recording events and will be exported.
 func startSpan(o StartOptions) *Span {
 	_, span := StartSpanWithRemoteParent(context.Background(), "span0",
@@ -274,7 +300,11 @@ func endSpan(span *Span) (*SpanData, error) {
 	if got.SpanContext.SpanID == (SpanID{}) {
 		return nil, fmt.Errorf("exporting span: expected nonzero SpanID")
 	}
+	if got.LocalRootSpanID == (SpanID{}) {
+		return nil, fmt.Errorf("exporting span: expected nonzero LocalRootSpanID")
+	}
 	got.SpanContext.SpanID = SpanID{}
+	got.LocalRootSpanID = SpanID{}
 	if !checkTime(&got.StartTime) {
 		return nil, fmt.Errorf("exporting span: expected nonzero StartTime")
 	}
@@ -451,6 +481,45 @@ func TestAnnotations(t *testing.T) {
 	}
 }
 
+func TestAnnotationsOverLimit(t *testing.T) {
+	cfg := Config{MaxAnnotationEventsPerSpan: 2}
+	ApplyConfig(cfg)
+	span := startSpan(StartOptions{})
+	span.Annotatef([]Attribute{StringAttribute("key4", "value4")}, "%d", 1)
+	span.Annotate([]Attribute{StringAttribute("key3", "value3")}, "Annotate oldest")
+	span.Annotatef([]Attribute{StringAttribute("key1", "value1")}, "%f", 1.5)
+	span.Annotate([]Attribute{StringAttribute("key2", "value2")}, "Annotate")
+	got, err := endSpan(span)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for i := range got.Annotations {
+		if !checkTime(&got.Annotations[i].Time) {
+			t.Error("exporting span: expected nonzero Annotation Time")
+		}
+	}
+
+	want := &SpanData{
+		SpanContext: SpanContext{
+			TraceID:      tid,
+			SpanID:       SpanID{},
+			TraceOptions: 0x1,
+		},
+		ParentSpanID: sid,
+		Name:         "span0",
+		Annotations: []Annotation{
+			{Message: "1.500000", Attributes: map[string]interface{}{"key1": "value1"}},
+			{Message: "Annotate", Attributes: map[string]interface{}{"key2": "value2"}},
+		},
+		DroppedAnnotationCount: 2,
+		HasRemoteParent:        true,
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("exporting span: got %#v want %#v", got, want)
+	}
+}
+
 func TestMessageEvents(t *testing.T) {
 	span := startSpan(StartOptions{})
 	span.AddMessageReceiveEvent(3, 400, 300)
@@ -479,6 +548,45 @@ func TestMessageEvents(t *testing.T) {
 			{EventType: 1, MessageID: 0x1, UncompressedByteSize: 0xc8, CompressedByteSize: 0x64},
 		},
 		HasRemoteParent: true,
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("exporting span: got %#v want %#v", got, want)
+	}
+}
+
+func TestMessageEventsOverLimit(t *testing.T) {
+	cfg := Config{MaxMessageEventsPerSpan: 2}
+	ApplyConfig(cfg)
+	span := startSpan(StartOptions{})
+	span.AddMessageReceiveEvent(5, 300, 120)
+	span.AddMessageSendEvent(4, 100, 50)
+	span.AddMessageReceiveEvent(3, 400, 300)
+	span.AddMessageSendEvent(1, 200, 100)
+	got, err := endSpan(span)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for i := range got.MessageEvents {
+		if !checkTime(&got.MessageEvents[i].Time) {
+			t.Error("exporting span: expected nonzero MessageEvent Time")
+		}
+	}
+
+	want := &SpanData{
+		SpanContext: SpanContext{
+			TraceID:      tid,
+			SpanID:       SpanID{},
+			TraceOptions: 0x1,
+		},
+		ParentSpanID: sid,
+		Name:         "span0",
+		MessageEvents: []MessageEvent{
+			{EventType: 2, MessageID: 0x3, UncompressedByteSize: 0x190, CompressedByteSize: 0x12c},
+			{EventType: 1, MessageID: 0x1, UncompressedByteSize: 0xc8, CompressedByteSize: 0x64},
+		},
+		DroppedMessageEventCount: 2,
+		HasRemoteParent:          true,
 	}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("exporting span: got %#v want %#v", got, want)
@@ -588,6 +696,49 @@ func TestAddLink(t *testing.T) {
 			Attributes: map[string]interface{}{"key5": "value5"},
 		}},
 		HasRemoteParent: true,
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("exporting span: got %#v want %#v", got, want)
+	}
+}
+
+func TestAddLinkOverLimit(t *testing.T) {
+	cfg := Config{MaxLinksPerSpan: 1}
+	ApplyConfig(cfg)
+	span := startSpan(StartOptions{})
+	span.AddLink(Link{
+		TraceID:    tid,
+		SpanID:     sid,
+		Type:       LinkTypeParent,
+		Attributes: map[string]interface{}{"key4": "value4"},
+	})
+	span.AddLink(Link{
+		TraceID:    tid,
+		SpanID:     sid,
+		Type:       LinkTypeParent,
+		Attributes: map[string]interface{}{"key5": "value5"},
+	})
+	got, err := endSpan(span)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := &SpanData{
+		SpanContext: SpanContext{
+			TraceID:      tid,
+			SpanID:       SpanID{},
+			TraceOptions: 0x1,
+		},
+		ParentSpanID: sid,
+		Name:         "span0",
+		Links: []Link{{
+			TraceID:    tid,
+			SpanID:     sid,
+			Type:       2,
+			Attributes: map[string]interface{}{"key5": "value5"},
+		}},
+		DroppedLinkCount: 1,
+		HasRemoteParent:  true,
 	}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("exporting span: got %#v want %#v", got, want)
@@ -705,6 +856,37 @@ func TestStartSpanAfterEnd(t *testing.T) {
 	}
 	if got, want := spans["span-2"].ParentSpanID, spans["span-1"].SpanID; got != want {
 		t.Errorf("span-2.ParentSpanID=%q; want %q (span1.SpanID)", got, want)
+	}
+}
+
+func TestChildSpanCount(t *testing.T) {
+	spans := make(exporter)
+	RegisterExporter(&spans)
+	defer UnregisterExporter(&spans)
+	ctx, span0 := StartSpan(context.Background(), "parent", WithSampler(AlwaysSample()))
+	ctx1, span1 := StartSpan(ctx, "span-1", WithSampler(AlwaysSample()))
+	_, span2 := StartSpan(ctx1, "span-2", WithSampler(AlwaysSample()))
+	span2.End()
+	span1.End()
+
+	_, span3 := StartSpan(ctx, "span-3", WithSampler(AlwaysSample()))
+	span3.End()
+	span0.End()
+	UnregisterExporter(&spans)
+	if got, want := len(spans), 4; got != want {
+		t.Fatalf("len(%#v) = %d; want %d", spans, got, want)
+	}
+	if got, want := spans["span-3"].ChildSpanCount, 0; got != want {
+		t.Errorf("span-3.ChildSpanCount=%q; want %q", got, want)
+	}
+	if got, want := spans["span-2"].ChildSpanCount, 0; got != want {
+		t.Errorf("span-2.ChildSpanCount=%q; want %q", got, want)
+	}
+	if got, want := spans["span-1"].ChildSpanCount, 1; got != want {
+		t.Errorf("span-1.ChildSpanCount=%q; want %q", got, want)
+	}
+	if got, want := spans["parent"].ChildSpanCount, 2; got != want {
+		t.Errorf("parent.ChildSpanCount=%q; want %q", got, want)
 	}
 }
 

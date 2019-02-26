@@ -772,6 +772,13 @@ type DestinationTableProperties struct {
 	// friendly name is provided, the job will fail.
 	FriendlyName string `json:"friendlyName,omitempty"`
 
+	// Labels: [Optional] The labels associated with this table. You can use
+	// these to organize and group your tables. This will only be used if
+	// the destination table is newly created. If the table already exists
+	// and labels are different than the current labels are provided, the
+	// job will fail.
+	Labels map[string]string `json:"labels,omitempty"`
+
 	// ForceSendFields is a list of field names (e.g. "Description") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
@@ -2473,6 +2480,11 @@ type JobStatistics4 struct {
 	// specified in the 'destinationUris' field.
 	DestinationUriFileCounts googleapi.Int64s `json:"destinationUriFileCounts,omitempty"`
 
+	// InputBytes: [Output-only] Number of user bytes extracted into the
+	// result. This is the byte count as computed by BigQuery for billing
+	// purposes.
+	InputBytes int64 `json:"inputBytes,omitempty,string"`
+
 	// ForceSendFields is a list of field names (e.g.
 	// "DestinationUriFileCounts") to unconditionally include in API
 	// requests. By default, fields with empty values are omitted from API
@@ -3587,6 +3599,10 @@ func (s *TableDataList) MarshalJSON() ([]byte, error) {
 }
 
 type TableFieldSchema struct {
+	// Categories: [Optional] The categories attached to this field, used
+	// for field-level access control.
+	Categories *TableFieldSchemaCategories `json:"categories,omitempty"`
+
 	// Description: [Optional] The field description. The maximum length is
 	// 1,024 characters.
 	Description string `json:"description,omitempty"`
@@ -3611,7 +3627,7 @@ type TableFieldSchema struct {
 	// nested schema) or STRUCT (same as RECORD).
 	Type string `json:"type,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "Description") to
+	// ForceSendFields is a list of field names (e.g. "Categories") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -3619,10 +3635,10 @@ type TableFieldSchema struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "Description") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
+	// NullFields is a list of field names (e.g. "Categories") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -3630,6 +3646,37 @@ type TableFieldSchema struct {
 
 func (s *TableFieldSchema) MarshalJSON() ([]byte, error) {
 	type NoMethod TableFieldSchema
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// TableFieldSchemaCategories: [Optional] The categories attached to
+// this field, used for field-level access control.
+type TableFieldSchemaCategories struct {
+	// Names: A list of category resource names. For example,
+	// "projects/1/taxonomies/2/categories/3". At most 5 categories are
+	// allowed.
+	Names []string `json:"names,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Names") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Names") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *TableFieldSchemaCategories) MarshalJSON() ([]byte, error) {
+	type NoMethod TableFieldSchemaCategories
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
