@@ -21,14 +21,7 @@ func UpdateAADAppSecret(ctx context.Context, appClient azureclient.RBACApplicati
 	if err != nil {
 		return "", fmt.Errorf("failed listing applications: %v", err)
 	}
-	var apps []graphrbac.Application
-	for pages.NotDone() {
-		apps = append(apps, pages.Values()...)
-		err = pages.Next()
-		if err != nil {
-			return "", fmt.Errorf("failed iterating applications: %v", err)
-		}
-	}
+	apps := pages.Values()
 	if len(apps) != 1 {
 		return "", fmt.Errorf("found %d applications, should be 1", len(apps))
 	}
