@@ -7,4 +7,4 @@ if [[ -z "${CODECOV_UPLOAD_TOKEN}" ]]; then
     exit 1
 fi
 
-bash <(curl -s https://codecov.io/bash) -t ${CODECOV_UPLOAD_TOKEN} -f coverage.out
+bash <(curl -s https://codecov.io/bash) -Z -K -t ${CODECOV_UPLOAD_TOKEN} -f coverage.out -r ${REPO_OWNER}/${REPO_NAME} -P ${PULL_NUMBER} -C ${PULL_BASE_SHA}
