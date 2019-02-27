@@ -32,7 +32,7 @@ func NewRBACApplicationsClient(ctx context.Context, tenantID string, authorizer 
 }
 
 type ServicePrincipalsClient interface {
-	ServicePrincipalsClientAddons
+	List(ctx context.Context, filter string) (graphrbac.ServicePrincipalListResultPage, error)
 }
 
 type servicePrincipalsClient struct {

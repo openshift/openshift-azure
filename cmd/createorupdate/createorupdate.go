@@ -25,6 +25,7 @@ import (
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
+	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	v20180930previewclient "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2018-09-30-preview"
 	adminclient "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
@@ -159,8 +160,13 @@ func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.C
 			return fmt.Errorf("cannot get authorizer: %v", err)
 		}
 		aadClient := azureclient.NewRBACApplicationsClient(ctx, conf.TenantID, authorizer)
+		objID, err := aadapp.GetObjectIDUsingRbacClient(ctx, aadClient, conf.AADClientID)
+		if err != nil {
+			return err
+		}
+
 		callbackURL := fmt.Sprintf("https://%s.%s.cloudapp.azure.com/oauth2callback/Azure%%20AD", conf.ResourceGroup, conf.Region)
-		conf.AADClientSecret, err = fakerp.UpdateAADAppSecret(ctx, aadClient, conf.AADClientID, callbackURL)
+		conf.AADClientSecret, err = aadapp.UpdateSecret(ctx, aadClient, objID, callbackURL)
 		if err != nil {
 			return fmt.Errorf("cannot update aad app secret: %v", err)
 		}

@@ -18,6 +18,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	utilrs "github.com/openshift/openshift-azure/pkg/util/randomstring"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
@@ -149,7 +150,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		if err != nil {
 			return nil, err
 		}
-		objID, err := spc.ObjectIDforApplicationID(ctx, os.Getenv("AZURE_CLIENT_ID"))
+		objID, err := aadapp.GetObjectIDUsingSPClient(ctx, spc, os.Getenv("AZURE_CLIENT_ID"))
 		if err != nil {
 			return nil, err
 		}
