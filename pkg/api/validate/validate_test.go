@@ -2,6 +2,7 @@ package validate
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"reflect"
 	"testing"
@@ -670,6 +671,73 @@ func TestAdminAPIValidate(t *testing.T) {
 			for _, err := range errs {
 				t.Errorf("\t%v", err)
 			}
+		}
+	}
+}
+
+func TestValidateAgentPoolHostname(t *testing.T) {
+	for _, tt := range []struct {
+		hostname string
+		wantErr  bool
+	}{
+		{
+			hostname: "bad",
+			wantErr:  true,
+		},
+		{
+			hostname: "master-000000",
+		},
+		{
+			hostname: "master-00000a",
+		},
+		{
+			hostname: "master-00000A",
+		},
+		{
+			hostname: "mycompute-000000",
+			wantErr:  true,
+		},
+		{
+			hostname: "master-bad",
+			wantErr:  true,
+		},
+		{
+			hostname: "master-inval!",
+			wantErr:  true,
+		},
+		{
+			hostname: "mycompute-1234567890-000000",
+		},
+		{
+			hostname: "mycompute-1234567890-00000z",
+		},
+		{
+			hostname: "mycompute-1234567890-00000Z",
+		},
+		{
+			hostname: "mycompute-1234-00000Z",
+			wantErr:  true,
+		},
+		{
+			hostname: "mycompute-1234567890-bad",
+			wantErr:  true,
+		},
+		{
+			hostname: "mycompute-1234567890-inval!",
+			wantErr:  true,
+		},
+		{
+			hostname: "master-1234567890-000000",
+			wantErr:  true,
+		},
+		{
+			hostname: "bad-bad-bad-bad",
+			wantErr:  true,
+		},
+	} {
+		err := ValidateAgentPoolHostname(tt.hostname)
+		if (err == nil) == tt.wantErr || (tt.wantErr && err.Error() != fmt.Sprintf("invalid hostname %q", tt.hostname)) {
+			t.Errorf("%s: wanted err %v, got %v", tt.hostname, tt.wantErr, err)
 		}
 	}
 }

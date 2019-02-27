@@ -9,6 +9,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
+	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_config"
@@ -233,6 +234,25 @@ func TestForceUpdate(t *testing.T) {
 	}
 }
 
+func TestListClusterVMs(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
+
+	c := mockUp.EXPECT().CreateClients(nil, nil, true).Return(nil)
+	c = mockUp.EXPECT().ListVMHostnames(nil, nil).Return(nil, nil).After(c)
+
+	p := &plugin{
+		clusterUpgrader: mockUp,
+		log:             logrus.NewEntry(logrus.StandardLogger()),
+	}
+
+	if _, err := p.ListClusterVMs(nil, nil); err != nil {
+		t.Errorf("plugin.ListClusterVMs() error = %v", err)
+	}
+}
+
 func TestReimage(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
@@ -244,7 +264,7 @@ func TestReimage(t *testing.T) {
 	}{
 		{
 			name:     "reimage master vm",
-			hostname: "master-000A000",
+			hostname: "master-000A00",
 			isMaster: true,
 		},
 		{
@@ -259,31 +279,23 @@ func TestReimage(t *testing.T) {
 		},
 	}
 
-	cs := &api.OpenShiftManagedCluster{
-		Properties: api.Properties{
-			AgentPoolProfiles: []api.AgentPoolProfile{
-				{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
-				{Role: api.AgentPoolProfileRoleCompute, Name: "compute"},
-				{Role: api.AgentPoolProfileRoleInfra, Name: "infra"},
-			},
-		},
-	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockUp := mock_cluster.NewMockUpgrader(mockCtrl)
 			mockKubeclient := mock_kubeclient.NewMockKubeclient(mockCtrl)
 
-			computerName := kubeclient.ComputerName(tt.hostname)
+			scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(tt.hostname)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-			c := mockUp.EXPECT().CreateClients(nil, cs, true).Return(nil)
-			c = mockKubeclient.EXPECT().IsMaster(computerName).Return(tt.isMaster, nil).After(c)
-			c = mockUp.EXPECT().Reimage(nil, cs, computerName).Return(nil).After(c)
+			c := mockUp.EXPECT().CreateClients(nil, nil, true).Return(nil)
+			c = mockUp.EXPECT().Reimage(nil, nil, scaleset, instanceID).Return(nil).After(c)
 
 			if tt.isMaster {
-				c = mockKubeclient.EXPECT().WaitForReadyMaster(nil, computerName).Return(nil).After(c)
+				c = mockKubeclient.EXPECT().WaitForReadyMaster(nil, kubeclient.ComputerName(tt.hostname)).Return(nil).After(c)
 			} else {
-				c = mockKubeclient.EXPECT().WaitForReadyWorker(nil, computerName).Return(nil).After(c)
+				c = mockKubeclient.EXPECT().WaitForReadyWorker(nil, kubeclient.ComputerName(tt.hostname)).Return(nil).After(c)
 			}
 
 			p := &plugin{
@@ -292,7 +304,7 @@ func TestReimage(t *testing.T) {
 				log:             logrus.NewEntry(logrus.StandardLogger()),
 			}
 
-			if err := p.Reimage(nil, cs, tt.hostname); err != nil {
+			if err := p.Reimage(nil, nil, tt.hostname); err != nil {
 				t.Errorf("plugin.Reimage(%s) error = %v", tt.hostname, err)
 			}
 		})

@@ -3,6 +3,7 @@ package validate
 import (
 	"fmt"
 	"net"
+	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -249,6 +250,42 @@ func validateAgentPoolProfile(app api.AgentPoolProfile, vnet *net.IPNet) (errs [
 	}
 
 	return
+}
+
+func ValidateAgentPoolHostname(hostname string) error {
+	parts := strings.Split(hostname, "-")
+	switch len(parts) {
+	case 2: // master-XXXXXX
+		if parts[0] != "master" ||
+			len(parts[1]) != 6 {
+			return fmt.Errorf("invalid hostname %q", hostname)
+		}
+		_, err := strconv.ParseUint(parts[1], 36, 64)
+		if err != nil {
+			return fmt.Errorf("invalid hostname %q", hostname)
+		}
+
+	case 3: // something-XXXXXXXXXX-XXXXXX
+		if !rxAgentPoolProfileName.MatchString(parts[0]) ||
+			parts[0] == "master" ||
+			len(parts[1]) != 10 ||
+			len(parts[2]) != 6 {
+			return fmt.Errorf("invalid hostname %q", hostname)
+		}
+		_, err := strconv.ParseUint(parts[1], 10, 64)
+		if err != nil {
+			return fmt.Errorf("invalid hostname %q", hostname)
+		}
+		_, err = strconv.ParseUint(parts[2], 36, 64)
+		if err != nil {
+			return fmt.Errorf("invalid hostname %q", hostname)
+		}
+
+	default:
+		return fmt.Errorf("invalid hostname %q", hostname)
+	}
+
+	return nil
 }
 
 func validateFQDN(p *api.Properties, location string) (errs []error) {

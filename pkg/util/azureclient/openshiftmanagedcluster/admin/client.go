@@ -491,6 +491,72 @@ func (client OpenShiftManagedClustersClient) GetControlPlanePodsResponder(resp *
 	return
 }
 
+// ListClusterVMs gets the details of the managed openshift cluster with a specified resource group and name.
+// Parameters:
+// resourceGroupName - the name of the resource group.
+// resourceName - the name of the openshift managed cluster resource.
+func (client OpenShiftManagedClustersClient) ListClusterVMs(ctx context.Context, resourceGroupName string, resourceName string) (result OpenShiftManagedClustersClusterVMs, err error) {
+	req, err := client.ListClusterVMsPreparer(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "ListClusterVMs", nil, "Failure preparing request")
+		return
+	}
+
+	resp, err := client.ListClusterVMsSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "ListClusterVMs", resp, "Failure sending request")
+		return
+	}
+
+	result, err = client.ListClusterVMsResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "ListClusterVMs", resp, "Failure responding to request")
+	}
+
+	return
+}
+
+// ListClusterVMsPreparer prepares the ListClusterVMs request.
+func (client OpenShiftManagedClustersClient) ListClusterVMsPreparer(ctx context.Context, resourceGroupName string, resourceName string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": api.APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsGet(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/listClusterVMs", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// ListClusterVMsSender sends the ListClusterVMs request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) ListClusterVMsSender(req *http.Request) (*http.Response, error) {
+	return autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+}
+
+// ListClusterVMsResponder handles the response to the ListClusterVMs request. The method always
+// closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) ListClusterVMsResponder(resp *http.Response) (result OpenShiftManagedClustersClusterVMs, err error) {
+	defer resp.Body.Close()
+	clusterVMs, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	result.Response = autorest.Response{Response: resp}
+	err = json.Unmarshal(clusterVMs, &result.VMs)
+	return
+}
+
 // OpenShiftManagedClustersReimageFuture is an abstraction for monitoring and retrieving the results of a
 // long-running operation.
 type OpenShiftManagedClustersReimageFuture struct {
@@ -976,4 +1042,11 @@ type OpenShiftManagedClustersControlPlanePods struct {
 	autorest.Response `json:"-"`
 
 	Items []byte `json:"-"`
+}
+
+// OpenShiftManagedClustersClusterVMs contains the status of the cluster VMs
+type OpenShiftManagedClustersClusterVMs struct {
+	autorest.Response `json:"-"`
+
+	VMs []string `json:"-"`
 }

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -273,32 +274,57 @@ func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluste
 	return nil
 }
 
-func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, hostname string) error {
+func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedCluster) ([]byte, error) {
 	p.log.Info("generating cluster upgrader clients")
 	err := p.clusterUpgrader.CreateClients(ctx, oc, true)
 	if err != nil {
+		return nil, err
+	}
+
+	p.log.Infof("listing cluster VMs")
+	pods, err := p.clusterUpgrader.ListVMHostnames(ctx, oc)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(pods)
+}
+
+func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, hostname string) error {
+	err := validate.ValidateAgentPoolHostname(hostname)
+	if err != nil {
 		return err
 	}
+
+	scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(hostname)
+	if err != nil {
+		return err
+	}
+
+	p.log.Info("generating cluster upgrader clients")
+	err = p.clusterUpgrader.CreateClients(ctx, oc, true)
+	if err != nil {
+		return err
+	}
+
 	p.log.Info("generating admin kubeclient")
 	err = p.initialize(ctx, oc)
 	if err != nil {
 		return err
 	}
-	computerName := kubeclient.ComputerName(hostname)
-	isMaster, err := p.kubeclient.IsMaster(computerName)
+
+	p.log.Infof("reimaging %s", hostname)
+	err = p.clusterUpgrader.Reimage(ctx, oc, scaleset, instanceID)
 	if err != nil {
 		return err
 	}
-	p.log.Infof("reimaging %s", computerName)
-	err = p.clusterUpgrader.Reimage(ctx, oc, computerName)
-	if err != nil {
-		return err
-	}
-	p.log.Infof("waiting for %s to be ready", computerName)
-	if isMaster {
-		err = p.kubeclient.WaitForReadyMaster(ctx, computerName)
+
+	// not sure if we should do the following here: if the cluster is hosed, it
+	// really might not help us.
+	p.log.Infof("waiting for %s to be ready", hostname)
+	if strings.HasPrefix(hostname, "master-") {
+		err = p.kubeclient.WaitForReadyMaster(ctx, kubeclient.ComputerName(hostname))
 	} else {
-		err = p.kubeclient.WaitForReadyWorker(ctx, computerName)
+		err = p.kubeclient.WaitForReadyWorker(ctx, kubeclient.ComputerName(hostname))
 	}
 	return err
 }

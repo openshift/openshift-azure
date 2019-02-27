@@ -48,3 +48,52 @@ func TestGetMasterInstanceName(t *testing.T) {
 		t.Error(n)
 	}
 }
+
+func TestGetScaleSetNameAndInstanceID(t *testing.T) {
+	for _, tt := range []struct {
+		hostname       string
+		wantScaleset   string
+		wantInstanceID string
+		wantErr        string
+	}{
+		{
+			hostname:       "compute-1234-000000",
+			wantScaleset:   "ss-compute-1234",
+			wantInstanceID: "0",
+		},
+		{
+			hostname:       "master-00000A",
+			wantScaleset:   "ss-master",
+			wantInstanceID: "10",
+		},
+		{
+			hostname:       "mycompute-00000a",
+			wantScaleset:   "ss-mycompute",
+			wantInstanceID: "10",
+		},
+		{
+			hostname: "bad",
+			wantErr:  `invalid hostname "bad"`,
+		},
+		{
+			hostname: "bad-bad",
+			wantErr:  `invalid hostname "bad-bad"`,
+		},
+		{
+			hostname: "bad-inval!",
+			wantErr:  `invalid hostname "bad-inval!"`,
+		},
+	} {
+		scaleset, instanceID, err := GetScaleSetNameAndInstanceID(tt.hostname)
+		if (err == nil) != (tt.wantErr == "") || (err != nil && tt.wantErr != err.Error()) {
+			t.Errorf("wanted err %v, got %v", tt.wantErr, err)
+			continue
+		}
+		if tt.wantScaleset != scaleset {
+			t.Errorf("wanted scaleset %v, got %v", tt.wantScaleset, scaleset)
+		}
+		if tt.wantInstanceID != instanceID {
+			t.Errorf("wanted instanceID %v, got %v", tt.wantInstanceID, instanceID)
+		}
+	}
+}

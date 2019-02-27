@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
@@ -29,4 +31,25 @@ func GetComputerNamePrefix(app *api.AgentPoolProfile, suffix string) string {
 // AgentPoolProfile name and instance number
 func GetMasterInstanceName(instance int64) string {
 	return MasterScalesetName + fmt.Sprintf("_%d", instance)
+}
+
+// GetScaleSetNameAndInstanceID parses a hostname, e.g. master-000000 or
+// infra-1234567890-00000a, and returns the corresponding scaleset name and
+// instance ID, e.g. ss-master, 0 or ss-infra-1234567890, 10
+func GetScaleSetNameAndInstanceID(hostname string) (string, string, error) {
+	i := strings.LastIndexByte(hostname, '-')
+	if i == -1 {
+		return "", "", fmt.Errorf("invalid hostname %q", hostname)
+	}
+
+	if len(hostname[i+1:]) != 6 {
+		return "", "", fmt.Errorf("invalid hostname %q", hostname)
+	}
+
+	instanceID, err := strconv.ParseUint(hostname[i+1:], 36, 64)
+	if err != nil {
+		return "", "", fmt.Errorf("invalid hostname %q", hostname)
+	}
+
+	return "ss-" + hostname[:i], fmt.Sprintf("%d", instanceID), nil
 }
