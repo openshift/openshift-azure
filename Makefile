@@ -151,4 +151,4 @@ imagebuilder:
 	docker pull registry.access.redhat.com/rhel7:latest
 	go get -u github.com/openshift/imagebuilder/cmd/imagebuilder
 
-.PHONY: clean metricsbridge metricsbridge-image metricsbridge-push sync-image sync-push verify unit e2e imagebuilder all-image all-push
+.PHONY: clean metricsbridge metricsbridge-image metricsbridge-push sync-image sync-push startup startup-image startup-push verify unit e2e imagebuilder all-image all-push
