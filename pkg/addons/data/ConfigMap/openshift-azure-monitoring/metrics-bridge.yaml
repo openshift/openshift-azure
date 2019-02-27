@@ -11,7 +11,7 @@ data:
       name: apiserver_request_latencies_bucket
     - query: 'sum(apiserver_request_latencies_sum) without (endpoint, job, namespace, resource, scope, service, subresource, verb)'
       name: apiserver_request_latencies_sum
-    - query: 'cloudprovider_azure_api_request_duration_seconds_bucket'
+    - query: 'cloudprovider_azure_api_request_duration_seconds_bucket{le=~"1|5|10|\\+Inf"}'
     - query: 'cloudprovider_azure_api_request_duration_seconds_count'
     - query: 'cloudprovider_azure_api_request_duration_seconds_sum'
     - query: 'container_cpu_system_seconds_total{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"}'
