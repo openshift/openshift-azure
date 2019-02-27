@@ -23,7 +23,7 @@ import (
 // It returns the blob storage interface to the storage account containing the
 // config blob, etcd backups, etc.
 func GetService(ctx context.Context, cpc *cloudprovider.Config) (azureclientstorage.BlobStorageClient, error) {
-	authorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID)
+	authorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID, "")
 	if err != nil {
 		return nil, err
 	}

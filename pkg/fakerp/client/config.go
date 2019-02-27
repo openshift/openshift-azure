@@ -23,8 +23,6 @@ var supportedRegions = []string{
 }
 
 type Config struct {
-	Username        string `envconfig:"AZURE_USERNAME"`
-	Password        string `envconfig:"AZURE_PASSWORD"`
 	SubscriptionID  string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
 	TenantID        string `envconfig:"AZURE_TENANT_ID" required:"true"`
 	ClientID        string `envconfig:"AZURE_CLIENT_ID" required:"true"`

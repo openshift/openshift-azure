@@ -30,17 +30,6 @@ import (
 	adminclient "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
 )
 
-const (
-	// https://developer.microsoft.com/en-us/graph/docs/api-reference/beta/api/application_list
-	// To list and patch AAD applications, this code needs to have the clientID
-	// of an application with the following permissions:
-	// API: Windows Azure Active Directory
-	//   Delegated permissions:
-	//      Sign in and read user profile
-	//      Access the directory as the signed-in user
-	clientID = "643f441c-3ce4-4b9d-8a8f-577a3a738bfa"
-)
-
 var (
 	method  = flag.String("request", http.MethodPut, "Specify request to send to the OpenShift resource provider. Supported methods are PUT and DELETE.")
 	useProd = flag.Bool("use-prod", false, "If true, send the request to the production OpenShift resource provider.")
@@ -165,12 +154,9 @@ func execute(
 func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.Config) error {
 	if len(conf.AADClientID) > 0 && conf.AADClientID != conf.ClientID {
 		log.Info("updating the aad application")
-		if len(conf.Username) == 0 || len(conf.Password) == 0 {
-			return errors.New("AZURE_USERNAME and AZURE_PASSWORD are required to when updating the aad application")
-		}
-		authorizer, err := azureclient.NewAuthorizerFromUsernamePassword(conf.Username, conf.Password, clientID, conf.TenantID, azure.PublicCloud.GraphEndpoint)
+		authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID, azure.PublicCloud.GraphEndpoint)
 		if err != nil {
-			return fmt.Errorf("cannot get authorizer from username+password: %v", err)
+			return fmt.Errorf("cannot get authorizer: %v", err)
 		}
 		aadClient := azureclient.NewRBACApplicationsClient(ctx, conf.TenantID, authorizer)
 		callbackURL := fmt.Sprintf("https://%s.%s.cloudapp.azure.com/oauth2callback/Azure%%20AD", conf.ResourceGroup, conf.Region)
@@ -244,7 +230,7 @@ func main() {
 	// setup the osa clients
 	adminClient := adminclient.NewOpenShiftManagedClustersClientWithBaseURI(rpURL+shared.AdminContext, conf.SubscriptionID)
 	v20180930previewClient := v20180930previewclient.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
-	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID)
+	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID, "")
 	if err != nil {
 		log.Fatal(err)
 	}
