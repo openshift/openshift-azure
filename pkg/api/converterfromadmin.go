@@ -409,8 +409,8 @@ func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig)
 	if in.ServiceCatalogServer != nil {
 		mergeCertKeyPair(in.ServiceCatalogServer, &out.ServiceCatalogServer)
 	}
-	if in.AzureClusterReader != nil {
-		mergeCertKeyPair(in.AzureClusterReader, &out.AzureClusterReader)
+	if in.BlackBoxMonitor != nil {
+		mergeCertKeyPair(in.BlackBoxMonitor, &out.BlackBoxMonitor)
 	}
 	if in.GenevaLogging != nil {
 		mergeCertKeyPair(in.GenevaLogging, &out.GenevaLogging)

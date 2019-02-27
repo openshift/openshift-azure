@@ -127,7 +127,7 @@ upgrade:
 	./hack/upgrade-e2e.sh release-test-${TAG}-${COMMIT} ${SOURCE}
 
 e2e:
-	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
+	FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
 
 e2e-prod:
 	FOCUS="\[Default\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh

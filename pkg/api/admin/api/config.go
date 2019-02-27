@@ -115,7 +115,7 @@ type CertificateConfig struct {
 	ServiceCatalogServer *Certificate `json:"serviceCatalogServer,omitempty"`
 
 	// misc certificates
-	AzureClusterReader *Certificate `json:"azureClusterReader,omitempty"`
+	BlackBoxMonitor *Certificate `json:"blackBoxMonitor,omitempty"`
 
 	// geneva integration certificates
 	GenevaLogging *Certificate `json:"genevaLogging,omitempty"`

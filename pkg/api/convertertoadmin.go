@@ -145,7 +145,7 @@ func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateCon
 		Registry:             convertCertKeyPairToAdmin(in.Registry),
 		Router:               convertCertKeyPairToAdmin(in.Router),
 		ServiceCatalogServer: convertCertKeyPairToAdmin(in.ServiceCatalogServer),
-		AzureClusterReader:   convertCertKeyPairToAdmin(in.AzureClusterReader),
+		BlackBoxMonitor:      convertCertKeyPairToAdmin(in.BlackBoxMonitor),
 		GenevaLogging:        convertCertKeyPairToAdmin(in.GenevaLogging),
 		GenevaMetrics:        convertCertKeyPairToAdmin(in.GenevaMetrics),
 	}

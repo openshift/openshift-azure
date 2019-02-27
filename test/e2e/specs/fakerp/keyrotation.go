@@ -56,7 +56,7 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 		By("Verifying that certain non-ca public certificates have been updated")
 		Expect(reflect.DeepEqual(before.Config.Certificates.Admin.Cert, after.Config.Certificates.Admin.Cert)).To(BeFalse())
 		Expect(reflect.DeepEqual(before.Config.Certificates.AggregatorFrontProxy.Cert, after.Config.Certificates.AggregatorFrontProxy.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.AzureClusterReader.Cert, after.Config.Certificates.AzureClusterReader.Cert)).To(BeFalse())
+		Expect(reflect.DeepEqual(before.Config.Certificates.BlackBoxMonitor.Cert, after.Config.Certificates.BlackBoxMonitor.Cert)).To(BeFalse())
 		Expect(reflect.DeepEqual(before.Config.Certificates.EtcdClient.Cert, after.Config.Certificates.EtcdClient.Cert)).To(BeFalse())
 		Expect(reflect.DeepEqual(before.Config.Certificates.EtcdPeer.Cert, after.Config.Certificates.EtcdPeer.Cert)).To(BeFalse())
 		Expect(reflect.DeepEqual(before.Config.Certificates.EtcdServer.Cert, after.Config.Certificates.EtcdServer.Cert)).To(BeFalse())
