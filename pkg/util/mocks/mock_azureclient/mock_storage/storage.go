@@ -51,6 +51,20 @@ func (mr *MockClientMockRecorder) GetBlobService() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBlobService", reflect.TypeOf((*MockClient)(nil).GetBlobService))
 }
 
+// GetFileService mocks base method
+func (m *MockClient) GetFileService() storage0.FileServiceClient {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFileService")
+	ret0, _ := ret[0].(storage0.FileServiceClient)
+	return ret0
+}
+
+// GetFileService indicates an expected call of GetFileService
+func (mr *MockClientMockRecorder) GetFileService() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileService", reflect.TypeOf((*MockClient)(nil).GetFileService))
+}
+
 // MockBlobStorageClient is a mock of BlobStorageClient interface
 type MockBlobStorageClient struct {
 	ctrl     *gomock.Controller

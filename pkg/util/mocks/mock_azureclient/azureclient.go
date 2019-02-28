@@ -619,6 +619,36 @@ func (mr *MockAccountsClientMockRecorder) Create(arg0, arg1, arg2, arg3 interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockAccountsClient)(nil).Create), arg0, arg1, arg2, arg3)
 }
 
+// Delete mocks base method
+func (m *MockAccountsClient) Delete(arg0 context.Context, arg1, arg2 string) (autorest.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", arg0, arg1, arg2)
+	ret0, _ := ret[0].(autorest.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Delete indicates an expected call of Delete
+func (mr *MockAccountsClientMockRecorder) Delete(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockAccountsClient)(nil).Delete), arg0, arg1, arg2)
+}
+
+// GetOrCreate mocks base method
+func (m *MockAccountsClient) GetOrCreate(arg0 context.Context, arg1, arg2 string, arg3 storage.AccountCreateParameters) (*storage.Account, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOrCreate", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(*storage.Account)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetOrCreate indicates an expected call of GetOrCreate
+func (mr *MockAccountsClientMockRecorder) GetOrCreate(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrCreate", reflect.TypeOf((*MockAccountsClient)(nil).GetOrCreate), arg0, arg1, arg2, arg3)
+}
+
 // ListByResourceGroup mocks base method
 func (m *MockAccountsClient) ListByResourceGroup(arg0 context.Context, arg1 string) (storage.AccountListResult, error) {
 	m.ctrl.T.Helper()
