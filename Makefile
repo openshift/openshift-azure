@@ -10,14 +10,25 @@ endif
 $(info TAG set to ${TAG})
 LDFLAGS="-X main.gitCommit=$(COMMIT)"
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
+E2E_BIN_IMAGE = $(E2E_IMAGE)
 AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
 ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
 METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 STARTUP_IMAGE ?= quay.io/openshift-on-azure/startup:$(TAG)
 
+name2var = $(shell echo $1 | tr a-z A-Z | tr - _)
+get_image_url = $(shell echo $($(1)_IMAGE))
+
+ALL_BINARIES = azure-controllers e2e-bin etcdbackup sync metricsbridge startup
+ALL_BUILDS = $(addsuffix .build, $(ALL_BINARIES))
+ALL_IMAGES = $(addsuffix .image, $(ALL_BINARIES))
+ALL_PUSHES = $(addsuffix .push, $(ALL_BINARIES))
+
+IMAGEBUILDER = ${GOPATH}/bin/imagebuilder
+
 # all is the default target to build everything
-all: clean build azure-controllers etcdbackup sync metricsbridge startup e2e-bin
+all: clean build $(ALL_BUILDS)
 
 version:
 	echo ${TAG}
@@ -26,7 +37,7 @@ build: generate
 	go build ./...
 
 clean:
-	rm -f coverage.out azure-controllers etcdbackup sync metricsbridge startup e2e
+	rm -f coverage.out e2e $(ALL_BINARIES)
 
 test: unit e2e
 
@@ -40,67 +51,21 @@ delete:
 	./hack/delete.sh ${RESOURCEGROUP}
 	rm -rf _data
 
-azure-controllers: generate
-	go build -ldflags ${LDFLAGS} ./cmd/azure-controllers
-
-azure-controllers-image: azure-controllers imagebuilder
-	imagebuilder -f Dockerfile.azure-controllers -t $(AZURE_CONTROLLERS_IMAGE) .
-
-azure-controllers-push: azure-controllers-image
-	docker push $(AZURE_CONTROLLERS_IMAGE)
-
-e2e-bin: generate
+e2e-bin.build: generate
 	go test -ldflags ${LDFLAGS} -tags e2e -c -o ./e2e ./test/e2e
 
-e2e-image: e2e-bin imagebuilder
-	imagebuilder -f Dockerfile.e2e -t $(E2E_IMAGE) .
+%.build: cmd/%/*.go generate
+	go build -ldflags ${LDFLAGS} ./cmd/$(subst .build,,$@)
 
-e2e-push: e2e-image
-	docker push $(E2E_IMAGE)
+%.image: %.build $(IMAGEBUILDER)
+	$(IMAGEBUILDER) -f Dockerfile.$(subst -bin,,$(subst .image,,$@)) -t $(call get_image_url,$(call name2var,$(subst .image,,$@))) .
 
-recoveretcdcluster: generate
-	go build -ldflags ${LDFLAGS} ./cmd/recoveretcdcluster
+%.push: %.image
+	@echo docker push $(call get_image_url,$(call name2var,$(subst .push,,$@)))
 
-etcdbackup: generate
-	go build -ldflags ${LDFLAGS} ./cmd/etcdbackup
+all-image: $(ALL_IMAGES)
 
-etcdbackup-image: etcdbackup imagebuilder
-	imagebuilder -f Dockerfile.etcdbackup -t $(ETCDBACKUP_IMAGE) .
-
-etcdbackup-push: etcdbackup-image
-	docker push $(ETCDBACKUP_IMAGE)
-
-metricsbridge:
-	go build -ldflags ${LDFLAGS} ./cmd/metricsbridge
-
-metricsbridge-image: metricsbridge imagebuilder
-	imagebuilder -f Dockerfile.metricsbridge -t $(METRICSBRIDGE_IMAGE) .
-
-metricsbridge-push: metricsbridge-image
-	docker push $(METRICSBRIDGE_IMAGE)
-
-sync: generate
-	go build -ldflags ${LDFLAGS} ./cmd/sync
-
-sync-image: sync imagebuilder
-	imagebuilder -f Dockerfile.sync -t $(SYNC_IMAGE) .
-
-sync-push: sync-image
-	docker push $(SYNC_IMAGE)
-
-all-image: azure-controllers-image e2e-image etcdbackup-image metricsbridge-image sync-image startup-image
-
-all-push: azure-controllers-push e2e-push etcdbackup-push metrics-push sync-push startup-push
-
-startup: generate
-	go build -ldflags ${LDFLAGS} ./cmd/startup
-
-startup-image: startup
-	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-	imagebuilder -f Dockerfile.startup -t $(STARTUP_IMAGE) .
-
-startup-push: startup-image
-	docker push $(STARTUP_IMAGE)
+all-push: $(ALL_PUSHES)
 
 verify:
 	./hack/validate-generated.sh
@@ -147,8 +112,8 @@ e2e-forceupdate:
 e2e-vnet:
 	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
 
-imagebuilder:
+$(IMAGEBUILDER):
 	docker pull registry.access.redhat.com/rhel7:latest
 	go get -u github.com/openshift/imagebuilder/cmd/imagebuilder
 
-.PHONY: clean metricsbridge metricsbridge-image metricsbridge-push sync-image sync-push startup startup-image startup-push verify unit e2e imagebuilder all-image all-push
+.PHONY: clean verify generate unit create delete upgrade e2e all-image all-push
