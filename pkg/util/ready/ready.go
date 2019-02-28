@@ -141,6 +141,21 @@ func PodIsReady(cli corev1client.PodInterface, name string) func() (bool, error)
 	}
 }
 
+// PodReachesPhase will return true when the pod's phase matches the requested phase
+func PodReachesPhase(cli corev1client.PodInterface, name string, phase corev1.PodPhase) func() (bool, error) {
+	return func() (bool, error) {
+		node, err := cli.Get(name, metav1.GetOptions{})
+		switch {
+		case errors.IsNotFound(err):
+			return false, nil
+		case err != nil:
+			return false, err
+		}
+
+		return node.Status.Phase == phase, nil
+	}
+}
+
 func BatchIsReady(cli batchv1client.JobInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
 		job, err := cli.Get(name, metav1.GetOptions{})
