@@ -7,7 +7,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-07-01/network"
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2015-06-15/storage"
+	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -59,7 +59,7 @@ func fixupAPIVersions(template map[string]interface{}) {
 			"Microsoft.Network/virtualNetworks":
 			apiVersion = "2018-07-01"
 		case "Microsoft.Storage/storageAccounts":
-			apiVersion = "2015-06-15"
+			apiVersion = "2018-02-01"
 		default:
 			panic("unimplemented: " + typ)
 		}
@@ -346,9 +346,10 @@ func lbKubernetes(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *networ
 
 func storageRegistry(cs *api.OpenShiftManagedCluster) *storage.Account {
 	return &storage.Account{
-		AccountProperties: &storage.AccountProperties{
-			AccountType: storage.StandardLRS,
+		Sku: &storage.Sku{
+			Name: storage.StandardLRS,
 		},
+		Kind:     storage.Storage,
 		Name:     to.StringPtr(cs.Config.RegistryStorageAccount),
 		Type:     to.StringPtr("Microsoft.Storage/storageAccounts"),
 		Location: to.StringPtr(cs.Location),
