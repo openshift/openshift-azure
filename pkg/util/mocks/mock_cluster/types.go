@@ -217,3 +217,32 @@ func (mr *MockUpgraderMockRecorder) ResetUpdateBlob(cs interface{}) *gomock.Call
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResetUpdateBlob", reflect.TypeOf((*MockUpgrader)(nil).ResetUpdateBlob), cs)
 }
+
+// Reimage mocks base method
+func (m *MockUpgrader) Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Reimage", ctx, cs, scaleset, instanceID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Reimage indicates an expected call of Reimage
+func (mr *MockUpgraderMockRecorder) Reimage(ctx, cs, scaleset, instanceID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reimage", reflect.TypeOf((*MockUpgrader)(nil).Reimage), ctx, cs, scaleset, instanceID)
+}
+
+// ListVMHostnames mocks base method
+func (m *MockUpgrader) ListVMHostnames(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListVMHostnames", ctx, cs)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListVMHostnames indicates an expected call of ListVMHostnames
+func (mr *MockUpgraderMockRecorder) ListVMHostnames(ctx, cs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListVMHostnames", reflect.TypeOf((*MockUpgrader)(nil).ListVMHostnames), ctx, cs)
+}

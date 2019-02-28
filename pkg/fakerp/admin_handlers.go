@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/Azure/azure-sdk-for-go/storage"
+	"github.com/go-chi/chi"
 
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
@@ -33,6 +34,51 @@ func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Requ
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Write(pods)
 	s.log.Info("fetched control plane pods")
+}
+
+// handleListClusterVMs handles admin requests for the list of cluster VMs
+func (s *Server) handleListClusterVMs(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
+	json, err := s.plugin.ListClusterVMs(ctx, cs)
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to fetch cluster VMs: %v", err))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Write(json)
+	s.log.Info("fetched cluster VMs")
+}
+
+// handleReimage handles reimaging a vm in the cluster
+func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+
+	hostname := chi.URLParam(req, "hostname")
+
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
+	if err := s.plugin.Reimage(ctx, cs, hostname); err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to reimage vm: %v", err))
+		return
+	}
+	s.log.Infof("reimaged %s", hostname)
 }
 
 // handleRestore handles admin requests to restore an etcd cluster from a backup

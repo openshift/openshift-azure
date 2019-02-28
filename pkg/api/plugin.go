@@ -126,4 +126,10 @@ type GenevaActions interface {
 
 	// ForceUpdate forces rotates all vms in a cluster
 	ForceUpdate(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
+
+	// ListClusterVMs returns the hostnames of all vms in a cluster
+	ListClusterVMs(ctx context.Context, cs *OpenShiftManagedCluster) ([]byte, error)
+
+	// Reimage reimages a virtual machine in the cluster
+	Reimage(ctx context.Context, oc *OpenShiftManagedCluster, hostname string) error
 }
