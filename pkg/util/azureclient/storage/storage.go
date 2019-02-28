@@ -19,6 +19,7 @@ const (
 // Client is a minimal interface for azure Client
 type Client interface {
 	GetBlobService() BlobStorageClient
+	GetFileService() FileServiceClient
 }
 
 type client struct {
@@ -43,6 +44,10 @@ func (c *client) GetBlobService() BlobStorageClient {
 	return &blobStorageClient{BlobStorageClient: c.Client.GetBlobService()}
 }
 
+func (c *client) GetFileService() FileServiceClient {
+	return &fileServiceClient{FileServiceClient: c.Client.GetFileService()}
+}
+
 // BlobStorageClient is a minimal interface for azure BlobStorageClient
 type BlobStorageClient interface {
 	GetContainerReference(name string) Container
@@ -54,8 +59,23 @@ type blobStorageClient struct {
 
 var _ BlobStorageClient = &blobStorageClient{}
 
+// FileServiceClient is a minimal interface for azure FileServiceClient
+type FileServiceClient interface {
+	GetShareReference(name string) Share
+}
+
+type fileServiceClient struct {
+	storage.FileServiceClient
+}
+
+var _ FileServiceClient = &fileServiceClient{}
+
 func (c *blobStorageClient) GetContainerReference(name string) Container {
 	return &container{Container: c.BlobStorageClient.GetContainerReference(name)}
+}
+
+func (c *fileServiceClient) GetShareReference(name string) Share {
+	return &share{Share: c.FileServiceClient.GetShareReference(name)}
 }
 
 // Container is a minimal interface for azure Container
@@ -92,3 +112,18 @@ type blob struct {
 }
 
 var _ Blob = &blob{}
+
+// Share is a minimal interface for azure Blob
+type Share interface {
+	Exists() (bool, error)
+	Create(options *storage.FileRequestOptions) error
+	CreateIfNotExists(options *storage.FileRequestOptions) (bool, error)
+	Delete(options *storage.FileRequestOptions) error
+	DeleteIfExists(options *storage.FileRequestOptions) (bool, error)
+}
+
+type share struct {
+	*storage.Share
+}
+
+var _ Share = &share{}
