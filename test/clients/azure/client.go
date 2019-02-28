@@ -38,6 +38,7 @@ type Client struct {
 	ActivityLogs                     azureclient.ActivityLogsClient
 	Applications                     azureclient.ApplicationsClient
 	BlobStorage                      storage.BlobStorageClient
+	FileService                      storage.FileServiceClient
 	OpenShiftManagedClusters         externalapi.OpenShiftManagedClustersClient
 	OpenShiftManagedClustersAdmin    adminapi.OpenShiftManagedClustersClient
 	VirtualMachineScaleSets          azureclient.VirtualMachineScaleSetsClient
@@ -47,6 +48,7 @@ type Client struct {
 	VirtualNetworks                  azureclient.VirtualNetworksClient
 	VirtualNetworksPeerings          azureclient.VirtualNetworksPeeringsClient
 	Groups                           azureclient.GroupsClient
+	Config                           *cloudprovider.Config
 }
 
 // NewClientFromEnvironment creates a new azure client from environment variables.
@@ -69,9 +71,10 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 	}
 	subscriptionID := cfg.SubscriptionID
 
-	var storageClient storage.BlobStorageClient
+	var blobStorageClient storage.BlobStorageClient
+	// var fileServiceClient storage.FileServiceClient
 	if setStorageClient {
-		storageClient, err = configblob.GetService(context.Background(), cfg)
+		blobStorageClient, err = configblob.GetService(context.Background(), cfg)
 		if err != nil {
 			return nil, err
 		}
@@ -102,7 +105,7 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 		Accounts:                         azureclient.NewAccountsClient(ctx, subscriptionID, authorizer),
 		ActivityLogs:                     azureclient.NewActivityLogsClient(ctx, subscriptionID, authorizer),
 		Applications:                     azureclient.NewApplicationsClient(ctx, subscriptionID, authorizer),
-		BlobStorage:                      storageClient,
+		BlobStorage:                      blobStorageClient,
 		OpenShiftManagedClusters:         rpc,
 		OpenShiftManagedClustersAdmin:    rpcAdmin,
 		VirtualMachineScaleSets:          azureclient.NewVirtualMachineScaleSetsClient(ctx, subscriptionID, authorizer),
@@ -112,5 +115,6 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 		VirtualNetworks:                  azureclient.NewVirtualNetworkClient(ctx, subscriptionID, authorizer),
 		VirtualNetworksPeerings:          azureclient.NewVirtualNetworksPeeringsClient(ctx, subscriptionID, authorizer),
 		Groups:                           azureclient.NewGroupsClient(ctx, subscriptionID, authorizer),
+		Config:                           cfg,
 	}, nil
 }
