@@ -636,6 +636,12 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.Node }}",
 		},
 	},
+	"StatefulSet.apps/openshift-azure-monitoring/canary": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.Canary }}",
+		},
+	},
 	"StorageClass.storage.k8s.io/azure-disk": {
 		{
 			Path:     jsonpath.MustCompile("$.parameters.location"),

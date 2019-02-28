@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: canary
+  namespace: openshift-azure-monitoring
+  labels:
+    k8s-app: canary
+spec:
+  ports:
+  - name: metrics
+    port: 8080
+  selector:
+    k8s-app: canary

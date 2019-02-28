@@ -53,6 +53,9 @@ import:
   - go
 - package: github.com/prometheus/client_golang
   version: v0.9.2
+  subpackages:
+  - prometheus
+  - prometheus/promhttp
 - package: github.com/golang/protobuf
   version: ^1.2.0
   subpackages:
@@ -65,3 +68,6 @@ import:
   version: d69651ed3497faee15a5363a89578e9991f6d5e2
 - package: go.uber.org/zap
   version: v1.8.0
+- package: github.com/beorn7/perks
+  subpackages:
+  - quantile

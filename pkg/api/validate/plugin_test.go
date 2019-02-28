@@ -62,6 +62,7 @@ func TestPluginTemplateValidate(t *testing.T) {
 			errors.New(`invalid genevaLoggingControlPlaneRegion ""`),
 			errors.New(`invalid genevaMetricsAccount ""`),
 			errors.New(`invalid genevaMetricsEndpoint ""`),
+			errors.New(`invalid images.Canary ""`),
 		}
 
 	template := pluginapi.Config{}

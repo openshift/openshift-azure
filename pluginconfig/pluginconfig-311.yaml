@@ -46,6 +46,7 @@ images:
   controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.82
   etcdBackup: quay.io/openshift-on-azure/etcdbackup:latest
   httpd: registry.access.redhat.com/rhscl/httpd-24-rhel7:2.4-85
+  canary: quay.io/openshift-on-azure/canary:latest
   startup: quay.io/openshift-on-azure/startup:latest
   tlsProxy: quay.io/openshift-on-azure/tlsproxy:latest
   format: registry.access.redhat.com/openshift3/ose-${component}:${version}

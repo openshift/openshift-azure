@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: canary
+  namespace: openshift-azure-monitoring
+  labels:
+    k8s-app: canary
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: canary
+  template:
+    metadata:
+      labels:
+        k8s-app: canary
+    spec:
+      containers:
+      - image: '*** GENERATED ***'
+        name: canary
+        ports:
+        - containerPort: 8080
+          name: metrics
+        volumeMounts:
+        - mountPath: /data
+          name: data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 32Gi
+      storageClassName: azure-disk

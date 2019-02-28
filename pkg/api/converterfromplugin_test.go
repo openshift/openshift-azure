@@ -87,6 +87,7 @@ func internalPluginConfig() Config {
 			Console:                   "Images.Console",
 			EtcdBackup:                "Images.EtcdBackup",
 			Httpd:                     "Images.Httpd",
+			Canary:                    "Images.Canary",
 			GenevaLogging:             "Images.GenevaLogging",
 			GenevaTDAgent:             "Images.GenevaTDAgent",
 			GenevaStatsd:              "Images.GenevaStatsd",
