@@ -179,48 +179,22 @@ func (derived) MaxDataDisksPerVM(cs *api.OpenShiftManagedCluster) (string, error
 		return "8", nil
 	case api.StandardD8sV3:
 		return "16", nil
-	case api.StandardD16sV3, api.StandardD32sV3, api.StandardD64sV3:
+	case api.StandardD16sV3, api.StandardD32sV3:
 		return "32", nil
-
-	case api.StandardDS4V2:
-		return "32", nil
-	case api.StandardDS5V2:
-		return "64", nil
 
 	// Compute optimized VMs
 	case api.StandardF8sV2:
 		return "16", nil
-	case api.StandardF16sV2, api.StandardF32sV2, api.StandardF64sV2,
-		api.StandardF72sV2:
+	case api.StandardF16sV2, api.StandardF32sV2:
 		return "32", nil
-
-	case api.StandardF8s:
-		return "32", nil
-	case api.StandardF16s:
-		return "64", nil
 
 	// Memory optimized VMs
 	case api.StandardE4sV3:
 		return "8", nil
 	case api.StandardE8sV3:
 		return "16", nil
-	case api.StandardE16sV3, api.StandardE20sV3, api.StandardE32sV3,
-		api.StandardE64sV3:
+	case api.StandardE16sV3, api.StandardE20sV3, api.StandardE32sV3:
 		return "32", nil
-
-	case api.StandardGS2:
-		return "16", nil
-	case api.StandardGS3:
-		return "32", nil
-	case api.StandardGS4, api.StandardGS5:
-		return "64", nil
-
-	case api.StandardDS12V2:
-		return "16", nil
-	case api.StandardDS13V2:
-		return "32", nil
-	case api.StandardDS14V2, api.StandardDS15V2:
-		return "64", nil
 
 	// Storage optimized VMs
 	case api.StandardL4s:
