@@ -141,8 +141,8 @@ func PodIsReady(cli corev1client.PodInterface, name string) func() (bool, error)
 	}
 }
 
-// PodReachesPhase will return true when the pod's phase matches the requested phase
-func PodReachesPhase(cli corev1client.PodInterface, name string, phase corev1.PodPhase) func() (bool, error) {
+// PodHasPhase will return true when the pod's phase matches the requested phase
+func PodHasPhase(cli corev1client.PodInterface, name string, phase corev1.PodPhase) func() (bool, error) {
 	return func() (bool, error) {
 		node, err := cli.Get(name, metav1.GetOptions{})
 		switch {

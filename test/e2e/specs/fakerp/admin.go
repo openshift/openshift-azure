@@ -322,7 +322,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 			Expect(err).NotTo(HaveOccurred())
 			By("Created a simple pod to run dd")
 			By("Waiting for pod to succeed")
-			err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.PodReachesPhase(cli.Client.Admin.CoreV1.Pods(namespace), podName, corev1.PodSucceeded))
+			err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.PodHasPhase(cli.Client.Admin.CoreV1.Pods(namespace), podName, corev1.PodSucceeded))
 			Expect(err).NotTo(HaveOccurred())
 			By("Pod succeeded")
 
