@@ -93,6 +93,110 @@ func NewOpenShiftManagedClustersClientWithBaseURI(baseURI string, subscriptionID
 	return OpenShiftManagedClustersClient{NewWithBaseURI(baseURI, subscriptionID)}
 }
 
+// OpenShiftManagedClustersBackupFuture is an abstraction for monitoring and retrieving the results of a
+// long-running operation.
+type OpenShiftManagedClustersBackupFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *OpenShiftManagedClustersBackupFuture) Result(client OpenShiftManagedClustersClient) (ar autorest.Response, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersBackupFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("containerservice.OpenShiftManagedClustersBackupFuture")
+		return
+	}
+	ar.Response = future.Response()
+	return
+}
+
+// BackupAndWait backs up an  OpenShiftManagedCluster
+// and waits for the request to complete before returning.
+func (client OpenShiftManagedClustersClient) BackupAndWait(ctx context.Context, resourceGroupName, resourceName, backupName string) (result autorest.Response, err error) {
+	var future OpenShiftManagedClustersBackupFuture
+	future, err = client.Backup(ctx, resourceGroupName, resourceName, backupName)
+	if err != nil {
+		return
+	}
+	if err = future.WaitForCompletionRef(ctx, client.Client); err != nil {
+		return
+	}
+	return future.Result(client)
+}
+
+// Backup backs up an OpenShiftManagedCluster
+// Parameters:
+// resourceGroupName - the name of the Resource group.
+// resourceName - the name of the OpenShiftManagedCluster
+func (client OpenShiftManagedClustersClient) Backup(ctx context.Context, resourceGroupName, resourceName, backupName string) (result OpenShiftManagedClustersBackupFuture, err error) {
+	req, err := client.BackupPreparer(ctx, resourceGroupName, resourceName, backupName)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "Backup", nil, "Failure preparing request")
+		return
+	}
+
+	result, err = client.BackupSender(req)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "Backup", result.Response(), "Failure sending request")
+		return
+	}
+
+	return
+}
+
+// BackupPreparer prepares the Backup request.
+func (client OpenShiftManagedClustersClient) BackupPreparer(ctx context.Context, resourceGroupName, resourceName, backupName string) (*http.Request, error) {
+	pathParameters := map[string]interface{}{
+		"resourceGroupName": autorest.Encode("path", resourceGroupName),
+		"resourceName":      autorest.Encode("path", resourceName),
+		"backupName":        autorest.Encode("path", backupName),
+		"subscriptionId":    autorest.Encode("path", client.SubscriptionID),
+	}
+
+	queryParameters := map[string]interface{}{
+		"api-version": api.APIVersion,
+	}
+
+	preparer := autorest.CreatePreparer(
+		autorest.AsContentType("application/json; charset=utf-8"),
+		autorest.AsPut(),
+		autorest.WithBaseURL(client.BaseURI),
+		autorest.WithPathParameters("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/openShiftManagedClusters/{resourceName}/backup/{backupName}", pathParameters),
+		autorest.WithQueryParameters(queryParameters))
+	return preparer.Prepare((&http.Request{}).WithContext(ctx))
+}
+
+// BackupSender sends the Backup request. The method will close the
+// http.Response Body if it receives an error.
+func (client OpenShiftManagedClustersClient) BackupSender(req *http.Request) (future OpenShiftManagedClustersBackupFuture, err error) {
+	var resp *http.Response
+	resp, err = autorest.SendWithSender(client, req,
+		azure.DoRetryWithRegistration(client.Client))
+	if err != nil {
+		return
+	}
+	future.Future, err = azure.NewFutureFromResponse(resp)
+	return
+}
+
+// BackupResponder handles the response to the Backup request. The method
+// always closes the http.Response Body.
+func (client OpenShiftManagedClustersClient) BackupResponder(resp *http.Response) (result autorest.Response, err error) {
+	err = autorest.Respond(
+		resp,
+		client.ByInspecting(),
+		azure.WithErrorUnlessStatusCode(http.StatusOK, http.StatusAccepted),
+		autorest.ByClosing())
+	result.Response = resp
+	return
+}
+
 // CreateOrUpdateAndWait creates or updates a openshift managed cluster and waits for the
 // request to complete before returning.
 func (client OpenShiftManagedClustersClient) CreateOrUpdateAndWait(ctx context.Context, resourceGroupName, resourceName string, parameters api.OpenShiftManagedCluster) (osmc api.OpenShiftManagedCluster, err error) {

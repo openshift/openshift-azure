@@ -22,6 +22,7 @@ import (
 
 // Kubeclient interface to utility kubenetes functions
 type Kubeclient interface {
+	BackupCluster(ctx context.Context, backupName string) error
 	DrainAndDeleteWorker(ctx context.Context, computerName ComputerName) error
 	DeleteMaster(computerName ComputerName) error
 	GetControlPlanePods(ctx context.Context) ([]corev1.Pod, error)

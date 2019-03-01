@@ -53,3 +53,4 @@ The following are required for running all e2e tests against the fake RP
 | `File` | `secrets/metrics-int.cert` | Geneva metrics client certificate |
 | `File` | `secrets/metrics-int.key` |  Geneva metrics client key |
 | `File` | `secrets/.dockerconfigjson` |  Docker config allowing to pull geneva images |
+| `File` | `secrets/system-docker-config.json` |  Docker config allowing to pull red hat secured registry images |

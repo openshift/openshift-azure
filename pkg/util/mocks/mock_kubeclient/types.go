@@ -38,6 +38,20 @@ func (m *MockKubeclient) EXPECT() *MockKubeclientMockRecorder {
 	return m.recorder
 }
 
+// BackupCluster mocks base method
+func (m *MockKubeclient) BackupCluster(arg0 context.Context, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BackupCluster", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BackupCluster indicates an expected call of BackupCluster
+func (mr *MockKubeclientMockRecorder) BackupCluster(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BackupCluster", reflect.TypeOf((*MockKubeclient)(nil).BackupCluster), arg0, arg1)
+}
+
 // DeleteMaster mocks base method
 func (m *MockKubeclient) DeleteMaster(arg0 kubeclient.ComputerName) error {
 	m.ctrl.T.Helper()

@@ -1,7 +1,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: etcd-backup-hourly
+  name: etcd-backup
   namespace: openshift-etcd
 spec:
   jobTemplate:
@@ -13,7 +13,7 @@ spec:
             - save
             image: '*** GENERATED ***'
             imagePullPolicy: Always
-            name: etcd-backup-hourly
+            name: etcd-backup
             volumeMounts:
             - mountPath: /_data/_out
               name: azureconfig

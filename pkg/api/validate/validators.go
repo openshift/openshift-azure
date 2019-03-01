@@ -61,6 +61,19 @@ func isValidIPV4CIDR(cidr string) bool {
 	return true
 }
 
+func IsValidBlobContainerName(c string) bool {
+	// https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata
+	if !rxBlobContainerName.MatchString(c) {
+		return false
+	}
+
+	if strings.Trim(c, "-") != c || strings.Contains(c, "--") {
+		return false
+	}
+
+	return true
+}
+
 func vnetContainsSubnet(vnet, subnet *net.IPNet) bool {
 	vnetbits, _ := vnet.Mask.Size()
 	subnetbits, _ := subnet.Mask.Size()
@@ -252,17 +265,17 @@ func validateAgentPoolProfile(app api.AgentPoolProfile, vnet *net.IPNet) (errs [
 	return
 }
 
-func ValidateAgentPoolHostname(hostname string) error {
+func IsValidAgentPoolHostname(hostname string) bool {
 	parts := strings.Split(hostname, "-")
 	switch len(parts) {
 	case 2: // master-XXXXXX
 		if parts[0] != "master" ||
 			len(parts[1]) != 6 {
-			return fmt.Errorf("invalid hostname %q", hostname)
+			return false
 		}
 		_, err := strconv.ParseUint(parts[1], 36, 64)
 		if err != nil {
-			return fmt.Errorf("invalid hostname %q", hostname)
+			return false
 		}
 
 	case 3: // something-XXXXXXXXXX-XXXXXX
@@ -270,22 +283,22 @@ func ValidateAgentPoolHostname(hostname string) error {
 			parts[0] == "master" ||
 			len(parts[1]) != 10 ||
 			len(parts[2]) != 6 {
-			return fmt.Errorf("invalid hostname %q", hostname)
+			return false
 		}
 		_, err := strconv.ParseUint(parts[1], 10, 64)
 		if err != nil {
-			return fmt.Errorf("invalid hostname %q", hostname)
+			return false
 		}
 		_, err = strconv.ParseUint(parts[2], 36, 64)
 		if err != nil {
-			return fmt.Errorf("invalid hostname %q", hostname)
+			return false
 		}
 
 	default:
-		return fmt.Errorf("invalid hostname %q", hostname)
+		return false
 	}
 
-	return nil
+	return true
 }
 
 func validateFQDN(p *api.Properties, location string) (errs []error) {

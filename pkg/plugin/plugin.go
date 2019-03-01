@@ -290,9 +290,8 @@ func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedClu
 }
 
 func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, hostname string) error {
-	err := validate.ValidateAgentPoolHostname(hostname)
-	if err != nil {
-		return err
+	if !validate.IsValidAgentPoolHostname(hostname) {
+		return fmt.Errorf("invalid hostname %q", hostname)
 	}
 
 	scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(hostname)
@@ -327,4 +326,22 @@ func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, h
 		err = p.kubeclient.WaitForReadyWorker(ctx, kubeclient.ComputerName(hostname))
 	}
 	return err
+}
+
+func (p *plugin) BackupEtcdCluster(ctx context.Context, oc *api.OpenShiftManagedCluster, backupName string) error {
+	if !validate.IsValidBlobContainerName(backupName) { // no valid blob name is an invalid kubernetes name
+		return fmt.Errorf("invalid backup name %q", backupName)
+	}
+
+	p.log.Info("generating admin kubeclient")
+	err := p.initialize(ctx, oc)
+	if err != nil {
+		return err
+	}
+	p.log.Infof("backing up cluster")
+	err = p.kubeclient.BackupCluster(ctx, backupName)
+	if err != nil {
+		return err
+	}
+	return nil
 }

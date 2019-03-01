@@ -132,4 +132,7 @@ type GenevaActions interface {
 
 	// Reimage reimages a virtual machine in the cluster
 	Reimage(ctx context.Context, oc *OpenShiftManagedCluster, hostname string) error
+
+	// BackupEtcdCluster backs up the cluster's etcd
+	BackupEtcdCluster(ctx context.Context, cs *OpenShiftManagedCluster, backupName string) error
 }

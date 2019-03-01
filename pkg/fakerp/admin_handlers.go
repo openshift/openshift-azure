@@ -13,6 +13,28 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 )
 
+// handleBackup handles admin requests to backup an etcd cluster
+func (s *Server) handleBackup(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+
+	backupName := chi.URLParam(req, "backupName")
+
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
+	if err := s.plugin.BackupEtcdCluster(ctx, cs, backupName); err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to backup cluster: %v", err))
+		return
+	}
+	s.log.Info("backed up cluster")
+}
+
 // handleGetControlPlanePods handles admin requests for the list of control plane pods
 func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
