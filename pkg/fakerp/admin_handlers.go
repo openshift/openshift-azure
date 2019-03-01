@@ -160,7 +160,7 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	deployer := GetDeployer(s.log, cs)
-	if err := s.plugin.RotateClusterSecrets(ctx, cs, deployer, s.pluginTemplate); err != nil {
+	if err := s.plugin.RotateClusterSecrets(ctx, cs, deployer); err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to rotate cluster secrets: %v", err))
 		return
 	}
@@ -199,7 +199,7 @@ func (s *Server) handleGetPluginVersion(w http.ResponseWriter, req *http.Request
 		return
 	}
 	var version []byte
-	if version, err = s.plugin.GetPluginVersion(ctx, s.pluginTemplate); err != nil {
+	if version, err = s.plugin.GetPluginVersion(ctx); err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to get plugin version: %v", err))
 		return
 	}

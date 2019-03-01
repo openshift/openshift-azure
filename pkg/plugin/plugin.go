@@ -22,6 +22,7 @@ import (
 
 type plugin struct {
 	log             *logrus.Entry
+	pluginConfig    *pluginapi.Config
 	testConfig      api.TestConfig
 	clusterUpgrader cluster.Upgrader
 	armGenerator    arm.Generator
@@ -32,9 +33,10 @@ type plugin struct {
 var _ api.Plugin = &plugin{}
 
 // NewPlugin creates a new plugin instance
-func NewPlugin(log *logrus.Entry, testConfig api.TestConfig) (api.Plugin, []error) {
+func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, testConfig api.TestConfig) (api.Plugin, []error) {
 	return &plugin{
 		log:             log,
+		pluginConfig:    pluginConfig,
 		testConfig:      testConfig,
 		clusterUpgrader: cluster.NewSimpleUpgrader(log, testConfig),
 		armGenerator:    arm.NewSimpleGenerator(testConfig),
@@ -54,16 +56,16 @@ func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManag
 	return validator.Validate(new, old, false)
 }
 
-func (p *plugin) ValidatePluginTemplate(ctx context.Context, template *pluginapi.Config) []error {
+func (p *plugin) ValidatePluginTemplate(ctx context.Context) []error {
 	p.log.Info("validating external plugin api data models")
 	validator := validate.NewPluginAPIValidator()
-	return validator.Validate(template)
+	return validator.Validate(p.pluginConfig)
 }
 
-func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster, template *pluginapi.Config) error {
+func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	p.log.Info("generating configs")
 	// TODO should we save off the original config here and if there are any errors we can restore it?
-	err := p.configGenerator.Generate(cs, template)
+	err := p.configGenerator.Generate(cs, p.pluginConfig)
 	if err != nil {
 		return err
 	}
@@ -209,14 +211,14 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	return nil
 }
 
-func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, pluginTemplate *pluginapi.Config) *api.PluginError {
+func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
 	p.log.Info("invalidating non-ca certificates, private keys and secrets")
 	err := p.configGenerator.InvalidateSecrets(cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInvalidateClusterSecrets}
 	}
 	p.log.Info("regenerating config including private keys and secrets")
-	err = p.GenerateConfig(ctx, cs, pluginTemplate)
+	err = p.GenerateConfig(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepRegenerateClusterSecrets}
 	}
@@ -329,11 +331,11 @@ func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, h
 	return err
 }
 
-func (p *plugin) GetPluginVersion(ctx context.Context, pluginTemplate *pluginapi.Config) ([]byte, error) {
+func (p *plugin) GetPluginVersion(ctx context.Context) ([]byte, error) {
 	pluginVersion := &struct {
 		Version string `json:"version,omitempty"`
 	}{
-		Version: pluginTemplate.ClusterVersion,
+		Version: p.pluginConfig.ClusterVersion,
 	}
 	return json.Marshal(pluginVersion)
 }

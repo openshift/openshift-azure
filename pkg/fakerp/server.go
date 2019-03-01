@@ -57,13 +57,13 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	var err error
 	var errs []error
 	s.testConfig = GetTestConfig()
-	s.plugin, errs = plugin.NewPlugin(s.log, s.testConfig)
-	if len(errs) > 0 {
-		s.log.Fatal(errs)
-	}
 	s.pluginTemplate, err = GetPluginTemplate()
 	if err != nil {
 		s.log.Fatal(err)
+	}
+	s.plugin, errs = plugin.NewPlugin(s.log, s.pluginTemplate, s.testConfig)
+	if len(errs) > 0 {
+		s.log.Fatal(errs)
 	}
 	// We need to restore the internal cluster state into memory for GETs
 	// and DELETEs to work appropriately.

@@ -3,8 +3,6 @@ package api
 
 import (
 	"context"
-
-	plugin "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 )
 
 // ContextKey is a type for context property bag payload keys
@@ -96,11 +94,11 @@ type Plugin interface {
 	ValidateAdmin(ctx context.Context, new, old *OpenShiftManagedCluster) []error
 
 	// ValidatePluginTemplate validates external config request
-	ValidatePluginTemplate(ctx context.Context, template *plugin.Config) []error
+	ValidatePluginTemplate(ctx context.Context) []error
 
 	// GenerateConfig ensures all the necessary in-cluster config is generated
 	// for an Openshift cluster.
-	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster, template *plugin.Config) error
+	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster) error
 
 	// CreateOrUpdate either deploys or runs the update depending on the isUpdate argument
 	// this will call the deployer.
@@ -115,7 +113,7 @@ type GenevaActions interface {
 	RecoverEtcdCluster(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn, backupBlob string) *PluginError
 
 	// RotateClusterSecrets rotates the secrets in a cluster's config blob and then updates the cluster
-	RotateClusterSecrets(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn, template *plugin.Config) *PluginError
+	RotateClusterSecrets(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
 
 	// GetControlPlanePods fetches a consolidated list of the control plane pods in the cluster
 	GetControlPlanePods(ctx context.Context, oc *OpenShiftManagedCluster) ([]byte, error)
@@ -130,5 +128,5 @@ type GenevaActions interface {
 	Reimage(ctx context.Context, oc *OpenShiftManagedCluster, hostname string) error
 
 	// GetPluginVersion fetches the RP plugin version
-	GetPluginVersion(ctx context.Context, template *plugin.Config) ([]byte, error)
+	GetPluginVersion(ctx context.Context) ([]byte, error)
 }

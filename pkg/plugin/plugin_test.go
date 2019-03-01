@@ -186,7 +186,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 		log:             logrus.NewEntry(logrus.StandardLogger()),
 	}
 
-	if err := p.RotateClusterSecrets(nil, cs, deployer, nil); err != nil {
+	if err := p.RotateClusterSecrets(nil, cs, deployer); err != nil {
 		t.Errorf("plugin.RotateClusterSecrets error = %v", err)
 	}
 }
@@ -314,13 +314,13 @@ func TestReimage(t *testing.T) {
 }
 
 func TestGetPluginVersion(t *testing.T) {
-	pluginTemplate := &pluginapi.Config{
-		ClusterVersion: "v0.0",
-	}
 	p := &plugin{
+		pluginConfig: &pluginapi.Config{
+			ClusterVersion: "v0.0",
+		},
 		log: logrus.NewEntry(logrus.StandardLogger()),
 	}
-	b, err := p.GetPluginVersion(nil, pluginTemplate)
+	b, err := p.GetPluginVersion(nil)
 	if err != nil {
 		t.Errorf("plugin.GetPluginVersion error = %v", err)
 	}
@@ -331,7 +331,7 @@ func TestGetPluginVersion(t *testing.T) {
 	if err != nil {
 		t.Errorf("json.Unmarshall error = %v", err)
 	}
-	if result.Version != pluginTemplate.ClusterVersion {
-		t.Errorf("expected plugin version %s, got %s", pluginTemplate.ClusterVersion, result.Version)
+	if result.Version != p.pluginConfig.ClusterVersion {
+		t.Errorf("expected plugin version %s, got %s", p.pluginConfig.ClusterVersion, result.Version)
 	}
 }
