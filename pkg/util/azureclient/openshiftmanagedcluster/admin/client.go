@@ -673,7 +673,7 @@ func (client OpenShiftManagedClustersClient) ReimageResponder(resp *http.Respons
 type OpenShiftManagedClustersPluginVersion struct {
 	autorest.Response `json:"-"`
 
-	Version string `json:"version"`
+	PluginVersion string `json:"pluginVersion"`
 }
 
 // OpenShiftManagedClustersGetPluginVersionFuture an abstraction for monitoring and retrieving the results of a

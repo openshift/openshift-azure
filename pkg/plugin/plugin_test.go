@@ -325,13 +325,13 @@ func TestGetPluginVersion(t *testing.T) {
 		t.Errorf("plugin.GetPluginVersion error = %v", err)
 	}
 	var result struct {
-		Version string `json:"version,omitempty"`
+		PluginVersion string `json:"pluginVersion,omitempty"`
 	}
 	err = json.Unmarshal(b, &result)
 	if err != nil {
 		t.Errorf("json.Unmarshall error = %v", err)
 	}
-	if result.Version != p.pluginConfig.ClusterVersion {
-		t.Errorf("expected plugin version %s, got %s", p.pluginConfig.ClusterVersion, result.Version)
+	if result.PluginVersion != p.pluginConfig.ClusterVersion {
+		t.Errorf("expected plugin version %s, got %s", p.pluginConfig.ClusterVersion, result.PluginVersion)
 	}
 }
