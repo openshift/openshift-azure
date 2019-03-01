@@ -20,9 +20,9 @@ ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup
 ALL_IMAGES = $(addsuffix -image, $(ALL_BINARIES))
 ALL_PUSHES = $(addsuffix -push, $(ALL_BINARIES))
 
-IMAGEBUILDER = imagebuilder
+IMAGEBUILDER = ${GOPATH}/bin/imagebuilder
 
-.PHONY: $(ALL_PUSHES) $(ALL_IMAGES) all version clean build test unit generate $(IMAGEBUILDER)
+.PHONY: $(ALL_PUSHES) $(ALL_IMAGES) all version clean build test unit generate pullregistry
 # all is the default target to build everything
 all: clean build $(ALL_BINARIES)
 
@@ -54,7 +54,7 @@ upgrade:
 azure-controllers: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
-azure-controllers-image: azure-controllers $(IMAGEBUILDER)
+azure-controllers-image: azure-controllers $(IMAGEBUILDER) pullregistry
 	$(IMAGEBUILDER) -f images/azure-controllers/Dockerfile -t $(AZURE_CONTROLLERS_IMAGE) .
 
 azure-controllers-push: azure-controllers-image
@@ -69,8 +69,8 @@ e2e-push: e2e-tests-push
 e2e-tests: generate
 	go test -ldflags ${LDFLAGS} -tags e2e -c -o ./e2e-tests ./test/e2e
 
-e2e-tests-image: e2e-tests $(IMAGEBUILDER)
-	imagebuilder -f images/e2e-tests/Dockerfile -t $(E2E_IMAGE) .
+e2e-tests-image: e2e-tests $(IMAGEBUILDER) pullregistry
+	$(IMAGEBUILDER) -f images/e2e-tests/Dockerfile -t $(E2E_IMAGE) .
 
 e2e-tests-push: e2e-tests-image
 	docker push $(E2E_IMAGE)
@@ -78,8 +78,8 @@ e2e-tests-push: e2e-tests-image
 etcdbackup: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
-etcdbackup-image: etcdbackup $(IMAGEBUILDER)
-	imagebuilder -f images/etcdbackup/Dockerfile -t $(ETCDBACKUP_IMAGE) .
+etcdbackup-image: etcdbackup $(IMAGEBUILDER) pullregistry
+	$(IMAGEBUILDER) -f images/etcdbackup/Dockerfile -t $(ETCDBACKUP_IMAGE) .
 
 etcdbackup-push: etcdbackup-image
 	docker push $(ETCDBACKUP_IMAGE)
@@ -87,7 +87,7 @@ etcdbackup-push: etcdbackup-image
 metricsbridge:
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
-metricsbridge-image: metricsbridge $(IMAGEBUILDER)
+metricsbridge-image: metricsbridge $(IMAGEBUILDER) pullregistry
 	$(IMAGEBUILDER) -f images/metricsbridge/Dockerfile -t $(METRICSBRIDGE_IMAGE) .
 
 metricsbridge-push: metricsbridge-image
@@ -96,7 +96,7 @@ metricsbridge-push: metricsbridge-image
 sync: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
-sync-image: sync $(IMAGEBUILDER)
+sync-image: sync $(IMAGEBUILDER) pullregistry
 	$(IMAGEBUILDER) -f images/sync/Dockerfile -t $(SYNC_IMAGE) .
 
 sync-push: sync-image
@@ -109,7 +109,7 @@ all-push: $(ALL_PUSHES)
 startup: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
-startup-image: startup $(IMAGEBUILDER)
+startup-image: startup $(IMAGEBUILDER) pullregistry
 	$(IMAGEBUILDER) -f images/startup/Dockerfile -t $(STARTUP_IMAGE) .
 
 startup-push: startup-image
@@ -164,5 +164,7 @@ e2e-vnet:
 	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
 
 $(IMAGEBUILDER):
-	docker pull registry.access.redhat.com/rhel7:latest
 	go get -u github.com/openshift/imagebuilder/cmd/imagebuilder
+
+pullregistry: $(IMAGEBUILDER)
+	docker pull registry.access.redhat.com/rhel7:latest
