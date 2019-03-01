@@ -2,7 +2,6 @@ package fakerp
 
 import (
 	"context"
-	"crypto/sha1"
 	"fmt"
 	"net/http"
 	"os"
@@ -33,33 +32,18 @@ import (
 
 var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]", func() {
 	var (
-		cli       *standard.SanityChecker
-		azCli     *azure.Client
-		ctx       context.Context
-		namespace string
-		err       error
+		cli *standard.SanityChecker
+		ctx context.Context
+		err error
 	)
 
 	BeforeEach(func() {
+		By("Creating default sanity checker")
 		cli, err = standard.NewDefaultSanityChecker()
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cli).ToNot(BeNil())
-		azCli, err = azure.NewClientFromEnvironment(true)
-		Expect(err).NotTo(HaveOccurred())
 		ctx = context.Background()
-
-		// Create a temp project for specs in this suite
-		suffix, err := randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
-		Expect(err).NotTo(HaveOccurred())
-		namespace = fmt.Sprintf("admin-test-%s", suffix)
-		err = cli.Client.Admin.CreateProject(namespace)
-		Expect(err).NotTo(HaveOccurred())
-	})
-
-	AfterEach(func() {
-		By("Cleaning up...")
-		err = cli.Client.Admin.CleanupProject(namespace)
-		Expect(err).NotTo(HaveOccurred())
+		By("Created default sanity checker")
 	})
 
 	It("should run the correct image", func() {
@@ -132,181 +116,218 @@ var _ = Describe("Openshift on Azure admin e2e tests [AzureClusterReader][Fake]"
 		Expect(reflect.DeepEqual(before, after)).To(Equal(true))
 	})
 
-	It("should be able to configure azure file persistent volumes", func() {
-		const (
-			prefix = "azure-file"
-		)
-
+	Context("when working with azure storage accounts [AzureClusterReader][Fake][StorageAccount]", func() {
 		var (
-			pvName string
+			accountName string
+			accountKey  string
+			// storageAccount storage.Account
+			resourceGroup string
+			location      string
+			namespace     string
+			azCli         *azure.Client
+			suffix        string
 		)
 
-		pvName = fmt.Sprintf("%s-pv", prefix)
-		// need a way to lessen the chances of name collision in storage account names
-		// and also they must lowercase letters and numbers
-		clusterSHA := sha1.Sum([]byte(azCli.Config.ResourceGroup))
-		// storage account names are capped at 24 chars
-		accountName := fmt.Sprintf("azf%x", clusterSHA)[:24]
+		BeforeEach(func() {
+			resourceGroup = os.Getenv("RESOURCEGROUP")
+			location = os.Getenv("AZURE_REGION")
+			accountName, err = randomstring.RandomStorageAccountName()
+			Expect(err).NotTo(HaveOccurred())
 
-		// create storage accounts and get their keys
-		By(fmt.Sprintf("Creating %s storage account", accountName))
-		_, err = azCli.Accounts.GetOrCreate(
-			ctx,
-			azCli.Config.ResourceGroup,
-			accountName,
-			storage.AccountCreateParameters{
-				Sku: &storage.Sku{
-					Name: storage.StandardLRS},
-				Kind:                              storage.Storage,
-				Location:                          to.StringPtr(azCli.Config.Location),
-				AccountPropertiesCreateParameters: &storage.AccountPropertiesCreateParameters{},
-				Tags: map[string]*string{
-					"type": to.StringPtr("test"),
+			By("Creating azure client")
+			azCli, err = azure.NewClientFromEnvironment(true)
+			Expect(err).NotTo(HaveOccurred())
+			By("Created azure client")
+
+			// create a random storage account for each spec in this context
+			By(fmt.Sprintf("Creating %s storage account", accountName))
+			err = azCli.Accounts.Create(
+				ctx,
+				resourceGroup,
+				accountName,
+				storage.AccountCreateParameters{
+					Sku: &storage.Sku{
+						Name: storage.StandardLRS},
+					Kind:                              storage.Storage,
+					Location:                          to.StringPtr(location),
+					AccountPropertiesCreateParameters: &storage.AccountPropertiesCreateParameters{},
+					Tags: map[string]*string{
+						"type": to.StringPtr("test"),
+					},
+				})
+			Expect(err).NotTo(HaveOccurred())
+			By(fmt.Sprintf("Created %s storage account", accountName))
+
+			// get the storage account key
+			By(fmt.Sprintf("Fetching %s account key", accountName))
+			accountKeys, err := azCli.Accounts.ListKeys(ctx, resourceGroup, accountName)
+			Expect(err).NotTo(HaveOccurred())
+			accountKey = *(*accountKeys.Keys)[0].Value
+			By(fmt.Sprintf("Fetched %s account key", accountName))
+
+			// Create a temp project for specs in this suite
+			suffix, err = randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
+			Expect(err).NotTo(HaveOccurred())
+			namespace = fmt.Sprintf("end-user-%s", suffix)
+			By(fmt.Sprintf("Creating %s temporary project", namespace))
+			err = cli.Client.EndUser.CreateProject(namespace)
+			Expect(err).NotTo(HaveOccurred())
+			By(fmt.Sprintf("Created %s temporary project", namespace))
+		})
+
+		AfterEach(func() {
+			By(fmt.Sprintf("Deleting %s temporary project", namespace))
+			err = cli.Client.Admin.CleanupProject(namespace)
+			Expect(err).NotTo(HaveOccurred())
+			By(fmt.Sprintf("Deleted %s temporary project", namespace))
+			By(fmt.Sprintf("Deleting %s storage account", accountName))
+			_, err = azCli.Accounts.Delete(ctx, resourceGroup, accountName)
+			Expect(err).NotTo(HaveOccurred())
+			By(fmt.Sprintf("Deleted %s storage account", accountName))
+		})
+
+		It("should be able to configure azure file persistent volumes", func() {
+			const (
+				prefix = "azure-file"
+			)
+			pvName := fmt.Sprintf("%s-pv-%s", prefix, suffix)
+
+			// create a file share to hold the PV
+			shareName := fmt.Sprintf("%s-share", prefix)
+			By(fmt.Sprintf("Creating %s file share", shareName))
+			storageCli, err := azureclientstorage.NewClient(accountName, accountKey, azureclientstorage.DefaultBaseURL, azureclientstorage.DefaultAPIVersion, true)
+			Expect(err).NotTo(HaveOccurred())
+			fss := storageCli.GetFileService()
+			share := fss.GetShareReference(shareName)
+			_, err = share.CreateIfNotExists(nil)
+			Expect(err).NotTo(HaveOccurred())
+			By(fmt.Sprintf("Created %s file share", shareName))
+
+			// As an end user: create a secret to hold the account data
+			secretName := fmt.Sprintf("%s-secret", prefix)
+			By(fmt.Sprintf("Creating %s in %s to hold the account credentials", secretName, namespace))
+			_, err = cli.Client.EndUser.CoreV1.Secrets(namespace).Create(&corev1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: secretName,
+				},
+				StringData: map[string]string{
+					"azurestorageaccountname": accountName,
+					"azurestorageaccountkey":  accountKey,
 				},
 			})
-		Expect(err).NotTo(HaveOccurred())
-		By(fmt.Sprintf("Created %s storage account", accountName))
-		By(fmt.Sprintf("Fetching %s account keys", accountName))
-		accountKeys, err := azCli.Accounts.ListKeys(ctx, azCli.Config.ResourceGroup, accountName)
-		Expect(err).NotTo(HaveOccurred())
-		accountKey := *(*accountKeys.Keys)[0].Value
-		By(fmt.Sprintf("Fetched %s account keys", accountName))
+			Expect(err).NotTo(HaveOccurred())
+			By(fmt.Sprintf("Created %s", secretName))
 
-		// create a file share to hold the PV
-		shareName := fmt.Sprintf("%s-share", prefix)
-		By(fmt.Sprintf("Creating %s file share", shareName))
-		storageCli, err := azureclientstorage.NewClient(accountName, accountKey, azureclientstorage.DefaultBaseURL, azureclientstorage.DefaultAPIVersion, true)
-		Expect(err).NotTo(HaveOccurred())
-		fss := storageCli.GetFileService()
-		share := fss.GetShareReference(shareName)
-		_, err = share.CreateIfNotExists(nil)
-		Expect(err).NotTo(HaveOccurred())
-		By(fmt.Sprintf("Created %s file share", shareName))
-
-		// Create a secret to hold the account data
-		secretName := fmt.Sprintf("%s-secret", prefix)
-		By(fmt.Sprintf("Creating %s in %s to hold the account credentials", secretName, namespace))
-		_, err = cli.Client.Admin.CoreV1.Secrets(namespace).Create(&corev1.Secret{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: secretName,
-			},
-			StringData: map[string]string{
-				"azurestorageaccountname": accountName,
-				"azurestorageaccountkey":  accountKey,
-			},
-		})
-		Expect(err).NotTo(HaveOccurred())
-		By(fmt.Sprintf("Created %s", secretName))
-
-		// Create a PersistentVolume
-		storageClass := fmt.Sprintf("%s-sc", prefix)
-		pvQuota, err := resource.ParseQuantity("10Gi")
-		Expect(err).NotTo(HaveOccurred())
-		By(fmt.Sprintf("Creating PV %s of size %v", pvName, pvQuota))
-		_, err = cli.Client.Admin.CoreV1.PersistentVolumes().Create(&corev1.PersistentVolume{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: pvName,
-			},
-			Spec: corev1.PersistentVolumeSpec{
-				Capacity: corev1.ResourceList{
-					corev1.ResourceStorage: pvQuota,
+			// As an admin: create a PersistentVolume
+			storageClass := fmt.Sprintf("%s-sc-%s", prefix, suffix)
+			pvQuota, err := resource.ParseQuantity("10Gi")
+			Expect(err).NotTo(HaveOccurred())
+			By(fmt.Sprintf("Creating PV %s of size %v", pvName, pvQuota))
+			_, err = cli.Client.Admin.CoreV1.PersistentVolumes().Create(&corev1.PersistentVolume{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: pvName,
 				},
-				AccessModes: []corev1.PersistentVolumeAccessMode{
-					corev1.PersistentVolumeAccessMode("ReadWriteMany"),
-				},
-				StorageClassName: storageClass,
-				PersistentVolumeSource: corev1.PersistentVolumeSource{
-					AzureFile: &corev1.AzureFilePersistentVolumeSource{
-						SecretName:      secretName,
-						SecretNamespace: to.StringPtr(namespace),
-						ShareName:       shareName,
-						ReadOnly:        false,
+				Spec: corev1.PersistentVolumeSpec{
+					Capacity: corev1.ResourceList{
+						corev1.ResourceStorage: pvQuota,
 					},
-				},
-				MountOptions: []string{
-					"dir_mode=0777",
-					"file_mode=0777",
-				},
-			},
-		})
-		defer cli.Client.Admin.CoreV1.PersistentVolumes().Delete(pvName, nil)
-		Expect(err).NotTo(HaveOccurred())
-		By(fmt.Sprintf("Created PV %s", pvName))
-
-		// Create a PersistentVolumeClaim
-		pvcName := fmt.Sprintf("%s-pvc", prefix)
-		pvcStorage, err := resource.ParseQuantity("2Gi")
-		Expect(err).NotTo(HaveOccurred())
-		By(fmt.Sprintf("Creating PVC %s in namespace %s", pvcName, namespace))
-		_, err = cli.Client.Admin.CoreV1.PersistentVolumeClaims(namespace).Create(&corev1.PersistentVolumeClaim{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: pvcName,
-			},
-			Spec: corev1.PersistentVolumeClaimSpec{
-				AccessModes: []corev1.PersistentVolumeAccessMode{
-					corev1.PersistentVolumeAccessMode("ReadWriteMany"),
-				},
-				StorageClassName: to.StringPtr(storageClass),
-				VolumeName:       pvName,
-				Resources: corev1.ResourceRequirements{
-					Requests: corev1.ResourceList{
-						corev1.ResourceStorage: pvcStorage,
+					AccessModes: []corev1.PersistentVolumeAccessMode{
+						corev1.PersistentVolumeAccessMode("ReadWriteMany"),
 					},
-				},
-			},
-		})
-		Expect(err).NotTo(HaveOccurred())
-		By(fmt.Sprintf("Created PVC %s", pvcName))
-
-		// Create a pod to run a simple program to test azure-file
-		By("Creating a simple pod to run dd")
-		podName := "busybox-1"
-		_, err = cli.Client.Admin.CoreV1.Pods(namespace).Create(&corev1.Pod{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: podName,
-			},
-			Spec: corev1.PodSpec{
-				Containers: []corev1.Container{
-					{
-						Name:  podName,
-						Image: "busybox",
-						Command: []string{
-							"/bin/dd",
-							"if=/dev/urandom",
-							fmt.Sprintf("of=/data/%s.bin", namespace),
-							"bs=1M",
-							"count=100",
+					StorageClassName: storageClass,
+					PersistentVolumeSource: corev1.PersistentVolumeSource{
+						AzureFile: &corev1.AzureFilePersistentVolumeSource{
+							SecretName:      secretName,
+							SecretNamespace: to.StringPtr(namespace),
+							ShareName:       shareName,
+							ReadOnly:        false,
 						},
-						VolumeMounts: []corev1.VolumeMount{
-							{
-								Name:      fmt.Sprintf("%s-vol", prefix),
-								MountPath: "/data",
-								ReadOnly:  false,
+					},
+					MountOptions: []string{
+						"dir_mode=0777",
+						"file_mode=0777",
+					},
+				},
+			})
+			defer cli.Client.Admin.CoreV1.PersistentVolumes().Delete(pvName, nil)
+			Expect(err).NotTo(HaveOccurred())
+			By(fmt.Sprintf("Created PV %s", pvName))
+
+			// As an end user: Create a PersistentVolumeClaim
+			pvcName := fmt.Sprintf("%s-pvc", prefix)
+			pvcStorage, err := resource.ParseQuantity("2Gi")
+			Expect(err).NotTo(HaveOccurred())
+			By(fmt.Sprintf("Creating PVC %s in namespace %s", pvcName, namespace))
+			_, err = cli.Client.EndUser.CoreV1.PersistentVolumeClaims(namespace).Create(&corev1.PersistentVolumeClaim{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: pvcName,
+				},
+				Spec: corev1.PersistentVolumeClaimSpec{
+					AccessModes: []corev1.PersistentVolumeAccessMode{
+						corev1.PersistentVolumeAccessMode("ReadWriteMany"),
+					},
+					StorageClassName: to.StringPtr(storageClass),
+					VolumeName:       pvName,
+					Resources: corev1.ResourceRequirements{
+						Requests: corev1.ResourceList{
+							corev1.ResourceStorage: pvcStorage,
+						},
+					},
+				},
+			})
+			Expect(err).NotTo(HaveOccurred())
+			By(fmt.Sprintf("Created PVC %s", pvcName))
+
+			// As an end user: create a pod to run a simple program to test azure-file
+			By("Creating a simple pod to run dd")
+			podName := "busybox"
+			_, err = cli.Client.EndUser.CoreV1.Pods(namespace).Create(&corev1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: podName,
+				},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:  podName,
+							Image: "busybox",
+							Command: []string{
+								"/bin/dd",
+								"if=/dev/urandom",
+								fmt.Sprintf("of=/data/%s.bin", namespace),
+								"bs=1M",
+								"count=100",
+							},
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name:      fmt.Sprintf("%s-vol", prefix),
+									MountPath: "/data",
+									ReadOnly:  false,
+								},
 							},
 						},
 					},
-				},
-				Volumes: []corev1.Volume{
-					{
-						Name: fmt.Sprintf("%s-vol", prefix),
-						VolumeSource: corev1.VolumeSource{
-							PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-								ClaimName: pvcName,
+					Volumes: []corev1.Volume{
+						{
+							Name: fmt.Sprintf("%s-vol", prefix),
+							VolumeSource: corev1.VolumeSource{
+								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+									ClaimName: pvcName,
+								},
 							},
 						},
 					},
+					RestartPolicy: corev1.RestartPolicyNever,
 				},
-				RestartPolicy: corev1.RestartPolicyNever,
-			},
-		})
-		Expect(err).NotTo(HaveOccurred())
-		By("Created a simple pod to run dd")
-		By("Waiting for pod to succeed")
-		err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.PodReachesPhase(cli.Client.Admin.CoreV1.Pods(namespace), podName, corev1.PodSucceeded))
-		Expect(err).NotTo(HaveOccurred())
-		By("Pod succeeded")
+			})
+			Expect(err).NotTo(HaveOccurred())
+			By("Created a simple pod to run dd")
+			By("Waiting for pod to succeed")
+			err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.PodReachesPhase(cli.Client.Admin.CoreV1.Pods(namespace), podName, corev1.PodSucceeded))
+			Expect(err).NotTo(HaveOccurred())
+			By("Pod succeeded")
 
-		// TODO: cleanup azure resources? Storage accounts act up funny if you
-		// remove and re-create in quick succession
+			// TODO: cleanup azure resources? Storage accounts act up funny if you
+			// remove and re-create in quick succession
+		})
 	})
 })
