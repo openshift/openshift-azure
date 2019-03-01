@@ -3,9 +3,9 @@ kind: Namespace
 metadata:
   annotations:
     openshift.io/node-selector: ""
-  name: default
   labels:
     name: default
+  name: default
 spec:
   finalizers:
   - kubernetes

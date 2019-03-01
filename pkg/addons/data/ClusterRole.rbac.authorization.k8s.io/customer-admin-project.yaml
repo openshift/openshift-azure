@@ -18,6 +18,7 @@ rules:
   - update
 - apiGroups:
   - ""
+  - network.openshift.io
   resources:
   - egressnetworkpolicies
   verbs:
