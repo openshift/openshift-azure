@@ -3,7 +3,7 @@
 /env
 /env.*
 !/env.example
-/e2e
+/e2e-tests
 /kubeconfig*
 /sync
 /startup

@@ -17,7 +17,7 @@ SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 STARTUP_IMAGE ?= quay.io/openshift-on-azure/startup:$(TAG)
 
 # all is the default target to build everything
-all: clean build azure-controllers etcdbackup sync metricsbridge startup e2e-bin
+all: clean build azure-controllers etcdbackup sync metricsbridge startup e2e-tests
 
 version:
 	echo ${TAG}
@@ -26,7 +26,7 @@ build: generate
 	go build ./...
 
 clean:
-	rm -f coverage.out azure-controllers etcdbackup sync metricsbridge startup e2e
+	rm -f coverage.out azure-controllers etcdbackup sync metricsbridge startup e2e-tests
 
 test: unit e2e
 
@@ -49,13 +49,19 @@ azure-controllers-image: azure-controllers imagebuilder
 azure-controllers-push: azure-controllers-image
 	docker push $(AZURE_CONTROLLERS_IMAGE)
 
-e2e-bin: generate
-	go test -ldflags ${LDFLAGS} -tags e2e -c -o ./e2e ./test/e2e
+# for backwards compat
+.PHONY: e2e-bin e2e-image e2e-push
+e2e-bin: e2e-tests
+e2e-image: e2e-tests-image
+e2e-push: e2e-tests-push
 
-e2e-image: e2e-bin imagebuilder
-	imagebuilder -f images/e2e/Dockerfile -t $(E2E_IMAGE) .
+e2e-tests: generate
+	go test -ldflags ${LDFLAGS} -tags e2e -c -o ./e2e-tests ./test/e2e
 
-e2e-push: e2e-image
+e2e-tests-image: e2e-tests imagebuilder
+	imagebuilder -f images/e2e-tests/Dockerfile -t $(E2E_IMAGE) .
+
+e2e-tests-push: e2e-tests-image
 	docker push $(E2E_IMAGE)
 
 etcdbackup: generate
