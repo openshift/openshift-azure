@@ -14,9 +14,9 @@ EOF
 }
 
 # Meaning of the below magic numbers
-# "00000003-0000-0000-c000-000000000000" -> microsoft graph
-# "5b567255-7703-4780-807c-7be8301ae99b" -> read all groups
-# "37f7f235-527c-4136-accd-4a02d197296e" -> sign users in
+# "00000002-0000-0000-c000-000000000000" -> AAD Graph API
+# "5778995a-e1bf-45b8-affa-663a9f3f4d04" -> Read directory data
+# "311a71cc-e848-46a1-bdf8-97ff7156d8e6" -> Sign in and read user profile
 # "type": "Role" -> application permission
 # "type": "Scope" -> delegated permission
 
@@ -44,14 +44,14 @@ app-create)
         --required-resource-accesses @- <<'EOF' | tr -d '"'
 [
     {
-      "resourceAppId": "00000003-0000-0000-c000-000000000000",
+      "resourceAppId": "00000002-0000-0000-c000-000000000000",
       "resourceAccess": [
         {
-          "id": "5b567255-7703-4780-807c-7be8301ae99b",
+          "id": "5778995a-e1bf-45b8-affa-663a9f3f4d04",
           "type": "Role"
         },
         {
-          "id": "37f7f235-527c-4136-accd-4a02d197296e",
+          "id": "311a71cc-e848-46a1-bdf8-97ff7156d8e6",
           "type": "Scope"
         }
       ]
