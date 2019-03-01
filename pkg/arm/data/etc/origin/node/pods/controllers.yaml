@@ -14,7 +14,7 @@ spec:
     - controllers
     - --config=/etc/origin/master/master-config.yaml
     - --listen=https://0.0.0.0:8444
-    - {{ print "--loglevel=" .Config.ClusterLogLevel.ControllerManager | quote }}
+    - {{ print "--loglevel=" .Config.ComponentLogLevel.ControllerManager | quote }}
     command:
     - openshift
     env:

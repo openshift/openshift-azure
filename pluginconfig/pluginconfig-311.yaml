@@ -14,7 +14,7 @@
 ## Geneva integration other details
 clusterVersion: v0.0
 ## Openshift component logging levels
-clusterLogLevel:
+componentLogLevel:
   apiServer: 2
   controllerManager: 2
   node: 2

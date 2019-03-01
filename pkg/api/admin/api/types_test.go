@@ -77,7 +77,7 @@ var marshalled = []byte(`{
 	},
 	"config": {
 		"clusterVersion": "Config.ClusterVersion",
-		"clusterLogLevel": {
+		"componentLogLevel": {
 			"apiServer": 1,
 			"controllerManager": 1,
 			"node": 1

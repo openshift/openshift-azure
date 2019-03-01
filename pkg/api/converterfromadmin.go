@@ -303,8 +303,8 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	if in.ClusterVersion != nil {
 		out.ClusterVersion = *in.ClusterVersion
 	}
-	if in.ClusterLogLevel != nil {
-		mergeClusterLogLevel(in.ClusterLogLevel, &out.ClusterLogLevel)
+	if in.ComponentLogLevel != nil {
+		mergeComponentLogLevel(in.ComponentLogLevel, &out.ComponentLogLevel)
 	}
 	if in.ImageOffer != nil {
 		out.ImageOffer = *in.ImageOffer
@@ -363,9 +363,9 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	return
 }
 
-func mergeClusterLogLevel(in *admin.ComponentsLogLevel, out *ComponentsLogLevel) {
-	if in.ApiServer != nil {
-		out.ApiServer = *in.ApiServer
+func mergeComponentLogLevel(in *admin.ComponentLogLevel, out *ComponentLogLevel) {
+	if in.APIServer != nil {
+		out.APIServer = *in.APIServer
 	}
 	if in.ControllerManager != nil {
 		out.ControllerManager = *in.ControllerManager

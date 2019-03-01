@@ -104,7 +104,7 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 func convertConfigToAdmin(cs *Config) *admin.Config {
 	return &admin.Config{
 		ClusterVersion:                       &cs.ClusterVersion,
-		ClusterLogLevel:                      convertClusterLogLevelsToAdmin(cs.ClusterLogLevel),
+		ComponentLogLevel:                    convertComponentLogLevelsToAdmin(cs.ComponentLogLevel),
 		SSHSourceAddressPrefixes:             &cs.SSHSourceAddressPrefixes,
 		ImageOffer:                           &cs.ImageOffer,
 		ImagePublisher:                       &cs.ImagePublisher,
@@ -126,9 +126,9 @@ func convertConfigToAdmin(cs *Config) *admin.Config {
 	}
 }
 
-func convertClusterLogLevelsToAdmin(in ComponentsLogLevel) *admin.ComponentsLogLevel {
-	return &admin.ComponentsLogLevel{
-		ApiServer:         &in.ApiServer,
+func convertComponentLogLevelsToAdmin(in ComponentLogLevel) *admin.ComponentLogLevel {
+	return &admin.ComponentLogLevel{
+		APIServer:         &in.APIServer,
 		ControllerManager: &in.ControllerManager,
 		Node:              &in.Node,
 	}

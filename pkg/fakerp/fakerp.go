@@ -68,7 +68,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	}
 
 	// This should be executed only for fakeRP
-	overridePluginTemplate(template)
+	overridePluginTemplate(template, shared.IsUpdate())
 
 	errs = p.ValidatePluginTemplate(ctx, template)
 	if len(errs) > 0 {

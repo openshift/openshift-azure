@@ -19,7 +19,7 @@ func (v *AdminAPIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster, ext
 	if errs := validateUpdateContainerService(cs, oldCs); len(errs) > 0 {
 		return errs
 	}
-	if errs := validateUpdateConfig(cs.Config, oldCs.Config); len(errs) > 0 {
+	if errs := validateUpdateConfig(&cs.Config, &oldCs.Config); len(errs) > 0 {
 		return errs
 	}
 

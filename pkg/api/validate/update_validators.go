@@ -29,15 +29,21 @@ func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster) (err
 		old.Properties.AgentPoolProfiles[i].Count = new.Count
 	}
 
+	old.Config.ComponentLogLevel = cs.Config.ComponentLogLevel
+
 	if !reflect.DeepEqual(cs, old) {
 		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
 	}
 	return errs
 }
 
-func validateUpdateConfig(internalConfig, adminConfig api.Config) (errs []error) {
-	if !reflect.DeepEqual(internalConfig, adminConfig) {
-		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(internalConfig, adminConfig)))
+func validateUpdateConfig(config, oldConfig *api.Config) (errs []error) {
+	old := oldConfig.DeepCopy()
+
+	old.ComponentLogLevel = config.ComponentLogLevel
+
+	if !reflect.DeepEqual(config, old) {
+		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(config, old)))
 	}
 	return
 }

@@ -36,8 +36,9 @@ var _ = Describe("Change OpenShift Component Log Level E2E tests [ChangeLogLevel
 		Expect(before).NotTo(BeNil())
 
 		By("Executing a cluster update with updated log levels.")
-		before.Config.ClusterLogLevel.ApiServer = to.IntPtr(4)
-		before.Config.ClusterLogLevel.ControllerManager = to.IntPtr(4)
+		before.Config.ComponentLogLevel.APIServer = to.IntPtr(*before.Config.ComponentLogLevel.APIServer - 2)
+		before.Config.ComponentLogLevel.ControllerManager = to.IntPtr(*before.Config.ComponentLogLevel.ControllerManager - 2)
+		before.Config.ComponentLogLevel.Node = to.IntPtr(*before.Config.ComponentLogLevel.Node - 2)
 		update, err := azurecli.OpenShiftManagedClustersAdmin.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), before)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(update).NotTo(BeNil())
@@ -49,7 +50,7 @@ var _ = Describe("Change OpenShift Component Log Level E2E tests [ChangeLogLevel
 		Expect(after).NotTo(BeNil())
 
 		By("Verifying that the cluster log level has been updated")
-		Expect(after.Config.ClusterLogLevel).To(Equal(before.Config.ClusterLogLevel))
+		Expect(after.Config.ComponentLogLevel).To(Equal(before.Config.ComponentLogLevel))
 
 		By("Validating the cluster")
 		errs := cli.ValidateCluster(context.Background())

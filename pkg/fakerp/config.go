@@ -109,7 +109,7 @@ func enrichContext(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-func overridePluginTemplate(template *pluginapi.Config) {
+func overridePluginTemplate(template *pluginapi.Config, isUpdate bool) {
 	if os.Getenv("SYNC_IMAGE") != "" {
 		template.Images.Sync = os.Getenv("SYNC_IMAGE")
 	}
@@ -133,6 +133,11 @@ func overridePluginTemplate(template *pluginapi.Config) {
 	}
 	if os.Getenv("IMAGE_OFFER") != "" {
 		template.ImageOffer = os.Getenv("IMAGE_OFFER")
+	}
+	if os.Getenv("RUNNING_UNDER_TEST") == "true" && !isUpdate {
+		template.ComponentLogLevel.APIServer = 4
+		template.ComponentLogLevel.ControllerManager = 4
+		template.ComponentLogLevel.Node = 4
 	}
 }
 

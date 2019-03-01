@@ -12,9 +12,9 @@ func ConvertFromPlugin(in *plugin.Config, old *Config) *Config {
 		cs = old.DeepCopy()
 	}
 	cs.ClusterVersion = in.ClusterVersion
-	cs.ClusterLogLevel.ApiServer = in.ClusterLogLevel.ApiServer
-	cs.ClusterLogLevel.ControllerManager = in.ClusterLogLevel.ControllerManager
-	cs.ClusterLogLevel.Node = in.ClusterLogLevel.Node
+	cs.ComponentLogLevel.APIServer = in.ComponentLogLevel.APIServer
+	cs.ComponentLogLevel.ControllerManager = in.ComponentLogLevel.ControllerManager
+	cs.ComponentLogLevel.Node = in.ComponentLogLevel.Node
 	// Generic offering configurables
 	cs.ImageOffer = in.ImageOffer
 	cs.ImagePublisher = in.ImagePublisher

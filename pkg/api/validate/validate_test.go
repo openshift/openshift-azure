@@ -651,7 +651,43 @@ properties:
 
 		gotErrs := validateUpdateContainerService(newCs, oldCs)
 		if !reflect.DeepEqual(gotErrs, tt.wantErrs) {
-			t.Errorf("validateUpdateContainerService:%s() = %v, want %v", name, gotErrs, tt.wantErrs)
+			t.Errorf("validateUpdateContainerService(%s) = %v, want %v", name, gotErrs, tt.wantErrs)
+		}
+	}
+}
+
+func TestValidateUpdateConfig(t *testing.T) {
+	tests := []struct {
+		name      string
+		newConfig api.Config
+		wantErr   bool
+	}{
+		{
+			name: "no change",
+		},
+		{
+			name: "change componentLogLevel",
+			newConfig: api.Config{
+				ComponentLogLevel: api.ComponentLogLevel{
+					APIServer:         1,
+					ControllerManager: 1,
+					Node:              1,
+				},
+			},
+		},
+		{
+			name: "invalid change",
+			newConfig: api.Config{
+				ClusterVersion: "value",
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		gotErrs := validateUpdateConfig(&api.Config{}, &tt.newConfig)
+		if (gotErrs != nil) != tt.wantErr {
+			t.Errorf("validateUpdateConfig(%s) = %v", tt.name, gotErrs)
 		}
 	}
 }

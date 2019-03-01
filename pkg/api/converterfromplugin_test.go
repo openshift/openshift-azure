@@ -25,8 +25,8 @@ func internalPluginConfig() Config {
 	return Config{
 
 		ClusterVersion: "ClusterVersion",
-		ClusterLogLevel: ComponentsLogLevel{
-			ApiServer:         1,
+		ComponentLogLevel: ComponentLogLevel{
+			APIServer:         1,
 			ControllerManager: 1,
 			Node:              1,
 		},
