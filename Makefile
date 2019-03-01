@@ -58,9 +58,6 @@ e2e-image: e2e-bin imagebuilder
 e2e-push: e2e-image
 	docker push $(E2E_IMAGE)
 
-recoveretcdcluster: generate
-	go build -ldflags ${LDFLAGS} ./cmd/recoveretcdcluster
-
 etcdbackup: generate
 	go build -ldflags ${LDFLAGS} ./cmd/etcdbackup
 
