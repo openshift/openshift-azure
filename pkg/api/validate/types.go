@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	RxRfc1123 = regexp.MustCompile(`(?i)^` +
+	rxRfc1123 = regexp.MustCompile(`(?i)^` +
 		`([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9])` +
 		`(\.([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9]))*` +
 		`$`)
@@ -24,6 +24,8 @@ var (
 
 	// This regexp is to guard against InvalidDomainNameLabel for hostname validation
 	rxCloudDomainLabel = regexp.MustCompile(`^[a-z][a-z0-9-]{1,61}[a-z0-9]\.`)
+
+	rxBlobContainerName = regexp.MustCompile(`^[a-z0-9-]{3,63}$`)
 
 	// This regexp is to check image version format
 	imageVersion = regexp.MustCompile(`^[0-9]{3}.[0-9]{1,4}.[0-9]{8}$`)

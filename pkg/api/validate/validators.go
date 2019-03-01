@@ -37,7 +37,7 @@ var validRouterProfileNames = map[string]struct{}{
 }
 
 func isValidHostname(h string) bool {
-	return len(h) <= 255 && RxRfc1123.MatchString(h)
+	return len(h) <= 255 && rxRfc1123.MatchString(h)
 }
 
 func isValidCloudAppHostname(h, location string) bool {
@@ -58,6 +58,19 @@ func isValidIPV4CIDR(cidr string) bool {
 	if net == nil || !ip.Equal(net.IP) {
 		return false
 	}
+	return true
+}
+
+func IsValidBlobContainerName(c string) bool {
+	// https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata
+	if !rxBlobContainerName.MatchString(c) {
+		return false
+	}
+
+	if strings.Trim(c, "-") != c || strings.Contains(c, "--") {
+		return false
+	}
+
 	return true
 }
 

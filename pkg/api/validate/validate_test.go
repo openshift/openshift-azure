@@ -741,3 +741,53 @@ func TestValidateAgentPoolHostname(t *testing.T) {
 		}
 	}
 }
+
+func TestIsValidBlobContainerName(t *testing.T) {
+	for _, tt := range []struct {
+		name  string
+		valid bool
+	}{
+		{
+			name: "12",
+		},
+		{
+			name:  "123",
+			valid: true,
+		},
+		{
+			name:  "abc",
+			valid: true,
+		},
+		{
+			name:  "abc-123",
+			valid: true,
+		},
+		{
+			name:  "123456789012345678901234567890123456789012345678901234567890123",
+			valid: true,
+		},
+		{
+			name: "1234567890123456789012345678901234567890123456789012345678901234",
+		},
+		{
+			name: "bad!",
+		},
+		{
+			name: "Bad",
+		},
+		{
+			name: "-bad",
+		},
+		{
+			name: "bad-",
+		},
+		{
+			name: "bad--bad",
+		},
+	} {
+		valid := IsValidBlobContainerName(tt.name)
+		if valid != tt.valid {
+			t.Errorf("%s: wanted valid %v, got %v", tt.name, tt.valid, valid)
+		}
+	}
+}

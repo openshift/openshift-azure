@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -73,9 +72,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		Expect(cm1.Data).To(HaveKeyWithValue("value", "before-backup"))
 
 		By(fmt.Sprintf("Running an etcd backup"))
-		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
-		defer cancel()
-		resp, err := azurecli.OpenShiftManagedClustersAdmin.BackupAndWait(ctx, resourceGroup, resourceGroup, backup)
+		resp, err := azurecli.OpenShiftManagedClustersAdmin.BackupAndWait(context.Background(), resourceGroup, resourceGroup, backup)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
@@ -94,7 +91,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		Expect(cm2.Data).To(HaveKeyWithValue("value", "after-backup"))
 
 		By("Restore from the backup")
-		resp, err = azurecli.OpenShiftManagedClustersAdmin.RestoreAndWait(ctx, resourceGroup, resourceGroup, backup)
+		resp, err = azurecli.OpenShiftManagedClustersAdmin.RestoreAndWait(context.Background(), resourceGroup, resourceGroup, backup)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(resp.StatusCode).To(Equal(http.StatusOK))
 

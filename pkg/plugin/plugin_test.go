@@ -327,7 +327,7 @@ func TestBackupEtcdCluster(t *testing.T) {
 
 	mockKube := mock_kubeclient.NewMockKubeclient(mockCtrl)
 
-	_ = mockKube.EXPECT().BackupCluster(nil, backupName).Return(nil)
+	mockKube.EXPECT().BackupCluster(nil, backupName).Return(nil)
 
 	p := &plugin{
 		kubeclient: mockKube,

@@ -330,6 +330,10 @@ func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, h
 }
 
 func (p *plugin) BackupEtcdCluster(ctx context.Context, oc *api.OpenShiftManagedCluster, backupName string) error {
+	if !validate.IsValidBlobContainerName(backupName) { // no valid blob name is an invalid kubernetes name
+		return fmt.Errorf("invalid backup name %q", backupName)
+	}
+
 	p.log.Info("generating admin kubeclient")
 	err := p.initialize(ctx, oc)
 	if err != nil {
