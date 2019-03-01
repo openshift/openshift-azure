@@ -44,7 +44,7 @@ azure-controllers: generate
 	go build -ldflags ${LDFLAGS} ./cmd/azure-controllers
 
 azure-controllers-image: azure-controllers imagebuilder
-	imagebuilder -f Dockerfile.azure-controllers -t $(AZURE_CONTROLLERS_IMAGE) .
+	imagebuilder -f images/azure-controllers/Dockerfile -t $(AZURE_CONTROLLERS_IMAGE) .
 
 azure-controllers-push: azure-controllers-image
 	docker push $(AZURE_CONTROLLERS_IMAGE)
@@ -53,7 +53,7 @@ e2e-bin: generate
 	go test -ldflags ${LDFLAGS} -tags e2e -c -o ./e2e ./test/e2e
 
 e2e-image: e2e-bin imagebuilder
-	imagebuilder -f Dockerfile.e2e -t $(E2E_IMAGE) .
+	imagebuilder -f images/e2e/Dockerfile -t $(E2E_IMAGE) .
 
 e2e-push: e2e-image
 	docker push $(E2E_IMAGE)
@@ -65,7 +65,7 @@ etcdbackup: generate
 	go build -ldflags ${LDFLAGS} ./cmd/etcdbackup
 
 etcdbackup-image: etcdbackup imagebuilder
-	imagebuilder -f Dockerfile.etcdbackup -t $(ETCDBACKUP_IMAGE) .
+	imagebuilder -f images/etcdbackup/Dockerfile -t $(ETCDBACKUP_IMAGE) .
 
 etcdbackup-push: etcdbackup-image
 	docker push $(ETCDBACKUP_IMAGE)
@@ -74,7 +74,7 @@ metricsbridge:
 	go build -ldflags ${LDFLAGS} ./cmd/metricsbridge
 
 metricsbridge-image: metricsbridge imagebuilder
-	imagebuilder -f Dockerfile.metricsbridge -t $(METRICSBRIDGE_IMAGE) .
+	imagebuilder -f images/metricsbridge/Dockerfile -t $(METRICSBRIDGE_IMAGE) .
 
 metricsbridge-push: metricsbridge-image
 	docker push $(METRICSBRIDGE_IMAGE)
@@ -83,7 +83,7 @@ sync: generate
 	go build -ldflags ${LDFLAGS} ./cmd/sync
 
 sync-image: sync imagebuilder
-	imagebuilder -f Dockerfile.sync -t $(SYNC_IMAGE) .
+	imagebuilder -f images/sync/Dockerfile -t $(SYNC_IMAGE) .
 
 sync-push: sync-image
 	docker push $(SYNC_IMAGE)
@@ -97,7 +97,7 @@ startup: generate
 
 startup-image: startup
 	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-	imagebuilder -f Dockerfile.startup -t $(STARTUP_IMAGE) .
+	imagebuilder -f images/startup/Dockerfile -t $(STARTUP_IMAGE) .
 
 startup-push: startup-image
 	docker push $(STARTUP_IMAGE)
