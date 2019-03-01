@@ -16,3 +16,15 @@ rules:
   - delete
   - patch
   - update
+- apiGroups:
+  - ""
+  resources:
+  - egressnetworkpolicies
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - patch
+  - update

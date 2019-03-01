@@ -4,6 +4,8 @@ metadata:
   annotations:
     openshift.io/node-selector: ""
   name: default
+  labels:
+    name: default
 spec:
   finalizers:
   - kubernetes
