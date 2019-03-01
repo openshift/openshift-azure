@@ -52,7 +52,7 @@ upgrade:
 	./hack/upgrade-e2e.sh release-test-${TAG}-${COMMIT} ${SOURCE}
 
 azure-controllers: generate
-	go build -ldflags ${LDFLAGS} ./cmd/azure-controllers
+	go build -ldflags ${LDFLAGS} ./cmd/$@
 
 azure-controllers-image: azure-controllers $(IMAGEBUILDER)
 	$(IMAGEBUILDER) -f images/azure-controllers/Dockerfile -t $(AZURE_CONTROLLERS_IMAGE) .
@@ -76,7 +76,7 @@ e2e-tests-push: e2e-tests-image
 	docker push $(E2E_IMAGE)
 
 etcdbackup: generate
-	go build -ldflags ${LDFLAGS} ./cmd/etcdbackup
+	go build -ldflags ${LDFLAGS} ./cmd/$@
 
 etcdbackup-image: etcdbackup $(IMAGEBUILDER)
 	imagebuilder -f images/etcdbackup/Dockerfile -t $(ETCDBACKUP_IMAGE) .
@@ -85,7 +85,7 @@ etcdbackup-push: etcdbackup-image
 	docker push $(ETCDBACKUP_IMAGE)
 
 metricsbridge:
-	go build -ldflags ${LDFLAGS} ./cmd/metricsbridge
+	go build -ldflags ${LDFLAGS} ./cmd/$@
 
 metricsbridge-image: metricsbridge $(IMAGEBUILDER)
 	$(IMAGEBUILDER) -f images/metricsbridge/Dockerfile -t $(METRICSBRIDGE_IMAGE) .
@@ -94,7 +94,7 @@ metricsbridge-push: metricsbridge-image
 	docker push $(METRICSBRIDGE_IMAGE)
 
 sync: generate
-	go build -ldflags ${LDFLAGS} ./cmd/sync
+	go build -ldflags ${LDFLAGS} ./cmd/$@
 
 sync-image: sync $(IMAGEBUILDER)
 	$(IMAGEBUILDER) -f images/sync/Dockerfile -t $(SYNC_IMAGE) .
@@ -107,7 +107,7 @@ all-image: $(ALL_IMAGES)
 all-push: $(ALL_PUSHES)
 
 startup: generate
-	go build -ldflags ${LDFLAGS} ./cmd/startup
+	go build -ldflags ${LDFLAGS} ./cmd/$@
 
 startup-image: startup $(IMAGEBUILDER)
 	$(IMAGEBUILDER) -f images/startup/Dockerfile -t $(STARTUP_IMAGE) .
