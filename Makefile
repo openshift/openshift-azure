@@ -35,17 +35,21 @@ build: generate
 clean:
 	rm -f coverage.out $(ALL_BINARIES)
 
-test: unit e2e
-
 generate:
 	go generate ./...
 
+test: unit e2e
+
+.PHONY: create delete upgrade
 create:
 	timeout 1h ./hack/create.sh ${RESOURCEGROUP}
 
 delete:
 	./hack/delete.sh ${RESOURCEGROUP}
 	rm -rf _data
+
+upgrade:
+	./hack/upgrade-e2e.sh release-test-${TAG}-${COMMIT} ${SOURCE}
 
 azure-controllers: generate
 	go build -ldflags ${LDFLAGS} ./cmd/azure-controllers
@@ -111,6 +115,7 @@ startup-image: startup $(IMAGEBUILDER)
 startup-push: startup-image
 	docker push $(STARTUP_IMAGE)
 
+.PHONY: verify
 verify:
 	./hack/validate-generated.sh
 	go vet ./...
@@ -126,15 +131,14 @@ ifneq ($(ARTIFACT_DIR),)
 	cp coverage.out $(ARTIFACT_DIR)
 endif
 
+.PHONY: cover codecov
 cover: unit
 	go tool cover -html=coverage.out
 
 codecov: unit
 	./hack/codecov-report.sh
 
-upgrade:
-	./hack/upgrade-e2e.sh release-test-${TAG}-${COMMIT} ${SOURCE}
-
+.PHONY: e2e e2e-prod e2e-etcdbackuprecovery e2e-keyrotation e2e-reimagevm e2e-scaleupdown e2e-forceupdate e2e-vnet
 e2e:
 	FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
 
@@ -162,5 +166,3 @@ e2e-vnet:
 $(IMAGEBUILDER):
 	docker pull registry.access.redhat.com/rhel7:latest
 	go get -u github.com/openshift/imagebuilder/cmd/imagebuilder
-
-.PHONY: clean metricsbridge metricsbridge-image metricsbridge-push sync-image sync-push startup startup-image startup-push verify unit e2e imagebuilder all-image all-push
