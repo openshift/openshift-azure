@@ -16,8 +16,9 @@ METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 STARTUP_IMAGE ?= quay.io/openshift-on-azure/startup:$(TAG)
 
+ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup
 # all is the default target to build everything
-all: clean build azure-controllers etcdbackup sync metricsbridge startup e2e-tests
+all: clean build $(ALL_BINARIES)
 
 version:
 	echo ${TAG}
@@ -26,7 +27,7 @@ build: generate
 	go build ./...
 
 clean:
-	rm -f coverage.out azure-controllers etcdbackup sync metricsbridge startup e2e-tests
+	rm -f coverage.out $(ALL_BINARIES)
 
 test: unit e2e
 
