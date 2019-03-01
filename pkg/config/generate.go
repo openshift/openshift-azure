@@ -13,6 +13,7 @@ import (
 	api "github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/randomstring"
 )
 
 func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pluginapi.Config) (err error) {
@@ -385,33 +386,33 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 	}
 
 	if len(c.RegistryStorageAccount) == 0 {
-		if c.RegistryStorageAccount, err = randomStorageAccountName(); err != nil {
+		if c.RegistryStorageAccount, err = randomstring.RandomStorageAccountName(); err != nil {
 			return
 		}
 	}
 
 	if len(c.ConfigStorageAccount) == 0 {
-		if c.ConfigStorageAccount, err = randomStorageAccountName(); err != nil {
+		if c.ConfigStorageAccount, err = randomstring.RandomStorageAccountName(); err != nil {
 			return
 		}
 	}
 
 	if len(c.RegistryConsoleOAuthSecret) == 0 {
 		var pass string
-		if pass, err = randomString(64); err != nil {
+		if pass, err = randomstring.RandomASCIIString(64); err != nil {
 			return err
 		}
 		c.RegistryConsoleOAuthSecret = fmt.Sprintf("user%s", pass)
 	}
 
 	if len(c.ConsoleOAuthSecret) == 0 {
-		if c.ConsoleOAuthSecret, err = randomString(64); err != nil {
+		if c.ConsoleOAuthSecret, err = randomstring.RandomASCIIString(64); err != nil {
 			return err
 		}
 	}
 
 	if len(c.RouterStatsPassword) == 0 {
-		if c.RouterStatsPassword, err = randomString(10); err != nil {
+		if c.RouterStatsPassword, err = randomstring.RandomASCIIString(10); err != nil {
 			return
 		}
 	}
