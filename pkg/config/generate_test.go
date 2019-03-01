@@ -20,17 +20,15 @@ func TestGenerate(t *testing.T) {
 			},
 		},
 	}
-	pc := api.PluginConfig{
-		TestConfig: api.TestConfig{
-			RunningUnderTest: true,
-		},
+	tc := api.TestConfig{
+		RunningUnderTest: true,
 	}
 
 	prepare := func(v reflect.Value) {}
 	var template *pluginapi.Config
 	populate.Walk(&template, prepare)
 
-	cg := simpleGenerator{pluginConfig: pc}
+	cg := simpleGenerator{testConfig: tc}
 	err := cg.Generate(cs, template)
 	if err != nil {
 		t.Error(err)

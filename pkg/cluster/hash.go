@@ -21,7 +21,7 @@ type Hasher interface {
 }
 
 type hasher struct {
-	pluginConfig api.PluginConfig
+	testConfig api.TestConfig
 }
 
 func hashVMSS(vmss *compute.VirtualMachineScaleSet) ([]byte, error) {
@@ -43,7 +43,7 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 	appCopy.Count = 0
 	appCopy.Name = ""
 
-	vmss, err := arm.Vmss(&h.pluginConfig, cs, &appCopy, "", "") // TODO: backupBlob is rather a layering violation here
+	vmss, err := arm.Vmss(cs, &appCopy, "", "", h.testConfig) // TODO: backupBlob is rather a layering violation here
 	if err != nil {
 		return nil, err
 	}

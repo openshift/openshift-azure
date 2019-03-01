@@ -125,7 +125,7 @@ func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenS
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
 	}
 
-	target, err := arm.Vmss(&u.pluginConfig, cs, app, "", suffix)
+	target, err := arm.Vmss(cs, app, "", suffix, u.testConfig)
 	if err != nil {
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}

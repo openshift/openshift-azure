@@ -21,7 +21,7 @@ type Generator interface {
 }
 
 type simpleGenerator struct {
-	pluginConfig api.PluginConfig
+	testConfig api.TestConfig
 }
 
 var _ Generator = &simpleGenerator{}
@@ -36,9 +36,9 @@ type armTemplate struct {
 }
 
 // NewSimpleGenerator create a new SimpleGenerator
-func NewSimpleGenerator(pluginConfig *api.PluginConfig) Generator {
+func NewSimpleGenerator(testConfig api.TestConfig) Generator {
 	return &simpleGenerator{
-		pluginConfig: *pluginConfig,
+		testConfig: testConfig,
 	}
 }
 
@@ -49,17 +49,17 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 		Resources: []interface{}{
 			vnet(cs),
 			ipAPIServer(cs),
-			lbAPIServer(&g.pluginConfig, cs),
+			lbAPIServer(cs, g.testConfig),
 			storageRegistry(cs),
 			nsgMaster(cs),
 		},
 	}
 	if !isUpdate {
-		t.Resources = append(t.Resources, ipOutbound(cs), lbKubernetes(&g.pluginConfig, cs), nsgWorker(cs))
+		t.Resources = append(t.Resources, ipOutbound(cs), lbKubernetes(cs, g.testConfig), nsgWorker(cs))
 	}
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
-			vmss, err := Vmss(&g.pluginConfig, cs, &app, backupBlob, suffix)
+			vmss, err := Vmss(cs, &app, backupBlob, suffix, g.testConfig)
 			if err != nil {
 				return nil, err
 			}

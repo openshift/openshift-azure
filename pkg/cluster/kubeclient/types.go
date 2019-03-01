@@ -31,15 +31,15 @@ type Kubeclient interface {
 }
 
 type kubeclient struct {
-	pluginConfig api.PluginConfig
-	client       kubernetes.Interface
-	log          *logrus.Entry
+	testConfig api.TestConfig
+	client     kubernetes.Interface
+	log        *logrus.Entry
 }
 
 var _ Kubeclient = &kubeclient{}
 
 // NewKubeclient creates a new kubelient instance
-func NewKubeclient(log *logrus.Entry, config *v1.Config, pluginConfig *api.PluginConfig, disableKeepAlives bool) (Kubeclient, error) {
+func NewKubeclient(log *logrus.Entry, config *v1.Config, disableKeepAlives bool, testConfig api.TestConfig) (Kubeclient, error) {
 	restconfig, err := managedcluster.RestConfigFromV1Config(config)
 	if err != nil {
 		return nil, err
@@ -60,9 +60,9 @@ func NewKubeclient(log *logrus.Entry, config *v1.Config, pluginConfig *api.Plugi
 	}
 
 	return &kubeclient{
-		pluginConfig: *pluginConfig,
-		log:          log,
-		client:       cli,
+		testConfig: testConfig,
+		log:        log,
+		client:     cli,
 	}, nil
 
 }

@@ -374,7 +374,7 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		}
 	}
 
-	if g.pluginConfig.TestConfig.RunningUnderTest {
+	if g.testConfig.RunningUnderTest {
 		c.RunningUnderTest = true
 	}
 

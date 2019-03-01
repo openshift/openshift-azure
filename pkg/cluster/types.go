@@ -49,7 +49,7 @@ type Upgrader interface {
 }
 
 type simpleUpgrader struct {
-	pluginConfig      api.PluginConfig
+	testConfig        api.TestConfig
 	accountsClient    azureclient.AccountsClient
 	storageClient     storage.Client
 	updateBlobService updateblob.BlobService
@@ -65,12 +65,12 @@ type simpleUpgrader struct {
 var _ Upgrader = &simpleUpgrader{}
 
 // NewSimpleUpgrader creates a new upgrader instance
-func NewSimpleUpgrader(log *logrus.Entry, pluginConfig *api.PluginConfig) Upgrader {
+func NewSimpleUpgrader(log *logrus.Entry, testConfig api.TestConfig) Upgrader {
 	return &simpleUpgrader{
-		pluginConfig:  *pluginConfig,
+		testConfig:    testConfig,
 		log:           log,
 		scalerFactory: scaler.NewFactory(),
-		hasher:        &hasher{pluginConfig: *pluginConfig},
+		hasher:        &hasher{testConfig: testConfig},
 	}
 }
 
@@ -92,6 +92,6 @@ func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftMan
 	u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
 	u.ssc = azureclient.NewVirtualMachineScaleSetsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
 
-	u.kubeclient, err = kubeclient.NewKubeclient(u.log, cs.Config.AdminKubeconfig, &u.pluginConfig, disableKeepAlives)
+	u.kubeclient, err = kubeclient.NewKubeclient(u.log, cs.Config.AdminKubeconfig, disableKeepAlives, u.testConfig)
 	return err
 }

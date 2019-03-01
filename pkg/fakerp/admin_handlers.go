@@ -138,7 +138,7 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
 		return
 	}
-	deployer := GetDeployer(s.log, cs, s.pluginConfig)
+	deployer := GetDeployer(s.log, cs)
 	if err := s.plugin.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to recover cluster: %v", err))
 		return
@@ -159,7 +159,7 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
 		return
 	}
-	deployer := GetDeployer(s.log, cs, s.pluginConfig)
+	deployer := GetDeployer(s.log, cs)
 	if err := s.plugin.RotateClusterSecrets(ctx, cs, deployer, s.pluginTemplate); err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to rotate cluster secrets: %v", err))
 		return
@@ -183,7 +183,7 @@ func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
 		return
 	}
-	deployer := GetDeployer(s.log, cs, s.pluginConfig)
+	deployer := GetDeployer(s.log, cs)
 	if err := s.plugin.ForceUpdate(ctx, cs, deployer); err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to force update cluster: %v", err))
 		return

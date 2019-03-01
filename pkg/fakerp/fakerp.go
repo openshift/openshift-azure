@@ -23,7 +23,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
-func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api.PluginConfig) api.DeployFn {
+func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployFn {
 	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
 		log.Info("applying arm template deployment")
 		authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
@@ -53,9 +53,9 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api
 	}
 }
 
-func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, config *api.PluginConfig, isAdmin bool) (*api.OpenShiftManagedCluster, error) {
+func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
 	// instantiate the plugin
-	p, errs := plugin.NewPlugin(log, config)
+	p, errs := plugin.NewPlugin(log, testConfig)
 	if len(errs) > 0 {
 		return nil, kerrors.NewAggregate(errs)
 	}
@@ -165,13 +165,13 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
-	err = acceptMarketplaceAgreement(ctx, log, cs, config)
+	err = acceptMarketplaceAgreement(ctx, log, cs, testConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	log.Info("plugin createorupdate")
-	deployer := GetDeployer(log, cs, config)
+	deployer := GetDeployer(log, cs)
 	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
 		return nil, err
 	}
@@ -179,8 +179,8 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	return cs, nil
 }
 
-func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, pluginConfig *api.PluginConfig) error {
-	if pluginConfig.TestConfig.ImageResourceName != "" ||
+func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) error {
+	if testConfig.ImageResourceName != "" ||
 		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
 		return nil
 	}
