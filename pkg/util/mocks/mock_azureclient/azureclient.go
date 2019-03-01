@@ -634,19 +634,19 @@ func (mr *MockAccountsClientMockRecorder) Delete(arg0, arg1, arg2 interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockAccountsClient)(nil).Delete), arg0, arg1, arg2)
 }
 
-// GetOrCreate mocks base method
-func (m *MockAccountsClient) GetOrCreate(arg0 context.Context, arg1, arg2 string, arg3 storage.AccountCreateParameters) (*storage.Account, error) {
+// GetProperties mocks base method
+func (m *MockAccountsClient) GetProperties(arg0 context.Context, arg1, arg2 string) (storage.Account, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetOrCreate", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(*storage.Account)
+	ret := m.ctrl.Call(m, "GetProperties", arg0, arg1, arg2)
+	ret0, _ := ret[0].(storage.Account)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetOrCreate indicates an expected call of GetOrCreate
-func (mr *MockAccountsClientMockRecorder) GetOrCreate(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+// GetProperties indicates an expected call of GetProperties
+func (mr *MockAccountsClientMockRecorder) GetProperties(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOrCreate", reflect.TypeOf((*MockAccountsClient)(nil).GetOrCreate), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProperties", reflect.TypeOf((*MockAccountsClient)(nil).GetProperties), arg0, arg1, arg2)
 }
 
 // ListByResourceGroup mocks base method
