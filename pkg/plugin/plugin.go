@@ -290,9 +290,8 @@ func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedClu
 }
 
 func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, hostname string) error {
-	err := validate.ValidateAgentPoolHostname(hostname)
-	if err != nil {
-		return err
+	if !validate.IsValidAgentPoolHostname(hostname) {
+		return fmt.Errorf("invalid hostname %q", hostname)
 	}
 
 	scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(hostname)
