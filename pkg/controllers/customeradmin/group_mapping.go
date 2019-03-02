@@ -40,9 +40,9 @@ func fromMSGraphGroup(log *logrus.Entry, kubeGroup *v1.Group, kubeGroupName stri
 // https://docs.microsoft.com/en-us/graph/api/group-list
 // To list AAD groups, this code needs to have the clientID
 // of an application with the following permissions:
-// API: Microsoft Graph
+// API: Windows Azure Active Directory
 //   Application permissions:
-//      Read all groups
+//      Read directory data
 func newAADGroupsClient(config api.AADIdentityProvider) (*graphrbac.GroupsClient, error) {
 	authorizer, err := azureclient.NewAuthorizer(config.ClientID, config.Secret, config.TenantID, azure.PublicCloud.GraphEndpoint)
 	if err != nil {
