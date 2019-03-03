@@ -120,7 +120,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
-	err = vm.createOrUpdateVault(ctx, cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, strings.Split(u.Host, ".")[0])
+	err = vm.createOrUpdateVault(ctx, os.Getenv("AZURE_CLIENT_ID"), cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, strings.Split(u.Host, ".")[0])
 	if err != nil {
 		return nil, err
 	}
@@ -227,14 +227,13 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
 	}
 
-	// TODO these should be different
 	cs.Properties.MasterServicePrincipalProfile = api.ServicePrincipalProfile{
-		ClientID: os.Getenv("AZURE_CLIENT_ID"),
-		Secret:   os.Getenv("AZURE_CLIENT_SECRET"),
+		ClientID: os.Getenv("AZURE_MASTER_CLIENT_ID"),
+		Secret:   os.Getenv("AZURE_MASTER_CLIENT_SECRET"),
 	}
 	cs.Properties.WorkerServicePrincipalProfile = api.ServicePrincipalProfile{
-		ClientID: os.Getenv("AZURE_CLIENT_ID"),
-		Secret:   os.Getenv("AZURE_CLIENT_SECRET"),
+		ClientID: os.Getenv("AZURE_WORKER_CLIENT_ID"),
+		Secret:   os.Getenv("AZURE_WORKER_CLIENT_SECRET"),
 	}
 
 	// /subscriptions/{subscription}/resourcegroups/{resource_group}/providers/Microsoft.ContainerService/openshiftmanagedClusters/{cluster_name}

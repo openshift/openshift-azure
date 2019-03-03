@@ -102,13 +102,18 @@ func (vm *vaultManager) writeTLSCertsToVault(ctx context.Context, cs *api.OpenSh
 	return nil
 }
 
-func (vm *vaultManager) createOrUpdateVault(ctx context.Context, appID, tenantID, resourceGroup, location, vaultName string) error {
+func (vm *vaultManager) createOrUpdateVault(ctx context.Context, fakerpAppID, masterAppID, tenantID, resourceGroup, location, vaultName string) error {
 	tID, err := uuid.FromString(tenantID)
 	if err != nil {
 		return err
 	}
 
-	spObjID, err := aadapp.GetServicePrincipalObjectIDFromAppID(ctx, vm.spc, appID)
+	fakerpObjID, err := aadapp.GetServicePrincipalObjectIDFromAppID(ctx, vm.spc, fakerpAppID)
+	if err != nil {
+		return err
+	}
+
+	masterObjID, err := aadapp.GetServicePrincipalObjectIDFromAppID(ctx, vm.spc, masterAppID)
 	if err != nil {
 		return err
 	}
@@ -124,11 +129,20 @@ func (vm *vaultManager) createOrUpdateVault(ctx context.Context, appID, tenantID
 			AccessPolicies: &[]mgmtkeyvault.AccessPolicyEntry{
 				{
 					TenantID: &tID,
-					ObjectID: &spObjID,
+					ObjectID: &fakerpObjID,
 					Permissions: &mgmtkeyvault.Permissions{
 						Certificates: &[]mgmtkeyvault.CertificatePermissions{
 							mgmtkeyvault.Import,
 						},
+						Secrets: &[]mgmtkeyvault.SecretPermissions{
+							mgmtkeyvault.SecretPermissionsGet,
+						},
+					},
+				},
+				{
+					TenantID: &tID,
+					ObjectID: &masterObjID,
+					Permissions: &mgmtkeyvault.Permissions{
 						Secrets: &[]mgmtkeyvault.SecretPermissions{
 							mgmtkeyvault.SecretPermissionsGet,
 						},
