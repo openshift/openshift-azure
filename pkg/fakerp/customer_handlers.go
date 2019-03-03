@@ -29,7 +29,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, internalapi.ContextKeyClientAuthorizer)
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
 		return
@@ -43,13 +43,9 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	cfg := azureclient.NewClientCredentialsConfigFromEnvironment()
-	vc, err := azureclient.NewVaultMgmtClient(cfg, os.Getenv("AZURE_SUBSCRIPTION_ID"))
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to delete vault: %v", err))
-	}
-
-	err = vc.DeleteVault(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), vaultName(os.Getenv("RESOURCEGROUP")))
+	// TODO: we shoult not be creating clients left right and center - all in one place
+	vc := azureclient.NewVaultMgmtClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
+	err = deleteVault(ctx, vc, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), vaultName(os.Getenv("RESOURCEGROUP")))
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to delete vault: %v", err))
 		return

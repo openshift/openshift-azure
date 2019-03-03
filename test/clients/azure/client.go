@@ -54,7 +54,7 @@ type Client struct {
 // tests that need access to the config storage blob because configblob.GetService
 // makes api calls to Azure in order to setup the blob client.
 func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
-	authorizer, err := azureclient.NewAuthorizerFromEnvironment()
+	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
 	if err != nil {
 		return nil, err
 	}

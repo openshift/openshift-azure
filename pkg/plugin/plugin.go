@@ -124,6 +124,11 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
+	err = p.clusterUpgrader.EnrichCSFromVault(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepEnrichFromVault}
+	}
+
 	if !isUpdate {
 		err = p.clusterUpgrader.CreateConfigStorageAccount(ctx, cs)
 		if err != nil {

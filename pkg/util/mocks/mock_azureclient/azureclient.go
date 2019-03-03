@@ -6,8 +6,6 @@ package mock_azureclient
 
 import (
 	context "context"
-	rsa "crypto/rsa"
-	x509 "crypto/x509"
 	reflect "reflect"
 
 	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
@@ -690,16 +688,17 @@ func (mr *MockKeyVaultClientMockRecorder) GetSecret(arg0, arg1, arg2, arg3 inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecret", reflect.TypeOf((*MockKeyVaultClient)(nil).GetSecret), arg0, arg1, arg2, arg3)
 }
 
-// StoreCertAndKey mocks base method
-func (m *MockKeyVaultClient) StoreCertAndKey(arg0 context.Context, arg1 string, arg2 *rsa.PrivateKey, arg3 *x509.Certificate) error {
+// ImportCertificate mocks base method
+func (m *MockKeyVaultClient) ImportCertificate(arg0 context.Context, arg1, arg2 string, arg3 keyvault.CertificateImportParameters) (keyvault.CertificateBundle, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StoreCertAndKey", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "ImportCertificate", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(keyvault.CertificateBundle)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// StoreCertAndKey indicates an expected call of StoreCertAndKey
-func (mr *MockKeyVaultClientMockRecorder) StoreCertAndKey(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+// ImportCertificate indicates an expected call of ImportCertificate
+func (mr *MockKeyVaultClientMockRecorder) ImportCertificate(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreCertAndKey", reflect.TypeOf((*MockKeyVaultClient)(nil).StoreCertAndKey), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportCertificate", reflect.TypeOf((*MockKeyVaultClient)(nil).ImportCertificate), arg0, arg1, arg2, arg3)
 }

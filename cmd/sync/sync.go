@@ -17,6 +17,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 	"github.com/openshift/openshift-azure/pkg/util/log"
+	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
 var (
@@ -29,7 +30,7 @@ var (
 
 type sync struct {
 	azs  azureclient.AccountsClient
-	cpc  *cloudprovider.Config
+	kvc  azureclient.KeyVaultClient
 	blob azureclientstorage.Blob
 	log  *logrus.Entry
 }
@@ -39,7 +40,6 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 	if err != nil {
 		return err
 	}
-	s.cpc = cpc
 
 	authorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID, "")
 	if err != nil {
@@ -47,6 +47,13 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 	}
 
 	s.azs = azureclient.NewAccountsClient(ctx, cpc.SubscriptionID, authorizer)
+
+	vaultauthorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID, azureclient.KeyVaultEndpoint)
+	if err != nil {
+		return err
+	}
+
+	s.kvc = azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
 
 	bsc, err := configblob.GetService(ctx, cpc)
 	if err != nil {
@@ -70,12 +77,18 @@ func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
 		return false, err
 	}
 
+	s.log.Print("enriching config blob")
+	err = vault.EnrichCSFromVault(ctx, s.kvc, cs)
+	if err != nil {
+		return true, errors.Wrap(err, "EnrichCSFromVault")
+	}
+
 	v := validate.NewAPIValidator(cs.Config.RunningUnderTest)
 	if errs := v.Validate(cs, nil, false); len(errs) > 0 {
 		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
 	}
 
-	if err := addons.Main(ctx, s.log, cs, s.azs, s.cpc, *dryRun); err != nil {
+	if err := addons.Main(ctx, s.log, cs, s.azs, *dryRun); err != nil {
 		return true, errors.Wrap(err, "cannot sync cluster config")
 	}
 

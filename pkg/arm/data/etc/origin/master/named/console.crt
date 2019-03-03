@@ -1,1 +1,1 @@
-{{ SecretFromVault "CERTIFICATE" .ContainerService.Properties.APICertProfile.KeyVaultSecretURL }}
+{{ CertAsBytes .Config.Certificates.OpenShiftConsole.Cert | String }}

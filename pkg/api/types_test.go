@@ -288,6 +288,9 @@ func TestUnmarshal(t *testing.T) {
 	populatedOc := OpenShiftManagedCluster{}
 	populate.Walk(&populatedOc, prepare)
 
+	populatedOc.Config.Certificates.OpenShiftConsole = CertKeyPair{}
+	populatedOc.Config.Certificates.Router = CertKeyPair{}
+
 	var unmarshalledOc OpenShiftManagedCluster
 	err := json.Unmarshal(marshalled, &unmarshalledOc)
 	if err != nil {
@@ -383,8 +386,6 @@ func TestAdminAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Config\.RunningUnderTest$`),
 		regexp.MustCompile(`^\.Config\.Images\.ImagePullSecret$`),
 		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
-		regexp.MustCompile(`^\.Properties\.APICertProfile\.`),
-		regexp.MustCompile(`\.RouterCertProfile\.`),
 		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile\.`),
 		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile\.`),
 	}

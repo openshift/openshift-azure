@@ -5,8 +5,6 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac"
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
 )
 
 // RBACApplicationsClient is a minimal interface for azure ApplicationsClient
@@ -42,11 +40,11 @@ type servicePrincipalsClient struct {
 var _ ServicePrincipalsClient = &servicePrincipalsClient{}
 
 // NewServicePrincipalsClient create a client to query ServicePrincipal information
-func NewServicePrincipalsClient(cfg auth.ClientCredentialsConfig, tenantID string) (ServicePrincipalsClient, error) {
-	var err error
-	var spc servicePrincipalsClient
-	spc.ServicePrincipalsClient = graphrbac.NewServicePrincipalsClient(tenantID)
-	cfg.Resource = azure.PublicCloud.GraphEndpoint
-	spc.Authorizer, err = cfg.Authorizer()
-	return &spc, err
+func NewServicePrincipalsClient(ctx context.Context, tenantID string, authorizer autorest.Authorizer) ServicePrincipalsClient {
+	client := graphrbac.NewServicePrincipalsClient(tenantID)
+	setupClient(ctx, &client.Client, authorizer)
+
+	return &servicePrincipalsClient{
+		ServicePrincipalsClient: client,
+	}
 }

@@ -13,35 +13,39 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-// GetObjectIDUsingRbacClient find the ObjectID for the application
-func GetObjectIDUsingRbacClient(ctx context.Context, appClient azureclient.RBACApplicationsClient, appID string) (string, error) {
-	pages, err := appClient.List(ctx, fmt.Sprintf("appid eq '%s'", appID))
+// GetApplicationObjectIDFromAppID returns the ObjectID of the AAD application
+// corresponding to a given appID
+func GetApplicationObjectIDFromAppID(ctx context.Context, appClient azureclient.RBACApplicationsClient, appID string) (string, error) {
+	app, err := appClient.List(ctx, fmt.Sprintf("appid eq '%s'", appID))
 	if err != nil {
-		return "", fmt.Errorf("failed listing applications: %v", err)
+		return "", err
 	}
-	apps := pages.Values()
-	if len(apps) != 1 {
-		return "", fmt.Errorf("found %d applications, should be 1", len(apps))
+
+	if len(app.Values()) != 1 {
+		return "", fmt.Errorf("found %d applications, should be 1", len(app.Values()))
 	}
-	return *apps[0].ObjectID, nil
+
+	return *app.Values()[0].ObjectID, nil
 }
 
-// GetObjectIDUsingSPClient find the ObjectID for the application
-func GetObjectIDUsingSPClient(ctx context.Context, spc azureclient.ServicePrincipalsClient, appID string) (string, error) {
+// GetServicePrincipalObjectIDFromAppID returns the ObjectID of the service
+// principal corresponding to a given appID
+func GetServicePrincipalObjectIDFromAppID(ctx context.Context, spc azureclient.ServicePrincipalsClient, appID string) (string, error) {
 	sp, err := spc.List(ctx, fmt.Sprintf("appID eq '%s'", appID))
 	if err != nil {
 		return "", err
 	}
 
 	if len(sp.Values()) != 1 {
-		return "", fmt.Errorf("graph query returned %d values", len(sp.Values()))
+		return "", fmt.Errorf("found %d service principals, should be 1", len(sp.Values()))
 	}
 
 	return *sp.Values()[0].ObjectID, nil
 }
 
-// UpdateSecret creates a new secret updates Azure AAD and returns it.
-func UpdateSecret(ctx context.Context, appClient azureclient.RBACApplicationsClient, appObjID string, callbackURL string) (string, error) {
+// UpdateAADApp updates the ReplyURLs in an AAD app.  A side-effect is that the
+// secret must be regenerated.  The new secret is returned.
+func UpdateAADApp(ctx context.Context, appClient azureclient.RBACApplicationsClient, appObjID string, callbackURL string) (string, error) {
 	azureAadClientSecretID := uuid.NewV4().String()
 	azureAadClientSecretValue := uuid.NewV4().String()
 

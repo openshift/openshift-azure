@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -24,10 +25,10 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
-func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api.PluginConfig) api.DeployFn {
+func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployFn {
 	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
 		log.Info("applying arm template deployment")
-		authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
+		authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 		if err != nil {
 			return err
 		}
@@ -140,30 +141,35 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	}
 
 	if !shared.IsUpdate() {
-		// call after GenerateConfig() as we need the certifcates created
-		cfg := azureclient.NewClientCredentialsConfigFromEnvironment()
-		vc, err := azureclient.NewVaultMgmtClient(cfg, os.Getenv("AZURE_SUBSCRIPTION_ID"))
+		// call after GenerateConfig() as we need the CA certificate created
+		authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 		if err != nil {
 			return nil, err
 		}
-		spc, err := azureclient.NewServicePrincipalsClient(cfg, os.Getenv("AZURE_TENANT_ID"))
+
+		graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
 		if err != nil {
 			return nil, err
 		}
-		objID, err := aadapp.GetObjectIDUsingSPClient(ctx, spc, os.Getenv("AZURE_CLIENT_ID"))
+
+		vaultauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyVaultClientAuthorizer)
 		if err != nil {
 			return nil, err
 		}
-		vaultURL, err := vc.CreateVault(ctx, objID, os.Getenv("AZURE_SUBSCRIPTION_ID"),
-			os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
+
+		vc := azureclient.NewVaultMgmtClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
+		spc := azureclient.NewServicePrincipalsClient(ctx, os.Getenv("AZURE_TENANT_ID"), graphauthorizer)
+		kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
+
+		objID, err := aadapp.GetServicePrincipalObjectIDFromAppID(ctx, spc, cs.Properties.MasterServicePrincipalProfile.ClientID)
 		if err != nil {
 			return nil, err
 		}
-		kvc, err := azureclient.NewKeyVaultClient(cfg, vaultURL)
+		vaultURL, err := createVault(ctx, vc, objID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
 		if err != nil {
 			return nil, err
 		}
-		err = WriteTLSCertsToVault(ctx, kvc, cs, vaultURL)
+		err = writeTLSCertsToVault(ctx, kvc, cs, vaultURL)
 		if err != nil {
 			return nil, err
 		}
@@ -202,7 +208,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	}
 
 	log.Info("plugin createorupdate")
-	deployer := GetDeployer(log, cs, config)
+	deployer := GetDeployer(log, cs)
 	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
 		return nil, err
 	}
@@ -216,7 +222,7 @@ func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.
 		return nil
 	}
 
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return err
 	}
@@ -292,7 +298,6 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 			return err
 		}
 	}
-	// TODO check this
 	b, err := config.Derived.MasterCloudProviderConf(cs)
 	if err != nil {
 		return err
