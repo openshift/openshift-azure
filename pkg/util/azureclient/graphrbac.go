@@ -28,3 +28,23 @@ func NewRBACApplicationsClient(ctx context.Context, tenantID string, authorizer 
 		ApplicationsClient: client,
 	}
 }
+
+type ServicePrincipalsClient interface {
+	List(ctx context.Context, filter string) (graphrbac.ServicePrincipalListResultPage, error)
+}
+
+type servicePrincipalsClient struct {
+	graphrbac.ServicePrincipalsClient
+}
+
+var _ ServicePrincipalsClient = &servicePrincipalsClient{}
+
+// NewServicePrincipalsClient create a client to query ServicePrincipal information
+func NewServicePrincipalsClient(ctx context.Context, tenantID string, authorizer autorest.Authorizer) ServicePrincipalsClient {
+	client := graphrbac.NewServicePrincipalsClient(tenantID)
+	setupClient(ctx, &client.Client, authorizer)
+
+	return &servicePrincipalsClient{
+		ServicePrincipalsClient: client,
+	}
+}

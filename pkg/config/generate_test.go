@@ -105,7 +105,6 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assertCert(c.Certificates.EtcdPeer, "EtcdPeer")
 	assertCert(c.Certificates.EtcdClient, "EtcdClient")
 	assertCert(c.Certificates.MasterServer, "MasterServer")
-	assertCert(c.Certificates.OpenShiftConsole, "OpenShiftConsole")
 	assertCert(c.Certificates.Admin, "Admin")
 	assertCert(c.Certificates.AggregatorFrontProxy, "AggregatorFrontProxy")
 	assertCert(c.Certificates.MasterKubeletClient, "MasterKubeletClient")
@@ -113,7 +112,6 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assertCert(c.Certificates.OpenShiftMaster, "OpenShiftMaster")
 	assertCert(c.Certificates.NodeBootstrap, "NodeBootstrap")
 	assertCert(c.Certificates.Registry, "Registry")
-	assertCert(c.Certificates.Router, "Router")
 	assertCert(c.Certificates.ServiceCatalogServer, "ServiceCatalogServer")
 	assertCert(c.Certificates.ServiceCatalogAPIClient, "ServiceCatalogAPIClient")
 	assertCert(c.Certificates.AzureClusterReader, "AzureClusterReader")
@@ -182,17 +180,11 @@ func TestInvalidateSecrets(t *testing.T) {
 	if reflect.DeepEqual(saved.Config.Certificates.NodeBootstrap, cs.Config.Certificates.NodeBootstrap) {
 		t.Errorf("expected change to NodeBootstrap certificates after secret invalidation")
 	}
-	if reflect.DeepEqual(saved.Config.Certificates.OpenShiftConsole, cs.Config.Certificates.OpenShiftConsole) {
-		t.Errorf("expected change to OpenShiftConsole certificates after secret invalidation")
-	}
 	if reflect.DeepEqual(saved.Config.Certificates.OpenShiftMaster, cs.Config.Certificates.OpenShiftMaster) {
 		t.Errorf("expected change to OpenShiftMaster certificates after secret invalidation")
 	}
 	if reflect.DeepEqual(saved.Config.Certificates.Registry, cs.Config.Certificates.Registry) {
 		t.Errorf("expected change to Registry certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.Router, cs.Config.Certificates.Router) {
-		t.Errorf("expected change to Router certificates after secret invalidation")
 	}
 	if reflect.DeepEqual(saved.Config.Certificates.ServiceCatalogAPIClient, cs.Config.Certificates.ServiceCatalogAPIClient) {
 		t.Errorf("expected change to ServiceCatalogAPIClient certificates after secret invalidation")
@@ -250,10 +242,8 @@ func TestInvalidateSecrets(t *testing.T) {
 	cs.Config.Certificates.MasterProxyClient = saved.Config.Certificates.MasterProxyClient
 	cs.Config.Certificates.MasterServer = saved.Config.Certificates.MasterServer
 	cs.Config.Certificates.NodeBootstrap = saved.Config.Certificates.NodeBootstrap
-	cs.Config.Certificates.OpenShiftConsole = saved.Config.Certificates.OpenShiftConsole
 	cs.Config.Certificates.OpenShiftMaster = saved.Config.Certificates.OpenShiftMaster
 	cs.Config.Certificates.Registry = saved.Config.Certificates.Registry
-	cs.Config.Certificates.Router = saved.Config.Certificates.Router
 	cs.Config.Certificates.ServiceCatalogAPIClient = saved.Config.Certificates.ServiceCatalogAPIClient
 	cs.Config.Certificates.ServiceCatalogServer = saved.Config.Certificates.ServiceCatalogServer
 	cs.Config.Certificates.GenevaLogging = saved.Config.Certificates.GenevaLogging

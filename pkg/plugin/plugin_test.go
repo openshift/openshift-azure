@@ -52,6 +52,7 @@ func TestCreateOrUpdate(t *testing.T) {
 			armGenerator := mock_arm.NewMockGenerator(mockCtrl)
 			clusterUpgrader := mock_cluster.NewMockUpgrader(mockCtrl)
 			c := clusterUpgrader.EXPECT().CreateClients(nil, cs, tt.isUpdate).Return(nil)
+			c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 			if !tt.isUpdate {
 				c = clusterUpgrader.EXPECT().CreateConfigStorageAccount(nil, cs).Return(nil).After(c)
 			}
@@ -123,6 +124,7 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], "").Return(nil).After(c)
 	// update
 	c = clusterUpgrader.EXPECT().CreateClients(nil, cs, true).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 	c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
@@ -167,6 +169,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 	c := mockGen.EXPECT().InvalidateSecrets(cs).Return(nil)
 	c = mockGen.EXPECT().Generate(cs, nil).Return(nil).After(c)
 	c = mockUp.EXPECT().CreateClients(nil, cs, true).Return(nil).After(c)
+	c = mockUp.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 	c = mockArm.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
@@ -213,6 +216,7 @@ func TestForceUpdate(t *testing.T) {
 	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().ResetUpdateBlob(cs).Return(nil).After(c)
 	c = mockUp.EXPECT().CreateClients(nil, cs, true).Return(nil).After(c)
+	c = mockUp.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 	c = mockArm.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)

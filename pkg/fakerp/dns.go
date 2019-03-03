@@ -9,13 +9,14 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 // CreateOCPDNS creates the dns zone for the cluster, updates the main zone in dnsResourceGroup and returns
 // the generated publicSubdomain, routerPrefix
 func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, dnsResourceGroup, dnsDomain, zoneName, routerCName string, noTags bool) error {
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return err
 	}
@@ -115,7 +116,7 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, 
 }
 
 func DeleteOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourceGroup, dnsDomain string) error {
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return err
 	}

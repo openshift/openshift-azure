@@ -11,8 +11,9 @@ import (
 type ContextKey string
 
 const (
-	ContextKeyClientAuthorizer ContextKey = "ClientAuthorizer"
-	ContextAcceptLanguages     ContextKey = "AcceptLanguages"
+	ContextKeyClientAuthorizer      ContextKey = "ClientAuthorizer"
+	ContextKeyVaultClientAuthorizer ContextKey = "VaultClientAuthorizer"
+	ContextAcceptLanguages          ContextKey = "AcceptLanguages"
 )
 
 type PluginStep string
@@ -23,6 +24,7 @@ const (
 	PluginStepInitializeUpdateBlob                PluginStep = "InitializeUpdateBlob"
 	PluginStepResetUpdateBlob                     PluginStep = "ResetUpdateBlob"
 	PluginStepClientCreation                      PluginStep = "ClientCreation"
+	PluginStepEnrichFromVault                     PluginStep = "EnrichFromVault"
 	PluginStepScaleSetDelete                      PluginStep = "ScaleSetDelete"
 	PluginCreateConfigStorageAccount              PluginStep = "CreateConfigStorageAccount"
 	PluginStepGenerateARM                         PluginStep = "GenerateARM"

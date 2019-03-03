@@ -9,7 +9,7 @@ if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
 fi
 
 # remove registry certificate softlink from docker
-unlink /etc/docker/certs.d/registry.access.redhat.com/redhat-ca.crt 
+unlink /etc/docker/certs.d/registry.access.redhat.com/redhat-ca.crt
 
 if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker.service
@@ -55,7 +55,7 @@ echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
 mkdir -p /etc/origin/cloudprovider
 
 cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
-{{ .Derived.CloudProviderConf .ContainerService | String }}
+{{ .Derived.WorkerCloudProviderConf .ContainerService | String }}
 EOF
 
 # note: ${SERVICE_TYPE}-node crash loops until master is up

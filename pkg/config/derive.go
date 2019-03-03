@@ -94,12 +94,10 @@ func (derived) MasterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
 	return strings.Split(cs.Properties.FQDN, ".")[0]
 }
 
-func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
-	return yaml.Marshal(cloudprovider.Config{
+func baseCloudProviderConf(cs *api.OpenShiftManagedCluster) *cloudprovider.Config {
+	return &cloudprovider.Config{
 		TenantID:          cs.Properties.AzProfile.TenantID,
 		SubscriptionID:    cs.Properties.AzProfile.SubscriptionID,
-		AadClientID:       cs.Properties.ServicePrincipalProfile.ClientID,
-		AadClientSecret:   cs.Properties.ServicePrincipalProfile.Secret,
 		ResourceGroup:     cs.Properties.AzProfile.ResourceGroup,
 		LoadBalancerSku:   "standard",
 		Location:          cs.Location,
@@ -107,7 +105,21 @@ func (derived) CloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error
 		VMType:            "vmss",
 		SubnetName:        "default",
 		VnetName:          "vnet",
-	})
+	}
+}
+
+func (derived) MasterCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	cpc := baseCloudProviderConf(cs)
+	cpc.AadClientID = cs.Properties.MasterServicePrincipalProfile.ClientID
+	cpc.AadClientSecret = cs.Properties.MasterServicePrincipalProfile.Secret
+	return yaml.Marshal(cpc)
+}
+
+func (derived) WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	cpc := baseCloudProviderConf(cs)
+	cpc.AadClientID = cs.Properties.WorkerServicePrincipalProfile.ClientID
+	cpc.AadClientSecret = cs.Properties.WorkerServicePrincipalProfile.Secret
+	return yaml.Marshal(cpc)
 }
 
 func (derived) AadGroupSyncConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {

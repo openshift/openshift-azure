@@ -64,6 +64,20 @@ func (mr *MockUpgraderMockRecorder) CreateConfigStorageAccount(ctx, cs interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateConfigStorageAccount", reflect.TypeOf((*MockUpgrader)(nil).CreateConfigStorageAccount), ctx, cs)
 }
 
+// EnrichCSFromVault mocks base method
+func (m *MockUpgrader) EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EnrichCSFromVault", ctx, cs)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// EnrichCSFromVault indicates an expected call of EnrichCSFromVault
+func (mr *MockUpgraderMockRecorder) EnrichCSFromVault(ctx, cs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnrichCSFromVault", reflect.TypeOf((*MockUpgrader)(nil).EnrichCSFromVault), ctx, cs)
+}
+
 // Initialize mocks base method
 func (m *MockUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	m.ctrl.T.Helper()

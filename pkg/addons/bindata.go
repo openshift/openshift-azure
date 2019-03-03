@@ -409,7 +409,6 @@
 // data/Route.route.openshift.io/kube-service-catalog/apiserver.yaml
 // data/Route.route.openshift.io/openshift-ansible-service-broker/asb-1338.yaml
 // data/Route.route.openshift.io/openshift-console/console.yaml
-// data/Secret/default/etc-origin-cloudprovider.yaml
 // data/Secret/default/registry-certificates.yaml
 // data/Secret/default/registry-config.yaml
 // data/Secret/default/router-certs.yaml
@@ -8929,26 +8928,6 @@ func routeRouteOpenshiftIoOpenshiftConsoleConsoleYaml() (*asset, error) {
 	return a, nil
 }
 
-var _secretDefaultEtcOriginCloudproviderYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x2c\xcc\xb1\x0a\xc2\x40\x0c\x00\xd0\xfd\xbe\x22\x5b\x21\x50\xc1\x35\x9b\xd0\xe2\xe6\xa0\xe2\x1e\xee\xd2\x12\x6c\x73\x25\xcd\x75\xf0\xeb\x5d\xba\x3f\x1e\x6f\xfa\x11\xdf\xb5\x1a\xc1\x71\x4d\x5f\xb5\x42\xf0\x92\xec\x12\x69\x95\xe0\xc2\xc1\x94\x00\x8c\x57\x21\x90\xc8\x7d\x75\x9d\xd5\xfa\xbc\xd4\x56\x36\xaf\x87\x16\xf1\x13\xec\x1b\x67\x21\x28\x32\x71\x5b\x22\xed\xe1\x6a\xf3\x70\x0e\xfc\x6b\x2e\x97\x5c\x6d\x22\xe8\x10\x11\xee\xe3\x63\x7c\xde\xde\xe3\x00\x88\xd8\xa5\x7f\x00\x00\x00\xff\xff\x6c\x68\x5e\x6c\x8a\x00\x00\x00")
-
-func secretDefaultEtcOriginCloudproviderYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_secretDefaultEtcOriginCloudproviderYaml,
-		"Secret/default/etc-origin-cloudprovider.yaml",
-	)
-}
-
-func secretDefaultEtcOriginCloudproviderYaml() (*asset, error) {
-	bytes, err := secretDefaultEtcOriginCloudproviderYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "Secret/default/etc-origin-cloudprovider.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _secretDefaultRegistryCertificatesYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\xcb\xb1\x0a\xc2\x40\x0c\x87\xf1\xfd\x9e\x22\x5b\x21\xa0\xe0\x9a\x4d\x68\x71\x73\x50\x71\x0f\xd7\x7f\x4b\xa8\x3d\x4b\x2e\x0a\x7d\x7b\x97\x0a\x0e\xce\xdf\xf7\xd3\xc5\xee\xf0\x6a\xcf\x22\xf4\x3e\xa4\xc9\x4a\x2f\x74\x45\x76\x44\x9a\x11\xda\x6b\xa8\x24\xa2\xa2\x33\x84\x1c\xa3\xd5\xf0\x75\x97\xe1\x61\x83\x65\x0d\xd4\xad\xd6\x45\x33\x84\x7a\x0c\xfa\x7a\x44\xaa\xe1\x56\xc6\x76\xe3\x5f\xb8\xcf\x1e\x42\x0d\x33\xd3\xa9\x3b\x77\x97\xe3\xad\x6b\x89\x99\x9b\xdf\x67\xc2\xfa\xff\xf9\x04\x00\x00\xff\xff\xe1\x6c\x2e\x8d\xad\x00\x00\x00")
 
 func secretDefaultRegistryCertificatesYamlBytes() ([]byte, error) {
@@ -14890,7 +14869,6 @@ var _bindata = map[string]func() (*asset, error){
 	"Route.route.openshift.io/kube-service-catalog/apiserver.yaml":                                                                       routeRouteOpenshiftIoKubeServiceCatalogApiserverYaml,
 	"Route.route.openshift.io/openshift-ansible-service-broker/asb-1338.yaml":                                                            routeRouteOpenshiftIoOpenshiftAnsibleServiceBrokerAsb1338Yaml,
 	"Route.route.openshift.io/openshift-console/console.yaml":                                                                            routeRouteOpenshiftIoOpenshiftConsoleConsoleYaml,
-	"Secret/default/etc-origin-cloudprovider.yaml":                                                                                       secretDefaultEtcOriginCloudproviderYaml,
 	"Secret/default/registry-certificates.yaml":                                                                                          secretDefaultRegistryCertificatesYaml,
 	"Secret/default/registry-config.yaml":                                                                                                secretDefaultRegistryConfigYaml,
 	"Secret/default/router-certs.yaml":                                                                                                   secretDefaultRouterCertsYaml,
@@ -15737,10 +15715,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	}},
 	"Secret": {nil, map[string]*bintree{
 		"default": {nil, map[string]*bintree{
-			"etc-origin-cloudprovider.yaml": {secretDefaultEtcOriginCloudproviderYaml, map[string]*bintree{}},
-			"registry-certificates.yaml":    {secretDefaultRegistryCertificatesYaml, map[string]*bintree{}},
-			"registry-config.yaml":          {secretDefaultRegistryConfigYaml, map[string]*bintree{}},
-			"router-certs.yaml":             {secretDefaultRouterCertsYaml, map[string]*bintree{}},
+			"registry-certificates.yaml": {secretDefaultRegistryCertificatesYaml, map[string]*bintree{}},
+			"registry-config.yaml":       {secretDefaultRegistryConfigYaml, map[string]*bintree{}},
+			"router-certs.yaml":          {secretDefaultRouterCertsYaml, map[string]*bintree{}},
 		}},
 		"kube-service-catalog": {nil, map[string]*bintree{
 			"apiserver-ssl.yaml": {secretKubeServiceCatalogApiserverSslYaml, map[string]*bintree{}},

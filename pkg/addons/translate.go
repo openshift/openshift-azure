@@ -592,15 +592,6 @@ var Translations = map[string][]struct {
 			Template:   "{{ .Extra.RegistryStorageAccountKey }}",
 		},
 	},
-	"Secret/default/etc-origin-cloudprovider": {
-		{
-			Path: jsonpath.MustCompile("$.stringData.'azure.conf'"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				b, err := config.Derived.CloudProviderConf(cs)
-				return string(b), err
-			},
-		},
-	},
 	"Secret/default/router-certs": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),

@@ -20,6 +20,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
+	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
 // here follow well known container and blob names
@@ -33,6 +34,7 @@ const (
 type Upgrader interface {
 	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, disableKeepAlives bool) error
 	CreateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error
+	EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error
 	WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error
@@ -55,6 +57,7 @@ type simpleUpgrader struct {
 	updateBlobService updateblob.BlobService
 	vmc               azureclient.VirtualMachineScaleSetVMsClient
 	ssc               azureclient.VirtualMachineScaleSetsClient
+	kvc               azureclient.KeyVaultClient
 	kubeclient        kubeclient.Kubeclient
 	log               *logrus.Entry
 	scalerFactory     scaler.Factory
@@ -84,14 +87,26 @@ func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftMan
 		},
 	}
 
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return err
 	}
+
+	vaultauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyVaultClientAuthorizer)
+	if err != nil {
+		return err
+	}
+
 	u.accountsClient = azureclient.NewAccountsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
 	u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
 	u.ssc = azureclient.NewVirtualMachineScaleSetsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
+	u.kvc = azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
 
 	u.kubeclient, err = kubeclient.NewKubeclient(u.log, cs.Config.AdminKubeconfig, &u.pluginConfig, disableKeepAlives)
+
 	return err
+}
+
+func (u *simpleUpgrader) EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	return vault.EnrichCSFromVault(ctx, u.kvc, cs)
 }

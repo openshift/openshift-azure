@@ -11,9 +11,10 @@ import (
 
 func TestDerivedCloudProviderConf(t *testing.T) {
 	tests := []struct {
-		cs   api.OpenShiftManagedCluster
-		name string
-		want []byte
+		cs         api.OpenShiftManagedCluster
+		name       string
+		wantMaster []byte
+		wantWorker []byte
 	}{
 		{
 			name: "one",
@@ -24,9 +25,13 @@ func TestDerivedCloudProviderConf(t *testing.T) {
 						SubscriptionID: "sub",
 						ResourceGroup:  "rg",
 					},
-					ServicePrincipalProfile: api.ServicePrincipalProfile{
-						ClientID: "client_id",
-						Secret:   "client_secrett",
+					MasterServicePrincipalProfile: api.ServicePrincipalProfile{
+						ClientID: "master_client_id",
+						Secret:   "master_client_secrett",
+					},
+					WorkerServicePrincipalProfile: api.ServicePrincipalProfile{
+						ClientID: "worker_client_id",
+						Secret:   "worker_client_secrett",
 					},
 					AgentPoolProfiles: []api.AgentPoolProfile{
 						{Role: api.AgentPoolProfileRoleMaster, Name: "master"},
@@ -36,8 +41,20 @@ func TestDerivedCloudProviderConf(t *testing.T) {
 				},
 				Location: "eastus",
 			},
-			want: []byte(`aadClientId: client_id
-aadClientSecret: client_secrett
+			wantMaster: []byte(`aadClientId: master_client_id
+aadClientSecret: master_client_secrett
+loadBalancerSku: standard
+location: eastus
+resourceGroup: rg
+securityGroupName: nsg-worker
+subnetName: default
+subscriptionId: sub
+tenantId: tenant
+vmType: vmss
+vnetName: vnet
+`),
+			wantWorker: []byte(`aadClientId: worker_client_id
+aadClientSecret: worker_client_secrett
 loadBalancerSku: standard
 location: eastus
 resourceGroup: rg
@@ -52,13 +69,21 @@ vnetName: vnet
 	}
 
 	for _, tt := range tests {
-		got, err := Derived.CloudProviderConf(&tt.cs)
+		got, err := Derived.MasterCloudProviderConf(&tt.cs)
 		if err != nil {
 			t.Fatal(err)
 			return
 		}
-		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("derived.CloudProviderConf() = \"%v\", want \"%v\"", string(got), string(tt.want))
+		if !reflect.DeepEqual(got, tt.wantMaster) {
+			t.Errorf("derived.MasterCloudProviderConf() = \"%v\", want \"%v\"", string(got), string(tt.wantMaster))
+		}
+		got, err = Derived.WorkerCloudProviderConf(&tt.cs)
+		if err != nil {
+			t.Fatal(err)
+			return
+		}
+		if !reflect.DeepEqual(got, tt.wantWorker) {
+			t.Errorf("derived.WorkerCloudProviderConf() = \"%v\", want \"%v\"", string(got), string(tt.wantWorker))
 		}
 	}
 }

@@ -2,7 +2,7 @@ package azureclient
 
 //go:generate go get github.com/golang/mock/gomock
 //go:generate go install github.com/golang/mock/mockgen
-//go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/azureclient.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE Client,VirtualMachineScaleSetsClient,VirtualMachineScaleSetVMsClient,VirtualMachineScaleSetExtensionsClient,ApplicationsClient,MarketPlaceAgreementsClient,DeploymentsClient,AccountsClient
+//go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/azureclient.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE Client,VirtualMachineScaleSetsClient,VirtualMachineScaleSetVMsClient,VirtualMachineScaleSetExtensionsClient,ApplicationsClient,MarketPlaceAgreementsClient,DeploymentsClient,AccountsClient,KeyVaultClient
 //go:generate gofmt -s -l -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
 //go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
 //go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE/storage Client,BlobStorageClient,Container,Blob
@@ -18,10 +18,13 @@ import (
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
+
+const KeyVaultEndpoint = "https://vault.azure.net" // beware of the leopard
 
 // Client returns the Client
 type Client interface {
@@ -72,6 +75,10 @@ func setupClient(ctx context.Context, client *autorest.Client, authorizer autore
 }
 
 func NewAuthorizer(clientID, clientSecret, tenantID, resource string) (autorest.Authorizer, error) {
+	if resource == azure.PublicCloud.KeyVaultEndpoint {
+		return nil, fmt.Errorf("resource azure.PublicCloud.KeyVaultEndpoint doesn't work: use azureclient.KeyVaultEndpoint")
+	}
+
 	config := auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID)
 	if resource != "" {
 		config.Resource = resource
@@ -79,14 +86,14 @@ func NewAuthorizer(clientID, clientSecret, tenantID, resource string) (autorest.
 	return config.Authorizer()
 }
 
-func GetAuthorizerFromContext(ctx context.Context) (autorest.Authorizer, error) {
-	authorizer, ok := ctx.Value(api.ContextKeyClientAuthorizer).(autorest.Authorizer)
+func GetAuthorizerFromContext(ctx context.Context, key api.ContextKey) (autorest.Authorizer, error) {
+	authorizer, ok := ctx.Value(key).(autorest.Authorizer)
 	if !ok {
-		return nil, fmt.Errorf("failed to get authorizer, not found within context")
+		return nil, fmt.Errorf("failed to get authorizer, key %s not found within context", key)
 	}
 	return authorizer, nil
 }
 
-func NewAuthorizerFromEnvironment() (autorest.Authorizer, error) {
-	return NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"), "")
+func NewAuthorizerFromEnvironment(resource string) (autorest.Authorizer, error) {
+	return NewAuthorizer(os.Getenv("AZURE_CLIENT_ID"), os.Getenv("AZURE_CLIENT_SECRET"), os.Getenv("AZURE_TENANT_ID"), resource)
 }

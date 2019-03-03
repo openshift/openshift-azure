@@ -84,38 +84,45 @@ func SSHPublicKeyAsString(key *rsa.PublicKey) (s string, err error) {
 }
 
 func ParseCert(b []byte) (*x509.Certificate, error) {
-	block, rest := pem.Decode(b)
-	if len(rest) > 0 {
-		return nil, errors.New("extra data after decoding PEM block")
+	for {
+		var block *pem.Block
+		block, b = pem.Decode(b)
+		if block == nil {
+			break
+		}
+
+		switch block.Type {
+		case "CERTIFICATE":
+			return x509.ParseCertificate(block.Bytes)
+		}
 	}
 
-	cert, err := x509.ParseCertificate(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-
-	return cert, err
+	return nil, errors.New("failed to parse certificate")
 }
 
 func ParsePrivateKey(b []byte) (*rsa.PrivateKey, error) {
-	block, rest := pem.Decode(b)
-	if len(rest) > 0 {
-		return nil, errors.New("extra data after decoding PEM block")
-	}
-	switch block.Type {
-	case "RSA PRIVATE KEY":
-		if key, err := x509.ParsePKCS1PrivateKey(block.Bytes); err == nil {
-			return key, nil
+	for {
+		var block *pem.Block
+		block, b = pem.Decode(b)
+		if block == nil {
+			break
 		}
-	case "PRIVATE KEY":
-		if key, err := x509.ParsePKCS8PrivateKey(block.Bytes); err == nil {
-			switch key := key.(type) {
-			case *rsa.PrivateKey:
-				return key, nil
-			default:
-				return nil, errors.New("found unknown private key type in PKCS#8 wrapping")
+
+		switch block.Type {
+		case "RSA PRIVATE KEY":
+			return x509.ParsePKCS1PrivateKey(block.Bytes)
+
+		case "PRIVATE KEY":
+			if key, err := x509.ParsePKCS8PrivateKey(block.Bytes); err == nil {
+				switch key := key.(type) {
+				case *rsa.PrivateKey:
+					return key, nil
+				default:
+					return nil, errors.New("found unknown private key type in PKCS#8 wrapping")
+				}
 			}
 		}
 	}
-	return nil, errors.New(" failed to parse private key")
+
+	return nil, errors.New("failed to parse private key")
 }

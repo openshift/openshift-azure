@@ -1,1 +1,1 @@
-{{ CertFromVault "PublicHostname" | String }}
+{{ CertAsBytes .Config.Certificates.OpenShiftConsole.Cert | String }}

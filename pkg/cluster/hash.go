@@ -10,8 +10,6 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
-
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 )
@@ -22,18 +20,6 @@ type Hasher interface {
 
 type hasher struct {
 	pluginConfig api.PluginConfig
-}
-
-func hashVMSS(vmss *compute.VirtualMachineScaleSet) ([]byte, error) {
-	data, err := json.Marshal(vmss)
-	if err != nil {
-		return nil, err
-	}
-
-	hf := sha256.New()
-	hf.Write(data)
-
-	return hf.Sum(nil), nil
 }
 
 // hashScaleSets returns the set of desired state scale set hashes
@@ -48,5 +34,28 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 		return nil, err
 	}
 
-	return hashVMSS(vmss)
+	data, err := json.Marshal(vmss)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.Role == api.AgentPoolProfileRoleMaster {
+		// add certificates pulled from keyvault by the master to the hash, to
+		// ensure the masters update if a cert changes.  We don't add the keys
+		// because these are not necessarily stable (sometimes the 'D' value of
+		// the RSA key returned by keyvault differs to the one that was sent).
+		// I believe that in a given RSA key, there are multiple suitable values
+		// of 'D', so this is not a problem, however it doesn't make the value
+		// suitable for a hash.  References:
+		// https://stackoverflow.com/a/14233140,
+		// https://crypto.stackexchange.com/a/46572.
+
+		data = append(data, cs.Config.Certificates.OpenShiftConsole.Cert.Raw...)
+		data = append(data, cs.Config.Certificates.Router.Cert.Raw...)
+	}
+
+	hf := sha256.New()
+	hf.Write(data)
+
+	return hf.Sum(nil), nil
 }

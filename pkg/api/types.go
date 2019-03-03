@@ -58,9 +58,16 @@ type Properties struct {
 	// AuthProfile (in): configures OpenShift authentication
 	AuthProfile AuthProfile `json:"authProfile,omitempty"`
 
-	ServicePrincipalProfile ServicePrincipalProfile `json:"servicePrincipalProfile,omitempty"`
+	// MasterServicePrincipalProfile service principle used on the masters
+	MasterServicePrincipalProfile ServicePrincipalProfile `json:"masterServicePrincipalProfile,omitempty"`
+
+	// WorkerServicePrincipalProfile service principle used on the nodes
+	WorkerServicePrincipalProfile ServicePrincipalProfile `json:"workerServicePrincipalProfile,omitempty"`
 
 	AzProfile AzProfile `json:"azProfile,omitempty"`
+
+	// APICertProfile (in, optional): configures OpenShift API certificate
+	APICertProfile CertProfile `json:"apiCertProfile,omitempty"`
 }
 
 // ProvisioningState represents the current state of the OSA resource.
@@ -117,6 +124,15 @@ type RouterProfile struct {
 
 	// FQDN (out): Auto-allocated FQDN for the OpenShift router.
 	FQDN string `json:"fqdn,omitempty"`
+
+	// RouterCertProfile (in, optional): configures OpenShift Router certificate
+	RouterCertProfile CertProfile `json:"routerCertProfile,omitempty"`
+}
+
+// CertProfile contains the vault location for OpenShift certificates.
+type CertProfile struct {
+	// KeyVaultSecretURL (in, optional): the customer secret URL
+	KeyVaultSecretURL string `json:"keyVaultSecretURL,omitempty"`
 }
 
 // AgentPoolProfile represents configuration of OpenShift cluster VMs.

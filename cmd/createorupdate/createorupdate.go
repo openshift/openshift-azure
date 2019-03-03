@@ -25,6 +25,7 @@ import (
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
+	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	v20180930previewclient "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2018-09-30-preview"
 	adminclient "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
@@ -154,13 +155,18 @@ func execute(
 func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.Config) error {
 	if len(conf.AADClientID) > 0 && conf.AADClientID != conf.ClientID {
 		log.Info("updating the aad application")
-		authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID, azure.PublicCloud.GraphEndpoint)
+		graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
 		if err != nil {
 			return fmt.Errorf("cannot get authorizer: %v", err)
 		}
-		aadClient := azureclient.NewRBACApplicationsClient(ctx, conf.TenantID, authorizer)
+		aadClient := azureclient.NewRBACApplicationsClient(ctx, conf.TenantID, graphauthorizer)
+		objID, err := aadapp.GetApplicationObjectIDFromAppID(ctx, aadClient, conf.AADClientID)
+		if err != nil {
+			return err
+		}
+
 		callbackURL := fmt.Sprintf("https://%s.%s.cloudapp.azure.com/oauth2callback/Azure%%20AD", conf.ResourceGroup, conf.Region)
-		conf.AADClientSecret, err = fakerp.UpdateAADAppSecret(ctx, aadClient, conf.AADClientID, callbackURL)
+		conf.AADClientSecret, err = aadapp.UpdateAADApp(ctx, aadClient, objID, callbackURL)
 		if err != nil {
 			return fmt.Errorf("cannot update aad app secret: %v", err)
 		}

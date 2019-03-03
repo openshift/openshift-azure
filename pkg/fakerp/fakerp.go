@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -18,15 +19,16 @@ import (
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	utilrs "github.com/openshift/openshift-azure/pkg/util/randomstring"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
-func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, config *api.PluginConfig) api.DeployFn {
+func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployFn {
 	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
 		log.Info("applying arm template deployment")
-		authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
+		authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 		if err != nil {
 			return err
 		}
@@ -138,6 +140,41 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
+	if !shared.IsUpdate() {
+		// call after GenerateConfig() as we need the CA certificate created
+		authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
+		if err != nil {
+			return nil, err
+		}
+
+		graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
+		if err != nil {
+			return nil, err
+		}
+
+		vaultauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyVaultClientAuthorizer)
+		if err != nil {
+			return nil, err
+		}
+
+		vc := azureclient.NewVaultMgmtClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
+		spc := azureclient.NewServicePrincipalsClient(ctx, os.Getenv("AZURE_TENANT_ID"), graphauthorizer)
+		kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
+
+		objID, err := aadapp.GetServicePrincipalObjectIDFromAppID(ctx, spc, cs.Properties.MasterServicePrincipalProfile.ClientID)
+		if err != nil {
+			return nil, err
+		}
+		vaultURL, err := createVault(ctx, vc, objID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
+		if err != nil {
+			return nil, err
+		}
+		err = writeTLSCertsToVault(ctx, kvc, cs, vaultURL)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// persist the OpenShift container service
 	log.Info("persist config")
 	bytes, err := yaml.Marshal(cs)
@@ -171,7 +208,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	}
 
 	log.Info("plugin createorupdate")
-	deployer := GetDeployer(log, cs, config)
+	deployer := GetDeployer(log, cs)
 	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
 		return nil, err
 	}
@@ -185,7 +222,7 @@ func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.
 		return nil
 	}
 
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx)
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return err
 	}
@@ -229,7 +266,12 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
 	}
 
-	cs.Properties.ServicePrincipalProfile = api.ServicePrincipalProfile{
+	// TODO these should be different
+	cs.Properties.MasterServicePrincipalProfile = api.ServicePrincipalProfile{
+		ClientID: os.Getenv("AZURE_CLIENT_ID"),
+		Secret:   os.Getenv("AZURE_CLIENT_SECRET"),
+	}
+	cs.Properties.WorkerServicePrincipalProfile = api.ServicePrincipalProfile{
 		ClientID: os.Getenv("AZURE_CLIENT_ID"),
 		Secret:   os.Getenv("AZURE_CLIENT_SECRET"),
 	}
@@ -256,7 +298,7 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 			return err
 		}
 	}
-	b, err := config.Derived.CloudProviderConf(cs)
+	b, err := config.Derived.MasterCloudProviderConf(cs)
 	if err != nil {
 		return err
 	}
