@@ -2,7 +2,7 @@
 
 OSA is designed to allow customers to choose an update `stream` for their cluster. Currently the only stream is `3.11`, but this may change over time. A single release of the OSA project can in principle support co-existent clusters at multiple streams. In principle, clusters will one day be upgradable between streams. This is not in scope for this document.
 
-An OSA release is a combination of multiple versioned items:
+An OSA release is a combination of multiple versioned components:
 
 Per stream:
 
@@ -15,18 +15,19 @@ Per stream:
 For each stream, the configuration manifest combines the version numbers of all of the above (except the openshift-azure repository) and is checked into the openshift-azure repository. 
 It is set as `clusterVersion` field.
 
-OSA is an evolving service. During normal operations, we aim to release the RP infrastructure on a weekly basis, although emergency changes can be expedited.
-Globally, we aim for all production RP release versions to correspond.
-The OSA major release (`n`) is incremented with each weekly release.
-The OSA minor release (`n.x`) starts at .0 and is incremented by exception, e.g. to publish an emergency release (CVE, critical bug fix) or resolve a handover issue.
+OSA is an evolving service. During normal operations, our goal is to release the RP infrastructure on a three-weekly basis, although emergency changes can be expedited.
+Globally, our goal is for all production RP release versions to correspond.
+The OSA major release (`n`) is incremented with each three-weekly release.
+The OSA minor release (`n.x`) starts at .0 and is incremented by exception, e.g. to publish an emergency release (CVE, critical bug fix) or resolve a QA or handover issue.
 
 OSA releases are defined by git tags on the openshift-azure repository (`vn.x`).
-The change to any production cluster implied by a new release varies. It may be nothing; alternatively it is also feasible that many or all versioned items could change in a release.
-We aim to ensure that during normal operations, clusters are created at, and upgraded to, versions exactly corresponding with a released manifest according to the cluster’s stream.
-Irrespective of the stream, we aim for the spread of production cluster versions to be as small as feasible (e.g. n.0, (n-1).0, (n-1).1, (n-2).0).  Exact spread goal TBD.  A larger spread implies more testing.
+The amount of changes per new release could vary. This range includes little to no changes to many or possibly all versioned items changing.
+Our goal is to ensure that during normal operations, clusters are created at, and upgraded to, versions exactly corresponding with a released manifest according to the cluster’s stream.
+Irrespective of the stream, our goal for the spread of production cluster versions to be as small as feasible (e.g. n.0, (n-1).0, (n-1).1, (n-2).0).  Exact spread goal TBD. A larger spread implies more testing.
 
-Within a stream, we aim to be able to directly upgrade any deployed production cluster to the latest version.
-Versioning
+Within a stream, our goal is to be able to directly upgrade any deployed production cluster to the latest version.
+
+# Versioning
 
 ## Major releases
 The plugin major release (“n”) is incremented with each weekly release.
@@ -79,9 +80,11 @@ git checkout -b release-vx.y-fix
 git cherry-pick <git commit id>
 ```
 
+Command `/cherrypick release-vx` prow command can be used too.
+
 Open a PR into release branch.
 
-2. Configure testing for release branch in `openshift/release` repository
+2. Configure testing for release branch in `openshift/release` repository. This will make sure that any PR to release branches is gated by tests.
 
 ```
 git checkout master
@@ -101,9 +104,10 @@ docker pull registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest
 docker run -it -v $(pwd)/ci-operator:/ci-operator:z registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest --from-dir /ci-operator/config/ --to-dir /ci-operator/jobs
 ```
 
-Merge it to release repository. This will make sure that any PR to release branches is gates by tests.
+Merge it to release repository. After this is done, all PR's should run all tests.
 
-3. Create release PR into `openshift/openshift-azure` repository release branch:
+
+3. Create release PR into `openshift/openshift-azure` repository release branch. This is main step, where we configure/edit release specific configuration.
 
 ```
 git checkout upstream/release-vx
@@ -122,7 +126,7 @@ images:
 
 Make sure you update `clusterVersion` field all image version to point to specific version, instead of `latest` tag.
 
-Merge this PR into `release-vx` branch. Test should be using test infrastructure built images.
+Merge this PR into `release-vx` branch. If step 2 was completed right, this PR now should run all OSA test suites for it to be merged. Test will be using CI infrastructure built images.
 
 4. Tag release for the release you just merged in step 3.
 
@@ -130,7 +134,8 @@ This step requires elevated right on git repo. You might need to ask somebody el
 
 ```
 git checkout upstream/release-vx
-git tag -a vx.y -m 'reason' # where reason is release summary in one sentence
+# Better to sign the release, Tagger needs a GPG key setup in github
+git tag -a -s -m "Version vx.y" vx.y
 git push upstream tags/vx.y
 ```
 
@@ -143,7 +148,7 @@ git checkout tags/vx.y
 # validate script can see right tag
 make version
 <you should see tag version as an output. It will be used to tag and publish images>
-make azure-controllers-push metricsbridge-push sync-push etcdbackup-push
+make all-push
 ```
 
 6. Update upgrade tests for published release in `openshift/release`
@@ -173,8 +178,34 @@ docker pull registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest
 docker run -it -v $(pwd)/ci-operator:/ci-operator:z registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest --from-dir /ci-operator/config/ --to-dir /ci-operator/jobs
 ```
 
-Change generated jobs to `always_run: false` and `optional: true`
-We not gonna use automatic generated jobs with `e2e-upgrade-vx.y` because of lack of targets.
+Change generated jobs to `always_run: false` and `optional: true`. This will make upgrade tests on master branch optional! 
 
-Copy existing `upgrade` jobs and create new job with `upgrade-vx.y` syntax.
+We are not going to use automatic generated jobs with `e2e-upgrade-vx.y` because of lack of targets in the jobs. This should change in the future. See https://github.com/openshift/ci-operator/issues/276 for more details. 
+
+Copy existing `upgrade` jobs and create new job with `upgrade-vx.y` syntax. This is consequence of the issue above. `e2e-upgrade-vx.y` jobs lacks necessary targets so they cant complete if ran independently. 
 Merge the PR. After this test command `/test upgrade-vx.y` should work on PR's.
+
+# Cleaning old release
+
+When deprecating a release we need to clean old release reference files from `release` repository:
+
+Delete branch specific files:
+```
+ci-operator/config/openshift/openshift-azure/openshift-openshift-azure-release-vx.yaml
+```
+
+Delete test job configurations files:
+```
+ci-operator/jobs/openshift/openshift-azure/openshift-openshift-azure-release-vx-presubmits.yaml
+ci-operator/jobs/openshift/openshift-azure/openshift-openshift-azure-release-vx-postsubmits.yaml
+```
+
+Delete reference in master branch config files:
+```
+# delete anything related to jobs with upgrade-vx.y release. In example job:
+# pull-ci-openshift-openshift-azure-master-upgrade-vx.y
+ci-operator/jobs/openshift/openshift-azure/openshift-openshift-azure-master-postsubmits.yaml
+ci-operator/jobs/openshift/openshift-azure/openshift-openshift-azure-master-presubmits.yaml
+```
+
+Github tags/branches and old images inside the registry are left for future reference.
