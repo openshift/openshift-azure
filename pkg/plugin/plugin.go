@@ -83,6 +83,12 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
+
+	err = p.clusterUpgrader.EtcdBlobExists(ctx, backupBlob)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepBlobDoesNotExist}
+	}
+
 	p.log.Info("restoring the cluster")
 	if err := p.clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx, cs); err != nil {
 		return err

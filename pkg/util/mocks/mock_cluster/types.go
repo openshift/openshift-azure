@@ -190,6 +190,20 @@ func (mr *MockUpgraderMockRecorder) UpdateWorkerAgentPool(ctx, cs, app, suffix i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateWorkerAgentPool", reflect.TypeOf((*MockUpgrader)(nil).UpdateWorkerAgentPool), ctx, cs, app, suffix)
 }
 
+// EtcdBlobExists mocks base method
+func (m *MockUpgrader) EtcdBlobExists(ctx context.Context, blobName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EtcdBlobExists", ctx, blobName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// EtcdBlobExists indicates an expected call of EtcdBlobExists
+func (mr *MockUpgraderMockRecorder) EtcdBlobExists(ctx, blobName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EtcdBlobExists", reflect.TypeOf((*MockUpgrader)(nil).EtcdBlobExists), ctx, blobName)
+}
+
 // EtcdRestoreDeleteMasterScaleSet mocks base method
 func (m *MockUpgrader) EtcdRestoreDeleteMasterScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	m.ctrl.T.Helper()

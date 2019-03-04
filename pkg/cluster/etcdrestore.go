@@ -2,11 +2,26 @@ package cluster
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
 )
+
+func (u *simpleUpgrader) EtcdBlobExists(ctx context.Context, blobName string) error {
+	bsc := u.storageClient.GetBlobService()
+	etcdContainer := bsc.GetContainerReference(EtcdBackupContainerName)
+	blob := etcdContainer.GetBlobReference(blobName)
+	exists, err := blob.Exists()
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return fmt.Errorf("Blob %s does not exist", blobName)
+	}
+	return nil
+}
 
 func (u *simpleUpgrader) EtcdRestoreDeleteMasterScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	// We may need/want to delete all the scalesets in the future
