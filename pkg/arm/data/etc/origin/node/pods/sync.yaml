@@ -3,6 +3,9 @@ kind: Pod
 metadata:
   name: sync
   namespace: kube-system
+  labels:
+    openshift.io/component: controllers
+    openshift.io/control-plane: 'true'
 spec:
   containers:
   - image: {{ .Config.Images.Sync | quote }}
