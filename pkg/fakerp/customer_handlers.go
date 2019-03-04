@@ -34,6 +34,10 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		s.internalError(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
 		return
 	}
+	// TODO: Determine subscription ID from the request path
+	vc := azureclient.NewVaultMgmtClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
+	gc := resources.NewGroupsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	gc.Authorizer = authorizer
 
 	// delete dns records
 	// TODO: get resource group from request path
@@ -43,16 +47,11 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// TODO: we shoult not be creating clients left right and center - all in one place
-	vc := azureclient.NewVaultMgmtClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
 	err = deleteVault(ctx, vc, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), vaultName(os.Getenv("RESOURCEGROUP")))
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to delete vault: %v", err))
 		return
 	}
-	// TODO: Determine subscription ID from the request path
-	gc := resources.NewGroupsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
-	gc.Authorizer = authorizer
 
 	resourceGroup := filepath.Base(req.URL.Path)
 	s.log.Infof("deleting resource group %s", resourceGroup)
