@@ -5,12 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Azure/azure-sdk-for-go/storage"
 	"github.com/go-chi/chi"
-
-	"github.com/openshift/openshift-azure/pkg/cluster"
-	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
-	"github.com/openshift/openshift-azure/pkg/util/configblob"
 )
 
 // handleBackup handles admin requests to backup an etcd cluster
@@ -111,14 +106,6 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	cpc := &cloudprovider.Config{
-		TenantID:        cs.Properties.AzProfile.TenantID,
-		SubscriptionID:  cs.Properties.AzProfile.SubscriptionID,
-		AadClientID:     cs.Properties.MasterServicePrincipalProfile.ClientID,
-		AadClientSecret: cs.Properties.MasterServicePrincipalProfile.Secret,
-		ResourceGroup:   cs.Properties.AzProfile.ResourceGroup,
-	}
-
 	blobName, err := readBlobName(req)
 	if err != nil {
 		s.badRequest(w, fmt.Sprintf("Cannot read blob name from request: %v", err))
@@ -129,33 +116,7 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	ctx := context.Background()
-	bsc, err := configblob.GetService(ctx, cpc)
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to configure blob client: %v", err))
-		return
-	}
-	etcdContainer := bsc.GetContainerReference(cluster.EtcdBackupContainerName)
-
-	blob := etcdContainer.GetBlobReference(blobName)
-	exists, err := blob.Exists() // TODO: this check should be within the plugin
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Cannot get blob ref for %s: %v", blobName, err))
-		return
-	}
-	if !exists {
-		resp, err := etcdContainer.ListBlobs(storage.ListBlobsParameters{})
-		if err == nil {
-			s.log.Infof("available blobs:")
-			for _, blob := range resp.Blobs {
-				s.log.Infof("  %s", blob.Name)
-			}
-		}
-		s.badRequest(w, fmt.Sprintf("Blob %s does not exist", blobName))
-		return
-	}
-
-	ctx, err = enrichContext(context.Background())
+	ctx, err := enrichContext(context.Background())
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
 		return

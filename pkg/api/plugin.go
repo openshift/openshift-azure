@@ -23,6 +23,7 @@ const (
 	PluginStepInitialize                          PluginStep = "Initialize"
 	PluginStepInitializeUpdateBlob                PluginStep = "InitializeUpdateBlob"
 	PluginStepResetUpdateBlob                     PluginStep = "ResetUpdateBlob"
+	PluginStepBlobDoesNotExist                    PluginStep = "BlobDoesNotExist"
 	PluginStepClientCreation                      PluginStep = "ClientCreation"
 	PluginStepEnrichFromVault                     PluginStep = "EnrichFromVault"
 	PluginStepScaleSetDelete                      PluginStep = "ScaleSetDelete"

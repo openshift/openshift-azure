@@ -114,6 +114,7 @@ func TestRecoverEtcdCluster(t *testing.T) {
 		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testData, nil),
 	)
 	c := clusterUpgrader.EXPECT().CreateClients(nil, cs, true).Return(nil)
+	c = clusterUpgrader.EXPECT().EtcdBlobExists(nil, "test-backup").Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil, cs).Return(nil).After(c)
 
 	// deploy masters
