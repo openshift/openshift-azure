@@ -54,8 +54,9 @@ type config struct {
 	StatsdSocket       string        `json:"statsdSocket,omitempty"`
 
 	Queries []struct {
-		Name  string `json:"name,omitempty"`
-		Query string `json:"query,omitempty"`
+		Name          string `json:"name,omitempty"`
+		Query         string `json:"query,omitempty"`
+		CalculateRate bool   `json:"calculate_rate,omitempty"`
 	} `json:"queries,omitempty"`
 
 	Account   string `json:"account,omitempty"`
@@ -213,7 +214,14 @@ func (c *config) runOnce(ctx context.Context) error {
 	var metricsCount int
 
 	for _, query := range c.Queries {
-		value, err := c.prometheus.Query(ctx, query.Query, time.Time{})
+		var prometheusQuery string
+		if query.CalculateRate {
+			//query for rate of change
+			prometheusQuery = fmt.Sprintf("(%s - %s offset 1m) or (%s unless %s offset 1m)", query.Query, query.Query, query.Query, query.Query)
+		} else {
+			prometheusQuery = query.Query
+		}
+		value, err := c.prometheus.Query(ctx, prometheusQuery, time.Time{})
 		if err != nil {
 			return err
 		}
