@@ -11,6 +11,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 )
 
 // ReadConfig returns a config object from a config file
@@ -38,4 +39,74 @@ func RestConfigFromV1Config(kc *v1.Config) (*rest.Config, error) {
 
 	kubeconfig := clientcmd.NewDefaultClientConfig(c, &clientcmd.ConfigOverrides{})
 	return kubeconfig.ClientConfig()
+}
+
+// GetPluginTemplate returns the plugin template which was used to create the cluster specified by cs
+func GetPluginTemplate(cs *api.OpenShiftManagedCluster) *pluginapi.Config {
+	return &pluginapi.Config{
+		ClusterVersion: cs.Config.ClusterVersion,
+		ComponentLogLevel: pluginapi.ComponentLogLevel{
+			APIServer:         cs.Config.ComponentLogLevel.APIServer,
+			ControllerManager: cs.Config.ComponentLogLevel.ControllerManager,
+			Node:              cs.Config.ComponentLogLevel.Node,
+		},
+		ImageOffer:                           cs.Config.ImageOffer,
+		ImagePublisher:                       cs.Config.ImagePublisher,
+		ImageSKU:                             cs.Config.ImageSKU,
+		ImageVersion:                         cs.Config.ImageVersion,
+		GenevaLoggingSector:                  cs.Config.GenevaLoggingSector,
+		GenevaLoggingNamespace:               cs.Config.GenevaLoggingNamespace,
+		GenevaLoggingAccount:                 cs.Config.GenevaLoggingAccount,
+		GenevaMetricsAccount:                 cs.Config.GenevaMetricsAccount,
+		GenevaMetricsEndpoint:                cs.Config.GenevaMetricsEndpoint,
+		GenevaLoggingControlPlaneAccount:     cs.Config.GenevaLoggingControlPlaneAccount,
+		GenevaLoggingControlPlaneEnvironment: cs.Config.GenevaLoggingControlPlaneEnvironment,
+		GenevaLoggingControlPlaneRegion:      cs.Config.GenevaLoggingControlPlaneRegion,
+		SSHSourceAddressPrefixes:             cs.Config.SSHSourceAddressPrefixes,
+		Certificates: pluginapi.CertificateConfig{
+			GenevaLogging: pluginapi.CertKeyPair{
+				Key:  cs.Config.Certificates.GenevaLogging.Key,
+				Cert: cs.Config.Certificates.GenevaLogging.Cert,
+			},
+			GenevaMetrics: pluginapi.CertKeyPair{
+				Key:  cs.Config.Certificates.GenevaMetrics.Key,
+				Cert: cs.Config.Certificates.GenevaMetrics.Cert,
+			},
+		},
+		Images: pluginapi.ImageConfig{
+			ImagePullSecret:              cs.Config.Images.ImagePullSecret,
+			GenevaImagePullSecret:        cs.Config.Images.GenevaImagePullSecret,
+			Format:                       cs.Config.Images.Format,
+			ClusterMonitoringOperator:    cs.Config.Images.ClusterMonitoringOperator,
+			AzureControllers:             cs.Config.Images.AzureControllers,
+			PrometheusOperatorBase:       cs.Config.Images.PrometheusOperatorBase,
+			PrometheusBase:               cs.Config.Images.PrometheusBase,
+			PrometheusConfigReloaderBase: cs.Config.Images.PrometheusConfigReloaderBase,
+			ConfigReloaderBase:           cs.Config.Images.ConfigReloaderBase,
+			AlertManagerBase:             cs.Config.Images.AlertManagerBase,
+			NodeExporterBase:             cs.Config.Images.NodeExporterBase,
+			GrafanaBase:                  cs.Config.Images.GrafanaBase,
+			KubeStateMetricsBase:         cs.Config.Images.KubeStateMetricsBase,
+			KubeRbacProxyBase:            cs.Config.Images.KubeRbacProxyBase,
+			OAuthProxyBase:               cs.Config.Images.OAuthProxyBase,
+			MasterEtcd:                   cs.Config.Images.MasterEtcd,
+			ControlPlane:                 cs.Config.Images.ControlPlane,
+			Node:                         cs.Config.Images.Node,
+			ServiceCatalog:               cs.Config.Images.ServiceCatalog,
+			Sync:                         cs.Config.Images.Sync,
+			Startup:                      cs.Config.Images.Startup,
+			TemplateServiceBroker:        cs.Config.Images.TemplateServiceBroker,
+			Registry:                     cs.Config.Images.Registry,
+			Router:                       cs.Config.Images.Router,
+			RegistryConsole:              cs.Config.Images.RegistryConsole,
+			AnsibleServiceBroker:         cs.Config.Images.AnsibleServiceBroker,
+			WebConsole:                   cs.Config.Images.WebConsole,
+			Console:                      cs.Config.Images.Console,
+			EtcdBackup:                   cs.Config.Images.EtcdBackup,
+			GenevaLogging:                cs.Config.Images.GenevaLogging,
+			GenevaTDAgent:                cs.Config.Images.GenevaTDAgent,
+			GenevaStatsd:                 cs.Config.Images.GenevaStatsd,
+			MetricsBridge:                cs.Config.Images.MetricsBridge,
+		},
+	}
 }
