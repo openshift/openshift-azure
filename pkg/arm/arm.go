@@ -50,6 +50,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 			vnet(cs),
 			eipAPIServer(cs),
 			elbAPIServer(&g.pluginConfig, cs),
+			ilbAPIServer(&g.pluginConfig, cs),
 			storageRegistry(cs),
 			nsgMaster(cs),
 		},

@@ -24,6 +24,8 @@ const (
 	eipAPIServerName                              = "eip-apiserver"
 	ipOutboundName                                = "ip-outbound"
 	elbAPIServerName                              = "elb-apiserver"
+	ilbAPIServerName                              = "ilb-apiserver"
+	ilbAPIServerIPAddress                         = "10.0.0.254"
 	lbAPIServerFrontendConfigurationName          = "frontend"
 	lbAPIServerBackendPoolName                    = "backend"
 	lbAPIServerLoadBalancingRuleName              = "port-443"
@@ -270,6 +272,99 @@ func elbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *networ
 			OutboundRules:   &[]network.OutboundRule{},
 		},
 		Name:     to.StringPtr(elbAPIServerName),
+		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
+		Location: to.StringPtr(cs.Location),
+	}
+
+	if pc.TestConfig.RunningUnderTest {
+		(*lb.LoadBalancingRules)[0].EnableTCPReset = to.BoolPtr(true)
+	}
+
+	return lb
+}
+
+func ilbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
+	lb := &network.LoadBalancer{
+		Sku: &network.LoadBalancerSku{
+			Name: network.LoadBalancerSkuNameStandard,
+		},
+		LoadBalancerPropertiesFormat: &network.LoadBalancerPropertiesFormat{
+			FrontendIPConfigurations: &[]network.FrontendIPConfiguration{
+				{
+					FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
+						Subnet: &network.Subnet{
+							ID: to.StringPtr(resourceid.ResourceID(
+								cs.Properties.AzProfile.SubscriptionID,
+								cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/virtualNetworks",
+								VnetName,
+							) + "/subnets/" + vnetSubnetName),
+						},
+						PrivateIPAllocationMethod: network.Static,
+						PrivateIPAddress:          to.StringPtr(ilbAPIServerIPAddress),
+					},
+					Name: to.StringPtr(lbAPIServerFrontendConfigurationName),
+				},
+			},
+			BackendAddressPools: &[]network.BackendAddressPool{
+				{
+					Name: to.StringPtr(lbAPIServerBackendPoolName),
+				},
+			},
+			LoadBalancingRules: &[]network.LoadBalancingRule{
+				{
+					LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
+						FrontendIPConfiguration: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								cs.Properties.AzProfile.SubscriptionID,
+								cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								ilbAPIServerName,
+							) + "/frontendIPConfigurations/" + lbAPIServerFrontendConfigurationName),
+						},
+						BackendAddressPool: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								cs.Properties.AzProfile.SubscriptionID,
+								cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								ilbAPIServerName,
+							) + "/backendAddressPools/" + lbAPIServerBackendPoolName),
+						},
+						Probe: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								cs.Properties.AzProfile.SubscriptionID,
+								cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								ilbAPIServerName,
+							) + "/probes/" + lbAPIServerProbeName),
+						},
+						Protocol:             network.TransportProtocolTCP,
+						LoadDistribution:     network.Default,
+						FrontendPort:         to.Int32Ptr(443),
+						BackendPort:          to.Int32Ptr(443),
+						IdleTimeoutInMinutes: to.Int32Ptr(15),
+						EnableFloatingIP:     to.BoolPtr(false),
+					},
+					Name: to.StringPtr(lbAPIServerLoadBalancingRuleName),
+				},
+			},
+			Probes: &[]network.Probe{
+				{
+					ProbePropertiesFormat: &network.ProbePropertiesFormat{
+						Protocol:          network.ProbeProtocolHTTPS,
+						Port:              to.Int32Ptr(443),
+						IntervalInSeconds: to.Int32Ptr(5),
+						NumberOfProbes:    to.Int32Ptr(2),
+						RequestPath:       to.StringPtr("/healthz/ready"),
+					},
+					Name: to.StringPtr(lbAPIServerProbeName),
+				},
+			},
+			InboundNatRules: &[]network.InboundNatRule{},
+			InboundNatPools: &[]network.InboundNatPool{},
+			OutboundRules:   &[]network.OutboundRule{},
+		},
+		Name:     to.StringPtr(ilbAPIServerName),
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
 		Location: to.StringPtr(cs.Location),
 	}
@@ -570,6 +665,14 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 					cs.Properties.AzProfile.ResourceGroup,
 					"Microsoft.Network/loadBalancers",
 					elbAPIServerName,
+				) + "/backendAddressPools/" + lbAPIServerBackendPoolName),
+			},
+			{
+				ID: to.StringPtr(resourceid.ResourceID(
+					cs.Properties.AzProfile.SubscriptionID,
+					cs.Properties.AzProfile.ResourceGroup,
+					"Microsoft.Network/loadBalancers",
+					ilbAPIServerName,
 				) + "/backendAddressPools/" + lbAPIServerBackendPoolName),
 			},
 		}
