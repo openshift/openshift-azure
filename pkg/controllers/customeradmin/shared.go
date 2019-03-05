@@ -44,23 +44,6 @@ var desiredRolebindings = map[string]rbacv1.RoleBinding{
 			Name:     "customer-admin-project",
 		},
 	},
-	"osa-customer-view": {
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "osa-customer-view",
-		},
-		Subjects: []rbacv1.Subject{
-			{
-				APIGroup: "rbac.authorization.k8s.io",
-				Kind:     "Group",
-				Name:     "osa-customer-readers",
-			},
-		},
-		RoleRef: rbacv1.RoleRef{
-			APIGroup: "rbac.authorization.k8s.io",
-			Kind:     "ClusterRole",
-			Name:     "view",
-		},
-	},
 }
 
 // AddToManager adds all Controllers to the Manager

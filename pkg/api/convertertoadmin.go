@@ -84,11 +84,10 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 		switch provider := ip.Provider.(type) {
 		case *AADIdentityProvider:
 			oc.Properties.AuthProfile.IdentityProviders[i].Provider = &admin.AADIdentityProvider{
-				Kind:                  &provider.Kind,
-				ClientID:              &provider.ClientID,
-				TenantID:              &provider.TenantID,
-				CustomerAdminGroupID:  provider.CustomerAdminGroupID,
-				CustomerReaderGroupID: provider.CustomerReaderGroupID,
+				Kind:                 &provider.Kind,
+				ClientID:             &provider.ClientID,
+				TenantID:             &provider.TenantID,
+				CustomerAdminGroupID: provider.CustomerAdminGroupID,
 			}
 
 		default:
