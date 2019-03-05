@@ -438,35 +438,35 @@ func mergeImageConfig(in *admin.ImageConfig, out *ImageConfig) {
 	if in.AzureControllers != nil {
 		out.AzureControllers = *in.AzureControllers
 	}
-	if in.PrometheusOperatorBase != nil {
-		out.PrometheusOperatorBase = *in.PrometheusOperatorBase
+	if in.PrometheusOperator != nil {
+		out.PrometheusOperator = *in.PrometheusOperator
 	}
-	if in.PrometheusBase != nil {
-		out.PrometheusBase = *in.PrometheusBase
+	if in.Prometheus != nil {
+		out.Prometheus = *in.Prometheus
 	}
-	if in.PrometheusConfigReloaderBase != nil {
-		out.PrometheusConfigReloaderBase = *in.PrometheusConfigReloaderBase
+	if in.PrometheusConfigReloader != nil {
+		out.PrometheusConfigReloader = *in.PrometheusConfigReloader
 	}
-	if in.ConfigReloaderBase != nil {
-		out.ConfigReloaderBase = *in.ConfigReloaderBase
+	if in.ConfigReloader != nil {
+		out.ConfigReloader = *in.ConfigReloader
 	}
-	if in.AlertManagerBase != nil {
-		out.AlertManagerBase = *in.AlertManagerBase
+	if in.AlertManager != nil {
+		out.AlertManager = *in.AlertManager
 	}
-	if in.NodeExporterBase != nil {
-		out.NodeExporterBase = *in.NodeExporterBase
+	if in.NodeExporter != nil {
+		out.NodeExporter = *in.NodeExporter
 	}
-	if in.GrafanaBase != nil {
-		out.GrafanaBase = *in.GrafanaBase
+	if in.Grafana != nil {
+		out.Grafana = *in.Grafana
 	}
-	if in.KubeStateMetricsBase != nil {
-		out.KubeStateMetricsBase = *in.KubeStateMetricsBase
+	if in.KubeStateMetrics != nil {
+		out.KubeStateMetrics = *in.KubeStateMetrics
 	}
-	if in.KubeRbacProxyBase != nil {
-		out.KubeRbacProxyBase = *in.KubeRbacProxyBase
+	if in.KubeRbacProxy != nil {
+		out.KubeRbacProxy = *in.KubeRbacProxy
 	}
-	if in.OAuthProxyBase != nil {
-		out.OAuthProxyBase = *in.OAuthProxyBase
+	if in.OAuthProxy != nil {
+		out.OAuthProxy = *in.OAuthProxy
 	}
 	if in.MasterEtcd != nil {
 		out.MasterEtcd = *in.MasterEtcd

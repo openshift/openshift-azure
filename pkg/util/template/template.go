@@ -23,6 +23,7 @@ func Template(tmpl string, f template.FuncMap, cs *api.OpenShiftManagedCluster, 
 		"Base64Encode":      base64.StdEncoding.EncodeToString,
 		"String":            func(b []byte) string { return string(b) },
 		"quote":             strconv.Quote,
+		"ImageOnly":         func(s string) string { return strings.Split(s, ":")[0] },
 		"escape": func(b string) string {
 			replacer := strings.NewReplacer("$", "\\$")
 			return replacer.Replace(b)

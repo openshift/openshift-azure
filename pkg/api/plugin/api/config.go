@@ -40,19 +40,19 @@ type Config struct {
 type ImageConfig struct {
 	// Format of the pull spec that is going to be
 	// used in the cluster.
-	Format                       string `json:"format,omitempty"`
-	ClusterMonitoringOperator    string `json:"clusterMonitoringOperator,omitempty"`
-	AzureControllers             string `json:"azureControllers,omitempty"`
-	PrometheusOperatorBase       string `json:"prometheusOperatorBase,omitempty"`
-	PrometheusBase               string `json:"prometheusBase,omitempty"`
-	PrometheusConfigReloaderBase string `json:"prometheusConfigReloaderBase,omitempty"`
-	ConfigReloaderBase           string `json:"configReloaderBase,omitempty"`
-	AlertManagerBase             string `json:"alertManagerBase,omitempty"`
-	NodeExporterBase             string `json:"nodeExporterBase,omitempty"`
-	GrafanaBase                  string `json:"grafanaBase,omitempty"`
-	KubeStateMetricsBase         string `json:"kubeStateMetricsBase,omitempty"`
-	KubeRbacProxyBase            string `json:"kubeRbacProxyBase,omitempty"`
-	OAuthProxyBase               string `json:"oAuthProxyBase,omitempty"`
+	Format                    string `json:"format,omitempty"`
+	ClusterMonitoringOperator string `json:"clusterMonitoringOperator,omitempty"`
+	AzureControllers          string `json:"azureControllers,omitempty"`
+	PrometheusOperator        string `json:"prometheusOperator,omitempty"`
+	Prometheus                string `json:"prometheus,omitempty"`
+	PrometheusConfigReloader  string `json:"prometheusConfigReloader,omitempty"`
+	ConfigReloader            string `json:"configReloader,omitempty"`
+	AlertManager              string `json:"alertManager,omitempty"`
+	NodeExporter              string `json:"nodeExporter,omitempty"`
+	Grafana                   string `json:"grafana,omitempty"`
+	KubeStateMetrics          string `json:"kubeStateMetrics,omitempty"`
+	KubeRbacProxy             string `json:"kubeRbacProxy,omitempty"`
+	OAuthProxy                string `json:"oAuthProxy,omitempty"`
 
 	MasterEtcd            string `json:"masterEtcd,omitempty"`
 	ControlPlane          string `json:"controlPlane,omitempty"`

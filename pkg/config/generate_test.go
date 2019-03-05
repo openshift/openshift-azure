@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
@@ -72,16 +72,16 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.Images.Startup != "", "startup image")
 	assert(c.Images.EtcdBackup != "", "etcdbackup image")
 	assert(c.Images.ClusterMonitoringOperator != "", "cluster monitoring operator image")
-	assert(c.Images.PrometheusOperatorBase != "", "cluster monitoring operator image")
-	assert(c.Images.PrometheusConfigReloaderBase != "", "prometheus config reloader base image")
-	assert(c.Images.ConfigReloaderBase != "", "config reloader base image")
-	assert(c.Images.PrometheusBase != "", "prometheus base image")
-	assert(c.Images.AlertManagerBase != "", "alertmanager base image")
-	assert(c.Images.NodeExporterBase != "", "node exporter base image")
-	assert(c.Images.GrafanaBase != "", "grafana base image")
-	assert(c.Images.KubeStateMetricsBase != "", "kube state metrics base image")
-	assert(c.Images.KubeRbacProxyBase != "", "kube rbac proxy base image")
-	assert(c.Images.OAuthProxyBase != "", "oauth proxy base image")
+	assert(c.Images.PrometheusOperator != "", "cluster monitoring operator image")
+	assert(c.Images.PrometheusConfigReloader != "", "prometheus config reloader image")
+	assert(c.Images.ConfigReloader != "", "config reloader image")
+	assert(c.Images.Prometheus != "", "prometheus image")
+	assert(c.Images.AlertManager != "", "alertmanager image")
+	assert(c.Images.NodeExporter != "", "node exporter image")
+	assert(c.Images.Grafana != "", "grafana image")
+	assert(c.Images.KubeStateMetrics != "", "kube state metrics image")
+	assert(c.Images.KubeRbacProxy != "", "kube rbac proxy image")
+	assert(c.Images.OAuthProxy != "", "oauth proxy image")
 	assert(c.Images.GenevaLogging != "", "azure logging image")
 	assert(c.Images.GenevaTDAgent != "", "azure TDAgent image")
 	assert(c.Images.MetricsBridge != "", "metrics-bridge image")

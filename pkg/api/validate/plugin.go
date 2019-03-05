@@ -107,44 +107,44 @@ func validateImageConfig(i *pluginapi.ImageConfig) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid images.azureControllers %q", i.AzureControllers))
 	}
 
-	if i.PrometheusOperatorBase == "" {
-		errs = append(errs, fmt.Errorf("invalid images.prometheusOperatorBase %q", i.PrometheusOperatorBase))
+	if i.PrometheusOperator == "" {
+		errs = append(errs, fmt.Errorf("invalid images.prometheusOperator %q", i.PrometheusOperator))
 	}
 
-	if i.PrometheusBase == "" {
-		errs = append(errs, fmt.Errorf("invalid images.prometheusBase %q", i.PrometheusBase))
+	if i.Prometheus == "" {
+		errs = append(errs, fmt.Errorf("invalid images.prometheus %q", i.Prometheus))
 	}
 
-	if i.PrometheusConfigReloaderBase == "" {
-		errs = append(errs, fmt.Errorf("invalid images.prometheusConfigReloaderBase %q", i.PrometheusConfigReloaderBase))
+	if i.PrometheusConfigReloader == "" {
+		errs = append(errs, fmt.Errorf("invalid images.prometheusConfigReloader %q", i.PrometheusConfigReloader))
 	}
 
-	if i.ConfigReloaderBase == "" {
-		errs = append(errs, fmt.Errorf("invalid images.configReloaderBase %q", i.ConfigReloaderBase))
+	if i.ConfigReloader == "" {
+		errs = append(errs, fmt.Errorf("invalid images.configReloader %q", i.ConfigReloader))
 	}
 
-	if i.AlertManagerBase == "" {
-		errs = append(errs, fmt.Errorf("invalid images.alertManagerBase %q", i.AlertManagerBase))
+	if i.AlertManager == "" {
+		errs = append(errs, fmt.Errorf("invalid images.alertManager %q", i.AlertManager))
 	}
 
-	if i.NodeExporterBase == "" {
-		errs = append(errs, fmt.Errorf("invalid images.nodeExporterBase %q", i.NodeExporterBase))
+	if i.NodeExporter == "" {
+		errs = append(errs, fmt.Errorf("invalid images.nodeExporter %q", i.NodeExporter))
 	}
 
-	if i.GrafanaBase == "" {
-		errs = append(errs, fmt.Errorf("invalid images.grafanaBase %q", i.GrafanaBase))
+	if i.Grafana == "" {
+		errs = append(errs, fmt.Errorf("invalid images.grafana %q", i.Grafana))
 	}
 
-	if i.KubeStateMetricsBase == "" {
-		errs = append(errs, fmt.Errorf("invalid images.kubeStateMetricsBase %q", i.KubeStateMetricsBase))
+	if i.KubeStateMetrics == "" {
+		errs = append(errs, fmt.Errorf("invalid images.kubeStateMetrics %q", i.KubeStateMetrics))
 	}
 
-	if i.KubeRbacProxyBase == "" {
-		errs = append(errs, fmt.Errorf("invalid images.kubeRbacProxyBase %q", i.KubeRbacProxyBase))
+	if i.KubeRbacProxy == "" {
+		errs = append(errs, fmt.Errorf("invalid images.kubeRbacProxy %q", i.KubeRbacProxy))
 	}
 
-	if i.OAuthProxyBase == "" {
-		errs = append(errs, fmt.Errorf("invalid images.oAuthProxyBase %q", i.OAuthProxyBase))
+	if i.OAuthProxy == "" {
+		errs = append(errs, fmt.Errorf("invalid images.oAuthProxy %q", i.OAuthProxy))
 	}
 
 	if i.MasterEtcd == "" {
