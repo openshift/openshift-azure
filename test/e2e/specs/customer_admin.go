@@ -81,7 +81,7 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 	})
 
 	It("should not able to query groups", func() {
-		_, err := cli.Client.CustomerAdmin.UserV1.Groups().Get("customer-admins", metav1.GetOptions{})
+		_, err := cli.Client.CustomerAdmin.UserV1.Groups().Get("osa-customer-admins", metav1.GetOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
 	})
 

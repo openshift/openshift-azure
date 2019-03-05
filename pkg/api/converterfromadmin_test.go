@@ -178,8 +178,7 @@ func TestConvertFromAdmin(t *testing.T) {
 							{
 								Name: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Name"),
 								Provider: &admin.AADIdentityProvider{
-									CustomerAdminGroupID:  to.StringPtr("admin"),
-									CustomerReaderGroupID: to.StringPtr("reader"),
+									CustomerAdminGroupID: to.StringPtr("admin"),
 								},
 							},
 						},
@@ -193,12 +192,11 @@ func TestConvertFromAdmin(t *testing.T) {
 						{
 							Name: "Properties.AuthProfile.IdentityProviders[0].Name",
 							Provider: &AADIdentityProvider{
-								Kind:                  "AADIdentityProvider",
-								ClientID:              "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
-								Secret:                "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
-								TenantID:              "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
-								CustomerAdminGroupID:  to.StringPtr("admin"),
-								CustomerReaderGroupID: to.StringPtr("reader"),
+								Kind:                 "AADIdentityProvider",
+								ClientID:             "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
+								Secret:               "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
+								TenantID:             "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
+								CustomerAdminGroupID: to.StringPtr("admin"),
 							},
 						},
 					},

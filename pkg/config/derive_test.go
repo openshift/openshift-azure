@@ -90,11 +90,10 @@ vnetName: vnet
 
 func TestDerivedAADGroupSyncConf(t *testing.T) {
 	provider := api.AADIdentityProvider{
-		ClientID:              "client_id",
-		Secret:                "hush",
-		TenantID:              "tenant-id",
-		CustomerAdminGroupID:  to.StringPtr("customerAdminGroupId"),
-		CustomerReaderGroupID: to.StringPtr("customerReaderGroupId"),
+		ClientID:             "client_id",
+		Secret:               "hush",
+		TenantID:             "tenant-id",
+		CustomerAdminGroupID: to.StringPtr("customerAdminGroupId"),
 	}
 
 	cs := api.OpenShiftManagedCluster{
@@ -110,7 +109,6 @@ func TestDerivedAADGroupSyncConf(t *testing.T) {
 	}
 	want := []byte(`clientId: client_id
 customerAdminGroupId: customerAdminGroupId
-customerReaderGroupId: customerReaderGroupId
 secret: hush
 tenantId: tenant-id
 `)
