@@ -185,6 +185,7 @@ func (derived) MaxDataDisksPerVM(cs *api.OpenShiftManagedCluster) (string, error
 	}
 
 	switch app.VMSize {
+	// General purpose VMs
 	case api.StandardD2sV3:
 		return "4", nil
 	case api.StandardD4sV3:
@@ -194,27 +195,19 @@ func (derived) MaxDataDisksPerVM(cs *api.OpenShiftManagedCluster) (string, error
 	case api.StandardD16sV3, api.StandardD32sV3:
 		return "32", nil
 
-	// Compute optimized VMs
-	case api.StandardF8sV2:
-		return "16", nil
-	case api.StandardF16sV2, api.StandardF32sV2:
-		return "32", nil
-
 	// Memory optimized VMs
 	case api.StandardE4sV3:
 		return "8", nil
 	case api.StandardE8sV3:
 		return "16", nil
-	case api.StandardE16sV3, api.StandardE20sV3, api.StandardE32sV3:
+	case api.StandardE16sV3, api.StandardE32sV3:
 		return "32", nil
 
-	// Storage optimized VMs
-	case api.StandardL4s:
+	// Compute optimized VMs
+	case api.StandardF8sV2:
 		return "16", nil
-	case api.StandardL8s:
+	case api.StandardF16sV2, api.StandardF32sV2:
 		return "32", nil
-	case api.StandardL16s, api.StandardL32s:
-		return "64", nil
 	}
 
 	return "", fmt.Errorf("unknown VMSize %q", app.VMSize)

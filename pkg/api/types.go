@@ -180,23 +180,16 @@ const (
 	StandardD16sV3 VMSize = "Standard_D16s_v3"
 	StandardD32sV3 VMSize = "Standard_D32s_v3"
 
-	// Compute optimized VMs
-	StandardF8sV2  VMSize = "Standard_F8s_v2"
-	StandardF16sV2 VMSize = "Standard_F16s_v2"
-	StandardF32sV2 VMSize = "Standard_F32s_v2"
-
 	// Memory optimized VMs
 	StandardE4sV3  VMSize = "Standard_E4s_v3"
 	StandardE8sV3  VMSize = "Standard_E8s_v3"
 	StandardE16sV3 VMSize = "Standard_E16s_v3"
-	StandardE20sV3 VMSize = "Standard_E20s_v3"
 	StandardE32sV3 VMSize = "Standard_E32s_v3"
 
-	// Storage optimized VMs
-	StandardL4s  VMSize = "Standard_L4s"
-	StandardL8s  VMSize = "Standard_L8s"
-	StandardL16s VMSize = "Standard_L16s"
-	StandardL32s VMSize = "Standard_L32s"
+	// Compute optimized VMs
+	StandardF8sV2  VMSize = "Standard_F8s_v2"
+	StandardF16sV2 VMSize = "Standard_F16s_v2"
+	StandardF32sV2 VMSize = "Standard_F32s_v2"
 )
 
 // AuthProfile defines all possible authentication profiles for the OpenShift
