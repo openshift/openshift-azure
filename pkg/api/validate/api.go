@@ -24,9 +24,11 @@ func (v *APIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster, external
 	}
 
 	errs = append(errs, validateContainerService(cs, externalOnly)...)
+
 	if oldCs != nil {
 		errs = append(errs, validateUpdateContainerService(cs, oldCs)...)
 	}
+
 	// this limits use of RunningUnderTest variable inside our validators
 	// TODO: When removed this should be part of common validators
 	for _, app := range cs.Properties.AgentPoolProfiles {

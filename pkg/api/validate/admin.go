@@ -29,16 +29,21 @@ func (v *AdminAPIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster, ext
 		errs = append(errs, errors.New("admin requests cannot create clusters"))
 		return errs
 	}
+
 	if errs := validateContainerService(cs, externalOnly); len(errs) > 0 {
 		return errs
 	}
+
 	if errs := validateUpdateContainerService(cs, oldCs); len(errs) > 0 {
 		return errs
 	}
+
 	if errs := validateUpdateConfig(&cs.Config, &oldCs.Config); len(errs) > 0 {
 		return errs
 	}
 
+	// this limits use of RunningUnderTest variable inside our validators
+	// TODO: When removed this should be part of common validators
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		errs = append(errs, validateVMSize(&app, v.runningUnderTest)...)
 	}

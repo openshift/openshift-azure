@@ -22,6 +22,7 @@ func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool)
 	}
 
 	errs = append(errs, validateProperties(&c.Properties, c.Location, externalOnly)...)
+
 	return
 }
 
@@ -41,16 +42,21 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 	if p.PublicHostname != "" { // TODO: relax after private preview (&& !isValidHostname(p.PublicHostname))
 		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
 	}
+
 	errs = append(errs, validateNetworkProfile(&p.NetworkProfile)...)
 
 	errs = append(errs, validateRouterProfiles(p.RouterProfiles, location, externalOnly)...)
 
 	errs = append(errs, validateFQDN(p, location)...)
+
 	// we can disregard any error below because we are already going to fail
 	// validation if VnetCIDR does not parse correctly.
 	_, vnet, _ := net.ParseCIDR(p.NetworkProfile.VnetCIDR)
+
 	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
+
 	errs = append(errs, validateAuthProfile(&p.AuthProfile)...)
+
 	return
 }
 
@@ -76,15 +82,19 @@ func validateNetworkProfile(np *api.NetworkProfile) (errs []error) {
 		errs = append(errs, fmt.Errorf("networkProfile cannot be nil"))
 		return
 	}
+
 	if np.VnetID != "" && !rxVNetID.MatchString(np.VnetID) {
 		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetId %q", np.VnetID))
 	}
+
 	if !isValidIPV4CIDR(np.VnetCIDR) {
 		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetCidr %q", np.VnetCIDR))
 	}
+
 	if np.PeerVnetID != nil && !rxVNetID.MatchString(*np.PeerVnetID) {
 		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.peerVnetId %q", *np.PeerVnetID))
 	}
+
 	return
 }
 
@@ -103,6 +113,11 @@ func validateRouterProfiles(rps []api.RouterProfile, location string, externalOn
 
 		errs = append(errs, validateRouterProfile(&rp, location, externalOnly)...)
 	}
+
+	// a bit questionable: seems that we allow a user to PUT empty
+	// RouterProfiles on cluster creation.  We allow this on the first
+	// validation pass (externalOnly set), then the RP apparently defaults in a
+	// RouterProfile before validating a second time without externalOnly set.
 	if !externalOnly {
 		for name := range validRouterProfileNames {
 			if _, found := rpmap[name]; !found {
@@ -110,6 +125,7 @@ func validateRouterProfiles(rps []api.RouterProfile, location string, externalOn
 			}
 		}
 	}
+
 	return
 }
 
@@ -243,6 +259,7 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 	if len(ap.IdentityProviders) != 1 {
 		errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders length"))
 	}
+
 	//check supported identity providers
 	for _, ip := range ap.IdentityProviders {
 		switch provider := ip.Provider.(type) {
@@ -272,9 +289,11 @@ func validateFQDN(p *api.Properties, location string) (errs []error) {
 		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
 		return
 	}
+
 	if p.FQDN == "" || !isValidCloudAppHostname(p.FQDN, location) {
 		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
 	}
+
 	return
 }
 
@@ -298,5 +317,6 @@ func validateVMSize(app *api.AgentPoolProfile, runningUnderTest bool) (errs []er
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
 		}
 	}
+
 	return errs
 }
