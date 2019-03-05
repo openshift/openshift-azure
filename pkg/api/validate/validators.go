@@ -160,9 +160,6 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 			if provider.CustomerAdminGroupID != nil && !isValidUUID(*provider.CustomerAdminGroupID) {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider customerAdminGroupId %q", *provider.CustomerAdminGroupID))
 			}
-			if provider.CustomerReaderGroupID != nil && !isValidUUID(*provider.CustomerReaderGroupID) {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider customerReaderGroupId %q", *provider.CustomerReaderGroupID))
-			}
 		}
 	}
 	return
