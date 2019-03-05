@@ -3,6 +3,10 @@ package validate
 import (
 	"net"
 	"regexp"
+	"strconv"
+	"strings"
+
+	"github.com/google/uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
@@ -80,30 +84,135 @@ var (
 	serviceNetworkCIDR *net.IPNet
 )
 
-// APIValidator validator for external API
-type APIValidator struct {
-	runningUnderTest bool
+func init() {
+	var err error
+
+	// TODO: we probably need to bite the bullet and make these configurable.
+	_, clusterNetworkCIDR, err = net.ParseCIDR("10.128.0.0/14")
+	if err != nil {
+		panic(err)
+	}
+
+	_, serviceNetworkCIDR, err = net.ParseCIDR("172.30.0.0/16")
+	if err != nil {
+		panic(err)
+	}
 }
 
-// AdminAPIValidator validator for external Admin API
-type AdminAPIValidator struct {
-	runningUnderTest bool
+var validAgentPoolProfileRoles = map[api.AgentPoolProfileRole]struct{}{
+	api.AgentPoolProfileRoleCompute: {},
+	api.AgentPoolProfileRoleInfra:   {},
+	api.AgentPoolProfileRoleMaster:  {},
 }
 
-// PluginAPIValidator validator for external Plugin API
-type PluginAPIValidator struct{}
-
-// NewAPIValidator return instance of external API validator
-func NewAPIValidator(runningUnderTest bool) *APIValidator {
-	return &APIValidator{runningUnderTest: runningUnderTest}
+var validRouterProfileNames = map[string]struct{}{
+	"default": {},
 }
 
-// NewAdminValidator return instance of external Admin API validator
-func NewAdminValidator(runningUnderTest bool) *AdminAPIValidator {
-	return &AdminAPIValidator{runningUnderTest: runningUnderTest}
+func isValidHostname(h string) bool {
+	return len(h) <= 255 && rxRfc1123.MatchString(h)
 }
 
-// NewPluginAPIValidator return instance of external Plugin API validator
-func NewPluginAPIValidator() *PluginAPIValidator {
-	return &PluginAPIValidator{}
+func isValidCloudAppHostname(h, location string) bool {
+	if !rxCloudDomainLabel.MatchString(h) {
+		return false
+	}
+	return strings.HasSuffix(h, "."+location+".cloudapp.azure.com") && strings.Count(h, ".") == 4
+}
+
+func isValidIPV4CIDR(cidr string) bool {
+	ip, net, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return false
+	}
+	if ip.To4() == nil {
+		return false
+	}
+	if net == nil || !ip.Equal(net.IP) {
+		return false
+	}
+	return true
+}
+
+func IsValidBlobContainerName(c string) bool {
+	// https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata
+	if !rxBlobContainerName.MatchString(c) {
+		return false
+	}
+
+	if strings.Trim(c, "-") != c || strings.Contains(c, "--") {
+		return false
+	}
+
+	return true
+}
+
+func vnetContainsSubnet(vnet, subnet *net.IPNet) bool {
+	vnetbits, _ := vnet.Mask.Size()
+	subnetbits, _ := subnet.Mask.Size()
+	if vnetbits > subnetbits {
+		// e.g., vnet is a /24, subnet is a /16: vnet cannot contain subnet.
+		return false
+	}
+
+	return vnet.IP.Equal(subnet.IP.Mask(vnet.Mask))
+}
+
+func isValidUUID(u string) bool {
+	_, err := uuid.Parse(u)
+	return err == nil
+}
+
+func IsValidAgentPoolHostname(hostname string) bool {
+	parts := strings.Split(hostname, "-")
+	switch len(parts) {
+	case 2: // master-XXXXXX
+		if parts[0] != "master" ||
+			len(parts[1]) != 6 {
+			return false
+		}
+		_, err := strconv.ParseUint(parts[1], 36, 64)
+		if err != nil {
+			return false
+		}
+
+	case 3: // something-XXXXXXXXXX-XXXXXX
+		if !rxAgentPoolProfileName.MatchString(parts[0]) ||
+			parts[0] == "master" ||
+			len(parts[1]) != 10 ||
+			len(parts[2]) != 6 {
+			return false
+		}
+		_, err := strconv.ParseUint(parts[1], 10, 64)
+		if err != nil {
+			return false
+		}
+		_, err = strconv.ParseUint(parts[2], 36, 64)
+		if err != nil {
+			return false
+		}
+
+	default:
+		return false
+	}
+
+	return true
+}
+
+func isValidMasterAndInfraVMSize(size api.VMSize, runningUnderTest bool) bool {
+	if runningUnderTest && size == api.StandardD2sV3 {
+		return true
+	}
+
+	_, found := validMasterAndInfraVMSizes[size]
+	return found
+}
+
+func isValidComputeVMSize(size api.VMSize, runningUnderTest bool) bool {
+	if runningUnderTest && size == api.StandardD2sV3 {
+		return true
+	}
+
+	_, found := validComputeVMSizes[size]
+	return found
 }

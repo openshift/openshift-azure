@@ -6,6 +6,14 @@ import (
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 )
 
+// PluginAPIValidator validator for external Plugin API
+type PluginAPIValidator struct{}
+
+// NewPluginAPIValidator return instance of external Plugin API validator
+func NewPluginAPIValidator() *PluginAPIValidator {
+	return &PluginAPIValidator{}
+}
+
 // Validate validates an Plugin API external template/config struct
 func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 	if t.ImageOffer != "osa" {
@@ -50,27 +58,6 @@ func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 	// validate certificates
 	errs = append(errs, v.validatePluginTemplateCertificates(&t.Certificates)...)
 	errs = append(errs, v.validatePluginTemplateImages(&t.Images)...)
-	return errs
-}
-
-func (v *PluginAPIValidator) validatePluginTemplateCertificates(c *pluginapi.CertificateConfig) (errs []error) {
-	if c.GenevaLogging.Key == nil {
-		errs = append(errs, fmt.Errorf("GenevaLogging key cannot be empty"))
-	} else if err := c.GenevaLogging.Key.Validate(); err != nil {
-		errs = append(errs, fmt.Errorf("invalid GenevaLogging key: %v", err))
-	}
-	if c.GenevaLogging.Cert == nil {
-		errs = append(errs, fmt.Errorf("GenevaLogging certificate cannot be empty"))
-	}
-
-	if c.GenevaMetrics.Key == nil {
-		errs = append(errs, fmt.Errorf("GenevaMetrics key cannot be empty"))
-	} else if err := c.GenevaMetrics.Key.Validate(); err != nil {
-		errs = append(errs, fmt.Errorf("invalid GenevaMetrics key: %v", err))
-	}
-	if c.GenevaMetrics.Cert == nil {
-		errs = append(errs, fmt.Errorf("GenevaMetrics certificate cannot be empty"))
-	}
 	return errs
 }
 
@@ -160,5 +147,26 @@ func (v *PluginAPIValidator) validatePluginTemplateImages(i *pluginapi.ImageConf
 		errs = append(errs, fmt.Errorf("images.EtcdBackup cannot be empty"))
 	}
 
+	return errs
+}
+
+func (v *PluginAPIValidator) validatePluginTemplateCertificates(c *pluginapi.CertificateConfig) (errs []error) {
+	if c.GenevaLogging.Key == nil {
+		errs = append(errs, fmt.Errorf("GenevaLogging key cannot be empty"))
+	} else if err := c.GenevaLogging.Key.Validate(); err != nil {
+		errs = append(errs, fmt.Errorf("invalid GenevaLogging key: %v", err))
+	}
+	if c.GenevaLogging.Cert == nil {
+		errs = append(errs, fmt.Errorf("GenevaLogging certificate cannot be empty"))
+	}
+
+	if c.GenevaMetrics.Key == nil {
+		errs = append(errs, fmt.Errorf("GenevaMetrics key cannot be empty"))
+	} else if err := c.GenevaMetrics.Key.Validate(); err != nil {
+		errs = append(errs, fmt.Errorf("invalid GenevaMetrics key: %v", err))
+	}
+	if c.GenevaMetrics.Cert == nil {
+		errs = append(errs, fmt.Errorf("GenevaMetrics certificate cannot be empty"))
+	}
 	return errs
 }

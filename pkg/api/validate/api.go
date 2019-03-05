@@ -4,6 +4,16 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
+// APIValidator validator for external API
+type APIValidator struct {
+	runningUnderTest bool
+}
+
+// NewAPIValidator return instance of external API validator
+func NewAPIValidator(runningUnderTest bool) *APIValidator {
+	return &APIValidator{runningUnderTest: runningUnderTest}
+}
+
 // Validate validates a OpenShiftManagedCluster struct
 func (v *APIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	errs = append(errs, validateContainerService(cs, externalOnly)...)

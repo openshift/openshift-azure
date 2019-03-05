@@ -6,6 +6,16 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
+// AdminAPIValidator validator for external Admin API
+type AdminAPIValidator struct {
+	runningUnderTest bool
+}
+
+// NewAdminValidator return instance of external Admin API validator
+func NewAdminValidator(runningUnderTest bool) *AdminAPIValidator {
+	return &AdminAPIValidator{runningUnderTest: runningUnderTest}
+}
+
 // Validate validates a OpenShiftManagedCluster struct
 func (v *AdminAPIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	// TODO are these error messages confusing since they may not correspond with the external model?
