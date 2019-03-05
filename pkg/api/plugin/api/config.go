@@ -6,8 +6,10 @@ import (
 )
 
 type Config struct {
-	// ClusterVersion defines release version of the plugin used to build the cluster
-	ClusterVersion string `json:"clusterVersion,omitempty"`
+	// PluginVersion defines version of the plugin used to build the cluster
+	PluginVersion string `json:"pluginVersion,omitempty"`
+	// RPVersion defines version of the resource provider used to build the cluster
+	RPVersion string `json:"rpVersion,omitempty"`
 	// configuration of VMs in ARM template
 	ImageOffer     string `json:"imageOffer,omitempty"`
 	ImagePublisher string `json:"imagePublisher,omitempty"`

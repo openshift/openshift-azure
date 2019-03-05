@@ -11,7 +11,8 @@ func ConvertFromPlugin(in *plugin.Config, old *Config) *Config {
 	if old != nil {
 		cs = old.DeepCopy()
 	}
-	cs.ClusterVersion = in.ClusterVersion
+	cs.PluginVersion = in.PluginVersion
+	cs.RPVersion = in.RPVersion
 	// Generic offering configurables
 	cs.ImageOffer = in.ImageOffer
 	cs.ImagePublisher = in.ImagePublisher

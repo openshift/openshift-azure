@@ -3,12 +3,14 @@ package api
 import (
 	"crypto/x509"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Config struct {
-	// ClusterVersion (out) defines release version of the plugin used to build the cluster
-	ClusterVersion *string `json:"clusterVersion,omitempty"`
+	// PluginVersion (out) defines version of the plugin used to build the cluster
+	PluginVersion *string `json:"pluginVersion,omitempty"`
+	// RPVersion (out) defines version of the resource provider used to build the cluster
+	RPVersion *string `json:"rpVersion,omitempty"`
 	// configuration of VMs in ARM template
 	ImageOffer     *string `json:"imageOffer,omitempty"`
 	ImagePublisher *string `json:"imagePublisher,omitempty"`

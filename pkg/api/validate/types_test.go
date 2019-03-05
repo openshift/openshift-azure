@@ -29,7 +29,7 @@ func TestValidateImageVersion(t *testing.T) {
 	}
 }
 
-func TestValidateClusterVersion(t *testing.T) {
+func TestValidatePluginVersion(t *testing.T) {
 	invalidVersions := []string{
 		".1.1",
 		"1.1",
@@ -38,7 +38,7 @@ func TestValidateClusterVersion(t *testing.T) {
 		"v1.0.0",
 	}
 	for _, invalidVersion := range invalidVersions {
-		if clusterVersion.MatchString(invalidVersion) {
+		if pluginVersion.MatchString(invalidVersion) {
 			t.Errorf("invalid Version passed test: %s", invalidVersion)
 		}
 	}
@@ -47,7 +47,7 @@ func TestValidateClusterVersion(t *testing.T) {
 		"v123.123456789",
 	}
 	for _, validVersion := range validVersions {
-		if !clusterVersion.MatchString(validVersion) {
+		if !pluginVersion.MatchString(validVersion) {
 			t.Errorf("valid Version failed to test: %s", validVersion)
 		}
 	}

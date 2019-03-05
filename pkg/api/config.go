@@ -4,13 +4,15 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 
-	"github.com/satori/go.uuid"
-	"k8s.io/client-go/tools/clientcmd/api/v1"
+	uuid "github.com/satori/go.uuid"
+	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
 type Config struct {
-	// ClusterVersion defines release version of the plugin used to build the cluster
-	ClusterVersion string `json:"clusterVersion,omitempty"`
+	// PluginVersion defines version of the plugin used to build the cluster
+	PluginVersion string `json:"pluginVersion,omitempty"`
+	// RPVersion defines version of the resource provider used to build the cluster
+	RPVersion string `json:"rpVersion,omitempty"`
 	// configuration of VMs in ARM template
 	ImageOffer     string `json:"imageOffer,omitempty"`
 	ImagePublisher string `json:"imagePublisher,omitempty"`

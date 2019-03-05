@@ -24,7 +24,8 @@ func internalPluginConfig() Config {
 	// internal API Config
 	return Config{
 
-		ClusterVersion: "ClusterVersion",
+		PluginVersion: "PluginVersion",
+		RPVersion:     "RPVersion",
 		// generic Offering configuration
 		ImageOffer:               "ImageOffer",
 		ImagePublisher:           "ImagePublisher",

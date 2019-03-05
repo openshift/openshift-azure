@@ -13,7 +13,7 @@ func TestPluginTemplateValidate(t *testing.T) {
 		[]error{errors.New(`imageOffer should be osa`),
 			errors.New(`imagePublisher should be redhat`),
 			errors.New(`invalid ImageSKU ""`),
-			errors.New(`invalid ClusterVersion ""`),
+			errors.New(`invalid PluginVersion ""`),
 			errors.New(`invalid ImageVersion ""`),
 			errors.New(`genevaLoggingSector cannot be empty`),
 			errors.New(`genevaLoggingAccount cannot be empty`),
