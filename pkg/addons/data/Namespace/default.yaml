@@ -3,6 +3,8 @@ kind: Namespace
 metadata:
   annotations:
     openshift.io/node-selector: ""
+  labels:
+    name: default
   name: default
 spec:
   finalizers:

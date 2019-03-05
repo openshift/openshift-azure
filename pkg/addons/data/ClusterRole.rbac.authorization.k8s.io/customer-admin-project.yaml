@@ -16,3 +16,16 @@ rules:
   - delete
   - patch
   - update
+- apiGroups:
+  - ""
+  - network.openshift.io
+  resources:
+  - egressnetworkpolicies
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - patch
+  - update
