@@ -356,3 +356,33 @@ func (p *plugin) BackupEtcdCluster(ctx context.Context, oc *api.OpenShiftManaged
 	}
 	return nil
 }
+
+func (p *plugin) RunCommand(ctx context.Context, oc *api.OpenShiftManagedCluster, hostname string, command api.Command) error {
+	if !validate.IsValidAgentPoolHostname(hostname) {
+		return fmt.Errorf("invalid hostname %q", hostname)
+	}
+
+	var script string
+	switch command {
+	case api.CommandRestartNetworkManager:
+		script = "systemctl restart NetworkManager.service"
+	case api.CommandRestartKubelet:
+		script = "systemctl restart atomic-openshift-node.service"
+	default:
+		return fmt.Errorf("invalid command %q", command)
+	}
+
+	scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(hostname)
+	if err != nil {
+		return err
+	}
+
+	p.log.Info("creating clients")
+	err = p.clusterUpgrader.CreateClients(ctx, oc, true)
+	if err != nil {
+		return err
+	}
+
+	p.log.Infof("running %s on %s", command, hostname)
+	return p.clusterUpgrader.RunCommand(ctx, oc, scaleset, instanceID, script)
+}

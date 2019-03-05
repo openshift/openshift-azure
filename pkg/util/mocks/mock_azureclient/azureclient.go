@@ -245,21 +245,6 @@ func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Reimage(arg0, arg1, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reimage", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Reimage), arg0, arg1, arg2, arg3, arg4)
 }
 
-// ReimageAll mocks base method
-func (m *MockVirtualMachineScaleSetVMsClient) ReimageAll(arg0 context.Context, arg1, arg2, arg3 string) (compute.VirtualMachineScaleSetVMsReimageAllFuture, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ReimageAll", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(compute.VirtualMachineScaleSetVMsReimageAllFuture)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ReimageAll indicates an expected call of ReimageAll
-func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) ReimageAll(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReimageAll", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).ReimageAll), arg0, arg1, arg2, arg3)
-}
-
 // Restart mocks base method
 func (m *MockVirtualMachineScaleSetVMsClient) Restart(arg0 context.Context, arg1, arg2, arg3 string) error {
 	m.ctrl.T.Helper()
@@ -272,6 +257,20 @@ func (m *MockVirtualMachineScaleSetVMsClient) Restart(arg0 context.Context, arg1
 func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) Restart(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Restart", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).Restart), arg0, arg1, arg2, arg3)
+}
+
+// RunCommand mocks base method
+func (m *MockVirtualMachineScaleSetVMsClient) RunCommand(arg0 context.Context, arg1, arg2, arg3 string, arg4 compute.RunCommandInput) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RunCommand", arg0, arg1, arg2, arg3, arg4)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RunCommand indicates an expected call of RunCommand
+func (mr *MockVirtualMachineScaleSetVMsClientMockRecorder) RunCommand(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunCommand", reflect.TypeOf((*MockVirtualMachineScaleSetVMsClient)(nil).RunCommand), arg0, arg1, arg2, arg3, arg4)
 }
 
 // Start mocks base method

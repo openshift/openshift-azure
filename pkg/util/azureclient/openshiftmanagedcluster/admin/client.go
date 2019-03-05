@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -1153,4 +1154,24 @@ type OpenShiftManagedClustersClusterVMs struct {
 	autorest.Response `json:"-"`
 
 	VMs []string `json:"-"`
+}
+
+func (client OpenShiftManagedClustersClient) RunCommand(ctx context.Context, resourceGroupName, resourceName, hostname, command string) error {
+	req, err := http.NewRequest(http.MethodPut, client.BaseURI+
+		"/subscriptions/"+client.SubscriptionID+
+		"/resourceGroups/"+resourceGroupName+
+		"/providers/Microsoft.ContainerService/openShiftManagedClusters/"+resourceName+
+		"/runCommand/"+hostname+"/"+command, nil)
+	if err != nil {
+		return err
+	}
+	resp, err := client.Sender.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code %d", resp.StatusCode)
+	}
+	return nil
 }

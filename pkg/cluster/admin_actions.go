@@ -4,6 +4,9 @@ import (
 	"context"
 	"strings"
 
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
+	"github.com/Azure/go-autorest/autorest/to"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
@@ -30,4 +33,11 @@ func (u *simpleUpgrader) ListVMHostnames(ctx context.Context, cs *api.OpenShiftM
 	}
 
 	return hostnames, nil
+}
+
+func (u *simpleUpgrader) RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID, command string) error {
+	return u.vmc.RunCommand(ctx, cs.Properties.AzProfile.ResourceGroup, scaleset, instanceID, compute.RunCommandInput{
+		CommandID: to.StringPtr("RunShellScript"),
+		Script:    &[]string{command},
+	})
 }

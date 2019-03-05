@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+
+	"github.com/openshift/openshift-azure/pkg/api"
 )
 
 // handleBackup handles admin requests to backup an etcd cluster
@@ -172,4 +174,32 @@ func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	s.log.Info("force-updated cluster")
+}
+
+// handleRunCommand handles running generic commands on a given vm within a scaleset in the cluster
+func (s *Server) handleRunCommand(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+
+	hostname := chi.URLParam(req, "hostname")
+	command := chi.URLParam(req, "command")
+
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
+		return
+	}
+
+	s.log.Infof("running command %s on %s", command, hostname)
+
+	err = s.plugin.RunCommand(ctx, cs, hostname, api.Command(command))
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to run command: %v", err))
+		return
+	}
+
+	s.log.Infof("ran command %s on %s", command, hostname)
 }

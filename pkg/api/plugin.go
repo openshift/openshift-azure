@@ -60,6 +60,13 @@ const (
 	PluginStepRegenerateClusterSecrets            PluginStep = "RegenerateClusterSecrets"
 )
 
+type Command string
+
+const (
+	CommandRestartNetworkManager = "RestartNetworkManager"
+	CommandRestartKubelet        = "RestartKubelet"
+)
+
 // PluginError error returned by CreateOrUpdate to specify the step that failed.
 type PluginError struct {
 	Err  error
@@ -138,4 +145,7 @@ type GenevaActions interface {
 
 	// BackupEtcdCluster backs up the cluster's etcd
 	BackupEtcdCluster(ctx context.Context, cs *OpenShiftManagedCluster, backupName string) error
+
+	// RunCommand runs a predefined command on a virtual machine in the cluster
+	RunCommand(ctx context.Context, cs *OpenShiftManagedCluster, hostname string, command Command) error
 }
