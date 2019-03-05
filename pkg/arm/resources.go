@@ -21,9 +21,9 @@ import (
 const (
 	VnetName                                      = "vnet"
 	vnetSubnetName                                = "default"
-	ipAPIServerName                               = "ip-apiserver"
+	eipAPIServerName                              = "eip-apiserver"
 	ipOutboundName                                = "ip-outbound"
-	lbAPIServerName                               = "lb-apiserver"
+	elbAPIServerName                              = "elb-apiserver"
 	lbAPIServerFrontendConfigurationName          = "frontend"
 	lbAPIServerBackendPoolName                    = "backend"
 	lbAPIServerLoadBalancingRuleName              = "port-443"
@@ -156,7 +156,7 @@ func vnet(cs *api.OpenShiftManagedCluster) *network.VirtualNetwork {
 	}
 }
 
-func ipAPIServer(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
+func eipAPIServer(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 	return &network.PublicIPAddress{
 		Sku: &network.PublicIPAddressSku{
 			Name: network.PublicIPAddressSkuNameStandard,
@@ -168,7 +168,7 @@ func ipAPIServer(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 			},
 			IdleTimeoutInMinutes: to.Int32Ptr(15),
 		},
-		Name:     to.StringPtr(ipAPIServerName),
+		Name:     to.StringPtr(eipAPIServerName),
 		Type:     to.StringPtr("Microsoft.Network/publicIPAddresses"),
 		Location: to.StringPtr(cs.Location),
 	}
@@ -189,7 +189,7 @@ func ipOutbound(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 	}
 }
 
-func lbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
+func elbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 	lb := &network.LoadBalancer{
 		Sku: &network.LoadBalancerSku{
 			Name: network.LoadBalancerSkuNameStandard,
@@ -204,7 +204,7 @@ func lbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/publicIPAddresses",
-								ipAPIServerName,
+								eipAPIServerName,
 							)),
 						},
 					},
@@ -224,7 +224,7 @@ func lbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
-								lbAPIServerName,
+								elbAPIServerName,
 							) + "/frontendIPConfigurations/" + lbAPIServerFrontendConfigurationName),
 						},
 						BackendAddressPool: &network.SubResource{
@@ -232,7 +232,7 @@ func lbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
-								lbAPIServerName,
+								elbAPIServerName,
 							) + "/backendAddressPools/" + lbAPIServerBackendPoolName),
 						},
 						Probe: &network.SubResource{
@@ -240,7 +240,7 @@ func lbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network
 								cs.Properties.AzProfile.SubscriptionID,
 								cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
-								lbAPIServerName,
+								elbAPIServerName,
 							) + "/probes/" + lbAPIServerProbeName),
 						},
 						Protocol:             network.TransportProtocolTCP,
@@ -269,7 +269,7 @@ func lbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network
 			InboundNatPools: &[]network.InboundNatPool{},
 			OutboundRules:   &[]network.OutboundRule{},
 		},
-		Name:     to.StringPtr(lbAPIServerName),
+		Name:     to.StringPtr(elbAPIServerName),
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
 		Location: to.StringPtr(cs.Location),
 	}
@@ -569,7 +569,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 					cs.Properties.AzProfile.SubscriptionID,
 					cs.Properties.AzProfile.ResourceGroup,
 					"Microsoft.Network/loadBalancers",
-					lbAPIServerName,
+					elbAPIServerName,
 				) + "/backendAddressPools/" + lbAPIServerBackendPoolName),
 			},
 		}

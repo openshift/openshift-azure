@@ -27,17 +27,17 @@ func TestFixupDepends(t *testing.T) {
 		{
 			name: "have deps, but missing resources",
 			resources: []interface{}{
-				lbAPIServer(&api.PluginConfig{}, cs),
+				elbAPIServer(&api.PluginConfig{}, cs),
 			},
 			expect: []string{},
 		},
 		{
 			name: "have deps and dependent resources",
 			resources: []interface{}{
-				ipAPIServer(cs),
-				lbAPIServer(&api.PluginConfig{}, cs),
+				eipAPIServer(cs),
+				elbAPIServer(&api.PluginConfig{}, cs),
 			},
-			expect: []string{"/subscriptions/sess/resourceGroups/rg/providers/Microsoft.Network/publicIPAddresses/ip-apiserver"},
+			expect: []string{"/subscriptions/sess/resourceGroups/rg/providers/Microsoft.Network/publicIPAddresses/eip-apiserver"},
 		},
 	}
 	for _, tt := range tests {
@@ -58,7 +58,7 @@ func TestFixupDepends(t *testing.T) {
 		}
 
 		fixupDepends(&cs.Properties.AzProfile, azuretemplate)
-		res := jsonpath.MustCompile("$.resources[?(@.name='lb-apiserver')]").MustGetObject(azuretemplate)
+		res := jsonpath.MustCompile("$.resources[?(@.name='elb-apiserver')]").MustGetObject(azuretemplate)
 		deps, found := res["dependsOn"].([]string)
 		if !found && len(tt.expect) > 0 {
 			t.Fatalf("expected %v, got %v", tt.expect, deps)

@@ -48,8 +48,8 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 		ContentVersion: "1.0.0.0",
 		Resources: []interface{}{
 			vnet(cs),
-			ipAPIServer(cs),
-			lbAPIServer(&g.pluginConfig, cs),
+			eipAPIServer(cs),
+			elbAPIServer(&g.pluginConfig, cs),
 			storageRegistry(cs),
 			nsgMaster(cs),
 		},
