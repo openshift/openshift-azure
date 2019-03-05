@@ -10,7 +10,8 @@ import (
 )
 
 func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster) (errs []error) {
-	if cs != nil && oldCs == nil {
+	if cs == nil || oldCs == nil {
+		errs = append(errs, fmt.Errorf("cs and oldCs cannot be nil"))
 		return
 	}
 	newAgents := make(map[string]*api.AgentPoolProfile)
@@ -35,7 +36,12 @@ func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster) (err
 	return errs
 }
 
-func validateUpdateConfig(internalConfig, adminConfig api.Config) (errs []error) {
+func validateUpdateConfig(internalConfig, adminConfig *api.Config) (errs []error) {
+	if internalConfig == nil || adminConfig == nil {
+		errs = append(errs, fmt.Errorf("internalConfig and adminConfig cannot be nil"))
+		return
+	}
+
 	if !reflect.DeepEqual(internalConfig, adminConfig) {
 		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(internalConfig, adminConfig)))
 	}

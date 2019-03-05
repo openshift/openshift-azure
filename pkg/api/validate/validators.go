@@ -101,7 +101,7 @@ func validateRouterProfiles(rps []api.RouterProfile, location string, externalOn
 		}
 		rpmap[rp.Name] = rp
 
-		errs = append(errs, validateRouterProfile(rp, location, externalOnly)...)
+		errs = append(errs, validateRouterProfile(&rp, location, externalOnly)...)
 	}
 	if !externalOnly {
 		for name := range validRouterProfileNames {
@@ -113,7 +113,12 @@ func validateRouterProfiles(rps []api.RouterProfile, location string, externalOn
 	return
 }
 
-func validateRouterProfile(rp api.RouterProfile, location string, externalOnly bool) (errs []error) {
+func validateRouterProfile(rp *api.RouterProfile, location string, externalOnly bool) (errs []error) {
+	if rp == nil {
+		errs = append(errs, fmt.Errorf("routerProfile cannot be nil"))
+		return
+	}
+
 	if rp.Name == "" {
 		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
 	}
@@ -148,7 +153,7 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile, vnet *net.IPNet) (er
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.subnetCidr %q: all subnetCidrs must match", app.SubnetCIDR))
 		}
 
-		errs = append(errs, validateAgentPoolProfile(app, vnet)...)
+		errs = append(errs, validateAgentPoolProfile(&app, vnet)...)
 	}
 
 	for role := range validAgentPoolProfileRoles {
@@ -164,7 +169,12 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile, vnet *net.IPNet) (er
 	return
 }
 
-func validateAgentPoolProfile(app api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {
+func validateAgentPoolProfile(app *api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {
+	if app == nil {
+		errs = append(errs, fmt.Errorf("agentPoolProfile cannot be nil"))
+		return
+	}
+
 	switch app.Role {
 	case api.AgentPoolProfileRoleCompute:
 		switch app.Name {
@@ -226,7 +236,7 @@ func validateAgentPoolProfile(app api.AgentPoolProfile, vnet *net.IPNet) (errs [
 
 func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 	if ap == nil {
-		errs = append(errs, fmt.Errorf("properties.authProfile cannot be nil"))
+		errs = append(errs, fmt.Errorf("authProfile cannot be nil"))
 		return
 	}
 
@@ -268,7 +278,12 @@ func validateFQDN(p *api.Properties, location string) (errs []error) {
 	return
 }
 
-func validateVMSize(app api.AgentPoolProfile, runningUnderTest bool) (errs []error) {
+func validateVMSize(app *api.AgentPoolProfile, runningUnderTest bool) (errs []error) {
+	if app == nil {
+		errs = append(errs, fmt.Errorf("agentPoolProfile cannot be nil"))
+		return
+	}
+
 	switch app.Role {
 	case api.AgentPoolProfileRoleMaster:
 		if !isValidMasterAndInfraVMSize(app.VMSize, runningUnderTest) {

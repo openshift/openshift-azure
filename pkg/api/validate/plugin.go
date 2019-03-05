@@ -16,6 +16,11 @@ func NewPluginAPIValidator() *PluginAPIValidator {
 
 // Validate validates an Plugin API external template/config struct
 func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
+	if t == nil {
+		errs = append(errs, fmt.Errorf("Config cannot be nil"))
+		return
+	}
+
 	if t.ImageOffer != "osa" {
 		errs = append(errs, fmt.Errorf("imageOffer should be osa"))
 	}
@@ -62,6 +67,11 @@ func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 }
 
 func (v *PluginAPIValidator) validatePluginTemplateImages(i *pluginapi.ImageConfig) (errs []error) {
+	if i == nil {
+		errs = append(errs, fmt.Errorf("imageConfig cannot be nil"))
+		return
+	}
+
 	if i.Format == "" {
 		errs = append(errs, fmt.Errorf("images.Format cannot be empty"))
 	}
@@ -151,6 +161,11 @@ func (v *PluginAPIValidator) validatePluginTemplateImages(i *pluginapi.ImageConf
 }
 
 func (v *PluginAPIValidator) validatePluginTemplateCertificates(c *pluginapi.CertificateConfig) (errs []error) {
+	if c == nil {
+		errs = append(errs, fmt.Errorf("certificateConfig cannot be nil"))
+		return
+	}
+
 	if c.GenevaLogging.Key == nil {
 		errs = append(errs, fmt.Errorf("GenevaLogging key cannot be empty"))
 	} else if err := c.GenevaLogging.Key.Validate(); err != nil {
