@@ -79,39 +79,8 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	// in the update path, the RP should have access to the previous internal
 	// API representation for comparison.
 	if !shared.IsUpdate() {
-		// If containerservice.yaml does not exist - it is Create call
-		// create DNS records only on first call and when user does not supply them
-		if cs.Properties.RouterProfiles[0].PublicSubdomain == "" {
-			log.Info("routeprofiles[0].publicsubdomain was empty, randomizing publicSubdomain and routerCName")
+		// create DNS records only on first call
 
-			// generate a random domain string
-			rDomain, err := random.LowerCaseAlphanumericString(20)
-			if err != nil {
-				return nil, err
-			}
-			publicSubdomain := fmt.Sprintf("%s.%s", rDomain, os.Getenv("DNS_DOMAIN"))
-
-			rrCName, err := random.LowerCaseAlphanumericString(20)
-			if err != nil {
-				return nil, err
-			}
-			// create router wildcard DNS CName
-			routerCName := fmt.Sprintf("osa%s.%s.%s", rrCName, cs.Location, "cloudapp.azure.com")
-
-			log.Info("routeprofiles[0].publicsubdomain was empty, creating dns")
-			err = CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"), publicSubdomain, routerCName)
-			if err != nil {
-				return nil, err
-			}
-
-			cs.Properties.RouterProfiles = []api.RouterProfile{
-				{
-					Name:            "default",
-					PublicSubdomain: publicSubdomain,
-					FQDN:            routerCName,
-				},
-			}
-		}
 		// the RP will enrich the internal API representation with data not included
 		// in the original request
 		log.Info("enrich")
@@ -119,6 +88,17 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		if err != nil {
 			return nil, err
 		}
+
+		dm, err := newDNSManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
+		if err != nil {
+			return nil, err
+		}
+
+		err = dm.createOCPDNS(ctx, cs)
+		if err != nil {
+			return nil, err
+		}
+
 	}
 
 	// validate the internal API representation (with reference to the previous
@@ -279,8 +259,28 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	// /subscriptions/{subscription}/resourcegroups/{resource_group}/providers/Microsoft.ContainerService/openshiftmanagedClusters/{cluster_name}
 	cs.ID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.ContainerService/openshiftmanagedClusters", cs.Name)
 
+	cs.Properties.RouterProfiles = []api.RouterProfile{
+		{
+			Name: "default",
+		},
+	}
+
 	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/PublicHostname"
 	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/Router"
+
+	cs.Properties.PublicHostname = "openshift." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
+	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
+
+	var err error
+	cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+	if err != nil {
+		return err
+	}
+
+	cs.Properties.RouterProfiles[0].FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

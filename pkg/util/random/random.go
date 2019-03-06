@@ -32,6 +32,11 @@ func LowerCaseAlphanumericString(n int) (string, error) {
 	return String("abcdefghijklmnopqrstuvwxyz0123456789", n)
 }
 
+// LowerCaseAlphaString returns a random string of length n comprised of [a-z]
+func LowerCaseAlphaString(n int) (string, error) {
+	return String("abcdefghijklmnopqrstuvwxyz", n)
+}
+
 // Bytes returns a random byte slice of legth n
 func Bytes(n int) ([]byte, error) {
 	b := make([]byte, n)
@@ -45,4 +50,15 @@ func Bytes(n int) ([]byte, error) {
 // storage account name
 func StorageAccountName() (string, error) {
 	return LowerCaseAlphanumericString(24)
+}
+
+// FQDN returns a random fully qualified domain name within a given parent
+// domain
+func FQDN(parentDomain string, n int) (string, error) {
+	d, err := LowerCaseAlphaString(n)
+	if err != nil {
+		return "", err
+	}
+
+	return d + "." + parentDomain, nil
 }
