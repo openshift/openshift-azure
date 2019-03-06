@@ -40,7 +40,7 @@ properties:
   agentPoolProfiles:
   - name: infra
     role: infra
-    count: 2
+    count: 3
     vmSize: Standard_D2s_v3
     osType: Linux
     subnetCidr: 10.0.0.0/24
