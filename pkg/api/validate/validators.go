@@ -62,9 +62,9 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
 	}
 
-	errs = append(errs, validateNetworkProfile(&p.NetworkProfile)...)
+	errs = append(errs, validateNetworkProfile("properties.networkProfile", &p.NetworkProfile)...)
 
-	errs = append(errs, validateRouterProfiles(p.RouterProfiles, location, externalOnly)...)
+	errs = append(errs, validateRouterProfiles("properties.routerProfiles", p.RouterProfiles, location, externalOnly)...)
 
 	// we can disregard any error below because we are already going to fail
 	// validation if VnetCIDR does not parse correctly.
@@ -72,14 +72,14 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 
 	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
 
-	errs = append(errs, validateAuthProfile(&p.AuthProfile)...)
+	errs = append(errs, validateAuthProfile("properties.authProfile", &p.AuthProfile)...)
 
 	if !externalOnly {
 		errs = append(errs, validateServicePrincipalProfile("properties.masterServicePrincipalProfile", &p.MasterServicePrincipalProfile)...)
 
 		errs = append(errs, validateServicePrincipalProfile("properties.workerServicePrincipalProfile", &p.WorkerServicePrincipalProfile)...)
 
-		errs = append(errs, validateAzProfile(&p.AzProfile)...)
+		errs = append(errs, validateAzProfile("properties.azProfile", &p.AzProfile)...)
 
 		errs = append(errs, validateCertProfile("properties.apiCertProfile", &p.APICertProfile)...)
 	}
@@ -87,41 +87,41 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 	return
 }
 
-func validateNetworkProfile(np *api.NetworkProfile) (errs []error) {
+func validateNetworkProfile(path string, np *api.NetworkProfile) (errs []error) {
 	if np == nil {
-		errs = append(errs, fmt.Errorf("networkProfile cannot be nil"))
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
 		return
 	}
 
 	if !isValidIPV4CIDR(np.VnetCIDR) {
-		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetCidr %q", np.VnetCIDR))
+		errs = append(errs, fmt.Errorf("invalid %s.vnetCidr %q", path, np.VnetCIDR))
 	}
 
 	if np.VnetID != "" && !rxVNetID.MatchString(np.VnetID) {
-		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetId %q", np.VnetID))
+		errs = append(errs, fmt.Errorf("invalid %s.vnetId %q", path, np.VnetID))
 	}
 
 	if np.PeerVnetID != nil && !rxVNetID.MatchString(*np.PeerVnetID) {
-		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.peerVnetId %q", *np.PeerVnetID))
+		errs = append(errs, fmt.Errorf("invalid %s.peerVnetId %q", path, *np.PeerVnetID))
 	}
 
 	return
 }
 
-func validateRouterProfiles(rps []api.RouterProfile, location string, externalOnly bool) (errs []error) {
+func validateRouterProfiles(path string, rps []api.RouterProfile, location string, externalOnly bool) (errs []error) {
 	rpmap := map[string]api.RouterProfile{}
 
 	for _, rp := range rps {
 		if _, found := validRouterProfileNames[rp.Name]; !found {
-			errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q]", rp.Name))
+			errs = append(errs, fmt.Errorf("invalid %s[%q]", path, rp.Name))
 		}
 
 		if _, found := rpmap[rp.Name]; found {
-			errs = append(errs, fmt.Errorf("duplicate properties.routerProfiles[%q]", rp.Name))
+			errs = append(errs, fmt.Errorf("duplicate %s[%q]", path, rp.Name))
 		}
 		rpmap[rp.Name] = rp
 
-		errs = append(errs, validateRouterProfile(fmt.Sprintf("properties.routerProfiles[%q]", rp.Name), &rp, location, externalOnly)...)
+		errs = append(errs, validateRouterProfile(fmt.Sprintf("%s[%q]", path, rp.Name), &rp, location, externalOnly)...)
 	}
 
 	// a bit questionable: seems that we allow a user to PUT empty
@@ -131,7 +131,7 @@ func validateRouterProfiles(rps []api.RouterProfile, location string, externalOn
 	if !externalOnly {
 		for name := range validRouterProfileNames {
 			if _, found := rpmap[name]; !found {
-				errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q]", name))
+				errs = append(errs, fmt.Errorf("invalid %s[%q]", path, name))
 			}
 		}
 	}
@@ -141,7 +141,7 @@ func validateRouterProfiles(rps []api.RouterProfile, location string, externalOn
 
 func validateRouterProfile(path string, rp *api.RouterProfile, location string, externalOnly bool) (errs []error) {
 	if rp == nil {
-		errs = append(errs, fmt.Errorf("routerProfile cannot be nil"))
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
 		return
 	}
 
@@ -280,37 +280,37 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile, vnet *net.IPNet) (errs 
 	return
 }
 
-func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
+func validateAuthProfile(path string, ap *api.AuthProfile) (errs []error) {
 	if ap == nil {
-		errs = append(errs, fmt.Errorf("authProfile cannot be nil"))
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
 		return
 	}
 
 	if len(ap.IdentityProviders) != 1 {
-		errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders length"))
+		errs = append(errs, fmt.Errorf("invalid %s.identityProviders length", path))
 	}
 
 	//check supported identity providers
 	for _, ip := range ap.IdentityProviders {
 		if ip.Name != "Azure AD" {
-			errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q]", ip.Name))
+			errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q]", path, ip.Name))
 		}
 		switch provider := ip.Provider.(type) {
 		case (*api.AADIdentityProvider):
 			if provider.Kind != "AADIdentityProvider" {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q].kind %q", ip.Name, provider.Kind))
+				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].kind %q", path, ip.Name, provider.Kind))
 			}
 			if !isValidUUID(provider.ClientID) {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q].clientId %q", ip.Name, provider.ClientID))
+				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].clientId %q", path, ip.Name, provider.ClientID))
 			}
 			if provider.Secret == "" {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q].secret %q", ip.Name, provider.Secret))
+				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].secret %q", path, ip.Name, provider.Secret))
 			}
 			if !isValidUUID(provider.TenantID) {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q].tenantId %q", ip.Name, provider.TenantID))
+				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].tenantId %q", path, ip.Name, provider.TenantID))
 			}
 			if provider.CustomerAdminGroupID != nil && !isValidUUID(*provider.CustomerAdminGroupID) {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q].customerAdminGroupId %q", ip.Name, *provider.CustomerAdminGroupID))
+				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].customerAdminGroupId %q", path, ip.Name, *provider.CustomerAdminGroupID))
 			}
 		}
 	}
@@ -334,22 +334,22 @@ func validateServicePrincipalProfile(path string, p *api.ServicePrincipalProfile
 	return
 }
 
-func validateAzProfile(a *api.AzProfile) (errs []error) {
+func validateAzProfile(path string, a *api.AzProfile) (errs []error) {
 	if a == nil {
-		errs = append(errs, fmt.Errorf("azProfile cannot be nil"))
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
 		return
 	}
 
 	if !isValidUUID(a.TenantID) {
-		errs = append(errs, fmt.Errorf("invalid properties.azProfile.tenantId %q", a.TenantID))
+		errs = append(errs, fmt.Errorf("invalid %s.tenantId %q", path, a.TenantID))
 	}
 
 	if !isValidUUID(a.SubscriptionID) {
-		errs = append(errs, fmt.Errorf("invalid properties.azProfile.subscriptionId %q", a.SubscriptionID))
+		errs = append(errs, fmt.Errorf("invalid %s.subscriptionId %q", path, a.SubscriptionID))
 	}
 
 	if !rxResourceGroupName.MatchString(a.ResourceGroup) {
-		errs = append(errs, fmt.Errorf("invalid properties.azProfile.resourceGroup %q", a.ResourceGroup))
+		errs = append(errs, fmt.Errorf("invalid %s.resourceGroup %q", path, a.ResourceGroup))
 	}
 
 	return
