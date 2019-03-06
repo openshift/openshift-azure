@@ -52,11 +52,11 @@ type loggingSender struct {
 
 func (ls *loggingSender) Do(req *http.Request) (*http.Response, error) {
 	b, _ := httputil.DumpRequestOut(req, true)
-	os.Stdout.Write(b)
+	fmt.Printf("%s\n\n", string(b))
 	resp, err := ls.Sender.Do(req)
 	if resp != nil {
 		b, _ = httputil.DumpResponse(resp, true)
-		os.Stdout.Write(b)
+		fmt.Printf("%s\n\n", string(b))
 	}
 	return resp, err
 }
