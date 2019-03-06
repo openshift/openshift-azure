@@ -74,11 +74,19 @@ var (
 		api.StandardF16sV2: {},
 		api.StandardF32sV2: {},
 	}
-)
 
-var (
 	clusterNetworkCIDR *net.IPNet
 	serviceNetworkCIDR *net.IPNet
+
+	validAgentPoolProfileRoles = map[api.AgentPoolProfileRole]struct{}{
+		api.AgentPoolProfileRoleCompute: {},
+		api.AgentPoolProfileRoleInfra:   {},
+		api.AgentPoolProfileRoleMaster:  {},
+	}
+
+	validRouterProfileNames = map[string]struct{}{
+		"default": {},
+	}
 )
 
 func init() {
@@ -94,16 +102,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-var validAgentPoolProfileRoles = map[api.AgentPoolProfileRole]struct{}{
-	api.AgentPoolProfileRoleCompute: {},
-	api.AgentPoolProfileRoleInfra:   {},
-	api.AgentPoolProfileRoleMaster:  {},
-}
-
-var validRouterProfileNames = map[string]struct{}{
-	"default": {},
 }
 
 func isValidHostname(h string) bool {
