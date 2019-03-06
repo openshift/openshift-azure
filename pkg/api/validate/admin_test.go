@@ -38,7 +38,7 @@ func TestAdminAPIValidate(t *testing.T) {
 			test.f(cs)
 		}
 		v := AdminAPIValidator{}
-		errs := v.Validate(cs, nil, false)
+		errs := v.Validate(cs, nil)
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
 			t.Logf("test case %q", name)
 			t.Errorf("expected errors:")

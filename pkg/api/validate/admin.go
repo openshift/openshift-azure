@@ -18,7 +18,7 @@ func NewAdminValidator(runningUnderTest bool) *AdminAPIValidator {
 }
 
 // Validate validates a OpenShiftManagedCluster struct
-func (v *AdminAPIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
+func (v *AdminAPIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster) (errs []error) {
 	// TODO are these error messages confusing since they may not correspond with the external model?
 	if cs == nil {
 		errs = append(errs, fmt.Errorf("cs cannot be nil"))
@@ -30,7 +30,7 @@ func (v *AdminAPIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster, ext
 		return
 	}
 
-	errs = append(errs, validateContainerService(cs, externalOnly)...)
+	errs = append(errs, validateContainerService(cs, false)...)
 
 	errs = append(errs, validateUpdateContainerService(cs, oldCs)...)
 

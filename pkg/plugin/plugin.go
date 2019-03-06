@@ -51,7 +51,7 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManagedCluster) []error {
 	p.log.Info("validating internal admin data models")
 	validator := validate.NewAdminValidator(p.config.TestConfig.RunningUnderTest)
-	return validator.Validate(new, old, false)
+	return validator.Validate(new, old)
 }
 
 func (p *plugin) ValidatePluginTemplate(ctx context.Context, template *pluginapi.Config) []error {
