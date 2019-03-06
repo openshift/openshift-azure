@@ -1,0 +1,36 @@
+name: "{{ .Env.RESOURCEGROUP }}"
+location: "{{ .Env.AZURE_REGION }}"
+properties:
+  openShiftVersion: "{{ .Env.DEPLOY_VERSION }}"
+  fqdn: "{{ .Env.RESOURCEGROUP }}.{{ .Env.AZURE_REGION }}.cloudapp.azure.com"
+  authProfile:
+    identityProviders:
+    - name: Azure AD
+      provider:
+        kind: AADIdentityProvider
+        clientId: "{{ .Env.AZURE_AAD_CLIENT_ID }}"
+        secret: "{{ .Env.AZURE_AAD_CLIENT_SECRET }}"
+        tenantId: "{{ .Env.AZURE_TENANT_ID }}"
+  networkProfile:
+    vnetCidr: 10.0.0.0/8
+  routerProfiles:
+  - name: default
+    publicSubdomain: "{{ .Env.ROUTER_SUBDOMAIN }}"
+    fqdn: "{{ .Env.ROUTER_FQDN }}"
+  masterPoolProfile:
+    count: 3
+    vmSize: Standard_D4s_v3
+    subnetCidr: 10.0.0.0/24
+  agentPoolProfiles:
+  - name: infra
+    role: infra
+    count: 2
+    vmSize: Standard_D4s_v3
+    subnetCidr: 10.0.0.0/24
+    osType: Linux
+  - name: compute
+    role: compute
+    count: 1
+    vmSize: Standard_D4s_v3
+    subnetCidr: 10.0.0.0/24
+    osType: Linux
