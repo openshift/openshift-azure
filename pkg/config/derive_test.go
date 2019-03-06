@@ -147,31 +147,6 @@ func TestDerivedRouterLBCNamePrefix(t *testing.T) {
 	}
 }
 
-func TestDerivedPublicHostname(t *testing.T) {
-	tests := []struct {
-		cs   api.OpenShiftManagedCluster
-		want string
-	}{
-		{
-			cs: api.OpenShiftManagedCluster{
-				Properties: api.Properties{FQDN: "bar", PublicHostname: "baar"},
-			},
-			want: "baar",
-		},
-		{
-			cs: api.OpenShiftManagedCluster{
-				Properties: api.Properties{FQDN: "bar", PublicHostname: ""},
-			},
-			want: "bar",
-		},
-	}
-	for _, tt := range tests {
-		if got := Derived.PublicHostname(&tt.cs); got != tt.want {
-			t.Errorf("derived.PublicHostname() = %v, want %v", got, tt.want)
-		}
-	}
-}
-
 func TestDerivedKubeAndSystemReserved(t *testing.T) {
 	tests := []struct {
 		cs        api.OpenShiftManagedCluster

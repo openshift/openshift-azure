@@ -151,12 +151,12 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'console-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.developerConsolePublicURL"),
-			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}/console/",
+			Template:   "https://{{ .ContainerService.Properties.PublicHostname }}/console/",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'console-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.masterPublicURL"),
-			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}",
+			Template:   "https://{{ .ContainerService.Properties.PublicHostname }}",
 		},
 	},
 	"ConfigMap/openshift-ansible-service-broker/broker-config": {
@@ -201,7 +201,7 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.prometheusK8s.externalLabels.cluster"),
-			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}",
+			Template:   "https://{{ .ContainerService.Properties.PublicHostname }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
@@ -326,12 +326,12 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.consolePublicURL"),
-			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}/console/",
+			Template:   "https://{{ .ContainerService.Properties.PublicHostname }}/console/",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.masterPublicURL"),
-			Template:   "https://{{ .Derived.PublicHostname .ContainerService }}",
+			Template:   "https://{{ .ContainerService.Properties.PublicHostname }}",
 		},
 	},
 	"CronJob.batch/openshift-etcd/etcd-backup": {
@@ -445,7 +445,7 @@ var Translations = map[string][]struct {
 	"Deployment.apps/default/registry-console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='OPENSHIFT_OAUTH_PROVIDER_URL')].value"),
-			Template: "https://{{ .Derived.PublicHostname .ContainerService }}",
+			Template: "https://{{ .ContainerService.Properties.PublicHostname }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='REGISTRY_HOST')].value"),

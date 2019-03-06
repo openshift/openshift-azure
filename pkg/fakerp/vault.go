@@ -11,7 +11,6 @@ import (
 	"github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
@@ -26,8 +25,6 @@ func vaultURL(rg string) string {
 }
 
 func writeTLSCertsToVault(ctx context.Context, kvc azureclient.KeyVaultClient, cs *api.OpenShiftManagedCluster, vaultURL string) error {
-	publicHostname := config.Derived.PublicHostname(cs)
-
 	certs := []struct {
 		vaultKeyName string
 		params       tls.CertParams
@@ -45,17 +42,14 @@ func writeTLSCertsToVault(ctx context.Context, kvc azureclient.KeyVaultClient, c
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			},
 		},
-		// Do not attempt to make the OpenShift console certificate self-signed
-		// if cs.Properties == cs.FQDN:
-		// https://github.com/openshift/openshift-azure/issues/307
 		{
 			vaultKeyName: "PublicHostname",
 			params: tls.CertParams{
 				Subject: pkix.Name{
-					CommonName: publicHostname,
+					CommonName: cs.Properties.PublicHostname,
 				},
 				DNSNames: []string{
-					publicHostname,
+					cs.Properties.PublicHostname,
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			},

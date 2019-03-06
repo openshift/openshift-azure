@@ -118,7 +118,7 @@ masterClients:
     contentType: application/vnd.kubernetes.protobuf
     qps: 300
   openshiftLoopbackKubeConfig: openshift-master.kubeconfig
-masterPublicURL: {{ print "https://" (.Derived.PublicHostname .ContainerService) | quote }}
+masterPublicURL: {{ print "https://" .ContainerService.Properties.PublicHostname | quote }}
 networkConfig:
   clusterNetworks:
   - cidr: 10.128.0.0/14
@@ -128,7 +128,7 @@ networkConfig:
   networkPluginName: redhat/openshift-ovs-networkpolicy
   serviceNetworkCIDR: 172.30.0.0/16
 oauthConfig:
-  assetPublicURL: {{ print "https://" (.Derived.PublicHostname .ContainerService) "/console/" | quote }}
+  assetPublicURL: {{ print "https://" .ContainerService.Properties.PublicHostname "/console/" | quote }}
   grantConfig:
     method: auto
   identityProviders:
@@ -153,7 +153,7 @@ oauthConfig:
         authorize: {{ print "https://login.microsoftonline.com/" (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.TenantID "/oauth2/authorize" | quote }}
         token: {{ print "https://login.microsoftonline.com/" (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.TenantID "/oauth2/token" | quote }}
   masterCA: ca.crt
-  masterPublicURL: {{ print "https://" (.Derived.PublicHostname .ContainerService) | quote }}
+  masterPublicURL: {{ print "https://" .ContainerService.Properties.PublicHostname | quote }}
   masterURL: {{ print "https://" .ContainerService.Properties.FQDN | quote }}
   sessionConfig:
     sessionMaxAgeSeconds: 3600
@@ -191,6 +191,6 @@ servingInfo:
    - certFile: /etc/origin/master/named/console.crt
      keyFile: /etc/origin/master/named/console.key
      names:
-      - {{ .Derived.PublicHostname .ContainerService | quote }}
+      - {{ .ContainerService.Properties.PublicHostname | quote }}
 volumeConfig:
   dynamicProvisioningEnabled: true

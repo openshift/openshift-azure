@@ -66,13 +66,6 @@ func (derived) KubeReserved(cs *api.OpenShiftManagedCluster, role api.AgentPoolP
 	return "", fmt.Errorf("role %s not found", role)
 }
 
-func (derived) PublicHostname(cs *api.OpenShiftManagedCluster) string {
-	if cs.Properties.PublicHostname != "" {
-		return cs.Properties.PublicHostname
-	}
-	return cs.Properties.FQDN
-}
-
 func (derived) RegistryURL(cs *api.OpenShiftManagedCluster) string {
 	return strings.Split(cs.Config.Images.Format, "/")[0]
 }
