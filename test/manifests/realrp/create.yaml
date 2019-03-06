@@ -1,22 +1,22 @@
-name: "{{ .Env.RESOURCEGROUP }}"
-location: "{{ .Env.AZURE_REGION }}"
+name: {{ Getenv "RESOURCEGROUP" | quote }}
+location: {{ Getenv "AZURE_REGION" | quote }}
 properties:
-  openShiftVersion: "{{ .Env.DEPLOY_VERSION }}"
-  fqdn: "{{ .Env.RESOURCEGROUP }}.{{ .Env.AZURE_REGION }}.cloudapp.azure.com"
+  openShiftVersion: {{ Getenv "DEPLOY_VERSION" | quote }}
+  fqdn: {{ print (Getenv "RESOURCEGROUP) "." (Getenv "AZURE_REGION") ".cloudapp.azure.com" | quote }}
   authProfile:
     identityProviders:
     - name: Azure AD
       provider:
         kind: AADIdentityProvider
-        clientId: "{{ .Env.AZURE_AAD_CLIENT_ID }}"
-        secret: "{{ .Env.AZURE_AAD_CLIENT_SECRET }}"
-        tenantId: "{{ .Env.AZURE_TENANT_ID }}"
+        clientId: {{ Getenv "AZURE_AAD_CLIENT_ID" | quote }}
+        secret: {{ Getenv "AZURE_AAD_CLIENT_SECRET" | quote }}
+        tenantId: {{ Getenv "AZURE_TENANT_ID" | quote }}
   networkProfile:
     vnetCidr: 10.0.0.0/8
   routerProfiles:
   - name: default
-    publicSubdomain: "{{ .Env.ROUTER_SUBDOMAIN }}"
-    fqdn: "{{ .Env.ROUTER_FQDN }}"
+    publicSubdomain: {{ Getenv "ROUTER_SUBDOMAIN" | quote }}
+    fqdn: {{ Getenv "ROUTER_FQDN" | quote }}
   masterPoolProfile:
     count: 3
     vmSize: Standard_D4s_v3

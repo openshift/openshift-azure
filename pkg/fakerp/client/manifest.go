@@ -1,27 +1,17 @@
 package client
 
 import (
-	"bytes"
-	"html/template"
 	"io/ioutil"
 	"os"
-	"strings"
+	"text/template"
 
 	"github.com/ghodss/yaml"
-	"github.com/pkg/errors"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
+	utiltemplate "github.com/openshift/openshift-azure/pkg/util/template"
 )
-
-func readEnv() map[string]string {
-	env := make(map[string]string)
-	for _, setting := range os.Environ() {
-		pair := strings.SplitN(setting, "=", 2)
-		env[pair[0]] = pair[1]
-	}
-	return env
-}
 
 // WriteClusterConfigToManifest write to file
 func WriteClusterConfigToManifest(oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) error {
@@ -37,19 +27,20 @@ func WriteClusterConfigToManifest(oc *v20180930preview.OpenShiftManagedCluster, 
 // and updates. If the provided manifest is templatized, it will be
 // parsed appropriately.
 func GenerateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCluster, error) {
-	t, err := template.ParseFiles(manifestFile)
+	b, err := ioutil.ReadFile(manifestFile)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed parsing the manifest %s", manifestFile)
+		return nil, err
 	}
 
-	b := &bytes.Buffer{}
-	err = t.Execute(b, struct{ Env map[string]string }{Env: readEnv()})
+	b, err = utiltemplate.Template(string(b), template.FuncMap{
+		"Getenv": os.Getenv,
+	}, &api.OpenShiftManagedCluster{}, nil)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed templating the manifest")
+		return nil, err
 	}
 
 	oc := &v20180930preview.OpenShiftManagedCluster{}
-	if err = yaml.Unmarshal(b.Bytes(), oc); err != nil {
+	if err = yaml.Unmarshal(b, oc); err != nil {
 		return nil, err
 	}
 
@@ -64,19 +55,20 @@ func GenerateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCl
 // If the provided manifest is templatized, it will be parsed
 // appropriately.
 func GenerateManifestAdmin(manifestFile string) (*admin.OpenShiftManagedCluster, error) {
-	t, err := template.ParseFiles(manifestFile)
+	b, err := ioutil.ReadFile(manifestFile)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed parsing the manifest %s", manifestFile)
+		return nil, err
 	}
 
-	b := &bytes.Buffer{}
-	err = t.Execute(b, struct{ Env map[string]string }{Env: readEnv()})
+	b, err = utiltemplate.Template(string(b), template.FuncMap{
+		"Getenv": os.Getenv,
+	}, &api.OpenShiftManagedCluster{}, nil)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed templating the manifest")
+		return nil, err
 	}
 
 	oc := &admin.OpenShiftManagedCluster{}
-	if err = yaml.Unmarshal(b.Bytes(), oc); err != nil {
+	if err = yaml.Unmarshal(b, oc); err != nil {
 		return nil, err
 	}
 
