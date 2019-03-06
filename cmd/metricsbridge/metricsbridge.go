@@ -22,6 +22,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 
+	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/statsd"
 )
@@ -48,7 +49,7 @@ func (rt authorizingRoundTripper) RoundTrip(req *http.Request) (*http.Response, 
 	return rt.RoundTripper.RoundTrip(req)
 }
 
-type config struct {
+type metricsbridgeConfig struct {
 	Interval           time.Duration `json:"intervalNanoseconds,omitempty"`
 	PrometheusEndpoint string        `json:"prometheusEndpoint,omitempty"`
 	StatsdSocket       string        `json:"statsdSocket,omitempty"`
@@ -76,7 +77,7 @@ type config struct {
 	conn       net.Conn
 }
 
-func (c *config) load(path string) error {
+func (c *metricsbridgeConfig) load(path string) error {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
@@ -108,7 +109,7 @@ func (c *config) load(path string) error {
 	return nil
 }
 
-func (c *config) defaultAndValidate() (errs []error) {
+func (c *metricsbridgeConfig) defaultAndValidate() (errs []error) {
 	if c.Interval == 0 {
 		c.Interval = time.Minute
 	}
@@ -129,7 +130,7 @@ func (c *config) defaultAndValidate() (errs []error) {
 	return
 }
 
-func (c *config) init() error {
+func (c *metricsbridgeConfig) init() error {
 	for {
 		var err error
 		c.conn, err = net.Dial("unix", c.StatsdSocket)
@@ -170,7 +171,7 @@ func (c *config) init() error {
 }
 
 func run(log *logrus.Entry, configpath string) error {
-	c := &config{log: log}
+	c := &metricsbridgeConfig{log: log}
 
 	if err := c.load(configpath); err != nil {
 		return err
@@ -197,7 +198,7 @@ func run(log *logrus.Entry, configpath string) error {
 	return c.run()
 }
 
-func (c *config) run() error {
+func (c *metricsbridgeConfig) run() error {
 	t := time.NewTicker(c.Interval)
 	defer t.Stop()
 
@@ -209,9 +210,17 @@ func (c *config) run() error {
 	}
 }
 
-func (c *config) runOnce(ctx context.Context) error {
+func (c *metricsbridgeConfig) runOnce(ctx context.Context) error {
 	var metricsCount int
+	hostnameMap := make(map[string]string)
 
+	value, err := c.prometheus.Query(ctx, "node_uname_info", time.Time{})
+	if err != nil {
+		return err
+	}
+	for _, nodeSample := range value.(model.Vector) {
+		hostnameMap[strings.Split(string(nodeSample.Metric["instance"]), ":")[0]] = string(nodeSample.Metric["nodename"])
+	}
 	for _, query := range c.Queries {
 		value, err := c.prometheus.Query(ctx, query.Query, time.Time{})
 		if err != nil {
@@ -233,6 +242,15 @@ func (c *config) runOnce(ctx context.Context) error {
 			for k, v := range sample.Metric {
 				if k != model.MetricNameLabel {
 					f.Dims[string(k)] = string(v)
+				}
+			}
+			//if there's an instance dimension try to lookup the hostname
+			if instance, found := sample.Metric["instance"]; found {
+				hostname, present := hostnameMap[strings.Split(string(instance), ":")[0]]
+				if present {
+					//only add the hostname dimension if the lookup succeeds
+					f.Dims["hostname"] = hostname
+					f.Dims["agentrole"] = config.GetAgentRole(hostname)
 				}
 			}
 			if c.Region != "" {

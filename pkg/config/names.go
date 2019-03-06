@@ -8,6 +8,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
+//MasterScalesetName contains the name of the master VMs scaleset
 const MasterScalesetName = "ss-master"
 
 // GetScalesetName returns the VMSS name for a given AgentPoolProfile
@@ -52,4 +53,14 @@ func GetScaleSetNameAndInstanceID(hostname string) (string, string, error) {
 	}
 
 	return "ss-" + hostname[:i], fmt.Sprintf("%d", instanceID), nil
+}
+
+// GetAgentRole parses a hostname, e.g. master-000000 or infra-12345-000000
+// and returns the lowercase role name ("master", "infra" or "compute")
+func GetAgentRole(hostname string) string {
+	hostnameprefix := strings.Split(hostname, "-")[0]
+	if hostnameprefix == "master" || hostnameprefix == "infra" {
+		return hostnameprefix
+	}
+	return "compute"
 }
