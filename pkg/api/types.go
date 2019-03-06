@@ -37,13 +37,10 @@ type Properties struct {
 	// `v3.11`.
 	OpenShiftVersion string `json:"openShiftVersion,omitempty"`
 
-	// PublicHostname (in,optional): Optional user-specified FQDN for OpenShift
-	// API server.  If specified, after OSA cluster creation, user must create a
-	// PublicHostname CNAME record forwarding to the returned FQDN value.
+	// PublicHostname (out): public hostname of OpenShift API server.
 	PublicHostname string `json:"publicHostname,omitempty"`
 
-	// FQDN (in): FQDN for OpenShift API server.  User-specified FQDN for
-	// OpenShift API server loadbalancer internal hostname.
+	// FQDN (out): Auto-allocated internal FQDN for OpenShift API server.
 	FQDN string `json:"fqdn,omitempty"`
 
 	// NetworkProfile (in): Configuration for OpenShift networking.
@@ -114,15 +111,12 @@ type NetworkProfile struct {
 type RouterProfile struct {
 	Name string `json:"name,omitempty"`
 
-	// PublicSubdomain (in,optional/out): DNS subdomain for OpenShift router. If
-	// specified, after OSA cluster creation, user must create a (wildcard)
-	// *.PublicSubdomain CNAME record forwarding to the returned FQDN value.  If
-	// not specified, OSA will auto-allocate and setup a PublicSubdomain and
-	// return it.  The OpenShift master is configured with the PublicSubdomain
-	// of the "default" RouterProfile.
+	// PublicSubdomain (out): DNS subdomain for OpenShift router.  The OpenShift
+	// master is configured with the PublicSubdomain of the "default"
+	// RouterProfile.
 	PublicSubdomain string `json:"publicSubdomain,omitempty"`
 
-	// FQDN (out): Auto-allocated FQDN for the OpenShift router.
+	// FQDN (out): Auto-allocated internal FQDN for the OpenShift router.
 	FQDN string `json:"fqdn,omitempty"`
 
 	// RouterCertProfile (in, optional): configures OpenShift Router certificate
