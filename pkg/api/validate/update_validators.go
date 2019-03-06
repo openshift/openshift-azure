@@ -38,14 +38,14 @@ func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster) (err
 	return
 }
 
-func validateUpdateConfig(internalConfig, adminConfig *api.Config) (errs []error) {
-	if internalConfig == nil || adminConfig == nil {
-		errs = append(errs, fmt.Errorf("internalConfig and adminConfig cannot be nil"))
+func validateUpdateConfig(config, oldConfig *api.Config) (errs []error) {
+	if config == nil || oldConfig == nil {
+		errs = append(errs, fmt.Errorf("internalConfig and oldConfig cannot be nil"))
 		return
 	}
 
-	if !reflect.DeepEqual(internalConfig, adminConfig) {
-		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(internalConfig, adminConfig)))
+	if !reflect.DeepEqual(config, oldConfig) {
+		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(config, oldConfig)))
 	}
 
 	return

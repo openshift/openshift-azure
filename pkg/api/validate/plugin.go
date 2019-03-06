@@ -15,66 +15,66 @@ func NewPluginAPIValidator() *PluginAPIValidator {
 }
 
 // Validate validates an Plugin API external template/config struct
-func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
-	if t == nil {
+func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
+	if c == nil {
 		errs = append(errs, fmt.Errorf("Config cannot be nil"))
 		return
 	}
 
-	if !clusterVersion.MatchString(t.ClusterVersion) {
-		errs = append(errs, fmt.Errorf("invalid ClusterVersion %q", t.ClusterVersion))
+	if !rxClusterVersion.MatchString(c.ClusterVersion) {
+		errs = append(errs, fmt.Errorf("invalid ClusterVersion %q", c.ClusterVersion))
 	}
 
-	if t.ImageOffer != "osa" {
+	if c.ImageOffer != "osa" {
 		errs = append(errs, fmt.Errorf("imageOffer should be osa"))
 	}
 
-	if t.ImagePublisher != "redhat" {
+	if c.ImagePublisher != "redhat" {
 		errs = append(errs, fmt.Errorf("imagePublisher should be redhat"))
 	}
 
-	switch t.ImageSKU {
+	switch c.ImageSKU {
 	case "osa_311":
 	default:
-		errs = append(errs, fmt.Errorf("invalid ImageSKU %q", t.ImageSKU))
+		errs = append(errs, fmt.Errorf("invalid ImageSKU %q", c.ImageSKU))
 	}
 
-	if !imageVersion.MatchString(t.ImageVersion) {
-		errs = append(errs, fmt.Errorf("invalid ImageVersion %q", t.ImageVersion))
+	if !rxImageVersion.MatchString(c.ImageVersion) {
+		errs = append(errs, fmt.Errorf("invalid ImageVersion %q", c.ImageVersion))
 	}
 
-	errs = append(errs, v.validatePluginTemplateCertificates(&t.Certificates)...)
+	errs = append(errs, v.validateCertificateConfig(&c.Certificates)...)
 
-	errs = append(errs, v.validatePluginTemplateImages(&t.Images)...)
+	errs = append(errs, v.validateImageConfig(&c.Images)...)
 
-	if t.GenevaLoggingSector == "" {
+	if c.GenevaLoggingSector == "" {
 		errs = append(errs, fmt.Errorf("genevaLoggingSector cannot be empty"))
 	}
 
-	if t.GenevaLoggingAccount == "" {
+	if c.GenevaLoggingAccount == "" {
 		errs = append(errs, fmt.Errorf("genevaLoggingAccount cannot be empty"))
 	}
 
-	if t.GenevaLoggingNamespace == "" {
+	if c.GenevaLoggingNamespace == "" {
 		errs = append(errs, fmt.Errorf("genevaLoggingNamespace cannot be empty"))
 	}
 
-	if t.GenevaLoggingControlPlaneAccount == "" {
+	if c.GenevaLoggingControlPlaneAccount == "" {
 		errs = append(errs, fmt.Errorf("genevaLoggingControlPlaneAccount cannot be empty"))
 	}
 
-	if t.GenevaMetricsAccount == "" {
+	if c.GenevaMetricsAccount == "" {
 		errs = append(errs, fmt.Errorf("genevaMetricsAccount cannot be empty"))
 	}
 
-	if t.GenevaMetricsEndpoint == "" {
+	if c.GenevaMetricsEndpoint == "" {
 		errs = append(errs, fmt.Errorf("genevaMetricsEndpoint cannot be empty"))
 	}
 
 	return
 }
 
-func (v *PluginAPIValidator) validatePluginTemplateImages(i *pluginapi.ImageConfig) (errs []error) {
+func (v *PluginAPIValidator) validateImageConfig(i *pluginapi.ImageConfig) (errs []error) {
 	if i == nil {
 		errs = append(errs, fmt.Errorf("imageConfig cannot be nil"))
 		return
@@ -195,7 +195,7 @@ func (v *PluginAPIValidator) validatePluginTemplateImages(i *pluginapi.ImageConf
 	return
 }
 
-func (v *PluginAPIValidator) validatePluginTemplateCertificates(c *pluginapi.CertificateConfig) (errs []error) {
+func (v *PluginAPIValidator) validateCertificateConfig(c *pluginapi.CertificateConfig) (errs []error) {
 	if c == nil {
 		errs = append(errs, fmt.Errorf("certificateConfig cannot be nil"))
 		return
