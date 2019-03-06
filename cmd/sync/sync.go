@@ -85,7 +85,7 @@ func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
 
 	v := validate.NewAPIValidator(cs.Config.RunningUnderTest)
 	if errs := v.Validate(cs, nil, false); len(errs) > 0 {
-		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate _data/manifest.yaml")
+		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate config blob")
 	}
 
 	if err := addons.Main(ctx, s.log, cs, s.azs, *dryRun); err != nil {

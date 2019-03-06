@@ -76,17 +76,17 @@ func delete(ctx context.Context, log *logrus.Entry, rpc v20180930previewclient.O
 	return nil
 }
 
-func createOrUpdatev20180930preview(ctx context.Context, log *logrus.Entry, rpc v20180930previewclient.OpenShiftManagedClustersClient, resourceGroup string, oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) error {
+func createOrUpdatev20180930preview(ctx context.Context, log *logrus.Entry, rpc v20180930previewclient.OpenShiftManagedClustersClient, resourceGroup string, oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) (*v20180930preview.OpenShiftManagedCluster, error) {
 	log.Info("creating/updating cluster")
 	resp, err := rpc.CreateOrUpdateAndWait(ctx, resourceGroup, resourceGroup, *oc)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected response: %s", resp.Status)
+		return nil, fmt.Errorf("unexpected response: %s", resp.Status)
 	}
 	log.Info("created/updated cluster")
-	return fakerp.WriteClusterConfigToManifest(&resp, manifestFile)
+	return &resp, nil
 }
 
 func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, rpc adminclient.OpenShiftManagedClustersClient, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) error {
@@ -116,19 +116,19 @@ func execute(
 	rpc v20180930previewclient.OpenShiftManagedClustersClient,
 	conf *fakerp.Config,
 	adminManifest string,
-) error {
+) (*v20180930preview.OpenShiftManagedCluster, error) {
 	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
-		return fmt.Errorf("failed to find %s: %v", shared.DataDirectory, err)
+		return nil, fmt.Errorf("failed to find %s: %v", shared.DataDirectory, err)
 	}
 
 	if adminManifest != "" {
 		oc, err := fakerp.GenerateManifestAdmin(adminManifest)
 		if err != nil {
-			return fmt.Errorf("failed reading admin manifest: %v", err)
+			return nil, fmt.Errorf("failed reading admin manifest: %v", err)
 		}
 		defaultAdminManifest := filepath.Join(dataDir, "manifest-admin.yaml")
-		return createOrUpdateAdmin(ctx, log, ac, conf.ResourceGroup, oc, defaultAdminManifest)
+		return nil, createOrUpdateAdmin(ctx, log, ac, conf.ResourceGroup, oc, defaultAdminManifest)
 	}
 
 	defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
@@ -146,44 +146,43 @@ func execute(
 
 	oc, err := fakerp.GenerateManifest(manifest)
 	if err != nil {
-		return fmt.Errorf("failed reading manifest: %v", err)
+		return nil, fmt.Errorf("failed reading manifest: %v", err)
 	}
 
-	return createOrUpdatev20180930preview(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile)
+	oc, err = createOrUpdatev20180930preview(ctx, log, rpc, conf.ResourceGroup, oc, defaultManifestFile)
+	if err != nil {
+		return nil, err
+	}
+
+	err = fakerp.WriteClusterConfigToManifest(oc, defaultManifestFile)
+	if err != nil {
+		return nil, err
+	}
+
+	return oc, nil
 }
 
-func updateAadApplication(ctx context.Context, log *logrus.Entry, conf *fakerp.Config) error {
+func updateAadApplication(ctx context.Context, oc *v20180930preview.OpenShiftManagedCluster, log *logrus.Entry, conf *fakerp.Config) error {
 	if len(conf.AADClientID) > 0 && conf.AADClientID != conf.ClientID {
 		log.Info("updating the aad application")
 		graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
 		if err != nil {
 			return fmt.Errorf("cannot get authorizer: %v", err)
 		}
+
 		aadClient := azureclient.NewRBACApplicationsClient(ctx, conf.TenantID, graphauthorizer)
 		objID, err := aadapp.GetApplicationObjectIDFromAppID(ctx, aadClient, conf.AADClientID)
 		if err != nil {
 			return err
 		}
 
-		callbackURL := fmt.Sprintf("https://%s.%s.cloudapp.azure.com/oauth2callback/Azure%%20AD", conf.ResourceGroup, conf.Region)
-		conf.AADClientSecret, err = aadapp.UpdateAADApp(ctx, aadClient, objID, callbackURL)
+		callbackURL := fmt.Sprintf("https://%s/oauth2callback/Azure%%20AD", *oc.Properties.PublicHostname)
+		err = aadapp.UpdateAADApp(ctx, aadClient, objID, callbackURL)
 		if err != nil {
 			return fmt.Errorf("cannot update aad app secret: %v", err)
 		}
-	} else {
-		log.Info("using dummy aad")
-		conf.AADClientID = conf.ClientID
-		conf.AADClientSecret = conf.ClientSecret
 	}
-	// set env variable so enrich() still works
-	err := os.Setenv("AZURE_AAD_CLIENT_ID", conf.AADClientID)
-	if err != nil {
-		return fmt.Errorf("failed setting AZURE_AAD_CLIENT_ID: %v", err)
-	}
-	err = os.Setenv("AZURE_AAD_CLIENT_SECRET", conf.AADClientSecret)
-	if err != nil {
-		return fmt.Errorf("failed setting AZURE_AAD_CLIENT_SECRET: %v", err)
-	}
+
 	return nil
 }
 
@@ -213,6 +212,7 @@ func main() {
 	}
 
 	isDelete := strings.ToUpper(*method) == http.MethodDelete
+	isUpdate := shared.IsUpdate()
 	conf, err := fakerp.NewConfig(log, !isDelete)
 	if err != nil {
 		log.Fatal(err)
@@ -278,14 +278,9 @@ func main() {
 		}
 	}
 
-	if !shared.IsUpdate() {
-		if err := updateAadApplication(ctx, log, conf); err != nil {
-			log.Fatal(err)
-		}
-	}
-
+	var oc *v20180930preview.OpenShiftManagedCluster
 	err = wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
-		if err := execute(ctx, log, adminClient, v20180930previewClient, conf, *adminManifest); err != nil {
+		if oc, err = execute(ctx, log, adminClient, v20180930previewClient, conf, *adminManifest); err != nil {
 			if isConnectionRefused(err) {
 				return false, nil
 			}
@@ -297,5 +292,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("\nCluster available at https://%s.%s.cloudapp.azure.com/\n", conf.ResourceGroup, conf.Region)
+	if !isUpdate {
+		if err := updateAadApplication(ctx, oc, log, conf); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	fmt.Printf("\nCluster available at https://%s/\n", *oc.Properties.PublicHostname)
 }

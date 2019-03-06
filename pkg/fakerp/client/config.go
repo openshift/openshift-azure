@@ -73,5 +73,11 @@ func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
 		log.Infof("using generated resource group name %s", c.ResourceGroup)
 		os.Setenv("RESOURCEGROUP", c.ResourceGroup)
 	}
+	if c.AADClientID == "" {
+		c.AADClientID = c.ClientID
+		c.AADClientSecret = c.ClientSecret
+		os.Setenv("AZURE_AAD_CLIENT_ID", c.AADClientID)
+		os.Setenv("AZURE_AAD_CLIENT_SECRET", c.AADClientSecret)
+	}
 	return &c, nil
 }
