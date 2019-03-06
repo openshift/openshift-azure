@@ -274,10 +274,6 @@ func lbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network
 		Location: to.StringPtr(cs.Location),
 	}
 
-	if pc.TestConfig.RunningUnderTest {
-		(*lb.LoadBalancingRules)[0].EnableTCPReset = to.BoolPtr(true)
-	}
-
 	return lb
 }
 
