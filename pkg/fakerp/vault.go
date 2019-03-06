@@ -16,6 +16,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
+const (
+	vaultKeyNamePublicHostname = "PublicHostname"
+	vaultKeyNameRouter         = "Router"
+)
+
 func vaultName(rg string) string {
 	return rg + "-vault"
 }
@@ -30,7 +35,7 @@ func writeTLSCertsToVault(ctx context.Context, kvc azureclient.KeyVaultClient, c
 		params       tls.CertParams
 	}{
 		{
-			vaultKeyName: "Router",
+			vaultKeyName: vaultKeyNameRouter,
 			params: tls.CertParams{
 				Subject: pkix.Name{
 					CommonName: cs.Properties.RouterProfiles[0].PublicSubdomain,
@@ -43,7 +48,7 @@ func writeTLSCertsToVault(ctx context.Context, kvc azureclient.KeyVaultClient, c
 			},
 		},
 		{
-			vaultKeyName: "PublicHostname",
+			vaultKeyName: vaultKeyNamePublicHostname,
 			params: tls.CertParams{
 				Subject: pkix.Name{
 					CommonName: cs.Properties.PublicHostname,

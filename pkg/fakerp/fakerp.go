@@ -265,8 +265,8 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 		},
 	}
 
-	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/PublicHostname"
-	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/Router"
+	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/" + vaultKeyNamePublicHostname
+	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/" + vaultKeyNameRouter
 
 	cs.Properties.PublicHostname = "openshift." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
 	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
