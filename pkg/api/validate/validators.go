@@ -34,36 +34,7 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 		return
 	}
 
-	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
-	switch p.OpenShiftVersion {
-	case "v3.11":
-	default:
-		errs = append(errs, fmt.Errorf("invalid properties.openShiftVersion %q", p.OpenShiftVersion))
-	}
-
-	if p.PublicHostname != "" { // TODO: relax after private preview (&& !isValidHostname(p.PublicHostname))
-		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
-	}
-
-	errs = append(errs, validateNetworkProfile(&p.NetworkProfile)...)
-
-	errs = append(errs, validateRouterProfiles(p.RouterProfiles, location, externalOnly)...)
-
-	errs = append(errs, validateFQDN(p, location)...)
-
-	// we can disregard any error below because we are already going to fail
-	// validation if VnetCIDR does not parse correctly.
-	_, vnet, _ := net.ParseCIDR(p.NetworkProfile.VnetCIDR)
-
-	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
-
-	errs = append(errs, validateAuthProfile(&p.AuthProfile)...)
-
-	return
-}
-
-func validateProvisioningState(ps api.ProvisioningState) (errs []error) {
-	switch ps {
+	switch p.ProvisioningState {
 	case "",
 		api.Creating,
 		api.Updating,
@@ -74,8 +45,35 @@ func validateProvisioningState(ps api.ProvisioningState) (errs []error) {
 		api.Migrating,
 		api.Upgrading:
 	default:
-		errs = append(errs, fmt.Errorf("invalid properties.provisioningState %q", ps))
+		errs = append(errs, fmt.Errorf("invalid properties.provisioningState %q", p.ProvisioningState))
 	}
+
+	switch p.OpenShiftVersion {
+	case "v3.11":
+	default:
+		errs = append(errs, fmt.Errorf("invalid properties.openShiftVersion %q", p.OpenShiftVersion))
+	}
+
+	if p.PublicHostname != "" { // TODO: relax after private preview (&& !isValidHostname(p.PublicHostname))
+		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
+	}
+
+	if p.FQDN == "" || !isValidCloudAppHostname(p.FQDN, location) {
+		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
+	}
+
+	errs = append(errs, validateNetworkProfile(&p.NetworkProfile)...)
+
+	errs = append(errs, validateRouterProfiles(p.RouterProfiles, location, externalOnly)...)
+
+	// we can disregard any error below because we are already going to fail
+	// validation if VnetCIDR does not parse correctly.
+	_, vnet, _ := net.ParseCIDR(p.NetworkProfile.VnetCIDR)
+
+	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
+
+	errs = append(errs, validateAuthProfile(&p.AuthProfile)...)
+
 	return
 }
 
@@ -283,19 +281,6 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 			}
 		}
 	}
-	return
-}
-
-func validateFQDN(p *api.Properties, location string) (errs []error) {
-	if p == nil {
-		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
-		return
-	}
-
-	if p.FQDN == "" || !isValidCloudAppHostname(p.FQDN, location) {
-		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
-	}
-
 	return
 }
 
