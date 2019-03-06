@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -15,7 +14,7 @@ import (
 
 // CreateOCPDNS creates the dns zone for the cluster, updates the main zone in dnsResourceGroup and returns
 // the generated publicSubdomain, routerPrefix
-func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, dnsResourceGroup, dnsDomain, zoneName, routerCName string, noTags bool) error {
+func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, dnsResourceGroup, dnsDomain, zoneName, routerCName string) error {
 	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return err
@@ -30,12 +29,6 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, 
 	// dns zone object
 	z := dns.Zone{
 		Location: to.StringPtr("global"),
-	}
-	if !noTags {
-		z.Tags = make(map[string]*string)
-		ttl, now := "76h", fmt.Sprintf("%d", time.Now().Unix())
-		z.Tags["ttl"] = &ttl
-		z.Tags["now"] = &now
 	}
 
 	// This creates creates the new zone

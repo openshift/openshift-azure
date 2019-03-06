@@ -99,7 +99,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 			routerCName := fmt.Sprintf("osa%s.%s.%s", rrCName, cs.Location, "cloudapp.azure.com")
 
 			log.Info("routeprofiles[0].publicsubdomain was empty, creating dns")
-			err = CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"), publicSubdomain, routerCName, os.Getenv("NOGROUPTAGS") == "true")
+			err = CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"), publicSubdomain, routerCName)
 			if err != nil {
 				return nil, err
 			}
