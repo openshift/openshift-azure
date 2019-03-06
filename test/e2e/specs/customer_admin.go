@@ -15,7 +15,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/openshift/openshift-azure/pkg/util/randomstring"
+	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/test/e2e/standard"
 )
 
@@ -38,7 +38,7 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 
 	It("should have full access on all non-infrastructure namespaces", func() {
 		// Create project as normal user
-		namespace, err := randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
+		namespace, err := random.LowerCaseAlphanumericString(5)
 		Expect(err).ToNot(HaveOccurred())
 		namespace = "e2e-test-" + namespace
 		err = cli.Client.EndUser.CreateProject(namespace)
@@ -111,7 +111,7 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 		// create a project as an end user
 		// add quota as customer-admin
 		// verify it was added
-		namespace, err := randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
+		namespace, err := random.LowerCaseAlphanumericString(5)
 		Expect(err).ToNot(HaveOccurred())
 		namespace = "e2e-test-" + namespace
 		err = cli.Client.EndUser.CreateProject(namespace)

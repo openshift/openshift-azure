@@ -21,7 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	utilrs "github.com/openshift/openshift-azure/pkg/util/randomstring"
+	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
 
@@ -85,13 +85,13 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 			log.Info("routeprofiles[0].publicsubdomain was empty, randomizing publicSubdomain and routerCName")
 
 			// generate a random domain string
-			rDomain, err := utilrs.RandomString("abcdefghijklmnopqrstuvxyz0123456789", 20)
+			rDomain, err := random.LowerCaseAlphanumericString(20)
 			if err != nil {
 				return nil, err
 			}
 			publicSubdomain := fmt.Sprintf("%s.%s", rDomain, os.Getenv("DNS_DOMAIN"))
 
-			rrCName, err := utilrs.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 20)
+			rrCName, err := random.LowerCaseAlphanumericString(20)
 			if err != nil {
 				return nil, err
 			}

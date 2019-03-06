@@ -16,7 +16,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
-	"github.com/openshift/openshift-azure/pkg/util/randomstring"
+	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/e2e/standard"
@@ -41,7 +41,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		Expect(err).NotTo(HaveOccurred())
 		Expect(occli).NotTo(BeNil())
 
-		namespace, err = randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
+		namespace, err = random.LowerCaseAlphanumericString(5)
 		Expect(err).ToNot(HaveOccurred())
 		namespace = "e2e-test-" + namespace
 		fmt.Fprintln(GinkgoWriter, "Using namespace", namespace)

@@ -9,7 +9,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/util/randomstring"
+	"github.com/openshift/openshift-azure/pkg/util/random"
 )
 
 var supportedRegions = []string{
@@ -65,7 +65,7 @@ func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
 	}
 	if c.ResourceGroup == "" {
 		// Generate a resource group name
-		suffix, err := randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 8)
+		suffix, err := random.LowerCaseAlphanumericString(8)
 		if err != nil {
 			return nil, err
 		}
