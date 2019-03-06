@@ -74,6 +74,16 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 
 	errs = append(errs, validateAuthProfile(&p.AuthProfile)...)
 
+	if !externalOnly {
+		errs = append(errs, validateServicePrincipalProfile("properties.masterServicePrincipalProfile", &p.MasterServicePrincipalProfile)...)
+
+		errs = append(errs, validateServicePrincipalProfile("properties.workerServicePrincipalProfile", &p.WorkerServicePrincipalProfile)...)
+
+		errs = append(errs, validateAzProfile(&p.AzProfile)...)
+
+		errs = append(errs, validateCertProfile("properties.apiCertProfile", &p.APICertProfile)...)
+	}
+
 	return
 }
 
@@ -111,7 +121,7 @@ func validateRouterProfiles(rps []api.RouterProfile, location string, externalOn
 		}
 		rpmap[rp.Name] = rp
 
-		errs = append(errs, validateRouterProfile(&rp, location, externalOnly)...)
+		errs = append(errs, validateRouterProfile(fmt.Sprintf("properties.routerProfiles[%q]", rp.Name), &rp, location, externalOnly)...)
 	}
 
 	// a bit questionable: seems that we allow a user to PUT empty
@@ -129,24 +139,41 @@ func validateRouterProfiles(rps []api.RouterProfile, location string, externalOn
 	return
 }
 
-func validateRouterProfile(rp *api.RouterProfile, location string, externalOnly bool) (errs []error) {
+func validateRouterProfile(path string, rp *api.RouterProfile, location string, externalOnly bool) (errs []error) {
 	if rp == nil {
 		errs = append(errs, fmt.Errorf("routerProfile cannot be nil"))
 		return
 	}
 
-	if rp.Name == "" {
-		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
+	if !rxRouterProfileName.MatchString(rp.Name) {
+		errs = append(errs, fmt.Errorf("invalid %s.name %q", path, rp.Name))
 	}
 
 	// TODO: consider ensuring that PublicSubdomain is of the form
 	// <string>.<location>.azmosa.io
 	if rp.PublicSubdomain != "" && !isValidHostname(rp.PublicSubdomain) {
-		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].publicSubdomain %q", rp.Name, rp.PublicSubdomain))
+		errs = append(errs, fmt.Errorf("invalid %s.publicSubdomain %q", path, rp.PublicSubdomain))
 	}
 
-	if !externalOnly && rp.FQDN != "" && !isValidCloudAppHostname(rp.FQDN, location) {
-		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].fqdn %q", rp.Name, rp.FQDN))
+	if !externalOnly {
+		if rp.FQDN != "" && !isValidCloudAppHostname(rp.FQDN, location) {
+			errs = append(errs, fmt.Errorf("invalid %s.fqdn %q", path, rp.FQDN))
+		}
+
+		errs = append(errs, validateCertProfile(path+".routerCertProfile", &rp.RouterCertProfile)...)
+	}
+
+	return
+}
+
+func validateCertProfile(path string, cp *api.CertProfile) (errs []error) {
+	if cp == nil {
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
+		return
+	}
+
+	if !rxKeyVaultSecretURL.MatchString(cp.KeyVaultSecretURL) {
+		errs = append(errs, fmt.Errorf("invalid %s.keyVaultSecretURL %q", path, cp.KeyVaultSecretURL))
 	}
 
 	return
@@ -222,6 +249,9 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile, vnet *net.IPNet) (errs 
 		}
 	}
 
+	// VMSize is checked by the caller using validateVMSize as it depends on
+	// runningUnderTest.
+
 	if !isValidIPV4CIDR(app.SubnetCIDR) {
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q", app.Name, app.SubnetCIDR))
 	}
@@ -267,13 +297,16 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 		}
 		switch provider := ip.Provider.(type) {
 		case (*api.AADIdentityProvider):
-			if provider.ClientID == "" {
+			if provider.Kind != "AADIdentityProvider" {
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider kind %q", provider.Kind))
+			}
+			if !isValidUUID(provider.ClientID) {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider clientId %q", provider.ClientID))
 			}
 			if provider.Secret == "" {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider secret %q", provider.Secret))
 			}
-			if provider.TenantID == "" {
+			if !isValidUUID(provider.TenantID) {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider tenantId %q", provider.TenantID))
 			}
 			if provider.CustomerAdminGroupID != nil && !isValidUUID(*provider.CustomerAdminGroupID) {
@@ -281,6 +314,44 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 			}
 		}
 	}
+	return
+}
+
+func validateServicePrincipalProfile(path string, p *api.ServicePrincipalProfile) (errs []error) {
+	if p == nil {
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
+		return
+	}
+
+	if !isValidUUID(p.ClientID) {
+		errs = append(errs, fmt.Errorf("invalid %s.clientID %q", path, p.ClientID))
+	}
+
+	if p.Secret == "" {
+		errs = append(errs, fmt.Errorf("invalid %s.secret %q", path, p.Secret))
+	}
+
+	return
+}
+
+func validateAzProfile(a *api.AzProfile) (errs []error) {
+	if a == nil {
+		errs = append(errs, fmt.Errorf("azProfile cannot be nil"))
+		return
+	}
+
+	if !isValidUUID(a.TenantID) {
+		errs = append(errs, fmt.Errorf("invalid properties.azProfile.tenantId %q", a.TenantID))
+	}
+
+	if !isValidUUID(a.SubscriptionID) {
+		errs = append(errs, fmt.Errorf("invalid properties.azProfile.subscriptionId %q", a.SubscriptionID))
+	}
+
+	if !rxResourceGroupName.MatchString(a.ResourceGroup) {
+		errs = append(errs, fmt.Errorf("invalid properties.azProfile.resourceGroup %q", a.ResourceGroup))
+	}
+
 	return
 }
 

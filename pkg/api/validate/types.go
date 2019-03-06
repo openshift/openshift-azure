@@ -26,6 +26,8 @@ var (
 
 	rxAgentPoolProfileName = regexp.MustCompile(`^[a-z0-9]{1,12}$`)
 
+	rxRouterProfileName = rxAgentPoolProfileName
+
 	// This regexp is to guard against InvalidDomainNameLabel for hostname validation
 	rxCloudDomainLabel = regexp.MustCompile(`^[a-z][a-z0-9-]{1,61}[a-z0-9]\.`)
 
@@ -36,6 +38,10 @@ var (
 
 	// This regexp is to check cluster version (plugin) format
 	rxClusterVersion = regexp.MustCompile(`^v\d+\.\d+$`)
+
+	rxResourceGroupName = regexp.MustCompile(`^[-\w._()]{1,90}$`)
+
+	rxKeyVaultSecretURL = regexp.MustCompile(`^https://[-a-zA-Z0-9]{3,24}\.vault\.azure\.net/secrets/[-a-zA-Z0-9]{1,127}$`)
 
 	validMasterAndInfraVMSizes = map[api.VMSize]struct{}{
 		// Rationale here is: a highly limited set of modern general purpose

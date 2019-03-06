@@ -9,46 +9,61 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
-var testOpenShiftClusterYAML = []byte(`---
+var testOpenShiftClusterYAML = []byte(`
 location: eastus
 name: openshift
 properties:
-  openShiftVersion: v3.11
-  fqdn: example.eastus.cloudapp.azure.com
+  agentPoolProfiles:
+  - count: 3
+    name: master
+    osType: Linux
+    role: master
+    subnetCidr: 10.0.0.0/24
+    vmSize: Standard_D2s_v3
+  - count: 3
+    name: infra
+    osType: Linux
+    role: infra
+    subnetCidr: 10.0.0.0/24
+    vmSize: Standard_D2s_v3
+  - count: 1
+    name: mycompute
+    osType: Linux
+    role: compute
+    subnetCidr: 10.0.0.0/24
+    vmSize: Standard_D2s_v3
+  apiCertProfile:
+    keyVaultSecretURL: https://myvault.vault.azure.net/secrets/secret
   authProfile:
     identityProviders:
     - name: Azure AD
       provider:
+        clientId: 00000000-0000-0000-0000-000000000000
         kind: AADIdentityProvider
-        clientId: aadClientId
-        secret: aadClientSecret
-        tenantId: aadTenantId
-  routerProfiles:
-  - name: default
-    publicSubdomain: test.example.com
-    fqdn: router-fqdn.eastus.cloudapp.azure.com
+        secret: secret
+        tenantId: 00000000-0000-0000-0000-000000000000
+  azProfile:
+    resourceGroup: resourcegroup
+    subscriptionId: 00000000-0000-0000-0000-000000000000
+    tenantId: 00000000-0000-0000-0000-000000000000
+  fqdn: example.eastus.cloudapp.azure.com
+  masterServicePrincipalProfile:
+    clientID: 00000000-0000-0000-0000-000000000000
+    secret: secret
   networkProfile:
     vnetCidr: 10.0.0.0/8
-  masterPoolProfile:
-    count: 3
-    vmSize: Standard_D2s_v3
-    subnetCidr: 10.0.0.0/24
-  agentPoolProfiles:
-  - name: infra
-    role: infra
-    count: 3
-    vmSize: Standard_D2s_v3
-    osType: Linux
-    subnetCidr: 10.0.0.0/24
-  - name: mycompute
-    role: compute
-    count: 1
-    vmSize: Standard_D2s_v3
-    osType: Linux
-    subnetCidr: 10.0.0.0/24
+  openShiftVersion: v3.11
+  routerProfiles:
+  - fqdn: router-fqdn.eastus.cloudapp.azure.com
+    name: default
+    publicSubdomain: test.example.com
+    routerCertProfile:
+      keyVaultSecretURL: https://myvault.vault.azure.net/secrets/secret
+  workerServicePrincipalProfile:
+    clientID: 00000000-0000-0000-0000-000000000000
+    secret: secret
 `)
 
 func TestValidate(t *testing.T) {
@@ -141,7 +156,6 @@ func TestValidate(t *testing.T) {
 		"test external only false - invalid fqdn fails": {
 			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.FQDN = "()" },
 			expectedErrs: []error{errors.New(`invalid properties.fqdn "()"`)},
-			externalOnly: false,
 		},
 		"provisioning state bad": {
 			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "bad" },
@@ -244,7 +258,6 @@ func TestValidate(t *testing.T) {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].Name = "foo"
 			},
-			externalOnly: false,
 			// two errors expected here because we require the default profile
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["foo"]`),
 				errors.New(`invalid properties.routerProfiles["default"]`)},
@@ -289,14 +302,12 @@ func TestValidate(t *testing.T) {
 				oc.Properties.RouterProfiles = nil
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"]`)},
-			externalOnly: false,
 		},
 		"test external only false - invalid router profile does fail": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].FQDN = "()"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].fqdn "()"`)},
-			externalOnly: false,
 		},
 		"agent pool profile duplicate name": {
 			f: func(oc *api.OpenShiftManagedCluster) {
@@ -410,9 +421,9 @@ func TestValidate(t *testing.T) {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				aadIdentityProvider := &api.AADIdentityProvider{
 					Kind:     "AADIdentityProvider",
-					ClientID: "clientId",
+					ClientID: "00000000-0000-0000-0000-000000000000",
 					Secret:   "",
-					TenantID: "tenantId",
+					TenantID: "00000000-0000-0000-0000-000000000000",
 				}
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
@@ -425,7 +436,7 @@ func TestValidate(t *testing.T) {
 					Kind:     "AADIdentityProvider",
 					ClientID: "",
 					Secret:   "aadClientSecret",
-					TenantID: "tenantId",
+					TenantID: "00000000-0000-0000-0000-000000000000",
 				}
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
@@ -436,7 +447,7 @@ func TestValidate(t *testing.T) {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				aadIdentityProvider := &api.AADIdentityProvider{
 					Kind:     "AADIdentityProvider",
-					ClientID: "test",
+					ClientID: "00000000-0000-0000-0000-000000000000",
 					Secret:   "aadClientSecret",
 					TenantID: "",
 				}
@@ -445,20 +456,88 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider tenantId ""`)},
 		},
+		"AADIdentityProvider kind empty": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				aadIdentityProvider := &api.AADIdentityProvider{
+					Kind:     "",
+					ClientID: "00000000-0000-0000-0000-000000000000",
+					Secret:   "aadClientSecret",
+					TenantID: "00000000-0000-0000-0000-000000000000",
+				}
+				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
+				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider kind ""`)},
+		},
+		"master service principal bad client": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.MasterServicePrincipalProfile.ClientID = "bad"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.masterServicePrincipalProfile.clientID "bad"`)},
+		},
+		"master service principal empty secret": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.MasterServicePrincipalProfile.Secret = ""
+			},
+			expectedErrs: []error{errors.New(`invalid properties.masterServicePrincipalProfile.secret ""`)},
+		},
+		"worker service principal bad client": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.WorkerServicePrincipalProfile.ClientID = "bad"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.workerServicePrincipalProfile.clientID "bad"`)},
+		},
+		"worker service principal empty secret": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.WorkerServicePrincipalProfile.Secret = ""
+			},
+			expectedErrs: []error{errors.New(`invalid properties.workerServicePrincipalProfile.secret ""`)},
+		},
+		"azprofile empty resource group": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AzProfile.ResourceGroup = ""
+			},
+			expectedErrs: []error{errors.New(`invalid properties.azProfile.resourceGroup ""`)},
+		},
+		"azprofile bad resource group": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AzProfile.ResourceGroup = "bad!"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.azProfile.resourceGroup "bad!"`)},
+		},
+		"azprofile bad tenantid": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AzProfile.TenantID = "bad"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.azProfile.tenantId "bad"`)},
+		},
+		"azprofile bad subscriptionid": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AzProfile.SubscriptionID = ""
+			},
+			expectedErrs: []error{errors.New(`invalid properties.azProfile.subscriptionId ""`)},
+		},
+		"routercertprofile bad secreturl": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = "bad"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].routerCertProfile.keyVaultSecretURL "bad"`)},
+		},
+		"apicertprofile bad secreturl": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.APICertProfile.KeyVaultSecretURL = "bad"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.apiCertProfile.keyVaultSecretURL "bad"`)},
+		},
 	}
 
 	for name, test := range tests {
-		var oc *v20180930preview.OpenShiftManagedCluster
-		err := yaml.Unmarshal(testOpenShiftClusterYAML, &oc)
+		var cs *api.OpenShiftManagedCluster
+		err := yaml.Unmarshal(testOpenShiftClusterYAML, &cs)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// TODO we're hoping conversion is correct. Change this to a known valid config
-		cs, err := api.ConvertFromV20180930preview(oc, nil)
-		if err != nil {
-			t.Errorf("%s: unexpected error: %v", name, err)
-		}
 		if test.f != nil {
 			test.f(cs)
 		}
