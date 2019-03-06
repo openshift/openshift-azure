@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"fmt"
 
 	mgmtkeyvault "github.com/Azure/azure-sdk-for-go/services/keyvault/mgmt/2016-10-01/keyvault"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -20,11 +21,12 @@ func vaultName(rg string) string {
 	return rg + "-vault"
 }
 
+func vaultURL(rg string) string {
+	return fmt.Sprintf("https://%s.vault.azure.net", vaultName(rg))
+}
+
 func writeTLSCertsToVault(ctx context.Context, kvc azureclient.KeyVaultClient, cs *api.OpenShiftManagedCluster, vaultURL string) error {
 	publicHostname := config.Derived.PublicHostname(cs)
-
-	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL + "/secrets/PublicHostname"
-	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL + "/secrets/Router"
 
 	certs := []struct {
 		vaultKeyName string
@@ -75,13 +77,13 @@ func writeTLSCertsToVault(ctx context.Context, kvc azureclient.KeyVaultClient, c
 	return nil
 }
 
-func createVault(ctx context.Context, vc azureclient.VaultMgmtClient, appObjectID, tenantID, resourceGroup, location, vaultName string) (string, error) {
+func createVault(ctx context.Context, vc azureclient.VaultMgmtClient, appObjectID, tenantID, resourceGroup, location, vaultName string) error {
 	tID, err := uuid.FromString(tenantID)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	vault, err := vc.CreateOrUpdate(ctx, resourceGroup, vaultName, mgmtkeyvault.VaultCreateOrUpdateParameters{
+	_, err = vc.CreateOrUpdate(ctx, resourceGroup, vaultName, mgmtkeyvault.VaultCreateOrUpdateParameters{
 		Location: to.StringPtr(location),
 		Properties: &mgmtkeyvault.VaultProperties{
 			TenantID: &tID,
@@ -106,10 +108,7 @@ func createVault(ctx context.Context, vc azureclient.VaultMgmtClient, appObjectI
 			},
 		},
 	})
-	if err != nil {
-		return "", err
-	}
-	return *vault.Properties.VaultURI, nil
+	return err
 }
 
 func deleteVault(ctx context.Context, m azureclient.VaultMgmtClient, subscriptionID, resourceGroup, vaultName string) error {
