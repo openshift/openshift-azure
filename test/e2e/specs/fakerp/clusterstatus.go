@@ -14,7 +14,7 @@ import (
 	"github.com/openshift/openshift-azure/test/clients/azure"
 )
 
-var _ = Describe("Control Plane Pods Status E2E tests [AzureClusterReader][Fake][EveryPR]", func() {
+var _ = Describe("Control Plane Pods Status E2E tests [Fake][EveryPR]", func() {
 	var (
 		cli *azure.Client
 	)

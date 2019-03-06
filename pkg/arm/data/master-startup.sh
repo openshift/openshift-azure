@@ -29,8 +29,7 @@ fi
 # /var/lib/origin thanks to https://github.com/kubernetes/kubernetes/issues/45487
 DPATH=/var/lib/origin/.docker
 mkdir -p $DPATH
-base64 -d <<< {{ .Config.Images.ImagePullSecret | Base64Encode }} >${DPATH}/config.json
-chmod 0600 ${DPATH}/config.json
+base64 -d <<< {{ .Config.Images.ImagePullSecret | Base64Encode }} >${DPATH}/config.json; chmod 0600 ${DPATH}/config.json
 
 # TODO: consider fact that /dev/disk/azure/scsi1/lun0 is currently hardcoded;
 # partition /dev/disk/azure/scsi1/lun0; consider future strategy for resizes if
@@ -59,7 +58,7 @@ iptables-save >/etc/sysconfig/iptables
 rm -rf /etc/etcd/* /etc/origin/master/*
 
 mkdir -p /etc/origin/cloudprovider
-cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
+cat >/etc/origin/cloudprovider/azure.conf <<'EOF'; chmod 0600 /etc/origin/cloudprovider/azure.conf
 {{ .Derived.MasterCloudProviderConf .ContainerService | String }}
 EOF
 

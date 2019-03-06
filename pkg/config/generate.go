@@ -173,7 +173,7 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{CommonName: "system:openshift-master",
-					Organization: []string{"system:cluster-admins", "system:masters"},
+					Organization: []string{"system:masters"},
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 			},
@@ -183,11 +183,11 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{
-					CommonName: "servicecatalog-api",
+					CommonName: "apiserver.kube-service-catalog.svc",
 				},
 				DNSNames: []string{
-					"servicecatalog-api",
-					"apiserver.kube-service-catalog.svc", // TODO: unclear how safe this is
+					"apiserver.kube-service-catalog.svc",
+					"apiserver.kube-service-catalog.svc.cluster.local",
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 				SigningKey:  c.Certificates.ServiceCatalogCa.Key,
@@ -195,16 +195,6 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 			},
 			key:  &c.Certificates.ServiceCatalogServer.Key,
 			cert: &c.Certificates.ServiceCatalogServer.Cert,
-		},
-		{
-			params: tls.CertParams{
-				Subject: pkix.Name{
-					CommonName: "system:serviceaccount:kube-service-catalog:service-catalog-apiserver",
-				},
-				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-			},
-			key:  &c.Certificates.ServiceCatalogAPIClient.Key,
-			cert: &c.Certificates.ServiceCatalogAPIClient.Cert,
 		},
 		{
 			params: tls.CertParams{
@@ -219,20 +209,19 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{
-					CommonName: "system:serviceaccount:openshift-azure:azure-cluster-reader",
+					CommonName: "system:serviceaccount:openshift-azure:blackboxmonitor",
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
 			},
-			key:  &c.Certificates.AzureClusterReader.Key,
-			cert: &c.Certificates.AzureClusterReader.Cert,
+			key:  &c.Certificates.BlackBoxMonitor.Key,
+			cert: &c.Certificates.BlackBoxMonitor.Cert,
 		},
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{
-					CommonName: "docker-registry-default." + cs.Properties.RouterProfiles[0].PublicSubdomain,
+					CommonName: "docker-registry.default.svc",
 				},
 				DNSNames: []string{
-					"docker-registry-default." + cs.Properties.RouterProfiles[0].PublicSubdomain,
 					"docker-registry.default.svc",
 					"docker-registry.default.svc.cluster.local",
 				},
@@ -321,11 +310,11 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 			namespace:  "openshift-infra",
 		},
 		{
-			clientKey:  c.Certificates.AzureClusterReader.Key,
-			clientCert: c.Certificates.AzureClusterReader.Cert,
+			clientKey:  c.Certificates.BlackBoxMonitor.Key,
+			clientCert: c.Certificates.BlackBoxMonitor.Cert,
 			endpoint:   cs.Properties.FQDN,
-			username:   "system:serviceaccount:openshift-azure:azure-cluster-reader",
-			kubeconfig: &c.AzureClusterReaderKubeconfig,
+			username:   "system:serviceaccount:openshift-azure:blackboxmonitor",
+			kubeconfig: &c.BlackBoxMonitorKubeconfig,
 			namespace:  "openshift-azure",
 		},
 	}
@@ -398,7 +387,7 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 func (g *simpleGenerator) InvalidateSecrets(cs *api.OpenShiftManagedCluster) (err error) {
 	cs.Config.Certificates.Admin = api.CertKeyPair{}
 	cs.Config.Certificates.AggregatorFrontProxy = api.CertKeyPair{}
-	cs.Config.Certificates.AzureClusterReader = api.CertKeyPair{}
+	cs.Config.Certificates.BlackBoxMonitor = api.CertKeyPair{}
 	cs.Config.Certificates.EtcdClient = api.CertKeyPair{}
 	cs.Config.Certificates.EtcdPeer = api.CertKeyPair{}
 	cs.Config.Certificates.EtcdServer = api.CertKeyPair{}
@@ -410,7 +399,6 @@ func (g *simpleGenerator) InvalidateSecrets(cs *api.OpenShiftManagedCluster) (er
 	cs.Config.Certificates.NodeBootstrap = api.CertKeyPair{}
 	cs.Config.Certificates.OpenShiftMaster = api.CertKeyPair{}
 	cs.Config.Certificates.Registry = api.CertKeyPair{}
-	cs.Config.Certificates.ServiceCatalogAPIClient = api.CertKeyPair{}
 	cs.Config.Certificates.ServiceCatalogServer = api.CertKeyPair{}
 
 	cs.Config.SSHKey = nil

@@ -110,13 +110,12 @@ type CertificateConfig struct {
 	NodeBootstrap        *Certificate `json:"nodeBootstrap,omitempty"`
 
 	// infra certificates
-	Registry                *Certificate `json:"registry,omitempty"`
-	Router                  *Certificate `json:"router,omitempty"`
-	ServiceCatalogServer    *Certificate `json:"serviceCatalogServer,omitempty"`
-	ServiceCatalogAPIClient *Certificate `json:"serviceCatalogAPIClient,omitempty"`
+	Registry             *Certificate `json:"registry,omitempty"`
+	Router               *Certificate `json:"router,omitempty"`
+	ServiceCatalogServer *Certificate `json:"serviceCatalogServer,omitempty"`
 
 	// misc certificates
-	AzureClusterReader *Certificate `json:"azureClusterReader,omitempty"`
+	BlackBoxMonitor *Certificate `json:"blackBoxMonitor,omitempty"`
 
 	// geneva integration certificates
 	GenevaLogging *Certificate `json:"genevaLogging,omitempty"`

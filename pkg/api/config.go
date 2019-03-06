@@ -30,10 +30,10 @@ type Config struct {
 	Images       ImageConfig       `json:"images,omitempty"`
 
 	// kubeconfigs
-	AdminKubeconfig              *v1.Config `json:"adminKubeconfig,omitempty"`
-	MasterKubeconfig             *v1.Config `json:"masterKubeconfig,omitempty"`
-	NodeBootstrapKubeconfig      *v1.Config `json:"nodeBootstrapKubeconfig,omitempty"`
-	AzureClusterReaderKubeconfig *v1.Config `json:"azureClusterReaderKubeconfig,omitempty"`
+	AdminKubeconfig           *v1.Config `json:"adminKubeconfig,omitempty"`
+	MasterKubeconfig          *v1.Config `json:"masterKubeconfig,omitempty"`
+	NodeBootstrapKubeconfig   *v1.Config `json:"nodeBootstrapKubeconfig,omitempty"`
+	BlackBoxMonitorKubeconfig *v1.Config `json:"blackBoxMonitorKubeconfig,omitempty"`
 
 	// misc control plane configurables
 	ServiceAccountKey *rsa.PrivateKey `json:"serviceAccountKey,omitempty"`
@@ -139,13 +139,12 @@ type CertificateConfig struct {
 	NodeBootstrap        CertKeyPair `json:"nodeBootstrap,omitempty"`
 
 	// infra certificates
-	Registry                CertKeyPair `json:"registry,omitempty"`
-	Router                  CertKeyPair `json:"-"`
-	ServiceCatalogServer    CertKeyPair `json:"serviceCatalogServer,omitempty"`
-	ServiceCatalogAPIClient CertKeyPair `json:"serviceCatalogAPIClient,omitempty"`
+	Registry             CertKeyPair `json:"registry,omitempty"`
+	Router               CertKeyPair `json:"-"`
+	ServiceCatalogServer CertKeyPair `json:"serviceCatalogServer,omitempty"`
 
 	// misc certificates
-	AzureClusterReader CertKeyPair `json:"azureClusterReader,omitempty"`
+	BlackBoxMonitor CertKeyPair `json:"blackBoxMonitor,omitempty"`
 
 	// geneva integration certificates
 	GenevaLogging CertKeyPair `json:"genevaLogging,omitempty"`

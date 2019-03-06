@@ -5,7 +5,7 @@ If you are developing tests locally, you can use the native `go test` to invoke 
 Example: Run the end user e2e tests
 ```
 source ./env
-export FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]"
+export FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]"
 ./hack/e2e.sh
 ```
 
@@ -22,7 +22,7 @@ export EXTRA_FLAGS="-scaleUpManifest=test/manifests/normal/scaleup.yaml -scaleDo
 
 #### Running e2e tests with the container image
 
-To run the e2e tests in a container use the [e2e](https://quay.io/repository/openshift-on-azure/e2e-tests) container 
+To run the e2e tests in a container use the [e2e](https://quay.io/repository/openshift-on-azure/e2e-tests) container
 image
 
 ```
@@ -31,7 +31,7 @@ docker pull quay.io/openshift-on-azure/e2e-tests:latest
 
 Example: Run the end user e2e tests in a container
 ```
-export FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]"
+export FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]"
 export TIMEOUT=20m
 source ./env
 

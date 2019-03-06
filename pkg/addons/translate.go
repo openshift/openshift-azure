@@ -543,25 +543,13 @@ var Translations = map[string][]struct {
 	"Route.route.openshift.io/default/docker-registry": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "docker-registry-default.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
+			Template: "docker-registry.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/default/registry-console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "registry-console-default.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
-		},
-	},
-	"Route.route.openshift.io/kube-service-catalog/apiserver": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "apiserver-kube-service-catalog.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
-		},
-	},
-	"Route.route.openshift.io/openshift-ansible-service-broker/asb-1338": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.host"),
-			Template: "asb-1338-openshift-ansible-service-broker.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
+			Template: "registry-console.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
 	"Route.route.openshift.io/openshift-console/console": {

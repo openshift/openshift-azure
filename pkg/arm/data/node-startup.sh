@@ -31,8 +31,7 @@ fi
 # /var/lib/origin thanks to https://github.com/kubernetes/kubernetes/issues/45487
 DPATH=/var/lib/origin/.docker
 mkdir -p $DPATH
-base64 -d <<< {{ .Config.Images.ImagePullSecret | Base64Encode }} >${DPATH}/config.json
-chmod 0600 ${DPATH}/config.json
+base64 -d <<< {{ .Config.Images.ImagePullSecret | Base64Encode }} >${DPATH}/config.json; chmod 0600 ${DPATH}/config.json
 
 echo 'BOOTSTRAP_CONFIG_NAME=node-config-{{ .Extra.Role }}' >>/etc/sysconfig/${SERVICE_TYPE}-node
 
@@ -42,10 +41,9 @@ sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-
 
 rm -rf /etc/etcd/* /etc/origin/master/*
 
-base64 -d <<< {{ Base64Encode (YamlMarshal .Config.NodeBootstrapKubeconfig) }} >/etc/origin/node/bootstrap.kubeconfig
+base64 -d <<< {{ Base64Encode (YamlMarshal .Config.NodeBootstrapKubeconfig) }} >/etc/origin/node/bootstrap.kubeconfig; chmod 0600 /etc/origin/node/bootstrap.kubeconfig
 base64 -d <<< {{ Base64Encode (CertAsBytes .Config.Certificates.NodeBootstrap.Cert) }} >/etc/origin/node/node-bootstrapper.crt
-base64 -d <<< {{ Base64Encode (PrivateKeyAsBytes .Config.Certificates.NodeBootstrap.Key) }} >/etc/origin/node/node-bootstrapper.key
-chmod 0600 /etc/origin/node/node-bootstrapper.key /etc/origin/node/bootstrap.kubeconfig
+base64 -d <<< {{ Base64Encode (PrivateKeyAsBytes .Config.Certificates.NodeBootstrap.Key) }} >/etc/origin/node/node-bootstrapper.key; chmod 0600 /etc/origin/node/node-bootstrapper.key
 
 base64 -d <<< {{ Base64Encode (CertAsBytes .Config.Certificates.Ca.Cert) }} >/etc/origin/node/ca.crt
 cp /etc/origin/node/ca.crt /etc/pki/ca-trust/source/anchors/openshift-ca.crt
@@ -54,7 +52,7 @@ update-ca-trust
 echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
 mkdir -p /etc/origin/cloudprovider
 
-cat >/etc/origin/cloudprovider/azure.conf <<'EOF'
+cat >/etc/origin/cloudprovider/azure.conf <<'EOF'; chmod 0600 /etc/origin/cloudprovider/azure.conf
 {{ .Derived.WorkerCloudProviderConf .ContainerService | String }}
 EOF
 

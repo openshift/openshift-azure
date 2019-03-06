@@ -16,7 +16,6 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
-	"k8s.io/client-go/tools/clientcmd/api/latest"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
@@ -67,16 +66,6 @@ func newClientFromKubeConfig(kc *api.Config) (*Client, error) {
 	return newClientFromRestConfig(restconfig), nil
 }
 
-func NewAzureClusterReaderClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
-	var kc api.Config
-	err := latest.Scheme.Convert(cs.Config.AzureClusterReaderKubeconfig, &kc, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return newClientFromKubeConfig(&kc)
-}
-
 func NewAdminClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
 	kc, err := login("admin", cs)
 	if err != nil {
@@ -105,10 +94,9 @@ func NewEndUserClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) 
 }
 
 type ClientSet struct {
-	AzureClusterReader *Client
-	Admin              *Client
-	CustomerAdmin      *Client
-	EndUser            *Client
+	Admin         *Client
+	CustomerAdmin *Client
+	EndUser       *Client
 }
 
 // NewClientSet creates a new set of openshift clients scoped for different levels
@@ -117,10 +105,6 @@ func NewClientSet(cs *internalapi.OpenShiftManagedCluster) (*ClientSet, error) {
 	c := &ClientSet{}
 	var err error
 	c.Admin, err = NewAdminClient(cs)
-	if err != nil {
-		return nil, err
-	}
-	c.AzureClusterReader, err = NewAzureClusterReaderClient(cs)
 	if err != nil {
 		return nil, err
 	}

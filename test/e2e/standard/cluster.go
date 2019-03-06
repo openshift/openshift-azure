@@ -22,31 +22,31 @@ import (
 )
 
 func (sc *SanityChecker) checkMonitoringStackHealth(ctx context.Context) error {
-	err := wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.AzureClusterReader.AppsV1.Deployments("openshift-monitoring"), "cluster-monitoring-operator"))
+	err := wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "cluster-monitoring-operator"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.AzureClusterReader.AppsV1.Deployments("openshift-monitoring"), "prometheus-operator"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "prometheus-operator"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.AzureClusterReader.AppsV1.Deployments("openshift-monitoring"), "grafana"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "grafana"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.StatefulSetIsReady(sc.Client.AzureClusterReader.AppsV1.StatefulSets("openshift-monitoring"), "prometheus-k8s"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.StatefulSetIsReady(sc.Client.Admin.AppsV1.StatefulSets("openshift-monitoring"), "prometheus-k8s"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.StatefulSetIsReady(sc.Client.AzureClusterReader.AppsV1.StatefulSets("openshift-monitoring"), "alertmanager-main"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.StatefulSetIsReady(sc.Client.Admin.AppsV1.StatefulSets("openshift-monitoring"), "alertmanager-main"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DaemonSetIsReady(sc.Client.AzureClusterReader.AppsV1.DaemonSets("openshift-monitoring"), "node-exporter"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DaemonSetIsReady(sc.Client.Admin.AppsV1.DaemonSets("openshift-monitoring"), "node-exporter"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.AzureClusterReader.AppsV1.Deployments("openshift-azure-monitoring"), "metrics-bridge"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-azure-monitoring"), "metrics-bridge"))
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func (sc *SanityChecker) checkNodesLabelledCorrectly(ctx context.Context) error 
 			"node-role.kubernetes.io/infra": "true",
 		},
 	}
-	list, err := sc.Client.AzureClusterReader.CoreV1.Nodes().List(metav1.ListOptions{})
+	list, err := sc.Client.Admin.CoreV1.Nodes().List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}

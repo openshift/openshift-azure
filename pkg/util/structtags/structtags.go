@@ -66,9 +66,6 @@ func toTag(s string) string {
 		// should theoretically be vnetSubnetId, but isn't.  Our behaviour here
 		// matches the AKS API.
 		return "vnetSubnetID"
-	case "ServiceCatalogAPIClient":
-		// should be serviceCatalogApiClient, but isn't.
-		return "serviceCatalogAPIClient"
 	}
 
 	for _, acronym := range []string{"API", "FQDN", "HTTP", "CIDR", "ID", "SKU", "SSH", "VM"} {
