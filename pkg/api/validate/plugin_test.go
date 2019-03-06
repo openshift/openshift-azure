@@ -10,23 +10,17 @@ import (
 
 func TestPluginTemplateValidate(t *testing.T) {
 	expectedErrs :=
-		[]error{errors.New(`imageOffer should be osa`),
+		[]error{
+			errors.New(`invalid ClusterVersion ""`),
+			errors.New(`imageOffer should be osa`),
 			errors.New(`imagePublisher should be redhat`),
 			errors.New(`invalid ImageSKU ""`),
-			errors.New(`invalid ClusterVersion ""`),
 			errors.New(`invalid ImageVersion ""`),
-			errors.New(`genevaLoggingSector cannot be empty`),
-			errors.New(`genevaLoggingAccount cannot be empty`),
-			errors.New(`genevaLoggingNamespace cannot be empty`),
-			errors.New(`genevaLoggingControlPlaneAccount cannot be empty`),
-			errors.New(`genevaMetricsAccount cannot be empty`),
-			errors.New(`genevaMetricsEndpoint cannot be empty`),
 			errors.New(`GenevaLogging key cannot be empty`),
 			errors.New(`GenevaLogging certificate cannot be empty`),
 			errors.New(`GenevaMetrics key cannot be empty`),
 			errors.New(`GenevaMetrics certificate cannot be empty`),
 			errors.New(`images.Format cannot be empty`),
-			errors.New(`images.GenevaImagePullSecret cannot be empty`),
 			errors.New(`images.ClusterMonitoringOperator cannot be empty`),
 			errors.New(`images.AzureControllers cannot be empty`),
 			errors.New(`images.PrometheusOperatorBase cannot be empty`),
@@ -53,6 +47,13 @@ func TestPluginTemplateValidate(t *testing.T) {
 			errors.New(`images.WebConsole cannot be empty`),
 			errors.New(`images.Console cannot be empty`),
 			errors.New(`images.EtcdBackup cannot be empty`),
+			errors.New(`images.GenevaImagePullSecret cannot be empty`),
+			errors.New(`genevaLoggingSector cannot be empty`),
+			errors.New(`genevaLoggingAccount cannot be empty`),
+			errors.New(`genevaLoggingNamespace cannot be empty`),
+			errors.New(`genevaLoggingControlPlaneAccount cannot be empty`),
+			errors.New(`genevaMetricsAccount cannot be empty`),
+			errors.New(`genevaMetricsEndpoint cannot be empty`),
 		}
 
 	template := pluginapi.Config{}

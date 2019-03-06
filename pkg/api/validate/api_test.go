@@ -123,9 +123,9 @@ func TestValidate(t *testing.T) {
 		"empty location": {
 			f: func(oc *api.OpenShiftManagedCluster) { oc.Location = "" },
 			expectedErrs: []error{
-				errors.New(`invalid location ""`),
-				errors.New(`invalid properties.routerProfiles["default"].fqdn "router-fqdn.eastus.cloudapp.azure.com"`),
 				errors.New(`invalid properties.fqdn "example.eastus.cloudapp.azure.com"`),
+				errors.New(`invalid properties.routerProfiles["default"].fqdn "router-fqdn.eastus.cloudapp.azure.com"`),
+				errors.New(`invalid location ""`),
 			},
 		},
 		"name": {

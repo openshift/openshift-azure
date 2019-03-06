@@ -21,6 +21,10 @@ func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 		return
 	}
 
+	if !clusterVersion.MatchString(t.ClusterVersion) {
+		errs = append(errs, fmt.Errorf("invalid ClusterVersion %q", t.ClusterVersion))
+	}
+
 	if t.ImageOffer != "osa" {
 		errs = append(errs, fmt.Errorf("imageOffer should be osa"))
 	}
@@ -35,13 +39,13 @@ func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid ImageSKU %q", t.ImageSKU))
 	}
 
-	if !clusterVersion.MatchString(t.ClusterVersion) {
-		errs = append(errs, fmt.Errorf("invalid ClusterVersion %q", t.ClusterVersion))
-	}
-
 	if !imageVersion.MatchString(t.ImageVersion) {
 		errs = append(errs, fmt.Errorf("invalid ImageVersion %q", t.ImageVersion))
 	}
+
+	errs = append(errs, v.validatePluginTemplateCertificates(&t.Certificates)...)
+
+	errs = append(errs, v.validatePluginTemplateImages(&t.Images)...)
 
 	if t.GenevaLoggingSector == "" {
 		errs = append(errs, fmt.Errorf("genevaLoggingSector cannot be empty"))
@@ -67,10 +71,6 @@ func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 		errs = append(errs, fmt.Errorf("genevaMetricsEndpoint cannot be empty"))
 	}
 
-	errs = append(errs, v.validatePluginTemplateCertificates(&t.Certificates)...)
-
-	errs = append(errs, v.validatePluginTemplateImages(&t.Images)...)
-
 	return
 }
 
@@ -82,10 +82,6 @@ func (v *PluginAPIValidator) validatePluginTemplateImages(i *pluginapi.ImageConf
 
 	if i.Format == "" {
 		errs = append(errs, fmt.Errorf("images.Format cannot be empty"))
-	}
-
-	if len(i.GenevaImagePullSecret) == 0 {
-		errs = append(errs, fmt.Errorf("images.GenevaImagePullSecret cannot be empty"))
 	}
 
 	if i.ClusterMonitoringOperator == "" {
@@ -190,6 +186,10 @@ func (v *PluginAPIValidator) validatePluginTemplateImages(i *pluginapi.ImageConf
 
 	if i.EtcdBackup == "" {
 		errs = append(errs, fmt.Errorf("images.EtcdBackup cannot be empty"))
+	}
+
+	if len(i.GenevaImagePullSecret) == 0 {
+		errs = append(errs, fmt.Errorf("images.GenevaImagePullSecret cannot be empty"))
 	}
 
 	return

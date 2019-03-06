@@ -13,15 +13,17 @@ func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool)
 		return
 	}
 
-	if c.Location == "" {
-		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
-	}
+	errs = append(errs, validateProperties(&c.Properties, c.Location, externalOnly)...)
 
 	if c.Name == "" {
 		errs = append(errs, fmt.Errorf("invalid name %q", c.Name))
 	}
 
-	errs = append(errs, validateProperties(&c.Properties, c.Location, externalOnly)...)
+	if c.Location == "" {
+		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
+	}
+
+	// TODO: we don't currently validate Config
 
 	return
 }
@@ -83,12 +85,12 @@ func validateNetworkProfile(np *api.NetworkProfile) (errs []error) {
 		return
 	}
 
-	if np.VnetID != "" && !rxVNetID.MatchString(np.VnetID) {
-		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetId %q", np.VnetID))
-	}
-
 	if !isValidIPV4CIDR(np.VnetCIDR) {
 		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetCidr %q", np.VnetCIDR))
+	}
+
+	if np.VnetID != "" && !rxVNetID.MatchString(np.VnetID) {
+		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetId %q", np.VnetID))
 	}
 
 	if np.PeerVnetID != nil && !rxVNetID.MatchString(*np.PeerVnetID) {
@@ -262,16 +264,16 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 
 	//check supported identity providers
 	for _, ip := range ap.IdentityProviders {
+		if ip.Name != "Azure AD" {
+			errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders name"))
+		}
 		switch provider := ip.Provider.(type) {
 		case (*api.AADIdentityProvider):
-			if ip.Name != "Azure AD" {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders name"))
+			if provider.ClientID == "" {
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider clientId %q", provider.ClientID))
 			}
 			if provider.Secret == "" {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider secret %q", provider.Secret))
-			}
-			if provider.ClientID == "" {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider clientId %q", provider.ClientID))
 			}
 			if provider.TenantID == "" {
 				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider tenantId %q", provider.TenantID))
