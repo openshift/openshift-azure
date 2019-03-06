@@ -21,10 +21,8 @@ func CreateOCPDNS(ctx context.Context, subscriptionID, resourceGroup, location, 
 	}
 
 	// create clients
-	zc := dns.NewZonesClient(subscriptionID)
-	zc.Authorizer = authorizer
-	rsc := dns.NewRecordSetsClient(subscriptionID)
-	rsc.Authorizer = authorizer
+	zc := azureclient.NewZonesClient(ctx, subscriptionID, authorizer)
+	rsc := azureclient.NewRecordSetsClient(ctx, subscriptionID, authorizer)
 
 	// dns zone object
 	z := dns.Zone{
@@ -115,12 +113,10 @@ func DeleteOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 	}
 
 	// delete zone
-	zc := dns.NewZonesClient(subscriptionID)
-	zc.Authorizer = authorizer
-	rsc := dns.NewRecordSetsClient(subscriptionID)
-	rsc.Authorizer = authorizer
-	zoneResults, err := zc.ListByResourceGroup(ctx, resourceGroup, to.Int32Ptr(100))
-	for _, z := range zoneResults.Values() {
+	zc := azureclient.NewZonesClient(ctx, subscriptionID, authorizer)
+	rsc := azureclient.NewRecordSetsClient(ctx, subscriptionID, authorizer)
+	zones, err := zc.ListByResourceGroup(ctx, resourceGroup, to.Int32Ptr(100))
+	for _, z := range zones {
 		zoneName := to.String(z.Name)
 		// delete main zone NS record
 		rscDelete, err := rsc.Delete(ctx, dnsResourceGroup, dnsDomain, zoneName, dns.NS, "")
@@ -132,15 +128,10 @@ func DeleteOCPDNS(ctx context.Context, subscriptionID, resourceGroup, dnsResourc
 			return fmt.Errorf("error(%d) removing %v from %v in %v", rscDelete.StatusCode, strings.Split(zoneName, ".")[0], dnsDomain, dnsResourceGroup)
 		}
 
-		future, err := zc.Delete(ctx, dnsResourceGroup, zoneName, "")
+		err = zc.Delete(ctx, dnsResourceGroup, zoneName, "")
 		if err != nil {
 			return err
 		}
-
-		if err := future.WaitForCompletionRef(ctx, zc.Client); err != nil {
-			return err
-		}
-
 	}
 
 	return nil
