@@ -318,5 +318,5 @@ func validateVMSize(app *api.AgentPoolProfile, runningUnderTest bool) (errs []er
 		}
 	}
 
-	return errs
+	return
 }

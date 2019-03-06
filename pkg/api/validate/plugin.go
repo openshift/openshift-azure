@@ -71,7 +71,7 @@ func (v *PluginAPIValidator) Validate(t *pluginapi.Config) (errs []error) {
 
 	errs = append(errs, v.validatePluginTemplateImages(&t.Images)...)
 
-	return errs
+	return
 }
 
 func (v *PluginAPIValidator) validatePluginTemplateImages(i *pluginapi.ImageConfig) (errs []error) {
@@ -192,7 +192,7 @@ func (v *PluginAPIValidator) validatePluginTemplateImages(i *pluginapi.ImageConf
 		errs = append(errs, fmt.Errorf("images.EtcdBackup cannot be empty"))
 	}
 
-	return errs
+	return
 }
 
 func (v *PluginAPIValidator) validatePluginTemplateCertificates(c *pluginapi.CertificateConfig) (errs []error) {
@@ -221,5 +221,5 @@ func (v *PluginAPIValidator) validatePluginTemplateCertificates(c *pluginapi.Cer
 		errs = append(errs, fmt.Errorf("GenevaMetrics certificate cannot be empty"))
 	}
 
-	return errs
+	return
 }

@@ -35,5 +35,5 @@ func (v *APIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster, external
 		errs = append(errs, validateVMSize(&app, v.runningUnderTest)...)
 	}
 
-	return errs
+	return
 }

@@ -35,7 +35,7 @@ func validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster) (err
 		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
 	}
 
-	return errs
+	return
 }
 
 func validateUpdateConfig(internalConfig, adminConfig *api.Config) (errs []error) {
