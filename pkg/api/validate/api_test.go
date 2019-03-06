@@ -252,7 +252,7 @@ func TestValidate(t *testing.T) {
 					append(oc.Properties.RouterProfiles,
 						oc.Properties.RouterProfiles[0])
 			},
-			expectedErrs: []error{errors.New(`duplicate properties.routerProfiles "default"`)},
+			expectedErrs: []error{errors.New(`duplicate properties.routerProfiles["default"]`)},
 		},
 		"test external only false - router profile invalid name": {
 			f: func(oc *api.OpenShiftManagedCluster) {
@@ -277,7 +277,7 @@ func TestValidate(t *testing.T) {
 			// this is not very user friendly but testing as is for now
 			// TODO fix
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles[""]`),
-				errors.New(`invalid properties.routerProfiles[""].name ""`),
+				errors.New(`invalid properties.routerProfiles[""]`),
 				errors.New(`invalid properties.routerProfiles["default"]`)},
 		},
 		"router empty public subdomain": {
@@ -326,7 +326,7 @@ func TestValidate(t *testing.T) {
 				}
 			},
 			expectedErrs: []error{
-				errors.New(`invalid properties.agentPoolProfiles["foo"].name "foo"`),
+				errors.New(`invalid properties.agentPoolProfiles["foo"]`),
 			},
 		},
 		"agent pool profile invalid compute name": {
@@ -428,7 +428,7 @@ func TestValidate(t *testing.T) {
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider secret ""`)},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders["Azure AD"].secret ""`)},
 		},
 		"AADIdentityProvider clientId empty": {
 			f: func(oc *api.OpenShiftManagedCluster) {
@@ -441,7 +441,7 @@ func TestValidate(t *testing.T) {
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider clientId ""`)},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders["Azure AD"].clientId ""`)},
 		},
 		"AADIdentityProvider tenantId empty": {
 			f: func(oc *api.OpenShiftManagedCluster) {
@@ -454,7 +454,7 @@ func TestValidate(t *testing.T) {
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider tenantId ""`)},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders["Azure AD"].tenantId ""`)},
 		},
 		"AADIdentityProvider kind empty": {
 			f: func(oc *api.OpenShiftManagedCluster) {
@@ -467,7 +467,7 @@ func TestValidate(t *testing.T) {
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider kind ""`)},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders["Azure AD"].kind ""`)},
 		},
 		"master service principal bad client": {
 			f: func(oc *api.OpenShiftManagedCluster) {

@@ -117,7 +117,7 @@ func validateRouterProfiles(rps []api.RouterProfile, location string, externalOn
 		}
 
 		if _, found := rpmap[rp.Name]; found {
-			errs = append(errs, fmt.Errorf("duplicate properties.routerProfiles %q", rp.Name))
+			errs = append(errs, fmt.Errorf("duplicate properties.routerProfiles[%q]", rp.Name))
 		}
 		rpmap[rp.Name] = rp
 
@@ -146,7 +146,7 @@ func validateRouterProfile(path string, rp *api.RouterProfile, location string, 
 	}
 
 	if !rxRouterProfileName.MatchString(rp.Name) {
-		errs = append(errs, fmt.Errorf("invalid %s.name %q", path, rp.Name))
+		errs = append(errs, fmt.Errorf("invalid %s", path))
 	}
 
 	// TODO: consider ensuring that PublicSubdomain is of the form
@@ -222,7 +222,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile, vnet *net.IPNet) (errs 
 	case api.AgentPoolProfileRoleCompute:
 		switch app.Name {
 		case string(api.AgentPoolProfileRoleMaster), string(api.AgentPoolProfileRoleInfra):
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q]", app.Name))
 		}
 		if !rxAgentPoolProfileName.MatchString(app.Name) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
@@ -233,7 +233,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile, vnet *net.IPNet) (errs 
 
 	case api.AgentPoolProfileRoleInfra:
 		if app.Name != string(app.Role) {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q]", app.Name))
 		}
 		// TODO: remove count "2" check when CLI is adjusted
 		if app.Count < 2 || app.Count > 3 {
@@ -242,7 +242,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile, vnet *net.IPNet) (errs 
 
 	case api.AgentPoolProfileRoleMaster:
 		if app.Name != string(app.Role) {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q]", app.Name))
 		}
 		if app.Count != 3 {
 			errs = append(errs, fmt.Errorf("invalid properties.masterPoolProfile.count %d", app.Count))
@@ -293,24 +293,24 @@ func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
 	//check supported identity providers
 	for _, ip := range ap.IdentityProviders {
 		if ip.Name != "Azure AD" {
-			errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders name"))
+			errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q]", ip.Name))
 		}
 		switch provider := ip.Provider.(type) {
 		case (*api.AADIdentityProvider):
 			if provider.Kind != "AADIdentityProvider" {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider kind %q", provider.Kind))
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q].kind %q", ip.Name, provider.Kind))
 			}
 			if !isValidUUID(provider.ClientID) {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider clientId %q", provider.ClientID))
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q].clientId %q", ip.Name, provider.ClientID))
 			}
 			if provider.Secret == "" {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider secret %q", provider.Secret))
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q].secret %q", ip.Name, provider.Secret))
 			}
 			if !isValidUUID(provider.TenantID) {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider tenantId %q", provider.TenantID))
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q].tenantId %q", ip.Name, provider.TenantID))
 			}
 			if provider.CustomerAdminGroupID != nil && !isValidUUID(*provider.CustomerAdminGroupID) {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider customerAdminGroupId %q", *provider.CustomerAdminGroupID))
+				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders[%q].customerAdminGroupId %q", ip.Name, *provider.CustomerAdminGroupID))
 			}
 		}
 	}
