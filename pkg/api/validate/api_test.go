@@ -55,6 +55,7 @@ properties:
   networkProfile:
     vnetCidr: 10.0.0.0/8
   openShiftVersion: v3.11
+  publicHostname: test.example.com
   routerProfiles:
   - fqdn: router-fqdn.eastus.cloudapp.azure.com
     name: default
@@ -196,12 +197,19 @@ func TestValidate(t *testing.T) {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.PublicHostname = ""
 			},
+			expectedErrs: []error{errors.New(`invalid properties.publicHostname ""`)},
 		},
 		"openshift config invalid public hostname": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.PublicHostname = "www.example.com"
+				oc.Properties.PublicHostname = "bad!"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.publicHostname "www.example.com"`)},
+			expectedErrs: []error{errors.New(`invalid properties.publicHostname "bad!"`)},
+		},
+		"openshift config matching public hostname": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.PublicHostname = oc.Properties.FQDN
+			},
+			expectedErrs: []error{errors.New(`invalid properties.fqdn "example.eastus.cloudapp.azure.com": must differ from properties.publicHostname`)},
 		},
 		"network profile valid VnetId": {
 			f: func(oc *api.OpenShiftManagedCluster) {
@@ -284,12 +292,19 @@ func TestValidate(t *testing.T) {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].PublicSubdomain = ""
 			},
+			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].publicSubdomain ""`)},
 		},
 		"router invalid public subdomain": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].PublicSubdomain = "()"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].publicSubdomain "()"`)},
+		},
+		"router matching public subdomain": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RouterProfiles[0].PublicSubdomain = oc.Properties.RouterProfiles[0].FQDN
+			},
+			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].fqdn "router-fqdn.eastus.cloudapp.azure.com": must differ from properties.routerProfiles["default"].publicSubdomain`)},
 		},
 		"test external only true - unset router profile does not fail": {
 			f: func(oc *api.OpenShiftManagedCluster) {
