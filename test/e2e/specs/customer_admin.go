@@ -2,6 +2,7 @@ package specs
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -240,5 +241,19 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 		Expect(err).ToNot(HaveOccurred())
 	})
 
+	It("should sync AAD admin group", func() {
+		syncSecret, err := cli.Client.Admin.CoreV1.Secrets("openshift-infra").Get("aad-group-sync-config", metav1.GetOptions{})
+		Expect(err).ToNot(HaveOccurred())
+		id := "44e69b4e-2e70-42df-bb97-3a890730d7b0"
+		testUser := "testuserdisabled"
+		gid := syncSecret.Data["customerAdminGroupId"]
+		if strings.EqualFold(string(gid), id) {
+			// test the users
+			oca, err := cli.Client.Admin.UserV1.Groups().Get("osa-customer-admins", metav1.GetOptions{})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(oca.Users)).To(Equal(1))
+			Expect(strings.HasPrefix(oca.Users[0], testUser)).To(BeTrue())
+		}
+	})
 	// Placeholder to test that a ded admin cannot delete pods in the default or openshift- namespaces
 })
