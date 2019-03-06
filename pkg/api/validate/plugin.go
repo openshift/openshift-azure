@@ -2,6 +2,7 @@ package validate
 
 import (
 	"fmt"
+	"net"
 
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 )
@@ -43,6 +44,12 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid ImageVersion %q", c.ImageVersion))
 	}
 
+	for _, prefix := range c.SSHSourceAddressPrefixes {
+		if _, _, err := net.ParseCIDR(prefix); err != nil {
+			errs = append(errs, fmt.Errorf("invalid sshSourceAddressPrefix %q", prefix))
+		}
+	}
+
 	errs = append(errs, v.validateCertificateConfig(&c.Certificates)...)
 
 	errs = append(errs, v.validateImageConfig(&c.Images)...)
@@ -61,6 +68,14 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 
 	if c.GenevaLoggingControlPlaneAccount == "" {
 		errs = append(errs, fmt.Errorf("genevaLoggingControlPlaneAccount cannot be empty"))
+	}
+
+	if c.GenevaLoggingControlPlaneEnvironment == "" {
+		errs = append(errs, fmt.Errorf("genevaLoggingControlPlaneEnvironment cannot be empty"))
+	}
+
+	if c.GenevaLoggingControlPlaneRegion == "" {
+		errs = append(errs, fmt.Errorf("genevaLoggingControlPlaneRegion cannot be empty"))
 	}
 
 	if c.GenevaMetricsAccount == "" {
@@ -190,6 +205,26 @@ func (v *PluginAPIValidator) validateImageConfig(i *pluginapi.ImageConfig) (errs
 
 	if len(i.GenevaImagePullSecret) == 0 {
 		errs = append(errs, fmt.Errorf("images.GenevaImagePullSecret cannot be empty"))
+	}
+
+	if i.GenevaLogging == "" {
+		errs = append(errs, fmt.Errorf("images.GenevaLogging cannot be empty"))
+	}
+
+	if i.GenevaTDAgent == "" {
+		errs = append(errs, fmt.Errorf("images.GenevaTDAgent cannot be empty"))
+	}
+
+	if i.GenevaStatsd == "" {
+		errs = append(errs, fmt.Errorf("images.GenevaStatsd cannot be empty"))
+	}
+
+	if i.MetricsBridge == "" {
+		errs = append(errs, fmt.Errorf("images.MetricsBridge cannot be empty"))
+	}
+
+	if len(i.ImagePullSecret) == 0 {
+		errs = append(errs, fmt.Errorf("images.ImagePullSecret cannot be empty"))
 	}
 
 	return
