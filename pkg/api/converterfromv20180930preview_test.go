@@ -65,12 +65,11 @@ func internalManagedCluster() *OpenShiftManagedCluster {
 					{
 						Name: "Properties.AuthProfile.IdentityProviders[0].Name",
 						Provider: &AADIdentityProvider{
-							Kind:                  "AADIdentityProvider",
-							ClientID:              "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
-							Secret:                "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
-							TenantID:              "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
-							CustomerAdminGroupID:  to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Provider.CustomerAdminGroupID"),
-							CustomerReaderGroupID: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Provider.CustomerReaderGroupID"),
+							Kind:                 "AADIdentityProvider",
+							ClientID:             "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
+							Secret:               "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
+							TenantID:             "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
+							CustomerAdminGroupID: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Provider.CustomerAdminGroupID"),
 						},
 					},
 				},

@@ -20,8 +20,7 @@ import (
 )
 
 const (
-	osaCustomerAdmins  = "osa-customer-admins"
-	osaCustomerReaders = "osa-customer-readers"
+	osaCustomerAdmins = "osa-customer-admins"
 )
 
 type reconcileGroup struct {
@@ -91,9 +90,6 @@ func (r *reconcileGroup) load(path string) error {
 	}
 	if r.config.CustomerAdminGroupID != nil {
 		r.groupMap[osaCustomerAdmins] = *r.config.CustomerAdminGroupID
-	}
-	if r.config.CustomerReaderGroupID != nil {
-		r.groupMap[osaCustomerReaders] = *r.config.CustomerReaderGroupID
 	}
 	return nil
 }

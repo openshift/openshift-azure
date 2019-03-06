@@ -74,15 +74,6 @@ func NewAzureClusterReaderClient(cs *internalapi.OpenShiftManagedCluster) (*Clie
 	return newClientFromKubeConfig(&kc)
 }
 
-func NewCustomerReaderClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
-	kc, err := login("customer-cluster-reader", cs)
-	if err != nil {
-		return nil, err
-	}
-
-	return newClientFromKubeConfig(kc)
-}
-
 func NewAdminClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
 	kc, err := login("admin", cs)
 	if err != nil {
@@ -112,7 +103,6 @@ func NewEndUserClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) 
 
 type ClientSet struct {
 	AzureClusterReader *Client
-	CustomerReader     *Client
 	Admin              *Client
 	CustomerAdmin      *Client
 	EndUser            *Client
@@ -132,10 +122,6 @@ func NewClientSet(cs *internalapi.OpenShiftManagedCluster) (*ClientSet, error) {
 		return nil, err
 	}
 	c.CustomerAdmin, err = NewCustomerAdminClient(cs)
-	if err != nil {
-		return nil, err
-	}
-	c.CustomerReader, err = NewCustomerReaderClient(cs)
 	if err != nil {
 		return nil, err
 	}
