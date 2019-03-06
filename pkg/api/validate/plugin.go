@@ -50,9 +50,9 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 		}
 	}
 
-	errs = append(errs, v.validateCertificateConfig(&c.Certificates)...)
+	errs = append(errs, validateCertificateConfig(&c.Certificates)...)
 
-	errs = append(errs, v.validateImageConfig(&c.Images)...)
+	errs = append(errs, validateImageConfig(&c.Images)...)
 
 	if c.GenevaLoggingSector == "" {
 		errs = append(errs, fmt.Errorf("invalid genevaLoggingSector %q", c.GenevaLoggingSector))
@@ -89,7 +89,7 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 	return
 }
 
-func (v *PluginAPIValidator) validateImageConfig(i *pluginapi.ImageConfig) (errs []error) {
+func validateImageConfig(i *pluginapi.ImageConfig) (errs []error) {
 	if i == nil {
 		errs = append(errs, fmt.Errorf("imageConfig cannot be nil"))
 		return
@@ -230,31 +230,34 @@ func (v *PluginAPIValidator) validateImageConfig(i *pluginapi.ImageConfig) (errs
 	return
 }
 
-func (v *PluginAPIValidator) validateCertificateConfig(c *pluginapi.CertificateConfig) (errs []error) {
+func validateCertificateConfig(c *pluginapi.CertificateConfig) (errs []error) {
 	if c == nil {
 		errs = append(errs, fmt.Errorf("certificateConfig cannot be nil"))
 		return
 	}
 
-	if c.GenevaLogging.Key == nil {
-		errs = append(errs, fmt.Errorf("invalid certificates.genevaLogging.key"))
-	} else if err := c.GenevaLogging.Key.Validate(); err != nil {
-		errs = append(errs, fmt.Errorf("invalid certificates.genevaLogging.key: %v", err))
-	}
+	errs = append(errs, validateCertKeyPair("certificates.genevaLogging", &c.GenevaLogging)...)
 
-	if c.GenevaLogging.Cert == nil {
-		errs = append(errs, fmt.Errorf("invalid certificates.genevaLogging.cert"))
-	}
-
-	if c.GenevaMetrics.Key == nil {
-		errs = append(errs, fmt.Errorf("invalid certificates.genevaMetrics.key"))
-	} else if err := c.GenevaMetrics.Key.Validate(); err != nil {
-		errs = append(errs, fmt.Errorf("invalid certificates.genevaMetrics.key: %v", err))
-	}
-
-	if c.GenevaMetrics.Cert == nil {
-		errs = append(errs, fmt.Errorf("invalid certificates.genevaMetrics.cert"))
-	}
+	errs = append(errs, validateCertKeyPair("certificates.genevaMetrics", &c.GenevaMetrics)...)
 
 	return
+}
+
+func validateCertKeyPair(path string, c *pluginapi.CertKeyPair) (errs []error) {
+	if c == nil {
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
+		return
+	}
+
+	if c.Key == nil {
+		errs = append(errs, fmt.Errorf("invalid %s.key", path))
+	} else if err := c.Key.Validate(); err != nil {
+		errs = append(errs, fmt.Errorf("invalid %s.key: %v", path, err))
+	}
+
+	if c.Cert == nil {
+		errs = append(errs, fmt.Errorf("invalid %s.cert", path))
+	}
+
+	return errs
 }
