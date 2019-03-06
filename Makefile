@@ -124,7 +124,13 @@ codecov: unit
 	./hack/codecov-report.sh
 
 upgrade:
-	./hack/upgrade-e2e.sh release-test-${TAG}-${COMMIT} ${SOURCE}
+   # if $SOURCE is provided, we test upgrade source to pr code base
+ifneq ($(SOURCE),)
+	./hack/upgrade-e2e.sh release-${TAG}-${COMMIT} ${SOURCE}
+else
+   # if $SOURCE is not provided, we test PR code base to latest container images
+	./hack/upgrade-e2e.sh release-${TAG}-${COMMIT}
+endif
 
 e2e:
 	FOCUS="\[AzureClusterReader\]|\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh

@@ -1,12 +1,15 @@
 #!/bin/bash -ex
 
-if [[ $# -ne 2  ]]; then
-    echo error: $0 resourcegroup source_cluster_tag_version
-    exit 1
+if [[ $# == 1  ]]; then
+    echo "pr code base to latest upgrade test"
+fi
+
+if [[ $# == 2  ]]; then
+    echo "source code base to pr code base upgrade test"
+    export SOURCE=tags/$2
 fi
 
 export RESOURCEGROUP=$1
-export SOURCE=tags/$2
 
 if [[ -f /usr/secrets/secret ]] ;then
     set +x
@@ -19,31 +22,18 @@ if [[ -f /usr/secrets/secret ]] ;then
     export DEPLOY_VERSION=v3.11
     export NO_WAIT=true
 
-    # iniciate source code for source cluster
-    T="$(mktemp -d)"
-    export GOPATH="${T}"
-    trap "rm -rf ${T}" EXIT
-    mkdir -p "${T}/src/github.com/openshift/"
-    cd "${T}/src/github.com/openshift/"
-    git clone https://github.com/openshift/openshift-azure
-    cd openshift-azure
-    git checkout $SOURCE
-    # link shared secrets
-    ln -s /usr/secrets secrets
+    export GOPATH="/go"
+    cd ${GOPATH}/src/github.com/openshift/openshift-azure
 
+    # if this is source code base to pr code upgrade
+    if [[ $SOURCE != "" ]]; then
+        git checkout $SOURCE
+    fi
+    # link shared secrets
+    ln -s /usr/secrets /go/src/github.com/openshift/openshift-azure/secrets
     trap "make delete" EXIT
     echo "Create source cluster"
     make create
-
-    # try upgrade cluster to newest code base
-    export GOPATH="/go"
-    # link secret
-    ln -s /usr/secrets /go/src/github.com/openshift/openshift-azure/secrets
-    ## copy manifest files
-    ## TODO: fakeRP should read config blob so this should be removed
-    cp -r ${T}/src/github.com/openshift/openshift-azure/_data /go/src/github.com/openshift/openshift-azure/
-
-    cd /go/src/github.com/openshift/openshift-azure
 
     # set ci namespace images for cluster creation
     REGISTRY=registry.svc.ci.openshift.org
