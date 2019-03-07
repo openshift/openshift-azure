@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"fmt"
 	"os"
 
 	mgmtkeyvault "github.com/Azure/azure-sdk-for-go/services/keyvault/mgmt/2016-10-01/keyvault"
@@ -23,14 +22,6 @@ const (
 	vaultKeyNamePublicHostname = "PublicHostname"
 	vaultKeyNameRouter         = "Router"
 )
-
-func vaultName(rg string) string {
-	return rg + "-vault"
-}
-
-func vaultURL(rg string) string {
-	return fmt.Sprintf("https://%s.vault.azure.net", vaultName(rg))
-}
 
 type vaultManager struct {
 	vc  azureclient.VaultMgmtClient
@@ -146,10 +137,5 @@ func (vm *vaultManager) createOrUpdateVault(ctx context.Context, appID, tenantID
 			},
 		},
 	})
-	return err
-}
-
-func (vm *vaultManager) deleteVault(ctx context.Context, subscriptionID, resourceGroup, vaultName string) error {
-	_, err := vm.vc.Delete(ctx, resourceGroup, vaultName)
 	return err
 }

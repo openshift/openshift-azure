@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -21,6 +23,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
+	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
 func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployFn {
@@ -107,12 +110,22 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
-	err = vm.createOrUpdateVault(ctx, cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
+	vaultURL, _, err := vault.SplitSecretURL(cs.Properties.APICertProfile.KeyVaultSecretURL)
 	if err != nil {
 		return nil, err
 	}
 
-	err = vm.writeTLSCertsToVault(ctx, cs, vaultURL(os.Getenv("RESOURCEGROUP")))
+	u, err := url.Parse(vaultURL)
+	if err != nil {
+		return nil, err
+	}
+
+	err = vm.createOrUpdateVault(ctx, cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, strings.Split(u.Host, ".")[0])
+	if err != nil {
+		return nil, err
+	}
+
+	err = vm.writeTLSCertsToVault(ctx, cs, vaultURL)
 	if err != nil {
 		return nil, err
 	}
@@ -235,13 +248,27 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 		}
 	}
 
-	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/" + vaultKeyNamePublicHostname
-	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/" + vaultKeyNameRouter
+	var vaultURL string
+	var err error
+	if cs.Properties.APICertProfile.KeyVaultSecretURL != "" {
+		vaultURL, _, err = vault.SplitSecretURL(cs.Properties.APICertProfile.KeyVaultSecretURL)
+		if err != nil {
+			return err
+		}
+	} else {
+		vaultURL, err = random.FQDN("vault.azure.net", 24)
+		if err != nil {
+			return err
+		}
+		vaultURL = "https://" + vaultURL
+	}
+
+	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNamePublicHostname
+	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNameRouter
 
 	cs.Properties.PublicHostname = "openshift." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
 	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
 
-	var err error
 	if cs.Properties.FQDN == "" {
 		cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
 		if err != nil {

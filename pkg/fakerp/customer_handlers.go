@@ -55,18 +55,6 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	vm, err := newVaultManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"))
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to delete vault: %v", err))
-		return
-	}
-
-	err = vm.deleteVault(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), vaultName(os.Getenv("RESOURCEGROUP")))
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to delete vault: %v", err))
-		return
-	}
-
 	resourceGroup := filepath.Base(req.URL.Path)
 	s.log.Infof("deleting resource group %s", resourceGroup)
 

@@ -10,7 +10,6 @@ import (
 
 type VaultMgmtClient interface {
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, vaultName string, parameters mgmtkeyvault.VaultCreateOrUpdateParameters) (result mgmtkeyvault.Vault, err error)
-	Delete(ctx context.Context, resourceGroupName string, vaultName string) (result autorest.Response, err error)
 }
 
 type vaultsMgmtClient struct {
