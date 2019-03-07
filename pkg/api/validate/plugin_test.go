@@ -11,7 +11,7 @@ import (
 func TestPluginTemplateValidate(t *testing.T) {
 	expectedErrs :=
 		[]error{
-			errors.New(`invalid clusterVersion ""`),
+			errors.New(`invalid pluginVersion ""`),
 			errors.New(`invalid imageOffer ""`),
 			errors.New(`invalid imagePublisher ""`),
 			errors.New(`invalid imageSKU ""`),

@@ -102,7 +102,7 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 
 func convertConfigToAdmin(cs *Config) *admin.Config {
 	return &admin.Config{
-		ClusterVersion:                       &cs.ClusterVersion,
+		PluginVersion:                        &cs.PluginVersion,
 		SSHSourceAddressPrefixes:             &cs.SSHSourceAddressPrefixes,
 		ImageOffer:                           &cs.ImageOffer,
 		ImagePublisher:                       &cs.ImagePublisher,

@@ -22,8 +22,8 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 		return
 	}
 
-	if !rxClusterVersion.MatchString(c.ClusterVersion) {
-		errs = append(errs, fmt.Errorf("invalid clusterVersion %q", c.ClusterVersion))
+	if !rxPluginVersion.MatchString(c.PluginVersion) {
+		errs = append(errs, fmt.Errorf("invalid pluginVersion %q", c.PluginVersion))
 	}
 
 	if c.ImageOffer != "osa" {

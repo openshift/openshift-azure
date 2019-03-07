@@ -1,11 +1,11 @@
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
-CLUSTER_VERSION=$(shell awk '/^clusterVersion: /{ print $$2 }' <pluginconfig/pluginconfig-311.yaml)
+PLUGIN_VERSION=$(shell awk '/^pluginVersion: /{ print $$2 }' <pluginconfig/pluginconfig-311.yaml)
 # if we are on master branch we should always use dev tag
-$(info CLUSTER_VERSION is ${CLUSTER_VERSION})
-ifeq ($(CLUSTER_VERSION),v0.0)
+$(info PLUGIN_VERSION is ${PLUGIN_VERSION})
+ifeq ($(PLUGIN_VERSION),v0.0)
   TAG := dev
 else
-  TAG := ${CLUSTER_VERSION}
+  TAG := ${PLUGIN_VERSION}
 endif
 $(info TAG set to ${TAG})
 LDFLAGS="-X main.gitCommit=$(COMMIT)"

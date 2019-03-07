@@ -75,7 +75,7 @@ var marshalled = []byte(`{
 		"Tags.key": "Tags.val"
 	},
 	"config": {
-		"clusterVersion": "Config.ClusterVersion",
+		"pluginVersion": "Config.PluginVersion",
 		"imageOffer": "Config.ImageOffer",
 		"imagePublisher": "Config.ImagePublisher",
 		"imageSku": "Config.ImageSKU",
