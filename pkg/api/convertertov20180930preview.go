@@ -31,6 +31,7 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 	oc.Properties = &v20180930preview.Properties{
 		ProvisioningState: &provisioningState,
 		OpenShiftVersion:  &cs.Properties.OpenShiftVersion,
+		ClusterVersion:    &cs.Properties.ClusterVersion,
 		PublicHostname:    &cs.Properties.PublicHostname,
 		FQDN:              &cs.Properties.FQDN,
 	}

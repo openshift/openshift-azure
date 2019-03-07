@@ -37,6 +37,10 @@ type Properties struct {
 	// `v3.11`.
 	OpenShiftVersion string `json:"openShiftVersion,omitempty"`
 
+	// ClusterVersion (out): RP version at which cluster was last
+	// created/updated
+	ClusterVersion string `json:"clusterVersion,omitempty"`
+
 	// PublicHostname (out): public hostname of OpenShift API server.
 	PublicHostname string `json:"publicHostname,omitempty"`
 
