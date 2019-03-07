@@ -181,22 +181,22 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.prometheusOperator.baseImage"),
-			Template:   "{{ .Config.Images.PrometheusOperatorBase }}",
+			Template:   "{{ ImageOnly .Config.Images.PrometheusOperator }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.prometheusOperator.prometheusConfigReloaderBaseImage"),
-			Template:   "{{ .Config.Images.PrometheusConfigReloaderBase }}",
+			Template:   "{{ ImageOnly .Config.Images.PrometheusConfigReloader }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.prometheusOperator.configReloaderBaseImage"),
-			Template:   "{{ .Config.Images.ConfigReloaderBase }}",
+			Template:   "{{ ImageOnly .Config.Images.ConfigReloader }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.prometheusK8s.baseImage"),
-			Template:   "{{ .Config.Images.PrometheusBase }}",
+			Template:   "{{ ImageOnly .Config.Images.Prometheus }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
@@ -206,32 +206,32 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.alertmanagerMain.baseImage"),
-			Template:   "{{ .Config.Images.AlertManagerBase }}",
+			Template:   "{{ ImageOnly .Config.Images.AlertManager }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.nodeExporter.baseImage"),
-			Template:   "{{ .Config.Images.NodeExporterBase }}",
+			Template:   "{{ ImageOnly .Config.Images.NodeExporter }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.grafana.baseImage"),
-			Template:   "{{ .Config.Images.GrafanaBase }}",
+			Template:   "{{ ImageOnly .Config.Images.Grafana }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeStateMetrics.baseImage"),
-			Template:   "{{ .Config.Images.KubeStateMetricsBase }}",
+			Template:   "{{ ImageOnly .Config.Images.KubeStateMetrics }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.kubeRbacProxy.baseImage"),
-			Template:   "{{ .Config.Images.KubeRbacProxyBase }}",
+			Template:   "{{ ImageOnly .Config.Images.KubeRbacProxy }}",
 		},
 		{
 			Path:       jsonpath.MustCompile("$.data.'config.yaml'"),
 			NestedPath: jsonpath.MustCompile("$.auth.baseImage"),
-			Template:   "{{ .Config.Images.OAuthProxyBase }}",
+			Template:   "{{ ImageOnly .Config.Images.OAuthProxy }}",
 		},
 	},
 	"ConfigMap/openshift-azure-monitoring/metrics-bridge": {
