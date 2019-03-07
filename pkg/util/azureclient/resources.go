@@ -63,7 +63,6 @@ func NewResourcesClient(ctx context.Context, subscriptionID string, authorizer a
 // GroupsClient is a minimal interface for azure Resources Client
 type GroupsClient interface {
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, parameters resources.Group) (result resources.Group, err error)
-	CheckExistence(ctx context.Context, resourceGroupName string) (exists bool, err error)
 	List(ctx context.Context, filter string, top *int32) (result resources.GroupListResultPage, err error)
 	Delete(ctx context.Context, resourceGroupName string) (result resources.GroupsDeleteFuture, err error)
 	Client
@@ -87,20 +86,4 @@ func NewGroupsClient(ctx context.Context, subscriptionID string, authorizer auto
 
 func (c *groupsClient) Client() autorest.Client {
 	return c.GroupsClient.Client
-}
-
-func (c *groupsClient) CreateOrUpdate(ctx context.Context, resourceGroupName string, parameters resources.Group) (resources.Group, error) {
-	return c.GroupsClient.CreateOrUpdate(ctx, resourceGroupName, parameters)
-}
-
-func (c *groupsClient) CheckExistence(ctx context.Context, resourceGroupName string) (bool, error) {
-	resp, err := c.GroupsClient.CheckExistence(ctx, resourceGroupName)
-	switch resp.StatusCode {
-	case 404:
-		return false, nil
-	case 200:
-		return true, nil
-	default:
-		return false, err
-	}
 }

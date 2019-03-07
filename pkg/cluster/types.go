@@ -49,6 +49,7 @@ type Upgrader interface {
 	ResetUpdateBlob(cs *api.OpenShiftManagedCluster) error
 	Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID string) error
 	ListVMHostnames(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]string, error)
+	RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID, command string) error
 }
 
 type simpleUpgrader struct {

@@ -274,3 +274,17 @@ func (mr *MockUpgraderMockRecorder) ListVMHostnames(ctx, cs interface{}) *gomock
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListVMHostnames", reflect.TypeOf((*MockUpgrader)(nil).ListVMHostnames), ctx, cs)
 }
+
+// RunCommand mocks base method
+func (m *MockUpgrader) RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID, command string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RunCommand", ctx, cs, scaleset, instanceID, command)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RunCommand indicates an expected call of RunCommand
+func (mr *MockUpgraderMockRecorder) RunCommand(ctx, cs, scaleset, instanceID, command interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunCommand", reflect.TypeOf((*MockUpgrader)(nil).RunCommand), ctx, cs, scaleset, instanceID, command)
+}
