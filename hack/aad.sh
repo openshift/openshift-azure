@@ -35,12 +35,12 @@ app-create)
     AZURE_AAD_CLIENT_SECRET=$(uuidgen)
     AZURE_AAD_CLIENT_ID=$(az ad app create \
         --display-name "$2" \
-        --homepage http://localhost/ \
-        --identifier-uris http://localhost/ \
+        --homepage "http://$2/" \
+        --identifier-uris "http://$2/" \
         --key-type password \
         --password "$AZURE_AAD_CLIENT_SECRET" \
         --query appId \
-        --reply-urls http://localhost/ \
+        --reply-urls "http://$2/" \
         --required-resource-accesses @- <<'EOF' | tr -d '"'
 [
     {
