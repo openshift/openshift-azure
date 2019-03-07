@@ -32,7 +32,7 @@ func newDNSManager(ctx context.Context, subscriptionID, dnsResourceGroup, dnsDom
 	}, nil
 }
 
-func (dm *dnsManager) createZone(ctx context.Context, resourceGroup, zoneName, parentResourceGroup, parentZoneName string) error {
+func (dm *dnsManager) createOrUpdateZone(ctx context.Context, resourceGroup, zoneName, parentResourceGroup, parentZoneName string) error {
 	zone, err := dm.zc.CreateOrUpdate(ctx, resourceGroup, zoneName, dns.Zone{
 		Location: to.StringPtr("global"),
 	}, "", "")
@@ -97,11 +97,11 @@ func (dm *dnsManager) deleteZone(ctx context.Context, resourceGroup, zoneName, p
 	return dm.zc.Delete(ctx, resourceGroup, zoneName, "")
 }
 
-func (dm *dnsManager) createOCPDNS(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (dm *dnsManager) createOrUpdateOCPDNS(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	parentZone := strings.SplitN(cs.Properties.RouterProfiles[0].PublicSubdomain, ".", 2)[1]
 
 	// <random>.osacloud.dev zone
-	err := dm.createZone(ctx, cs.Properties.AzProfile.ResourceGroup, parentZone, dm.dnsResourceGroup, dm.dnsDomain)
+	err := dm.createOrUpdateZone(ctx, cs.Properties.AzProfile.ResourceGroup, parentZone, dm.dnsResourceGroup, dm.dnsDomain)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (dm *dnsManager) createOCPDNS(ctx context.Context, cs *api.OpenShiftManaged
 	}, "", "")
 
 	// apps.<random>.osacloud.dev zone
-	err = dm.createZone(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Properties.RouterProfiles[0].PublicSubdomain, cs.Properties.AzProfile.ResourceGroup, parentZone)
+	err = dm.createOrUpdateZone(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Properties.RouterProfiles[0].PublicSubdomain, cs.Properties.AzProfile.ResourceGroup, parentZone)
 	if err != nil {
 		return err
 	}

@@ -73,30 +73,10 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, kerrors.NewAggregate(errs)
 	}
 
-	// read in the OpenShift config blob if it exists (i.e. we're updating)
-	// in the update path, the RP should have access to the previous internal
-	// API representation for comparison.
-	if !shared.IsUpdate() {
-		// create DNS records only on first call
-
-		// the RP will enrich the internal API representation with data not included
-		// in the original request
-		log.Info("enrich")
-		err = enrich(cs)
-		if err != nil {
-			return nil, err
-		}
-
-		dm, err := newDNSManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
-		if err != nil {
-			return nil, err
-		}
-
-		err = dm.createOCPDNS(ctx, cs)
-		if err != nil {
-			return nil, err
-		}
-
+	log.Info("enrich")
+	err = enrich(cs)
+	if err != nil {
+		return nil, err
 	}
 
 	// validate the internal API representation (with reference to the previous
@@ -112,27 +92,35 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, kerrors.NewAggregate(errs)
 	}
 
-	// generate or update the OpenShift config blob
-	err = p.GenerateConfig(ctx, cs, template)
+	dm, err := newDNSManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
 	if err != nil {
 		return nil, err
 	}
 
-	if !shared.IsUpdate() {
-		// call after GenerateConfig() as we need the CA certificate created
-		vm, err := newVaultManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"))
-		if err != nil {
-			return nil, err
-		}
+	err = dm.createOrUpdateOCPDNS(ctx, cs)
+	if err != nil {
+		return nil, err
+	}
 
-		err = vm.createVault(ctx, cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
-		if err != nil {
-			return nil, err
-		}
-		err = vm.writeTLSCertsToVault(ctx, cs, vaultURL(os.Getenv("RESOURCEGROUP")))
-		if err != nil {
-			return nil, err
-		}
+	vm, err := newVaultManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	if err != nil {
+		return nil, err
+	}
+
+	err = vm.createOrUpdateVault(ctx, cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
+	if err != nil {
+		return nil, err
+	}
+
+	err = vm.writeTLSCertsToVault(ctx, cs, vaultURL(os.Getenv("RESOURCEGROUP")))
+	if err != nil {
+		return nil, err
+	}
+
+	// generate or update the OpenShift config blob
+	err = p.GenerateConfig(ctx, cs, template)
+	if err != nil {
+		return nil, err
 	}
 
 	// persist the OpenShift container service
@@ -239,10 +227,12 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	// /subscriptions/{subscription}/resourcegroups/{resource_group}/providers/Microsoft.ContainerService/openshiftmanagedClusters/{cluster_name}
 	cs.ID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.ContainerService/openshiftmanagedClusters", cs.Name)
 
-	cs.Properties.RouterProfiles = []api.RouterProfile{
-		{
-			Name: "default",
-		},
+	if len(cs.Properties.RouterProfiles) == 0 {
+		cs.Properties.RouterProfiles = []api.RouterProfile{
+			{
+				Name: "default",
+			},
+		}
 	}
 
 	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/" + vaultKeyNamePublicHostname
@@ -252,14 +242,18 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
 
 	var err error
-	cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
-	if err != nil {
-		return err
+	if cs.Properties.FQDN == "" {
+		cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+		if err != nil {
+			return err
+		}
 	}
 
-	cs.Properties.RouterProfiles[0].FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
-	if err != nil {
-		return err
+	if cs.Properties.RouterProfiles[0].FQDN == "" {
+		cs.Properties.RouterProfiles[0].FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

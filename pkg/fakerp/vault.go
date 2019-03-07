@@ -93,9 +93,12 @@ func (vm *vaultManager) writeTLSCertsToVault(ctx context.Context, cs *api.OpenSh
 		},
 	}
 	for _, cert := range certs {
-		if cert.params.SigningKey == nil && cert.params.SigningCert == nil {
-			cert.params.SigningKey, cert.params.SigningCert = cs.Config.Certificates.Ca.Key, cs.Config.Certificates.Ca.Cert
+		_, err := vm.kvc.GetSecret(ctx, vaultURL, cert.vaultKeyName, "")
+		if err == nil {
+			// let's assume it doesn't need updating
+			continue
 		}
+
 		newkey, newcert, err := tls.NewCert(&cert.params)
 		if err != nil {
 			return err
@@ -108,7 +111,7 @@ func (vm *vaultManager) writeTLSCertsToVault(ctx context.Context, cs *api.OpenSh
 	return nil
 }
 
-func (vm *vaultManager) createVault(ctx context.Context, appID, tenantID, resourceGroup, location, vaultName string) error {
+func (vm *vaultManager) createOrUpdateVault(ctx context.Context, appID, tenantID, resourceGroup, location, vaultName string) error {
 	tID, err := uuid.FromString(tenantID)
 	if err != nil {
 		return err
