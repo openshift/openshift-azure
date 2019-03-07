@@ -57,10 +57,13 @@ func GetScaleSetNameAndInstanceID(hostname string) (string, string, error) {
 
 // GetAgentRole parses a hostname, e.g. master-000000 or infra-12345-000000
 // and returns the lowercase role name ("master", "infra" or "compute")
-func GetAgentRole(hostname string) string {
-	hostnameprefix := strings.Split(hostname, "-")[0]
-	if hostnameprefix == "master" || hostnameprefix == "infra" {
-		return hostnameprefix
+func GetAgentRole(hostname string) api.AgentPoolProfileRole {
+	switch strings.Split(hostname, "-")[0] {
+	case "master":
+		return api.AgentPoolProfileRoleMaster
+	case "infra":
+		return api.AgentPoolProfileRoleInfra
+	default:
+		return api.AgentPoolProfileRoleCompute
 	}
-	return "compute"
 }

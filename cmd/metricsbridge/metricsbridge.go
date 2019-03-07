@@ -22,7 +22,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/config"
+	pkgconfig "github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/statsd"
 )
@@ -49,7 +49,7 @@ func (rt authorizingRoundTripper) RoundTrip(req *http.Request) (*http.Response, 
 	return rt.RoundTripper.RoundTrip(req)
 }
 
-type metricsbridgeConfig struct {
+type config struct {
 	Interval           time.Duration `json:"intervalNanoseconds,omitempty"`
 	PrometheusEndpoint string        `json:"prometheusEndpoint,omitempty"`
 	StatsdSocket       string        `json:"statsdSocket,omitempty"`
@@ -77,7 +77,7 @@ type metricsbridgeConfig struct {
 	conn       net.Conn
 }
 
-func (c *metricsbridgeConfig) load(path string) error {
+func (c *config) load(path string) error {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
@@ -109,7 +109,7 @@ func (c *metricsbridgeConfig) load(path string) error {
 	return nil
 }
 
-func (c *metricsbridgeConfig) defaultAndValidate() (errs []error) {
+func (c *config) defaultAndValidate() (errs []error) {
 	if c.Interval == 0 {
 		c.Interval = time.Minute
 	}
@@ -130,7 +130,7 @@ func (c *metricsbridgeConfig) defaultAndValidate() (errs []error) {
 	return
 }
 
-func (c *metricsbridgeConfig) init() error {
+func (c *config) init() error {
 	for {
 		var err error
 		c.conn, err = net.Dial("unix", c.StatsdSocket)
@@ -171,7 +171,7 @@ func (c *metricsbridgeConfig) init() error {
 }
 
 func run(log *logrus.Entry, configpath string) error {
-	c := &metricsbridgeConfig{log: log}
+	c := &config{log: log}
 
 	if err := c.load(configpath); err != nil {
 		return err
@@ -198,7 +198,7 @@ func run(log *logrus.Entry, configpath string) error {
 	return c.run()
 }
 
-func (c *metricsbridgeConfig) run() error {
+func (c *config) run() error {
 	t := time.NewTicker(c.Interval)
 	defer t.Stop()
 
@@ -210,7 +210,7 @@ func (c *metricsbridgeConfig) run() error {
 	}
 }
 
-func (c *metricsbridgeConfig) runOnce(ctx context.Context) error {
+func (c *config) runOnce(ctx context.Context) error {
 	var metricsCount int
 	hostnameMap := make(map[string]string)
 
@@ -250,7 +250,7 @@ func (c *metricsbridgeConfig) runOnce(ctx context.Context) error {
 				if present {
 					//only add the hostname dimension if the lookup succeeds
 					f.Dims["hostname"] = hostname
-					f.Dims["agentrole"] = config.GetAgentRole(hostname)
+					f.Dims["agentrole"] = string(pkgconfig.GetAgentRole(hostname))
 				}
 			}
 			if c.Region != "" {
