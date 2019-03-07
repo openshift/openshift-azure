@@ -165,11 +165,11 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		if err != nil {
 			return nil, err
 		}
-		vaultURL, err := createVault(ctx, vc, objID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
+		err = createVault(ctx, vc, objID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
 		if err != nil {
 			return nil, err
 		}
-		err = writeTLSCertsToVault(ctx, kvc, cs, vaultURL)
+		err = writeTLSCertsToVault(ctx, kvc, cs, vaultURL(os.Getenv("RESOURCEGROUP")))
 		if err != nil {
 			return nil, err
 		}
@@ -278,6 +278,10 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 
 	// /subscriptions/{subscription}/resourcegroups/{resource_group}/providers/Microsoft.ContainerService/openshiftmanagedClusters/{cluster_name}
 	cs.ID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.ContainerService/openshiftmanagedClusters", cs.Name)
+
+	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/PublicHostname"
+	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/Router"
+
 	return nil
 }
 

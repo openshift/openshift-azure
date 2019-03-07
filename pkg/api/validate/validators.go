@@ -3,87 +3,9 @@ package validate
 import (
 	"fmt"
 	"net"
-	"strconv"
-	"strings"
-
-	"github.com/google/uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
-
-func init() {
-	var err error
-
-	// TODO: we probably need to bite the bullet and make these configurable.
-	_, clusterNetworkCIDR, err = net.ParseCIDR("10.128.0.0/14")
-	if err != nil {
-		panic(err)
-	}
-
-	_, serviceNetworkCIDR, err = net.ParseCIDR("172.30.0.0/16")
-	if err != nil {
-		panic(err)
-	}
-}
-
-var validAgentPoolProfileRoles = map[api.AgentPoolProfileRole]struct{}{
-	api.AgentPoolProfileRoleCompute: {},
-	api.AgentPoolProfileRoleInfra:   {},
-	api.AgentPoolProfileRoleMaster:  {},
-}
-
-var validRouterProfileNames = map[string]struct{}{
-	"default": {},
-}
-
-func isValidHostname(h string) bool {
-	return len(h) <= 255 && rxRfc1123.MatchString(h)
-}
-
-func isValidCloudAppHostname(h, location string) bool {
-	if !rxCloudDomainLabel.MatchString(h) {
-		return false
-	}
-	return strings.HasSuffix(h, "."+location+".cloudapp.azure.com") && strings.Count(h, ".") == 4
-}
-
-func isValidIPV4CIDR(cidr string) bool {
-	ip, net, err := net.ParseCIDR(cidr)
-	if err != nil {
-		return false
-	}
-	if ip.To4() == nil {
-		return false
-	}
-	if net == nil || !ip.Equal(net.IP) {
-		return false
-	}
-	return true
-}
-
-func IsValidBlobContainerName(c string) bool {
-	// https://docs.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers--blobs--and-metadata
-	if !rxBlobContainerName.MatchString(c) {
-		return false
-	}
-
-	if strings.Trim(c, "-") != c || strings.Contains(c, "--") {
-		return false
-	}
-
-	return true
-}
-
-func vnetContainsSubnet(vnet, subnet *net.IPNet) bool {
-	vnetbits, _ := vnet.Mask.Size()
-	subnetbits, _ := subnet.Mask.Size()
-	if vnetbits > subnetbits {
-		// e.g., vnet is a /24, subnet is a /16: vnet cannot contain subnet.
-		return false
-	}
-
-	return vnet.IP.Equal(subnet.IP.Mask(vnet.Mask))
-}
 
 func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	if c == nil {
@@ -91,15 +13,18 @@ func validateContainerService(c *api.OpenShiftManagedCluster, externalOnly bool)
 		return
 	}
 
-	if c.Location == "" {
-		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
-	}
+	errs = append(errs, validateProperties(&c.Properties, c.Location, externalOnly)...)
 
 	if c.Name == "" {
 		errs = append(errs, fmt.Errorf("invalid name %q", c.Name))
 	}
 
-	errs = append(errs, validateProperties(&c.Properties, c.Location, externalOnly)...)
+	if c.Location == "" {
+		errs = append(errs, fmt.Errorf("invalid location %q", c.Location))
+	}
+
+	// TODO: we don't currently validate Config
+
 	return
 }
 
@@ -109,7 +34,20 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 		return
 	}
 
-	errs = append(errs, validateProvisioningState(p.ProvisioningState)...)
+	switch p.ProvisioningState {
+	case "",
+		api.Creating,
+		api.Updating,
+		api.AdminUpdating,
+		api.Failed,
+		api.Succeeded,
+		api.Deleting,
+		api.Migrating,
+		api.Upgrading:
+	default:
+		errs = append(errs, fmt.Errorf("invalid properties.provisioningState %q", p.ProvisioningState))
+	}
+
 	switch p.OpenShiftVersion {
 	case "v3.11":
 	default:
@@ -119,55 +57,126 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 	if p.PublicHostname != "" { // TODO: relax after private preview (&& !isValidHostname(p.PublicHostname))
 		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
 	}
-	errs = append(errs, validateNetworkProfile(&p.NetworkProfile)...)
 
-	errs = append(errs, validateRouterProfiles(p.RouterProfiles, location, externalOnly)...)
+	if p.FQDN == "" || !isValidCloudAppHostname(p.FQDN, location) {
+		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
+	}
 
-	errs = append(errs, validateFQDN(p, location)...)
+	errs = append(errs, validateNetworkProfile("properties.networkProfile", &p.NetworkProfile)...)
+
+	errs = append(errs, validateRouterProfiles("properties.routerProfiles", p.RouterProfiles, location, externalOnly)...)
+
 	// we can disregard any error below because we are already going to fail
 	// validation if VnetCIDR does not parse correctly.
 	_, vnet, _ := net.ParseCIDR(p.NetworkProfile.VnetCIDR)
+
 	errs = append(errs, validateAgentPoolProfiles(p.AgentPoolProfiles, vnet)...)
-	errs = append(errs, validateAuthProfile(&p.AuthProfile)...)
+
+	errs = append(errs, validateAuthProfile("properties.authProfile", &p.AuthProfile)...)
+
+	if !externalOnly {
+		errs = append(errs, validateServicePrincipalProfile("properties.masterServicePrincipalProfile", &p.MasterServicePrincipalProfile)...)
+
+		errs = append(errs, validateServicePrincipalProfile("properties.workerServicePrincipalProfile", &p.WorkerServicePrincipalProfile)...)
+
+		errs = append(errs, validateAzProfile("properties.azProfile", &p.AzProfile)...)
+
+		errs = append(errs, validateCertProfile("properties.apiCertProfile", &p.APICertProfile)...)
+	}
+
 	return
 }
 
-func validateAuthProfile(ap *api.AuthProfile) (errs []error) {
-	if ap == nil {
-		errs = append(errs, fmt.Errorf("properties.authProfile cannot be nil"))
+func validateNetworkProfile(path string, np *api.NetworkProfile) (errs []error) {
+	if np == nil {
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
 		return
 	}
 
-	if len(ap.IdentityProviders) != 1 {
-		errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders length"))
+	if !isValidIPV4CIDR(np.VnetCIDR) {
+		errs = append(errs, fmt.Errorf("invalid %s.vnetCidr %q", path, np.VnetCIDR))
 	}
-	//check supported identity providers
-	for _, ip := range ap.IdentityProviders {
-		switch provider := ip.Provider.(type) {
-		case (*api.AADIdentityProvider):
-			if ip.Name != "Azure AD" {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.identityProviders name"))
-			}
-			if provider.Secret == "" {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider secret %q", provider.Secret))
-			}
-			if provider.ClientID == "" {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider clientId %q", provider.ClientID))
-			}
-			if provider.TenantID == "" {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider tenantId %q", provider.TenantID))
-			}
-			if provider.CustomerAdminGroupID != nil && !isValidUUID(*provider.CustomerAdminGroupID) {
-				errs = append(errs, fmt.Errorf("invalid properties.authProfile.AADIdentityProvider customerAdminGroupId %q", *provider.CustomerAdminGroupID))
-			}
-		}
+
+	if np.VnetID != "" && !rxVNetID.MatchString(np.VnetID) {
+		errs = append(errs, fmt.Errorf("invalid %s.vnetId %q", path, np.VnetID))
 	}
+
+	if np.PeerVnetID != nil && !rxVNetID.MatchString(*np.PeerVnetID) {
+		errs = append(errs, fmt.Errorf("invalid %s.peerVnetId %q", path, *np.PeerVnetID))
+	}
+
 	return
 }
 
-func isValidUUID(u string) bool {
-	_, err := uuid.Parse(u)
-	return err == nil
+func validateRouterProfiles(path string, rps []api.RouterProfile, location string, externalOnly bool) (errs []error) {
+	rpmap := map[string]api.RouterProfile{}
+
+	for _, rp := range rps {
+		if _, found := validRouterProfileNames[rp.Name]; !found {
+			errs = append(errs, fmt.Errorf("invalid %s[%q]", path, rp.Name))
+		}
+
+		if _, found := rpmap[rp.Name]; found {
+			errs = append(errs, fmt.Errorf("duplicate %s[%q]", path, rp.Name))
+		}
+		rpmap[rp.Name] = rp
+
+		errs = append(errs, validateRouterProfile(fmt.Sprintf("%s[%q]", path, rp.Name), &rp, location, externalOnly)...)
+	}
+
+	// a bit questionable: seems that we allow a user to PUT empty
+	// RouterProfiles on cluster creation.  We allow this on the first
+	// validation pass (externalOnly set), then the RP apparently defaults in a
+	// RouterProfile before validating a second time without externalOnly set.
+	if !externalOnly {
+		for name := range validRouterProfileNames {
+			if _, found := rpmap[name]; !found {
+				errs = append(errs, fmt.Errorf("invalid %s[%q]", path, name))
+			}
+		}
+	}
+
+	return
+}
+
+func validateRouterProfile(path string, rp *api.RouterProfile, location string, externalOnly bool) (errs []error) {
+	if rp == nil {
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
+		return
+	}
+
+	if !rxRouterProfileName.MatchString(rp.Name) {
+		errs = append(errs, fmt.Errorf("invalid %s", path))
+	}
+
+	// TODO: consider ensuring that PublicSubdomain is of the form
+	// <string>.<location>.azmosa.io
+	if rp.PublicSubdomain != "" && !isValidHostname(rp.PublicSubdomain) {
+		errs = append(errs, fmt.Errorf("invalid %s.publicSubdomain %q", path, rp.PublicSubdomain))
+	}
+
+	if !externalOnly {
+		if rp.FQDN != "" && !isValidCloudAppHostname(rp.FQDN, location) {
+			errs = append(errs, fmt.Errorf("invalid %s.fqdn %q", path, rp.FQDN))
+		}
+
+		errs = append(errs, validateCertProfile(path+".routerCertProfile", &rp.RouterCertProfile)...)
+	}
+
+	return
+}
+
+func validateCertProfile(path string, cp *api.CertProfile) (errs []error) {
+	if cp == nil {
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
+		return
+	}
+
+	if !rxKeyVaultSecretURL.MatchString(cp.KeyVaultSecretURL) {
+		errs = append(errs, fmt.Errorf("invalid %s.keyVaultSecretURL %q", path, cp.KeyVaultSecretURL))
+	}
+
+	return
 }
 
 func validateAgentPoolProfiles(apps []api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {
@@ -187,7 +196,7 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile, vnet *net.IPNet) (er
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles.subnetCidr %q: all subnetCidrs must match", app.SubnetCIDR))
 		}
 
-		errs = append(errs, validateAgentPoolProfile(app, vnet)...)
+		errs = append(errs, validateAgentPoolProfile(&app, vnet)...)
 	}
 
 	for role := range validAgentPoolProfileRoles {
@@ -203,12 +212,17 @@ func validateAgentPoolProfiles(apps []api.AgentPoolProfile, vnet *net.IPNet) (er
 	return
 }
 
-func validateAgentPoolProfile(app api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {
+func validateAgentPoolProfile(app *api.AgentPoolProfile, vnet *net.IPNet) (errs []error) {
+	if app == nil {
+		errs = append(errs, fmt.Errorf("agentPoolProfile cannot be nil"))
+		return
+	}
+
 	switch app.Role {
 	case api.AgentPoolProfileRoleCompute:
 		switch app.Name {
 		case string(api.AgentPoolProfileRoleMaster), string(api.AgentPoolProfileRoleInfra):
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q]", app.Name))
 		}
 		if !rxAgentPoolProfileName.MatchString(app.Name) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
@@ -219,7 +233,7 @@ func validateAgentPoolProfile(app api.AgentPoolProfile, vnet *net.IPNet) (errs [
 
 	case api.AgentPoolProfileRoleInfra:
 		if app.Name != string(app.Role) {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q]", app.Name))
 		}
 		// TODO: remove count "2" check when CLI is adjusted
 		if app.Count < 2 || app.Count > 3 {
@@ -228,12 +242,15 @@ func validateAgentPoolProfile(app api.AgentPoolProfile, vnet *net.IPNet) (errs [
 
 	case api.AgentPoolProfileRoleMaster:
 		if app.Name != string(app.Role) {
-			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
+			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q]", app.Name))
 		}
 		if app.Count != 3 {
 			errs = append(errs, fmt.Errorf("invalid properties.masterPoolProfile.count %d", app.Count))
 		}
 	}
+
+	// VMSize is checked by the caller using validateVMSize as it depends on
+	// runningUnderTest.
 
 	if !isValidIPV4CIDR(app.SubnetCIDR) {
 		errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].subnetCidr %q", app.Name, app.SubnetCIDR))
@@ -263,131 +280,87 @@ func validateAgentPoolProfile(app api.AgentPoolProfile, vnet *net.IPNet) (errs [
 	return
 }
 
-func IsValidAgentPoolHostname(hostname string) bool {
-	parts := strings.Split(hostname, "-")
-	switch len(parts) {
-	case 2: // master-XXXXXX
-		if parts[0] != "master" ||
-			len(parts[1]) != 6 {
-			return false
-		}
-		_, err := strconv.ParseUint(parts[1], 36, 64)
-		if err != nil {
-			return false
-		}
-
-	case 3: // something-XXXXXXXXXX-XXXXXX
-		if !rxAgentPoolProfileName.MatchString(parts[0]) ||
-			parts[0] == "master" ||
-			len(parts[1]) != 10 ||
-			len(parts[2]) != 6 {
-			return false
-		}
-		_, err := strconv.ParseUint(parts[1], 10, 64)
-		if err != nil {
-			return false
-		}
-		_, err = strconv.ParseUint(parts[2], 36, 64)
-		if err != nil {
-			return false
-		}
-
-	default:
-		return false
-	}
-
-	return true
-}
-
-func validateFQDN(p *api.Properties, location string) (errs []error) {
-	if p == nil {
-		errs = append(errs, fmt.Errorf("masterProfile cannot be nil"))
+func validateAuthProfile(path string, ap *api.AuthProfile) (errs []error) {
+	if ap == nil {
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
 		return
 	}
-	if p.FQDN == "" || !isValidCloudAppHostname(p.FQDN, location) {
-		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
-	}
-	return
-}
 
-func validateNetworkProfile(np *api.NetworkProfile) (errs []error) {
-	if np == nil {
-		errs = append(errs, fmt.Errorf("networkProfile cannot be nil"))
-		return
+	if len(ap.IdentityProviders) != 1 {
+		errs = append(errs, fmt.Errorf("invalid %s.identityProviders length", path))
 	}
-	if np.VnetID != "" && !rxVNetID.MatchString(np.VnetID) {
-		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetId %q", np.VnetID))
-	}
-	if !isValidIPV4CIDR(np.VnetCIDR) {
-		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.vnetCidr %q", np.VnetCIDR))
-	}
-	if np.PeerVnetID != nil && !rxVNetID.MatchString(*np.PeerVnetID) {
-		errs = append(errs, fmt.Errorf("invalid properties.networkProfile.peerVnetId %q", *np.PeerVnetID))
-	}
-	return
-}
 
-func validateRouterProfiles(rps []api.RouterProfile, location string, externalOnly bool) (errs []error) {
-	rpmap := map[string]api.RouterProfile{}
-
-	for _, rp := range rps {
-		if _, found := validRouterProfileNames[rp.Name]; !found {
-			errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q]", rp.Name))
+	//check supported identity providers
+	for _, ip := range ap.IdentityProviders {
+		if ip.Name != "Azure AD" {
+			errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q]", path, ip.Name))
 		}
-
-		if _, found := rpmap[rp.Name]; found {
-			errs = append(errs, fmt.Errorf("duplicate properties.routerProfiles %q", rp.Name))
-		}
-		rpmap[rp.Name] = rp
-
-		errs = append(errs, validateRouterProfile(rp, location, externalOnly)...)
-	}
-	if !externalOnly {
-		for name := range validRouterProfileNames {
-			if _, found := rpmap[name]; !found {
-				errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q]", name))
+		switch provider := ip.Provider.(type) {
+		case (*api.AADIdentityProvider):
+			if provider.Kind != "AADIdentityProvider" {
+				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].kind %q", path, ip.Name, provider.Kind))
+			}
+			if !isValidUUID(provider.ClientID) {
+				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].clientId %q", path, ip.Name, provider.ClientID))
+			}
+			if provider.Secret == "" {
+				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].secret %q", path, ip.Name, provider.Secret))
+			}
+			if !isValidUUID(provider.TenantID) {
+				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].tenantId %q", path, ip.Name, provider.TenantID))
+			}
+			if provider.CustomerAdminGroupID != nil && !isValidUUID(*provider.CustomerAdminGroupID) {
+				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].customerAdminGroupId %q", path, ip.Name, *provider.CustomerAdminGroupID))
 			}
 		}
 	}
 	return
 }
 
-func validateRouterProfile(rp api.RouterProfile, location string, externalOnly bool) (errs []error) {
-	if rp.Name == "" {
-		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].name %q", rp.Name, rp.Name))
+func validateServicePrincipalProfile(path string, p *api.ServicePrincipalProfile) (errs []error) {
+	if p == nil {
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
+		return
 	}
 
-	// TODO: consider ensuring that PublicSubdomain is of the form
-	// <string>.<location>.azmosa.io
-	if rp.PublicSubdomain != "" && !isValidHostname(rp.PublicSubdomain) {
-		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].publicSubdomain %q", rp.Name, rp.PublicSubdomain))
+	if !isValidUUID(p.ClientID) {
+		errs = append(errs, fmt.Errorf("invalid %s.clientID %q", path, p.ClientID))
 	}
 
-	if !externalOnly && rp.FQDN != "" && !isValidCloudAppHostname(rp.FQDN, location) {
-		errs = append(errs, fmt.Errorf("invalid properties.routerProfiles[%q].fqdn %q", rp.Name, rp.FQDN))
+	if p.Secret == "" {
+		errs = append(errs, fmt.Errorf("invalid %s.secret %q", path, p.Secret))
 	}
 
 	return
 }
 
-func validateProvisioningState(ps api.ProvisioningState) (errs []error) {
-	switch ps {
-	case "",
-		api.Creating,
-		api.Updating,
-		api.AdminUpdating,
-		api.Failed,
-		api.Succeeded,
-		api.Deleting,
-		api.Migrating,
-		api.Upgrading:
-	default:
-		errs = append(errs, fmt.Errorf("invalid properties.provisioningState %q", ps))
+func validateAzProfile(path string, a *api.AzProfile) (errs []error) {
+	if a == nil {
+		errs = append(errs, fmt.Errorf("%s cannot be nil", path))
+		return
 	}
+
+	if !isValidUUID(a.TenantID) {
+		errs = append(errs, fmt.Errorf("invalid %s.tenantId %q", path, a.TenantID))
+	}
+
+	if !isValidUUID(a.SubscriptionID) {
+		errs = append(errs, fmt.Errorf("invalid %s.subscriptionId %q", path, a.SubscriptionID))
+	}
+
+	if !rxResourceGroupName.MatchString(a.ResourceGroup) {
+		errs = append(errs, fmt.Errorf("invalid %s.resourceGroup %q", path, a.ResourceGroup))
+	}
+
 	return
 }
 
-func validateVMSize(app api.AgentPoolProfile, runningUnderTest bool) (errs []error) {
+func validateVMSize(app *api.AgentPoolProfile, runningUnderTest bool) (errs []error) {
+	if app == nil {
+		errs = append(errs, fmt.Errorf("agentPoolProfile cannot be nil"))
+		return
+	}
+
 	switch app.Role {
 	case api.AgentPoolProfileRoleMaster:
 		if !isValidMasterAndInfraVMSize(app.VMSize, runningUnderTest) {
@@ -402,23 +375,6 @@ func validateVMSize(app api.AgentPoolProfile, runningUnderTest bool) (errs []err
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].vmSize %q", app.Name, app.VMSize))
 		}
 	}
-	return errs
-}
 
-func isValidMasterAndInfraVMSize(size api.VMSize, runningUnderTest bool) bool {
-	if runningUnderTest && size == api.StandardD2sV3 {
-		return true
-	}
-
-	_, found := validMasterAndInfraVMSizes[size]
-	return found
-}
-
-func isValidComputeVMSize(size api.VMSize, runningUnderTest bool) bool {
-	if runningUnderTest && size == api.StandardD2sV3 {
-		return true
-	}
-
-	_, found := validComputeVMSizes[size]
-	return found
+	return
 }

@@ -2,7 +2,6 @@ package validate
 
 import (
 	"errors"
-	"net"
 	"reflect"
 	"testing"
 
@@ -10,46 +9,61 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
-var testOpenShiftClusterYAML = []byte(`---
+var testOpenShiftClusterYAML = []byte(`
 location: eastus
 name: openshift
 properties:
-  openShiftVersion: v3.11
-  fqdn: example.eastus.cloudapp.azure.com
+  agentPoolProfiles:
+  - count: 3
+    name: master
+    osType: Linux
+    role: master
+    subnetCidr: 10.0.0.0/24
+    vmSize: Standard_D2s_v3
+  - count: 3
+    name: infra
+    osType: Linux
+    role: infra
+    subnetCidr: 10.0.0.0/24
+    vmSize: Standard_D2s_v3
+  - count: 1
+    name: mycompute
+    osType: Linux
+    role: compute
+    subnetCidr: 10.0.0.0/24
+    vmSize: Standard_D2s_v3
+  apiCertProfile:
+    keyVaultSecretURL: https://myvault.vault.azure.net/secrets/secret
   authProfile:
     identityProviders:
     - name: Azure AD
       provider:
+        clientId: 00000000-0000-0000-0000-000000000000
         kind: AADIdentityProvider
-        clientId: aadClientId
-        secret: aadClientSecret
-        tenantId: aadTenantId
-  routerProfiles:
-  - name: default
-    publicSubdomain: test.example.com
-    fqdn: router-fqdn.eastus.cloudapp.azure.com
+        secret: secret
+        tenantId: 00000000-0000-0000-0000-000000000000
+  azProfile:
+    resourceGroup: resourcegroup
+    subscriptionId: 00000000-0000-0000-0000-000000000000
+    tenantId: 00000000-0000-0000-0000-000000000000
+  fqdn: example.eastus.cloudapp.azure.com
+  masterServicePrincipalProfile:
+    clientID: 00000000-0000-0000-0000-000000000000
+    secret: secret
   networkProfile:
     vnetCidr: 10.0.0.0/8
-  masterPoolProfile:
-    count: 3
-    vmSize: Standard_D2s_v3
-    subnetCidr: 10.0.0.0/24
-  agentPoolProfiles:
-  - name: infra
-    role: infra
-    count: 3
-    vmSize: Standard_D2s_v3
-    osType: Linux
-    subnetCidr: 10.0.0.0/24
-  - name: mycompute
-    role: compute
-    count: 1
-    vmSize: Standard_D2s_v3
-    osType: Linux
-    subnetCidr: 10.0.0.0/24
+  openShiftVersion: v3.11
+  routerProfiles:
+  - fqdn: router-fqdn.eastus.cloudapp.azure.com
+    name: default
+    publicSubdomain: test.example.com
+    routerCertProfile:
+      keyVaultSecretURL: https://myvault.vault.azure.net/secrets/secret
+  workerServicePrincipalProfile:
+    clientID: 00000000-0000-0000-0000-000000000000
+    secret: secret
 `)
 
 func TestValidate(t *testing.T) {
@@ -124,9 +138,9 @@ func TestValidate(t *testing.T) {
 		"empty location": {
 			f: func(oc *api.OpenShiftManagedCluster) { oc.Location = "" },
 			expectedErrs: []error{
-				errors.New(`invalid location ""`),
-				errors.New(`invalid properties.routerProfiles["default"].fqdn "router-fqdn.eastus.cloudapp.azure.com"`),
 				errors.New(`invalid properties.fqdn "example.eastus.cloudapp.azure.com"`),
+				errors.New(`invalid properties.routerProfiles["default"].fqdn "router-fqdn.eastus.cloudapp.azure.com"`),
+				errors.New(`invalid location ""`),
 			},
 		},
 		"name": {
@@ -142,7 +156,6 @@ func TestValidate(t *testing.T) {
 		"test external only false - invalid fqdn fails": {
 			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.FQDN = "()" },
 			expectedErrs: []error{errors.New(`invalid properties.fqdn "()"`)},
-			externalOnly: false,
 		},
 		"provisioning state bad": {
 			f:            func(oc *api.OpenShiftManagedCluster) { oc.Properties.ProvisioningState = "bad" },
@@ -239,13 +252,12 @@ func TestValidate(t *testing.T) {
 					append(oc.Properties.RouterProfiles,
 						oc.Properties.RouterProfiles[0])
 			},
-			expectedErrs: []error{errors.New(`duplicate properties.routerProfiles "default"`)},
+			expectedErrs: []error{errors.New(`duplicate properties.routerProfiles["default"]`)},
 		},
 		"test external only false - router profile invalid name": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].Name = "foo"
 			},
-			externalOnly: false,
 			// two errors expected here because we require the default profile
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["foo"]`),
 				errors.New(`invalid properties.routerProfiles["default"]`)},
@@ -265,7 +277,7 @@ func TestValidate(t *testing.T) {
 			// this is not very user friendly but testing as is for now
 			// TODO fix
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles[""]`),
-				errors.New(`invalid properties.routerProfiles[""].name ""`),
+				errors.New(`invalid properties.routerProfiles[""]`),
 				errors.New(`invalid properties.routerProfiles["default"]`)},
 		},
 		"router empty public subdomain": {
@@ -290,14 +302,12 @@ func TestValidate(t *testing.T) {
 				oc.Properties.RouterProfiles = nil
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"]`)},
-			externalOnly: false,
 		},
 		"test external only false - invalid router profile does fail": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.RouterProfiles[0].FQDN = "()"
 			},
 			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].fqdn "()"`)},
-			externalOnly: false,
 		},
 		"agent pool profile duplicate name": {
 			f: func(oc *api.OpenShiftManagedCluster) {
@@ -316,7 +326,7 @@ func TestValidate(t *testing.T) {
 				}
 			},
 			expectedErrs: []error{
-				errors.New(`invalid properties.agentPoolProfiles["foo"].name "foo"`),
+				errors.New(`invalid properties.agentPoolProfiles["foo"]`),
 			},
 		},
 		"agent pool profile invalid compute name": {
@@ -411,14 +421,14 @@ func TestValidate(t *testing.T) {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				aadIdentityProvider := &api.AADIdentityProvider{
 					Kind:     "AADIdentityProvider",
-					ClientID: "clientId",
+					ClientID: "00000000-0000-0000-0000-000000000000",
 					Secret:   "",
-					TenantID: "tenantId",
+					TenantID: "00000000-0000-0000-0000-000000000000",
 				}
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider secret ""`)},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders["Azure AD"].secret ""`)},
 		},
 		"AADIdentityProvider clientId empty": {
 			f: func(oc *api.OpenShiftManagedCluster) {
@@ -426,40 +436,108 @@ func TestValidate(t *testing.T) {
 					Kind:     "AADIdentityProvider",
 					ClientID: "",
 					Secret:   "aadClientSecret",
-					TenantID: "tenantId",
+					TenantID: "00000000-0000-0000-0000-000000000000",
 				}
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider clientId ""`)},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders["Azure AD"].clientId ""`)},
 		},
 		"AADIdentityProvider tenantId empty": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				aadIdentityProvider := &api.AADIdentityProvider{
 					Kind:     "AADIdentityProvider",
-					ClientID: "test",
+					ClientID: "00000000-0000-0000-0000-000000000000",
 					Secret:   "aadClientSecret",
 					TenantID: "",
 				}
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.authProfile.AADIdentityProvider tenantId ""`)},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders["Azure AD"].tenantId ""`)},
+		},
+		"AADIdentityProvider kind empty": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				aadIdentityProvider := &api.AADIdentityProvider{
+					Kind:     "",
+					ClientID: "00000000-0000-0000-0000-000000000000",
+					Secret:   "aadClientSecret",
+					TenantID: "00000000-0000-0000-0000-000000000000",
+				}
+				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
+				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders["Azure AD"].kind ""`)},
+		},
+		"master service principal bad client": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.MasterServicePrincipalProfile.ClientID = "bad"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.masterServicePrincipalProfile.clientID "bad"`)},
+		},
+		"master service principal empty secret": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.MasterServicePrincipalProfile.Secret = ""
+			},
+			expectedErrs: []error{errors.New(`invalid properties.masterServicePrincipalProfile.secret ""`)},
+		},
+		"worker service principal bad client": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.WorkerServicePrincipalProfile.ClientID = "bad"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.workerServicePrincipalProfile.clientID "bad"`)},
+		},
+		"worker service principal empty secret": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.WorkerServicePrincipalProfile.Secret = ""
+			},
+			expectedErrs: []error{errors.New(`invalid properties.workerServicePrincipalProfile.secret ""`)},
+		},
+		"azprofile empty resource group": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AzProfile.ResourceGroup = ""
+			},
+			expectedErrs: []error{errors.New(`invalid properties.azProfile.resourceGroup ""`)},
+		},
+		"azprofile bad resource group": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AzProfile.ResourceGroup = "bad!"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.azProfile.resourceGroup "bad!"`)},
+		},
+		"azprofile bad tenantid": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AzProfile.TenantID = "bad"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.azProfile.tenantId "bad"`)},
+		},
+		"azprofile bad subscriptionid": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AzProfile.SubscriptionID = ""
+			},
+			expectedErrs: []error{errors.New(`invalid properties.azProfile.subscriptionId ""`)},
+		},
+		"routercertprofile bad secreturl": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = "bad"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.routerProfiles["default"].routerCertProfile.keyVaultSecretURL "bad"`)},
+		},
+		"apicertprofile bad secreturl": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.APICertProfile.KeyVaultSecretURL = "bad"
+			},
+			expectedErrs: []error{errors.New(`invalid properties.apiCertProfile.keyVaultSecretURL "bad"`)},
 		},
 	}
 
 	for name, test := range tests {
-		var oc *v20180930preview.OpenShiftManagedCluster
-		err := yaml.Unmarshal(testOpenShiftClusterYAML, &oc)
+		var cs *api.OpenShiftManagedCluster
+		err := yaml.Unmarshal(testOpenShiftClusterYAML, &cs)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// TODO we're hoping conversion is correct. Change this to a known valid config
-		cs, err := api.ConvertFromV20180930preview(oc, nil)
-		if err != nil {
-			t.Errorf("%s: unexpected error: %v", name, err)
-		}
 		if test.f != nil {
 			test.f(cs)
 		}
@@ -475,339 +553,6 @@ func TestValidate(t *testing.T) {
 			for _, err := range errs {
 				t.Errorf("\t%v", err)
 			}
-		}
-	}
-}
-
-func TestIsValidCloudAppHostname(t *testing.T) {
-	invalidFqdns := []string{
-		"invalid.random.domain",
-		"too.long.domain.cloudapp.azure.com",
-		"invalid#characters#domain.westus2.cloudapp.azure.com",
-		"wronglocation.eastus.cloudapp.azure.com",
-		"123.eastus.cloudapp.azure.com",
-		"-abc.eastus.cloudapp.azure.com",
-		"abcdefghijklmnopqrstuvwxzyabcdefghijklmnopqrstuvwxzyabcdefghijkl.eastus.cloudapp.azure.com",
-		"a/b/c.eastus.cloudapp.azure.com",
-		".eastus.cloudapp.azure.com",
-		"Thisisatest.eastus.cloudapp.azure.com",
-	}
-	for _, invalidFqdn := range invalidFqdns {
-		if isValidCloudAppHostname(invalidFqdn, "westus2") {
-			t.Errorf("invalid FQDN passed test: %s", invalidFqdn)
-		}
-	}
-	validFqdns := []string{
-		"example.westus2.cloudapp.azure.com",
-		"test-dashes.westus2.cloudapp.azure.com",
-		"test123.westus2.cloudapp.azure.com",
-		"test-123.westus2.cloudapp.azure.com",
-	}
-	for _, validFqdn := range validFqdns {
-		if !isValidCloudAppHostname(validFqdn, "westus2") {
-			t.Errorf("Valid FQDN failed to pass test: %s", validFqdn)
-		}
-	}
-}
-
-func TestIsValidIPV4CIDR(t *testing.T) {
-	for _, test := range []struct {
-		cidr  string
-		valid bool
-	}{
-		{
-			cidr: "",
-		},
-		{
-			cidr: "foo",
-		},
-		{
-			cidr: "::/0",
-		},
-		{
-			cidr: "192.168.0.1/24",
-		},
-		{
-			cidr:  "192.168.0.0/24",
-			valid: true,
-		},
-	} {
-		valid := isValidIPV4CIDR(test.cidr)
-		if valid != test.valid {
-			t.Errorf("%s: unexpected result %v", test.cidr, valid)
-		}
-	}
-}
-
-func TestVnetContainsSubnet(t *testing.T) {
-	for i, test := range []struct {
-		vnetCidr   string
-		subnetCidr string
-		valid      bool
-	}{
-		{
-			vnetCidr:   "10.0.0.0/16",
-			subnetCidr: "192.168.0.0/16",
-		},
-		{
-			vnetCidr:   "10.0.0.0/16",
-			subnetCidr: "10.0.0.0/8",
-		},
-		{
-			vnetCidr:   "10.0.0.0/16",
-			subnetCidr: "10.0.128.0/15",
-		},
-		{
-			vnetCidr:   "10.0.0.0/8",
-			subnetCidr: "10.0.0.0/16",
-			valid:      true,
-		},
-		{
-			vnetCidr:   "10.0.0.0/8",
-			subnetCidr: "10.0.0.0/8",
-			valid:      true,
-		},
-	} {
-		_, vnet, err := net.ParseCIDR(test.vnetCidr)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		_, subnet, err := net.ParseCIDR(test.subnetCidr)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		valid := vnetContainsSubnet(vnet, subnet)
-		if valid != test.valid {
-			t.Errorf("%d: unexpected result %v", i, valid)
-		}
-	}
-}
-
-func TestValidateUpdateContainerService(t *testing.T) {
-	var twoAgents = []byte(`---
-location: eastus
-name: openshift
-properties:
-  publicHostname: donotchange
-  routerProfiles:
-  - name: default
-    publicSubdomain: test.example.com
-  agentPoolProfiles:
-  - name: infra
-    role: infra
-    count: 1
-    vmSize: Standard_D2s_v3
-    osType: Linux
-  - name: mycompute
-    role: compute
-    count: 1
-    vmSize: Standard_D2s_v3
-    osType: Linux
-`)
-
-	tests := map[string]struct {
-		newAgentCount    int64
-		oldAgentCount    int64
-		newHostNameValue string
-		wantErrs         []error
-	}{
-		"good-2": {
-			newAgentCount: 1,
-			oldAgentCount: 1,
-		},
-		"good-2-count-not-important": {
-			newAgentCount: 5,
-			oldAgentCount: 2,
-		},
-		"bad-field-change": {
-			newAgentCount:    1,
-			oldAgentCount:    1,
-			newHostNameValue: "different",
-			wantErrs:         []error{errors.New("invalid change [Properties.PublicHostname: different != donotchange]")},
-		},
-	}
-
-	for name, tt := range tests {
-		var newCs *api.OpenShiftManagedCluster
-		var oldCs *api.OpenShiftManagedCluster
-
-		err := yaml.Unmarshal(twoAgents, &oldCs)
-		if err != nil {
-			t.Fatal(err)
-		}
-		newCs = oldCs.DeepCopy()
-
-		for i := range oldCs.Properties.AgentPoolProfiles {
-			oldCs.Properties.AgentPoolProfiles[i].Count = tt.oldAgentCount
-		}
-		for i := range newCs.Properties.AgentPoolProfiles {
-			newCs.Properties.AgentPoolProfiles[i].Count = tt.newAgentCount
-		}
-		if tt.newHostNameValue != "" {
-			newCs.Properties.PublicHostname = tt.newHostNameValue
-		}
-
-		gotErrs := validateUpdateContainerService(newCs, oldCs)
-		if !reflect.DeepEqual(gotErrs, tt.wantErrs) {
-			t.Errorf("validateUpdateContainerService:%s() = %v, want %v", name, gotErrs, tt.wantErrs)
-		}
-	}
-}
-
-func TestAdminAPIValidate(t *testing.T) {
-	tests := map[string]struct {
-		f            func(*api.OpenShiftManagedCluster)
-		externalOnly bool
-		expectedErrs []error
-	}{
-		"admin api cluster create": {
-			expectedErrs: []error{errors.New(`admin requests cannot create clusters`)},
-		},
-	}
-
-	for name, test := range tests {
-		var oc *v20180930preview.OpenShiftManagedCluster
-		err := yaml.Unmarshal(testOpenShiftClusterYAML, &oc)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		// TODO we're hoping conversion is correct. Change this to a known valid config
-		cs, err := api.ConvertFromV20180930preview(oc, nil)
-		if err != nil {
-			t.Errorf("%s: unexpected error: %v", name, err)
-		}
-		if test.f != nil {
-			test.f(cs)
-		}
-		v := AdminAPIValidator{}
-		errs := v.Validate(cs, nil, false)
-		if !reflect.DeepEqual(errs, test.expectedErrs) {
-			t.Logf("test case %q", name)
-			t.Errorf("expected errors:")
-			for _, err := range test.expectedErrs {
-				t.Errorf("\t%v", err)
-			}
-			t.Error("received errors:")
-			for _, err := range errs {
-				t.Errorf("\t%v", err)
-			}
-		}
-	}
-}
-
-func TestIsValidAgentPoolHostname(t *testing.T) {
-	for _, tt := range []struct {
-		hostname string
-		valid    bool
-	}{
-		{
-			hostname: "bad",
-		},
-		{
-			hostname: "master-000000",
-			valid:    true,
-		},
-		{
-			hostname: "master-00000a",
-			valid:    true,
-		},
-		{
-			hostname: "master-00000A",
-			valid:    true,
-		},
-		{
-			hostname: "mycompute-000000",
-		},
-		{
-			hostname: "master-bad",
-		},
-		{
-			hostname: "master-inval!",
-		},
-		{
-			hostname: "mycompute-1234567890-000000",
-			valid:    true,
-		},
-		{
-			hostname: "mycompute-1234567890-00000z",
-			valid:    true,
-		},
-		{
-			hostname: "mycompute-1234567890-00000Z",
-			valid:    true,
-		},
-		{
-			hostname: "mycompute-1234-00000Z",
-		},
-		{
-			hostname: "mycompute-1234567890-bad",
-		},
-		{
-			hostname: "mycompute-1234567890-inval!",
-		},
-		{
-			hostname: "master-1234567890-000000",
-		},
-		{
-			hostname: "bad-bad-bad-bad",
-		},
-	} {
-		valid := IsValidAgentPoolHostname(tt.hostname)
-		if valid != tt.valid {
-			t.Errorf("%s: wanted valid %v, got %v", tt.hostname, tt.valid, valid)
-		}
-	}
-}
-
-func TestIsValidBlobContainerName(t *testing.T) {
-	for _, tt := range []struct {
-		name  string
-		valid bool
-	}{
-		{
-			name: "12",
-		},
-		{
-			name:  "123",
-			valid: true,
-		},
-		{
-			name:  "abc",
-			valid: true,
-		},
-		{
-			name:  "abc-123",
-			valid: true,
-		},
-		{
-			name:  "123456789012345678901234567890123456789012345678901234567890123",
-			valid: true,
-		},
-		{
-			name: "1234567890123456789012345678901234567890123456789012345678901234",
-		},
-		{
-			name: "bad!",
-		},
-		{
-			name: "Bad",
-		},
-		{
-			name: "-bad",
-		},
-		{
-			name: "bad-",
-		},
-		{
-			name: "bad--bad",
-		},
-	} {
-		valid := IsValidBlobContainerName(tt.name)
-		if valid != tt.valid {
-			t.Errorf("%s: wanted valid %v, got %v", tt.name, tt.valid, valid)
 		}
 	}
 }
