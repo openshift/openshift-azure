@@ -30,11 +30,11 @@ type extra struct {
 	ConfigStorageAccountKey   string
 }
 
+// Unmarshal has to reimplement yaml.Unmarshal because it universally mangles yaml
+// integers into float64s, whereas the Kubernetes client library uses int64s
+// wherever it can.  Such a difference can cause us to update objects when
+// we don't actually need to.
 func Unmarshal(b []byte) (unstructured.Unstructured, error) {
-	// can't use straight yaml.Unmarshal() because it universally mangles yaml
-	// integers into float64s, whereas the Kubernetes client library uses int64s
-	// wherever it can.  Such a difference can cause us to update objects when
-	// we don't actually need to.
 	json, err := yaml.YAMLToJSON(b)
 	if err != nil {
 		return unstructured.Unstructured{}, err
@@ -251,6 +251,7 @@ func writeDB(log *logrus.Entry, client Interface, db map[string]unstructured.Uns
 	return client.ApplyResources(scFilter, db, keys)
 }
 
+// Main loop
 func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) error {
 	client, err := newClient(ctx, log, cs, azs, dryRun)
 	if err != nil {

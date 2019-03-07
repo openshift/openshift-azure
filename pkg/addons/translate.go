@@ -696,10 +696,16 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.Node }}",
 		},
 	},
-	"StorageClass.storage.k8s.io/azure": {
+	"StorageClass.storage.k8s.io/azure-disk": {
 		{
 			Path:     jsonpath.MustCompile("$.parameters.location"),
 			Template: "{{ .ContainerService.Location }}",
+		},
+	},
+	"StorageClass.storage.k8s.io/azure-file": {
+		{
+			Path:     jsonpath.MustCompile("$.parameters.storageAccount"),
+			Template: "{{ .Config.AzureFileStorageAccount }}",
 		},
 	},
 }

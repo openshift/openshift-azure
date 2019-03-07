@@ -13,6 +13,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/Azure/go-autorest/autorest/to"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
@@ -50,7 +52,12 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 			vnet(cs),
 			ipAPIServer(cs),
 			lbAPIServer(cs),
-			storageRegistry(cs),
+			storageAccount(cs.Config.RegistryStorageAccount, cs, map[string]*string{
+				"type": to.StringPtr("registry"),
+			}),
+			storageAccount(cs.Config.AzureFileStorageAccount, cs, map[string]*string{
+				"type": to.StringPtr("storage"),
+			}),
 			nsgMaster(cs),
 		},
 	}

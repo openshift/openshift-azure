@@ -4,6 +4,7 @@ import (
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 )
 
+// ConvertToAdmin converts the config representation for the admin API
 func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster {
 	oc := &admin.OpenShiftManagedCluster{
 		ID:       &cs.ID,
@@ -111,6 +112,7 @@ func convertConfigToAdmin(cs *Config) *admin.Config {
 		ImageVersion:                         &cs.ImageVersion,
 		ConfigStorageAccount:                 &cs.ConfigStorageAccount,
 		RegistryStorageAccount:               &cs.RegistryStorageAccount,
+		AzureFileStorageAccount:              &cs.AzureFileStorageAccount,
 		Certificates:                         convertCertificateConfigToAdmin(cs.Certificates),
 		Images:                               convertImageConfigToAdmin(cs.Images),
 		ServiceCatalogClusterID:              &cs.ServiceCatalogClusterID,

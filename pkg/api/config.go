@@ -8,6 +8,7 @@ import (
 	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
+// Config holds the cluster config structure
 type Config struct {
 	// PluginVersion defines release version of the plugin used to build the cluster
 	PluginVersion string `json:"pluginVersion,omitempty"`
@@ -23,8 +24,9 @@ type Config struct {
 	SSHKey *rsa.PrivateKey `json:"sshKey,omitempty"`
 
 	// configuration of other ARM resources
-	ConfigStorageAccount   string `json:"configStorageAccount,omitempty"`
-	RegistryStorageAccount string `json:"registryStorageAccount,omitempty"`
+	ConfigStorageAccount    string `json:"configStorageAccount,omitempty"`
+	RegistryStorageAccount  string `json:"registryStorageAccount,omitempty"`
+	AzureFileStorageAccount string `json:"azureFileStorageAccount,omitempty"`
 
 	Certificates CertificateConfig `json:"certificates,omitempty"`
 	Images       ImageConfig       `json:"images,omitempty"`

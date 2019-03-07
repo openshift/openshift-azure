@@ -148,6 +148,12 @@ func (sc *SanityChecker) ValidateCluster(ctx context.Context) (errs []*TestError
 		sc.log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanAccessServices"})
 	}
+	sc.log.Debugf("validating that the cluster can use azure-file storage")
+	err = sc.checkCanUseAzureFileStorage(ctx)
+	if err != nil {
+		sc.log.Error(err)
+		errs = append(errs, &TestError{Err: err, Bucket: "checkCanUseAzureFile"})
+	}
 	return
 }
 

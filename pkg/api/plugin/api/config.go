@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 )
 
+// Config holds the api plugin config structure
 type Config struct {
 	// PluginVersion defines release version of the plugin used to build the cluster
 	PluginVersion string `json:"pluginVersion,omitempty"`
