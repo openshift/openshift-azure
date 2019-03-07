@@ -22,6 +22,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 
+	pkgconfig "github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/statsd"
 )
@@ -211,7 +212,15 @@ func (c *config) run() error {
 
 func (c *config) runOnce(ctx context.Context) error {
 	var metricsCount int
+	hostnameMap := make(map[string]string)
 
+	value, err := c.prometheus.Query(ctx, "node_uname_info", time.Time{})
+	if err != nil {
+		return err
+	}
+	for _, nodeSample := range value.(model.Vector) {
+		hostnameMap[strings.Split(string(nodeSample.Metric["instance"]), ":")[0]] = string(nodeSample.Metric["nodename"])
+	}
 	for _, query := range c.Queries {
 		value, err := c.prometheus.Query(ctx, query.Query, time.Time{})
 		if err != nil {
@@ -233,6 +242,15 @@ func (c *config) runOnce(ctx context.Context) error {
 			for k, v := range sample.Metric {
 				if k != model.MetricNameLabel {
 					f.Dims[string(k)] = string(v)
+				}
+			}
+			//if there's an instance dimension try to lookup the hostname
+			if instance, found := sample.Metric["instance"]; found {
+				hostname, present := hostnameMap[strings.Split(string(instance), ":")[0]]
+				if present {
+					//only add the hostname dimension if the lookup succeeds
+					f.Dims["hostname"] = hostname
+					f.Dims["agentrole"] = string(pkgconfig.GetAgentRole(hostname))
 				}
 			}
 			if c.Region != "" {

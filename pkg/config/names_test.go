@@ -97,3 +97,32 @@ func TestGetScaleSetNameAndInstanceID(t *testing.T) {
 		}
 	}
 }
+
+func TestGetAgentRole(t *testing.T) {
+	for _, tt := range []struct {
+		hostname      string
+		wantAgentrole api.AgentPoolProfileRole
+	}{
+		{
+			hostname:      "compute-1234-000000",
+			wantAgentrole: api.AgentPoolProfileRoleCompute,
+		},
+		{
+			hostname:      "mycompute-1234-000000",
+			wantAgentrole: api.AgentPoolProfileRoleCompute,
+		},
+		{
+			hostname:      "master-00000A",
+			wantAgentrole: api.AgentPoolProfileRoleMaster,
+		},
+		{
+			hostname:      "infra-12345-00000A",
+			wantAgentrole: api.AgentPoolProfileRoleInfra,
+		},
+	} {
+		agentrole := GetAgentRole(tt.hostname)
+		if tt.wantAgentrole != agentrole {
+			t.Errorf("wanted agentrole %v, got %v", tt.wantAgentrole, agentrole)
+		}
+	}
+}
