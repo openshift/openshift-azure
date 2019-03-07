@@ -118,6 +118,28 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 		Expect(err).ToNot(HaveOccurred())
 		defer cli.Client.EndUser.CleanupProject(namespace)
 
+		err = wait.PollImmediate(2*time.Second, 5*time.Minute, func() (bool, error) {
+			rb, err := cli.Client.CustomerAdmin.RbacV1.RoleBindings(namespace).Get("osa-customer-admin", metav1.GetOptions{})
+			if err != nil {
+				// still waiting for namespace
+				if kerrors.IsNotFound(err) {
+					return false, nil
+				}
+				// still waiting for reconciler and permissions
+				if kerrors.IsForbidden(err) {
+					return false, nil
+				}
+				return false, err
+			}
+			for _, subject := range rb.Subjects {
+				if subject.Kind == "Group" && subject.Name == "osa-customer-admins" {
+					return true, nil
+				}
+			}
+			return false, errors.New("customer-admins rolebinding does not bind to customer-admins group")
+		})
+		Expect(err).ToNot(HaveOccurred())
+
 		resQuota := v1.ResourceQuota{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "testresourcequota",
