@@ -70,6 +70,7 @@ To use this application with an OpenShift cluster, add the following line to
 your env file and source it:
 
 export AZURE_AAD_CLIENT_ID=$AZURE_AAD_CLIENT_ID
+export AZURE_AAD_CLIENT_SECRET=$AZURE_AAD_CLIENT_SECRET
 EOF
     ;;
 

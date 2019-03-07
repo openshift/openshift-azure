@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
-	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -19,10 +20,10 @@ import (
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
-	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	utilrs "github.com/openshift/openshift-azure/pkg/util/randomstring"
+	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
+	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
 func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployFn {
@@ -75,50 +76,10 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, kerrors.NewAggregate(errs)
 	}
 
-	// read in the OpenShift config blob if it exists (i.e. we're updating)
-	// in the update path, the RP should have access to the previous internal
-	// API representation for comparison.
-	if !shared.IsUpdate() {
-		// If containerservice.yaml does not exist - it is Create call
-		// create DNS records only on first call and when user does not supply them
-		if cs.Properties.RouterProfiles[0].PublicSubdomain == "" {
-			log.Info("routeprofiles[0].publicsubdomain was empty, randomizing publicSubdomain and routerCName")
-
-			// generate a random domain string
-			rDomain, err := utilrs.RandomString("abcdefghijklmnopqrstuvxyz0123456789", 20)
-			if err != nil {
-				return nil, err
-			}
-			publicSubdomain := fmt.Sprintf("%s.%s", rDomain, os.Getenv("DNS_DOMAIN"))
-
-			rrCName, err := utilrs.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 20)
-			if err != nil {
-				return nil, err
-			}
-			// create router wildcard DNS CName
-			routerCName := fmt.Sprintf("osa%s.%s.%s", rrCName, cs.Location, "cloudapp.azure.com")
-
-			log.Info("routeprofiles[0].publicsubdomain was empty, creating dns")
-			err = CreateOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"), publicSubdomain, routerCName, os.Getenv("NOGROUPTAGS") == "true")
-			if err != nil {
-				return nil, err
-			}
-
-			cs.Properties.RouterProfiles = []api.RouterProfile{
-				{
-					Name:            "default",
-					PublicSubdomain: publicSubdomain,
-					FQDN:            routerCName,
-				},
-			}
-		}
-		// the RP will enrich the internal API representation with data not included
-		// in the original request
-		log.Info("enrich")
-		err = enrich(cs)
-		if err != nil {
-			return nil, err
-		}
+	log.Info("enrich")
+	err = enrich(cs)
+	if err != nil {
+		return nil, err
 	}
 
 	// validate the internal API representation (with reference to the previous
@@ -134,45 +95,45 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, kerrors.NewAggregate(errs)
 	}
 
-	// generate or update the OpenShift config blob
-	err = p.GenerateConfig(ctx, cs, template)
+	dm, err := newDNSManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
 	if err != nil {
 		return nil, err
 	}
 
-	if !shared.IsUpdate() {
-		// call after GenerateConfig() as we need the CA certificate created
-		authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
-		if err != nil {
-			return nil, err
-		}
+	err = dm.createOrUpdateOCPDNS(ctx, cs)
+	if err != nil {
+		return nil, err
+	}
 
-		graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
-		if err != nil {
-			return nil, err
-		}
+	vm, err := newVaultManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	if err != nil {
+		return nil, err
+	}
 
-		vaultauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyVaultClientAuthorizer)
-		if err != nil {
-			return nil, err
-		}
+	vaultURL, _, err := vault.SplitSecretURL(cs.Properties.APICertProfile.KeyVaultSecretURL)
+	if err != nil {
+		return nil, err
+	}
 
-		vc := azureclient.NewVaultMgmtClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
-		spc := azureclient.NewServicePrincipalsClient(ctx, os.Getenv("AZURE_TENANT_ID"), graphauthorizer)
-		kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
+	u, err := url.Parse(vaultURL)
+	if err != nil {
+		return nil, err
+	}
 
-		objID, err := aadapp.GetServicePrincipalObjectIDFromAppID(ctx, spc, cs.Properties.MasterServicePrincipalProfile.ClientID)
-		if err != nil {
-			return nil, err
-		}
-		err = createVault(ctx, vc, objID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
-		if err != nil {
-			return nil, err
-		}
-		err = writeTLSCertsToVault(ctx, kvc, cs, vaultURL(os.Getenv("RESOURCEGROUP")))
-		if err != nil {
-			return nil, err
-		}
+	err = vm.createOrUpdateVault(ctx, cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, strings.Split(u.Host, ".")[0])
+	if err != nil {
+		return nil, err
+	}
+
+	err = vm.writeTLSCertsToVault(ctx, cs, vaultURL)
+	if err != nil {
+		return nil, err
+	}
+
+	// generate or update the OpenShift config blob
+	err = p.GenerateConfig(ctx, cs, template)
+	if err != nil {
+		return nil, err
 	}
 
 	// persist the OpenShift container service
@@ -279,8 +240,48 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	// /subscriptions/{subscription}/resourcegroups/{resource_group}/providers/Microsoft.ContainerService/openshiftmanagedClusters/{cluster_name}
 	cs.ID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.ContainerService/openshiftmanagedClusters", cs.Name)
 
-	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/PublicHostname"
-	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL(os.Getenv("RESOURCEGROUP")) + "/secrets/Router"
+	if len(cs.Properties.RouterProfiles) == 0 {
+		cs.Properties.RouterProfiles = []api.RouterProfile{
+			{
+				Name: "default",
+			},
+		}
+	}
+
+	var vaultURL string
+	var err error
+	if cs.Properties.APICertProfile.KeyVaultSecretURL != "" {
+		vaultURL, _, err = vault.SplitSecretURL(cs.Properties.APICertProfile.KeyVaultSecretURL)
+		if err != nil {
+			return err
+		}
+	} else {
+		vaultURL, err = random.FQDN("vault.azure.net", 24)
+		if err != nil {
+			return err
+		}
+		vaultURL = "https://" + vaultURL
+	}
+
+	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNamePublicHostname
+	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNameRouter
+
+	cs.Properties.PublicHostname = "openshift." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
+	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
+
+	if cs.Properties.FQDN == "" {
+		cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+		if err != nil {
+			return err
+		}
+	}
+
+	if cs.Properties.RouterProfiles[0].FQDN == "" {
+		cs.Properties.RouterProfiles[0].FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

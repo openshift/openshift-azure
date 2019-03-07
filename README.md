@@ -119,7 +119,6 @@ name: openshift
 location: $AZURE_REGION
 properties:
   openShiftVersion: v3.11
-  fqdn: $RESOURCEGROUP.$AZURE_REGION.cloudapp.azure.com
   authProfile:
     identityProviders:
     - name: Azure AD
@@ -130,8 +129,6 @@ properties:
         tenantId: $AZURE_TENANT_ID
   networkProfile:
     vnetCidr: 10.0.0.0/8
-  routerProfiles:
-  - name: default
   masterPoolProfile:
     count: 3
     vmSize: Standard_D2s_v3

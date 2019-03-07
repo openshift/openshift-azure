@@ -9,7 +9,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/util/randomstring"
+	"github.com/openshift/openshift-azure/pkg/util/random"
 )
 
 var supportedRegions = []string{
@@ -65,13 +65,19 @@ func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
 	}
 	if c.ResourceGroup == "" {
 		// Generate a resource group name
-		suffix, err := randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 8)
+		suffix, err := random.LowerCaseAlphanumericString(8)
 		if err != nil {
 			return nil, err
 		}
 		c.ResourceGroup = fmt.Sprintf("generated-%s", suffix)
 		log.Infof("using generated resource group name %s", c.ResourceGroup)
 		os.Setenv("RESOURCEGROUP", c.ResourceGroup)
+	}
+	if c.AADClientID == "" {
+		c.AADClientID = c.ClientID
+		c.AADClientSecret = c.ClientSecret
+		os.Setenv("AZURE_AAD_CLIENT_ID", c.AADClientID)
+		os.Setenv("AZURE_AAD_CLIENT_SECRET", c.AADClientSecret)
 	}
 	return &c, nil
 }

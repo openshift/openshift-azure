@@ -22,7 +22,11 @@ import (
 )
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
-	// simulate Context with property bag
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
 	ctx, err := enrichContext(context.Background())
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
@@ -35,21 +39,19 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	// TODO: Determine subscription ID from the request path
-	vc := azureclient.NewVaultMgmtClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
 	gc := resources.NewGroupsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
 	gc.Authorizer = authorizer
 
 	// delete dns records
 	// TODO: get resource group from request path
-	err = DeleteOCPDNS(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
+	dm, err := newDNSManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to delete dns records: %v", err))
 		return
 	}
-
-	err = deleteVault(ctx, vc, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), vaultName(os.Getenv("RESOURCEGROUP")))
+	err = dm.deleteOCPDNS(ctx, cs)
 	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to delete vault: %v", err))
+		s.internalError(w, fmt.Sprintf("Failed to delete dns records: %v", err))
 		return
 	}
 

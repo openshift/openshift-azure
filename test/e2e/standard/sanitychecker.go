@@ -9,7 +9,7 @@ import (
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	shared "github.com/openshift/openshift-azure/pkg/fakerp/shared"
-	"github.com/openshift/openshift-azure/pkg/util/randomstring"
+	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/test/clients/openshift"
 	testlogger "github.com/openshift/openshift-azure/test/util/log"
 )
@@ -144,7 +144,7 @@ func (sc *SanityChecker) DeleteTestApp(ctx context.Context, cookie interface{}) 
 }
 
 func (sc *SanityChecker) createProject(ctx context.Context) (string, error) {
-	template, err := randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
+	template, err := random.LowerCaseAlphanumericString(5)
 	if err != nil {
 		return "", err
 	}

@@ -3,12 +3,9 @@ package aadapp
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac"
-	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/Azure/go-autorest/autorest/to"
-	uuid "github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
@@ -43,31 +40,12 @@ func GetServicePrincipalObjectIDFromAppID(ctx context.Context, spc azureclient.S
 	return *sp.Values()[0].ObjectID, nil
 }
 
-// UpdateAADApp updates the ReplyURLs in an AAD app.  A side-effect is that the
-// secret must be regenerated.  The new secret is returned.
-func UpdateAADApp(ctx context.Context, appClient azureclient.RBACApplicationsClient, appObjID string, callbackURL string) (string, error) {
-	azureAadClientSecretID := uuid.NewV4().String()
-	azureAadClientSecretValue := uuid.NewV4().String()
-
-	// Create a new password credential
-	timestart := date.Time{Time: time.Now()}
-	timeend := date.Time{Time: timestart.AddDate(1, 0, 0)} // make it valid for a year
-	newPc := []graphrbac.PasswordCredential{
-		{
-			EndDate:   &timeend,
-			StartDate: &timestart,
-			KeyID:     to.StringPtr(azureAadClientSecretID),
-			Value:     to.StringPtr(azureAadClientSecretValue),
-		},
-	}
+// UpdateAADApp updates the ReplyURLs in an AAD app.
+func UpdateAADApp(ctx context.Context, appClient azureclient.RBACApplicationsClient, appObjID string, callbackURL string) error {
 	_, err := appClient.Patch(ctx, appObjID, graphrbac.ApplicationUpdateParameters{
-		Homepage:            to.StringPtr(callbackURL),
-		ReplyUrls:           &[]string{callbackURL},
-		IdentifierUris:      &[]string{callbackURL},
-		PasswordCredentials: &newPc,
+		Homepage:       to.StringPtr(callbackURL),
+		ReplyUrls:      &[]string{callbackURL},
+		IdentifierUris: &[]string{callbackURL},
 	})
-	if err != nil {
-		return "", fmt.Errorf("failed patching aad password and uris: %v", err)
-	}
-	return azureAadClientSecretValue, nil
+	return err
 }

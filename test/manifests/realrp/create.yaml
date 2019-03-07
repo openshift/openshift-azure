@@ -1,0 +1,36 @@
+name: {{ Getenv "RESOURCEGROUP" | quote }}
+location: {{ Getenv "AZURE_REGION" | quote }}
+properties:
+  openShiftVersion: {{ Getenv "DEPLOY_VERSION" | quote }}
+  fqdn: {{ print (Getenv "RESOURCEGROUP) "." (Getenv "AZURE_REGION") ".cloudapp.azure.com" | quote }}
+  authProfile:
+    identityProviders:
+    - name: Azure AD
+      provider:
+        kind: AADIdentityProvider
+        clientId: {{ Getenv "AZURE_AAD_CLIENT_ID" | quote }}
+        secret: {{ Getenv "AZURE_AAD_CLIENT_SECRET" | quote }}
+        tenantId: {{ Getenv "AZURE_TENANT_ID" | quote }}
+  networkProfile:
+    vnetCidr: 10.0.0.0/8
+  routerProfiles:
+  - name: default
+    publicSubdomain: {{ Getenv "ROUTER_SUBDOMAIN" | quote }}
+    fqdn: {{ Getenv "ROUTER_FQDN" | quote }}
+  masterPoolProfile:
+    count: 3
+    vmSize: Standard_D4s_v3
+    subnetCidr: 10.0.0.0/24
+  agentPoolProfiles:
+  - name: infra
+    role: infra
+    count: 2
+    vmSize: Standard_D4s_v3
+    subnetCidr: 10.0.0.0/24
+    osType: Linux
+  - name: compute
+    role: compute
+    count: 1
+    vmSize: Standard_D4s_v3
+    subnetCidr: 10.0.0.0/24
+    osType: Linux

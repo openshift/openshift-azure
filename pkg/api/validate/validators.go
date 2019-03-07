@@ -54,12 +54,20 @@ func validateProperties(p *api.Properties, location string, externalOnly bool) (
 		errs = append(errs, fmt.Errorf("invalid properties.openShiftVersion %q", p.OpenShiftVersion))
 	}
 
-	if p.PublicHostname != "" { // TODO: relax after private preview (&& !isValidHostname(p.PublicHostname))
-		errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
-	}
+	if !externalOnly {
+		// TODO: consider ensuring that PublicSubdomain is of the form
+		// openshift.<random>.<location>.azmosa.io
+		if !isValidHostname(p.PublicHostname) {
+			errs = append(errs, fmt.Errorf("invalid properties.publicHostname %q", p.PublicHostname))
+		}
 
-	if p.FQDN == "" || !isValidCloudAppHostname(p.FQDN, location) {
-		errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
+		if !isValidCloudAppHostname(p.FQDN, location) {
+			errs = append(errs, fmt.Errorf("invalid properties.fqdn %q", p.FQDN))
+		}
+
+		if p.FQDN == p.PublicHostname {
+			errs = append(errs, fmt.Errorf("invalid properties.fqdn %q: must differ from properties.publicHostname", p.FQDN))
+		}
 	}
 
 	errs = append(errs, validateNetworkProfile("properties.networkProfile", &p.NetworkProfile)...)
@@ -149,15 +157,19 @@ func validateRouterProfile(path string, rp *api.RouterProfile, location string, 
 		errs = append(errs, fmt.Errorf("invalid %s", path))
 	}
 
-	// TODO: consider ensuring that PublicSubdomain is of the form
-	// <string>.<location>.azmosa.io
-	if rp.PublicSubdomain != "" && !isValidHostname(rp.PublicSubdomain) {
-		errs = append(errs, fmt.Errorf("invalid %s.publicSubdomain %q", path, rp.PublicSubdomain))
-	}
-
 	if !externalOnly {
-		if rp.FQDN != "" && !isValidCloudAppHostname(rp.FQDN, location) {
+		// TODO: consider ensuring that PublicSubdomain is of the form
+		// apps.<random>.<location>.azmosa.io
+		if !isValidHostname(rp.PublicSubdomain) {
+			errs = append(errs, fmt.Errorf("invalid %s.publicSubdomain %q", path, rp.PublicSubdomain))
+		}
+
+		if !isValidCloudAppHostname(rp.FQDN, location) {
 			errs = append(errs, fmt.Errorf("invalid %s.fqdn %q", path, rp.FQDN))
+		}
+
+		if rp.FQDN == rp.PublicSubdomain {
+			errs = append(errs, fmt.Errorf("invalid %s.fqdn %q: must differ from %[1]s.publicSubdomain", path, rp.FQDN))
 		}
 
 		errs = append(errs, validateCertProfile(path+".routerCertProfile", &rp.RouterCertProfile)...)

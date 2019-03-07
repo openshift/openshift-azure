@@ -1,16 +1,13 @@
 package config
 
 import (
-	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"io"
 	"strings"
 
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/tls"
-	"github.com/openshift/openshift-azure/pkg/util/randomstring"
 )
 
 func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certificate, endpoint, username, namespace string) (*v1.Config, error) {
@@ -64,20 +61,4 @@ func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certific
 		},
 		CurrentContext: contextname,
 	}, nil
-}
-
-func randomBytes(n int) ([]byte, error) {
-	b := make([]byte, n)
-	if _, err := io.ReadAtLeast(rand.Reader, b, n); err != nil {
-		return nil, err
-	}
-	return b, nil
-}
-
-func randomStorageAccountName() (string, error) {
-	return randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 24)
-}
-
-func randomString(length int) (string, error) {
-	return randomstring.RandomString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", length)
 }

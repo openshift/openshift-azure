@@ -36,7 +36,7 @@ func EnrichCSFromVault(ctx context.Context, kvc azureclient.KeyVaultClient, cs *
 // SplitSecretURL parses a key vault secret URL, e.g.
 // https://myvault.vault.azure.net/secrets/mysecret, and returns the root vault
 // URL and secret name, e.g. https://myvault.vault.azure.net/ and mysecret.
-func splitSecretURL(kvURL string) (string, string, error) {
+func SplitSecretURL(kvURL string) (string, string, error) {
 	u, err := url.Parse(kvURL)
 	if err != nil {
 		return "", "", err
@@ -50,7 +50,7 @@ func splitSecretURL(kvURL string) (string, string, error) {
 }
 
 func getSecret(ctx context.Context, kvc azureclient.KeyVaultClient, secretURL string) (*api.CertKeyPair, error) {
-	vaultURL, secretName, err := splitSecretURL(secretURL)
+	vaultURL, secretName, err := SplitSecretURL(secretURL)
 	if err != nil {
 		return nil, err
 	}

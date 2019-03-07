@@ -9,7 +9,7 @@ func TestSplitSecretURL(t *testing.T) {
 	wantVaultURL := "https://myvault.vault.azure.net"
 	wantSecretName := "mysecret"
 
-	vaultURL, secretName, err := splitSecretURL(secretURL)
+	vaultURL, secretName, err := SplitSecretURL(secretURL)
 	if err != nil {
 		t.Fatal(err)
 	}

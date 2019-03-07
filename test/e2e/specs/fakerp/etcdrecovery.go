@@ -13,7 +13,7 @@ import (
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/openshift/openshift-azure/pkg/util/randomstring"
+	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/e2e/standard"
 )
@@ -36,10 +36,10 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).ToNot(HaveOccurred())
 
-		backup, err = randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
+		backup, err = random.LowerCaseAlphanumericString(5)
 		Expect(err).ToNot(HaveOccurred())
 		backup = "e2e-test-" + backup
-		namespace, err = randomstring.RandomString("abcdefghijklmnopqrstuvwxyz0123456789", 5)
+		namespace, err = random.LowerCaseAlphanumericString(5)
 		Expect(err).ToNot(HaveOccurred())
 		namespace = "e2e-test-" + namespace
 		fmt.Fprintln(GinkgoWriter, "Using namespace", namespace)

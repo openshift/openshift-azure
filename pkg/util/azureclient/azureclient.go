@@ -2,7 +2,7 @@ package azureclient
 
 //go:generate go get github.com/golang/mock/gomock
 //go:generate go install github.com/golang/mock/mockgen
-//go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/azureclient.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE Client,VirtualMachineScaleSetsClient,VirtualMachineScaleSetVMsClient,VirtualMachineScaleSetExtensionsClient,ApplicationsClient,MarketPlaceAgreementsClient,DeploymentsClient,AccountsClient,KeyVaultClient
+//go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/azureclient.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE Client,VirtualMachineScaleSetsClient,VirtualMachineScaleSetVMsClient,VirtualMachineScaleSetExtensionsClient,ApplicationsClient,MarketPlaceAgreementsClient,DeploymentsClient,AccountsClient,KeyVaultClient,VaultMgmtClient,ZonesClient,RecordSetsClient
 //go:generate gofmt -s -l -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
 //go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
 //go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE/storage Client,BlobStorageClient,Container,Blob
@@ -52,11 +52,11 @@ type loggingSender struct {
 
 func (ls *loggingSender) Do(req *http.Request) (*http.Response, error) {
 	b, _ := httputil.DumpRequestOut(req, true)
-	os.Stdout.Write(b)
+	fmt.Printf("%s\n\n", string(b))
 	resp, err := ls.Sender.Do(req)
 	if resp != nil {
 		b, _ = httputil.DumpResponse(resp, true)
-		os.Stdout.Write(b)
+		fmt.Printf("%s\n\n", string(b))
 	}
 	return resp, err
 }

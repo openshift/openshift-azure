@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -13,15 +14,31 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-func getHealthCheckHTTPClient(cs *api.OpenShiftManagedCluster) *http.Client {
-	c := cs.Config
+// getHealthCheckHTTPClient returns a specially configured http client.  When
+// the client is used to connect to a remote TLS server (e.g.
+// openshift.<random>.osadev.cloud), it will in fact dial dialHost (e.g.
+// <random>.<location>.cloudapp.azure.com).  It will then negotiate TLS against
+// the former address (i.e. openshift.<random>.osadev.cloud), verifying that the
+// server certificate presented matches cert.
+func getHealthCheckHTTPClient(dialHost string, cert *x509.Certificate) *http.Client {
 	pool := x509.NewCertPool()
-	pool.AddCert(c.Certificates.Ca.Cert)
+	pool.AddCert(cert)
 
 	return &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs: pool,
+			DialTLS: func(network, addr string) (net.Conn, error) {
+				host, port, err := net.SplitHostPort(addr)
+				if err != nil {
+					return nil, err
+				}
+				c, err := net.Dial(network, net.JoinHostPort(dialHost, port))
+				if err != nil {
+					return nil, err
+				}
+				return tls.Client(c, &tls.Config{
+					RootCAs:    pool,
+					ServerName: host,
+				}), nil
 			},
 		},
 		Timeout: 10 * time.Second,
@@ -66,21 +83,13 @@ func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManag
 	}
 
 	u.log.Info("checking developer console health")
-	err = u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://"+cs.Properties.FQDN+"/console/", 10*time.Second)
+	err = u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs.Properties.FQDN, cs.Config.Certificates.OpenShiftConsole.Cert), "https://"+cs.Properties.PublicHostname+"/console/", time.Second)
 	if err != nil {
 		return err
 	}
 
-	// currently this makes a tcp connection to console.publicsubdomain:443 then
-	// issues a GET with Host header console.publicsubdomain
-
-	// in the future when we enable vanity domains, the end user won't have
-	// created the publicsubdomain record yet, so this will need to make a tcp
-	// connection to console.fqdn:443 with an SNI header set to
-	// console.publicsubdomain,then issue a GET with Host header
-	// console.publicsubdomain
 	u.log.Info("checking admin console health")
-	return u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs), "https://console."+cs.Properties.RouterProfiles[0].PublicSubdomain, 10*time.Second)
+	return u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs.Properties.RouterProfiles[0].FQDN, cs.Config.Certificates.Router.Cert), "https://console."+cs.Properties.RouterProfiles[0].PublicSubdomain+"/", time.Second)
 }
 
 func (u *simpleUpgrader) WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
