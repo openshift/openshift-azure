@@ -39,7 +39,6 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	// TODO: Determine subscription ID from the request path
-	vc := azureclient.NewVaultMgmtClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
 	gc := resources.NewGroupsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
 	gc.Authorizer = authorizer
 
@@ -56,7 +55,13 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = deleteVault(ctx, vc, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), vaultName(os.Getenv("RESOURCEGROUP")))
+	vm, err := newVaultManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to delete vault: %v", err))
+		return
+	}
+
+	err = vm.deleteVault(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), vaultName(os.Getenv("RESOURCEGROUP")))
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to delete vault: %v", err))
 		return

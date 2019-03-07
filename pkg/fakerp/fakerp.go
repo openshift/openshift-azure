@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
-	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -19,7 +18,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/tls"
-	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
@@ -122,34 +120,16 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 
 	if !shared.IsUpdate() {
 		// call after GenerateConfig() as we need the CA certificate created
-		authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
+		vm, err := newVaultManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"))
 		if err != nil {
 			return nil, err
 		}
 
-		graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
+		err = vm.createVault(ctx, cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
 		if err != nil {
 			return nil, err
 		}
-
-		vaultauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyVaultClientAuthorizer)
-		if err != nil {
-			return nil, err
-		}
-
-		vc := azureclient.NewVaultMgmtClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
-		spc := azureclient.NewServicePrincipalsClient(ctx, os.Getenv("AZURE_TENANT_ID"), graphauthorizer)
-		kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
-
-		objID, err := aadapp.GetServicePrincipalObjectIDFromAppID(ctx, spc, cs.Properties.MasterServicePrincipalProfile.ClientID)
-		if err != nil {
-			return nil, err
-		}
-		err = createVault(ctx, vc, objID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultName(os.Getenv("RESOURCEGROUP")))
-		if err != nil {
-			return nil, err
-		}
-		err = writeTLSCertsToVault(ctx, kvc, cs, vaultURL(os.Getenv("RESOURCEGROUP")))
+		err = vm.writeTLSCertsToVault(ctx, cs, vaultURL(os.Getenv("RESOURCEGROUP")))
 		if err != nil {
 			return nil, err
 		}

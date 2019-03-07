@@ -5,13 +5,16 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
+	"os"
 
 	mgmtkeyvault "github.com/Azure/azure-sdk-for-go/services/keyvault/mgmt/2016-10-01/keyvault"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
@@ -29,7 +32,36 @@ func vaultURL(rg string) string {
 	return fmt.Sprintf("https://%s.vault.azure.net", vaultName(rg))
 }
 
-func writeTLSCertsToVault(ctx context.Context, kvc azureclient.KeyVaultClient, cs *api.OpenShiftManagedCluster, vaultURL string) error {
+type vaultManager struct {
+	vc  azureclient.VaultMgmtClient
+	spc azureclient.ServicePrincipalsClient
+	kvc azureclient.KeyVaultClient
+}
+
+func newVaultManager(ctx context.Context, subscriptionID string) (*vaultManager, error) {
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
+	if err != nil {
+		return nil, err
+	}
+
+	graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	vaultauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyVaultClientAuthorizer)
+	if err != nil {
+		return nil, err
+	}
+
+	return &vaultManager{
+		vc:  azureclient.NewVaultMgmtClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
+		spc: azureclient.NewServicePrincipalsClient(ctx, os.Getenv("AZURE_TENANT_ID"), graphauthorizer),
+		kvc: azureclient.NewKeyVaultClient(ctx, vaultauthorizer),
+	}, nil
+}
+
+func (vm *vaultManager) writeTLSCertsToVault(ctx context.Context, cs *api.OpenShiftManagedCluster, vaultURL string) error {
 	certs := []struct {
 		vaultKeyName string
 		params       tls.CertParams
@@ -68,7 +100,7 @@ func writeTLSCertsToVault(ctx context.Context, kvc azureclient.KeyVaultClient, c
 		if err != nil {
 			return err
 		}
-		err = vault.ImportCertificate(ctx, kvc, vaultURL, cert.vaultKeyName, newkey, newcert)
+		err = vault.ImportCertificate(ctx, vm.kvc, vaultURL, cert.vaultKeyName, newkey, newcert)
 		if err != nil {
 			return err
 		}
@@ -76,13 +108,18 @@ func writeTLSCertsToVault(ctx context.Context, kvc azureclient.KeyVaultClient, c
 	return nil
 }
 
-func createVault(ctx context.Context, vc azureclient.VaultMgmtClient, appObjectID, tenantID, resourceGroup, location, vaultName string) error {
+func (vm *vaultManager) createVault(ctx context.Context, appID, tenantID, resourceGroup, location, vaultName string) error {
 	tID, err := uuid.FromString(tenantID)
 	if err != nil {
 		return err
 	}
 
-	_, err = vc.CreateOrUpdate(ctx, resourceGroup, vaultName, mgmtkeyvault.VaultCreateOrUpdateParameters{
+	spObjID, err := aadapp.GetServicePrincipalObjectIDFromAppID(ctx, vm.spc, appID)
+	if err != nil {
+		return err
+	}
+
+	_, err = vm.vc.CreateOrUpdate(ctx, resourceGroup, vaultName, mgmtkeyvault.VaultCreateOrUpdateParameters{
 		Location: to.StringPtr(location),
 		Properties: &mgmtkeyvault.VaultProperties{
 			TenantID: &tID,
@@ -93,11 +130,10 @@ func createVault(ctx context.Context, vc azureclient.VaultMgmtClient, appObjectI
 			AccessPolicies: &[]mgmtkeyvault.AccessPolicyEntry{
 				{
 					TenantID: &tID,
-					ObjectID: &appObjectID,
+					ObjectID: &spObjID,
 					Permissions: &mgmtkeyvault.Permissions{
 						Certificates: &[]mgmtkeyvault.CertificatePermissions{
 							mgmtkeyvault.Import,
-							// mgmtkeyvault.Get,
 						},
 						Secrets: &[]mgmtkeyvault.SecretPermissions{
 							mgmtkeyvault.SecretPermissionsGet,
@@ -110,7 +146,7 @@ func createVault(ctx context.Context, vc azureclient.VaultMgmtClient, appObjectI
 	return err
 }
 
-func deleteVault(ctx context.Context, m azureclient.VaultMgmtClient, subscriptionID, resourceGroup, vaultName string) error {
-	_, err := m.Delete(ctx, resourceGroup, vaultName)
+func (vm *vaultManager) deleteVault(ctx context.Context, subscriptionID, resourceGroup, vaultName string) error {
+	_, err := vm.vc.Delete(ctx, resourceGroup, vaultName)
 	return err
 }
