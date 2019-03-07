@@ -145,7 +145,7 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	deployer := GetDeployer(s.log, cs)
-	if err := s.plugin.RotateClusterSecrets(ctx, cs, deployer, s.pluginTemplate); err != nil {
+	if err := s.plugin.RotateClusterSecrets(ctx, cs, deployer); err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to rotate cluster secrets: %v", err))
 		return
 	}

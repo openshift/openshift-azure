@@ -188,7 +188,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 		log:             logrus.NewEntry(logrus.StandardLogger()),
 	}
 
-	if err := p.RotateClusterSecrets(nil, cs, deployer, nil); err != nil {
+	if err := p.RotateClusterSecrets(nil, cs, deployer); err != nil {
 		t.Errorf("plugin.RotateClusterSecrets error = %v", err)
 	}
 }
