@@ -29,9 +29,8 @@ type Kubeclient interface {
 }
 
 type kubeclient struct {
-	pluginConfig api.PluginConfig
-	client       kubernetes.Interface
-	log          *logrus.Entry
+	client kubernetes.Interface
+	log    *logrus.Entry
 }
 
 var _ Kubeclient = &kubeclient{}

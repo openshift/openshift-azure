@@ -154,7 +154,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// apply the request
-	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, s.pluginConfig, isAdminRequest)
+	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, isAdminRequest, s.testConfig)
 	if err != nil {
 		s.writeState(internalapi.Failed)
 		s.badRequest(w, fmt.Sprintf("Failed to apply request: %v", err))

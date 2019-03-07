@@ -189,7 +189,7 @@ func ipOutbound(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 	}
 }
 
-func lbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
+func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 	lb := &network.LoadBalancer{
 		Sku: &network.LoadBalancerSku{
 			Name: network.LoadBalancerSkuNameStandard,
@@ -277,7 +277,7 @@ func lbAPIServer(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network
 	return lb
 }
 
-func lbKubernetes(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
+func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 	lb := &network.LoadBalancer{
 		Sku: &network.LoadBalancerSku{
 			Name: network.LoadBalancerSkuNameStandard,
@@ -403,7 +403,7 @@ func nsgWorker(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
 	}
 }
 
-func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
+func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string, testConfig api.TestConfig) (*compute.VirtualMachineScaleSet, error) {
 	sshPublicKey, err := tls.SSHPublicKeyAsString(&cs.Config.SSHKey.PublicKey)
 	if err != nil {
 		return nil, err
@@ -425,7 +425,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 			"IsRecovery":     len(backupBlob) > 0,
 			"BackupBlobName": backupBlob,
 			"Role":           app.Role,
-			"TestConfig":     pc.TestConfig,
+			"TestConfig":     testConfig,
 		})
 		if err != nil {
 			return nil, err
@@ -434,7 +434,7 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 	} else {
 		b, err := template.Template(string(nodeStartup), nil, cs, map[string]interface{}{
 			"Role":       app.Role,
-			"TestConfig": pc.TestConfig,
+			"TestConfig": testConfig,
 		})
 		if err != nil {
 			return nil, err
@@ -598,14 +598,14 @@ func Vmss(pc *api.PluginConfig, cs *api.OpenShiftManagedCluster, app *api.AgentP
 		}
 	}
 
-	if pc.TestConfig.ImageResourceName != "" {
+	if testConfig.ImageResourceName != "" {
 		vmss.Plan = nil
 		vmss.VirtualMachineScaleSetProperties.VirtualMachineProfile.StorageProfile.ImageReference = &compute.ImageReference{
 			ID: to.StringPtr(resourceid.ResourceID(
 				cs.Properties.AzProfile.SubscriptionID,
-				pc.TestConfig.ImageResourceGroup,
+				testConfig.ImageResourceGroup,
 				"Microsoft.Compute/images",
-				pc.TestConfig.ImageResourceName,
+				testConfig.ImageResourceName,
 			)),
 		}
 	}

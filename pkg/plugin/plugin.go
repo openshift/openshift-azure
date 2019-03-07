@@ -22,7 +22,7 @@ import (
 
 type plugin struct {
 	log             *logrus.Entry
-	config          api.PluginConfig
+	testConfig      api.TestConfig
 	clusterUpgrader cluster.Upgrader
 	armGenerator    arm.Generator
 	configGenerator config.Generator
@@ -32,25 +32,25 @@ type plugin struct {
 var _ api.Plugin = &plugin{}
 
 // NewPlugin creates a new plugin instance
-func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) (api.Plugin, []error) {
+func NewPlugin(log *logrus.Entry, testConfig api.TestConfig) (api.Plugin, []error) {
 	return &plugin{
 		log:             log,
-		config:          *pluginConfig,
-		clusterUpgrader: cluster.NewSimpleUpgrader(log, pluginConfig),
-		armGenerator:    arm.NewSimpleGenerator(pluginConfig),
-		configGenerator: config.NewSimpleGenerator(pluginConfig),
+		testConfig:      testConfig,
+		clusterUpgrader: cluster.NewSimpleUpgrader(log, testConfig),
+		armGenerator:    arm.NewSimpleGenerator(testConfig),
+		configGenerator: config.NewSimpleGenerator(testConfig.RunningUnderTest),
 	}, nil
 }
 
 func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) []error {
 	p.log.Info("validating internal data models")
-	validator := validate.NewAPIValidator(p.config.TestConfig.RunningUnderTest)
+	validator := validate.NewAPIValidator(p.testConfig.RunningUnderTest)
 	return validator.Validate(new, old, externalOnly)
 }
 
 func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManagedCluster) []error {
 	p.log.Info("validating internal admin data models")
-	validator := validate.NewAdminValidator(p.config.TestConfig.RunningUnderTest)
+	validator := validate.NewAdminValidator(p.testConfig.RunningUnderTest)
 	return validator.Validate(new, old)
 }
 
@@ -241,7 +241,7 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 func (p *plugin) initialize(ctx context.Context, oc *api.OpenShiftManagedCluster) error {
 	var err error
 	if p.kubeclient == nil {
-		p.kubeclient, err = kubeclient.NewKubeclient(p.log, oc.Config.AdminKubeconfig, &p.config, false)
+		p.kubeclient, err = kubeclient.NewKubeclient(p.log, oc.Config.AdminKubeconfig, false)
 	}
 	return err
 }

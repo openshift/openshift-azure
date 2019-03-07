@@ -10,7 +10,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
@@ -123,7 +122,7 @@ func (rt *retryingRoundTripper) RoundTrip(req *http.Request) (resp *http.Respons
 }
 
 // NewKubeclient creates a new kubeclient
-func NewKubeclient(log *logrus.Entry, config *v1.Config, pluginConfig *api.PluginConfig, disableKeepAlives bool) (Kubeclient, error) {
+func NewKubeclient(log *logrus.Entry, config *v1.Config, disableKeepAlives bool) (Kubeclient, error) {
 	restconfig, err := managedcluster.RestConfigFromV1Config(config)
 	if err != nil {
 		return nil, err
@@ -158,9 +157,8 @@ func NewKubeclient(log *logrus.Entry, config *v1.Config, pluginConfig *api.Plugi
 	}
 
 	return &kubeclient{
-		pluginConfig: *pluginConfig,
-		log:          log,
-		client:       cli,
+		log:    log,
+		client: cli,
 	}, nil
 
 }

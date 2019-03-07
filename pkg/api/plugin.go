@@ -84,12 +84,8 @@ func (pe *PluginError) Error() string {
 // mode resources.Incremental and wait for it to complete.
 type DeployFn func(context.Context, map[string]interface{}) error
 
-// PluginConfig is passed into NewPlugin
-type PluginConfig struct {
-	TestConfig TestConfig
-}
-
-// TestConfig holds all testing variables. It should be empty in production.
+// TestConfig holds all testing variables. It should be the zero value in
+// production.
 type TestConfig struct {
 	RunningUnderTest   bool
 	ImageResourceGroup string

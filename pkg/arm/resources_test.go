@@ -27,7 +27,7 @@ func TestFixupDepends(t *testing.T) {
 		{
 			name: "have deps, but missing resources",
 			resources: []interface{}{
-				lbAPIServer(&api.PluginConfig{}, cs),
+				lbAPIServer(cs),
 			},
 			expect: []string{},
 		},
@@ -35,7 +35,7 @@ func TestFixupDepends(t *testing.T) {
 			name: "have deps and dependent resources",
 			resources: []interface{}{
 				ipAPIServer(cs),
-				lbAPIServer(&api.PluginConfig{}, cs),
+				lbAPIServer(cs),
 			},
 			expect: []string{"/subscriptions/sess/resourceGroups/rg/providers/Microsoft.Network/publicIPAddresses/ip-apiserver"},
 		},

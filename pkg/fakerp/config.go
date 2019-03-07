@@ -25,16 +25,12 @@ const (
 	TemplatesDirectory    = "/test/templates/"
 )
 
-func GetPluginConfig() (*api.PluginConfig, error) {
-	tc := api.TestConfig{
+func GetTestConfig() api.TestConfig {
+	return api.TestConfig{
 		RunningUnderTest:   os.Getenv("RUNNING_UNDER_TEST") == "true",
 		ImageResourceGroup: os.Getenv("IMAGE_RESOURCEGROUP"),
 		ImageResourceName:  os.Getenv("IMAGE_RESOURCENAME"),
 	}
-
-	return &api.PluginConfig{
-		TestConfig: tc,
-	}, nil
 }
 
 func GetPluginTemplate() (*pluginapi.Config, error) {
