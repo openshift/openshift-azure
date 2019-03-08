@@ -16,8 +16,15 @@ METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 STARTUP_IMAGE ?= quay.io/openshift-on-azure/startup:$(TAG)
 
+ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup
+ALL_IMAGES = $(addsuffix -image, $(ALL_BINARIES))
+ALL_PUSHES = $(addsuffix -push, $(ALL_BINARIES))
+
+IMAGEBUILDER = ${GOPATH}/bin/imagebuilder
+
+.PHONY: $(ALL_PUSHES) $(ALL_IMAGES) all version clean build test unit generate pullregistry
 # all is the default target to build everything
-all: clean build azure-controllers etcdbackup sync metricsbridge startup e2e-bin
+all: clean build $(ALL_BINARIES)
 
 version:
 	echo ${TAG}
@@ -26,13 +33,14 @@ build: generate
 	go build ./...
 
 clean:
-	rm -f coverage.out azure-controllers etcdbackup sync metricsbridge startup e2e
-
-test: unit e2e
+	rm -f coverage.out $(ALL_BINARIES)
 
 generate:
 	go generate ./...
 
+test: unit e2e
+
+.PHONY: create delete upgrade
 create:
 	timeout 1h ./hack/create.sh ${RESOURCEGROUP}
 
@@ -40,68 +48,74 @@ delete:
 	./hack/delete.sh ${RESOURCEGROUP}
 	rm -rf _data
 
-azure-controllers: generate
-	go build -ldflags ${LDFLAGS} ./cmd/azure-controllers
+upgrade:
+	./hack/upgrade-e2e.sh release-test-${TAG}-${COMMIT} ${SOURCE}
 
-azure-controllers-image: azure-controllers imagebuilder
-	imagebuilder -f images/azure-controllers/Dockerfile -t $(AZURE_CONTROLLERS_IMAGE) .
+azure-controllers: generate
+	go build -ldflags ${LDFLAGS} ./cmd/$@
+
+azure-controllers-image: azure-controllers $(IMAGEBUILDER) pullregistry
+	$(IMAGEBUILDER) -f images/azure-controllers/Dockerfile -t $(AZURE_CONTROLLERS_IMAGE) .
 
 azure-controllers-push: azure-controllers-image
 	docker push $(AZURE_CONTROLLERS_IMAGE)
 
-e2e-bin: generate
-	go test -ldflags ${LDFLAGS} -tags e2e -c -o ./e2e ./test/e2e
+# for backwards compat
+.PHONY: e2e-bin e2e-image e2e-push
+e2e-bin: e2e-tests
+e2e-image: e2e-tests-image
+e2e-push: e2e-tests-push
 
-e2e-image: e2e-bin imagebuilder
-	imagebuilder -f images/e2e/Dockerfile -t $(E2E_IMAGE) .
+e2e-tests: generate
+	go test -ldflags ${LDFLAGS} -tags e2e -c -o ./e2e-tests ./test/e2e
 
-e2e-push: e2e-image
+e2e-tests-image: e2e-tests $(IMAGEBUILDER) pullregistry
+	$(IMAGEBUILDER) -f images/e2e-tests/Dockerfile -t $(E2E_IMAGE) .
+
+e2e-tests-push: e2e-tests-image
 	docker push $(E2E_IMAGE)
 
-recoveretcdcluster: generate
-	go build -ldflags ${LDFLAGS} ./cmd/recoveretcdcluster
-
 etcdbackup: generate
-	go build -ldflags ${LDFLAGS} ./cmd/etcdbackup
+	go build -ldflags ${LDFLAGS} ./cmd/$@
 
-etcdbackup-image: etcdbackup imagebuilder
-	imagebuilder -f images/etcdbackup/Dockerfile -t $(ETCDBACKUP_IMAGE) .
+etcdbackup-image: etcdbackup $(IMAGEBUILDER) pullregistry
+	$(IMAGEBUILDER) -f images/etcdbackup/Dockerfile -t $(ETCDBACKUP_IMAGE) .
 
 etcdbackup-push: etcdbackup-image
 	docker push $(ETCDBACKUP_IMAGE)
 
 metricsbridge:
-	go build -ldflags ${LDFLAGS} ./cmd/metricsbridge
+	go build -ldflags ${LDFLAGS} ./cmd/$@
 
-metricsbridge-image: metricsbridge imagebuilder
-	imagebuilder -f images/metricsbridge/Dockerfile -t $(METRICSBRIDGE_IMAGE) .
+metricsbridge-image: metricsbridge $(IMAGEBUILDER) pullregistry
+	$(IMAGEBUILDER) -f images/metricsbridge/Dockerfile -t $(METRICSBRIDGE_IMAGE) .
 
 metricsbridge-push: metricsbridge-image
 	docker push $(METRICSBRIDGE_IMAGE)
 
 sync: generate
-	go build -ldflags ${LDFLAGS} ./cmd/sync
+	go build -ldflags ${LDFLAGS} ./cmd/$@
 
-sync-image: sync imagebuilder
-	imagebuilder -f images/sync/Dockerfile -t $(SYNC_IMAGE) .
+sync-image: sync $(IMAGEBUILDER) pullregistry
+	$(IMAGEBUILDER) -f images/sync/Dockerfile -t $(SYNC_IMAGE) .
 
 sync-push: sync-image
 	docker push $(SYNC_IMAGE)
 
-all-image: azure-controllers-image e2e-image etcdbackup-image metricsbridge-image sync-image startup-image
+all-image: $(ALL_IMAGES)
 
-all-push: azure-controllers-push e2e-push etcdbackup-push metrics-push sync-push startup-push
+all-push: $(ALL_PUSHES)
 
 startup: generate
-	go build -ldflags ${LDFLAGS} ./cmd/startup
+	go build -ldflags ${LDFLAGS} ./cmd/$@
 
-startup-image: startup
-	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-	imagebuilder -f images/startup/Dockerfile -t $(STARTUP_IMAGE) .
+startup-image: startup $(IMAGEBUILDER) pullregistry
+	$(IMAGEBUILDER) -f images/startup/Dockerfile -t $(STARTUP_IMAGE) .
 
 startup-push: startup-image
 	docker push $(STARTUP_IMAGE)
 
+.PHONY: verify
 verify:
 	./hack/validate-generated.sh
 	go vet ./...
@@ -117,15 +131,14 @@ ifneq ($(ARTIFACT_DIR),)
 	cp coverage.out $(ARTIFACT_DIR)
 endif
 
+.PHONY: cover codecov
 cover: unit
 	go tool cover -html=coverage.out
 
 codecov: unit
 	./hack/codecov-report.sh
 
-upgrade:
-	./hack/upgrade-e2e.sh release-test-${TAG}-${COMMIT} ${SOURCE}
-
+.PHONY: e2e e2e-prod e2e-etcdbackuprecovery e2e-keyrotation e2e-reimagevm e2e-scaleupdown e2e-forceupdate e2e-vnet
 e2e:
 	FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
 
@@ -150,8 +163,8 @@ e2e-forceupdate:
 e2e-vnet:
 	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
 
-imagebuilder:
-	docker pull registry.access.redhat.com/rhel7:latest
+$(IMAGEBUILDER):
 	go get -u github.com/openshift/imagebuilder/cmd/imagebuilder
 
-.PHONY: clean metricsbridge metricsbridge-image metricsbridge-push sync-image sync-push startup startup-image startup-push verify unit e2e imagebuilder all-image all-push
+pullregistry: $(IMAGEBUILDER)
+	docker pull registry.access.redhat.com/rhel7:latest
