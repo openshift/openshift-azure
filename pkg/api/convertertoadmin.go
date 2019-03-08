@@ -144,6 +144,7 @@ func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateCon
 		OpenShiftMaster:      convertCertKeyPairToAdmin(in.OpenShiftMaster),
 		NodeBootstrap:        convertCertKeyPairToAdmin(in.NodeBootstrap),
 		Registry:             convertCertKeyPairToAdmin(in.Registry),
+		RegistryConsole:      convertCertKeyPairToAdmin(in.RegistryConsole),
 		Router:               convertCertKeyPairToAdmin(in.Router),
 		ServiceCatalogServer: convertCertKeyPairToAdmin(in.ServiceCatalogServer),
 		BlackBoxMonitor:      convertCertKeyPairToAdmin(in.BlackBoxMonitor),

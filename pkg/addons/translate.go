@@ -523,7 +523,7 @@ var Translations = map[string][]struct {
 	"OAuthClient.oauth.openshift.io/cockpit-oauth-client": {
 		{
 			Path:     jsonpath.MustCompile("$.redirectURIs[0]"),
-			Template: "https://registry-console-default.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
+			Template: "https://registry-console.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.secret"),
@@ -578,6 +578,12 @@ var Translations = map[string][]struct {
 			Path:       jsonpath.MustCompile("$.stringData.'config.yml'"),
 			NestedPath: jsonpath.MustCompile("$.storage.azure.accountkey"),
 			Template:   "{{ .Extra.RegistryStorageAccountKey }}",
+		},
+	},
+	"Secret/default/registry-console": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'tls.cert'"),
+			Template: "{{ String (CertAsBytes .Config.Certificates.RegistryConsole.Cert) }}\n{{ String (PrivateKeyAsBytes .Config.Certificates.RegistryConsole.Key) }}",
 		},
 	},
 	"Secret/default/router-certs": {

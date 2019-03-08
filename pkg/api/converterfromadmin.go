@@ -406,6 +406,9 @@ func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig)
 	if in.Registry != nil {
 		mergeCertKeyPair(in.Registry, &out.Registry)
 	}
+	if in.RegistryConsole != nil {
+		mergeCertKeyPair(in.RegistryConsole, &out.RegistryConsole)
+	}
 	if in.Router != nil {
 		mergeCertKeyPair(in.Router, &out.Router)
 	}

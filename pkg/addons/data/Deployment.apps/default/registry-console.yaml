@@ -48,5 +48,14 @@ spec:
             port: 9090
             scheme: HTTP
           timeoutSeconds: 5
+        volumeMounts:
+        - mountPath: /etc/cockpit/ws-certs.d
+          name: serving-cert
+          readOnly: true
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
+      volumes:
+      - name: serving-cert
+        secret:
+          defaultMode: 288
+          secretName: registry-console
