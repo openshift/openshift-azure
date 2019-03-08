@@ -89,12 +89,12 @@ func createOrUpdatev20180930preview(ctx context.Context, log *logrus.Entry, rpc 
 	return &resp, nil
 }
 
-func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, rpc adminclient.OpenShiftManagedClustersClient, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) error {
+func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, rpc *adminclient.Client, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) error {
 	log.Info("creating/updating cluster")
 	if oc.Properties != nil {
 		oc.Properties.ProvisioningState = nil
 	}
-	resp, err := rpc.CreateOrUpdateAndWait(ctx, resourceGroup, resourceGroup, *oc)
+	resp, err := rpc.CreateOrUpdate(ctx, resourceGroup, resourceGroup, oc)
 	if err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, rpc adminclient
 func execute(
 	ctx context.Context,
 	log *logrus.Entry,
-	ac adminclient.OpenShiftManagedClustersClient,
+	ac *adminclient.Client,
 	rpc v20180930previewclient.OpenShiftManagedClustersClient,
 	conf *fakerp.Config,
 	adminManifest string,
@@ -238,13 +238,12 @@ func main() {
 	}
 
 	// setup the osa clients
-	adminClient := adminclient.NewOpenShiftManagedClustersClientWithBaseURI(rpURL+shared.AdminContext, conf.SubscriptionID)
+	adminClient := adminclient.NewClient(rpURL, conf.SubscriptionID)
 	v20180930previewClient := v20180930previewclient.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, conf.SubscriptionID)
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID, "")
 	if err != nil {
 		log.Fatal(err)
 	}
-	adminClient.Authorizer = authorizer
 	v20180930previewClient.Authorizer = authorizer
 
 	ctx := context.Background()
@@ -265,15 +264,12 @@ func main() {
 
 	if *restoreFromBlob != "" {
 		err = wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
-			resp, err := adminClient.RestoreAndWait(ctx, conf.ResourceGroup, conf.ResourceGroup, *restoreFromBlob)
+			err = adminClient.Restore(ctx, conf.ResourceGroup, conf.ResourceGroup, *restoreFromBlob)
 			if isConnectionRefused(err) {
 				return false, nil
 			}
 			if err != nil {
 				return false, err
-			}
-			if resp.StatusCode != http.StatusOK {
-				return false, fmt.Errorf("expected 200 OK, got %v", resp.Status)
 			}
 			return true, nil
 		})

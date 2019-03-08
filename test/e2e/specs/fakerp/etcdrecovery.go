@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
 	"os"
 
 	. "github.com/onsi/ginkgo"
@@ -72,9 +71,8 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		Expect(cm1.Data).To(HaveKeyWithValue("value", "before-backup"))
 
 		By(fmt.Sprintf("Running an etcd backup"))
-		resp, err := azurecli.OpenShiftManagedClustersAdmin.BackupAndWait(context.Background(), resourceGroup, resourceGroup, backup)
+		err = azurecli.OpenShiftManagedClustersAdmin.Backup(context.Background(), resourceGroup, resourceGroup, backup)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
 		// wait for it to exist
 		By("Overwrite the test configmap with value=second")
@@ -91,9 +89,8 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		Expect(cm2.Data).To(HaveKeyWithValue("value", "after-backup"))
 
 		By("Restore from the backup")
-		resp, err = azurecli.OpenShiftManagedClustersAdmin.RestoreAndWait(context.Background(), resourceGroup, resourceGroup, backup)
+		err = azurecli.OpenShiftManagedClustersAdmin.Restore(context.Background(), resourceGroup, resourceGroup, backup)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(resp.StatusCode).To(Equal(http.StatusOK))
 
 		By("Confirm the state of the backup")
 		final, err := cli.Client.EndUser.CoreV1.ConfigMaps(namespace).Get(configMapName, metav1.GetOptions{})

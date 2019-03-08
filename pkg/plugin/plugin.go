@@ -288,7 +288,7 @@ func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluste
 	return nil
 }
 
-func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedCluster) ([]byte, error) {
+func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedCluster) (*adminapi.GenevaActionListClusterVMs, error) {
 	p.log.Info("generating cluster upgrader clients")
 	err := p.clusterUpgrader.CreateClients(ctx, oc, true)
 	if err != nil {
@@ -300,7 +300,8 @@ func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedClu
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(pods)
+
+	return &adminapi.GenevaActionListClusterVMs{VMs: &pods}, nil
 }
 
 func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, hostname string) error {

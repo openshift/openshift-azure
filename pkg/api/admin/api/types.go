@@ -214,3 +214,9 @@ type AADIdentityProvider struct {
 type GenevaActionPluginVersion struct {
 	PluginVersion *string `json:"pluginVersion,omitempty"`
 }
+
+// GenevaActionListClusterVMs is the struct returned by the ListClusterVMs
+// Geneva action API
+type GenevaActionListClusterVMs struct {
+	VMs *[]string `json:"vms,omitempty"`
+}

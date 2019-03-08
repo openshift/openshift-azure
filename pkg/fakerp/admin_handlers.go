@@ -51,7 +51,7 @@ func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(pods)
 	s.log.Info("fetched control plane pods")
 }
@@ -68,14 +68,19 @@ func (s *Server) handleListClusterVMs(w http.ResponseWriter, req *http.Request) 
 		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
 		return
 	}
-	json, err := s.plugin.ListClusterVMs(ctx, cs)
+	vms, err := s.plugin.ListClusterVMs(ctx, cs)
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to fetch cluster VMs: %v", err))
 		return
 	}
+	b, err := json.Marshal(vms)
+	if err != nil {
+		s.internalError(w, err.Error())
+		return
+	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Write(json)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(b)
 	s.log.Info("fetched cluster VMs")
 }
 
@@ -109,12 +114,8 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	blobName, err := readBlobName(req)
-	if err != nil {
-		s.badRequest(w, fmt.Sprintf("Cannot read blob name from request: %v", err))
-		return
-	}
-	if len(blobName) == 0 {
+	backupName := chi.URLParam(req, "backupName")
+	if len(backupName) == 0 {
 		s.badRequest(w, "Blob name to restore from was not provided")
 		return
 	}
@@ -125,7 +126,7 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	deployer := GetDeployer(s.log, cs)
-	if err := s.plugin.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
+	if err := s.plugin.RecoverEtcdCluster(ctx, cs, deployer, backupName); err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to recover cluster: %v", err))
 		return
 	}
@@ -219,7 +220,7 @@ func (s *Server) handleGetPluginVersion(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(b)
 
 	s.log.Info("fetched plugin version")

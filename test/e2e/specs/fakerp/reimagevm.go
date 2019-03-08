@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
-	"net/http"
 	"os"
 	"time"
 
@@ -42,16 +41,14 @@ var _ = Describe("Reimage VM E2E tests [ReimageVM][Fake][LongRunning]", func() {
 		By("Executing reimage on a vm in the cluster")
 		vmlist, err := azurecli.OpenShiftManagedClustersAdmin.ListClusterVMs(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
-		Expect(len(vmlist.VMs)).To(BeNumerically(">=", 6))
+		Expect(len(*vmlist.VMs)).To(BeNumerically(">=", 6))
 		rand.Seed(time.Now().Unix())
-		vm := vmlist.VMs[rand.Intn(len(vmlist.VMs))]
+		vm := (*vmlist.VMs)[rand.Intn(len(*vmlist.VMs))]
 		By(fmt.Sprintf("Reimaging %s", vm))
 		startTime := time.Now()
-		update, err := azurecli.OpenShiftManagedClustersAdmin.ReimageAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm)
+		err = azurecli.OpenShiftManagedClustersAdmin.Reimage(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm)
 		endTime := time.Now()
 		Expect(err).NotTo(HaveOccurred())
-		Expect(update.StatusCode).To(Equal(http.StatusOK))
-		Expect(update).NotTo(BeNil())
 
 		By("Verifying through azure activity logs that the reimage happened")
 		scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(vm)

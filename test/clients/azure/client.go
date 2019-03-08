@@ -39,7 +39,7 @@ type Client struct {
 	Applications                     azureclient.ApplicationsClient
 	BlobStorage                      storage.BlobStorageClient
 	OpenShiftManagedClusters         externalapi.OpenShiftManagedClustersClient
-	OpenShiftManagedClustersAdmin    adminapi.OpenShiftManagedClustersClient
+	OpenShiftManagedClustersAdmin    *adminapi.Client
 	VirtualMachineScaleSets          azureclient.VirtualMachineScaleSetsClient
 	VirtualMachineScaleSetExtensions azureclient.VirtualMachineScaleSetExtensionsClient
 	VirtualMachineScaleSetVMs        azureclient.VirtualMachineScaleSetVMsClient
@@ -93,8 +93,7 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 	rpc := externalapi.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, subscriptionID)
 	rpc.Authorizer = authorizer
 
-	rpcAdmin := adminapi.NewOpenShiftManagedClustersClientWithBaseURI(rpURL+shared.AdminContext, subscriptionID)
-	rpcAdmin.Authorizer = authorizer
+	rpcAdmin := adminapi.NewClient(rpURL, subscriptionID)
 
 	ctx := context.Background()
 

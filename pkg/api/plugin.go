@@ -134,7 +134,7 @@ type GenevaActions interface {
 	ForceUpdate(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
 
 	// ListClusterVMs returns the hostnames of all vms in a cluster
-	ListClusterVMs(ctx context.Context, cs *OpenShiftManagedCluster) ([]byte, error)
+	ListClusterVMs(ctx context.Context, cs *OpenShiftManagedCluster) (*adminapi.GenevaActionListClusterVMs, error)
 
 	// Reimage reimages a virtual machine in the cluster
 	Reimage(ctx context.Context, oc *OpenShiftManagedCluster, hostname string) error

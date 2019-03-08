@@ -2,7 +2,6 @@ package fakerp
 
 import (
 	"context"
-	"net/http"
 	"os"
 
 	. "github.com/onsi/ginkgo"
@@ -39,10 +38,8 @@ var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func
 		Expect(len(before.ScalesetHashes)).To(BeEquivalentTo(2)) // one per worker scaleset
 
 		By("Executing force update on the cluster.")
-		update, err := azurecli.OpenShiftManagedClustersAdmin.ForceUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		err = azurecli.OpenShiftManagedClustersAdmin.ForceUpdate(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
-		Expect(update.StatusCode).To(Equal(http.StatusOK))
-		Expect(update).NotTo(BeNil())
 
 		By("Reading the update blob after the force update")
 		after, err := ubs.Read()

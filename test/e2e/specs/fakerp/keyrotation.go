@@ -2,7 +2,6 @@ package fakerp
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"reflect"
 
@@ -36,10 +35,8 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 		Expect(before).NotTo(BeNil())
 
 		By("Executing key rotation on the cluster.")
-		update, err := azurecli.OpenShiftManagedClustersAdmin.RotateSecretsAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		err = azurecli.OpenShiftManagedClustersAdmin.RotateSecrets(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
-		Expect(update.StatusCode).To(Equal(http.StatusOK))
-		Expect(update).NotTo(BeNil())
 
 		By("Reading the cluster state after the update")
 		after, err := azurecli.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
