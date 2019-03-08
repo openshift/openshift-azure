@@ -208,3 +208,9 @@ type AADIdentityProvider struct {
 	// CustomerAdminGroupID group memberships will get synced into the OpenShift group "osa-customer-admins"
 	CustomerAdminGroupID *string `json:"customerAdminGroupId,omitempty"`
 }
+
+// GenevaActionPluginVersion is the struct returned by the GetPluginVersion
+// Geneva action API
+type GenevaActionPluginVersion struct {
+	PluginVersion *string `json:"pluginVersion,omitempty"`
+}

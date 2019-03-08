@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
@@ -342,5 +343,17 @@ func TestBackupEtcdCluster(t *testing.T) {
 	err := p.BackupEtcdCluster(nil, cs, backupName)
 	if err != nil {
 		t.Errorf("plugin.BackupEtcdCluster error = %v", err)
+	}
+}
+
+func TestGetPluginVersion(t *testing.T) {
+	p := &plugin{
+		pluginConfig: &pluginapi.Config{
+			PluginVersion: "v0.0",
+		},
+	}
+	result := p.GetPluginVersion(nil)
+	if *result.PluginVersion != p.pluginConfig.PluginVersion {
+		t.Errorf("expected plugin version %s, got %s", p.pluginConfig.PluginVersion, *result.PluginVersion)
 	}
 }

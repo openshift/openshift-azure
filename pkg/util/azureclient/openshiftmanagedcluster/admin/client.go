@@ -1175,3 +1175,32 @@ func (client OpenShiftManagedClustersClient) RunCommand(ctx context.Context, res
 	}
 	return nil
 }
+
+func (client OpenShiftManagedClustersClient) GetPluginVersion(ctx context.Context, resourceGroupName, resourceName string) (*api.GenevaActionPluginVersion, error) {
+	req, err := http.NewRequest(http.MethodPut, client.BaseURI+
+		"/subscriptions/"+client.SubscriptionID+
+		"/resourceGroups/"+resourceGroupName+
+		"/providers/Microsoft.ContainerService/openShiftManagedClusters/"+resourceName+
+		"/pluginVersion", nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.Sender.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code %d", resp.StatusCode)
+	}
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var version *api.GenevaActionPluginVersion
+	err = json.Unmarshal(b, &version)
+	if err != nil {
+		return nil, err
+	}
+	return version, nil
+}

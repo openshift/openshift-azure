@@ -3,6 +3,8 @@ package api
 
 import (
 	"context"
+
+	adminapi "github.com/openshift/openshift-azure/pkg/api/admin/api"
 )
 
 // ContextKey is a type for context property bag payload keys
@@ -142,4 +144,7 @@ type GenevaActions interface {
 
 	// RunCommand runs a predefined command on a virtual machine in the cluster
 	RunCommand(ctx context.Context, cs *OpenShiftManagedCluster, hostname string, command Command) error
+
+	// GetPluginVersion fetches the RP plugin version
+	GetPluginVersion(ctx context.Context) *adminapi.GenevaActionPluginVersion
 }

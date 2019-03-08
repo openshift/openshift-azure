@@ -11,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	adminapi "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/arm"
@@ -387,4 +388,10 @@ func (p *plugin) RunCommand(ctx context.Context, oc *api.OpenShiftManagedCluster
 
 	p.log.Infof("running %s on %s", command, hostname)
 	return p.clusterUpgrader.RunCommand(ctx, oc, scaleset, instanceID, script)
+}
+
+func (p *plugin) GetPluginVersion(ctx context.Context) *adminapi.GenevaActionPluginVersion {
+	return &adminapi.GenevaActionPluginVersion{
+		PluginVersion: &p.pluginConfig.PluginVersion,
+	}
 }

@@ -2,6 +2,7 @@ package fakerp
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -202,4 +203,24 @@ func (s *Server) handleRunCommand(w http.ResponseWriter, req *http.Request) {
 	}
 
 	s.log.Infof("ran command %s on %s", command, hostname)
+}
+
+// handleGetPluginVersion handles admin requests to get the RP plugin version for OpenShiftManagedClusters
+func (s *Server) handleGetPluginVersion(w http.ResponseWriter, req *http.Request) {
+	ctx, err := enrichContext(context.Background())
+	if err != nil {
+		s.internalError(w, err.Error())
+		return
+	}
+
+	b, err := json.Marshal(s.plugin.GetPluginVersion(ctx))
+	if err != nil {
+		s.internalError(w, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Write(b)
+
+	s.log.Info("fetched plugin version")
 }
