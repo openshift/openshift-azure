@@ -1,7 +1,6 @@
 package fakerp
 
 import (
-	"context"
 	"crypto/rsa"
 	"crypto/x509"
 	"fmt"
@@ -12,11 +11,9 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/tls"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 const (
@@ -85,24 +82,6 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	template.Images.ImagePullSecret = imagePullSecret
 
 	return template, nil
-}
-
-// enrichContext returns enriched context for plugin initiation
-func enrichContext(ctx context.Context) (context.Context, error) {
-	// simulate Context with property bag
-	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
-	if err != nil {
-		return nil, err
-	}
-	ctx = context.WithValue(ctx, internalapi.ContextKeyClientAuthorizer, authorizer)
-
-	vaultauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azureclient.KeyVaultEndpoint)
-	if err != nil {
-		return nil, err
-	}
-	ctx = context.WithValue(ctx, internalapi.ContextKeyVaultClientAuthorizer, vaultauthorizer)
-
-	return ctx, nil
 }
 
 func overridePluginTemplate(template *pluginapi.Config) {

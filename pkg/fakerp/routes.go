@@ -12,6 +12,7 @@ func (s *Server) SetupRoutes() {
 	s.router.Use(middleware.Recoverer)
 	s.router.Use(s.logger)
 	s.router.Use(s.validator)
+	s.router.Use(s.context)
 
 	s.router.Delete(s.basePath, s.handleDelete)
 	s.router.Get(s.basePath, s.handleGet)
