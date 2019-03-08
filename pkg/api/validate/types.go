@@ -36,8 +36,8 @@ var (
 	// This regexp is to check image version format
 	rxImageVersion = regexp.MustCompile(`^[0-9]{3}.[0-9]{1,4}.[0-9]{8}$`)
 
-	// This regexp is to check cluster version (plugin) format
-	rxClusterVersion = regexp.MustCompile(`^v\d+\.\d+$`)
+	// This regexp is to check plugin version format
+	rxPluginVersion = regexp.MustCompile(`^v\d+\.\d+$`)
 
 	rxResourceGroupName = regexp.MustCompile(`^[-\w._()]{1,90}$`)
 

@@ -23,15 +23,15 @@ var _ = Describe("Validate AdimAPI field readability [AdminAPI][Fake]", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("should not be possible to update clusterVersion using AdminAPI", func() {
+	It("should not be possible to update pluginVersion using AdminAPI", func() {
 		By("Reading the cluster state")
 		before, err := cli.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(before).NotTo(BeNil())
-		Expect(before.Config.ClusterVersion).To(BeEquivalentTo(to.StringPtr("v0.0")))
+		Expect(before.Config.PluginVersion).To(BeEquivalentTo(to.StringPtr("v0.0")))
 
 		By("Updating the cluster state")
-		before.Config.ClusterVersion = to.StringPtr("v0.1")
+		before.Config.PluginVersion = to.StringPtr("v0.1")
 		update, err := cli.OpenShiftManagedClustersAdmin.CreateOrUpdate(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), before)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(update).NotTo(BeNil())
@@ -40,6 +40,6 @@ var _ = Describe("Validate AdimAPI field readability [AdminAPI][Fake]", func() {
 		after, err := cli.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(after).NotTo(BeNil())
-		Expect(after.Config.ClusterVersion).To(BeEquivalentTo(to.StringPtr("v0.0")))
+		Expect(after.Config.PluginVersion).To(BeEquivalentTo(to.StringPtr("v0.0")))
 	})
 })

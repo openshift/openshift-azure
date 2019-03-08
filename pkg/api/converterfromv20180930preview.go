@@ -77,6 +77,9 @@ func mergeProperties(oc *v20180930preview.OpenShiftManagedCluster, cs *OpenShift
 	if oc.Properties.OpenShiftVersion != nil {
 		cs.Properties.OpenShiftVersion = *oc.Properties.OpenShiftVersion
 	}
+	if oc.Properties.ClusterVersion != nil {
+		cs.Properties.ClusterVersion = *oc.Properties.ClusterVersion
+	}
 	if oc.Properties.PublicHostname != nil {
 		cs.Properties.PublicHostname = *oc.Properties.PublicHostname
 	}

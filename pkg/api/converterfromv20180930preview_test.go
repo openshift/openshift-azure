@@ -51,6 +51,7 @@ func internalManagedCluster() *OpenShiftManagedCluster {
 		Properties: Properties{
 			ProvisioningState: "Properties.ProvisioningState",
 			OpenShiftVersion:  "Properties.OpenShiftVersion",
+			ClusterVersion:    "Properties.ClusterVersion",
 			PublicHostname:    "Properties.PublicHostname",
 			RouterProfiles: []RouterProfile{
 				{
