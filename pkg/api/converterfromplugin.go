@@ -60,6 +60,7 @@ func ConvertFromPlugin(in *plugin.Config, old *Config) *Config {
 	cs.Images.WebConsole = in.Images.WebConsole
 	cs.Images.Console = in.Images.Console
 	cs.Images.EtcdBackup = in.Images.EtcdBackup
+	cs.Images.Httpd = in.Images.Httpd
 	cs.Images.Startup = in.Images.Startup
 	cs.Images.GenevaLogging = in.Images.GenevaLogging
 	cs.Images.GenevaTDAgent = in.Images.GenevaTDAgent

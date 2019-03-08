@@ -333,6 +333,11 @@ var Translations = map[string][]struct {
 			NestedPath: jsonpath.MustCompile("$.clusterInfo.masterPublicURL"),
 			Template:   "https://{{ .ContainerService.Properties.PublicHostname }}",
 		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.extensions.stylesheetURLs[0]"),
+			Template:   "https://branding.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}/branding.css",
+		},
 	},
 	"CronJob.batch/openshift-etcd/etcd-backup": {
 		{
@@ -484,6 +489,12 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.Console }}",
 		},
 	},
+	"Deployment.apps/openshift-azure-branding/branding": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "{{ .Config.Images.Httpd }}",
+		},
+	},
 	"Deployment.apps/openshift-infra/customer-admin-controller": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
@@ -556,6 +567,12 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.host"),
 			Template: "console.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
+		},
+	},
+	"Route.route.openshift.io/openshift-azure-branding/branding": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.host"),
+			Template: "branding.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
 	"Secret/default/registry-certificates": {
