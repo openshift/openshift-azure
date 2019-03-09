@@ -165,3 +165,8 @@ $(IMAGEBUILDER):
 
 pullregistry: $(IMAGEBUILDER)
 	docker pull registry.access.redhat.com/rhel7:latest
+
+vmimage:
+	./hack/vmimage.sh
+
+.PHONY: vmimage

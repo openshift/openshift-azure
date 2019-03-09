@@ -18,3 +18,4 @@ cscope.out
 /secrets/*
 /fakerp
 /artifacts
+/id_rsa
