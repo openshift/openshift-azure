@@ -97,7 +97,12 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 
 	backupName := chi.URLParam(req, "backupName")
 
-	err := s.plugin.RecoverEtcdCluster(req.Context(), cs, GetDeployer(s.log, cs), backupName)
+	pluginErr := s.plugin.RecoverEtcdCluster(req.Context(), cs, GetDeployer(s.log, cs), backupName)
+	var err error
+	if pluginErr != nil {
+		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error
+		err = pluginErr
+	}
 	s.adminreply(w, err, nil)
 }
 
@@ -109,15 +114,14 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var err error
 	deployer := GetDeployer(s.log, cs)
-	err = s.plugin.RotateClusterSecrets(req.Context(), cs, deployer)
-	if err != nil {
-		s.internalError(w, err.Error())
+	pluginErr := s.plugin.RotateClusterSecrets(req.Context(), cs, deployer)
+	if pluginErr != nil {
+		s.internalError(w, pluginErr.Error())
 		return
 	}
 
-	err = writeHelpers(cs)
+	err := writeHelpers(cs)
 	s.adminreply(w, err, nil)
 }
 
@@ -129,7 +133,12 @@ func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err := s.plugin.ForceUpdate(req.Context(), cs, GetDeployer(s.log, cs))
+	pluginErr := s.plugin.ForceUpdate(req.Context(), cs, GetDeployer(s.log, cs))
+	var err error
+	if pluginErr != nil {
+		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error
+		err = pluginErr
+	}
 	s.adminreply(w, err, nil)
 }
 
