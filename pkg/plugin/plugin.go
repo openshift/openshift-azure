@@ -86,6 +86,10 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
+	err = p.clusterUpgrader.Initialize(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
+	}
 
 	err = p.clusterUpgrader.EtcdBlobExists(ctx, backupBlob)
 	if err != nil {
@@ -99,10 +103,6 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
-	}
-	err = p.clusterUpgrader.Initialize(ctx, cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
 	if err := p.clusterUpgrader.EtcdRestoreDeleteMasterScaleSetHashes(ctx, cs); err != nil {
 		return err

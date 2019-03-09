@@ -115,11 +115,11 @@ func TestRecoverEtcdCluster(t *testing.T) {
 		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testData, nil),
 	)
 	c := clusterUpgrader.EXPECT().CreateClients(nil, cs, true).Return(nil)
+	c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdBlobExists(nil, "test-backup").Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil, cs).Return(nil).After(c)
 
 	// deploy masters
-	c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSetHashes(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().WaitForHealthzStatusOk(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
