@@ -182,6 +182,7 @@ var marshalled = []byte(`{
 			"webConsole": "Config.Images.WebConsole",
 			"console": "Config.Images.Console",
 			"etcdBackup": "Config.Images.EtcdBackup",
+			"httpd": "Config.Images.Httpd",
 			"genevaLogging": "Config.Images.GenevaLogging",
 			"genevaTDAgent": "Config.Images.GenevaTDAgent",
 			"genevaStatsd": "Config.Images.GenevaStatsd",

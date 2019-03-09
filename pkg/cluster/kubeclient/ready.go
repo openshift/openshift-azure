@@ -33,6 +33,10 @@ var deploymentWhitelist = []struct {
 		Name:      "console",
 		Namespace: "openshift-console",
 	},
+	{
+		Name:      "branding",
+		Namespace: "openshift-azure-branding",
+	},
 }
 
 var daemonsetWhitelist = []struct {

@@ -40,6 +40,7 @@ images:
   console: registry.access.redhat.com/openshift3/ose-console:v3.11.82
   controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.82
   etcdBackup: quay.io/openshift-on-azure/etcdbackup:latest
+  httpd: registry.access.redhat.com/rhscl/httpd-24-rhel7:2.4-85
   startup: quay.io/openshift-on-azure/startup:latest
   format: registry.access.redhat.com/openshift3/ose-${component}:${version}
   genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1

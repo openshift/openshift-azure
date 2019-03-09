@@ -12,7 +12,8 @@ data:
     extensions:
       properties: {}
       scriptURLs: []
-      stylesheetURLs: []
+      stylesheetURLs:
+      - '*** GENERATED ***'
     features:
       clusterResourceOverridesEnabled: false
       inactivityTimeoutMinutes: 0
