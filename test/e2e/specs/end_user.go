@@ -16,7 +16,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake]", func()
 
 	BeforeEach(func() {
 		var err error
-		cli, err = standard.NewDefaultSanityChecker()
+		cli, err = standard.NewDefaultSanityChecker(context.Background())
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cli).ToNot(BeNil())
 	})

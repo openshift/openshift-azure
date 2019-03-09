@@ -23,7 +23,7 @@ var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func
 		var err error
 		azurecli, err = azure.NewClientFromEnvironment(true)
 		Expect(err).NotTo(HaveOccurred())
-		cli, err = standard.NewDefaultSanityChecker()
+		cli, err = standard.NewDefaultSanityChecker(context.Background())
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cli).NotTo(BeNil())
 	})
