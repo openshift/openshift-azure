@@ -22,15 +22,12 @@ ALL_PUSHES = $(addsuffix -push, $(ALL_BINARIES))
 
 IMAGEBUILDER = ${GOPATH}/bin/imagebuilder
 
-.PHONY: $(ALL_PUSHES) $(ALL_IMAGES) all version clean build test unit generate pullregistry
+.PHONY: $(ALL_PUSHES) $(ALL_IMAGES) all version clean test unit generate pullregistry
 # all is the default target to build everything
-all: clean build $(ALL_BINARIES)
+all: $(ALL_BINARIES)
 
 version:
 	echo ${TAG}
-
-build: generate
-	go build ./...
 
 clean:
 	rm -f coverage.out $(ALL_BINARIES)
