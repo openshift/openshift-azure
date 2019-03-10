@@ -58,7 +58,7 @@ spec:
         resources:
           requests:
             cpu: 100m
-            memory: 256Mi
+            memory: 100Mi
         volumeMounts:
         - mountPath: /etc/secrets
           name: registry-certificates

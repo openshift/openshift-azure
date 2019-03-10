@@ -75,8 +75,8 @@ spec:
             cpu: 200m
             memory: 400Mi
           requests:
-            cpu: 100m
-            memory: 300Mi
+            cpu: 10m
+            memory: 100Mi
         securityContext:
           privileged: true
           runAsUser: 0
