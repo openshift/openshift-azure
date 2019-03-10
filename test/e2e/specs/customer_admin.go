@@ -121,7 +121,7 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 		defer cli.Client.EndUser.CleanupProject(namespace)
 
 		err = wait.PollImmediate(2*time.Second, 5*time.Minute, func() (bool, error) {
-			rb, err := cli.Client.CustomerAdmin.RbacV1.RoleBindings(namespace).Get("osa-customer-admin", metav1.GetOptions{})
+			rb, err := cli.Client.CustomerAdmin.RbacV1.RoleBindings(namespace).Get("osa-customer-admin-project", metav1.GetOptions{})
 			if err != nil {
 				// still waiting for namespace
 				if kerrors.IsNotFound(err) {

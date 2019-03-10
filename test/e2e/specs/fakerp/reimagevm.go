@@ -10,6 +10,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"k8s.io/apimachinery/pkg/util/wait"
+
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/test/clients/azure"
@@ -47,37 +49,41 @@ var _ = Describe("Reimage VM E2E tests [ReimageVM][Fake][LongRunning]", func() {
 		By(fmt.Sprintf("Reimaging %s", vm))
 		startTime := time.Now()
 		err = azurecli.OpenShiftManagedClustersAdmin.Reimage(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm)
-		endTime := time.Now()
 		Expect(err).NotTo(HaveOccurred())
 
-		By("Verifying through azure activity logs that the reimage happened")
 		scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(vm)
 		Expect(err).NotTo(HaveOccurred())
 
-		logs, err := azurecli.ActivityLogs.List(
-			context.Background(),
-			fmt.Sprintf("eventTimestamp ge '%s' and eventTimestamp le '%s' and resourceUri eq %s",
-				startTime.Format(time.RFC3339),
-				endTime.Format(time.RFC3339),
-				resourceid.ResourceID(os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), "Microsoft.Compute/virtualMachineScaleSets", scaleset)+"/virtualMachines/"+instanceID,
-			),
-			"status,subscriptionId,resourceId,eventName,operationName,httpRequest")
-		Expect(err).NotTo(HaveOccurred())
+		wait.PollImmediate(10*time.Second, 2*time.Minute, func() (bool, error) {
+			By("Verifying through azure activity logs that the reimage happened")
+			logs, err := azurecli.ActivityLogs.List(
+				context.Background(),
+				fmt.Sprintf("eventTimestamp ge '%s' and resourceUri eq %s",
+					startTime.Format(time.RFC3339),
+					resourceid.ResourceID(os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), "Microsoft.Compute/virtualMachineScaleSets", scaleset)+"/virtualMachines/"+instanceID,
+				),
+				"status,operationName")
+			if err != nil {
+				return false, err
+			}
 
-		var found bool
-	out:
-		for logs.NotDone() {
-			for _, log := range logs.Values() {
-				if *log.OperationName.Value == "Microsoft.Compute/virtualMachineScaleSets/virtualmachines/reimage/action" &&
-					*log.Status.Value == "Succeeded" {
-					found = true
-					break out
+			var count int
+			for logs.NotDone() {
+				for _, log := range logs.Values() {
+					if *log.OperationName.Value == "Microsoft.Compute/virtualMachineScaleSets/virtualmachines/reimage/action" &&
+						*log.Status.Value == "Succeeded" {
+						count++
+					}
+				}
+				err = logs.Next()
+				if err != nil {
+					return false, err
 				}
 			}
-			err = logs.Next()
-			Expect(err).NotTo(HaveOccurred())
-		}
-		Expect(found).To(BeTrue())
+
+			return count == 1, nil
+		})
+		Expect(err).NotTo(HaveOccurred())
 
 		By("Validating the cluster")
 		errs := cli.ValidateCluster(context.Background())
