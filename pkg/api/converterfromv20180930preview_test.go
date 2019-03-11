@@ -290,3 +290,15 @@ func TestConvertFromV20180930preview(t *testing.T) {
 		}
 	}
 }
+
+func TestRoundTripV20180930preview(t *testing.T) {
+	start := v20180930previewManagedCluster()
+	internal, err := ConvertFromV20180930preview(start, nil)
+	if err != nil {
+		t.Error(err)
+	}
+	end := ConvertToV20180930preview(internal)
+	if !reflect.DeepEqual(start, end) {
+		t.Errorf("unexpected diff %s", deep.Equal(start, end))
+	}
+}

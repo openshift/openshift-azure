@@ -303,6 +303,9 @@ func convertIdentityProviderAdmin(in admin.IdentityProvider, old *IdentityProvid
 func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) {
 	in, out := oc.Config, &cs.Config
 
+	if in.PluginVersion != nil {
+		out.PluginVersion = *in.PluginVersion
+	}
 	if in.ImageOffer != nil {
 		out.ImageOffer = *in.ImageOffer
 	}
@@ -341,6 +344,12 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	}
 	if in.GenevaLoggingAccount != nil {
 		out.GenevaLoggingAccount = *in.GenevaLoggingAccount
+	}
+	if in.GenevaLoggingControlPlaneEnvironment != nil {
+		out.GenevaLoggingControlPlaneEnvironment = *in.GenevaLoggingControlPlaneEnvironment
+	}
+	if in.GenevaLoggingControlPlaneRegion != nil {
+		out.GenevaLoggingControlPlaneRegion = *in.GenevaLoggingControlPlaneRegion
 	}
 	if in.GenevaMetricsAccount != nil {
 		out.GenevaMetricsAccount = *in.GenevaMetricsAccount
