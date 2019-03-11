@@ -37,7 +37,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(azurecli).NotTo(BeNil())
-		occli, err = standard.NewDefaultSanityChecker()
+		occli, err = standard.NewDefaultSanityChecker(context.Background())
 		Expect(err).NotTo(HaveOccurred())
 		Expect(occli).NotTo(BeNil())
 

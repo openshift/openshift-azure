@@ -28,7 +28,7 @@ var _ = Describe("Command tests [Command][Fake][LongRunning]", func() {
 		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(azurecli).NotTo(BeNil())
-		cli, err = standard.NewDefaultSanityChecker()
+		cli, err = standard.NewDefaultSanityChecker(context.Background())
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cli).NotTo(BeNil())
 	})

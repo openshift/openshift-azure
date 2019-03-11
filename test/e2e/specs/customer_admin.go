@@ -1,6 +1,7 @@
 package specs
 
 import (
+	"context"
 	"errors"
 	"strings"
 	"time"
@@ -27,7 +28,7 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 
 	BeforeEach(func() {
 		var err error
-		cli, err = standard.NewDefaultSanityChecker()
+		cli, err = standard.NewDefaultSanityChecker(context.Background())
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cli).ToNot(BeNil())
 	})

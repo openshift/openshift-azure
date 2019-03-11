@@ -2,7 +2,10 @@ package standard
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -256,5 +259,51 @@ func (sc *SanityChecker) checkCanCreateLB(ctx context.Context) error {
 		}
 	}
 
+	return nil
+}
+
+func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
+	for _, svc := range []struct {
+		url  string
+		cert *x509.Certificate
+	}{
+		{
+			url:  "https://" + sc.cs.Properties.PublicHostname + "/healthz",
+			cert: sc.cs.Config.Certificates.OpenShiftConsole.Cert,
+		},
+		{
+			url:  "https://console." + sc.cs.Properties.RouterProfiles[0].PublicSubdomain + "/health",
+			cert: sc.cs.Config.Certificates.Router.Cert,
+		},
+		{
+			url:  "https://docker-registry." + sc.cs.Properties.RouterProfiles[0].PublicSubdomain + "/healthz",
+			cert: sc.cs.Config.Certificates.Router.Cert,
+		},
+		{
+			url:  "https://registry-console." + sc.cs.Properties.RouterProfiles[0].PublicSubdomain + "/ping",
+			cert: sc.cs.Config.Certificates.Router.Cert,
+		},
+	} {
+		pool := x509.NewCertPool()
+		pool.AddCert(svc.cert)
+
+		cli := &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					RootCAs: pool,
+				},
+			},
+			Timeout: 10 * time.Second,
+		}
+
+		By(fmt.Sprintf("checking %s", svc.url))
+		resp, err := cli.Get(svc.url)
+		if err != nil {
+			return err
+		}
+		if resp.StatusCode != http.StatusOK {
+			return fmt.Errorf("unexpected status code %d", resp.StatusCode)
+		}
+	}
 	return nil
 }

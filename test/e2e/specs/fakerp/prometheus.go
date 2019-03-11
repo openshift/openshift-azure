@@ -1,6 +1,7 @@
 package fakerp
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"net/http"
@@ -42,7 +43,7 @@ var _ = Describe("Prometheus E2E tests [Prometheus][EveryPR]", func() {
 
 	BeforeEach(func() {
 		var err error
-		cli, err = standard.NewDefaultSanityChecker()
+		cli, err = standard.NewDefaultSanityChecker(context.Background())
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cli).NotTo(BeNil())
 

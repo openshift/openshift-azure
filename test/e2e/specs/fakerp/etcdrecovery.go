@@ -31,7 +31,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 
 	BeforeEach(func() {
 		var err error
-		cli, err = standard.NewDefaultSanityChecker()
+		cli, err = standard.NewDefaultSanityChecker(context.Background())
 		Expect(cli).ToNot(BeNil())
 		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).ToNot(HaveOccurred())

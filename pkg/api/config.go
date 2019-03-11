@@ -141,6 +141,7 @@ type CertificateConfig struct {
 
 	// infra certificates
 	Registry             CertKeyPair `json:"registry,omitempty"`
+	RegistryConsole      CertKeyPair `json:"registryConsole,omitempty"`
 	Router               CertKeyPair `json:"-"`
 	ServiceCatalogServer CertKeyPair `json:"serviceCatalogServer,omitempty"`
 

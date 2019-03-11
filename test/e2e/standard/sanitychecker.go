@@ -9,7 +9,9 @@ import (
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	shared "github.com/openshift/openshift-azure/pkg/fakerp/shared"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/random"
+	"github.com/openshift/openshift-azure/pkg/util/vault"
 	"github.com/openshift/openshift-azure/test/clients/openshift"
 	testlogger "github.com/openshift/openshift-azure/test/util/log"
 )
@@ -41,12 +43,23 @@ type SanityChecker struct {
 var _ DeepTestInterface = &SanityChecker{}
 
 // NewSanityChecker creates a new deep test sanity checker for OpenshiftManagedCluster resources.
-func NewSanityChecker(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*SanityChecker, error) {
+func NewSanityChecker(ctx context.Context, log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*SanityChecker, error) {
 	scc := &SanityChecker{
 		log: log,
 		cs:  cs,
 	}
-	var err error
+
+	vaultauthorizer, err := azureclient.NewAuthorizer(cs.Properties.MasterServicePrincipalProfile.ClientID, cs.Properties.MasterServicePrincipalProfile.Secret, cs.Properties.AzProfile.TenantID, azureclient.KeyVaultEndpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
+
+	err = vault.EnrichCSFromVault(ctx, kvc, cs)
+	if err != nil {
+		return nil, err
+	}
 	scc.Client, err = openshift.NewClientSet(cs)
 	if err != nil {
 		return nil, err
@@ -54,13 +67,13 @@ func NewSanityChecker(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster
 	return scc, nil
 }
 
-func NewDefaultSanityChecker() (*SanityChecker, error) {
+func NewDefaultSanityChecker(ctx context.Context) (*SanityChecker, error) {
 	log := testlogger.GetTestLogger()
 	cs, err := shared.DiscoverInternalConfig()
 	if err != nil {
 		return nil, err
 	}
-	return NewSanityChecker(log, cs)
+	return NewSanityChecker(ctx, log, cs)
 }
 
 func (sc *SanityChecker) CreateTestApp(ctx context.Context) (interface{}, []*TestError) {
@@ -128,6 +141,12 @@ func (sc *SanityChecker) ValidateCluster(ctx context.Context) (errs []*TestError
 	if err != nil {
 		sc.log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanCreateLB"})
+	}
+	sc.log.Debugf("validating that cluster services are available")
+	err = sc.checkCanAccessServices(ctx)
+	if err != nil {
+		sc.log.Error(err)
+		errs = append(errs, &TestError{Err: err, Bucket: "checkCanAccessServices"})
 	}
 	return
 }

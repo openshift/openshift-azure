@@ -231,6 +231,20 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 			key:  &c.Certificates.Registry.Key,
 			cert: &c.Certificates.Registry.Cert,
 		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
+					CommonName: "registry-console.default.svc",
+				},
+				DNSNames: []string{
+					"registry-console.default.svc",
+					"registry-console.default.svc.cluster.local",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+			},
+			key:  &c.Certificates.RegistryConsole.Key,
+			cert: &c.Certificates.RegistryConsole.Cert,
+		},
 	}
 	for _, cert := range certs {
 		if cert.params.SigningKey == nil && cert.params.SigningCert == nil {
@@ -400,6 +414,7 @@ func (g *simpleGenerator) InvalidateSecrets(cs *api.OpenShiftManagedCluster) (er
 	cs.Config.Certificates.NodeBootstrap = api.CertKeyPair{}
 	cs.Config.Certificates.OpenShiftMaster = api.CertKeyPair{}
 	cs.Config.Certificates.Registry = api.CertKeyPair{}
+	cs.Config.Certificates.RegistryConsole = api.CertKeyPair{}
 	cs.Config.Certificates.ServiceCatalogServer = api.CertKeyPair{}
 
 	cs.Config.SSHKey = nil
