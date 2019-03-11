@@ -18,14 +18,14 @@ type Generator interface {
 }
 
 type simpleGenerator struct {
-	pluginConfig api.PluginConfig
+	runningUnderTest bool
 }
 
 var _ Generator = &simpleGenerator{}
 
 // NewSimpleGenerator creates a struct to hold both the cluster and plugin configs
-func NewSimpleGenerator(pluginConfig *api.PluginConfig) Generator {
+func NewSimpleGenerator(runningUnderTest bool) Generator {
 	return &simpleGenerator{
-		pluginConfig: *pluginConfig,
+		runningUnderTest: runningUnderTest,
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
@@ -114,11 +115,11 @@ func TestRecoverEtcdCluster(t *testing.T) {
 		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testData, nil),
 	)
 	c := clusterUpgrader.EXPECT().CreateClients(nil, cs, true).Return(nil)
+	c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdBlobExists(nil, "test-backup").Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil, cs).Return(nil).After(c)
 
 	// deploy masters
-	c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSetHashes(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().WaitForHealthzStatusOk(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
@@ -188,7 +189,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 		log:             logrus.NewEntry(logrus.StandardLogger()),
 	}
 
-	if err := p.RotateClusterSecrets(nil, cs, deployer, nil); err != nil {
+	if err := p.RotateClusterSecrets(nil, cs, deployer); err != nil {
 		t.Errorf("plugin.RotateClusterSecrets error = %v", err)
 	}
 }
@@ -342,5 +343,17 @@ func TestBackupEtcdCluster(t *testing.T) {
 	err := p.BackupEtcdCluster(nil, cs, backupName)
 	if err != nil {
 		t.Errorf("plugin.BackupEtcdCluster error = %v", err)
+	}
+}
+
+func TestGetPluginVersion(t *testing.T) {
+	p := &plugin{
+		pluginConfig: &pluginapi.Config{
+			PluginVersion: "v0.0",
+		},
+	}
+	result := p.GetPluginVersion(nil)
+	if *result.PluginVersion != p.pluginConfig.PluginVersion {
+		t.Errorf("expected plugin version %s, got %s", p.pluginConfig.PluginVersion, *result.PluginVersion)
 	}
 }

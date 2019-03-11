@@ -27,18 +27,18 @@ var _ = Describe("Control Plane Pods Status E2E tests [Fake][EveryPR]", func() {
 
 	It("should allow an SRE to fetch the status of control plane pods", func() {
 		By("Using the OSA admin client to fetch the raw cluster status")
-		status, err := cli.OpenShiftManagedClustersAdmin.GetControlPlanePods(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		b, err := cli.OpenShiftManagedClustersAdmin.GetControlPlanePods(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
-		Expect(status).NotTo(BeNil())
+		Expect(b).NotTo(BeNil())
 
 		By("Unmarshalling the returned raw cluster status to a Pod slice")
-		var pods []v1.Pod
-		err = json.Unmarshal(status.Items, &pods)
+		var podlist v1.PodList
+		err = json.Unmarshal(b, &podlist)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Constructing a mapping of namespaces to pods")
 		podnames := make(map[string][]string)
-		for _, pod := range pods {
+		for _, pod := range podlist.Items {
 			list := append(podnames[pod.Namespace], pod.Name)
 			sort.Strings(list)
 			podnames[pod.Namespace] = list

@@ -27,13 +27,8 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		s.internalError(w, "Failed to read the internal config")
 		return
 	}
-	ctx, err := enrichContext(context.Background())
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
-		return
-	}
 
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, internalapi.ContextKeyClientAuthorizer)
+	authorizer, err := azureclient.GetAuthorizerFromContext(req.Context(), internalapi.ContextKeyClientAuthorizer)
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
 		return
@@ -44,12 +39,12 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 
 	// delete dns records
 	// TODO: get resource group from request path
-	dm, err := newDNSManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
+	dm, err := newDNSManager(req.Context(), os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to delete dns records: %v", err))
 		return
 	}
-	err = dm.deleteOCPDNS(ctx, cs)
+	err = dm.deleteOCPDNS(req.Context(), cs)
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to delete dns records: %v", err))
 		return
@@ -58,7 +53,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	resourceGroup := filepath.Base(req.URL.Path)
 	s.log.Infof("deleting resource group %s", resourceGroup)
 
-	future, err := gc.Delete(ctx, resourceGroup)
+	future, err := gc.Delete(req.Context(), resourceGroup)
 	if err != nil {
 		if autoRestErr, ok := err.(autorest.DetailedError); ok {
 			if original, ok := autoRestErr.Original.(*azure.RequestError); ok {
@@ -145,16 +140,8 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	}
 	s.write(cs)
 
-	// simulate Context with property bag
-	// TODO: Populate context from request header
-	ctx, err := enrichContext(context.Background())
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
-		return
-	}
-
 	// apply the request
-	cs, err = createOrUpdate(ctx, s.log, cs, oldCs, s.pluginConfig, isAdminRequest)
+	cs, err = createOrUpdate(req.Context(), s.log, cs, oldCs, isAdminRequest, s.testConfig)
 	if err != nil {
 		s.writeState(internalapi.Failed)
 		s.badRequest(w, fmt.Sprintf("Failed to apply request: %v", err))

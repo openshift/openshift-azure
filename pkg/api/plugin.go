@@ -4,7 +4,7 @@ package api
 import (
 	"context"
 
-	plugin "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	adminapi "github.com/openshift/openshift-azure/pkg/api/admin/api"
 )
 
 // ContextKey is a type for context property bag payload keys
@@ -84,12 +84,8 @@ func (pe *PluginError) Error() string {
 // mode resources.Incremental and wait for it to complete.
 type DeployFn func(context.Context, map[string]interface{}) error
 
-// PluginConfig is passed into NewPlugin
-type PluginConfig struct {
-	TestConfig TestConfig
-}
-
-// TestConfig holds all testing variables. It should be empty in production.
+// TestConfig holds all testing variables. It should be the zero value in
+// production.
 type TestConfig struct {
 	RunningUnderTest   bool
 	ImageResourceGroup string
@@ -110,11 +106,11 @@ type Plugin interface {
 	ValidateAdmin(ctx context.Context, new, old *OpenShiftManagedCluster) []error
 
 	// ValidatePluginTemplate validates external config request
-	ValidatePluginTemplate(ctx context.Context, template *plugin.Config) []error
+	ValidatePluginTemplate(ctx context.Context) []error
 
 	// GenerateConfig ensures all the necessary in-cluster config is generated
 	// for an Openshift cluster.
-	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster, template *plugin.Config) error
+	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster) error
 
 	// CreateOrUpdate either deploys or runs the update depending on the isUpdate argument
 	// this will call the deployer.
@@ -129,7 +125,7 @@ type GenevaActions interface {
 	RecoverEtcdCluster(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn, backupBlob string) *PluginError
 
 	// RotateClusterSecrets rotates the secrets in a cluster's config blob and then updates the cluster
-	RotateClusterSecrets(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn, template *plugin.Config) *PluginError
+	RotateClusterSecrets(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
 
 	// GetControlPlanePods fetches a consolidated list of the control plane pods in the cluster
 	GetControlPlanePods(ctx context.Context, oc *OpenShiftManagedCluster) ([]byte, error)
@@ -138,7 +134,7 @@ type GenevaActions interface {
 	ForceUpdate(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
 
 	// ListClusterVMs returns the hostnames of all vms in a cluster
-	ListClusterVMs(ctx context.Context, cs *OpenShiftManagedCluster) ([]byte, error)
+	ListClusterVMs(ctx context.Context, cs *OpenShiftManagedCluster) (*adminapi.GenevaActionListClusterVMs, error)
 
 	// Reimage reimages a virtual machine in the cluster
 	Reimage(ctx context.Context, oc *OpenShiftManagedCluster, hostname string) error
@@ -148,4 +144,7 @@ type GenevaActions interface {
 
 	// RunCommand runs a predefined command on a virtual machine in the cluster
 	RunCommand(ctx context.Context, cs *OpenShiftManagedCluster, hostname string, command Command) error
+
+	// GetPluginVersion fetches the RP plugin version
+	GetPluginVersion(ctx context.Context) *adminapi.GenevaActionPluginVersion
 }

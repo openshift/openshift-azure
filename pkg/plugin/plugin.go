@@ -11,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	adminapi "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/arm"
@@ -22,7 +23,8 @@ import (
 
 type plugin struct {
 	log             *logrus.Entry
-	config          api.PluginConfig
+	pluginConfig    *pluginapi.Config
+	testConfig      api.TestConfig
 	clusterUpgrader cluster.Upgrader
 	armGenerator    arm.Generator
 	configGenerator config.Generator
@@ -32,38 +34,39 @@ type plugin struct {
 var _ api.Plugin = &plugin{}
 
 // NewPlugin creates a new plugin instance
-func NewPlugin(log *logrus.Entry, pluginConfig *api.PluginConfig) (api.Plugin, []error) {
+func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, testConfig api.TestConfig) (api.Plugin, []error) {
 	return &plugin{
 		log:             log,
-		config:          *pluginConfig,
-		clusterUpgrader: cluster.NewSimpleUpgrader(log, pluginConfig),
-		armGenerator:    arm.NewSimpleGenerator(pluginConfig),
-		configGenerator: config.NewSimpleGenerator(pluginConfig),
+		pluginConfig:    pluginConfig,
+		testConfig:      testConfig,
+		clusterUpgrader: cluster.NewSimpleUpgrader(log, testConfig),
+		armGenerator:    arm.NewSimpleGenerator(testConfig),
+		configGenerator: config.NewSimpleGenerator(testConfig.RunningUnderTest),
 	}, nil
 }
 
 func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) []error {
 	p.log.Info("validating internal data models")
-	validator := validate.NewAPIValidator(p.config.TestConfig.RunningUnderTest)
+	validator := validate.NewAPIValidator(p.testConfig.RunningUnderTest)
 	return validator.Validate(new, old, externalOnly)
 }
 
 func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManagedCluster) []error {
 	p.log.Info("validating internal admin data models")
-	validator := validate.NewAdminValidator(p.config.TestConfig.RunningUnderTest)
+	validator := validate.NewAdminValidator(p.testConfig.RunningUnderTest)
 	return validator.Validate(new, old)
 }
 
-func (p *plugin) ValidatePluginTemplate(ctx context.Context, template *pluginapi.Config) []error {
+func (p *plugin) ValidatePluginTemplate(ctx context.Context) []error {
 	p.log.Info("validating external plugin api data models")
 	validator := validate.NewPluginAPIValidator()
-	return validator.Validate(template)
+	return validator.Validate(p.pluginConfig)
 }
 
-func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster, template *pluginapi.Config) error {
+func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	p.log.Info("generating configs")
 	// TODO should we save off the original config here and if there are any errors we can restore it?
-	err := p.configGenerator.Generate(cs, template)
+	err := p.configGenerator.Generate(cs, p.pluginConfig)
 	if err != nil {
 		return err
 	}
@@ -83,6 +86,10 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
+	err = p.clusterUpgrader.Initialize(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
+	}
 
 	err = p.clusterUpgrader.EtcdBlobExists(ctx, backupBlob)
 	if err != nil {
@@ -96,10 +103,6 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
-	}
-	err = p.clusterUpgrader.Initialize(ctx, cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
 	if err := p.clusterUpgrader.EtcdRestoreDeleteMasterScaleSetHashes(ctx, cs); err != nil {
 		return err
@@ -220,14 +223,14 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	return nil
 }
 
-func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, pluginTemplate *pluginapi.Config) *api.PluginError {
+func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
 	p.log.Info("invalidating non-ca certificates, private keys and secrets")
 	err := p.configGenerator.InvalidateSecrets(cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInvalidateClusterSecrets}
 	}
 	p.log.Info("regenerating config including private keys and secrets")
-	err = p.GenerateConfig(ctx, cs, pluginTemplate)
+	err = p.GenerateConfig(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepRegenerateClusterSecrets}
 	}
@@ -241,7 +244,7 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 func (p *plugin) initialize(ctx context.Context, oc *api.OpenShiftManagedCluster) error {
 	var err error
 	if p.kubeclient == nil {
-		p.kubeclient, err = kubeclient.NewKubeclient(p.log, oc.Config.AdminKubeconfig, &p.config, false)
+		p.kubeclient, err = kubeclient.NewKubeclient(p.log, oc.Config.AdminKubeconfig, false)
 	}
 	return err
 }
@@ -285,7 +288,7 @@ func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluste
 	return nil
 }
 
-func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedCluster) ([]byte, error) {
+func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedCluster) (*adminapi.GenevaActionListClusterVMs, error) {
 	p.log.Info("generating cluster upgrader clients")
 	err := p.clusterUpgrader.CreateClients(ctx, oc, true)
 	if err != nil {
@@ -297,7 +300,8 @@ func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedClu
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(pods)
+
+	return &adminapi.GenevaActionListClusterVMs{VMs: &pods}, nil
 }
 
 func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, hostname string) error {
@@ -385,4 +389,10 @@ func (p *plugin) RunCommand(ctx context.Context, oc *api.OpenShiftManagedCluster
 
 	p.log.Infof("running %s on %s", command, hostname)
 	return p.clusterUpgrader.RunCommand(ctx, oc, scaleset, instanceID, script)
+}
+
+func (p *plugin) GetPluginVersion(ctx context.Context) *adminapi.GenevaActionPluginVersion {
+	return &adminapi.GenevaActionPluginVersion{
+		PluginVersion: &p.pluginConfig.PluginVersion,
+	}
 }

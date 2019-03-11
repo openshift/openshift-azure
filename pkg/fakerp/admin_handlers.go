@@ -1,14 +1,39 @@
 package fakerp
 
 import (
-	"context"
-	"fmt"
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
+
+func (s *Server) adminreply(w http.ResponseWriter, err error, out interface{}) {
+	if err != nil {
+		s.internalError(w, err.Error())
+		return
+	}
+
+	if out == nil {
+		return
+	}
+
+	if b, ok := out.([]byte); ok {
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Write(b)
+		return
+	}
+
+	b, err := json.Marshal(out)
+	if err != nil {
+		s.internalError(w, err.Error())
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(b)
+	return
+}
 
 // handleBackup handles admin requests to backup an etcd cluster
 func (s *Server) handleBackup(w http.ResponseWriter, req *http.Request) {
@@ -20,16 +45,8 @@ func (s *Server) handleBackup(w http.ResponseWriter, req *http.Request) {
 
 	backupName := chi.URLParam(req, "backupName")
 
-	ctx, err := enrichContext(context.Background())
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
-		return
-	}
-	if err := s.plugin.BackupEtcdCluster(ctx, cs, backupName); err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to backup cluster: %v", err))
-		return
-	}
-	s.log.Info("backed up cluster")
+	err := s.plugin.BackupEtcdCluster(req.Context(), cs, backupName)
+	s.adminreply(w, err, nil)
 }
 
 // handleGetControlPlanePods handles admin requests for the list of control plane pods
@@ -39,20 +56,9 @@ func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Requ
 		s.internalError(w, "Failed to read the internal config")
 		return
 	}
-	ctx, err := enrichContext(context.Background())
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
-		return
-	}
-	pods, err := s.plugin.GetControlPlanePods(ctx, cs)
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to fetch control plane pods: %v", err))
-		return
-	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Write(pods)
-	s.log.Info("fetched control plane pods")
+	pods, err := s.plugin.GetControlPlanePods(req.Context(), cs)
+	s.adminreply(w, err, pods)
 }
 
 // handleListClusterVMs handles admin requests for the list of cluster VMs
@@ -62,20 +68,9 @@ func (s *Server) handleListClusterVMs(w http.ResponseWriter, req *http.Request) 
 		s.internalError(w, "Failed to read the internal config")
 		return
 	}
-	ctx, err := enrichContext(context.Background())
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
-		return
-	}
-	json, err := s.plugin.ListClusterVMs(ctx, cs)
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to fetch cluster VMs: %v", err))
-		return
-	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Write(json)
-	s.log.Info("fetched cluster VMs")
+	vms, err := s.plugin.ListClusterVMs(req.Context(), cs)
+	s.adminreply(w, err, vms)
 }
 
 // handleReimage handles reimaging a vm in the cluster
@@ -88,16 +83,8 @@ func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
 
 	hostname := chi.URLParam(req, "hostname")
 
-	ctx, err := enrichContext(context.Background())
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
-		return
-	}
-	if err := s.plugin.Reimage(ctx, cs, hostname); err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to reimage vm: %v", err))
-		return
-	}
-	s.log.Infof("reimaged %s", hostname)
+	err := s.plugin.Reimage(req.Context(), cs, hostname)
+	s.adminreply(w, err, nil)
 }
 
 // handleRestore handles admin requests to restore an etcd cluster from a backup
@@ -108,28 +95,15 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	blobName, err := readBlobName(req)
-	if err != nil {
-		s.badRequest(w, fmt.Sprintf("Cannot read blob name from request: %v", err))
-		return
-	}
-	if len(blobName) == 0 {
-		s.badRequest(w, "Blob name to restore from was not provided")
-		return
-	}
+	backupName := chi.URLParam(req, "backupName")
 
-	ctx, err := enrichContext(context.Background())
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
-		return
+	pluginErr := s.plugin.RecoverEtcdCluster(req.Context(), cs, GetDeployer(s.log, cs), backupName)
+	var err error
+	if pluginErr != nil {
+		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error
+		err = pluginErr
 	}
-	deployer := GetDeployer(s.log, cs)
-	if err := s.plugin.RecoverEtcdCluster(ctx, cs, deployer, blobName); err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to recover cluster: %v", err))
-		return
-	}
-
-	s.log.Info("recovered cluster")
+	s.adminreply(w, err, nil)
 }
 
 // handleRotateSecrets handles admin requests for the rotation of cluster secrets
@@ -139,21 +113,16 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		s.internalError(w, "Failed to read the internal config")
 		return
 	}
-	ctx, err := enrichContext(context.Background())
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
-		return
-	}
+
 	deployer := GetDeployer(s.log, cs)
-	if err := s.plugin.RotateClusterSecrets(ctx, cs, deployer, s.pluginTemplate); err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to rotate cluster secrets: %v", err))
+	pluginErr := s.plugin.RotateClusterSecrets(req.Context(), cs, deployer)
+	if pluginErr != nil {
+		s.internalError(w, pluginErr.Error())
 		return
 	}
-	err = writeHelpers(cs)
-	if err != nil {
-		s.log.Warnf("could not write helpers: %v", err)
-	}
-	s.log.Info("rotated cluster secrets")
+
+	err := writeHelpers(cs)
+	s.adminreply(w, err, nil)
 }
 
 // handleForceUpdate handles admin requests for the force updates of clusters
@@ -163,17 +132,14 @@ func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 		s.internalError(w, "Failed to read the internal config")
 		return
 	}
-	ctx, err := enrichContext(context.Background())
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
-		return
+
+	pluginErr := s.plugin.ForceUpdate(req.Context(), cs, GetDeployer(s.log, cs))
+	var err error
+	if pluginErr != nil {
+		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error
+		err = pluginErr
 	}
-	deployer := GetDeployer(s.log, cs)
-	if err := s.plugin.ForceUpdate(ctx, cs, deployer); err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to force update cluster: %v", err))
-		return
-	}
-	s.log.Info("force-updated cluster")
+	s.adminreply(w, err, nil)
 }
 
 // handleRunCommand handles running generic commands on a given vm within a scaleset in the cluster
@@ -187,19 +153,12 @@ func (s *Server) handleRunCommand(w http.ResponseWriter, req *http.Request) {
 	hostname := chi.URLParam(req, "hostname")
 	command := chi.URLParam(req, "command")
 
-	ctx, err := enrichContext(context.Background())
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to enrich context: %v", err))
-		return
-	}
+	err := s.plugin.RunCommand(req.Context(), cs, hostname, api.Command(command))
+	s.adminreply(w, err, nil)
+}
 
-	s.log.Infof("running command %s on %s", command, hostname)
-
-	err = s.plugin.RunCommand(ctx, cs, hostname, api.Command(command))
-	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to run command: %v", err))
-		return
-	}
-
-	s.log.Infof("ran command %s on %s", command, hostname)
+// handleGetPluginVersion handles admin requests to get the RP plugin version for OpenShiftManagedClusters
+func (s *Server) handleGetPluginVersion(w http.ResponseWriter, req *http.Request) {
+	version := s.plugin.GetPluginVersion(req.Context())
+	s.adminreply(w, nil, version)
 }

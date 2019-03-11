@@ -28,10 +28,10 @@ spec:
         resources:
           limits:
             cpu: 200m
-            memory: 400Mi
-          requests:
-            cpu: 200m
             memory: 200Mi
+          requests:
+            cpu: 10m
+            memory: 25Mi
         volumeMounts:
         - mountPath: /mdm/certs
           name: mdm-cert
@@ -44,11 +44,11 @@ spec:
         name: metricsbridge
         resources:
           limits:
-            cpu: 400m
-            memory: 1Gi
-          requests:
             cpu: 200m
-            memory: 500Mi
+            memory: 200Mi
+          requests:
+            cpu: 10m
+            memory: 25Mi
         volumeMounts:
         - mountPath: /config
           name: metrics-bridge

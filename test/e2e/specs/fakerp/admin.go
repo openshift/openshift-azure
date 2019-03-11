@@ -100,4 +100,17 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake]", func() {
 		By("comparing the update blob before and after an update")
 		Expect(reflect.DeepEqual(before, after)).To(Equal(true))
 	})
+
+	It("should be possible for an SRE to fetch the RP plugin version", func() {
+		Expect(os.Getenv("RESOURCEGROUP")).ToNot(BeEmpty())
+		azurecli, err := azure.NewClientFromEnvironment(true)
+		Expect(err).ToNot(HaveOccurred())
+
+		By("Using the OSA admin client to fetch the RP plugin version")
+		result, err := azurecli.OpenShiftManagedClustersAdmin.GetPluginVersion(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		Expect(err).NotTo(HaveOccurred())
+		Expect(result).NotTo(BeNil())
+		Expect(result.PluginVersion).NotTo(BeEmpty())
+		Expect(strings.HasPrefix(*result.PluginVersion, "v")).To(BeTrue())
+	})
 })

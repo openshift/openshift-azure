@@ -8,16 +8,13 @@ package kubeclient
 
 import (
 	"context"
-	"net/http"
 	"strings"
 
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
-	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 // Kubeclient interface to utility kubenetes functions
@@ -32,41 +29,11 @@ type Kubeclient interface {
 }
 
 type kubeclient struct {
-	pluginConfig api.PluginConfig
-	client       kubernetes.Interface
-	log          *logrus.Entry
+	client kubernetes.Interface
+	log    *logrus.Entry
 }
 
 var _ Kubeclient = &kubeclient{}
-
-// NewKubeclient creates a new kubelient instance
-func NewKubeclient(log *logrus.Entry, config *v1.Config, pluginConfig *api.PluginConfig, disableKeepAlives bool) (Kubeclient, error) {
-	restconfig, err := managedcluster.RestConfigFromV1Config(config)
-	if err != nil {
-		return nil, err
-	}
-
-	// We create new TCP connection for each HTTP request because of the flow:
-	// 1. we initiate health check connection to api server master-000000
-	// 2. we initiate master vmss upgrade, master-000000 gets re-imaged
-	// 3. if connection is not being drained by api server, we get EOF error
-	restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
-		rt.(*http.Transport).DisableKeepAlives = disableKeepAlives
-		return rt
-	}
-
-	cli, err := kubernetes.NewForConfig(restconfig)
-	if err != nil {
-		return nil, err
-	}
-
-	return &kubeclient{
-		pluginConfig: *pluginConfig,
-		log:          log,
-		client:       cli,
-	}, nil
-
-}
 
 type ComputerName string
 

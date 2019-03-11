@@ -42,7 +42,7 @@ type Server struct {
 	basePath string
 
 	plugin         internalapi.Plugin
-	pluginConfig   *api.PluginConfig
+	testConfig     api.TestConfig
 	pluginTemplate *pluginapi.Config
 }
 
@@ -56,17 +56,14 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	}
 	var err error
 	var errs []error
-	s.pluginConfig, err = GetPluginConfig()
-	if err != nil {
-		s.log.Fatal(err)
-	}
-	s.plugin, errs = plugin.NewPlugin(s.log, s.pluginConfig)
-	if len(errs) > 0 {
-		s.log.Fatal(errs)
-	}
+	s.testConfig = GetTestConfig()
 	s.pluginTemplate, err = GetPluginTemplate()
 	if err != nil {
 		s.log.Fatal(err)
+	}
+	s.plugin, errs = plugin.NewPlugin(s.log, s.pluginTemplate, s.testConfig)
+	if len(errs) > 0 {
+		s.log.Fatal(errs)
 	}
 	// We need to restore the internal cluster state into memory for GETs
 	// and DELETEs to work appropriately.

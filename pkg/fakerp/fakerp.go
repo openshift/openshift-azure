@@ -56,13 +56,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployF
 	}
 }
 
-func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, config *api.PluginConfig, isAdmin bool) (*api.OpenShiftManagedCluster, error) {
-	// instantiate the plugin
-	p, errs := plugin.NewPlugin(log, config)
-	if len(errs) > 0 {
-		return nil, kerrors.NewAggregate(errs)
-	}
-
+func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
 	template, err := GetPluginTemplate()
 	if err != nil {
 		return nil, err
@@ -71,7 +65,13 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	// This should be executed only for fakeRP
 	overridePluginTemplate(template)
 
-	errs = p.ValidatePluginTemplate(ctx, template)
+	// instantiate the plugin
+	p, errs := plugin.NewPlugin(log, template, testConfig)
+	if len(errs) > 0 {
+		return nil, kerrors.NewAggregate(errs)
+	}
+
+	errs = p.ValidatePluginTemplate(ctx)
 	if len(errs) > 0 {
 		return nil, kerrors.NewAggregate(errs)
 	}
@@ -131,7 +131,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	}
 
 	// generate or update the OpenShift config blob
-	err = p.GenerateConfig(ctx, cs, template)
+	err = p.GenerateConfig(ctx, cs)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
-	err = acceptMarketplaceAgreement(ctx, log, cs, config)
+	err = acceptMarketplaceAgreement(ctx, log, cs, testConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -177,8 +177,8 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	return cs, nil
 }
 
-func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, pluginConfig *api.PluginConfig) error {
-	if pluginConfig.TestConfig.ImageResourceName != "" ||
+func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) error {
+	if testConfig.ImageResourceName != "" ||
 		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
 		return nil
 	}

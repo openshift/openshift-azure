@@ -48,7 +48,7 @@ var _ = Describe("Command tests [Command][Fake][LongRunning]", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		wait.PollImmediate(10*time.Second, 2*time.Minute, func() (bool, error) {
-			By("Verifying through azure activity logs that the reimage happened")
+			By("Verifying through azure activity logs that the command ran")
 			logs, err := azurecli.ActivityLogs.List(
 				context.Background(),
 				fmt.Sprintf("eventTimestamp ge '%s' and resourceUri eq %s",

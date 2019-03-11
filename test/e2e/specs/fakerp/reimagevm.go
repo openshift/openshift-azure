@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
-	"net/http"
 	"os"
 	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
@@ -42,45 +43,47 @@ var _ = Describe("Reimage VM E2E tests [ReimageVM][Fake][LongRunning]", func() {
 		By("Executing reimage on a vm in the cluster")
 		vmlist, err := azurecli.OpenShiftManagedClustersAdmin.ListClusterVMs(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
-		Expect(len(vmlist.VMs)).To(BeNumerically(">=", 6))
+		Expect(len(*vmlist.VMs)).To(BeNumerically(">=", 6))
 		rand.Seed(time.Now().Unix())
-		vm := vmlist.VMs[rand.Intn(len(vmlist.VMs))]
+		vm := (*vmlist.VMs)[rand.Intn(len(*vmlist.VMs))]
 		By(fmt.Sprintf("Reimaging %s", vm))
 		startTime := time.Now()
-		update, err := azurecli.OpenShiftManagedClustersAdmin.ReimageAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm)
-		endTime := time.Now()
+		err = azurecli.OpenShiftManagedClustersAdmin.Reimage(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(update.StatusCode).To(Equal(http.StatusOK))
-		Expect(update).NotTo(BeNil())
 
-		By("Verifying through azure activity logs that the reimage happened")
 		scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(vm)
 		Expect(err).NotTo(HaveOccurred())
 
-		logs, err := azurecli.ActivityLogs.List(
-			context.Background(),
-			fmt.Sprintf("eventTimestamp ge '%s' and eventTimestamp le '%s' and resourceUri eq %s",
-				startTime.Format(time.RFC3339),
-				endTime.Format(time.RFC3339),
-				resourceid.ResourceID(os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), "Microsoft.Compute/virtualMachineScaleSets", scaleset)+"/virtualMachines/"+instanceID,
-			),
-			"status,subscriptionId,resourceId,eventName,operationName,httpRequest")
-		Expect(err).NotTo(HaveOccurred())
+		wait.PollImmediate(10*time.Second, 2*time.Minute, func() (bool, error) {
+			By("Verifying through azure activity logs that the reimage happened")
+			logs, err := azurecli.ActivityLogs.List(
+				context.Background(),
+				fmt.Sprintf("eventTimestamp ge '%s' and resourceUri eq %s",
+					startTime.Format(time.RFC3339),
+					resourceid.ResourceID(os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("RESOURCEGROUP"), "Microsoft.Compute/virtualMachineScaleSets", scaleset)+"/virtualMachines/"+instanceID,
+				),
+				"status,operationName")
+			if err != nil {
+				return false, err
+			}
 
-		var found bool
-	out:
-		for logs.NotDone() {
-			for _, log := range logs.Values() {
-				if *log.OperationName.Value == "Microsoft.Compute/virtualMachineScaleSets/virtualmachines/reimage/action" &&
-					*log.Status.Value == "Succeeded" {
-					found = true
-					break out
+			var count int
+			for logs.NotDone() {
+				for _, log := range logs.Values() {
+					if *log.OperationName.Value == "Microsoft.Compute/virtualMachineScaleSets/virtualmachines/reimage/action" &&
+						*log.Status.Value == "Succeeded" {
+						count++
+					}
+				}
+				err = logs.Next()
+				if err != nil {
+					return false, err
 				}
 			}
-			err = logs.Next()
-			Expect(err).NotTo(HaveOccurred())
-		}
-		Expect(found).To(BeTrue())
+
+			return count == 1, nil
+		})
+		Expect(err).NotTo(HaveOccurred())
 
 		By("Validating the cluster")
 		errs := cli.ValidateCluster(context.Background())

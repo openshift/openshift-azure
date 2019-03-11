@@ -55,11 +55,11 @@ spec:
             scheme: HTTPS
         resources:
           limits:
-            cpu: 100m
-            memory: 100Mi
+            cpu: 200m
+            memory: 200Mi
           requests:
-            cpu: 100m
-            memory: 100Mi
+            cpu: 10m
+            memory: 25Mi
         volumeMounts:
         - mountPath: /var/serving-cert
           name: serving-cert
