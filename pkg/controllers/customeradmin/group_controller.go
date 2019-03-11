@@ -1,10 +1,10 @@
 package customeradmin
 
 import (
+	"context"
 	"io/ioutil"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac"
 	"github.com/ghodss/yaml"
 	userv1client "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
 	"github.com/sirupsen/logrus"
@@ -17,6 +17,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 const (
@@ -25,7 +26,7 @@ const (
 
 type reconcileGroup struct {
 	userV1    userv1client.UserV1Interface
-	aadClient *graphrbac.GroupsClient
+	aadClient azureclient.RBACGroupsClient
 	log       *logrus.Entry
 	groupMap  map[string]string
 	config    api.AADIdentityProvider
@@ -33,7 +34,7 @@ type reconcileGroup struct {
 
 var _ reconcile.Reconciler = &reconcileGroup{}
 
-func addGroupController(log *logrus.Entry, m manager.Manager, stopCh <-chan struct{}) error {
+func addGroupController(ctx context.Context, log *logrus.Entry, m manager.Manager, stopCh <-chan struct{}) error {
 	r := &reconcileGroup{
 		log:      log,
 		groupMap: map[string]string{},
@@ -45,7 +46,7 @@ func addGroupController(log *logrus.Entry, m manager.Manager, stopCh <-chan stru
 
 	r.userV1 = userv1client.NewForConfigOrDie(m.GetConfig())
 
-	r.aadClient, err = newAADGroupsClient(r.config)
+	r.aadClient, err = newAADGroupsClient(ctx, r.config)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 
 	"github.com/sirupsen/logrus"
@@ -18,6 +19,8 @@ var (
 )
 
 func main() {
+	ctx := context.Background()
+
 	flag.Parse()
 	logrus.SetLevel(log.SanitizeLogLevel(*logLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
@@ -40,7 +43,7 @@ func main() {
 
 	stopCh := signals.SetupSignalHandler()
 
-	if err := customeradmin.AddToManager(log, m, stopCh); err != nil {
+	if err := customeradmin.AddToManager(ctx, log, m, stopCh); err != nil {
 		log.Fatal(err)
 	}
 
