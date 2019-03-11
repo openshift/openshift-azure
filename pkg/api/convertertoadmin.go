@@ -136,7 +136,7 @@ func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateCon
 		EtcdPeer:             convertCertKeyPairToAdmin(in.EtcdPeer),
 		EtcdClient:           convertCertKeyPairToAdmin(in.EtcdClient),
 		MasterServer:         convertCertKeyPairToAdmin(in.MasterServer),
-		OpenShiftConsole:     convertCertKeyPairToAdmin(in.OpenShiftConsole),
+		OpenShiftConsole:     convertCertKeyPairChainToAdmin(in.OpenShiftConsole),
 		Admin:                convertCertKeyPairToAdmin(in.Admin),
 		AggregatorFrontProxy: convertCertKeyPairToAdmin(in.AggregatorFrontProxy),
 		MasterKubeletClient:  convertCertKeyPairToAdmin(in.MasterKubeletClient),
@@ -145,7 +145,7 @@ func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateCon
 		NodeBootstrap:        convertCertKeyPairToAdmin(in.NodeBootstrap),
 		Registry:             convertCertKeyPairToAdmin(in.Registry),
 		RegistryConsole:      convertCertKeyPairToAdmin(in.RegistryConsole),
-		Router:               convertCertKeyPairToAdmin(in.Router),
+		Router:               convertCertKeyPairChainToAdmin(in.Router),
 		ServiceCatalogServer: convertCertKeyPairToAdmin(in.ServiceCatalogServer),
 		BlackBoxMonitor:      convertCertKeyPairToAdmin(in.BlackBoxMonitor),
 		GenevaLogging:        convertCertKeyPairToAdmin(in.GenevaLogging),
@@ -156,6 +156,12 @@ func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateCon
 func convertCertKeyPairToAdmin(in CertKeyPair) *admin.Certificate {
 	return &admin.Certificate{
 		Cert: in.Cert,
+	}
+}
+
+func convertCertKeyPairChainToAdmin(in CertKeyPairChain) *admin.CertificateChain {
+	return &admin.CertificateChain{
+		Certs: in.Certs,
 	}
 }
 

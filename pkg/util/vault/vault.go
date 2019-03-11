@@ -3,7 +3,6 @@ package vault
 import (
 	"bytes"
 	"context"
-	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"net/url"
@@ -49,7 +48,7 @@ func SplitSecretURL(kvURL string) (string, string, error) {
 	return vaultURL, secretName, nil
 }
 
-func getSecret(ctx context.Context, kvc azureclient.KeyVaultClient, secretURL string) (*api.CertKeyPair, error) {
+func getSecret(ctx context.Context, kvc azureclient.KeyVaultClient, secretURL string) (*api.CertKeyPairChain, error) {
 	vaultURL, secretName, err := SplitSecretURL(secretURL)
 	if err != nil {
 		return nil, err
@@ -65,29 +64,33 @@ func getSecret(ctx context.Context, kvc azureclient.KeyVaultClient, secretURL st
 		return nil, err
 	}
 
-	cert, err := tls.ParseCert([]byte(*bundle.Value))
+	certs, err := tls.ParseCertChain([]byte(*bundle.Value))
 	if err != nil {
 		return nil, err
 	}
 
-	return &api.CertKeyPair{Key: key, Cert: cert}, nil
+	return &api.CertKeyPairChain{Key: key, Certs: certs}, nil
 }
 
-func ImportCertificate(ctx context.Context, kvc azureclient.KeyVaultClient, vaultURL, name string, key *rsa.PrivateKey, cert *x509.Certificate) error {
+func ImportCertificate(ctx context.Context, kvc azureclient.KeyVaultClient, vaultURL, name string, chain api.CertKeyPairChain) error {
 	buf := &bytes.Buffer{}
-	b, err := x509.MarshalPKCS8PrivateKey(key) // Must be PKCS#8 for Azure Key Vault.
+	b, err := x509.MarshalPKCS8PrivateKey(chain.Key) // Must be PKCS#8 for Azure Key Vault.
 	if err != nil {
 		return err
 	}
-
+	// This chain should follow Certificate chain practices, where order is:
+	// End-User Certificate
+	// Intermediate Certificate
+	// Root Certificate
 	err = pem.Encode(buf, &pem.Block{Type: "PRIVATE KEY", Bytes: b})
 	if err != nil {
 		return err
 	}
-
-	err = pem.Encode(buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
-	if err != nil {
-		return err
+	for _, cert := range chain.Certs {
+		err = pem.Encode(buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
+		if err != nil {
+			return err
+		}
 	}
 
 	_, err = kvc.ImportCertificate(ctx, vaultURL, name, keyvault.CertificateImportParameters{

@@ -101,20 +101,23 @@ type CertificateConfig struct {
 	EtcdClient *Certificate `json:"etcdClient,omitempty"`
 
 	// control plane certificates
-	MasterServer         *Certificate `json:"masterServer,omitempty"`
-	OpenShiftConsole     *Certificate `json:"openShiftConsole,omitempty"`
-	Admin                *Certificate `json:"admin,omitempty"`
-	AggregatorFrontProxy *Certificate `json:"aggregatorFrontProxy,omitempty"`
-	MasterKubeletClient  *Certificate `json:"masterKubeletClient,omitempty"`
-	MasterProxyClient    *Certificate `json:"masterProxyClient,omitempty"`
-	OpenShiftMaster      *Certificate `json:"openShiftMaster,omitempty"`
-	NodeBootstrap        *Certificate `json:"nodeBootstrap,omitempty"`
+	MasterServer *Certificate `json:"masterServer,omitempty"`
+	// external web facing certificates must contain
+	// all certificate chain
+	// TODO: Move all certificates to be slice
+	OpenShiftConsole     *CertificateChain `json:"openShiftConsole,omitempty"`
+	Admin                *Certificate      `json:"admin,omitempty"`
+	AggregatorFrontProxy *Certificate      `json:"aggregatorFrontProxy,omitempty"`
+	MasterKubeletClient  *Certificate      `json:"masterKubeletClient,omitempty"`
+	MasterProxyClient    *Certificate      `json:"masterProxyClient,omitempty"`
+	OpenShiftMaster      *Certificate      `json:"openShiftMaster,omitempty"`
+	NodeBootstrap        *Certificate      `json:"nodeBootstrap,omitempty"`
 
 	// infra certificates
-	Registry             *Certificate `json:"registry,omitempty"`
-	RegistryConsole      *Certificate `json:"registryConsole,omitempty"`
-	Router               *Certificate `json:"router,omitempty"`
-	ServiceCatalogServer *Certificate `json:"serviceCatalogServer,omitempty"`
+	Registry             *Certificate      `json:"registry,omitempty"`
+	RegistryConsole      *Certificate      `json:"registryConsole,omitempty"`
+	Router               *CertificateChain `json:"router,omitempty"`
+	ServiceCatalogServer *Certificate      `json:"serviceCatalogServer,omitempty"`
 
 	// misc certificates
 	BlackBoxMonitor *Certificate `json:"blackBoxMonitor,omitempty"`
@@ -127,4 +130,8 @@ type CertificateConfig struct {
 // Certificate is an x509 certificate.
 type Certificate struct {
 	Cert *x509.Certificate `json:"cert,omitempty"`
+}
+
+type CertificateChain struct {
+	Certs []*x509.Certificate `json:"certs,omitempty"`
 }

@@ -383,7 +383,7 @@ func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig)
 		mergeCertKeyPair(in.MasterServer, &out.MasterServer)
 	}
 	if in.OpenShiftConsole != nil {
-		mergeCertKeyPair(in.OpenShiftConsole, &out.OpenShiftConsole)
+		mergeCertKeyPairChain(in.OpenShiftConsole, &out.OpenShiftConsole)
 	}
 	if in.Admin != nil {
 		mergeCertKeyPair(in.Admin, &out.Admin)
@@ -410,7 +410,7 @@ func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig)
 		mergeCertKeyPair(in.RegistryConsole, &out.RegistryConsole)
 	}
 	if in.Router != nil {
-		mergeCertKeyPair(in.Router, &out.Router)
+		mergeCertKeyPairChain(in.Router, &out.Router)
 	}
 	if in.ServiceCatalogServer != nil {
 		mergeCertKeyPair(in.ServiceCatalogServer, &out.ServiceCatalogServer)
@@ -432,6 +432,13 @@ func mergeCertKeyPair(in *admin.Certificate, out *CertKeyPair) {
 		out.Cert = in.Cert
 	}
 	return
+}
+
+// TODO: this is not a great semantic - revisit if this field is ever enabled for write
+func mergeCertKeyPairChain(in *admin.CertificateChain, out *CertKeyPairChain) {
+	if in.Certs != nil {
+		out.Certs = in.Certs
+	}
 }
 
 func mergeImageConfig(in *admin.ImageConfig, out *ImageConfig) {

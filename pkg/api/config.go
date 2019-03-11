@@ -130,20 +130,20 @@ type CertificateConfig struct {
 	EtcdClient CertKeyPair `json:"etcdClient,omitempty"`
 
 	// control plane certificates
-	MasterServer         CertKeyPair `json:"masterServer,omitempty"`
-	OpenShiftConsole     CertKeyPair `json:"-"`
-	Admin                CertKeyPair `json:"admin,omitempty"`
-	AggregatorFrontProxy CertKeyPair `json:"aggregatorFrontProxy,omitempty"`
-	MasterKubeletClient  CertKeyPair `json:"masterKubeletClient,omitempty"`
-	MasterProxyClient    CertKeyPair `json:"masterProxyClient,omitempty"`
-	OpenShiftMaster      CertKeyPair `json:"openShiftMaster,omitempty"`
-	NodeBootstrap        CertKeyPair `json:"nodeBootstrap,omitempty"`
+	MasterServer         CertKeyPair      `json:"masterServer,omitempty"`
+	OpenShiftConsole     CertKeyPairChain `json:"-"`
+	Admin                CertKeyPair      `json:"admin,omitempty"`
+	AggregatorFrontProxy CertKeyPair      `json:"aggregatorFrontProxy,omitempty"`
+	MasterKubeletClient  CertKeyPair      `json:"masterKubeletClient,omitempty"`
+	MasterProxyClient    CertKeyPair      `json:"masterProxyClient,omitempty"`
+	OpenShiftMaster      CertKeyPair      `json:"openShiftMaster,omitempty"`
+	NodeBootstrap        CertKeyPair      `json:"nodeBootstrap,omitempty"`
 
 	// infra certificates
-	Registry             CertKeyPair `json:"registry,omitempty"`
-	RegistryConsole      CertKeyPair `json:"registryConsole,omitempty"`
-	Router               CertKeyPair `json:"-"`
-	ServiceCatalogServer CertKeyPair `json:"serviceCatalogServer,omitempty"`
+	Registry             CertKeyPair      `json:"registry,omitempty"`
+	RegistryConsole      CertKeyPair      `json:"registryConsole,omitempty"`
+	Router               CertKeyPairChain `json:"-"`
+	ServiceCatalogServer CertKeyPair      `json:"serviceCatalogServer,omitempty"`
 
 	// misc certificates
 	BlackBoxMonitor CertKeyPair `json:"blackBoxMonitor,omitempty"`
@@ -157,4 +157,10 @@ type CertificateConfig struct {
 type CertKeyPair struct {
 	Key  *rsa.PrivateKey   `json:"key,omitempty"`
 	Cert *x509.Certificate `json:"cert,omitempty"`
+}
+
+// CertKeyPairChain is an rsa private key and  slice of x509 certificates.
+type CertKeyPairChain struct {
+	Key   *rsa.PrivateKey     `json:"key,omitempty"`
+	Certs []*x509.Certificate `json:"certs,omitempty"`
 }

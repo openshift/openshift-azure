@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"crypto/x509"
 	"encoding/xml"
 	"fmt"
 	"strings"
@@ -10,6 +11,7 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 )
 
@@ -260,4 +262,19 @@ func (derived) MDSDConfig(cs *api.OpenShiftManagedCluster) (string, error) {
 	}
 
 	return string(b.Bytes()), nil
+}
+
+// CaBundle created ca-bundle which includes
+// CA and any external certificates we trust
+func (derived) CaBundle(cs *api.OpenShiftManagedCluster) ([]*x509.Certificate, error) {
+	caBundle := []*x509.Certificate{cs.Config.Certificates.Ca.Cert}
+
+	// we take only root certificate from the chain (last)
+	certs := cs.Config.Certificates.OpenShiftConsole.Certs
+	caBundle = append(caBundle, certs[len(certs)-1])
+
+	certs = cs.Config.Certificates.Router.Certs
+	caBundle = append(caBundle, certs[len(certs)-1])
+
+	return tls.UniqueCert(caBundle), nil
 }

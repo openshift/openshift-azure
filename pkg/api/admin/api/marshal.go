@@ -24,6 +24,14 @@ func (c *Certificate) UnmarshalJSON(b []byte) error {
 	return oajson.UnmarshalJSON(reflect.ValueOf(c).Elem(), b)
 }
 
+func (c CertificateChain) MarshalJSON() ([]byte, error) {
+	return oajson.MarshalJSON(reflect.ValueOf(c))
+}
+
+func (c *CertificateChain) UnmarshalJSON(b []byte) error {
+	return oajson.UnmarshalJSON(reflect.ValueOf(c).Elem(), b)
+}
+
 func (ip *IdentityProvider) UnmarshalJSON(b []byte) error {
 	dummy := struct {
 		Name     *string         `json:"name,omitempty"`
