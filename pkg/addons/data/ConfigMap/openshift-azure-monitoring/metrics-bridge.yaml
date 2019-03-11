@@ -86,7 +86,7 @@ data:
     - query: 'rate(node_disk_read_bytes_total{device!~"sr0"}[1m])'
       name: node_disk_read_bytes_rate
     - query: 'rate(node_disk_written_bytes_total{device!~"sr0"}[1m])'
-      name: node_disk_read_bytes_rate
+      name: node_disk_written_bytes_rate
     - query: 'node_filesystem_device_error{device=~"/dev/sd.+", mountpoint=~"/host/root.*"} != 0'
     - query: 'node_filesystem_free_bytes{device=~"/dev/sd.+", mountpoint=~"/host/root.*"}'
     - query: 'node_filesystem_readonly{device=~"/dev/sd.+", mountpoint=~"/host/root.*"} != 0'
