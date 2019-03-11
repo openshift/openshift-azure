@@ -135,7 +135,7 @@ cover: unit
 codecov: unit
 	./hack/codecov-report.sh
 
-.PHONY: e2e e2e-prod e2e-etcdbackuprecovery e2e-keyrotation e2e-reimagevm e2e-scaleupdown e2e-forceupdate e2e-vnet
+.PHONY: e2e e2e-prod e2e-etcdbackuprecovery e2e-keyrotation e2e-reimagevm e2e-changeloglevel e2e-scaleupdown e2e-forceupdate e2e-vnet
 e2e:
 	FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
 
@@ -150,6 +150,9 @@ e2e-keyrotation:
 
 e2e-reimagevm:
 	FOCUS="\[ReimageVM\]\[Fake\]" TIMEOUT=20m ./hack/e2e.sh
+
+e2e-changeloglevel:
+	FOCUS="\[ChangeLogLevel\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
 
 e2e-scaleupdown:
 	FOCUS="\[ScaleUpDown\]\[Fake\]" TIMEOUT=30m ./hack/e2e.sh

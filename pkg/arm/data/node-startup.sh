@@ -35,9 +35,7 @@ base64 -d <<< {{ .Config.Images.ImagePullSecret | Base64Encode }} >${DPATH}/conf
 
 echo 'BOOTSTRAP_CONFIG_NAME=node-config-{{ .Extra.Role }}' >>/etc/sysconfig/${SERVICE_TYPE}-node
 
-{{- if $.Extra.TestConfig.RunningUnderTest }}
-sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-node
-{{- end }}
+sed -i -e "s#DEBUG_LOGLEVEL=.*#DEBUG_LOGLEVEL={{ .Config.ComponentLogLevel.Node }}#" /etc/sysconfig/${SERVICE_TYPE}-node
 
 rm -rf /etc/etcd/* /etc/origin/master/*
 

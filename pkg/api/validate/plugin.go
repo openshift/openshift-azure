@@ -26,6 +26,8 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid pluginVersion %q", c.PluginVersion))
 	}
 
+	errs = append(errs, validateComponentLogLevel(&c.ComponentLogLevel)...)
+
 	if c.ImageOffer != "osa" {
 		errs = append(errs, fmt.Errorf("invalid imageOffer %q", c.ImageOffer))
 	}
@@ -84,6 +86,22 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 
 	if c.GenevaMetricsEndpoint == "" {
 		errs = append(errs, fmt.Errorf("invalid genevaMetricsEndpoint %q", c.GenevaMetricsEndpoint))
+	}
+
+	return
+}
+
+func validateComponentLogLevel(c *pluginapi.ComponentLogLevel) (errs []error) {
+	if c.APIServer < 0 || c.APIServer > 20 {
+		errs = append(errs, fmt.Errorf("invalid componentLogLevel.apiServer %d", c.APIServer))
+	}
+
+	if c.ControllerManager < 0 || c.ControllerManager > 20 {
+		errs = append(errs, fmt.Errorf("invalid componentLogLevel.controllerManager %d", c.ControllerManager))
+	}
+
+	if c.Node < 0 || c.Node > 20 {
+		errs = append(errs, fmt.Errorf("invalid componentLogLevel.node %d", c.Node))
 	}
 
 	return

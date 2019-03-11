@@ -268,6 +268,20 @@ func TestConvertFromAdmin(t *testing.T) {
 				expectedCs.Config.Certificates.OpenShiftConsole.Cert = dummyCA
 			},
 		},
+		{
+			name: "loglevel update",
+			input: &admin.OpenShiftManagedCluster{
+				Config: &admin.Config{
+					ComponentLogLevel: &admin.ComponentLogLevel{
+						Node: to.IntPtr(2),
+					},
+				},
+			},
+			base: internalManagedClusterAdmin(),
+			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
+				expectedCs.Config.ComponentLogLevel.Node = 2
+			},
+		},
 	}
 
 	for _, test := range tests {

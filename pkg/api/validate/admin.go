@@ -54,6 +54,8 @@ func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenSh
 
 	old := oldCs.DeepCopy()
 
+	old.Config.ComponentLogLevel = cs.Config.ComponentLogLevel
+
 	if !reflect.DeepEqual(cs, old) {
 		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
 	}

@@ -24,6 +24,13 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 		expectedErrs []error
 	}{
 		"no-op": {},
+		"change log level": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Config.ComponentLogLevel.APIServer++
+				oc.Config.ComponentLogLevel.ControllerManager++
+				oc.Config.ComponentLogLevel.Node++
+			},
+		},
 		"invalid change": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Name = "new"

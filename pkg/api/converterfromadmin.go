@@ -306,6 +306,9 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	if in.PluginVersion != nil {
 		out.PluginVersion = *in.PluginVersion
 	}
+	if in.ComponentLogLevel != nil {
+		mergeComponentLogLevel(in.ComponentLogLevel, &out.ComponentLogLevel)
+	}
 	if in.ImageOffer != nil {
 		out.ImageOffer = *in.ImageOffer
 	}
@@ -361,6 +364,18 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 		out.GenevaLoggingControlPlaneAccount = *in.GenevaLoggingControlPlaneAccount
 	}
 	return
+}
+
+func mergeComponentLogLevel(in *admin.ComponentLogLevel, out *ComponentLogLevel) {
+	if in.APIServer != nil {
+		out.APIServer = *in.APIServer
+	}
+	if in.ControllerManager != nil {
+		out.ControllerManager = *in.ControllerManager
+	}
+	if in.Node != nil {
+		out.Node = *in.Node
+	}
 }
 
 func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig) {

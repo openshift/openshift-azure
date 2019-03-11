@@ -9,6 +9,10 @@ import (
 type Config struct {
 	// PluginVersion defines release version of the plugin used to build the cluster
 	PluginVersion *string `json:"pluginVersion,omitempty"`
+
+	// ComponentLogLevel specifies the log levels for the various openshift components
+	ComponentLogLevel *ComponentLogLevel `json:"componentLogLevel,omitempty"`
+
 	// configuration of VMs in ARM template
 	ImageOffer     *string `json:"imageOffer,omitempty"`
 	ImagePublisher *string `json:"imagePublisher,omitempty"`
@@ -42,6 +46,14 @@ type Config struct {
 	GenevaMetricsAccount *string `json:"genevaMetricsAccount,omitempty"`
 	// Geneva Metrics System (MDM) endpoint for metrics
 	GenevaMetricsEndpoint *string `json:"genevaMetricsEndpoint,omitempty"`
+}
+
+// ComponentLogLevel represents the log levels for the various components of a
+// cluster
+type ComponentLogLevel struct {
+	APIServer         *int `json:"apiServer,omitempty"`
+	ControllerManager *int `json:"controllerManager,omitempty"`
+	Node              *int `json:"node,omitempty"`
 }
 
 // ImageConfig contains all images for the pods
