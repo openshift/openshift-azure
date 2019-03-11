@@ -26,7 +26,7 @@ type simpleGenerator struct {
 
 var _ Generator = &simpleGenerator{}
 
-type armTemplate struct {
+type Template struct {
 	Schema         string        `json:"$schema,omitempty"`
 	ContentVersion string        `json:"contentVersion,omitempty"`
 	Parameters     struct{}      `json:"parameters,omitempty"`
@@ -43,7 +43,7 @@ func NewSimpleGenerator(testConfig api.TestConfig) Generator {
 }
 
 func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
-	t := armTemplate{
+	t := Template{
 		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 		ContentVersion: "1.0.0.0",
 		Resources: []interface{}{
@@ -78,8 +78,8 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 		return nil, err
 	}
 
-	fixupAPIVersions(azuretemplate)
-	fixupDepends(&cs.Properties.AzProfile, azuretemplate)
+	FixupAPIVersions(azuretemplate)
+	FixupDepends(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, azuretemplate)
 
 	return azuretemplate, nil
 }

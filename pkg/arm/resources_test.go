@@ -41,7 +41,7 @@ func TestFixupDepends(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		armT := armTemplate{
+		armT := Template{
 			Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 			ContentVersion: "1.0.0.0",
 			Resources:      tt.resources,
@@ -57,7 +57,7 @@ func TestFixupDepends(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		fixupDepends(&cs.Properties.AzProfile, azuretemplate)
+		FixupDepends(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, azuretemplate)
 		res := jsonpath.MustCompile("$.resources[?(@.name='lb-apiserver')]").MustGetObject(azuretemplate)
 		deps, found := res["dependsOn"].([]string)
 		if !found && len(tt.expect) > 0 {

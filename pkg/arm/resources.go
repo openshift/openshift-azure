@@ -43,18 +43,21 @@ const (
 	vmssAdminUsername                             = "cloud-user"
 )
 
-// fixupAPIVersions inserts an apiVersion field into the ARM template for each
+// FixupAPIVersions inserts an apiVersion field into the ARM template for each
 // resource (the field is missing from the internal Azure type).  The versions
 // referenced here must be kept in lockstep with the imports above.
-func fixupAPIVersions(template map[string]interface{}) {
+func FixupAPIVersions(template map[string]interface{}) {
 	for _, resource := range jsonpath.MustCompile("$.resources.*").Get(template) {
 		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
 		var apiVersion string
 		switch typ {
-		case "Microsoft.Compute/virtualMachineScaleSets":
+		case "Microsoft.Compute/virtualMachines",
+			"Microsoft.Compute/virtualMachines/extensions",
+			"Microsoft.Compute/virtualMachineScaleSets":
 			apiVersion = "2018-10-01"
 		case "Microsoft.Network/loadBalancers",
 			"Microsoft.Network/networkSecurityGroups",
+			"Microsoft.Network/networkInterfaces",
 			"Microsoft.Network/publicIPAddresses",
 			"Microsoft.Network/virtualNetworks":
 			apiVersion = "2018-07-01"
@@ -67,15 +70,15 @@ func fixupAPIVersions(template map[string]interface{}) {
 	}
 }
 
-// fixupDepends inserts a dependsOn field into the ARM template for each
+// FixupDepends inserts a dependsOn field into the ARM template for each
 // resource that needs it (the field is missing from the internal Azure type).
-func fixupDepends(azProfile *api.AzProfile, template map[string]interface{}) {
+func FixupDepends(subscriptionID, resourceGroup string, template map[string]interface{}) {
 	myResources := map[string]struct{}{}
 	for _, resource := range jsonpath.MustCompile("$.resources.*").Get(template) {
 		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
 		name := jsonpath.MustCompile("$.name").MustGetString(resource)
 
-		myResources[resourceid.ResourceID(azProfile.SubscriptionID, azProfile.ResourceGroup, typ, name)] = struct{}{}
+		myResources[resourceid.ResourceID(subscriptionID, resourceGroup, typ, name)] = struct{}{}
 	}
 
 	var recurse func(myResourceID string, i interface{}, dependsMap map[string]struct{})
@@ -116,7 +119,13 @@ func fixupDepends(azProfile *api.AzProfile, template map[string]interface{}) {
 
 		dependsMap := map[string]struct{}{}
 
-		recurse(resourceid.ResourceID(azProfile.SubscriptionID, azProfile.ResourceGroup, typ, name), resource, dependsMap)
+		// if we're a child resource, depend on our parent
+		if strings.Count(typ, "/") == 2 {
+			id := resourceid.ResourceID(subscriptionID, resourceGroup, typ[:strings.LastIndexByte(typ, '/')], name[:strings.LastIndexByte(name, '/')])
+			dependsMap[id] = struct{}{}
+		}
+
+		recurse(resourceid.ResourceID(subscriptionID, resourceGroup, typ, name), resource, dependsMap)
 
 		depends := make([]string, 0, len(dependsMap))
 		for k := range dependsMap {
