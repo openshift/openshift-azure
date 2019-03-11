@@ -11,28 +11,42 @@ import (
 )
 
 func TestAdminAPIValidate(t *testing.T) {
+	var v AdminAPIValidator
+	errs := v.Validate(&api.OpenShiftManagedCluster{}, nil)
+	if len(errs) != 1 || errs[0].Error() != `admin requests cannot create clusters` {
+		t.Errorf("unexpected validate output %#v", errs)
+	}
+}
+
+func TestAdminAPIValidateUpdate(t *testing.T) {
 	tests := map[string]struct {
 		f            func(*api.OpenShiftManagedCluster)
-		externalOnly bool
 		expectedErrs []error
 	}{
-		"admin api cluster create": {
-			expectedErrs: []error{errors.New(`admin requests cannot create clusters`)},
+		"no-op": {},
+		"invalid change": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Name = "new"
+			},
+			expectedErrs: []error{
+				errors.New(`invalid change [Name: new != openshift]`),
+			},
 		},
 	}
 
 	for name, test := range tests {
-		var cs *api.OpenShiftManagedCluster
-		err := yaml.Unmarshal(testOpenShiftClusterYAML, &cs)
+		var oldCs *api.OpenShiftManagedCluster
+		err := yaml.Unmarshal(testOpenShiftClusterYAML, &oldCs)
 		if err != nil {
 			t.Fatal(err)
 		}
+		cs := oldCs.DeepCopy()
 
 		if test.f != nil {
 			test.f(cs)
 		}
-		v := AdminAPIValidator{}
-		errs := v.Validate(cs, nil)
+		var v AdminAPIValidator
+		errs := v.Validate(cs, oldCs)
 		if !reflect.DeepEqual(errs, test.expectedErrs) {
 			t.Logf("test case %q", name)
 			t.Errorf("expected errors:")

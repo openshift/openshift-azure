@@ -2,6 +2,9 @@ package validate
 
 import (
 	"fmt"
+	"reflect"
+
+	"github.com/go-test/deep"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
@@ -26,13 +29,42 @@ func (v *APIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster, external
 	errs = append(errs, validateContainerService(cs, externalOnly)...)
 
 	if oldCs != nil {
-		errs = append(errs, validateUpdateContainerService(cs, oldCs)...)
+		errs = append(errs, v.validateUpdateContainerService(cs, oldCs)...)
 	}
 
 	// this limits use of RunningUnderTest variable inside our validators
 	// TODO: When removed this should be part of common validators
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		errs = append(errs, validateVMSize(&app, v.runningUnderTest)...)
+	}
+
+	return
+}
+
+func (v *APIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster) (errs []error) {
+	if cs == nil || oldCs == nil {
+		errs = append(errs, fmt.Errorf("cs and oldCs cannot be nil"))
+		return
+	}
+
+	old := oldCs.DeepCopy()
+
+	newAgents := make(map[string]*api.AgentPoolProfile)
+	for i := range cs.Properties.AgentPoolProfiles {
+		newAgent := cs.Properties.AgentPoolProfiles[i]
+		newAgents[newAgent.Name] = &newAgent
+	}
+
+	for i, o := range old.Properties.AgentPoolProfiles {
+		new, ok := newAgents[o.Name]
+		if !ok {
+			continue // we know we are going to fail the DeepEqual test below.
+		}
+		old.Properties.AgentPoolProfiles[i].Count = new.Count
+	}
+
+	if !reflect.DeepEqual(cs, old) {
+		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
 	}
 
 	return

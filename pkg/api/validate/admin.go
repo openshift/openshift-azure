@@ -3,6 +3,9 @@ package validate
 import (
 	"errors"
 	"fmt"
+	"reflect"
+
+	"github.com/go-test/deep"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
@@ -32,9 +35,7 @@ func (v *AdminAPIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster) (er
 
 	errs = append(errs, validateContainerService(cs, false)...)
 
-	errs = append(errs, validateUpdateContainerService(cs, oldCs)...)
-
-	errs = append(errs, validateUpdateConfig(&cs.Config, &oldCs.Config)...)
+	errs = append(errs, v.validateUpdateContainerService(cs, oldCs)...)
 
 	// this limits use of RunningUnderTest variable inside our validators
 	// TODO: When removed this should be part of common validators
@@ -42,5 +43,20 @@ func (v *AdminAPIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster) (er
 		errs = append(errs, validateVMSize(&app, v.runningUnderTest)...)
 	}
 
-	return nil
+	return
+}
+
+func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster) (errs []error) {
+	if cs == nil || oldCs == nil {
+		errs = append(errs, fmt.Errorf("cs and oldCs cannot be nil"))
+		return
+	}
+
+	old := oldCs.DeepCopy()
+
+	if !reflect.DeepEqual(cs, old) {
+		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
+	}
+
+	return
 }
