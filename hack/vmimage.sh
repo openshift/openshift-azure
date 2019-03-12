@@ -13,8 +13,8 @@ export IMAGE_RESOURCENAME="${IMAGE_RESOURCENAME:-rhel7-3.11-$(TZ=Etc/UTC date +%
 go generate ./...
 go run -ldflags "-X main.gitCommit=$COMMIT" ./cmd/vmimage -imageResourceGroup "$IMAGE_RESOURCEGROUP" -image "$IMAGE_RESOURCENAME"
 
+export AZURE_REGION=eastus
 export RESOURCEGROUP="${IMAGE_RESOURCENAME//./}-e2e"
-export NO_WAIT=true
 
 trap '[[ -z "$NO_DELETE" ]] && make delete' EXIT
 

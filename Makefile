@@ -40,14 +40,13 @@ test: unit e2e
 
 .PHONY: create delete upgrade
 create:
-	timeout 1h ./hack/create.sh ${RESOURCEGROUP}
+	./hack/create.sh ${RESOURCEGROUP}
 
 delete:
 	./hack/delete.sh ${RESOURCEGROUP}
-	rm -rf _data
 
 upgrade:
-	./hack/upgrade-e2e.sh release-test-${TAG}-${COMMIT} ${SOURCE}
+	./hack/upgrade.sh ${RESOURCEGROUP}
 
 azure-controllers: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
