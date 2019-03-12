@@ -37,40 +37,25 @@ func fromMSGraphGroup(log *logrus.Entry, kubeGroup *v1.Group, kubeGroupName stri
 	return g, !reflect.DeepEqual(kubeGroup, g)
 }
 
-// https://docs.microsoft.com/en-us/graph/api/group-list
-// To list AAD groups, this code needs to have the clientID
-// of an application with the following permissions:
-// API: Windows Azure Active Directory
-//   Application permissions:
-//      Read directory data
-func newAADGroupsClient(config api.AADIdentityProvider) (*graphrbac.GroupsClient, error) {
-	authorizer, err := azureclient.NewAuthorizer(config.ClientID, config.Secret, config.TenantID, azure.PublicCloud.GraphEndpoint)
+func newAADGroupsClient(ctx context.Context, config api.AADIdentityProvider) (azureclient.RBACGroupsClient, error) {
+	graphauthorizer, err := azureclient.NewAuthorizer(config.ClientID, config.Secret, config.TenantID, azure.PublicCloud.GraphEndpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	gc := graphrbac.NewGroupsClient(config.TenantID)
-	gc.Authorizer = authorizer
-	return &gc, nil
+	return azureclient.NewRBACGroupsClient(ctx, config.TenantID, graphauthorizer), nil
 }
 
-func getAADGroupMembers(gc *graphrbac.GroupsClient, groupID string) ([]graphrbac.User, error) {
-	users, err := gc.GetGroupMembers(context.Background(), groupID)
+func getAADGroupMembers(gc azureclient.RBACGroupsClient, groupID string) ([]graphrbac.User, error) {
+	members, err := gc.GetGroupMembers(context.Background(), groupID)
 	if err != nil {
 		return nil, err
 	}
-	members := []graphrbac.User{}
-	for users.NotDone() {
-		for _, bdo := range users.Values() {
-			user, isUser := bdo.AsUser()
-			if isUser {
-				members = append(members, *user)
-			}
-		}
-
-		if err = users.Next(); err != nil {
-			return nil, err
+	var users []graphrbac.User
+	for _, member := range members {
+		if user, ok := member.AsUser(); ok {
+			users = append(users, *user)
 		}
 	}
-	return members, nil
+	return users, nil
 }

@@ -6,6 +6,8 @@ import (
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 func updateKubeGroup(log *logrus.Entry, userV1 userv1client.UserV1Interface, kubeGroupName string, msGroupMembers []graphrbac.User) error {
@@ -35,7 +37,7 @@ func updateKubeGroup(log *logrus.Entry, userV1 userv1client.UserV1Interface, kub
 	return nil
 }
 
-func reconcileGroups(log *logrus.Entry, gc *graphrbac.GroupsClient, userV1 userv1client.UserV1Interface, groupMap map[string]string) error {
+func reconcileGroups(log *logrus.Entry, gc azureclient.RBACGroupsClient, userV1 userv1client.UserV1Interface, groupMap map[string]string) error {
 	aadGroupID, have := groupMap[osaCustomerAdmins]
 	if !have {
 		// CustomerAdminGroupID not configured: ensure the group is empty

@@ -1,6 +1,7 @@
 package customeradmin
 
 import (
+	"context"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -47,8 +48,8 @@ var desiredRolebindings = map[string]rbacv1.RoleBinding{
 }
 
 // AddToManager adds all Controllers to the Manager
-func AddToManager(log *logrus.Entry, m manager.Manager, stopCh <-chan struct{}) error {
-	if err := addGroupController(log, m, stopCh); err != nil {
+func AddToManager(ctx context.Context, log *logrus.Entry, m manager.Manager, stopCh <-chan struct{}) error {
+	if err := addGroupController(ctx, log, m, stopCh); err != nil {
 		return err
 	}
 	if err := addNamespaceController(log, m); err != nil {
