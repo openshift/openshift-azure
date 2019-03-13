@@ -2,10 +2,8 @@ package arm
 
 import (
 	"io/ioutil"
-	"net"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -14,11 +12,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/template"
 )
 
-func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster) error {
-	hostname, _ := os.Hostname()
-	cname, _ := net.LookupCNAME(hostname)
-	domainname := strings.SplitN(strings.TrimSuffix(cname, "."), ".", 2)[1]
-
+func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, hostname, domainname string) error {
 	for _, templateFileName := range AssetNames() {
 		if hostname != "master-000000" && templateFileName == "etc/origin/node/pods/sync.yaml" {
 			continue

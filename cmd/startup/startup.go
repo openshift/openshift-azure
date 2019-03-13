@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"flag"
+	"net"
+	"os"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -74,7 +77,11 @@ func (s *startup) run(ctx context.Context) error {
 		return errors.Wrap(kerrors.NewAggregate(errs), "can not validate config blob")
 	}
 
-	if err := arm.WriteTemplatedFiles(s.log, s.cs); err != nil {
+	hostname, _ := os.Hostname()
+	cname, _ := net.LookupCNAME(hostname)
+	domainname := strings.SplitN(strings.TrimSuffix(cname, "."), ".", 2)[1]
+
+	if err := arm.WriteTemplatedFiles(s.log, s.cs, hostname, domainname); err != nil {
 		return errors.Wrap(err, "writeTemplatedFiles")
 	}
 
