@@ -9,6 +9,7 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/addons"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
@@ -66,38 +67,30 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 	return nil
 }
 
-// desired state that is kept in a blob in an Azure storage
-// account. It returns whether it managed to access the
-// config blob or not and any error that occured.
-func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
-	s.log.Print("Sync process started")
+func (s *sync) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, error) {
+	s.log.Print("fetching config blob")
 	cs, err := configblob.GetBlob(s.blob)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	s.log.Print("enriching config blob")
 	err = vault.EnrichCSFromVault(ctx, s.kvc, cs)
 	if err != nil {
-		return true, err
+		return nil, err
 	}
 
 	err = addons.EnrichCSStorageAccountKeys(ctx, s.azs, cs)
 	if err != nil {
-		return true, err
+		return nil, err
 	}
 
 	v := validate.NewAPIValidator(cs.Config.RunningUnderTest)
 	if errs := v.Validate(cs, nil, false); len(errs) > 0 {
-		return true, kerrors.NewAggregate(errs)
+		return nil, kerrors.NewAggregate(errs)
 	}
 
-	if err := addons.Main(ctx, s.log, cs, *dryRun); err != nil {
-		return true, err
-	}
-
-	s.log.Print("Sync process complete")
-	return true, nil
+	return cs, nil
 }
 
 func main() {
@@ -111,21 +104,29 @@ func main() {
 	s := new(sync)
 	ctx := context.Background()
 
-	if err := s.init(ctx, log); err != nil {
+	err := s.init(ctx, log)
+	if err != nil {
 		log.Fatalf("Cannot initialize sync: %v", err)
 	}
 
 	t := time.NewTicker(*interval)
 
+	var cs *api.OpenShiftManagedCluster
 	for {
-		gotBlob, err := s.sync(ctx, log)
-		if !gotBlob {
-			// If we didn't manage to access the blob, error out and start
-			// again.
-			log.Fatalf("Error while accessing config blob: %v", err)
+		cs, err = s.getBlob(ctx)
+		if err == nil {
+			break
 		}
-		if err != nil {
+		log.Printf("Error while accessing config blob: %v", err)
+		<-t.C
+	}
+
+	for {
+		s.log.Print("Sync process started")
+		if err := addons.Main(ctx, s.log, cs, *dryRun); err != nil {
 			log.Printf("Error while syncing: %v", err)
+		} else {
+			s.log.Print("Sync process complete")
 		}
 		if *once {
 			return
