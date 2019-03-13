@@ -13,7 +13,7 @@ func TestMasterIsReady(t *testing.T) {
 	tests := []struct {
 		name     string
 		kc       kubernetes.Interface
-		hostname ComputerName
+		hostname string
 		want     bool
 		wantErr  bool
 	}{
@@ -48,7 +48,7 @@ func TestMasterIsReady(t *testing.T) {
 		},
 		{
 			name:     "node ready, pods ready",
-			hostname: "master-00000A",
+			hostname: "master-00000a",
 			wantErr:  false,
 			want:     true,
 			kc: fake.NewSimpleClientset(&corev1.Node{

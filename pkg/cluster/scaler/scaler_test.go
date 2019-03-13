@@ -3,6 +3,7 @@ package scaler
 import (
 	"context"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
@@ -11,7 +12,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
@@ -102,8 +102,8 @@ func TestScaleUp(t *testing.T) {
 
 				for i, vm := range tt.vmsAfter {
 					if i >= len(tt.vmsBefore) {
-						hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
-						c = kc.EXPECT().WaitForReadyWorker(ctx, kubeclient.ComputerName(hostname)).Return(nil).After(c)
+						hostname := strings.ToLower(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+						c = kc.EXPECT().WaitForReadyWorker(ctx, hostname).Return(nil).After(c)
 					}
 				}
 			}
@@ -213,8 +213,8 @@ func TestScaleDown(t *testing.T) {
 
 				for i, vm := range tt.vmsBefore {
 					if i >= len(tt.vmsAfter) {
-						hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
-						c = kc.EXPECT().DrainAndDeleteWorker(ctx, kubeclient.ComputerName(hostname)).Return(nil).After(c)
+						hostname := strings.ToLower(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+						c = kc.EXPECT().DrainAndDeleteWorker(ctx, hostname).Return(nil).After(c)
 						c = vmc.EXPECT().Delete(ctx, testRg, testSS, *vm.InstanceID).Return(nil).After(c)
 					}
 				}

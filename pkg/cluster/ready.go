@@ -3,9 +3,9 @@ package cluster
 import (
 	"context"
 	"sort"
+	"strings"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/config"
 )
 
@@ -15,7 +15,7 @@ func (u *simpleUpgrader) WaitForNodesInAgentPoolProfile(ctx context.Context, cs 
 		return err
 	}
 	for _, vm := range vms {
-		hostname := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		hostname := strings.ToLower(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		u.log.Infof("waiting for %s to be ready", hostname)
 		if app.Role == api.AgentPoolProfileRoleMaster {
 			err = u.kubeclient.WaitForReadyMaster(ctx, hostname)

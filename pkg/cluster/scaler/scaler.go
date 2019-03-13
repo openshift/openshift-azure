@@ -8,6 +8,7 @@ package scaler
 
 import (
 	"context"
+	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -126,10 +127,10 @@ func (ws *workerScaler) scaleUp(ctx context.Context, count int64) *api.PluginErr
 
 	for _, vm := range vms {
 		if _, found := ws.vmMap[*vm.InstanceID]; !found {
-			hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
+			hostname := strings.ToLower(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 			ws.log.Infof("waiting for %s to be ready", hostname)
 
-			err = ws.kubeclient.WaitForReadyWorker(ctx, kubeclient.ComputerName(hostname))
+			err = ws.kubeclient.WaitForReadyWorker(ctx, hostname)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolWaitForReady}
 			}
@@ -153,12 +154,12 @@ func (ws *workerScaler) scaleDown(ctx context.Context, count int64) *api.PluginE
 	}
 
 	for _, vm := range ws.vms[count:] {
-		hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
+		hostname := strings.ToLower(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 
 		// TODO: should probably mark all appropriate nodes unschedulable, then
 		// do the draining, then do the deleting in parallel.
 		ws.log.Infof("draining %s", hostname)
-		if err := ws.kubeclient.DrainAndDeleteWorker(ctx, kubeclient.ComputerName(hostname)); err != nil {
+		if err := ws.kubeclient.DrainAndDeleteWorker(ctx, hostname); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolDrain}
 		}
 

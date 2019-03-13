@@ -14,7 +14,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, hostname ComputerName) error {
+func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, hostname string) error {
 	err := u.setUnschedulable(hostname, true)
 	switch {
 	case err == nil:
@@ -30,16 +30,16 @@ func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, hostname Computer
 		return err
 	}
 
-	return u.client.CoreV1().Nodes().Delete(hostname.toKubernetes(), &metav1.DeleteOptions{})
+	return u.client.CoreV1().Nodes().Delete(hostname, &metav1.DeleteOptions{})
 }
 
-func (u *kubeclient) DeleteMaster(hostname ComputerName) error {
-	return u.client.CoreV1().Nodes().Delete(hostname.toKubernetes(), &metav1.DeleteOptions{})
+func (u *kubeclient) DeleteMaster(hostname string) error {
+	return u.client.CoreV1().Nodes().Delete(hostname, &metav1.DeleteOptions{})
 }
 
-func (u *kubeclient) setUnschedulable(hostname ComputerName, unschedulable bool) error {
+func (u *kubeclient) setUnschedulable(hostname string, unschedulable bool) error {
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		node, err := u.client.CoreV1().Nodes().Get(hostname.toKubernetes(), metav1.GetOptions{})
+		node, err := u.client.CoreV1().Nodes().Get(hostname, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
@@ -66,9 +66,9 @@ func max(i, j time.Duration) time.Duration {
 	return j
 }
 
-func (u *kubeclient) deletePods(ctx context.Context, hostname ComputerName) error {
+func (u *kubeclient) deletePods(ctx context.Context, hostname string) error {
 	podList, err := u.client.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
-		FieldSelector: fields.SelectorFromSet(fields.Set{"spec.nodeName": hostname.toKubernetes()}).String(),
+		FieldSelector: fields.SelectorFromSet(fields.Set{"spec.nodeName": hostname}).String(),
 	})
 	if err != nil {
 		return err

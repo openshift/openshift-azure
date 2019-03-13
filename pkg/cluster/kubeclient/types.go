@@ -8,7 +8,6 @@ package kubeclient
 
 import (
 	"context"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
@@ -20,12 +19,12 @@ import (
 // Kubeclient interface to utility kubenetes functions
 type Kubeclient interface {
 	BackupCluster(ctx context.Context, backupName string) error
-	DrainAndDeleteWorker(ctx context.Context, hostname ComputerName) error
-	DeleteMaster(hostname ComputerName) error
+	DrainAndDeleteWorker(ctx context.Context, hostname string) error
+	DeleteMaster(hostname string) error
 	GetControlPlanePods(ctx context.Context) ([]corev1.Pod, error)
 	WaitForInfraServices(ctx context.Context) *api.PluginError
-	WaitForReadyMaster(ctx context.Context, hostname ComputerName) error
-	WaitForReadyWorker(ctx context.Context, hostname ComputerName) error
+	WaitForReadyMaster(ctx context.Context, hostname string) error
+	WaitForReadyWorker(ctx context.Context, hostname string) error
 }
 
 type kubeclient struct {
@@ -34,9 +33,3 @@ type kubeclient struct {
 }
 
 var _ Kubeclient = &kubeclient{}
-
-type ComputerName string
-
-func (hostname ComputerName) toKubernetes() string {
-	return strings.ToLower(string(hostname))
-}

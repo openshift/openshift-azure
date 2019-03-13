@@ -14,7 +14,7 @@ func TestDrainAndDeleteWorker(t *testing.T) {
 	tests := []struct {
 		name            string
 		kubeclient      *fake.Clientset
-		hostname        ComputerName
+		hostname        string
 		wantErr         error
 		expectedActions [][]string
 	}{

@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"context"
 	"sort"
+	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
 )
@@ -53,7 +53,7 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 
 	vms = u.filterOldVMs(vms, blob, desiredHash)
 	for _, vm := range vms {
-		hostname := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		hostname := strings.ToLower(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		u.log.Infof("draining %s", hostname)
 		err = u.kubeclient.DeleteMaster(hostname)
 		if err != nil {

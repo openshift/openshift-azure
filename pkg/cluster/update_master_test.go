@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
@@ -11,7 +12,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
@@ -167,7 +167,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			c = vmc.EXPECT().List(ctx, tt.cs.Properties.AzProfile.ResourceGroup, "ss-master", "", "", "").Return(tt.vms, nil).After(c)
 
 			for _, vm := range tt.vms {
-				hostname := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+				hostname := strings.ToLower(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 
 				// 1. drain
 				c = kclient.EXPECT().DeleteMaster(hostname).Return(nil).After(c)

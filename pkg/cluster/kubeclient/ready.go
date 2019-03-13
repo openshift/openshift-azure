@@ -122,29 +122,29 @@ func (u *kubeclient) WaitForInfraServices(ctx context.Context) *api.PluginError 
 	return nil
 }
 
-func (u *kubeclient) WaitForReadyMaster(ctx context.Context, hostname ComputerName) error {
+func (u *kubeclient) WaitForReadyMaster(ctx context.Context, hostname string) error {
 	return wait.PollImmediateUntil(time.Second, func() (bool, error) { return u.masterIsReady(hostname) }, ctx.Done())
 }
 
-func (u *kubeclient) masterIsReady(hostname ComputerName) (bool, error) {
-	r, err := ready.NodeIsReady(u.client.CoreV1().Nodes(), hostname.toKubernetes())()
+func (u *kubeclient) masterIsReady(hostname string) (bool, error) {
+	r, err := ready.NodeIsReady(u.client.CoreV1().Nodes(), hostname)()
 	if !r || err != nil {
 		return r, err
 	}
 
-	r, err = ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "master-etcd-"+hostname.toKubernetes())()
+	r, err = ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "master-etcd-"+hostname)()
 	if !r || err != nil {
 		return r, err
 	}
 
-	r, err = ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "master-api-"+hostname.toKubernetes())()
+	r, err = ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "master-api-"+hostname)()
 	if !r || err != nil {
 		return r, err
 	}
 
-	return ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "controllers-"+hostname.toKubernetes())()
+	return ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "controllers-"+hostname)()
 }
 
-func (u *kubeclient) WaitForReadyWorker(ctx context.Context, hostname ComputerName) error {
-	return wait.PollImmediateUntil(time.Second, ready.NodeIsReady(u.client.CoreV1().Nodes(), hostname.toKubernetes()), ctx.Done())
+func (u *kubeclient) WaitForReadyWorker(ctx context.Context, hostname string) error {
+	return wait.PollImmediateUntil(time.Second, ready.NodeIsReady(u.client.CoreV1().Nodes(), hostname), ctx.Done())
 }
