@@ -72,6 +72,12 @@ func readDB(cs *api.OpenShiftManagedCluster, ext *extra) (map[string]unstructure
 
 		db[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = o
 	}
+
+	err := syncWorkloadsConfig(db)
+	if err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }
 
@@ -291,10 +297,6 @@ func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluste
 		ConfigStorageAccountKey:   *(*keyConfig.Keys)[0].Value,
 	})
 	if err != nil {
-		return err
-	}
-
-	if err := syncWorkloadsConfig(db); err != nil {
 		return err
 	}
 
