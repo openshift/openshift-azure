@@ -162,7 +162,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 
 			hostnameHashes := map[string][]byte{}
 
-			c := hasher.EXPECT().HashScaleSet(tt.cs, &tt.cs.Properties.AgentPoolProfiles[0]).Return([]byte("updated"), nil)
+			c := hasher.EXPECT().HashMasterScaleSet(tt.cs, &tt.cs.Properties.AgentPoolProfiles[0]).Return([]byte("updated"), nil)
 			c = ubs.EXPECT().Read().Return(updateblob.NewUpdateBlob(), nil).After(c)
 			c = vmc.EXPECT().List(ctx, tt.cs.Properties.AzProfile.ResourceGroup, "ss-master", "", "", "").Return(tt.vms, nil).After(c)
 
