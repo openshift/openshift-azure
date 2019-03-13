@@ -5,7 +5,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -23,7 +22,7 @@ func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, hos
 		log.Debugf("processing template %s", templateFileName)
 		templateFile, err := Asset(templateFileName)
 		if err != nil {
-			return errors.Wrapf(err, "Asset(%s)", templateFileName)
+			return err
 		}
 
 		b, err := template.Template(string(templateFile), nil, cs, map[string]interface{}{
@@ -31,13 +30,13 @@ func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, hos
 			"DomainName": domainname,
 		})
 		if err != nil {
-			return errors.Wrapf(err, "Template(%s)", templateFileName)
+			return err
 		}
 		destination := "/" + templateFileName
 		parentDir := path.Dir(destination)
 		err = os.MkdirAll(parentDir, 0755)
 		if err != nil {
-			return errors.Wrapf(err, "MkdirAll(%s)", parentDir)
+			return err
 		}
 		var perm os.FileMode = 0666
 		if path.Ext(destination) == ".key" ||
@@ -48,7 +47,7 @@ func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, hos
 
 		err = ioutil.WriteFile(destination, b, perm)
 		if err != nil {
-			return errors.Wrapf(err, "WriteFile(%s)", destination)
+			return err
 		}
 	}
 	return nil
