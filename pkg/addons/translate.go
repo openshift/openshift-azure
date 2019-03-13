@@ -9,7 +9,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	util "github.com/openshift/openshift-azure/pkg/util/template"
 )
 

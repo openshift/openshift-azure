@@ -10,7 +10,7 @@ import (
 	"github.com/go-test/deep"
 
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
-	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/tls"
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
