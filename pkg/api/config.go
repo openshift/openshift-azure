@@ -28,9 +28,11 @@ type Config struct {
 	SSHKey *rsa.PrivateKey `json:"sshKey,omitempty"`
 
 	// configuration of other ARM resources
-	ConfigStorageAccount    string `json:"configStorageAccount,omitempty"`
-	RegistryStorageAccount  string `json:"registryStorageAccount,omitempty"`
-	AzureFileStorageAccount string `json:"azureFileStorageAccount,omitempty"`
+	ConfigStorageAccount      string `json:"configStorageAccount,omitempty"`
+	ConfigStorageAccountKey   string `json:"-"`
+	RegistryStorageAccount    string `json:"registryStorageAccount,omitempty"`
+	RegistryStorageAccountKey string `json:"-"`
+	AzureFileStorageAccount   string `json:"azureFileStorageAccount,omitempty"`
 
 	Certificates CertificateConfig `json:"certificates,omitempty"`
 	Images       ImageConfig       `json:"images,omitempty"`

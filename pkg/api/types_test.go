@@ -305,6 +305,8 @@ func TestUnmarshal(t *testing.T) {
 
 	populatedOc.Config.Certificates.OpenShiftConsole = CertKeyPairChain{}
 	populatedOc.Config.Certificates.Router = CertKeyPairChain{}
+	populatedOc.Config.ConfigStorageAccountKey = ""
+	populatedOc.Config.RegistryStorageAccountKey = ""
 
 	var unmarshalledOc OpenShiftManagedCluster
 	err := json.Unmarshal(marshalled, &unmarshalledOc)
@@ -540,6 +542,8 @@ func TestPluginTemplateAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Alert`),
 		regexp.MustCompile(`^\.Console`),
 		regexp.MustCompile(`^\.RunningUnderTest`),
+		regexp.MustCompile(`^\.ConfigStorageAccountKey$`),
+		regexp.MustCompile(`^\.RegistryStorageAccountKey$`),
 		regexp.MustCompile(`^\.Certificates\.Ca\.`),
 		regexp.MustCompile(`^\.Certificates\.FrontProxyCa\.`),
 		regexp.MustCompile(`^\.Certificates\.Service`),

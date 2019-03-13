@@ -29,7 +29,7 @@ const (
 	NestedFlagsBase64 NestedFlags = (1 << iota)
 )
 
-func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster, ext *extra) (unstructured.Unstructured, error) {
+func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster) (unstructured.Unstructured, error) {
 	ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
 	for _, tr := range ts {
 		var s interface{}
@@ -40,7 +40,7 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 				return unstructured.Unstructured{}, err
 			}
 		} else {
-			b, err := util.Template(tr.Template, nil, cs, ext)
+			b, err := util.Template(tr.Template, nil, cs, nil)
 			s = string(b)
 			if err != nil {
 				return unstructured.Unstructured{}, err
@@ -514,7 +514,7 @@ var Translations = map[string][]struct {
 		{
 			Path:       jsonpath.MustCompile("$.stringData.'config.yml'"),
 			NestedPath: jsonpath.MustCompile("$.storage.azure.accountkey"),
-			Template:   "{{ .Extra.RegistryStorageAccountKey }}",
+			Template:   "{{ .Config.RegistryStorageAccountKey }}",
 		},
 	},
 	"Secret/default/registry-console": {

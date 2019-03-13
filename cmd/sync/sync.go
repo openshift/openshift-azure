@@ -83,12 +83,17 @@ func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
 		return true, errors.Wrap(err, "EnrichCSFromVault")
 	}
 
+	err = addons.EnrichCSStorageAccountKeys(ctx, s.azs, cs)
+	if err != nil {
+		return true, err
+	}
+
 	v := validate.NewAPIValidator(cs.Config.RunningUnderTest)
 	if errs := v.Validate(cs, nil, false); len(errs) > 0 {
 		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate config blob")
 	}
 
-	if err := addons.Main(ctx, s.log, cs, s.azs, *dryRun); err != nil {
+	if err := addons.Main(ctx, s.log, cs, *dryRun); err != nil {
 		return true, errors.Wrap(err, "cannot sync cluster config")
 	}
 

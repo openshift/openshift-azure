@@ -25,11 +25,6 @@ import (
 
 const ownedBySyncPodLabelKey = "azure.openshift.io/owned-by-sync-pod"
 
-type extra struct {
-	RegistryStorageAccountKey string
-	ConfigStorageAccountKey   string
-}
-
 // Unmarshal has to reimplement yaml.Unmarshal because it universally mangles yaml
 // integers into float64s, whereas the Kubernetes client library uses int64s
 // wherever it can.  Such a difference can cause us to update objects when
@@ -51,7 +46,7 @@ func Unmarshal(b []byte) (unstructured.Unstructured, error) {
 
 // readDB reads previously exported objects into a map via go-bindata as well as
 // populating configuration items via Translate().
-func readDB(cs *api.OpenShiftManagedCluster, ext *extra) (map[string]unstructured.Unstructured, error) {
+func readDB(cs *api.OpenShiftManagedCluster) (map[string]unstructured.Unstructured, error) {
 	db := map[string]unstructured.Unstructured{}
 
 	for _, asset := range AssetNames() {
@@ -65,7 +60,7 @@ func readDB(cs *api.OpenShiftManagedCluster, ext *extra) (map[string]unstructure
 			return nil, err
 		}
 
-		o, err = translateAsset(o, cs, ext)
+		o, err = translateAsset(o, cs)
 		if err != nil {
 			return nil, err
 		}
@@ -281,21 +276,25 @@ func writeDB(log *logrus.Entry, client *client, db map[string]unstructured.Unstr
 	return client.ApplyResources(monitoringCrdFilter, db, keys)
 }
 
-// Main loop
-func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) error {
-	keyRegistry, err := azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
+func EnrichCSStorageAccountKeys(ctx context.Context, azs azureclient.AccountsClient, cs *api.OpenShiftManagedCluster) error {
+	key, err := azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
 	if err != nil {
 		return err
 	}
-	keyConfig, err := azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
-	if err != nil {
-		return err
-	}
+	cs.Config.RegistryStorageAccountKey = *(*key.Keys)[0].Value
 
-	db, err := readDB(cs, &extra{
-		RegistryStorageAccountKey: *(*keyRegistry.Keys)[0].Value,
-		ConfigStorageAccountKey:   *(*keyConfig.Keys)[0].Value,
-	})
+	key, err = azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+	if err != nil {
+		return err
+	}
+	cs.Config.ConfigStorageAccountKey = *(*key.Keys)[0].Value
+
+	return nil
+}
+
+// Main loop
+func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, dryRun bool) error {
+	db, err := readDB(cs)
 	if err != nil {
 		return err
 	}
