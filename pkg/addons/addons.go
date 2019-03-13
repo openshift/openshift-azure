@@ -207,7 +207,7 @@ var (
 // writeDB uses the discovery and dynamic clients to synchronise an API server's
 // objects with db.
 // TODO: need to implement deleting objects which we don't want any more.
-func writeDB(log *logrus.Entry, client Interface, db map[string]unstructured.Unstructured) error {
+func writeDB(log *logrus.Entry, client *client, db map[string]unstructured.Unstructured) error {
 	// impose an order to improve debuggability.
 	var keys []string
 	for k := range db {

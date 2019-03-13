@@ -27,19 +27,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-// Interface exposes the methods a client needs to implement
-// for the syncing process of the addons.
-type Interface interface {
-	ApplyResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error
-	UpdateDynamicClient() error
-	ServiceCatalogExists() (bool, error)
-	CRDReady(name string) (bool, error)
-	DeleteOrphans(db map[string]unstructured.Unstructured) error
-}
-
-// client implements Interface
-var _ Interface = &client{}
-
 type client struct {
 	restconfig *rest.Config
 	ac         *kaggregator.Clientset
@@ -50,7 +37,7 @@ type client struct {
 	log        *logrus.Entry
 }
 
-func newClient(ctx context.Context, log *logrus.Entry, cs *acsapi.OpenShiftManagedCluster) (Interface, error) {
+func newClient(ctx context.Context, log *logrus.Entry, cs *acsapi.OpenShiftManagedCluster) (*client, error) {
 	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return nil, err
