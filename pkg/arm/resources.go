@@ -349,15 +349,16 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 	return lb
 }
 
-func storageRegistry(cs *api.OpenShiftManagedCluster) *storage.Account {
+func storageAccount(name string, cs *api.OpenShiftManagedCluster, tags map[string]*string) *storage.Account {
 	return &storage.Account{
 		Sku: &storage.Sku{
 			Name: storage.StandardLRS,
 		},
 		Kind:     storage.Storage,
-		Name:     to.StringPtr(cs.Config.RegistryStorageAccount),
+		Name:     to.StringPtr(name),
 		Type:     to.StringPtr("Microsoft.Storage/storageAccounts"),
 		Location: to.StringPtr(cs.Location),
+		Tags:     tags,
 	}
 }
 

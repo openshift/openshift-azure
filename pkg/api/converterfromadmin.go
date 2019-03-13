@@ -6,6 +6,7 @@ import (
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 )
 
+// ConvertFromAdmin converts from admin API representation to public API
 func ConvertFromAdmin(oc *admin.OpenShiftManagedCluster, old *OpenShiftManagedCluster) (*OpenShiftManagedCluster, error) {
 	cs := &OpenShiftManagedCluster{}
 	if old != nil {
@@ -329,6 +330,9 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	}
 	if in.RegistryStorageAccount != nil {
 		out.RegistryStorageAccount = *in.RegistryStorageAccount
+	}
+	if in.AzureFileStorageAccount != nil {
+		out.AzureFileStorageAccount = *in.AzureFileStorageAccount
 	}
 	if in.Certificates != nil {
 		mergeCertificateConfig(in.Certificates, &out.Certificates)

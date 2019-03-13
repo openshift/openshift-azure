@@ -21,7 +21,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake]", func()
 		Expect(cli).ToNot(BeNil())
 	})
 
-	It("should create and validate test apps", func() {
+	It("should create and validate test apps [EndUser][Fake][Apps]", func() {
 		ctx := context.Background()
 		By("creating test app")
 		namespace, errs := cli.CreateTestApp(ctx)
@@ -36,7 +36,7 @@ var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake]", func()
 		Expect(errs).To(BeEmpty())
 	})
 
-	It("should validate the cluster", func() {
+	It("should validate the cluster [EndUser][Fake][Cluster]", func() {
 		errs := cli.ValidateCluster(context.Background())
 		Expect(errs).To(BeEmpty())
 	})

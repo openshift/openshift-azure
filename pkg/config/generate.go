@@ -371,6 +371,12 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		}
 	}
 
+	if len(c.AzureFileStorageAccount) == 0 {
+		if c.AzureFileStorageAccount, err = random.StorageAccountName(); err != nil {
+			return
+		}
+	}
+
 	if len(c.ConfigStorageAccount) == 0 {
 		if c.ConfigStorageAccount, err = random.StorageAccountName(); err != nil {
 			return

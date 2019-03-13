@@ -11,12 +11,14 @@ import (
 
 	. "github.com/onsi/ginkgo"
 
+	"github.com/Azure/go-autorest/autorest/to"
 	apiappsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	policy "k8s.io/api/policy/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -305,5 +307,90 @@ func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 			return fmt.Errorf("unexpected status code %d", resp.StatusCode)
 		}
 	}
+
+	return nil
+}
+
+func (sc *SanityChecker) checkCanUseAzureFileStorage(ctx context.Context) error {
+	namespace, err := sc.createProject(ctx)
+	if err != nil {
+		return err
+	}
+	defer sc.deleteProject(ctx, namespace)
+
+	pvcStorage, err := resource.ParseQuantity("2Gi")
+	if err != nil {
+		return err
+	}
+
+	pvcName := "azure-file"
+	storageClass := "azure-file"
+	By(fmt.Sprintf("Creating PVC %s in namespace %s", pvcName, namespace))
+	_, err = sc.Client.EndUser.CoreV1.PersistentVolumeClaims(namespace).Create(&corev1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: pvcName,
+		},
+		Spec: corev1.PersistentVolumeClaimSpec{
+			AccessModes: []corev1.PersistentVolumeAccessMode{
+				corev1.PersistentVolumeAccessMode("ReadWriteMany"),
+			},
+			StorageClassName: to.StringPtr(storageClass),
+			Resources: corev1.ResourceRequirements{
+				Requests: corev1.ResourceList{
+					corev1.ResourceStorage: pvcStorage,
+				},
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	By(fmt.Sprintf("Created PVC %s", pvcName))
+
+	podName := "busybox"
+	By("Creating a simple pod to run dd")
+	_, err = sc.Client.EndUser.CoreV1.Pods(namespace).Create(&corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: podName,
+		},
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name:  podName,
+					Image: podName,
+					Command: []string{
+						"/bin/dd",
+						"if=/dev/urandom",
+						fmt.Sprintf("of=/data/%s.bin", namespace),
+						"bs=1M",
+						"count=100",
+					},
+					VolumeMounts: []corev1.VolumeMount{
+						{
+							Name:      fmt.Sprintf("%s-vol", pvcName),
+							MountPath: "/data",
+							ReadOnly:  false,
+						},
+					},
+				},
+			},
+			Volumes: []corev1.Volume{
+				{
+					Name: fmt.Sprintf("%s-vol", pvcName),
+					VolumeSource: corev1.VolumeSource{
+						PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+							ClaimName: pvcName,
+						},
+					},
+				},
+			},
+			RestartPolicy: corev1.RestartPolicyNever,
+		},
+	})
+	By("Created pod")
+	By(fmt.Sprintf("Waiting for pod %s to finish", podName))
+	err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.PodHasPhase(sc.Client.Admin.CoreV1.Pods(namespace), podName, corev1.PodSucceeded))
+	By(fmt.Sprintf("Pod %s finished", podName))
+
 	return nil
 }
