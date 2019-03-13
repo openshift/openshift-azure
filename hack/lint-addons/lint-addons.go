@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
-	"github.com/pkg/errors"
 
 	"github.com/openshift/openshift-azure/pkg/addons"
 )
@@ -25,7 +24,7 @@ func run() error {
 
 	err := filepath.Walk("pkg/addons/data", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("failed walk file %s", path))
+			return err
 		}
 
 		if info.IsDir() {
@@ -34,24 +33,24 @@ func run() error {
 
 		b1, err := ioutil.ReadFile(path)
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("failed read file %s", path))
+			return err
 		}
 
 		u, err := addons.Unmarshal(b1)
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("failed unmarshal file %s", path))
+			return err
 		}
 
 		if err = addons.Clean(u); err != nil {
 			log.Print(path)
-			return errors.Wrap(err, fmt.Sprintf("failed clean file %s", path))
+			return err
 		}
 
 		addons.Default(u)
 
 		b2, err := yaml.Marshal(u.Object)
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("failed marshal file %s", path))
+			return err
 		}
 
 		if *dryRun {
@@ -60,7 +59,7 @@ func run() error {
 			}
 		} else {
 			if err = ioutil.WriteFile(path, b2, 0666); err != nil {
-				return errors.Wrap(err, fmt.Sprintf("failed writefile %s", path))
+				return err
 			}
 		}
 

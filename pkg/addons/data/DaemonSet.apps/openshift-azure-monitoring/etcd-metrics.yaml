@@ -24,7 +24,7 @@ spec:
         - -hostname
         - https://$(HOSTNAME):2379
         - -listen
-        - ":8443"
+        - :8443
         - -cacert
         - /etc/etcd/ca.crt
         - -cert
@@ -36,7 +36,7 @@ spec:
         - -servingcert
         - /var/serving-cert/tls.crt
         - -whitelist
-        - ^/metrics(/|$)
+        - /metrics(/|$)
         command:
         - /tlsproxy
         env:

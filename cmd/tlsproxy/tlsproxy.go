@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"flag"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -16,7 +15,6 @@ import (
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
-	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
@@ -46,47 +44,12 @@ type config struct {
 
 func (c *config) validate() []error {
 	var errs []error
-	// check variables
-	if *hostname != "" && !validate.IsValidURI(*hostname) {
+	if _, err := url.Parse(*hostname); err != nil {
 		return append(errs, errors.New("hostname is not a valid hostname"))
-	}
-	if !*insecure {
-		if *cacert == "" {
-			return append(errs, errors.New("cacert must be provided"))
-		}
-		if *cert == "" {
-			return append(errs, errors.New("cert must be provided"))
-		}
-		if *key == "" {
-			return append(errs, errors.New("key must be provided"))
-		}
-	}
-	if *servingkey == "" && *servingcert != "" ||
-		*servingkey != "" && *servingcert == "" {
-		return append(errs, errors.New("servingkey and servingcert must be provided for re-encrypt"))
 	}
 	if c.password == "" && c.username != "" ||
 		c.password != "" && c.username == "" {
-		return append(errs, errors.New("USERNAME and PASSWORD variables must be provided"))
-	}
-
-	// check files exist
-	if _, err := os.Stat(*cacert); os.IsNotExist(err) {
-		return append(errs, errors.New(fmt.Sprintf("file %s does not exist", *cacert)))
-	}
-	if _, err := os.Stat(*cert); os.IsNotExist(err) {
-		return append(errs, errors.New(fmt.Sprintf("file %s does not exist", *cert)))
-	}
-	if _, err := os.Stat(*key); os.IsNotExist(err) {
-		return append(errs, errors.New(fmt.Sprintf("file %s does not exist", *key)))
-	}
-	if *servingkey != "" && *servingcert != "" {
-		if _, err := os.Stat(*servingkey); os.IsNotExist(err) {
-			return append(errs, errors.New(fmt.Sprintf("file %s does not exist", *servingkey)))
-		}
-		if _, err := os.Stat(*servingcert); os.IsNotExist(err) {
-			return append(errs, errors.New(fmt.Sprintf("file %s does not exist", *servingcert)))
-		}
+		return append(errs, errors.New("both, USERNAME and PASSWORD, variables must be provided"))
 	}
 
 	return errs
@@ -102,7 +65,7 @@ func (c *config) Init() error {
 
 	// validate flags
 	if errs := c.validate(); len(errs) > 0 {
-		return errors.Wrap(kerrors.NewAggregate(errs), "cannot validate flags")
+		return errors.Wrap(kerrors.NewAggregate(errs), "validation failed")
 	}
 
 	// sanitize inputs
@@ -141,39 +104,26 @@ func (c *config) Init() error {
 	return nil
 }
 
-func usage() {
-	fmt.Printf("Usage:\n")
-	fmt.Printf("\"%s -hostname\" url to rewrite \n\n", os.Args[0])
-	flag.PrintDefaults()
-	os.Exit(1)
-}
-
 func (c *config) Run() error {
-	whitelist, err := regexp.Compile(*whitelist)
-	if err != nil {
-		return err
-	}
-
 	handlerFunc := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		req.URL.Scheme = c.redirectURL.Scheme
 		req.URL.Host = c.redirectURL.Host
 		req.RequestURI = ""
 		req.Host = ""
 
-		if !whitelist.MatchString(req.URL.String()) || req.Method != http.MethodGet {
+		if !c.whitelistRegexp.MatchString(req.URL.String()) || req.Method != http.MethodGet {
 			http.Error(rw, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 			return
 		}
 
 		// check authentication
 		if c.username != "" {
-			if !c.checkAuth(rw, req) {
+			if !c.authIsOK(rw, req) {
 				http.Error(rw, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 				return
 			}
 		}
 
-		c.log.Debug(req.URL.String())
 		resp, err := c.cli.Do(req)
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
@@ -196,15 +146,12 @@ func (c *config) Run() error {
 	return http.ListenAndServe(*listen, handlerFunc)
 }
 
-func (c *config) checkAuth(rw http.ResponseWriter, req *http.Request) bool {
-	if username, password, ok := req.BasicAuth(); ok {
-		return username == c.username && password == c.password
-	}
-	return false
+func (c *config) authIsOK(rw http.ResponseWriter, req *http.Request) bool {
+	username, password, _ := req.BasicAuth()
+	return username == c.username && password == c.password
 }
 
 func main() {
-	flag.Usage = usage
 	flag.Parse()
 
 	c := config{}

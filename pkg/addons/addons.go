@@ -189,8 +189,8 @@ var (
 	crdFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "apiextensions.k8s.io", Kind: "CustomResourceDefinition"}
 	}
-	// targeted filter is used to target specific CRDs, which are managed not by sync pod
-	targetedCrdFilter = func(o unstructured.Unstructured) bool {
+	// targeted filter is used to target specific CRD - ServiceMonitor, which are managed not by sync pod
+	monitoringCrdFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "monitoring.coreos.com", Kind: "ServiceMonitor"}
 	}
 	storageClassFilter = func(o unstructured.Unstructured) bool {
@@ -271,8 +271,8 @@ func writeDB(log *logrus.Entry, client Interface, db map[string]unstructured.Uns
 		return err
 	}
 
-	// write all post boostrap objects depending on targeted CRDs, managed by operators
-	return client.ApplyResources(targetedCrdFilter, db, keys)
+	// write all post boostrap objects depending on monitoring CRDs, managed by operators
+	return client.ApplyResources(monitoringCrdFilter, db, keys)
 }
 
 // Main loop

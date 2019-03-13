@@ -5,7 +5,7 @@ metadata:
     service.alpha.openshift.io/serving-cert-secret-name: etcd-metrics-serving-cert
   labels:
     k8s-app: etcd-metrics
-  name: etcd
+  name: etcd-metrics
   namespace: openshift-azure-monitoring
 spec:
   ports:

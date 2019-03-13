@@ -17,7 +17,7 @@ METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 STARTUP_IMAGE ?= quay.io/openshift-on-azure/startup:$(TAG)
 
-ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup
+ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup tlsproxy
 ALL_IMAGES = $(addsuffix -image, $(ALL_BINARIES))
 ALL_PUSHES = $(addsuffix -push, $(ALL_BINARIES))
 
