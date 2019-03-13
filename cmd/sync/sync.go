@@ -115,6 +115,8 @@ func main() {
 		log.Fatalf("Cannot initialize sync: %v", err)
 	}
 
+	t := time.NewTicker(*interval)
+
 	for {
 		gotBlob, err := s.sync(ctx, log)
 		if !gotBlob {
@@ -128,6 +130,6 @@ func main() {
 		if *once {
 			return
 		}
-		<-time.After(*interval)
+		<-t.C
 	}
 }
