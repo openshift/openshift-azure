@@ -25,7 +25,7 @@ genevaMetricsEndpoint: https://az-int.metrics.nsatc.net/
 imageOffer: osa
 imagePublisher: redhat
 imageSku: osa_311
-imageVersion: 311.82.20190222
+imageVersion: 311.82.20190311
 ## Change this for an address range using CIDR notation (e.g. 192.168.99.0/24); an IP address (e.g. 192.168.99.0);
 ## or a list of address ranges or IP addresses (e.g. 192.168.99.0/24,10.0.0.0/24,44.66.0.0/24)
 ## having access to system nodes: default (any ip address)
