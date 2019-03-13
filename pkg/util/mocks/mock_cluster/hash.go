@@ -51,16 +51,16 @@ func (mr *MockHasherMockRecorder) HashWorkerScaleSet(arg0, arg1 interface{}) *go
 }
 
 // HashMasterScaleSet mocks base method
-func (m *MockHasher) HashMasterScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
+func (m *MockHasher) HashMasterScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, instanceID int64) ([]byte, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HashMasterScaleSet", cs, app)
+	ret := m.ctrl.Call(m, "HashMasterScaleSet", cs, app, instanceID)
 	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // HashMasterScaleSet indicates an expected call of HashMasterScaleSet
-func (mr *MockHasherMockRecorder) HashMasterScaleSet(cs, app interface{}) *gomock.Call {
+func (mr *MockHasherMockRecorder) HashMasterScaleSet(cs, app, instanceID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HashMasterScaleSet", reflect.TypeOf((*MockHasher)(nil).HashMasterScaleSet), cs, app)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HashMasterScaleSet", reflect.TypeOf((*MockHasher)(nil).HashMasterScaleSet), cs, app, instanceID)
 }

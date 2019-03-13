@@ -18,7 +18,7 @@ import (
 
 type Hasher interface {
 	HashWorkerScaleSet(*api.OpenShiftManagedCluster, *api.AgentPoolProfile) ([]byte, error)
-	HashMasterScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error)
+	HashMasterScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, instanceID int64) ([]byte, error)
 }
 
 type hasher struct {
@@ -52,7 +52,7 @@ func (h *hasher) HashWorkerScaleSet(cs *api.OpenShiftManagedCluster, app *api.Ag
 }
 
 // HashMasterScaleSet returns the hash of a worker scale set
-func (h *hasher) HashMasterScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
+func (h *hasher) HashMasterScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, instanceID int64) ([]byte, error) {
 	hash := sha256.New()
 
 	vmss, err := h.vmss(cs, app)

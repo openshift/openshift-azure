@@ -80,11 +80,12 @@ func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		switch app.Role {
 		case api.AgentPoolProfileRoleMaster:
-			h, err := u.hasher.HashMasterScaleSet(cs, &app)
-			if err != nil {
-				return err
-			}
 			for i := int64(0); i < app.Count; i++ {
+				h, err := u.hasher.HashMasterScaleSet(cs, &app, i)
+				if err != nil {
+					return err
+				}
+
 				hostname := config.GetHostname(&app, suffix, i)
 				blob.HostnameHashes[hostname] = h
 			}

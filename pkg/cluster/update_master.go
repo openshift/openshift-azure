@@ -3,57 +3,38 @@ package cluster
 import (
 	"bytes"
 	"context"
-	"sort"
-	"strings"
+	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
 )
-
-func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob *updateblob.UpdateBlob, ssHash []byte) []compute.VirtualMachineScaleSetVM {
-	var oldVMs []compute.VirtualMachineScaleSetVM
-	for _, vm := range vms {
-		if !bytes.Equal(blob.HostnameHashes[*vm.Name], ssHash) {
-			oldVMs = append(oldVMs, vm)
-		} else {
-			u.log.Infof("skipping vm %q since it's already updated", *vm.Name)
-		}
-	}
-	return oldVMs
-}
 
 // UpdateMasterAgentPool updates one by one all the VMs of the master scale set,
 // in place.
 func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError {
 	ssName := config.MasterScalesetName
-	desiredHash, err := u.hasher.HashMasterScaleSet(cs, app)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashMasterScaleSet}
-	}
 
 	blob, err := u.updateBlobService.Read()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReadBlob}
 	}
 
-	vms, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, "", "", "")
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolListVMs}
-	}
+	for i := int64(0); i < app.Count; i++ {
+		desiredHash, err := u.hasher.HashMasterScaleSet(cs, app, i)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashMasterScaleSet}
+		}
 
-	// range our vms in order, so that if we previously crashed half-way through
-	// updating one and it is broken, we pick up where we left off.
-	sort.Slice(vms, func(i, j int) bool {
-		return *vms[i].VirtualMachineScaleSetVMProperties.OsProfile.ComputerName <
-			*vms[j].VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
-	})
+		hostname := config.GetHostname(app, "", i)
+		instanceID := fmt.Sprintf("%d", i)
 
-	vms = u.filterOldVMs(vms, blob, desiredHash)
-	for _, vm := range vms {
-		hostname := strings.ToLower(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		if bytes.Equal(blob.HostnameHashes[hostname], desiredHash) {
+			u.log.Infof("skipping vm %q since it's already updated", hostname)
+			continue
+		}
+
 		u.log.Infof("draining %s", hostname)
 		err = u.kubeclient.DeleteMaster(hostname)
 		if err != nil {
@@ -61,27 +42,27 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 		}
 
 		u.log.Infof("deallocating %s", hostname)
-		err = u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
+		err = u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, instanceID)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDeallocate}
 		}
 
 		u.log.Infof("updating %s", hostname)
 		err = u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
-			InstanceIds: &[]string{*vm.InstanceID},
+			InstanceIds: &[]string{instanceID},
 		})
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateVMs}
 		}
 
 		u.log.Infof("reimaging %s", hostname)
-		err = u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID, nil)
+		err = u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, instanceID, nil)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
 		}
 
 		u.log.Infof("starting %s", hostname)
-		err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
+		err = u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, instanceID)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolStart}
 		}
@@ -92,7 +73,7 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolWaitForReady}
 		}
 
-		blob.HostnameHashes[*vm.Name] = desiredHash
+		blob.HostnameHashes[hostname] = desiredHash
 		if err := u.updateBlobService.Write(blob); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateBlob}
 		}
