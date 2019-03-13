@@ -85,7 +85,7 @@ func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 		if app.Role == api.AgentPoolProfileRoleMaster {
 			for i := int64(0); i < app.Count; i++ {
 				name := config.GetMasterInstanceName(i)
-				blob.InstanceHashes[name] = h
+				blob.HostnameHashes[name] = h
 			}
 		} else {
 			blob.ScalesetHashes[config.GetScalesetName(&app, suffix)] = h

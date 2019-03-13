@@ -41,7 +41,7 @@ func TestFilterOldVMs(t *testing.T) {
 				},
 			},
 			blob: &updateblob.UpdateBlob{
-				InstanceHashes: updateblob.InstanceHashes{
+				HostnameHashes: updateblob.HostnameHashes{
 					"ss-master_0": []byte("newhash"),
 					"ss-master_1": []byte("oldhash"),
 					"ss-master_2": []byte("oldhash"),
@@ -71,7 +71,7 @@ func TestFilterOldVMs(t *testing.T) {
 				},
 			},
 			blob: &updateblob.UpdateBlob{
-				InstanceHashes: updateblob.InstanceHashes{
+				HostnameHashes: updateblob.HostnameHashes{
 					"ss-master_0": []byte("newhash"),
 					"ss-master_1": []byte("newhash"),
 					"ss-master_2": []byte("newhash"),
@@ -160,7 +160,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				hasher:            hasher,
 			}
 
-			instanceHashes := map[string][]byte{}
+			hostnameHashes := map[string][]byte{}
 
 			c := hasher.EXPECT().HashScaleSet(tt.cs, &tt.cs.Properties.AgentPoolProfiles[0]).Return([]byte("updated"), nil)
 			c = ubs.EXPECT().Read().Return(updateblob.NewUpdateBlob(), nil).After(c)
@@ -190,11 +190,11 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				c = kclient.EXPECT().WaitForReadyMaster(ctx, computerName).Return(nil).After(c)
 
 				// 7. write the updatehash
-				instanceHashes[*vm.Name] = []byte("updated")
+				hostnameHashes[*vm.Name] = []byte("updated")
 
 				uBlob := updateblob.NewUpdateBlob()
-				for k, v := range instanceHashes {
-					uBlob.InstanceHashes[k] = v
+				for k, v := range hostnameHashes {
+					uBlob.HostnameHashes[k] = v
 				}
 
 				c = ubs.EXPECT().Write(uBlob).Return(nil).After(c)

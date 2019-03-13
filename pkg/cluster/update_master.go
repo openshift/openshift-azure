@@ -16,7 +16,7 @@ import (
 func (u *simpleUpgrader) filterOldVMs(vms []compute.VirtualMachineScaleSetVM, blob *updateblob.UpdateBlob, ssHash []byte) []compute.VirtualMachineScaleSetVM {
 	var oldVMs []compute.VirtualMachineScaleSetVM
 	for _, vm := range vms {
-		if !bytes.Equal(blob.InstanceHashes[*vm.Name], ssHash) {
+		if !bytes.Equal(blob.HostnameHashes[*vm.Name], ssHash) {
 			oldVMs = append(oldVMs, vm)
 		} else {
 			u.log.Infof("skipping vm %q since it's already updated", *vm.Name)
@@ -92,7 +92,7 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolWaitForReady}
 		}
 
-		blob.InstanceHashes[*vm.Name] = desiredHash
+		blob.HostnameHashes[*vm.Name] = desiredHash
 		if err := u.updateBlobService.Write(blob); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateBlob}
 		}

@@ -79,7 +79,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake]", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		By("ensuring the update blob has the right amount of entries")
-		Expect(len(before.InstanceHashes)).To(BeEquivalentTo(3)) // one per master instance
+		Expect(len(before.HostnameHashes)).To(BeEquivalentTo(3)) // one per master instance
 		Expect(len(before.ScalesetHashes)).To(BeEquivalentTo(2)) // one per worker scaleset
 
 		By("running an update")

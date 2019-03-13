@@ -65,8 +65,8 @@ func (u *blobService) Read() (*UpdateBlob, error) {
 	if b.ScalesetHashes == nil {
 		b.ScalesetHashes = ScalesetHashes{}
 	}
-	if b.InstanceHashes == nil {
-		b.InstanceHashes = InstanceHashes{}
+	if b.HostnameHashes == nil {
+		b.HostnameHashes = HostnameHashes{}
 	}
 
 	return &b, nil

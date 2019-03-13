@@ -34,7 +34,7 @@ var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func
 		before, err := ubs.Read()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(before).NotTo(BeNil())
-		Expect(len(before.InstanceHashes)).To(BeEquivalentTo(3)) // one per master instance
+		Expect(len(before.HostnameHashes)).To(BeEquivalentTo(3)) // one per master instance
 		Expect(len(before.ScalesetHashes)).To(BeEquivalentTo(2)) // one per worker scaleset
 
 		By("Executing force update on the cluster.")
@@ -47,9 +47,9 @@ var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func
 		Expect(after).NotTo(BeNil())
 
 		By("Verifying that the instance hashes of the update blob are identical (masters)")
-		for key, val := range before.InstanceHashes {
-			Expect(after.InstanceHashes).To(HaveKey(key))
-			Expect(val).To(Equal(after.InstanceHashes[key]))
+		for key, val := range before.HostnameHashes {
+			Expect(after.HostnameHashes).To(HaveKey(key))
+			Expect(val).To(Equal(after.HostnameHashes[key]))
 		}
 
 		By("Verifying that the scaleset hashes of the update blob are different (workers)")
