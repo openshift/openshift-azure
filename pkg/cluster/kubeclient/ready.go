@@ -122,29 +122,29 @@ func (u *kubeclient) WaitForInfraServices(ctx context.Context) *api.PluginError 
 	return nil
 }
 
-func (u *kubeclient) WaitForReadyMaster(ctx context.Context, computerName ComputerName) error {
-	return wait.PollImmediateUntil(time.Second, func() (bool, error) { return u.masterIsReady(computerName) }, ctx.Done())
+func (u *kubeclient) WaitForReadyMaster(ctx context.Context, hostname ComputerName) error {
+	return wait.PollImmediateUntil(time.Second, func() (bool, error) { return u.masterIsReady(hostname) }, ctx.Done())
 }
 
-func (u *kubeclient) masterIsReady(computerName ComputerName) (bool, error) {
-	r, err := ready.NodeIsReady(u.client.CoreV1().Nodes(), computerName.toKubernetes())()
+func (u *kubeclient) masterIsReady(hostname ComputerName) (bool, error) {
+	r, err := ready.NodeIsReady(u.client.CoreV1().Nodes(), hostname.toKubernetes())()
 	if !r || err != nil {
 		return r, err
 	}
 
-	r, err = ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "master-etcd-"+computerName.toKubernetes())()
+	r, err = ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "master-etcd-"+hostname.toKubernetes())()
 	if !r || err != nil {
 		return r, err
 	}
 
-	r, err = ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "master-api-"+computerName.toKubernetes())()
+	r, err = ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "master-api-"+hostname.toKubernetes())()
 	if !r || err != nil {
 		return r, err
 	}
 
-	return ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "controllers-"+computerName.toKubernetes())()
+	return ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "controllers-"+hostname.toKubernetes())()
 }
 
-func (u *kubeclient) WaitForReadyWorker(ctx context.Context, computerName ComputerName) error {
-	return wait.PollImmediateUntil(time.Second, ready.NodeIsReady(u.client.CoreV1().Nodes(), computerName.toKubernetes()), ctx.Done())
+func (u *kubeclient) WaitForReadyWorker(ctx context.Context, hostname ComputerName) error {
+	return wait.PollImmediateUntil(time.Second, ready.NodeIsReady(u.client.CoreV1().Nodes(), hostname.toKubernetes()), ctx.Done())
 }

@@ -53,20 +53,20 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 
 	vms = u.filterOldVMs(vms, blob, desiredHash)
 	for _, vm := range vms {
-		computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		u.log.Infof("draining %s", computerName)
-		err = u.kubeclient.DeleteMaster(computerName)
+		hostname := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		u.log.Infof("draining %s", hostname)
+		err = u.kubeclient.DeleteMaster(hostname)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDrain}
 		}
 
-		u.log.Infof("deallocating %s", *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+		u.log.Infof("deallocating %s", hostname)
 		err = u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDeallocate}
 		}
 
-		u.log.Infof("updating %s", computerName)
+		u.log.Infof("updating %s", hostname)
 		err = u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
 			InstanceIds: &[]string{*vm.InstanceID},
 		})
@@ -74,20 +74,20 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateVMs}
 		}
 
-		u.log.Infof("reimaging %s", computerName)
+		u.log.Infof("reimaging %s", hostname)
 		err = u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID, nil)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
 		}
 
-		u.log.Infof("starting %s", computerName)
+		u.log.Infof("starting %s", hostname)
 		err := u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, *vm.InstanceID)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolStart}
 		}
 
-		u.log.Infof("waiting for %s to be ready", computerName)
-		err = u.kubeclient.WaitForReadyMaster(ctx, computerName)
+		u.log.Infof("waiting for %s to be ready", hostname)
+		err = u.kubeclient.WaitForReadyMaster(ctx, hostname)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolWaitForReady}
 		}

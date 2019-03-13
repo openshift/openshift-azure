@@ -167,10 +167,10 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			c = vmc.EXPECT().List(ctx, tt.cs.Properties.AzProfile.ResourceGroup, "ss-master", "", "", "").Return(tt.vms, nil).After(c)
 
 			for _, vm := range tt.vms {
-				computerName := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
+				hostname := kubeclient.ComputerName(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 
 				// 1. drain
-				c = kclient.EXPECT().DeleteMaster(computerName).Return(nil).After(c)
+				c = kclient.EXPECT().DeleteMaster(hostname).Return(nil).After(c)
 
 				// 2. deallocate
 				c = vmc.EXPECT().Deallocate(ctx, tt.cs.Properties.AzProfile.ResourceGroup, "ss-master", *vm.InstanceID).Return(nil).After(c)
@@ -187,7 +187,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				c = vmc.EXPECT().Start(ctx, tt.cs.Properties.AzProfile.ResourceGroup, "ss-master", *vm.InstanceID).Return(nil).After(c)
 
 				// 6. waitforready
-				c = kclient.EXPECT().WaitForReadyMaster(ctx, computerName).Return(nil).After(c)
+				c = kclient.EXPECT().WaitForReadyMaster(ctx, hostname).Return(nil).After(c)
 
 				// 7. write the updatehash
 				hostnameHashes[*vm.Name] = []byte("updated")

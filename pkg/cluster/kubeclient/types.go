@@ -20,12 +20,12 @@ import (
 // Kubeclient interface to utility kubenetes functions
 type Kubeclient interface {
 	BackupCluster(ctx context.Context, backupName string) error
-	DrainAndDeleteWorker(ctx context.Context, computerName ComputerName) error
-	DeleteMaster(computerName ComputerName) error
+	DrainAndDeleteWorker(ctx context.Context, hostname ComputerName) error
+	DeleteMaster(hostname ComputerName) error
 	GetControlPlanePods(ctx context.Context) ([]corev1.Pod, error)
 	WaitForInfraServices(ctx context.Context) *api.PluginError
-	WaitForReadyMaster(ctx context.Context, computerName ComputerName) error
-	WaitForReadyWorker(ctx context.Context, computerName ComputerName) error
+	WaitForReadyMaster(ctx context.Context, hostname ComputerName) error
+	WaitForReadyWorker(ctx context.Context, hostname ComputerName) error
 }
 
 type kubeclient struct {
@@ -37,6 +37,6 @@ var _ Kubeclient = &kubeclient{}
 
 type ComputerName string
 
-func (computerName ComputerName) toKubernetes() string {
-	return strings.ToLower(string(computerName))
+func (hostname ComputerName) toKubernetes() string {
+	return strings.ToLower(string(hostname))
 }

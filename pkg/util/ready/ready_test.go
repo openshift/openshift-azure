@@ -56,24 +56,24 @@ func TestIsPodReady(t *testing.T) {
 
 func TestNodeIsReady(t *testing.T) {
 	tests := []struct {
-		name         string
-		kc           *fake.Clientset
-		computerName string
-		want         bool
-		wantErr      bool
+		name     string
+		kc       *fake.Clientset
+		hostname string
+		want     bool
+		wantErr  bool
 	}{
 		{
-			name:         "not found",
-			computerName: "master-000000",
-			wantErr:      false,
-			want:         false,
-			kc:           fake.NewSimpleClientset(),
+			name:     "not found",
+			hostname: "master-000000",
+			wantErr:  false,
+			want:     false,
+			kc:       fake.NewSimpleClientset(),
 		},
 		{
-			name:         "not ready",
-			computerName: "master-000000",
-			wantErr:      false,
-			want:         false,
+			name:     "not ready",
+			hostname: "master-000000",
+			wantErr:  false,
+			want:     false,
 			kc: fake.NewSimpleClientset(&corev1.Node{
 				TypeMeta: metav1.TypeMeta{
 					Kind: "node",
@@ -84,10 +84,10 @@ func TestNodeIsReady(t *testing.T) {
 			}),
 		},
 		{
-			name:         "ready",
-			computerName: "master-00000a",
-			wantErr:      false,
-			want:         true,
+			name:     "ready",
+			hostname: "master-00000a",
+			wantErr:  false,
+			want:     true,
 			kc: fake.NewSimpleClientset(&corev1.Node{
 				TypeMeta: metav1.TypeMeta{
 					Kind: "node",
@@ -107,7 +107,7 @@ func TestNodeIsReady(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got, err := NodeIsReady(tt.kc.CoreV1().Nodes(), tt.computerName)()
+		got, err := NodeIsReady(tt.kc.CoreV1().Nodes(), tt.hostname)()
 		if (err != nil) != tt.wantErr {
 			t.Errorf("nodeIsReady() error = %v, wantErr %v", err, tt.wantErr)
 			return

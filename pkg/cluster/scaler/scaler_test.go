@@ -102,8 +102,8 @@ func TestScaleUp(t *testing.T) {
 
 				for i, vm := range tt.vmsAfter {
 					if i >= len(tt.vmsBefore) {
-						computerName := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
-						c = kc.EXPECT().WaitForReadyWorker(ctx, kubeclient.ComputerName(computerName)).Return(nil).After(c)
+						hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
+						c = kc.EXPECT().WaitForReadyWorker(ctx, kubeclient.ComputerName(hostname)).Return(nil).After(c)
 					}
 				}
 			}
@@ -213,8 +213,8 @@ func TestScaleDown(t *testing.T) {
 
 				for i, vm := range tt.vmsBefore {
 					if i >= len(tt.vmsAfter) {
-						computerName := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
-						c = kc.EXPECT().DrainAndDeleteWorker(ctx, kubeclient.ComputerName(computerName)).Return(nil).After(c)
+						hostname := *vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName
+						c = kc.EXPECT().DrainAndDeleteWorker(ctx, kubeclient.ComputerName(hostname)).Return(nil).After(c)
 						c = vmc.EXPECT().Delete(ctx, testRg, testSS, *vm.InstanceID).Return(nil).After(c)
 					}
 				}

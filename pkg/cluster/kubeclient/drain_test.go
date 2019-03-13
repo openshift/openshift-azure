@@ -14,21 +14,21 @@ func TestDrainAndDeleteWorker(t *testing.T) {
 	tests := []struct {
 		name            string
 		kubeclient      *fake.Clientset
-		computerName    ComputerName
+		hostname        ComputerName
 		wantErr         error
 		expectedActions [][]string
 	}{
 		{
-			name:         "compute-empty",
-			computerName: "compute-000000",
+			name:     "compute-empty",
+			hostname: "compute-000000",
 			expectedActions: [][]string{
 				{"get", "nodes"},
 			},
 			kubeclient: fake.NewSimpleClientset(),
 		},
 		{
-			name:         "compute-no-pods",
-			computerName: "compute-000000",
+			name:     "compute-no-pods",
+			hostname: "compute-000000",
 			expectedActions: [][]string{
 				{"get", "nodes"},
 				{"update", "nodes"},
@@ -42,8 +42,8 @@ func TestDrainAndDeleteWorker(t *testing.T) {
 			}),
 		},
 		{
-			name:         "compute-with-a-pod",
-			computerName: "kubernetes",
+			name:     "compute-with-a-pod",
+			hostname: "kubernetes",
 			expectedActions: [][]string{
 				{"get", "nodes"},
 				{"update", "nodes"},
@@ -68,7 +68,7 @@ func TestDrainAndDeleteWorker(t *testing.T) {
 			client: tt.kubeclient,
 			log:    logrus.NewEntry(logrus.StandardLogger()),
 		}
-		if err := u.DrainAndDeleteWorker(context.Background(), tt.computerName); err != tt.wantErr {
+		if err := u.DrainAndDeleteWorker(context.Background(), tt.hostname); err != tt.wantErr {
 			t.Errorf("[%v] simpleUpgrader.drain() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
 		actions := tt.kubeclient.Actions()
