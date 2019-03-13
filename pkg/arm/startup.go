@@ -13,12 +13,13 @@ import (
 
 func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, hostname, domainname string) error {
 	for _, templateFileName := range AssetNames() {
-		if hostname != "master-000000" && templateFileName == "etc/origin/node/pods/sync.yaml" {
+		switch {
+		case templateFileName == "etc/origin/node/pods/sync.yaml" && hostname != "master-000000",
+			templateFileName == "master-startup.sh",
+			templateFileName == "node-startup.sh":
 			continue
 		}
-		if templateFileName == "master-startup.sh" || templateFileName == "node-startup.sh" {
-			continue
-		}
+
 		log.Debugf("processing template %s", templateFileName)
 		templateFile, err := Asset(templateFileName)
 		if err != nil {
@@ -32,17 +33,23 @@ func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, hos
 		if err != nil {
 			return err
 		}
+
 		destination := "/" + templateFileName
+
 		parentDir := path.Dir(destination)
 		err = os.MkdirAll(parentDir, 0755)
 		if err != nil {
 			return err
 		}
-		var perm os.FileMode = 0666
-		if path.Ext(destination) == ".key" ||
-			path.Ext(destination) == ".kubeconfig" ||
-			path.Base(destination) == "session-secrets.yaml" {
+
+		var perm os.FileMode
+		switch {
+		case path.Ext(destination) == ".key",
+			path.Ext(destination) == ".kubeconfig",
+			path.Base(destination) == "session-secrets.yaml":
 			perm = 0600
+		default:
+			perm = 0644
 		}
 
 		err = ioutil.WriteFile(destination, b, perm)
@@ -50,5 +57,6 @@ func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, hos
 			return err
 		}
 	}
+
 	return nil
 }
