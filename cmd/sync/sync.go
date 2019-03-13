@@ -93,20 +93,12 @@ func (s *sync) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, error
 	return cs, nil
 }
 
-func main() {
-	flag.Parse()
-	logger := logrus.New()
-	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
-	logger.SetLevel(log.SanitizeLogLevel(*logLevel))
-	log := logrus.NewEntry(logger)
-	log.Printf("sync pod starting, git commit %s", gitCommit)
-
-	s := new(sync)
-	ctx := context.Background()
+func run(ctx context.Context, log *logrus.Entry) error {
+	var s sync
 
 	err := s.init(ctx, log)
 	if err != nil {
-		log.Fatalf("Cannot initialize sync: %v", err)
+		return err
 	}
 
 	t := time.NewTicker(*interval)
@@ -117,20 +109,33 @@ func main() {
 		if err == nil {
 			break
 		}
-		log.Printf("Error while accessing config blob: %v", err)
+		log.Printf("s.getBlob: %s", err)
 		<-t.C
 	}
 
 	for {
-		s.log.Print("Sync process started")
+		s.log.Print("starting sync")
 		if err := addons.Main(ctx, s.log, cs, *dryRun); err != nil {
-			log.Printf("Error while syncing: %v", err)
+			log.Printf("sync error: %s", err)
 		} else {
-			s.log.Print("Sync process complete")
+			s.log.Print("sync done")
 		}
 		if *once {
-			return
+			return nil
 		}
 		<-t.C
+	}
+}
+
+func main() {
+	flag.Parse()
+	logger := logrus.New()
+	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
+	logger.SetLevel(log.SanitizeLogLevel(*logLevel))
+	log := logrus.NewEntry(logger)
+	log.Printf("sync pod starting, git commit %s", gitCommit)
+
+	if err := run(context.Background(), log); err != nil {
+		log.Fatal(err)
 	}
 }
