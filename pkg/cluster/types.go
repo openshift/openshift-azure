@@ -75,7 +75,7 @@ func NewSimpleUpgrader(log *logrus.Entry, testConfig api.TestConfig) Upgrader {
 		testConfig:    testConfig,
 		log:           log,
 		scalerFactory: scaler.NewFactory(),
-		hasher:        &hasher{testConfig: testConfig},
+		hasher:        &hasher{log: log, testConfig: testConfig},
 	}
 }
 

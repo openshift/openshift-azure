@@ -11,9 +11,12 @@ import (
 	"encoding/json"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
+	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
+	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/util/writers"
 )
 
 type Hasher interface {
@@ -22,6 +25,7 @@ type Hasher interface {
 }
 
 type hasher struct {
+	log        *logrus.Entry
 	testConfig api.TestConfig
 }
 
@@ -61,6 +65,11 @@ func (h *hasher) HashMasterScaleSet(cs *api.OpenShiftManagedCluster, app *api.Ag
 	}
 
 	err = json.NewEncoder(hash).Encode(vmss)
+	if err != nil {
+		return nil, err
+	}
+
+	err = arm.WriteStartupFiles(h.log, cs, writers.NewTarWriter(hash), config.GetHostname(app, "", instanceID), "")
 	if err != nil {
 		return nil, err
 	}
