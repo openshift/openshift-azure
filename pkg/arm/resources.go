@@ -472,7 +472,7 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 			},
 			VirtualMachineProfile: &compute.VirtualMachineScaleSetVMProfile{
 				OsProfile: &compute.VirtualMachineScaleSetOSProfile{
-					ComputerNamePrefix: to.StringPtr(config.GetComputerNamePrefix(app, suffix)),
+					ComputerNamePrefix: to.StringPtr(config.GetHostnamePrefix(app, suffix)),
 					AdminUsername:      to.StringPtr(vmssAdminUsername),
 					LinuxConfiguration: &compute.LinuxConfiguration{
 						DisablePasswordAuthentication: to.BoolPtr(true),

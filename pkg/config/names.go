@@ -19,9 +19,9 @@ func GetScalesetName(app *api.AgentPoolProfile, suffix string) string {
 	return "ss-" + app.Name + "-" + suffix
 }
 
-// GetComputerNamePrefix returns the computer name prefix for a given
+// GetHostnamePrefix returns the computer name prefix for a given
 // AgentPoolProfile
-func GetComputerNamePrefix(app *api.AgentPoolProfile, suffix string) string {
+func GetHostnamePrefix(app *api.AgentPoolProfile, suffix string) string {
 	if app.Role == api.AgentPoolProfileRoleMaster {
 		return app.Name + "-"
 	}
@@ -30,7 +30,7 @@ func GetComputerNamePrefix(app *api.AgentPoolProfile, suffix string) string {
 
 // GetHostname returns the hostname of a given instance in an AgentPoolProfile
 func GetHostname(app *api.AgentPoolProfile, suffix string, instance int64) string {
-	return GetComputerNamePrefix(app, suffix) + fmt.Sprintf("%06s", strconv.FormatInt(instance, 36))
+	return GetHostnamePrefix(app, suffix) + fmt.Sprintf("%06s", strconv.FormatInt(instance, 36))
 }
 
 // GetScaleSetNameAndInstanceID parses a hostname, e.g. master-000000 or
