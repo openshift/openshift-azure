@@ -1,7 +1,6 @@
 package arm
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 
@@ -9,9 +8,10 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/template"
+	"github.com/openshift/openshift-azure/pkg/util/writers"
 )
 
-func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, hostname, domainname string) error {
+func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, w writers.Writer, hostname, domainname string) error {
 	for _, templateFileName := range AssetNames() {
 		switch {
 		case templateFileName == "etc/origin/node/pods/sync.yaml" && hostname != "master-000000",
@@ -37,7 +37,7 @@ func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, hos
 		destination := "/" + templateFileName
 
 		parentDir := path.Dir(destination)
-		err = os.MkdirAll(parentDir, 0755)
+		err = w.MkdirAll(parentDir, 0755)
 		if err != nil {
 			return err
 		}
@@ -52,7 +52,7 @@ func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, hos
 			perm = 0644
 		}
 
-		err = ioutil.WriteFile(destination, b, perm)
+		err = w.WriteFile(destination, b, perm)
 		if err != nil {
 			return err
 		}

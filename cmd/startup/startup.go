@@ -21,6 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
+	"github.com/openshift/openshift-azure/pkg/util/writers"
 )
 
 var (
@@ -81,7 +82,7 @@ func (s *startup) run(ctx context.Context) error {
 	cname, _ := net.LookupCNAME(hostname)
 	domainname := strings.SplitN(strings.TrimSuffix(cname, "."), ".", 2)[1]
 
-	if err := arm.WriteTemplatedFiles(s.log, s.cs, hostname, domainname); err != nil {
+	if err := arm.WriteTemplatedFiles(s.log, s.cs, writers.NewFilesystemWriter(), hostname, domainname); err != nil {
 		return errors.Wrap(err, "writeTemplatedFiles")
 	}
 
