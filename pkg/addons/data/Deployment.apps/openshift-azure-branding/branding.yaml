@@ -19,6 +19,16 @@ spec:
       labels:
         app: branding
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - openshift-azure-branding
+            topologyKey: kubernetes.io/hostname
       containers:
       - image: '*** GENERATED ***'
         name: branding
