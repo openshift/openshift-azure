@@ -23,8 +23,12 @@ func internalPluginConfig() Config {
 	// this is the expected internal equivalent to
 	// internal API Config
 	return Config{
-
 		PluginVersion: "PluginVersion",
+		ComponentLogLevel: ComponentLogLevel{
+			APIServer:         1,
+			ControllerManager: 1,
+			Node:              1,
+		},
 		// generic Offering configuration
 		ImageOffer:               "ImageOffer",
 		ImagePublisher:           "ImagePublisher",

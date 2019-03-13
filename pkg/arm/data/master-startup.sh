@@ -43,9 +43,7 @@ fi
 
 echo "BOOTSTRAP_CONFIG_NAME=node-config-master" >>/etc/sysconfig/${SERVICE_TYPE}-node
 
-{{- if $.Extra.TestConfig.RunningUnderTest }}
-sed -i -e "s#DEBUG_LOGLEVEL=2#DEBUG_LOGLEVEL=4#" /etc/sysconfig/${SERVICE_TYPE}-node
-{{- end }}
+sed -i -e "s#DEBUG_LOGLEVEL=.*#DEBUG_LOGLEVEL={{ .Config.ComponentLogLevel.Node }}#" /etc/sysconfig/${SERVICE_TYPE}-node
 
 for dst in tcp,8444; do
 	proto=${dst%%,*}

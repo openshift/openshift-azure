@@ -77,6 +77,11 @@ var marshalled = []byte(`{
 	},
 	"config": {
 		"pluginVersion": "Config.PluginVersion",
+		"componentLogLevel": {
+			"apiServer": 1,
+			"controllerManager": 1,
+			"node": 1
+		},
 		"imageOffer": "Config.ImageOffer",
 		"imagePublisher": "Config.ImagePublisher",
 		"imageSku": "Config.ImageSKU",

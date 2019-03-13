@@ -268,6 +268,20 @@ func TestConvertFromAdmin(t *testing.T) {
 				expectedCs.Config.Certificates.OpenShiftConsole.Cert = dummyCA
 			},
 		},
+		{
+			name: "loglevel update",
+			input: &admin.OpenShiftManagedCluster{
+				Config: &admin.Config{
+					ComponentLogLevel: &admin.ComponentLogLevel{
+						Node: to.IntPtr(2),
+					},
+				},
+			},
+			base: internalManagedClusterAdmin(),
+			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
+				expectedCs.Config.ComponentLogLevel.Node = 2
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -285,5 +299,17 @@ func TestConvertFromAdmin(t *testing.T) {
 				t.Errorf("%s: unexpected diff %s", test.name, deep.Equal(output, expected))
 			}
 		}
+	}
+}
+
+func TestRoundTripAdmin(t *testing.T) {
+	start := adminManagedCluster()
+	internal, err := ConvertFromAdmin(start, nil)
+	if err != nil {
+		t.Error(err)
+	}
+	end := ConvertToAdmin(internal)
+	if !reflect.DeepEqual(start, end) {
+		t.Errorf("unexpected diff %s", deep.Equal(start, end))
 	}
 }

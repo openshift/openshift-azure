@@ -12,6 +12,9 @@ func ConvertFromPlugin(in *plugin.Config, old *Config) *Config {
 		cs = old.DeepCopy()
 	}
 	cs.PluginVersion = in.PluginVersion
+	cs.ComponentLogLevel.APIServer = in.ComponentLogLevel.APIServer
+	cs.ComponentLogLevel.ControllerManager = in.ComponentLogLevel.ControllerManager
+	cs.ComponentLogLevel.Node = in.ComponentLogLevel.Node
 	// Generic offering configurables
 	cs.ImageOffer = in.ImageOffer
 	cs.ImagePublisher = in.ImagePublisher

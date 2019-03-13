@@ -39,7 +39,6 @@ type startup struct {
 }
 
 func (s *startup) writeTemplatedFiles() error {
-	tc := api.TestConfig{RunningUnderTest: s.cs.Config.RunningUnderTest}
 	hostname, _ := os.Hostname()
 	cname, _ := net.LookupCNAME(hostname)
 	domainname := strings.SplitN(strings.TrimSuffix(cname, "."), ".", 2)[1]
@@ -60,7 +59,6 @@ func (s *startup) writeTemplatedFiles() error {
 		b, err := template.Template(string(templateFile), nil, s.cs, map[string]interface{}{
 			"Hostname":    hostname,
 			"DNSHostname": domainname,
-			"TestConfig":  tc,
 		})
 		if err != nil {
 			return errors.Wrapf(err, "Template(%s)", templateFileName)

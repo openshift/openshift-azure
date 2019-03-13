@@ -13,6 +13,11 @@
   #  cert: <Geveva metrics certificate value. Format: Base64 in YAML, x509.Certificate struct>
 ## Geneva integration other details
 pluginVersion: v0.0
+## Openshift component logging levels
+componentLogLevel:
+  apiServer: 2
+  controllerManager: 2
+  node: 2
 genevaLoggingAccount: ccpopenshiftdiag
 genevaLoggingControlPlaneAccount: RPOpenShiftAccount
 genevaLoggingControlPlaneEnvironment: Test

@@ -13,7 +13,7 @@ import (
 func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster, old *OpenShiftManagedCluster) (*OpenShiftManagedCluster, error) {
 	cs := &OpenShiftManagedCluster{}
 	if old != nil {
-		cs = old
+		cs = old.DeepCopy()
 	}
 	if oc.ID != nil {
 		cs.ID = *oc.ID

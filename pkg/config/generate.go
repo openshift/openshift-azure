@@ -17,7 +17,16 @@ import (
 )
 
 func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pluginapi.Config) (err error) {
+	cll := cs.Config.ComponentLogLevel
+
 	config := api.ConvertFromPlugin(template, &cs.Config)
+
+	// HACK: only set ComponentLogLevel at cluster creation, don't let
+	// ConvertFromPlugin override it.  This will be done properly in the future.
+	if cs.Config.Certificates.Ca.Cert != nil { // HACK: we're not a new cluster
+		config.ComponentLogLevel = cll
+	}
+
 	cs.Config = *config
 	c := &cs.Config
 
