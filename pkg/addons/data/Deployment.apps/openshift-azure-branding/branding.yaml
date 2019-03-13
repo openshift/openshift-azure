@@ -6,7 +6,7 @@ metadata:
   name: branding
   namespace: openshift-azure-branding
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: branding
