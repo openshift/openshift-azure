@@ -271,19 +271,19 @@ func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 	}{
 		{
 			url:  "https://" + sc.cs.Properties.PublicHostname + "/healthz",
-			cert: sc.cs.Config.Certificates.OpenShiftConsole.Cert,
+			cert: sc.cs.Config.Certificates.OpenShiftConsole.Certs[len(sc.cs.Config.Certificates.OpenShiftConsole.Certs)-1],
 		},
 		{
 			url:  "https://console." + sc.cs.Properties.RouterProfiles[0].PublicSubdomain + "/health",
-			cert: sc.cs.Config.Certificates.Router.Cert,
+			cert: sc.cs.Config.Certificates.Router.Certs[len(sc.cs.Config.Certificates.Router.Certs)-1],
 		},
 		{
 			url:  "https://docker-registry." + sc.cs.Properties.RouterProfiles[0].PublicSubdomain + "/healthz",
-			cert: sc.cs.Config.Certificates.Router.Cert,
+			cert: sc.cs.Config.Certificates.Router.Certs[len(sc.cs.Config.Certificates.Router.Certs)-1],
 		},
 		{
 			url:  "https://registry-console." + sc.cs.Properties.RouterProfiles[0].PublicSubdomain + "/ping",
-			cert: sc.cs.Config.Certificates.Router.Cert,
+			cert: sc.cs.Config.Certificates.Router.Certs[len(sc.cs.Config.Certificates.Router.Certs)-1],
 		},
 	} {
 		pool := x509.NewCertPool()

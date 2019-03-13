@@ -295,8 +295,8 @@ func TestUnmarshal(t *testing.T) {
 	populatedOc := OpenShiftManagedCluster{}
 	populate.Walk(&populatedOc, prepare)
 
-	populatedOc.Config.Certificates.OpenShiftConsole = CertKeyPair{}
-	populatedOc.Config.Certificates.Router = CertKeyPair{}
+	populatedOc.Config.Certificates.OpenShiftConsole = CertKeyPairChain{}
+	populatedOc.Config.Certificates.Router = CertKeyPairChain{}
 
 	var unmarshalledOc OpenShiftManagedCluster
 	err := json.Unmarshal(marshalled, &unmarshalledOc)

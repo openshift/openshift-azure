@@ -606,7 +606,7 @@ var Translations = map[string][]struct {
 	"Secret/default/router-certs": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),
-			Template: "{{ String (CertAsBytes .Config.Certificates.Router.Cert) }}\n{{ String (CertAsBytes .Config.Certificates.Ca.Cert) }}\n{{ String (PrivateKeyAsBytes .Config.Certificates.Router.Key) }}",
+			Template: "{{ String (CertChainAsBytes .Config.Certificates.Router.Certs) }}\n{{ String (PrivateKeyAsBytes .Config.Certificates.Router.Key) }}",
 		},
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.key'"),
@@ -667,7 +667,7 @@ var Translations = map[string][]struct {
 	"Secret/openshift-console/apiserver-cert": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'tls.crt'"),
-			Template: "{{ String (CertAsBytes .Config.Certificates.OpenShiftConsole.Cert) }}",
+			Template: "{{ String (CertChainAsBytes .Config.Certificates.OpenShiftConsole.Certs) }}",
 		},
 	},
 	"Secret/openshift-console/console-oauth-config": {

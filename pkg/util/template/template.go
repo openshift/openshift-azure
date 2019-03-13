@@ -17,6 +17,7 @@ import (
 func Template(tmpl string, f template.FuncMap, cs *api.OpenShiftManagedCluster, extra interface{}) ([]byte, error) {
 	t, err := template.New("").Funcs(template.FuncMap{
 		"CertAsBytes":       tls.CertAsBytes,
+		"CertChainAsBytes":  tls.CertChainAsBytes,
 		"PrivateKeyAsBytes": tls.PrivateKeyAsBytes,
 		"PublicKeyAsBytes":  tls.PublicKeyAsBytes,
 		"YamlMarshal":       yaml.Marshal,

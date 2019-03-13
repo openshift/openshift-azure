@@ -1,6 +1,7 @@
 package api
 
 import (
+	"crypto/x509"
 	"errors"
 	"reflect"
 	"testing"
@@ -257,15 +258,15 @@ func TestConvertFromAdmin(t *testing.T) {
 			input: &admin.OpenShiftManagedCluster{
 				Config: &admin.Config{
 					Certificates: &admin.CertificateConfig{
-						OpenShiftConsole: &admin.Certificate{
-							Cert: dummyCA,
+						OpenShiftConsole: &admin.CertificateChain{
+							Certs: []*x509.Certificate{dummyCA},
 						},
 					},
 				},
 			},
 			base: internalManagedClusterAdmin(),
 			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
-				expectedCs.Config.Certificates.OpenShiftConsole.Cert = dummyCA
+				expectedCs.Config.Certificates.OpenShiftConsole.Certs = []*x509.Certificate{dummyCA}
 			},
 		},
 		{

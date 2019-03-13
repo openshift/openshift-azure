@@ -49,9 +49,8 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 		// suitable for a hash.  References:
 		// https://stackoverflow.com/a/14233140,
 		// https://crypto.stackexchange.com/a/46572.
-
-		data = append(data, cs.Config.Certificates.OpenShiftConsole.Cert.Raw...)
-		data = append(data, cs.Config.Certificates.Router.Cert.Raw...)
+		data = append(data, cs.Config.Certificates.OpenShiftConsole.Certs[0].Raw...)
+		data = append(data, cs.Config.Certificates.Router.Certs[0].Raw...)
 	}
 
 	hf := sha256.New()

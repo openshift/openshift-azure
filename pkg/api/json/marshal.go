@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"k8s.io/client-go/tools/clientcmd/api/v1"
+	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/tls"
 )
@@ -19,7 +19,7 @@ func makeShadowStruct(v reflect.Value) reflect.Value {
 	for i := 0; i < v.NumField(); i++ {
 		f := v.Type().Field(i)
 		switch f.Type.String() {
-		case "*rsa.PrivateKey", "*v1.Config", "*x509.Certificate":
+		case "*rsa.PrivateKey", "*v1.Config", "*x509.Certificate", "[]*x509.Certificate":
 			f.Type = reflect.TypeOf(json.RawMessage{})
 		}
 		fields = append(fields, f)
@@ -76,6 +76,23 @@ func MarshalJSON(v reflect.Value) ([]byte, error) {
 			}
 
 			b, err := tls.CertAsBytes(v)
+			if err != nil {
+				return nil, err
+			}
+
+			b, err = json.Marshal(b)
+			if err != nil {
+				return nil, err
+			}
+
+			shadow.Field(i).Set(reflect.ValueOf(b))
+
+		case []*x509.Certificate:
+			if v == nil {
+				continue
+			}
+
+			b, err := tls.CertChainAsBytes(v)
 			if err != nil {
 				return nil, err
 			}
@@ -157,6 +174,24 @@ func UnmarshalJSON(v reflect.Value, b []byte) error {
 			}
 
 			cert, err := tls.ParseCert(b)
+			if err != nil {
+				return err
+			}
+
+			v.Field(i).Set(reflect.ValueOf(cert))
+
+		case []*x509.Certificate:
+			if len(shadow.Field(i).Bytes()) == 0 {
+				continue
+			}
+
+			var b []byte
+			err = json.Unmarshal(shadow.Field(i).Bytes(), &b)
+			if err != nil {
+				return err
+			}
+
+			cert, err := tls.ParseCertChain(b)
 			if err != nil {
 				return err
 			}

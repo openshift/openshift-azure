@@ -1,12 +1,14 @@
 package config
 
 import (
+	"crypto/x509"
 	"reflect"
 	"testing"
 
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/test/util/tls"
 )
 
 func TestDerivedCloudProviderConf(t *testing.T) {
@@ -248,4 +250,36 @@ func TestRegistryURL(t *testing.T) {
 	if got := Derived.RegistryURL(&cs); got != "quay.io" {
 		t.Errorf("derived.RegistryURL() = %v, want %v", got, "quay.io")
 	}
+}
+
+func TestCaBundle(t *testing.T) {
+	expected := []*x509.Certificate{
+		tls.GetDummyCertificate(),
+	}
+	cs := api.OpenShiftManagedCluster{
+		Config: api.Config{
+			Certificates: api.CertificateConfig{
+				Ca: api.CertKeyPair{
+					Cert: tls.GetDummyCertificate(),
+					Key:  tls.GetDummyPrivateKey(),
+				},
+				OpenShiftConsole: api.CertKeyPairChain{
+					Certs: []*x509.Certificate{
+						tls.GetDummyCertificate(), tls.GetDummyCertificate(),
+					},
+				},
+				Router: api.CertKeyPairChain{
+					Certs: []*x509.Certificate{tls.GetDummyCertificate()},
+				},
+			},
+		},
+	}
+	bundle, err := Derived.CaBundle(&cs)
+	if err != nil {
+		t.Errorf("derived.CaBundle() error %v", err)
+	}
+	if !reflect.DeepEqual(expected, bundle) {
+		t.Errorf("derived.CaBundle() = ca-bundle lenght \"%v\", want \"%v\"", len(bundle), len(expected))
+	}
+
 }

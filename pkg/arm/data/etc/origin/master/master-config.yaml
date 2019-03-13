@@ -175,7 +175,7 @@ serviceAccountConfig:
   - default
   - builder
   - deployer
-  masterCA: ca.crt
+  masterCA: ca-bundle.crt
   privateKeyFile: serviceaccounts.private.key
   publicKeyFiles:
   - serviceaccounts.public.key

@@ -9,7 +9,7 @@ import (
 	mgmtkeyvault "github.com/Azure/azure-sdk-for-go/services/keyvault/mgmt/2016-10-01/keyvault"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/tls"
@@ -53,6 +53,11 @@ func newVaultManager(ctx context.Context, subscriptionID string) (*vaultManager,
 }
 
 func (vm *vaultManager) writeTLSCertsToVault(ctx context.Context, cs *api.OpenShiftManagedCluster, vaultURL string) error {
+	fakerpCAKey, fakerpCACert, err := tls.NewCA("external-signer")
+	if err != nil {
+		return err
+	}
+
 	certs := []struct {
 		vaultKeyName string
 		params       tls.CertParams
@@ -68,6 +73,8 @@ func (vm *vaultManager) writeTLSCertsToVault(ctx context.Context, cs *api.OpenSh
 					"*." + cs.Properties.RouterProfiles[0].PublicSubdomain,
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+				SigningCert: fakerpCACert,
+				SigningKey:  fakerpCAKey,
 			},
 		},
 		{
@@ -80,9 +87,12 @@ func (vm *vaultManager) writeTLSCertsToVault(ctx context.Context, cs *api.OpenSh
 					cs.Properties.PublicHostname,
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+				SigningCert: fakerpCACert,
+				SigningKey:  fakerpCAKey,
 			},
 		},
 	}
+
 	for _, cert := range certs {
 		_, err := vm.kvc.GetSecret(ctx, vaultURL, cert.vaultKeyName, "")
 		if err == nil {
@@ -94,7 +104,19 @@ func (vm *vaultManager) writeTLSCertsToVault(ctx context.Context, cs *api.OpenSh
 		if err != nil {
 			return err
 		}
-		err = vault.ImportCertificate(ctx, vm.kvc, vaultURL, cert.vaultKeyName, newkey, newcert)
+
+		// This chain should follow Certificate chain practices, where order is:
+		// End-User Certificate
+		// Intermediate Certificate
+		// Root Certificate
+		chain := api.CertKeyPairChain{
+			Key: newkey,
+			Certs: []*x509.Certificate{
+				newcert, fakerpCACert,
+			},
+		}
+
+		err = vault.ImportCertificate(ctx, vm.kvc, vaultURL, cert.vaultKeyName, chain)
 		if err != nil {
 			return err
 		}
