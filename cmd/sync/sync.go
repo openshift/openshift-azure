@@ -5,7 +5,6 @@ import (
 	"flag"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
@@ -80,7 +79,7 @@ func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
 	s.log.Print("enriching config blob")
 	err = vault.EnrichCSFromVault(ctx, s.kvc, cs)
 	if err != nil {
-		return true, errors.Wrap(err, "EnrichCSFromVault")
+		return true, err
 	}
 
 	err = addons.EnrichCSStorageAccountKeys(ctx, s.azs, cs)
@@ -90,11 +89,11 @@ func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
 
 	v := validate.NewAPIValidator(cs.Config.RunningUnderTest)
 	if errs := v.Validate(cs, nil, false); len(errs) > 0 {
-		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate config blob")
+		return true, kerrors.NewAggregate(errs)
 	}
 
 	if err := addons.Main(ctx, s.log, cs, *dryRun); err != nil {
-		return true, errors.Wrap(err, "cannot sync cluster config")
+		return true, err
 	}
 
 	s.log.Print("Sync process complete")
