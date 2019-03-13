@@ -33,8 +33,8 @@ func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster) err
 		}
 
 		b, err := template.Template(string(templateFile), nil, cs, map[string]interface{}{
-			"Hostname":    hostname,
-			"DNSHostname": domainname,
+			"Hostname":   hostname,
+			"DomainName": domainname,
 		})
 		if err != nil {
 			return errors.Wrapf(err, "Template(%s)", templateFileName)
