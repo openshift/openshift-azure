@@ -36,6 +36,7 @@ const (
 	PluginStepWaitForInfraStatefulSets                PluginStep = "WaitForInfraStatefulSets"
 	PluginStepWaitForInfraDeployments                 PluginStep = "WaitForInfraDeployments"
 	PluginStepUpdateMasterAgentPoolHashMasterScaleSet PluginStep = "UpdateMasterAgentPoolHashMasterScaleSet"
+	PluginStepUpdateMasterAgentPoolHashSyncPod        PluginStep = "UpdateMasterAgentPoolHashSyncPod"
 	PluginStepUpdateMasterAgentPoolListVMs            PluginStep = "UpdateMasterAgentPoolListVMs"
 	PluginStepUpdateMasterAgentPoolReadBlob           PluginStep = "UpdateMasterAgentPoolReadBlob"
 	PluginStepUpdateMasterAgentPoolDrain              PluginStep = "UpdateMasterAgentPoolDrain"

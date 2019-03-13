@@ -44,9 +44,9 @@ func Unmarshal(b []byte) (unstructured.Unstructured, error) {
 	return o, nil
 }
 
-// readDB reads previously exported objects into a map via go-bindata as well as
+// ReadDB reads previously exported objects into a map via go-bindata as well as
 // populating configuration items via Translate().
-func readDB(cs *api.OpenShiftManagedCluster) (map[string]unstructured.Unstructured, error) {
+func ReadDB(cs *api.OpenShiftManagedCluster) (map[string]unstructured.Unstructured, error) {
 	db := map[string]unstructured.Unstructured{}
 
 	for _, asset := range AssetNames() {
@@ -294,7 +294,7 @@ func EnrichCSStorageAccountKeys(ctx context.Context, azs azureclient.AccountsCli
 
 // Main loop
 func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, dryRun bool) error {
-	db, err := readDB(cs)
+	db, err := ReadDB(cs)
 	if err != nil {
 		return err
 	}

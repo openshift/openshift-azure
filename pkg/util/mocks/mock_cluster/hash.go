@@ -64,3 +64,18 @@ func (mr *MockHasherMockRecorder) HashMasterScaleSet(cs, app, instanceID interfa
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HashMasterScaleSet", reflect.TypeOf((*MockHasher)(nil).HashMasterScaleSet), cs, app, instanceID)
 }
+
+// HashSyncPod mocks base method
+func (m *MockHasher) HashSyncPod(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HashSyncPod", cs)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HashSyncPod indicates an expected call of HashSyncPod
+func (mr *MockHasherMockRecorder) HashSyncPod(cs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HashSyncPod", reflect.TypeOf((*MockHasher)(nil).HashSyncPod), cs)
+}

@@ -98,6 +98,11 @@ func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 			blob.ScalesetHashes[config.GetScalesetName(&app, suffix)] = h
 		}
 	}
+	var err error
+	blob.SyncPodHash, err = u.hasher.HashSyncPod(cs)
+	if err != nil {
+		return err
+	}
 	return u.updateBlobService.Write(blob)
 }
 

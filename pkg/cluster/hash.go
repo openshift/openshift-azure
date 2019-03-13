@@ -13,6 +13,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/sirupsen/logrus"
 
+	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
@@ -22,6 +23,7 @@ import (
 type Hasher interface {
 	HashWorkerScaleSet(*api.OpenShiftManagedCluster, *api.AgentPoolProfile) ([]byte, error)
 	HashMasterScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, instanceID int64) ([]byte, error)
+	HashSyncPod(cs *api.OpenShiftManagedCluster) ([]byte, error)
 }
 
 type hasher struct {
@@ -85,6 +87,23 @@ func (h *hasher) HashMasterScaleSet(cs *api.OpenShiftManagedCluster, app *api.Ag
 	// https://crypto.stackexchange.com/a/46572.
 	hash.Write(cs.Config.Certificates.OpenShiftConsole.Certs[0].Raw)
 	hash.Write(cs.Config.Certificates.Router.Certs[0].Raw)
+
+	return hash.Sum(nil), nil
+}
+
+// HashSyncPod returns the hash of the sync pod output
+func (h *hasher) HashSyncPod(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	hash := sha256.New()
+
+	m, err := addons.ReadDB(cs)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.NewEncoder(hash).Encode(m)
+	if err != nil {
+		return nil, err
+	}
 
 	return hash.Sum(nil), nil
 }
