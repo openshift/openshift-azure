@@ -50,11 +50,7 @@ type client struct {
 	log        *logrus.Entry
 }
 
-func newClient(ctx context.Context, log *logrus.Entry, cs *acsapi.OpenShiftManagedCluster, dryRun bool) (Interface, error) {
-	if dryRun {
-		return &dryClient{}, nil
-	}
-
+func newClient(ctx context.Context, log *logrus.Entry, cs *acsapi.OpenShiftManagedCluster) (Interface, error) {
 	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return nil, err
@@ -331,16 +327,3 @@ func (c *client) ServiceCatalogExists() (bool, error) {
 func (c *client) CRDReady(name string) (bool, error) {
 	return ready.CRDReady(c.ae.ApiextensionsV1beta1().CustomResourceDefinitions(), name)()
 }
-
-type dryClient struct{}
-
-// dryClient implements Interface
-var _ Interface = &dryClient{}
-
-func (c *dryClient) ApplyResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error {
-	return nil
-}
-func (c *dryClient) UpdateDynamicClient() error                                  { return nil }
-func (c *dryClient) ServiceCatalogExists() (bool, error)                         { return true, nil }
-func (c *dryClient) CRDReady(name string) (bool, error)                          { return true, nil }
-func (c *dryClient) DeleteOrphans(db map[string]unstructured.Unstructured) error { return nil }
