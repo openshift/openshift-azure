@@ -82,7 +82,7 @@ func (s *startup) run(ctx context.Context) error {
 	cname, _ := net.LookupCNAME(hostname)
 	domainname := strings.SplitN(strings.TrimSuffix(cname, "."), ".", 2)[1]
 
-	if err := arm.WriteTemplatedFiles(s.log, s.cs, writers.NewFilesystemWriter(), hostname, domainname); err != nil {
+	if err := arm.WriteStartupFiles(s.log, s.cs, writers.NewFilesystemWriter(), hostname, domainname); err != nil {
 		return errors.Wrap(err, "writeTemplatedFiles")
 	}
 

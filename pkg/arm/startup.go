@@ -11,7 +11,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/writers"
 )
 
-func WriteTemplatedFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, w writers.Writer, hostname, domainname string) error {
+func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, w writers.Writer, hostname, domainname string) error {
 	for _, templateFileName := range AssetNames() {
 		switch {
 		case templateFileName == "etc/origin/node/pods/sync.yaml" && hostname != "master-000000",
