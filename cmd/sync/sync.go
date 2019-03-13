@@ -114,11 +114,11 @@ func run(ctx context.Context, log *logrus.Entry) error {
 	}
 
 	for {
-		s.log.Print("starting sync")
+		log.Print("starting sync")
 		if err := addons.Main(ctx, s.log, cs, *dryRun); err != nil {
 			log.Printf("sync error: %s", err)
 		} else {
-			s.log.Print("sync done")
+			log.Print("sync done")
 		}
 		if *once {
 			return nil
