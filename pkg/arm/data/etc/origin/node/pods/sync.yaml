@@ -10,6 +10,8 @@ spec:
     name: sync
     securityContext:
       privileged: true
+    ports:
+    - containerPort: 8080
     volumeMounts:
     - mountPath: /_data/_out
       name: master-cloud-provider

@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"flag"
+	"net"
+	"net/http"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -33,6 +35,8 @@ type sync struct {
 	kvc  azureclient.KeyVaultClient
 	blob azureclientstorage.Blob
 	log  *logrus.Entry
+
+	ready bool
 }
 
 func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
@@ -64,7 +68,25 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 
 	s.log = log
 
+	l, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		return err
+	}
+
+	mux := &http.ServeMux{}
+	mux.Handle("/healthz/ready", http.HandlerFunc(s.readyHandler))
+
+	go http.Serve(l, mux)
+
 	return nil
+}
+
+func (s *sync) readyHandler(w http.ResponseWriter, r *http.Request) {
+	if s.ready {
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}
 }
 
 func (s *sync) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, error) {
@@ -94,6 +116,7 @@ func (s *sync) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, error
 }
 
 func run(ctx context.Context, log *logrus.Entry) error {
+
 	var s sync
 
 	err := s.init(ctx, log)
@@ -119,6 +142,10 @@ func run(ctx context.Context, log *logrus.Entry) error {
 			log.Printf("sync error: %s", err)
 		} else {
 			log.Print("sync done")
+			// TODO: move healthchecks/deployment waits here
+			// TODO: when etcd monitoring code gets added, set this earlier
+			// otherwise cluster creation will block on the monitoring stack
+			s.ready = true
 		}
 		if *once {
 			return nil
