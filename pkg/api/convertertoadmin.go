@@ -198,6 +198,7 @@ func convertImageConfigToAdmin(in ImageConfig) *admin.ImageConfig {
 		Sync:                      &in.Sync,
 		Startup:                   &in.Startup,
 		TemplateServiceBroker:     &in.TemplateServiceBroker,
+		TLSProxy:                  &in.TLSProxy,
 		Registry:                  &in.Registry,
 		Router:                    &in.Router,
 		RegistryConsole:           &in.RegistryConsole,

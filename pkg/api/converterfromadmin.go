@@ -527,6 +527,9 @@ func mergeImageConfig(in *admin.ImageConfig, out *ImageConfig) {
 	if in.TemplateServiceBroker != nil {
 		out.TemplateServiceBroker = *in.TemplateServiceBroker
 	}
+	if in.TLSProxy != nil {
+		out.TLSProxy = *in.TLSProxy
+	}
 	if in.Registry != nil {
 		out.Registry = *in.Registry
 	}

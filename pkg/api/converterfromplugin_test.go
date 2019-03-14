@@ -78,6 +78,7 @@ func internalPluginConfig() Config {
 			Sync:                      "Images.Sync",
 			Startup:                   "Images.Startup",
 			TemplateServiceBroker:     "Images.TemplateServiceBroker",
+			TLSProxy:                  "Images.TLSProxy",
 			Registry:                  "Images.Registry",
 			Router:                    "Images.Router",
 			RegistryConsole:           "Images.RegistryConsole",

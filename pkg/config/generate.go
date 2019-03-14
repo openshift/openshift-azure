@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/satori/go.uuid"
-	"k8s.io/client-go/tools/clientcmd/api/v1"
+	uuid "github.com/satori/go.uuid"
+	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
@@ -399,6 +399,17 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 
 	if len(c.RouterStatsPassword) == 0 {
 		if c.RouterStatsPassword, err = random.AlphanumericString(10); err != nil {
+			return
+		}
+	}
+
+	if len(c.EtcdMetricsPassword) == 0 {
+		if c.EtcdMetricsPassword, err = random.AlphanumericString(10); err != nil {
+			return
+		}
+	}
+	if len(c.EtcdMetricsUsername) == 0 {
+		if c.EtcdMetricsUsername, err = random.AlphanumericString(10); err != nil {
 			return
 		}
 	}

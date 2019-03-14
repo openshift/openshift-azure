@@ -8,6 +8,7 @@
 /sync
 /startup
 /etcdbackup
+/tlsproxy
 /azure-controllers
 /metricsbridge
 .vscode

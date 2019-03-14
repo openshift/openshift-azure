@@ -84,6 +84,7 @@ type ImageConfig struct {
 	Sync                  *string `json:"sync,omitempty"`
 	Startup               *string `json:"startup,omitempty"`
 	TemplateServiceBroker *string `json:"templateServiceBroker,omitempty"`
+	TLSProxy              *string `json:"tlsProxy,omitempty"`
 	Registry              *string `json:"registry,omitempty"`
 	Router                *string `json:"router,omitempty"`
 	RegistryConsole       *string `json:"registryConsole,omitempty"`

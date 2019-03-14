@@ -30,6 +30,7 @@ seLinuxContext:
 supplementalGroups:
   type: RunAsAny
 users:
+- system:serviceaccount:openshift-azure-monitoring:etcd-metrics
 - system:serviceaccount:openshift-infra:pv-recycler-controller
 - system:serviceaccount:kube-service-catalog:service-catalog-apiserver
 volumes:

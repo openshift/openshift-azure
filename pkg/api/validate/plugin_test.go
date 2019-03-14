@@ -40,6 +40,7 @@ func TestPluginTemplateValidate(t *testing.T) {
 			errors.New(`invalid images.sync ""`),
 			errors.New(`invalid images.startup ""`),
 			errors.New(`invalid images.templateServiceBroker ""`),
+			errors.New(`invalid images.TLSProxy ""`),
 			errors.New(`invalid images.registry ""`),
 			errors.New(`invalid images.router ""`),
 			errors.New(`invalid images.registryConsole ""`),

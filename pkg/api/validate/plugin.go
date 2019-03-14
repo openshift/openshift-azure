@@ -193,6 +193,10 @@ func validateImageConfig(i *pluginapi.ImageConfig) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid images.templateServiceBroker %q", i.TemplateServiceBroker))
 	}
 
+	if i.TLSProxy == "" {
+		errs = append(errs, fmt.Errorf("invalid images.TLSProxy %q", i.TLSProxy))
+	}
+
 	if i.Registry == "" {
 		errs = append(errs, fmt.Errorf("invalid images.registry %q", i.Registry))
 	}

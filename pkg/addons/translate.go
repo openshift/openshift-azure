@@ -447,6 +447,12 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.RouterStatsPassword }}",
 		},
 	},
+	"DaemonSet.apps/openshift-azure-monitoring/etcd-metrics": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
+			Template: "quay.io/mangirdas/tlsproxy",
+		},
+	},
 	"Deployment.apps/default/registry-console": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].env[?(@.name='OPENSHIFT_OAUTH_PROVIDER_URL')].value"),
@@ -670,10 +676,30 @@ var Translations = map[string][]struct {
 			Template: "{{ String (CertChainAsBytes .Config.Certificates.OpenShiftConsole.Certs) }}",
 		},
 	},
+	"Secret/openshift-azure-monitoring/etcd-metrics": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'username'"),
+			Template: "{{ .Config.EtcdMetricsUsername }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'password'"),
+			Template: "{{ .Config.EtcdMetricsPassword }}",
+		},
+	},
 	"Secret/openshift-console/console-oauth-config": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.clientSecret"),
 			Template: "{{ .Config.ConsoleOAuthSecret }}",
+		},
+	},
+	"Secret/openshift-monitoring/etcd-metrics": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'username'"),
+			Template: "{{ .Config.EtcdMetricsUsername }}",
+		},
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'password'"),
+			Template: "{{ .Config.EtcdMetricsPassword }}",
 		},
 	},
 	"Service/default/router": {

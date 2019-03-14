@@ -12,11 +12,12 @@ LDFLAGS="-X main.gitCommit=$(COMMIT)"
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
 AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
 ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
+TLSPROXY_IMAGE ?= quay.io/openshift-on-azure/tlsproxy:$(TAG)
 METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
 SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 STARTUP_IMAGE ?= quay.io/openshift-on-azure/startup:$(TAG)
 
-ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup
+ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup tlsproxy
 ALL_IMAGES = $(addsuffix -image, $(ALL_BINARIES))
 ALL_PUSHES = $(addsuffix -push, $(ALL_BINARIES))
 
@@ -80,6 +81,15 @@ etcdbackup-image: etcdbackup $(IMAGEBUILDER) pullregistry
 
 etcdbackup-push: etcdbackup-image
 	docker push $(ETCDBACKUP_IMAGE)
+
+tlsproxy: generate
+	go build -ldflags ${LDFLAGS} ./cmd/tlsproxy
+
+tlsproxy-image: tlsproxy
+	$(IMAGEBUILDER) -f images/tlsproxy/Dockerfile -t $(TLSPROXY_IMAGE) .
+
+tlsproxy-push: tlsproxy-image
+	docker push $(TLSPROXY_IMAGE)
 
 metricsbridge:
 	go build -ldflags ${LDFLAGS} ./cmd/$@

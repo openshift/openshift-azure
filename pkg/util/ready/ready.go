@@ -9,6 +9,8 @@ import (
 	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	kapiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	kapiextensionsv1beta1client "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	appsv1client "k8s.io/client-go/kubernetes/typed/apps/v1"
@@ -31,6 +33,27 @@ func APIServiceIsReady(cli apiregistrationv1client.APIServiceInterface, name str
 		for _, cond := range svc.Status.Conditions {
 			if cond.Type == apiregistrationv1.Available &&
 				cond.Status == apiregistrationv1.ConditionTrue {
+				return true, nil
+			}
+		}
+
+		return false, nil
+	}
+}
+
+func CRDReady(cli kapiextensionsv1beta1client.CustomResourceDefinitionInterface, name string) func() (bool, error) {
+	return func() (bool, error) {
+		svc, err := cli.Get(name, metav1.GetOptions{})
+		switch {
+		case errors.IsNotFound(err):
+			return false, nil
+		case err != nil:
+			return false, err
+		}
+
+		for _, cond := range svc.Status.Conditions {
+			if cond.Type == kapiextensionsv1beta1.Established &&
+				cond.Status == kapiextensionsv1beta1.ConditionTrue {
 				return true, nil
 			}
 		}

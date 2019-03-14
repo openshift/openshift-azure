@@ -56,6 +56,7 @@ func ConvertFromPlugin(in *plugin.Config, old *Config) *Config {
 	cs.Images.ServiceCatalog = in.Images.ServiceCatalog
 	cs.Images.Sync = in.Images.Sync
 	cs.Images.TemplateServiceBroker = in.Images.TemplateServiceBroker
+	cs.Images.TLSProxy = in.Images.TLSProxy
 	cs.Images.Registry = in.Images.Registry
 	cs.Images.Router = in.Images.Router
 	cs.Images.RegistryConsole = in.Images.RegistryConsole

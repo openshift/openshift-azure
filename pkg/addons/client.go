@@ -34,6 +34,7 @@ type Interface interface {
 	ApplyResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error
 	UpdateDynamicClient() error
 	ServiceCatalogExists() (bool, error)
+	CRDReady(name string) (bool, error)
 	GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error)
 	DeleteOrphans(db map[string]unstructured.Unstructured) error
 }
@@ -340,6 +341,11 @@ func (c *client) ServiceCatalogExists() (bool, error) {
 	return ready.APIServiceIsReady(c.ac.ApiregistrationV1().APIServices(), "v1beta1.servicecatalog.k8s.io")()
 }
 
+// CRDReady returns whether the required CRDs got registered.
+func (c *client) CRDReady(name string) (bool, error) {
+	return ready.CRDReady(c.ae.ApiextensionsV1beta1().CustomResourceDefinitions(), name)()
+}
+
 type dryClient struct{}
 
 // dryClient implements Interface
@@ -350,6 +356,7 @@ func (c *dryClient) ApplyResources(filter func(unstructured.Unstructured) bool, 
 }
 func (c *dryClient) UpdateDynamicClient() error          { return nil }
 func (c *dryClient) ServiceCatalogExists() (bool, error) { return true, nil }
+func (c *dryClient) CRDReady(name string) (bool, error)  { return true, nil }
 func (c *dryClient) GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error) {
 	return "", nil
 }

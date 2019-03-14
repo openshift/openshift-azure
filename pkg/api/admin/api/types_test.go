@@ -184,6 +184,7 @@ var marshalled = []byte(`{
 			"sync": "Config.Images.Sync",
 			"startup": "Config.Images.Startup",
 			"templateServiceBroker": "Config.Images.TemplateServiceBroker",
+			"tlsProxy": "Config.Images.TLSProxy",
 			"registry": "Config.Images.Registry",
 			"router": "Config.Images.Router",
 			"registryConsole": "Config.Images.RegistryConsole",
