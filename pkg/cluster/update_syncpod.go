@@ -9,6 +9,8 @@ import (
 
 // UpdateSyncPod updates the sync pod.
 func (u *simpleUpgrader) UpdateSyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
+	u.log.Infof("updating sync pod")
+
 	blob, err := u.updateBlobService.Read()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPodReadBlob}
@@ -30,7 +32,6 @@ func (u *simpleUpgrader) UpdateSyncPod(ctx context.Context, cs *api.OpenShiftMan
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPodDeletePod}
 	}
 
-	u.log.Infof("waiting for sync pod to be ready")
 	err = u.kubeclient.WaitForReadySyncPod(ctx)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPodWaitForReady}

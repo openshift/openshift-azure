@@ -170,9 +170,6 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 				return perr
 			}
 		}
-		if perr := p.clusterUpgrader.UpdateSyncPod(ctx, cs); perr != nil {
-			return perr
-		}
 		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
 			if perr := p.clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
 				return perr
@@ -182,6 +179,9 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 			if perr := p.clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
 				return perr
 			}
+		}
+		if perr := p.clusterUpgrader.UpdateSyncPod(ctx, cs); perr != nil {
+			return perr
 		}
 	} else {
 		err = p.clusterUpgrader.InitializeUpdateBlob(cs, suffix)
@@ -205,16 +205,15 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 			}
 		}
-		p.log.Infof("waiting for sync pod to be ready")
-		err := p.clusterUpgrader.WaitForReadySyncPod(ctx, cs)
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepWaitForSyncPod}
-		}
 		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
 			err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 			}
+		}
+		err := p.clusterUpgrader.WaitForReadySyncPod(ctx, cs)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepWaitForSyncPod}
 		}
 	}
 

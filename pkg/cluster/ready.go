@@ -42,5 +42,6 @@ func (u *simpleUpgrader) SortedAgentPoolProfilesForRole(cs *api.OpenShiftManaged
 }
 
 func (u *simpleUpgrader) WaitForReadySyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	u.log.Infof("waiting for sync pod to be ready")
 	return u.kubeclient.WaitForReadySyncPod(ctx)
 }

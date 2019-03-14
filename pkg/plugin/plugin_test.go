@@ -61,11 +61,11 @@ func TestCreateOrUpdate(t *testing.T) {
 			if tt.isUpdate {
 				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 				c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
-				c = clusterUpgrader.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
 				c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
 				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
 				c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 			} else {
 				c = clusterUpgrader.EXPECT().InitializeUpdateBlob(cs, gomock.Any()).Return(nil).After(c)
 				c = clusterUpgrader.EXPECT().WaitForHealthzStatusOk(nil, cs).Return(nil).After(c)
@@ -73,9 +73,9 @@ func TestCreateOrUpdate(t *testing.T) {
 				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], gomock.Any()).Return(nil).After(c)
 				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
 				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
-				c = clusterUpgrader.EXPECT().WaitForReadySyncPod(nil, cs).Return(nil).After(c)
 				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
 				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().WaitForReadySyncPod(nil, cs).Return(nil).After(c)
 			}
 			c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 			p := &plugin{
@@ -131,11 +131,11 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	c = clusterUpgrader.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 
 	p := &plugin{
@@ -178,11 +178,11 @@ func TestRotateClusterSecrets(t *testing.T) {
 	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = mockUp.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
-	c = mockUp.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
 	c = mockUp.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
 	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
 	c = mockUp.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = mockUp.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 
 	p := &plugin{
@@ -226,11 +226,11 @@ func TestForceUpdate(t *testing.T) {
 	c = mockUp.EXPECT().Initialize(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = mockUp.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
-	c = mockUp.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
 	c = mockUp.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
 	c = mockUp.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
 	c = mockUp.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = mockUp.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 	c = mockUp.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 
 	p := &plugin{
