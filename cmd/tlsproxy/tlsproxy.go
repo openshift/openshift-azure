@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -42,17 +43,16 @@ type config struct {
 	whitelistRegexp *regexp.Regexp
 }
 
-func (c *config) validate() []error {
-	var errs []error
+func (c *config) validate() (errs []error) {
 	if _, err := url.Parse(*hostname); err != nil {
-		return append(errs, errors.New("hostname is not a valid hostname"))
+		errs = append(errs, fmt.Errorf("invalid hostname %q", *hostname))
 	}
 	if c.password == "" && c.username != "" ||
 		c.password != "" && c.username == "" {
-		return append(errs, errors.New("both, USERNAME and PASSWORD, variables must be provided"))
+		errs = append(errs, fmt.Errorf("if either USERNAME or PASSWORD environment variable is set, both must be set"))
 	}
 
-	return errs
+	return
 }
 
 func (c *config) Init() error {
@@ -80,24 +80,29 @@ func (c *config) Init() error {
 		return err
 	}
 
-	b, err := ioutil.ReadFile(*cacert)
-	if err != nil {
-		return err
-	}
-	pool := x509.NewCertPool()
-	pool.AppendCertsFromPEM(b)
 	cert, err := tls.LoadX509KeyPair(*cert, *key)
 	if err != nil {
 		return err
 	}
 
+	tlsClientConfig := &tls.Config{
+		InsecureSkipVerify: *insecure,
+		Certificates:       []tls.Certificate{cert},
+	}
+
+	if *cacert != "" {
+		b, err := ioutil.ReadFile(*cacert)
+		if err != nil {
+			return err
+		}
+		pool := x509.NewCertPool()
+		pool.AppendCertsFromPEM(b)
+		tlsClientConfig.RootCAs = pool
+	}
+
 	c.cli = &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: *insecure,
-				RootCAs:            pool,
-				Certificates:       []tls.Certificate{cert},
-			},
+			TLSClientConfig: tlsClientConfig,
 		},
 	}
 
