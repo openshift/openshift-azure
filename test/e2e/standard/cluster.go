@@ -387,9 +387,15 @@ func (sc *SanityChecker) checkCanUseAzureFileStorage(ctx context.Context) error 
 			RestartPolicy: corev1.RestartPolicyNever,
 		},
 	})
+	if err != nil {
+		return err
+	}
 	By("Created pod")
 	By(fmt.Sprintf("Waiting for pod %s to finish", podName))
 	err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.PodHasPhase(sc.Client.Admin.CoreV1.Pods(namespace), podName, corev1.PodSucceeded))
+	if err != nil {
+		return err
+	}
 	By(fmt.Sprintf("Pod %s finished", podName))
 
 	return nil
