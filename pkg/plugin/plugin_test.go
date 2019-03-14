@@ -9,7 +9,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
-	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
@@ -299,9 +298,9 @@ func TestReimage(t *testing.T) {
 			c = mockUp.EXPECT().Reimage(nil, nil, scaleset, instanceID).Return(nil).After(c)
 
 			if tt.isMaster {
-				c = mockKubeclient.EXPECT().WaitForReadyMaster(nil, kubeclient.ComputerName(tt.hostname)).Return(nil).After(c)
+				c = mockKubeclient.EXPECT().WaitForReadyMaster(nil, tt.hostname).Return(nil).After(c)
 			} else {
-				c = mockKubeclient.EXPECT().WaitForReadyWorker(nil, kubeclient.ComputerName(tt.hostname)).Return(nil).After(c)
+				c = mockKubeclient.EXPECT().WaitForReadyWorker(nil, tt.hostname).Return(nil).After(c)
 			}
 
 			p := &plugin{

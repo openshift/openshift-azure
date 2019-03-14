@@ -14,7 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
-	"github.com/openshift/openshift-azure/pkg/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/e2e/standard"
 )
@@ -79,7 +79,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake]", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		By("ensuring the update blob has the right amount of entries")
-		Expect(len(before.InstanceHashes)).To(BeEquivalentTo(3)) // one per master instance
+		Expect(len(before.HostnameHashes)).To(BeEquivalentTo(3)) // one per master instance
 		Expect(len(before.ScalesetHashes)).To(BeEquivalentTo(2)) // one per worker scaleset
 
 		By("running an update")

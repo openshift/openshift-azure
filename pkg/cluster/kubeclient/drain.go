@@ -14,8 +14,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, computerName ComputerName) error {
-	err := u.setUnschedulable(computerName, true)
+func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, hostname string) error {
+	err := u.setUnschedulable(hostname, true)
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
@@ -25,21 +25,21 @@ func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, computerName Comp
 		return err
 	}
 
-	err = u.deletePods(ctx, computerName)
+	err = u.deletePods(ctx, hostname)
 	if err != nil {
 		return err
 	}
 
-	return u.client.CoreV1().Nodes().Delete(computerName.toKubernetes(), &metav1.DeleteOptions{})
+	return u.client.CoreV1().Nodes().Delete(hostname, &metav1.DeleteOptions{})
 }
 
-func (u *kubeclient) DeleteMaster(computerName ComputerName) error {
-	return u.client.CoreV1().Nodes().Delete(computerName.toKubernetes(), &metav1.DeleteOptions{})
+func (u *kubeclient) DeleteMaster(hostname string) error {
+	return u.client.CoreV1().Nodes().Delete(hostname, &metav1.DeleteOptions{})
 }
 
-func (u *kubeclient) setUnschedulable(computerName ComputerName, unschedulable bool) error {
+func (u *kubeclient) setUnschedulable(hostname string, unschedulable bool) error {
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		node, err := u.client.CoreV1().Nodes().Get(computerName.toKubernetes(), metav1.GetOptions{})
+		node, err := u.client.CoreV1().Nodes().Get(hostname, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
@@ -66,9 +66,9 @@ func max(i, j time.Duration) time.Duration {
 	return j
 }
 
-func (u *kubeclient) deletePods(ctx context.Context, computerName ComputerName) error {
+func (u *kubeclient) deletePods(ctx context.Context, hostname string) error {
 	podList, err := u.client.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
-		FieldSelector: fields.SelectorFromSet(fields.Set{"spec.nodeName": computerName.toKubernetes()}).String(),
+		FieldSelector: fields.SelectorFromSet(fields.Set{"spec.nodeName": hostname}).String(),
 	})
 	if err != nil {
 		return err

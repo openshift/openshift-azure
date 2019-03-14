@@ -11,7 +11,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api/latest"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
-	azuretls "github.com/openshift/openshift-azure/pkg/tls"
+	azuretls "github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
 func login(username string, cs *internalapi.OpenShiftManagedCluster) (*api.Config, error) {

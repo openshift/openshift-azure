@@ -40,12 +40,42 @@ func TestGetNames(t *testing.T) {
 	}
 }
 
-func TestGetMasterInstanceName(t *testing.T) {
-	if n := GetMasterInstanceName(0); n != "ss-master_0" {
-		t.Error(n)
-	}
-	if n := GetMasterInstanceName(10); n != "ss-master_10" {
-		t.Error(n)
+func TestGetHostname(t *testing.T) {
+	for _, tt := range []struct {
+		app          *api.AgentPoolProfile
+		suffix       string
+		instance     int64
+		wantHostname string
+	}{
+		{
+			app: &api.AgentPoolProfile{
+				Name: "master",
+				Role: api.AgentPoolProfileRoleMaster,
+			},
+			wantHostname: "master-000000",
+		},
+		{
+			app: &api.AgentPoolProfile{
+				Name: "master",
+				Role: api.AgentPoolProfileRoleMaster,
+			},
+			instance:     10,
+			wantHostname: "master-00000a",
+		},
+		{
+			app: &api.AgentPoolProfile{
+				Name: "my-compute",
+				Role: api.AgentPoolProfileRoleCompute,
+			},
+			suffix:       "suffix",
+			instance:     25294,
+			wantHostname: "my-compute-suffix-000jim",
+		},
+	} {
+		hostname := GetHostname(tt.app, tt.suffix, tt.instance)
+		if tt.wantHostname != hostname {
+			t.Errorf("wanted hostname %s, got %s", tt.wantHostname, hostname)
+		}
 	}
 }
 

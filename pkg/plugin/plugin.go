@@ -337,9 +337,9 @@ func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, h
 	// really might not help us.
 	p.log.Infof("waiting for %s to be ready", hostname)
 	if strings.HasPrefix(hostname, "master-") {
-		err = p.kubeclient.WaitForReadyMaster(ctx, kubeclient.ComputerName(hostname))
+		err = p.kubeclient.WaitForReadyMaster(ctx, hostname)
 	} else {
-		err = p.kubeclient.WaitForReadyWorker(ctx, kubeclient.ComputerName(hostname))
+		err = p.kubeclient.WaitForReadyWorker(ctx, hostname)
 	}
 	return err
 }

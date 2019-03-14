@@ -78,16 +78,23 @@ func (u *simpleUpgrader) CreateConfigStorageAccount(ctx context.Context, cs *api
 func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error {
 	blob := updateblob.NewUpdateBlob()
 	for _, app := range cs.Properties.AgentPoolProfiles {
-		h, err := u.hasher.HashScaleSet(cs, &app)
-		if err != nil {
-			return err
-		}
-		if app.Role == api.AgentPoolProfileRoleMaster {
+		switch app.Role {
+		case api.AgentPoolProfileRoleMaster:
 			for i := int64(0); i < app.Count; i++ {
-				name := config.GetMasterInstanceName(i)
-				blob.InstanceHashes[name] = h
+				h, err := u.hasher.HashMasterScaleSet(cs, &app, i)
+				if err != nil {
+					return err
+				}
+
+				hostname := config.GetHostname(&app, suffix, i)
+				blob.HostnameHashes[hostname] = h
 			}
-		} else {
+
+		default:
+			h, err := u.hasher.HashWorkerScaleSet(cs, &app)
+			if err != nil {
+				return err
+			}
 			blob.ScalesetHashes[config.GetScalesetName(&app, suffix)] = h
 		}
 	}

@@ -11,8 +11,8 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
+	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
 type derived struct{}

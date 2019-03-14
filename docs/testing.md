@@ -37,10 +37,10 @@ Upstream issue: https://github.com/openshift/ci-operator-prowgen/issues/79
 Packages under `pkg` directory contain their individual unit tests.
 To run all unit tests locally, execute: `make unit` or `go test ./...`
 To run a single package's tests:
-`go test ./pkg/tls`
+`go test ./pkg/util/tls`
 
 To run a subset of tests in a package:
-`go test -run TestFoo ./pkg/tls`
+`go test -run TestFoo ./pkg/util/tls`
 
 ## OpenShift E2E tests
 

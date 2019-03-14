@@ -54,7 +54,7 @@ spec:
     nameservers:
       - 168.63.129.16
     searches:
-      - {{ .Extra.DNSHostname }}
+      - {{ .Extra.DomainName }}
   priorityClassName: system-node-critical
   volumes:
   - hostPath:

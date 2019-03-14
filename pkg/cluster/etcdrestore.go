@@ -39,7 +39,7 @@ func (u *simpleUpgrader) EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Conte
 	}
 	// delete only the master entries from the blob in order to
 	// avoid unnecessary infra and compute rotations.
-	uBlob.InstanceHashes = updateblob.InstanceHashes{}
+	uBlob.HostnameHashes = updateblob.HostnameHashes{}
 
 	err = u.updateBlobService.Write(uBlob)
 	if err != nil {

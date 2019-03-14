@@ -5,36 +5,36 @@ import (
 	"sort"
 )
 
-var _ json.Marshaler = &InstanceHashes{}
-var _ json.Unmarshaler = &InstanceHashes{}
+var _ json.Marshaler = &HostnameHashes{}
+var _ json.Unmarshaler = &HostnameHashes{}
 
-func (ihm InstanceHashes) MarshalJSON() ([]byte, error) {
-	instancenames := make([]string, 0, len(ihm))
-	for instancename := range ihm {
-		instancenames = append(instancenames, instancename)
+func (hhm HostnameHashes) MarshalJSON() ([]byte, error) {
+	hostnames := make([]string, 0, len(hhm))
+	for hostname := range hhm {
+		hostnames = append(hostnames, hostname)
 	}
-	sort.Slice(instancenames, func(i, j int) bool { return instancenames[i] < instancenames[j] })
+	sort.Slice(hostnames, func(i, j int) bool { return hostnames[i] < hostnames[j] })
 
-	slice := make([]instanceHashes, 0, len(ihm))
-	for _, instancename := range instancenames {
-		slice = append(slice, instanceHashes{
-			InstanceName: instancename,
-			Hash:         ihm[instancename],
+	slice := make([]hostnameHashes, 0, len(hhm))
+	for _, hostname := range hostnames {
+		slice = append(slice, hostnameHashes{
+			Hostname: hostname,
+			Hash:     hhm[hostname],
 		})
 	}
 
 	return json.Marshal(slice)
 }
 
-func (ihm *InstanceHashes) UnmarshalJSON(data []byte) error {
-	var slice []instanceHashes
+func (hhm *HostnameHashes) UnmarshalJSON(data []byte) error {
+	var slice []hostnameHashes
 	if err := json.Unmarshal(data, &slice); err != nil {
 		return err
 	}
 
-	*ihm = InstanceHashes{}
+	*hhm = HostnameHashes{}
 	for _, vi := range slice {
-		(*ihm)[vi.InstanceName] = vi.Hash
+		(*hhm)[vi.Hostname] = vi.Hash
 	}
 
 	return nil

@@ -9,7 +9,7 @@ import (
 
 	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
-	"github.com/openshift/openshift-azure/pkg/tls"
+	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
 // makeShadowStruct returns a pointer to a struct identical in type to the one

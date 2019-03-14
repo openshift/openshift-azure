@@ -11,24 +11,24 @@ import (
 
 func TestMasterIsReady(t *testing.T) {
 	tests := []struct {
-		name         string
-		kc           kubernetes.Interface
-		computerName ComputerName
-		want         bool
-		wantErr      bool
+		name     string
+		kc       kubernetes.Interface
+		hostname string
+		want     bool
+		wantErr  bool
 	}{
 		{
-			name:         "node not found",
-			computerName: "master-000000",
-			wantErr:      false,
-			want:         false,
-			kc:           fake.NewSimpleClientset(),
+			name:     "node not found",
+			hostname: "master-000000",
+			wantErr:  false,
+			want:     false,
+			kc:       fake.NewSimpleClientset(),
 		},
 		{
-			name:         "node ready, pods not found",
-			computerName: "master-000000",
-			wantErr:      false,
-			want:         false,
+			name:     "node ready, pods not found",
+			hostname: "master-000000",
+			wantErr:  false,
+			want:     false,
 			kc: fake.NewSimpleClientset(&corev1.Node{
 				TypeMeta: metav1.TypeMeta{
 					Kind: "node",
@@ -47,10 +47,10 @@ func TestMasterIsReady(t *testing.T) {
 			}),
 		},
 		{
-			name:         "node ready, pods ready",
-			computerName: "master-00000A",
-			wantErr:      false,
-			want:         true,
+			name:     "node ready, pods ready",
+			hostname: "master-00000a",
+			wantErr:  false,
+			want:     true,
 			kc: fake.NewSimpleClientset(&corev1.Node{
 				TypeMeta: metav1.TypeMeta{
 					Kind: "node",
@@ -119,7 +119,7 @@ func TestMasterIsReady(t *testing.T) {
 	}
 	for _, tt := range tests {
 		u := &kubeclient{client: tt.kc}
-		got, err := u.masterIsReady(tt.computerName)
+		got, err := u.masterIsReady(tt.hostname)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("masterIsReady() error = %v, wantErr %v. Test: %v", err, tt.wantErr, tt.name)
 			return

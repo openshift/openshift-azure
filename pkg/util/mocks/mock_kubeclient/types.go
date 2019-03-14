@@ -12,7 +12,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
-	kubeclient "github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 )
 
 // MockKubeclient is a mock of Kubeclient interface
@@ -53,7 +52,7 @@ func (mr *MockKubeclientMockRecorder) BackupCluster(arg0, arg1 interface{}) *gom
 }
 
 // DeleteMaster mocks base method
-func (m *MockKubeclient) DeleteMaster(arg0 kubeclient.ComputerName) error {
+func (m *MockKubeclient) DeleteMaster(arg0 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteMaster", arg0)
 	ret0, _ := ret[0].(error)
@@ -67,7 +66,7 @@ func (mr *MockKubeclientMockRecorder) DeleteMaster(arg0 interface{}) *gomock.Cal
 }
 
 // DrainAndDeleteWorker mocks base method
-func (m *MockKubeclient) DrainAndDeleteWorker(arg0 context.Context, arg1 kubeclient.ComputerName) error {
+func (m *MockKubeclient) DrainAndDeleteWorker(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DrainAndDeleteWorker", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -110,7 +109,7 @@ func (mr *MockKubeclientMockRecorder) WaitForInfraServices(arg0 interface{}) *go
 }
 
 // WaitForReadyMaster mocks base method
-func (m *MockKubeclient) WaitForReadyMaster(arg0 context.Context, arg1 kubeclient.ComputerName) error {
+func (m *MockKubeclient) WaitForReadyMaster(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WaitForReadyMaster", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -124,7 +123,7 @@ func (mr *MockKubeclientMockRecorder) WaitForReadyMaster(arg0, arg1 interface{})
 }
 
 // WaitForReadyWorker mocks base method
-func (m *MockKubeclient) WaitForReadyWorker(arg0 context.Context, arg1 kubeclient.ComputerName) error {
+func (m *MockKubeclient) WaitForReadyWorker(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WaitForReadyWorker", arg0, arg1)
 	ret0, _ := ret[0].(error)

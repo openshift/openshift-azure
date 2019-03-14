@@ -26,9 +26,9 @@ func TestReadUpdateBlob(t *testing.T) {
 		},
 		{
 			name: "ok",
-			blob: `{"instanceHashes":[{"instanceName":"ss-compute_0","hash":"N3g5OT0="},{"instanceName":"ss-infra_0","hash":"NDU="}]}`,
+			blob: `{"hostnameHashes":[{"hostname":"ss-compute_0","hash":"N3g5OT0="},{"hostname":"ss-infra_0","hash":"NDU="}]}`,
 			want: &UpdateBlob{
-				InstanceHashes: InstanceHashes{
+				HostnameHashes: HostnameHashes{
 					"ss-infra_0":   []byte("45"),
 					"ss-compute_0": []byte("7x99="),
 				},
@@ -77,12 +77,12 @@ func TestWriteUpdateBlob(t *testing.T) {
 		{
 			name: "valid",
 			blob: &UpdateBlob{
-				InstanceHashes: InstanceHashes{
+				HostnameHashes: HostnameHashes{
 					"ss-infra_0":   []byte("45"),
 					"ss-compute_0": []byte("7x99="),
 				},
 			},
-			want: `{"instanceHashes":[{"instanceName":"ss-compute_0","hash":"N3g5OT0="},{"instanceName":"ss-infra_0","hash":"NDU="}]}`,
+			want: `{"hostnameHashes":[{"hostname":"ss-compute_0","hash":"N3g5OT0="},{"hostname":"ss-infra_0","hash":"NDU="}]}`,
 		},
 	}
 	gmc := gomock.NewController(t)

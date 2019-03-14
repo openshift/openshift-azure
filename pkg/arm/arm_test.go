@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/test/util/tls"
 )
 

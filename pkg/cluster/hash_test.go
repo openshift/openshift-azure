@@ -8,7 +8,7 @@ import (
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
-func TestHashScaleSet(t *testing.T) {
+func TestHashWorkerScaleSet(t *testing.T) {
 	tests := []struct {
 		name string
 		app  api.AgentPoolProfile
@@ -39,7 +39,7 @@ func TestHashScaleSet(t *testing.T) {
 	var h hasher
 	var exp []byte
 	for _, test := range tests {
-		got, err := h.HashScaleSet(&cs, &test.app)
+		got, err := h.HashWorkerScaleSet(&cs, &test.app)
 		if err != nil {
 			t.Errorf("%s: unexpected error: %v", test.name, err)
 		}

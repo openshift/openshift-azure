@@ -15,9 +15,9 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
-	"github.com/openshift/openshift-azure/pkg/tls"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/template"
+	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
 //go:generate ../../hack/build-archive.sh
