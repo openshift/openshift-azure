@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -44,6 +45,9 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployF
 		if err != nil {
 			return err
 		}
+
+		cli := deployments.Client()
+		cli.PollingDuration = 30 * time.Minute
 
 		log.Info("waiting for arm template deployment to complete")
 		if err := future.WaitForCompletionRef(ctx, deployments.Client()); err != nil {
