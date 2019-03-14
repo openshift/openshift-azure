@@ -48,8 +48,12 @@ func Bytes(n int) ([]byte, error) {
 
 // StorageAccountName returns a random string suitable for use as an Azure
 // storage account name
-func StorageAccountName() (string, error) {
-	return LowerCaseAlphanumericString(24)
+func StorageAccountName(prefix string) (string, error) {
+	name, err := LowerCaseAlphanumericString(24 - len(prefix))
+	if err != nil {
+		return "", err
+	}
+	return prefix + name, nil
 }
 
 // FQDN returns a random fully qualified domain name within a given parent
