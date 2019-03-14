@@ -190,6 +190,20 @@ func (mr *MockUpgraderMockRecorder) UpdateWorkerAgentPool(ctx, cs, app, suffix i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateWorkerAgentPool", reflect.TypeOf((*MockUpgrader)(nil).UpdateWorkerAgentPool), ctx, cs, app, suffix)
 }
 
+// UpdateSyncPod mocks base method
+func (m *MockUpgrader) UpdateSyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateSyncPod", ctx, cs)
+	ret0, _ := ret[0].(*api.PluginError)
+	return ret0
+}
+
+// UpdateSyncPod indicates an expected call of UpdateSyncPod
+func (mr *MockUpgraderMockRecorder) UpdateSyncPod(ctx, cs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSyncPod", reflect.TypeOf((*MockUpgrader)(nil).UpdateSyncPod), ctx, cs)
+}
+
 // EtcdBlobExists mocks base method
 func (m *MockUpgrader) EtcdBlobExists(ctx context.Context, blobName string) error {
 	m.ctrl.T.Helper()

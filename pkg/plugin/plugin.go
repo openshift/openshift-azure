@@ -170,6 +170,9 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 				return perr
 			}
 		}
+		if perr := p.clusterUpgrader.UpdateSyncPod(ctx, cs); perr != nil {
+			return perr
+		}
 		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
 			if perr := p.clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
 				return perr

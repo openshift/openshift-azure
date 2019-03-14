@@ -57,6 +57,11 @@ const (
 	PluginStepUpdateWorkerAgentPoolWaitForReady       PluginStep = "UpdateWorkerAgentPoolWaitForReady"
 	PluginStepUpdateWorkerAgentPoolUpdateBlob         PluginStep = "UpdateWorkerAgentPoolUpdateBlob"
 	PluginStepUpdateWorkerAgentPoolDeleteVM           PluginStep = "UpdateWorkerAgentPoolDeleteVM"
+	PluginStepUpdateSyncPodReadBlob                   PluginStep = "UpdateSyncPodReadBlob"
+	PluginStepUpdateSyncPodHashSyncPod                PluginStep = "UpdateSyncPodHashSyncPod"
+	PluginStepUpdateSyncPodDeletePod                  PluginStep = "UpdateSyncPodDeletePod"
+	PluginStepUpdateSyncPodWaitForReady               PluginStep = "UpdateSyncPodWaitForReady"
+	PluginStepUpdateSyncPodUpdateBlob                 PluginStep = "UpdateSyncPodUpdateBlob"
 	PluginStepInvalidateClusterSecrets                PluginStep = "InvalidateClusterSecrets"
 	PluginStepRegenerateClusterSecrets                PluginStep = "RegenerateClusterSecrets"
 )

@@ -21,10 +21,12 @@ type Kubeclient interface {
 	BackupCluster(ctx context.Context, backupName string) error
 	DrainAndDeleteWorker(ctx context.Context, hostname string) error
 	DeleteMaster(hostname string) error
+	DeletePod(ctx context.Context, namespace, name string) error
 	GetControlPlanePods(ctx context.Context) ([]corev1.Pod, error)
 	WaitForInfraServices(ctx context.Context) *api.PluginError
 	WaitForReadyMaster(ctx context.Context, hostname string) error
 	WaitForReadyWorker(ctx context.Context, hostname string) error
+	WaitForReadySyncPod(ctx context.Context) error
 }
 
 type kubeclient struct {

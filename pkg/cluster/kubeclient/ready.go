@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"k8s.io/apimachinery/pkg/api/errors"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
@@ -139,4 +141,30 @@ func (u *kubeclient) masterIsReady(hostname string) (bool, error) {
 
 func (u *kubeclient) WaitForReadyWorker(ctx context.Context, hostname string) error {
 	return wait.PollImmediateUntil(time.Second, ready.NodeIsReady(u.client.CoreV1().Nodes(), hostname), ctx.Done())
+}
+
+func (u *kubeclient) WaitForReadySyncPod(ctx context.Context) error {
+	return wait.PollImmediateUntil(time.Second,
+		func() (bool, error) {
+			// can't check the pod status - health checks don't exist for
+			// static/mirror pods
+			result := u.client.CoreV1().RESTClient().Get().
+				Namespace("kube-system").
+				Resource("pods").
+				Name("sync-master-000000").
+				SubResource("proxy").
+				Suffix("/healthz/ready").
+				Do()
+
+			err := result.Error()
+			switch {
+			case err == nil:
+				return true, nil
+			case errors.IsServiceUnavailable(err):
+				return false, nil
+			default:
+				return false, err
+			}
+		},
+		ctx.Done())
 }

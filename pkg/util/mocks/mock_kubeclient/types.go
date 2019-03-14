@@ -65,6 +65,20 @@ func (mr *MockKubeclientMockRecorder) DeleteMaster(arg0 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMaster", reflect.TypeOf((*MockKubeclient)(nil).DeleteMaster), arg0)
 }
 
+// DeletePod mocks base method
+func (m *MockKubeclient) DeletePod(arg0 context.Context, arg1, arg2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeletePod", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeletePod indicates an expected call of DeletePod
+func (mr *MockKubeclientMockRecorder) DeletePod(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePod", reflect.TypeOf((*MockKubeclient)(nil).DeletePod), arg0, arg1, arg2)
+}
+
 // DrainAndDeleteWorker mocks base method
 func (m *MockKubeclient) DrainAndDeleteWorker(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
@@ -120,6 +134,20 @@ func (m *MockKubeclient) WaitForReadyMaster(arg0 context.Context, arg1 string) e
 func (mr *MockKubeclientMockRecorder) WaitForReadyMaster(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForReadyMaster", reflect.TypeOf((*MockKubeclient)(nil).WaitForReadyMaster), arg0, arg1)
+}
+
+// WaitForReadySyncPod mocks base method
+func (m *MockKubeclient) WaitForReadySyncPod(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForReadySyncPod", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForReadySyncPod indicates an expected call of WaitForReadySyncPod
+func (mr *MockKubeclientMockRecorder) WaitForReadySyncPod(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForReadySyncPod", reflect.TypeOf((*MockKubeclient)(nil).WaitForReadySyncPod), arg0)
 }
 
 // WaitForReadyWorker mocks base method
