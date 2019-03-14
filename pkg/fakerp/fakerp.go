@@ -261,11 +261,10 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 			return err
 		}
 	} else {
-		vaultURL, err = random.FQDN("vault.azure.net", 24)
+		vaultURL, err = random.VaultURL("kv-")
 		if err != nil {
 			return err
 		}
-		vaultURL = "https://" + vaultURL
 	}
 
 	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNamePublicHostname
