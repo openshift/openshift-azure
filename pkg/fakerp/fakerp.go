@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
@@ -44,6 +45,9 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployF
 		if err != nil {
 			return err
 		}
+
+		cli := deployments.Client()
+		cli.PollingDuration = 30 * time.Minute
 
 		log.Info("waiting for arm template deployment to complete")
 		if err := future.WaitForCompletionRef(ctx, deployments.Client()); err != nil {
@@ -100,6 +104,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
+	log.Info("setting up DNS")
 	err = dm.createOrUpdateOCPDNS(ctx, cs)
 	if err != nil {
 		return nil, err
@@ -120,6 +125,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
+	log.Info("setting up key vault")
 	err = vm.createOrUpdateVault(ctx, os.Getenv("AZURE_CLIENT_ID"), cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, strings.Split(u.Host, ".")[0])
 	if err != nil {
 		return nil, err
