@@ -162,6 +162,20 @@ func (mr *MockUpgraderMockRecorder) WaitForNodesInAgentPoolProfile(ctx, cs, app,
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForNodesInAgentPoolProfile", reflect.TypeOf((*MockUpgrader)(nil).WaitForNodesInAgentPoolProfile), ctx, cs, app, suffix)
 }
 
+// WaitForReadySyncPod mocks base method
+func (m *MockUpgrader) WaitForReadySyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForReadySyncPod", ctx, cs)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForReadySyncPod indicates an expected call of WaitForReadySyncPod
+func (mr *MockUpgraderMockRecorder) WaitForReadySyncPod(ctx, cs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForReadySyncPod", reflect.TypeOf((*MockUpgrader)(nil).WaitForReadySyncPod), ctx, cs)
+}
+
 // UpdateMasterAgentPool mocks base method
 func (m *MockUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError {
 	m.ctrl.T.Helper()

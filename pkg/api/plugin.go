@@ -31,6 +31,7 @@ const (
 	PluginStepGenerateARM                             PluginStep = "GenerateARM"
 	PluginStepWaitForWaitForOpenShiftAPI              PluginStep = "WaitForOpenShiftAPI"
 	PluginStepWaitForNodes                            PluginStep = "WaitForNodes"
+	PluginStepWaitForSyncPod                          PluginStep = "WaitForSyncPod"
 	PluginStepWaitForConsoleHealth                    PluginStep = "WaitForConsoleHealth"
 	PluginStepWaitForInfraDaemonSets                  PluginStep = "WaitForInfraDaemonSets"
 	PluginStepWaitForInfraStatefulSets                PluginStep = "WaitForInfraStatefulSets"

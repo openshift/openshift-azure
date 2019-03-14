@@ -205,6 +205,11 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 			}
 		}
+		p.log.Infof("waiting for sync pod to be ready")
+		err := p.clusterUpgrader.WaitForReadySyncPod(ctx, cs)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepWaitForSyncPod}
+		}
 		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
 			err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
 			if err != nil {

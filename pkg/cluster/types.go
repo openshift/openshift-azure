@@ -41,6 +41,7 @@ type Upgrader interface {
 	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	SortedAgentPoolProfilesForRole(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) []api.AgentPoolProfile
 	WaitForNodesInAgentPoolProfile(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) error
+	WaitForReadySyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError
 	UpdateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError
 	UpdateSyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError

@@ -40,3 +40,7 @@ func (u *simpleUpgrader) SortedAgentPoolProfilesForRole(cs *api.OpenShiftManaged
 	sort.Slice(apps, func(i, j int) bool { return apps[i].Name < apps[j].Name })
 	return apps
 }
+
+func (u *simpleUpgrader) WaitForReadySyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	return u.kubeclient.WaitForReadySyncPod(ctx)
+}
