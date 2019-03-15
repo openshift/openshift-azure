@@ -27,6 +27,8 @@ EOF
   systemctl start docker.service
 fi
 
+docker pull {{ .Config.Images.Node }} &>/dev/null &
+
 # file should be /root/.docker/config.json, but actually need it in
 # /var/lib/origin thanks to https://github.com/kubernetes/kubernetes/issues/45487
 DPATH=/var/lib/origin/.docker
