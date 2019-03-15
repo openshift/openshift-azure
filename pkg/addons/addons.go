@@ -293,32 +293,7 @@ func EnrichCSStorageAccountKeys(ctx context.Context, azs azureclient.AccountsCli
 }
 
 // Main loop
-func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, dryRun bool) error {
-	db, err := ReadDB(cs)
-	if err != nil {
-		return err
-	}
-
-	if dryRun {
-		// impose an order to improve debuggability.
-		var keys []string
-		for k := range db {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-
-		for _, k := range keys {
-			b, err := yaml.Marshal(db[k].Object)
-			if err != nil {
-				return err
-			}
-
-			log.Info(string(b))
-		}
-
-		return nil
-	}
-
+func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, db map[string]unstructured.Unstructured) error {
 	client, err := newClient(ctx, log, cs)
 	if err != nil {
 		return err

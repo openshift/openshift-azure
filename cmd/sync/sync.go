@@ -5,9 +5,12 @@ import (
 	"flag"
 	"net"
 	"net/http"
+	"sort"
 	"time"
 
+	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/addons"
@@ -36,6 +39,7 @@ type sync struct {
 	blob azureclientstorage.Blob
 	log  *logrus.Entry
 
+	db    map[string]unstructured.Unstructured
 	ready bool
 }
 
@@ -115,8 +119,27 @@ func (s *sync) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, error
 	return cs, nil
 }
 
-func run(ctx context.Context, log *logrus.Entry) error {
+func (s *sync) printDB() error {
+	// impose an order to improve debuggability.
+	var keys []string
+	for k := range s.db {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
 
+	for _, k := range keys {
+		b, err := yaml.Marshal(s.db[k].Object)
+		if err != nil {
+			return err
+		}
+
+		s.log.Info(string(b))
+	}
+
+	return nil
+}
+
+func run(ctx context.Context, log *logrus.Entry) error {
 	var s sync
 
 	err := s.init(ctx, log)
@@ -136,9 +159,18 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		<-t.C
 	}
 
+	s.db, err = addons.ReadDB(cs)
+	if err != nil {
+		return err
+	}
+
+	if *dryRun {
+		return s.printDB()
+	}
+
 	for {
 		log.Print("starting sync")
-		if err := addons.Main(ctx, s.log, cs, *dryRun); err != nil {
+		if err := addons.Main(ctx, s.log, cs, s.db); err != nil {
 			log.Printf("sync error: %s", err)
 		} else {
 			log.Print("sync done")
