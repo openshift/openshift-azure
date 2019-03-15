@@ -72,8 +72,7 @@ func DaemonSetIsReady(cli appsv1client.DaemonSetInterface, name string) func() (
 			return false, err
 		}
 
-		return ds.Status.DesiredNumberScheduled == ds.Status.CurrentNumberScheduled &&
-			ds.Status.DesiredNumberScheduled == ds.Status.NumberReady &&
+		return ds.Status.DesiredNumberScheduled == ds.Status.NumberAvailable &&
 			ds.Status.DesiredNumberScheduled == ds.Status.UpdatedNumberScheduled &&
 			ds.Generation == ds.Status.ObservedGeneration, nil
 	}
@@ -94,9 +93,7 @@ func DeploymentIsReady(cli appsv1client.DeploymentInterface, name string) func()
 			specReplicas = *d.Spec.Replicas
 		}
 
-		return specReplicas == d.Status.Replicas &&
-			specReplicas == d.Status.ReadyReplicas &&
-			specReplicas == d.Status.AvailableReplicas &&
+		return specReplicas == d.Status.AvailableReplicas &&
 			specReplicas == d.Status.UpdatedReplicas &&
 			d.Generation == d.Status.ObservedGeneration, nil
 	}
@@ -114,9 +111,7 @@ func DeploymentConfigIsReady(cli oappsv1client.DeploymentConfigInterface, name s
 
 		specReplicas := dc.Spec.Replicas
 
-		return specReplicas == dc.Status.Replicas &&
-			specReplicas == dc.Status.ReadyReplicas &&
-			specReplicas == dc.Status.AvailableReplicas &&
+		return specReplicas == dc.Status.AvailableReplicas &&
 			specReplicas == dc.Status.UpdatedReplicas &&
 			dc.Generation == dc.Status.ObservedGeneration, nil
 	}
@@ -215,9 +210,8 @@ func StatefulSetIsReady(cli appsv1client.StatefulSetInterface, name string) func
 			specReplicas = *ss.Spec.Replicas
 		}
 
-		return specReplicas == ss.Status.Replicas &&
-			specReplicas == ss.Status.ReadyReplicas &&
-			specReplicas == ss.Status.CurrentReplicas &&
+		return specReplicas == ss.Status.ReadyReplicas &&
+			specReplicas == ss.Status.UpdatedReplicas &&
 			ss.Generation == ss.Status.ObservedGeneration, nil
 	}
 }
