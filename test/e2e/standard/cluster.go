@@ -27,31 +27,31 @@ import (
 )
 
 func (sc *SanityChecker) checkMonitoringStackHealth(ctx context.Context) error {
-	err := wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "cluster-monitoring-operator"))
+	err := wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "cluster-monitoring-operator"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "prometheus-operator"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "prometheus-operator"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "grafana"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "grafana"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.StatefulSetIsReady(sc.Client.Admin.AppsV1.StatefulSets("openshift-monitoring"), "prometheus-k8s"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckStatefulSetIsReady(sc.Client.Admin.AppsV1.StatefulSets("openshift-monitoring"), "prometheus-k8s"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.StatefulSetIsReady(sc.Client.Admin.AppsV1.StatefulSets("openshift-monitoring"), "alertmanager-main"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckStatefulSetIsReady(sc.Client.Admin.AppsV1.StatefulSets("openshift-monitoring"), "alertmanager-main"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DaemonSetIsReady(sc.Client.Admin.AppsV1.DaemonSets("openshift-monitoring"), "node-exporter"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDaemonSetIsReady(sc.Client.Admin.AppsV1.DaemonSets("openshift-monitoring"), "node-exporter"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.DeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-azure-monitoring"), "metrics-bridge"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-azure-monitoring"), "metrics-bridge"))
 	if err != nil {
 		return err
 	}
@@ -226,7 +226,7 @@ func (sc *SanityChecker) checkCanDeployRedhatIoImages(ctx context.Context) error
 		return err
 	}
 	By(fmt.Sprintf("waiting for deployment to be ready (%v)", time.Now()))
-	err = wait.PollImmediate(2*time.Second, 5*time.Minute, ready.DeploymentIsReady(sc.Client.EndUser.AppsV1.Deployments(namespace), deploymentName))
+	err = wait.PollImmediate(2*time.Second, 5*time.Minute, ready.CheckDeploymentIsReady(sc.Client.EndUser.AppsV1.Deployments(namespace), deploymentName))
 	if err != nil {
 		return err
 	}
@@ -255,7 +255,7 @@ func (sc *SanityChecker) checkCanCreateLB(ctx context.Context) error {
 
 	for _, lb := range []string{"elb", "ilb"} {
 		By(fmt.Sprintf("waiting for %s to be ready (%v)", lb, time.Now()))
-		err = wait.PollImmediate(2*time.Second, 5*time.Minute, ready.ServiceIsReady(sc.Client.EndUser.CoreV1.Services(namespace), lb))
+		err = wait.PollImmediate(2*time.Second, 5*time.Minute, ready.CheckServiceIsReady(sc.Client.EndUser.CoreV1.Services(namespace), lb))
 		if err != nil {
 			return err
 		}
@@ -392,7 +392,7 @@ func (sc *SanityChecker) checkCanUseAzureFileStorage(ctx context.Context) error 
 	}
 	By("Created pod")
 	By(fmt.Sprintf("Waiting for pod %s to finish", podName))
-	err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.PodHasPhase(sc.Client.Admin.CoreV1.Pods(namespace), podName, corev1.PodSucceeded))
+	err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.CheckPodHasPhase(sc.Client.Admin.CoreV1.Pods(namespace), podName, corev1.PodSucceeded))
 	if err != nil {
 		return err
 	}

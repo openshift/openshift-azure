@@ -44,7 +44,7 @@ func (u *kubeclient) BackupCluster(ctx context.Context, backupName string) error
 	}()
 
 	err = wait.PollImmediateUntil(2*time.Second, func() (bool, error) {
-		return ready.BatchIsReady(u.client.BatchV1().Jobs(job.Namespace), job.Name)()
+		return ready.CheckJobIsReady(u.client.BatchV1().Jobs(job.Namespace), job.Name)()
 	}, ctx.Done())
 	if err != nil {
 		return err

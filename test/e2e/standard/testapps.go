@@ -107,7 +107,7 @@ func (sc *SanityChecker) validateStatefulApp(ctx context.Context, namespace stri
 			return err
 		}
 		sc.log.Debugf("waiting for database deploymentconfig to reflect %d replicas", i)
-		waitErr := wait.PollImmediate(2*time.Second, 10*time.Minute, ready.DeploymentConfigIsReady(sc.Client.EndUser.OAppsV1.DeploymentConfigs(namespace), dcName))
+		waitErr := wait.PollImmediate(2*time.Second, 10*time.Minute, ready.CheckDeploymentConfigIsReady(sc.Client.EndUser.OAppsV1.DeploymentConfigs(namespace), dcName))
 		if waitErr != nil {
 			return waitErr
 		}

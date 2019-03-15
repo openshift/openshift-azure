@@ -20,7 +20,7 @@ import (
 	apiregistrationv1client "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset/typed/apiregistration/v1"
 )
 
-func APIServiceIsReady(cli apiregistrationv1client.APIServiceInterface, name string) func() (bool, error) {
+func CheckAPIServiceIsReady(cli apiregistrationv1client.APIServiceInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
 		svc, err := cli.Get(name, metav1.GetOptions{})
 		switch {
@@ -41,9 +41,9 @@ func APIServiceIsReady(cli apiregistrationv1client.APIServiceInterface, name str
 	}
 }
 
-func CRDReady(cli kapiextensionsv1beta1client.CustomResourceDefinitionInterface, name string) func() (bool, error) {
+func CheckCustomResourceDefinitionIsReady(cli kapiextensionsv1beta1client.CustomResourceDefinitionInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
-		svc, err := cli.Get(name, metav1.GetOptions{})
+		crd, err := cli.Get(name, metav1.GetOptions{})
 		switch {
 		case errors.IsNotFound(err):
 			return false, nil
@@ -51,7 +51,7 @@ func CRDReady(cli kapiextensionsv1beta1client.CustomResourceDefinitionInterface,
 			return false, err
 		}
 
-		for _, cond := range svc.Status.Conditions {
+		for _, cond := range crd.Status.Conditions {
 			if cond.Type == kapiextensionsv1beta1.Established &&
 				cond.Status == kapiextensionsv1beta1.ConditionTrue {
 				return true, nil
@@ -62,7 +62,7 @@ func CRDReady(cli kapiextensionsv1beta1client.CustomResourceDefinitionInterface,
 	}
 }
 
-func DaemonSetIsReady(cli appsv1client.DaemonSetInterface, name string) func() (bool, error) {
+func CheckDaemonSetIsReady(cli appsv1client.DaemonSetInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
 		ds, err := cli.Get(name, metav1.GetOptions{})
 		switch {
@@ -78,7 +78,7 @@ func DaemonSetIsReady(cli appsv1client.DaemonSetInterface, name string) func() (
 	}
 }
 
-func DeploymentIsReady(cli appsv1client.DeploymentInterface, name string) func() (bool, error) {
+func CheckDeploymentIsReady(cli appsv1client.DeploymentInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
 		d, err := cli.Get(name, metav1.GetOptions{})
 		switch {
@@ -99,7 +99,7 @@ func DeploymentIsReady(cli appsv1client.DeploymentInterface, name string) func()
 	}
 }
 
-func DeploymentConfigIsReady(cli oappsv1client.DeploymentConfigInterface, name string) func() (bool, error) {
+func CheckDeploymentConfigIsReady(cli oappsv1client.DeploymentConfigInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
 		dc, err := cli.Get(name, metav1.GetOptions{})
 		switch {
@@ -117,7 +117,7 @@ func DeploymentConfigIsReady(cli oappsv1client.DeploymentConfigInterface, name s
 	}
 }
 
-func NodeIsReady(cli corev1client.NodeInterface, name string) func() (bool, error) {
+func CheckNodeIsReady(cli corev1client.NodeInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
 		node, err := cli.Get(name, metav1.GetOptions{})
 		switch {
@@ -138,7 +138,7 @@ func NodeIsReady(cli corev1client.NodeInterface, name string) func() (bool, erro
 	}
 }
 
-func PodIsReady(cli corev1client.PodInterface, name string) func() (bool, error) {
+func CheckPodIsReady(cli corev1client.PodInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
 		node, err := cli.Get(name, metav1.GetOptions{})
 		switch {
@@ -159,8 +159,8 @@ func PodIsReady(cli corev1client.PodInterface, name string) func() (bool, error)
 	}
 }
 
-// PodHasPhase will return true when the pod's phase matches the requested phase
-func PodHasPhase(cli corev1client.PodInterface, name string, phase corev1.PodPhase) func() (bool, error) {
+// CheckPodHasPhase will return true when the pod's phase matches the requested phase
+func CheckPodHasPhase(cli corev1client.PodInterface, name string, phase corev1.PodPhase) func() (bool, error) {
 	return func() (bool, error) {
 		node, err := cli.Get(name, metav1.GetOptions{})
 		switch {
@@ -174,7 +174,7 @@ func PodHasPhase(cli corev1client.PodInterface, name string, phase corev1.PodPha
 	}
 }
 
-func BatchIsReady(cli batchv1client.JobInterface, name string) func() (bool, error) {
+func CheckJobIsReady(cli batchv1client.JobInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
 		job, err := cli.Get(name, metav1.GetOptions{})
 		switch {
@@ -195,7 +195,7 @@ func BatchIsReady(cli batchv1client.JobInterface, name string) func() (bool, err
 	}
 }
 
-func StatefulSetIsReady(cli appsv1client.StatefulSetInterface, name string) func() (bool, error) {
+func CheckStatefulSetIsReady(cli appsv1client.StatefulSetInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
 		ss, err := cli.Get(name, metav1.GetOptions{})
 		switch {
@@ -216,7 +216,7 @@ func StatefulSetIsReady(cli appsv1client.StatefulSetInterface, name string) func
 	}
 }
 
-func TemplateInstanceIsReady(cli templatev1client.TemplateInstanceInterface, name string) func() (bool, error) {
+func CheckTemplateInstanceIsReady(cli templatev1client.TemplateInstanceInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
 		ti, err := cli.Get(name, metav1.GetOptions{})
 		switch {
@@ -240,7 +240,7 @@ func TemplateInstanceIsReady(cli templatev1client.TemplateInstanceInterface, nam
 	}
 }
 
-func ServiceIsReady(cli corev1client.ServiceInterface, name string) func() (bool, error) {
+func CheckServiceIsReady(cli corev1client.ServiceInterface, name string) func() (bool, error) {
 	return func() (bool, error) {
 		ti, err := cli.Get(name, metav1.GetOptions{})
 		switch {

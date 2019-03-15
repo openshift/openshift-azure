@@ -89,7 +89,7 @@ func (u *kubeclient) WaitForInfraServices(ctx context.Context) *api.PluginError 
 	for _, app := range daemonsetWhitelist {
 		u.log.Infof("checking daemonset %s/%s", app.Namespace, app.Name)
 
-		err := wait.PollImmediateUntil(time.Second, ready.DaemonSetIsReady(u.client.AppsV1().DaemonSets(app.Namespace), app.Name), ctx.Done())
+		err := wait.PollImmediateUntil(time.Second, ready.CheckDaemonSetIsReady(u.client.AppsV1().DaemonSets(app.Namespace), app.Name), ctx.Done())
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForInfraDaemonSets}
 		}
@@ -98,7 +98,7 @@ func (u *kubeclient) WaitForInfraServices(ctx context.Context) *api.PluginError 
 	for _, app := range statefulsetWhitelist {
 		u.log.Infof("checking statefulset %s/%s", app.Namespace, app.Name)
 
-		err := wait.PollImmediateUntil(time.Second, ready.StatefulSetIsReady(u.client.AppsV1().StatefulSets(app.Namespace), app.Name), ctx.Done())
+		err := wait.PollImmediateUntil(time.Second, ready.CheckStatefulSetIsReady(u.client.AppsV1().StatefulSets(app.Namespace), app.Name), ctx.Done())
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForInfraStatefulSets}
 		}
@@ -107,7 +107,7 @@ func (u *kubeclient) WaitForInfraServices(ctx context.Context) *api.PluginError 
 	for _, app := range deploymentWhitelist {
 		u.log.Infof("checking deployment %s/%s", app.Namespace, app.Name)
 
-		err := wait.PollImmediateUntil(time.Second, ready.DeploymentIsReady(u.client.AppsV1().Deployments(app.Namespace), app.Name), ctx.Done())
+		err := wait.PollImmediateUntil(time.Second, ready.CheckDeploymentIsReady(u.client.AppsV1().Deployments(app.Namespace), app.Name), ctx.Done())
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForInfraDeployments}
 		}
@@ -121,26 +121,26 @@ func (u *kubeclient) WaitForReadyMaster(ctx context.Context, hostname string) er
 }
 
 func (u *kubeclient) masterIsReady(hostname string) (bool, error) {
-	r, err := ready.NodeIsReady(u.client.CoreV1().Nodes(), hostname)()
+	r, err := ready.CheckNodeIsReady(u.client.CoreV1().Nodes(), hostname)()
 	if !r || err != nil {
 		return r, err
 	}
 
-	r, err = ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "master-etcd-"+hostname)()
+	r, err = ready.CheckPodIsReady(u.client.CoreV1().Pods("kube-system"), "master-etcd-"+hostname)()
 	if !r || err != nil {
 		return r, err
 	}
 
-	r, err = ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "master-api-"+hostname)()
+	r, err = ready.CheckPodIsReady(u.client.CoreV1().Pods("kube-system"), "master-api-"+hostname)()
 	if !r || err != nil {
 		return r, err
 	}
 
-	return ready.PodIsReady(u.client.CoreV1().Pods("kube-system"), "controllers-"+hostname)()
+	return ready.CheckPodIsReady(u.client.CoreV1().Pods("kube-system"), "controllers-"+hostname)()
 }
 
 func (u *kubeclient) WaitForReadyWorker(ctx context.Context, hostname string) error {
-	return wait.PollImmediateUntil(time.Second, ready.NodeIsReady(u.client.CoreV1().Nodes(), hostname), ctx.Done())
+	return wait.PollImmediateUntil(time.Second, ready.CheckNodeIsReady(u.client.CoreV1().Nodes(), hostname), ctx.Done())
 }
 
 func (u *kubeclient) WaitForReadySyncPod(ctx context.Context) error {
