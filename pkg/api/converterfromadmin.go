@@ -431,6 +431,9 @@ func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig)
 	if in.NodeBootstrap != nil {
 		mergeCertKeyPair(in.NodeBootstrap, &out.NodeBootstrap)
 	}
+	if in.SDN != nil {
+		mergeCertKeyPair(in.SDN, &out.SDN)
+	}
 	if in.Registry != nil {
 		mergeCertKeyPair(in.Registry, &out.Registry)
 	}

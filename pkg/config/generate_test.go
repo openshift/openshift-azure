@@ -110,6 +110,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assertCert(c.Certificates.MasterProxyClient, "MasterProxyClient")
 	assertCert(c.Certificates.OpenShiftMaster, "OpenShiftMaster")
 	assertCert(c.Certificates.NodeBootstrap, "NodeBootstrap")
+	assertCert(c.Certificates.SDN, "SDN")
 	assertCert(c.Certificates.Registry, "Registry")
 	assertCert(c.Certificates.RegistryConsole, "RegistryConsole")
 	assertCert(c.Certificates.ServiceCatalogServer, "ServiceCatalogServer")
@@ -125,6 +126,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 	assert(c.MasterKubeconfig != nil, "MasterKubeconfig")
 	assert(c.AdminKubeconfig != nil, "AdminKubeconfig")
 	assert(c.NodeBootstrapKubeconfig != nil, "NodeBootstrapKubeconfig")
+	assert(c.SDNKubeconfig != nil, "SDNKubeconfig")
 	assert(c.BlackBoxMonitorKubeconfig != nil, "BlackBoxMonitorKubeconfig")
 }
 
@@ -178,6 +180,9 @@ func TestInvalidateSecrets(t *testing.T) {
 	}
 	if reflect.DeepEqual(saved.Config.Certificates.NodeBootstrap, cs.Config.Certificates.NodeBootstrap) {
 		t.Errorf("expected change to NodeBootstrap certificates after secret invalidation")
+	}
+	if reflect.DeepEqual(saved.Config.Certificates.SDN, cs.Config.Certificates.SDN) {
+		t.Errorf("expected change to SDN certificates after secret invalidation")
 	}
 	if reflect.DeepEqual(saved.Config.Certificates.OpenShiftMaster, cs.Config.Certificates.OpenShiftMaster) {
 		t.Errorf("expected change to OpenShiftMaster certificates after secret invalidation")
@@ -241,6 +246,7 @@ func TestInvalidateSecrets(t *testing.T) {
 	cs.Config.Certificates.MasterProxyClient = saved.Config.Certificates.MasterProxyClient
 	cs.Config.Certificates.MasterServer = saved.Config.Certificates.MasterServer
 	cs.Config.Certificates.NodeBootstrap = saved.Config.Certificates.NodeBootstrap
+	cs.Config.Certificates.SDN = saved.Config.Certificates.SDN
 	cs.Config.Certificates.OpenShiftMaster = saved.Config.Certificates.OpenShiftMaster
 	cs.Config.Certificates.Registry = saved.Config.Certificates.Registry
 	cs.Config.Certificates.RegistryConsole = saved.Config.Certificates.RegistryConsole

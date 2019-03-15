@@ -127,6 +127,7 @@ type CertificateConfig struct {
 	MasterProxyClient    *Certificate      `json:"masterProxyClient,omitempty"`
 	OpenShiftMaster      *Certificate      `json:"openShiftMaster,omitempty"`
 	NodeBootstrap        *Certificate      `json:"nodeBootstrap,omitempty"`
+	SDN                  *Certificate      `json:"sdn,omitempty"`
 
 	// infra certificates
 	Registry             *Certificate      `json:"registry,omitempty"`

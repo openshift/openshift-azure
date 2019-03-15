@@ -95,6 +95,8 @@ spec:
           name: host-config-openvswitch
       hostNetwork: true
       hostPID: true
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
       priorityClassName: system-node-critical
       serviceAccountName: sdn
       volumes:

@@ -39,6 +39,7 @@ type Config struct {
 	AdminKubeconfig           *v1.Config `json:"adminKubeconfig,omitempty"`
 	MasterKubeconfig          *v1.Config `json:"masterKubeconfig,omitempty"`
 	NodeBootstrapKubeconfig   *v1.Config `json:"nodeBootstrapKubeconfig,omitempty"`
+	SDNKubeconfig             *v1.Config `json:"sdnKubeconfig,omitempty"`
 	BlackBoxMonitorKubeconfig *v1.Config `json:"blackBoxMonitorKubeconfig,omitempty"`
 
 	// misc control plane configurables
@@ -155,6 +156,7 @@ type CertificateConfig struct {
 	MasterProxyClient    CertKeyPair      `json:"masterProxyClient,omitempty"`
 	OpenShiftMaster      CertKeyPair      `json:"openShiftMaster,omitempty"`
 	NodeBootstrap        CertKeyPair      `json:"nodeBootstrap,omitempty"`
+	SDN                  CertKeyPair      `json:"sdn,omitempty"`
 
 	// infra certificates
 	Registry             CertKeyPair      `json:"registry,omitempty"`

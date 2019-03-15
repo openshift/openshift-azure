@@ -139,6 +139,8 @@ spec:
           name: host-var-lib-cni-networks-openshift-sdn
       hostNetwork: true
       hostPID: true
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
       priorityClassName: system-node-critical
       serviceAccountName: sdn
       volumes:

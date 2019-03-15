@@ -61,6 +61,7 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 		Expect(reflect.DeepEqual(before.Config.Certificates.MasterProxyClient.Cert, after.Config.Certificates.MasterProxyClient.Cert)).To(BeFalse())
 		Expect(reflect.DeepEqual(before.Config.Certificates.MasterServer.Cert, after.Config.Certificates.MasterServer.Cert)).To(BeFalse())
 		Expect(reflect.DeepEqual(before.Config.Certificates.NodeBootstrap.Cert, after.Config.Certificates.NodeBootstrap.Cert)).To(BeFalse())
+		Expect(reflect.DeepEqual(before.Config.Certificates.SDN.Cert, after.Config.Certificates.SDN.Cert)).To(BeFalse())
 		Expect(reflect.DeepEqual(before.Config.Certificates.OpenShiftMaster.Cert, after.Config.Certificates.OpenShiftMaster.Cert)).To(BeFalse())
 		Expect(reflect.DeepEqual(before.Config.Certificates.Registry.Cert, after.Config.Certificates.Registry.Cert)).To(BeFalse())
 		Expect(reflect.DeepEqual(before.Config.Certificates.RegistryConsole.Cert, after.Config.Certificates.RegistryConsole.Cert)).To(BeFalse())
