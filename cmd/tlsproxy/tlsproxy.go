@@ -116,7 +116,7 @@ func (c *config) Run() error {
 		req.RequestURI = ""
 		req.Host = ""
 
-		if !c.whitelistRegexp.MatchString(req.URL.String()) || req.Method != http.MethodGet {
+		if !c.whitelistRegexp.MatchString(req.URL.Path) || req.Method != http.MethodGet {
 			http.Error(rw, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 			return
 		}
