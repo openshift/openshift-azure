@@ -51,7 +51,7 @@ func TestCreateOrUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			armGenerator := mock_arm.NewMockGenerator(mockCtrl)
 			clusterUpgrader := mock_cluster.NewMockUpgrader(mockCtrl)
-			c := clusterUpgrader.EXPECT().CreateClients(nil, cs, tt.isUpdate).Return(nil)
+			c := clusterUpgrader.EXPECT().CreateClients(nil, cs, true).Return(nil)
 			c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 			if !tt.isUpdate {
 				c = clusterUpgrader.EXPECT().CreateConfigStorageAccount(nil, cs).Return(nil).After(c)

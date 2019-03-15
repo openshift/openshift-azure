@@ -128,7 +128,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
 	suffix := fmt.Sprintf("%d", time.Now().Unix())
 
-	err := p.clusterUpgrader.CreateClients(ctx, cs, isUpdate)
+	err := p.clusterUpgrader.CreateClients(ctx, cs, true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}

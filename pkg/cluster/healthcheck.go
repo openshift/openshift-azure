@@ -77,14 +77,9 @@ func (u *simpleUpgrader) doHealthCheck(ctx context.Context, cli wait.SimpleHTTPC
 
 // HealthCheck function to verify cluster health
 func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
-	err := u.kubeclient.WaitForInfraServices(ctx)
-	if err != nil {
-		return err
-	}
-
 	u.log.Info("checking developer console health")
 	cert := cs.Config.Certificates.OpenShiftConsole.Certs
-	err = u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs.Properties.FQDN, cert[len(cert)-1]), "https://"+cs.Properties.PublicHostname+"/console/", time.Second)
+	err := u.doHealthCheck(ctx, getHealthCheckHTTPClient(cs.Properties.FQDN, cert[len(cert)-1]), "https://"+cs.Properties.PublicHostname+"/console/", time.Second)
 	if err != nil {
 		return err
 	}

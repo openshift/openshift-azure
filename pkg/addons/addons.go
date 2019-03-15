@@ -14,16 +14,22 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/util/ready"
 )
 
-const ownedBySyncPodLabelKey = "azure.openshift.io/owned-by-sync-pod"
+const (
+	ownedBySyncPodLabelKey          = "azure.openshift.io/owned-by-sync-pod"
+	syncPodWaitForReadinessLabelKey = "azure.openshift.io/sync-pod-wait-for-readiness"
+)
 
 // Unmarshal has to reimplement yaml.Unmarshal because it universally mangles yaml
 // integers into float64s, whereas the Kubernetes client library uses int64s
@@ -165,6 +171,62 @@ func setPodTemplateAnnotation(key, value string, o unstructured.Unstructured) {
 	}
 	annotations[key] = value
 	unstructured.SetNestedStringMap(o.Object, annotations, "spec", "template", "metadata", "annotations")
+}
+
+func CalculateReadiness(kc kubernetes.Interface, db map[string]unstructured.Unstructured) (errs []error) {
+	var keys []string
+	for k := range db {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		o := db[k]
+
+		if o.GetLabels()[syncPodWaitForReadinessLabelKey] == "false" {
+			continue
+		}
+
+		gk := o.GroupVersionKind().GroupKind()
+
+		switch gk.String() {
+		case "DaemonSet.apps":
+			ds, err := kc.AppsV1().DaemonSets(o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
+			if err != nil {
+				errs = append(errs, err)
+			} else if !ready.DaemonSetIsReady(ds) {
+				errs = append(errs, fmt.Errorf("%s %s/%s is not ready: %d,%d/%d", gk.String(), o.GetNamespace(), o.GetName(), ds.Status.UpdatedNumberScheduled, ds.Status.NumberAvailable, ds.Status.DesiredNumberScheduled))
+			}
+
+		case "Deployment.apps":
+			d, err := kc.AppsV1().Deployments(o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
+			if err != nil {
+				errs = append(errs, err)
+			} else if !ready.DeploymentIsReady(d) {
+				specReplicas := int32(1)
+				if d.Spec.Replicas != nil {
+					specReplicas = *d.Spec.Replicas
+				}
+
+				errs = append(errs, fmt.Errorf("%s %s/%s is not ready: %d,%d/%d", gk.String(), o.GetNamespace(), o.GetName(), d.Status.UpdatedReplicas, d.Status.AvailableReplicas, specReplicas))
+			}
+
+		case "StatefulSet.apps":
+			ss, err := kc.AppsV1().StatefulSets(o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
+			if err != nil {
+				errs = append(errs, err)
+			} else if !ready.StatefulSetIsReady(ss) {
+				specReplicas := int32(1)
+				if ss.Spec.Replicas != nil {
+					specReplicas = *ss.Spec.Replicas
+				}
+
+				errs = append(errs, fmt.Errorf("%s %s/%s is not ready: %d,%d/%d", gk.String(), o.GetNamespace(), o.GetName(), ss.Status.UpdatedReplicas, ss.Status.ReadyReplicas, specReplicas))
+			}
+		}
+	}
+
+	return
 }
 
 // resource filters

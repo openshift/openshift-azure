@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: cluster-monitoring-operator
+    azure.openshift.io/sync-pod-wait-for-readiness: "false"
   name: cluster-monitoring-operator
   namespace: openshift-monitoring
 spec:

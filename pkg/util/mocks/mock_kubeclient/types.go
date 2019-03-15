@@ -10,8 +10,6 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	v1 "k8s.io/api/core/v1"
-
-	api "github.com/openshift/openshift-azure/pkg/api"
 )
 
 // MockKubeclient is a mock of Kubeclient interface
@@ -106,20 +104,6 @@ func (m *MockKubeclient) GetControlPlanePods(arg0 context.Context) ([]v1.Pod, er
 func (mr *MockKubeclientMockRecorder) GetControlPlanePods(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetControlPlanePods", reflect.TypeOf((*MockKubeclient)(nil).GetControlPlanePods), arg0)
-}
-
-// WaitForInfraServices mocks base method
-func (m *MockKubeclient) WaitForInfraServices(arg0 context.Context) *api.PluginError {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WaitForInfraServices", arg0)
-	ret0, _ := ret[0].(*api.PluginError)
-	return ret0
-}
-
-// WaitForInfraServices indicates an expected call of WaitForInfraServices
-func (mr *MockKubeclientMockRecorder) WaitForInfraServices(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForInfraServices", reflect.TypeOf((*MockKubeclient)(nil).WaitForInfraServices), arg0)
 }
 
 // WaitForReadyMaster mocks base method

@@ -12,8 +12,6 @@ import (
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
-
-	"github.com/openshift/openshift-azure/pkg/api"
 )
 
 // Kubeclient interface to utility kubenetes functions
@@ -23,7 +21,6 @@ type Kubeclient interface {
 	DeleteMaster(hostname string) error
 	DeletePod(ctx context.Context, namespace, name string) error
 	GetControlPlanePods(ctx context.Context) ([]corev1.Pod, error)
-	WaitForInfraServices(ctx context.Context) *api.PluginError
 	WaitForReadyMaster(ctx context.Context, hostname string) error
 	WaitForReadyWorker(ctx context.Context, hostname string) error
 	WaitForReadySyncPod(ctx context.Context) error

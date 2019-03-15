@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: metrics-bridge
+    azure.openshift.io/sync-pod-wait-for-readiness: "false"
   name: metrics-bridge
   namespace: openshift-azure-monitoring
 spec:

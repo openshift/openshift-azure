@@ -3,15 +3,19 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net"
 	"net/http"
 	"sort"
+	"sync/atomic"
 	"time"
 
 	"github.com/ghodss/yaml"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -34,16 +38,18 @@ var (
 )
 
 type sync struct {
-	azs  azureclient.AccountsClient
-	kvc  azureclient.KeyVaultClient
-	blob azureclientstorage.Blob
-	log  *logrus.Entry
-
+	azs   azureclient.AccountsClient
+	kvc   azureclient.KeyVaultClient
+	blob  azureclientstorage.Blob
+	kc    kubernetes.Interface
+	log   *logrus.Entry
 	db    map[string]unstructured.Unstructured
-	ready bool
+	ready atomic.Value
 }
 
 func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
+	s.ready.Store(false)
+
 	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
 	if err != nil {
 		return err
@@ -86,10 +92,23 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 }
 
 func (s *sync) readyHandler(w http.ResponseWriter, r *http.Request) {
-	if s.ready {
-		w.WriteHeader(http.StatusOK)
+	var errs []error
+
+	if !s.ready.Load().(bool) {
+		errs = []error{fmt.Errorf("sync pod has not completed first run")}
 	} else {
-		w.WriteHeader(http.StatusServiceUnavailable)
+		errs = addons.CalculateReadiness(s.kc, s.db)
+	}
+
+	if len(errs) == 0 {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	w.Header().Set("Content-type", "text/plain")
+	w.WriteHeader(http.StatusInternalServerError)
+	for _, err := range errs {
+		fmt.Fprintln(w, err)
 	}
 }
 
@@ -114,6 +133,16 @@ func (s *sync) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, error
 	v := validate.NewAPIValidator(cs.Config.RunningUnderTest)
 	if errs := v.Validate(cs, nil, false); len(errs) > 0 {
 		return nil, kerrors.NewAggregate(errs)
+	}
+
+	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
+	if err != nil {
+		return nil, err
+	}
+
+	s.kc, err = kubernetes.NewForConfig(restconfig)
+	if err != nil {
+		return nil, err
 	}
 
 	return cs, nil
@@ -177,7 +206,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 			// TODO: move healthchecks/deployment waits here
 			// TODO: when etcd monitoring code gets added, set this earlier
 			// otherwise cluster creation will block on the monitoring stack
-			s.ready = true
+			s.ready.Store(true)
 		}
 		if *once {
 			return nil
