@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
@@ -120,13 +118,8 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
-	u, err := url.Parse(vaultURL)
-	if err != nil {
-		return nil, err
-	}
-
 	log.Info("setting up key vault")
-	err = vm.createOrUpdateVault(ctx, os.Getenv("AZURE_CLIENT_ID"), cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, strings.Split(u.Host, ".")[0])
+	err = vm.createOrUpdateVault(ctx, log, os.Getenv("AZURE_CLIENT_ID"), cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultURL)
 	if err != nil {
 		return nil, err
 	}
