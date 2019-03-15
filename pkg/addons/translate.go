@@ -525,18 +525,6 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.WebConsole }}",
 		},
 	},
-	"ImageStream.image.openshift.io/openshift-node/node": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.tags[0].from.name"),
-			Template: "{{ .Config.Images.Node }}",
-		},
-	},
-	"ImageStream.image.openshift.io/openshift-sdn/node": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.tags[0].from.name"),
-			Template: "{{ .Config.Images.Node }}",
-		},
-	},
 	"OAuthClient.oauth.openshift.io/cockpit-oauth-client": {
 		{
 			Path:     jsonpath.MustCompile("$.redirectURIs[0]"),

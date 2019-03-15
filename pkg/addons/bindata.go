@@ -357,8 +357,6 @@
 // data/ImageStream.image.openshift.io/openshift/rhpam70-kieserver-openshift.yaml
 // data/ImageStream.image.openshift.io/openshift/rhpam70-smartrouter-openshift.yaml
 // data/ImageStream.image.openshift.io/openshift/ruby.yaml
-// data/ImageStream.image.openshift.io/openshift-node/node.yaml
-// data/ImageStream.image.openshift.io/openshift-sdn/node.yaml
 // data/Namespace/default.yaml
 // data/Namespace/kube-public.yaml
 // data/Namespace/kube-service-catalog.yaml
@@ -7901,46 +7899,6 @@ func imagestreamImageOpenshiftIoOpenshiftRubyYaml() (*asset, error) {
 	return a, nil
 }
 
-var _imagestreamImageOpenshiftIoOpenshiftNodeNodeYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x54\x8f\xcd\x6a\xc4\x30\x0c\x84\xef\x79\x0a\xdd\x16\x0c\xbb\x25\xf4\xe6\x5b\x61\x43\xe9\xa5\x94\x6e\xe9\x5d\x38\x4a\x6a\x62\x4b\xc6\x56\x16\x96\xd2\x77\x2f\x76\x42\x7f\x8e\x9a\x19\x0d\xdf\x60\xf2\xef\x94\x8b\x17\xb6\xe0\x23\xce\x74\x92\x44\x5c\x3e\xfc\xa4\x27\x2f\x77\xd7\xbe\x5b\x3c\x8f\x16\x9e\xaa\x77\xd1\x4c\x18\xbb\x48\x8a\x23\x2a\xda\x0e\x80\x31\x92\x05\x96\x91\xf6\xa3\x24\x74\x64\xe1\xa7\xe5\xd8\xbc\x92\xc8\xd5\x78\x10\x59\xd6\xf4\x22\xc1\xbb\x5b\xbd\xab\xe2\x30\x58\x98\x30\x94\x5a\xa1\x38\x97\x6a\x1c\x01\x99\x45\x51\xbd\x70\xb1\xc0\x6b\x08\x2d\x3e\x65\x89\xdb\x23\xc0\x46\x76\x16\xb7\x50\x6e\x7c\xbb\xbe\x31\x1d\x8c\x31\xf0\x38\x3c\x0f\xaf\x0f\x6f\xc3\x19\x8c\x31\x87\xe6\xcf\xc4\x94\x5b\xaf\x85\xbe\x29\x3e\x26\xc9\xba\x43\xc1\xe7\x57\xf7\x5b\x72\xbd\x3f\xf5\x5b\x28\xd3\x44\x99\xb8\x6e\xd3\xbc\xd2\x7f\xed\xef\x20\x00\xbd\x25\xb2\x70\x91\x35\x3b\xea\xbe\x03\x00\x00\xff\xff\x1b\x3a\x2d\x38\x61\x01\x00\x00")
-
-func imagestreamImageOpenshiftIoOpenshiftNodeNodeYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_imagestreamImageOpenshiftIoOpenshiftNodeNodeYaml,
-		"ImageStream.image.openshift.io/openshift-node/node.yaml",
-	)
-}
-
-func imagestreamImageOpenshiftIoOpenshiftNodeNodeYaml() (*asset, error) {
-	bytes, err := imagestreamImageOpenshiftIoOpenshiftNodeNodeYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "ImageStream.image.openshift.io/openshift-node/node.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _imagestreamImageOpenshiftIoOpenshiftSdnNodeYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x54\x8f\xcd\x6a\xc4\x30\x0c\x84\xef\x7e\x0a\xdd\x16\x0c\xbb\x25\xf4\xe6\x5b\x61\x43\xe9\xa5\x94\x6e\xe9\x5d\x38\x4a\x6a\x62\x4b\xc6\x56\x16\x96\xd2\x77\x2f\x4e\x42\x7f\x8e\x9a\x19\x0d\xdf\x60\x0e\xef\x54\x6a\x10\x76\x10\x12\x4e\x74\x92\x4c\x5c\x3f\xc2\xa8\xa7\x20\x77\xd7\xce\xcc\x81\x07\x07\x4f\xcd\xbb\x68\x21\x4c\x26\x91\xe2\x80\x8a\xce\x00\x30\x26\x72\xc0\x32\xd0\x7e\xd4\x8c\x9e\x1c\xfc\xb4\x1c\xeb\xc0\xa6\x66\xf2\x2d\x1d\x45\xe6\x25\xbf\x48\x0c\xfe\xd6\xee\xa6\x78\x8c\x0e\x46\x8c\xb5\x35\x28\x4e\xb5\x19\x47\x40\x66\x51\xd4\x20\x5c\x1d\xf0\x12\xe3\x1a\x1f\x8b\xa4\xed\x11\x60\x03\x3b\x8b\x9f\xa9\xac\x78\xbb\xbe\x21\x1d\xac\xb5\xf0\xd8\x3f\xf7\xaf\x0f\x6f\xfd\x19\xac\xb5\x87\xd5\x9f\x88\xa9\xac\xbd\x0e\xba\x55\x09\x29\x4b\xd1\x1d\x0a\x3e\xbf\xcc\x6f\xc9\xf5\xfe\xd4\x6d\xa1\x42\x23\x15\xe2\x36\x4d\xcb\x42\xff\xb5\xbf\x83\x00\xf4\x96\xc9\xc1\x45\x96\xe2\xc9\x7c\x07\x00\x00\xff\xff\x52\x7a\x38\xcc\x60\x01\x00\x00")
-
-func imagestreamImageOpenshiftIoOpenshiftSdnNodeYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_imagestreamImageOpenshiftIoOpenshiftSdnNodeYaml,
-		"ImageStream.image.openshift.io/openshift-sdn/node.yaml",
-	)
-}
-
-func imagestreamImageOpenshiftIoOpenshiftSdnNodeYaml() (*asset, error) {
-	bytes, err := imagestreamImageOpenshiftIoOpenshiftSdnNodeYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "ImageStream.image.openshift.io/openshift-sdn/node.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _namespaceDefaultYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x5c\xcb\x31\x0e\xc2\x30\x0c\x46\xe1\x3d\xa7\xb0\xba\x17\xc4\x9a\x43\x30\xb2\xbb\xcd\x5f\x61\x35\xb1\xa3\xd8\x65\xe0\xf4\xa8\x88\x89\xf1\x49\xdf\xe3\x2e\x0f\x0c\x17\xd3\x4c\xaf\x5b\xda\x45\x4b\xa6\x3b\x37\x78\xe7\x15\xa9\x21\xb8\x70\x70\x4e\x44\xac\x6a\xc1\x21\xa6\x7e\x26\x91\x75\xa8\x3f\x65\x8b\x8b\xd8\x55\xad\x60\x76\x54\xac\x61\x23\xd3\x34\x25\xa2\xca\x0b\xea\x0f\x2b\x37\x64\x2a\xd8\xf8\xa8\x91\xfe\xdb\x3b\xd6\xd3\x6d\xa2\x5c\xe5\x8d\xf1\xbd\x66\xda\x8f\x05\x43\x11\xf0\xf4\x09\x00\x00\xff\xff\x0e\x67\x0c\x65\xaa\x00\x00\x00")
 
 func namespaceDefaultYamlBytes() ([]byte, error) {
@@ -15090,8 +15048,6 @@ var _bindata = map[string]func() (*asset, error){
 	"ImageStream.image.openshift.io/openshift/rhpam70-kieserver-openshift.yaml":                                                  imagestreamImageOpenshiftIoOpenshiftRhpam70KieserverOpenshiftYaml,
 	"ImageStream.image.openshift.io/openshift/rhpam70-smartrouter-openshift.yaml":                                                imagestreamImageOpenshiftIoOpenshiftRhpam70SmartrouterOpenshiftYaml,
 	"ImageStream.image.openshift.io/openshift/ruby.yaml":                                                                         imagestreamImageOpenshiftIoOpenshiftRubyYaml,
-	"ImageStream.image.openshift.io/openshift-node/node.yaml":                                                                    imagestreamImageOpenshiftIoOpenshiftNodeNodeYaml,
-	"ImageStream.image.openshift.io/openshift-sdn/node.yaml":                                                                     imagestreamImageOpenshiftIoOpenshiftSdnNodeYaml,
 	"Namespace/default.yaml":                                                                                                             namespaceDefaultYaml,
 	"Namespace/kube-public.yaml":                                                                                                         namespaceKubePublicYaml,
 	"Namespace/kube-service-catalog.yaml":                                                                                                namespaceKubeServiceCatalogYaml,
@@ -15903,12 +15859,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"rhpam70-kieserver-openshift.yaml":                  {imagestreamImageOpenshiftIoOpenshiftRhpam70KieserverOpenshiftYaml, map[string]*bintree{}},
 			"rhpam70-smartrouter-openshift.yaml":                {imagestreamImageOpenshiftIoOpenshiftRhpam70SmartrouterOpenshiftYaml, map[string]*bintree{}},
 			"ruby.yaml":                                         {imagestreamImageOpenshiftIoOpenshiftRubyYaml, map[string]*bintree{}},
-		}},
-		"openshift-node": {nil, map[string]*bintree{
-			"node.yaml": {imagestreamImageOpenshiftIoOpenshiftNodeNodeYaml, map[string]*bintree{}},
-		}},
-		"openshift-sdn": {nil, map[string]*bintree{
-			"node.yaml": {imagestreamImageOpenshiftIoOpenshiftSdnNodeYaml, map[string]*bintree{}},
 		}},
 	}},
 	"Namespace": {nil, map[string]*bintree{
