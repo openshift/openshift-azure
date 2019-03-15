@@ -92,7 +92,9 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 }
 
 func validateComponentLogLevel(c *pluginapi.ComponentLogLevel) (errs []error) {
-	if c.APIServer < 0 || c.APIServer > 20 {
+	// can't set logging level > 7 due to:
+	// https://bugzilla.redhat.com/show_bug.cgi?id=1689366
+	if c.APIServer < 0 || c.APIServer > 7 {
 		errs = append(errs, fmt.Errorf("invalid componentLogLevel.apiServer %d", c.APIServer))
 	}
 
