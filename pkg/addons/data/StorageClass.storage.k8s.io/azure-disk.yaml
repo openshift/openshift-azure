@@ -5,6 +5,7 @@ metadata:
     storageclass.kubernetes.io/is-default-class: "true"
   name: azure-disk
 parameters:
+  cachingmode: None
   fsType: xfs
   kind: managed
   location: '*** GENERATED ***'
