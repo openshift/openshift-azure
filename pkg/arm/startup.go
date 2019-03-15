@@ -20,7 +20,6 @@ func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, w wri
 			continue
 		}
 
-		log.Debugf("processing template %s", templateFileName)
 		templateFile, err := Asset(templateFileName)
 		if err != nil {
 			return err
