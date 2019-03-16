@@ -55,14 +55,6 @@ func NewSimpleGenerator(ctx context.Context, cs *api.OpenShiftManagedCluster, te
 		accountsClient: azureclient.NewAccountsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
 	}
 
-	if cs.Config.ConfigStorageAccountKey == "" {
-		keys, err := g.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
-		if err != nil {
-			return nil, err
-		}
-		cs.Config.ConfigStorageAccountKey = *(*keys.Keys)[0].Value
-	}
-
 	g.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
 	if err != nil {
 		return nil, err
