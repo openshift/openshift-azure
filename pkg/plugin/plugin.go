@@ -21,10 +21,11 @@ import (
 )
 
 type plugin struct {
+	// nothing in here should be dependent on an OpenShiftManagedCluster object
 	log             *logrus.Entry
 	pluginConfig    *pluginapi.Config
 	testConfig      api.TestConfig
-	clusterUpgrader cluster.Upgrader
+	upgraderFactory func(*logrus.Entry, api.TestConfig) cluster.Upgrader
 	armGenerator    arm.Generator
 	configGenerator config.Generator
 }
@@ -37,7 +38,7 @@ func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, testConfig api
 		log:             log,
 		pluginConfig:    pluginConfig,
 		testConfig:      testConfig,
-		clusterUpgrader: cluster.NewSimpleUpgrader(log, testConfig),
+		upgraderFactory: cluster.NewSimpleUpgrader,
 		armGenerator:    arm.NewSimpleGenerator(testConfig),
 		configGenerator: config.NewSimpleGenerator(testConfig.RunningUnderTest),
 	}, nil
@@ -72,6 +73,8 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 }
 
 func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, backupBlob string) *api.PluginError {
+	clusterUpgrader := p.upgraderFactory(p.log, p.testConfig)
+
 	suffix := fmt.Sprintf("%d", time.Now().Unix())
 
 	p.log.Info("generating arm templates")
@@ -80,33 +83,33 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
 
-	err = p.clusterUpgrader.CreateClients(ctx, cs, true, true)
+	err = clusterUpgrader.CreateClients(ctx, cs, true, true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
-	err = p.clusterUpgrader.EtcdBlobExists(ctx, backupBlob)
+	err = clusterUpgrader.EtcdBlobExists(ctx, backupBlob)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepCheckEtcdBlobExists}
 	}
 
 	p.log.Info("restoring the cluster")
-	if err := p.clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx, cs); err != nil {
+	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx, cs); err != nil {
 		return err
 	}
 	err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}
-	if err := p.clusterUpgrader.EtcdRestoreDeleteMasterScaleSetHashes(ctx, cs); err != nil {
+	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSetHashes(ctx, cs); err != nil {
 		return err
 	}
-	err = p.clusterUpgrader.WaitForHealthzStatusOk(ctx, cs)
+	err = clusterUpgrader.WaitForHealthzStatusOk(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 	}
-	for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
-		err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, "")
+	for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+		err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, "")
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 		}
@@ -120,24 +123,26 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 }
 
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
+	clusterUpgrader := p.upgraderFactory(p.log, p.testConfig)
+
 	suffix := fmt.Sprintf("%d", time.Now().Unix())
 
-	err := p.clusterUpgrader.CreateClients(ctx, cs, false, true)
+	err := clusterUpgrader.CreateClients(ctx, cs, false, true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
-	err = p.clusterUpgrader.CreateOrUpdateConfigStorageAccount(ctx, cs)
+	err = clusterUpgrader.CreateOrUpdateConfigStorageAccount(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginCreateOrUpdateConfigStorageAccount}
 	}
 
-	err = p.clusterUpgrader.WriteConfigBlob(cs)
+	err = clusterUpgrader.WriteConfigBlob(cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWriteConfigBlob}
 	}
 
-	err = p.clusterUpgrader.EnrichCSFromVault(ctx, cs)
+	err = clusterUpgrader.EnrichCSFromVault(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepEnrichFromVault}
 	}
@@ -158,60 +163,60 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}
 	if isUpdate {
-		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
-			if perr := p.clusterUpgrader.UpdateMasterAgentPool(ctx, cs, &app); perr != nil {
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+			if perr := clusterUpgrader.UpdateMasterAgentPool(ctx, cs, &app); perr != nil {
 				return perr
 			}
 		}
-		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
-			if perr := p.clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
+			if perr := clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
 				return perr
 			}
 		}
-		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
-			if perr := p.clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
+			if perr := clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
 				return perr
 			}
 		}
-		if perr := p.clusterUpgrader.UpdateSyncPod(ctx, cs); perr != nil {
+		if perr := clusterUpgrader.UpdateSyncPod(ctx, cs); perr != nil {
 			return perr
 		}
 	} else {
-		err = p.clusterUpgrader.InitializeUpdateBlob(cs, suffix)
+		err = clusterUpgrader.InitializeUpdateBlob(cs, suffix)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
 		}
-		err = p.clusterUpgrader.WaitForHealthzStatusOk(ctx, cs)
+		err = clusterUpgrader.WaitForHealthzStatusOk(ctx, cs)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 		}
 
-		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
-			err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, "")
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
+			err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, "")
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 			}
 		}
-		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
-			err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
+			err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 			}
 		}
-		for _, app := range p.clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
-			err := p.clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
+			err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 			}
 		}
-		err := p.clusterUpgrader.WaitForReadySyncPod(ctx)
+		err := clusterUpgrader.WaitForReadySyncPod(ctx)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForSyncPod}
 		}
 	}
 
 	// Wait for infrastructure services to be healthy
-	if err := p.clusterUpgrader.HealthCheck(ctx, cs); err != nil {
+	if err := clusterUpgrader.HealthCheck(ctx, cs); err != nil {
 		return err
 	}
 
@@ -243,14 +248,16 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 }
 
 func (p *plugin) GetControlPlanePods(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	clusterUpgrader := p.upgraderFactory(p.log, p.testConfig)
+
 	p.log.Info("creating clients")
-	err := p.clusterUpgrader.CreateClients(ctx, cs, true, true)
+	err := clusterUpgrader.CreateClients(ctx, cs, true, true)
 	if err != nil {
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
 	p.log.Infof("querying control plane pods")
-	pods, err := p.clusterUpgrader.GetControlPlanePods(ctx)
+	pods, err := clusterUpgrader.GetControlPlanePods(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -258,13 +265,15 @@ func (p *plugin) GetControlPlanePods(ctx context.Context, cs *api.OpenShiftManag
 }
 
 func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
+	clusterUpgrader := p.upgraderFactory(p.log, p.testConfig)
+
 	p.log.Info("creating clients")
-	err := p.clusterUpgrader.CreateClients(ctx, cs, true, true)
+	err := clusterUpgrader.CreateClients(ctx, cs, true, true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 	p.log.Info("resetting the clusters update blob")
-	err = p.clusterUpgrader.ResetUpdateBlob(cs)
+	err = clusterUpgrader.ResetUpdateBlob(cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepResetUpdateBlob}
 	}
@@ -277,14 +286,16 @@ func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluste
 }
 
 func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedCluster) (*adminapi.GenevaActionListClusterVMs, error) {
+	clusterUpgrader := p.upgraderFactory(p.log, p.testConfig)
+
 	p.log.Info("generating cluster upgrader clients")
-	err := p.clusterUpgrader.CreateClients(ctx, oc, true, true)
+	err := clusterUpgrader.CreateClients(ctx, oc, true, true)
 	if err != nil {
 		return nil, err
 	}
 
 	p.log.Infof("listing cluster VMs")
-	pods, err := p.clusterUpgrader.ListVMHostnames(ctx, oc)
+	pods, err := clusterUpgrader.ListVMHostnames(ctx, oc)
 	if err != nil {
 		return nil, err
 	}
@@ -293,6 +304,8 @@ func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedClu
 }
 
 func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, hostname string) error {
+	clusterUpgrader := p.upgraderFactory(p.log, p.testConfig)
+
 	if !validate.IsValidAgentPoolHostname(hostname) {
 		return fmt.Errorf("invalid hostname %q", hostname)
 	}
@@ -303,13 +316,13 @@ func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, h
 	}
 
 	p.log.Info("generating cluster upgrader clients")
-	err = p.clusterUpgrader.CreateClients(ctx, oc, true, true)
+	err = clusterUpgrader.CreateClients(ctx, oc, true, true)
 	if err != nil {
 		return err
 	}
 
 	p.log.Infof("reimaging %s", hostname)
-	err = p.clusterUpgrader.Reimage(ctx, oc, scaleset, instanceID)
+	err = clusterUpgrader.Reimage(ctx, oc, scaleset, instanceID)
 	if err != nil {
 		return err
 	}
@@ -318,26 +331,28 @@ func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, h
 	// really might not help us.
 	p.log.Infof("waiting for %s to be ready", hostname)
 	if strings.HasPrefix(hostname, "master-") {
-		err = p.clusterUpgrader.WaitForReadyMaster(ctx, hostname)
+		err = clusterUpgrader.WaitForReadyMaster(ctx, hostname)
 	} else {
-		err = p.clusterUpgrader.WaitForReadyWorker(ctx, hostname)
+		err = clusterUpgrader.WaitForReadyWorker(ctx, hostname)
 	}
 	return err
 }
 
 func (p *plugin) BackupEtcdCluster(ctx context.Context, oc *api.OpenShiftManagedCluster, backupName string) error {
+	clusterUpgrader := p.upgraderFactory(p.log, p.testConfig)
+
 	if !validate.IsValidBlobContainerName(backupName) { // no valid blob name is an invalid kubernetes name
 		return fmt.Errorf("invalid backup name %q", backupName)
 	}
 
 	p.log.Info("creating clients")
-	err := p.clusterUpgrader.CreateClients(ctx, oc, true, true)
+	err := clusterUpgrader.CreateClients(ctx, oc, true, true)
 	if err != nil {
 		return err
 	}
 
 	p.log.Infof("backing up cluster")
-	err = p.clusterUpgrader.BackupCluster(ctx, backupName)
+	err = clusterUpgrader.BackupCluster(ctx, backupName)
 	if err != nil {
 		return err
 	}
@@ -345,6 +360,8 @@ func (p *plugin) BackupEtcdCluster(ctx context.Context, oc *api.OpenShiftManaged
 }
 
 func (p *plugin) RunCommand(ctx context.Context, oc *api.OpenShiftManagedCluster, hostname string, command api.Command) error {
+	clusterUpgrader := p.upgraderFactory(p.log, p.testConfig)
+
 	if !validate.IsValidAgentPoolHostname(hostname) {
 		return fmt.Errorf("invalid hostname %q", hostname)
 	}
@@ -365,13 +382,13 @@ func (p *plugin) RunCommand(ctx context.Context, oc *api.OpenShiftManagedCluster
 	}
 
 	p.log.Info("creating clients")
-	err = p.clusterUpgrader.CreateClients(ctx, oc, true, true)
+	err = clusterUpgrader.CreateClients(ctx, oc, true, true)
 	if err != nil {
 		return err
 	}
 
 	p.log.Infof("running %s on %s", command, hostname)
-	return p.clusterUpgrader.RunCommand(ctx, oc, scaleset, instanceID, script)
+	return clusterUpgrader.RunCommand(ctx, oc, scaleset, instanceID, script)
 }
 
 func (p *plugin) GetPluginVersion(ctx context.Context) *adminapi.GenevaActionPluginVersion {

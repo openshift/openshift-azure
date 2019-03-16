@@ -9,6 +9,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
@@ -76,7 +77,7 @@ func TestCreateOrUpdate(t *testing.T) {
 			}
 			c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 			p := &plugin{
-				clusterUpgrader: clusterUpgrader,
+				upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
 				armGenerator:    armGenerator,
 				log:             logrus.NewEntry(logrus.StandardLogger()),
 			}
@@ -136,7 +137,7 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 
 	p := &plugin{
-		clusterUpgrader: clusterUpgrader,
+		upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
 		armGenerator:    armGenerator,
 		log:             logrus.NewEntry(logrus.StandardLogger()),
 	}
@@ -185,7 +186,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 
 	p := &plugin{
 		armGenerator:    armGenerator,
-		clusterUpgrader: clusterUpgrader,
+		upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
 		configGenerator: configGenerator,
 		log:             logrus.NewEntry(logrus.StandardLogger()),
 	}
@@ -233,7 +234,7 @@ func TestForceUpdate(t *testing.T) {
 
 	p := &plugin{
 		armGenerator:    armGenerator,
-		clusterUpgrader: clusterUpgrader,
+		upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
 		log:             logrus.NewEntry(logrus.StandardLogger()),
 	}
 
@@ -252,7 +253,7 @@ func TestListClusterVMs(t *testing.T) {
 	c = clusterUpgrader.EXPECT().ListVMHostnames(nil, nil).Return(nil, nil).After(c)
 
 	p := &plugin{
-		clusterUpgrader: clusterUpgrader,
+		upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
 		log:             logrus.NewEntry(logrus.StandardLogger()),
 	}
 
@@ -306,7 +307,7 @@ func TestReimage(t *testing.T) {
 			}
 
 			p := &plugin{
-				clusterUpgrader: clusterUpgrader,
+				upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
 				log:             logrus.NewEntry(logrus.StandardLogger()),
 			}
 
@@ -336,7 +337,7 @@ func TestBackupEtcdCluster(t *testing.T) {
 	clusterUpgrader.EXPECT().BackupCluster(nil, backupName).Return(nil).After(c)
 
 	p := &plugin{
-		clusterUpgrader: clusterUpgrader,
+		upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
 		log:             logrus.NewEntry(logrus.StandardLogger()),
 	}
 
