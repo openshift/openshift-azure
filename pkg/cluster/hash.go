@@ -71,7 +71,7 @@ func (h *hasher) HashMasterScaleSet(cs *api.OpenShiftManagedCluster, app *api.Ag
 		return nil, err
 	}
 
-	err = arm.WriteStartupFiles(h.log, cs, writers.NewTarWriter(hash), config.GetHostname(app, "", instanceID), "")
+	err = arm.WriteStartupFiles(h.log, cs, app.Role, writers.NewTarWriter(hash), config.GetHostname(app, "", instanceID), "")
 	if err != nil {
 		return nil, err
 	}

@@ -50,24 +50,26 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		spp = &cs.Properties.WorkerServicePrincipalProfile
 	}
 
-	log.Info("creating clients")
-	vaultauthorizer, err := azureclient.NewAuthorizer(spp.ClientID, spp.Secret, cs.Properties.AzProfile.TenantID, azureclient.KeyVaultEndpoint)
-	if err != nil {
-		return err
-	}
+	if config.GetAgentRole(hostname) == api.AgentPoolProfileRoleMaster {
+		log.Info("creating clients")
+		vaultauthorizer, err := azureclient.NewAuthorizer(spp.ClientID, spp.Secret, cs.Properties.AzProfile.TenantID, azureclient.KeyVaultEndpoint)
+		if err != nil {
+			return err
+		}
 
-	kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
+		kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
 
-	log.Info("enriching config")
-	err = vault.EnrichCSFromVault(ctx, kvc, cs)
-	if err != nil {
-		return err
+		log.Info("enriching config")
+		err = vault.EnrichCSFromVault(ctx, kvc, cs)
+		if err != nil {
+			return err
+		}
 	}
 
 	// TODO: validate that the config version matches our version
 
 	log.Info("writing startup files")
-	return arm.WriteStartupFiles(log, cs, writers.NewFilesystemWriter(), hostname, domainname)
+	return arm.WriteStartupFiles(log, cs, config.GetAgentRole(hostname), writers.NewFilesystemWriter(), hostname, domainname)
 }
 
 func main() {

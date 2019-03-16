@@ -3,6 +3,7 @@ package arm
 import (
 	"os"
 	"path"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 
@@ -11,22 +12,31 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/writers"
 )
 
-func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, w writers.Writer, hostname, domainname string) error {
-	for _, templateFileName := range AssetNames() {
-		switch {
-		case templateFileName == "etc/origin/node/pods/sync.yaml" && hostname != "master-000000",
-			templateFileName == "master-startup.sh",
-			templateFileName == "node-startup.sh":
-			continue
+func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, w writers.Writer, hostname, domainname string) error {
+	for _, filepath := range AssetNames() {
+		var tmpl string
+
+		switch role {
+		case api.AgentPoolProfileRoleMaster:
+			if !strings.HasPrefix(filepath, "master/") {
+				continue
+			}
+
+			b, err := Asset(filepath)
+			if err != nil {
+				return err
+			}
+			tmpl = string(b)
+
+			filepath = strings.TrimPrefix(filepath, "master")
+
+			if filepath == "/etc/origin/node/pods/sync.yaml" && hostname != "master-000000" {
+				continue
+			}
 		}
 
-		templateFile, err := Asset(templateFileName)
-		if err != nil {
-			return err
-		}
-
-		b, err := template.Template(string(templateFile), nil, cs, map[string]interface{}{
-			"Role":       api.AgentPoolProfileRoleMaster,
+		b, err := template.Template(tmpl, nil, cs, map[string]interface{}{
+			"Role":       role,
 			"Hostname":   hostname,
 			"DomainName": domainname,
 		})
@@ -34,30 +44,28 @@ func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, w wri
 			return err
 		}
 
-		destination := "/" + templateFileName
-
 		var perm os.FileMode
 		switch {
-		case path.Ext(destination) == ".key",
-			path.Ext(destination) == ".kubeconfig",
-			destination == "/etc/origin/cloudprovider/azure.conf",
-			destination == "/etc/origin/master/session-secrets.yaml",
-			destination == "/var/lib/origin/.docker/config.json",
-			destination == "/root/.kube/config":
+		case strings.HasSuffix(filepath, ".key"),
+			strings.HasSuffix(filepath, ".kubeconfig"),
+			filepath == "/etc/origin/cloudprovider/azure.conf",
+			filepath == "/etc/origin/master/session-secrets.yaml",
+			filepath == "/var/lib/origin/.docker/config.json",
+			filepath == "/root/.kube/config":
 			perm = 0600
 		default:
 			perm = 0644
 		}
 
-		destination = "/host" + destination
+		filepath = "/host" + filepath
 
-		parentDir := path.Dir(destination)
+		parentDir := path.Dir(filepath)
 		err = w.MkdirAll(parentDir, 0755)
 		if err != nil {
 			return err
 		}
 
-		err = w.WriteFile(destination, b, perm)
+		err = w.WriteFile(filepath, b, perm)
 		if err != nil {
 			return err
 		}
