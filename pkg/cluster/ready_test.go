@@ -153,7 +153,7 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 			u := &simpleUpgrader{
 				vmc:        vmc,
 				ssc:        ssc,
-				kubeclient: kc,
+				Kubeclient: kc,
 				log:        logrus.NewEntry(logrus.StandardLogger()),
 			}
 			err := u.WaitForNodesInAgentPoolProfile(ctx, cs, &cs.Properties.AgentPoolProfiles[tt.appIndex], "")

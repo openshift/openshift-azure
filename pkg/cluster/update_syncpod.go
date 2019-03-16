@@ -27,12 +27,12 @@ func (u *simpleUpgrader) UpdateSyncPod(ctx context.Context, cs *api.OpenShiftMan
 	}
 
 	u.log.Infof("deleting sync pod")
-	err = u.kubeclient.DeletePod(ctx, "kube-system", "sync-master-000000")
+	err = u.Kubeclient.DeletePod(ctx, "kube-system", "sync-master-000000")
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPodDeletePod}
 	}
 
-	err = u.kubeclient.WaitForReadySyncPod(ctx)
+	err = u.Kubeclient.WaitForReadySyncPod(ctx)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPodWaitForReady}
 	}

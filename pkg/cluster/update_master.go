@@ -36,7 +36,7 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 		}
 
 		u.log.Infof("draining %s", hostname)
-		err = u.kubeclient.DeleteMaster(hostname)
+		err = u.Kubeclient.DeleteMaster(hostname)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDrain}
 		}
@@ -68,7 +68,7 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 		}
 
 		u.log.Infof("waiting for %s to be ready", hostname)
-		err = u.kubeclient.WaitForReadyMaster(ctx, hostname)
+		err = u.Kubeclient.WaitForReadyMaster(ctx, hostname)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolWaitForReady}
 		}

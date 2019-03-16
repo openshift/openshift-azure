@@ -27,7 +27,7 @@ func TestUpdateSyncPod(t *testing.T) {
 
 	u := &simpleUpgrader{
 		updateBlobService: ubs,
-		kubeclient:        kc,
+		Kubeclient:        kc,
 		log:               logrus.NewEntry(logrus.StandardLogger()),
 		hasher:            hasher,
 	}

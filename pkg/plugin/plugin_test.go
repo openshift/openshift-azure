@@ -13,7 +13,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_config"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
 
 func TestCreateOrUpdate(t *testing.T) {
@@ -73,7 +72,7 @@ func TestCreateOrUpdate(t *testing.T) {
 				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
 				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
 				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
-				c = clusterUpgrader.EXPECT().WaitForReadySyncPod(nil, cs).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().WaitForReadySyncPod(nil).Return(nil).After(c)
 			}
 			c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 			p := &plugin{
@@ -291,7 +290,6 @@ func TestReimage(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
-			kc := mock_kubeclient.NewMockKubeclient(gmc)
 
 			scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(tt.hostname)
 			if err != nil {
@@ -302,14 +300,13 @@ func TestReimage(t *testing.T) {
 			c = clusterUpgrader.EXPECT().Reimage(nil, nil, scaleset, instanceID).Return(nil).After(c)
 
 			if tt.isMaster {
-				c = kc.EXPECT().WaitForReadyMaster(nil, tt.hostname).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().WaitForReadyMaster(nil, tt.hostname).Return(nil).After(c)
 			} else {
-				c = kc.EXPECT().WaitForReadyWorker(nil, tt.hostname).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().WaitForReadyWorker(nil, tt.hostname).Return(nil).After(c)
 			}
 
 			p := &plugin{
 				clusterUpgrader: clusterUpgrader,
-				kubeclient:      kc,
 				log:             logrus.NewEntry(logrus.StandardLogger()),
 			}
 
@@ -334,13 +331,13 @@ func TestBackupEtcdCluster(t *testing.T) {
 		},
 	}
 
-	kc := mock_kubeclient.NewMockKubeclient(gmc)
-
-	kc.EXPECT().BackupCluster(nil, backupName).Return(nil)
+	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
+	c := clusterUpgrader.EXPECT().CreateClients(nil, cs, true, true).Return(nil)
+	clusterUpgrader.EXPECT().BackupCluster(nil, backupName).Return(nil).After(c)
 
 	p := &plugin{
-		kubeclient: kc,
-		log:        logrus.NewEntry(logrus.StandardLogger()),
+		clusterUpgrader: clusterUpgrader,
+		log:             logrus.NewEntry(logrus.StandardLogger()),
 	}
 
 	err := p.BackupEtcdCluster(nil, cs, backupName)

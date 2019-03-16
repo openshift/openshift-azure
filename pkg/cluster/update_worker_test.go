@@ -126,7 +126,7 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 				scalerFactory:     scalerFactory,
 				vmc:               vmc,
 				ssc:               ssc,
-				kubeclient:        kc,
+				Kubeclient:        kc,
 				log:               log,
 				hasher:            hasher,
 			}

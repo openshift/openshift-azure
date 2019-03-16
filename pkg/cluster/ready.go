@@ -18,9 +18,9 @@ func (u *simpleUpgrader) WaitForNodesInAgentPoolProfile(ctx context.Context, cs 
 		hostname := strings.ToLower(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
 		u.log.Infof("waiting for %s to be ready", hostname)
 		if app.Role == api.AgentPoolProfileRoleMaster {
-			err = u.kubeclient.WaitForReadyMaster(ctx, hostname)
+			err = u.Kubeclient.WaitForReadyMaster(ctx, hostname)
 		} else {
-			err = u.kubeclient.WaitForReadyWorker(ctx, hostname)
+			err = u.Kubeclient.WaitForReadyWorker(ctx, hostname)
 		}
 		if err != nil {
 			return err
@@ -39,9 +39,4 @@ func (u *simpleUpgrader) SortedAgentPoolProfilesForRole(cs *api.OpenShiftManaged
 	}
 	sort.Slice(apps, func(i, j int) bool { return apps[i].Name < apps[j].Name })
 	return apps
-}
-
-func (u *simpleUpgrader) WaitForReadySyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	u.log.Infof("waiting for sync pod to be ready")
-	return u.kubeclient.WaitForReadySyncPod(ctx)
 }

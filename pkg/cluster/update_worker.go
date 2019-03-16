@@ -88,12 +88,12 @@ func (u *simpleUpgrader) UpdateWorkerAgentPool(ctx context.Context, cs *api.Open
 		}
 	}
 
-	targetScaler := u.scalerFactory.New(u.log, u.ssc, u.vmc, u.kubeclient, cs.Properties.AzProfile.ResourceGroup, target)
+	targetScaler := u.scalerFactory.New(u.log, u.ssc, u.vmc, u.Kubeclient, cs.Properties.AzProfile.ResourceGroup, target)
 
 	// One by one, get rid of instances in any "source" scalesets.  Clean scales
 	// should not hit this codepath.
 	for _, source := range sources {
-		sourceScaler := u.scalerFactory.New(u.log, u.ssc, u.vmc, u.kubeclient, cs.Properties.AzProfile.ResourceGroup, &source)
+		sourceScaler := u.scalerFactory.New(u.log, u.ssc, u.vmc, u.Kubeclient, cs.Properties.AzProfile.ResourceGroup, &source)
 
 		for *source.Sku.Capacity > 0 {
 			if *target.Sku.Capacity < app.Count {

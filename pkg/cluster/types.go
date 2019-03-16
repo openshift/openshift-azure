@@ -2,7 +2,7 @@ package cluster
 
 //go:generate go get github.com/golang/mock/gomock
 //go:generate go install github.com/golang/mock/mockgen
-//go:generate mockgen -destination=../util/mocks/mock_$GOPACKAGE/types.go -package=mock_$GOPACKAGE -source types.go
+//go:generate mockgen -destination=../util/mocks/mock_$GOPACKAGE/types.go github.com/openshift/openshift-azure/pkg/$GOPACKAGE Upgrader
 //go:generate gofmt -s -l -w ../util/mocks/mock_$GOPACKAGE/types.go
 //go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../util/mocks/mock_$GOPACKAGE/types.go
 
@@ -40,7 +40,6 @@ type Upgrader interface {
 	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	SortedAgentPoolProfilesForRole(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) []api.AgentPoolProfile
 	WaitForNodesInAgentPoolProfile(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) error
-	WaitForReadySyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError
 	UpdateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError
 	UpdateSyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
@@ -52,9 +51,13 @@ type Upgrader interface {
 	ListVMHostnames(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]string, error)
 	RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID, command string) error
 	WriteConfigBlob(cs *api.OpenShiftManagedCluster) error
+
+	kubeclient.Kubeclient
 }
 
 type simpleUpgrader struct {
+	kubeclient.Kubeclient
+
 	testConfig        api.TestConfig
 	accountsClient    azureclient.AccountsClient
 	storageClient     storage.Client
@@ -62,7 +65,6 @@ type simpleUpgrader struct {
 	vmc               azureclient.VirtualMachineScaleSetVMsClient
 	ssc               azureclient.VirtualMachineScaleSetsClient
 	kvc               azureclient.KeyVaultClient
-	kubeclient        kubeclient.Kubeclient
 	log               *logrus.Entry
 	scalerFactory     scaler.Factory
 	hasher            Hasher
@@ -106,7 +108,7 @@ func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftMan
 	u.ssc = azureclient.NewVirtualMachineScaleSetsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
 	u.kvc = azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
 
-	u.kubeclient, err = kubeclient.NewKubeclient(u.log, cs.Config.AdminKubeconfig, disableKeepAlives)
+	u.Kubeclient, err = kubeclient.NewKubeclient(u.log, cs.Config.AdminKubeconfig, disableKeepAlives)
 	if err != nil {
 		return err
 	}

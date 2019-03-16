@@ -16,7 +16,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
-	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
@@ -28,7 +27,6 @@ type plugin struct {
 	clusterUpgrader cluster.Upgrader
 	armGenerator    arm.Generator
 	configGenerator config.Generator
-	kubeclient      kubeclient.Kubeclient
 }
 
 var _ api.Plugin = &plugin{}
@@ -206,7 +204,7 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 			}
 		}
-		err := p.clusterUpgrader.WaitForReadySyncPod(ctx, cs)
+		err := p.clusterUpgrader.WaitForReadySyncPod(ctx)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForSyncPod}
 		}
@@ -244,23 +242,15 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 	return nil
 }
 
-func (p *plugin) initialize(ctx context.Context, oc *api.OpenShiftManagedCluster) error {
-	var err error
-	if p.kubeclient == nil {
-		p.kubeclient, err = kubeclient.NewKubeclient(p.log, oc.Config.AdminKubeconfig, false)
-	}
-	return err
-}
-
-func (p *plugin) GetControlPlanePods(ctx context.Context, oc *api.OpenShiftManagedCluster) ([]byte, error) {
-	p.log.Info("generating admin kubeclient")
-	err := p.initialize(ctx, oc)
+func (p *plugin) GetControlPlanePods(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	p.log.Info("creating clients")
+	err := p.clusterUpgrader.CreateClients(ctx, cs, true, true)
 	if err != nil {
-		return nil, err
+		return nil, &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
 	p.log.Infof("querying control plane pods")
-	pods, err := p.kubeclient.GetControlPlanePods(ctx)
+	pods, err := p.clusterUpgrader.GetControlPlanePods(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -318,12 +308,6 @@ func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, h
 		return err
 	}
 
-	p.log.Info("generating admin kubeclient")
-	err = p.initialize(ctx, oc)
-	if err != nil {
-		return err
-	}
-
 	p.log.Infof("reimaging %s", hostname)
 	err = p.clusterUpgrader.Reimage(ctx, oc, scaleset, instanceID)
 	if err != nil {
@@ -334,9 +318,9 @@ func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, h
 	// really might not help us.
 	p.log.Infof("waiting for %s to be ready", hostname)
 	if strings.HasPrefix(hostname, "master-") {
-		err = p.kubeclient.WaitForReadyMaster(ctx, hostname)
+		err = p.clusterUpgrader.WaitForReadyMaster(ctx, hostname)
 	} else {
-		err = p.kubeclient.WaitForReadyWorker(ctx, hostname)
+		err = p.clusterUpgrader.WaitForReadyWorker(ctx, hostname)
 	}
 	return err
 }
@@ -346,13 +330,14 @@ func (p *plugin) BackupEtcdCluster(ctx context.Context, oc *api.OpenShiftManaged
 		return fmt.Errorf("invalid backup name %q", backupName)
 	}
 
-	p.log.Info("generating admin kubeclient")
-	err := p.initialize(ctx, oc)
+	p.log.Info("creating clients")
+	err := p.clusterUpgrader.CreateClients(ctx, oc, true, true)
 	if err != nil {
 		return err
 	}
+
 	p.log.Infof("backing up cluster")
-	err = p.kubeclient.BackupCluster(ctx, backupName)
+	err = p.clusterUpgrader.BackupCluster(ctx, backupName)
 	if err != nil {
 		return err
 	}

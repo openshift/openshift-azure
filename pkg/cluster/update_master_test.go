@@ -60,7 +60,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				updateBlobService: ubs,
 				vmc:               vmc,
 				ssc:               ssc,
-				kubeclient:        kc,
+				Kubeclient:        kc,
 				log:               logrus.NewEntry(logrus.StandardLogger()),
 				hasher:            hasher,
 			}
