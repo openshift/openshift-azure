@@ -8,9 +8,6 @@ package cluster
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
-	"net/http"
 
 	"github.com/sirupsen/logrus"
 
@@ -67,16 +64,12 @@ type simpleUpgrader struct {
 	log               *logrus.Entry
 	scalerFactory     scaler.Factory
 	hasher            Hasher
-	rt                http.RoundTripper
 }
 
 var _ Upgrader = &simpleUpgrader{}
 
 // NewSimpleUpgrader creates a new upgrader instance
 func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (Upgrader, error) {
-	pool := x509.NewCertPool()
-	pool.AddCert(cs.Config.Certificates.Ca.Cert)
-
 	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return nil, err
@@ -103,11 +96,6 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		log:            log,
 		scalerFactory:  scaler.NewFactory(),
 		hasher:         &hasher{log: log, testConfig: testConfig},
-		rt: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs: pool,
-			},
-		},
 	}
 
 	if initializeStorageClients {

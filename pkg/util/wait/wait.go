@@ -52,9 +52,9 @@ func forHTTPStatusOk(ctx context.Context, log *logrus.Entry, cli SimpleHTTPClien
 	if err != nil {
 		return nil, err
 	}
-	var response *http.Response
+	var resp *http.Response
 	err = PollImmediateUntil(interval, func() (bool, error) {
-		resp, err := cli.Do(req)
+		resp, err = cli.Do(req)
 		if err, ok := err.(*url.Error); ok {
 			if err, ok := err.Err.(*net.OpError); ok {
 				if err, ok := err.Err.(*os.SyscallError); ok {
@@ -65,7 +65,7 @@ func forHTTPStatusOk(ctx context.Context, log *logrus.Entry, cli SimpleHTTPClien
 				}
 			}
 			if _, ok := err.Err.(x509.UnknownAuthorityError); ok {
-				log.Info(err)
+				log.Warn(err)
 				return false, nil
 			}
 			if err.Timeout() || err.Err == io.EOF || err.Err == io.ErrUnexpectedEOF {
@@ -78,11 +78,7 @@ func forHTTPStatusOk(ctx context.Context, log *logrus.Entry, cli SimpleHTTPClien
 		if err != nil {
 			return false, err
 		}
-		response = resp
-		if resp != nil && resp.StatusCode == http.StatusOK {
-			return true, nil
-		}
-		return false, nil
+		return resp.StatusCode == http.StatusOK, nil
 	}, ctx.Done())
-	return response, err
+	return resp, err
 }
