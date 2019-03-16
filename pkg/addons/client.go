@@ -23,7 +23,6 @@ import (
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
-	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
@@ -303,14 +302,4 @@ func printDiff(log *logrus.Entry, existing, o *unstructured.Unstructured) bool {
 		}
 	}
 	return diffShown
-}
-
-// ServiceCatalogExists returns whether the service catalog API exists.
-func (c *client) ServiceCatalogExists() (bool, error) {
-	return ready.CheckAPIServiceIsReady(c.ac.ApiregistrationV1().APIServices(), "v1beta1.servicecatalog.k8s.io")()
-}
-
-// CRDReady returns whether the required CRDs got registered.
-func (c *client) CRDReady(name string) (bool, error) {
-	return ready.CheckCustomResourceDefinitionIsReady(c.ae.ApiextensionsV1beta1().CustomResourceDefinitions(), name)()
 }

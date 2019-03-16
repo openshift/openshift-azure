@@ -306,7 +306,9 @@ func writeDB(log *logrus.Entry, client *client, db map[string]unstructured.Unstr
 	// wait for the service catalog api extension to arrive. TODO: we should do
 	// this dynamically, and should not PollInfinite.
 	log.Debug("Waiting for the service catalog api to get aggregated")
-	if err := wait.PollImmediateInfinite(time.Second, client.ServiceCatalogExists); err != nil {
+	if err := wait.PollImmediateInfinite(time.Second,
+		ready.CheckAPIServiceIsReady(client.ac.ApiregistrationV1().APIServices(), "v1beta1.servicecatalog.k8s.io"),
+	); err != nil {
 		return err
 	}
 	log.Debug("Service catalog api is aggregated")
@@ -322,9 +324,9 @@ func writeDB(log *logrus.Entry, client *client, db map[string]unstructured.Unstr
 	}
 
 	log.Debug("Waiting for the targeted CRDs to get ready")
-	if err := wait.PollImmediateInfinite(time.Second, func() (bool, error) {
-		return client.CRDReady("servicemonitors.monitoring.coreos.com")
-	}); err != nil {
+	if err := wait.PollImmediateInfinite(time.Second,
+		ready.CheckCustomResourceDefinitionIsReady(client.ae.ApiextensionsV1beta1().CustomResourceDefinitions(), "servicemonitors.monitoring.coreos.com"),
+	); err != nil {
 		return err
 	}
 	log.Debug("ServiceMonitors CRDs apis ready")
