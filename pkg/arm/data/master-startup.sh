@@ -89,7 +89,6 @@ restorecon -Rv /var/lib/etcd
 logger -t master-startup.sh "restore done"
 {{- end }}
 
-#set the recommended openshift-control-plane profile on first boot
 tuned-adm profile openshift-control-plane
 
 # note: atomic-openshift-node crash loops until master is up

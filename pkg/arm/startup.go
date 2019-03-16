@@ -33,6 +33,19 @@ func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, role 
 			if filepath == "/etc/origin/node/pods/sync.yaml" && hostname != "master-000000" {
 				continue
 			}
+
+		default:
+			if !strings.HasPrefix(filepath, "worker/") {
+				continue
+			}
+
+			b, err := Asset(filepath)
+			if err != nil {
+				return err
+			}
+			tmpl = string(b)
+
+			filepath = strings.TrimPrefix(filepath, "worker")
 		}
 
 		b, err := template.Template(tmpl, nil, cs, map[string]interface{}{
