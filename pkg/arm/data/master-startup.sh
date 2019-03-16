@@ -83,7 +83,7 @@ sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubec
 # daemonset will not fail and set the master node labels correctly.
 cp /etc/origin/node/node.kubeconfig /etc/origin/node/bootstrap.kubeconfig
 
-{{- if $.Extra.IsRecovery }}
+{{- if ne $.Extra.BackupBlobName "" }}
 logger -t master-startup.sh "starting recovery on $(hostname)"
 # step 1 get the backup
 rm -Rf /var/lib/etcd/*
