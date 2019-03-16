@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"

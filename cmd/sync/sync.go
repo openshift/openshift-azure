@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/ghodss/yaml"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
@@ -26,6 +25,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 	"github.com/openshift/openshift-azure/pkg/util/log"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
