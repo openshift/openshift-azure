@@ -51,8 +51,7 @@ func TestCreateOrUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			armGenerator := mock_arm.NewMockGenerator(gmc)
 			clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
-			c := clusterUpgrader.EXPECT().CreateClients(nil, cs, false, true).Return(nil)
-			c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
+			c := clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil)
 			c = clusterUpgrader.EXPECT().WriteConfigBlob(cs).Return(nil).After(c)
 			c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 			c = armGenerator.EXPECT().Generate(nil, cs, "", tt.isUpdate, gomock.Any()).Return(nil, nil).After(c)
@@ -77,9 +76,11 @@ func TestCreateOrUpdate(t *testing.T) {
 			}
 			c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 			p := &plugin{
-				upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
-				armGenerator:    armGenerator,
-				log:             logrus.NewEntry(logrus.StandardLogger()),
+				upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
+					return clusterUpgrader, nil
+				},
+				armGenerator: armGenerator,
+				log:          logrus.NewEntry(logrus.StandardLogger()),
 			}
 			if err := p.CreateOrUpdate(nil, cs, tt.isUpdate, deployer); err != nil {
 				t.Errorf("plugin.CreateOrUpdate(%s) error = %v", tt.name, err)
@@ -113,8 +114,7 @@ func TestRecoverEtcdCluster(t *testing.T) {
 		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil),
 		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testData, nil),
 	)
-	c := clusterUpgrader.EXPECT().CreateClients(nil, cs, true, true).Return(nil)
-	c = clusterUpgrader.EXPECT().EtcdBlobExists(nil, "test-backup").Return(nil).After(c)
+	c := clusterUpgrader.EXPECT().EtcdBlobExists(nil, "test-backup").Return(nil)
 	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil, cs).Return(nil).After(c)
 
 	// deploy masters
@@ -123,7 +123,6 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], "").Return(nil).After(c)
 	// update
-	c = clusterUpgrader.EXPECT().CreateClients(nil, cs, false, true).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().WriteConfigBlob(cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
@@ -137,9 +136,11 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 
 	p := &plugin{
-		upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
-		armGenerator:    armGenerator,
-		log:             logrus.NewEntry(logrus.StandardLogger()),
+		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
+			return clusterUpgrader, nil
+		},
+		armGenerator: armGenerator,
+		log:          logrus.NewEntry(logrus.StandardLogger()),
 	}
 
 	if err := p.RecoverEtcdCluster(nil, cs, deployer, "test-backup"); err != nil {
@@ -170,7 +171,6 @@ func TestRotateClusterSecrets(t *testing.T) {
 
 	c := configGenerator.EXPECT().InvalidateSecrets(cs).Return(nil)
 	c = configGenerator.EXPECT().Generate(cs, nil).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().CreateClients(nil, cs, false, true).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().WriteConfigBlob(cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
@@ -185,8 +185,10 @@ func TestRotateClusterSecrets(t *testing.T) {
 	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 
 	p := &plugin{
-		armGenerator:    armGenerator,
-		upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
+		armGenerator: armGenerator,
+		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
+			return clusterUpgrader, nil
+		},
 		configGenerator: configGenerator,
 		log:             logrus.NewEntry(logrus.StandardLogger()),
 	}
@@ -216,9 +218,7 @@ func TestForceUpdate(t *testing.T) {
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 	armGenerator := mock_arm.NewMockGenerator(gmc)
 
-	c := clusterUpgrader.EXPECT().CreateClients(nil, cs, true, true).Return(nil)
-	c = clusterUpgrader.EXPECT().ResetUpdateBlob(cs).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().CreateClients(nil, cs, false, true).Return(nil).After(c)
+	c := clusterUpgrader.EXPECT().ResetUpdateBlob(cs).Return(nil)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().WriteConfigBlob(cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
@@ -233,9 +233,11 @@ func TestForceUpdate(t *testing.T) {
 	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 
 	p := &plugin{
-		armGenerator:    armGenerator,
-		upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
-		log:             logrus.NewEntry(logrus.StandardLogger()),
+		armGenerator: armGenerator,
+		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
+			return clusterUpgrader, nil
+		},
+		log: logrus.NewEntry(logrus.StandardLogger()),
 	}
 
 	if err := p.ForceUpdate(nil, cs, deployer); err != nil {
@@ -249,12 +251,13 @@ func TestListClusterVMs(t *testing.T) {
 
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 
-	c := clusterUpgrader.EXPECT().CreateClients(nil, nil, true, true).Return(nil)
-	c = clusterUpgrader.EXPECT().ListVMHostnames(nil, nil).Return(nil, nil).After(c)
+	clusterUpgrader.EXPECT().ListVMHostnames(nil, nil).Return(nil, nil)
 
 	p := &plugin{
-		upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
-		log:             logrus.NewEntry(logrus.StandardLogger()),
+		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
+			return clusterUpgrader, nil
+		},
+		log: logrus.NewEntry(logrus.StandardLogger()),
 	}
 
 	if _, err := p.ListClusterVMs(nil, nil); err != nil {
@@ -297,8 +300,7 @@ func TestReimage(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			c := clusterUpgrader.EXPECT().CreateClients(nil, nil, true, true).Return(nil)
-			c = clusterUpgrader.EXPECT().Reimage(nil, nil, scaleset, instanceID).Return(nil).After(c)
+			c := clusterUpgrader.EXPECT().Reimage(nil, nil, scaleset, instanceID).Return(nil)
 
 			if tt.isMaster {
 				c = clusterUpgrader.EXPECT().WaitForReadyMaster(nil, tt.hostname).Return(nil).After(c)
@@ -307,8 +309,10 @@ func TestReimage(t *testing.T) {
 			}
 
 			p := &plugin{
-				upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
-				log:             logrus.NewEntry(logrus.StandardLogger()),
+				upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
+					return clusterUpgrader, nil
+				},
+				log: logrus.NewEntry(logrus.StandardLogger()),
 			}
 
 			if err := p.Reimage(nil, nil, tt.hostname); err != nil {
@@ -333,12 +337,13 @@ func TestBackupEtcdCluster(t *testing.T) {
 	}
 
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
-	c := clusterUpgrader.EXPECT().CreateClients(nil, cs, true, true).Return(nil)
-	clusterUpgrader.EXPECT().BackupCluster(nil, backupName).Return(nil).After(c)
+	clusterUpgrader.EXPECT().BackupCluster(nil, backupName).Return(nil)
 
 	p := &plugin{
-		upgraderFactory: func(*logrus.Entry, api.TestConfig) cluster.Upgrader { return clusterUpgrader },
-		log:             logrus.NewEntry(logrus.StandardLogger()),
+		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
+			return clusterUpgrader, nil
+		},
+		log: logrus.NewEntry(logrus.StandardLogger()),
 	}
 
 	err := p.BackupEtcdCluster(nil, cs, backupName)

@@ -32,7 +32,6 @@ const (
 
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
-	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool) error
 	CreateOrUpdateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error
@@ -74,53 +73,51 @@ type simpleUpgrader struct {
 var _ Upgrader = &simpleUpgrader{}
 
 // NewSimpleUpgrader creates a new upgrader instance
-func NewSimpleUpgrader(log *logrus.Entry, testConfig api.TestConfig) Upgrader {
-	return &simpleUpgrader{
-		testConfig:    testConfig,
-		log:           log,
-		scalerFactory: scaler.NewFactory(),
-		hasher:        &hasher{log: log, testConfig: testConfig},
-	}
-}
-
-func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool) error {
+func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (Upgrader, error) {
 	pool := x509.NewCertPool()
 	pool.AddCert(cs.Config.Certificates.Ca.Cert)
 
-	u.rt = &http.Transport{
-		TLSClientConfig: &tls.Config{
-			RootCAs: pool,
-		},
-	}
-
 	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	vaultauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyVaultClientAuthorizer)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	u.accountsClient = azureclient.NewAccountsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
-	u.vmc = azureclient.NewVirtualMachineScaleSetVMsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
-	u.ssc = azureclient.NewVirtualMachineScaleSetsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
-	u.kvc = azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
-
-	u.Kubeclient, err = kubeclient.NewKubeclient(u.log, cs.Config.AdminKubeconfig, disableKeepAlives)
+	kubeclient, err := kubeclient.NewKubeclient(log, cs.Config.AdminKubeconfig, disableKeepAlives)
 	if err != nil {
-		return err
+		return nil, err
+	}
+
+	u := &simpleUpgrader{
+		Kubeclient: kubeclient,
+
+		testConfig:     testConfig,
+		accountsClient: azureclient.NewAccountsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		vmc:            azureclient.NewVirtualMachineScaleSetVMsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		ssc:            azureclient.NewVirtualMachineScaleSetsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		kvc:            azureclient.NewKeyVaultClient(ctx, vaultauthorizer),
+		log:            log,
+		scalerFactory:  scaler.NewFactory(),
+		hasher:         &hasher{log: log, testConfig: testConfig},
+		rt: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: pool,
+			},
+		},
 	}
 
 	if initializeStorageClients {
 		err = u.initializeStorageClients(ctx, cs)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	return u, nil
 }
 
 func (u *simpleUpgrader) EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
