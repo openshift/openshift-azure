@@ -22,20 +22,20 @@ func TestUpdateSyncPod(t *testing.T) {
 	cs := &api.OpenShiftManagedCluster{}
 
 	ubs := mock_updateblob.NewMockBlobService(gmc)
-	kclient := mock_kubeclient.NewMockKubeclient(gmc)
+	kc := mock_kubeclient.NewMockKubeclient(gmc)
 	hasher := mock_cluster.NewMockHasher(gmc)
 
 	u := &simpleUpgrader{
 		updateBlobService: ubs,
-		kubeclient:        kclient,
+		kubeclient:        kc,
 		log:               logrus.NewEntry(logrus.StandardLogger()),
 		hasher:            hasher,
 	}
 
 	c := ubs.EXPECT().Read().Return(updateblob.NewUpdateBlob(), nil)
 	c = hasher.EXPECT().HashSyncPod(cs).Return([]byte("updated"), nil).After(c)
-	c = kclient.EXPECT().DeletePod(ctx, "kube-system", "sync-master-000000").Return(nil).After(c)
-	c = kclient.EXPECT().WaitForReadySyncPod(ctx).Return(nil).After(c)
+	c = kc.EXPECT().DeletePod(ctx, "kube-system", "sync-master-000000").Return(nil).After(c)
+	c = kc.EXPECT().WaitForReadySyncPod(ctx).Return(nil).After(c)
 
 	uBlob := updateblob.NewUpdateBlob()
 	uBlob.SyncPodHash = []byte("updated")

@@ -74,14 +74,14 @@ func TestHealthCheck(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockCtrl := gomock.NewController(t)
-			defer mockCtrl.Finish()
+			gmc := gomock.NewController(t)
+			defer gmc.Finish()
 			ctx := context.Background()
 			u := &simpleUpgrader{
 				log: logrus.NewEntry(logrus.StandardLogger()),
 			}
 			urltocheck := "https://" + tt.cs.Properties.FQDN + "/console/"
-			mockCli := mock_wait.NewMockSimpleHTTPClient(mockCtrl)
+			mockCli := mock_wait.NewMockSimpleHTTPClient(gmc)
 			req, _ := http.NewRequest("HEAD", urltocheck, nil)
 			req = req.WithContext(ctx)
 			for _, resp := range tt.responses {

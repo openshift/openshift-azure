@@ -53,14 +53,14 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			ubs := mock_updateblob.NewMockBlobService(gmc)
 			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
-			kclient := mock_kubeclient.NewMockKubeclient(gmc)
+			kc := mock_kubeclient.NewMockKubeclient(gmc)
 			hasher := mock_cluster.NewMockHasher(gmc)
 
 			u := &simpleUpgrader{
 				updateBlobService: ubs,
 				vmc:               vmc,
 				ssc:               ssc,
-				kubeclient:        kclient,
+				kubeclient:        kc,
 				log:               logrus.NewEntry(logrus.StandardLogger()),
 				hasher:            hasher,
 			}
@@ -76,7 +76,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				instanceID := fmt.Sprintf("%d", i)
 
 				// 1. drain
-				c = kclient.EXPECT().DeleteMaster(hostname).Return(nil).After(c)
+				c = kc.EXPECT().DeleteMaster(hostname).Return(nil).After(c)
 
 				// 2. deallocate
 				c = vmc.EXPECT().Deallocate(ctx, tt.cs.Properties.AzProfile.ResourceGroup, "ss-master", instanceID).Return(nil).After(c)
@@ -93,7 +93,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				c = vmc.EXPECT().Start(ctx, tt.cs.Properties.AzProfile.ResourceGroup, "ss-master", instanceID).Return(nil).After(c)
 
 				// 6. waitforready
-				c = kclient.EXPECT().WaitForReadyMaster(ctx, hostname).Return(nil).After(c)
+				c = kc.EXPECT().WaitForReadyMaster(ctx, hostname).Return(nil).After(c)
 
 				// 7. write the updatehash
 				hostnameHashes[hostname] = []byte("updated")
