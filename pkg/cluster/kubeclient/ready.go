@@ -52,10 +52,6 @@ var daemonsetWhitelist = []struct {
 		Namespace: "default",
 	},
 	{
-		Name:      "sync",
-		Namespace: "openshift-node",
-	},
-	{
 		Name:      "apiserver",
 		Namespace: "kube-service-catalog",
 	},

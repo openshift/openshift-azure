@@ -15,11 +15,15 @@ func TestHashWorkerScaleSet(t *testing.T) {
 	}{
 		{
 			name: "hash shouldn't change over time",
+			app: api.AgentPoolProfile{
+				Role: api.AgentPoolProfileRoleCompute,
+			},
 		},
 		{
 			name: "hash is invariant with name and count",
 			app: api.AgentPoolProfile{
 				Name:  "foo",
+				Role:  api.AgentPoolProfileRoleCompute,
 				Count: 1,
 			},
 		},
@@ -35,6 +39,11 @@ func TestHashWorkerScaleSet(t *testing.T) {
 
 	var cs api.OpenShiftManagedCluster
 	populate.Walk(&cs, prepare)
+	cs.Properties.AgentPoolProfiles = []api.AgentPoolProfile{
+		{
+			Role: api.AgentPoolProfileRoleCompute,
+		},
+	}
 
 	var h hasher
 	var exp []byte

@@ -27,6 +27,7 @@ func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, w wri
 		}
 
 		b, err := template.Template(string(templateFile), nil, cs, map[string]interface{}{
+			"Role":       api.AgentPoolProfileRoleMaster,
 			"Hostname":   hostname,
 			"DomainName": domainname,
 		})

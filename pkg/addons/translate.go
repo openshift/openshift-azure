@@ -261,62 +261,6 @@ var Translations = map[string][]struct {
 			Template:   "{{ .ContainerService.Properties.AzProfile.SubscriptionID }}",
 		},
 	},
-	"ConfigMap/openshift-node/node-config-compute": {
-		{
-			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
-			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
-			Template:   "{{ .Config.Images.Format }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
-			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.KubeReserved(cs, api.AgentPoolProfileRoleCompute)
-			},
-		},
-		{
-			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
-			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleCompute)
-			},
-		},
-	},
-	"ConfigMap/openshift-node/node-config-infra": {
-		{
-			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
-			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
-			Template:   "{{ .Config.Images.Format }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
-			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'kube-reserved'[0]"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.KubeReserved(cs, api.AgentPoolProfileRoleInfra)
-			},
-		},
-		{
-			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
-			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleInfra)
-			},
-		},
-	},
-	"ConfigMap/openshift-node/node-config-master": {
-		{
-			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
-			NestedPath: jsonpath.MustCompile("$.imageConfig.format"),
-			Template:   "{{ .Config.Images.Format }}",
-		},
-		{
-			Path:       jsonpath.MustCompile("$.data.'node-config.yaml'"),
-			NestedPath: jsonpath.MustCompile("$.kubeletArguments.'system-reserved'[0]"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.SystemReserved(cs, api.AgentPoolProfileRoleMaster)
-			},
-		},
-	},
 	"ConfigMap/openshift-web-console/webconsole-config": {
 		{
 			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
@@ -397,12 +341,6 @@ var Translations = map[string][]struct {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[1].env[?(@.name='MONITORING_GCS_REGION')].value"),
 			Template: "{{ .Config.GenevaLoggingControlPlaneRegion }}",
-		},
-	},
-	"DaemonSet.apps/openshift-node/sync": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.Node }}",
 		},
 	},
 	"DaemonSet.apps/openshift-template-service-broker/apiserver": {
