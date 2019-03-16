@@ -34,7 +34,7 @@ func newCert(key *rsa.PrivateKey, template *x509.Certificate, signingkey *rsa.Pr
 // NewCA returns a new rsa.PrivateKey and x509.Certificate for a CA
 // corresponding to the given CommonName.
 func NewCA(cn string) (*rsa.PrivateKey, *x509.Certificate, error) {
-	now := time.Now()
+	now := time.Now().Add(-time.Hour)
 
 	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
 	if err != nil {
