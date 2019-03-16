@@ -71,7 +71,7 @@ while ! docker pull {{ .Config.Images.Startup }}; do
   logger -t master-startup.sh "waiting for image pull to work"
   sleep 10
 done
-docker run --privileged --rm --network host -v /etc:/etc:z {{ .Config.Images.Startup }}
+docker run --privileged --rm --network host -v /etc:/etc:z $PWD/master-startup:/blob {{ .Config.Images.Startup }} /blob
 logger -t master-startup.sh "finished running startup container rc:$?"
 
 update-ca-trust
