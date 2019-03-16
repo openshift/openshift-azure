@@ -20,13 +20,13 @@ type PluginStep string
 
 const (
 	PluginStepDeploy                                  PluginStep = "Deploy"
-	PluginStepInitialize                              PluginStep = "Initialize"
 	PluginStepInitializeUpdateBlob                    PluginStep = "InitializeUpdateBlob"
 	PluginStepResetUpdateBlob                         PluginStep = "ResetUpdateBlob"
 	PluginStepCheckEtcdBlobExists                     PluginStep = "CheckEtcdBlobExists"
 	PluginStepClientCreation                          PluginStep = "ClientCreation"
 	PluginStepEnrichFromVault                         PluginStep = "EnrichFromVault"
 	PluginStepScaleSetDelete                          PluginStep = "ScaleSetDelete"
+	PluginStepWriteConfigBlob                         PluginStep = "WriteConfigBlob"
 	PluginCreateOrUpdateConfigStorageAccount          PluginStep = "CreateOrUpdateConfigStorageAccount"
 	PluginStepGenerateARM                             PluginStep = "GenerateARM"
 	PluginStepWaitForWaitForOpenShiftAPI              PluginStep = "WaitForOpenShiftAPI"

@@ -37,17 +37,17 @@ func (m *MockUpgrader) EXPECT() *MockUpgraderMockRecorder {
 }
 
 // CreateClients mocks base method
-func (m *MockUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, disableKeepAlives bool) error {
+func (m *MockUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateClients", ctx, cs, disableKeepAlives)
+	ret := m.ctrl.Call(m, "CreateClients", ctx, cs, initializeStorageClients, disableKeepAlives)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateClients indicates an expected call of CreateClients
-func (mr *MockUpgraderMockRecorder) CreateClients(ctx, cs, disableKeepAlives interface{}) *gomock.Call {
+func (mr *MockUpgraderMockRecorder) CreateClients(ctx, cs, initializeStorageClients, disableKeepAlives interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClients", reflect.TypeOf((*MockUpgrader)(nil).CreateClients), ctx, cs, disableKeepAlives)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClients", reflect.TypeOf((*MockUpgrader)(nil).CreateClients), ctx, cs, initializeStorageClients, disableKeepAlives)
 }
 
 // CreateOrUpdateConfigStorageAccount mocks base method
@@ -76,20 +76,6 @@ func (m *MockUpgrader) EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftM
 func (mr *MockUpgraderMockRecorder) EnrichCSFromVault(ctx, cs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnrichCSFromVault", reflect.TypeOf((*MockUpgrader)(nil).EnrichCSFromVault), ctx, cs)
-}
-
-// Initialize mocks base method
-func (m *MockUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Initialize", ctx, cs)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Initialize indicates an expected call of Initialize
-func (mr *MockUpgraderMockRecorder) Initialize(ctx, cs interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Initialize", reflect.TypeOf((*MockUpgrader)(nil).Initialize), ctx, cs)
 }
 
 // InitializeUpdateBlob mocks base method
@@ -315,4 +301,18 @@ func (m *MockUpgrader) RunCommand(ctx context.Context, cs *api.OpenShiftManagedC
 func (mr *MockUpgraderMockRecorder) RunCommand(ctx, cs, scaleset, instanceID, command interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunCommand", reflect.TypeOf((*MockUpgrader)(nil).RunCommand), ctx, cs, scaleset, instanceID, command)
+}
+
+// WriteConfigBlob mocks base method
+func (m *MockUpgrader) WriteConfigBlob(cs *api.OpenShiftManagedCluster) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteConfigBlob", cs)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteConfigBlob indicates an expected call of WriteConfigBlob
+func (mr *MockUpgraderMockRecorder) WriteConfigBlob(cs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteConfigBlob", reflect.TypeOf((*MockUpgrader)(nil).WriteConfigBlob), cs)
 }

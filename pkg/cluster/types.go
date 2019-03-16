@@ -32,10 +32,9 @@ const (
 
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
-	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, disableKeepAlives bool) error
+	CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool) error
 	CreateOrUpdateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error
 	WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
@@ -52,6 +51,7 @@ type Upgrader interface {
 	Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID string) error
 	ListVMHostnames(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]string, error)
 	RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID, command string) error
+	WriteConfigBlob(cs *api.OpenShiftManagedCluster) error
 }
 
 type simpleUpgrader struct {
@@ -81,7 +81,7 @@ func NewSimpleUpgrader(log *logrus.Entry, testConfig api.TestConfig) Upgrader {
 	}
 }
 
-func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, disableKeepAlives bool) error {
+func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool) error {
 	pool := x509.NewCertPool()
 	pool.AddCert(cs.Config.Certificates.Ca.Cert)
 
@@ -107,8 +107,18 @@ func (u *simpleUpgrader) CreateClients(ctx context.Context, cs *api.OpenShiftMan
 	u.kvc = azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
 
 	u.kubeclient, err = kubeclient.NewKubeclient(u.log, cs.Config.AdminKubeconfig, disableKeepAlives)
+	if err != nil {
+		return err
+	}
 
-	return err
+	if initializeStorageClients {
+		err = u.initializeStorageClients(ctx, cs)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (u *simpleUpgrader) EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error {

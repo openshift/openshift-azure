@@ -82,13 +82,9 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
 
-	err = p.clusterUpgrader.CreateClients(ctx, cs, true)
+	err = p.clusterUpgrader.CreateClients(ctx, cs, true, true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
-	}
-	err = p.clusterUpgrader.Initialize(ctx, cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
 
 	err = p.clusterUpgrader.EtcdBlobExists(ctx, backupBlob)
@@ -128,7 +124,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
 	suffix := fmt.Sprintf("%d", time.Now().Unix())
 
-	err := p.clusterUpgrader.CreateClients(ctx, cs, true)
+	err := p.clusterUpgrader.CreateClients(ctx, cs, false, true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
@@ -136,6 +132,11 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	err = p.clusterUpgrader.CreateOrUpdateConfigStorageAccount(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginCreateOrUpdateConfigStorageAccount}
+	}
+
+	err = p.clusterUpgrader.WriteConfigBlob(cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepWriteConfigBlob}
 	}
 
 	err = p.clusterUpgrader.EnrichCSFromVault(ctx, cs)
@@ -147,10 +148,6 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	azuretemplate, err := p.armGenerator.Generate(ctx, cs, "", isUpdate, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
-	}
-	err = p.clusterUpgrader.Initialize(ctx, cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
 	if isUpdate {
 		p.log.Info("starting update")
@@ -272,14 +269,9 @@ func (p *plugin) GetControlPlanePods(ctx context.Context, oc *api.OpenShiftManag
 
 func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
 	p.log.Info("creating clients")
-	err := p.clusterUpgrader.CreateClients(ctx, cs, true)
+	err := p.clusterUpgrader.CreateClients(ctx, cs, true, true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
-	}
-	p.log.Info("initializing cluster upgrader")
-	err = p.clusterUpgrader.Initialize(ctx, cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepInitialize}
 	}
 	p.log.Info("resetting the clusters update blob")
 	err = p.clusterUpgrader.ResetUpdateBlob(cs)
@@ -296,7 +288,7 @@ func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluste
 
 func (p *plugin) ListClusterVMs(ctx context.Context, oc *api.OpenShiftManagedCluster) (*adminapi.GenevaActionListClusterVMs, error) {
 	p.log.Info("generating cluster upgrader clients")
-	err := p.clusterUpgrader.CreateClients(ctx, oc, true)
+	err := p.clusterUpgrader.CreateClients(ctx, oc, true, true)
 	if err != nil {
 		return nil, err
 	}
@@ -321,7 +313,7 @@ func (p *plugin) Reimage(ctx context.Context, oc *api.OpenShiftManagedCluster, h
 	}
 
 	p.log.Info("generating cluster upgrader clients")
-	err = p.clusterUpgrader.CreateClients(ctx, oc, true)
+	err = p.clusterUpgrader.CreateClients(ctx, oc, true, true)
 	if err != nil {
 		return err
 	}
@@ -388,7 +380,7 @@ func (p *plugin) RunCommand(ctx context.Context, oc *api.OpenShiftManagedCluster
 	}
 
 	p.log.Info("creating clients")
-	err = p.clusterUpgrader.CreateClients(ctx, oc, true)
+	err = p.clusterUpgrader.CreateClients(ctx, oc, true, true)
 	if err != nil {
 		return err
 	}

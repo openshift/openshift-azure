@@ -14,13 +14,18 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
-func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (u *simpleUpgrader) initializeStorageClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	if u.storageClient == nil {
-		keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
-		if err != nil {
-			return err
+		if cs.Config.ConfigStorageAccountKey == "" {
+			keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+			if err != nil {
+				return err
+			}
+			cs.Config.ConfigStorageAccountKey = *(*keys.Keys)[0].Value
 		}
-		u.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, *(*keys.Keys)[0].Value, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
+
+		var err error
+		u.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
 		if err != nil {
 			return err
 		}
@@ -29,7 +34,7 @@ func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManage
 		u.updateBlobService = updateblob.NewBlobService(bsc)
 	}
 
-	return u.WriteConfigBlob(cs)
+	return nil
 }
 
 func (u *simpleUpgrader) WriteConfigBlob(cs *api.OpenShiftManagedCluster) error {
@@ -61,16 +66,12 @@ func (u *simpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context,
 		return err
 	}
 
-	keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+	err = u.initializeStorageClients(ctx, cs)
 	if err != nil {
 		return err
 	}
 
-	storageClient, err := storage.NewClient(cs.Config.ConfigStorageAccount, *(*keys.Keys)[0].Value, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
-	if err != nil {
-		return err
-	}
-	bsc := storageClient.GetBlobService()
+	bsc := u.storageClient.GetBlobService()
 
 	// cluster config container
 	c := bsc.GetContainerReference(ConfigContainerName)
