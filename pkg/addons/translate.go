@@ -405,18 +405,6 @@ var Translations = map[string][]struct {
 			Template: "{{ .Config.Images.Node }}",
 		},
 	},
-	"DaemonSet.apps/openshift-sdn/ovs": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.Node }}",
-		},
-	},
-	"DaemonSet.apps/openshift-sdn/sdn": {
-		{
-			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "{{ .Config.Images.Node }}",
-		},
-	},
 	"DaemonSet.apps/openshift-template-service-broker/apiserver": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
