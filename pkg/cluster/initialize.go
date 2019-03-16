@@ -37,18 +37,69 @@ func (u *simpleUpgrader) initializeStorageClients(ctx context.Context, cs *api.O
 	return nil
 }
 
-func (u *simpleUpgrader) WriteConfigBlob(cs *api.OpenShiftManagedCluster) error {
+func (u *simpleUpgrader) writeBlob(blobName string, cs *api.OpenShiftManagedCluster) error {
 	bsc := u.storageClient.GetBlobService()
-
 	c := bsc.GetContainerReference(ConfigContainerName)
-	b := c.GetBlobReference(ConfigBlobName)
+	b := c.GetBlobReference(blobName)
 
-	csj, err := json.Marshal(cs)
+	json, err := json.Marshal(cs)
 	if err != nil {
 		return err
 	}
 
-	return b.CreateBlockBlobFromReader(bytes.NewReader(csj), nil)
+	return b.CreateBlockBlobFromReader(bytes.NewReader(json), nil)
+}
+
+func (u *simpleUpgrader) WriteSyncBlob(cs *api.OpenShiftManagedCluster) error {
+	return u.writeBlob(SyncBlobName, cs)
+}
+
+func (u *simpleUpgrader) WriteStartupBlobs(cs *api.OpenShiftManagedCluster) error {
+	err := u.writeBlob(MasterStartupBlobName, cs)
+	if err != nil {
+		return err
+	}
+
+	workerCS := &api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			WorkerServicePrincipalProfile: api.ServicePrincipalProfile{
+				ClientID: cs.Properties.WorkerServicePrincipalProfile.ClientID,
+				Secret:   cs.Properties.WorkerServicePrincipalProfile.Secret,
+			},
+			AzProfile: api.AzProfile{
+				TenantID:       cs.Properties.AzProfile.TenantID,
+				SubscriptionID: cs.Properties.AzProfile.SubscriptionID,
+				ResourceGroup:  cs.Properties.AzProfile.ResourceGroup,
+			},
+		},
+		Location: cs.Location,
+		Config: api.Config{
+			ComponentLogLevel: api.ComponentLogLevel{
+				Node: cs.Config.ComponentLogLevel.Node,
+			},
+			Certificates: api.CertificateConfig{
+				Ca: api.CertKeyPair{
+					Cert: cs.Config.Certificates.Ca.Cert,
+				},
+				NodeBootstrap: cs.Config.Certificates.NodeBootstrap,
+			},
+			Images: api.ImageConfig{
+				Format:          cs.Config.Images.Format,
+				Node:            cs.Config.Images.Node,
+				ImagePullSecret: cs.Config.Images.ImagePullSecret,
+			},
+			NodeBootstrapKubeconfig: cs.Config.NodeBootstrapKubeconfig,
+			SDNKubeconfig:           cs.Config.SDNKubeconfig,
+		},
+	}
+	for _, app := range cs.Properties.AgentPoolProfiles {
+		workerCS.Properties.AgentPoolProfiles = append(workerCS.Properties.AgentPoolProfiles, api.AgentPoolProfile{
+			Role:   app.Role,
+			VMSize: app.VMSize,
+		})
+	}
+
+	return u.writeBlob(WorkerStartupBlobName, workerCS)
 }
 
 func (u *simpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error {

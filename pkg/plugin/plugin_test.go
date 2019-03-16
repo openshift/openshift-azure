@@ -52,9 +52,13 @@ func TestCreateOrUpdate(t *testing.T) {
 			armGenerator := mock_arm.NewMockGenerator(gmc)
 			clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 			c := clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil)
-			c = clusterUpgrader.EXPECT().WriteConfigBlob(cs).Return(nil).After(c)
-			c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 			c = armGenerator.EXPECT().Generate(nil, cs, "", tt.isUpdate, gomock.Any()).Return(nil, nil).After(c)
+			c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
+			if !tt.isUpdate {
+				c = clusterUpgrader.EXPECT().WriteSyncBlob(cs).Return(nil).After(c)
+			}
+			c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
+			c = clusterUpgrader.EXPECT().EnrichCSStorageAccountKeys(nil, cs).Return(nil)
 			if tt.isUpdate {
 				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 				c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
@@ -62,6 +66,7 @@ func TestCreateOrUpdate(t *testing.T) {
 				c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
 				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
 				c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().WriteSyncBlob(cs).Return(nil).After(c)
 				c = clusterUpgrader.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 			} else {
 				c = clusterUpgrader.EXPECT().InitializeUpdateBlob(cs, gomock.Any()).Return(nil).After(c)
@@ -110,11 +115,9 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	testDataWithBackup := map[string]interface{}{"test": "backup"}
 	armGenerator := mock_arm.NewMockGenerator(gmc)
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
-	gomock.InOrder(
-		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil),
-		armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testData, nil),
-	)
-	c := clusterUpgrader.EXPECT().EtcdBlobExists(nil, "test-backup").Return(nil)
+
+	c := armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil)
+	c = clusterUpgrader.EXPECT().EtcdBlobExists(nil, "test-backup").Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil, cs).Return(nil).After(c)
 
 	// deploy masters
@@ -124,14 +127,17 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], "").Return(nil).After(c)
 	// update
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().WriteConfigBlob(cs).Return(nil).After(c)
+	c = armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testData, nil).After(c)
+	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
+	c = clusterUpgrader.EXPECT().EnrichCSStorageAccountKeys(nil, cs).Return(nil)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().WriteSyncBlob(cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 
@@ -172,15 +178,17 @@ func TestRotateClusterSecrets(t *testing.T) {
 	c := configGenerator.EXPECT().InvalidateSecrets(cs).Return(nil)
 	c = configGenerator.EXPECT().Generate(cs, nil).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().WriteConfigBlob(cs).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 	c = armGenerator.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
+	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
+	c = clusterUpgrader.EXPECT().EnrichCSStorageAccountKeys(nil, cs).Return(nil)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().WriteSyncBlob(cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 
@@ -220,15 +228,17 @@ func TestForceUpdate(t *testing.T) {
 
 	c := clusterUpgrader.EXPECT().ResetUpdateBlob(cs).Return(nil)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().WriteConfigBlob(cs).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 	c = armGenerator.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
+	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
+	c = clusterUpgrader.EXPECT().EnrichCSStorageAccountKeys(nil, cs).Return(nil)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
 	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().WriteSyncBlob(cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().UpdateSyncPod(nil, cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 

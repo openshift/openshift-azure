@@ -74,7 +74,7 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
-	s.blob = bsc.GetContainerReference(cluster.ConfigContainerName).GetBlobReference(cluster.ConfigBlobName)
+	s.blob = bsc.GetContainerReference(cluster.ConfigContainerName).GetBlobReference(cluster.SyncBlobName)
 
 	s.log = log
 

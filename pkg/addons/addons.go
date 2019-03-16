@@ -341,17 +341,21 @@ func writeDB(log *logrus.Entry, client *client, db map[string]unstructured.Unstr
 }
 
 func EnrichCSStorageAccountKeys(ctx context.Context, azs azureclient.AccountsClient, cs *api.OpenShiftManagedCluster) error {
-	key, err := azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
-	if err != nil {
-		return err
+	if cs.Config.RegistryStorageAccountKey == "" {
+		key, err := azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
+		if err != nil {
+			return err
+		}
+		cs.Config.RegistryStorageAccountKey = *(*key.Keys)[0].Value
 	}
-	cs.Config.RegistryStorageAccountKey = *(*key.Keys)[0].Value
 
-	key, err = azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
-	if err != nil {
-		return err
+	if cs.Config.ConfigStorageAccount == "" {
+		key, err := azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+		if err != nil {
+			return err
+		}
+		cs.Config.ConfigStorageAccountKey = *(*key.Keys)[0].Value
 	}
-	cs.Config.ConfigStorageAccountKey = *(*key.Keys)[0].Value
 
 	return nil
 }

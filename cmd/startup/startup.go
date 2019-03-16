@@ -53,7 +53,7 @@ func (s *startup) initClients(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrap(err, "could not find storage account")
 	}
-	s.blob = bsc.GetContainerReference(cluster.ConfigContainerName).GetBlobReference(cluster.ConfigBlobName)
+	s.blob = bsc.GetContainerReference(cluster.ConfigContainerName).GetBlobReference(cluster.MasterStartupBlobName)
 
 	return nil
 }

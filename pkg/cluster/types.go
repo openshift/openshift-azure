@@ -11,6 +11,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/cluster/scaler"
@@ -23,7 +24,9 @@ import (
 // here follow well known container and blob names
 const (
 	ConfigContainerName     = "config"
-	ConfigBlobName          = "config"
+	SyncBlobName            = "sync"
+	MasterStartupBlobName   = "master-startup"
+	WorkerStartupBlobName   = "worker-startup"
 	EtcdBackupContainerName = "etcd"
 )
 
@@ -31,6 +34,7 @@ const (
 type Upgrader interface {
 	CreateOrUpdateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error
+	EnrichCSStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error
 	WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
@@ -46,7 +50,8 @@ type Upgrader interface {
 	Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID string) error
 	ListVMHostnames(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]string, error)
 	RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID, command string) error
-	WriteConfigBlob(cs *api.OpenShiftManagedCluster) error
+	WriteSyncBlob(cs *api.OpenShiftManagedCluster) error
+	WriteStartupBlobs(cs *api.OpenShiftManagedCluster) error
 
 	kubeclient.Kubeclient
 }
@@ -110,4 +115,8 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 
 func (u *simpleUpgrader) EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	return vault.EnrichCSFromVault(ctx, u.kvc, cs)
+}
+
+func (u *simpleUpgrader) EnrichCSStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	return addons.EnrichCSStorageAccountKeys(ctx, u.accountsClient, cs)
 }

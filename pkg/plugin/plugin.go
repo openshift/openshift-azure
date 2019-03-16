@@ -135,21 +135,27 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginCreateOrUpdateConfigStorageAccount}
 	}
 
-	err = clusterUpgrader.WriteConfigBlob(cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepWriteConfigBlob}
-	}
-
-	err = clusterUpgrader.EnrichCSFromVault(ctx, cs)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepEnrichFromVault}
-	}
-
 	p.log.Info("generating arm templates")
 	azuretemplate, err := p.armGenerator.Generate(ctx, cs, "", isUpdate, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
+
+	// blobs must exist before deploy
+	err = clusterUpgrader.WriteStartupBlobs(cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepWriteStartupBlobs}
+	}
+
+	if !isUpdate {
+		// on update, we write the sync blob after the cluster VMs are all
+		// updated
+		err = clusterUpgrader.WriteSyncBlob(cs)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepWriteSyncBlob}
+		}
+	}
+
 	if isUpdate {
 		p.log.Info("starting update")
 	} else {
@@ -160,6 +166,18 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}
+
+	// enrich is required for the hash functions which are used below
+	err = clusterUpgrader.EnrichCSFromVault(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepEnrichFromVault}
+	}
+
+	err = clusterUpgrader.EnrichCSStorageAccountKeys(ctx, cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepEnrichKeys}
+	}
+
 	if isUpdate {
 		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
 			if perr := clusterUpgrader.UpdateMasterAgentPool(ctx, cs, &app); perr != nil {
@@ -175,6 +193,10 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 			if perr := clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
 				return perr
 			}
+		}
+		err = clusterUpgrader.WriteSyncBlob(cs)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepWriteSyncBlob}
 		}
 		if perr := clusterUpgrader.UpdateSyncPod(ctx, cs); perr != nil {
 			return perr
