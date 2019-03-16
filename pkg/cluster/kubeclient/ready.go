@@ -57,7 +57,7 @@ func (u *kubeclient) WaitForReadySyncPod(ctx context.Context) error {
 				return false, nil
 			case errors.IsInternalError(err):
 				if err, ok := err.(*errors.StatusError); ok && err.ErrStatus.Details != nil && len(err.ErrStatus.Details.Causes) == 1 {
-					u.log.Info(err.ErrStatus.Details.Causes[0])
+					u.log.Info(err.ErrStatus.Details.Causes[0].Message)
 				}
 				return false, nil
 			default:
