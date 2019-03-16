@@ -450,7 +450,7 @@ var Translations = map[string][]struct {
 	"DaemonSet.apps/openshift-azure-monitoring/etcd-metrics": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),
-			Template: "quay.io/mangirdas/tlsproxy",
+			Template: "{{ .Config.Images.TLSProxy }}",
 		},
 	},
 	"Deployment.apps/default/registry-console": {
