@@ -14,11 +14,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
-// Initialize does the following:
-// - ensures the storageClient is initialised (this is dependent on the config
-//   storage account existing, which is why it can't be done before)
-// - ensures the expected containers (config, etcd, update) exist
-// - populates the config blob
 func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	if u.storageClient == nil {
 		keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
@@ -29,28 +24,18 @@ func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManage
 		if err != nil {
 			return err
 		}
+
+		bsc := u.storageClient.GetBlobService()
+		u.updateBlobService = updateblob.NewBlobService(bsc)
 	}
+
+	return u.WriteConfigBlob(cs)
+}
+
+func (u *simpleUpgrader) WriteConfigBlob(cs *api.OpenShiftManagedCluster) error {
 	bsc := u.storageClient.GetBlobService()
 
-	// etcd data container
-	c := bsc.GetContainerReference(EtcdBackupContainerName)
-	_, err := c.CreateIfNotExists(nil)
-	if err != nil {
-		return err
-	}
-
-	u.updateBlobService, err = updateblob.NewBlobService(bsc)
-	if err != nil {
-		return err
-	}
-
-	// cluster config container
-	c = bsc.GetContainerReference(ConfigContainerName)
-	_, err = c.CreateIfNotExists(nil)
-	if err != nil {
-		return err
-	}
-
+	c := bsc.GetContainerReference(ConfigContainerName)
 	b := c.GetBlobReference(ConfigBlobName)
 
 	csj, err := json.Marshal(cs)
@@ -61,18 +46,54 @@ func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManage
 	return b.CreateBlockBlobFromReader(bytes.NewReader(csj), nil)
 }
 
-func (u *simpleUpgrader) CreateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	parameters := azstorage.AccountCreateParameters{
+func (u *simpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	err := u.accountsClient.Create(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount, azstorage.AccountCreateParameters{
 		Sku: &azstorage.Sku{
 			Name: azstorage.StandardLRS,
 		},
 		Kind:     azstorage.Storage,
 		Location: &cs.Location,
+		Tags: map[string]*string{
+			"type": to.StringPtr("config"),
+		},
+	})
+	if err != nil {
+		return err
 	}
-	parameters.Tags = map[string]*string{
-		"type": to.StringPtr("config"),
+
+	keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+	if err != nil {
+		return err
 	}
-	return u.accountsClient.Create(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount, parameters)
+
+	storageClient, err := storage.NewClient(cs.Config.ConfigStorageAccount, *(*keys.Keys)[0].Value, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
+	if err != nil {
+		return err
+	}
+	bsc := storageClient.GetBlobService()
+
+	// cluster config container
+	c := bsc.GetContainerReference(ConfigContainerName)
+	_, err = c.CreateIfNotExists(nil)
+	if err != nil {
+		return err
+	}
+
+	// etcd data container
+	c = bsc.GetContainerReference(EtcdBackupContainerName)
+	_, err = c.CreateIfNotExists(nil)
+	if err != nil {
+		return err
+	}
+
+	// update container
+	c = bsc.GetContainerReference(updateblob.UpdateContainerName)
+	_, err = c.CreateIfNotExists(nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error {

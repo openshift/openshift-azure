@@ -28,14 +28,8 @@ type BlobService interface {
 	Write(*UpdateBlob) error
 }
 
-func NewBlobService(bsc storage.BlobStorageClient) (BlobService, error) {
-	u := &blobService{updateContainer: bsc.GetContainerReference(UpdateContainerName)}
-
-	if _, err := u.updateContainer.CreateIfNotExists(nil); err != nil {
-		return nil, err
-	}
-
-	return u, nil
+func NewBlobService(bsc storage.BlobStorageClient) BlobService {
+	return &blobService{updateContainer: bsc.GetContainerReference(UpdateContainerName)}
 }
 
 func (u *blobService) Write(blob *UpdateBlob) error {

@@ -50,18 +50,18 @@ func (mr *MockUpgraderMockRecorder) CreateClients(ctx, cs, disableKeepAlives int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateClients", reflect.TypeOf((*MockUpgrader)(nil).CreateClients), ctx, cs, disableKeepAlives)
 }
 
-// CreateConfigStorageAccount mocks base method
-func (m *MockUpgrader) CreateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+// CreateOrUpdateConfigStorageAccount mocks base method
+func (m *MockUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateConfigStorageAccount", ctx, cs)
+	ret := m.ctrl.Call(m, "CreateOrUpdateConfigStorageAccount", ctx, cs)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// CreateConfigStorageAccount indicates an expected call of CreateConfigStorageAccount
-func (mr *MockUpgraderMockRecorder) CreateConfigStorageAccount(ctx, cs interface{}) *gomock.Call {
+// CreateOrUpdateConfigStorageAccount indicates an expected call of CreateOrUpdateConfigStorageAccount
+func (mr *MockUpgraderMockRecorder) CreateOrUpdateConfigStorageAccount(ctx, cs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateConfigStorageAccount", reflect.TypeOf((*MockUpgrader)(nil).CreateConfigStorageAccount), ctx, cs)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdateConfigStorageAccount", reflect.TypeOf((*MockUpgrader)(nil).CreateOrUpdateConfigStorageAccount), ctx, cs)
 }
 
 // EnrichCSFromVault mocks base method

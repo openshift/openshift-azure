@@ -27,7 +27,7 @@ const (
 	PluginStepClientCreation                          PluginStep = "ClientCreation"
 	PluginStepEnrichFromVault                         PluginStep = "EnrichFromVault"
 	PluginStepScaleSetDelete                          PluginStep = "ScaleSetDelete"
-	PluginCreateConfigStorageAccount                  PluginStep = "CreateConfigStorageAccount"
+	PluginCreateOrUpdateConfigStorageAccount          PluginStep = "CreateOrUpdateConfigStorageAccount"
 	PluginStepGenerateARM                             PluginStep = "GenerateARM"
 	PluginStepWaitForWaitForOpenShiftAPI              PluginStep = "WaitForOpenShiftAPI"
 	PluginStepWaitForNodes                            PluginStep = "WaitForNodes"
