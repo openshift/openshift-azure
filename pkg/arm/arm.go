@@ -12,10 +12,14 @@ package arm
 import (
 	"context"
 	"encoding/json"
+	"time"
 
+	azstorage "github.com/Azure/azure-sdk-for-go/storage"
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
 type Generator interface {
@@ -23,7 +27,9 @@ type Generator interface {
 }
 
 type simpleGenerator struct {
-	testConfig api.TestConfig
+	testConfig     api.TestConfig
+	accountsClient azureclient.AccountsClient
+	storageClient  storage.Client
 }
 
 var _ Generator = &simpleGenerator{}
@@ -38,10 +44,56 @@ type Template struct {
 }
 
 // NewSimpleGenerator create a new SimpleGenerator
-func NewSimpleGenerator(testConfig api.TestConfig) Generator {
-	return &simpleGenerator{
-		testConfig: testConfig,
+func NewSimpleGenerator(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Generator, error) {
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
+	if err != nil {
+		return nil, err
 	}
+
+	g := &simpleGenerator{
+		testConfig:     testConfig,
+		accountsClient: azureclient.NewAccountsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
+	}
+
+	if cs.Config.ConfigStorageAccountKey == "" {
+		keys, err := g.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+		if err != nil {
+			return nil, err
+		}
+		cs.Config.ConfigStorageAccountKey = *(*keys.Keys)[0].Value
+	}
+
+	g.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
+	if err != nil {
+		return nil, err
+	}
+
+	return g, nil
+}
+
+func GetConfigSASURI(storageClient storage.Client, app *api.AgentPoolProfile) (string, error) {
+	now := time.Now().Add(-time.Hour)
+
+	bsc := storageClient.GetBlobService()
+	c := bsc.GetContainerReference("config") // TODO: should be using consts, need to merge packages
+	var b storage.Blob
+	switch app.Role {
+	case api.AgentPoolProfileRoleMaster:
+		b = c.GetBlobReference("master-startup")
+	default:
+		b = c.GetBlobReference("worker-startup")
+	}
+	return b.GetSASURI(azstorage.BlobSASOptions{
+		BlobServiceSASPermissions: azstorage.BlobServiceSASPermissions{
+			Read: true,
+		},
+		SASOptions: azstorage.SASOptions{
+			APIVersion: "2015-04-05",
+			Start:      now,
+			Expiry:     now.AddDate(5, 0, 0),
+			UseHTTPS:   true,
+		},
+	})
 }
 
 func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
@@ -66,7 +118,12 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 	}
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
-			vmss, err := Vmss(cs, &app, backupBlob, suffix, g.testConfig)
+			blobURI, err := GetConfigSASURI(g.storageClient, &app)
+			if err != nil {
+				return nil, err
+			}
+
+			vmss, err := Vmss(cs, &app, blobURI, backupBlob, suffix, g.testConfig)
 			if err != nil {
 				return nil, err
 			}

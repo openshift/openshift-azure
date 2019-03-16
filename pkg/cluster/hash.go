@@ -37,7 +37,7 @@ func (h *hasher) vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile
 	appCopy.Count = 0
 	appCopy.Name = ""
 
-	return arm.Vmss(cs, &appCopy, "", "", h.testConfig) // TODO: backupBlob is rather a layering violation here
+	return arm.Vmss(cs, &appCopy, "", "", "", h.testConfig) // TODO: backupBlob is rather a layering violation here
 }
 
 // HashWorkerScaleSet returns the hash of a worker scale set

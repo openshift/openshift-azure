@@ -22,12 +22,12 @@ import (
 
 type plugin struct {
 	// nothing in here should be dependent on an OpenShiftManagedCluster object
-	log             *logrus.Entry
-	pluginConfig    *pluginapi.Config
-	testConfig      api.TestConfig
-	upgraderFactory func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error)
-	armGenerator    arm.Generator
-	configGenerator config.Generator
+	log                 *logrus.Entry
+	pluginConfig        *pluginapi.Config
+	testConfig          api.TestConfig
+	upgraderFactory     func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error)
+	armGeneratorFactory func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error)
+	configGenerator     config.Generator
 }
 
 var _ api.Plugin = &plugin{}
@@ -35,12 +35,12 @@ var _ api.Plugin = &plugin{}
 // NewPlugin creates a new plugin instance
 func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, testConfig api.TestConfig) (api.Plugin, []error) {
 	return &plugin{
-		log:             log,
-		pluginConfig:    pluginConfig,
-		testConfig:      testConfig,
-		upgraderFactory: cluster.NewSimpleUpgrader,
-		armGenerator:    arm.NewSimpleGenerator(testConfig),
-		configGenerator: config.NewSimpleGenerator(testConfig.RunningUnderTest),
+		log:                 log,
+		pluginConfig:        pluginConfig,
+		testConfig:          testConfig,
+		upgraderFactory:     cluster.NewSimpleUpgrader,
+		armGeneratorFactory: arm.NewSimpleGenerator,
+		configGenerator:     config.NewSimpleGenerator(testConfig.RunningUnderTest),
 	}, nil
 }
 
@@ -80,9 +80,13 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
+	armGenerator, err := p.armGeneratorFactory(ctx, cs, p.testConfig)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
 
 	p.log.Info("generating arm templates")
-	azuretemplate, err := p.armGenerator.Generate(ctx, cs, backupBlob, true, suffix)
+	azuretemplate, err := armGenerator.Generate(ctx, cs, backupBlob, true, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
@@ -135,8 +139,15 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginCreateOrUpdateConfigStorageAccount}
 	}
 
+	// must be done after config storage account is created
+	p.log.Info("creating more clients")
+	armGenerator, err := p.armGeneratorFactory(ctx, cs, p.testConfig)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
+
 	p.log.Info("generating arm templates")
-	azuretemplate, err := p.armGenerator.Generate(ctx, cs, "", isUpdate, suffix)
+	azuretemplate, err := armGenerator.Generate(ctx, cs, "", isUpdate, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}

@@ -9,6 +9,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
@@ -84,8 +85,10 @@ func TestCreateOrUpdate(t *testing.T) {
 				upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 					return clusterUpgrader, nil
 				},
-				armGenerator: armGenerator,
-				log:          logrus.NewEntry(logrus.StandardLogger()),
+				armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
+					return armGenerator, nil
+				},
+				log: logrus.NewEntry(logrus.StandardLogger()),
 			}
 			if err := p.CreateOrUpdate(nil, cs, tt.isUpdate, deployer); err != nil {
 				t.Errorf("plugin.CreateOrUpdate(%s) error = %v", tt.name, err)
@@ -145,8 +148,10 @@ func TestRecoverEtcdCluster(t *testing.T) {
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 			return clusterUpgrader, nil
 		},
-		armGenerator: armGenerator,
-		log:          logrus.NewEntry(logrus.StandardLogger()),
+		armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
+			return armGenerator, nil
+		},
+		log: logrus.NewEntry(logrus.StandardLogger()),
 	}
 
 	if err := p.RecoverEtcdCluster(nil, cs, deployer, "test-backup"); err != nil {
@@ -193,9 +198,11 @@ func TestRotateClusterSecrets(t *testing.T) {
 	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 
 	p := &plugin{
-		armGenerator: armGenerator,
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 			return clusterUpgrader, nil
+		},
+		armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
+			return armGenerator, nil
 		},
 		configGenerator: configGenerator,
 		log:             logrus.NewEntry(logrus.StandardLogger()),
@@ -243,9 +250,11 @@ func TestForceUpdate(t *testing.T) {
 	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
 
 	p := &plugin{
-		armGenerator: armGenerator,
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 			return clusterUpgrader, nil
+		},
+		armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
+			return armGenerator, nil
 		},
 		log: logrus.NewEntry(logrus.StandardLogger()),
 	}

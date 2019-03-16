@@ -83,6 +83,7 @@ type Blob interface {
 	PutBlock(blockID string, chunk []byte, options *storage.PutBlockOptions) error
 	PutBlockList(blocks []storage.Block, options *storage.PutBlockListOptions) error
 	Get(options *storage.GetBlobOptions) (io.ReadCloser, error)
+	GetSASURI(options storage.BlobSASOptions) (string, error)
 	Delete(options *storage.DeleteBlobOptions) error
 	Exists() (bool, error)
 }
