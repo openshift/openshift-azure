@@ -36,20 +36,25 @@ func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, w wri
 
 		destination := "/" + templateFileName
 
-		parentDir := path.Dir(destination)
-		err = w.MkdirAll(parentDir, 0755)
-		if err != nil {
-			return err
-		}
-
 		var perm os.FileMode
 		switch {
 		case path.Ext(destination) == ".key",
 			path.Ext(destination) == ".kubeconfig",
-			path.Base(destination) == "session-secrets.yaml":
+			destination == "/etc/origin/cloudprovider/azure.conf",
+			destination == "/etc/origin/master/session-secrets.yaml",
+			destination == "/var/lib/origin/.docker/config.json",
+			destination == "/root/.kube/config":
 			perm = 0600
 		default:
 			perm = 0644
+		}
+
+		destination = "/host" + destination
+
+		parentDir := path.Dir(destination)
+		err = w.MkdirAll(parentDir, 0755)
+		if err != nil {
+			return err
 		}
 
 		err = w.WriteFile(destination, b, perm)
