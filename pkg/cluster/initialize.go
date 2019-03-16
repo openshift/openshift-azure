@@ -51,10 +51,12 @@ func (u *simpleUpgrader) writeBlob(blobName string, cs *api.OpenShiftManagedClus
 }
 
 func (u *simpleUpgrader) WriteSyncBlob(cs *api.OpenShiftManagedCluster) error {
+	u.log.Info("writing sync blob")
 	return u.writeBlob(SyncBlobName, cs)
 }
 
 func (u *simpleUpgrader) WriteStartupBlobs(cs *api.OpenShiftManagedCluster) error {
+	u.log.Info("writing startup blobs")
 	err := u.writeBlob(MasterStartupBlobName, cs)
 	if err != nil {
 		return err
@@ -103,6 +105,8 @@ func (u *simpleUpgrader) WriteStartupBlobs(cs *api.OpenShiftManagedCluster) erro
 }
 
 func (u *simpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	u.log.Info("creating/updating storage account")
+
 	err := u.accountsClient.Create(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount, azstorage.AccountCreateParameters{
 		Sku: &azstorage.Sku{
 			Name: azstorage.StandardLRS,
