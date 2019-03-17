@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   labels:
+    azure.openshift.io/sync-pod-wait-for-readiness: "false"
     k8s-app: etcd-metrics
   name: etcd-metrics
   namespace: openshift-azure-monitoring

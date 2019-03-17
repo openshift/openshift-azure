@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"sync/atomic"
 	"time"
 
 	"github.com/ghodss/yaml"
@@ -281,7 +282,7 @@ var (
 // writeDB uses the discovery and dynamic clients to synchronise an API server's
 // objects with db.
 // TODO: need to implement deleting objects which we don't want any more.
-func writeDB(log *logrus.Entry, client *client, db map[string]unstructured.Unstructured) error {
+func writeDB(log *logrus.Entry, client *client, db map[string]unstructured.Unstructured, readyFlag *atomic.Value) error {
 	// impose an order to improve debuggability.
 	var keys []string
 	for k := range db {
@@ -340,6 +341,9 @@ func writeDB(log *logrus.Entry, client *client, db map[string]unstructured.Unstr
 		return err
 	}
 
+	// to speed up cluster startup time, we call this ready
+	readyFlag.Store(true)
+
 	log.Debug("Waiting for the targeted CRDs to get ready")
 	if err := wait.PollImmediateInfinite(time.Second,
 		ready.CheckCustomResourceDefinitionIsReady(client.ae.ApiextensionsV1beta1().CustomResourceDefinitions(), "servicemonitors.monitoring.coreos.com"),
@@ -378,13 +382,13 @@ func EnrichCSStorageAccountKeys(ctx context.Context, azs azureclient.AccountsCli
 }
 
 // Main loop
-func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, db map[string]unstructured.Unstructured) error {
+func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, db map[string]unstructured.Unstructured, ready *atomic.Value) error {
 	client, err := newClient(ctx, log, cs)
 	if err != nil {
 		return err
 	}
 
-	err = writeDB(log, client, db)
+	err = writeDB(log, client, db, ready)
 	if err != nil {
 		return err
 	}

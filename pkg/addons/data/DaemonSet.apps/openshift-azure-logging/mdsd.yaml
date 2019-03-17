@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
+  labels:
+    azure.openshift.io/sync-pod-wait-for-readiness: "false"
   name: mdsd
   namespace: openshift-azure-logging
 spec:

@@ -199,14 +199,10 @@ func run(ctx context.Context, log *logrus.Entry) error {
 
 	for {
 		log.Print("starting sync")
-		if err := addons.Main(ctx, s.log, s.cs, s.db); err != nil {
+		if err := addons.Main(ctx, s.log, s.cs, s.db, &s.ready); err != nil {
 			log.Printf("sync error: %s", err)
 		} else {
 			log.Print("sync done")
-			// TODO: move healthchecks/deployment waits here
-			// TODO: when etcd monitoring code gets added, set this earlier
-			// otherwise cluster creation will block on the monitoring stack
-			s.ready.Store(true)
 		}
 		if *once {
 			return nil
