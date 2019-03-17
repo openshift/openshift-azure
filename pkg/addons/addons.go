@@ -7,7 +7,7 @@ package addons
 import (
 	"context"
 	"crypto/sha256"
-	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"sort"
@@ -162,7 +162,7 @@ func getHash(o *unstructured.Unstructured) string {
 		fmt.Fprintf(h, "%s: %#v", key, content[key])
 	}
 
-	return base64.StdEncoding.EncodeToString(h.Sum(nil))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 // setPodTemplateAnnotation sets the provided key-value pair as an annotation
