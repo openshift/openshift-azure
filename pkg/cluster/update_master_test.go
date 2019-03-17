@@ -102,10 +102,6 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				for k, v := range hostnameHashes {
 					uBlob.HostnameHashes[k] = v
 				}
-				if i == 0 {
-					c = hasher.EXPECT().HashSyncPod(tt.cs).Return([]byte("updated"), nil).After(c)
-				}
-				uBlob.SyncPodHash = []byte("updated")
 
 				c = ubs.EXPECT().Write(uBlob).Return(nil).After(c)
 			}

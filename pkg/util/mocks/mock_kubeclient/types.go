@@ -63,20 +63,6 @@ func (mr *MockKubeclientMockRecorder) DeleteMaster(arg0 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMaster", reflect.TypeOf((*MockKubeclient)(nil).DeleteMaster), arg0)
 }
 
-// DeletePod mocks base method
-func (m *MockKubeclient) DeletePod(arg0 context.Context, arg1, arg2 string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeletePod", arg0, arg1, arg2)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeletePod indicates an expected call of DeletePod
-func (mr *MockKubeclientMockRecorder) DeletePod(arg0, arg1, arg2 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePod", reflect.TypeOf((*MockKubeclient)(nil).DeletePod), arg0, arg1, arg2)
-}
-
 // DrainAndDeleteWorker mocks base method
 func (m *MockKubeclient) DrainAndDeleteWorker(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
@@ -89,6 +75,20 @@ func (m *MockKubeclient) DrainAndDeleteWorker(arg0 context.Context, arg1 string)
 func (mr *MockKubeclientMockRecorder) DrainAndDeleteWorker(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DrainAndDeleteWorker", reflect.TypeOf((*MockKubeclient)(nil).DrainAndDeleteWorker), arg0, arg1)
+}
+
+// EnsureSyncPod mocks base method
+func (m *MockKubeclient) EnsureSyncPod(arg0 context.Context, arg1 string, arg2 []byte) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EnsureSyncPod", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// EnsureSyncPod indicates an expected call of EnsureSyncPod
+func (mr *MockKubeclientMockRecorder) EnsureSyncPod(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnsureSyncPod", reflect.TypeOf((*MockKubeclient)(nil).EnsureSyncPod), arg0, arg1, arg2)
 }
 
 // GetControlPlanePods mocks base method

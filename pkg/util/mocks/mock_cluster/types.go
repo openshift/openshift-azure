@@ -65,6 +65,20 @@ func (mr *MockUpgraderMockRecorder) CreateOrUpdateConfigStorageAccount(arg0, arg
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdateConfigStorageAccount", reflect.TypeOf((*MockUpgrader)(nil).CreateOrUpdateConfigStorageAccount), arg0, arg1)
 }
 
+// CreateOrUpdateSyncPod mocks base method
+func (m *MockUpgrader) CreateOrUpdateSyncPod(arg0 context.Context, arg1 *api.OpenShiftManagedCluster) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateOrUpdateSyncPod", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateOrUpdateSyncPod indicates an expected call of CreateOrUpdateSyncPod
+func (mr *MockUpgraderMockRecorder) CreateOrUpdateSyncPod(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdateSyncPod", reflect.TypeOf((*MockUpgrader)(nil).CreateOrUpdateSyncPod), arg0, arg1)
+}
+
 // DeleteMaster mocks base method
 func (m *MockUpgrader) DeleteMaster(arg0 string) error {
 	m.ctrl.T.Helper()
@@ -77,20 +91,6 @@ func (m *MockUpgrader) DeleteMaster(arg0 string) error {
 func (mr *MockUpgraderMockRecorder) DeleteMaster(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMaster", reflect.TypeOf((*MockUpgrader)(nil).DeleteMaster), arg0)
-}
-
-// DeletePod mocks base method
-func (m *MockUpgrader) DeletePod(arg0 context.Context, arg1, arg2 string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeletePod", arg0, arg1, arg2)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeletePod indicates an expected call of DeletePod
-func (mr *MockUpgraderMockRecorder) DeletePod(arg0, arg1, arg2 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePod", reflect.TypeOf((*MockUpgrader)(nil).DeletePod), arg0, arg1, arg2)
 }
 
 // DrainAndDeleteWorker mocks base method
@@ -133,6 +133,20 @@ func (m *MockUpgrader) EnrichCSStorageAccountKeys(arg0 context.Context, arg1 *ap
 func (mr *MockUpgraderMockRecorder) EnrichCSStorageAccountKeys(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnrichCSStorageAccountKeys", reflect.TypeOf((*MockUpgrader)(nil).EnrichCSStorageAccountKeys), arg0, arg1)
+}
+
+// EnsureSyncPod mocks base method
+func (m *MockUpgrader) EnsureSyncPod(arg0 context.Context, arg1 string, arg2 []byte) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EnsureSyncPod", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// EnsureSyncPod indicates an expected call of EnsureSyncPod
+func (mr *MockUpgraderMockRecorder) EnsureSyncPod(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnsureSyncPod", reflect.TypeOf((*MockUpgrader)(nil).EnsureSyncPod), arg0, arg1, arg2)
 }
 
 // EtcdBlobExists mocks base method
@@ -305,20 +319,6 @@ func (mr *MockUpgraderMockRecorder) UpdateMasterAgentPool(arg0, arg1, arg2 inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMasterAgentPool", reflect.TypeOf((*MockUpgrader)(nil).UpdateMasterAgentPool), arg0, arg1, arg2)
 }
 
-// UpdateSyncPod mocks base method
-func (m *MockUpgrader) UpdateSyncPod(arg0 context.Context, arg1 *api.OpenShiftManagedCluster) *api.PluginError {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateSyncPod", arg0, arg1)
-	ret0, _ := ret[0].(*api.PluginError)
-	return ret0
-}
-
-// UpdateSyncPod indicates an expected call of UpdateSyncPod
-func (mr *MockUpgraderMockRecorder) UpdateSyncPod(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSyncPod", reflect.TypeOf((*MockUpgrader)(nil).UpdateSyncPod), arg0, arg1)
-}
-
 // UpdateWorkerAgentPool mocks base method
 func (m *MockUpgrader) UpdateWorkerAgentPool(arg0 context.Context, arg1 *api.OpenShiftManagedCluster, arg2 *api.AgentPoolProfile, arg3 string) *api.PluginError {
 	m.ctrl.T.Helper()
@@ -415,18 +415,4 @@ func (m *MockUpgrader) WriteStartupBlobs(arg0 *api.OpenShiftManagedCluster) erro
 func (mr *MockUpgraderMockRecorder) WriteStartupBlobs(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteStartupBlobs", reflect.TypeOf((*MockUpgrader)(nil).WriteStartupBlobs), arg0)
-}
-
-// WriteSyncBlob mocks base method
-func (m *MockUpgrader) WriteSyncBlob(arg0 *api.OpenShiftManagedCluster) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WriteSyncBlob", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// WriteSyncBlob indicates an expected call of WriteSyncBlob
-func (mr *MockUpgraderMockRecorder) WriteSyncBlob(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteSyncBlob", reflect.TypeOf((*MockUpgrader)(nil).WriteSyncBlob), arg0)
 }

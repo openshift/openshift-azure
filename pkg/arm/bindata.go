@@ -42,7 +42,6 @@
 // data/master/etc/origin/node/pods/etcd.yaml
 // data/master/etc/origin/node/pods/ovs.yaml
 // data/master/etc/origin/node/pods/sdn.yaml
-// data/master/etc/origin/node/pods/sync.yaml
 // data/master/etc/origin/node/resolv.conf
 // data/master/etc/origin/node/sdn.kubeconfig
 // data/master/etc/pki/ca-trust/source/anchors/openshift-ca.crt
@@ -969,26 +968,6 @@ func masterEtcOriginNodePodsSdnYaml() (*asset, error) {
 	return a, nil
 }
 
-var _masterEtcOriginNodePodsSyncYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\x90\x4d\x4e\xc3\x30\x10\x85\xf7\x39\xc5\x5c\x20\x4d\xd9\x55\xde\xa1\xae\x58\x00\x91\x90\xd8\x56\xc6\x1e\x52\x2b\xb6\x27\x78\xc6\x29\x56\xe9\xdd\x51\x7e\x68\xd5\x0d\xcb\xf7\xfc\x49\xdf\xf3\xe8\xc1\xbd\x63\x62\x47\x51\xc1\xf8\x50\xf5\x2e\x5a\x05\x2d\xd9\x2a\xa0\x68\xab\x45\xab\x0a\x20\xea\x80\x0a\xb8\x44\xb3\x06\x1e\xb4\x41\x05\x7d\xfe\xc0\x9a\x0b\x0b\x86\x8a\x07\x34\x13\x6b\x28\x8a\x76\x11\x13\x4f\xa9\x06\x17\x74\x87\x0a\xce\x67\xd8\xec\x29\x7e\xba\x6e\xf3\x34\x35\xbc\x79\x2b\xd1\xc0\x0f\x7c\x65\x12\x84\xcb\xa5\x02\x80\x05\x6e\xb3\xf7\x2d\x79\x67\x8a\x82\x47\x7f\xd2\x85\xe7\xb7\xbb\x11\x00\x8c\x26\x27\x27\x65\x4f\x51\xf0\x5b\xd4\x5c\x02\x0c\xc9\x8d\xce\x63\x87\x56\x81\xa4\x8c\x73\x3d\x50\x12\x5e\x88\xfa\x36\xb0\xa5\x24\x0a\x76\xdb\xdd\x76\x7e\x19\xc9\xe7\x80\xcf\x94\xe3\x8d\x0d\x53\x6a\xb5\x1c\x15\x34\x87\xe9\x1a\xcd\x81\xb2\xac\xaa\x65\x50\xd0\x2c\x98\x6a\xe3\x29\xdb\x7a\x48\x34\x3a\x8b\x69\x25\x12\x6a\xfb\x1a\x7d\xb9\x4e\x39\x12\xcb\x0b\xca\x89\x52\x7f\xed\x16\xef\x7a\xad\x09\x98\x7d\x7f\xdf\x59\xdc\x28\xa6\xa1\xe4\x3a\x17\x9b\x59\x74\xe7\xf9\x6f\xc7\x6f\x00\x00\x00\xff\xff\x3d\x8f\x46\xfa\xdf\x01\x00\x00")
-
-func masterEtcOriginNodePodsSyncYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_masterEtcOriginNodePodsSyncYaml,
-		"master/etc/origin/node/pods/sync.yaml",
-	)
-}
-
-func masterEtcOriginNodePodsSyncYaml() (*asset, error) {
-	bytes, err := masterEtcOriginNodePodsSyncYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "master/etc/origin/node/pods/sync.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _masterEtcOriginNodeResolvConf = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xca\x4b\xcc\x4d\x2d\x4e\x2d\x2a\x4b\x2d\x52\x30\x34\xb3\xd0\x33\x33\xd6\x33\x34\xb2\xd4\x33\x34\xe3\x02\x04\x00\x00\xff\xff\x77\xaa\x94\x8c\x19\x00\x00\x00")
 
 func masterEtcOriginNodeResolvConfBytes() ([]byte, error) {
@@ -1503,7 +1482,6 @@ var _bindata = map[string]func() (*asset, error){
 	"master/etc/origin/node/pods/etcd.yaml":                   masterEtcOriginNodePodsEtcdYaml,
 	"master/etc/origin/node/pods/ovs.yaml":                    masterEtcOriginNodePodsOvsYaml,
 	"master/etc/origin/node/pods/sdn.yaml":                    masterEtcOriginNodePodsSdnYaml,
-	"master/etc/origin/node/pods/sync.yaml":                   masterEtcOriginNodePodsSyncYaml,
 	"master/etc/origin/node/resolv.conf":                      masterEtcOriginNodeResolvConf,
 	"master/etc/origin/node/sdn.kubeconfig":                   masterEtcOriginNodeSdnKubeconfig,
 	"master/etc/pki/ca-trust/source/anchors/openshift-ca.crt": masterEtcPkiCaTrustSourceAnchorsOpenshiftCaCrt,
@@ -1623,7 +1601,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 						"etcd.yaml":        {masterEtcOriginNodePodsEtcdYaml, map[string]*bintree{}},
 						"ovs.yaml":         {masterEtcOriginNodePodsOvsYaml, map[string]*bintree{}},
 						"sdn.yaml":         {masterEtcOriginNodePodsSdnYaml, map[string]*bintree{}},
-						"sync.yaml":        {masterEtcOriginNodePodsSyncYaml, map[string]*bintree{}},
 					}},
 					"resolv.conf":    {masterEtcOriginNodeResolvConf, map[string]*bintree{}},
 					"sdn.kubeconfig": {masterEtcOriginNodeSdnKubeconfig, map[string]*bintree{}},

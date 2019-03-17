@@ -158,15 +158,6 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginStepWriteStartupBlobs}
 	}
 
-	if !isUpdate {
-		// on update, we write the sync blob after the cluster VMs are all
-		// updated
-		err = clusterUpgrader.WriteSyncBlob(cs)
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepWriteSyncBlob}
-		}
-	}
-
 	if isUpdate {
 		p.log.Info("starting update")
 	} else {
@@ -205,13 +196,15 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 				return perr
 			}
 		}
-		err = clusterUpgrader.WriteSyncBlob(cs)
+		err = clusterUpgrader.CreateOrUpdateSyncPod(ctx, cs)
 		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepWriteSyncBlob}
+			return &api.PluginError{Err: err, Step: api.PluginStepCreateSyncPod}
 		}
-		if perr := clusterUpgrader.UpdateSyncPod(ctx, cs); perr != nil {
-			return perr
+		err = clusterUpgrader.WaitForReadySyncPod(ctx)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepCreateSyncPodWaitForReady}
 		}
+
 	} else {
 		err = clusterUpgrader.InitializeUpdateBlob(cs, suffix)
 		if err != nil {
@@ -220,6 +213,10 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		err = clusterUpgrader.WaitForHealthzStatusOk(ctx, cs)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
+		}
+		err = clusterUpgrader.CreateOrUpdateSyncPod(ctx, cs)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPod}
 		}
 
 		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {

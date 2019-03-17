@@ -50,11 +50,6 @@ func (u *simpleUpgrader) writeBlob(blobName string, cs *api.OpenShiftManagedClus
 	return b.CreateBlockBlobFromReader(bytes.NewReader(json), nil)
 }
 
-func (u *simpleUpgrader) WriteSyncBlob(cs *api.OpenShiftManagedCluster) error {
-	u.log.Info("writing sync blob")
-	return u.writeBlob(SyncBlobName, cs)
-}
-
 func (u *simpleUpgrader) WriteStartupBlobs(cs *api.OpenShiftManagedCluster) error {
 	u.log.Info("writing startup blobs")
 	err := u.writeBlob(MasterStartupBlobName, cs)
@@ -174,11 +169,6 @@ func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 			}
 			blob.ScalesetHashes[config.GetScalesetName(&app, suffix)] = h
 		}
-	}
-	var err error
-	blob.SyncPodHash, err = u.hasher.HashSyncPod(cs)
-	if err != nil {
-		return err
 	}
 	return u.updateBlobService.Write(blob)
 }

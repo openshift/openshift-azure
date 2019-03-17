@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	security "github.com/openshift/client-go/security/clientset/versioned"
 	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd/api/v1"
@@ -156,9 +157,15 @@ func NewKubeclient(log *logrus.Entry, config *v1.Config, disableKeepAlives bool)
 		return nil, err
 	}
 
+	seccli, err := security.NewForConfig(restconfig)
+	if err != nil {
+		return nil, err
+	}
+
 	return &kubeclient{
 		log:    log,
 		client: cli,
+		seccli: seccli,
 	}, nil
 
 }

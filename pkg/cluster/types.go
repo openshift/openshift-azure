@@ -42,7 +42,7 @@ type Upgrader interface {
 	WaitForNodesInAgentPoolProfile(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) error
 	UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError
 	UpdateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError
-	UpdateSyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
+	CreateOrUpdateSyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	EtcdBlobExists(ctx context.Context, blobName string) error
 	EtcdRestoreDeleteMasterScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
 	EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
@@ -50,7 +50,6 @@ type Upgrader interface {
 	Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID string) error
 	ListVMHostnames(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]string, error)
 	RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID, command string) error
-	WriteSyncBlob(cs *api.OpenShiftManagedCluster) error
 	WriteStartupBlobs(cs *api.OpenShiftManagedCluster) error
 
 	kubeclient.Kubeclient

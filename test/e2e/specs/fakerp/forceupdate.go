@@ -50,7 +50,6 @@ var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func
 			Expect(after.HostnameHashes).To(HaveKey(key))
 			Expect(val).To(Equal(after.HostnameHashes[key]))
 		}
-		Expect(before.SyncPodHash).To(Equal(after.SyncPodHash))
 
 		By("Verifying that the scaleset hashes of the update blob are different (workers)")
 		for key := range before.ScalesetHashes {

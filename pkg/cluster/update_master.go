@@ -75,14 +75,6 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 
 		blob.HostnameHashes[hostname] = desiredHash
 
-		if i == 0 {
-			// if we've updated master-000000, we've updated the sync pod
-			blob.SyncPodHash, err = u.hasher.HashSyncPod(cs)
-			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashSyncPod}
-			}
-		}
-
 		if err := u.updateBlobService.Write(blob); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateBlob}
 		}

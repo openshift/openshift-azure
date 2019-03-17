@@ -19,8 +19,6 @@ type UpdateBlob struct {
 	ScalesetHashes ScalesetHashes `json:"scalesetHashes,omitempty"`
 	// HostnameHashes stores the config hash for each master instance
 	HostnameHashes HostnameHashes `json:"hostnameHashes,omitempty"`
-	// SyncPodHash stores the config hash for the sync pod
-	SyncPodHash []byte `json:"syncPodHash,omitempty"`
 }
 
 func NewUpdateBlob() *UpdateBlob {

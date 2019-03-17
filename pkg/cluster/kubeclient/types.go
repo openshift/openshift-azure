@@ -9,6 +9,7 @@ package kubeclient
 import (
 	"context"
 
+	security "github.com/openshift/client-go/security/clientset/versioned"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
@@ -19,7 +20,7 @@ type Kubeclient interface {
 	BackupCluster(ctx context.Context, backupName string) error
 	DrainAndDeleteWorker(ctx context.Context, hostname string) error
 	DeleteMaster(hostname string) error
-	DeletePod(ctx context.Context, namespace, name string) error
+	EnsureSyncPod(ctx context.Context, syncImage string, hash []byte) error
 	GetControlPlanePods(ctx context.Context) ([]corev1.Pod, error)
 	WaitForReadyMaster(ctx context.Context, hostname string) error
 	WaitForReadyWorker(ctx context.Context, hostname string) error
@@ -28,6 +29,7 @@ type Kubeclient interface {
 
 type kubeclient struct {
 	client kubernetes.Interface
+	seccli security.Interface
 	log    *logrus.Entry
 }
 

@@ -40,21 +40,14 @@ func (u *kubeclient) WaitForReadyWorker(ctx context.Context, hostname string) er
 func (u *kubeclient) WaitForReadySyncPod(ctx context.Context) error {
 	return wait.PollImmediateUntil(time.Second,
 		func() (bool, error) {
-			// can't check the pod status - health checks don't exist for
-			// static/mirror pods
-			_, err := u.client.CoreV1().RESTClient().Get().
-				Namespace("kube-system").
-				Resource("pods").
-				Name("sync-master-000000").
-				SubResource("proxy").
-				Suffix("/healthz/ready").
+			_, err := u.client.CoreV1().
+				Services("kube-system").
+				ProxyGet("", "sync", "", "/healthz/ready", nil).
 				DoRaw()
 
 			switch {
 			case err == nil:
 				return true, nil
-			case errors.IsServiceUnavailable(err): // HACK - this happens when we hit a different API server
-				return false, nil
 			case errors.IsInternalError(err):
 				if err, ok := err.(*errors.StatusError); ok && err.ErrStatus.Details != nil && len(err.ErrStatus.Details.Causes) == 1 {
 					u.log.Info(err.ErrStatus.Details.Causes[0].Message)

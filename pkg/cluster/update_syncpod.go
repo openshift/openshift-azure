@@ -1,47 +1,24 @@
 package cluster
 
 import (
-	"bytes"
 	"context"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// UpdateSyncPod updates the sync pod.
-func (u *simpleUpgrader) UpdateSyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
+// CreateOrUpdateSyncPod creates or updates the sync pod.
+func (u *simpleUpgrader) CreateOrUpdateSyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	u.log.Infof("updating sync pod")
 
-	blob, err := u.updateBlobService.Read()
+	err := u.writeBlob(SyncBlobName, cs)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPodReadBlob}
+		return err
 	}
 
-	desiredHash, err := u.hasher.HashSyncPod(cs)
+	hash, err := u.hasher.HashSyncPod(cs)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPodHashSyncPod}
+		return err
 	}
 
-	if bytes.Equal(blob.SyncPodHash, desiredHash) {
-		u.log.Infof("skipping sync pod since it's already updated")
-		return nil
-	}
-
-	u.log.Infof("deleting sync pod")
-	err = u.Kubeclient.DeletePod(ctx, "kube-system", "sync-master-000000")
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPodDeletePod}
-	}
-
-	err = u.Kubeclient.WaitForReadySyncPod(ctx)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPodWaitForReady}
-	}
-
-	blob.SyncPodHash = desiredHash
-
-	if err := u.updateBlobService.Write(blob); err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPodUpdateBlob}
-	}
-
-	return nil
+	return u.Kubeclient.EnsureSyncPod(ctx, cs.Config.Images.Sync, hash)
 }
