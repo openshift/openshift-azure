@@ -61,6 +61,7 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	if err != nil {
 		s.log.Fatal(err)
 	}
+	overridePluginTemplate(s.pluginTemplate)
 	s.plugin, errs = plugin.NewPlugin(s.log, s.pluginTemplate, s.testConfig)
 	if len(errs) > 0 {
 		s.log.Fatal(errs)

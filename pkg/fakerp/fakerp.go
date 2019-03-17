@@ -17,7 +17,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
-	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
@@ -58,28 +57,9 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployF
 	}
 }
 
-func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
-	template, err := GetPluginTemplate()
-	if err != nil {
-		return nil, err
-	}
-
-	// This should be executed only for fakeRP
-	overridePluginTemplate(template)
-
-	// instantiate the plugin
-	p, errs := plugin.NewPlugin(log, template, testConfig)
-	if len(errs) > 0 {
-		return nil, kerrors.NewAggregate(errs)
-	}
-
-	errs = p.ValidatePluginTemplate(ctx)
-	if len(errs) > 0 {
-		return nil, kerrors.NewAggregate(errs)
-	}
-
+func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
 	log.Info("enrich")
-	err = enrich(cs)
+	err := enrich(cs)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +68,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	// internal API representation)
 	// we set fqdn during enrichment which is slightly different than what the RP
 	// will do so we are only validating once.
+	var errs []error
 	if isAdmin {
 		errs = p.ValidateAdmin(ctx, cs, oldCs)
 	} else {
