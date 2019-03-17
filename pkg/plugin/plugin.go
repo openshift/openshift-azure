@@ -136,7 +136,7 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 
 	err = clusterUpgrader.CreateOrUpdateConfigStorageAccount(ctx, cs)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginCreateOrUpdateConfigStorageAccount}
+		return &api.PluginError{Err: err, Step: api.PluginStepCreateOrUpdateConfigStorageAccount}
 	}
 
 	// must be done after config storage account is created

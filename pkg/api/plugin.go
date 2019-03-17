@@ -29,7 +29,7 @@ const (
 	PluginStepScaleSetDelete                          PluginStep = "ScaleSetDelete"
 	PluginStepWriteSyncBlob                           PluginStep = "WriteSyncBlob"
 	PluginStepWriteStartupBlobs                       PluginStep = "WriteStartupBlobs"
-	PluginCreateOrUpdateConfigStorageAccount          PluginStep = "CreateOrUpdateConfigStorageAccount"
+	PluginStepCreateOrUpdateConfigStorageAccount      PluginStep = "CreateOrUpdateConfigStorageAccount"
 	PluginStepGenerateARM                             PluginStep = "GenerateARM"
 	PluginStepWaitForWaitForOpenShiftAPI              PluginStep = "WaitForOpenShiftAPI"
 	PluginStepWaitForNodes                            PluginStep = "WaitForNodes"
