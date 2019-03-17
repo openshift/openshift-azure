@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"net"
+	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -14,8 +17,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/log"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 	"github.com/openshift/openshift-azure/pkg/util/writers"
 )
 
@@ -25,8 +28,26 @@ var (
 )
 
 func run(ctx context.Context, log *logrus.Entry) error {
-	log.Infof("reading config from %s", os.Args[1])
-	cs, err := managedcluster.ReadConfig(os.Args[1])
+	log.Infof("reading config")
+	var cs *api.OpenShiftManagedCluster
+	err := wait.PollImmediateUntil(10*time.Second, func() (bool, error) {
+		resp, err := http.Get(os.Args[1])
+		if err != nil {
+			log.Info(err)
+			return false, nil
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			log.Infof("unexpected status code %d", resp.StatusCode)
+			return false, nil
+		}
+		err = json.NewDecoder(resp.Body).Decode(&cs)
+		if err != nil {
+			log.Info(err)
+			return false, nil
+		}
+		return true, nil
+	}, ctx.Done())
 	if err != nil {
 		return err
 	}
@@ -81,7 +102,7 @@ func main() {
 	log.Infof("startup pod starting, git commit %s", gitCommit)
 
 	if len(os.Args) != 2 {
-		log.Fatalf("usage: %s /path/to/config.blob", os.Args[0])
+		log.Fatalf("usage: %s sasurl", os.Args[0])
 	}
 
 	if err := run(context.Background(), log); err != nil {

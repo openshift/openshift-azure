@@ -77,6 +77,9 @@ type Config struct {
 	GenevaMetricsAccount string `json:"genevaMetricsAccount,omitempty"`
 	// Geneva Metrics System (MDM) endpoint for metrics
 	GenevaMetricsEndpoint string `json:"genevaMetricsEndpoint,omitempty"`
+
+	MasterStartupSASURI string `json:"-"`
+	WorkerStartupSASURI string `json:"-"`
 }
 
 // ComponentLogLevel represents the log levels for the various components of a

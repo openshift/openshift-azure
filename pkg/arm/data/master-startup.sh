@@ -38,7 +38,9 @@ while [[ $(hostname -d) == "" ]]; do sleep 1; done
 while ! docker pull {{ .Config.Images.Startup }}; do
   sleep 1
 done
-docker run --privileged --rm --network host -v /:/host:z {{ .Config.Images.Startup }} /host$PWD/master-startup
+set +x
+docker run --privileged --rm --network host -v /:/host:z {{ .Config.Images.Startup }} '{{ .Config.MasterStartupSASURI }}'
+set -x
 
 update-ca-trust
 

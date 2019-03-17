@@ -413,7 +413,7 @@ func nsgWorker(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
 	}
 }
 
-func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, blobURI, backupBlob, suffix string, testConfig api.TestConfig) (*compute.VirtualMachineScaleSet, error) {
+func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string, testConfig api.TestConfig) (*compute.VirtualMachineScaleSet, error) {
 	sshPublicKey, err := tls.SSHPublicKeyAsString(&cs.Config.SSHKey.PublicKey)
 	if err != nil {
 		return nil, err
@@ -535,8 +535,7 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, blobURI, b
 								AutoUpgradeMinorVersion: to.BoolPtr(true),
 								Settings:                map[string]interface{}{},
 								ProtectedSettings: map[string]interface{}{
-									"script":   script,
-									"fileUris": []string{blobURI},
+									"script": script,
 								},
 							},
 						},

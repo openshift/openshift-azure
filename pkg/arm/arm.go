@@ -63,19 +63,13 @@ func NewSimpleGenerator(ctx context.Context, cs *api.OpenShiftManagedCluster, te
 	return g, nil
 }
 
-func GetConfigSASURI(storageClient storage.Client, app *api.AgentPoolProfile) (string, error) {
+func enrichCSSASURIs(storageClient storage.Client, cs *api.OpenShiftManagedCluster) (err error) {
 	now := time.Now().Add(-time.Hour)
 
 	bsc := storageClient.GetBlobService()
 	c := bsc.GetContainerReference("config") // TODO: should be using consts, need to merge packages
-	var b storage.Blob
-	switch app.Role {
-	case api.AgentPoolProfileRoleMaster:
-		b = c.GetBlobReference("master-startup")
-	default:
-		b = c.GetBlobReference("worker-startup")
-	}
-	return b.GetSASURI(azstorage.BlobSASOptions{
+
+	cs.Config.MasterStartupSASURI, err = c.GetBlobReference("master-startup").GetSASURI(azstorage.BlobSASOptions{
 		BlobServiceSASPermissions: azstorage.BlobServiceSASPermissions{
 			Read: true,
 		},
@@ -86,9 +80,32 @@ func GetConfigSASURI(storageClient storage.Client, app *api.AgentPoolProfile) (s
 			UseHTTPS:   true,
 		},
 	})
+	if err != nil {
+		return
+	}
+
+	cs.Config.WorkerStartupSASURI, err = c.GetBlobReference("worker-startup").GetSASURI(azstorage.BlobSASOptions{
+		BlobServiceSASPermissions: azstorage.BlobServiceSASPermissions{
+			Read: true,
+		},
+		SASOptions: azstorage.SASOptions{
+			APIVersion: "2015-04-05",
+			Start:      now,
+			Expiry:     now.AddDate(5, 0, 0),
+			UseHTTPS:   true,
+		},
+	})
+	return
 }
 
 func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
+	cs = cs.DeepCopy()
+
+	err := enrichCSSASURIs(g.storageClient, cs)
+	if err != nil {
+		return nil, err
+	}
+
 	t := Template{
 		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 		ContentVersion: "1.0.0.0",
@@ -110,12 +127,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManaged
 	}
 	for _, app := range cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
-			blobURI, err := GetConfigSASURI(g.storageClient, &app)
-			if err != nil {
-				return nil, err
-			}
-
-			vmss, err := Vmss(cs, &app, blobURI, backupBlob, suffix, g.testConfig)
+			vmss, err := Vmss(cs, &app, backupBlob, suffix, g.testConfig)
 			if err != nil {
 				return nil, err
 			}

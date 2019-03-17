@@ -307,6 +307,8 @@ func TestUnmarshal(t *testing.T) {
 	populatedOc.Config.Certificates.Router = CertKeyPairChain{}
 	populatedOc.Config.ConfigStorageAccountKey = ""
 	populatedOc.Config.RegistryStorageAccountKey = ""
+	populatedOc.Config.MasterStartupSASURI = ""
+	populatedOc.Config.WorkerStartupSASURI = ""
 
 	var unmarshalledOc OpenShiftManagedCluster
 	err := json.Unmarshal(marshalled, &unmarshalledOc)
@@ -403,6 +405,7 @@ func TestAdminAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Config\.RunningUnderTest$`),
 		regexp.MustCompile(`^\.Config\.Images\.ImagePullSecret$`),
 		regexp.MustCompile(`^\.Config\.EtcdMetrics`),
+		regexp.MustCompile(`^\.Config\.(Master|Worker)StartupSASURI$`),
 		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
 		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile\.`),
 		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile\.`),
@@ -544,6 +547,7 @@ func TestPluginTemplateAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.RunningUnderTest`),
 		regexp.MustCompile(`^\.ConfigStorageAccountKey$`),
 		regexp.MustCompile(`^\.RegistryStorageAccountKey$`),
+		regexp.MustCompile(`^\.(Master|Worker)StartupSASURI$`),
 		regexp.MustCompile(`^\.Certificates\.Ca\.`),
 		regexp.MustCompile(`^\.Certificates\.FrontProxyCa\.`),
 		regexp.MustCompile(`^\.Certificates\.Service`),
