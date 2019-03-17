@@ -180,7 +180,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 	armGenerator := mock_arm.NewMockGenerator(gmc)
 
 	c := configGenerator.EXPECT().InvalidateSecrets(cs).Return(nil)
-	c = configGenerator.EXPECT().Generate(cs, nil).Return(nil).After(c)
+	c = configGenerator.EXPECT().Generate(cs, gomock.Any()).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
 	c = armGenerator.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
@@ -205,6 +205,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 		},
 		configGenerator: configGenerator,
 		log:             logrus.NewEntry(logrus.StandardLogger()),
+		pluginConfig:    &pluginapi.Config{},
 	}
 
 	if err := p.RotateClusterSecrets(nil, cs, deployer); err != nil {

@@ -13,6 +13,9 @@ import (
 
 func TestGenerate(t *testing.T) {
 	cs := &api.OpenShiftManagedCluster{
+		Config: api.Config{
+			PluginVersion: "Versions.key",
+		},
 		Properties: api.Properties{
 			OpenShiftVersion: "v3.11",
 			RouterProfiles: []api.RouterProfile{
@@ -28,7 +31,7 @@ func TestGenerate(t *testing.T) {
 	cg := simpleGenerator{runningUnderTest: true}
 	err := cg.Generate(cs, template)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	testRequiredFields(cs, t)
@@ -143,6 +146,7 @@ func TestInvalidateSecrets(t *testing.T) {
 	template := &pluginapi.Config{}
 	populate.Walk(cs, prepare)
 	populate.Walk(template, prepare)
+	cs.Config.PluginVersion = "Versions.key"
 
 	var g simpleGenerator
 	saved := cs.DeepCopy()

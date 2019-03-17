@@ -111,6 +111,12 @@ func (w walker) walk(v reflect.Value, path string) {
 		case v.Type().Key().Kind() == reflect.String && v.Type().Elem().Kind() == reflect.Ptr && v.Type().Elem().Elem().Kind() == reflect.String:
 			v.Set(reflect.MakeMap(v.Type()))
 			v.SetMapIndex(reflect.ValueOf(path+".key"), reflect.ValueOf(to.StringPtr(path+".val")))
+
+		case v.Type().Key().Kind() == reflect.String:
+			v.Set(reflect.MakeMap(v.Type()))
+			vv := reflect.New(v.Type().Elem()).Elem()
+			w.walk(vv, path+".key")
+			v.SetMapIndex(reflect.ValueOf(path+".key"), vv)
 		}
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		v.SetInt(1)

@@ -70,6 +70,11 @@ func (p *plugin) ValidatePluginTemplate(ctx context.Context) []error {
 
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	p.log.Info("generating configs")
+
+	if cs.Config.PluginVersion == "" {
+		cs.Config.PluginVersion = p.pluginConfig.PluginVersion
+	}
+
 	// TODO should we save off the original config here and if there are any errors we can restore it?
 	err := p.configGenerator.Generate(cs, p.pluginConfig)
 	if err != nil {

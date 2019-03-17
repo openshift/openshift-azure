@@ -13,17 +13,12 @@ type Config struct {
 	// ComponentLogLevel specifies the log levels for the various openshift components
 	ComponentLogLevel ComponentLogLevel `json:"componentLogLevel,omitempty"`
 
-	// configuration of VMs in ARM template
-	ImageOffer     string `json:"imageOffer,omitempty"`
-	ImagePublisher string `json:"imagePublisher,omitempty"`
-	ImageSKU       string `json:"imageSku,omitempty"`
-	ImageVersion   string `json:"imageVersion,omitempty"`
-
 	// SSH to system nodes allowed IP ranges
 	SSHSourceAddressPrefixes []string `json:"sshSourceAddressPrefixes,omitempty"`
 
+	Versions map[string]VersionConfig `json:"versions,omitempty"`
+
 	Certificates CertificateConfig `json:"certificates,omitempty"`
-	Images       ImageConfig       `json:"images,omitempty"`
 
 	// Geneva Metrics System (MDM) sector used for logging
 	GenevaLoggingSector string `json:"genevaLoggingSector,omitempty"`
@@ -39,6 +34,21 @@ type Config struct {
 	GenevaMetricsAccount string `json:"genevaMetricsAccount,omitempty"`
 	// Geneva Metrics System (MDM) endpoint for metrics
 	GenevaMetricsEndpoint string `json:"genevaMetricsEndpoint,omitempty"`
+
+	// GenevaImagePullSecret defines secret used to pull private Azure images
+	GenevaImagePullSecret []byte `json:"genevaImagePullSecret,omitempty"`
+	// ImagePullSecret defines the secret used to pull from the private registries, used system-wide
+	ImagePullSecret []byte `json:"imagePullSecret,omitempty"`
+}
+
+type VersionConfig struct {
+	// configuration of VMs in ARM template
+	ImageOffer     string `json:"imageOffer,omitempty"`
+	ImagePublisher string `json:"imagePublisher,omitempty"`
+	ImageSKU       string `json:"imageSku,omitempty"`
+	ImageVersion   string `json:"imageVersion,omitempty"`
+
+	Images ImageConfig `json:"images,omitempty"`
 }
 
 // ComponentLogLevel represents the log levels for the various components of a
@@ -51,50 +61,44 @@ type ComponentLogLevel struct {
 
 // ImageConfig contains all images for the pods
 type ImageConfig struct {
-	// Format of the pull spec that is going to be
-	// used in the cluster.
-	Format                    string `json:"format,omitempty"`
+	AlertManager              string `json:"alertManager,omitempty"`
+	AnsibleServiceBroker      string `json:"ansibleServiceBroker,omitempty"`
 	ClusterMonitoringOperator string `json:"clusterMonitoringOperator,omitempty"`
-	AzureControllers          string `json:"azureControllers,omitempty"`
-	PrometheusOperator        string `json:"prometheusOperator,omitempty"`
+	ConfigReloader            string `json:"configReloader,omitempty"`
+	Console                   string `json:"console,omitempty"`
+	ControlPlane              string `json:"controlPlane,omitempty"`
+	Grafana                   string `json:"grafana,omitempty"`
+	KubeRbacProxy             string `json:"kubeRbacProxy,omitempty"`
+	KubeStateMetrics          string `json:"kubeStateMetrics,omitempty"`
+	Node                      string `json:"node,omitempty"`
+	NodeExporter              string `json:"nodeExporter,omitempty"`
+	OAuthProxy                string `json:"oAuthProxy,omitempty"`
 	Prometheus                string `json:"prometheus,omitempty"`
 	PrometheusConfigReloader  string `json:"prometheusConfigReloader,omitempty"`
-	ConfigReloader            string `json:"configReloader,omitempty"`
-	AlertManager              string `json:"alertManager,omitempty"`
-	NodeExporter              string `json:"nodeExporter,omitempty"`
-	Grafana                   string `json:"grafana,omitempty"`
-	KubeStateMetrics          string `json:"kubeStateMetrics,omitempty"`
-	KubeRbacProxy             string `json:"kubeRbacProxy,omitempty"`
-	OAuthProxy                string `json:"oAuthProxy,omitempty"`
+	PrometheusOperator        string `json:"prometheusOperator,omitempty"`
+	Registry                  string `json:"registry,omitempty"`
+	RegistryConsole           string `json:"registryConsole,omitempty"`
+	Router                    string `json:"router,omitempty"`
+	ServiceCatalog            string `json:"serviceCatalog,omitempty"`
+	TemplateServiceBroker     string `json:"templateServiceBroker,omitempty"`
+	WebConsole                string `json:"webConsole,omitempty"`
 
-	MasterEtcd            string `json:"masterEtcd,omitempty"`
-	ControlPlane          string `json:"controlPlane,omitempty"`
-	Node                  string `json:"node,omitempty"`
-	ServiceCatalog        string `json:"serviceCatalog,omitempty"`
-	Sync                  string `json:"sync,omitempty"`
-	Startup               string `json:"startup,omitempty"`
-	TemplateServiceBroker string `json:"templateServiceBroker,omitempty"`
-	TLSProxy              string `json:"tlsProxy,omitempty"`
-	Registry              string `json:"registry,omitempty"`
-	Router                string `json:"router,omitempty"`
-	RegistryConsole       string `json:"registryConsole,omitempty"`
-	AnsibleServiceBroker  string `json:"ansibleServiceBroker,omitempty"`
-	WebConsole            string `json:"webConsole,omitempty"`
-	Console               string `json:"console,omitempty"`
-	EtcdBackup            string `json:"etcdBackup,omitempty"`
-	Httpd                 string `json:"httpd,omitempty"`
-	Canary                string `json:"canary,omitempty"`
+	Format string `json:"format,omitempty"`
 
-	// GenevaImagePullSecret defines secret used to pull private Azure images
-	GenevaImagePullSecret []byte `json:"genevaImagePullSecret,omitempty"`
-	// Geneva integration images
+	Httpd      string `json:"httpd,omitempty"`
+	MasterEtcd string `json:"masterEtcd,omitempty"`
+
 	GenevaLogging string `json:"genevaLogging,omitempty"`
-	GenevaTDAgent string `json:"genevaTDAgent,omitempty"`
 	GenevaStatsd  string `json:"genevaStatsd,omitempty"`
-	MetricsBridge string `json:"metricsBridge,omitempty"`
+	GenevaTDAgent string `json:"genevaTDAgent,omitempty"`
 
-	// ImagePullSecret defines the secret used to pull from the private registries, used system-wide
-	ImagePullSecret []byte `json:"imagePullSecret,omitempty"`
+	AzureControllers string `json:"azureControllers,omitempty"`
+	Canary           string `json:"canary,omitempty"`
+	EtcdBackup       string `json:"etcdBackup,omitempty"`
+	MetricsBridge    string `json:"metricsBridge,omitempty"`
+	Startup          string `json:"startup,omitempty"`
+	Sync             string `json:"sync,omitempty"`
+	TLSProxy         string `json:"tlsProxy,omitempty"`
 }
 
 // CertificateConfig contains all certificate configuration for the cluster.

@@ -1,12 +1,6 @@
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
 PLUGIN_VERSION=$(shell awk '/^pluginVersion: /{ print $$2 }' <pluginconfig/pluginconfig-311.yaml)
-# if we are on master branch we should always use dev tag
 $(info PLUGIN_VERSION is ${PLUGIN_VERSION})
-ifeq ($(PLUGIN_VERSION),v0.0)
-  TAG := dev
-else
-  TAG := ${PLUGIN_VERSION}
-endif
 $(info TAG set to ${TAG})
 LDFLAGS="-X main.gitCommit=$(COMMIT)"
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
