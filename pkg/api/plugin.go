@@ -35,7 +35,6 @@ const (
 	PluginStepWaitForNodes                            PluginStep = "WaitForNodes"
 	PluginStepWaitForSyncPod                          PluginStep = "WaitForSyncPod"
 	PluginStepWaitForConsoleHealth                    PluginStep = "WaitForConsoleHealth"
-	PluginStepWaitForAdminConsoleHealth               PluginStep = "WaitForAdminConsoleHealth"
 	PluginStepWaitForInfraDaemonSets                  PluginStep = "WaitForInfraDaemonSets"
 	PluginStepWaitForInfraStatefulSets                PluginStep = "WaitForInfraStatefulSets"
 	PluginStepWaitForInfraDeployments                 PluginStep = "WaitForInfraDeployments"

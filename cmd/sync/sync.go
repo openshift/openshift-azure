@@ -43,6 +43,7 @@ type sync struct {
 	blob  azureclientstorage.Blob
 	kc    kubernetes.Interface
 	log   *logrus.Entry
+	cs    *api.OpenShiftManagedCluster
 	db    map[string]unstructured.Unstructured
 	ready atomic.Value
 }
@@ -97,7 +98,7 @@ func (s *sync) readyHandler(w http.ResponseWriter, r *http.Request) {
 	if !s.ready.Load().(bool) {
 		errs = []error{fmt.Errorf("sync pod has not completed first run")}
 	} else {
-		errs = addons.CalculateReadiness(s.kc, s.db)
+		errs = addons.CalculateReadiness(s.kc, s.db, s.cs)
 	}
 
 	if len(errs) == 0 {
@@ -178,9 +179,8 @@ func run(ctx context.Context, log *logrus.Entry) error {
 
 	t := time.NewTicker(*interval)
 
-	var cs *api.OpenShiftManagedCluster
 	for {
-		cs, err = s.getBlob(ctx)
+		s.cs, err = s.getBlob(ctx)
 		if err == nil {
 			break
 		}
@@ -188,7 +188,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		<-t.C
 	}
 
-	s.db, err = addons.ReadDB(cs)
+	s.db, err = addons.ReadDB(s.cs)
 	if err != nil {
 		return err
 	}
@@ -199,7 +199,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 
 	for {
 		log.Print("starting sync")
-		if err := addons.Main(ctx, s.log, cs, s.db); err != nil {
+		if err := addons.Main(ctx, s.log, s.cs, s.db); err != nil {
 			log.Printf("sync error: %s", err)
 		} else {
 			log.Print("sync done")

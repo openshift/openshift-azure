@@ -9,6 +9,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"net/http"
 	"sort"
 	"time"
 
@@ -22,13 +23,15 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/healthcheck"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 )
 
 const (
-	ownedBySyncPodLabelKey          = "azure.openshift.io/owned-by-sync-pod"
-	syncPodWaitForReadinessLabelKey = "azure.openshift.io/sync-pod-wait-for-readiness"
+	ownedBySyncPodLabelKey            = "azure.openshift.io/owned-by-sync-pod"
+	syncPodWaitForReadinessLabelKey   = "azure.openshift.io/sync-pod-wait-for-readiness"
+	syncPodReadinessPathAnnotationKey = "azure.openshift.io/sync-pod-readiness-path"
 )
 
 // Unmarshal has to reimplement yaml.Unmarshal because it universally mangles yaml
@@ -173,7 +176,7 @@ func setPodTemplateAnnotation(key, value string, o unstructured.Unstructured) {
 	unstructured.SetNestedStringMap(o.Object, annotations, "spec", "template", "metadata", "annotations")
 }
 
-func CalculateReadiness(kc kubernetes.Interface, db map[string]unstructured.Unstructured) (errs []error) {
+func CalculateReadiness(kc kubernetes.Interface, db map[string]unstructured.Unstructured, cs *api.OpenShiftManagedCluster) (errs []error) {
 	var keys []string
 	for k := range db {
 		keys = append(keys, k)
@@ -222,6 +225,20 @@ func CalculateReadiness(kc kubernetes.Interface, db map[string]unstructured.Unst
 				}
 
 				errs = append(errs, fmt.Errorf("%s %s/%s is not ready: %d,%d/%d", gk.String(), o.GetNamespace(), o.GetName(), ss.Status.UpdatedReplicas, ss.Status.ReadyReplicas, specReplicas))
+			}
+
+		case "Route.route.openshift.io":
+			url := "https://" + jsonpath.MustCompile("$.spec.host").MustGetString(o.Object) + o.GetAnnotations()[syncPodReadinessPathAnnotationKey]
+			cert := cs.Config.Certificates.Router.Certs
+			cli := http.Client{
+				Transport: healthcheck.RoundTripper(cs.Properties.RouterProfiles[0].FQDN, cert[len(cert)-1]),
+				Timeout:   5 * time.Second,
+			}
+			resp, err := cli.Get(url)
+			if err != nil {
+				errs = append(errs, err)
+			} else if resp.StatusCode != http.StatusOK {
+				errs = append(errs, fmt.Errorf("%s %s/%s is not ready: %d", gk.String(), o.GetNamespace(), o.GetName(), resp.StatusCode))
 			}
 		}
 	}
