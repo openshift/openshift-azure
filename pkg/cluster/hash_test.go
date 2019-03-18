@@ -8,27 +8,7 @@ import (
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
-func TestHashWorkerScaleSet(t *testing.T) {
-	tests := []struct {
-		name string
-		app  api.AgentPoolProfile
-	}{
-		{
-			name: "hash shouldn't change over time",
-			app: api.AgentPoolProfile{
-				Role: api.AgentPoolProfileRoleCompute,
-			},
-		},
-		{
-			name: "hash is invariant with name and count",
-			app: api.AgentPoolProfile{
-				Name:  "foo",
-				Role:  api.AgentPoolProfileRoleCompute,
-				Count: 1,
-			},
-		},
-	}
-
+func TestHashScaleSet(t *testing.T) {
 	prepare := func(v reflect.Value) {
 		switch v.Interface().(type) {
 		case []api.IdentityProvider:
@@ -41,22 +21,32 @@ func TestHashWorkerScaleSet(t *testing.T) {
 	populate.Walk(&cs, prepare)
 	cs.Properties.AgentPoolProfiles = []api.AgentPoolProfile{
 		{
-			Role: api.AgentPoolProfileRoleCompute,
+			Role: api.AgentPoolProfileRoleMaster,
+		},
+		{
+			Role:   api.AgentPoolProfileRoleCompute,
+			VMSize: api.StandardD2sV3,
 		},
 	}
 
-	var h hasher
-	var exp []byte
-	for _, test := range tests {
-		got, err := h.HashWorkerScaleSet(&cs, &test.app)
+	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleCompute} {
+		var h hasher
+		baseline, err := h.HashScaleSet(&cs, &api.AgentPoolProfile{
+			Role: role,
+		})
 		if err != nil {
-			t.Errorf("%s: unexpected error: %v", test.name, err)
+			t.Errorf("%s: unexpected error: %v", role, err)
 		}
-		if exp == nil {
-			exp = got
+		second, err := h.HashScaleSet(&cs, &api.AgentPoolProfile{
+			Name:  "foo",
+			Role:  role,
+			Count: 1,
+		})
+		if err != nil {
+			t.Errorf("%s: unexpected error: %v", role, err)
 		}
-		if !reflect.DeepEqual(got, exp) {
-			t.Errorf("%s: expected:\n%#v\ngot:\n%#v", test.name, exp, got)
+		if !reflect.DeepEqual(baseline, second) {
+			t.Errorf("%s: expected:\n%#v\ngot:\n%#v", role, baseline, second)
 		}
 	}
 }

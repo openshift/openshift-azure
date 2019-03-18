@@ -97,7 +97,7 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 			sourceScaler := mock_scaler.NewMockScaler(gmc)
 			scalerFactory := mock_scaler.NewMockFactory(gmc)
 
-			c := hasher.EXPECT().HashWorkerScaleSet(tt.cs, &tt.cs.Properties.AgentPoolProfiles[0]).Return([]byte("updated"), nil)
+			c := hasher.EXPECT().HashScaleSet(tt.cs, &tt.cs.Properties.AgentPoolProfiles[0]).Return([]byte("updated"), nil)
 			ublob := updateblob.NewUpdateBlob()
 			ublob.ScalesetHashes[*sss[0].Name] = []byte("updated")
 			c = ubs.EXPECT().Read().Return(ublob, nil).After(c)

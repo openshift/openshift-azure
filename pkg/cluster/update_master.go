@@ -21,12 +21,12 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReadBlob}
 	}
 
-	for i := int64(0); i < app.Count; i++ {
-		desiredHash, err := u.hasher.HashMasterScaleSet(cs, app, i)
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashMasterScaleSet}
-		}
+	desiredHash, err := u.hasher.HashScaleSet(cs, app)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashScaleSet}
+	}
 
+	for i := int64(0); i < app.Count; i++ {
 		hostname := config.GetHostname(app, "", i)
 		instanceID := fmt.Sprintf("%d", i)
 

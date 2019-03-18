@@ -69,9 +69,8 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 
 			c := ubs.EXPECT().Read().Return(updateblob.NewUpdateBlob(), nil)
 
+			c = hasher.EXPECT().HashScaleSet(tt.cs, &tt.cs.Properties.AgentPoolProfiles[0]).Return([]byte("updated"), nil).After(c)
 			for i := int64(0); i < tt.cs.Properties.AgentPoolProfiles[0].Count; i++ {
-				c = hasher.EXPECT().HashMasterScaleSet(tt.cs, &tt.cs.Properties.AgentPoolProfiles[0], i).Return([]byte("updated"), nil).After(c)
-
 				hostname := config.GetHostname(&tt.cs.Properties.AgentPoolProfiles[0], "", i)
 				instanceID := fmt.Sprintf("%d", i)
 
