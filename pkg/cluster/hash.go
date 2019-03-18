@@ -12,10 +12,10 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/startup"
+	"github.com/openshift/openshift-azure/pkg/sync"
 )
 
 type Hasher interface {
@@ -86,7 +86,7 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 func (h *hasher) HashSyncPod(cs *api.OpenShiftManagedCluster) ([]byte, error) {
 	hash := sha256.New()
 
-	m, err := addons.ReadDB(cs)
+	m, err := sync.ReadDB(cs)
 	if err != nil {
 		return nil, err
 	}

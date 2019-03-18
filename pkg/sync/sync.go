@@ -1,4 +1,4 @@
-package addons
+package sync
 
 //go:generate go get github.com/go-bindata/go-bindata/go-bindata
 //go:generate go-bindata -nometadata -pkg $GOPACKAGE -prefix data data/...

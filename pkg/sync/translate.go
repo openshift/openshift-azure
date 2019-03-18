@@ -1,4 +1,4 @@
-package addons
+package sync
 
 import (
 	"encoding/base64"

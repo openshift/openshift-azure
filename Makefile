@@ -149,7 +149,7 @@ verify:
 	./hack/validate-util.sh
 	./hack/validate-codecov.sh
 	go run ./hack/validate-imports/validate-imports.go cmd hack pkg test
-	go run ./hack/lint-addons/lint-addons.go -n
+	go run ./hack/lint-sync/lint-sync.go -n
 
 unit: generate
 	go test ./... -coverprofile=coverage.out -covermode=atomic

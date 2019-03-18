@@ -17,7 +17,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/openshift/openshift-azure/pkg/addons"
+	"github.com/openshift/openshift-azure/pkg/sync"
 )
 
 var (
@@ -67,7 +67,7 @@ func readDB() (map[string]unstructured.Unstructured, error) {
 
 			gvk := gv.WithKind(resource.Kind)
 			gk := gvk.GroupKind()
-			if addons.IsDouble(gk) {
+			if sync.IsDouble(gk) {
 				continue
 			}
 
@@ -87,7 +87,7 @@ func readDB() (map[string]unstructured.Unstructured, error) {
 			}
 
 			for _, i := range l.Items {
-				db[addons.KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())] = i
+				db[sync.KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())] = i
 			}
 		}
 	}
@@ -105,11 +105,11 @@ func contains(haystack []string, needle string) bool {
 	return false
 }
 
-// blank uses addons.Translate() to insert a placeholder in all configuration
+// blank uses sync.Translate() to insert a placeholder in all configuration
 // items that will be templated upon import, to avoid persisting any secrets.
 func blank(o unstructured.Unstructured) (unstructured.Unstructured, error) {
-	for _, t := range addons.Translations[addons.KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] {
-		err := addons.Translate(o.Object, t.Path, t.NestedPath, t.NestedFlags, "*** GENERATED ***")
+	for _, t := range sync.Translations[sync.KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] {
+		err := sync.Translate(o.Object, t.Path, t.NestedPath, t.NestedFlags, "*** GENERATED ***")
 		if err != nil {
 			return unstructured.Unstructured{}, err
 		}
@@ -121,16 +121,16 @@ func blank(o unstructured.Unstructured) (unstructured.Unstructured, error) {
 // writeDB selects, prepares and outputs YAML files for all relevant objects.
 func writeDB(db map[string]unstructured.Unstructured) error {
 	for _, o := range db {
-		if !addons.Wants(o) {
+		if !sync.Wants(o) {
 			continue
 		}
 
-		err := addons.Clean(o)
+		err := sync.Clean(o)
 		if err != nil {
 			return err
 		}
 
-		addons.Default(o)
+		sync.Default(o)
 
 		o, err := blank(o)
 		if err != nil {

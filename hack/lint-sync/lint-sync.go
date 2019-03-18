@@ -12,7 +12,7 @@ import (
 
 	"github.com/ghodss/yaml"
 
-	"github.com/openshift/openshift-azure/pkg/addons"
+	"github.com/openshift/openshift-azure/pkg/sync"
 )
 
 var (
@@ -22,7 +22,7 @@ var (
 func run() error {
 	var paths []string
 
-	err := filepath.Walk("pkg/addons/data", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk("pkg/sync/data", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -36,17 +36,17 @@ func run() error {
 			return err
 		}
 
-		u, err := addons.Unmarshal(b1)
+		u, err := sync.Unmarshal(b1)
 		if err != nil {
 			return err
 		}
 
-		if err = addons.Clean(u); err != nil {
+		if err = sync.Clean(u); err != nil {
 			log.Print(path)
 			return err
 		}
 
-		addons.Default(u)
+		sync.Default(u)
 
 		b2, err := yaml.Marshal(u.Object)
 		if err != nil {

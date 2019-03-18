@@ -16,10 +16,10 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/cluster"
+	"github.com/openshift/openshift-azure/pkg/sync"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	azureclientstorage "github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
@@ -37,7 +37,7 @@ var (
 	gitCommit = "unknown"
 )
 
-type sync struct {
+type syncer struct {
 	azs   azureclient.AccountsClient
 	kvc   azureclient.KeyVaultClient
 	blob  azureclientstorage.Blob
@@ -48,7 +48,7 @@ type sync struct {
 	ready atomic.Value
 }
 
-func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
+func (s *syncer) init(ctx context.Context, log *logrus.Entry) error {
 	s.ready.Store(false)
 
 	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
@@ -92,13 +92,13 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 	return nil
 }
 
-func (s *sync) readyHandler(w http.ResponseWriter, r *http.Request) {
+func (s *syncer) readyHandler(w http.ResponseWriter, r *http.Request) {
 	var errs []error
 
 	if !s.ready.Load().(bool) {
 		errs = []error{fmt.Errorf("sync pod has not completed first run")}
 	} else {
-		errs = addons.CalculateReadiness(s.kc, s.db, s.cs)
+		errs = sync.CalculateReadiness(s.kc, s.db, s.cs)
 	}
 
 	if len(errs) == 0 {
@@ -113,7 +113,7 @@ func (s *sync) readyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *sync) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, error) {
+func (s *syncer) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, error) {
 	s.log.Print("fetching config blob")
 	cs, err := configblob.GetBlob(s.blob)
 	if err != nil {
@@ -126,7 +126,7 @@ func (s *sync) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, error
 		return nil, err
 	}
 
-	err = addons.EnrichCSStorageAccountKeys(ctx, s.azs, cs)
+	err = sync.EnrichCSStorageAccountKeys(ctx, s.azs, cs)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (s *sync) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, error
 	return cs, nil
 }
 
-func (s *sync) printDB() error {
+func (s *syncer) printDB() error {
 	// impose an order to improve debuggability.
 	var keys []string
 	for k := range s.db {
@@ -170,7 +170,7 @@ func (s *sync) printDB() error {
 }
 
 func run(ctx context.Context, log *logrus.Entry) error {
-	var s sync
+	var s syncer
 
 	err := s.init(ctx, log)
 	if err != nil {
@@ -188,7 +188,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		<-t.C
 	}
 
-	s.db, err = addons.ReadDB(s.cs)
+	s.db, err = sync.ReadDB(s.cs)
 	if err != nil {
 		return err
 	}
@@ -199,7 +199,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 
 	for {
 		log.Print("starting sync")
-		if err := addons.Main(ctx, s.log, s.cs, s.db, &s.ready); err != nil {
+		if err := sync.Main(ctx, s.log, s.cs, s.db, &s.ready); err != nil {
 			log.Printf("sync error: %s", err)
 		} else {
 			log.Print("sync done")
