@@ -13,8 +13,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/startup"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
@@ -90,7 +90,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 	// TODO: validate that the config version matches our version
 
 	log.Info("writing startup files")
-	return arm.WriteStartupFiles(log, cs, config.GetAgentRole(hostname), writers.NewFilesystemWriter(), hostname, domainname)
+	return startup.WriteStartupFiles(log, cs, config.GetAgentRole(hostname), writers.NewFilesystemWriter(), hostname, domainname)
 }
 
 func main() {

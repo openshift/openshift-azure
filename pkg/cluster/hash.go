@@ -15,6 +15,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
+	"github.com/openshift/openshift-azure/pkg/startup"
 	"github.com/openshift/openshift-azure/pkg/util/writers"
 )
 
@@ -52,7 +53,7 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 		return nil, err
 	}
 
-	err = arm.WriteStartupFiles(h.log, cs, app.Role, writers.NewTarWriter(hash), "", "")
+	err = startup.WriteStartupFiles(h.log, cs, app.Role, writers.NewTarWriter(hash), "", "")
 	if err != nil {
 		return nil, err
 	}
