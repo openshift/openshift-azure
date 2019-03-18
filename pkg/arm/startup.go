@@ -3,6 +3,7 @@ package arm
 import (
 	"os"
 	"path"
+	"sort"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -13,7 +14,10 @@ import (
 )
 
 func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, w writers.Writer, hostname, domainname string) error {
-	for _, filepath := range AssetNames() {
+	assetNames := AssetNames()
+	sort.Strings(assetNames)
+
+	for _, filepath := range assetNames {
 		var tmpl string
 
 		switch role {
