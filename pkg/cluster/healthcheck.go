@@ -21,6 +21,7 @@ func (u *simpleUpgrader) HealthCheck(ctx context.Context, cs *api.OpenShiftManag
 }
 
 func (u *simpleUpgrader) WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	u.log.Infof("waiting for API server healthz")
 	_, err := wait.ForHTTPStatusOk(ctx, u.log, healthcheck.RoundTripper(cs.Properties.FQDN, cs.Config.Certificates.Ca.Cert), "https://"+cs.Properties.FQDN+"/healthz")
 	return err
 }
