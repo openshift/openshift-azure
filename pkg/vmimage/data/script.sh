@@ -163,6 +163,8 @@ yum -y install \
     sudo \
     tcpdump \
     tuned \
+    tree \
+    find \
     WALinuxAgent \
     yum-utils
 yum clean all
