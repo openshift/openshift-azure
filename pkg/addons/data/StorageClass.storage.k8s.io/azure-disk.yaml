@@ -10,5 +10,3 @@ parameters:
   location: '*** GENERATED ***'
   skuName: Premium_LRS
 provisioner: kubernetes.io/azure-disk
-reclaimPolicy: Delete
-volumeBindingMode: Immediate

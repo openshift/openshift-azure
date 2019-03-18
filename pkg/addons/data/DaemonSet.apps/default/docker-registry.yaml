@@ -9,10 +9,6 @@ spec:
   selector:
     matchLabels:
       docker-registry: default
-  strategy:
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
   template:
     metadata:
       labels:

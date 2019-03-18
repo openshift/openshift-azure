@@ -10,9 +10,6 @@ spec:
   selector:
     matchLabels:
       k8s-app: etcd-metrics
-  strategy:
-    rollingUpdate:
-      maxSurge: 0
   template:
     metadata:
       labels:

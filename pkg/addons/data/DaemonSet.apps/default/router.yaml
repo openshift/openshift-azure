@@ -9,9 +9,6 @@ spec:
   selector:
     matchLabels:
       router: router
-  strategy:
-    rollingUpdate:
-      maxSurge: 0
   template:
     metadata:
       labels:

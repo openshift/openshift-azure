@@ -249,6 +249,9 @@ func CalculateReadiness(kc kubernetes.Interface, db map[string]unstructured.Unst
 
 // resource filters
 var (
+	crdFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "apiextensions.k8s.io", Kind: "CustomResourceDefinition"}
+	}
 	nsFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "Namespace"}
 	}
@@ -259,23 +262,26 @@ var (
 		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "Secret"} ||
 			o.GroupVersionKind().GroupKind() == schema.GroupKind{Kind: "ConfigMap"}
 	}
-	nonCRDFilter = func(o unstructured.Unstructured) bool {
-		return o.GroupVersionKind().Group != "servicecatalog.k8s.io" &&
-			o.GroupVersionKind().Group != "monitoring.coreos.com"
+	storageClassFilter = func(o unstructured.Unstructured) bool {
+		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "storage.k8s.io", Kind: "StorageClass"}
+	}
+
+	everythingElseFilter = func(o unstructured.Unstructured) bool {
+		return !crdFilter(o) &&
+			!nsFilter(o) &&
+			!saFilter(o) &&
+			!cfgFilter(o) &&
+			!storageClassFilter(o) &&
+			!scFilter(o) &&
+			!monitoringCrdFilter(o)
 	}
 
 	scFilter = func(o unstructured.Unstructured) bool {
 		return o.GroupVersionKind().Group == "servicecatalog.k8s.io"
 	}
-	crdFilter = func(o unstructured.Unstructured) bool {
-		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "apiextensions.k8s.io", Kind: "CustomResourceDefinition"}
-	}
 	// targeted filter is used to target specific CRD - ServiceMonitor, which are managed not by sync pod
 	monitoringCrdFilter = func(o unstructured.Unstructured) bool {
-		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "monitoring.coreos.com", Kind: "ServiceMonitor"}
-	}
-	storageClassFilter = func(o unstructured.Unstructured) bool {
-		return o.GroupVersionKind().GroupKind() == schema.GroupKind{Group: "storage.k8s.io", Kind: "StorageClass"}
+		return o.GroupVersionKind().Group == "monitoring.coreos.com"
 	}
 )
 
@@ -317,7 +323,7 @@ func writeDB(log *logrus.Entry, client *client, db map[string]unstructured.Unstr
 	}
 
 	// create all, except targeted CRDs resources
-	if err := client.ApplyResources(nonCRDFilter, db, keys); err != nil {
+	if err := client.ApplyResources(everythingElseFilter, db, keys); err != nil {
 		return err
 	}
 

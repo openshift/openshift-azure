@@ -98,5 +98,9 @@ func Default(o unstructured.Unstructured) {
 		for _, c := range jsonpath.MustCompile("$.spec.template.spec").Get(o.Object) {
 			defaultPodSpec(c.(map[string]interface{}))
 		}
+
+	case "StorageClass.storage.k8s.io":
+		jsonpath.MustCompile("$.reclaimPolicy").DeleteIfMatch(o.Object, "Delete")
+		jsonpath.MustCompile("$.volumeBindingMode").DeleteIfMatch(o.Object, "Immediate")
 	}
 }

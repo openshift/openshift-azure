@@ -278,7 +278,6 @@ func needsUpdate(log *logrus.Entry, existing, o *unstructured.Unstructured) bool
 	handleSpecialObjects(*existing, *o)
 
 	if reflect.DeepEqual(*existing, *o) {
-		log.Info("Skip " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 		return false
 	}
 
