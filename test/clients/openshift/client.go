@@ -17,7 +17,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
@@ -115,12 +114,4 @@ func NewClientSet(cs *internalapi.OpenShiftManagedCluster) (*ClientSet, error) {
 		return nil, err
 	}
 	return c, nil
-}
-
-func NewDefaultClientSet() (*ClientSet, error) {
-	cs, err := shared.DiscoverInternalConfig()
-	if err != nil {
-		return nil, err
-	}
-	return NewClientSet(cs)
 }

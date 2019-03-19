@@ -5,14 +5,14 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"net/http"
+	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
+	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/e2e/standard"
 )
 
@@ -35,17 +35,16 @@ type targetsResponse struct {
 
 var _ = Describe("Prometheus E2E tests [Prometheus][EveryPR]", func() {
 	var (
-		cli *standard.SanityChecker
-		cs  *api.OpenShiftManagedCluster
+		cli      *standard.SanityChecker
+		azurecli *azure.Client
 	)
 
 	BeforeEach(func() {
 		var err error
 		cli, err = standard.NewDefaultSanityChecker(context.Background())
 		Expect(err).NotTo(HaveOccurred())
-		Expect(cli).NotTo(BeNil())
 
-		cs, err = shared.DiscoverInternalConfig()
+		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -85,12 +84,12 @@ var _ = Describe("Prometheus E2E tests [Prometheus][EveryPR]", func() {
 			}
 		}
 
-		nodes, masters := 0, 0
+		cs, err := azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		Expect(err).NotTo(HaveOccurred())
+
+		nodes, masters := int(*cs.Properties.MasterPoolProfile.Count), int(*cs.Properties.MasterPoolProfile.Count)
 		for _, app := range cs.Properties.AgentPoolProfiles {
-			if app.Role == api.AgentPoolProfileRoleMaster {
-				masters = int(app.Count)
-			}
-			nodes += int(app.Count)
+			nodes += int(*app.Count)
 		}
 
 		Expect(healthyTargets).To(Equal(map[string]int{
