@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
@@ -86,20 +85,11 @@ func (s *Server) Run() {
 // filesystem. Whether the file that holds the state exists or
 // not is returned and any other error that was encountered.
 func (s *Server) load() error {
-	dataDir, err := shared.FindDirectory(shared.DataDirectory)
-	if err != nil {
-		return err
-	}
-	csFile := filepath.Join(dataDir, "containerservice.yaml")
-	if _, err = os.Stat(csFile); err != nil {
+	cs, err := shared.DiscoverInternalConfig()
+	switch {
+	case os.IsNotExist(err):
 		return nil
-	}
-	data, err := ioutil.ReadFile(csFile)
-	if err != nil {
-		return err
-	}
-	var cs *internalapi.OpenShiftManagedCluster
-	if err := yaml.Unmarshal(data, &cs); err != nil {
+	case err != nil:
 		return err
 	}
 	s.write(cs)
