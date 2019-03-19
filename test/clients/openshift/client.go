@@ -14,11 +14,11 @@ import (
 	policyv1beta1client "k8s.io/client-go/kubernetes/typed/policy/v1beta1"
 	rbacv1client "k8s.io/client-go/kubernetes/typed/rbac/v1"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/tools/clientcmd/api"
+	"k8s.io/client-go/tools/clientcmd/api/v1"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 type Client struct {
@@ -55,10 +55,8 @@ func newClientFromRestConfig(config *rest.Config) *Client {
 	}
 }
 
-func newClientFromKubeConfig(kc *api.Config) (*Client, error) {
-	kubeconfig := clientcmd.NewDefaultClientConfig(*kc, &clientcmd.ConfigOverrides{})
-
-	restconfig, err := kubeconfig.ClientConfig()
+func newClientFromKubeConfig(kc *v1.Config) (*Client, error) {
+	restconfig, err := managedcluster.RestConfigFromV1Config(kc)
 	if err != nil {
 		return nil, err
 	}
