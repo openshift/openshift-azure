@@ -14,13 +14,12 @@ import (
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/test/clients/azure"
-	"github.com/openshift/openshift-azure/test/e2e/standard"
+	"github.com/openshift/openshift-azure/test/sanity"
 )
 
 var _ = Describe("Command tests [Command][Fake][LongRunning]", func() {
 	var (
 		azurecli *azure.Client
-		cli      *standard.SanityChecker
 	)
 
 	BeforeEach(func() {
@@ -28,9 +27,6 @@ var _ = Describe("Command tests [Command][Fake][LongRunning]", func() {
 		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(azurecli).NotTo(BeNil())
-		cli, err = standard.NewDefaultSanityChecker(context.Background())
-		Expect(err).NotTo(HaveOccurred())
-		Expect(cli).NotTo(BeNil())
 	})
 
 	It("should be possible for an SRE to restart Kubelet and NetworkManager", func() {
@@ -79,7 +75,7 @@ var _ = Describe("Command tests [Command][Fake][LongRunning]", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Validating the cluster")
-		errs := cli.ValidateCluster(context.Background())
+		errs := sanity.Checker.ValidateCluster(context.Background())
 		Expect(errs).To(BeEmpty())
 	})
 })

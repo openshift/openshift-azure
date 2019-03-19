@@ -14,7 +14,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/test/clients/azure"
-	"github.com/openshift/openshift-azure/test/e2e/standard"
+	"github.com/openshift/openshift-azure/test/sanity"
 )
 
 var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", func() {
@@ -22,7 +22,6 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		configMapName = "recovery-test-data"
 	)
 	var (
-		cli       *standard.SanityChecker
 		azurecli  *azure.Client
 		backup    string
 		namespace string
@@ -30,8 +29,6 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 
 	BeforeEach(func() {
 		var err error
-		cli, err = standard.NewDefaultSanityChecker(context.Background())
-		Expect(cli).ToNot(BeNil())
 		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -42,13 +39,13 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		Expect(err).ToNot(HaveOccurred())
 		namespace = "e2e-test-" + namespace
 		fmt.Fprintln(GinkgoWriter, "Using namespace", namespace)
-		err = cli.Client.EndUser.CreateProject(namespace)
+		err = sanity.Checker.Client.EndUser.CreateProject(namespace)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
-		cli.Client.EndUser.CleanupProject(namespace)
-		cli.Client.Admin.BatchV1.Jobs("openshift-etcd").Delete("e2e-test-etcdbackup", nil)
+		sanity.Checker.Client.EndUser.CleanupProject(namespace)
+		sanity.Checker.Client.Admin.BatchV1.Jobs("openshift-etcd").Delete("e2e-test-etcdbackup", nil)
 	})
 
 	It("should be possible to recover etcd from a backup", func() {
@@ -58,7 +55,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		}
 
 		By("Create a test configmap with value=first")
-		cm1, err := cli.Client.EndUser.CoreV1.ConfigMaps(namespace).Create(&v1.ConfigMap{
+		cm1, err := sanity.Checker.Client.EndUser.CoreV1.ConfigMaps(namespace).Create(&v1.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      configMapName,
 				Namespace: namespace,
@@ -76,7 +73,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 
 		// wait for it to exist
 		By("Overwrite the test configmap with value=second")
-		cm2, err := cli.Client.EndUser.CoreV1.ConfigMaps(namespace).Update(&v1.ConfigMap{
+		cm2, err := sanity.Checker.Client.EndUser.CoreV1.ConfigMaps(namespace).Update(&v1.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      configMapName,
 				Namespace: namespace,
@@ -93,12 +90,12 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Confirm the state of the backup")
-		final, err := cli.Client.EndUser.CoreV1.ConfigMaps(namespace).Get(configMapName, metav1.GetOptions{})
+		final, err := sanity.Checker.Client.EndUser.CoreV1.ConfigMaps(namespace).Get(configMapName, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(final.Data).To(HaveKeyWithValue("value", "before-backup"))
 
 		By("Validating the cluster")
-		errs := cli.ValidateCluster(context.Background())
+		errs := sanity.Checker.ValidateCluster(context.Background())
 		Expect(errs).To(BeEmpty())
 	})
 })
