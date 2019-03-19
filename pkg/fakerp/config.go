@@ -3,7 +3,6 @@ package fakerp
 import (
 	"crypto/rsa"
 	"crypto/x509"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -36,7 +35,7 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := readFile(filepath.Join(artifactDir, "pluginconfig-311.yaml"))
+	data, err := ioutil.ReadFile(filepath.Join(artifactDir, "pluginconfig-311.yaml"))
 	if err != nil {
 		return nil, err
 	}
@@ -66,11 +65,11 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	pullSecret, err := readFile(filepath.Join(artifactDir, ".dockerconfigjson"))
+	pullSecret, err := ioutil.ReadFile(filepath.Join(artifactDir, ".dockerconfigjson"))
 	if err != nil {
 		return nil, err
 	}
-	imagePullSecret, err := readFile(filepath.Join(artifactDir, "system-docker-config.json"))
+	imagePullSecret, err := ioutil.ReadFile(filepath.Join(artifactDir, "system-docker-config.json"))
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +114,7 @@ func overridePluginTemplate(template *pluginapi.Config) {
 }
 
 func readCert(path string) (*x509.Certificate, error) {
-	b, err := readFile(path)
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -123,21 +122,9 @@ func readCert(path string) (*x509.Certificate, error) {
 }
 
 func readKey(path string) (*rsa.PrivateKey, error) {
-	b, err := readFile(path)
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 	return tls.ParsePrivateKey(b)
-}
-
-func readFile(path string) ([]byte, error) {
-	if fileExist(path) {
-		return ioutil.ReadFile(path)
-	}
-	return []byte{}, fmt.Errorf("file %s does not exist", path)
-}
-
-func fileExist(path string) bool {
-	_, err := os.Stat(path)
-	return !os.IsNotExist(err)
 }
