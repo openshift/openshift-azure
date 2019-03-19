@@ -1,11 +1,12 @@
 package shared
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
+	"github.com/ghodss/yaml"
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
 const (
@@ -31,5 +32,16 @@ func DiscoverInternalConfig() (*api.OpenShiftManagedCluster, error) {
 	if err != nil {
 		return nil, err
 	}
-	return managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
+
+	b, err := ioutil.ReadFile(filepath.Join(dataDir, "containerservice.yaml"))
+	if err != nil {
+		return nil, err
+	}
+
+	var cs *api.OpenShiftManagedCluster
+	if err := yaml.Unmarshal(b, &cs); err != nil {
+		return nil, err
+	}
+
+	return cs, nil
 }
