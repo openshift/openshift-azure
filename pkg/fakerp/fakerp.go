@@ -114,6 +114,29 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
+	err = acceptMarketplaceAgreement(ctx, log, cs, testConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	// write out development files
+	log.Info("write helpers")
+	err = os.MkdirAll("_data/_out", 0777)
+	if err != nil {
+		return nil, err
+	}
+
+	err = writeHelpers(cs)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Info("plugin createorupdate")
+	deployer := GetDeployer(log, cs)
+	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
+		return nil, err
+	}
+
 	// persist the OpenShift container service
 	log.Info("persist config")
 	bytes, err := yaml.Marshal(cs)
@@ -122,29 +145,6 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 	}
 	err = ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
 	if err != nil {
-		return nil, err
-	}
-
-	err = os.MkdirAll("_data/_out", 0777)
-	if err != nil {
-		return nil, err
-	}
-
-	// write out development files
-	log.Info("write helpers")
-	err = writeHelpers(cs)
-	if err != nil {
-		return nil, err
-	}
-
-	err = acceptMarketplaceAgreement(ctx, log, cs, testConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Info("plugin createorupdate")
-	deployer := GetDeployer(log, cs)
-	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
 		return nil, err
 	}
 
