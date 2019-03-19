@@ -18,7 +18,6 @@ import (
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 )
 
@@ -85,14 +84,21 @@ func (s *Server) Run() {
 // filesystem. Whether the file that holds the state exists or
 // not is returned and any other error that was encountered.
 func (s *Server) load() error {
-	cs, err := shared.DiscoverInternalConfig()
+	b, err := ioutil.ReadFile("_data/containerservice.yaml")
 	switch {
 	case os.IsNotExist(err):
 		return nil
 	case err != nil:
 		return err
 	}
+
+	var cs *api.OpenShiftManagedCluster
+	if err := yaml.Unmarshal(b, &cs); err != nil {
+		return err
+	}
+
 	s.write(cs)
+
 	return nil
 }
 

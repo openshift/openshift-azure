@@ -5,20 +5,12 @@ import (
 	"crypto/x509"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
-)
-
-const (
-	SecretsDirectory      = "secrets/"
-	PluginConfigDirectory = "pluginconfig/"
-	TemplatesDirectory    = "/test/templates/"
 )
 
 func GetTestConfig() api.TestConfig {
@@ -31,11 +23,7 @@ func GetTestConfig() api.TestConfig {
 
 func GetPluginTemplate() (*pluginapi.Config, error) {
 	// read template file without secrets
-	artifactDir, err := shared.FindDirectory(PluginConfigDirectory)
-	if err != nil {
-		return nil, err
-	}
-	data, err := ioutil.ReadFile(filepath.Join(artifactDir, "pluginconfig-311.yaml"))
+	data, err := ioutil.ReadFile("pluginconfig/pluginconfig-311.yaml")
 	if err != nil {
 		return nil, err
 	}
@@ -45,31 +33,27 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	}
 
 	// enrich template with secrets
-	artifactDir, err = shared.FindDirectory(SecretsDirectory)
+	logCert, err := readCert("secrets/logging-int.cert")
 	if err != nil {
 		return nil, err
 	}
-	logCert, err := readCert(filepath.Join(artifactDir, "logging-int.cert"))
+	logKey, err := readKey("secrets/logging-int.key")
 	if err != nil {
 		return nil, err
 	}
-	logKey, err := readKey(filepath.Join(artifactDir, "logging-int.key"))
+	metCert, err := readCert("secrets/metrics-int.cert")
 	if err != nil {
 		return nil, err
 	}
-	metCert, err := readCert(filepath.Join(artifactDir, "metrics-int.cert"))
+	metKey, err := readKey("secrets/metrics-int.key")
 	if err != nil {
 		return nil, err
 	}
-	metKey, err := readKey(filepath.Join(artifactDir, "metrics-int.key"))
+	pullSecret, err := ioutil.ReadFile("secrets/.dockerconfigjson")
 	if err != nil {
 		return nil, err
 	}
-	pullSecret, err := ioutil.ReadFile(filepath.Join(artifactDir, ".dockerconfigjson"))
-	if err != nil {
-		return nil, err
-	}
-	imagePullSecret, err := ioutil.ReadFile(filepath.Join(artifactDir, "system-docker-config.json"))
+	imagePullSecret, err := ioutil.ReadFile("secrets/system-docker-config.json")
 	if err != nil {
 		return nil, err
 	}

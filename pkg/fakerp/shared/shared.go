@@ -16,14 +16,8 @@ const (
 
 // IsUpdate return whether or not this is an update or create.
 func IsUpdate() bool {
-	dataDir, err := FindDirectory(DataDirectory)
-	if err != nil {
-		return false
-	}
-	if _, err := os.Stat(filepath.Join(dataDir, "containerservice.yaml")); err == nil {
-		return true
-	}
-	return false
+	_, err := os.Stat("_data/containerservice.yaml")
+	return err == nil
 }
 
 // DiscoverInternalConfig discover and returns the internal config struct
