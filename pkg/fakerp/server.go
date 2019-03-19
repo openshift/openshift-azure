@@ -68,7 +68,7 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	}
 	// We need to restore the internal cluster state into memory for GETs
 	// and DELETEs to work appropriately.
-	if _, err := s.load(); err != nil {
+	if err := s.load(); err != nil {
 		s.log.Fatal(err)
 	}
 	return s
@@ -85,25 +85,25 @@ func (s *Server) Run() {
 // to restore the internal state of the cluster from the
 // filesystem. Whether the file that holds the state exists or
 // not is returned and any other error that was encountered.
-func (s *Server) load() (bool, error) {
+func (s *Server) load() error {
 	dataDir, err := shared.FindDirectory(shared.DataDirectory)
 	if err != nil {
-		return false, err
+		return err
 	}
 	csFile := filepath.Join(dataDir, "containerservice.yaml")
 	if _, err = os.Stat(csFile); err != nil {
-		return false, nil
+		return nil
 	}
 	data, err := ioutil.ReadFile(csFile)
 	if err != nil {
-		return true, err
+		return err
 	}
 	var cs *internalapi.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(data, &cs); err != nil {
-		return true, err
+		return err
 	}
 	s.write(cs)
-	return true, nil
+	return nil
 }
 
 func (s *Server) read20180930previewRequest(body io.ReadCloser) (*v20180930preview.OpenShiftManagedCluster, error) {
