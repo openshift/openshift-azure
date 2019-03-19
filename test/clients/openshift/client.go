@@ -2,6 +2,7 @@ package openshift
 
 import (
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
+	buildv1client "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
 	networkv1client "github.com/openshift/client-go/network/clientset/versioned/typed/network/v1"
 	projectv1client "github.com/openshift/client-go/project/clientset/versioned/typed/project/v1"
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
@@ -31,6 +32,7 @@ type Client struct {
 	RbacV1          rbacv1client.RbacV1Interface
 
 	OAppsV1    oappsv1client.AppsV1Interface
+	BuildV1    buildv1client.BuildV1Interface
 	ProjectV1  projectv1client.ProjectV1Interface
 	RouteV1    routev1client.RouteV1Interface
 	TemplateV1 templatev1client.TemplateV1Interface
@@ -48,6 +50,7 @@ func newClientFromRestConfig(config *rest.Config) *Client {
 		BatchV1:         batchv1client.NewForConfigOrDie(config),
 
 		OAppsV1:    oappsv1client.NewForConfigOrDie(config),
+		BuildV1:    buildv1client.NewForConfigOrDie(config),
 		ProjectV1:  projectv1client.NewForConfigOrDie(config),
 		RouteV1:    routev1client.NewForConfigOrDie(config),
 		TemplateV1: templatev1client.NewForConfigOrDie(config),

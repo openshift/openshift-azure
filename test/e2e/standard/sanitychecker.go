@@ -154,6 +154,12 @@ func (sc *SanityChecker) ValidateCluster(ctx context.Context) (errs []*TestError
 		sc.log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanUseAzureFile"})
 	}
+	sc.log.Debugf("validating that Docker builds are not permitted")
+	err = sc.checkCantDoDockerBuild(ctx)
+	if err != nil {
+		sc.log.Error(err)
+		errs = append(errs, &TestError{Err: err, Bucket: "checkCantDoDockerBuild"})
+	}
 	return
 }
 
