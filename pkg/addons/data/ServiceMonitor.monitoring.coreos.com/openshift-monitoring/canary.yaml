@@ -10,7 +10,7 @@ spec:
   endpoints:
   - interval: 1m
     metrics_path: /metrics
-    port: metrics
+    port: http
     scheme: http
   jobLabel: k8s-app
   namespaceSelector:

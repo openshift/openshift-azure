@@ -495,6 +495,12 @@ var Translations = map[string][]struct {
 			Template: "branding.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
 		},
 	},
+	"Route.route.openshift.io/openshift-azure-monitoring/canary": {
+		{
+			Path:     jsonpath.MustCompile("$.spec.host"),
+			Template: "canary-openshift-azure-monitoring.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}",
+		},
+	},
 	"Secret/default/registry-certificates": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'registry.crt'"),

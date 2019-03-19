@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
+    azure.openshift.io/sync-pod-wait-for-readiness: "false"
     k8s-app: canary
   name: canary
   namespace: openshift-azure-monitoring
@@ -16,14 +17,27 @@ spec:
         k8s-app: canary
     spec:
       containers:
-      - image: '*** GENERATED ***'
+      - env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        image: '*** GENERATED ***'
         name: canary
         ports:
         - containerPort: 8080
-          name: metrics
+          name: http
+        readinessProbe:
+          httpGet:
+            path: healthz/ready
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 10
         volumeMounts:
         - mountPath: /data
           name: data
+      nodeSelector:
+        node-role.kubernetes.io/infra: "true"
   volumeClaimTemplates:
   - metadata:
       name: data

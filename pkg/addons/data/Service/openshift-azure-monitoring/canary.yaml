@@ -7,7 +7,8 @@ metadata:
   namespace: openshift-azure-monitoring
 spec:
   ports:
-  - name: metrics
-    port: 8080
+  - name: http
+    port: 80
+    targetPort: 8080
   selector:
     k8s-app: canary
