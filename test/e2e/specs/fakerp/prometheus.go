@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"net/http"
-	"path/filepath"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,7 +13,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/test/e2e/standard"
 )
 
@@ -47,9 +45,7 @@ var _ = Describe("Prometheus E2E tests [Prometheus][EveryPR]", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(cli).NotTo(BeNil())
 
-		dataDir, err := shared.FindDirectory(shared.DataDirectory)
-		Expect(err).NotTo(HaveOccurred())
-		cs, err = managedcluster.ReadConfig(filepath.Join(dataDir, "containerservice.yaml"))
+		cs, err = shared.DiscoverInternalConfig()
 		Expect(err).NotTo(HaveOccurred())
 	})
 
