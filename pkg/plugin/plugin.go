@@ -152,6 +152,10 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
 
+	// set VnetID based on VnetName, do this before writing the blobs so that
+	// they are exactly correct
+	cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", arm.VnetName)
+
 	// blobs must exist before deploy
 	err = clusterUpgrader.WriteStartupBlobs(cs)
 	if err != nil {
@@ -244,17 +248,7 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	// Wait for infrastructure services to be healthy
-	if err := clusterUpgrader.HealthCheck(ctx, cs); err != nil {
-		return err
-	}
-
-	if cs != nil {
-		// setting VnetID based on VnetName
-		cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", arm.VnetName)
-	}
-
-	// explicitly return nil if all went well
-	return nil
+	return clusterUpgrader.HealthCheck(ctx, cs)
 }
 
 func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
