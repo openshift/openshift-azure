@@ -14,87 +14,155 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
-// Initialize does the following:
-// - ensures the storageClient is initialised (this is dependent on the config
-//   storage account existing, which is why it can't be done before)
-// - ensures the expected containers (config, etcd, update) exist
-// - populates the config blob
-func (u *simpleUpgrader) Initialize(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+func (u *simpleUpgrader) initializeStorageClients(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	if u.storageClient == nil {
-		keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+		if cs.Config.ConfigStorageAccountKey == "" {
+			keys, err := u.accountsClient.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+			if err != nil {
+				return err
+			}
+			cs.Config.ConfigStorageAccountKey = *(*keys.Keys)[0].Value
+		}
+
+		var err error
+		u.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
 		if err != nil {
 			return err
 		}
-		u.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, *(*keys.Keys)[0].Value, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
-		if err != nil {
-			return err
-		}
-	}
-	bsc := u.storageClient.GetBlobService()
 
-	// etcd data container
-	c := bsc.GetContainerReference(EtcdBackupContainerName)
-	_, err := c.CreateIfNotExists(nil)
-	if err != nil {
-		return err
+		bsc := u.storageClient.GetBlobService()
+		u.updateBlobService = updateblob.NewBlobService(bsc)
 	}
 
-	u.updateBlobService, err = updateblob.NewBlobService(bsc)
-	if err != nil {
-		return err
-	}
-
-	// cluster config container
-	c = bsc.GetContainerReference(ConfigContainerName)
-	_, err = c.CreateIfNotExists(nil)
-	if err != nil {
-		return err
-	}
-
-	b := c.GetBlobReference(ConfigBlobName)
-
-	csj, err := json.Marshal(cs)
-	if err != nil {
-		return err
-	}
-
-	return b.CreateBlockBlobFromReader(bytes.NewReader(csj), nil)
+	return nil
 }
 
-func (u *simpleUpgrader) CreateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	parameters := azstorage.AccountCreateParameters{
+func (u *simpleUpgrader) writeBlob(blobName string, cs *api.OpenShiftManagedCluster) error {
+	bsc := u.storageClient.GetBlobService()
+	c := bsc.GetContainerReference(ConfigContainerName)
+	b := c.GetBlobReference(blobName)
+
+	json, err := json.Marshal(cs)
+	if err != nil {
+		return err
+	}
+
+	return b.CreateBlockBlobFromReader(bytes.NewReader(json), nil)
+}
+
+func (u *simpleUpgrader) WriteStartupBlobs(cs *api.OpenShiftManagedCluster) error {
+	u.log.Info("writing startup blobs")
+	err := u.writeBlob(MasterStartupBlobName, cs)
+	if err != nil {
+		return err
+	}
+
+	workerCS := &api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			WorkerServicePrincipalProfile: api.ServicePrincipalProfile{
+				ClientID: cs.Properties.WorkerServicePrincipalProfile.ClientID,
+				Secret:   cs.Properties.WorkerServicePrincipalProfile.Secret,
+			},
+			AzProfile: api.AzProfile{
+				TenantID:       cs.Properties.AzProfile.TenantID,
+				SubscriptionID: cs.Properties.AzProfile.SubscriptionID,
+				ResourceGroup:  cs.Properties.AzProfile.ResourceGroup,
+			},
+		},
+		Location: cs.Location,
+		Config: api.Config{
+			ComponentLogLevel: api.ComponentLogLevel{
+				Node: cs.Config.ComponentLogLevel.Node,
+			},
+			Certificates: api.CertificateConfig{
+				Ca: api.CertKeyPair{
+					Cert: cs.Config.Certificates.Ca.Cert,
+				},
+				NodeBootstrap: cs.Config.Certificates.NodeBootstrap,
+			},
+			Images: api.ImageConfig{
+				Format:          cs.Config.Images.Format,
+				Node:            cs.Config.Images.Node,
+				ImagePullSecret: cs.Config.Images.ImagePullSecret,
+			},
+			NodeBootstrapKubeconfig: cs.Config.NodeBootstrapKubeconfig,
+			SDNKubeconfig:           cs.Config.SDNKubeconfig,
+		},
+	}
+	for _, app := range cs.Properties.AgentPoolProfiles {
+		workerCS.Properties.AgentPoolProfiles = append(workerCS.Properties.AgentPoolProfiles, api.AgentPoolProfile{
+			Role:   app.Role,
+			VMSize: app.VMSize,
+		})
+	}
+
+	return u.writeBlob(WorkerStartupBlobName, workerCS)
+}
+
+func (u *simpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	u.log.Info("creating/updating storage account")
+
+	err := u.accountsClient.Create(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount, azstorage.AccountCreateParameters{
 		Sku: &azstorage.Sku{
 			Name: azstorage.StandardLRS,
 		},
 		Kind:     azstorage.Storage,
 		Location: &cs.Location,
+		Tags: map[string]*string{
+			"type": to.StringPtr("config"),
+		},
+	})
+	if err != nil {
+		return err
 	}
-	parameters.Tags = map[string]*string{
-		"type": to.StringPtr("config"),
+
+	err = u.initializeStorageClients(ctx, cs)
+	if err != nil {
+		return err
 	}
-	return u.accountsClient.Create(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount, parameters)
+
+	bsc := u.storageClient.GetBlobService()
+
+	// cluster config container
+	c := bsc.GetContainerReference(ConfigContainerName)
+	_, err = c.CreateIfNotExists(nil)
+	if err != nil {
+		return err
+	}
+
+	// etcd data container
+	c = bsc.GetContainerReference(EtcdBackupContainerName)
+	_, err = c.CreateIfNotExists(nil)
+	if err != nil {
+		return err
+	}
+
+	// update container
+	c = bsc.GetContainerReference(updateblob.UpdateContainerName)
+	_, err = c.CreateIfNotExists(nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error {
 	blob := updateblob.NewUpdateBlob()
 	for _, app := range cs.Properties.AgentPoolProfiles {
+		h, err := u.hasher.HashScaleSet(cs, &app)
+		if err != nil {
+			return err
+		}
+
 		switch app.Role {
 		case api.AgentPoolProfileRoleMaster:
 			for i := int64(0); i < app.Count; i++ {
-				h, err := u.hasher.HashMasterScaleSet(cs, &app, i)
-				if err != nil {
-					return err
-				}
-
 				hostname := config.GetHostname(&app, suffix, i)
 				blob.HostnameHashes[hostname] = h
 			}
 
 		default:
-			h, err := u.hasher.HashWorkerScaleSet(cs, &app)
-			if err != nil {
-				return err
-			}
 			blob.ScalesetHashes[config.GetScalesetName(&app, suffix)] = h
 		}
 	}

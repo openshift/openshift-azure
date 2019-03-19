@@ -219,6 +219,16 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{
+					CommonName: "system:serviceaccount:openshift-sdn:sdn",
+				},
+				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+			},
+			key:  &c.Certificates.SDN.Key,
+			cert: &c.Certificates.SDN.Cert,
+		},
+		{
+			params: tls.CertParams{
+				Subject: pkix.Name{
 					CommonName: "system:serviceaccount:openshift-azure:blackboxmonitor",
 				},
 				ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
@@ -334,6 +344,14 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 			namespace:  "openshift-infra",
 		},
 		{
+			clientKey:  c.Certificates.SDN.Key,
+			clientCert: c.Certificates.SDN.Cert,
+			endpoint:   cs.Properties.FQDN,
+			username:   "system:serviceaccount:openshift-sdn:sdn",
+			kubeconfig: &c.SDNKubeconfig,
+			namespace:  "openshift-sdn",
+		},
+		{
 			clientKey:  c.Certificates.BlackBoxMonitor.Key,
 			clientCert: c.Certificates.BlackBoxMonitor.Cert,
 			endpoint:   cs.Properties.FQDN,
@@ -436,6 +454,7 @@ func (g *simpleGenerator) InvalidateSecrets(cs *api.OpenShiftManagedCluster) (er
 	cs.Config.Certificates.MasterProxyClient = api.CertKeyPair{}
 	cs.Config.Certificates.MasterServer = api.CertKeyPair{}
 	cs.Config.Certificates.NodeBootstrap = api.CertKeyPair{}
+	cs.Config.Certificates.SDN = api.CertKeyPair{}
 	cs.Config.Certificates.OpenShiftMaster = api.CertKeyPair{}
 	cs.Config.Certificates.Registry = api.CertKeyPair{}
 	cs.Config.Certificates.RegistryConsole = api.CertKeyPair{}

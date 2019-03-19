@@ -29,8 +29,7 @@ var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func
 
 	It("should be possible for an SRE to force update a cluster", func() {
 		By("Reading the update blob before the force update")
-		ubs, err := updateblob.NewBlobService(azurecli.BlobStorage)
-		Expect(err).ToNot(HaveOccurred())
+		ubs := updateblob.NewBlobService(azurecli.BlobStorage)
 		before, err := ubs.Read()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(before).NotTo(BeNil())

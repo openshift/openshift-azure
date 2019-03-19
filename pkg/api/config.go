@@ -28,9 +28,11 @@ type Config struct {
 	SSHKey *rsa.PrivateKey `json:"sshKey,omitempty"`
 
 	// configuration of other ARM resources
-	ConfigStorageAccount    string `json:"configStorageAccount,omitempty"`
-	RegistryStorageAccount  string `json:"registryStorageAccount,omitempty"`
-	AzureFileStorageAccount string `json:"azureFileStorageAccount,omitempty"`
+	ConfigStorageAccount      string `json:"configStorageAccount,omitempty"`
+	ConfigStorageAccountKey   string `json:"-"`
+	RegistryStorageAccount    string `json:"registryStorageAccount,omitempty"`
+	RegistryStorageAccountKey string `json:"-"`
+	AzureFileStorageAccount   string `json:"azureFileStorageAccount,omitempty"`
 
 	Certificates CertificateConfig `json:"certificates,omitempty"`
 	Images       ImageConfig       `json:"images,omitempty"`
@@ -39,6 +41,7 @@ type Config struct {
 	AdminKubeconfig           *v1.Config `json:"adminKubeconfig,omitempty"`
 	MasterKubeconfig          *v1.Config `json:"masterKubeconfig,omitempty"`
 	NodeBootstrapKubeconfig   *v1.Config `json:"nodeBootstrapKubeconfig,omitempty"`
+	SDNKubeconfig             *v1.Config `json:"sdnKubeconfig,omitempty"`
 	BlackBoxMonitorKubeconfig *v1.Config `json:"blackBoxMonitorKubeconfig,omitempty"`
 
 	// misc control plane configurables
@@ -74,6 +77,9 @@ type Config struct {
 	GenevaMetricsAccount string `json:"genevaMetricsAccount,omitempty"`
 	// Geneva Metrics System (MDM) endpoint for metrics
 	GenevaMetricsEndpoint string `json:"genevaMetricsEndpoint,omitempty"`
+
+	MasterStartupSASURI string `json:"-"`
+	WorkerStartupSASURI string `json:"-"`
 }
 
 // ComponentLogLevel represents the log levels for the various components of a
@@ -155,6 +161,7 @@ type CertificateConfig struct {
 	MasterProxyClient    CertKeyPair      `json:"masterProxyClient,omitempty"`
 	OpenShiftMaster      CertKeyPair      `json:"openShiftMaster,omitempty"`
 	NodeBootstrap        CertKeyPair      `json:"nodeBootstrap,omitempty"`
+	SDN                  CertKeyPair      `json:"sdn,omitempty"`
 
 	// infra certificates
 	Registry             CertKeyPair      `json:"registry,omitempty"`

@@ -1,16 +1,5 @@
 #!/bin/bash -ex
 
-# TODO: /etc/dnsmasq.d/origin-upstream-dns.conf is currently hardcoded; it
-# probably shouldn't be
-
-SERVICE_TYPE=origin
-if [ -f "/etc/sysconfig/atomic-openshift-node" ]; then
-    SERVICE_TYPE=atomic-openshift
-fi
-
-# remove registry certificate softlink from docker
-unlink /etc/docker/certs.d/registry.access.redhat.com/redhat-ca.crt
-
 if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker.service
   mkfs.xfs -f /dev/disk/azure/resource-part1
@@ -27,44 +16,33 @@ EOF
   systemctl start docker.service
 fi
 
-# file should be /root/.docker/config.json, but actually need it in
-# /var/lib/origin thanks to https://github.com/kubernetes/kubernetes/issues/45487
-DPATH=/var/lib/origin/.docker
-mkdir -p $DPATH
-base64 -d <<< {{ .Config.Images.ImagePullSecret | Base64Encode }} >${DPATH}/config.json; chmod 0600 ${DPATH}/config.json
+docker pull {{ .Config.Images.Node }} &>/dev/null &
 
-echo 'BOOTSTRAP_CONFIG_NAME=node-config-{{ .Extra.Role }}' >>/etc/sysconfig/${SERVICE_TYPE}-node
+# when starting node waagent and network utilities goes into race condition.
+# if waagent runs before dns is known to the node we end up with empty string
+while [[ $(hostname -d) == "" ]]; do sleep 1; done
 
-sed -i -e "s#DEBUG_LOGLEVEL=.*#DEBUG_LOGLEVEL={{ .Config.ComponentLogLevel.Node }}#" /etc/sysconfig/${SERVICE_TYPE}-node
+while ! docker pull {{ .Config.Images.Startup }}; do
+  sleep 1
+done
+set +x
+export SASURI='{{ .Config.WorkerStartupSASURI }}'
+set -x
+docker run --privileged --rm --network host -v /:/host:z -e SASURI {{ .Config.Images.Startup }}
+unset SASURI
 
-rm -rf /etc/etcd/* /etc/origin/master/*
-
-base64 -d <<< {{ Base64Encode (YamlMarshal .Config.NodeBootstrapKubeconfig) }} >/etc/origin/node/bootstrap.kubeconfig; chmod 0600 /etc/origin/node/bootstrap.kubeconfig
-base64 -d <<< {{ Base64Encode (CertAsBytes .Config.Certificates.NodeBootstrap.Cert) }} >/etc/origin/node/node-bootstrapper.crt
-base64 -d <<< {{ Base64Encode (PrivateKeyAsBytes .Config.Certificates.NodeBootstrap.Key) }} >/etc/origin/node/node-bootstrapper.key; chmod 0600 /etc/origin/node/node-bootstrapper.key
-
-base64 -d <<< {{ Base64Encode (CertAsBytes .Config.Certificates.Ca.Cert) }} >/etc/origin/node/ca.crt
-cp /etc/origin/node/ca.crt /etc/pki/ca-trust/source/anchors/openshift-ca.crt
 update-ca-trust
 
-echo 'nameserver 168.63.129.16' >/etc/origin/node/resolv.conf
-mkdir -p /etc/origin/cloudprovider
-
-cat >/etc/origin/cloudprovider/azure.conf <<'EOF'; chmod 0600 /etc/origin/cloudprovider/azure.conf
-{{ .Derived.WorkerCloudProviderConf .ContainerService | String }}
-EOF
-
-# note: ${SERVICE_TYPE}-node crash loops until master is up
-systemctl enable ${SERVICE_TYPE}-node.service
-systemctl start ${SERVICE_TYPE}-node.service &
-
-# disabling rsyslog since we manage everything through journald
-systemctl disable rsyslog.service
-systemctl stop rsyslog.service
-
-#load the tuned profile which is recommended the host joins the cluster
 {{- if eq .Extra.Role "infra" }}
 tuned-adm profile openshift-control-plane
 {{- else }}
 tuned-adm profile openshift-node
 {{- end }}
+
+# note: atomic-openshift-node crash loops until master is up
+systemctl enable atomic-openshift-node.service
+systemctl start atomic-openshift-node.service &
+
+# disabling rsyslog since we manage everything through journald
+systemctl disable rsyslog.service
+systemctl stop rsyslog.service

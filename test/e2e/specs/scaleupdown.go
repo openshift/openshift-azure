@@ -110,7 +110,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		}
 		_, err = occli.Client.EndUser.AppsV1.Deployments(namespace).Create(deployment)
 		Expect(err).NotTo(HaveOccurred())
-		err = wait.PollImmediate(2*time.Second, 1*time.Minute, ready.DeploymentIsReady(occli.Client.EndUser.AppsV1.Deployments(namespace), sampleDeployment))
+		err = wait.PollImmediate(2*time.Second, 1*time.Minute, ready.CheckDeploymentIsReady(occli.Client.EndUser.AppsV1.Deployments(namespace), sampleDeployment))
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Verifying that the deployment's pods are spread across 2 nodes...")

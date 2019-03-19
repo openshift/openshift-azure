@@ -7,28 +7,33 @@ package addons
 import (
 	"context"
 	"crypto/sha256"
-	"encoding/base64"
+	"encoding/hex"
 	"fmt"
+	"net/http"
 	"sort"
+	"sync/atomic"
 	"time"
 
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/healthcheck"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
+	"github.com/openshift/openshift-azure/pkg/util/ready"
 )
 
-const ownedBySyncPodLabelKey = "azure.openshift.io/owned-by-sync-pod"
-
-type extra struct {
-	RegistryStorageAccountKey string
-	ConfigStorageAccountKey   string
-}
+const (
+	ownedBySyncPodLabelKey            = "azure.openshift.io/owned-by-sync-pod"
+	syncPodWaitForReadinessLabelKey   = "azure.openshift.io/sync-pod-wait-for-readiness"
+	syncPodReadinessPathAnnotationKey = "azure.openshift.io/sync-pod-readiness-path"
+)
 
 // Unmarshal has to reimplement yaml.Unmarshal because it universally mangles yaml
 // integers into float64s, whereas the Kubernetes client library uses int64s
@@ -49,9 +54,9 @@ func Unmarshal(b []byte) (unstructured.Unstructured, error) {
 	return o, nil
 }
 
-// readDB reads previously exported objects into a map via go-bindata as well as
+// ReadDB reads previously exported objects into a map via go-bindata as well as
 // populating configuration items via Translate().
-func readDB(cs *api.OpenShiftManagedCluster, ext *extra) (map[string]unstructured.Unstructured, error) {
+func ReadDB(cs *api.OpenShiftManagedCluster) (map[string]unstructured.Unstructured, error) {
 	db := map[string]unstructured.Unstructured{}
 
 	for _, asset := range AssetNames() {
@@ -65,13 +70,19 @@ func readDB(cs *api.OpenShiftManagedCluster, ext *extra) (map[string]unstructure
 			return nil, err
 		}
 
-		o, err = translateAsset(o, cs, ext)
+		o, err = translateAsset(o, cs)
 		if err != nil {
 			return nil, err
 		}
 
 		db[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = o
 	}
+
+	err := syncWorkloadsConfig(db)
+	if err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }
 
@@ -152,7 +163,7 @@ func getHash(o *unstructured.Unstructured) string {
 		fmt.Fprintf(h, "%s: %#v", key, content[key])
 	}
 
-	return base64.StdEncoding.EncodeToString(h.Sum(nil))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 // setPodTemplateAnnotation sets the provided key-value pair as an annotation
@@ -164,6 +175,76 @@ func setPodTemplateAnnotation(key, value string, o unstructured.Unstructured) {
 	}
 	annotations[key] = value
 	unstructured.SetNestedStringMap(o.Object, annotations, "spec", "template", "metadata", "annotations")
+}
+
+func CalculateReadiness(kc kubernetes.Interface, db map[string]unstructured.Unstructured, cs *api.OpenShiftManagedCluster) (errs []error) {
+	var keys []string
+	for k := range db {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		o := db[k]
+
+		if o.GetLabels()[syncPodWaitForReadinessLabelKey] == "false" {
+			continue
+		}
+
+		gk := o.GroupVersionKind().GroupKind()
+
+		switch gk.String() {
+		case "DaemonSet.apps":
+			ds, err := kc.AppsV1().DaemonSets(o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
+			if err != nil {
+				errs = append(errs, err)
+			} else if !ready.DaemonSetIsReady(ds) {
+				errs = append(errs, fmt.Errorf("%s %s/%s is not ready: %d,%d/%d", gk.String(), o.GetNamespace(), o.GetName(), ds.Status.UpdatedNumberScheduled, ds.Status.NumberAvailable, ds.Status.DesiredNumberScheduled))
+			}
+
+		case "Deployment.apps":
+			d, err := kc.AppsV1().Deployments(o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
+			if err != nil {
+				errs = append(errs, err)
+			} else if !ready.DeploymentIsReady(d) {
+				specReplicas := int32(1)
+				if d.Spec.Replicas != nil {
+					specReplicas = *d.Spec.Replicas
+				}
+
+				errs = append(errs, fmt.Errorf("%s %s/%s is not ready: %d,%d/%d", gk.String(), o.GetNamespace(), o.GetName(), d.Status.UpdatedReplicas, d.Status.AvailableReplicas, specReplicas))
+			}
+
+		case "StatefulSet.apps":
+			ss, err := kc.AppsV1().StatefulSets(o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
+			if err != nil {
+				errs = append(errs, err)
+			} else if !ready.StatefulSetIsReady(ss) {
+				specReplicas := int32(1)
+				if ss.Spec.Replicas != nil {
+					specReplicas = *ss.Spec.Replicas
+				}
+
+				errs = append(errs, fmt.Errorf("%s %s/%s is not ready: %d,%d/%d", gk.String(), o.GetNamespace(), o.GetName(), ss.Status.UpdatedReplicas, ss.Status.ReadyReplicas, specReplicas))
+			}
+
+		case "Route.route.openshift.io":
+			url := "https://" + jsonpath.MustCompile("$.spec.host").MustGetString(o.Object) + o.GetAnnotations()[syncPodReadinessPathAnnotationKey]
+			cert := cs.Config.Certificates.Router.Certs
+			cli := http.Client{
+				Transport: healthcheck.RoundTripper(cs.Properties.RouterProfiles[0].FQDN, cert[len(cert)-1]),
+				Timeout:   5 * time.Second,
+			}
+			resp, err := cli.Get(url)
+			if err != nil {
+				errs = append(errs, err)
+			} else if resp.StatusCode != http.StatusOK {
+				errs = append(errs, fmt.Errorf("%s %s/%s is not ready: %d", gk.String(), o.GetNamespace(), o.GetName(), resp.StatusCode))
+			}
+		}
+	}
+
+	return
 }
 
 // resource filters
@@ -201,7 +282,7 @@ var (
 // writeDB uses the discovery and dynamic clients to synchronise an API server's
 // objects with db.
 // TODO: need to implement deleting objects which we don't want any more.
-func writeDB(log *logrus.Entry, client Interface, db map[string]unstructured.Unstructured) error {
+func writeDB(log *logrus.Entry, client *client, db map[string]unstructured.Unstructured, readyFlag *atomic.Value) error {
 	// impose an order to improve debuggability.
 	var keys []string
 	for k := range db {
@@ -243,7 +324,9 @@ func writeDB(log *logrus.Entry, client Interface, db map[string]unstructured.Uns
 	// wait for the service catalog api extension to arrive. TODO: we should do
 	// this dynamically, and should not PollInfinite.
 	log.Debug("Waiting for the service catalog api to get aggregated")
-	if err := wait.PollImmediateInfinite(time.Second, client.ServiceCatalogExists); err != nil {
+	if err := wait.PollImmediateInfinite(time.Second,
+		ready.CheckAPIServiceIsReady(client.ac.ApiregistrationV1().APIServices(), "v1beta1.servicecatalog.k8s.io"),
+	); err != nil {
 		return err
 	}
 	log.Debug("Service catalog api is aggregated")
@@ -258,10 +341,13 @@ func writeDB(log *logrus.Entry, client Interface, db map[string]unstructured.Uns
 		return err
 	}
 
+	// to speed up cluster startup time, we call this ready
+	readyFlag.Store(true)
+
 	log.Debug("Waiting for the targeted CRDs to get ready")
-	if err := wait.PollImmediateInfinite(time.Second, func() (bool, error) {
-		return client.CRDReady("servicemonitors.monitoring.coreos.com")
-	}); err != nil {
+	if err := wait.PollImmediateInfinite(time.Second,
+		ready.CheckCustomResourceDefinitionIsReady(client.ae.ApiextensionsV1beta1().CustomResourceDefinitions(), "servicemonitors.monitoring.coreos.com"),
+	); err != nil {
 		return err
 	}
 	log.Debug("ServiceMonitors CRDs apis ready")
@@ -275,54 +361,34 @@ func writeDB(log *logrus.Entry, client Interface, db map[string]unstructured.Uns
 	return client.ApplyResources(monitoringCrdFilter, db, keys)
 }
 
+func EnrichCSStorageAccountKeys(ctx context.Context, azs azureclient.AccountsClient, cs *api.OpenShiftManagedCluster) error {
+	if cs.Config.RegistryStorageAccountKey == "" {
+		key, err := azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
+		if err != nil {
+			return err
+		}
+		cs.Config.RegistryStorageAccountKey = *(*key.Keys)[0].Value
+	}
+
+	if cs.Config.ConfigStorageAccount == "" {
+		key, err := azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+		if err != nil {
+			return err
+		}
+		cs.Config.ConfigStorageAccountKey = *(*key.Keys)[0].Value
+	}
+
+	return nil
+}
+
 // Main loop
-func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) error {
-	client, err := newClient(ctx, log, cs, azs, dryRun)
-	if err != nil {
-		return err
-	}
-	keyRegistry, err := client.GetStorageAccountKey(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
-	if err != nil {
-		return err
-	}
-	keyConfig, err := client.GetStorageAccountKey(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
+func Main(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, db map[string]unstructured.Unstructured, ready *atomic.Value) error {
+	client, err := newClient(ctx, log, cs)
 	if err != nil {
 		return err
 	}
 
-	db, err := readDB(cs, &extra{
-		RegistryStorageAccountKey: keyRegistry,
-		ConfigStorageAccountKey:   keyConfig,
-	})
-	if err != nil {
-		return err
-	}
-
-	if err := syncWorkloadsConfig(db); err != nil {
-		return err
-	}
-
-	if dryRun {
-		// impose an order to improve debuggability.
-		var keys []string
-		for k := range db {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-
-		for _, k := range keys {
-			b, err := yaml.Marshal(db[k].Object)
-			if err != nil {
-				return err
-			}
-
-			log.Info(string(b))
-		}
-
-		return nil
-	}
-
-	err = writeDB(log, client, db)
+	err = writeDB(log, client, db, ready)
 	if err != nil {
 		return err
 	}

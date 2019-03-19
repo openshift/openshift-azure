@@ -48,13 +48,13 @@ func TestIsPodReady(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		if got, err := PodIsReady(tt.kubeclient.CoreV1().Pods(""), "")(); err != nil || got != tt.want {
+		if got, err := CheckPodIsReady(tt.kubeclient.CoreV1().Pods(""), "")(); err != nil || got != tt.want {
 			t.Errorf("isPodReady(%s) = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
 
-func TestNodeIsReady(t *testing.T) {
+func TestCheckNodeIsReady(t *testing.T) {
 	tests := []struct {
 		name     string
 		kc       *fake.Clientset
@@ -107,7 +107,7 @@ func TestNodeIsReady(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		got, err := NodeIsReady(tt.kc.CoreV1().Nodes(), tt.hostname)()
+		got, err := CheckNodeIsReady(tt.kc.CoreV1().Nodes(), tt.hostname)()
 		if (err != nil) != tt.wantErr {
 			t.Errorf("nodeIsReady() error = %v, wantErr %v", err, tt.wantErr)
 			return

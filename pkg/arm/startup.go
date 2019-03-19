@@ -3,6 +3,8 @@ package arm
 import (
 	"os"
 	"path"
+	"sort"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 
@@ -11,22 +13,43 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/writers"
 )
 
-func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, w writers.Writer, hostname, domainname string) error {
-	for _, templateFileName := range AssetNames() {
-		switch {
-		case templateFileName == "etc/origin/node/pods/sync.yaml" && hostname != "master-000000",
-			templateFileName == "master-startup.sh",
-			templateFileName == "node-startup.sh":
-			continue
+func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, w writers.Writer, hostname, domainname string) error {
+	assetNames := AssetNames()
+	sort.Strings(assetNames)
+
+	for _, filepath := range assetNames {
+		var tmpl string
+
+		switch role {
+		case api.AgentPoolProfileRoleMaster:
+			if !strings.HasPrefix(filepath, "master/") {
+				continue
+			}
+
+			b, err := Asset(filepath)
+			if err != nil {
+				return err
+			}
+			tmpl = string(b)
+
+			filepath = strings.TrimPrefix(filepath, "master")
+
+		default:
+			if !strings.HasPrefix(filepath, "worker/") {
+				continue
+			}
+
+			b, err := Asset(filepath)
+			if err != nil {
+				return err
+			}
+			tmpl = string(b)
+
+			filepath = strings.TrimPrefix(filepath, "worker")
 		}
 
-		log.Debugf("processing template %s", templateFileName)
-		templateFile, err := Asset(templateFileName)
-		if err != nil {
-			return err
-		}
-
-		b, err := template.Template(string(templateFile), nil, cs, map[string]interface{}{
+		b, err := template.Template(tmpl, nil, cs, map[string]interface{}{
+			"Role":       role,
 			"Hostname":   hostname,
 			"DomainName": domainname,
 		})
@@ -34,25 +57,28 @@ func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, w wri
 			return err
 		}
 
-		destination := "/" + templateFileName
-
-		parentDir := path.Dir(destination)
-		err = w.MkdirAll(parentDir, 0755)
-		if err != nil {
-			return err
-		}
-
 		var perm os.FileMode
 		switch {
-		case path.Ext(destination) == ".key",
-			path.Ext(destination) == ".kubeconfig",
-			path.Base(destination) == "session-secrets.yaml":
+		case strings.HasSuffix(filepath, ".key"),
+			strings.HasSuffix(filepath, ".kubeconfig"),
+			filepath == "/etc/origin/cloudprovider/azure.conf",
+			filepath == "/etc/origin/master/session-secrets.yaml",
+			filepath == "/var/lib/origin/.docker/config.json",
+			filepath == "/root/.kube/config":
 			perm = 0600
 		default:
 			perm = 0644
 		}
 
-		err = w.WriteFile(destination, b, perm)
+		filepath = "/host" + filepath
+
+		parentDir := path.Dir(filepath)
+		err = w.MkdirAll(parentDir, 0755)
+		if err != nil {
+			return err
+		}
+
+		err = w.WriteFile(filepath, b, perm)
 		if err != nil {
 			return err
 		}

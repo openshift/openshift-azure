@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
@@ -19,7 +17,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
-	"github.com/openshift/openshift-azure/pkg/plugin"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
@@ -50,7 +47,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployF
 		cli.PollingDuration = 30 * time.Minute
 
 		log.Info("waiting for arm template deployment to complete")
-		if err := future.WaitForCompletionRef(ctx, deployments.Client()); err != nil {
+		if err := future.WaitForCompletionRef(ctx, cli); err != nil {
 			return fmt.Errorf("failed waiting for arm template deployment to complete: %#v", err)
 		}
 		if _, err := future.Result(deployments.DeploymentClient()); err != nil {
@@ -60,28 +57,9 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployF
 	}
 }
 
-func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
-	template, err := GetPluginTemplate()
-	if err != nil {
-		return nil, err
-	}
-
-	// This should be executed only for fakeRP
-	overridePluginTemplate(template)
-
-	// instantiate the plugin
-	p, errs := plugin.NewPlugin(log, template, testConfig)
-	if len(errs) > 0 {
-		return nil, kerrors.NewAggregate(errs)
-	}
-
-	errs = p.ValidatePluginTemplate(ctx)
-	if len(errs) > 0 {
-		return nil, kerrors.NewAggregate(errs)
-	}
-
+func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
 	log.Info("enrich")
-	err = enrich(cs)
+	err := enrich(cs)
 	if err != nil {
 		return nil, err
 	}
@@ -90,6 +68,7 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 	// internal API representation)
 	// we set fqdn during enrichment which is slightly different than what the RP
 	// will do so we are only validating once.
+	var errs []error
 	if isAdmin {
 		errs = p.ValidateAdmin(ctx, cs, oldCs)
 	} else {
@@ -120,13 +99,8 @@ func createOrUpdate(ctx context.Context, log *logrus.Entry, cs, oldCs *api.OpenS
 		return nil, err
 	}
 
-	u, err := url.Parse(vaultURL)
-	if err != nil {
-		return nil, err
-	}
-
 	log.Info("setting up key vault")
-	err = vm.createOrUpdateVault(ctx, os.Getenv("AZURE_CLIENT_ID"), cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, strings.Split(u.Host, ".")[0])
+	err = vm.createOrUpdateVault(ctx, log, os.Getenv("AZURE_CLIENT_ID"), cs.Properties.MasterServicePrincipalProfile.ClientID, os.Getenv("AZURE_TENANT_ID"), os.Getenv("RESOURCEGROUP"), cs.Location, vaultURL)
 	if err != nil {
 		return nil, err
 	}

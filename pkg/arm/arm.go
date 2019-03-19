@@ -12,10 +12,14 @@ package arm
 import (
 	"context"
 	"encoding/json"
+	"time"
 
+	azstorage "github.com/Azure/azure-sdk-for-go/storage"
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
 type Generator interface {
@@ -23,7 +27,9 @@ type Generator interface {
 }
 
 type simpleGenerator struct {
-	testConfig api.TestConfig
+	testConfig     api.TestConfig
+	accountsClient azureclient.AccountsClient
+	storageClient  storage.Client
 }
 
 var _ Generator = &simpleGenerator{}
@@ -38,13 +44,68 @@ type Template struct {
 }
 
 // NewSimpleGenerator create a new SimpleGenerator
-func NewSimpleGenerator(testConfig api.TestConfig) Generator {
-	return &simpleGenerator{
-		testConfig: testConfig,
+func NewSimpleGenerator(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Generator, error) {
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
+	if err != nil {
+		return nil, err
 	}
+
+	g := &simpleGenerator{
+		testConfig:     testConfig,
+		accountsClient: azureclient.NewAccountsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
+	}
+
+	g.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
+	if err != nil {
+		return nil, err
+	}
+
+	return g, nil
+}
+
+func enrichCSSASURIs(storageClient storage.Client, cs *api.OpenShiftManagedCluster) (err error) {
+	now := time.Now().Add(-time.Hour)
+
+	bsc := storageClient.GetBlobService()
+	c := bsc.GetContainerReference("config") // TODO: should be using consts, need to merge packages
+
+	cs.Config.MasterStartupSASURI, err = c.GetBlobReference("master-startup").GetSASURI(azstorage.BlobSASOptions{
+		BlobServiceSASPermissions: azstorage.BlobServiceSASPermissions{
+			Read: true,
+		},
+		SASOptions: azstorage.SASOptions{
+			APIVersion: "2015-04-05",
+			Start:      now,
+			Expiry:     now.AddDate(5, 0, 0),
+			UseHTTPS:   true,
+		},
+	})
+	if err != nil {
+		return
+	}
+
+	cs.Config.WorkerStartupSASURI, err = c.GetBlobReference("worker-startup").GetSASURI(azstorage.BlobSASOptions{
+		BlobServiceSASPermissions: azstorage.BlobServiceSASPermissions{
+			Read: true,
+		},
+		SASOptions: azstorage.SASOptions{
+			APIVersion: "2015-04-05",
+			Start:      now,
+			Expiry:     now.AddDate(5, 0, 0),
+			UseHTTPS:   true,
+		},
+	})
+	return
 }
 
 func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
+	cs = cs.DeepCopy()
+
+	err := enrichCSSASURIs(g.storageClient, cs)
+	if err != nil {
+		return nil, err
+	}
+
 	t := Template{
 		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 		ContentVersion: "1.0.0.0",

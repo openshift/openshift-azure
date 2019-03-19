@@ -21,12 +21,12 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReadBlob}
 	}
 
-	for i := int64(0); i < app.Count; i++ {
-		desiredHash, err := u.hasher.HashMasterScaleSet(cs, app, i)
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashMasterScaleSet}
-		}
+	desiredHash, err := u.hasher.HashScaleSet(cs, app)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashScaleSet}
+	}
 
+	for i := int64(0); i < app.Count; i++ {
 		hostname := config.GetHostname(app, "", i)
 		instanceID := fmt.Sprintf("%d", i)
 
@@ -36,7 +36,7 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 		}
 
 		u.log.Infof("draining %s", hostname)
-		err = u.kubeclient.DeleteMaster(hostname)
+		err = u.Kubeclient.DeleteMaster(hostname)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDrain}
 		}
@@ -68,12 +68,13 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 		}
 
 		u.log.Infof("waiting for %s to be ready", hostname)
-		err = u.kubeclient.WaitForReadyMaster(ctx, hostname)
+		err = u.Kubeclient.WaitForReadyMaster(ctx, hostname)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolWaitForReady}
 		}
 
 		blob.HostnameHashes[hostname] = desiredHash
+
 		if err := u.updateBlobService.Write(blob); err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateBlob}
 		}

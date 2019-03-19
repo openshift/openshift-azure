@@ -269,7 +269,7 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 						Port:              to.Int32Ptr(443),
 						IntervalInSeconds: to.Int32Ptr(5),
 						NumberOfProbes:    to.Int32Ptr(2),
-						RequestPath:       to.StringPtr("/healthz/ready"),
+						RequestPath:       to.StringPtr("/healthz"),
 					},
 					Name: to.StringPtr(lbAPIServerProbeName),
 				},
@@ -432,10 +432,7 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 	var script string
 	if app.Role == api.AgentPoolProfileRoleMaster {
 		b, err := template.Template(string(masterStartup), nil, cs, map[string]interface{}{
-			"IsRecovery":     len(backupBlob) > 0,
 			"BackupBlobName": backupBlob,
-			"Role":           app.Role,
-			"TestConfig":     testConfig,
 		})
 		if err != nil {
 			return nil, err
@@ -443,8 +440,7 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 		script = base64.StdEncoding.EncodeToString(b)
 	} else {
 		b, err := template.Template(string(nodeStartup), nil, cs, map[string]interface{}{
-			"Role":       app.Role,
-			"TestConfig": testConfig,
+			"Role": app.Role,
 		})
 		if err != nil {
 			return nil, err

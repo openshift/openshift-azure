@@ -62,9 +62,9 @@ func (u *simpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string
 func (u *simpleUpgrader) UpdateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError {
 	u.log.Infof("updating worker agent pool %s", app.Name)
 
-	desiredHash, err := u.hasher.HashWorkerScaleSet(cs, app)
+	desiredHash, err := u.hasher.HashScaleSet(cs, app)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashWorkerScaleSet}
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
 	}
 
 	blob, err := u.updateBlobService.Read()
@@ -88,12 +88,12 @@ func (u *simpleUpgrader) UpdateWorkerAgentPool(ctx context.Context, cs *api.Open
 		}
 	}
 
-	targetScaler := u.scalerFactory.New(u.log, u.ssc, u.vmc, u.kubeclient, cs.Properties.AzProfile.ResourceGroup, target)
+	targetScaler := u.scalerFactory.New(u.log, u.ssc, u.vmc, u.Kubeclient, cs.Properties.AzProfile.ResourceGroup, target)
 
 	// One by one, get rid of instances in any "source" scalesets.  Clean scales
 	// should not hit this codepath.
 	for _, source := range sources {
-		sourceScaler := u.scalerFactory.New(u.log, u.ssc, u.vmc, u.kubeclient, cs.Properties.AzProfile.ResourceGroup, &source)
+		sourceScaler := u.scalerFactory.New(u.log, u.ssc, u.vmc, u.Kubeclient, cs.Properties.AzProfile.ResourceGroup, &source)
 
 		for *source.Sku.Capacity > 0 {
 			if *target.Sku.Capacity < app.Count {
@@ -120,9 +120,9 @@ func (u *simpleUpgrader) UpdateWorkerAgentPool(ctx context.Context, cs *api.Open
 // simplicity, the scaleset has zero instances - we fix this up later.  TODO:
 // improve this.
 func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string, blob *updateblob.UpdateBlob) (*compute.VirtualMachineScaleSet, *api.PluginError) {
-	hash, err := u.hasher.HashWorkerScaleSet(cs, app)
+	hash, err := u.hasher.HashScaleSet(cs, app)
 	if err != nil {
-		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashWorkerScaleSet}
+		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
 	}
 
 	target, err := arm.Vmss(cs, app, "", suffix, u.testConfig)

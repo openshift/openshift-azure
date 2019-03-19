@@ -99,11 +99,11 @@ func TestForHTTPStatusOk(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
+	gmc := gomock.NewController(t)
+	defer gmc.Finish()
 
 	for _, tt := range tests {
-		mockCli := mock_wait.NewMockSimpleHTTPClient(mockCtrl)
+		mockCli := mock_wait.NewMockSimpleHTTPClient(gmc)
 		req, _ := http.NewRequest("GET", urltocheck, nil)
 		for _, resp := range tt.responses {
 			mockCli.EXPECT().Do(req).Return(resp.resp, resp.err)

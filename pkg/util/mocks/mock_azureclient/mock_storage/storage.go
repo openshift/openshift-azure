@@ -265,6 +265,21 @@ func (mr *MockBlobMockRecorder) Get(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockBlob)(nil).Get), arg0)
 }
 
+// GetSASURI mocks base method
+func (m *MockBlob) GetSASURI(arg0 storage.BlobSASOptions) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSASURI", arg0)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSASURI indicates an expected call of GetSASURI
+func (mr *MockBlobMockRecorder) GetSASURI(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSASURI", reflect.TypeOf((*MockBlob)(nil).GetSASURI), arg0)
+}
+
 // PutBlock mocks base method
 func (m *MockBlob) PutBlock(arg0 string, arg1 []byte, arg2 *storage.PutBlockOptions) error {
 	m.ctrl.T.Helper()

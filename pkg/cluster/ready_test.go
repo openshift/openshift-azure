@@ -126,34 +126,34 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 			ctx := context.Background()
 			gmc := gomock.NewController(t)
 			defer gmc.Finish()
-			virtualMachineScaleSetsClient := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
-			virtualMachineScaleSetVMsClient := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
+			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
+			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 
-			kubeclient := mock_kubeclient.NewMockKubeclient(gmc)
+			kc := mock_kubeclient.NewMockKubeclient(gmc)
 			if tt.wantErr {
 				if tt.expectedErr == vmListErr {
-					virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(nil, tt.expectedErr)
+					vmc.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(nil, tt.expectedErr)
 				} else {
-					virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(tt.expect, nil)
+					vmc.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(tt.expect, nil)
 					if cs.Properties.AgentPoolProfiles[tt.appIndex].Role == api.AgentPoolProfileRoleMaster {
-						kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Return(nodeGetErr)
+						kc.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Return(nodeGetErr)
 					} else {
-						kubeclient.EXPECT().WaitForReadyWorker(ctx, gomock.Any()).Return(nodeGetErr)
+						kc.EXPECT().WaitForReadyWorker(ctx, gomock.Any()).Return(nodeGetErr)
 					}
 				}
 			} else {
-				virtualMachineScaleSetVMsClient.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(tt.expect, nil)
+				vmc.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(tt.expect, nil)
 				if cs.Properties.AgentPoolProfiles[tt.appIndex].Role == api.AgentPoolProfileRoleMaster {
-					kubeclient.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Times(len(tt.expect)).Return(nil)
+					kc.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Times(len(tt.expect)).Return(nil)
 				} else {
-					kubeclient.EXPECT().WaitForReadyWorker(ctx, gomock.Any()).Times(len(tt.expect)).Return(nil)
+					kc.EXPECT().WaitForReadyWorker(ctx, gomock.Any()).Times(len(tt.expect)).Return(nil)
 				}
 			}
 
 			u := &simpleUpgrader{
-				vmc:        virtualMachineScaleSetVMsClient,
-				ssc:        virtualMachineScaleSetsClient,
-				kubeclient: kubeclient,
+				vmc:        vmc,
+				ssc:        ssc,
+				Kubeclient: kc,
 				log:        logrus.NewEntry(logrus.StandardLogger()),
 			}
 			err := u.WaitForNodesInAgentPoolProfile(ctx, cs, &cs.Properties.AgentPoolProfiles[tt.appIndex], "")

@@ -10,8 +10,6 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	v1 "k8s.io/api/core/v1"
-
-	api "github.com/openshift/openshift-azure/pkg/api"
 )
 
 // MockKubeclient is a mock of Kubeclient interface
@@ -79,6 +77,20 @@ func (mr *MockKubeclientMockRecorder) DrainAndDeleteWorker(arg0, arg1 interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DrainAndDeleteWorker", reflect.TypeOf((*MockKubeclient)(nil).DrainAndDeleteWorker), arg0, arg1)
 }
 
+// EnsureSyncPod mocks base method
+func (m *MockKubeclient) EnsureSyncPod(arg0 context.Context, arg1 string, arg2 []byte) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EnsureSyncPod", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// EnsureSyncPod indicates an expected call of EnsureSyncPod
+func (mr *MockKubeclientMockRecorder) EnsureSyncPod(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnsureSyncPod", reflect.TypeOf((*MockKubeclient)(nil).EnsureSyncPod), arg0, arg1, arg2)
+}
+
 // GetControlPlanePods mocks base method
 func (m *MockKubeclient) GetControlPlanePods(arg0 context.Context) ([]v1.Pod, error) {
 	m.ctrl.T.Helper()
@@ -94,20 +106,6 @@ func (mr *MockKubeclientMockRecorder) GetControlPlanePods(arg0 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetControlPlanePods", reflect.TypeOf((*MockKubeclient)(nil).GetControlPlanePods), arg0)
 }
 
-// WaitForInfraServices mocks base method
-func (m *MockKubeclient) WaitForInfraServices(arg0 context.Context) *api.PluginError {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WaitForInfraServices", arg0)
-	ret0, _ := ret[0].(*api.PluginError)
-	return ret0
-}
-
-// WaitForInfraServices indicates an expected call of WaitForInfraServices
-func (mr *MockKubeclientMockRecorder) WaitForInfraServices(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForInfraServices", reflect.TypeOf((*MockKubeclient)(nil).WaitForInfraServices), arg0)
-}
-
 // WaitForReadyMaster mocks base method
 func (m *MockKubeclient) WaitForReadyMaster(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
@@ -120,6 +118,20 @@ func (m *MockKubeclient) WaitForReadyMaster(arg0 context.Context, arg1 string) e
 func (mr *MockKubeclientMockRecorder) WaitForReadyMaster(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForReadyMaster", reflect.TypeOf((*MockKubeclient)(nil).WaitForReadyMaster), arg0, arg1)
+}
+
+// WaitForReadySyncPod mocks base method
+func (m *MockKubeclient) WaitForReadySyncPod(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForReadySyncPod", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForReadySyncPod indicates an expected call of WaitForReadySyncPod
+func (mr *MockKubeclientMockRecorder) WaitForReadySyncPod(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForReadySyncPod", reflect.TypeOf((*MockKubeclient)(nil).WaitForReadySyncPod), arg0)
 }
 
 // WaitForReadyWorker mocks base method

@@ -3,13 +3,21 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
+	"net"
+	"net/http"
+	"sort"
+	"sync/atomic"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/addons"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
@@ -17,6 +25,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 	"github.com/openshift/openshift-azure/pkg/util/log"
+	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
@@ -29,13 +38,19 @@ var (
 )
 
 type sync struct {
-	azs  azureclient.AccountsClient
-	kvc  azureclient.KeyVaultClient
-	blob azureclientstorage.Blob
-	log  *logrus.Entry
+	azs   azureclient.AccountsClient
+	kvc   azureclient.KeyVaultClient
+	blob  azureclientstorage.Blob
+	kc    kubernetes.Interface
+	log   *logrus.Entry
+	cs    *api.OpenShiftManagedCluster
+	db    map[string]unstructured.Unstructured
+	ready atomic.Value
 }
 
 func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
+	s.ready.Store(false)
+
 	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
 	if err != nil {
 		return err
@@ -60,40 +75,140 @@ func (s *sync) init(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
-	s.blob = bsc.GetContainerReference(cluster.ConfigContainerName).GetBlobReference(cluster.ConfigBlobName)
+	s.blob = bsc.GetContainerReference(cluster.ConfigContainerName).GetBlobReference(cluster.SyncBlobName)
 
 	s.log = log
+
+	l, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		return err
+	}
+
+	mux := &http.ServeMux{}
+	mux.Handle("/healthz/ready", http.HandlerFunc(s.readyHandler))
+
+	go http.Serve(l, mux)
 
 	return nil
 }
 
-// desired state that is kept in a blob in an Azure storage
-// account. It returns whether it managed to access the
-// config blob or not and any error that occured.
-func (s *sync) sync(ctx context.Context, log *logrus.Entry) (bool, error) {
-	s.log.Print("Sync process started")
+func (s *sync) readyHandler(w http.ResponseWriter, r *http.Request) {
+	var errs []error
+
+	if !s.ready.Load().(bool) {
+		errs = []error{fmt.Errorf("sync pod has not completed first run")}
+	} else {
+		errs = addons.CalculateReadiness(s.kc, s.db, s.cs)
+	}
+
+	if len(errs) == 0 {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	w.Header().Set("Content-type", "text/plain")
+	w.WriteHeader(http.StatusInternalServerError)
+	for _, err := range errs {
+		fmt.Fprintln(w, err)
+	}
+}
+
+func (s *sync) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, error) {
+	s.log.Print("fetching config blob")
 	cs, err := configblob.GetBlob(s.blob)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	s.log.Print("enriching config blob")
 	err = vault.EnrichCSFromVault(ctx, s.kvc, cs)
 	if err != nil {
-		return true, errors.Wrap(err, "EnrichCSFromVault")
+		return nil, err
+	}
+
+	err = addons.EnrichCSStorageAccountKeys(ctx, s.azs, cs)
+	if err != nil {
+		return nil, err
 	}
 
 	v := validate.NewAPIValidator(cs.Config.RunningUnderTest)
 	if errs := v.Validate(cs, nil, false); len(errs) > 0 {
-		return true, errors.Wrap(kerrors.NewAggregate(errs), "cannot validate config blob")
+		return nil, kerrors.NewAggregate(errs)
 	}
 
-	if err := addons.Main(ctx, s.log, cs, s.azs, *dryRun); err != nil {
-		return true, errors.Wrap(err, "cannot sync cluster config")
+	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
+	if err != nil {
+		return nil, err
 	}
 
-	s.log.Print("Sync process complete")
-	return true, nil
+	s.kc, err = kubernetes.NewForConfig(restconfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return cs, nil
+}
+
+func (s *sync) printDB() error {
+	// impose an order to improve debuggability.
+	var keys []string
+	for k := range s.db {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		b, err := yaml.Marshal(s.db[k].Object)
+		if err != nil {
+			return err
+		}
+
+		s.log.Info(string(b))
+	}
+
+	return nil
+}
+
+func run(ctx context.Context, log *logrus.Entry) error {
+	var s sync
+
+	err := s.init(ctx, log)
+	if err != nil {
+		return err
+	}
+
+	t := time.NewTicker(*interval)
+
+	for {
+		s.cs, err = s.getBlob(ctx)
+		if err == nil {
+			break
+		}
+		log.Printf("s.getBlob: %s", err)
+		<-t.C
+	}
+
+	s.db, err = addons.ReadDB(s.cs)
+	if err != nil {
+		return err
+	}
+
+	if *dryRun {
+		return s.printDB()
+	}
+
+	for {
+		log.Print("starting sync")
+		if err := addons.Main(ctx, s.log, s.cs, s.db, &s.ready); err != nil {
+			log.Printf("sync error: %s", err)
+		} else {
+			log.Print("sync done")
+		}
+		if *once {
+			return nil
+		}
+		<-t.C
+	}
 }
 
 func main() {
@@ -104,26 +219,7 @@ func main() {
 	log := logrus.NewEntry(logger)
 	log.Printf("sync pod starting, git commit %s", gitCommit)
 
-	s := new(sync)
-	ctx := context.Background()
-
-	if err := s.init(ctx, log); err != nil {
-		log.Fatalf("Cannot initialize sync: %v", err)
-	}
-
-	for {
-		gotBlob, err := s.sync(ctx, log)
-		if !gotBlob {
-			// If we didn't manage to access the blob, error out and start
-			// again.
-			log.Fatalf("Error while accessing config blob: %v", err)
-		}
-		if err != nil {
-			log.Printf("Error while syncing: %v", err)
-		}
-		if *once {
-			return
-		}
-		<-time.After(*interval)
+	if err := run(context.Background(), log); err != nil {
+		log.Fatal(err)
 	}
 }

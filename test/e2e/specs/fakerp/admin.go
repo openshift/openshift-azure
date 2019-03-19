@@ -71,8 +71,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake]", func() {
 		azurecli, err := azure.NewClientFromEnvironment(true)
 		Expect(err).ToNot(HaveOccurred())
 
-		ubs, err := updateblob.NewBlobService(azurecli.BlobStorage)
-		Expect(err).ToNot(HaveOccurred())
+		ubs := updateblob.NewBlobService(azurecli.BlobStorage)
 
 		By("reading the update blob before running an update")
 		before, err := ubs.Read()

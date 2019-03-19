@@ -22,25 +22,9 @@ import (
 	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	acsapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
-	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
-
-// Interface exposes the methods a client needs to implement
-// for the syncing process of the addons.
-type Interface interface {
-	ApplyResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error
-	UpdateDynamicClient() error
-	ServiceCatalogExists() (bool, error)
-	CRDReady(name string) (bool, error)
-	GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error)
-	DeleteOrphans(db map[string]unstructured.Unstructured) error
-}
-
-// client implements Interface
-var _ Interface = &client{}
 
 type client struct {
 	restconfig *rest.Config
@@ -49,15 +33,10 @@ type client struct {
 	cli        *discovery.DiscoveryClient
 	dyn        dynamic.ClientPool
 	grs        []*discovery.APIGroupResources
-	azs        azureclient.AccountsClient
 	log        *logrus.Entry
 }
 
-func newClient(ctx context.Context, log *logrus.Entry, cs *acsapi.OpenShiftManagedCluster, azs azureclient.AccountsClient, dryRun bool) (Interface, error) {
-	if dryRun {
-		return &dryClient{}, nil
-	}
-
+func newClient(ctx context.Context, log *logrus.Entry, cs *acsapi.OpenShiftManagedCluster) (*client, error) {
 	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
 	if err != nil {
 		return nil, err
@@ -85,7 +64,6 @@ func newClient(ctx context.Context, log *logrus.Entry, cs *acsapi.OpenShiftManag
 		ac:         ac,
 		ae:         ae,
 		cli:        cli,
-		azs:        azs,
 		log:        log,
 	}
 	transport, err := rest.TransportFor(c.restconfig)
@@ -101,16 +79,6 @@ func newClient(ctx context.Context, log *logrus.Entry, cs *acsapi.OpenShiftManag
 	}
 
 	return c, nil
-}
-
-func (c *client) GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error) {
-	response, err := c.azs.ListKeys(ctx, resourceGroup, storageAccount)
-	if err != nil {
-		return "", err
-	}
-	// TODO: Allow choosing between the two storage account keys to
-	// enable more convenient key rotation.
-	return *(((*response.Keys)[0]).Value), nil
 }
 
 // UpdateDynamicClient updates the client's server API group resource
@@ -335,29 +303,3 @@ func printDiff(log *logrus.Entry, existing, o *unstructured.Unstructured) bool {
 	}
 	return diffShown
 }
-
-// ServiceCatalogExists returns whether the service catalog API exists.
-func (c *client) ServiceCatalogExists() (bool, error) {
-	return ready.APIServiceIsReady(c.ac.ApiregistrationV1().APIServices(), "v1beta1.servicecatalog.k8s.io")()
-}
-
-// CRDReady returns whether the required CRDs got registered.
-func (c *client) CRDReady(name string) (bool, error) {
-	return ready.CRDReady(c.ae.ApiextensionsV1beta1().CustomResourceDefinitions(), name)()
-}
-
-type dryClient struct{}
-
-// dryClient implements Interface
-var _ Interface = &dryClient{}
-
-func (c *dryClient) ApplyResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error {
-	return nil
-}
-func (c *dryClient) UpdateDynamicClient() error          { return nil }
-func (c *dryClient) ServiceCatalogExists() (bool, error) { return true, nil }
-func (c *dryClient) CRDReady(name string) (bool, error)  { return true, nil }
-func (c *dryClient) GetStorageAccountKey(ctx context.Context, resourceGroup, storageAccount string) (string, error) {
-	return "", nil
-}
-func (c *dryClient) DeleteOrphans(db map[string]unstructured.Unstructured) error { return nil }

@@ -4,18 +4,24 @@ import (
 	"context"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"net"
+	"net/url"
 	"os"
+	"strings"
+	"time"
 
 	mgmtkeyvault "github.com/Azure/azure-sdk-for-go/services/keyvault/mgmt/2016-10-01/keyvault"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 	uuid "github.com/satori/go.uuid"
+	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 const (
@@ -124,7 +130,12 @@ func (vm *vaultManager) writeTLSCertsToVault(ctx context.Context, cs *api.OpenSh
 	return nil
 }
 
-func (vm *vaultManager) createOrUpdateVault(ctx context.Context, fakerpAppID, masterAppID, tenantID, resourceGroup, location, vaultName string) error {
+func (vm *vaultManager) createOrUpdateVault(ctx context.Context, log *logrus.Entry, fakerpAppID, masterAppID, tenantID, resourceGroup, location, vaultURL string) error {
+	u, err := url.Parse(vaultURL)
+	if err != nil {
+		return err
+	}
+
 	tID, err := uuid.FromString(tenantID)
 	if err != nil {
 		return err
@@ -140,7 +151,7 @@ func (vm *vaultManager) createOrUpdateVault(ctx context.Context, fakerpAppID, ma
 		return err
 	}
 
-	_, err = vm.vc.CreateOrUpdate(ctx, resourceGroup, vaultName, mgmtkeyvault.VaultCreateOrUpdateParameters{
+	_, err = vm.vc.CreateOrUpdate(ctx, resourceGroup, strings.Split(u.Host, ".")[0], mgmtkeyvault.VaultCreateOrUpdateParameters{
 		Location: to.StringPtr(location),
 		Properties: &mgmtkeyvault.VaultProperties{
 			TenantID: &tID,
@@ -173,5 +184,16 @@ func (vm *vaultManager) createOrUpdateVault(ctx context.Context, fakerpAppID, ma
 			},
 		},
 	})
-	return err
+	if err != nil {
+		return err
+	}
+
+	log.Infof("waiting for keyvault DNS to be ready")
+	return wait.PollImmediateUntil(time.Second, func() (bool, error) {
+		_, err = net.ResolveIPAddr("ip", u.Host)
+		if err, ok := err.(*net.DNSError); ok && err.Err == "no such host" {
+			return false, nil
+		}
+		return err == nil, err
+	}, ctx.Done())
 }
