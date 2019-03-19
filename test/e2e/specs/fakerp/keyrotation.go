@@ -9,13 +9,12 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/openshift/openshift-azure/test/clients/azure"
-	"github.com/openshift/openshift-azure/test/e2e/standard"
+	"github.com/openshift/openshift-azure/test/sanity"
 )
 
 var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func() {
 	var (
 		azurecli *azure.Client
-		cli      *standard.SanityChecker
 	)
 
 	BeforeEach(func() {
@@ -23,9 +22,6 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(azurecli).NotTo(BeNil())
-		cli, err = standard.NewDefaultSanityChecker(context.Background())
-		Expect(err).NotTo(HaveOccurred())
-		Expect(cli).NotTo(BeNil())
 	})
 
 	It("should be possible to maintain a healthy cluster after rotating all credentials", func() {
@@ -73,7 +69,7 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 		Expect(reflect.DeepEqual(before.Config.Certificates.GenevaMetrics.Cert, after.Config.Certificates.GenevaMetrics.Cert)).To(BeTrue())
 
 		By("Validating the cluster")
-		errs := cli.ValidateCluster(context.Background())
+		errs := sanity.Checker.ValidateCluster(context.Background())
 		Expect(errs).To(BeEmpty())
 	})
 })

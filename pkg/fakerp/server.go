@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
@@ -19,7 +18,6 @@ import (
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
-	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 )
 
@@ -68,7 +66,7 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	}
 	// We need to restore the internal cluster state into memory for GETs
 	// and DELETEs to work appropriately.
-	if _, err := s.load(); err != nil {
+	if err := s.load(); err != nil {
 		s.log.Fatal(err)
 	}
 	return s
@@ -85,25 +83,23 @@ func (s *Server) Run() {
 // to restore the internal state of the cluster from the
 // filesystem. Whether the file that holds the state exists or
 // not is returned and any other error that was encountered.
-func (s *Server) load() (bool, error) {
-	dataDir, err := shared.FindDirectory(shared.DataDirectory)
-	if err != nil {
-		return false, err
+func (s *Server) load() error {
+	b, err := ioutil.ReadFile("_data/containerservice.yaml")
+	switch {
+	case os.IsNotExist(err):
+		return nil
+	case err != nil:
+		return err
 	}
-	csFile := filepath.Join(dataDir, "containerservice.yaml")
-	if _, err = os.Stat(csFile); err != nil {
-		return false, nil
+
+	var cs *api.OpenShiftManagedCluster
+	if err := yaml.Unmarshal(b, &cs); err != nil {
+		return err
 	}
-	data, err := ioutil.ReadFile(csFile)
-	if err != nil {
-		return true, err
-	}
-	var cs *internalapi.OpenShiftManagedCluster
-	if err := yaml.Unmarshal(data, &cs); err != nil {
-		return true, err
-	}
+
 	s.write(cs)
-	return true, nil
+
+	return nil
 }
 
 func (s *Server) read20180930previewRequest(body io.ReadCloser) (*v20180930preview.OpenShiftManagedCluster, error) {

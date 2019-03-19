@@ -16,24 +16,13 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/test/clients/azure"
-	"github.com/openshift/openshift-azure/test/e2e/standard"
+	"github.com/openshift/openshift-azure/test/sanity"
 )
 
 var _ = Describe("Openshift on Azure admin e2e tests [Fake]", func() {
-	var (
-		cli *standard.SanityChecker
-	)
-
-	BeforeEach(func() {
-		var err error
-		cli, err = standard.NewDefaultSanityChecker(context.Background())
-		Expect(err).NotTo(HaveOccurred())
-		Expect(cli).ToNot(BeNil())
-	})
-
 	It("should run the correct image", func() {
 		// e2e check should ensure that no reg-aws images are running on box
-		pods, err := cli.Client.Admin.CoreV1.Pods("").List(metav1.ListOptions{})
+		pods, err := sanity.Checker.Client.Admin.CoreV1.Pods("").List(metav1.ListOptions{})
 		Expect(err).ToNot(HaveOccurred())
 
 		for _, pod := range pods.Items {
@@ -43,7 +32,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake]", func() {
 		}
 
 		// fetch master-000000 and determine the OS type
-		master0, _ := cli.Client.Admin.CoreV1.Nodes().Get("master-000000", metav1.GetOptions{})
+		master0, _ := sanity.Checker.Client.Admin.CoreV1.Nodes().Get("master-000000", metav1.GetOptions{})
 		Expect(err).ToNot(HaveOccurred())
 
 		// set registryPrefix to appropriate string based upon master's OS type
@@ -56,7 +45,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake]", func() {
 
 		// Check all Configmaps for image format matches master's OS type
 		// format: registry.access.redhat.com/openshift3/ose-${component}:${version}
-		configmaps, err := cli.Client.Admin.CoreV1.ConfigMaps("openshift-node").List(metav1.ListOptions{})
+		configmaps, err := sanity.Checker.Client.Admin.CoreV1.ConfigMaps("openshift-node").List(metav1.ListOptions{})
 		Expect(err).ToNot(HaveOccurred())
 		var nodeConfig map[string]interface{}
 		for _, configmap := range configmaps.Items {

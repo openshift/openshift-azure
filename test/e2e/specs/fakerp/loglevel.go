@@ -10,13 +10,12 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/test/clients/azure"
-	"github.com/openshift/openshift-azure/test/e2e/standard"
+	"github.com/openshift/openshift-azure/test/sanity"
 )
 
 var _ = Describe("Change OpenShift Component Log Level E2E tests [ChangeLogLevel][Fake][LongRunning]", func() {
 	var (
 		azurecli *azure.Client
-		cli      *standard.SanityChecker
 		ctx      = context.Background()
 	)
 
@@ -24,9 +23,6 @@ var _ = Describe("Change OpenShift Component Log Level E2E tests [ChangeLogLevel
 		var err error
 		azurecli, err = azure.NewClientFromEnvironment(true)
 		Expect(err).NotTo(HaveOccurred())
-		cli, err = standard.NewDefaultSanityChecker(ctx)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(cli).NotTo(BeNil())
 	})
 
 	It("should be possible for an SRE to update the OpenShift component log level of a cluster", func() {
@@ -52,7 +48,7 @@ var _ = Describe("Change OpenShift Component Log Level E2E tests [ChangeLogLevel
 		Expect(after.Config.ComponentLogLevel).To(Equal(before.Config.ComponentLogLevel))
 
 		By("Validating the cluster")
-		errs := cli.ValidateCluster(context.Background())
+		errs := sanity.Checker.ValidateCluster(context.Background())
 		Expect(errs).To(BeEmpty())
 	})
 })

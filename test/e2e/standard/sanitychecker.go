@@ -8,12 +8,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
-	shared "github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 	"github.com/openshift/openshift-azure/test/clients/openshift"
-	testlogger "github.com/openshift/openshift-azure/test/util/log"
 )
 
 type TestError struct {
@@ -65,15 +63,6 @@ func NewSanityChecker(ctx context.Context, log *logrus.Entry, cs *internalapi.Op
 		return nil, err
 	}
 	return scc, nil
-}
-
-func NewDefaultSanityChecker(ctx context.Context) (*SanityChecker, error) {
-	log := testlogger.GetTestLogger()
-	cs, err := shared.DiscoverInternalConfig()
-	if err != nil {
-		return nil, err
-	}
-	return NewSanityChecker(ctx, log, cs)
 }
 
 func (sc *SanityChecker) CreateTestApp(ctx context.Context) (interface{}, []*TestError) {

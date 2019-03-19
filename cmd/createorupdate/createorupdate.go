@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -117,21 +116,16 @@ func execute(
 	conf *fakerp.Config,
 	adminManifest string,
 ) (*v20180930preview.OpenShiftManagedCluster, error) {
-	dataDir, err := shared.FindDirectory(shared.DataDirectory)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find %s: %v", shared.DataDirectory, err)
-	}
-
 	if adminManifest != "" {
 		oc, err := fakerp.GenerateManifestAdmin(adminManifest)
 		if err != nil {
 			return nil, fmt.Errorf("failed reading admin manifest: %v", err)
 		}
-		defaultAdminManifest := filepath.Join(dataDir, "manifest-admin.yaml")
+		defaultAdminManifest := "_data/manifest-admin.yaml"
 		return nil, createOrUpdateAdmin(ctx, log, ac, conf.ResourceGroup, oc, defaultAdminManifest)
 	}
 
-	defaultManifestFile := filepath.Join(dataDir, "manifest.yaml")
+	defaultManifestFile := "_data/manifest.yaml"
 	// TODO: Configuring this is probably not needed
 	manifest := conf.Manifest
 	// If no MANIFEST has been provided and this is a cluster

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
@@ -16,7 +15,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
@@ -116,34 +114,19 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
-	// persist the OpenShift container service
-	log.Info("persist config")
-	bytes, err := yaml.Marshal(cs)
-	if err != nil {
-		return nil, err
-	}
-	dataDir, err := shared.FindDirectory(shared.DataDirectory)
-	if err != nil {
-		return nil, err
-	}
-	err = ioutil.WriteFile(filepath.Join(dataDir, "containerservice.yaml"), bytes, 0600)
-	if err != nil {
-		return nil, err
-	}
-
-	err = os.MkdirAll(filepath.Join(dataDir, "_out"), 0777)
+	err = acceptMarketplaceAgreement(ctx, log, cs, testConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	// write out development files
 	log.Info("write helpers")
-	err = writeHelpers(cs)
+	err = os.MkdirAll("_data/_out", 0777)
 	if err != nil {
 		return nil, err
 	}
 
-	err = acceptMarketplaceAgreement(ctx, log, cs, testConfig)
+	err = writeHelpers(cs)
 	if err != nil {
 		return nil, err
 	}
@@ -151,6 +134,17 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 	log.Info("plugin createorupdate")
 	deployer := GetDeployer(log, cs)
 	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
+		return nil, err
+	}
+
+	// persist the OpenShift container service
+	log.Info("persist config")
+	bytes, err := yaml.Marshal(cs)
+	if err != nil {
+		return nil, err
+	}
+	err = ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
+	if err != nil {
 		return nil, err
 	}
 
@@ -265,18 +259,14 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 }
 
 func writeHelpers(cs *api.OpenShiftManagedCluster) error {
-	dataDir, err := shared.FindDirectory(shared.DataDirectory)
-	if err != nil {
-		return err
-	}
 	// ensure both the new key and the old key are on disk so
 	// you can SSH in regardless of the state of a VM after an update
-	if _, err = os.Stat(filepath.Join(dataDir, "_out/id_rsa")); err == nil {
-		b, err := ioutil.ReadFile(filepath.Join(dataDir, "_out/id_rsa"))
+	if _, err := os.Stat("_data/_out/id_rsa"); err == nil {
+		b, err := ioutil.ReadFile("_data/_out/id_rsa")
 		if err != nil {
 			return err
 		}
-		err = ioutil.WriteFile(filepath.Join(dataDir, "_out/id_rsa.old"), b, 0600)
+		err = ioutil.WriteFile("_data/_out/id_rsa.old", b, 0600)
 		if err != nil {
 			return err
 		}
@@ -286,7 +276,7 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(filepath.Join(dataDir, "_out/azure.conf"), b, 0600)
+	err = ioutil.WriteFile("_data/_out/azure.conf", b, 0600)
 	if err != nil {
 		return err
 	}
@@ -296,7 +286,7 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(filepath.Join(dataDir, "_out/aad-group-sync.yaml"), b, 0600)
+	err = ioutil.WriteFile("_data/_out/aad-group-sync.yaml", b, 0600)
 	if err != nil {
 		return err
 	}
@@ -305,7 +295,7 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath.Join(dataDir, "_out/id_rsa"), b, 0600)
+	err = ioutil.WriteFile("_data/_out/id_rsa", b, 0600)
 	if err != nil {
 		return err
 	}
@@ -314,5 +304,5 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filepath.Join(dataDir, "_out/admin.kubeconfig"), b, 0600)
+	return ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
 }

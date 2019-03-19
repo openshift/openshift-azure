@@ -19,7 +19,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
-	"github.com/openshift/openshift-azure/test/e2e/standard"
+	"github.com/openshift/openshift-azure/test/sanity"
 )
 
 var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", func() {
@@ -28,7 +28,6 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 	)
 	var (
 		azurecli  *azure.Client
-		occli     *standard.SanityChecker
 		namespace string
 	)
 
@@ -37,20 +36,17 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		azurecli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(azurecli).NotTo(BeNil())
-		occli, err = standard.NewDefaultSanityChecker(context.Background())
-		Expect(err).NotTo(HaveOccurred())
-		Expect(occli).NotTo(BeNil())
 
 		namespace, err = random.LowerCaseAlphanumericString(5)
 		Expect(err).ToNot(HaveOccurred())
 		namespace = "e2e-test-" + namespace
 		fmt.Fprintln(GinkgoWriter, "Using namespace", namespace)
-		err = occli.Client.EndUser.CreateProject(namespace)
+		err = sanity.Checker.Client.EndUser.CreateProject(namespace)
 		Expect(err).ToNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
-		occli.Client.EndUser.CleanupProject(namespace)
+		sanity.Checker.Client.EndUser.CleanupProject(namespace)
 	})
 
 	It("should be possible to maintain a healthy cluster after scaling it out and in", func() {
@@ -108,14 +104,14 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 				},
 			},
 		}
-		_, err = occli.Client.EndUser.AppsV1.Deployments(namespace).Create(deployment)
+		_, err = sanity.Checker.Client.EndUser.AppsV1.Deployments(namespace).Create(deployment)
 		Expect(err).NotTo(HaveOccurred())
-		err = wait.PollImmediate(2*time.Second, 1*time.Minute, ready.CheckDeploymentIsReady(occli.Client.EndUser.AppsV1.Deployments(namespace), sampleDeployment))
+		err = wait.PollImmediate(2*time.Second, 1*time.Minute, ready.CheckDeploymentIsReady(sanity.Checker.Client.EndUser.AppsV1.Deployments(namespace), sampleDeployment))
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Verifying that the deployment's pods are spread across 2 nodes...")
 		By(fmt.Sprintf("Getting deployment %s.%s", namespace, sampleDeployment))
-		dep, err := occli.Client.EndUser.AppsV1.Deployments(namespace).Get(sampleDeployment, metav1.GetOptions{})
+		dep, err := sanity.Checker.Client.EndUser.AppsV1.Deployments(namespace).Get(sampleDeployment, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(dep).NotTo(BeNil())
 
@@ -124,7 +120,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		listOptions := metav1.ListOptions{LabelSelector: set.AsSelector().String()}
 
 		By(fmt.Sprintf("Listing pods matching deployment's labels %+v", set))
-		poditems, err := occli.Client.EndUser.CoreV1.Pods(namespace).List(listOptions)
+		poditems, err := sanity.Checker.Client.EndUser.CoreV1.Pods(namespace).List(listOptions)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(poditems).NotTo(BeNil())
 		pods := poditems.Items
@@ -138,7 +134,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		Expect(len(nodes)).To(Equal(2))
 
 		By("Validating the cluster")
-		errs := occli.ValidateCluster(context.Background())
+		errs := sanity.Checker.ValidateCluster(context.Background())
 		Expect(errs).To(BeEmpty())
 
 		By("Fetching the scale down manifest")
@@ -155,7 +151,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 
 		By("Verifying that the deployment's pods are all on 1 node...")
 		By(fmt.Sprintf("Listing pods matching deployment's labels %+v", set))
-		poditems, err = occli.Client.EndUser.CoreV1.Pods(namespace).List(listOptions)
+		poditems, err = sanity.Checker.Client.EndUser.CoreV1.Pods(namespace).List(listOptions)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(poditems).NotTo(BeNil())
 		pods = poditems.Items
@@ -170,7 +166,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		Expect(len(nodes)).To(Equal(1))
 
 		By("Validating the cluster")
-		errs = occli.ValidateCluster(context.Background())
+		errs = sanity.Checker.ValidateCluster(context.Background())
 		Expect(errs).To(BeEmpty())
 	})
 })

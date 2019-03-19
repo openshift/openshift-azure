@@ -9,22 +9,18 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/test/clients/azure"
-	"github.com/openshift/openshift-azure/test/e2e/standard"
+	"github.com/openshift/openshift-azure/test/sanity"
 )
 
 var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func() {
 	var (
 		azurecli *azure.Client
-		cli      *standard.SanityChecker
 	)
 
 	BeforeEach(func() {
 		var err error
 		azurecli, err = azure.NewClientFromEnvironment(true)
 		Expect(err).NotTo(HaveOccurred())
-		cli, err = standard.NewDefaultSanityChecker(context.Background())
-		Expect(err).NotTo(HaveOccurred())
-		Expect(cli).NotTo(BeNil())
 	})
 
 	It("should be possible for an SRE to force update a cluster", func() {
@@ -57,7 +53,7 @@ var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func
 		}
 
 		By("Validating the cluster")
-		errs := cli.ValidateCluster(context.Background())
+		errs := sanity.Checker.ValidateCluster(context.Background())
 		Expect(errs).To(BeEmpty())
 	})
 })
