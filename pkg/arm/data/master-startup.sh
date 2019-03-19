@@ -39,8 +39,10 @@ while ! docker pull {{ .Config.Images.Startup }}; do
   sleep 1
 done
 set +x
-docker run --privileged --rm --network host -v /:/host:z {{ .Config.Images.Startup }} '{{ .Config.MasterStartupSASURI }}'
+export SASURI='{{ .Config.MasterStartupSASURI }}'
 set -x
+docker run --privileged --rm --network host -v /:/host:z -e SASURI {{ .Config.Images.Startup }}
+unset SASURI
 
 update-ca-trust
 

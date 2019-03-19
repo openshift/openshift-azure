@@ -31,7 +31,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 	log.Infof("reading config")
 	var cs *api.OpenShiftManagedCluster
 	err := wait.PollImmediateUntil(10*time.Second, func() (bool, error) {
-		resp, err := http.Get(os.Args[1])
+		resp, err := http.Get(os.Getenv("SASURI"))
 		if err != nil {
 			log.Info(err)
 			return false, nil
@@ -100,10 +100,6 @@ func main() {
 	logger.SetLevel(log.SanitizeLogLevel(*logLevel))
 	log := logrus.NewEntry(logger)
 	log.Infof("startup pod starting, git commit %s", gitCommit)
-
-	if len(os.Args) != 2 {
-		log.Fatalf("usage: %s sasurl", os.Args[0])
-	}
 
 	if err := run(context.Background(), log); err != nil {
 		log.Fatal(err)
