@@ -94,6 +94,7 @@ func ensureRoleDefinitions(ctx context.Context) error {
 						"Microsoft.Network/loadBalancers/read",
 						"Microsoft.Network/loadBalancers/write",
 						"Microsoft.Network/loadBalancers/delete",
+						"Microsoft.Network/loadBalancers/backendAddressPools/join/action",
 						"Microsoft.Network/networkSecurityGroups/read",
 						"Microsoft.Network/networkSecurityGroups/write",
 						"Microsoft.Network/publicIPAddresses/read",
