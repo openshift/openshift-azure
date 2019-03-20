@@ -26,12 +26,16 @@ import (
 
 func TestGauge(t *testing.T) {
 	r := NewRegistry()
-	f := r.AddFloat64Gauge("TestGauge", "", "", "k1", "k2")
-	f.GetEntry(metricdata.LabelValue{}, metricdata.LabelValue{}).Set(5)
-	f.GetEntry(metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{}).Add(1)
-	f.GetEntry(metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{}).Add(1)
-	f.GetEntry(metricdata.NewLabelValue("k1v2"), metricdata.NewLabelValue("k2v2")).Add(1)
-	m := r.ReadAll()
+	f, _ := r.AddFloat64Gauge("TestGauge", "", "", "k1", "k2")
+	e, _ := f.GetEntry(metricdata.LabelValue{}, metricdata.LabelValue{})
+	e.Set(5)
+	e, _ = f.GetEntry(metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{})
+	e.Add(1)
+	e, _ = f.GetEntry(metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{})
+	e.Add(1)
+	e, _ = f.GetEntry(metricdata.NewLabelValue("k1v2"), metricdata.NewLabelValue("k2v2"))
+	e.Add(1)
+	m := r.Read()
 	want := []*metricdata.Metric{
 		{
 			Descriptor: metricdata.Descriptor{
@@ -77,19 +81,22 @@ func TestGauge(t *testing.T) {
 
 func TestFloat64Entry_Add(t *testing.T) {
 	r := NewRegistry()
-	g := r.AddFloat64Gauge("g", "", metricdata.UnitDimensionless)
-	g.GetEntry().Add(0)
-	ms := r.ReadAll()
+	g, _ := r.AddFloat64Gauge("g", "", metricdata.UnitDimensionless)
+	e, _ := g.GetEntry()
+	e.Add(0)
+	ms := r.Read()
 	if got, want := ms[0].TimeSeries[0].Points[0].Value.(float64), 0.0; got != want {
 		t.Errorf("value = %v, want %v", got, want)
 	}
-	g.GetEntry().Add(1)
-	ms = r.ReadAll()
+	e, _ = g.GetEntry()
+	e.Add(1)
+	ms = r.Read()
 	if got, want := ms[0].TimeSeries[0].Points[0].Value.(float64), 1.0; got != want {
 		t.Errorf("value = %v, want %v", got, want)
 	}
-	g.GetEntry().Add(-1)
-	ms = r.ReadAll()
+	e, _ = g.GetEntry()
+	e.Add(-1)
+	ms = r.Read()
 	if got, want := ms[0].TimeSeries[0].Points[0].Value.(float64), 0.0; got != want {
 		t.Errorf("value = %v, want %v", got, want)
 	}
@@ -97,9 +104,10 @@ func TestFloat64Entry_Add(t *testing.T) {
 
 func TestFloat64Gauge_Add_NegativeTotals(t *testing.T) {
 	r := NewRegistry()
-	g := r.AddFloat64Gauge("g", "", metricdata.UnitDimensionless)
-	g.GetEntry().Add(-1.0)
-	ms := r.ReadAll()
+	g, _ := r.AddFloat64Gauge("g", "", metricdata.UnitDimensionless)
+	e, _ := g.GetEntry()
+	e.Add(-1.0)
+	ms := r.Read()
 	if got, want := ms[0].TimeSeries[0].Points[0].Value.(float64), float64(0); got != want {
 		t.Errorf("value = %v, want %v", got, want)
 	}
@@ -107,14 +115,16 @@ func TestFloat64Gauge_Add_NegativeTotals(t *testing.T) {
 
 func TestInt64GaugeEntry_Add(t *testing.T) {
 	r := NewRegistry()
-	g := r.AddInt64Gauge("g", "", metricdata.UnitDimensionless)
-	g.GetEntry().Add(0)
-	ms := r.ReadAll()
+	g, _ := r.AddInt64Gauge("g", "", metricdata.UnitDimensionless)
+	e, _ := g.GetEntry()
+	e.Add(0)
+	ms := r.Read()
 	if got, want := ms[0].TimeSeries[0].Points[0].Value.(int64), int64(0); got != want {
 		t.Errorf("value = %v, want %v", got, want)
 	}
-	g.GetEntry().Add(1)
-	ms = r.ReadAll()
+	e, _ = g.GetEntry()
+	e.Add(1)
+	ms = r.Read()
 	if got, want := ms[0].TimeSeries[0].Points[0].Value.(int64), int64(1); got != want {
 		t.Errorf("value = %v, want %v", got, want)
 	}
@@ -122,11 +132,38 @@ func TestInt64GaugeEntry_Add(t *testing.T) {
 
 func TestInt64Gauge_Add_NegativeTotals(t *testing.T) {
 	r := NewRegistry()
-	g := r.AddInt64Gauge("g", "", metricdata.UnitDimensionless)
-	g.GetEntry().Add(-1)
-	ms := r.ReadAll()
+	g, _ := r.AddInt64Gauge("g", "", metricdata.UnitDimensionless)
+	e, _ := g.GetEntry()
+	e.Add(-1)
+	ms := r.Read()
 	if got, want := ms[0].TimeSeries[0].Points[0].Value.(int64), int64(0); got != want {
 		t.Errorf("value = %v, want %v", got, want)
+	}
+}
+
+func TestGaugeWithSameNameDiffType(t *testing.T) {
+	r := NewRegistry()
+	r.AddInt64Gauge("g", "", metricdata.UnitDimensionless)
+	_, gotErr := r.AddFloat64Gauge("g", "", metricdata.UnitDimensionless)
+	if gotErr == nil {
+		t.Errorf("got: nil, want error: %v", errGaugeExistsWithDiffType)
+	}
+	_, gotErr = r.AddInt64DerivedGauge("g", "", metricdata.UnitDimensionless)
+	if gotErr == nil {
+		t.Errorf("got: nil, want error: %v", errGaugeExistsWithDiffType)
+	}
+	_, gotErr = r.AddFloat64DerivedGauge("g", "", metricdata.UnitDimensionless)
+	if gotErr == nil {
+		t.Errorf("got: nil, want error: %v", errGaugeExistsWithDiffType)
+	}
+}
+
+func TestGaugeWithLabelMismatch(t *testing.T) {
+	r := NewRegistry()
+	g, _ := r.AddInt64Gauge("g", "", metricdata.UnitDimensionless, "k1")
+	_, gotErr := g.GetEntry(metricdata.NewLabelValue("k1v2"), metricdata.NewLabelValue("k2v2"))
+	if gotErr == nil {
+		t.Errorf("got: nil, want error: %v", errKeyValueMismatch)
 	}
 }
 
@@ -156,6 +193,27 @@ func TestMapKey(t *testing.T) {
 	}
 }
 
+func TestRaceCondition(t *testing.T) {
+	r := NewRegistry()
+
+	// start reader before adding Gauge metric.
+	var ms = []*metricdata.Metric{}
+	for i := 0; i < 5; i++ {
+		go func(k int) {
+			for j := 0; j < 5; j++ {
+				g, _ := r.AddInt64Gauge(fmt.Sprintf("g%d%d", k, j), "", metricdata.UnitDimensionless)
+				e, _ := g.GetEntry()
+				e.Add(1)
+			}
+		}(i)
+	}
+	time.Sleep(1 * time.Second)
+	ms = r.Read()
+	if got, want := ms[0].TimeSeries[0].Points[0].Value.(int64), int64(1); got != want {
+		t.Errorf("value = %v, want %v", got, want)
+	}
+}
+
 func ignoreTimes(_, _ time.Time) bool {
 	return true
 }
@@ -179,5 +237,129 @@ func canonicalize(ms []*metricdata.Metric) {
 			}
 			panic("should have returned")
 		})
+	}
+}
+
+type queueInt64 struct {
+	size int64
+}
+
+func (q *queueInt64) ToInt64() int64 {
+	return q.size
+}
+
+func TestInt64DerivedGaugeEntry_Add(t *testing.T) {
+	r := NewRegistry()
+	q := &queueInt64{3}
+	g, _ := r.AddInt64DerivedGauge("g", "", metricdata.UnitDimensionless, "k1", "k2")
+	err := g.UpsertEntry(q.ToInt64, metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{})
+	if err != nil {
+		t.Errorf("want: nil, got: %v", err)
+	}
+	ms := r.Read()
+	if got, want := ms[0].TimeSeries[0].Points[0].Value.(int64), int64(3); got != want {
+		t.Errorf("value = %v, want %v", got, want)
+	}
+	q.size = 5
+	ms = r.Read()
+	if got, want := ms[0].TimeSeries[0].Points[0].Value.(int64), int64(5); got != want {
+		t.Errorf("value = %v, want %v", got, want)
+	}
+}
+
+func TestInt64DerivedGaugeEntry_AddWithNilObj(t *testing.T) {
+	r := NewRegistry()
+	g, _ := r.AddInt64DerivedGauge("g", "", metricdata.UnitDimensionless, "k1", "k2")
+	gotErr := g.UpsertEntry(nil, metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{})
+	if gotErr == nil {
+		t.Errorf("expected error but got nil")
+	}
+}
+
+func TestInt64DerivedGaugeEntry_AddWithInvalidLabels(t *testing.T) {
+	r := NewRegistry()
+	q := &queueInt64{3}
+	g, _ := r.AddInt64DerivedGauge("g", "", metricdata.UnitDimensionless, "k1", "k2")
+	gotErr := g.UpsertEntry(q.ToInt64, metricdata.NewLabelValue("k1v1"))
+	if gotErr == nil {
+		t.Errorf("expected error but got nil")
+	}
+}
+
+func TestInt64DerivedGaugeEntry_Update(t *testing.T) {
+	r := NewRegistry()
+	q := &queueInt64{3}
+	q2 := &queueInt64{5}
+	g, _ := r.AddInt64DerivedGauge("g", "", metricdata.UnitDimensionless, "k1", "k2")
+	g.UpsertEntry(q.ToInt64, metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{})
+	gotErr := g.UpsertEntry(q2.ToInt64, metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{})
+	if gotErr != nil {
+		t.Errorf("got: %v, want: nil", gotErr)
+	}
+	ms := r.Read()
+	if got, want := ms[0].TimeSeries[0].Points[0].Value.(int64), int64(5); got != want {
+		t.Errorf("value = %v, want %v", got, want)
+	}
+}
+
+type queueFloat64 struct {
+	size float64
+}
+
+func (q *queueFloat64) ToFloat64() float64 {
+	return q.size
+}
+
+func TestFloat64DerivedGaugeEntry_Add(t *testing.T) {
+	r := NewRegistry()
+	q := &queueFloat64{5.0}
+	g, _ := r.AddFloat64DerivedGauge("g", "", metricdata.UnitDimensionless, "k1", "k2")
+	err := g.UpsertEntry(q.ToFloat64, metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{})
+	if err != nil {
+		t.Errorf("want: nil, got: %v", err)
+	}
+	ms := r.Read()
+	if got, want := ms[0].TimeSeries[0].Points[0].Value.(float64), float64(5.0); got != want {
+		t.Errorf("value = %v, want %v", got, want)
+	}
+	q.size = 5
+	ms = r.Read()
+	if got, want := ms[0].TimeSeries[0].Points[0].Value.(float64), float64(5.0); got != want {
+		t.Errorf("value = %v, want %v", got, want)
+	}
+}
+
+func TestFloat64DerivedGaugeEntry_AddWithNilObj(t *testing.T) {
+	r := NewRegistry()
+	g, _ := r.AddFloat64DerivedGauge("g", "", metricdata.UnitDimensionless, "k1", "k2")
+	gotErr := g.UpsertEntry(nil, metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{})
+	if gotErr == nil {
+		t.Errorf("expected error but got nil")
+	}
+}
+
+func TestFloat64DerivedGaugeEntry_AddWithInvalidLabels(t *testing.T) {
+	r := NewRegistry()
+	q := &queueFloat64{3}
+	g, _ := r.AddFloat64DerivedGauge("g", "", metricdata.UnitDimensionless, "k1", "k2")
+	gotErr := g.UpsertEntry(q.ToFloat64, metricdata.NewLabelValue("k1v1"))
+	if gotErr == nil {
+		t.Errorf("expected error but got nil")
+	}
+}
+
+func TestFloat64DerivedGaugeEntry_Update(t *testing.T) {
+	r := NewRegistry()
+	q := &queueFloat64{3.0}
+	q2 := &queueFloat64{5.0}
+	g, _ := r.AddFloat64DerivedGauge("g", "", metricdata.UnitDimensionless, "k1", "k2")
+	g.UpsertEntry(q.ToFloat64, metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{})
+	gotErr := g.UpsertEntry(q2.ToFloat64, metricdata.NewLabelValue("k1v1"), metricdata.LabelValue{})
+	if gotErr != nil {
+		t.Errorf("got: %v, want: nil", gotErr)
+	}
+	ms := r.Read()
+	if got, want := ms[0].TimeSeries[0].Points[0].Value.(float64), float64(5.0); got != want {
+		t.Errorf("value = %v, want %v", got, want)
 	}
 }

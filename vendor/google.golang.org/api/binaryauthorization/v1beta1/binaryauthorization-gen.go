@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,35 @@
 
 // Package binaryauthorization provides access to the Binary Authorization API.
 //
-// See https://cloud.google.com/binary-authorization/
+// For product documentation, see: https://cloud.google.com/binary-authorization/
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/binaryauthorization/v1beta1"
 //   ...
-//   binaryauthorizationService, err := binaryauthorization.New(oauthHttpClient)
+//   ctx := context.Background()
+//   binaryauthorizationService, err := binaryauthorization.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   binaryauthorizationService, err := binaryauthorization.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   binaryauthorizationService, err := binaryauthorization.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package binaryauthorization // import "google.golang.org/api/binaryauthorization/v1beta1"
 
 import (
@@ -29,6 +51,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -56,6 +80,32 @@ const (
 	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/cloud-platform",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -271,25 +321,40 @@ func (s *Attestor) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// AttestorPublicKey: An attestator public key that will be used
-// to
-// verify attestations signed by this attestor.
+// AttestorPublicKey: An attestor public key that will be used to
+// verify
+// attestations signed by this attestor.
 type AttestorPublicKey struct {
 	// AsciiArmoredPgpPublicKey: ASCII-armored representation of a PGP
 	// public key, as the entire output by
 	// the command `gpg --export --armor foo@example.com` (either LF or
 	// CRLF
 	// line endings).
+	// When using this field, `id` should be left blank.  The BinAuthz
+	// API
+	// handlers will calculate the ID and fill it in automatically.
+	// BinAuthz
+	// computes this ID as the OpenPGP RFC4880 V4 fingerprint, represented
+	// as
+	// upper-case hex.  If `id` is provided by the caller, it will
+	// be
+	// overwritten by the API-calculated ID.
 	AsciiArmoredPgpPublicKey string `json:"asciiArmoredPgpPublicKey,omitempty"`
 
 	// Comment: Optional. A descriptive comment. This field may be updated.
 	Comment string `json:"comment,omitempty"`
 
-	// Id: Output only. This field will be overwritten with key ID
-	// information, for
-	// example, an identifier extracted from a PGP public key. This field
-	// may not
-	// be updated.
+	// Id: The ID of this public key.
+	// Signatures verified by BinAuthz must include the ID of the public key
+	// that
+	// can be used to verify them, and that ID must match the contents of
+	// this
+	// field exactly.
+	// Additional restrictions on this field can be imposed based on which
+	// public
+	// key type is encapsulated. See the documentation on `public_key` cases
+	// below
+	// for details.
 	Id string `json:"id,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g.
@@ -355,7 +420,7 @@ type Binding struct {
 	//    For example, `admins@example.com`.
 	//
 	//
-	// * `domain:{domain}`: A Google Apps domain name that represents all
+	// * `domain:{domain}`: The G Suite domain (primary) that represents all
 	// the
 	//    users of that domain. For example, `google.com` or
 	// `example.com`.
@@ -631,8 +696,9 @@ type Policy struct {
 	ClusterAdmissionRules map[string]AdmissionRule `json:"clusterAdmissionRules,omitempty"`
 
 	// DefaultAdmissionRule: Required. Default admission rule for a cluster
-	// without a per-cluster
-	// admission rule.
+	// without a per-cluster, per-
+	// kubernetes-service-account, or per-istio-service-identity admission
+	// rule.
 	DefaultAdmissionRule *AdmissionRule `json:"defaultAdmissionRule,omitempty"`
 
 	// Description: Optional. A descriptive comment.

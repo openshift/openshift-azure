@@ -1303,7 +1303,7 @@
       }
     }
   },
-  "revision": "20190215",
+  "revision": "20190311",
   "rootUrl": "https://dialogflow.googleapis.com/",
   "schemas": {
     "GoogleCloudDialogflowV2Agent": {
@@ -1315,7 +1315,7 @@
           "type": "string"
         },
         "classificationThreshold": {
-          "description": "Optional. To filter out false positive results and still get variety in\nmatched natural language inputs for your agent, you can tune the machine\nlearning classification threshold. If the returned score value is less than\nthe threshold value, then a fallback intent is be triggered or, if there\nare no fallback intents defined, no intent will be triggered. The score\nvalues range from 0.0 (completely uncertain) to 1.0 (completely certain).\nIf set to 0.0, the default of 0.3 is used.",
+          "description": "Optional. To filter out false positive results and still get variety in\nmatched natural language inputs for your agent, you can tune the machine\nlearning classification threshold. If the returned score value is less than\nthe threshold value, then a fallback intent will be triggered or, if there\nare no fallback intents defined, no intent will be triggered. The score\nvalues range from 0.0 (completely uncertain) to 1.0 (completely certain).\nIf set to 0.0, the default of 0.3 is used.",
           "format": "float",
           "type": "number"
         },
@@ -2408,7 +2408,7 @@
           "type": "string"
         },
         "parts": {
-          "description": "Required. The collection of training phrase parts (can be annotated).\nFields: `entity_type`, `alias` and `user_defined` should be populated\nonly for the annotated parts of the training phrase.",
+          "description": "Required. The ordered list of training phrase parts.\nThe parts are concatenated in order to form the training phrase.\n\nNote: The API does not automatically annotate training phrases like the\nDialogflow Console does.\n\nNote: Do not forget to include whitespace at part boundaries,\nso the training phrase is well formatted when the parts are concatenated.\n\nIf the training phrase does not need to be annotated with parameters,\nyou just need a single part with only the Part.text field set.\n\nIf you want to annotate the training phrase, you must create multiple\nparts, where the fields of each part are populated in one of two ways:\n\n-   `Part.text` is set to a part of the phrase that has no parameters.\n-   `Part.text` is set to a part of the phrase that you want to annotate,\n    and the `entity_type`, `alias`, and `user_defined` fields are all\n    set.",
           "items": {
             "$ref": "GoogleCloudDialogflowV2IntentTrainingPhrasePart"
           },
@@ -2441,19 +2441,19 @@
       "id": "GoogleCloudDialogflowV2IntentTrainingPhrasePart",
       "properties": {
         "alias": {
-          "description": "Optional. The parameter name for the value extracted from the\nannotated part of the example.",
+          "description": "Optional. The parameter name for the value extracted from the\nannotated part of the example.\nThis field is required for annotated parts of the training phrase.",
           "type": "string"
         },
         "entityType": {
-          "description": "Optional. The entity type name prefixed with `@`. This field is\nrequired for the annotated part of the text and applies only to\nexamples.",
+          "description": "Optional. The entity type name prefixed with `@`.\nThis field is required for annotated parts of the training phrase.",
           "type": "string"
         },
         "text": {
-          "description": "Required. The text corresponding to the example,\nif there are no annotations. For\nannotated examples, it is the text for one of the example's parts.",
+          "description": "Required. The text for this part.",
           "type": "string"
         },
         "userDefined": {
-          "description": "Optional. Indicates whether the text was manually annotated by the\ndeveloper.",
+          "description": "Optional. Indicates whether the text was manually annotated.\nThis field is set to true when the Dialogflow Console is used to\nmanually annotate the part. When creating an annotated part with the\nAPI, you must set this to true.",
           "type": "boolean"
         }
       },
@@ -3662,7 +3662,7 @@
           "type": "string"
         },
         "parts": {
-          "description": "Required. The collection of training phrase parts (can be annotated).\nFields: `entity_type`, `alias` and `user_defined` should be populated\nonly for the annotated parts of the training phrase.",
+          "description": "Required. The ordered list of training phrase parts.\nThe parts are concatenated in order to form the training phrase.\n\nNote: The API does not automatically annotate training phrases like the\nDialogflow Console does.\n\nNote: Do not forget to include whitespace at part boundaries,\nso the training phrase is well formatted when the parts are concatenated.\n\nIf the training phrase does not need to be annotated with parameters,\nyou just need a single part with only the Part.text field set.\n\nIf you want to annotate the training phrase, you must create multiple\nparts, where the fields of each part are populated in one of two ways:\n\n-   `Part.text` is set to a part of the phrase that has no parameters.\n-   `Part.text` is set to a part of the phrase that you want to annotate,\n    and the `entity_type`, `alias`, and `user_defined` fields are all\n    set.",
           "items": {
             "$ref": "GoogleCloudDialogflowV2beta1IntentTrainingPhrasePart"
           },
@@ -3695,19 +3695,19 @@
       "id": "GoogleCloudDialogflowV2beta1IntentTrainingPhrasePart",
       "properties": {
         "alias": {
-          "description": "Optional. The parameter name for the value extracted from the\nannotated part of the example.",
+          "description": "Optional. The parameter name for the value extracted from the\nannotated part of the example.\nThis field is required for annotated parts of the training phrase.",
           "type": "string"
         },
         "entityType": {
-          "description": "Optional. The entity type name prefixed with `@`. This field is\nrequired for the annotated part of the text and applies only to\nexamples.",
+          "description": "Optional. The entity type name prefixed with `@`.\nThis field is required for annotated parts of the training phrase.",
           "type": "string"
         },
         "text": {
-          "description": "Required. The text corresponding to the example,\nif there are no annotations. For\nannotated examples, it is the text for one of the example's parts.",
+          "description": "Required. The text for this part.",
           "type": "string"
         },
         "userDefined": {
-          "description": "Optional. Indicates whether the text was manually annotated by the\ndeveloper.",
+          "description": "Optional. Indicates whether the text was manually annotated.\nThis field is set to true when the Dialogflow Console is used to\nmanually annotate the part. When creating an annotated part with the\nAPI, you must set this to true.",
           "type": "boolean"
         }
       },
@@ -4049,7 +4049,7 @@
       "type": "object"
     },
     "GoogleRpcStatus": {
-      "description": "The `Status` type defines a logical error model that is suitable for different\nprogramming environments, including REST APIs and RPC APIs. It is used by\n[gRPC](https://github.com/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error message,\nand error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security/privacy reasons.",
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https://github.com/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security/privacy reasons.",
       "id": "GoogleRpcStatus",
       "properties": {
         "code": {

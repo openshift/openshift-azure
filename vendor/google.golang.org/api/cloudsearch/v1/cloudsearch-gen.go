@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,39 @@
 
 // Package cloudsearch provides access to the Cloud Search API.
 //
-// See https://gsuite.google.com/products/cloud-search/
+// For product documentation, see: https://gsuite.google.com/products/cloud-search/
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/cloudsearch/v1"
 //   ...
-//   cloudsearchService, err := cloudsearch.New(oauthHttpClient)
+//   ctx := context.Background()
+//   cloudsearchService, err := cloudsearch.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
+//
+//   cloudsearchService, err := cloudsearch.NewService(ctx, option.WithScopes(cloudsearch.CloudSearchStatsIndexingScope))
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   cloudsearchService, err := cloudsearch.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   cloudsearchService, err := cloudsearch.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package cloudsearch // import "google.golang.org/api/cloudsearch/v1"
 
 import (
@@ -29,6 +55,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -83,6 +111,40 @@ const (
 	CloudSearchStatsIndexingScope = "https://www.googleapis.com/auth/cloud_search.stats.indexing"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/cloud_search",
+		"https://www.googleapis.com/auth/cloud_search.debug",
+		"https://www.googleapis.com/auth/cloud_search.indexing",
+		"https://www.googleapis.com/auth/cloud_search.query",
+		"https://www.googleapis.com/auth/cloud_search.settings",
+		"https://www.googleapis.com/auth/cloud_search.settings.indexing",
+		"https://www.googleapis.com/auth/cloud_search.settings.query",
+		"https://www.googleapis.com/auth/cloud_search.stats",
+		"https://www.googleapis.com/auth/cloud_search.stats.indexing",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -521,11 +583,12 @@ func (s *CustomerIndexStats) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// DataSource: Datasource is a logical namespace for items to be
-// indexed.
-// All items must belong to a datasource.  This is the prerequisite
-// before
-// items can be indexed into Cloud Search.
+// DataSource: Frontend protos implement autoconverters for this message
+// type. If you add
+// fields to this proto, please add corresponding fields to the frontend
+// proto
+// with the same names.
+// LINT.IfChange
 type DataSource struct {
 	// DisableModifications: If true, Indexing API rejects any modification
 	// calls to this datasource
@@ -2219,6 +2282,37 @@ func (s *HtmlValues) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+type IndexItemOptions struct {
+	// AllowUnknownGsuitePrincipals: Specifies if the index request should
+	// allow gsuite principals that do not
+	// exist or are deleted in the index request.
+	AllowUnknownGsuitePrincipals bool `json:"allowUnknownGsuitePrincipals,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "AllowUnknownGsuitePrincipals") to unconditionally include in API
+	// requests. By default, fields with empty values are omitted from API
+	// requests. However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g.
+	// "AllowUnknownGsuitePrincipals") to include in API requests with the
+	// JSON null value. By default, fields with empty values are omitted
+	// from API requests. However, any field with an empty value appearing
+	// in NullFields will be sent to the server as null. It is an error if a
+	// field in this list has a non-empty value. This may be used to include
+	// null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *IndexItemOptions) MarshalJSON() ([]byte, error) {
+	type NoMethod IndexItemOptions
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 type IndexItemRequest struct {
 	// ConnectorName: Name of connector making this call.
 	// <br />Format: datasources/{source_id}/connectors/{ID}
@@ -2226,6 +2320,8 @@ type IndexItemRequest struct {
 
 	// DebugOptions: Common debug options.
 	DebugOptions *DebugOptions `json:"debugOptions,omitempty"`
+
+	IndexItemOptions *IndexItemOptions `json:"indexItemOptions,omitempty"`
 
 	// Item: Name of the item.
 	// Format:
@@ -2652,7 +2748,8 @@ type ItemAcl struct {
 	// Optional if inheriting permissions from another item or if the
 	// item
 	// is not intended to be visible, such as
-	// virtual containers.
+	// virtual
+	// containers.
 	// The maximum number of elements is 1000.
 	Readers []*Principal `json:"readers,omitempty"`
 
@@ -4025,18 +4122,18 @@ type PropertyDefinition struct {
 	IsRepeatable bool `json:"isRepeatable,omitempty"`
 
 	// IsReturnable: Indicates that the property identifies data that should
-	// be returned in search
-	// results via the Query API. If set to *true*, indicates that Query
-	// API
-	// users can use matching property fields in results. However, storing
-	// fields
-	// requires more space allocation and uses more bandwidth for search
-	// queries,
-	// which impacts performance over large datasets. Set to *true* here
-	// only if
-	// the field is needed for search results. Cannot be true for
-	// properties
-	// whose type is an object.
+	// be returned in
+	// search results via the Query API. If set to *true*, indicates that
+	// Query
+	// API users can use matching property fields in results. However,
+	// storing
+	// fields requires more space allocation and uses more bandwidth for
+	// search
+	// queries, which impacts performance over large datasets. Set to *true*
+	// here
+	// only if the field is needed for search results. Cannot be true
+	// for
+	// properties whose type is an object.
 	IsReturnable bool `json:"isReturnable,omitempty"`
 
 	// IsSortable: Indicates that the property can be used for sorting.
@@ -4929,7 +5026,7 @@ type Schema struct {
 
 	// OperationIds: IDs of the Long Running Operations (LROs) currently
 	// running for this
-	// schema. After modifying the schema, wait for opeations to
+	// schema. After modifying the schema, wait for operations to
 	// complete
 	// before indexing additional content.
 	OperationIds []string `json:"operationIds,omitempty"`
@@ -5029,8 +5126,8 @@ type SearchApplication struct {
 	Name string `json:"name,omitempty"`
 
 	// OperationIds: IDs of the Long Running Operations (LROs) currently
-	// running for this schema.
-	// Output only field.
+	// running for this
+	// schema. Output only field.
 	OperationIds []string `json:"operationIds,omitempty"`
 
 	// ScoringConfig: Configuration for ranking results.
@@ -5868,6 +5965,7 @@ func (s *StructuredDataObject) MarshalJSON() ([]byte, error) {
 // StructuredResult: Structured results that are returned as part of
 // search request.
 type StructuredResult struct {
+	// Person: Representation of a person
 	Person *Person `json:"person,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Person") to
@@ -9605,7 +9703,7 @@ func (c *MediaUploadCall) doRequest(alt string) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header = reqHeaders
-	gensupport.SetGetBody(req, getBody)
+	req.GetBody = getBody
 	googleapi.Expand(req.URL, map[string]string{
 		"resourceName": c.resourceName,
 	})

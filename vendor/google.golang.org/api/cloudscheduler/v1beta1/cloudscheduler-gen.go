@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,35 @@
 
 // Package cloudscheduler provides access to the Cloud Scheduler API.
 //
-// See https://cloud.google.com/scheduler/
+// For product documentation, see: https://cloud.google.com/scheduler/
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/cloudscheduler/v1beta1"
 //   ...
-//   cloudschedulerService, err := cloudscheduler.New(oauthHttpClient)
+//   ctx := context.Background()
+//   cloudschedulerService, err := cloudscheduler.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   cloudschedulerService, err := cloudscheduler.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   cloudschedulerService, err := cloudscheduler.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package cloudscheduler // import "google.golang.org/api/cloudscheduler/v1beta1"
 
 import (
@@ -29,6 +51,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -56,6 +80,32 @@ const (
 	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/cloud-platform",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -156,8 +206,8 @@ type AppEngineHttpTarget struct {
 	//   modified `User-Agent`.
 	// * `X-CloudScheduler`: This header will be set to true.
 	//
-	// If the job has an body, Cloud Scheduler sets the
-	// following headers:
+	// If the job has an body, Cloud Scheduler sets
+	// the following headers:
 	//
 	// * `Content-Type`: By default, the `Content-Type` header is set to
 	//   "application/octet-stream". The default can be overridden by
@@ -232,18 +282,22 @@ func (s *AppEngineHttpTarget) MarshalJSON() ([]byte, error) {
 // AppEngineRouting: App Engine Routing.
 //
 // For more information about services, versions, and instances see
-// [An Overview of App
-// Engine](https://cloud.google.com/appengine/docs/python/an-overview-of-
-// app-engine),
-// [Microservices Architecture on Google App
-// Engine](https://cloud.google.com/appengine/docs/python/microservices-o
-// n-app-engine),
-// [App Engine Standard request
-// routing](https://cloud.google.com/appengine/docs/standard/python/how-r
-// equests-are-routed), and
-// [App Engine Flex request
-// routing](https://cloud.google.com/appengine/docs/flexible/python/how-r
-// equests-are-routed).
+// [An Overview of
+// App
+// Engine](https://cloud.google.com/appengine/docs/python/an-overview
+// -of-app-engine),
+// [Microservices Architecture on Google
+// App
+// Engine](https://cloud.google.com/appengine/docs/python/microservic
+// es-on-app-engine),
+// [App Engine Standard
+// request
+// routing](https://cloud.google.com/appengine/docs/standard/pyth
+// on/how-requests-are-routed),
+// and [App Engine Flex
+// request
+// routing](https://cloud.google.com/appengine/docs/flexible/pyth
+// on/how-requests-are-routed).
 type AppEngineRouting struct {
 	// Host: Output only. The host that the job is sent to.
 	//
@@ -318,17 +372,20 @@ type AppEngineRouting struct {
 	// the job is attempted.
 	//
 	// Requests can only be sent to a specific instance if
-	// [manual scaling is used in App Engine
-	// Standard](https://cloud.google.com/appengine/docs/python/an-overview-o
-	// f-app-engine?hl=en_US#scaling_types_and_instance_classes).
+	// [manual scaling is used in App
+	// Engine
+	// Standard](https://cloud.google.com/appengine/docs/python/an-ove
+	// rview-of-app-engine?hl=en_US#scaling_types_and_instance_classes).
 	// App Engine Flex does not support instances. For more information,
 	// see
-	// [App Engine Standard request
-	// routing](https://cloud.google.com/appengine/docs/standard/python/how-r
-	// equests-are-routed) and
-	// [App Engine Flex request
-	// routing](https://cloud.google.com/appengine/docs/flexible/python/how-r
-	// equests-are-routed).
+	// [App Engine Standard
+	// request
+	// routing](https://cloud.google.com/appengine/docs/standard/pyth
+	// on/how-requests-are-routed)
+	// and [App Engine Flex
+	// request
+	// routing](https://cloud.google.com/appengine/docs/flexible/pyth
+	// on/how-requests-are-routed).
 	Instance string `json:"instance,omitempty"`
 
 	// Service: App service.
@@ -481,8 +538,12 @@ type Job struct {
 	// AppEngineHttpTarget: App Engine HTTP target.
 	AppEngineHttpTarget *AppEngineHttpTarget `json:"appEngineHttpTarget,omitempty"`
 
-	// Description: A human-readable description for the job. This string
-	// must not contain
+	// Description: Optionally caller-specified in CreateJob
+	// or
+	// UpdateJob.
+	//
+	// A human-readable description for the job. This string must not
+	// contain
 	// more than 500 characters.
 	Description string `json:"description,omitempty"`
 
@@ -492,7 +553,10 @@ type Job struct {
 	// LastAttemptTime: Output only. The time the last job attempt started.
 	LastAttemptTime string `json:"lastAttemptTime,omitempty"`
 
-	// Name: The job name. For
+	// Name: Optionally caller-specified in CreateJob, after
+	// which it becomes output only.
+	//
+	// The job name. For
 	// example:
 	// `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
 	//
@@ -500,6 +564,7 @@ type Job struct {
 	//    hyphens (-), colons (:), or periods (.).
 	//    For more information, see
 	//    [Identifying
+	//
 	// projects](https://cloud.google.com/resource-manager/docs/creating-mana
 	// ging-projects#identifying_projects)
 	// * `LOCATION_ID` is the canonical ID for the job's location.
@@ -518,9 +583,17 @@ type Job struct {
 	// RetryConfig: Settings that determine the retry behavior.
 	RetryConfig *RetryConfig `json:"retryConfig,omitempty"`
 
-	// Schedule: Required.
+	// Schedule: Required, except when used with UpdateJob.
 	//
 	// Describes the schedule on which the job will be executed.
+	//
+	// The schedule can be either of the following types:
+	//
+	// * [Crontab](http://en.wikipedia.org/wiki/Cron#Overview)
+	// *
+	// English-like
+	// [schedule](https://cloud.google.com/scheduler/docs/config
+	// uring/cron-job-schedules)
 	//
 	// As a general rule, execution `n + 1` of a job will not begin
 	// until execution `n` has finished. Cloud Scheduler will never
@@ -535,16 +608,8 @@ type Job struct {
 	//
 	// If retry_count > 0 and a job attempt fails,
 	// the job will be tried a total of retry_count
-	// times, with exponential backoff, until the next scheduled
-	// start
+	// times, with exponential backoff, until the next scheduled start
 	// time.
-	//
-	// The schedule can be either of the following types:
-	//
-	// * [Crontab](http://en.wikipedia.org/wiki/Cron#Overview)
-	// * English-like
-	// [schedule](https://cloud.google.com/scheduler/docs/configuring/cron-jo
-	// b-schedules)
 	Schedule string `json:"schedule,omitempty"`
 
 	// ScheduleTime: Output only. The next time the job is scheduled. Note
@@ -923,9 +988,8 @@ type RetryConfig struct {
 	// MaxRetryDuration: The time limit for retrying a failed job, measured
 	// from time when an
 	// execution was first attempted. If specified with
-	// retry_count, the job will be retried until both limits
-	// are
-	// reached.
+	// retry_count, the job will be retried until both
+	// limits are reached.
 	//
 	// The default value for max_retry_duration is zero, which means
 	// retry
@@ -2200,7 +2264,7 @@ func (c *ProjectsLocationsJobsPatchCall) Do(opts ...googleapi.CallOption) (*Job,
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "The job name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.\n\n* `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),\n   hyphens (-), colons (:), or periods (.).\n   For more information, see\n   [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)\n* `LOCATION_ID` is the canonical ID for the job's location.\n   The list of available locations can be obtained by calling\n   ListLocations.\n   For more information, see https://cloud.google.com/about/locations/.\n* `JOB_ID` can contain only letters ([A-Za-z]), numbers ([0-9]),\n   hyphens (-), or underscores (_). The maximum length is 500 characters.",
+	//       "description": "Optionally caller-specified in CreateJob, after\nwhich it becomes output only.\n\nThe job name. For example:\n`projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.\n\n* `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),\n   hyphens (-), colons (:), or periods (.).\n   For more information, see\n   [Identifying\n   projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)\n* `LOCATION_ID` is the canonical ID for the job's location.\n   The list of available locations can be obtained by calling\n   ListLocations.\n   For more information, see https://cloud.google.com/about/locations/.\n* `JOB_ID` can contain only letters ([A-Za-z]), numbers ([0-9]),\n   hyphens (-), or underscores (_). The maximum length is 500 characters.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/jobs/[^/]+$",
 	//       "required": true,

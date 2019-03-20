@@ -15,7 +15,7 @@
   "description": "Manages product items, inventory, and Merchant Center accounts for Google Shopping.",
   "discoveryVersion": "v1",
   "documentationLink": "https://developers.google.com/shopping-content",
-  "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/UDv2xPFupgkH3VahIuNaT5YcELg\"",
+  "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/_vzcX2m-YUsApzTF74HdX3hw9hM\"",
   "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
     "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -129,7 +129,7 @@
           "id": "content.accounts.custombatch",
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             }
@@ -162,7 +162,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -226,7 +226,7 @@
           ],
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -336,7 +336,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -376,7 +376,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -419,7 +419,7 @@
           ]
         },
         "get": {
-          "description": "Retrieves the status of a Merchant Center account. Multi-client accounts can only call this method for sub-accounts.",
+          "description": "Retrieves the status of a Merchant Center account. No itemLevelIssues are returned for multi-client accounts.",
           "httpMethod": "GET",
           "id": "content.accountstatuses.get",
           "parameterOrder": [
@@ -507,7 +507,7 @@
           "id": "content.accounttax.custombatch",
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             }
@@ -607,7 +607,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -647,7 +647,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -679,7 +679,7 @@
           "id": "content.datafeeds.custombatch",
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             }
@@ -712,7 +712,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -746,7 +746,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -807,7 +807,7 @@
           ],
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -882,7 +882,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -922,7 +922,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -1050,7 +1050,7 @@
           "id": "content.inventory.custombatch",
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             }
@@ -1077,7 +1077,7 @@
           ],
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -1089,7 +1089,7 @@
               "type": "string"
             },
             "productId": {
-              "description": "The REST id of the product for which to update price and availability.",
+              "description": "The REST ID of the product for which to update price and availability.",
               "location": "path",
               "required": true,
               "type": "string"
@@ -1122,7 +1122,7 @@
           "id": "content.liasettings.custombatch",
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             }
@@ -1266,7 +1266,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -1494,7 +1494,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -2206,7 +2206,7 @@
           ]
         },
         "getbymerchantorderid": {
-          "description": "Retrieves an order using merchant order id.",
+          "description": "Retrieves an order using merchant order ID.",
           "httpMethod": "GET",
           "id": "content.orders.getbymerchantorderid",
           "parameterOrder": [
@@ -2222,7 +2222,7 @@
               "type": "string"
             },
             "merchantOrderId": {
-              "description": "The merchant order id to be looked for.",
+              "description": "The merchant order ID to be looked for.",
               "location": "path",
               "required": true,
               "type": "string"
@@ -2550,7 +2550,7 @@
           ]
         },
         "setlineitemmetadata": {
-          "description": "Sets (overrides) merchant provided annotations on the line item.",
+          "description": "Sets (or overrides if it already exists) merchant provided annotations in the form of key-value pairs. A common use case would be to supply us with additional structured information about a line item that cannot be provided via other methods. Submitted key-value pairs can be retrieved as part of the orders resource.",
           "httpMethod": "POST",
           "id": "content.orders.setlineitemmetadata",
           "parameterOrder": [
@@ -2729,7 +2729,7 @@
           "id": "content.pos.custombatch",
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             }
@@ -2756,7 +2756,7 @@
           ],
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -2835,7 +2835,7 @@
           ],
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -2875,7 +2875,7 @@
           ],
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -2947,7 +2947,7 @@
           ],
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -2987,7 +2987,7 @@
           "id": "content.products.custombatch",
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             }
@@ -3013,7 +3013,7 @@
           ],
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -3025,7 +3025,7 @@
               "type": "string"
             },
             "productId": {
-              "description": "The REST id of the product.",
+              "description": "The REST ID of the product.",
               "location": "path",
               "required": true,
               "type": "string"
@@ -3053,7 +3053,7 @@
               "type": "string"
             },
             "productId": {
-              "description": "The REST id of the product.",
+              "description": "The REST ID of the product.",
               "location": "path",
               "required": true,
               "type": "string"
@@ -3076,7 +3076,7 @@
           ],
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -3193,7 +3193,7 @@
               "type": "string"
             },
             "productId": {
-              "description": "The REST id of the product.",
+              "description": "The REST ID of the product.",
               "location": "path",
               "required": true,
               "type": "string"
@@ -3268,7 +3268,7 @@
           "id": "content.shippingsettings.custombatch",
           "parameters": {
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             }
@@ -3416,7 +3416,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -3456,7 +3456,7 @@
               "type": "string"
             },
             "dryRun": {
-              "description": "Flag to run the request in dry-run mode.",
+              "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
               "location": "query",
               "type": "boolean"
             },
@@ -3482,7 +3482,7 @@
       }
     }
   },
-  "revision": "20190215",
+  "revision": "20190308",
   "rootUrl": "https://www.googleapis.com/",
   "schemas": {
     "Account": {
@@ -3685,7 +3685,7 @@
           "type": "array"
         },
         "dataQualityIssues": {
-          "description": "A list of data quality issues.",
+          "description": "DEPRECATED - never populated.",
           "items": {
             "$ref": "AccountStatusDataQualityIssue"
           },
@@ -3748,78 +3748,61 @@
       "id": "AccountStatusDataQualityIssue",
       "properties": {
         "country": {
-          "description": "Country for which this issue is reported.",
           "type": "string"
         },
         "destination": {
-          "description": "The destination the issue applies to.",
           "type": "string"
         },
         "detail": {
-          "description": "A more detailed description of the issue.",
           "type": "string"
         },
         "displayedValue": {
-          "description": "Actual value displayed on the landing page.",
           "type": "string"
         },
         "exampleItems": {
-          "description": "Example items featuring the issue.",
           "items": {
             "$ref": "AccountStatusExampleItem"
           },
           "type": "array"
         },
         "id": {
-          "description": "Issue identifier.",
           "type": "string"
         },
         "lastChecked": {
-          "description": "Last time the account was checked for this issue.",
           "type": "string"
         },
         "location": {
-          "description": "The attribute name that is relevant for the issue.",
           "type": "string"
         },
         "numItems": {
-          "description": "Number of items in the account found to have the said issue.",
           "format": "uint32",
           "type": "integer"
         },
         "severity": {
-          "description": "Severity of the problem.",
           "type": "string"
         },
         "submittedValue": {
-          "description": "Submitted value that causes the issue.",
           "type": "string"
         }
       },
       "type": "object"
     },
     "AccountStatusExampleItem": {
-      "description": "An example of an item that has poor data quality. An item value on the landing page differs from what is submitted, or conflicts with a policy.",
       "id": "AccountStatusExampleItem",
       "properties": {
         "itemId": {
-          "description": "Unique item ID as specified in the uploaded product data.",
           "type": "string"
         },
         "link": {
-          "description": "Landing page of the item.",
           "type": "string"
         },
         "submittedValue": {
-          "description": "The item value that was submitted.",
           "type": "string"
         },
         "title": {
-          "description": "Title of the item.",
           "type": "string"
         },
         "valueOnLandingPage": {
-          "description": "The actual value on the landing page.",
           "type": "string"
         }
       },
@@ -3962,7 +3945,7 @@
               "content.accounttax.update"
             ]
           },
-          "description": "State (or province) is which the tax is applicable, described by its location id (also called criteria id).",
+          "description": "State (or province) is which the tax is applicable, described by its location ID (also called criteria ID).",
           "format": "uint64",
           "type": "string"
         },
@@ -6053,7 +6036,7 @@
           "type": "boolean"
         },
         "channelType": {
-          "description": "The channel type of the order: \"purchaseOnGoogle\" or \"googleExpress\".",
+          "description": "Deprecated.",
           "type": "string"
         },
         "customer": {
@@ -6065,7 +6048,7 @@
           "description": "The details for the delivery."
         },
         "id": {
-          "description": "The REST id of the order. Globally unique.",
+          "description": "The REST ID of the order. Globally unique.",
           "type": "string"
         },
         "kind": {
@@ -6085,7 +6068,7 @@
           "type": "string"
         },
         "merchantOrderId": {
-          "description": "Merchant-provided id of the order.",
+          "description": "Merchant-provided ID of the order.",
           "type": "string"
         },
         "netAmount": {
@@ -6105,7 +6088,7 @@
           "type": "string"
         },
         "promotions": {
-          "description": "Deprecated. Ignored if provided for createTestOrder. The details of the merchant provided promotions applied to the order. More details about the program are here.",
+          "description": "The details of the merchant provided promotions applied to the order. More details about the program are here.",
           "items": {
             "$ref": "OrderLegacyPromotion"
           },
@@ -6134,7 +6117,7 @@
           "description": "The tax for the total shipping cost."
         },
         "shippingOption": {
-          "description": "The requested shipping option.",
+          "description": "Deprecated. Shipping details are provided with line items instead.",
           "type": "string"
         },
         "status": {
@@ -6253,7 +6236,7 @@
           "type": "string"
         },
         "marketingEmailAddress": {
-          "description": "Email address that can be used for marketing purposes. This field is only filled when explicitMarketingPreference is equal to 'granted'.",
+          "description": "Email address that can be used for marketing purposes. The field may be empty even if explicitMarketingPreference is 'granted'. This happens when retrieving an old order from the customer who deleted their account.",
           "type": "string"
         }
       },
@@ -6356,7 +6339,7 @@
           "type": "array"
         },
         "id": {
-          "description": "The id of the line item.",
+          "description": "The ID of the line item.",
           "type": "string"
         },
         "price": {
@@ -6450,7 +6433,7 @@
           "type": "string"
         },
         "id": {
-          "description": "The REST id of the product.",
+          "description": "The REST ID of the product.",
           "type": "string"
         },
         "imageLink": {
@@ -6754,11 +6737,11 @@
           "type": "string"
         },
         "merchantOrderId": {
-          "description": "Merchant-provided id of the order.",
+          "description": "Merchant-provided ID of the order.",
           "type": "string"
         },
         "orderId": {
-          "description": "The id of the order.",
+          "description": "The ID of the order.",
           "type": "string"
         },
         "productAmount": {
@@ -6819,7 +6802,7 @@
           "type": "string"
         },
         "id": {
-          "description": "The id of the shipment.",
+          "description": "The ID of the shipment.",
           "type": "string"
         },
         "lineItems": {
@@ -6834,7 +6817,7 @@
           "type": "string"
         },
         "trackingId": {
-          "description": "The tracking id for the shipment.",
+          "description": "The tracking ID for the shipment.",
           "type": "string"
         }
       },
@@ -6844,7 +6827,7 @@
       "id": "OrderShipmentLineItemShipment",
       "properties": {
         "lineItemId": {
-          "description": "The id of the line item that is shipped. Either lineItemId or productId is required.",
+          "description": "The ID of the line item that is shipped. Either lineItemId or productId is required.",
           "type": "string"
         },
         "productId": {
@@ -7414,7 +7397,7 @@
           "type": "string"
         },
         "merchantOrderId": {
-          "description": "The merchant order id. Required for updateMerchantOrderId and getByMerchantOrderId methods.",
+          "description": "The merchant order ID. Required for updateMerchantOrderId and getByMerchantOrderId methods.",
           "type": "string"
         },
         "method": {
@@ -7732,7 +7715,7 @@
           "type": "array"
         },
         "trackingId": {
-          "description": "Deprecated. Please use shipmentInfo instead. The tracking id for the shipment.",
+          "description": "Deprecated. Please use shipmentInfo instead. The tracking ID for the shipment.",
           "type": "string"
         }
       },
@@ -7751,11 +7734,11 @@
               "content.orders.shiplineitems"
             ]
           },
-          "description": "The ID of the shipment.",
+          "description": "The ID of the shipment. This is assigned by the merchant and is unique to each shipment.",
           "type": "string"
         },
         "trackingId": {
-          "description": "The tracking id for the shipment.",
+          "description": "The tracking ID for the shipment.",
           "type": "string"
         }
       },
@@ -7803,7 +7786,7 @@
           "type": "string"
         },
         "trackingId": {
-          "description": "The tracking id for the shipment. Not updated if missing.",
+          "description": "The tracking ID for the shipment. Not updated if missing.",
           "type": "string"
         }
       },
@@ -8224,7 +8207,7 @@
           "type": "array"
         },
         "trackingId": {
-          "description": "Deprecated. Please use shipmentInfo instead. The tracking id for the shipment.",
+          "description": "Deprecated. Please use shipmentInfo instead. The tracking ID for the shipment.",
           "type": "string"
         }
       },
@@ -8339,7 +8322,7 @@
           "type": "string"
         },
         "trackingId": {
-          "description": "The tracking id for the shipment. Not updated if missing.",
+          "description": "The tracking ID for the shipment. Not updated if missing.",
           "type": "string"
         }
       },
@@ -9253,7 +9236,7 @@
           "type": "string"
         },
         "id": {
-          "description": "The REST id of the product. Content API methods that operate on products take this as their productId parameter.\nThe REST id for a product is of the form channel:contentLanguage:targetCountry:offerId.",
+          "description": "The REST ID of the product. Content API methods that operate on products take this as their productId parameter.\nThe REST ID for a product is of the form channel:contentLanguage:targetCountry:offerId.",
           "type": "string"
         },
         "identifierExists": {
@@ -9330,7 +9313,7 @@
               "content.products.insert"
             ]
           },
-          "description": "A unique identifier for the item. Leading and trailing whitespaces are stripped and multiple whitespaces are replaced by a single whitespace upon submission. Only valid unicode characters are accepted. See the products feed specification for details.\nNote: Content API methods that operate on products take the REST id of the product, not this identifier.",
+          "description": "A unique identifier for the item. Leading and trailing whitespaces are stripped and multiple whitespaces are replaced by a single whitespace upon submission. Only valid unicode characters are accepted. See the products feed specification for details.\nNote: Content API methods that operate on products take the REST ID of the product, not this identifier.",
           "type": "string"
         },
         "onlineOnly": {
@@ -9522,7 +9505,7 @@
           "type": "string"
         },
         "locationId": {
-          "description": "The numeric id of a location that the shipping rate applies to as defined in the AdWords API.",
+          "description": "The numeric ID of a location that the shipping rate applies to as defined in the AdWords API.",
           "format": "int64",
           "type": "string"
         },
@@ -9576,7 +9559,7 @@
       "type": "object"
     },
     "ProductStatus": {
-      "description": "The status of a product, i.e., information about a product computed asynchronously by the data quality analysis.",
+      "description": "The status of a product, i.e., information about a product computed asynchronously.",
       "id": "ProductStatus",
       "properties": {
         "creationDate": {
@@ -9584,7 +9567,7 @@
           "type": "string"
         },
         "dataQualityIssues": {
-          "description": "A list of data quality issues associated with the product.",
+          "description": "DEPRECATED - never populated",
           "items": {
             "$ref": "ProductStatusDataQualityIssue"
           },
@@ -9626,7 +9609,7 @@
           "description": "Product data after applying all the join inputs."
         },
         "productId": {
-          "description": "The id of the product for which status is reported.",
+          "description": "The ID of the product for which status is reported.",
           "type": "string"
         },
         "title": {
@@ -9640,39 +9623,30 @@
       "id": "ProductStatusDataQualityIssue",
       "properties": {
         "destination": {
-          "description": "The destination the issue applies to.",
           "type": "string"
         },
         "detail": {
-          "description": "A more detailed error string.",
           "type": "string"
         },
         "fetchStatus": {
-          "description": "The fetch status for landing_page_errors.",
           "type": "string"
         },
         "id": {
-          "description": "The id of the data quality issue.",
           "type": "string"
         },
         "location": {
-          "description": "The attribute name that is relevant for the issue.",
           "type": "string"
         },
         "severity": {
-          "description": "The severity of the data quality issue.",
           "type": "string"
         },
         "timestamp": {
-          "description": "The time stamp of the data quality issue.",
           "type": "string"
         },
         "valueOnLandingPage": {
-          "description": "The value of that attribute that was found on the landing page",
           "type": "string"
         },
         "valueProvided": {
-          "description": "The value the attribute had at time of evaluation.",
           "type": "string"
         }
       },
@@ -9746,7 +9720,7 @@
           "type": "string"
         },
         "locationId": {
-          "description": "The numeric id of a location that the tax rate applies to as defined in the AdWords API.",
+          "description": "The numeric ID of a location that the tax rate applies to as defined in the AdWords API.",
           "format": "int64",
           "type": "string"
         },
@@ -10467,7 +10441,7 @@
           "type": "string"
         },
         "promotions": {
-          "description": "Deprecated. The details of the merchant provided promotions applied to the order. More details about the program are here.",
+          "description": "Deprecated. Ignored if provided.",
           "items": {
             "$ref": "OrderLegacyPromotion"
           },
@@ -10502,7 +10476,12 @@
       "id": "TestOrderCustomer",
       "properties": {
         "email": {
-          "description": "Deprecated.",
+          "annotations": {
+            "required": [
+              "content.orders.createtestorder"
+            ]
+          },
+          "description": "Email address of the customer.",
           "type": "string"
         },
         "explicitMarketingPreference": {
@@ -10589,12 +10568,7 @@
           "type": "string"
         },
         "channel": {
-          "annotations": {
-            "required": [
-              "content.orders.createtestorder"
-            ]
-          },
-          "description": "The item's channel.",
+          "description": "Deprecated.",
           "type": "string"
         },
         "condition": {

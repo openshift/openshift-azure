@@ -100,8 +100,7 @@ func TestTransport_RoundTrip_Race(t *testing.T) {
 }
 
 func TestTransport_RoundTrip(t *testing.T) {
-	ctx := context.Background()
-	ctx, parent := trace.StartSpan(ctx, "parent")
+	_, parent := trace.StartSpan(context.Background(), "parent")
 	tests := []struct {
 		name   string
 		parent *trace.Span
@@ -328,7 +327,7 @@ func TestEndToEnd(t *testing.T) {
 					t.Errorf("len(server.Links) = %d; want %d", got, want)
 				} else {
 					link := server.Links[0]
-					if got, want := link.Type, trace.LinkTypeChild; got != want {
+					if got, want := link.Type, trace.LinkTypeParent; got != want {
 						t.Errorf("link.Type = %v; want %v", got, want)
 					}
 				}

@@ -1,5 +1,5 @@
 hash: 2f0929c849972b0d8dab393641ac6c65d139f0bb39b155ea7e6780bd462827f9
-updated: 2019-02-19T17:31:47.538456901-06:00
+updated: 2019-03-20T10:33:20.596664724-06:00
 imports:
 - name: contrib.go.opencensus.io/exporter/ocagent
   version: 00af367e65149ff1f2f4b93bbfbb84fd9297170d
@@ -8,15 +8,18 @@ imports:
   subpackages:
   - profiles/latest/resources/mgmt/resources
   - profiles/preview/resources/mgmt/managedapplications
+  - services/authorization/mgmt/2015-07-01/authorization
   - services/compute/mgmt/2018-10-01/compute
   - services/dns/mgmt/2017-10-01/dns
   - services/graphrbac/1.6/graphrbac
+  - services/keyvault/2016-10-01/keyvault
+  - services/keyvault/mgmt/2016-10-01/keyvault
   - services/marketplaceordering/mgmt/2015-06-01/marketplaceordering
+  - services/monitor/mgmt/2017-09-01/insights
   - services/network/mgmt/2018-06-01/network
   - services/network/mgmt/2018-07-01/network
   - services/resources/mgmt/2018-05-01/resources
   - services/resources/mgmt/2018-06-01/managedapplications
-  - services/storage/mgmt/2015-06-15/storage
   - services/storage/mgmt/2018-02-01/storage
   - storage
   - version
@@ -89,7 +92,7 @@ imports:
   subpackages:
   - gomock
 - name: github.com/golang/protobuf
-  version: aa810b61a9c79d51363740d207bb46cf8e620ed5
+  version: b5d812f8a3706043e23a9cd5babf2e5423744d30
   subpackages:
   - proto
   - protoc-gen-go/descriptor
@@ -98,6 +101,14 @@ imports:
   - ptypes/duration
   - ptypes/timestamp
   - ptypes/wrappers
+- name: github.com/google/go-github
+  version: a627c9f2b45bda1e367a0241649807445a4fc0a8
+  subpackages:
+  - github
+- name: github.com/google/go-querystring
+  version: c8c88dbee036db4e4808d1f2ec8c2e15e11c3f80
+  subpackages:
+  - query
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/google/uuid
@@ -128,13 +139,9 @@ imports:
 - name: github.com/kelseyhightower/envconfig
   version: f611eb38b3875cc3bd991ca91c51d06446afa14c
 - name: github.com/konsorten/go-windows-terminal-sequences
-  version: 5c8c8bd35d3832f5d134ae1e1e375b69a4d25242
+  version: f55edac94c9bbba5d6182a4be46d86a2c9b5b50e
 - name: github.com/marstr/guid
   version: 8bd9a64bf37eb297b492a4101fb28e80ac0b290f
-- name: github.com/matttproud/golang_protobuf_extensions
-  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
-  subpackages:
-  - pbutil
 - name: github.com/mitchellh/go-homedir
   version: b8bc1bf767474819792c23f32d8286a45736f1c6
 - name: github.com/modern-go/concurrent
@@ -179,9 +186,12 @@ imports:
   version: 7eef55a5dc24306c455777b9897ddc3cbeaf8b59
   subpackages:
   - apps/v1
+  - build/v1
+  - network/v1
   - pkg/serialization
   - project/v1
   - route/v1
+  - security/v1
   - template/v1
   - user/v1
 - name: github.com/openshift/client-go
@@ -189,10 +199,17 @@ imports:
   subpackages:
   - apps/clientset/versioned/scheme
   - apps/clientset/versioned/typed/apps/v1
+  - build/clientset/versioned/scheme
+  - build/clientset/versioned/typed/build/v1
+  - network/clientset/versioned/scheme
+  - network/clientset/versioned/typed/network/v1
   - project/clientset/versioned/scheme
   - project/clientset/versioned/typed/project/v1
   - route/clientset/versioned/scheme
   - route/clientset/versioned/typed/route/v1
+  - security/clientset/versioned
+  - security/clientset/versioned/scheme
+  - security/clientset/versioned/typed/security/v1
   - template/clientset/versioned/scheme
   - template/clientset/versioned/typed/template/v1
   - user/clientset/versioned/scheme
@@ -203,6 +220,9 @@ imports:
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/prometheus/client_golang
   version: 505eaef017263e299324067d40ca2c48f6a2cf50
+  subpackages:
+  - api
+  - api/prometheus/v1
 - name: github.com/prometheus/client_model
   version: fd36f4220a901265f90734c3183c5f0c91daa0b8
   subpackages:
@@ -210,26 +230,23 @@ imports:
 - name: github.com/prometheus/common
   version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
   subpackages:
-  - expfmt
-  - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/sirupsen/logrus
   version: e1e72e9de974bd926e5c56f83753fba2df402ce5
-  subpackages:
-  - hooks/test
 - name: github.com/spf13/pflag
   version: 583c0c0531f06d5278b7d917446061adc344b5cd
 - name: go.opencensus.io
-  version: 57c09932883846047fd542903575671cb6b75070
+  version: 8a36f74db452c3eb69935e0ce66aecc030cf5142
   subpackages:
-  - exemplar
   - internal
   - internal/tagencoding
+  - metric/metricdata
   - plugin/ochttp
   - plugin/ochttp/propagation/b3
   - plugin/ochttp/propagation/tracecontext
+  - resource
   - stats
   - stats/internal
   - stats/view
@@ -274,8 +291,12 @@ imports:
   - lex/httplex
   - trace
   - websocket
+- name: golang.org/x/oauth2
+  version: a6bd8cefa1811bd24b86f8902872e4e8225f74c4
+  subpackages:
+  - internal
 - name: golang.org/x/sync
-  version: 37e7f081c4d4c64e13b10787722085407fe5d15f
+  version: e225da77a7e68af35c70ccbf71af2b83e6acac3c
   subpackages:
   - semaphore
 - name: golang.org/x/sys
@@ -309,9 +330,19 @@ imports:
   subpackages:
   - rate
 - name: google.golang.org/api
-  version: 2eba4b8eddaf7e8873ed5ba4d2b7c51b3c443bf7
+  version: 2dc3ad4d67ba9a37200c5702d36687a940df1111
   subpackages:
   - support/bundler
+- name: google.golang.org/appengine
+  version: 4a4468ece617fc8205e99368fa2200e9d1fad421
+  subpackages:
+  - internal
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
 - name: google.golang.org/genproto
   version: 09f6ed296fc66555a25fe4ce95173148778dfa85
   subpackages:
@@ -350,6 +381,8 @@ imports:
   version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
+- name: gopkg.in/libgit2/git2go.v27
+  version: ecaeb7a21d479b7966311760a2e8bd734f8f0eef
 - name: gopkg.in/tomb.v1
   version: c131134a1947e9afd9cecfe11f4c6dff0732ae58
 - name: gopkg.in/yaml.v2
