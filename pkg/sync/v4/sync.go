@@ -17,17 +17,24 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
+	kapiextensions "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/util/flowcontrol"
+	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/healthcheck"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
+	utilwait "github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 const (
@@ -284,7 +291,7 @@ var (
 // writeDB uses the discovery and dynamic clients to synchronise an API server's
 // objects with db.
 // TODO: need to implement deleting objects which we don't want any more.
-func (s *sync) writeDB(client *client) error {
+func (s *sync) writeDB() error {
 	// impose an order to improve debuggability.
 	var keys []string
 	for k := range s.db {
@@ -293,33 +300,33 @@ func (s *sync) writeDB(client *client) error {
 	sort.Strings(keys)
 
 	// crd needs to land early to get initialized
-	if err := client.ApplyResources(crdFilter, s.db, keys); err != nil {
+	if err := s.applyResources(crdFilter, keys); err != nil {
 		return err
 	}
 	// namespaces must exist before namespaced objects.
-	if err := client.ApplyResources(nsFilter, s.db, keys); err != nil {
+	if err := s.applyResources(nsFilter, keys); err != nil {
 		return err
 	}
 	// create serviceaccounts
-	if err := client.ApplyResources(saFilter, s.db, keys); err != nil {
+	if err := s.applyResources(saFilter, keys); err != nil {
 		return err
 	}
 	// create all secrets and configmaps
-	if err := client.ApplyResources(cfgFilter, s.db, keys); err != nil {
+	if err := s.applyResources(cfgFilter, keys); err != nil {
 		return err
 	}
 	// default storage class must be created before PVCs as the admission controller is edge-triggered
-	if err := client.ApplyResources(storageClassFilter, s.db, keys); err != nil {
+	if err := s.applyResources(storageClassFilter, keys); err != nil {
 		return err
 	}
 
 	// refresh dynamic client
-	if err := client.UpdateDynamicClient(); err != nil {
+	if err := s.updateDynamicClient(); err != nil {
 		return err
 	}
 
 	// create all, except targeted CRDs resources
-	if err := client.ApplyResources(everythingElseFilter, s.db, keys); err != nil {
+	if err := s.applyResources(everythingElseFilter, keys); err != nil {
 		return err
 	}
 
@@ -327,19 +334,19 @@ func (s *sync) writeDB(client *client) error {
 	// this dynamically, and should not PollInfinite.
 	s.log.Debug("Waiting for the service catalog api to get aggregated")
 	if err := wait.PollImmediateInfinite(time.Second,
-		ready.CheckAPIServiceIsReady(client.ac.ApiregistrationV1().APIServices(), "v1beta1.servicecatalog.k8s.io"),
+		ready.CheckAPIServiceIsReady(s.ac.ApiregistrationV1().APIServices(), "v1beta1.servicecatalog.k8s.io"),
 	); err != nil {
 		return err
 	}
 	s.log.Debug("Service catalog api is aggregated")
 
 	// refresh dynamic client
-	if err := client.UpdateDynamicClient(); err != nil {
+	if err := s.updateDynamicClient(); err != nil {
 		return err
 	}
 
 	// now write the servicecatalog configurables.
-	if err := client.ApplyResources(scFilter, s.db, keys); err != nil {
+	if err := s.applyResources(scFilter, keys); err != nil {
 		return err
 	}
 
@@ -348,34 +355,44 @@ func (s *sync) writeDB(client *client) error {
 
 	s.log.Debug("Waiting for the targeted CRDs to get ready")
 	if err := wait.PollImmediateInfinite(time.Second,
-		ready.CheckCustomResourceDefinitionIsReady(client.ae.ApiextensionsV1beta1().CustomResourceDefinitions(), "servicemonitors.monitoring.coreos.com"),
+		ready.CheckCustomResourceDefinitionIsReady(s.ae.ApiextensionsV1beta1().CustomResourceDefinitions(), "servicemonitors.monitoring.coreos.com"),
 	); err != nil {
 		return err
 	}
 	s.log.Debug("ServiceMonitors CRDs apis ready")
 
 	// refresh dynamic client
-	if err := client.UpdateDynamicClient(); err != nil {
+	if err := s.updateDynamicClient(); err != nil {
 		return err
 	}
 
 	// write all post boostrap objects depending on monitoring CRDs, managed by operators
-	return client.ApplyResources(monitoringCrdFilter, s.db, keys)
+	return s.applyResources(monitoringCrdFilter, keys)
 }
 
 // Main loop
 func (s *sync) Sync(ctx context.Context) error {
-	client, err := newClient(ctx, s.log, s.cs)
+	transport, err := rest.TransportFor(s.restconfig)
 	if err != nil {
 		return err
 	}
 
-	err = s.writeDB(client)
+	_, err = utilwait.ForHTTPStatusOk(ctx, s.log, transport, s.restconfig.Host+"/healthz")
 	if err != nil {
 		return err
 	}
 
-	return client.DeleteOrphans(s.db)
+	err = s.updateDynamicClient()
+	if err != nil {
+		return err
+	}
+
+	err = s.writeDB()
+	if err != nil {
+		return err
+	}
+
+	return s.deleteOrphans()
 }
 
 func (s *sync) ReadyHandler(w http.ResponseWriter, r *http.Request) {
@@ -438,6 +455,13 @@ type sync struct {
 	cs    *api.OpenShiftManagedCluster
 	db    map[string]unstructured.Unstructured
 	ready atomic.Value
+
+	restconfig *rest.Config
+	ac         *kaggregator.Clientset
+	ae         *kapiextensions.Clientset
+	cli        *discovery.DiscoveryClient
+	dyn        dynamic.ClientPool
+	grs        []*discovery.APIGroupResources
 }
 
 func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*sync, error) {
@@ -446,12 +470,29 @@ func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*sync, error) {
 		cs:  cs,
 	}
 
-	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
+	var err error
+	s.restconfig, err = managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
+	if err != nil {
+		return nil, err
+	}
+	s.restconfig.RateLimiter = flowcontrol.NewFakeAlwaysRateLimiter()
+
+	s.kc, err = kubernetes.NewForConfig(s.restconfig)
 	if err != nil {
 		return nil, err
 	}
 
-	s.kc, err = kubernetes.NewForConfig(restconfig)
+	s.ac, err = kaggregator.NewForConfig(s.restconfig)
+	if err != nil {
+		return nil, err
+	}
+
+	s.ae, err = kapiextensions.NewForConfig(s.restconfig)
+	if err != nil {
+		return nil, err
+	}
+
+	s.cli, err = discovery.NewDiscoveryClientForConfig(s.restconfig)
 	if err != nil {
 		return nil, err
 	}

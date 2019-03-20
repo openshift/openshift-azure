@@ -1,14 +1,12 @@
 package sync
 
 import (
-	"context"
 	"errors"
 	"reflect"
 	"strings"
 
 	"github.com/go-test/deep"
 	"github.com/sirupsen/logrus"
-	kapiextensions "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -16,106 +14,46 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/util/flowcontrol"
 	"k8s.io/client-go/util/retry"
-	kaggregator "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
-
-	acsapi "github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
-	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-type client struct {
-	restconfig *rest.Config
-	ac         *kaggregator.Clientset
-	ae         *kapiextensions.Clientset
-	cli        *discovery.DiscoveryClient
-	dyn        dynamic.ClientPool
-	grs        []*discovery.APIGroupResources
-	log        *logrus.Entry
-}
-
-func newClient(ctx context.Context, log *logrus.Entry, cs *acsapi.OpenShiftManagedCluster) (*client, error) {
-	restconfig, err := managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
-	if err != nil {
-		return nil, err
-	}
-
-	restconfig.RateLimiter = flowcontrol.NewFakeAlwaysRateLimiter()
-
-	ac, err := kaggregator.NewForConfig(restconfig)
-	if err != nil {
-		return nil, err
-	}
-
-	ae, err := kapiextensions.NewForConfig(restconfig)
-	if err != nil {
-		return nil, err
-	}
-
-	cli, err := discovery.NewDiscoveryClientForConfig(restconfig)
-	if err != nil {
-		return nil, err
-	}
-
-	c := &client{
-		restconfig: restconfig,
-		ac:         ac,
-		ae:         ae,
-		cli:        cli,
-		log:        log,
-	}
-	transport, err := rest.TransportFor(c.restconfig)
-	if err != nil {
-		return nil, err
-	}
-	if _, err := wait.ForHTTPStatusOk(ctx, log, transport, c.restconfig.Host+"/healthz"); err != nil {
-		return nil, err
-	}
-
-	if err := c.UpdateDynamicClient(); err != nil {
-		return nil, err
-	}
-
-	return c, nil
-}
-
-// UpdateDynamicClient updates the client's server API group resource
+// updateDynamicClient updates the client's server API group resource
 // information and dynamic client pool.
-func (c *client) UpdateDynamicClient() error {
-	grs, err := discovery.GetAPIGroupResources(c.cli)
+func (s *sync) updateDynamicClient() error {
+	grs, err := discovery.GetAPIGroupResources(s.cli)
 	if err != nil {
 		return err
 	}
-	c.grs = grs
+	s.grs = grs
 
-	rm := discovery.NewRESTMapper(c.grs, meta.InterfacesForUnstructured)
-	c.dyn = dynamic.NewClientPool(c.restconfig, rm, dynamic.LegacyAPIPathResolverFunc)
+	rm := discovery.NewRESTMapper(s.grs, meta.InterfacesForUnstructured)
+	s.dyn = dynamic.NewClientPool(s.restconfig, rm, dynamic.LegacyAPIPathResolverFunc)
 
 	return nil
 }
 
-// ApplyResources creates or updates all resources in db that match the provided filter.
-func (c *client) ApplyResources(filter func(unstructured.Unstructured) bool, db map[string]unstructured.Unstructured, keys []string) error {
+// applyResources creates or updates all resources in db that match the provided
+// filter.
+func (s *sync) applyResources(filter func(unstructured.Unstructured) bool, keys []string) error {
 	for _, k := range keys {
-		o := db[k]
+		o := s.db[k]
 
 		if !filter(o) {
 			continue
 		}
 
-		if err := write(c.log, c.dyn, c.grs, &o); err != nil {
+		if err := write(s.log, s.dyn, s.grs, &o); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-// DeleteOrphans looks for the "belongs-to-syncpod: yes" annotation, if found and object not in current db, remove it.
-func (c *client) DeleteOrphans(db map[string]unstructured.Unstructured) error {
-	c.log.Info("Deleting Orphan Objects from the running cluster")
-	for _, gr := range c.grs {
+// deleteOrphans looks for the "belongs-to-syncpod: yes" annotation, if found
+// and object not in current db, remove it.
+func (s *sync) deleteOrphans() error {
+	s.log.Info("Deleting Orphan Objects from the running cluster")
+	for _, gr := range s.grs {
 		gv, err := schema.ParseGroupVersion(gr.Group.PreferredVersion.GroupVersion)
 		if err != nil {
 			return err
@@ -140,7 +78,7 @@ func (c *client) DeleteOrphans(db map[string]unstructured.Unstructured) error {
 				continue
 			}
 
-			dc, err := c.dyn.ClientForGroupVersionKind(gvk)
+			dc, err := s.dyn.ClientForGroupVersionKind(gvk)
 			if err != nil {
 				return err
 			}
@@ -160,8 +98,8 @@ func (c *client) DeleteOrphans(db map[string]unstructured.Unstructured) error {
 				l := i.GetLabels()
 				if l[ownedBySyncPodLabelKey] == "true" {
 					// if object is marked, but not in current DB, remove it
-					if _, ok := db[KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())]; !ok {
-						c.log.Info("Delete " + KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName()))
+					if _, ok := s.db[KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())]; !ok {
+						s.log.Info("Delete " + KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName()))
 						err = dc.Resource(&resource, i.GetNamespace()).Delete(i.GetName(), nil)
 						if err != nil {
 							return err
