@@ -247,6 +247,10 @@ func validateImageConfig(i *pluginapi.ImageConfig) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid images.metricsBridge %q", i.MetricsBridge))
 	}
 
+	if i.Canary == "" {
+		errs = append(errs, fmt.Errorf("invalid images.canary %q", i.Canary))
+	}
+
 	if len(i.ImagePullSecret) == 0 {
 		errs = append(errs, fmt.Errorf("invalid images.imagePullSecret %q", i.ImagePullSecret))
 	}

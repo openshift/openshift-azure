@@ -53,6 +53,7 @@ func TestPluginTemplateValidate(t *testing.T) {
 			errors.New(`invalid images.genevaTDAgent ""`),
 			errors.New(`invalid images.genevaStatsd ""`),
 			errors.New(`invalid images.metricsBridge ""`),
+			errors.New(`invalid images.canary ""`),
 			errors.New(`invalid images.imagePullSecret ""`),
 			errors.New(`invalid genevaLoggingSector ""`),
 			errors.New(`invalid genevaLoggingAccount ""`),

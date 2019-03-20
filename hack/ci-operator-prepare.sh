@@ -15,5 +15,6 @@ export AZURE_CONTROLLERS_IMAGE=registry.svc.ci.openshift.org/${OPENSHIFT_BUILD_N
 export METRICSBRIDGE_IMAGE=registry.svc.ci.openshift.org/${OPENSHIFT_BUILD_NAMESPACE}/stable:metricsbridge
 export STARTUP_IMAGE=registry.svc.ci.openshift.org/${OPENSHIFT_BUILD_NAMESPACE}/stable:startup
 export TLSPROXY_IMAGE=registry.svc.ci.openshift.org/${OPENSHIFT_BUILD_NAMESPACE}/stable:tlsproxy
+export CANARY_IMAGE=registry.svc.ci.openshift.org/${OPENSHIFT_BUILD_NAMESPACE}/stable:canary
 
 export NO_WAIT=true

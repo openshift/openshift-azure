@@ -11,6 +11,7 @@
 /tlsproxy
 /azure-controllers
 /metricsbridge
+/canary
 .vscode
 .idea
 coverage.out

@@ -400,6 +400,7 @@
 // data/Route.route.openshift.io/default/docker-registry.yaml
 // data/Route.route.openshift.io/default/registry-console.yaml
 // data/Route.route.openshift.io/openshift-azure-branding/branding.yaml
+// data/Route.route.openshift.io/openshift-azure-monitoring/canary.yaml
 // data/Route.route.openshift.io/openshift-console/console.yaml
 // data/Secret/default/registry-certificates.yaml
 // data/Secret/default/registry-config.yaml
@@ -434,6 +435,7 @@
 // data/Service/kube-system/kubelet.yaml
 // data/Service/openshift-ansible-service-broker/asb.yaml
 // data/Service/openshift-azure-branding/branding.yaml
+// data/Service/openshift-azure-monitoring/canary.yaml
 // data/Service/openshift-azure-monitoring/etcd-metrics.yaml
 // data/Service/openshift-console/console.yaml
 // data/Service/openshift-template-service-broker/apiserver.yaml
@@ -504,7 +506,9 @@
 // data/ServiceAccount/openshift-template-service-broker/apiserver.yaml
 // data/ServiceAccount/openshift-template-service-broker/templateservicebroker-client.yaml
 // data/ServiceAccount/openshift-web-console/webconsole.yaml
+// data/ServiceMonitor.monitoring.coreos.com/openshift-monitoring/canary.yaml
 // data/ServiceMonitor.monitoring.coreos.com/openshift-monitoring/etcd-metrics.yaml
+// data/StatefulSet.apps/openshift-azure-monitoring/canary.yaml
 // data/StatefulSet.apps/openshift-infra/bootstrap-autoapprover.yaml
 // data/StorageClass.storage.k8s.io/azure-disk.yaml
 // data/StorageClass.storage.k8s.io/azure-file.yaml
@@ -8748,6 +8752,26 @@ func routeRouteOpenshiftIoOpenshiftAzureBrandingBrandingYaml() (*asset, error) {
 	return a, nil
 }
 
+var _routeRouteOpenshiftIoOpenshiftAzureMonitoringCanaryYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x5c\x90\xcd\x6a\xeb\x30\x10\x85\xf7\x7a\x8a\xd9\x05\x0c\xce\xcf\xee\xa2\xdd\x85\x9a\xee\x42\x48\x43\xf7\x53\x69\x6a\x0f\xb1\x67\x84\x34\x49\x48\x9e\xbe\xc8\x49\x5a\xc8\xf2\xe8\xa0\xef\xd3\x11\x26\xfe\xa4\x5c\x58\xc5\x43\xd6\x93\xd1\x52\x13\x49\x19\xf8\xdb\x96\xac\xab\xf3\xc6\x1d\x59\xa2\x87\x7d\xed\xdc\x44\x86\x11\x0d\xbd\x03\x40\x11\x35\x34\x56\x29\x35\x02\xe0\xed\x94\x5f\xae\x97\xab\x84\x36\x69\x6c\x33\x61\x64\xa1\x52\xda\x84\x36\x78\x58\x0d\x84\xa3\x0d\xb7\x55\x2d\xae\x0e\x60\xc4\x2f\x1a\x1f\xa0\xe3\xbf\xd2\x62\x4a\x1e\x02\x0a\xe6\xda\x0a\x4e\xf4\x12\x4b\xc2\x40\x1e\x7e\x75\xed\xac\x6f\x27\x15\x36\xcd\x2c\xbd\x2b\x89\x42\x05\x0e\x5a\xcc\xc3\xa2\x69\x1a\x78\xef\xb6\xdd\xfe\xff\xa1\x7b\x83\xa6\x69\x16\x0e\x20\x69\xb6\xbb\xd4\x30\xf7\x64\xbb\x9a\x61\x30\x4b\x0e\xc0\x9e\x0f\x62\x29\x14\x4e\x99\xba\xd8\xd3\x81\xf2\xc4\x32\xef\xde\xe9\xc8\xe1\xea\x61\x4f\x91\x33\x05\xbb\x73\xfe\x7a\x0f\x14\x7b\xaa\x20\x7d\x0c\x9b\xbf\xf2\x83\xf2\x99\x03\xcd\x27\x2f\xc3\x00\x2e\xc4\xfd\x60\x1e\x36\xeb\xb5\x03\xb8\xf0\x18\x03\xe6\xf8\x34\x6d\x55\xc8\xfd\x04\x00\x00\xff\xff\x36\x4e\x7c\xdb\xb3\x01\x00\x00")
+
+func routeRouteOpenshiftIoOpenshiftAzureMonitoringCanaryYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_routeRouteOpenshiftIoOpenshiftAzureMonitoringCanaryYaml,
+		"Route.route.openshift.io/openshift-azure-monitoring/canary.yaml",
+	)
+}
+
+func routeRouteOpenshiftIoOpenshiftAzureMonitoringCanaryYaml() (*asset, error) {
+	bytes, err := routeRouteOpenshiftIoOpenshiftAzureMonitoringCanaryYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Route.route.openshift.io/openshift-azure-monitoring/canary.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _routeRouteOpenshiftIoOpenshiftConsoleConsoleYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x90\x4f\x6b\x2b\x31\x0c\xc4\xef\xfe\x14\x73\x0b\x2c\x6c\xfe\x5c\x7d\x7b\xf0\x96\x77\x0b\x21\x2f\xf4\xae\xda\x6a\x6c\xba\x91\x8c\xad\x24\xa4\x9f\xbe\x6c\x96\xb4\x34\xf4\x38\x1e\xeb\x37\x1a\x51\xc9\x2f\x5c\x5b\x56\xf1\xa8\x7a\x36\x5e\x6a\x61\x69\x29\xbf\xd9\x32\xeb\xea\xb2\x71\xef\x59\xa2\xc7\x7e\xf2\xdc\x89\x8d\x22\x19\x79\x07\x90\x88\x1a\x59\x56\x69\x93\x04\xe8\xe3\x5c\x9f\xc6\xdb\x4d\x42\x5f\x34\xf6\x95\x29\x66\xe1\xd6\xfa\x42\x96\x3c\x56\x89\x69\xb4\xe4\x80\x91\x5e\x79\x7c\x10\x4a\xf1\xf8\x02\xf4\x41\xa5\xe9\xc8\x0e\x10\x3a\xb1\xc7\x4f\xdd\x0a\x05\xfe\xed\x7b\x2b\x1c\x26\x5e\xd2\x66\x1e\x8b\xae\xeb\xf0\x6f\xd8\x0e\xfb\x3f\x87\xe1\x2f\xba\xae\x5b\x38\xa0\x68\xb5\x39\xd3\xa8\x1e\xd9\x76\x93\x46\x32\x2b\xcd\x01\xf6\x58\x28\x4b\xe3\x70\xae\x3c\xc4\x23\x1f\xb8\x9e\xb2\xdc\x0b\xef\x74\xcc\xe1\xe6\xb1\xe7\x98\x2b\x07\x9b\x41\xdf\xbe\x47\x65\x96\x50\x6f\x65\xb2\x4c\x67\xd8\x7c\xc8\xff\x5c\x2f\x39\xf0\xfd\xe5\xb9\x16\x70\xe5\x7c\x4c\xe6\xb1\x59\xaf\x1d\x70\xcd\x63\x0c\x54\xe3\x23\x6f\xab\xc2\xee\x33\x00\x00\xff\xff\xbc\x6b\x2c\x65\xb2\x01\x00\x00")
 
 func routeRouteOpenshiftIoOpenshiftConsoleConsoleYamlBytes() ([]byte, error) {
@@ -9424,6 +9448,26 @@ func serviceOpenshiftAzureBrandingBrandingYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "Service/openshift-azure-branding/branding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _serviceOpenshiftAzureMonitoringCanaryYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x8e\x41\xaa\xc3\x40\x08\x40\xf7\x73\x0a\x2f\x30\xf0\xff\x2e\xcc\x29\x0a\x85\xee\xed\xc4\x26\x92\xc4\x11\xb5\x81\xf6\xf4\x25\x43\x56\xa5\x3b\xdf\x13\x9e\xa2\xf2\x8d\xcc\xb9\x49\x81\xfd\x3f\x2d\x2c\x63\x81\x2b\xd9\xce\x95\xd2\x46\x81\x23\x06\x96\x04\xb0\xe2\x9d\x56\x3f\x26\x80\x65\xf0\x8c\xaa\x05\x2a\x0a\xda\x2b\x01\x08\x6e\xf4\x85\xae\x58\xa9\x40\x53\x12\x9f\xf9\x11\x19\xdf\x4f\xa3\xbc\x35\xe1\x68\xc6\x32\x25\x57\xaa\x47\x50\x9b\x45\x2f\xe7\xb3\x33\x47\x68\x3f\x74\x6c\x0a\x0c\x7f\x1d\x02\x6d\xa2\xb8\x9c\xaa\x4b\xa7\x95\x6a\x34\xfb\xfd\xd6\x27\x00\x00\xff\xff\xea\x40\x56\x63\xdc\x00\x00\x00")
+
+func serviceOpenshiftAzureMonitoringCanaryYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_serviceOpenshiftAzureMonitoringCanaryYaml,
+		"Service/openshift-azure-monitoring/canary.yaml",
+	)
+}
+
+func serviceOpenshiftAzureMonitoringCanaryYaml() (*asset, error) {
+	bytes, err := serviceOpenshiftAzureMonitoringCanaryYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Service/openshift-azure-monitoring/canary.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -10828,6 +10872,26 @@ func serviceaccountOpenshiftWebConsoleWebconsoleYaml() (*asset, error) {
 	return a, nil
 }
 
+var _servicemonitorMonitoringCoreosComOpenshiftMonitoringCanaryYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x64\x90\x41\x4e\xc3\x40\x0c\x45\xf7\x39\x85\x2f\x90\x56\xdd\xa1\x39\x43\x61\x53\x89\x2d\x72\xa7\x86\x98\x66\x6c\xcb\x36\x91\xe0\xf4\x28\x49\x11\x51\xbb\x9b\xff\x3d\xd6\x7f\xdf\x68\xfc\x4a\x1e\xac\x52\xa0\xa9\x70\xaa\xb3\x7c\xec\xaa\x3a\x69\xec\xaa\xb6\xfd\x74\xe8\xae\x2c\x97\x02\x27\xf2\x89\x2b\x3d\xaf\xbf\xba\x46\x89\x17\x4c\x2c\x1d\xc0\x88\x67\x1a\x63\x7e\x01\xe0\xcf\x97\x53\x8f\x66\x05\x2a\x0a\xfa\xf7\xe2\x5e\x9f\xe2\xce\x13\x6c\x74\x27\xc3\xb0\x52\x01\x35\x92\x18\xf8\x3d\xfb\x7f\xa2\x2e\x8c\xea\x1c\x40\x72\x31\x65\xc9\x25\xad\x07\x96\x24\x9f\x70\x2c\x70\x68\x4b\x50\xa3\x74\xae\xf1\x66\x98\x43\x81\xfd\x4d\x2e\x23\x53\xcf\x02\x43\xa6\x2d\x32\xea\x40\x33\xc2\xcd\xf8\xd4\xf3\x71\xae\x51\xfe\x58\xb7\x50\x27\x1a\xa9\xa6\xfa\x5a\xb1\x61\xd6\xe1\x65\x9e\xad\xba\xdf\x20\xaf\xf5\x37\xe0\x00\xf1\xb8\x7c\xdc\x1c\xec\xf1\x38\xbf\x01\x00\x00\xff\xff\x49\x96\x23\xf5\x95\x01\x00\x00")
+
+func servicemonitorMonitoringCoreosComOpenshiftMonitoringCanaryYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_servicemonitorMonitoringCoreosComOpenshiftMonitoringCanaryYaml,
+		"ServiceMonitor.monitoring.coreos.com/openshift-monitoring/canary.yaml",
+	)
+}
+
+func servicemonitorMonitoringCoreosComOpenshiftMonitoringCanaryYaml() (*asset, error) {
+	bytes, err := servicemonitorMonitoringCoreosComOpenshiftMonitoringCanaryYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ServiceMonitor.monitoring.coreos.com/openshift-monitoring/canary.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _servicemonitorMonitoringCoreosComOpenshiftMonitoringEtcdMetricsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x84\x92\x41\x8f\x9b\x40\x0c\x85\xef\xfc\x0a\xff\x01\x40\xb9\x55\x73\xab\x2a\xf5\x94\xf6\x12\xa9\xd7\xca\x18\x27\x4c\x81\x99\x91\x6d\xa8\x76\x7f\xfd\x6a\x20\x24\xac\x92\x68\x39\x31\x9f\x87\xe7\x87\xde\xc3\xe4\xff\xb0\xa8\x8f\xc1\xc1\x18\x83\xb7\x28\x3e\x5c\x2a\x8a\xc2\x51\x2b\x8a\x63\x3d\x1f\x8a\xde\x87\xd6\xc1\x89\x65\xf6\xc4\xbf\xd6\x5b\xc5\xc8\x86\x2d\x1a\xba\x02\x60\xc0\x86\x07\xcd\x6f\x00\xf8\x3e\x09\x97\x98\x92\x03\x36\x6a\xcb\x91\x4d\x3c\xe9\x32\xeb\xbf\xe9\xd3\x49\xc0\x91\x9f\x42\x4d\x48\xec\x20\x26\x0e\xda\xf9\xb3\x95\x77\x8f\x85\x26\xa6\xbc\x92\x43\x9b\xa2\x0f\xb6\xec\x2f\xa1\x41\xf5\xf4\x7d\xb2\x6e\xb5\x03\x90\x50\xf5\x7f\x94\x76\x3b\x03\xf4\xfc\xe6\x6e\xf8\x46\x9f\x9a\xc8\xcf\xa4\x2c\xcb\xf0\xb3\xc0\x86\xbf\x12\xf0\xc1\x58\x66\x1c\x1c\x1c\xc6\x05\x5c\x87\x7f\x13\x5a\xe7\xa0\xde\xdf\x4d\x51\xcc\xc1\x9e\x28\x75\x9c\x65\x3b\xb3\xb4\x12\x1b\xf4\x47\x0c\x67\x7f\xd9\xfc\x10\xfe\xf4\x03\x3b\xa8\x67\x94\x5a\xa6\x50\x2b\x93\xb0\x69\xdd\x4f\x0d\x4b\x60\x63\xad\x7c\xac\x75\xcd\x0f\x89\xe2\x14\x6c\x3b\x96\x84\x15\x89\x5d\xa5\x32\x64\xf9\xfd\xf0\x23\xd5\x3d\x81\x35\xdf\x5d\x57\x74\xa6\x02\xe0\x5f\x6c\x8e\xb9\x05\x6e\x0b\x79\x9f\xe0\x89\x07\x26\x8b\xb2\x3a\x1e\xd1\xa8\xcb\x3b\xae\x8d\x29\xe1\xb5\x7a\x91\x3d\x3d\x7c\x7c\xdc\xf5\xed\x55\xab\x3e\x02\x00\x00\xff\xff\xb6\x7b\x78\x09\xda\x02\x00\x00")
 
 func servicemonitorMonitoringCoreosComOpenshiftMonitoringEtcdMetricsYamlBytes() ([]byte, error) {
@@ -10844,6 +10908,26 @@ func servicemonitorMonitoringCoreosComOpenshiftMonitoringEtcdMetricsYaml() (*ass
 	}
 
 	info := bindataFileInfo{name: "ServiceMonitor.monitoring.coreos.com/openshift-monitoring/etcd-metrics.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _statefulsetAppsOpenshiftAzureMonitoringCanaryYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x53\x41\x6f\xe2\x3c\x10\xbd\xe7\x57\x8c\x7a\xa9\x14\x29\xd0\xf6\xbb\x54\xbe\x55\x2d\x5f\xf7\xb0\xa5\x08\xd0\xee\x79\x70\x26\x8d\x85\x63\x7b\x3d\x13\x56\xf4\xd7\xaf\x92\x40\xea\x50\x7c\x82\xe7\x79\x9e\xf7\x26\x6f\x30\x98\x5f\x14\xd9\x78\xa7\x00\x43\xe0\xf9\xe1\x3e\xdb\x1b\x57\x2a\xd8\x08\x0a\x55\xad\xdd\x90\x64\x0d\x09\x96\x28\xa8\x32\x00\x8b\x3b\xb2\xdc\xfd\x02\xc0\xcf\x36\xd2\xcc\x07\x72\x5c\x9b\x4a\x66\xc6\xcf\xf9\xe8\x74\x11\x7c\x59\xfc\x45\x23\x45\xe5\x63\x11\x09\x4b\xe3\x88\x59\xc1\x4d\x85\x96\xe9\xa6\xe7\xee\x1f\xb9\xc0\x10\x14\x68\x74\x18\x8f\x19\x80\xc3\x86\x2e\xfe\x72\x40\x4d\x0a\xc6\x0e\x45\xdf\xb1\x68\xbc\x33\xe2\xa3\x71\x1f\x19\x07\xd2\x9d\x98\x48\xc1\x1a\x8d\xac\xe0\x21\x03\x60\xb2\xa4\xc5\xc7\x41\x66\x83\xa2\xeb\x9f\x89\xee\x6b\xdd\x85\x9a\x60\x51\xe8\x44\x49\x1c\x77\xc7\x4e\xd8\xd7\xf8\x00\x67\x29\xdd\xd1\xde\x09\x1a\x47\x71\xe4\x14\x40\xee\xf0\xf5\x40\x71\xb2\xfb\xe3\x7d\xb3\x5d\x3e\xbd\x2d\xc6\x0b\x80\x03\xda\x96\xfe\x8f\xbe\x51\x09\x08\x50\x19\xb2\xe5\x9a\xaa\x29\x7a\xc2\x57\x28\xb5\xea\x15\xcc\x9c\x2f\x69\x89\x0d\x8d\x65\xa6\xc1\x0f\x52\x70\x9b\xe7\x39\xbc\x2e\x96\x8b\xf5\xd3\x76\xf1\x02\x79\x9e\xdf\x8e\x25\x17\xa3\x1f\x4e\xf0\x51\x38\x55\x3c\x9a\x5a\xf9\x28\x0a\x1e\xef\x1e\xef\x12\x2d\xc3\x1b\xb5\x48\x18\xc1\xf1\xd3\xaf\xa2\xdf\x51\x2a\xbc\x2b\x7b\x25\x99\x7a\x09\xbd\x89\x9a\xd0\x4a\xfd\x39\xef\xc8\xc7\xe9\xfd\xb5\xb6\x00\xac\x6b\xea\x47\xb9\xdd\xae\x92\x0b\xe3\x8c\x18\xb4\x2f\x64\xf1\xb8\x21\xed\x5d\xc9\x0a\xee\xbf\xa8\x07\x6f\xdb\x86\xde\x7c\xeb\xa6\x2e\x9b\x0e\x19\xe6\x39\xef\x22\xf0\xcd\x62\x02\x76\xb3\xde\x4c\xb2\x76\x46\x8b\xe8\x2d\xcd\xf6\xed\x8e\xa2\x23\x21\xee\x76\xc3\xb8\x2a\xa2\x82\x1b\x89\x6d\xbf\x04\x83\x82\x67\x8b\xa6\xd9\x9e\xd2\xd7\x2b\x29\xbe\xc5\xef\xa2\x71\x9a\x34\xd4\x9a\x98\xdf\x7c\x49\x49\xd4\xd6\x84\xe5\xef\x68\x84\xde\x9d\x3e\x07\x21\x12\xfb\x36\x6a\x4a\xcc\x46\xfa\xd3\x12\xa7\xf6\x01\x58\x7c\xec\xf3\xf2\xdf\xc3\xab\xc9\x26\xd8\xb3\x45\xe6\x65\x2f\x65\xd8\xc3\xd2\xf0\x3e\xfb\x17\x00\x00\xff\xff\xd9\xbc\xe0\x9a\x43\x04\x00\x00")
+
+func statefulsetAppsOpenshiftAzureMonitoringCanaryYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_statefulsetAppsOpenshiftAzureMonitoringCanaryYaml,
+		"StatefulSet.apps/openshift-azure-monitoring/canary.yaml",
+	)
+}
+
+func statefulsetAppsOpenshiftAzureMonitoringCanaryYaml() (*asset, error) {
+	bytes, err := statefulsetAppsOpenshiftAzureMonitoringCanaryYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "StatefulSet.apps/openshift-azure-monitoring/canary.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -14860,6 +14944,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Route.route.openshift.io/default/docker-registry.yaml":                                                                              routeRouteOpenshiftIoDefaultDockerRegistryYaml,
 	"Route.route.openshift.io/default/registry-console.yaml":                                                                             routeRouteOpenshiftIoDefaultRegistryConsoleYaml,
 	"Route.route.openshift.io/openshift-azure-branding/branding.yaml":                                                                    routeRouteOpenshiftIoOpenshiftAzureBrandingBrandingYaml,
+	"Route.route.openshift.io/openshift-azure-monitoring/canary.yaml":                                                                    routeRouteOpenshiftIoOpenshiftAzureMonitoringCanaryYaml,
 	"Route.route.openshift.io/openshift-console/console.yaml":                                                                            routeRouteOpenshiftIoOpenshiftConsoleConsoleYaml,
 	"Secret/default/registry-certificates.yaml":                                                                                          secretDefaultRegistryCertificatesYaml,
 	"Secret/default/registry-config.yaml":                                                                                                secretDefaultRegistryConfigYaml,
@@ -14894,6 +14979,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Service/kube-system/kubelet.yaml":                                                                                                   serviceKubeSystemKubeletYaml,
 	"Service/openshift-ansible-service-broker/asb.yaml":                                                                                  serviceOpenshiftAnsibleServiceBrokerAsbYaml,
 	"Service/openshift-azure-branding/branding.yaml":                                                                                     serviceOpenshiftAzureBrandingBrandingYaml,
+	"Service/openshift-azure-monitoring/canary.yaml":                                                                                     serviceOpenshiftAzureMonitoringCanaryYaml,
 	"Service/openshift-azure-monitoring/etcd-metrics.yaml":                                                                               serviceOpenshiftAzureMonitoringEtcdMetricsYaml,
 	"Service/openshift-console/console.yaml":                                                                                             serviceOpenshiftConsoleConsoleYaml,
 	"Service/openshift-template-service-broker/apiserver.yaml":                                                                           serviceOpenshiftTemplateServiceBrokerApiserverYaml,
@@ -14964,7 +15050,9 @@ var _bindata = map[string]func() (*asset, error){
 	"ServiceAccount/openshift-template-service-broker/apiserver.yaml":                                                                    serviceaccountOpenshiftTemplateServiceBrokerApiserverYaml,
 	"ServiceAccount/openshift-template-service-broker/templateservicebroker-client.yaml":                                                 serviceaccountOpenshiftTemplateServiceBrokerTemplateservicebrokerClientYaml,
 	"ServiceAccount/openshift-web-console/webconsole.yaml":                                                                               serviceaccountOpenshiftWebConsoleWebconsoleYaml,
+	"ServiceMonitor.monitoring.coreos.com/openshift-monitoring/canary.yaml":                                                              servicemonitorMonitoringCoreosComOpenshiftMonitoringCanaryYaml,
 	"ServiceMonitor.monitoring.coreos.com/openshift-monitoring/etcd-metrics.yaml":                                                        servicemonitorMonitoringCoreosComOpenshiftMonitoringEtcdMetricsYaml,
+	"StatefulSet.apps/openshift-azure-monitoring/canary.yaml":                                                                            statefulsetAppsOpenshiftAzureMonitoringCanaryYaml,
 	"StatefulSet.apps/openshift-infra/bootstrap-autoapprover.yaml":                                                                       statefulsetAppsOpenshiftInfraBootstrapAutoapproverYaml,
 	"StorageClass.storage.k8s.io/azure-disk.yaml":                                                                                        storageclassStorageK8sIoAzureDiskYaml,
 	"StorageClass.storage.k8s.io/azure-file.yaml":                                                                                        storageclassStorageK8sIoAzureFileYaml,
@@ -15693,6 +15781,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"openshift-azure-branding": {nil, map[string]*bintree{
 			"branding.yaml": {routeRouteOpenshiftIoOpenshiftAzureBrandingBrandingYaml, map[string]*bintree{}},
 		}},
+		"openshift-azure-monitoring": {nil, map[string]*bintree{
+			"canary.yaml": {routeRouteOpenshiftIoOpenshiftAzureMonitoringCanaryYaml, map[string]*bintree{}},
+		}},
 		"openshift-console": {nil, map[string]*bintree{
 			"console.yaml": {routeRouteOpenshiftIoOpenshiftConsoleConsoleYaml, map[string]*bintree{}},
 		}},
@@ -15764,6 +15855,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"branding.yaml": {serviceOpenshiftAzureBrandingBrandingYaml, map[string]*bintree{}},
 		}},
 		"openshift-azure-monitoring": {nil, map[string]*bintree{
+			"canary.yaml":       {serviceOpenshiftAzureMonitoringCanaryYaml, map[string]*bintree{}},
 			"etcd-metrics.yaml": {serviceOpenshiftAzureMonitoringEtcdMetricsYaml, map[string]*bintree{}},
 		}},
 		"openshift-console": {nil, map[string]*bintree{
@@ -15874,10 +15966,14 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	}},
 	"ServiceMonitor.monitoring.coreos.com": {nil, map[string]*bintree{
 		"openshift-monitoring": {nil, map[string]*bintree{
+			"canary.yaml":       {servicemonitorMonitoringCoreosComOpenshiftMonitoringCanaryYaml, map[string]*bintree{}},
 			"etcd-metrics.yaml": {servicemonitorMonitoringCoreosComOpenshiftMonitoringEtcdMetricsYaml, map[string]*bintree{}},
 		}},
 	}},
 	"StatefulSet.apps": {nil, map[string]*bintree{
+		"openshift-azure-monitoring": {nil, map[string]*bintree{
+			"canary.yaml": {statefulsetAppsOpenshiftAzureMonitoringCanaryYaml, map[string]*bintree{}},
+		}},
 		"openshift-infra": {nil, map[string]*bintree{
 			"bootstrap-autoapprover.yaml": {statefulsetAppsOpenshiftInfraBootstrapAutoapproverYaml, map[string]*bintree{}},
 		}},

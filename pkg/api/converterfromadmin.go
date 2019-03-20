@@ -557,6 +557,9 @@ func mergeImageConfig(in *admin.ImageConfig, out *ImageConfig) {
 	if in.Httpd != nil {
 		out.Httpd = *in.Httpd
 	}
+	if in.Canary != nil {
+		out.Canary = *in.Canary
+	}
 	if in.Startup != nil {
 		out.Startup = *in.Startup
 	}

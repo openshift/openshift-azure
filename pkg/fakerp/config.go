@@ -80,6 +80,9 @@ func overridePluginTemplate(template *pluginapi.Config) {
 	if os.Getenv("TLSPROXY_IMAGE") != "" {
 		template.Images.TLSProxy = os.Getenv("TLSPROXY_IMAGE")
 	}
+	if os.Getenv("CANARY_IMAGE") != "" {
+		template.Images.Canary = os.Getenv("CANARY_IMAGE")
+	}
 	if os.Getenv("AZURE_CONTROLLERS_IMAGE") != "" {
 		template.Images.AzureControllers = os.Getenv("AZURE_CONTROLLERS_IMAGE")
 	}
