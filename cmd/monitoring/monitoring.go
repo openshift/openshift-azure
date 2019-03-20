@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"syscall"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -130,7 +131,7 @@ func (m *monitor) run(ctx context.Context) error {
 	}
 
 	ch := make(chan os.Signal)
-	signal.Notify(ch, os.Interrupt)
+	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 	m.log.Info("collecting metrics... CTRL+C to stop\n")
 
 	for {

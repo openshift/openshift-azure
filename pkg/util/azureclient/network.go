@@ -89,11 +89,3 @@ func NewPublicIPAddressesClient(ctx context.Context, subscriptionID string, auth
 		PublicIPAddressesClient: client,
 	}
 }
-
-func (c *publicIPAddressesClient) ListVirtualMachineScaleSetPublicIPAddressesComplete(ctx context.Context, resourceGroupName string, scaleSetName string) (network.PublicIPAddressListResultIterator, error) {
-	return c.PublicIPAddressesClient.ListVirtualMachineScaleSetPublicIPAddressesComplete(ctx, resourceGroupName, scaleSetName)
-}
-
-func (c *publicIPAddressesClient) Get(ctx context.Context, resourceGroupName string, publicIPAddressName string, expand string) (network.PublicIPAddress, error) {
-	return c.PublicIPAddressesClient.Get(ctx, resourceGroupName, publicIPAddressName, expand)
-}
