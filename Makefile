@@ -1,4 +1,3 @@
-THIS_FILE := $(lastword $(MAKEFILE_LIST))
 COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
 PLUGIN_VERSION=$(shell awk '/^pluginVersion: /{ print $$2 }' <pluginconfig/pluginconfig-311.yaml)
 # if we are on master branch we should always use dev tag
@@ -42,16 +41,14 @@ test: unit e2e
 
 .PHONY: create delete upgrade
 
-create: monitoring-run
+create:
 	./hack/create.sh ${RESOURCEGROUP}
-	@$(MAKE) -f $(THIS_FILE) monitoring-stop
 
 delete:
 	./hack/delete.sh ${RESOURCEGROUP}
 
-upgrade: monitoring-run 
+upgrade: 
 	./hack/upgrade.sh ${RESOURCEGROUP}
-	@$(MAKE) -f $(THIS_FILE) monitoring-stop
 
 azure-controllers: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@

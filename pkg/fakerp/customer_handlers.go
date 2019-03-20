@@ -39,7 +39,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 
 	// delete dns records
 	// TODO: get resource group from request path
-	dm, err := newDNSManager(req.Context(), os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
+	dm, err := newDNSManager(req.Context(), s.log, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
 	if err != nil {
 		s.internalError(w, fmt.Sprintf("Failed to delete dns records: %v", err))
 		return

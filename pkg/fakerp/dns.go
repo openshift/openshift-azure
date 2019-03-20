@@ -6,25 +6,28 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
 type dnsManager struct {
+	log              *logrus.Entry
 	zc               azureclient.ZonesClient
 	rsc              azureclient.RecordSetsClient
 	dnsResourceGroup string
 	dnsDomain        string
 }
 
-func newDNSManager(ctx context.Context, subscriptionID, dnsResourceGroup, dnsDomain string) (*dnsManager, error) {
+func newDNSManager(ctx context.Context, log *logrus.Entry, subscriptionID, dnsResourceGroup, dnsDomain string) (*dnsManager, error) {
 	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return nil, err
 	}
 
 	return &dnsManager{
+		log:              log,
 		zc:               azureclient.NewZonesClient(ctx, subscriptionID, authorizer),
 		rsc:              azureclient.NewRecordSetsClient(ctx, subscriptionID, authorizer),
 		dnsResourceGroup: dnsResourceGroup,
@@ -98,7 +101,9 @@ func (dm *dnsManager) deleteZone(ctx context.Context, resourceGroup, zoneName, p
 }
 
 func (dm *dnsManager) createOrUpdateOCPDNS(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+
 	parentZone := strings.SplitN(cs.Properties.RouterProfiles[0].PublicSubdomain, ".", 2)[1]
+	dm.log.Infof("parrent zone %s", parentZone)
 
 	// <random>.osacloud.dev zone
 	err := dm.createOrUpdateZone(ctx, cs.Properties.AzProfile.ResourceGroup, parentZone, dm.dnsResourceGroup, dm.dnsDomain)

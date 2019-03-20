@@ -77,7 +77,7 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, kerrors.NewAggregate(errs)
 	}
 
-	dm, err := newDNSManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
+	dm, err := newDNSManager(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
 	if err != nil {
 		return nil, err
 	}
