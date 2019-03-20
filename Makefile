@@ -40,14 +40,13 @@ generate:
 test: unit e2e
 
 .PHONY: create delete upgrade
-
 create:
 	./hack/create.sh ${RESOURCEGROUP}
 
 delete:
 	./hack/delete.sh ${RESOURCEGROUP}
 
-upgrade: 
+upgrade:
 	./hack/upgrade.sh ${RESOURCEGROUP}
 
 azure-controllers: generate

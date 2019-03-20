@@ -23,7 +23,6 @@ var (
 	gitCommit = "unknown"
 	logLevel  = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
 	interval  = flag.Duration("interval", 100*time.Millisecond, "check interval with dimension. Example: 1000ms ")
-	timeout   = flag.Duration("timeout", 2*time.Hour, "timeout when script will exit if left unattended")
 	logerrors = flag.Bool("logerrors", false, "log initial errors")
 	outputdir = flag.String("outputdir", "./", "output directory")
 )
@@ -138,8 +137,6 @@ func (m *monitor) run(ctx context.Context) error {
 		select {
 		case <-ch:
 			return m.persist(instances)
-		case <-ctx.Done():
-			return m.persist(instances)
 		}
 	}
 }
@@ -167,8 +164,7 @@ func main() {
 	log.Printf("monitoring pod starting, git commit %s", gitCommit)
 
 	m := new(monitor)
-	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-	defer cancel()
+	ctx := context.Background()
 
 	if err := m.init(ctx, log); err != nil {
 		log.Fatalf("Cannot initialize monitor: %v", err)
