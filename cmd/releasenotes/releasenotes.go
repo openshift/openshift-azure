@@ -36,7 +36,7 @@ type model struct {
 	ReleaseNote *string
 }
 
-func newReleaseNotes(ctx context.Context) *releasenotes {
+func newReleaseNotes(ctx context.Context) (*releasenotes, error) {
 	var cli *http.Client
 
 	if token, found := os.LookupEnv("GITHUB_TOKEN"); found {
@@ -46,11 +46,13 @@ func newReleaseNotes(ctx context.Context) *releasenotes {
 				&oauth2.Token{AccessToken: token},
 			),
 		)
+	} else {
+		return nil, fmt.Errorf("env GITHUB_TOKEN needs to be set with a valid Github Personal Access Token")
 	}
 
 	return &releasenotes{
 		gh: github.NewClient(cli),
-	}
+	}, nil
 }
 
 func (rn *releasenotes) mergeCommits(repopath, commitrange string) ([]*git.Commit, error) {
@@ -166,8 +168,11 @@ func main() {
 
 	flag.Parse()
 
-	rn := newReleaseNotes(ctx)
-	if err := rn.run(ctx); err != nil {
+	rn, err := newReleaseNotes(ctx)
+	if err != nil {
+		panic(err)
+	}
+	if err = rn.run(ctx); err != nil {
 		panic(err)
 	}
 }
