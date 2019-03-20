@@ -4,11 +4,23 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+	"github.com/sirupsen/logrus"
+
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/startup"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_startup"
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
 func TestHashScaleSet(t *testing.T) {
+	gmc := gomock.NewController(t)
+	defer gmc.Finish()
+
+	mockStartup := mock_startup.NewMockInterface(gmc)
+	c := mockStartup.EXPECT().Hash(api.AgentPoolProfileRoleMaster).Return(nil, nil).Times(2)
+	c = mockStartup.EXPECT().Hash(api.AgentPoolProfileRoleCompute).Return(nil, nil).Times(2).After(c)
+
 	prepare := func(v reflect.Value) {
 		switch v.Interface().(type) {
 		case []api.IdentityProvider:
@@ -30,7 +42,9 @@ func TestHashScaleSet(t *testing.T) {
 	}
 
 	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleCompute} {
-		var h hasher
+		h := hasher{
+			startupFactory: func(*logrus.Entry, *api.OpenShiftManagedCluster) (startup.Interface, error) { return mockStartup, nil },
+		}
 		baseline, err := h.HashScaleSet(&cs, &api.AgentPoolProfile{
 			Role: role,
 		})

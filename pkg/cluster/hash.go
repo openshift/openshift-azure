@@ -16,7 +16,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/startup"
-	"github.com/openshift/openshift-azure/pkg/util/writers"
 )
 
 type Hasher interface {
@@ -25,8 +24,9 @@ type Hasher interface {
 }
 
 type hasher struct {
-	log        *logrus.Entry
-	testConfig api.TestConfig
+	log            *logrus.Entry
+	testConfig     api.TestConfig
+	startupFactory func(*logrus.Entry, *api.OpenShiftManagedCluster) (startup.Interface, error)
 }
 
 // HashScaleSet returns the hash of a scale set
@@ -53,10 +53,17 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 		return nil, err
 	}
 
-	err = startup.WriteStartupFiles(h.log, cs, app.Role, writers.NewTarWriter(hash), "", "")
+	s, err := h.startupFactory(h.log, cs)
 	if err != nil {
 		return nil, err
 	}
+
+	b, err := s.Hash(app.Role)
+	if err != nil {
+		return nil, err
+	}
+
+	hash.Write(b)
 
 	if app.Role == api.AgentPoolProfileRoleMaster {
 		// add certificates pulled from keyvault by the master to the hash, to

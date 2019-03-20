@@ -4,22 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"net"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/startup"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/log"
-	"github.com/openshift/openshift-azure/pkg/util/vault"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
-	"github.com/openshift/openshift-azure/pkg/util/writers"
 )
 
 var (
@@ -52,45 +46,13 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
-	hostname, err := os.Hostname()
+	s, err := startup.New(log, cs)
 	if err != nil {
 		return err
 	}
-
-	cname, err := net.LookupCNAME(hostname)
-	if err != nil {
-		return err
-	}
-
-	domainname := strings.SplitN(strings.TrimSuffix(cname, "."), ".", 2)[1]
-
-	var spp *api.ServicePrincipalProfile
-	if config.GetAgentRole(hostname) == api.AgentPoolProfileRoleMaster {
-		spp = &cs.Properties.MasterServicePrincipalProfile
-	} else {
-		spp = &cs.Properties.WorkerServicePrincipalProfile
-	}
-
-	if config.GetAgentRole(hostname) == api.AgentPoolProfileRoleMaster {
-		log.Info("creating clients")
-		vaultauthorizer, err := azureclient.NewAuthorizer(spp.ClientID, spp.Secret, cs.Properties.AzProfile.TenantID, azureclient.KeyVaultEndpoint)
-		if err != nil {
-			return err
-		}
-
-		kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
-
-		log.Info("enriching config")
-		err = vault.EnrichCSFromVault(ctx, kvc, cs)
-		if err != nil {
-			return err
-		}
-	}
-
-	// TODO: validate that the config version matches our version
 
 	log.Info("writing startup files")
-	return startup.WriteStartupFiles(log, cs, config.GetAgentRole(hostname), writers.NewFilesystemWriter(), hostname, domainname)
+	return s.WriteFiles(ctx)
 }
 
 func main() {

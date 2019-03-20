@@ -1,92 +1,31 @@
 package startup
 
-//go:generate go get github.com/go-bindata/go-bindata/go-bindata
-//go:generate go-bindata -nometadata -pkg $GOPACKAGE -prefix data data/...
-//go:generate gofmt -s -l -w bindata.go
+//go:generate go get github.com/golang/mock/gomock
+//go:generate go install github.com/golang/mock/mockgen
+//go:generate mockgen -destination=../util/mocks/mock_$GOPACKAGE/startup.go -package=mock_$GOPACKAGE -source startup.go
+//go:generate gofmt -s -l -w ../util/mocks/mock_$GOPACKAGE/startup.go
+//go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../util/mocks/mock_$GOPACKAGE/startup.go
 
 import (
-	"os"
-	"path"
-	"sort"
-	"strings"
+	"context"
+	"fmt"
 
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/template"
-	"github.com/openshift/openshift-azure/pkg/util/writers"
+	v4 "github.com/openshift/openshift-azure/pkg/startup/v4"
 )
 
-func WriteStartupFiles(log *logrus.Entry, cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole, w writers.Writer, hostname, domainname string) error {
-	assetNames := AssetNames()
-	sort.Strings(assetNames)
+type Interface interface {
+	WriteFiles(ctx context.Context) error
+	Hash(role api.AgentPoolProfileRole) ([]byte, error)
+}
 
-	for _, filepath := range assetNames {
-		var tmpl string
-
-		switch role {
-		case api.AgentPoolProfileRoleMaster:
-			if !strings.HasPrefix(filepath, "master/") {
-				continue
-			}
-
-			b, err := Asset(filepath)
-			if err != nil {
-				return err
-			}
-			tmpl = string(b)
-
-			filepath = strings.TrimPrefix(filepath, "master")
-
-		default:
-			if !strings.HasPrefix(filepath, "worker/") {
-				continue
-			}
-
-			b, err := Asset(filepath)
-			if err != nil {
-				return err
-			}
-			tmpl = string(b)
-
-			filepath = strings.TrimPrefix(filepath, "worker")
-		}
-
-		b, err := template.Template(tmpl, nil, cs, map[string]interface{}{
-			"Role":       role,
-			"Hostname":   hostname,
-			"DomainName": domainname,
-		})
-		if err != nil {
-			return err
-		}
-
-		var perm os.FileMode
-		switch {
-		case strings.HasSuffix(filepath, ".key"),
-			strings.HasSuffix(filepath, ".kubeconfig"),
-			filepath == "/etc/origin/cloudprovider/azure.conf",
-			filepath == "/etc/origin/master/session-secrets.yaml",
-			filepath == "/var/lib/origin/.docker/config.json",
-			filepath == "/root/.kube/config":
-			perm = 0600
-		default:
-			perm = 0644
-		}
-
-		filepath = "/host" + filepath
-
-		parentDir := path.Dir(filepath)
-		err = w.MkdirAll(parentDir, 0755)
-		if err != nil {
-			return err
-		}
-
-		err = w.WriteFile(filepath, b, perm)
-		if err != nil {
-			return err
-		}
+func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (Interface, error) {
+	switch cs.Config.PluginVersion {
+	case "v4.0":
+		return v4.New(log, cs), nil
 	}
 
-	return nil
+	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
 }
