@@ -126,6 +126,8 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
+	// persist the OpenShift container service
+	log.Info("persist final config")
 	err = writeHelpers(cs)
 	if err != nil {
 		return nil, err
@@ -137,13 +139,9 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
-	// persist the OpenShift container service
-	log.Info("persist config")
-	bytes, err := yaml.Marshal(cs)
-	if err != nil {
-		return nil, err
-	}
-	err = ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
+	// persist the OpenShift container service with final fields
+	log.Info("persist final config")
+	err = writeHelpers(cs)
 	if err != nil {
 		return nil, err
 	}
@@ -304,5 +302,14 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
+	err = ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
+	if err != nil {
+		return err
+	}
+
+	bytes, err := yaml.Marshal(cs)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
 }
