@@ -16,9 +16,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/scaler"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/startup"
-	"github.com/openshift/openshift-azure/pkg/sync"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
+	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
@@ -122,5 +122,5 @@ func (u *simpleUpgrader) EnrichCSFromVault(ctx context.Context, cs *api.OpenShif
 }
 
 func (u *simpleUpgrader) EnrichCSStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	return sync.EnrichCSStorageAccountKeys(ctx, u.accountsClient, cs)
+	return enrich.CSStorageAccountKeys(ctx, u.accountsClient, cs)
 }

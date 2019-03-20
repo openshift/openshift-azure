@@ -24,6 +24,7 @@ import (
 	azureclientstorage "github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
+	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
@@ -126,7 +127,7 @@ func (s *syncer) getBlob(ctx context.Context) (*api.OpenShiftManagedCluster, err
 		return nil, err
 	}
 
-	err = sync.EnrichCSStorageAccountKeys(ctx, s.azs, cs)
+	err = enrich.CSStorageAccountKeys(ctx, s.azs, cs)
 	if err != nil {
 		return nil, err
 	}

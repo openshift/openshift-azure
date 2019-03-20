@@ -23,7 +23,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/healthcheck"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
@@ -365,26 +364,6 @@ func writeDB(log *logrus.Entry, client *client, db map[string]unstructured.Unstr
 
 	// write all post boostrap objects depending on monitoring CRDs, managed by operators
 	return client.ApplyResources(monitoringCrdFilter, db, keys)
-}
-
-func EnrichCSStorageAccountKeys(ctx context.Context, azs azureclient.AccountsClient, cs *api.OpenShiftManagedCluster) error {
-	if cs.Config.RegistryStorageAccountKey == "" {
-		key, err := azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
-		if err != nil {
-			return err
-		}
-		cs.Config.RegistryStorageAccountKey = *(*key.Keys)[0].Value
-	}
-
-	if cs.Config.ConfigStorageAccount == "" {
-		key, err := azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.ConfigStorageAccount)
-		if err != nil {
-			return err
-		}
-		cs.Config.ConfigStorageAccountKey = *(*key.Keys)[0].Value
-	}
-
-	return nil
 }
 
 // Main loop
