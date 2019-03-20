@@ -12,7 +12,7 @@
   #  key: <Geveva metrics key value. Base64 in YAML, rsa.PrivateKey in struct>
   #  cert: <Geveva metrics certificate value. Format: Base64 in YAML, x509.Certificate struct>
 ## Geneva integration other details
-pluginVersion: v0.0
+pluginVersion: v3.0
 ## Openshift component logging levels
 componentLogLevel:
   apiServer: 2
@@ -39,15 +39,15 @@ sshSourceAddressPrefixes: ['0.0.0.0/0']
 images:
   alertManager: registry.access.redhat.com/openshift3/prometheus-alertmanager:v3.11.82
   ansibleServiceBroker: registry.access.redhat.com/openshift3/ose-ansible-service-broker:v3.11.82
-  azureControllers: quay.io/openshift-on-azure/azure-controllers:latest
+  azureControllers: quay.io/openshift-on-azure/azure-controllers:v3.0
   clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.82
   configReloader: registry.access.redhat.com/openshift3/ose-configmap-reloader:v3.11.82
   console: registry.access.redhat.com/openshift3/ose-console:v3.11.82
   controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.82
-  etcdBackup: quay.io/openshift-on-azure/etcdbackup:latest
+  etcdBackup: quay.io/openshift-on-azure/etcdbackup:v3.0
   httpd: registry.access.redhat.com/rhscl/httpd-24-rhel7:2.4-85
-  startup: quay.io/openshift-on-azure/startup:latest
-  tlsProxy: quay.io/openshift-on-azure/tlsproxy:latest
+  startup: quay.io/openshift-on-azure/startup:v3.0
+  tlsProxy: quay.io/openshift-on-azure/tlsproxy:v3.0
   format: registry.access.redhat.com/openshift3/ose-${component}:${version}
   genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
   genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
@@ -56,7 +56,7 @@ images:
   kubeRbacProxy: registry.access.redhat.com/openshift3/ose-kube-rbac-proxy:v3.11.82
   kubeStateMetrics: registry.access.redhat.com/openshift3/ose-kube-state-metrics:v3.11.82
   masterEtcd: registry.access.redhat.com/rhel7/etcd:3.2.22
-  metricsBridge: quay.io/openshift-on-azure/metricsbridge:latest
+  metricsBridge: quay.io/openshift-on-azure/metricsbridge:v3.0
   node: registry.access.redhat.com/openshift3/ose-node:v3.11.82
   nodeExporter: registry.access.redhat.com/openshift3/prometheus-node-exporter:v3.11.82
   oAuthProxy: registry.access.redhat.com/openshift3/oauth-proxy:v3.11.82
@@ -67,7 +67,7 @@ images:
   registryConsole: registry.access.redhat.com/openshift3/registry-console:v3.11.82
   router: registry.access.redhat.com/openshift3/ose-haproxy-router:v3.11.82
   serviceCatalog: registry.access.redhat.com/openshift3/ose-service-catalog:v3.11.82
-  sync: quay.io/openshift-on-azure/sync:latest
+  sync: quay.io/openshift-on-azure/sync:v3.0
   templateServiceBroker: registry.access.redhat.com/openshift3/ose-template-service-broker:v3.11.82
   webConsole: registry.access.redhat.com/openshift3/ose-web-console:v3.11.82
 ## Gevena image pull secret is used to access private components images. Format: base64 encoded .docker/config.json file "{auths:{osarpint.azurecr.io:{username:username,password:notthepasswordyouarelookingfor,email:openshift@example.com,auth:dXNlcm5hbWU6bm90dGhlcGFzc3dvcmR5b3VhcmVsb29raW5nZm9yCg==}}}"
