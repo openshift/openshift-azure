@@ -35,7 +35,7 @@ func TestClean(t *testing.T) {
 			t.Error(err)
 		}
 
-		Clean(i)
+		clean(i)
 		if !reflect.DeepEqual(i, o) {
 			t.Errorf("%s:\n%s", match, strings.Join(deep.Equal(i, o), "\n"))
 		}

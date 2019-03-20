@@ -12,9 +12,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 )
 
-// IsDouble indicates if we should ignore a given GroupKind because it is
+// isDouble indicates if we should ignore a given GroupKind because it is
 // accessible via a different API route.
-func IsDouble(gk schema.GroupKind) bool {
+func isDouble(gk schema.GroupKind) bool {
 	switch gk.String() {
 	case "ClusterRole.authorization.openshift.io", // ClusterRole.rbac.authorization.k8s.io
 		"ClusterRoleBinding.authorization.openshift.io", // ClusterRoleBinding.rbac.authorization.k8s.io
@@ -33,11 +33,11 @@ func IsDouble(gk schema.GroupKind) bool {
 }
 
 // Wants determines if we want to handle the object.
-func Wants(o unstructured.Unstructured) bool {
+func wants(o unstructured.Unstructured) bool {
 	gk := o.GroupVersionKind().GroupKind()
 	ns := o.GetNamespace()
 
-	if IsDouble(gk) {
+	if isDouble(gk) {
 		return false
 	}
 

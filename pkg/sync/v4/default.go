@@ -39,7 +39,7 @@ func defaultPodSpec(obj map[string]interface{}) {
 	jsonpath.MustCompile("$.volumes.*.secret.defaultMode").DeleteIfMatch(obj, int64(0644))
 }
 
-func Default(o unstructured.Unstructured) {
+func defaults(o unstructured.Unstructured) {
 	gk := o.GroupVersionKind().GroupKind()
 
 	switch gk.String() {

@@ -72,8 +72,8 @@ func convertSecretData(o unstructured.Unstructured) error {
 	return nil
 }
 
-// Clean removes object entries which should not be persisted.
-func Clean(o unstructured.Unstructured) error {
+// clean removes object entries which should not be persisted.
+func clean(o unstructured.Unstructured) error {
 	gk := o.GroupVersionKind().GroupKind()
 
 	jsonpath.MustCompile("$.status").Delete(o.Object)

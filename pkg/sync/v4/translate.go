@@ -47,7 +47,7 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 			}
 		}
 
-		err := Translate(o.Object, tr.Path, tr.NestedPath, tr.NestedFlags, s)
+		err := translate(o.Object, tr.Path, tr.NestedPath, tr.NestedFlags, s)
 		if err != nil {
 			return unstructured.Unstructured{}, err
 		}
@@ -55,7 +55,7 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 	return o, nil
 }
 
-func Translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nestedFlags NestedFlags, v interface{}) error {
+func translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nestedFlags NestedFlags, v interface{}) error {
 	var err error
 
 	if nestedPath == nil {

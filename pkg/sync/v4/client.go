@@ -132,7 +132,7 @@ func (c *client) DeleteOrphans(db map[string]unstructured.Unstructured) error {
 
 			gvk := gv.WithKind(resource.Kind)
 			gk := gvk.GroupKind()
-			if IsDouble(gk) {
+			if isDouble(gk) {
 				continue
 			}
 
@@ -243,11 +243,11 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 
 		rv := existing.GetResourceVersion()
 
-		err = Clean(*existing)
+		err = clean(*existing)
 		if err != nil {
 			return
 		}
-		Default(*existing)
+		defaults(*existing)
 
 		markSyncPodOwned(o)
 
