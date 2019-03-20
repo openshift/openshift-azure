@@ -40,6 +40,10 @@ func (sc *SanityChecker) checkMonitoringStackHealth(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "kube-state-metrics"))
+	if err != nil {
+		return err
+	}
 	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckStatefulSetIsReady(sc.Client.Admin.AppsV1.StatefulSets("openshift-monitoring"), "prometheus-k8s"))
 	if err != nil {
 		return err
