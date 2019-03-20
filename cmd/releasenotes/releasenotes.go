@@ -1,3 +1,5 @@
+//+build releasenotes
+
 package main
 
 import (

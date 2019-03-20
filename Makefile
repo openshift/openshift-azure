@@ -136,7 +136,7 @@ canary-push: canary-image
 	docker push $(CANARY_IMAGE)
 
 releasenotes:
-	go build ./cmd/$@
+	go build -tags releasenotes ./cmd/$@
 
 .PHONY: verify
 verify:
