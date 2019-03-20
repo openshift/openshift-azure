@@ -18,7 +18,7 @@ SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
 STARTUP_IMAGE ?= quay.io/openshift-on-azure/startup:$(TAG)
 CANARY_IMAGE ?= quay.io/openshift-on-azure/canary:$(TAG)
 
-ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup tlsproxy canary
+ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup tlsproxy canary releasenotes
 ALL_IMAGES = $(addsuffix -image, $(ALL_BINARIES))
 ALL_PUSHES = $(addsuffix -push, $(ALL_BINARIES))
 
@@ -133,7 +133,10 @@ canary-image: canary $(IMAGEBUILDER) pullregistry
 	$(IMAGEBUILDER) -f images/canary/Dockerfile -t $(CANARY_IMAGE) .
 
 canary-push: canary-image
-	docker push $(CANARY_IMAGE)	
+	docker push $(CANARY_IMAGE)
+
+releasenotes:
+	go build ./cmd/$@
 
 .PHONY: verify
 verify:
