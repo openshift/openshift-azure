@@ -32,7 +32,7 @@ kubeletArguments:
   feature-gates:
   - RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true
   node-labels:
-  - node-role.kubernetes.io/{{ .Extra.Role }}=true
+  - node-role.kubernetes.io/{{ .Role }}=true
   - openshift-infra=apiserver
   pod-manifest-path:
   - /etc/origin/node/pods
@@ -41,7 +41,7 @@ kubeletArguments:
   runtime-request-timeout:
   - 10m
   system-reserved:
-  - {{ .Derived.SystemReserved .ContainerService .Extra.Role | quote }}
+  - {{ .Derived.SystemReserved .ContainerService .Role | quote }}
 masterClientConnectionOverrides:
   acceptContentTypes: application/vnd.kubernetes.protobuf,application/json
   burst: 40

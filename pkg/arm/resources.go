@@ -432,7 +432,8 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 
 	var script string
 	if app.Role == api.AgentPoolProfileRoleMaster {
-		b, err := template.Template("master-startup.sh", string(masterStartup), nil, cs, map[string]interface{}{
+		b, err := template.Template("master-startup.sh", string(masterStartup), nil, map[string]interface{}{
+			"Config":         &cs.Config,
 			"BackupBlobName": backupBlob,
 		})
 		if err != nil {
@@ -440,8 +441,9 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 		}
 		script = base64.StdEncoding.EncodeToString(b)
 	} else {
-		b, err := template.Template("node-startup.sh", string(nodeStartup), nil, cs, map[string]interface{}{
-			"Role": app.Role,
+		b, err := template.Template("node-startup.sh", string(nodeStartup), nil, map[string]interface{}{
+			"Config": &cs.Config,
+			"Role":   app.Role,
 		})
 		if err != nil {
 			return nil, err

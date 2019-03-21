@@ -6,7 +6,7 @@ if ! grep /var/lib/docker /etc/fstab; then
   echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
   mount /var/lib/docker
   restorecon -R /var/lib/docker
-{{- if eq .Extra.Role "infra" }}
+{{- if eq .Role "infra" }}
   cat >/etc/docker/daemon.json <<'EOF'
 {
   "log-driver": "journald"
@@ -33,7 +33,7 @@ unset SASURI
 
 update-ca-trust
 
-{{- if eq .Extra.Role "infra" }}
+{{- if eq .Role "infra" }}
 tuned-adm profile openshift-control-plane
 {{- else }}
 tuned-adm profile openshift-node

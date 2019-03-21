@@ -63,7 +63,7 @@ etcdClientInfo:
   certFile: master.etcd-client.crt
   keyFile: master.etcd-client.key
   urls:
-  - https://{{ .Extra.Hostname }}:2379
+  - https://{{ .Hostname }}:2379
 etcdStorageConfig:
   kubernetesStoragePrefix: kubernetes.io
   kubernetesStorageVersion: v1

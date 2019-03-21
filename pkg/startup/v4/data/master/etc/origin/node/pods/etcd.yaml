@@ -34,7 +34,7 @@ spec:
         - --key
         - /etc/etcd/peer.key
         - --endpoints
-        - https://{{ .Extra.Hostname }}:2379
+        - https://{{ .Hostname }}:2379
         - endpoint
         - health
       initialDelaySeconds: 45
@@ -54,7 +54,7 @@ spec:
     nameservers:
       - 168.63.129.16
     searches:
-      - {{ .Extra.DomainName }}
+      - {{ .DomainName }}
   priorityClassName: system-node-critical
   volumes:
   - hostPath:

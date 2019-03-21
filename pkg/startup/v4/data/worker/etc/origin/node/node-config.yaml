@@ -32,7 +32,7 @@ kubeletArguments:
   feature-gates:
   - RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true
   node-labels:
-  - {{ print "node-role.kubernetes.io/" .Extra.Role "=true" | quote }}
+  - {{ print "node-role.kubernetes.io/" .Role "=true" | quote }}
   pod-manifest-path:
   - /etc/origin/node/pods
   rotate-certificates:
@@ -40,9 +40,9 @@ kubeletArguments:
   runtime-request-timeout:
   - 10m
   kube-reserved:
-  - {{ .Derived.KubeReserved .ContainerService .Extra.Role | quote }}
+  - {{ .Derived.KubeReserved .ContainerService .Role | quote }}
   system-reserved:
-  - {{ .Derived.SystemReserved .ContainerService .Extra.Role | quote }}
+  - {{ .Derived.SystemReserved .ContainerService .Role | quote }}
 masterClientConnectionOverrides:
   acceptContentTypes: application/vnd.kubernetes.protobuf,application/json
   burst: 40

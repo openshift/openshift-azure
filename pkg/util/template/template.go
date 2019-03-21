@@ -9,12 +9,10 @@ import (
 
 	"github.com/ghodss/yaml"
 
-	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
-func Template(name, tmpl string, f template.FuncMap, cs *api.OpenShiftManagedCluster, extra interface{}) ([]byte, error) {
+func Template(name, tmpl string, f template.FuncMap, data interface{}) ([]byte, error) {
 	t, err := template.New(name).Funcs(template.FuncMap{
 		"CertAsBytes":       tls.CertAsBytes,
 		"CertChainAsBytes":  tls.CertChainAsBytes,
@@ -36,12 +34,7 @@ func Template(name, tmpl string, f template.FuncMap, cs *api.OpenShiftManagedClu
 
 	b := &bytes.Buffer{}
 
-	err = t.Execute(b, struct {
-		ContainerService *api.OpenShiftManagedCluster
-		Config           *api.Config
-		Derived          interface{}
-		Extra            interface{}
-	}{ContainerService: cs, Config: &cs.Config, Derived: config.Derived, Extra: extra})
+	err = t.Execute(b, data)
 	if err != nil {
 		return nil, err
 	}

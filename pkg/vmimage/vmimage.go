@@ -13,7 +13,6 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/template"
@@ -45,7 +44,7 @@ type Builder struct {
 }
 
 func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
-	script, err := template.Template("script.sh", string(MustAsset("script.sh")), nil, &api.OpenShiftManagedCluster{}, map[string]interface{}{
+	script, err := template.Template("script.sh", string(MustAsset("script.sh")), nil, map[string]interface{}{
 		"Archive":      MustAsset("archive.tgz"),
 		"Builder":      builder,
 		"ClientID":     os.Getenv("AZURE_CLIENT_ID"),

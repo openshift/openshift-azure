@@ -41,7 +41,11 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 				return unstructured.Unstructured{}, err
 			}
 		} else {
-			b, err := util.Template(fmt.Sprintf("%s/%d", KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()), i), tr.Template, nil, cs, nil)
+			b, err := util.Template(fmt.Sprintf("%s/%d", KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()), i), tr.Template, nil, map[string]interface{}{
+				"ContainerService": cs,
+				"Config":           &cs.Config,
+				"Derived":          config.Derived,
+			})
 			s = string(b)
 			if err != nil {
 				return unstructured.Unstructured{}, err
