@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -378,5 +379,31 @@ func TestGetPluginVersion(t *testing.T) {
 	result := p.GetPluginVersion(nil)
 	if *result.PluginVersion != p.pluginConfig.PluginVersion {
 		t.Errorf("expected plugin version %s, got %s", p.pluginConfig.PluginVersion, *result.PluginVersion)
+	}
+}
+
+func errorsContains(errs []error, substr string) bool {
+	for _, err := range errs {
+		if strings.Contains(err.Error(), substr) {
+			return true
+		}
+	}
+	return false
+}
+
+func TestValidateUpdateBlock(t *testing.T) {
+	p := &plugin{
+		log:          logrus.NewEntry(logrus.StandardLogger()),
+		pluginConfig: &pluginapi.Config{PluginVersion: "v0.0"},
+	}
+	old := &api.OpenShiftManagedCluster{}
+	current := &api.OpenShiftManagedCluster{Config: api.Config{PluginVersion: p.pluginConfig.PluginVersion}}
+	errs := p.Validate(context.Background(), old, old, true)
+	if !errorsContains(errs, "cannot be updated by resource provider") {
+		t.Error("expected old cluster to fail update validation")
+	}
+	errs = p.Validate(context.Background(), current, current, true)
+	if errorsContains(errs, "cannot be updated by resource provider") {
+		t.Error("expected current cluster to pass update validation")
 	}
 }
