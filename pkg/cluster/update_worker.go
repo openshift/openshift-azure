@@ -10,8 +10,8 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
-	"github.com/openshift/openshift-azure/pkg/config"
 )
 
 // findScaleSets discovers all the scalesets that exist for a given agent pool.
@@ -27,7 +27,7 @@ func (u *simpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string
 	var target *compute.VirtualMachineScaleSet
 	var sources []compute.VirtualMachineScaleSet
 
-	prefix := config.GetScalesetName(app, "")
+	prefix := names.GetScalesetName(app, "")
 
 	for i, ss := range scalesets {
 		if !strings.HasPrefix(*ss.Name, prefix) {
@@ -131,7 +131,7 @@ func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenS
 	}
 	target.Sku.Capacity = to.Int64Ptr(0)
 
-	u.log.Infof("creating target scaleset %s", config.GetScalesetName(app, suffix))
+	u.log.Infof("creating target scaleset %s", names.GetScalesetName(app, suffix))
 	err = u.ssc.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, *target.Name, *target)
 	if err != nil {
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolCreateScaleSet}

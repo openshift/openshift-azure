@@ -16,6 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 )
@@ -336,7 +337,7 @@ func (p *plugin) Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, h
 		return fmt.Errorf("invalid hostname %q", hostname)
 	}
 
-	scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(hostname)
+	scaleset, instanceID, err := names.GetScaleSetNameAndInstanceID(hostname)
 	if err != nil {
 		return err
 	}
@@ -398,7 +399,7 @@ func (p *plugin) RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster
 		return fmt.Errorf("invalid command %q", command)
 	}
 
-	scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(hostname)
+	scaleset, instanceID, err := names.GetScaleSetNameAndInstanceID(hostname)
 	if err != nil {
 		return err
 	}

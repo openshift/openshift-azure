@@ -16,7 +16,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
@@ -45,7 +45,7 @@ func (s *startup) WriteFiles(ctx context.Context) error {
 
 	domainname := strings.SplitN(strings.TrimSuffix(cname, "."), ".", 2)[1]
 
-	role := config.GetAgentRole(hostname)
+	role := names.GetAgentRole(hostname)
 
 	spp := &s.cs.Properties.WorkerServicePrincipalProfile
 	if role == api.AgentPoolProfileRoleMaster {

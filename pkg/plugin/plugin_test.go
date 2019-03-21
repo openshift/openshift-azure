@@ -12,7 +12,7 @@ import (
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
-	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_config"
@@ -314,7 +314,7 @@ func TestReimage(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 
-			scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(tt.hostname)
+			scaleset, instanceID, err := names.GetScaleSetNameAndInstanceID(tt.hostname)
 			if err != nil {
 				t.Fatal(err)
 			}

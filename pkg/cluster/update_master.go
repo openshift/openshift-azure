@@ -8,13 +8,13 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 )
 
 // UpdateMasterAgentPool updates one by one all the VMs of the master scale set,
 // in place.
 func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError {
-	ssName := config.MasterScalesetName
+	ssName := names.MasterScalesetName
 
 	blob, err := u.updateBlobService.Read()
 	if err != nil {
@@ -27,7 +27,7 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 	}
 
 	for i := int64(0); i < app.Count; i++ {
-		hostname := config.GetHostname(app, "", i)
+		hostname := names.GetHostname(app, "", i)
 		instanceID := fmt.Sprintf("%d", i)
 
 		if bytes.Equal(blob.HostnameHashes[hostname], desiredHash) {

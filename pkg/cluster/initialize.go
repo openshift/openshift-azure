@@ -9,8 +9,8 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
@@ -158,12 +158,12 @@ func (u *simpleUpgrader) InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, s
 		switch app.Role {
 		case api.AgentPoolProfileRoleMaster:
 			for i := int64(0); i < app.Count; i++ {
-				hostname := config.GetHostname(&app, suffix, i)
+				hostname := names.GetHostname(&app, suffix, i)
 				blob.HostnameHashes[hostname] = h
 			}
 
 		default:
-			blob.ScalesetHashes[config.GetScalesetName(&app, suffix)] = h
+			blob.ScalesetHashes[names.GetScalesetName(&app, suffix)] = h
 		}
 	}
 	return u.updateBlobService.Write(blob)

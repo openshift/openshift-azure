@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
@@ -132,9 +132,9 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 			kc := mock_kubeclient.NewMockKubeclient(gmc)
 			if tt.wantErr {
 				if tt.expectedErr == vmListErr {
-					vmc.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(nil, tt.expectedErr)
+					vmc.EXPECT().List(ctx, testRg, names.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(nil, tt.expectedErr)
 				} else {
-					vmc.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(tt.expect, nil)
+					vmc.EXPECT().List(ctx, testRg, names.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(tt.expect, nil)
 					if cs.Properties.AgentPoolProfiles[tt.appIndex].Role == api.AgentPoolProfileRoleMaster {
 						kc.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Return(nodeGetErr)
 					} else {
@@ -142,7 +142,7 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 					}
 				}
 			} else {
-				vmc.EXPECT().List(ctx, testRg, config.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(tt.expect, nil)
+				vmc.EXPECT().List(ctx, testRg, names.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(tt.expect, nil)
 				if cs.Properties.AgentPoolProfiles[tt.appIndex].Role == api.AgentPoolProfileRoleMaster {
 					kc.EXPECT().WaitForReadyMaster(ctx, gomock.Any()).Times(len(tt.expect)).Return(nil)
 				} else {
