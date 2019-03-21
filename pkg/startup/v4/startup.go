@@ -115,7 +115,7 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 			filepath = strings.TrimPrefix(filepath, "worker")
 		}
 
-		b, err := template.Template(tmpl, nil, s.cs, map[string]interface{}{
+		b, err := template.Template(filepath, tmpl, nil, s.cs, map[string]interface{}{
 			"Role":       role,
 			"Hostname":   hostname,
 			"DomainName": domainname,

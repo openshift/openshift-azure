@@ -2,6 +2,7 @@ package sync
 
 import (
 	"encoding/base64"
+	"fmt"
 
 	"github.com/ghodss/yaml"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -31,7 +32,7 @@ const (
 
 func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster) (unstructured.Unstructured, error) {
 	ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
-	for _, tr := range ts {
+	for i, tr := range ts {
 		var s interface{}
 		if tr.F != nil {
 			var err error
@@ -40,7 +41,7 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 				return unstructured.Unstructured{}, err
 			}
 		} else {
-			b, err := util.Template(tr.Template, nil, cs, nil)
+			b, err := util.Template(fmt.Sprintf("%s/%d", KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()), i), tr.Template, nil, cs, nil)
 			s = string(b)
 			if err != nil {
 				return unstructured.Unstructured{}, err

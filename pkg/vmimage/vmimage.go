@@ -45,7 +45,7 @@ type Builder struct {
 }
 
 func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
-	script, err := template.Template(string(MustAsset("script.sh")), nil, &api.OpenShiftManagedCluster{}, map[string]interface{}{
+	script, err := template.Template("script.sh", string(MustAsset("script.sh")), nil, &api.OpenShiftManagedCluster{}, map[string]interface{}{
 		"Archive":      MustAsset("archive.tgz"),
 		"Builder":      builder,
 		"ClientID":     os.Getenv("AZURE_CLIENT_ID"),

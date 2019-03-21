@@ -14,8 +14,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
-func Template(tmpl string, f template.FuncMap, cs *api.OpenShiftManagedCluster, extra interface{}) ([]byte, error) {
-	t, err := template.New("").Funcs(template.FuncMap{
+func Template(name, tmpl string, f template.FuncMap, cs *api.OpenShiftManagedCluster, extra interface{}) ([]byte, error) {
+	t, err := template.New(name).Funcs(template.FuncMap{
 		"CertAsBytes":       tls.CertAsBytes,
 		"CertChainAsBytes":  tls.CertChainAsBytes,
 		"PrivateKeyAsBytes": tls.PrivateKeyAsBytes,
