@@ -99,8 +99,6 @@ func enrichCSSASURIs(storageClient storage.Client, cs *api.OpenShiftManagedClust
 }
 
 func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
-	cs = cs.DeepCopy()
-
 	err := enrichCSSASURIs(g.storageClient, cs)
 	if err != nil {
 		return nil, err
