@@ -32,7 +32,7 @@ version:
 	echo ${TAG}
 
 clean:
-	rm -f coverage.out $(ALL_BINARIES)
+	rm -f coverage.out $(ALL_BINARIES) releasenotes
 
 generate:
 	go generate ./...
@@ -133,7 +133,10 @@ canary-image: canary $(IMAGEBUILDER) pullregistry
 	$(IMAGEBUILDER) -f images/canary/Dockerfile -t $(CANARY_IMAGE) .
 
 canary-push: canary-image
-	docker push $(CANARY_IMAGE)	
+	docker push $(CANARY_IMAGE)
+
+releasenotes:
+	go build -tags releasenotes ./cmd/$@
 
 .PHONY: verify
 verify:

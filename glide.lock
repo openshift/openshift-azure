@@ -1,5 +1,5 @@
 hash: b79837fbfd7869061763f0107714144a79b2cc9b225134add0762921aaf8f7d2
-updated: 2019-03-14T11:33:09.333757891Z
+updated: 2019-03-20T13:44:42.769971658-07:00
 imports:
 - name: contrib.go.opencensus.io/exporter/ocagent
   version: 00af367e65149ff1f2f4b93bbfbb84fd9297170d
@@ -96,7 +96,7 @@ imports:
   subpackages:
   - gomock
 - name: github.com/golang/protobuf
-  version: c823c79ea1570fb5ff454033735a8e68575d1d0f
+  version: b5d812f8a3706043e23a9cd5babf2e5423744d30
   subpackages:
   - proto
   - protoc-gen-go/descriptor
@@ -105,6 +105,14 @@ imports:
   - ptypes/duration
   - ptypes/timestamp
   - ptypes/wrappers
+- name: github.com/google/go-github
+  version: 7462feb2032c2da9e3b85e9b04e6853a6e9e14ca
+  subpackages:
+  - github
+- name: github.com/google/go-querystring
+  version: c8c88dbee036db4e4808d1f2ec8c2e15e11c3f80
+  subpackages:
+  - query
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/google/uuid
@@ -186,10 +194,12 @@ imports:
   version: 7eef55a5dc24306c455777b9897ddc3cbeaf8b59
   subpackages:
   - apps/v1
+  - build/v1
   - network/v1
   - pkg/serialization
   - project/v1
   - route/v1
+  - security/v1
   - template/v1
   - user/v1
 - name: github.com/openshift/client-go
@@ -197,12 +207,17 @@ imports:
   subpackages:
   - apps/clientset/versioned/scheme
   - apps/clientset/versioned/typed/apps/v1
+  - build/clientset/versioned/scheme
+  - build/clientset/versioned/typed/build/v1
   - network/clientset/versioned/scheme
   - network/clientset/versioned/typed/network/v1
   - project/clientset/versioned/scheme
   - project/clientset/versioned/typed/project/v1
   - route/clientset/versioned/scheme
   - route/clientset/versioned/typed/route/v1
+  - security/clientset/versioned
+  - security/clientset/versioned/scheme
+  - security/clientset/versioned/typed/security/v1
   - template/clientset/versioned/scheme
   - template/clientset/versioned/typed/template/v1
   - user/clientset/versioned/scheme
@@ -292,6 +307,10 @@ imports:
   - lex/httplex
   - trace
   - websocket
+- name: golang.org/x/oauth2
+  version: a6bd8cefa1811bd24b86f8902872e4e8225f74c4
+  subpackages:
+  - internal
 - name: golang.org/x/sync
   version: 37e7f081c4d4c64e13b10787722085407fe5d15f
   subpackages:
@@ -330,6 +349,16 @@ imports:
   version: 2eba4b8eddaf7e8873ed5ba4d2b7c51b3c443bf7
   subpackages:
   - support/bundler
+- name: google.golang.org/appengine
+  version: 54a98f90d1c46b7731eb8fb305d2a321c30ef610
+  subpackages:
+  - internal
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
 - name: google.golang.org/genproto
   version: 09f6ed296fc66555a25fe4ce95173148778dfa85
   subpackages:
@@ -368,6 +397,8 @@ imports:
   version: c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9
 - name: gopkg.in/inf.v0
   version: 3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4
+- name: gopkg.in/libgit2/git2go.v27
+  version: ecaeb7a21d479b7966311760a2e8bd734f8f0eef
 - name: gopkg.in/tomb.v1
   version: c131134a1947e9afd9cecfe11f4c6dff0732ae58
 - name: gopkg.in/yaml.v2
