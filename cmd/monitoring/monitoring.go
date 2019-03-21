@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/signal"
@@ -12,8 +13,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/blackbox"
 	"github.com/openshift/openshift-azure/pkg/util/log"
@@ -85,27 +88,18 @@ func (m *monitor) listResourceGroupMonitoringHostnames(ctx context.Context, subs
 			break
 		}
 	}
+	// get dedicated routes we want to monitor
+	// these routes will not be available at creation time, so we will not check for their availability
+	oc, err := loadOCConfig()
+	if err != nil {
+		m.log.Warn("failed to load OpenShiftManagedCluster config, will not monitor routes")
+	} else {
+		hostnames = append(hostnames, fmt.Sprintf("canary-openshift-azure-monitoring.%s", oc.Properties.RouterProfiles[0].PublicSubdomain))
+	}
 	return hostnames, nil
 }
 
 func (m *monitor) run(ctx context.Context) error {
-	ch := make(chan os.Signal)
-	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
-
-	// we will close this guard when we load all monitors and clean-up is needed
-	bootCtx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	go func(ctx context.Context) {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ch:
-				os.Exit(0)
-			}
-		}
-	}(bootCtx)
-
 	m.log.Info("fetching URLs\n")
 	hostnames, err := m.listResourceGroupMonitoringHostnames(ctx, m.subscriptionID, m.resourceGroup)
 	if err != nil {
@@ -147,13 +141,11 @@ func (m *monitor) run(ctx context.Context) error {
 	}
 
 	m.log.Info("collecting metrics... CTRL+C to stop\n")
-	cancel()
-	for {
-		select {
-		case <-ch:
-			return m.persist(m.instances)
-		}
-	}
+	ch := make(chan os.Signal)
+	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
+	<-ch
+	return m.persist(m.instances)
+
 }
 
 func (m *monitor) persist(instances []instance) error {
@@ -168,6 +160,20 @@ func (m *monitor) persist(instances []instance) error {
 		f.Close()
 	}
 	return nil
+}
+
+func loadOCConfig() (*api.OpenShiftManagedCluster, error) {
+	b, err := ioutil.ReadFile("_data/containerservice.yaml")
+	if err != nil {
+		return nil, err
+	}
+
+	var cs *api.OpenShiftManagedCluster
+	if err := yaml.Unmarshal(b, &cs); err != nil {
+		return nil, err
+	}
+
+	return cs, nil
 }
 
 func main() {

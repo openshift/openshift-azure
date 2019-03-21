@@ -29,7 +29,7 @@ set +x
 . secrets/secret
 set -x
 
-trap 'kill -2 ${MON_PID}; wait; make delete' EXIT
+trap 'kill -15 ${MON_PID}; wait; make delete' EXIT
 
 make create
 
