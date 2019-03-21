@@ -44,10 +44,14 @@ func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, testConfig api
 	}, nil
 }
 
-func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) []error {
+func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
 	p.log.Info("validating internal data models")
 	validator := validate.NewAPIValidator(p.testConfig.RunningUnderTest)
-	return validator.Validate(new, old, externalOnly)
+	errs = validator.Validate(new, old, externalOnly)
+	if old != nil && old.Config.PluginVersion != p.pluginConfig.PluginVersion {
+		errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, old.Config.PluginVersion, p.pluginConfig.PluginVersion))
+	}
+	return
 }
 
 func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManagedCluster) []error {
