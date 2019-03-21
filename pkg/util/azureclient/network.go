@@ -36,7 +36,7 @@ func (c *virtualNetworksClient) Client() autorest.Client {
 	return c.VirtualNetworksClient.Client
 }
 
-// VirtualNetworksPeeringClient is a minimal interface for azure NewVirtualNetworkPeeringsClient
+// VirtualNetworksPeeringsClient is a minimal interface for azure NewVirtualNetworksPeeringsClient
 type VirtualNetworksPeeringsClient interface {
 	Delete(ctx context.Context, resourceGroupName string, virtualNetworkName string, instanceID string) (network.VirtualNetworkPeeringsDeleteFuture, error)
 	List(ctx context.Context, resourceGroupName string, virtualNetworkName string) (network.VirtualNetworkPeeringListResultPage, error)
@@ -66,4 +66,26 @@ func (c *virtualNetworkPeeringsClient) List(ctx context.Context, resourceGroupNa
 
 func (c *virtualNetworkPeeringsClient) Client() autorest.Client {
 	return c.VirtualNetworkPeeringsClient.Client
+}
+
+// PublicIPAddressesClient is a minimal interface for azure NewPublicIPAddressesClient
+type PublicIPAddressesClient interface {
+	Get(ctx context.Context, resourceGroupName string, publicIPAddressName string, expand string) (network.PublicIPAddress, error)
+	ListVirtualMachineScaleSetPublicIPAddressesComplete(ctx context.Context, resourceGroupName string, scaleSetName string) (network.PublicIPAddressListResultIterator, error)
+}
+
+type publicIPAddressesClient struct {
+	network.PublicIPAddressesClient
+}
+
+var _ PublicIPAddressesClient = &publicIPAddressesClient{}
+
+// NewPublicIPAddressesClient creates a new PublicIPAddressesClient
+func NewPublicIPAddressesClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) PublicIPAddressesClient {
+	client := network.NewPublicIPAddressesClient(subscriptionID)
+	setupClient(ctx, &client.Client, authorizer)
+
+	return &publicIPAddressesClient{
+		PublicIPAddressesClient: client,
+	}
 }

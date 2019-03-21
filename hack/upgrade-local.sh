@@ -1,5 +1,6 @@
 #!/bin/bash -ex
-# upgrade-e2e script is intended to run in CI environmet and will not run localy
+# Upgrade-local script works like upgrade-e2e CI script
+# It is intended to run on local development environment only
 
 if [[ $# -ne 1 ]]; then
     echo error: $0 source_cluster_tag_version
@@ -14,6 +15,8 @@ make monitoring-build
 ./monitoring -outputdir=/tmp/artifacts &
 MON_PID=$!
 
+ORG_GOPATH=$GOPATH
+
 T=$(mktemp -d)
 export GOPATH=$T
 trap "rm -rf $T" EXIT
@@ -21,7 +24,7 @@ git clone -b $SOURCE https://github.com/openshift/openshift-azure.git $T/src/git
 
 cd $T/src/github.com/openshift/openshift-azure
 
-ln -s /usr/secrets secrets
+ln -s ${ORG_GOPATH}/src/github.com/openshift/openshift-azure/secrets secrets
 set +x
 . secrets/secret
 set -x
@@ -30,9 +33,8 @@ trap 'kill -15 ${MON_PID}; wait; make delete' EXIT
 
 make create
 
-cd /go/src/github.com/openshift/openshift-azure
-
-. hack/ci-operator-prepare.sh
+export GOPATH=${ORG_GOPATH}
+cd ${GOPATH}/src/github.com/openshift/openshift-azure
 
 cp -a $T/src/github.com/openshift/openshift-azure/_data .
 

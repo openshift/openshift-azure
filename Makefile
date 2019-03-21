@@ -100,6 +100,15 @@ metricsbridge-image: metricsbridge $(IMAGEBUILDER) pullregistry
 metricsbridge-push: metricsbridge-image
 	docker push $(METRICSBRIDGE_IMAGE)
 
+monitoring-build: generate
+	go build -ldflags ${LDFLAGS} ./cmd/monitoring
+
+monitoring-run: monitoring-build
+	./hack/monitoring.sh
+
+monitoring-stop:
+	./hack/monitoring.sh clean
+
 sync: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
