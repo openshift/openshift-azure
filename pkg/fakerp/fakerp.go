@@ -1,6 +1,7 @@
 package fakerp
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -126,6 +127,8 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
+	// persist the OpenShift container service
+	log.Info("persist config")
 	err = writeHelpers(cs)
 	if err != nil {
 		return nil, err
@@ -137,13 +140,9 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
-	// persist the OpenShift container service
-	log.Info("persist config")
-	bytes, err := yaml.Marshal(cs)
-	if err != nil {
-		return nil, err
-	}
-	err = ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
+	// persist the OpenShift container service with final fields
+	log.Info("persist final config")
+	err = writeHelpers(cs)
 	if err != nil {
 		return nil, err
 	}
@@ -259,23 +258,10 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 }
 
 func writeHelpers(cs *api.OpenShiftManagedCluster) error {
-	// ensure both the new key and the old key are on disk so
-	// you can SSH in regardless of the state of a VM after an update
-	if _, err := os.Stat("_data/_out/id_rsa"); err == nil {
-		b, err := ioutil.ReadFile("_data/_out/id_rsa")
-		if err != nil {
-			return err
-		}
-		err = ioutil.WriteFile("_data/_out/id_rsa.old", b, 0600)
-		if err != nil {
-			return err
-		}
-	}
 	b, err := config.Derived.MasterCloudProviderConf(cs)
 	if err != nil {
 		return err
 	}
-
 	err = ioutil.WriteFile("_data/_out/azure.conf", b, 0600)
 	if err != nil {
 		return err
@@ -285,7 +271,6 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 	if err != nil {
 		return err
 	}
-
 	err = ioutil.WriteFile("_data/_out/aad-group-sync.yaml", b, 0600)
 	if err != nil {
 		return err
@@ -294,6 +279,20 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 	b, err = tls.PrivateKeyAsBytes(cs.Config.SSHKey)
 	if err != nil {
 		return err
+	}
+	// ensure both the new key and the old key are on disk so
+	// you can SSH in regardless of the state of a VM after an update
+	if _, err = os.Stat("_data/_out/id_rsa"); err == nil {
+		oldb, err := ioutil.ReadFile("_data/_out/id_rsa")
+		if err != nil {
+			return err
+		}
+		if !bytes.Equal(b, oldb) {
+			err = ioutil.WriteFile("_data/_out/id_rsa.old", oldb, 0600)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	err = ioutil.WriteFile("_data/_out/id_rsa", b, 0600)
 	if err != nil {
@@ -304,5 +303,14 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
+	err = ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
+	if err != nil {
+		return err
+	}
+
+	bytes, err := yaml.Marshal(cs)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
 }
