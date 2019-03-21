@@ -27,7 +27,7 @@ type plugin struct {
 	pluginConfig        *pluginapi.Config
 	testConfig          api.TestConfig
 	upgraderFactory     func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error)
-	armGeneratorFactory func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error)
+	armInterfaceFactory func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Interface, error)
 	configGenerator     config.Generator
 }
 
@@ -40,7 +40,7 @@ func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, testConfig api
 		pluginConfig:        pluginConfig,
 		testConfig:          testConfig,
 		upgraderFactory:     cluster.NewSimpleUpgrader,
-		armGeneratorFactory: arm.NewSimpleGenerator,
+		armInterfaceFactory: arm.New,
 		configGenerator:     config.NewSimpleGenerator(),
 	}, nil
 }
@@ -92,13 +92,13 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
-	armGenerator, err := p.armGeneratorFactory(ctx, cs, p.testConfig)
+	armInterface, err := p.armInterfaceFactory(ctx, p.log, cs, p.testConfig)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
 	p.log.Info("generating arm templates")
-	azuretemplate, err := armGenerator.Generate(ctx, cs, backupBlob, true, suffix)
+	azuretemplate, err := armInterface.Generate(ctx, backupBlob, true, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
@@ -153,20 +153,20 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 
 	// must be done after config storage account is created
 	p.log.Info("creating more clients")
-	armGenerator, err := p.armGeneratorFactory(ctx, cs, p.testConfig)
+	armInterface, err := p.armInterfaceFactory(ctx, p.log, cs, p.testConfig)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
 	p.log.Info("generating arm templates")
-	azuretemplate, err := armGenerator.Generate(ctx, cs, "", isUpdate, suffix)
+	azuretemplate, err := armInterface.Generate(ctx, "", isUpdate, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
 
 	// set VnetID based on VnetName, do this before writing the blobs so that
 	// they are exactly correct
-	cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", arm.VnetName)
+	cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", "vnet") // TODO: should be using const
 
 	// blobs must exist before deploy
 	err = clusterUpgrader.WriteStartupBlobs(cs)

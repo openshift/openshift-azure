@@ -2,8 +2,6 @@ package arm
 
 import (
 	"encoding/base64"
-	"sort"
-	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-07-01/network"
@@ -13,14 +11,13 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/config"
-	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
 const (
-	VnetName                                      = "vnet"
+	vnetName                                      = "vnet"
 	vnetSubnetName                                = "default"
 	ipAPIServerName                               = "ip-apiserver"
 	ipOutboundName                                = "ip-outbound"
@@ -44,129 +41,30 @@ const (
 	vmssAdminUsername                             = "cloud-user"
 )
 
-// FixupAPIVersions inserts an apiVersion field into the ARM template for each
-// resource (the field is missing from the internal Azure type).  The versions
-// referenced here must be kept in lockstep with the imports above.
-func FixupAPIVersions(template map[string]interface{}) {
-	for _, resource := range jsonpath.MustCompile("$.resources.*").Get(template) {
-		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
-		var apiVersion string
-		switch typ {
-		case "Microsoft.Compute/virtualMachines",
-			"Microsoft.Compute/virtualMachines/extensions",
-			"Microsoft.Compute/virtualMachineScaleSets":
-			apiVersion = "2018-10-01"
-		case "Microsoft.Network/loadBalancers",
-			"Microsoft.Network/networkSecurityGroups",
-			"Microsoft.Network/networkInterfaces",
-			"Microsoft.Network/publicIPAddresses",
-			"Microsoft.Network/virtualNetworks":
-			apiVersion = "2018-07-01"
-		case "Microsoft.Storage/storageAccounts":
-			apiVersion = "2018-02-01"
-		default:
-			panic("unimplemented: " + typ)
-		}
-		jsonpath.MustCompile("$.apiVersion").Set(resource, apiVersion)
-	}
-}
-
-// FixupDepends inserts a dependsOn field into the ARM template for each
-// resource that needs it (the field is missing from the internal Azure type).
-func FixupDepends(subscriptionID, resourceGroup string, template map[string]interface{}) {
-	myResources := map[string]struct{}{}
-	for _, resource := range jsonpath.MustCompile("$.resources.*").Get(template) {
-		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
-		name := jsonpath.MustCompile("$.name").MustGetString(resource)
-
-		myResources[resourceid.ResourceID(subscriptionID, resourceGroup, typ, name)] = struct{}{}
-	}
-
-	var recurse func(myResourceID string, i interface{}, dependsMap map[string]struct{})
-
-	// walk the data structure collecting "id" fields whose values look like
-	// Azure resource IDs.  Trim sub-resources from IDs.  Ignore IDs that are
-	// self-referent
-	recurse = func(myResourceID string, i interface{}, dependsMap map[string]struct{}) {
-		switch i := i.(type) {
-		case map[string]interface{}:
-			if id, ok := i["id"]; ok {
-				if id, ok := id.(string); ok {
-					parts := strings.Split(id, "/")
-					if len(parts) > 9 {
-						parts = parts[:9]
-					}
-					if len(parts) == 9 {
-						id = strings.Join(parts, "/")
-						if id != myResourceID {
-							dependsMap[id] = struct{}{}
-						}
-					}
-				}
-			}
-			for _, v := range i {
-				recurse(myResourceID, v, dependsMap)
-			}
-		case []interface{}:
-			for _, v := range i {
-				recurse(myResourceID, v, dependsMap)
-			}
-		}
-	}
-
-	for _, resource := range jsonpath.MustCompile("$.resources.*").Get(template) {
-		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
-		name := jsonpath.MustCompile("$.name").MustGetString(resource)
-
-		dependsMap := map[string]struct{}{}
-
-		// if we're a child resource, depend on our parent
-		if strings.Count(typ, "/") == 2 {
-			id := resourceid.ResourceID(subscriptionID, resourceGroup, typ[:strings.LastIndexByte(typ, '/')], name[:strings.LastIndexByte(name, '/')])
-			dependsMap[id] = struct{}{}
-		}
-
-		recurse(resourceid.ResourceID(subscriptionID, resourceGroup, typ, name), resource, dependsMap)
-
-		depends := make([]string, 0, len(dependsMap))
-		for k := range dependsMap {
-			if _, found := myResources[k]; found {
-				depends = append(depends, k)
-			}
-		}
-
-		if len(depends) > 0 {
-			sort.Strings(depends)
-
-			jsonpath.MustCompile("$.dependsOn").Set(resource, depends)
-		}
-	}
-}
-
-func vnet(cs *api.OpenShiftManagedCluster) *network.VirtualNetwork {
+func (g *simpleGenerator) vnet() *network.VirtualNetwork {
 	return &network.VirtualNetwork{
 		VirtualNetworkPropertiesFormat: &network.VirtualNetworkPropertiesFormat{
 			AddressSpace: &network.AddressSpace{
 				AddressPrefixes: &[]string{
-					cs.Properties.NetworkProfile.VnetCIDR,
+					g.cs.Properties.NetworkProfile.VnetCIDR,
 				},
 			},
 			Subnets: &[]network.Subnet{
 				{
 					SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
-						AddressPrefix: to.StringPtr(cs.Properties.AgentPoolProfiles[0].SubnetCIDR),
+						AddressPrefix: to.StringPtr(g.cs.Properties.AgentPoolProfiles[0].SubnetCIDR),
 					},
 					Name: to.StringPtr(vnetSubnetName),
 				},
 			},
 		},
-		Name:     to.StringPtr(VnetName),
+		Name:     to.StringPtr(vnetName),
 		Type:     to.StringPtr("Microsoft.Network/virtualNetworks"),
-		Location: to.StringPtr(cs.Location),
+		Location: to.StringPtr(g.cs.Location),
 	}
 }
 
-func ipAPIServer(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
+func (g *simpleGenerator) ipAPIServer() *network.PublicIPAddress {
 	return &network.PublicIPAddress{
 		Sku: &network.PublicIPAddressSku{
 			Name: network.PublicIPAddressSkuNameStandard,
@@ -174,17 +72,17 @@ func ipAPIServer(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 		PublicIPAddressPropertiesFormat: &network.PublicIPAddressPropertiesFormat{
 			PublicIPAllocationMethod: network.Static,
 			DNSSettings: &network.PublicIPAddressDNSSettings{
-				DomainNameLabel: to.StringPtr(config.Derived.MasterLBCNamePrefix(cs)),
+				DomainNameLabel: to.StringPtr(config.Derived.MasterLBCNamePrefix(g.cs)),
 			},
 			IdleTimeoutInMinutes: to.Int32Ptr(15),
 		},
 		Name:     to.StringPtr(ipAPIServerName),
 		Type:     to.StringPtr("Microsoft.Network/publicIPAddresses"),
-		Location: to.StringPtr(cs.Location),
+		Location: to.StringPtr(g.cs.Location),
 	}
 }
 
-func ipOutbound(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
+func (g *simpleGenerator) ipOutbound() *network.PublicIPAddress {
 	return &network.PublicIPAddress{
 		Sku: &network.PublicIPAddressSku{
 			Name: network.PublicIPAddressSkuNameStandard,
@@ -195,11 +93,11 @@ func ipOutbound(cs *api.OpenShiftManagedCluster) *network.PublicIPAddress {
 		},
 		Name:     to.StringPtr(ipOutboundName),
 		Type:     to.StringPtr("Microsoft.Network/publicIPAddresses"),
-		Location: to.StringPtr(cs.Location),
+		Location: to.StringPtr(g.cs.Location),
 	}
 }
 
-func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
+func (g *simpleGenerator) lbAPIServer() *network.LoadBalancer {
 	lb := &network.LoadBalancer{
 		Sku: &network.LoadBalancerSku{
 			Name: network.LoadBalancerSkuNameStandard,
@@ -211,8 +109,8 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 						PrivateIPAllocationMethod: network.Dynamic,
 						PublicIPAddress: &network.PublicIPAddress{
 							ID: to.StringPtr(resourceid.ResourceID(
-								cs.Properties.AzProfile.SubscriptionID,
-								cs.Properties.AzProfile.ResourceGroup,
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/publicIPAddresses",
 								ipAPIServerName,
 							)),
@@ -231,24 +129,24 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 					LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
 						FrontendIPConfiguration: &network.SubResource{
 							ID: to.StringPtr(resourceid.ResourceID(
-								cs.Properties.AzProfile.SubscriptionID,
-								cs.Properties.AzProfile.ResourceGroup,
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
 								lbAPIServerName,
 							) + "/frontendIPConfigurations/" + lbAPIServerFrontendConfigurationName),
 						},
 						BackendAddressPool: &network.SubResource{
 							ID: to.StringPtr(resourceid.ResourceID(
-								cs.Properties.AzProfile.SubscriptionID,
-								cs.Properties.AzProfile.ResourceGroup,
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
 								lbAPIServerName,
 							) + "/backendAddressPools/" + lbAPIServerBackendPoolName),
 						},
 						Probe: &network.SubResource{
 							ID: to.StringPtr(resourceid.ResourceID(
-								cs.Properties.AzProfile.SubscriptionID,
-								cs.Properties.AzProfile.ResourceGroup,
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
 								lbAPIServerName,
 							) + "/probes/" + lbAPIServerProbeName),
@@ -281,13 +179,13 @@ func lbAPIServer(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 		},
 		Name:     to.StringPtr(lbAPIServerName),
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
-		Location: to.StringPtr(cs.Location),
+		Location: to.StringPtr(g.cs.Location),
 	}
 
 	return lb
 }
 
-func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
+func (g *simpleGenerator) lbKubernetes() *network.LoadBalancer {
 	lb := &network.LoadBalancer{
 		Sku: &network.LoadBalancerSku{
 			Name: network.LoadBalancerSkuNameStandard,
@@ -299,8 +197,8 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 						PrivateIPAllocationMethod: network.Dynamic,
 						PublicIPAddress: &network.PublicIPAddress{
 							ID: to.StringPtr(resourceid.ResourceID(
-								cs.Properties.AzProfile.SubscriptionID,
-								cs.Properties.AzProfile.ResourceGroup,
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/publicIPAddresses",
 								ipOutboundName,
 							)),
@@ -321,8 +219,8 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 						FrontendIPConfigurations: &[]network.SubResource{
 							{
 								ID: to.StringPtr(resourceid.ResourceID(
-									cs.Properties.AzProfile.SubscriptionID,
-									cs.Properties.AzProfile.ResourceGroup,
+									g.cs.Properties.AzProfile.SubscriptionID,
+									g.cs.Properties.AzProfile.ResourceGroup,
 									"Microsoft.Network/loadBalancers",
 									lbKubernetesName,
 								) + "/frontendIPConfigurations/" + lbKubernetesOutboundFrontendConfigurationName),
@@ -330,8 +228,8 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 						},
 						BackendAddressPool: &network.SubResource{
 							ID: to.StringPtr(resourceid.ResourceID(
-								cs.Properties.AzProfile.SubscriptionID,
-								cs.Properties.AzProfile.ResourceGroup,
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
 								"Microsoft.Network/loadBalancers",
 								lbKubernetesName,
 							) + "/backendAddressPools/" + lbKubernetesBackendPoolName),
@@ -344,13 +242,13 @@ func lbKubernetes(cs *api.OpenShiftManagedCluster) *network.LoadBalancer {
 		},
 		Name:     to.StringPtr(lbKubernetesName),
 		Type:     to.StringPtr("Microsoft.Network/loadBalancers"),
-		Location: to.StringPtr(cs.Location),
+		Location: to.StringPtr(g.cs.Location),
 	}
 
 	return lb
 }
 
-func storageAccount(name string, cs *api.OpenShiftManagedCluster, tags map[string]*string) *storage.Account {
+func (g *simpleGenerator) storageAccount(name string, tags map[string]*string) *storage.Account {
 	return &storage.Account{
 		Sku: &storage.Sku{
 			Name: storage.StandardLRS,
@@ -358,12 +256,12 @@ func storageAccount(name string, cs *api.OpenShiftManagedCluster, tags map[strin
 		Kind:     storage.Storage,
 		Name:     to.StringPtr(name),
 		Type:     to.StringPtr("Microsoft.Storage/storageAccounts"),
-		Location: to.StringPtr(cs.Location),
+		Location: to.StringPtr(g.cs.Location),
 		Tags:     tags,
 	}
 }
 
-func nsgMaster(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
+func (g *simpleGenerator) nsgMaster() *network.SecurityGroup {
 	return &network.SecurityGroup{
 		SecurityGroupPropertiesFormat: &network.SecurityGroupPropertiesFormat{
 			SecurityRules: &[]network.SecurityRule{
@@ -373,7 +271,7 @@ func nsgMaster(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
 						Protocol:                 network.SecurityRuleProtocolTCP,
 						SourcePortRange:          to.StringPtr("*"),
 						DestinationPortRange:     to.StringPtr("22-22"),
-						SourceAddressPrefixes:    to.StringSlicePtr(cs.Config.SSHSourceAddressPrefixes),
+						SourceAddressPrefixes:    to.StringSlicePtr(g.cs.Config.SSHSourceAddressPrefixes),
 						DestinationAddressPrefix: to.StringPtr("*"),
 						Access:                   network.SecurityRuleAccessAllow,
 						Priority:                 to.Int32Ptr(101),
@@ -399,22 +297,33 @@ func nsgMaster(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
 		},
 		Name:     to.StringPtr(nsgMasterName),
 		Type:     to.StringPtr("Microsoft.Network/networkSecurityGroups"),
-		Location: to.StringPtr(cs.Location),
+		Location: to.StringPtr(g.cs.Location),
 	}
 }
 
-func nsgWorker(cs *api.OpenShiftManagedCluster) *network.SecurityGroup {
+func (g *simpleGenerator) nsgWorker() *network.SecurityGroup {
 	return &network.SecurityGroup{
 		SecurityGroupPropertiesFormat: &network.SecurityGroupPropertiesFormat{
 			SecurityRules: &[]network.SecurityRule{},
 		},
 		Name:     to.StringPtr(nsgWorkerName),
 		Type:     to.StringPtr("Microsoft.Network/networkSecurityGroups"),
-		Location: to.StringPtr(cs.Location),
+		Location: to.StringPtr(g.cs.Location),
 	}
 }
 
-func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string, testConfig api.TestConfig) (*compute.VirtualMachineScaleSet, error) {
+func (g *simpleGenerator) Vmss(app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
+	return g.vmss(app, backupBlob, suffix, false)
+}
+
+func (g *simpleGenerator) vmss(app *api.AgentPoolProfile, backupBlob, suffix string, zeroSASURIs bool) (*compute.VirtualMachineScaleSet, error) {
+	cs := g.cs
+	if zeroSASURIs {
+		cs = cs.DeepCopy()
+		cs.Config.MasterStartupSASURI = ""
+		cs.Config.WorkerStartupSASURI = ""
+	}
+
 	sshPublicKey, err := tls.SSHPublicKeyAsString(&cs.Config.SSHKey.PublicKey)
 	if err != nil {
 		return nil, err
@@ -515,7 +424,7 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 													cs.Properties.AzProfile.SubscriptionID,
 													cs.Properties.AzProfile.ResourceGroup,
 													"Microsoft.Network/virtualNetworks",
-													VnetName,
+													vnetName,
 												) + "/subnets/" + vnetSubnetName),
 											},
 											Primary: to.BoolPtr(true),
@@ -607,14 +516,14 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 		}
 	}
 
-	if testConfig.ImageResourceName != "" {
+	if g.testConfig.ImageResourceName != "" {
 		vmss.Plan = nil
 		vmss.VirtualMachineScaleSetProperties.VirtualMachineProfile.StorageProfile.ImageReference = &compute.ImageReference{
 			ID: to.StringPtr(resourceid.ResourceID(
 				cs.Properties.AzProfile.SubscriptionID,
-				testConfig.ImageResourceGroup,
+				g.testConfig.ImageResourceGroup,
 				"Microsoft.Compute/images",
-				testConfig.ImageResourceName,
+				g.testConfig.ImageResourceName,
 			)),
 		}
 	}

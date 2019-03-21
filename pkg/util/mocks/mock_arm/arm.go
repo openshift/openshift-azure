@@ -8,45 +8,76 @@ import (
 	context "context"
 	reflect "reflect"
 
+	compute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	gomock "github.com/golang/mock/gomock"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
 )
 
-// MockGenerator is a mock of Generator interface
-type MockGenerator struct {
+// MockInterface is a mock of Interface interface
+type MockInterface struct {
 	ctrl     *gomock.Controller
-	recorder *MockGeneratorMockRecorder
+	recorder *MockInterfaceMockRecorder
 }
 
-// MockGeneratorMockRecorder is the mock recorder for MockGenerator
-type MockGeneratorMockRecorder struct {
-	mock *MockGenerator
+// MockInterfaceMockRecorder is the mock recorder for MockInterface
+type MockInterfaceMockRecorder struct {
+	mock *MockInterface
 }
 
-// NewMockGenerator creates a new mock instance
-func NewMockGenerator(ctrl *gomock.Controller) *MockGenerator {
-	mock := &MockGenerator{ctrl: ctrl}
-	mock.recorder = &MockGeneratorMockRecorder{mock}
+// NewMockInterface creates a new mock instance
+func NewMockInterface(ctrl *gomock.Controller) *MockInterface {
+	mock := &MockInterface{ctrl: ctrl}
+	mock.recorder = &MockInterfaceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockGenerator) EXPECT() *MockGeneratorMockRecorder {
+func (m *MockInterface) EXPECT() *MockInterfaceMockRecorder {
 	return m.recorder
 }
 
 // Generate mocks base method
-func (m *MockGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
+func (m *MockInterface) Generate(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Generate", ctx, cs, backupBlob, isUpdate, suffix)
+	ret := m.ctrl.Call(m, "Generate", ctx, backupBlob, isUpdate, suffix)
 	ret0, _ := ret[0].(map[string]interface{})
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Generate indicates an expected call of Generate
-func (mr *MockGeneratorMockRecorder) Generate(ctx, cs, backupBlob, isUpdate, suffix interface{}) *gomock.Call {
+func (mr *MockInterfaceMockRecorder) Generate(ctx, backupBlob, isUpdate, suffix interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockGenerator)(nil).Generate), ctx, cs, backupBlob, isUpdate, suffix)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockInterface)(nil).Generate), ctx, backupBlob, isUpdate, suffix)
+}
+
+// Vmss mocks base method
+func (m *MockInterface) Vmss(app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Vmss", app, backupBlob, suffix)
+	ret0, _ := ret[0].(*compute.VirtualMachineScaleSet)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Vmss indicates an expected call of Vmss
+func (mr *MockInterfaceMockRecorder) Vmss(app, backupBlob, suffix interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Vmss", reflect.TypeOf((*MockInterface)(nil).Vmss), app, backupBlob, suffix)
+}
+
+// Hash mocks base method
+func (m *MockInterface) Hash(app *api.AgentPoolProfile) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Hash", app)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Hash indicates an expected call of Hash
+func (mr *MockInterfaceMockRecorder) Hash(app interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hash", reflect.TypeOf((*MockInterface)(nil).Hash), app)
 }

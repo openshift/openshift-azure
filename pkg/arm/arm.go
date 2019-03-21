@@ -1,8 +1,5 @@
 package arm
 
-//go:generate go get github.com/go-bindata/go-bindata/go-bindata
-//go:generate go-bindata -nometadata -pkg $GOPACKAGE -prefix data data/...
-//go:generate gofmt -s -l -w bindata.go
 //go:generate go get github.com/golang/mock/gomock
 //go:generate go install github.com/golang/mock/mockgen
 //go:generate mockgen -destination=../util/mocks/mock_$GOPACKAGE/arm.go -package=mock_$GOPACKAGE -source arm.go
@@ -11,105 +8,26 @@ package arm
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
 
-	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
+	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
-	"github.com/openshift/openshift-azure/pkg/util/enrich"
+	v4 "github.com/openshift/openshift-azure/pkg/arm/v4"
 )
 
-type Generator interface {
-	Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error)
+type Interface interface {
+	Generate(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error)
+	Vmss(app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error)
+	Hash(app *api.AgentPoolProfile) ([]byte, error)
 }
 
-type simpleGenerator struct {
-	testConfig     api.TestConfig
-	accountsClient azureclient.AccountsClient
-	storageClient  storage.Client
-}
-
-var _ Generator = &simpleGenerator{}
-
-type Template struct {
-	Schema         string        `json:"$schema,omitempty"`
-	ContentVersion string        `json:"contentVersion,omitempty"`
-	Parameters     struct{}      `json:"parameters,omitempty"`
-	Variables      struct{}      `json:"variables,omitempty"`
-	Resources      []interface{} `json:"resources,omitempty"`
-	Outputs        struct{}      `json:"outputs,omitempty"`
-}
-
-// NewSimpleGenerator create a new SimpleGenerator
-func NewSimpleGenerator(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Generator, error) {
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
-	if err != nil {
-		return nil, err
+func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Interface, error) {
+	switch cs.Config.PluginVersion {
+	case "v4.0":
+		return v4.New(ctx, log, cs, testConfig)
 	}
 
-	g := &simpleGenerator{
-		testConfig:     testConfig,
-		accountsClient: azureclient.NewAccountsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
-	}
-
-	g.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
-	if err != nil {
-		return nil, err
-	}
-
-	return g, nil
-}
-
-func (g *simpleGenerator) Generate(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
-	err := enrich.SASURIs(g.storageClient, cs)
-	if err != nil {
-		return nil, err
-	}
-
-	t := Template{
-		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-		ContentVersion: "1.0.0.0",
-		Resources: []interface{}{
-			vnet(cs),
-			ipAPIServer(cs),
-			lbAPIServer(cs),
-			storageAccount(cs.Config.RegistryStorageAccount, cs, map[string]*string{
-				"type": to.StringPtr("registry"),
-			}),
-			storageAccount(cs.Config.AzureFileStorageAccount, cs, map[string]*string{
-				"type": to.StringPtr("storage"),
-			}),
-			nsgMaster(cs),
-		},
-	}
-	if !isUpdate {
-		t.Resources = append(t.Resources, ipOutbound(cs), lbKubernetes(cs), nsgWorker(cs))
-	}
-	for _, app := range cs.Properties.AgentPoolProfiles {
-		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {
-			vmss, err := Vmss(cs, &app, backupBlob, suffix, g.testConfig)
-			if err != nil {
-				return nil, err
-			}
-			t.Resources = append(t.Resources, vmss)
-		}
-	}
-
-	b, err := json.Marshal(t)
-	if err != nil {
-		return nil, err
-	}
-
-	var azuretemplate map[string]interface{}
-	err = json.Unmarshal(b, &azuretemplate)
-	if err != nil {
-		return nil, err
-	}
-
-	FixupAPIVersions(azuretemplate)
-	FixupDepends(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, azuretemplate)
-
-	return azuretemplate, nil
+	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)
 }

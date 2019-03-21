@@ -2,6 +2,7 @@ package arm
 
 import (
 	"context"
+	"reflect"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -9,6 +10,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
+	"github.com/openshift/openshift-azure/test/util/populate"
 	"github.com/openshift/openshift-azure/test/util/tls"
 )
 
@@ -50,9 +52,10 @@ func TestGenerate(t *testing.T) {
 
 	sg := simpleGenerator{
 		storageClient: storageClient,
+		cs:            cs,
 	}
 
-	armtemplate, err := sg.Generate(context.Background(), cs, "", false, "")
+	armtemplate, err := sg.Generate(context.Background(), "", false, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,12 +64,60 @@ func TestGenerate(t *testing.T) {
 		t.Error("expected to find two networkSecurityGroups on create")
 	}
 
-	armtemplate, err = sg.Generate(context.Background(), cs, "", true, "")
+	armtemplate, err = sg.Generate(context.Background(), "", true, "")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if len(jsonpath.MustCompile("$.resources[?(@.type='Microsoft.Network/networkSecurityGroups')]").Get(armtemplate)) != 1 {
 		t.Error("expected to find one networkSecurityGroup on update")
+	}
+}
+
+func TestHash(t *testing.T) {
+	prepare := func(v reflect.Value) {
+		switch v.Interface().(type) {
+		case []api.IdentityProvider:
+			// set the Provider to AADIdentityProvider
+			v.Set(reflect.ValueOf([]api.IdentityProvider{{Provider: &api.AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
+		}
+	}
+
+	var cs api.OpenShiftManagedCluster
+	populate.Walk(&cs, prepare)
+	cs.Properties.AgentPoolProfiles = []api.AgentPoolProfile{
+		{
+			Role: api.AgentPoolProfileRoleMaster,
+		},
+		{
+			Role:   api.AgentPoolProfileRoleCompute,
+			VMSize: api.StandardD2sV3,
+		},
+	}
+
+	for _, role := range []api.AgentPoolProfileRole{api.AgentPoolProfileRoleMaster, api.AgentPoolProfileRoleCompute} {
+		sg := simpleGenerator{
+			cs: &cs,
+		}
+		baseline, err := sg.Hash(&api.AgentPoolProfile{
+			Role: role,
+		})
+		if err != nil {
+			t.Errorf("%s: unexpected error: %v", role, err)
+		}
+		sg.cs = cs.DeepCopy()
+		sg.cs.Config.MasterStartupSASURI = "foo"
+		sg.cs.Config.WorkerStartupSASURI = "foo"
+		second, err := sg.Hash(&api.AgentPoolProfile{
+			Name:  "foo",
+			Role:  role,
+			Count: 1,
+		})
+		if err != nil {
+			t.Errorf("%s: unexpected error: %v", role, err)
+		}
+		if !reflect.DeepEqual(baseline, second) {
+			t.Errorf("%s: expected:\n%#v\ngot:\n%#v", role, baseline, second)
+		}
 	}
 }

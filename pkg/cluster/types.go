@@ -12,6 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/cluster/scaler"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
@@ -69,6 +70,7 @@ type simpleUpgrader struct {
 	log               *logrus.Entry
 	scalerFactory     scaler.Factory
 	hasher            Hasher
+	arm               arm.Interface
 }
 
 var _ Upgrader = &simpleUpgrader{}
@@ -90,6 +92,11 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		return nil, err
 	}
 
+	arm, err := arm.New(ctx, log, cs, testConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	u := &simpleUpgrader{
 		Kubeclient: kubeclient,
 
@@ -104,7 +111,9 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 			log:            log,
 			testConfig:     testConfig,
 			startupFactory: startup.New,
+			arm:            arm,
 		},
+		arm: arm,
 	}
 
 	if initializeStorageClients {

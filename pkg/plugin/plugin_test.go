@@ -51,10 +51,10 @@ func TestCreateOrUpdate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			armGenerator := mock_arm.NewMockGenerator(gmc)
+			armInterface := mock_arm.NewMockInterface(gmc)
 			clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 			c := clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil)
-			c = armGenerator.EXPECT().Generate(nil, cs, "", tt.isUpdate, gomock.Any()).Return(nil, nil).After(c)
+			c = armInterface.EXPECT().Generate(nil, "", tt.isUpdate, gomock.Any()).Return(nil, nil).After(c)
 			c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
 			c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 			c = clusterUpgrader.EXPECT().EnrichStorageAccountKeys(nil, cs).Return(nil)
@@ -84,8 +84,8 @@ func TestCreateOrUpdate(t *testing.T) {
 				upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 					return clusterUpgrader, nil
 				},
-				armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
-					return armGenerator, nil
+				armInterfaceFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Interface, error) {
+					return armInterface, nil
 				},
 				log: logrus.NewEntry(logrus.StandardLogger()),
 			}
@@ -115,10 +115,10 @@ func TestRecoverEtcdCluster(t *testing.T) {
 
 	testData := map[string]interface{}{"test": "data"}
 	testDataWithBackup := map[string]interface{}{"test": "backup"}
-	armGenerator := mock_arm.NewMockGenerator(gmc)
+	armInterface := mock_arm.NewMockInterface(gmc)
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 
-	c := armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil)
+	c := armInterface.EXPECT().Generate(nil, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil)
 	c = clusterUpgrader.EXPECT().EtcdBlobExists(nil, "test-backup").Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil, cs).Return(nil).After(c)
 
@@ -129,7 +129,7 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], "").Return(nil).After(c)
 	// update
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
-	c = armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testData, nil).After(c)
+	c = armInterface.EXPECT().Generate(nil, gomock.Any(), true, gomock.Any()).Return(testData, nil).After(c)
 	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 	c = clusterUpgrader.EXPECT().EnrichStorageAccountKeys(nil, cs).Return(nil)
@@ -147,8 +147,8 @@ func TestRecoverEtcdCluster(t *testing.T) {
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 			return clusterUpgrader, nil
 		},
-		armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
-			return armGenerator, nil
+		armInterfaceFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Interface, error) {
+			return armInterface, nil
 		},
 		log: logrus.NewEntry(logrus.StandardLogger()),
 	}
@@ -177,12 +177,12 @@ func TestRotateClusterSecrets(t *testing.T) {
 
 	configGenerator := mock_config.NewMockGenerator(gmc)
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
-	armGenerator := mock_arm.NewMockGenerator(gmc)
+	armInterface := mock_arm.NewMockInterface(gmc)
 
 	c := configGenerator.EXPECT().InvalidateSecrets(cs).Return(nil)
 	c = configGenerator.EXPECT().Generate(cs, gomock.Any()).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
-	c = armGenerator.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
+	c = armInterface.EXPECT().Generate(nil, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 	c = clusterUpgrader.EXPECT().EnrichStorageAccountKeys(nil, cs).Return(nil)
@@ -200,8 +200,8 @@ func TestRotateClusterSecrets(t *testing.T) {
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 			return clusterUpgrader, nil
 		},
-		armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
-			return armGenerator, nil
+		armInterfaceFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Interface, error) {
+			return armInterface, nil
 		},
 		configGenerator: configGenerator,
 		log:             logrus.NewEntry(logrus.StandardLogger()),
@@ -231,11 +231,11 @@ func TestForceUpdate(t *testing.T) {
 	}
 
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
-	armGenerator := mock_arm.NewMockGenerator(gmc)
+	armInterface := mock_arm.NewMockInterface(gmc)
 
 	c := clusterUpgrader.EXPECT().ResetUpdateBlob(cs).Return(nil)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
-	c = armGenerator.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
+	c = armInterface.EXPECT().Generate(nil, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
 	c = clusterUpgrader.EXPECT().EnrichStorageAccountKeys(nil, cs).Return(nil)
@@ -253,8 +253,8 @@ func TestForceUpdate(t *testing.T) {
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 			return clusterUpgrader, nil
 		},
-		armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
-			return armGenerator, nil
+		armInterfaceFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Interface, error) {
+			return armInterface, nil
 		},
 		log: logrus.NewEntry(logrus.StandardLogger()),
 	}

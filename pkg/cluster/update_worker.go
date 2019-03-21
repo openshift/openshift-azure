@@ -9,7 +9,6 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 )
@@ -125,7 +124,7 @@ func (u *simpleUpgrader) createWorkerScaleSet(ctx context.Context, cs *api.OpenS
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
 	}
 
-	target, err := arm.Vmss(cs, app, "", suffix, u.testConfig)
+	target, err := u.arm.Vmss(app, "", suffix)
 	if err != nil {
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
