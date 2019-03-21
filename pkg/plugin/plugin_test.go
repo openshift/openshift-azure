@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -177,5 +178,30 @@ func TestRotateClusterSecrets(t *testing.T) {
 
 	if err := p.RotateClusterSecrets(nil, cs, deployer, nil); err != nil {
 		t.Errorf("plugin.RotateClusterSecrets error = %v", err)
+	}
+}
+
+func errorsContains(errs []error, substr string) bool {
+	for _, err := range errs {
+		if strings.Contains(err.Error(), substr) {
+			return true
+		}
+	}
+	return false
+}
+
+func TestValidateUpdateBlock(t *testing.T) {
+	p := &plugin{
+		log: logrus.NewEntry(logrus.StandardLogger()),
+	}
+	old := &api.OpenShiftManagedCluster{}
+	current := &api.OpenShiftManagedCluster{Config: api.Config{ClusterVersion: "v2.5"}}
+	errs := p.Validate(context.Background(), old, old, true)
+	if !errorsContains(errs, "cannot be updated by resource provider") {
+		t.Error("expected old cluster to fail update validation")
+	}
+	errs = p.Validate(context.Background(), current, current, true)
+	if errorsContains(errs, "cannot be updated by resource provider") {
+		t.Error("expected current cluster to pass update validation")
 	}
 }
