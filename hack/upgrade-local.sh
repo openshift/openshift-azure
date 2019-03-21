@@ -1,4 +1,6 @@
 #!/bin/bash -ex
+# Upgrade-local script works like upgrade-e2e CI script
+# It is intended to run on local development environment only
 
 if [[ $# -ne 1 ]]; then
     echo error: $0 source_cluster_tag_version
@@ -27,7 +29,7 @@ set +x
 . secrets/secret
 set -x
 
-trap 'kill -2 ${MON_PID}; make delete' EXIT
+trap 'kill -2 ${MON_PID}; wait; make delete' EXIT
 
 make create
 

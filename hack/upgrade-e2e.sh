@@ -1,4 +1,5 @@
 #!/bin/bash -ex
+# upgrade-e2e script is intended to run in CI environmet and will not run localy
 
 if [[ $# -ne 1 ]]; then
     echo error: $0 source_cluster_tag_version

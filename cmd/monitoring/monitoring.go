@@ -33,6 +33,8 @@ type monitor struct {
 
 	resourceGroup  string
 	subscriptionID string
+
+	instances []instance
 }
 
 type instance struct {
@@ -87,13 +89,28 @@ func (m *monitor) listResourceGroupMonitoringHostnames(ctx context.Context, subs
 }
 
 func (m *monitor) run(ctx context.Context) error {
+	ch := make(chan os.Signal)
+	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
+
+	// we will close this guard when we load all monitors and clean-up is needed
+	bootCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func(ctx context.Context) {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ch:
+				os.Exit(0)
+			}
+		}
+	}(bootCtx)
+
 	m.log.Info("fetching URLs\n")
 	hostnames, err := m.listResourceGroupMonitoringHostnames(ctx, m.subscriptionID, m.resourceGroup)
 	if err != nil {
 		return err
 	}
-
-	var instances []instance
 
 	for _, hostname := range hostnames {
 		m.log.Debugf("initiate blackbox monitor %s \n", hostname)
@@ -116,7 +133,7 @@ func (m *monitor) run(ctx context.Context) error {
 			LogInitialErrors: *logerrors,
 		}
 
-		instances = append(instances, struct {
+		m.instances = append(m.instances, struct {
 			hostname string
 			b        *blackbox.Config
 		}{
@@ -125,18 +142,16 @@ func (m *monitor) run(ctx context.Context) error {
 		})
 	}
 
-	for _, mon := range instances {
+	for _, mon := range m.instances {
 		mon.b.Start(ctx)
 	}
 
-	ch := make(chan os.Signal)
-	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 	m.log.Info("collecting metrics... CTRL+C to stop\n")
-
+	cancel()
 	for {
 		select {
 		case <-ch:
-			return m.persist(instances)
+			return m.persist(m.instances)
 		}
 	}
 }
