@@ -137,6 +137,9 @@ export GITHUB_TOKEN=<github_token_from_team_secret>
 ./releasenotes -repopath . -commitrange (vx.y)-1..HEAD >> CHANGELOG.md
 git add CHANGELOG.md
 ```
+note about release numbers to use as commitrange with releasenotes above:
+* If you're cutting a new major release, (vx.y)-1 means v(x-1)."latest y on the x-1 branch"
+* If you're cutting a new minor release, (vx.y)-1 means vx.(y-1)
 
 Make sure you update `clusterVersion` field all image version to point to specific version, instead of `latest` tag.
 
