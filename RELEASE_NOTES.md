@@ -55,7 +55,7 @@ MSFT: renames existing Config.ClusterVersion -> Config.PluginVersion; adds addit
 
 ## Serve Azure Red Hat OpenShift CSS logo. ([#1219](https://github.com/openshift/openshift-azure/pull/1219), [@y-cote](https://github.com/y-cote), 09/03/2019)
 
-- A new container image with httpd is used to serve the CSS stylesheet for the web console branding. 
+- A new container image with httpd is used to serve the CSS stylesheet for the web console branding.
 
 
 ## Geneva action get rp plugin versions ([#1261](https://github.com/openshift/openshift-azure/pull/1261), [@jim-minter](https://github.com/jim-minter), 11/03/2019)
@@ -88,7 +88,7 @@ Configure SA to use CA-Bundle for e2e trust
 
 ## etcd metrics shim ([#1176](https://github.com/openshift/openshift-azure/pull/1176), [@mjudeikis](https://github.com/mjudeikis), 14/03/2019)
 
-Internal: Enable ETCD metrics via tls-proxy container 
+Internal: Enable ETCD metrics via tls-proxy container
 
 
 ## add missing role, needed for ILBs ([#1301](https://github.com/openshift/openshift-azure/pull/1301), [@jim-minter](https://github.com/jim-minter), 19/03/2019)
@@ -123,7 +123,7 @@ MSFT: add missing master role definition "Microsoft.Network/loadBalancers/backen
 * use static pods instead of DaemonSets for OVS and SDN pods.  This makes the
   path to master Nodes being Ready simpler, and stops the sync pod being
   essential for that to happen
-  
+
 * run the sync pod as a Deployment
 
 * remove the openshift-node DaemonSet - it is completely unnecessary within the
@@ -148,3 +148,13 @@ MSFT: add missing master role definition "Microsoft.Network/loadBalancers/backen
   customisations into the VM image
 
 
+# Release v3.1
+
+## remove deepcopy otherwise sas uri not available when vmss are rotated ([#1316](https://github.com/openshift/openshift-azure/pull/1316), [@jim-minter](https://github.com/jim-minter), 21/03/2019)
+
+resolve bug whereby SAS URIs were not being calculated correctly during the vmss rotation procedure
+
+
+## prevent update from succeeding unless cluster version matches plugin version ([#1320](https://github.com/openshift/openshift-azure/pull/1320), [@jim-minter](https://github.com/jim-minter), 21/03/2019)
+
+prevent update from succeeding unless cluster version matches plugin version
