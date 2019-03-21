@@ -41,7 +41,7 @@ func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, testConfig api
 		testConfig:          testConfig,
 		upgraderFactory:     cluster.NewSimpleUpgrader,
 		armGeneratorFactory: arm.NewSimpleGenerator,
-		configGenerator:     config.NewSimpleGenerator(testConfig.RunningUnderTest),
+		configGenerator:     config.NewSimpleGenerator(),
 	}, nil
 }
 

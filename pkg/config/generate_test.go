@@ -28,7 +28,7 @@ func TestGenerate(t *testing.T) {
 	var template *pluginapi.Config
 	populate.Walk(&template, prepare)
 
-	cg := simpleGenerator{runningUnderTest: true}
+	cg := simpleGenerator{}
 	err := cg.Generate(cs, template)
 	if err != nil {
 		t.Fatal(err)

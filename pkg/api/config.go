@@ -49,8 +49,6 @@ type Config struct {
 	SessionSecretAuth []byte          `json:"sessionSecretAuth,omitempty"`
 	SessionSecretEnc  []byte          `json:"sessionSecretEnc,omitempty"`
 
-	RunningUnderTest bool `json:"runningUnderTest,omitempty"`
-
 	// misc infra configurables
 	RegistryHTTPSecret             []byte    `json:"registryHttpSecret,omitempty"`
 	PrometheusProxySessionSecret   []byte    `json:"prometheusProxySessionSecret,omitempty"`

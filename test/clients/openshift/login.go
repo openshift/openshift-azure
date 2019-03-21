@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"k8s.io/client-go/tools/clientcmd/api/v1"
+	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	azuretls "github.com/openshift/openshift-azure/pkg/util/tls"

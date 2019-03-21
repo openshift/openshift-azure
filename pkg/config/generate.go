@@ -378,8 +378,6 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		}
 	}
 
-	c.RunningUnderTest = g.runningUnderTest
-
 	if c.SSHKey == nil {
 		if c.SSHKey, err = tls.NewPrivateKey(); err != nil {
 			return
