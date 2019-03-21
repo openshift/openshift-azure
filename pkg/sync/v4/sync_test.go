@@ -2,9 +2,13 @@ package sync
 
 import (
 	"io/ioutil"
+	"reflect"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+
+	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
 func getObjectFromFile(path string) *unstructured.Unstructured {
@@ -56,5 +60,35 @@ func TestGetHash(t *testing.T) {
 		if !test.match && first == sec {
 			t.Errorf("%s: unexpected hashes match", test.name)
 		}
+	}
+}
+
+func TestReadDB(t *testing.T) {
+	prepare := func(v reflect.Value) {
+		switch v.Interface().(type) {
+		case []api.IdentityProvider:
+			// set the Provider to AADIdentityProvider
+			v.Set(reflect.ValueOf([]api.IdentityProvider{{Provider: &api.AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
+		}
+	}
+
+	var cs api.OpenShiftManagedCluster
+	populate.Walk(&cs, prepare)
+	cs.Config.ImageVersion = "311.123.456"
+	cs.Config.Images.PrometheusOperator = ":"
+	cs.Config.Images.PrometheusConfigReloader = ":"
+	cs.Config.Images.ConfigReloader = ":"
+	cs.Config.Images.Prometheus = ":"
+	cs.Config.Images.AlertManager = ":"
+	cs.Config.Images.Grafana = ":"
+	cs.Config.Images.OAuthProxy = ":"
+	cs.Config.Images.NodeExporter = ":"
+	cs.Config.Images.KubeStateMetrics = ":"
+	cs.Config.Images.KubeRbacProxy = ":"
+
+	s := &sync{cs: &cs}
+	err := s.readDB()
+	if err != nil {
+		t.Error(err)
 	}
 }
