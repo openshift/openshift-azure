@@ -121,18 +121,18 @@ func (mr *MockUpgraderMockRecorder) EnrichCSFromVault(arg0, arg1 interface{}) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnrichCSFromVault", reflect.TypeOf((*MockUpgrader)(nil).EnrichCSFromVault), arg0, arg1)
 }
 
-// EnrichCSStorageAccountKeys mocks base method
-func (m *MockUpgrader) EnrichCSStorageAccountKeys(arg0 context.Context, arg1 *api.OpenShiftManagedCluster) error {
+// EnrichStorageAccountKeys mocks base method
+func (m *MockUpgrader) EnrichStorageAccountKeys(arg0 context.Context, arg1 *api.OpenShiftManagedCluster) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EnrichCSStorageAccountKeys", arg0, arg1)
+	ret := m.ctrl.Call(m, "EnrichStorageAccountKeys", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// EnrichCSStorageAccountKeys indicates an expected call of EnrichCSStorageAccountKeys
-func (mr *MockUpgraderMockRecorder) EnrichCSStorageAccountKeys(arg0, arg1 interface{}) *gomock.Call {
+// EnrichStorageAccountKeys indicates an expected call of EnrichStorageAccountKeys
+func (mr *MockUpgraderMockRecorder) EnrichStorageAccountKeys(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnrichCSStorageAccountKeys", reflect.TypeOf((*MockUpgrader)(nil).EnrichCSStorageAccountKeys), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnrichStorageAccountKeys", reflect.TypeOf((*MockUpgrader)(nil).EnrichStorageAccountKeys), arg0, arg1)
 }
 
 // EnsureSyncPod mocks base method

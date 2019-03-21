@@ -191,7 +191,7 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginStepEnrichFromVault}
 	}
 
-	err = clusterUpgrader.EnrichCSStorageAccountKeys(ctx, cs)
+	err = clusterUpgrader.EnrichStorageAccountKeys(ctx, cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepEnrichKeys}
 	}

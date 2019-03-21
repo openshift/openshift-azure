@@ -35,7 +35,7 @@ const (
 type Upgrader interface {
 	CreateOrUpdateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	EnrichCSStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error
+	EnrichStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error
 	WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
@@ -121,6 +121,6 @@ func (u *simpleUpgrader) EnrichCSFromVault(ctx context.Context, cs *api.OpenShif
 	return vault.EnrichCSFromVault(ctx, u.kvc, cs)
 }
 
-func (u *simpleUpgrader) EnrichCSStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	return enrich.CSStorageAccountKeys(ctx, u.accountsClient, cs)
+func (u *simpleUpgrader) EnrichStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	return enrich.StorageAccountKeys(ctx, u.accountsClient, cs)
 }

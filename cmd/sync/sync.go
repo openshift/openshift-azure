@@ -76,7 +76,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
-	err = enrich.CSStorageAccountKeys(ctx, azs, cs)
+	err = enrich.StorageAccountKeys(ctx, azs, cs)
 	if err != nil {
 		return err
 	}
