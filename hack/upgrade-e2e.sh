@@ -15,6 +15,9 @@ set +x
 set -x
 
 # start monitor from head and record pid
+set +x
+. /usr/local/e2e-secrets/azure/secret
+set -x
 make monitoring-build
 ./monitoring -outputdir=/tmp/artifacts &
 MON_PID=$!
