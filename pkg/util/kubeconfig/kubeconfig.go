@@ -1,4 +1,4 @@
-package config
+package kubeconfig
 
 import (
 	"crypto/rsa"
@@ -10,7 +10,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
-func makeKubeConfig(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certificate, endpoint, username, namespace string) (*v1.Config, error) {
+func Make(clientKey *rsa.PrivateKey, clientCert, caCert *x509.Certificate, endpoint, username, namespace string) (*v1.Config, error) {
 	clustername := strings.Replace(endpoint, ".", "-", -1)
 	authinfoname := username + "/" + clustername
 	contextname := namespace + "/" + clustername + "/" + username
