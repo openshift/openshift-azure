@@ -124,6 +124,23 @@ images:
   etcdBackup: quay.io/openshift-on-azure/etcdbackup:vx.y
 ```
 
+create `CHANGELOG.md` at the root of the project starting with the version
+```
+# vx.y
+         <- additional blank line
+```
+
+scrape and append release-notes to `CHANGELOG.md`
+```
+make releasenotes
+export GITHUB_TOKEN=<github_token_from_team_secret>
+./releasenotes -repopath . -commitrange (vx.y)-1..HEAD >> CHANGELOG.md
+git add CHANGELOG.md
+```
+note about release numbers to use as commitrange with releasenotes above:
+* If you're cutting a new major release, (vx.y)-1 means v(x-1)."latest y on the x-1 branch"
+* If you're cutting a new minor release, (vx.y)-1 means vx.(y-1)
+
 Make sure you update `clusterVersion` field all image version to point to specific version, instead of `latest` tag.
 
 Merge this PR into `release-vx` branch. If step 2 was completed right, this PR now should run all OSA test suites for it to be merged. Test will be using CI infrastructure built images.
@@ -139,7 +156,7 @@ git tag -a -s -m "Version vx.y" vx.y
 git push upstream tags/vx.y
 ```
 
-1. Build release images from release tags
+5. Build release images from release tags
 
 This step should be executed only when PR from step 3 is merged and 4 is pushed.
 
