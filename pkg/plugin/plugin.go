@@ -70,14 +70,14 @@ func (p *plugin) ValidatePluginTemplate(ctx context.Context) []error {
 }
 
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	if cs.Config.PluginVersion == "" {
+		cs.Config.PluginVersion = p.pluginConfig.PluginVersion
+	}
+
 	p.log.Info("generating configs")
 	configInterface, err := p.configInterfaceFactory(cs)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
-	}
-
-	if cs.Config.PluginVersion == "" {
-		cs.Config.PluginVersion = p.pluginConfig.PluginVersion
 	}
 
 	// TODO should we save off the original config here and if there are any errors we can restore it?
