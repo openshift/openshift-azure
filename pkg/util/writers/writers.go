@@ -11,9 +11,9 @@ import (
 	"time"
 )
 
-//go:generate go get github.com/golang/mock/gomock
-//go:generate go install github.com/golang/mock/mockgen
+//go:generate go get github.com/golang/mock/mockgen
 //go:generate mockgen -destination=../mocks/mock_$GOPACKAGE/writers.go -package=mock_$GOPACKAGE -source writers.go
+//go:generate go get golang.org/x/tools/cmd/goimports
 //go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../../util/mocks/mock_$GOPACKAGE/writers.go
 
 type Writer interface {

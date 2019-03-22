@@ -1,9 +1,9 @@
 package azureclient
 
-//go:generate go get github.com/golang/mock/gomock
-//go:generate go install github.com/golang/mock/mockgen
+//go:generate go get github.com/golang/mock/mockgen
 //go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/azureclient.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE AccountsClient,ActivityLogsClient,ApplicationsClient,Client,DeploymentsClient,GroupsClient,KeyVaultClient,MarketPlaceAgreementsClient,RBACApplicationsClient,RBACGroupsClient,RecordSetsClient,ResourcesClient,ServicePrincipalsClient,VaultMgmtClient,VirtualMachineScaleSetExtensionsClient,VirtualMachineScaleSetsClient,VirtualMachineScaleSetVMsClient,VirtualNetworksClient,VirtualNetworksPeeringsClient,ZonesClient
 //go:generate gofmt -s -l -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
+//go:generate go get golang.org/x/tools/cmd/goimports
 //go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
 //go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE/storage Client,BlobStorageClient,Container,Blob
 //go:generate gofmt -s -l -w ../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go

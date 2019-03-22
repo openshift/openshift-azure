@@ -1,9 +1,9 @@
 package arm
 
-//go:generate go get github.com/golang/mock/gomock
-//go:generate go install github.com/golang/mock/mockgen
+//go:generate go get github.com/golang/mock/mockgen
 //go:generate mockgen -destination=../util/mocks/mock_$GOPACKAGE/arm.go -package=mock_$GOPACKAGE -source arm.go
 //go:generate gofmt -s -l -w ../util/mocks/mock_$GOPACKAGE/arm.go
+//go:generate go get golang.org/x/tools/cmd/goimports
 //go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../util/mocks/mock_$GOPACKAGE/arm.go
 
 import (
