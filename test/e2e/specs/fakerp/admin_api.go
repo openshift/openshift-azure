@@ -28,7 +28,7 @@ var _ = Describe("Validate AdimAPI field readability [AdminAPI][Fake]", func() {
 		before, err := cli.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(before).NotTo(BeNil())
-		Expect(before.Config.PluginVersion).To(BeEquivalentTo(to.StringPtr("v0.0")))
+		Expect(*before.Config.PluginVersion).To(Equal("v0.0"))
 
 		By("Updating the cluster state")
 		before.Config.PluginVersion = to.StringPtr("v0.1")
@@ -40,6 +40,6 @@ var _ = Describe("Validate AdimAPI field readability [AdminAPI][Fake]", func() {
 		after, err := cli.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(after).NotTo(BeNil())
-		Expect(after.Config.PluginVersion).To(BeEquivalentTo(to.StringPtr("v0.0")))
+		Expect(*after.Config.PluginVersion).To(Equal("v0.0"))
 	})
 })

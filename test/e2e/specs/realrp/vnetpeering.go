@@ -99,10 +99,10 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 		By("ensuring the OSA cluster vnet is peered with the custom vnet")
 		vnetPeer, err := cli.VirtualNetworks.Get(ctx, cfg.ResourceGroup, vnetPeerName, "")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(len(*vnetPeer.VirtualNetworkPeerings)).To(BeEquivalentTo(1))
+		Expect(len(*vnetPeer.VirtualNetworkPeerings)).To(Equal(1))
 		for _, vnetPeering := range *vnetPeer.VirtualNetworkPeerings {
-			Expect(vnetPeering.PeeringState).To(BeEquivalentTo("Connected"))
-			Expect(*vnetPeering.Name).To(BeEquivalentTo("OSACustomerVNetPeer"))
+			Expect(vnetPeering.PeeringState).To(Equal("Connected"))
+			Expect(*vnetPeering.Name).To(Equal("OSACustomerVNetPeer"))
 		}
 	})
 })

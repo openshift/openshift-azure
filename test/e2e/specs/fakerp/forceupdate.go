@@ -29,8 +29,8 @@ var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func
 		before, err := ubs.Read()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(before).NotTo(BeNil())
-		Expect(len(before.HostnameHashes)).To(BeEquivalentTo(3)) // one per master instance
-		Expect(len(before.ScalesetHashes)).To(BeEquivalentTo(2)) // one per worker scaleset
+		Expect(len(before.HostnameHashes)).To(Equal(3)) // one per master instance
+		Expect(len(before.ScalesetHashes)).To(Equal(2)) // one per worker scaleset
 
 		By("Executing force update on the cluster.")
 		err = azurecli.OpenShiftManagedClustersAdmin.ForceUpdate(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
