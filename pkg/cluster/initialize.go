@@ -71,6 +71,7 @@ func (u *simpleUpgrader) WriteStartupBlobs(cs *api.OpenShiftManagedCluster) erro
 		},
 		Location: cs.Location,
 		Config: api.Config{
+			PluginVersion: cs.Config.PluginVersion,
 			ComponentLogLevel: api.ComponentLogLevel{
 				Node: cs.Config.ComponentLogLevel.Node,
 			},
