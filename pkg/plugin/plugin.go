@@ -43,7 +43,7 @@ func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, testConfig api
 }
 
 func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedCluster, externalOnly bool) (errs []error) {
-	p.log.Info("validating internal data models")
+	p.log.Infof("validating internal data models %v", p.testConfig.RunningUnderTest)
 	validator := validate.NewAPIValidator(p.testConfig.RunningUnderTest)
 	errs = validator.Validate(new, old, externalOnly)
 
