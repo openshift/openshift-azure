@@ -158,3 +158,10 @@ resolve bug whereby SAS URIs were not being calculated correctly during the vmss
 ## prevent update from succeeding unless cluster version matches plugin version ([#1320](https://github.com/openshift/openshift-azure/pull/1320), [@jim-minter](https://github.com/jim-minter), 21/03/2019)
 
 prevent update from succeeding unless cluster version matches plugin version
+
+
+# Release v3.2
+
+## make hash invariant of SAS URIs ([#1329](https://github.com/openshift/openshift-azure/pull/1329), [@jim-minter](https://github.com/jim-minter), 22/03/2019)
+
+Fix an issue which was causing node rotations on scale; hardened testing
