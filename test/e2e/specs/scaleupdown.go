@@ -4,18 +4,20 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/Azure/go-autorest/autorest/to"
 	apiappsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
@@ -33,7 +35,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 
 	BeforeEach(func() {
 		var err error
-		azurecli, err = azure.NewClientFromEnvironment(false)
+		azurecli, err = azure.NewClientFromEnvironment(true)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(azurecli).NotTo(BeNil())
 
@@ -49,28 +51,61 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 		sanity.Checker.Client.EndUser.CleanupProject(namespace)
 	})
 
-	It("should be possible to maintain a healthy cluster after scaling it out and in", func() {
-		By("Fetching the scale up manifest")
+	scale := func(ubs updateblob.BlobService, before *updateblob.UpdateBlob, count int64) {
+		By("Fetching the manifest")
 		external, err := azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
-		Expect(external).NotTo(BeNil())
-		external.Properties.ProvisioningState = nil
-		scaleUp(&external)
+		external.Properties.ProvisioningState = nil // TODO: should not need to do this
+		err = setCount(&external, count)
+		Expect(err).NotTo(HaveOccurred())
 
 		By("Calling CreateOrUpdate on the rp with the scale up manifest")
-		updated, err := azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
+		_, err = azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(updated).NotTo(BeNil())
+
+		By("Reading the update blob after the scale up")
+		after, err := ubs.Read()
+		Expect(err).ToNot(HaveOccurred())
+
+		By("Verifying that the update blob is unchanged")
+		Expect(before).To(Equal(after))
+
+		By("Verifying that the expected number of nodes exist and are ready")
+		nodes, err := sanity.Checker.Client.Admin.CoreV1.Nodes().List(metav1.ListOptions{})
+		var nodeCount int64
+		for _, node := range nodes.Items {
+			if !strings.HasPrefix(node.Name, "master-") &&
+				!strings.HasPrefix(node.Name, "infra-") &&
+				ready.NodeIsReady(&node) {
+				nodeCount++
+			}
+		}
+		Expect(nodeCount).To(Equal(count))
+
+		By("Validating the cluster")
+		errs := sanity.Checker.ValidateCluster(context.Background())
+		Expect(errs).To(BeEmpty())
+	}
+
+	It("should be possible to maintain a healthy cluster after scaling it out and in", func() {
+		By("Reading the update blob before the scales")
+		ubs := updateblob.NewBlobService(azurecli.BlobStorage)
+		before, err := ubs.Read()
+		Expect(err).ToNot(HaveOccurred())
+		Expect(len(before.HostnameHashes)).To(Equal(3)) // one per master instance
+		Expect(len(before.ScalesetHashes)).To(Equal(2)) // one per worker scaleset
+
+		By("Scaling up")
+		scale(ubs, before, 2)
 
 		By("Creating a 2-replica sample deployment")
-		int32Ptr := func(i int32) *int32 { return &i }
-		deployment := &apiappsv1.Deployment{
+		d := &apiappsv1.Deployment{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      sampleDeployment,
 				Namespace: namespace,
 			},
 			Spec: apiappsv1.DeploymentSpec{
-				Replicas: int32Ptr(int32(2)),
+				Replicas: to.Int32Ptr(2),
 				Selector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{
 						"app": sampleDeployment,
@@ -84,105 +119,52 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 						},
 					},
 					Spec: corev1.PodSpec{
-						NodeSelector: map[string]string{
-							"node-role.kubernetes.io/compute": "true",
-						},
 						Containers: []corev1.Container{
 							{
 								Name:  sampleDeployment,
 								Image: "openshift/" + sampleDeployment,
-								Ports: []corev1.ContainerPort{
-									{
-										Name:          "http",
-										Protocol:      corev1.ProtocolTCP,
-										ContainerPort: 8080,
-									},
-								},
 							},
 						},
 					},
 				},
 			},
 		}
-		_, err = sanity.Checker.Client.EndUser.AppsV1.Deployments(namespace).Create(deployment)
+		_, err = sanity.Checker.Client.EndUser.AppsV1.Deployments(namespace).Create(d)
 		Expect(err).NotTo(HaveOccurred())
+
+		By("Verifying that the deployment's pods are spread across 2 nodes")
 		err = wait.PollImmediate(2*time.Second, 1*time.Minute, ready.CheckDeploymentIsReady(sanity.Checker.Client.EndUser.AppsV1.Deployments(namespace), sampleDeployment))
 		Expect(err).NotTo(HaveOccurred())
-
-		By("Verifying that the deployment's pods are spread across 2 nodes...")
-		By(fmt.Sprintf("Getting deployment %s.%s", namespace, sampleDeployment))
-		dep, err := sanity.Checker.Client.EndUser.AppsV1.Deployments(namespace).Get(sampleDeployment, metav1.GetOptions{})
+		d, err = sanity.Checker.Client.EndUser.AppsV1.Deployments(namespace).Get(sampleDeployment, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
-		Expect(dep).NotTo(BeNil())
-
-		By(fmt.Sprintf("Getting %s.%s deployment's labels", namespace, sampleDeployment))
-		set := labels.Set(dep.Spec.Template.Labels)
-		listOptions := metav1.ListOptions{LabelSelector: set.AsSelector().String()}
-
-		By(fmt.Sprintf("Listing pods matching deployment's labels %+v", set))
-		poditems, err := sanity.Checker.Client.EndUser.CoreV1.Pods(namespace).List(listOptions)
+		pods, err := sanity.Checker.Client.EndUser.CoreV1.Pods(namespace).List(metav1.ListOptions{})
 		Expect(err).NotTo(HaveOccurred())
-		Expect(poditems).NotTo(BeNil())
-		pods := poditems.Items
-		Expect(int(dep.Status.ReadyReplicas)).To(Equal(2))
-		Expect(len(pods)).To(Equal(2))
-		nodes := make(map[string]bool)
-		for _, pod := range pods {
-			By(fmt.Sprintf("Found pod %s on node %s", pod.Name, pod.Spec.NodeName))
-			nodes[pod.Spec.NodeName] = true
-		}
-		Expect(len(nodes)).To(Equal(2))
+		Expect(d.Status.ReadyReplicas).To(BeEquivalentTo(2))
+		Expect(len(pods.Items)).To(Equal(2))
+		Expect(pods.Items[0].Spec.NodeName).NotTo(Equal(pods.Items[1].Spec.NodeName))
 
-		By("Validating the cluster")
-		errs := sanity.Checker.ValidateCluster(context.Background())
-		Expect(errs).To(BeEmpty())
+		By("Scaling down")
+		scale(ubs, before, 1)
 
-		By("Fetching the scale down manifest")
-		external, err = azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		By("Verifying that the deployment's pods are all on 1 node")
+		err = wait.PollImmediate(2*time.Second, 1*time.Minute, ready.CheckDeploymentIsReady(sanity.Checker.Client.EndUser.AppsV1.Deployments(namespace), sampleDeployment))
 		Expect(err).NotTo(HaveOccurred())
-		Expect(external).NotTo(BeNil())
-		external.Properties.ProvisioningState = nil
-		scaleDown(&external)
-
-		By("Calling CreateOrUpdate on the rp with the scale down manifest")
-		updated, err = azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
+		d, err = sanity.Checker.Client.EndUser.AppsV1.Deployments(namespace).Get(sampleDeployment, metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
-		Expect(updated).NotTo(BeNil())
-
-		By("Verifying that the deployment's pods are all on 1 node...")
-		By(fmt.Sprintf("Listing pods matching deployment's labels %+v", set))
-		poditems, err = sanity.Checker.Client.EndUser.CoreV1.Pods(namespace).List(listOptions)
+		pods, err = sanity.Checker.Client.EndUser.CoreV1.Pods(namespace).List(metav1.ListOptions{})
 		Expect(err).NotTo(HaveOccurred())
-		Expect(poditems).NotTo(BeNil())
-		pods = poditems.Items
-		Expect(len(pods)).To(Equal(2))
-		nodes = make(map[string]bool)
-		for _, pod := range pods {
-			Expect(pod.Spec.NodeName).NotTo(BeEmpty())
-			By(fmt.Sprintf("Found pod %s on node %s", pod.Name, pod.Spec.NodeName))
-			nodes[pod.Spec.NodeName] = true
-			Expect(pod.Status.Phase).To(Equal(corev1.PodRunning))
-		}
-		Expect(len(nodes)).To(Equal(1))
-
-		By("Validating the cluster")
-		errs = sanity.Checker.ValidateCluster(context.Background())
-		Expect(errs).To(BeEmpty())
+		Expect(d.Status.ReadyReplicas).To(BeEquivalentTo(2))
+		Expect(len(pods.Items)).To(Equal(2))
+		Expect(pods.Items[0].Spec.NodeName).To(Equal(pods.Items[1].Spec.NodeName))
 	})
 })
 
-func scaleUp(oc *v20180930preview.OpenShiftManagedCluster) {
+func setCount(oc *v20180930preview.OpenShiftManagedCluster, count int64) error {
 	for _, p := range oc.Properties.AgentPoolProfiles {
 		if *p.Role == v20180930preview.AgentPoolProfileRoleCompute {
-			*p.Count++
+			*p.Count = count
+			return nil
 		}
 	}
-}
-
-func scaleDown(oc *v20180930preview.OpenShiftManagedCluster) {
-	for _, p := range oc.Properties.AgentPoolProfiles {
-		if *p.Role == v20180930preview.AgentPoolProfileRoleCompute {
-			*p.Count--
-		}
-	}
+	return fmt.Errorf("compute agent pool profile not found")
 }
