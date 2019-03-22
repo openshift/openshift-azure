@@ -98,8 +98,8 @@ func (s *sync) deleteOrphans() error {
 				l := i.GetLabels()
 				if l[ownedBySyncPodLabelKey] == "true" {
 					// if object is marked, but not in current DB, remove it
-					if _, ok := s.db[KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())]; !ok {
-						s.log.Info("Delete " + KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName()))
+					if _, ok := s.db[keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())]; !ok {
+						s.log.Info("Delete " + keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName()))
 						err = dc.Resource(&resource, i.GetNamespace()).Delete(i.GetName(), nil)
 						if err != nil {
 							return err
@@ -161,7 +161,7 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 		var existing *unstructured.Unstructured
 		existing, err = dc.Resource(res, o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
 		if kerrors.IsNotFound(err) {
-			log.Info("Create " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+			log.Info("Create " + keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 			markSyncPodOwned(o)
 			_, err = dc.Resource(res, o.GetNamespace()).Create(o)
 			if kerrors.IsAlreadyExists(err) {
@@ -219,7 +219,7 @@ func needsUpdate(log *logrus.Entry, existing, o *unstructured.Unstructured) bool
 		return false
 	}
 
-	log.Info("Update " + KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+	log.Info("Update " + keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 
 	return true
 }

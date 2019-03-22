@@ -14,7 +14,7 @@ import (
 	util "github.com/openshift/openshift-azure/pkg/util/template"
 )
 
-func KeyFunc(gk schema.GroupKind, namespace, name string) string {
+func keyFunc(gk schema.GroupKind, namespace, name string) string {
 	s := gk.String()
 	if namespace != "" {
 		s += "/" + namespace
@@ -24,14 +24,14 @@ func KeyFunc(gk schema.GroupKind, namespace, name string) string {
 	return s
 }
 
-type NestedFlags int
+type nestedFlags int
 
 const (
-	NestedFlagsBase64 NestedFlags = (1 << iota)
+	nestedFlagsBase64 nestedFlags = (1 << iota)
 )
 
 func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster) (unstructured.Unstructured, error) {
-	ts := Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
+	ts := translations[keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())]
 	for i, tr := range ts {
 		var s interface{}
 		if tr.F != nil {
@@ -41,7 +41,7 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 				return unstructured.Unstructured{}, err
 			}
 		} else {
-			b, err := util.Template(fmt.Sprintf("%s/%d", KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()), i), tr.Template, nil, map[string]interface{}{
+			b, err := util.Template(fmt.Sprintf("%s/%d", keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()), i), tr.Template, nil, map[string]interface{}{
 				"ContainerService": cs,
 				"Config":           &cs.Config,
 				"Derived":          config.Derived,
@@ -52,7 +52,7 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 			}
 		}
 
-		err := translate(o.Object, tr.Path, tr.NestedPath, tr.NestedFlags, s)
+		err := translate(o.Object, tr.Path, tr.NestedPath, tr.nestedFlags, s)
 		if err != nil {
 			return unstructured.Unstructured{}, err
 		}
@@ -60,7 +60,7 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 	return o, nil
 }
 
-func translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nestedFlags NestedFlags, v interface{}) error {
+func translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nestedFlags nestedFlags, v interface{}) error {
 	var err error
 
 	if nestedPath == nil {
@@ -70,7 +70,7 @@ func translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nest
 
 	nestedBytes := []byte(path.MustGetString(o))
 
-	if nestedFlags&NestedFlagsBase64 != 0 {
+	if nestedFlags&nestedFlagsBase64 != 0 {
 		nestedBytes, err = base64.StdEncoding.DecodeString(string(nestedBytes))
 		if err != nil {
 			return err
@@ -90,7 +90,7 @@ func translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nest
 		panic(err)
 	}
 
-	if nestedFlags&NestedFlagsBase64 != 0 {
+	if nestedFlags&nestedFlagsBase64 != 0 {
 		nestedBytes = []byte(base64.StdEncoding.EncodeToString(nestedBytes))
 		if err != nil {
 			panic(err)
@@ -102,14 +102,14 @@ func translate(o interface{}, path jsonpath.Path, nestedPath jsonpath.Path, nest
 	return nil
 }
 
-var Translations = map[string][]struct {
+var translations = map[string][]struct {
 	Path        jsonpath.Path
 	NestedPath  jsonpath.Path
-	NestedFlags NestedFlags
+	nestedFlags nestedFlags
 	Template    string
 	F           func(*api.OpenShiftManagedCluster) (interface{}, error)
 }{
-	// IMPORTANT: Translations must NOT use the quote function (i.e., write
+	// IMPORTANT: translations must NOT use the quote function (i.e., write
 	// "{{ .Config.Foo }}", NOT "{{ .Config.Foo | quote }}").  This is because
 	// the translations operate on in-memory objects, not on serialised YAML.
 	// Correct quoting will be handled automatically by the marshaller.

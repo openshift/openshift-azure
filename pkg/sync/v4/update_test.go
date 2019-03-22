@@ -87,7 +87,7 @@ func (u *updater) readDB() (map[string]unstructured.Unstructured, error) {
 			}
 
 			for _, i := range l.Items {
-				db[KeyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())] = i
+				db[keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())] = i
 			}
 		}
 	}
@@ -98,8 +98,8 @@ func (u *updater) readDB() (map[string]unstructured.Unstructured, error) {
 // blank uses translate() to insert a placeholder in all configuration items
 // that will be templated upon import, to avoid persisting any secrets.
 func (u *updater) blank(o unstructured.Unstructured) (unstructured.Unstructured, error) {
-	for _, t := range Translations[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] {
-		err := translate(o.Object, t.Path, t.NestedPath, t.NestedFlags, "*** GENERATED ***")
+	for _, t := range translations[keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] {
+		err := translate(o.Object, t.Path, t.NestedPath, t.nestedFlags, "*** GENERATED ***")
 		if err != nil {
 			return unstructured.Unstructured{}, err
 		}

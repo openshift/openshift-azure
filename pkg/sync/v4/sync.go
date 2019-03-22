@@ -43,11 +43,11 @@ const (
 	syncPodReadinessPathAnnotationKey = "azure.openshift.io/sync-pod-readiness-path"
 )
 
-// Unmarshal has to reimplement yaml.Unmarshal because it universally mangles yaml
+// unmarshal has to reimplement yaml.unmarshal because it universally mangles yaml
 // integers into float64s, whereas the Kubernetes client library uses int64s
 // wherever it can.  Such a difference can cause us to update objects when
 // we don't actually need to.
-func Unmarshal(b []byte) (unstructured.Unstructured, error) {
+func unmarshal(b []byte) (unstructured.Unstructured, error) {
 	json, err := yaml.YAMLToJSON(b)
 	if err != nil {
 		return unstructured.Unstructured{}, err
@@ -73,7 +73,7 @@ func (s *sync) readDB() error {
 			return err
 		}
 
-		o, err := Unmarshal(b)
+		o, err := unmarshal(b)
 		if err != nil {
 			return err
 		}
@@ -83,7 +83,7 @@ func (s *sync) readDB() error {
 			return err
 		}
 
-		s.db[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = o
+		s.db[keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = o
 	}
 
 	s.syncWorkloadsConfig()
@@ -106,7 +106,7 @@ func (s *sync) syncWorkloadsConfig() {
 			continue
 		}
 
-		configToHash[KeyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = getHash(&o)
+		configToHash[keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName())] = getHash(&o)
 	}
 
 	// iterate over all workload controllers and add annotations with the hashes
@@ -128,7 +128,7 @@ func (s *sync) syncWorkloadsConfig() {
 			if secretData, found := v["secret"]; found {
 				secretName := jsonpath.MustCompile("$.secretName").MustGetString(secretData)
 				key := fmt.Sprintf("checksum/secret-%s", secretName)
-				secretKey := KeyFunc(schema.GroupKind{Kind: "Secret"}, o.GetNamespace(), secretName)
+				secretKey := keyFunc(schema.GroupKind{Kind: "Secret"}, o.GetNamespace(), secretName)
 				if hash, found := configToHash[secretKey]; found {
 					setPodTemplateAnnotation(key, hash, o)
 				}
@@ -137,7 +137,7 @@ func (s *sync) syncWorkloadsConfig() {
 			if configMapData, found := v["configMap"]; found {
 				configMapName := jsonpath.MustCompile("$.name").MustGetString(configMapData)
 				key := fmt.Sprintf("checksum/configmap-%s", configMapName)
-				configMapKey := KeyFunc(schema.GroupKind{Kind: "ConfigMap"}, o.GetNamespace(), configMapName)
+				configMapKey := keyFunc(schema.GroupKind{Kind: "ConfigMap"}, o.GetNamespace(), configMapName)
 				if hash, found := configToHash[configMapKey]; found {
 					setPodTemplateAnnotation(key, hash, o)
 				}

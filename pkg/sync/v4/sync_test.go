@@ -16,7 +16,7 @@ func getObjectFromFile(path string) *unstructured.Unstructured {
 	if err != nil {
 		panic(err)
 	}
-	o, err := Unmarshal(b)
+	o, err := unmarshal(b)
 	if err != nil {
 		panic(err)
 	}

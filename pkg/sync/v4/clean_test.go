@@ -21,7 +21,7 @@ func TestClean(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		i, err := Unmarshal(b)
+		i, err := unmarshal(b)
 		if err != nil {
 			t.Error(err)
 		}
@@ -30,7 +30,7 @@ func TestClean(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		o, err := Unmarshal(b)
+		o, err := unmarshal(b)
 		if err != nil {
 			t.Error(err)
 		}

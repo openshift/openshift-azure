@@ -28,7 +28,7 @@ func TestLint(t *testing.T) {
 			return err
 		}
 
-		u, err := Unmarshal(b1)
+		u, err := unmarshal(b1)
 		if err != nil {
 			return err
 		}
