@@ -9,7 +9,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	util "github.com/openshift/openshift-azure/pkg/util/template"
 )
@@ -44,7 +43,7 @@ func translateAsset(o unstructured.Unstructured, cs *api.OpenShiftManagedCluster
 			b, err := util.Template(fmt.Sprintf("%s/%d", keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()), i), tr.Template, nil, map[string]interface{}{
 				"ContainerService": cs,
 				"Config":           &cs.Config,
-				"Derived":          config.Derived,
+				"Derived":          derived,
 			})
 			s = string(b)
 			if err != nil {
@@ -412,7 +411,7 @@ var translations = map[string][]struct {
 		{
 			Path: jsonpath.MustCompile("$.spec.template.spec.containers[?(@.name='statsd')].args"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.StatsdArgs(cs)
+				return derived.StatsdArgs(cs)
 			},
 		},
 		{
@@ -446,7 +445,7 @@ var translations = map[string][]struct {
 		{
 			Path: jsonpath.MustCompile("$.spec.template.spec.containers[0].args"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.ClusterMonitoringOperatorArgs(cs)
+				return derived.ClusterMonitoringOperatorArgs(cs)
 			},
 		},
 	},
@@ -548,7 +547,7 @@ var translations = map[string][]struct {
 		{
 			Path: jsonpath.MustCompile("$.stringData.'aad-group-sync.yaml'"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				b, err := config.Derived.AadGroupSyncConf(cs)
+				b, err := derived.AadGroupSyncConf(cs)
 				return string(b), err
 			},
 		},
@@ -631,7 +630,7 @@ var translations = map[string][]struct {
 		{
 			Path: jsonpath.MustCompile("$.metadata.annotations['service.beta.kubernetes.io/azure-dns-label-name']"),
 			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return config.Derived.RouterLBCNamePrefix(cs), nil
+				return derived.RouterLBCNamePrefix(cs), nil
 			},
 		},
 	},

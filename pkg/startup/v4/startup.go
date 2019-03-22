@@ -17,7 +17,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
@@ -119,7 +118,7 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 		b, err := template.Template(filepath, tmpl, nil, map[string]interface{}{
 			"ContainerService": s.cs,
 			"Config":           &s.cs.Config,
-			"Derived":          config.Derived,
+			"Derived":          derived,
 			"Role":             role,
 			"Hostname":         hostname,
 			"DomainName":       domainname,

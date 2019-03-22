@@ -10,7 +10,6 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
@@ -72,7 +71,7 @@ func (g *simpleGenerator) ipAPIServer() *network.PublicIPAddress {
 		PublicIPAddressPropertiesFormat: &network.PublicIPAddressPropertiesFormat{
 			PublicIPAllocationMethod: network.Static,
 			DNSSettings: &network.PublicIPAddressDNSSettings{
-				DomainNameLabel: to.StringPtr(config.Derived.MasterLBCNamePrefix(g.cs)),
+				DomainNameLabel: to.StringPtr(derived.MasterLBCNamePrefix(g.cs)),
 			},
 			IdleTimeoutInMinutes: to.Int32Ptr(15),
 		},
