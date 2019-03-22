@@ -176,12 +176,12 @@ func TestRotateClusterSecrets(t *testing.T) {
 		},
 	}
 
-	configGenerator := mock_config.NewMockGenerator(gmc)
+	configInterface := mock_config.NewMockInterface(gmc)
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 	armInterface := mock_arm.NewMockInterface(gmc)
 
-	c := configGenerator.EXPECT().InvalidateSecrets().Return(nil)
-	c = configGenerator.EXPECT().Generate(gomock.Any()).Return(nil).After(c)
+	c := configInterface.EXPECT().InvalidateSecrets().Return(nil)
+	c = configInterface.EXPECT().Generate(gomock.Any()).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
 	c = armInterface.EXPECT().Generate(nil, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
@@ -204,8 +204,8 @@ func TestRotateClusterSecrets(t *testing.T) {
 		armInterfaceFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Interface, error) {
 			return armInterface, nil
 		},
-		configGeneratorFactory: func(cs *api.OpenShiftManagedCluster) config.Generator {
-			return configGenerator
+		configInterfaceFactory: func(cs *api.OpenShiftManagedCluster) (config.Interface, error) {
+			return configInterface, nil
 		},
 		log:          logrus.NewEntry(logrus.StandardLogger()),
 		pluginConfig: &pluginapi.Config{},

@@ -28,7 +28,7 @@ type plugin struct {
 	testConfig             api.TestConfig
 	upgraderFactory        func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error)
 	armInterfaceFactory    func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Interface, error)
-	configGeneratorFactory func(cs *api.OpenShiftManagedCluster) config.Generator
+	configInterfaceFactory func(cs *api.OpenShiftManagedCluster) (config.Interface, error)
 }
 
 var _ api.Plugin = &plugin{}
@@ -41,7 +41,7 @@ func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, testConfig api
 		testConfig:             testConfig,
 		upgraderFactory:        cluster.NewSimpleUpgrader,
 		armInterfaceFactory:    arm.New,
-		configGeneratorFactory: config.NewSimpleGenerator,
+		configInterfaceFactory: config.New,
 	}, nil
 }
 
@@ -71,14 +71,17 @@ func (p *plugin) ValidatePluginTemplate(ctx context.Context) []error {
 
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	p.log.Info("generating configs")
-	configGenerator := p.configGeneratorFactory(cs)
+	configInterface, err := p.configInterfaceFactory(cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
 
 	if cs.Config.PluginVersion == "" {
 		cs.Config.PluginVersion = p.pluginConfig.PluginVersion
 	}
 
 	// TODO should we save off the original config here and if there are any errors we can restore it?
-	err := configGenerator.Generate(p.pluginConfig)
+	err = configInterface.Generate(p.pluginConfig)
 	if err != nil {
 		return err
 	}
@@ -266,9 +269,12 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 
 func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
 	p.log.Info("invalidating non-ca certificates, private keys and secrets")
-	configGenerator := p.configGeneratorFactory(cs)
+	configInterface, err := p.configInterfaceFactory(cs)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
+	}
 
-	err := configGenerator.InvalidateSecrets()
+	err = configInterface.InvalidateSecrets()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInvalidateClusterSecrets}
 	}
