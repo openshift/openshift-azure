@@ -172,22 +172,22 @@ e2e-prod:
 	FOCUS="\[Default\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
 
 e2e-etcdbackuprecovery:
-	FOCUS="\[EtcdRecovery\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
+	FOCUS="\[EtcdRecovery\]\[Fake\]" TIMEOUT=180m ./hack/e2e.sh
 
 e2e-keyrotation:
-	FOCUS="\[KeyRotation\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
+	FOCUS="\[KeyRotation\]\[Fake\]" TIMEOUT=180m ./hack/e2e.sh
 
 e2e-reimagevm:
-	FOCUS="\[ReimageVM\]\[Fake\]" TIMEOUT=20m ./hack/e2e.sh
+	FOCUS="\[ReimageVM\]\[Fake\]" TIMEOUT=40m ./hack/e2e.sh
 
 e2e-changeloglevel:
-	FOCUS="\[ChangeLogLevel\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
+	FOCUS="\[ChangeLogLevel\]\[Fake\]" TIMEOUT=180m ./hack/e2e.sh
 
 e2e-scaleupdown:
 	FOCUS="\[ScaleUpDown\]\[Fake\]" TIMEOUT=50m ./hack/e2e.sh
 
 e2e-forceupdate:
-	FOCUS="\[ForceUpdate\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
+	FOCUS="\[ForceUpdate\]\[Fake\]" TIMEOUT=180m ./hack/e2e.sh
 
 e2e-vnet:
 	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
