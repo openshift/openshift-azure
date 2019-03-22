@@ -247,7 +247,7 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		}
 		err := clusterUpgrader.WaitForReadySyncPod(ctx)
 		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepWaitForSyncPod}
+			return &api.PluginError{Err: err, Step: api.PluginStepWaitForReadySyncPod}
 		}
 	}
 
