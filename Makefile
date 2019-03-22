@@ -170,7 +170,7 @@ e2e-changeloglevel:
 	FOCUS="\[ChangeLogLevel\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
 
 e2e-scaleupdown:
-	FOCUS="\[ScaleUpDown\]\[Fake\]" TIMEOUT=30m ./hack/e2e.sh
+	FOCUS="\[ScaleUpDown\]\[Fake\]" TIMEOUT=50m ./hack/e2e.sh
 
 e2e-forceupdate:
 	FOCUS="\[ForceUpdate\]\[Fake\]" TIMEOUT=70m ./hack/e2e.sh
