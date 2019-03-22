@@ -48,7 +48,9 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 	p.log.Info("validating internal data models")
 	validator := validate.NewAPIValidator(p.testConfig.RunningUnderTest)
 	errs = validator.Validate(new, old, externalOnly)
-	if old != nil && old.Config.PluginVersion != p.pluginConfig.PluginVersion {
+	// HACK: We do not allow upgrades from different plugin version at the moment. We allow this only in RunningUnderTest for testing purposes
+	// TODO: Remove this before GA.
+	if old != nil && old.Config.PluginVersion != p.pluginConfig.PluginVersion && !p.testConfig.RunningUnderTest {
 		errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, old.Config.PluginVersion, p.pluginConfig.PluginVersion))
 	}
 	return
