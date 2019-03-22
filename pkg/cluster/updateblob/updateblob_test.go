@@ -35,6 +35,30 @@ func TestReadUpdateBlob(t *testing.T) {
 				ScalesetHashes: ScalesetHashes{},
 			},
 		},
+		{
+			name: "ok (scalesetHashes)",
+			blob: `{"scalesetHashes":[{"scalesetName":"ss-compute","hash":"N3g5OT0="},{"scalesetName":"ss-infra","hash":"NDU="}]}`,
+			want: &UpdateBlob{
+				HostnameHashes: HostnameHashes{},
+				ScalesetHashes: ScalesetHashes{
+					"ss-infra":   []byte("45"),
+					"ss-compute": []byte("7x99="),
+				},
+			},
+		},
+		// TODO: Apparently reading a malformed blob does not return an error.
+		// May need to use encoding/json/#Decoder.DisallowUnknownFields to catch those cases
+		{
+			name: "reading a malformed blob works!",
+			blob: `{"hostnameHashes":[{"hostnam":"ss-compute_0","has":"N3g5OT0="},{"hostname":"ss-infra_0","hash":"NDU="}]}`,
+			want: &UpdateBlob{
+				HostnameHashes: HostnameHashes{
+					"":           []byte(nil),
+					"ss-infra_0": []byte("45"),
+				},
+				ScalesetHashes: ScalesetHashes{},
+			},
+		},
 	}
 	gmc := gomock.NewController(t)
 	defer gmc.Finish()
@@ -50,14 +74,14 @@ func TestReadUpdateBlob(t *testing.T) {
 
 		got, err := u.Read()
 		if (err != nil) != (tt.wantErr != nil) {
-			t.Errorf("simpleUpgrader.readUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
+			t.Errorf("simpleUpgrader.readUpdateBlob() error = %#v, wantErr %#v", err, tt.wantErr)
 			return
 		}
 		if tt.wantErr != nil && err != tt.wantErr {
-			t.Errorf("simpleUpgrader.readUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
+			t.Errorf("simpleUpgrader.readUpdateBlob() error = %#v, wantErr %#v", err, tt.wantErr)
 		}
 		if tt.wantErr == nil && !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("simpleUpgrader.readUpdateBlob() = %v, want %v", got, tt.want)
+			t.Errorf("simpleUpgrader.readUpdateBlob() = %#v, want %#v", got, tt.want)
 		}
 	}
 }
