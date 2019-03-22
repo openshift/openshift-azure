@@ -34,7 +34,7 @@ const (
 	PluginStepCreateSyncPodWaitForReady           PluginStep = "CreateSyncPodWaitForReady"
 	PluginStepWaitForWaitForOpenShiftAPI          PluginStep = "WaitForOpenShiftAPI"
 	PluginStepWaitForNodes                        PluginStep = "WaitForNodes"
-	PluginStepWaitForSyncPod                      PluginStep = "WaitForSyncPod"
+	PluginStepWaitForReadySyncPod                 PluginStep = "WaitForReadySyncPod"
 	PluginStepWaitForConsoleHealth                PluginStep = "WaitForConsoleHealth"
 	PluginStepWaitForInfraDaemonSets              PluginStep = "WaitForInfraDaemonSets"
 	PluginStepWaitForInfraStatefulSets            PluginStep = "WaitForInfraStatefulSets"
@@ -62,7 +62,6 @@ const (
 	PluginStepUpdateWorkerAgentPoolUpdateBlob     PluginStep = "UpdateWorkerAgentPoolUpdateBlob"
 	PluginStepUpdateWorkerAgentPoolDeleteVM       PluginStep = "UpdateWorkerAgentPoolDeleteVM"
 	PluginStepUpdateSyncPod                       PluginStep = "UpdateSyncPod"
-	PluginStepUpdateSyncPodWaitForReady           PluginStep = "UpdateSyncPodWaitForReady"
 	PluginStepInvalidateClusterSecrets            PluginStep = "InvalidateClusterSecrets"
 	PluginStepRegenerateClusterSecrets            PluginStep = "RegenerateClusterSecrets"
 )
