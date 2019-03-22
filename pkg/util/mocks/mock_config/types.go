@@ -9,8 +9,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 
-	api "github.com/openshift/openshift-azure/pkg/api"
-	api0 "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	api "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 )
 
 // MockGenerator is a mock of Generator interface
@@ -37,29 +36,29 @@ func (m *MockGenerator) EXPECT() *MockGeneratorMockRecorder {
 }
 
 // Generate mocks base method
-func (m *MockGenerator) Generate(cs *api.OpenShiftManagedCluster, template *api0.Config) error {
+func (m *MockGenerator) Generate(template *api.Config) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Generate", cs, template)
+	ret := m.ctrl.Call(m, "Generate", template)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Generate indicates an expected call of Generate
-func (mr *MockGeneratorMockRecorder) Generate(cs, template interface{}) *gomock.Call {
+func (mr *MockGeneratorMockRecorder) Generate(template interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockGenerator)(nil).Generate), cs, template)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockGenerator)(nil).Generate), template)
 }
 
 // InvalidateSecrets mocks base method
-func (m *MockGenerator) InvalidateSecrets(cs *api.OpenShiftManagedCluster) error {
+func (m *MockGenerator) InvalidateSecrets() error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InvalidateSecrets", cs)
+	ret := m.ctrl.Call(m, "InvalidateSecrets")
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // InvalidateSecrets indicates an expected call of InvalidateSecrets
-func (mr *MockGeneratorMockRecorder) InvalidateSecrets(cs interface{}) *gomock.Call {
+func (mr *MockGeneratorMockRecorder) InvalidateSecrets() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InvalidateSecrets", reflect.TypeOf((*MockGenerator)(nil).InvalidateSecrets), cs)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InvalidateSecrets", reflect.TypeOf((*MockGenerator)(nil).InvalidateSecrets))
 }

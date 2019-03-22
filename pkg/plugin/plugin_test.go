@@ -13,6 +13,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
+	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_config"
@@ -179,8 +180,8 @@ func TestRotateClusterSecrets(t *testing.T) {
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 	armInterface := mock_arm.NewMockInterface(gmc)
 
-	c := configGenerator.EXPECT().InvalidateSecrets(cs).Return(nil)
-	c = configGenerator.EXPECT().Generate(cs, gomock.Any()).Return(nil).After(c)
+	c := configGenerator.EXPECT().InvalidateSecrets().Return(nil)
+	c = configGenerator.EXPECT().Generate(gomock.Any()).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
 	c = armInterface.EXPECT().Generate(nil, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
@@ -203,9 +204,11 @@ func TestRotateClusterSecrets(t *testing.T) {
 		armInterfaceFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Interface, error) {
 			return armInterface, nil
 		},
-		configGenerator: configGenerator,
-		log:             logrus.NewEntry(logrus.StandardLogger()),
-		pluginConfig:    &pluginapi.Config{},
+		configGeneratorFactory: func(cs *api.OpenShiftManagedCluster) config.Generator {
+			return configGenerator
+		},
+		log:          logrus.NewEntry(logrus.StandardLogger()),
+		pluginConfig: &pluginapi.Config{},
 	}
 
 	if err := p.RotateClusterSecrets(nil, cs, deployer); err != nil {

@@ -23,12 +23,12 @@ import (
 
 type plugin struct {
 	// nothing in here should be dependent on an OpenShiftManagedCluster object
-	log                 *logrus.Entry
-	pluginConfig        *pluginapi.Config
-	testConfig          api.TestConfig
-	upgraderFactory     func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error)
-	armInterfaceFactory func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Interface, error)
-	configGenerator     config.Generator
+	log                    *logrus.Entry
+	pluginConfig           *pluginapi.Config
+	testConfig             api.TestConfig
+	upgraderFactory        func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error)
+	armInterfaceFactory    func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Interface, error)
+	configGeneratorFactory func(cs *api.OpenShiftManagedCluster) config.Generator
 }
 
 var _ api.Plugin = &plugin{}
@@ -36,12 +36,12 @@ var _ api.Plugin = &plugin{}
 // NewPlugin creates a new plugin instance
 func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, testConfig api.TestConfig) (api.Plugin, []error) {
 	return &plugin{
-		log:                 log,
-		pluginConfig:        pluginConfig,
-		testConfig:          testConfig,
-		upgraderFactory:     cluster.NewSimpleUpgrader,
-		armInterfaceFactory: arm.New,
-		configGenerator:     config.NewSimpleGenerator(),
+		log:                    log,
+		pluginConfig:           pluginConfig,
+		testConfig:             testConfig,
+		upgraderFactory:        cluster.NewSimpleUpgrader,
+		armInterfaceFactory:    arm.New,
+		configGeneratorFactory: config.NewSimpleGenerator,
 	}, nil
 }
 
@@ -71,13 +71,14 @@ func (p *plugin) ValidatePluginTemplate(ctx context.Context) []error {
 
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	p.log.Info("generating configs")
+	configGenerator := p.configGeneratorFactory(cs)
 
 	if cs.Config.PluginVersion == "" {
 		cs.Config.PluginVersion = p.pluginConfig.PluginVersion
 	}
 
 	// TODO should we save off the original config here and if there are any errors we can restore it?
-	err := p.configGenerator.Generate(cs, p.pluginConfig)
+	err := configGenerator.Generate(p.pluginConfig)
 	if err != nil {
 		return err
 	}
@@ -265,7 +266,9 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 
 func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
 	p.log.Info("invalidating non-ca certificates, private keys and secrets")
-	err := p.configGenerator.InvalidateSecrets(cs)
+	configGenerator := p.configGeneratorFactory(cs)
+
+	err := configGenerator.InvalidateSecrets()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInvalidateClusterSecrets}
 	}

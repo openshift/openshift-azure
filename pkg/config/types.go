@@ -13,16 +13,17 @@ import (
 
 // Generator is an interface for sharing the cluster and plugin configs
 type Generator interface {
-	Generate(cs *api.OpenShiftManagedCluster, template *pluginapi.Config) error
-	InvalidateSecrets(cs *api.OpenShiftManagedCluster) error
+	Generate(template *pluginapi.Config) error
+	InvalidateSecrets() error
 }
 
 type simpleGenerator struct {
+	cs *api.OpenShiftManagedCluster
 }
 
 var _ Generator = &simpleGenerator{}
 
 // NewSimpleGenerator creates a struct to hold both the cluster and plugin configs
-func NewSimpleGenerator() Generator {
-	return &simpleGenerator{}
+func NewSimpleGenerator(cs *api.OpenShiftManagedCluster) Generator {
+	return &simpleGenerator{cs: cs}
 }
