@@ -9,6 +9,11 @@ fi
 export RESOURCEGROUP=$(cat /dev/urandom | tr -dc 'a-z' | fold -w 6 | head -n 1)
 export SOURCE=$1
 
+# source secrets early in the process
+set +x
+. /usr/local/e2e-secrets/azure/secret
+set -x
+
 # start monitor from head and record pid
 make monitoring-build
 ./monitoring -outputdir=/tmp/artifacts &
@@ -21,10 +26,7 @@ git clone -b $SOURCE https://github.com/openshift/openshift-azure.git $T/src/git
 
 cd $T/src/github.com/openshift/openshift-azure
 
-ln -s /usr/secrets secrets
-set +x
-. secrets/secret
-set -x
+ln -s /usr/local/e2e-secrets/azure secrets
 
 trap 'kill -15 ${MON_PID}; wait; make delete' EXIT
 
