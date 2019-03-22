@@ -37,7 +37,12 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 	appCopy.Count = 0
 	appCopy.Name = ""
 
-	vmss, err := arm.Vmss(cs, &appCopy, "", "", h.testConfig) // TODO: backupBlob is rather a layering violation here
+	// and also the SAS URIs
+	csCopy := cs.DeepCopy()
+	csCopy.Config.MasterStartupSASURI = ""
+	csCopy.Config.WorkerStartupSASURI = ""
+
+	vmss, err := arm.Vmss(csCopy, &appCopy, "", "", h.testConfig) // TODO: backupBlob is rather a layering violation here
 	if err != nil {
 		return nil, err
 	}

@@ -37,7 +37,10 @@ func TestHashScaleSet(t *testing.T) {
 		if err != nil {
 			t.Errorf("%s: unexpected error: %v", role, err)
 		}
-		second, err := h.HashScaleSet(&cs, &api.AgentPoolProfile{
+		csCopy := cs.DeepCopy()
+		csCopy.Config.MasterStartupSASURI = "foo"
+		csCopy.Config.WorkerStartupSASURI = "foo"
+		second, err := h.HashScaleSet(csCopy, &api.AgentPoolProfile{
 			Name:  "foo",
 			Role:  role,
 			Count: 1,
