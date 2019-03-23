@@ -24,7 +24,7 @@ func ConvertFromAdmin(oc *admin.OpenShiftManagedCluster, old *OpenShiftManagedCl
 	if oc.Location != nil {
 		cs.Location = *oc.Location
 	}
-	if cs.Tags == nil {
+	if cs.Tags == nil && len(oc.Tags) > 0 {
 		cs.Tags = make(map[string]string, len(oc.Tags))
 	}
 	for k, v := range oc.Tags {
@@ -234,7 +234,7 @@ func mergeAuthProfileAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManag
 		return nil
 	}
 
-	if cs.Properties.AuthProfile.IdentityProviders == nil {
+	if cs.Properties.AuthProfile.IdentityProviders == nil && len(oc.Properties.AuthProfile.IdentityProviders) > 0 {
 		cs.Properties.AuthProfile.IdentityProviders = make([]IdentityProvider, 0, len(oc.Properties.AuthProfile.IdentityProviders))
 	}
 

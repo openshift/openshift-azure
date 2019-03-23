@@ -27,7 +27,7 @@ func ConvertFromV20180930preview(oc *v20180930preview.OpenShiftManagedCluster, o
 	if oc.Location != nil {
 		cs.Location = *oc.Location
 	}
-	if cs.Tags == nil {
+	if cs.Tags == nil && len(oc.Tags) > 0 {
 		cs.Tags = make(map[string]string, len(oc.Tags))
 	}
 	for k, v := range oc.Tags {
@@ -248,7 +248,7 @@ func mergeAuthProfile(oc *v20180930preview.OpenShiftManagedCluster, cs *OpenShif
 		return nil
 	}
 
-	if cs.Properties.AuthProfile.IdentityProviders == nil {
+	if cs.Properties.AuthProfile.IdentityProviders == nil && len(oc.Properties.AuthProfile.IdentityProviders) > 0 {
 		cs.Properties.AuthProfile.IdentityProviders = make([]IdentityProvider, 0, len(oc.Properties.AuthProfile.IdentityProviders))
 	}
 
