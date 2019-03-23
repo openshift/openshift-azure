@@ -186,12 +186,13 @@ func updateAadApplication(ctx context.Context, oc *v20180930preview.OpenShiftMan
 
 func isConnectionRefused(err error) bool {
 	if autoRestErr, ok := err.(autorest.DetailedError); ok {
-		if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
-			if netErr, ok := urlErr.Err.(*net.OpError); ok {
-				if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
-					if sysErr.Err == syscall.ECONNREFUSED {
-						return true
-					}
+		err = autoRestErr.Original
+	}
+	if urlErr, ok := err.(*url.Error); ok {
+		if netErr, ok := urlErr.Err.(*net.OpError); ok {
+			if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
+				if sysErr.Err == syscall.ECONNREFUSED {
+					return true
 				}
 			}
 		}
