@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
-	"github.com/openshift/openshift-azure/pkg/config"
 )
 
 func (u *simpleUpgrader) EtcdBlobExists(ctx context.Context, blobName string) error {
@@ -25,7 +25,7 @@ func (u *simpleUpgrader) EtcdBlobExists(ctx context.Context, blobName string) er
 
 func (u *simpleUpgrader) EtcdRestoreDeleteMasterScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
 	// We may need/want to delete all the scalesets in the future
-	err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, config.MasterScalesetName)
+	err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, names.MasterScalesetName)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
 	}

@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 )
 
 func (u *simpleUpgrader) WaitForNodesInAgentPoolProfile(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) error {
-	vms, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, config.GetScalesetName(app, suffix), "", "", "")
+	vms, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, names.GetScalesetName(app, suffix), "", "", "")
 	if err != nil {
 		return err
 	}

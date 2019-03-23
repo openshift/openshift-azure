@@ -3,17 +3,9 @@ package configblob
 import (
 	"context"
 	"errors"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
-	azstorage "github.com/Azure/azure-sdk-for-go/storage"
-	"github.com/ghodss/yaml"
-	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	azureclientstorage "github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
@@ -58,34 +50,4 @@ func GetService(ctx context.Context, cpc *cloudprovider.Config) (azureclientstor
 	}
 
 	return storageCli.GetBlobService(), nil
-}
-
-// GetBlob get's the blob and unmarshals it into a OpenShiftManagedCluster
-func GetBlob(blob azureclientstorage.Blob) (*api.OpenShiftManagedCluster, error) {
-	var rc io.ReadCloser
-	var err error
-	err = wait.PollImmediateInfinite(time.Second, func() (bool, error) {
-		rc, err = blob.Get(nil)
-
-		if err, ok := err.(azstorage.AzureStorageServiceError); ok && err.StatusCode == http.StatusNotFound {
-			return false, nil
-		}
-
-		return err == nil, err
-	})
-	if err != nil {
-		return nil, err
-	}
-	defer rc.Close()
-
-	b, err := ioutil.ReadAll(rc)
-	if err != nil {
-		return nil, err
-	}
-
-	var cs *api.OpenShiftManagedCluster
-	if err := yaml.Unmarshal(b, &cs); err != nil {
-		return nil, err
-	}
-	return cs, nil
 }

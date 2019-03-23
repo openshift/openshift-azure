@@ -12,7 +12,7 @@ import (
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
-	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_config"
@@ -180,7 +180,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 	armGenerator := mock_arm.NewMockGenerator(gmc)
 
 	c := configGenerator.EXPECT().InvalidateSecrets(cs).Return(nil)
-	c = configGenerator.EXPECT().Generate(cs, nil).Return(nil).After(c)
+	c = configGenerator.EXPECT().Generate(cs, gomock.Any()).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
 	c = armGenerator.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
@@ -205,6 +205,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 		},
 		configGenerator: configGenerator,
 		log:             logrus.NewEntry(logrus.StandardLogger()),
+		pluginConfig:    &pluginapi.Config{},
 	}
 
 	if err := p.RotateClusterSecrets(nil, cs, deployer); err != nil {
@@ -313,7 +314,7 @@ func TestReimage(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 
-			scaleset, instanceID, err := config.GetScaleSetNameAndInstanceID(tt.hostname)
+			scaleset, instanceID, err := names.GetScaleSetNameAndInstanceID(tt.hostname)
 			if err != nil {
 				t.Fatal(err)
 			}

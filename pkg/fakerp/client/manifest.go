@@ -7,7 +7,6 @@ import (
 
 	"github.com/ghodss/yaml"
 
-	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	utiltemplate "github.com/openshift/openshift-azure/pkg/util/template"
@@ -32,9 +31,9 @@ func GenerateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
-	b, err = utiltemplate.Template(string(b), template.FuncMap{
+	b, err = utiltemplate.Template(manifestFile, string(b), template.FuncMap{
 		"Getenv": os.Getenv,
-	}, &api.OpenShiftManagedCluster{}, nil)
+	}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -60,9 +59,9 @@ func GenerateManifestAdmin(manifestFile string) (*admin.OpenShiftManagedCluster,
 		return nil, err
 	}
 
-	b, err = utiltemplate.Template(string(b), template.FuncMap{
+	b, err = utiltemplate.Template(manifestFile, string(b), template.FuncMap{
 		"Getenv": os.Getenv,
-	}, &api.OpenShiftManagedCluster{}, nil)
+	}, nil)
 	if err != nil {
 		return nil, err
 	}

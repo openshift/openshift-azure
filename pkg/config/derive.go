@@ -17,7 +17,7 @@ import (
 
 type derived struct{}
 
-var Derived derived
+var Derived = &derived{}
 
 func isSmallVM(vmSize api.VMSize) bool {
 	// TODO: we should only be allowing StandardD2sV3 for test

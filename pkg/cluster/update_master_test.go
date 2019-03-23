@@ -11,8 +11,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
@@ -71,7 +71,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 
 			c = hasher.EXPECT().HashScaleSet(tt.cs, &tt.cs.Properties.AgentPoolProfiles[0]).Return([]byte("updated"), nil).After(c)
 			for i := int64(0); i < tt.cs.Properties.AgentPoolProfiles[0].Count; i++ {
-				hostname := config.GetHostname(&tt.cs.Properties.AgentPoolProfiles[0], "", i)
+				hostname := names.GetHostname(&tt.cs.Properties.AgentPoolProfiles[0], "", i)
 				instanceID := fmt.Sprintf("%d", i)
 
 				// 1. drain

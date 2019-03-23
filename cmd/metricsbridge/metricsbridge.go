@@ -22,7 +22,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/sirupsen/logrus"
 
-	pkgconfig "github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/statsd"
 )
@@ -250,7 +250,7 @@ func (c *config) runOnce(ctx context.Context) error {
 				if present {
 					//only add the hostname dimension if the lookup succeeds
 					f.Dims["hostname"] = hostname
-					f.Dims["agentrole"] = string(pkgconfig.GetAgentRole(hostname))
+					f.Dims["agentrole"] = string(names.GetAgentRole(hostname))
 				}
 			}
 			if c.Region != "" {

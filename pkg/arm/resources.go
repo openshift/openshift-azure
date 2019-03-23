@@ -11,6 +11,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
@@ -431,7 +432,8 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 
 	var script string
 	if app.Role == api.AgentPoolProfileRoleMaster {
-		b, err := template.Template(string(masterStartup), nil, cs, map[string]interface{}{
+		b, err := template.Template("master-startup.sh", string(masterStartup), nil, map[string]interface{}{
+			"Config":         &cs.Config,
 			"BackupBlobName": backupBlob,
 		})
 		if err != nil {
@@ -439,8 +441,9 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 		}
 		script = base64.StdEncoding.EncodeToString(b)
 	} else {
-		b, err := template.Template(string(nodeStartup), nil, cs, map[string]interface{}{
-			"Role": app.Role,
+		b, err := template.Template("node-startup.sh", string(nodeStartup), nil, map[string]interface{}{
+			"Config": &cs.Config,
+			"Role":   app.Role,
 		})
 		if err != nil {
 			return nil, err
@@ -468,7 +471,7 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 			},
 			VirtualMachineProfile: &compute.VirtualMachineScaleSetVMProfile{
 				OsProfile: &compute.VirtualMachineScaleSetOSProfile{
-					ComputerNamePrefix: to.StringPtr(config.GetHostnamePrefix(app, suffix)),
+					ComputerNamePrefix: to.StringPtr(names.GetHostnamePrefix(app, suffix)),
 					AdminUsername:      to.StringPtr(vmssAdminUsername),
 					LinuxConfiguration: &compute.LinuxConfiguration{
 						DisablePasswordAuthentication: to.BoolPtr(true),
@@ -545,7 +548,7 @@ func Vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob
 			SinglePlacementGroup: to.BoolPtr(false),
 			Overprovision:        to.BoolPtr(false),
 		},
-		Name:     to.StringPtr(config.GetScalesetName(app, suffix)),
+		Name:     to.StringPtr(names.GetScalesetName(app, suffix)),
 		Type:     to.StringPtr("Microsoft.Compute/virtualMachineScaleSets"),
 		Location: to.StringPtr(cs.Location),
 	}

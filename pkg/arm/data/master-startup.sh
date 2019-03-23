@@ -49,7 +49,7 @@ update-ca-trust
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/master/openshift-master.kubeconfig
 sed -i -re "s#( *server: ).*#\1https://$(hostname)#" /etc/origin/node/node.kubeconfig
 
-{{- if ne $.Extra.BackupBlobName "" }}
+{{- if ne $.BackupBlobName "" }}
 logger -t master-startup.sh "starting recovery on $(hostname)"
 
 # step 1 get the backup
@@ -66,7 +66,7 @@ docker run --rm --network host \
   -v /etc/origin/cloudprovider/:/_data/_out \
   -v $tempBackDir:/out:z \
   {{ .Config.Images.EtcdBackup }} \
-  -blobname={{ .Extra.BackupBlobName }} \
+  -blobname={{ .BackupBlobName }} \
   -destination=/out/backup.db download
 logger -t master-startup.sh "backup downloaded"
 

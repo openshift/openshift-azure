@@ -13,7 +13,6 @@ import (
 
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/util/structtags"
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
@@ -524,89 +523,5 @@ loop:
 			ifield = ifields[0]
 		}
 		t.Fatalf("mismatch between internal and v20180930preview API fields: pfield=%q, ifield=%q", pfield, ifield)
-	}
-}
-
-func TestPluginTemplateAPIParity(t *testing.T) {
-	pfields := walk(reflect.TypeOf(pluginapi.Config{}), map[string][]reflect.Type{})
-	ifields := walk(reflect.TypeOf(Config{}), map[string][]reflect.Type{})
-
-	notInInternal := []*regexp.Regexp{}
-
-	notInPlugin := []*regexp.Regexp{
-		regexp.MustCompile(`^\.SSHKey$`),
-		regexp.MustCompile(`^\.ConfigStorageAccount$`),
-		regexp.MustCompile(`^\.RegistryStorageAccount$`),
-		regexp.MustCompile(`^\.AzureFileStorageAccount$`),
-		regexp.MustCompile(`^\.Service`),
-		regexp.MustCompile(`^\.Session`),
-		regexp.MustCompile(`^\.EtcdMetrics`),
-		regexp.MustCompile(`^\.Registry`),
-		regexp.MustCompile(`^\.Prometheus`),
-		regexp.MustCompile(`^\.Alert`),
-		regexp.MustCompile(`^\.Console`),
-		regexp.MustCompile(`^\.RunningUnderTest`),
-		regexp.MustCompile(`^\.ConfigStorageAccountKey$`),
-		regexp.MustCompile(`^\.RegistryStorageAccountKey$`),
-		regexp.MustCompile(`^\.(Master|Worker)StartupSASURI$`),
-		regexp.MustCompile(`^\.Certificates\.Ca\.`),
-		regexp.MustCompile(`^\.Certificates\.FrontProxyCa\.`),
-		regexp.MustCompile(`^\.Certificates\.Service`),
-		regexp.MustCompile(`^\.Certificates\.Etcd`),
-		regexp.MustCompile(`^\.Certificates\.Master`),
-		regexp.MustCompile(`^\.Certificates\.Admin`),
-		regexp.MustCompile(`^\.Certificates\.AggregatorFrontProxy`),
-		regexp.MustCompile(`^\.Certificates\.OpenShift`),
-		regexp.MustCompile(`^\.Certificates\.Node`),
-		regexp.MustCompile(`^\.Certificates\.SDN`),
-		regexp.MustCompile(`^\.Certificates\.Registry`),
-		regexp.MustCompile(`^\.Certificates\.RegistryConsole`),
-		regexp.MustCompile(`^\.Certificates\.Router`),
-		regexp.MustCompile(`^\.Certificates\.BlackBoxMonitor\.`),
-		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
-		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile\.`),
-		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile\.`),
-	}
-
-loop:
-	for len(pfields) > 0 || len(ifields) > 0 {
-		if len(pfields) > 0 {
-			for _, rx := range notInInternal {
-				if rx.MatchString(pfields[0]) {
-					pfields = pfields[1:]
-					continue loop
-				}
-			}
-		}
-
-		if len(ifields) > 0 {
-			if strings.Contains(ifields[0], "Kubeconfig") ||
-				strings.Contains(ifields[0], "Passwd") ||
-				strings.Contains(ifields[0], "Password") {
-				ifields = ifields[1:]
-				continue
-			}
-
-			for _, rx := range notInPlugin {
-				if rx.MatchString(ifields[0]) {
-					ifields = ifields[1:]
-					continue loop
-				}
-			}
-		}
-
-		if len(pfields) > 0 && len(ifields) > 0 && pfields[0] == ifields[0] {
-			pfields, ifields = pfields[1:], ifields[1:]
-			continue
-		}
-
-		var afield, ifield string
-		if len(pfields) > 0 {
-			afield = pfields[0]
-		}
-		if len(ifields) > 0 {
-			ifield = ifields[0]
-		}
-		t.Fatalf("mismatch between internal Config and plugin template API fields: pfield=%q, ifield=%q", afield, ifield)
 	}
 }

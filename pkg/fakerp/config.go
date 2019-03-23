@@ -61,43 +61,47 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	template.Certificates.GenevaLogging.Key = logKey
 	template.Certificates.GenevaMetrics.Cert = metCert
 	template.Certificates.GenevaMetrics.Key = metKey
-	template.Images.GenevaImagePullSecret = pullSecret
-	template.Images.ImagePullSecret = imagePullSecret
+	template.GenevaImagePullSecret = pullSecret
+	template.ImagePullSecret = imagePullSecret
 
 	return template, nil
 }
 
 func overridePluginTemplate(template *pluginapi.Config) {
+	v := template.Versions[template.PluginVersion]
+
 	if os.Getenv("SYNC_IMAGE") != "" {
-		template.Images.Sync = os.Getenv("SYNC_IMAGE")
+		v.Images.Sync = os.Getenv("SYNC_IMAGE")
 	}
 	if os.Getenv("METRICSBRIDGE_IMAGE") != "" {
-		template.Images.MetricsBridge = os.Getenv("METRICSBRIDGE_IMAGE")
+		v.Images.MetricsBridge = os.Getenv("METRICSBRIDGE_IMAGE")
 	}
 	if os.Getenv("ETCDBACKUP_IMAGE") != "" {
-		template.Images.EtcdBackup = os.Getenv("ETCDBACKUP_IMAGE")
+		v.Images.EtcdBackup = os.Getenv("ETCDBACKUP_IMAGE")
 	}
 	if os.Getenv("TLSPROXY_IMAGE") != "" {
-		template.Images.TLSProxy = os.Getenv("TLSPROXY_IMAGE")
+		v.Images.TLSProxy = os.Getenv("TLSPROXY_IMAGE")
 	}
 	if os.Getenv("CANARY_IMAGE") != "" {
-		template.Images.Canary = os.Getenv("CANARY_IMAGE")
+		v.Images.Canary = os.Getenv("CANARY_IMAGE")
 	}
 	if os.Getenv("AZURE_CONTROLLERS_IMAGE") != "" {
-		template.Images.AzureControllers = os.Getenv("AZURE_CONTROLLERS_IMAGE")
+		v.Images.AzureControllers = os.Getenv("AZURE_CONTROLLERS_IMAGE")
 	}
 	if os.Getenv("STARTUP_IMAGE") != "" {
-		template.Images.Startup = os.Getenv("STARTUP_IMAGE")
+		v.Images.Startup = os.Getenv("STARTUP_IMAGE")
 	}
 	if os.Getenv("OREG_URL") != "" {
-		template.Images.Format = os.Getenv("OREG_URL")
+		v.Images.Format = os.Getenv("OREG_URL")
 	}
 	if os.Getenv("IMAGE_VERSION") != "" {
-		template.ImageVersion = os.Getenv("IMAGE_VERSION")
+		v.ImageVersion = os.Getenv("IMAGE_VERSION")
 	}
 	if os.Getenv("IMAGE_OFFER") != "" {
-		template.ImageOffer = os.Getenv("IMAGE_OFFER")
+		v.ImageOffer = os.Getenv("IMAGE_OFFER")
 	}
+
+	template.Versions[template.PluginVersion] = v
 }
 
 func readCert(path string) (*x509.Certificate, error) {

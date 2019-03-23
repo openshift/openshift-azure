@@ -11,7 +11,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
@@ -40,7 +40,7 @@ var _ = Describe("Command tests [Command][Fake][LongRunning]", func() {
 		err = azurecli.OpenShiftManagedClustersAdmin.RunCommand(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm, "RestartNetworkManager")
 		Expect(err).NotTo(HaveOccurred())
 
-		scaleset, _, err := config.GetScaleSetNameAndInstanceID(vm)
+		scaleset, _, err := names.GetScaleSetNameAndInstanceID(vm)
 		Expect(err).NotTo(HaveOccurred())
 
 		wait.PollImmediate(10*time.Second, 2*time.Minute, func() (bool, error) {

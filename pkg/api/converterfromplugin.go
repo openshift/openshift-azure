@@ -1,76 +1,93 @@
 package api
 
 import (
+	"fmt"
+
 	plugin "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 )
 
 // ConvertFromPlugin converts external plugin API config type into
 // internal API Config type
-func ConvertFromPlugin(in *plugin.Config, old *Config) *Config {
-	cs := &Config{}
-	if old != nil {
-		cs = old.DeepCopy()
+func ConvertFromPlugin(in *plugin.Config, old *Config, version string) (*Config, error) {
+	if _, found := in.Versions[version]; !found {
+		return nil, fmt.Errorf("version %q not found", version)
 	}
-	cs.PluginVersion = in.PluginVersion
-	cs.ComponentLogLevel.APIServer = in.ComponentLogLevel.APIServer
-	cs.ComponentLogLevel.ControllerManager = in.ComponentLogLevel.ControllerManager
-	cs.ComponentLogLevel.Node = in.ComponentLogLevel.Node
-	// Generic offering configurables
-	cs.ImageOffer = in.ImageOffer
-	cs.ImagePublisher = in.ImagePublisher
-	cs.ImageSKU = in.ImageSKU
-	cs.ImageVersion = in.ImageVersion
-	cs.SSHSourceAddressPrefixes = in.SSHSourceAddressPrefixes
-	// Geneva integration configurables
-	cs.GenevaLoggingSector = in.GenevaLoggingSector
-	cs.GenevaLoggingNamespace = in.GenevaLoggingNamespace
-	cs.GenevaLoggingAccount = in.GenevaLoggingAccount
-	cs.GenevaMetricsAccount = in.GenevaMetricsAccount
-	cs.GenevaMetricsEndpoint = in.GenevaMetricsEndpoint
-	cs.GenevaLoggingControlPlaneAccount = in.GenevaLoggingControlPlaneAccount
-	cs.GenevaLoggingControlPlaneEnvironment = in.GenevaLoggingControlPlaneEnvironment
-	cs.GenevaLoggingControlPlaneRegion = in.GenevaLoggingControlPlaneRegion
-	cs.Certificates.GenevaLogging.Cert = in.Certificates.GenevaLogging.Cert
-	cs.Certificates.GenevaLogging.Key = in.Certificates.GenevaLogging.Key
-	cs.Certificates.GenevaMetrics.Cert = in.Certificates.GenevaMetrics.Cert
-	cs.Certificates.GenevaMetrics.Key = in.Certificates.GenevaMetrics.Key
-	// Container images configuration
-	cs.Images.ImagePullSecret = in.Images.ImagePullSecret
-	cs.Images.GenevaImagePullSecret = in.Images.GenevaImagePullSecret
-	cs.Images.Format = in.Images.Format
-	cs.Images.ClusterMonitoringOperator = in.Images.ClusterMonitoringOperator
-	cs.Images.AzureControllers = in.Images.AzureControllers
-	cs.Images.PrometheusOperator = in.Images.PrometheusOperator
-	cs.Images.Prometheus = in.Images.Prometheus
-	cs.Images.PrometheusConfigReloader = in.Images.PrometheusConfigReloader
-	cs.Images.ConfigReloader = in.Images.ConfigReloader
-	cs.Images.AlertManager = in.Images.AlertManager
-	cs.Images.NodeExporter = in.Images.NodeExporter
-	cs.Images.Grafana = in.Images.Grafana
-	cs.Images.KubeStateMetrics = in.Images.KubeStateMetrics
-	cs.Images.KubeRbacProxy = in.Images.KubeRbacProxy
-	cs.Images.OAuthProxy = in.Images.OAuthProxy
-	cs.Images.MasterEtcd = in.Images.MasterEtcd
-	cs.Images.ControlPlane = in.Images.ControlPlane
-	cs.Images.Node = in.Images.Node
-	cs.Images.ServiceCatalog = in.Images.ServiceCatalog
-	cs.Images.Sync = in.Images.Sync
-	cs.Images.TemplateServiceBroker = in.Images.TemplateServiceBroker
-	cs.Images.TLSProxy = in.Images.TLSProxy
-	cs.Images.Registry = in.Images.Registry
-	cs.Images.Router = in.Images.Router
-	cs.Images.RegistryConsole = in.Images.RegistryConsole
-	cs.Images.AnsibleServiceBroker = in.Images.AnsibleServiceBroker
-	cs.Images.WebConsole = in.Images.WebConsole
-	cs.Images.Console = in.Images.Console
-	cs.Images.EtcdBackup = in.Images.EtcdBackup
-	cs.Images.Httpd = in.Images.Httpd
-	cs.Images.Canary = in.Images.Canary
-	cs.Images.Startup = in.Images.Startup
-	cs.Images.GenevaLogging = in.Images.GenevaLogging
-	cs.Images.GenevaTDAgent = in.Images.GenevaTDAgent
-	cs.Images.GenevaStatsd = in.Images.GenevaStatsd
-	cs.Images.MetricsBridge = in.Images.MetricsBridge
+	c := &Config{}
+	if old != nil {
+		c = old.DeepCopy()
+	}
 
-	return cs
+	c.PluginVersion = in.PluginVersion
+
+	c.ComponentLogLevel.APIServer = in.ComponentLogLevel.APIServer
+	c.ComponentLogLevel.ControllerManager = in.ComponentLogLevel.ControllerManager
+	c.ComponentLogLevel.Node = in.ComponentLogLevel.Node
+
+	c.SSHSourceAddressPrefixes = in.SSHSourceAddressPrefixes
+
+	// Generic offering configurables
+	c.ImageOffer = in.Versions[version].ImageOffer
+	c.ImagePublisher = in.Versions[version].ImagePublisher
+	c.ImageSKU = in.Versions[version].ImageSKU
+	c.ImageVersion = in.Versions[version].ImageVersion
+
+	// Container images configuration
+	c.Images.AlertManager = in.Versions[version].Images.AlertManager
+	c.Images.AnsibleServiceBroker = in.Versions[version].Images.AnsibleServiceBroker
+	c.Images.ClusterMonitoringOperator = in.Versions[version].Images.ClusterMonitoringOperator
+	c.Images.ConfigReloader = in.Versions[version].Images.ConfigReloader
+	c.Images.Console = in.Versions[version].Images.Console
+	c.Images.ControlPlane = in.Versions[version].Images.ControlPlane
+	c.Images.Grafana = in.Versions[version].Images.Grafana
+	c.Images.KubeRbacProxy = in.Versions[version].Images.KubeRbacProxy
+	c.Images.KubeStateMetrics = in.Versions[version].Images.KubeStateMetrics
+	c.Images.Node = in.Versions[version].Images.Node
+	c.Images.NodeExporter = in.Versions[version].Images.NodeExporter
+	c.Images.OAuthProxy = in.Versions[version].Images.OAuthProxy
+	c.Images.Prometheus = in.Versions[version].Images.Prometheus
+	c.Images.PrometheusConfigReloader = in.Versions[version].Images.PrometheusConfigReloader
+	c.Images.PrometheusOperator = in.Versions[version].Images.PrometheusOperator
+	c.Images.Registry = in.Versions[version].Images.Registry
+	c.Images.RegistryConsole = in.Versions[version].Images.RegistryConsole
+	c.Images.Router = in.Versions[version].Images.Router
+	c.Images.ServiceCatalog = in.Versions[version].Images.ServiceCatalog
+	c.Images.TemplateServiceBroker = in.Versions[version].Images.TemplateServiceBroker
+	c.Images.WebConsole = in.Versions[version].Images.WebConsole
+
+	c.Images.Format = in.Versions[version].Images.Format
+
+	c.Images.Httpd = in.Versions[version].Images.Httpd
+	c.Images.MasterEtcd = in.Versions[version].Images.MasterEtcd
+
+	c.Images.GenevaLogging = in.Versions[version].Images.GenevaLogging
+	c.Images.GenevaStatsd = in.Versions[version].Images.GenevaStatsd
+	c.Images.GenevaTDAgent = in.Versions[version].Images.GenevaTDAgent
+
+	c.Images.AzureControllers = in.Versions[version].Images.AzureControllers
+	c.Images.Canary = in.Versions[version].Images.Canary
+	c.Images.EtcdBackup = in.Versions[version].Images.EtcdBackup
+	c.Images.MetricsBridge = in.Versions[version].Images.MetricsBridge
+	c.Images.Startup = in.Versions[version].Images.Startup
+	c.Images.Sync = in.Versions[version].Images.Sync
+	c.Images.TLSProxy = in.Versions[version].Images.TLSProxy
+
+	c.Certificates.GenevaLogging.Key = in.Certificates.GenevaLogging.Key
+	c.Certificates.GenevaLogging.Cert = in.Certificates.GenevaLogging.Cert
+	c.Certificates.GenevaMetrics.Key = in.Certificates.GenevaMetrics.Key
+	c.Certificates.GenevaMetrics.Cert = in.Certificates.GenevaMetrics.Cert
+
+	// Geneva integration configurables
+	c.GenevaLoggingSector = in.GenevaLoggingSector
+	c.GenevaLoggingAccount = in.GenevaLoggingAccount
+	c.GenevaLoggingNamespace = in.GenevaLoggingNamespace
+	c.GenevaLoggingControlPlaneAccount = in.GenevaLoggingControlPlaneAccount
+	c.GenevaLoggingControlPlaneEnvironment = in.GenevaLoggingControlPlaneEnvironment
+	c.GenevaLoggingControlPlaneRegion = in.GenevaLoggingControlPlaneRegion
+	c.GenevaMetricsAccount = in.GenevaMetricsAccount
+	c.GenevaMetricsEndpoint = in.GenevaMetricsEndpoint
+
+	c.Images.ImagePullSecret = in.ImagePullSecret
+	c.Images.GenevaImagePullSecret = in.GenevaImagePullSecret
+
+	return c, nil
 }

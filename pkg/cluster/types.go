@@ -11,13 +11,14 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/addons"
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/cluster/scaler"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
+	"github.com/openshift/openshift-azure/pkg/startup"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
+	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
@@ -99,7 +100,11 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		kvc:            azureclient.NewKeyVaultClient(ctx, vaultauthorizer),
 		log:            log,
 		scalerFactory:  scaler.NewFactory(),
-		hasher:         &hasher{log: log, testConfig: testConfig},
+		hasher: &hasher{
+			log:            log,
+			testConfig:     testConfig,
+			startupFactory: startup.New,
+		},
 	}
 
 	if initializeStorageClients {
@@ -117,5 +122,5 @@ func (u *simpleUpgrader) EnrichCSFromVault(ctx context.Context, cs *api.OpenShif
 }
 
 func (u *simpleUpgrader) EnrichCSStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	return addons.EnrichCSStorageAccountKeys(ctx, u.accountsClient, cs)
+	return enrich.CSStorageAccountKeys(ctx, u.accountsClient, cs)
 }
