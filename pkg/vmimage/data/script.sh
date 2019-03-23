@@ -26,15 +26,15 @@ systemctl start libvirtd.service
 
 mkdir data
 base64 -d <<'EOF' | tar -C data -xz
-{{ .Extra.Archive | Base64Encode }}
+{{ .Archive | Base64Encode }}
 EOF
 
 cat >client-cert.pem <<'EOF'
-{{ .Extra.Builder.ClientCert | CertAsBytes | String }}
+{{ .Builder.ClientCert | CertAsBytes | String }}
 EOF
 
 cat >client-key.pem <<'EOF'
-{{ .Extra.Builder.ClientKey | PrivateKeyAsBytes | String }}
+{{ .Builder.ClientKey | PrivateKeyAsBytes | String }}
 EOF
 
 go get github.com/jim-minter/tlsproxy
@@ -45,7 +45,7 @@ done
 
 firewall-cmd --zone=public --add-port=8080/tcp
 
-IMAGE="{{ .Extra.Builder.Image }}"
+IMAGE="{{ .Builder.Image }}"
 DISKGIB=${DISKGIB:-32}
 IP=$(ifconfig eth0 | awk '/inet / { print $2 }')
 
@@ -243,14 +243,14 @@ go get github.com/jim-minter/vhd-footer
 go/bin/vhd-footer -size $((DISKGIB << 30)) >>/var/lib/libvirt/images/$IMAGE.vhd
 
 set +x
-az login --service-principal -u '{{ .Extra.ClientID }}' -p '{{ .Extra.ClientSecret }}' -t '{{ .Extra.TenantID }}'
+az login --service-principal -u '{{ .ClientID }}' -p '{{ .ClientSecret }}' -t '{{ .TenantID }}'
 set -x
 
-az group create -g '{{ .Extra.Builder.ImageResourceGroup }}' -l '{{ .Extra.Builder.Location }}'
-az storage account create -g '{{ .Extra.Builder.ImageResourceGroup }}' -n '{{ .Extra.Builder.ImageStorageAccount }}'
-az storage container create --account-name '{{ .Extra.Builder.ImageStorageAccount }}' -n '{{ .Extra.Builder.ImageContainer }}'
+az group create -g '{{ .Builder.ImageResourceGroup }}' -l '{{ .Builder.Location }}'
+az storage account create -g '{{ .Builder.ImageResourceGroup }}' -n '{{ .Builder.ImageStorageAccount }}'
+az storage container create --account-name '{{ .Builder.ImageStorageAccount }}' -n '{{ .Builder.ImageContainer }}'
 set +x
-KEY=$(az storage account keys list -g '{{ .Extra.Builder.ImageResourceGroup }}' -n '{{ .Extra.Builder.ImageStorageAccount }}' --query "[?keyName == 'key1'].value" -o tsv)
+KEY=$(az storage account keys list -g '{{ .Builder.ImageResourceGroup }}' -n '{{ .Builder.ImageStorageAccount }}' --query "[?keyName == 'key1'].value" -o tsv)
 set -x
 
 # `az storage blob upload` wastes time and bandwidth uploading all zero bytes of
@@ -259,8 +259,8 @@ set -x
 
 go get github.com/jim-minter/azureblobupload
 set +x
-# az storage blob upload --account-name '{{ .Extra.Builder.ImageStorageAccount }}' --account-key $KEY --container-name '{{ .Extra.Builder.ImageContainer }}' --type page --file /var/lib/libvirt/images/$IMAGE.vhd
-go/bin/azureblobupload -account-name '{{ .Extra.Builder.ImageStorageAccount }}' -account-key $KEY -container-name '{{ .Extra.Builder.ImageContainer }}' -file /var/lib/libvirt/images/$IMAGE.vhd -name $IMAGE.vhd
+# az storage blob upload --account-name '{{ .Builder.ImageStorageAccount }}' --account-key $KEY --container-name '{{ .Builder.ImageContainer }}' --type page --file /var/lib/libvirt/images/$IMAGE.vhd
+go/bin/azureblobupload -account-name '{{ .Builder.ImageStorageAccount }}' -account-key $KEY -container-name '{{ .Builder.ImageContainer }}' -file /var/lib/libvirt/images/$IMAGE.vhd -name $IMAGE.vhd
 set -x
 
-az image create -g '{{ .Extra.Builder.ImageResourceGroup }}' -n $IMAGE --source "https://{{ .Extra.Builder.ImageStorageAccount }}.blob.core.windows.net/{{ .Extra.Builder.ImageContainer }}/$IMAGE.vhd" --os-type Linux --tags "kernel=$KERNEL" "openshift=$OPENSHIFT" 'gitcommit={{ .Extra.Builder.GitCommit }}'
+az image create -g '{{ .Builder.ImageResourceGroup }}' -n $IMAGE --source "https://{{ .Builder.ImageStorageAccount }}.blob.core.windows.net/{{ .Builder.ImageContainer }}/$IMAGE.vhd" --os-type Linux --tags "kernel=$KERNEL" "openshift=$OPENSHIFT" 'gitcommit={{ .Builder.GitCommit }}'
