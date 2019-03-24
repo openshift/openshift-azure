@@ -150,6 +150,7 @@ yum -y install \
     irqbalance \
     iscsi-initiator-utils \
     kernel \
+    lsof \
     NetworkManager-config-server \
     NetworkManager \
     nfs-utils \
