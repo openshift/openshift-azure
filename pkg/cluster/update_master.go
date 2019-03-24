@@ -13,7 +13,7 @@ import (
 
 // UpdateMasterAgentPool updates one by one all the VMs of the master scale set,
 // in place.
-func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError {
+func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, app *api.AgentPoolProfile) *api.PluginError {
 	ssName := names.MasterScalesetName
 
 	blob, err := u.updateBlobService.Read()
@@ -21,7 +21,7 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReadBlob}
 	}
 
-	desiredHash, err := u.hasher.HashScaleSet(cs, app)
+	desiredHash, err := u.hasher.HashScaleSet(u.cs, app)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashScaleSet}
 	}
@@ -42,13 +42,13 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 		}
 
 		u.log.Infof("deallocating %s", hostname)
-		err = u.vmc.Deallocate(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, instanceID)
+		err = u.vmc.Deallocate(ctx, u.cs.Properties.AzProfile.ResourceGroup, ssName, instanceID)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDeallocate}
 		}
 
 		u.log.Infof("updating %s", hostname)
-		err = u.ssc.UpdateInstances(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
+		err = u.ssc.UpdateInstances(ctx, u.cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
 			InstanceIds: &[]string{instanceID},
 		})
 		if err != nil {
@@ -56,13 +56,13 @@ func (u *simpleUpgrader) UpdateMasterAgentPool(ctx context.Context, cs *api.Open
 		}
 
 		u.log.Infof("reimaging %s", hostname)
-		err = u.vmc.Reimage(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, instanceID, nil)
+		err = u.vmc.Reimage(ctx, u.cs.Properties.AzProfile.ResourceGroup, ssName, instanceID, nil)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
 		}
 
 		u.log.Infof("starting %s", hostname)
-		err = u.vmc.Start(ctx, cs.Properties.AzProfile.ResourceGroup, ssName, instanceID)
+		err = u.vmc.Start(ctx, u.cs.Properties.AzProfile.ResourceGroup, ssName, instanceID)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolStart}
 		}

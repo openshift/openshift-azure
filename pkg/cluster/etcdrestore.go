@@ -23,16 +23,16 @@ func (u *simpleUpgrader) EtcdBlobExists(ctx context.Context, blobName string) er
 	return nil
 }
 
-func (u *simpleUpgrader) EtcdRestoreDeleteMasterScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
+func (u *simpleUpgrader) EtcdRestoreDeleteMasterScaleSet(ctx context.Context) *api.PluginError {
 	// We may need/want to delete all the scalesets in the future
-	err := u.ssc.Delete(ctx, cs.Properties.AzProfile.ResourceGroup, names.MasterScalesetName)
+	err := u.ssc.Delete(ctx, u.cs.Properties.AzProfile.ResourceGroup, names.MasterScalesetName)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepScaleSetDelete}
 	}
 	return nil
 }
 
-func (u *simpleUpgrader) EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError {
+func (u *simpleUpgrader) EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context) *api.PluginError {
 	uBlob, err := u.updateBlobService.Read()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}

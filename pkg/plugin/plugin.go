@@ -110,7 +110,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	}
 
 	p.log.Info("generating arm templates")
-	azuretemplate, err := clusterUpgrader.GenerateARM(ctx, cs, backupBlob, true, suffix)
+	azuretemplate, err := clusterUpgrader.GenerateARM(ctx, backupBlob, true, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
@@ -121,22 +121,22 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	}
 
 	p.log.Info("restoring the cluster")
-	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx, cs); err != nil {
+	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSet(ctx); err != nil {
 		return err
 	}
 	err = deployFn(ctx, azuretemplate)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepDeploy}
 	}
-	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSetHashes(ctx, cs); err != nil {
+	if err := clusterUpgrader.EtcdRestoreDeleteMasterScaleSetHashes(ctx); err != nil {
 		return err
 	}
-	err = clusterUpgrader.WaitForHealthzStatusOk(ctx, cs)
+	err = clusterUpgrader.WaitForHealthzStatusOk(ctx)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 	}
-	for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
-		err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, "")
+	for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleMaster) {
+		err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, &app, "")
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 		}
@@ -158,13 +158,13 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
-	err = clusterUpgrader.CreateOrUpdateConfigStorageAccount(ctx, cs)
+	err = clusterUpgrader.CreateOrUpdateConfigStorageAccount(ctx)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepCreateOrUpdateConfigStorageAccount}
 	}
 
 	p.log.Info("generating arm templates")
-	azuretemplate, err := clusterUpgrader.GenerateARM(ctx, cs, "", isUpdate, suffix)
+	azuretemplate, err := clusterUpgrader.GenerateARM(ctx, "", isUpdate, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
@@ -174,7 +174,7 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	cs.Properties.NetworkProfile.VnetID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.Network/virtualNetworks", "vnet") // TODO: should be using const
 
 	// blobs must exist before deploy
-	err = clusterUpgrader.WriteStartupBlobs(cs)
+	err = clusterUpgrader.WriteStartupBlobs()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepWriteStartupBlobs}
 	}
@@ -191,33 +191,33 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	// enrich is required for the hash functions which are used below
-	err = clusterUpgrader.EnrichCertificatesFromVault(ctx, cs)
+	err = clusterUpgrader.EnrichCertificatesFromVault(ctx)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepEnrichCertificatesFromVault}
 	}
 
-	err = clusterUpgrader.EnrichStorageAccountKeys(ctx, cs)
+	err = clusterUpgrader.EnrichStorageAccountKeys(ctx)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepEnrichStorageAccountKeys}
 	}
 
 	if isUpdate {
-		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
-			if perr := clusterUpgrader.UpdateMasterAgentPool(ctx, cs, &app); perr != nil {
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleMaster) {
+			if perr := clusterUpgrader.UpdateMasterAgentPool(ctx, &app); perr != nil {
 				return perr
 			}
 		}
-		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
-			if perr := clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleInfra) {
+			if perr := clusterUpgrader.UpdateWorkerAgentPool(ctx, &app, suffix); perr != nil {
 				return perr
 			}
 		}
-		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
-			if perr := clusterUpgrader.UpdateWorkerAgentPool(ctx, cs, &app, suffix); perr != nil {
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleCompute) {
+			if perr := clusterUpgrader.UpdateWorkerAgentPool(ctx, &app, suffix); perr != nil {
 				return perr
 			}
 		}
-		err = clusterUpgrader.CreateOrUpdateSyncPod(ctx, cs)
+		err = clusterUpgrader.CreateOrUpdateSyncPod(ctx)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepCreateSyncPod}
 		}
@@ -227,33 +227,33 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		}
 
 	} else {
-		err = clusterUpgrader.InitializeUpdateBlob(cs, suffix)
+		err = clusterUpgrader.InitializeUpdateBlob(suffix)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}
 		}
-		err = clusterUpgrader.WaitForHealthzStatusOk(ctx, cs)
+		err = clusterUpgrader.WaitForHealthzStatusOk(ctx)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepWaitForWaitForOpenShiftAPI}
 		}
-		err = clusterUpgrader.CreateOrUpdateSyncPod(ctx, cs)
+		err = clusterUpgrader.CreateOrUpdateSyncPod(ctx)
 		if err != nil {
 			return &api.PluginError{Err: err, Step: api.PluginStepUpdateSyncPod}
 		}
 
-		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster) {
-			err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, "")
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleMaster) {
+			err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, &app, "")
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 			}
 		}
-		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra) {
-			err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleInfra) {
+			err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, &app, suffix)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 			}
 		}
-		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute) {
-			err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, cs, &app, suffix)
+		for _, app := range clusterUpgrader.SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleCompute) {
+			err := clusterUpgrader.WaitForNodesInAgentPoolProfile(ctx, &app, suffix)
 			if err != nil {
 				return &api.PluginError{Err: err, Step: api.PluginStepWaitForNodes}
 			}
@@ -265,7 +265,7 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	// Wait for infrastructure services to be healthy
-	return clusterUpgrader.HealthCheck(ctx, cs)
+	return clusterUpgrader.HealthCheck(ctx)
 }
 
 func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
@@ -314,7 +314,7 @@ func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluste
 	}
 
 	p.log.Info("resetting the clusters update blob")
-	err = clusterUpgrader.ResetUpdateBlob(cs)
+	err = clusterUpgrader.ResetUpdateBlob()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepResetUpdateBlob}
 	}
@@ -334,7 +334,7 @@ func (p *plugin) ListClusterVMs(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	p.log.Infof("listing cluster VMs")
-	pods, err := clusterUpgrader.ListVMHostnames(ctx, cs)
+	pods, err := clusterUpgrader.ListVMHostnames(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -359,7 +359,7 @@ func (p *plugin) Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, h
 	}
 
 	p.log.Infof("reimaging %s", hostname)
-	err = clusterUpgrader.Reimage(ctx, cs, scaleset, instanceID)
+	err = clusterUpgrader.Reimage(ctx, scaleset, instanceID)
 	if err != nil {
 		return err
 	}
@@ -421,7 +421,7 @@ func (p *plugin) RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster
 	}
 
 	p.log.Infof("running %s on %s", command, hostname)
-	return clusterUpgrader.RunCommand(ctx, cs, scaleset, instanceID, script)
+	return clusterUpgrader.RunCommand(ctx, scaleset, instanceID, script)
 }
 
 func (p *plugin) GetPluginVersion(ctx context.Context) *adminapi.GenevaActionPluginVersion {

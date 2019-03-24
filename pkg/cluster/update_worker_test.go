@@ -129,8 +129,9 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 				Kubeclient:        kc,
 				log:               log,
 				hasher:            hasher,
+				cs:                tt.cs,
 			}
-			if got := u.UpdateWorkerAgentPool(ctx, tt.cs, &tt.cs.Properties.AgentPoolProfiles[0], tt.suffix); !reflect.DeepEqual(got, tt.want) {
+			if got := u.UpdateWorkerAgentPool(ctx, &tt.cs.Properties.AgentPoolProfiles[0], tt.suffix); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("simpleUpgrader.UpdateWorkerAgentPool() = %v, want %v", got, tt.want)
 			}
 		})

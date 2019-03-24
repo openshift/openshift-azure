@@ -33,26 +33,26 @@ const (
 
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
-	CreateOrUpdateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	EnrichCertificatesFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	EnrichStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error
-	WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	HealthCheck(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
-	SortedAgentPoolProfilesForRole(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) []api.AgentPoolProfile
-	WaitForNodesInAgentPoolProfile(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) error
-	UpdateMasterAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) *api.PluginError
-	UpdateWorkerAgentPool(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) *api.PluginError
-	CreateOrUpdateSyncPod(ctx context.Context, cs *api.OpenShiftManagedCluster) error
+	CreateOrUpdateConfigStorageAccount(ctx context.Context) error
+	EnrichCertificatesFromVault(ctx context.Context) error
+	EnrichStorageAccountKeys(ctx context.Context) error
+	InitializeUpdateBlob(suffix string) error
+	WaitForHealthzStatusOk(ctx context.Context) error
+	HealthCheck(ctx context.Context) *api.PluginError
+	SortedAgentPoolProfilesForRole(role api.AgentPoolProfileRole) []api.AgentPoolProfile
+	WaitForNodesInAgentPoolProfile(ctx context.Context, app *api.AgentPoolProfile, suffix string) error
+	UpdateMasterAgentPool(ctx context.Context, app *api.AgentPoolProfile) *api.PluginError
+	UpdateWorkerAgentPool(ctx context.Context, app *api.AgentPoolProfile, suffix string) *api.PluginError
+	CreateOrUpdateSyncPod(ctx context.Context) error
 	EtcdBlobExists(ctx context.Context, blobName string) error
-	EtcdRestoreDeleteMasterScaleSet(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
-	EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context, cs *api.OpenShiftManagedCluster) *api.PluginError
-	ResetUpdateBlob(cs *api.OpenShiftManagedCluster) error
-	Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID string) error
-	ListVMHostnames(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]string, error)
-	RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID, command string) error
-	WriteStartupBlobs(cs *api.OpenShiftManagedCluster) error
-	GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error)
+	EtcdRestoreDeleteMasterScaleSet(ctx context.Context) *api.PluginError
+	EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context) *api.PluginError
+	ResetUpdateBlob() error
+	Reimage(ctx context.Context, scaleset, instanceID string) error
+	ListVMHostnames(ctx context.Context) ([]string, error)
+	RunCommand(ctx context.Context, scaleset, instanceID, command string) error
+	WriteStartupBlobs() error
+	GenerateARM(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error)
 
 	kubeclient.Kubeclient
 }
@@ -71,6 +71,8 @@ type simpleUpgrader struct {
 	scalerFactory     scaler.Factory
 	hasher            Hasher
 	arm               arm.Interface
+
+	cs *api.OpenShiftManagedCluster
 }
 
 var _ Upgrader = &simpleUpgrader{}
@@ -114,10 +116,11 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 			arm:            arm,
 		},
 		arm: arm,
+		cs:  cs,
 	}
 
 	if initializeStorageClients {
-		err = u.initializeStorageClients(ctx, cs)
+		err = u.initializeStorageClients(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -126,16 +129,16 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 	return u, nil
 }
 
-func (u *simpleUpgrader) EnrichCertificatesFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	return enrich.CertificatesFromVault(ctx, u.kvc, cs)
+func (u *simpleUpgrader) EnrichCertificatesFromVault(ctx context.Context) error {
+	return enrich.CertificatesFromVault(ctx, u.kvc, u.cs)
 }
 
-func (u *simpleUpgrader) EnrichStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	return enrich.StorageAccountKeys(ctx, u.accountsClient, cs)
+func (u *simpleUpgrader) EnrichStorageAccountKeys(ctx context.Context) error {
+	return enrich.StorageAccountKeys(ctx, u.accountsClient, u.cs)
 }
 
-func (u *simpleUpgrader) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
-	err := enrich.SASURIs(u.storageClient, cs)
+func (u *simpleUpgrader) GenerateARM(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
+	err := enrich.SASURIs(u.storageClient, u.cs)
 	if err != nil {
 		return nil, err
 	}
