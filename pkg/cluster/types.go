@@ -20,7 +20,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
-	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
 // here follow well known container and blob names
@@ -35,7 +34,7 @@ const (
 // Upgrader is the public interface to the upgrade module used by the plugin.
 type Upgrader interface {
 	CreateOrUpdateConfigStorageAccount(ctx context.Context, cs *api.OpenShiftManagedCluster) error
-	EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error
+	EnrichCertificatesFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	EnrichStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error
 	InitializeUpdateBlob(cs *api.OpenShiftManagedCluster, suffix string) error
 	WaitForHealthzStatusOk(ctx context.Context, cs *api.OpenShiftManagedCluster) error
@@ -126,8 +125,8 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 	return u, nil
 }
 
-func (u *simpleUpgrader) EnrichCSFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	return vault.EnrichCSFromVault(ctx, u.kvc, cs)
+func (u *simpleUpgrader) EnrichCertificatesFromVault(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	return enrich.CertificatesFromVault(ctx, u.kvc, cs)
 }
 
 func (u *simpleUpgrader) EnrichStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error {

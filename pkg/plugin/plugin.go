@@ -205,14 +205,14 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	// enrich is required for the hash functions which are used below
-	err = clusterUpgrader.EnrichCSFromVault(ctx, cs)
+	err = clusterUpgrader.EnrichCertificatesFromVault(ctx, cs)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepEnrichFromVault}
+		return &api.PluginError{Err: err, Step: api.PluginStepEnrichCertificatesFromVault}
 	}
 
 	err = clusterUpgrader.EnrichStorageAccountKeys(ctx, cs)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepEnrichKeys}
+		return &api.PluginError{Err: err, Step: api.PluginStepEnrichStorageAccountKeys}
 	}
 
 	if isUpdate {

@@ -9,6 +9,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
+	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
 func StorageAccountKeys(ctx context.Context, azs azureclient.AccountsClient, cs *api.OpenShiftManagedCluster) error {
@@ -64,4 +65,20 @@ func SASURIs(storageClient storage.Client, cs *api.OpenShiftManagedCluster) (err
 		},
 	})
 	return
+}
+
+func CertificatesFromVault(ctx context.Context, kvc azureclient.KeyVaultClient, cs *api.OpenShiftManagedCluster) error {
+	kp, err := vault.GetSecret(ctx, kvc, cs.Properties.APICertProfile.KeyVaultSecretURL)
+	if err != nil {
+		return err
+	}
+	cs.Config.Certificates.OpenShiftConsole = *kp
+
+	kp, err = vault.GetSecret(ctx, kvc, cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL)
+	if err != nil {
+		return err
+	}
+	cs.Config.Certificates.Router = *kp
+
+	return nil
 }

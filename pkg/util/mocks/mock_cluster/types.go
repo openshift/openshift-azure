@@ -107,18 +107,18 @@ func (mr *MockUpgraderMockRecorder) DrainAndDeleteWorker(arg0, arg1 interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DrainAndDeleteWorker", reflect.TypeOf((*MockUpgrader)(nil).DrainAndDeleteWorker), arg0, arg1)
 }
 
-// EnrichCSFromVault mocks base method
-func (m *MockUpgrader) EnrichCSFromVault(arg0 context.Context, arg1 *api.OpenShiftManagedCluster) error {
+// EnrichCertificatesFromVault mocks base method
+func (m *MockUpgrader) EnrichCertificatesFromVault(arg0 context.Context, arg1 *api.OpenShiftManagedCluster) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EnrichCSFromVault", arg0, arg1)
+	ret := m.ctrl.Call(m, "EnrichCertificatesFromVault", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// EnrichCSFromVault indicates an expected call of EnrichCSFromVault
-func (mr *MockUpgraderMockRecorder) EnrichCSFromVault(arg0, arg1 interface{}) *gomock.Call {
+// EnrichCertificatesFromVault indicates an expected call of EnrichCertificatesFromVault
+func (mr *MockUpgraderMockRecorder) EnrichCertificatesFromVault(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnrichCSFromVault", reflect.TypeOf((*MockUpgrader)(nil).EnrichCSFromVault), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnrichCertificatesFromVault", reflect.TypeOf((*MockUpgrader)(nil).EnrichCertificatesFromVault), arg0, arg1)
 }
 
 // EnrichStorageAccountKeys mocks base method
