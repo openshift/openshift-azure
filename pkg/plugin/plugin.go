@@ -14,7 +14,6 @@ import (
 	adminapi "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/api/validate"
-	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/config"
@@ -27,7 +26,6 @@ type plugin struct {
 	pluginConfig           *pluginapi.Config
 	testConfig             api.TestConfig
 	upgraderFactory        func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error)
-	armInterfaceFactory    func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Interface, error)
 	configInterfaceFactory func(cs *api.OpenShiftManagedCluster) (config.Interface, error)
 }
 
@@ -40,7 +38,6 @@ func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, testConfig api
 		pluginConfig:           pluginConfig,
 		testConfig:             testConfig,
 		upgraderFactory:        cluster.NewSimpleUpgrader,
-		armInterfaceFactory:    arm.New,
 		configInterfaceFactory: config.New,
 	}, nil
 }
@@ -111,13 +108,9 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
-	armInterface, err := p.armInterfaceFactory(ctx, p.log, cs, p.testConfig)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
-	}
 
 	p.log.Info("generating arm templates")
-	azuretemplate, err := armInterface.Generate(ctx, backupBlob, true, suffix)
+	azuretemplate, err := clusterUpgrader.GenerateARM(ctx, cs, backupBlob, true, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
@@ -170,15 +163,8 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginStepCreateOrUpdateConfigStorageAccount}
 	}
 
-	// must be done after config storage account is created
-	p.log.Info("creating more clients")
-	armInterface, err := p.armInterfaceFactory(ctx, p.log, cs, p.testConfig)
-	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
-	}
-
 	p.log.Info("generating arm templates")
-	azuretemplate, err := armInterface.Generate(ctx, "", isUpdate, suffix)
+	azuretemplate, err := clusterUpgrader.GenerateARM(ctx, cs, "", isUpdate, suffix)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}

@@ -5,54 +5,28 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/golang/mock/gomock"
-
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_storage"
 	"github.com/openshift/openshift-azure/test/util/populate"
 	"github.com/openshift/openshift-azure/test/util/tls"
 )
 
 func TestGenerate(t *testing.T) {
-	gmc := gomock.NewController(t)
-	defer gmc.Finish()
-
-	cs := &api.OpenShiftManagedCluster{
-		Properties: api.Properties{
-			AgentPoolProfiles: []api.AgentPoolProfile{
-				{Role: api.AgentPoolProfileRoleCompute, Name: "compute"},
-			},
-		},
-		Config: api.Config{
-			SSHKey: tls.GetDummyPrivateKey(),
-			Certificates: api.CertificateConfig{
-				Ca:            api.CertKeyPair{Cert: tls.GetDummyCertificate(), Key: tls.GetDummyPrivateKey()},
-				NodeBootstrap: api.CertKeyPair{Cert: tls.GetDummyCertificate(), Key: tls.GetDummyPrivateKey()},
-			},
-		},
-	}
-
-	storageClient := mock_storage.NewMockClient(gmc)
-	bsc := mock_storage.NewMockBlobStorageClient(gmc)
-	container := mock_storage.NewMockContainer(gmc)
-	blob := mock_storage.NewMockBlob(gmc)
-	c := storageClient.EXPECT().GetBlobService().Return(bsc)
-	c = bsc.EXPECT().GetContainerReference("config").Return(container).After(c)
-	c = container.EXPECT().GetBlobReference("master-startup").Return(blob).After(c)
-	c = blob.EXPECT().GetSASURI(gomock.Any()).Return("", nil).After(c)
-	c = container.EXPECT().GetBlobReference("worker-startup").Return(blob).After(c)
-	c = blob.EXPECT().GetSASURI(gomock.Any()).Return("", nil).After(c)
-	c = storageClient.EXPECT().GetBlobService().Return(bsc).After(c)
-	c = bsc.EXPECT().GetContainerReference("config").Return(container).After(c)
-	c = container.EXPECT().GetBlobReference("master-startup").Return(blob).After(c)
-	c = blob.EXPECT().GetSASURI(gomock.Any()).Return("", nil).After(c)
-	c = container.EXPECT().GetBlobReference("worker-startup").Return(blob).After(c)
-	c = blob.EXPECT().GetSASURI(gomock.Any()).Return("", nil).After(c)
-
 	sg := simpleGenerator{
-		storageClient: storageClient,
-		cs:            cs,
+		cs: &api.OpenShiftManagedCluster{
+			Properties: api.Properties{
+				AgentPoolProfiles: []api.AgentPoolProfile{
+					{Role: api.AgentPoolProfileRoleCompute, Name: "compute"},
+				},
+			},
+			Config: api.Config{
+				SSHKey: tls.GetDummyPrivateKey(),
+				Certificates: api.CertificateConfig{
+					Ca:            api.CertKeyPair{Cert: tls.GetDummyCertificate(), Key: tls.GetDummyPrivateKey()},
+					NodeBootstrap: api.CertKeyPair{Cert: tls.GetDummyCertificate(), Key: tls.GetDummyPrivateKey()},
+				},
+			},
+		},
 	}
 
 	armtemplate, err := sg.Generate(context.Background(), "", false, "")

@@ -191,6 +191,21 @@ func (mr *MockUpgraderMockRecorder) EtcdRestoreDeleteMasterScaleSetHashes(arg0, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EtcdRestoreDeleteMasterScaleSetHashes", reflect.TypeOf((*MockUpgrader)(nil).EtcdRestoreDeleteMasterScaleSetHashes), arg0, arg1)
 }
 
+// GenerateARM mocks base method
+func (m *MockUpgrader) GenerateARM(arg0 context.Context, arg1 *api.OpenShiftManagedCluster, arg2 string, arg3 bool, arg4 string) (map[string]interface{}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenerateARM", arg0, arg1, arg2, arg3, arg4)
+	ret0, _ := ret[0].(map[string]interface{})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GenerateARM indicates an expected call of GenerateARM
+func (mr *MockUpgraderMockRecorder) GenerateARM(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateARM", reflect.TypeOf((*MockUpgrader)(nil).GenerateARM), arg0, arg1, arg2, arg3, arg4)
+}
+
 // GetControlPlanePods mocks base method
 func (m *MockUpgrader) GetControlPlanePods(arg0 context.Context) ([]v1.Pod, error) {
 	m.ctrl.T.Helper()

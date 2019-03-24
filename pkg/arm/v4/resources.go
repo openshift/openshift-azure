@@ -312,17 +312,10 @@ func (g *simpleGenerator) nsgWorker() *network.SecurityGroup {
 }
 
 func (g *simpleGenerator) Vmss(app *api.AgentPoolProfile, backupBlob, suffix string) (*compute.VirtualMachineScaleSet, error) {
-	return g.vmss(app, backupBlob, suffix, false)
+	return vmss(g.cs, app, backupBlob, suffix, g.testConfig)
 }
 
-func (g *simpleGenerator) vmss(app *api.AgentPoolProfile, backupBlob, suffix string, zeroSASURIs bool) (*compute.VirtualMachineScaleSet, error) {
-	cs := g.cs
-	if zeroSASURIs {
-		cs = cs.DeepCopy()
-		cs.Config.MasterStartupSASURI = ""
-		cs.Config.WorkerStartupSASURI = ""
-	}
-
+func vmss(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, backupBlob, suffix string, testConfig api.TestConfig) (*compute.VirtualMachineScaleSet, error) {
 	sshPublicKey, err := tls.SSHPublicKeyAsString(&cs.Config.SSHKey.PublicKey)
 	if err != nil {
 		return nil, err
@@ -515,14 +508,14 @@ func (g *simpleGenerator) vmss(app *api.AgentPoolProfile, backupBlob, suffix str
 		}
 	}
 
-	if g.testConfig.ImageResourceName != "" {
+	if testConfig.ImageResourceName != "" {
 		vmss.Plan = nil
 		vmss.VirtualMachineScaleSetProperties.VirtualMachineProfile.StorageProfile.ImageReference = &compute.ImageReference{
 			ID: to.StringPtr(resourceid.ResourceID(
 				cs.Properties.AzProfile.SubscriptionID,
-				g.testConfig.ImageResourceGroup,
+				testConfig.ImageResourceGroup,
 				"Microsoft.Compute/images",
-				g.testConfig.ImageResourceName,
+				testConfig.ImageResourceName,
 			)),
 		}
 	}

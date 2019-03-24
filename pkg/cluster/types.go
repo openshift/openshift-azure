@@ -52,6 +52,7 @@ type Upgrader interface {
 	ListVMHostnames(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]string, error)
 	RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster, scaleset, instanceID, command string) error
 	WriteStartupBlobs(cs *api.OpenShiftManagedCluster) error
+	GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error)
 
 	kubeclient.Kubeclient
 }
@@ -131,4 +132,13 @@ func (u *simpleUpgrader) EnrichCertificatesFromVault(ctx context.Context, cs *ap
 
 func (u *simpleUpgrader) EnrichStorageAccountKeys(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
 	return enrich.StorageAccountKeys(ctx, u.accountsClient, cs)
+}
+
+func (u *simpleUpgrader) GenerateARM(ctx context.Context, cs *api.OpenShiftManagedCluster, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
+	err := enrich.SASURIs(u.storageClient, cs)
+	if err != nil {
+		return nil, err
+	}
+
+	return u.arm.Generate(ctx, backupBlob, isUpdate, suffix)
 }

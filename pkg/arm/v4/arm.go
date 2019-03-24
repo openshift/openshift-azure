@@ -14,47 +14,23 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/arm"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
-	"github.com/openshift/openshift-azure/pkg/util/enrich"
 )
 
 type simpleGenerator struct {
-	testConfig     api.TestConfig
-	accountsClient azureclient.AccountsClient
-	storageClient  storage.Client
-
-	log *logrus.Entry
-	cs  *api.OpenShiftManagedCluster
+	testConfig api.TestConfig
+	log        *logrus.Entry
+	cs         *api.OpenShiftManagedCluster
 }
 
-func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (*simpleGenerator, error) {
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
-	if err != nil {
-		return nil, err
+func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) *simpleGenerator {
+	return &simpleGenerator{
+		testConfig: testConfig,
+		log:        log,
+		cs:         cs,
 	}
-
-	g := &simpleGenerator{
-		testConfig:     testConfig,
-		accountsClient: azureclient.NewAccountsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		log:            log,
-		cs:             cs,
-	}
-
-	g.storageClient, err = storage.NewClient(cs.Config.ConfigStorageAccount, cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
-	if err != nil {
-		return nil, err
-	}
-
-	return g, nil
 }
 
 func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
-	err := enrich.SASURIs(g.storageClient, g.cs)
-	if err != nil {
-		return nil, err
-	}
-
 	t := arm.Template{
 		Schema:         "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 		ContentVersion: "1.0.0.0",
@@ -104,12 +80,17 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 func (g *simpleGenerator) Hash(app *api.AgentPoolProfile) ([]byte, error) {
 	hash := sha256.New()
 
-	// the hash is invariant of name, suffix, count
+	// the hash is invariant of name, suffix, count...
 	appCopy := *app
 	appCopy.Count = 0
 	appCopy.Name = ""
 
-	vmss, err := g.vmss(&appCopy, "", "", true) // TODO: backupBlob is rather a layering violation here
+	// ...and also the SAS URIs
+	cs := g.cs.DeepCopy()
+	cs.Config.MasterStartupSASURI = ""
+	cs.Config.WorkerStartupSASURI = ""
+
+	vmss, err := vmss(cs, &appCopy, "", "", g.testConfig) // TODO: backupBlob is rather a layering violation here
 	if err != nil {
 		return nil, err
 	}
