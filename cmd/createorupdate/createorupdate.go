@@ -216,7 +216,6 @@ func main() {
 	}
 
 	isDelete := strings.ToUpper(*method) == http.MethodDelete
-	isUpdate := shared.IsUpdate()
 	conf, err := fakerp.NewConfig(log, !isDelete)
 	if err != nil {
 		log.Fatal(err)
@@ -292,10 +291,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if !isUpdate {
-		if err := updateAadApplication(ctx, oc, log, conf); err != nil {
-			log.Fatal(err)
-		}
+	if err := updateAadApplication(ctx, oc, log, conf); err != nil {
+		log.Fatal(err)
 	}
 
 	fmt.Printf("\nCluster available at https://%s/\n", *oc.Properties.PublicHostname)
