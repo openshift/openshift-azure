@@ -22,6 +22,7 @@ func TestAdminAPIValidate(t *testing.T) {
 func TestAdminAPIValidateUpdate(t *testing.T) {
 	tests := map[string]struct {
 		pluginVersion string
+		oldf          func(*api.OpenShiftManagedCluster)
 		f             func(*api.OpenShiftManagedCluster)
 		expectedErrs  []error
 	}{
@@ -48,6 +49,39 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 				oc.Config.PluginVersion = "latest"
 			},
 		},
+		"permitted infra scale up": {
+			oldf: func(oc *api.OpenShiftManagedCluster) {
+				for i, app := range oc.Properties.AgentPoolProfiles {
+					if app.Role == api.AgentPoolProfileRoleInfra {
+						oc.Properties.AgentPoolProfiles[i].Count = 2
+					}
+				}
+			},
+		},
+		"invalid infra scale down": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				for i, app := range oc.Properties.AgentPoolProfiles {
+					if app.Role == api.AgentPoolProfileRoleInfra {
+						oc.Properties.AgentPoolProfiles[i].Count = 2
+					}
+				}
+			},
+			expectedErrs: []error{
+				errors.New(`invalid change [Properties.AgentPoolProfiles.slice[1].Count: 2 != 3]`),
+			},
+		},
+		"invalid compute scale": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				for i, app := range oc.Properties.AgentPoolProfiles {
+					if app.Role == api.AgentPoolProfileRoleCompute {
+						oc.Properties.AgentPoolProfiles[i].Count = 4
+					}
+				}
+			},
+			expectedErrs: []error{
+				errors.New(`invalid change [Properties.AgentPoolProfiles.slice[2].Count: 4 != 1]`),
+			},
+		},
 		"invalid change": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Name = "new"
@@ -67,6 +101,9 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 		oldCs.Config.PluginVersion = test.pluginVersion
 		cs := oldCs.DeepCopy()
 
+		if test.oldf != nil {
+			test.oldf(oldCs)
+		}
 		if test.f != nil {
 			test.f(cs)
 		}

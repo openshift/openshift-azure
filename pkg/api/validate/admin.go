@@ -59,6 +59,18 @@ func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenSh
 
 	old := oldCs.DeepCopy()
 
+	for i, app := range old.Properties.AgentPoolProfiles {
+		if app.Role != api.AgentPoolProfileRoleInfra {
+			continue
+		}
+
+		for _, newApp := range cs.Properties.AgentPoolProfiles {
+			if newApp.Count == 3 {
+				old.Properties.AgentPoolProfiles[i].Count = newApp.Count
+			}
+		}
+	}
+
 	old.Config.ComponentLogLevel = cs.Config.ComponentLogLevel
 
 	oldMajor, _, err := parsePluginVersion(oldCs.Config.PluginVersion)
