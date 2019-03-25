@@ -92,7 +92,7 @@ func (m *monitor) listResourceGroupMonitoringHostnames(ctx context.Context, subs
 	// these routes will not be available at creation time, so we will not check for their availability
 	oc, err := loadOCConfig()
 	if err != nil {
-		m.log.Warn("failed to load OpenShiftManagedCluster config, will not monitor routes")
+		m.log.Warnf("failed to load OpenShiftManagedCluster config, will not monitor routes. Error: %s", err.Error())
 	} else {
 		hostnames = append(hostnames, fmt.Sprintf("canary-openshift-azure-monitoring.%s", oc.Properties.RouterProfiles[0].PublicSubdomain))
 	}
