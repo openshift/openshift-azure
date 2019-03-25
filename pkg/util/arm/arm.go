@@ -1,6 +1,7 @@
 package arm
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -18,30 +19,18 @@ type Template struct {
 }
 
 // FixupAPIVersions inserts an apiVersion field into the ARM template for each
-// resource (the field is missing from the internal Azure type).  The versions
-// referenced here must be kept in lockstep with the imports above.
-func FixupAPIVersions(template map[string]interface{}) {
+// resource (the field is missing from the internal Azure type).
+func FixupAPIVersions(template map[string]interface{}, versions map[string]string) error {
 	for _, resource := range jsonpath.MustCompile("$.resources.*").Get(template) {
 		typ := jsonpath.MustCompile("$.type").MustGetString(resource)
-		var apiVersion string
-		switch typ {
-		case "Microsoft.Compute/virtualMachines",
-			"Microsoft.Compute/virtualMachines/extensions",
-			"Microsoft.Compute/virtualMachineScaleSets":
-			apiVersion = "2018-10-01"
-		case "Microsoft.Network/loadBalancers",
-			"Microsoft.Network/networkSecurityGroups",
-			"Microsoft.Network/networkInterfaces",
-			"Microsoft.Network/publicIPAddresses",
-			"Microsoft.Network/virtualNetworks":
-			apiVersion = "2018-07-01"
-		case "Microsoft.Storage/storageAccounts":
-			apiVersion = "2018-02-01"
-		default:
-			panic("unimplemented: " + typ)
+		provider := strings.Split(typ, "/")[0]
+		apiVersion, found := versions[provider]
+		if !found {
+			return fmt.Errorf("couldn't find version for provider %q", provider)
 		}
 		jsonpath.MustCompile("$.apiVersion").Set(resource, apiVersion)
 	}
+	return nil
 }
 
 // FixupDepends inserts a dependsOn field into the ARM template for each

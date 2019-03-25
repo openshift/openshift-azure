@@ -71,7 +71,11 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 		return nil, err
 	}
 
-	arm.FixupAPIVersions(azuretemplate)
+	err = arm.FixupAPIVersions(azuretemplate, versionMap)
+	if err != nil {
+		return nil, err
+	}
+
 	arm.FixupDepends(g.cs.Properties.AzProfile.SubscriptionID, g.cs.Properties.AzProfile.ResourceGroup, azuretemplate)
 
 	return azuretemplate, nil

@@ -15,6 +15,16 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
+var (
+	// The versions referenced here must be kept in lockstep with the imports
+	// above.
+	versionMap = map[string]string{
+		"Microsoft.Compute": "2018-10-01",
+		"Microsoft.Network": "2018-07-01",
+		"Microsoft.Storage": "2018-02-01",
+	}
+)
+
 const (
 	vnetName                                      = "vnet"
 	vnetSubnetName                                = "default"

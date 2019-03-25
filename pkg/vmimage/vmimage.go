@@ -89,7 +89,11 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	arm.FixupAPIVersions(template)
+	err = arm.FixupAPIVersions(template, versionMap)
+	if err != nil {
+		return nil, err
+	}
+
 	arm.FixupDepends(builder.SubscriptionID, builder.BuildResourceGroup, template)
 
 	return template, nil
