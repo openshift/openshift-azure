@@ -21,33 +21,12 @@ spec:
 
       # if another process is listening on the cni-server socket, wait until it exits
       trap 'kill $(jobs -p); exit 0' TERM
-      retries=0
       while true; do
         if echo 'test' | socat - UNIX-CONNECT:/var/run/openshift-sdn/cni-server.sock >/dev/null; then
-          echo "warning: Another process is currently listening on the CNI socket, waiting 15s ..." 2>&1
-          sleep 15 & wait
-          (( retries += 1 ))
+          echo "warning: Another process is currently listening on the CNI socket, waiting 5s ..." 2>&1
+          sleep 5 & wait
         else
           break
-        fi
-        if [[ "${retries}" -gt 40 ]]; then
-          echo "error: Another process is currently listening on the CNI socket, exiting" 2>&1
-          exit 1
-        fi
-      done
-      # if the node config doesn't exist yet, wait until it does
-      retries=0
-      while true; do
-        if [[ ! -f /etc/origin/node/node-config.yaml ]]; then
-          echo "warning: Cannot find existing node-config.yaml, waiting 15s ..." 2>&1
-          sleep 15 & wait
-          (( retries += 1 ))
-        else
-          break
-        fi
-        if [[ "${retries}" -gt 40 ]]; then
-          echo "error: No existing node-config.yaml, exiting" 2>&1
-          exit 1
         fi
       done
 
