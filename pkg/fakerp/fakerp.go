@@ -110,7 +110,7 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 	}
 
 	// generate or update the OpenShift config blob
-	err = p.GenerateConfig(ctx, cs)
+	err = p.GenerateConfig(ctx, cs, oldCs != nil)
 	if err != nil {
 		return nil, err
 	}

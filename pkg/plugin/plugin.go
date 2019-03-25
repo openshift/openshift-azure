@@ -49,18 +49,34 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 	p.log.Info("validating internal data models")
 	validator := validate.NewAPIValidator(p.testConfig.RunningUnderTest)
 	errs = validator.Validate(new, old, externalOnly)
-	// HACK: We do not allow upgrades from different plugin version at the moment. We allow this only in RunningUnderTest for testing purposes
-	// TODO: Remove this before GA.
-	if old != nil && old.Config.PluginVersion != p.pluginConfig.PluginVersion && !p.testConfig.RunningUnderTest {
-		errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, old.Config.PluginVersion, p.pluginConfig.PluginVersion))
+
+	// if this is an update and not an upgrade, check if we can service it, and
+	// if not, fail early
+	if old != nil && new.Config.PluginVersion != "latest" {
+		_, err := p.configInterfaceFactory(new)
+		if err != nil {
+			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q, please upgrade`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
+		}
 	}
+
 	return
 }
 
-func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManagedCluster) []error {
+func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManagedCluster) (errs []error) {
 	p.log.Info("validating internal admin data models")
 	validator := validate.NewAdminValidator(p.testConfig.RunningUnderTest)
-	return validator.Validate(new, old)
+	errs = validator.Validate(new, old)
+
+	// if this is an update and not an upgrade, check if we can service it, and
+	// if not, fail early
+	if old != nil && new.Config.PluginVersion != "latest" {
+		_, err := p.configInterfaceFactory(new)
+		if err != nil {
+			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q, please upgrade`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
+		}
+	}
+
+	return
 }
 
 func (p *plugin) ValidatePluginTemplate(ctx context.Context) []error {
@@ -69,8 +85,8 @@ func (p *plugin) ValidatePluginTemplate(ctx context.Context) []error {
 	return validator.Validate(p.pluginConfig)
 }
 
-func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	if cs.Config.PluginVersion == "" {
+func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) error {
+	if !isUpdate || cs.Config.PluginVersion == "latest" {
 		cs.Config.PluginVersion = p.pluginConfig.PluginVersion
 	}
 
@@ -80,7 +96,6 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
-	// TODO should we save off the original config here and if there are any errors we can restore it?
 	err = configInterface.Generate(p.pluginConfig)
 	if err != nil {
 		return err
@@ -279,7 +294,7 @@ func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftMana
 		return &api.PluginError{Err: err, Step: api.PluginStepInvalidateClusterSecrets}
 	}
 	p.log.Info("regenerating config including private keys and secrets")
-	err = p.GenerateConfig(ctx, cs)
+	err = p.GenerateConfig(ctx, cs, true)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepRegenerateClusterSecrets}
 	}

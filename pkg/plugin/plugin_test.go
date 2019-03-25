@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -396,16 +397,26 @@ func errorsContains(errs []error, substr string) bool {
 }
 
 func TestValidateUpdateBlock(t *testing.T) {
+	const currentVersion = "current"
+
 	p := &plugin{
 		log:          logrus.NewEntry(logrus.StandardLogger()),
-		pluginConfig: &pluginapi.Config{PluginVersion: "v0.0"},
+		pluginConfig: &pluginapi.Config{PluginVersion: currentVersion},
+		configInterfaceFactory: func(cs *api.OpenShiftManagedCluster) (c config.Interface, err error) {
+			if cs.Config.PluginVersion != currentVersion {
+				err = fmt.Errorf("bad")
+			}
+			return
+		},
 	}
-	old := &api.OpenShiftManagedCluster{}
-	current := &api.OpenShiftManagedCluster{Config: api.Config{PluginVersion: p.pluginConfig.PluginVersion}}
+
+	old := &api.OpenShiftManagedCluster{Config: api.Config{PluginVersion: "old"}}
 	errs := p.Validate(context.Background(), old, old, true)
 	if !errorsContains(errs, "cannot be updated by resource provider") {
 		t.Error("expected old cluster to fail update validation")
 	}
+
+	current := &api.OpenShiftManagedCluster{Config: api.Config{PluginVersion: p.pluginConfig.PluginVersion}}
 	errs = p.Validate(context.Background(), current, current, true)
 	if errorsContains(errs, "cannot be updated by resource provider") {
 		t.Error("expected current cluster to pass update validation")

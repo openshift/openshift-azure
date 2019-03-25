@@ -116,7 +116,7 @@ type Plugin interface {
 
 	// GenerateConfig ensures all the necessary in-cluster config is generated
 	// for an Openshift cluster.
-	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster) error
+	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster, isUpdate bool) error
 
 	// CreateOrUpdate either deploys or runs the update depending on the isUpdate argument
 	// this will call the deployer.
