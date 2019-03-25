@@ -52,7 +52,7 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 	if old != nil && new.Config.PluginVersion != "latest" {
 		_, err := p.configInterfaceFactory(new)
 		if err != nil {
-			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q, please upgrade`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
+			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
 		}
 	}
 
@@ -69,7 +69,7 @@ func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManag
 	if old != nil && new.Config.PluginVersion != "latest" {
 		_, err := p.configInterfaceFactory(new)
 		if err != nil {
-			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q, please upgrade`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
+			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
 		}
 	}
 

@@ -21,8 +21,9 @@ func TestAdminAPIValidate(t *testing.T) {
 
 func TestAdminAPIValidateUpdate(t *testing.T) {
 	tests := map[string]struct {
-		f            func(*api.OpenShiftManagedCluster)
-		expectedErrs []error
+		pluginVersion string
+		f             func(*api.OpenShiftManagedCluster)
+		expectedErrs  []error
 	}{
 		"no-op": {},
 		"change log level": {
@@ -30,6 +31,21 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 				oc.Config.ComponentLogLevel.APIServer = to.IntPtr(1)
 				oc.Config.ComponentLogLevel.ControllerManager = to.IntPtr(1)
 				oc.Config.ComponentLogLevel.Node = to.IntPtr(1)
+			},
+		},
+		"invalid upgrade": {
+			pluginVersion: "v2.0",
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Config.PluginVersion = "latest"
+			},
+			expectedErrs: []error{
+				errors.New(`invalid change [Config.PluginVersion: latest != v2.0]`),
+			},
+		},
+		"permitted upgrade": {
+			pluginVersion: "v3.0",
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Config.PluginVersion = "latest"
 			},
 		},
 		"invalid change": {
@@ -48,6 +64,7 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		oldCs.Config.PluginVersion = test.pluginVersion
 		cs := oldCs.DeepCopy()
 
 		if test.f != nil {

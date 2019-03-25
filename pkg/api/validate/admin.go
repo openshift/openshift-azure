@@ -46,6 +46,11 @@ func (v *AdminAPIValidator) Validate(cs, oldCs *api.OpenShiftManagedCluster) (er
 	return
 }
 
+func parsePluginVersion(pluginVersion string) (major, minor int, err error) {
+	_, err = fmt.Sscanf(pluginVersion, "v%d.%d", &major, &minor)
+	return
+}
+
 func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftManagedCluster) (errs []error) {
 	if cs == nil || oldCs == nil {
 		errs = append(errs, fmt.Errorf("cs and oldCs cannot be nil"))
@@ -56,7 +61,8 @@ func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenSh
 
 	old.Config.ComponentLogLevel = cs.Config.ComponentLogLevel
 
-	if cs.Config.PluginVersion == "latest" {
+	oldMajor, _, err := parsePluginVersion(oldCs.Config.PluginVersion)
+	if cs.Config.PluginVersion == "latest" && err == nil && oldMajor >= 3 {
 		old.Config.PluginVersion = cs.Config.PluginVersion
 	}
 
