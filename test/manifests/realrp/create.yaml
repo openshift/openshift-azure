@@ -2,7 +2,7 @@ name: {{ Getenv "RESOURCEGROUP" | quote }}
 location: {{ Getenv "AZURE_REGION" | quote }}
 properties:
   openShiftVersion: {{ Getenv "DEPLOY_VERSION" | quote }}
-  fqdn: {{ print (Getenv "RESOURCEGROUP) "." (Getenv "AZURE_REGION") ".cloudapp.azure.com" | quote }}
+  fqdn: {{ print (Getenv "RESOURCEGROUP") "." (Getenv "AZURE_REGION") ".cloudapp.azure.com" | quote }}
   authProfile:
     identityProviders:
     - name: Azure AD
@@ -11,6 +11,9 @@ properties:
         clientId: {{ Getenv "AZURE_AAD_CLIENT_ID" | quote }}
         secret: {{ Getenv "AZURE_AAD_CLIENT_SECRET" | quote }}
         tenantId: {{ Getenv "AZURE_TENANT_ID" | quote }}
+{{- if ne (Getenv "AZURE_AAD_GROUP_ADMINS_ID") "" }}
+        customerAdminGroupId: {{ Getenv "AZURE_AAD_GROUP_ADMINS_ID" | quote }}
+{{- end }}
   networkProfile:
     vnetCidr: 10.0.0.0/8
   routerProfiles:
