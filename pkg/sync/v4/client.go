@@ -52,57 +52,61 @@ func (s *sync) applyResources(filter func(unstructured.Unstructured) bool, keys 
 // deleteOrphans looks for the "belongs-to-syncpod: yes" annotation, if found
 // and object not in current db, remove it.
 func (s *sync) deleteOrphans() error {
-	s.log.Info("Deleting Orphan Objects from the running cluster")
+	s.log.Info("Deleting orphan objects from the running cluster")
+	done := map[schema.GroupKind]struct{}{}
+
 	for _, gr := range s.grs {
-		gv, err := schema.ParseGroupVersion(gr.Group.PreferredVersion.GroupVersion)
-		if err != nil {
-			return err
-		}
+		for version, resources := range gr.VersionedResources {
+			for _, resource := range resources {
+				if strings.ContainsRune(resource.Name, '/') { // no subresources
+					continue
+				}
 
-		for _, resource := range gr.VersionedResources[gr.Group.PreferredVersion.Version] {
-			if strings.ContainsRune(resource.Name, '/') { // no subresources
-				continue
-			}
+				if !contains(resource.Verbs, "list") {
+					continue
+				}
 
-			if !contains(resource.Verbs, "list") {
-				continue
-			}
+				gvk := schema.GroupVersionKind{Group: gr.Group.Name, Version: version, Kind: resource.Kind}
+				gk := gvk.GroupKind()
+				if isDouble(gk) {
+					continue
+				}
 
-			gvk := gv.WithKind(resource.Kind)
-			gk := gvk.GroupKind()
-			if isDouble(gk) {
-				continue
-			}
+				if gk.String() == "Endpoints" { // Services transfer their labels to Endpoints; ignore the latter
+					continue
+				}
 
-			if gk.String() == "Endpoints" { // Services transfer their labels to Endpoints; ignore the latter
-				continue
-			}
+				if _, found := done[gk]; found {
+					continue
+				}
+				done[gk] = struct{}{}
 
-			dc, err := s.dyn.ClientForGroupVersionKind(gvk)
-			if err != nil {
-				return err
-			}
+				dc, err := s.dyn.ClientForGroupVersionKind(gvk)
+				if err != nil {
+					return err
+				}
 
-			o, err := dc.Resource(&resource, "").List(metav1.ListOptions{})
-			if err != nil {
-				return err
-			}
+				o, err := dc.Resource(&resource, "").List(metav1.ListOptions{})
+				if err != nil {
+					return err
+				}
 
-			l, ok := o.(*unstructured.UnstructuredList)
-			if !ok {
-				continue
-			}
+				l, ok := o.(*unstructured.UnstructuredList)
+				if !ok {
+					continue
+				}
 
-			for _, i := range l.Items {
-				// check that the object is marked by the sync pod
-				l := i.GetLabels()
-				if l[ownedBySyncPodLabelKey] == "true" {
-					// if object is marked, but not in current DB, remove it
-					if _, ok := s.db[keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())]; !ok {
-						s.log.Info("Delete " + keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName()))
-						err = dc.Resource(&resource, i.GetNamespace()).Delete(i.GetName(), nil)
-						if err != nil {
-							return err
+				for _, i := range l.Items {
+					// check that the object is marked by the sync pod
+					l := i.GetLabels()
+					if l[ownedBySyncPodLabelKey] == "true" {
+						// if object is marked, but not in current DB, remove it
+						if _, ok := s.db[keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())]; !ok {
+							s.log.Info("Delete " + keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName()))
+							err = dc.Resource(&resource, i.GetNamespace()).Delete(i.GetName(), nil)
+							if err != nil {
+								return err
+							}
 						}
 					}
 				}

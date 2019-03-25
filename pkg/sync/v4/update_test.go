@@ -50,44 +50,47 @@ func (u *updater) readDB() (map[string]unstructured.Unstructured, error) {
 	rm := discovery.NewRESTMapper(grs, meta.InterfacesForUnstructured)
 	dyn := dynamic.NewClientPool(restconfig, rm, dynamic.LegacyAPIPathResolverFunc)
 
+	done := map[schema.GroupKind]struct{}{}
 	for _, gr := range grs {
-		gv, err := schema.ParseGroupVersion(gr.Group.PreferredVersion.GroupVersion)
-		if err != nil {
-			return nil, err
-		}
+		for version, resources := range gr.VersionedResources {
+			for _, resource := range resources {
+				if strings.ContainsRune(resource.Name, '/') { // no subresources
+					continue
+				}
 
-		for _, resource := range gr.VersionedResources[gr.Group.PreferredVersion.Version] {
-			if strings.ContainsRune(resource.Name, '/') { // no subresources
-				continue
-			}
+				if !contains(resource.Verbs, "list") {
+					continue
+				}
 
-			if !contains(resource.Verbs, "list") {
-				continue
-			}
+				gvk := schema.GroupVersionKind{Group: gr.Group.Name, Version: version, Kind: resource.Kind}
+				gk := gvk.GroupKind()
+				if isDouble(gk) {
+					continue
+				}
 
-			gvk := gv.WithKind(resource.Kind)
-			gk := gvk.GroupKind()
-			if isDouble(gk) {
-				continue
-			}
+				if _, found := done[gk]; found {
+					continue
+				}
+				done[gk] = struct{}{}
 
-			dc, err := dyn.ClientForGroupVersionKind(gvk)
-			if err != nil {
-				return nil, err
-			}
+				dc, err := dyn.ClientForGroupVersionKind(gvk)
+				if err != nil {
+					return nil, err
+				}
 
-			o, err := dc.Resource(&resource, "").List(metav1.ListOptions{})
-			if err != nil {
-				return nil, err
-			}
+				o, err := dc.Resource(&resource, "").List(metav1.ListOptions{})
+				if err != nil {
+					return nil, err
+				}
 
-			l, ok := o.(*unstructured.UnstructuredList)
-			if !ok {
-				continue
-			}
+				l, ok := o.(*unstructured.UnstructuredList)
+				if !ok {
+					continue
+				}
 
-			for _, i := range l.Items {
-				db[keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())] = i
+				for _, i := range l.Items {
+					db[keyFunc(i.GroupVersionKind().GroupKind(), i.GetNamespace(), i.GetName())] = i
+				}
 			}
 		}
 	}
