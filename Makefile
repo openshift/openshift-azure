@@ -43,6 +43,9 @@ delete:
 upgrade:
 	./hack/upgrade.sh ${RESOURCEGROUP}
 
+artifacts:
+	./hack/artifacts.sh
+
 azure-controllers: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
@@ -143,11 +146,11 @@ releasenotes:
 
 .PHONY: verify
 verify:
-	./hack/validate-generated.sh
+	./hack/verify/validate-generated.sh
 	go vet ./...
-	./hack/verify-code-format.sh
-	./hack/validate-util.sh
-	./hack/validate-codecov.sh
+	./hack/verify/validate-code-format.sh
+	./hack/verify/validate-util.sh
+	./hack/verify/validate-codecov.sh
 	go run ./hack/validate-imports/validate-imports.go cmd hack pkg test
 
 unit: generate

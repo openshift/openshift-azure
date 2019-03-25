@@ -1,5 +1,4 @@
 #!/bin/bash -ex
-# upgrade-e2e script is intended to run in CI environmet and will not run localy
 
 ### Script flow:
 # 1. Source credentials from secret
@@ -12,21 +11,49 @@
 # 6. Switch to PR code base and inicate upgrade.
 #    Old cluster upgarde is always managed by new or same version of RP
 
+source_secret(){
+    # running in ci
+    if [[ -f /usr/local/e2e-secrets/azure/secret ]];then
+        set +x
+        . /usr/local/e2e-secrets/azure/secret
+        set -x
+    else
+        # running locally 
+        set +x
+        . secrets/secret
+        set -x
+    fi
+}
+
+link_secret(){
+    # running in ci
+    if [[ -f /usr/local/e2e-secrets/azure/secret ]];then
+        ln -s /usr/local/e2e-secrets/azure secrets
+    else
+        # running locally 
+        ln -s ${ORG_GOPATH}/src/github.com/openshift/openshift-azure/secrets secrets
+    fi
+}
+
+preprare_ci_env(){
+    # running in ci
+    if [[ -f /usr/local/e2e-secrets/azure/secret ]];then
+       . hack/tests/ci-operator-prepare.sh
+    fi
+}
+
 if [[ $# -ne 1 ]]; then
     echo error: $0 source_cluster_tag_version
     exit 1
 fi
 
-export RESOURCEGROUP=$(cat /dev/urandom | tr -dc 'a-z' | fold -w 6 | head -n 1)
+export RESOURCEGROUP=upgrade-$(cat /dev/urandom | tr -dc 'a-z' | fold -w 6 | head -n 1)
 export SOURCE=$1
 
-# source secrets early in the process
-set +x
-. /usr/local/e2e-secrets/azure/secret
-set -x
+source_secret
 
+export ORG_GOPATH=$GOPATH
 T=$(mktemp -d)
-trap "rm -rf $T" EXIT INT
 
 # start monitor from head and record pid
 make monitoring-build
@@ -38,15 +65,17 @@ git clone -b $SOURCE https://github.com/openshift/openshift-azure.git $T/src/git
 
 cd $T/src/github.com/openshift/openshift-azure
 
-ln -s /usr/local/e2e-secrets/azure/secret secrets
+link_secret
 
-trap 'kill -15 ${MON_PID}; wait; make delete' EXIT INT
+trap 'kill -15 ${MON_PID}; wait; rm -rf $T ; make artifacts; make delete' EXIT INT
 
 make create
 
-cd /go/src/github.com/openshift/openshift-azure
+export GOPATH=${ORG_GOPATH}
+cd ${GOPATH}/src/github.com/openshift/openshift-azure
 
-. hack/ci-operator-prepare.sh
+preprare_ci_env
+link_secret
 
 cp -a $T/src/github.com/openshift/openshift-azure/_data .
 
