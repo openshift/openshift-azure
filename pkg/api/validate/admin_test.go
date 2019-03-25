@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -26,9 +27,9 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 		"no-op": {},
 		"change log level": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Config.ComponentLogLevel.APIServer++
-				oc.Config.ComponentLogLevel.ControllerManager++
-				oc.Config.ComponentLogLevel.Node++
+				oc.Config.ComponentLogLevel.APIServer = to.IntPtr(1)
+				oc.Config.ComponentLogLevel.ControllerManager = to.IntPtr(1)
+				oc.Config.ComponentLogLevel.Node = to.IntPtr(1)
 			},
 		},
 		"invalid change": {

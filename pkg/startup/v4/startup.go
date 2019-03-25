@@ -115,7 +115,9 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 			filepath = strings.TrimPrefix(filepath, "worker")
 		}
 
-		b, err := template.Template(filepath, tmpl, nil, map[string]interface{}{
+		b, err := template.Template(filepath, tmpl, map[string]interface{}{
+			"Deref": func(pi *int) int { return *pi },
+		}, map[string]interface{}{
 			"ContainerService": s.cs,
 			"Config":           &s.cs.Config,
 			"Derived":          derived,

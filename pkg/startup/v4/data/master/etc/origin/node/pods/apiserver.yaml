@@ -15,7 +15,7 @@ spec:
     - master
     - api
     - --config=/etc/origin/master/master-config.yaml
-    - {{ print "--loglevel=" .Config.ComponentLogLevel.APIServer | quote }}
+    - {{ print "--loglevel=" (Deref .Config.ComponentLogLevel.APIServer) | quote }}
     command:
     - openshift
     image: {{ .Config.Images.ControlPlane | quote }}

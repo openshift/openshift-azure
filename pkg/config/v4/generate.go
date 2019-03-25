@@ -18,17 +18,9 @@ import (
 )
 
 func (g *simpleGenerator) Generate(template *pluginapi.Config) (err error) {
-	cll := g.cs.Config.ComponentLogLevel
-
 	config, err := api.ConvertFromPlugin(template, &g.cs.Config, g.cs.Config.PluginVersion)
 	if err != nil {
 		return err
-	}
-
-	// HACK: only set ComponentLogLevel at cluster creation, don't let
-	// ConvertFromPlugin override it.  This will be done properly in the future.
-	if g.cs.Config.Certificates.Ca.Cert != nil { // HACK: we're not a new cluster
-		config.ComponentLogLevel = cll
 	}
 
 	g.cs.Config = *config

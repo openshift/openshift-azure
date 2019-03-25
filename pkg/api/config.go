@@ -83,9 +83,9 @@ type Config struct {
 // ComponentLogLevel represents the log levels for the various components of a
 // cluster
 type ComponentLogLevel struct {
-	APIServer         int `json:"apiServer,omitempty"`
-	ControllerManager int `json:"controllerManager,omitempty"`
-	Node              int `json:"node,omitempty"`
+	APIServer         *int `json:"apiServer,omitempty"`
+	ControllerManager *int `json:"controllerManager,omitempty"`
+	Node              *int `json:"node,omitempty"`
 }
 
 // ImageConfig contains all images for the pods

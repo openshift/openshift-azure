@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/go-test/deep"
 
 	plugin "github.com/openshift/openshift-azure/pkg/api/plugin/api"
@@ -25,9 +26,9 @@ func internalPluginConfig() Config {
 	return Config{
 		PluginVersion: "PluginVersion",
 		ComponentLogLevel: ComponentLogLevel{
-			APIServer:         1,
-			ControllerManager: 1,
-			Node:              1,
+			APIServer:         to.IntPtr(1),
+			ControllerManager: to.IntPtr(1),
+			Node:              to.IntPtr(1),
 		},
 		// generic Offering configuration
 		ImageOffer:               "Versions.key.ImageOffer",

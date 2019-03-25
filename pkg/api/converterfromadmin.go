@@ -372,13 +372,13 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 
 func mergeComponentLogLevel(in *admin.ComponentLogLevel, out *ComponentLogLevel) {
 	if in.APIServer != nil {
-		out.APIServer = *in.APIServer
+		out.APIServer = in.APIServer
 	}
 	if in.ControllerManager != nil {
-		out.ControllerManager = *in.ControllerManager
+		out.ControllerManager = in.ControllerManager
 	}
 	if in.Node != nil {
-		out.Node = *in.Node
+		out.Node = in.Node
 	}
 }
 
