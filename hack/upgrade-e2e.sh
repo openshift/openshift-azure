@@ -38,7 +38,7 @@ git clone -b $SOURCE https://github.com/openshift/openshift-azure.git $T/src/git
 
 cd $T/src/github.com/openshift/openshift-azure
 
-ln -s /usr/secrets secrets
+ln -s /usr/local/e2e-secrets/azure/secret secrets
 
 trap 'kill -15 ${MON_PID}; wait; make delete' EXIT INT
 
