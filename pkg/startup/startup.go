@@ -13,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	v3 "github.com/openshift/openshift-azure/pkg/startup/v3"
 	v4 "github.com/openshift/openshift-azure/pkg/startup/v4"
 )
 
@@ -23,6 +24,8 @@ type Interface interface {
 
 func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (Interface, error) {
 	switch cs.Config.PluginVersion {
+	case "v3.2":
+		return v3.New(log, cs), nil
 	case "v4.0":
 		return v4.New(log, cs), nil
 	}

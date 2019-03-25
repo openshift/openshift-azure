@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    azure.openshift.io/sync-pod-wait-for-readiness: "false"
+  name: mdsd
+  namespace: openshift-azure-logging
+spec:
+  selector:
+    matchLabels:
+      app: mdsd
+  template:
+    metadata:
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+      labels:
+        app: mdsd
+    spec:
+      containers:
+      - env:
+        - name: FLUENTD_CONF
+          value: config/fluent.conf
+        image: '*** GENERATED ***'
+        name: td-agent
+        resources:
+          limits:
+            cpu: 500m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /var/run/mdsd/
+          name: socket
+          readOnly: true
+        - mountPath: /td-agent/config
+          name: fluentd-config
+        - mountPath: /var/log
+          name: hostlog
+      - args:
+        - -D
+        - -R
+        - -c
+        - /etc/mdsd.d/config/mdsd.xml
+        command:
+        - mdsd
+        env:
+        - name: MONITORING_GCS_ACCOUNT
+          value: '*** GENERATED ***'
+        - name: MONITORING_GCS_ENVIRONMENT
+          value: '*** GENERATED ***'
+        - name: MONITORING_GCS_REGION
+          value: '*** GENERATED ***'
+        - name: MONITORING_GCS_CERT_CERTFILE
+          value: /etc/mdsd.d/secret/gcscert.pem
+        - name: MONITORING_GCS_CERT_KEYFILE
+          value: /etc/mdsd.d/secret/gcskey.pem
+        image: '*** GENERATED ***'
+        name: mdsd
+        resources:
+          limits:
+            cpu: 200m
+            memory: 400Mi
+          requests:
+            cpu: 50m
+            memory: 400Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /var/run/mdsd/
+          name: socket
+        - mountPath: /etc/mdsd.d/secret
+          name: gcs-cert
+        - mountPath: /etc/mdsd.d/config
+          name: mdsd-config
+      hostPID: true
+      imagePullSecrets:
+      - name: azure-registry
+      serviceAccountName: geneva
+      tolerations:
+      - effect: NoExecute
+        operator: Exists
+      - effect: NoSchedule
+        operator: Exists
+      volumes:
+      - hostPath:
+          path: /var/log
+        name: hostlog
+      - configMap:
+          name: mdsd-config
+        name: mdsd-config
+      - configMap:
+          name: fluentd-config
+        name: fluentd-config
+      - name: gcs-cert
+        secret:
+          secretName: gcs-cert
+      - emptyDir: {}
+        name: socket
