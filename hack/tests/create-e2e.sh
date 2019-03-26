@@ -18,7 +18,7 @@ MON_PID=$!
 # prepare ci-operator env
 . hack/tests/ci-operator-prepare.sh
 
-trap 'kill -15 ${MON_PID}; wait; make artifacts; make delete' EXIT
+trap 'set +e; kill -15 ${MON_PID}; wait; make artifacts; make delete' EXIT
 
 make create
 
