@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  apiserver-config.yaml: |
+    kind: TemplateServiceBrokerConfig
+    apiVersion: config.templateservicebroker.openshift.io/v1
+    templateNamespaces:
+    - openshift
+kind: ConfigMap
+metadata:
+  name: apiserver-config
+  namespace: openshift-template-service-broker

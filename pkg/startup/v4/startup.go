@@ -72,7 +72,7 @@ func (s *startup) WriteFiles(ctx context.Context) error {
 func (s *startup) Hash(role api.AgentPoolProfileRole) ([]byte, error) {
 	hash := sha256.New()
 
-	err := s.writeFiles(role, writers.NewTarWriter(hash), "", "domainname")
+	err := s.writeFiles(role, writers.NewTarWriter(hash), "", "")
 	if err != nil {
 		return nil, err
 	}

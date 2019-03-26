@@ -33,24 +33,48 @@ type hasher struct {
 func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
 	hash := sha256.New()
 
-	b, err := h.arm.Hash(app)
-	if err != nil {
-		return nil, err
-	}
+	if armhd, ok := h.arm.(interface {
+		HashData(*api.AgentPoolProfile) ([]byte, error)
+	}); ok {
+		b, err := armhd.HashData(app) // legacy code path only for v3
+		if err != nil {
+			return nil, err
+		}
 
-	hash.Write(b)
+		hash.Write(b)
+
+	} else {
+		b, err := h.arm.Hash(app)
+		if err != nil {
+			return nil, err
+		}
+
+		hash.Write(b)
+	}
 
 	s, err := h.startupFactory(h.log, cs)
 	if err != nil {
 		return nil, err
 	}
 
-	b, err = s.Hash(app.Role)
-	if err != nil {
-		return nil, err
-	}
+	if shd, ok := s.(interface {
+		HashData(api.AgentPoolProfileRole) ([]byte, error)
+	}); ok {
+		b, err := shd.HashData(app.Role) // legacy code path only for v3
+		if err != nil {
+			return nil, err
+		}
 
-	hash.Write(b)
+		hash.Write(b)
+
+	} else {
+		b, err := s.Hash(app.Role)
+		if err != nil {
+			return nil, err
+		}
+
+		hash.Write(b)
+	}
 
 	if app.Role == api.AgentPoolProfileRoleMaster {
 		// add certificates pulled from keyvault by the master to the hash, to
