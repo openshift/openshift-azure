@@ -12,6 +12,7 @@ type DeploymentsClient interface {
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, deploymentName string, parameters resources.Deployment) (result resources.DeploymentsCreateOrUpdateFuture, err error)
 	Client
 	DeploymentClient() resources.DeploymentsClient
+	Get(ctx context.Context, resourceGroupName string, deploymentName string) (result resources.DeploymentExtended, err error)
 }
 
 type deploymentsClient struct {

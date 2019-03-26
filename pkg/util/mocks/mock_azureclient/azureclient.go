@@ -327,6 +327,21 @@ func (mr *MockDeploymentsClientMockRecorder) DeploymentClient() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeploymentClient", reflect.TypeOf((*MockDeploymentsClient)(nil).DeploymentClient))
 }
 
+// Get mocks base method
+func (m *MockDeploymentsClient) Get(arg0 context.Context, arg1, arg2 string) (resources.DeploymentExtended, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", arg0, arg1, arg2)
+	ret0, _ := ret[0].(resources.DeploymentExtended)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get
+func (mr *MockDeploymentsClientMockRecorder) Get(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockDeploymentsClient)(nil).Get), arg0, arg1, arg2)
+}
+
 // MockGroupsClient is a mock of GroupsClient interface
 type MockGroupsClient struct {
 	ctrl     *gomock.Controller

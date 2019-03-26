@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -47,7 +48,18 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployF
 
 		log.Info("waiting for arm template deployment to complete")
 		if err := future.WaitForCompletionRef(ctx, cli); err != nil {
-			return fmt.Errorf("failed waiting for arm template deployment to complete: %#v", err)
+			message := fmt.Sprintf("failed waiting for arm template deployment to complete: %#v", err)
+			log.Error(message)
+			if original, ok := err.(autorest.DetailedError); ok {
+				if original.Original == context.DeadlineExceeded {
+					deployment, err := deployments.Get(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy")
+					if err != nil {
+						return fmt.Errorf("failed fetching deployment status: %#v", err)
+					}
+					log.Errorf("deployment status: %+v", deployment.Properties)
+				}
+			}
+			return fmt.Errorf(message)
 		}
 		if _, err := future.Result(deployments.DeploymentClient()); err != nil {
 			return fmt.Errorf("failed to get arm template deloyment result: %#v", err)
