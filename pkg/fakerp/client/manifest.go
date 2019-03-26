@@ -7,13 +7,13 @@ import (
 
 	"github.com/ghodss/yaml"
 
-	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	utiltemplate "github.com/openshift/openshift-azure/pkg/util/template"
 )
 
 // WriteClusterConfigToManifest write to file
-func WriteClusterConfigToManifest(oc *v20180930preview.OpenShiftManagedCluster, manifestFile string) error {
+func WriteClusterConfigToManifest(oc *v20190430.OpenShiftManagedCluster, manifestFile string) error {
 	out, err := yaml.Marshal(oc)
 	if err != nil {
 		return err
@@ -22,10 +22,10 @@ func WriteClusterConfigToManifest(oc *v20180930preview.OpenShiftManagedCluster, 
 }
 
 // GenerateManifest accepts a manifest file and returns a typed OSA
-// v20180930preview struct that can be used to request OSA creates
+// v20190430 struct that can be used to request OSA creates
 // and updates. If the provided manifest is templatized, it will be
 // parsed appropriately.
-func GenerateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCluster, error) {
+func GenerateManifest(manifestFile string) (*v20190430.OpenShiftManagedCluster, error) {
 	b, err := ioutil.ReadFile(manifestFile)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func GenerateManifest(manifestFile string) (*v20180930preview.OpenShiftManagedCl
 		return nil, err
 	}
 
-	oc := &v20180930preview.OpenShiftManagedCluster{}
+	oc := &v20190430.OpenShiftManagedCluster{}
 	if err = yaml.Unmarshal(b, oc); err != nil {
 		return nil, err
 	}

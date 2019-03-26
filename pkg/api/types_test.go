@@ -11,7 +11,7 @@ import (
 
 	"github.com/Azure/go-autorest/autorest/to"
 
-	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	"github.com/openshift/openshift-azure/pkg/util/structtags"
 	"github.com/openshift/openshift-azure/test/util/populate"
@@ -461,10 +461,10 @@ func Test20180930previewAPIParity(t *testing.T) {
 	// list is expected not to be matched in the other, pop it.  If the heads of
 	// both lists match, pop them.  In any other case, error out.
 
-	pfields := walk(reflect.TypeOf(v20180930preview.OpenShiftManagedCluster{}),
+	pfields := walk(reflect.TypeOf(v20190430.OpenShiftManagedCluster{}),
 		map[string][]reflect.Type{
 			".Properties.AuthProfile.IdentityProviders.Provider": {
-				reflect.TypeOf(v20180930preview.AADIdentityProvider{}),
+				reflect.TypeOf(v20190430.AADIdentityProvider{}),
 			},
 		},
 	)
@@ -481,7 +481,7 @@ func Test20180930previewAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Properties\.MasterPoolProfile`),
 	}
 
-	notInV20180930preview := []*regexp.Regexp{
+	notInv20190430 := []*regexp.Regexp{
 		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile`),
 		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile`),
 		regexp.MustCompile(`^\.Properties\.AzProfile`),
@@ -502,7 +502,7 @@ loop:
 		}
 
 		if len(ifields) > 0 {
-			for _, rx := range notInV20180930preview {
+			for _, rx := range notInv20190430 {
 				if rx.MatchString(ifields[0]) {
 					ifields = ifields[1:]
 					continue loop
@@ -522,6 +522,6 @@ loop:
 		if len(ifields) > 0 {
 			ifield = ifields[0]
 		}
-		t.Fatalf("mismatch between internal and v20180930preview API fields: pfield=%q, ifield=%q", pfield, ifield)
+		t.Fatalf("mismatch between internal and v20190430 API fields: pfield=%q, ifield=%q", pfield, ifield)
 	}
 }

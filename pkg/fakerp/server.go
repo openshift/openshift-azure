@@ -15,7 +15,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
-	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/pkg/plugin"
@@ -102,12 +102,12 @@ func (s *Server) load() error {
 	return nil
 }
 
-func (s *Server) read20180930previewRequest(body io.ReadCloser) (*v20180930preview.OpenShiftManagedCluster, error) {
+func (s *Server) read20190430Request(body io.ReadCloser) (*v20190430.OpenShiftManagedCluster, error) {
 	data, err := ioutil.ReadAll(body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read request body: %v", err)
 	}
-	var oc *v20180930preview.OpenShiftManagedCluster
+	var oc *v20190430.OpenShiftManagedCluster
 	if err := yaml.Unmarshal(data, &oc); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal request: %v", err)
 	}
