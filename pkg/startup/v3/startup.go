@@ -88,7 +88,9 @@ func (s *startup) Hash(role api.AgentPoolProfileRole) ([]byte, error) {
 		return nil, err
 	}
 
-	return hash.Sum(b), nil
+	hash.Write(b)
+
+	return hash.Sum(nil), nil
 }
 
 func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, hostname, domainname string) error {

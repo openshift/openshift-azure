@@ -116,5 +116,7 @@ func (g *simpleGenerator) Hash(app *api.AgentPoolProfile) ([]byte, error) {
 		return nil, err
 	}
 
-	return hash.Sum(b), nil
+	hash.Write(b)
+
+	return hash.Sum(nil), nil
 }
