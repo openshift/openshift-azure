@@ -16,6 +16,7 @@ import (
 func GetTestConfig() api.TestConfig {
 	return api.TestConfig{
 		RunningUnderTest:   os.Getenv("RUNNING_UNDER_TEST") == "true",
+		DebugHashFunctions: os.Getenv("DEBUG_HASH_FUNCTIONS") == "true",
 		ImageResourceGroup: os.Getenv("IMAGE_RESOURCEGROUP"),
 		ImageResourceName:  os.Getenv("IMAGE_RESOURCENAME"),
 	}

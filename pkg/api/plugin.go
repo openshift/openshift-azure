@@ -94,6 +94,7 @@ type DeployFn func(context.Context, map[string]interface{}) error
 // production.
 type TestConfig struct {
 	RunningUnderTest   bool
+	DebugHashFunctions bool
 	ImageResourceGroup string
 	ImageResourceName  string
 }
