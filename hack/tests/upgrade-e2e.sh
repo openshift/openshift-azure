@@ -4,7 +4,7 @@
 # 1. Source credentials from secret
 # 2. Create temporary folder for "source cluster" code
 # 3. Start monitoring shim layer from master
-#    We pass config file from temporary folder, 
+#    We pass config file from temporary folder,
 #    because it will be created there first during source cluster creation
 # 4. Link secrets to appropriate location
 # 5. Clone released code and create a cluster
@@ -18,7 +18,7 @@ source_secret(){
         . /usr/local/e2e-secrets/azure/secret
         set -x
     else
-        # running locally 
+        # running locally
         set +x
         . secrets/secret
         set -x
@@ -30,7 +30,7 @@ link_secret(){
     if [[ -f /usr/local/e2e-secrets/azure/secret ]];then
         ln -s /usr/local/e2e-secrets/azure secrets
     else
-        # running locally 
+        # running locally
         ln -s ${ORG_GOPATH}/src/github.com/openshift/openshift-azure/secrets secrets
     fi
 }
@@ -67,7 +67,7 @@ cd $T/src/github.com/openshift/openshift-azure
 
 link_secret
 
-trap 'kill -15 ${MON_PID}; wait; rm -rf $T ; make artifacts; make delete' EXIT INT
+trap 'set +e; kill -15 ${MON_PID}; wait; make artifacts; make delete; rm -rf $T' EXIT
 
 make create
 
