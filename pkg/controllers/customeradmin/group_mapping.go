@@ -7,7 +7,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac"
 	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/openshift/api/user/v1"
+	v1 "github.com/openshift/api/user/v1"
 	"github.com/sirupsen/logrus"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 

@@ -155,8 +155,9 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 				ssc:        ssc,
 				Kubeclient: kc,
 				log:        logrus.NewEntry(logrus.StandardLogger()),
+				cs:         cs,
 			}
-			err := u.WaitForNodesInAgentPoolProfile(ctx, cs, &cs.Properties.AgentPoolProfiles[tt.appIndex], "")
+			err := u.WaitForNodesInAgentPoolProfile(ctx, &cs.Properties.AgentPoolProfiles[tt.appIndex], "")
 			if tt.wantErr && tt.expectedErr != err {
 				t.Errorf("simpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
 			}

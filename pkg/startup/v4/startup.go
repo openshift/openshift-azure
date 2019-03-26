@@ -17,10 +17,9 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/template"
-	"github.com/openshift/openshift-azure/pkg/util/vault"
 	"github.com/openshift/openshift-azure/pkg/util/writers"
 )
 
@@ -61,7 +60,7 @@ func (s *startup) WriteFiles(ctx context.Context) error {
 		kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
 
 		s.log.Info("enriching config")
-		err = vault.EnrichCSFromVault(ctx, kvc, s.cs)
+		err = enrich.CertificatesFromVault(ctx, kvc, s.cs)
 		if err != nil {
 			return err
 		}
@@ -116,10 +115,12 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 			filepath = strings.TrimPrefix(filepath, "worker")
 		}
 
-		b, err := template.Template(filepath, tmpl, nil, map[string]interface{}{
+		b, err := template.Template(filepath, tmpl, map[string]interface{}{
+			"Deref": func(pi *int) int { return *pi },
+		}, map[string]interface{}{
 			"ContainerService": s.cs,
 			"Config":           &s.cs.Config,
-			"Derived":          config.Derived,
+			"Derived":          derived,
 			"Role":             role,
 			"Hostname":         hostname,
 			"DomainName":       domainname,

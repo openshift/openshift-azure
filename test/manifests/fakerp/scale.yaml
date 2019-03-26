@@ -1,0 +1,5 @@
+# MANIFEST=test/manifests/fakerp/scale.yaml hack/upgrade.sh
+properties:
+  agentPoolProfiles:
+  - name: compute
+    count: 2

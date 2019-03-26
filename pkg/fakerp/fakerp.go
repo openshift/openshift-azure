@@ -15,8 +15,8 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/derived"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
@@ -110,7 +110,7 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 	}
 
 	// generate or update the OpenShift config blob
-	err = p.GenerateConfig(ctx, cs)
+	err = p.GenerateConfig(ctx, cs, oldCs != nil)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 
 	// persist the OpenShift container service
 	log.Info("persist config")
-	err = writeHelpers(cs)
+	err = writeHelpers(log, cs)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 
 	// persist the OpenShift container service with final fields
 	log.Info("persist final config")
-	err = writeHelpers(cs)
+	err = writeHelpers(log, cs)
 	if err != nil {
 		return nil, err
 	}
@@ -257,8 +257,8 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	return nil
 }
 
-func writeHelpers(cs *api.OpenShiftManagedCluster) error {
-	b, err := config.Derived.MasterCloudProviderConf(cs)
+func writeHelpers(log *logrus.Entry, cs *api.OpenShiftManagedCluster) error {
+	b, err := derived.MasterCloudProviderConf(cs)
 	if err != nil {
 		return err
 	}
@@ -267,7 +267,7 @@ func writeHelpers(cs *api.OpenShiftManagedCluster) error {
 		return err
 	}
 
-	b, err = config.Derived.AadGroupSyncConf(cs)
+	b, err = derived.AadGroupSyncConf(cs)
 	if err != nil {
 		return err
 	}

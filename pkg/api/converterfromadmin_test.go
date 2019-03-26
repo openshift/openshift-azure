@@ -280,7 +280,7 @@ func TestConvertFromAdmin(t *testing.T) {
 			},
 			base: internalManagedClusterAdmin(),
 			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
-				expectedCs.Config.ComponentLogLevel.Node = 2
+				expectedCs.Config.ComponentLogLevel.Node = to.IntPtr(2)
 			},
 		},
 	}

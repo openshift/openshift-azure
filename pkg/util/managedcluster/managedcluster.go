@@ -5,7 +5,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	kapi "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/tools/clientcmd/api/latest"
-	"k8s.io/client-go/tools/clientcmd/api/v1"
+	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 )
 
 // RestConfigFromV1Config takes a v1 config and returns a kubeconfig

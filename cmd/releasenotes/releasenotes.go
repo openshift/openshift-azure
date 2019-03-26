@@ -16,7 +16,7 @@ import (
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
-	"gopkg.in/libgit2/git2go.v27"
+	git "gopkg.in/libgit2/git2go.v27"
 )
 
 var (

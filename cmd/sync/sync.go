@@ -18,7 +18,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/log"
-	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
 var (
@@ -71,12 +70,12 @@ func run(ctx context.Context, log *logrus.Entry) error {
 	}
 
 	log.Print("enriching config")
-	err = vault.EnrichCSFromVault(ctx, kvc, cs)
+	err = enrich.CertificatesFromVault(ctx, kvc, cs)
 	if err != nil {
 		return err
 	}
 
-	err = enrich.CSStorageAccountKeys(ctx, azs, cs)
+	err = enrich.StorageAccountKeys(ctx, azs, cs)
 	if err != nil {
 		return err
 	}

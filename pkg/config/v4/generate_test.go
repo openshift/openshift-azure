@@ -28,8 +28,8 @@ func TestGenerate(t *testing.T) {
 	var template *pluginapi.Config
 	populate.Walk(&template, prepare)
 
-	cg := simpleGenerator{runningUnderTest: true}
-	err := cg.Generate(cs, template)
+	cg := simpleGenerator{cs: cs}
+	err := cg.Generate(template)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,12 +148,12 @@ func TestInvalidateSecrets(t *testing.T) {
 	populate.Walk(template, prepare)
 	cs.Config.PluginVersion = "Versions.key"
 
-	var g simpleGenerator
+	g := simpleGenerator{cs: cs}
 	saved := cs.DeepCopy()
-	if err := g.InvalidateSecrets(cs); err != nil {
+	if err := g.InvalidateSecrets(); err != nil {
 		t.Errorf("configGenerator.InvalidateSecrets error = %v", err)
 	}
-	g.Generate(cs, template)
+	g.Generate(template)
 
 	// compare fields that are expected to be different
 	if reflect.DeepEqual(saved.Config.Certificates.Admin, cs.Config.Certificates.Admin) {

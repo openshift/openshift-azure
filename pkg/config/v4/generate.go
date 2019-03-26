@@ -12,26 +12,19 @@ import (
 
 	api "github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	"github.com/openshift/openshift-azure/pkg/util/kubeconfig"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
-func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pluginapi.Config) (err error) {
-	cll := cs.Config.ComponentLogLevel
-
-	config, err := api.ConvertFromPlugin(template, &cs.Config, cs.Config.PluginVersion)
+func (g *simpleGenerator) Generate(template *pluginapi.Config) (err error) {
+	config, err := api.ConvertFromPlugin(template, &g.cs.Config, g.cs.Config.PluginVersion)
 	if err != nil {
 		return err
 	}
 
-	// HACK: only set ComponentLogLevel at cluster creation, don't let
-	// ConvertFromPlugin override it.  This will be done properly in the future.
-	if cs.Config.Certificates.Ca.Cert != nil { // HACK: we're not a new cluster
-		config.ComponentLogLevel = cll
-	}
-
-	cs.Config = *config
-	c := &cs.Config
+	g.cs.Config = *config
+	c := &g.cs.Config
 
 	// Generate CAs
 	cas := []struct {
@@ -165,10 +158,10 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			params: tls.CertParams{
 				Subject: pkix.Name{
-					CommonName: cs.Properties.FQDN,
+					CommonName: g.cs.Properties.FQDN,
 				},
 				DNSNames: []string{
-					cs.Properties.FQDN,
+					g.cs.Properties.FQDN,
 					"master-000000",
 					"master-000001",
 					"master-000002",
@@ -327,21 +320,21 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			clientKey:  c.Certificates.OpenShiftMaster.Key,
 			clientCert: c.Certificates.OpenShiftMaster.Cert,
-			endpoint:   cs.Properties.FQDN,
+			endpoint:   g.cs.Properties.FQDN,
 			username:   "system:openshift-master",
 			kubeconfig: &c.MasterKubeconfig,
 		},
 		{
 			clientKey:  c.Certificates.Admin.Key,
 			clientCert: c.Certificates.Admin.Cert,
-			endpoint:   cs.Properties.FQDN,
+			endpoint:   g.cs.Properties.FQDN,
 			username:   "system:admin",
 			kubeconfig: &c.AdminKubeconfig,
 		},
 		{
 			clientKey:  c.Certificates.NodeBootstrap.Key,
 			clientCert: c.Certificates.NodeBootstrap.Cert,
-			endpoint:   cs.Properties.FQDN,
+			endpoint:   g.cs.Properties.FQDN,
 			username:   "system:serviceaccount:openshift-infra:node-bootstrapper",
 			kubeconfig: &c.NodeBootstrapKubeconfig,
 			namespace:  "openshift-infra",
@@ -349,7 +342,7 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			clientKey:  c.Certificates.SDN.Key,
 			clientCert: c.Certificates.SDN.Cert,
-			endpoint:   cs.Properties.FQDN,
+			endpoint:   g.cs.Properties.FQDN,
 			username:   "system:serviceaccount:openshift-sdn:sdn",
 			kubeconfig: &c.SDNKubeconfig,
 			namespace:  "openshift-sdn",
@@ -357,7 +350,7 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		{
 			clientKey:  c.Certificates.BlackBoxMonitor.Key,
 			clientCert: c.Certificates.BlackBoxMonitor.Cert,
-			endpoint:   cs.Properties.FQDN,
+			endpoint:   g.cs.Properties.FQDN,
 			username:   "system:serviceaccount:openshift-azure:blackboxmonitor",
 			kubeconfig: &c.BlackBoxMonitorKubeconfig,
 			namespace:  "openshift-azure",
@@ -367,7 +360,7 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 		if kc.namespace == "" {
 			kc.namespace = "default"
 		}
-		if *kc.kubeconfig, err = makeKubeConfig(kc.clientKey, kc.clientCert, c.Certificates.Ca.Cert, kc.endpoint, kc.username, kc.namespace); err != nil {
+		if *kc.kubeconfig, err = kubeconfig.Make(kc.clientKey, kc.clientCert, c.Certificates.Ca.Cert, kc.endpoint, kc.username, kc.namespace); err != nil {
 			return
 		}
 	}
@@ -377,8 +370,6 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 			return
 		}
 	}
-
-	c.RunningUnderTest = g.runningUnderTest
 
 	if c.SSHKey == nil {
 		if c.SSHKey, err = tls.NewPrivateKey(); err != nil {
@@ -444,35 +435,35 @@ func (g *simpleGenerator) Generate(cs *api.OpenShiftManagedCluster, template *pl
 
 // InvalidateSecrets removes all non-ca certificates, private keys and secrets from an
 // OpenShiftManagedCluster's Config
-func (g *simpleGenerator) InvalidateSecrets(cs *api.OpenShiftManagedCluster) (err error) {
-	cs.Config.Certificates.Admin = api.CertKeyPair{}
-	cs.Config.Certificates.AggregatorFrontProxy = api.CertKeyPair{}
-	cs.Config.Certificates.BlackBoxMonitor = api.CertKeyPair{}
-	cs.Config.Certificates.EtcdClient = api.CertKeyPair{}
-	cs.Config.Certificates.EtcdPeer = api.CertKeyPair{}
-	cs.Config.Certificates.EtcdServer = api.CertKeyPair{}
-	cs.Config.Certificates.GenevaLogging = api.CertKeyPair{}
-	cs.Config.Certificates.GenevaMetrics = api.CertKeyPair{}
-	cs.Config.Certificates.MasterKubeletClient = api.CertKeyPair{}
-	cs.Config.Certificates.MasterProxyClient = api.CertKeyPair{}
-	cs.Config.Certificates.MasterServer = api.CertKeyPair{}
-	cs.Config.Certificates.NodeBootstrap = api.CertKeyPair{}
-	cs.Config.Certificates.SDN = api.CertKeyPair{}
-	cs.Config.Certificates.OpenShiftMaster = api.CertKeyPair{}
-	cs.Config.Certificates.Registry = api.CertKeyPair{}
-	cs.Config.Certificates.RegistryConsole = api.CertKeyPair{}
-	cs.Config.Certificates.ServiceCatalogServer = api.CertKeyPair{}
+func (g *simpleGenerator) InvalidateSecrets() (err error) {
+	g.cs.Config.Certificates.Admin = api.CertKeyPair{}
+	g.cs.Config.Certificates.AggregatorFrontProxy = api.CertKeyPair{}
+	g.cs.Config.Certificates.BlackBoxMonitor = api.CertKeyPair{}
+	g.cs.Config.Certificates.EtcdClient = api.CertKeyPair{}
+	g.cs.Config.Certificates.EtcdPeer = api.CertKeyPair{}
+	g.cs.Config.Certificates.EtcdServer = api.CertKeyPair{}
+	g.cs.Config.Certificates.GenevaLogging = api.CertKeyPair{}
+	g.cs.Config.Certificates.GenevaMetrics = api.CertKeyPair{}
+	g.cs.Config.Certificates.MasterKubeletClient = api.CertKeyPair{}
+	g.cs.Config.Certificates.MasterProxyClient = api.CertKeyPair{}
+	g.cs.Config.Certificates.MasterServer = api.CertKeyPair{}
+	g.cs.Config.Certificates.NodeBootstrap = api.CertKeyPair{}
+	g.cs.Config.Certificates.SDN = api.CertKeyPair{}
+	g.cs.Config.Certificates.OpenShiftMaster = api.CertKeyPair{}
+	g.cs.Config.Certificates.Registry = api.CertKeyPair{}
+	g.cs.Config.Certificates.RegistryConsole = api.CertKeyPair{}
+	g.cs.Config.Certificates.ServiceCatalogServer = api.CertKeyPair{}
 
-	cs.Config.SSHKey = nil
-	cs.Config.RegistryHTTPSecret = nil
-	cs.Config.RegistryConsoleOAuthSecret = ""
-	cs.Config.ConsoleOAuthSecret = ""
-	cs.Config.AlertManagerProxySessionSecret = nil
-	cs.Config.AlertsProxySessionSecret = nil
-	cs.Config.PrometheusProxySessionSecret = nil
-	cs.Config.SessionSecretAuth = nil
-	cs.Config.SessionSecretEnc = nil
-	cs.Config.Images.GenevaImagePullSecret = nil
+	g.cs.Config.SSHKey = nil
+	g.cs.Config.RegistryHTTPSecret = nil
+	g.cs.Config.RegistryConsoleOAuthSecret = ""
+	g.cs.Config.ConsoleOAuthSecret = ""
+	g.cs.Config.AlertManagerProxySessionSecret = nil
+	g.cs.Config.AlertsProxySessionSecret = nil
+	g.cs.Config.PrometheusProxySessionSecret = nil
+	g.cs.Config.SessionSecretAuth = nil
+	g.cs.Config.SessionSecretEnc = nil
+	g.cs.Config.Images.GenevaImagePullSecret = nil
 
 	return
 }

@@ -1,14 +1,13 @@
 package cluster
 
-//go:generate go get github.com/golang/mock/gomock
-//go:generate go install github.com/golang/mock/mockgen
+//go:generate go get github.com/golang/mock/mockgen
 //go:generate mockgen -destination=../util/mocks/mock_$GOPACKAGE/hash.go -package=mock_$GOPACKAGE -source hash.go
 //go:generate gofmt -s -l -w ../util/mocks/mock_$GOPACKAGE/hash.go
+//go:generate go get golang.org/x/tools/cmd/goimports
 //go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../util/mocks/mock_$GOPACKAGE/hash.go
 
 import (
 	"crypto/sha256"
-	"encoding/json"
 
 	"github.com/sirupsen/logrus"
 
@@ -27,38 +26,26 @@ type hasher struct {
 	log            *logrus.Entry
 	testConfig     api.TestConfig
 	startupFactory func(*logrus.Entry, *api.OpenShiftManagedCluster) (startup.Interface, error)
+	arm            arm.Interface
 }
 
 // HashScaleSet returns the hash of a scale set
 func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
 	hash := sha256.New()
 
-	// the hash is invariant of name, suffix, count
-	appCopy := *app
-	appCopy.Count = 0
-	appCopy.Name = ""
-
-	// and also the SAS URIs
-	csCopy := cs.DeepCopy()
-	csCopy.Config.MasterStartupSASURI = ""
-	csCopy.Config.WorkerStartupSASURI = ""
-
-	vmss, err := arm.Vmss(csCopy, &appCopy, "", "", h.testConfig) // TODO: backupBlob is rather a layering violation here
+	b, err := h.arm.Hash(app)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.NewEncoder(hash).Encode(vmss)
-	if err != nil {
-		return nil, err
-	}
+	hash.Write(b)
 
 	s, err := h.startupFactory(h.log, cs)
 	if err != nil {
 		return nil, err
 	}
 
-	b, err := s.Hash(app.Role)
+	b, err = s.Hash(app.Role)
 	if err != nil {
 		return nil, err
 	}

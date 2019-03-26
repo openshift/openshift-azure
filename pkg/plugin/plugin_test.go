@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -10,10 +11,9 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
-	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_arm"
+	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_config"
 )
@@ -51,41 +51,37 @@ func TestCreateOrUpdate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			armGenerator := mock_arm.NewMockGenerator(gmc)
 			clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
-			c := clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil)
-			c = armGenerator.EXPECT().Generate(nil, cs, "", tt.isUpdate, gomock.Any()).Return(nil, nil).After(c)
-			c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
-			c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
-			c = clusterUpgrader.EXPECT().EnrichCSStorageAccountKeys(nil, cs).Return(nil)
+			c := clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil).Return(nil)
+			c = clusterUpgrader.EXPECT().GenerateARM(nil, "", tt.isUpdate, gomock.Any()).Return(nil, nil).After(c)
+			c = clusterUpgrader.EXPECT().WriteStartupBlobs().Return(nil).After(c)
+			c = clusterUpgrader.EXPECT().EnrichCertificatesFromVault(nil).Return(nil)
+			c = clusterUpgrader.EXPECT().EnrichStorageAccountKeys(nil).Return(nil)
 			if tt.isUpdate {
-				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
-				c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
-				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
-				c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
-				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
-				c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
-				c = clusterUpgrader.EXPECT().CreateOrUpdateSyncPod(nil, cs).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+				c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+				c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+				c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().CreateOrUpdateSyncPod(nil).Return(nil).After(c)
 				c = clusterUpgrader.EXPECT().WaitForReadySyncPod(nil).Return(nil).After(c)
 			} else {
-				c = clusterUpgrader.EXPECT().InitializeUpdateBlob(cs, gomock.Any()).Return(nil).After(c)
-				c = clusterUpgrader.EXPECT().WaitForHealthzStatusOk(nil, cs).Return(nil).After(c)
-				c = clusterUpgrader.EXPECT().CreateOrUpdateSyncPod(nil, cs).Return(nil).After(c)
-				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
-				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], gomock.Any()).Return(nil).After(c)
-				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
-				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
-				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
-				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().InitializeUpdateBlob(gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().WaitForHealthzStatusOk(nil).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().CreateOrUpdateSyncPod(nil).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, &cs.Properties.AgentPoolProfiles[0], gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+				c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+				c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
 				c = clusterUpgrader.EXPECT().WaitForReadySyncPod(nil).Return(nil).After(c)
 			}
-			c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
+			c = clusterUpgrader.EXPECT().HealthCheck(nil).Return(nil).After(c)
 			p := &plugin{
 				upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 					return clusterUpgrader, nil
-				},
-				armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
-					return armGenerator, nil
 				},
 				log: logrus.NewEntry(logrus.StandardLogger()),
 			}
@@ -115,40 +111,36 @@ func TestRecoverEtcdCluster(t *testing.T) {
 
 	testData := map[string]interface{}{"test": "data"}
 	testDataWithBackup := map[string]interface{}{"test": "backup"}
-	armGenerator := mock_arm.NewMockGenerator(gmc)
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 
-	c := armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil)
+	c := clusterUpgrader.EXPECT().GenerateARM(nil, gomock.Any(), true, gomock.Any()).Return(testDataWithBackup, nil)
 	c = clusterUpgrader.EXPECT().EtcdBlobExists(nil, "test-backup").Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil, cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil).Return(nil).After(c)
 
 	// deploy masters
-	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSetHashes(nil, cs).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().WaitForHealthzStatusOk(nil, cs).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
-	c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, cs, &cs.Properties.AgentPoolProfiles[0], "").Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSetHashes(nil).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().WaitForHealthzStatusOk(nil).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+	c = clusterUpgrader.EXPECT().WaitForNodesInAgentPoolProfile(nil, &cs.Properties.AgentPoolProfiles[0], "").Return(nil).After(c)
 	// update
-	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
-	c = armGenerator.EXPECT().Generate(nil, cs, gomock.Any(), true, gomock.Any()).Return(testData, nil).After(c)
-	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
-	c = clusterUpgrader.EXPECT().EnrichCSStorageAccountKeys(nil, cs).Return(nil)
-	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
-	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
-	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
-	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().CreateOrUpdateSyncPod(nil, cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().GenerateARM(nil, gomock.Any(), true, gomock.Any()).Return(testData, nil).After(c)
+	c = clusterUpgrader.EXPECT().WriteStartupBlobs().Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().EnrichCertificatesFromVault(nil).Return(nil)
+	c = clusterUpgrader.EXPECT().EnrichStorageAccountKeys(nil).Return(nil)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().CreateOrUpdateSyncPod(nil).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().WaitForReadySyncPod(nil).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().HealthCheck(nil).Return(nil).After(c)
 
 	p := &plugin{
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 			return clusterUpgrader, nil
-		},
-		armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
-			return armGenerator, nil
 		},
 		log: logrus.NewEntry(logrus.StandardLogger()),
 	}
@@ -175,37 +167,35 @@ func TestRotateClusterSecrets(t *testing.T) {
 		},
 	}
 
-	configGenerator := mock_config.NewMockGenerator(gmc)
+	configInterface := mock_config.NewMockInterface(gmc)
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
-	armGenerator := mock_arm.NewMockGenerator(gmc)
 
-	c := configGenerator.EXPECT().InvalidateSecrets(cs).Return(nil)
-	c = configGenerator.EXPECT().Generate(cs, gomock.Any()).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
-	c = armGenerator.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
-	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
-	c = clusterUpgrader.EXPECT().EnrichCSStorageAccountKeys(nil, cs).Return(nil)
-	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
-	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
-	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
-	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().CreateOrUpdateSyncPod(nil, cs).Return(nil).After(c)
+	c := configInterface.EXPECT().InvalidateSecrets().Return(nil)
+	c = configInterface.EXPECT().Generate(gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().GenerateARM(nil, "", true, gomock.Any()).Return(nil, nil).After(c)
+	c = clusterUpgrader.EXPECT().WriteStartupBlobs().Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().EnrichCertificatesFromVault(nil).Return(nil)
+	c = clusterUpgrader.EXPECT().EnrichStorageAccountKeys(nil).Return(nil)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().CreateOrUpdateSyncPod(nil).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().WaitForReadySyncPod(nil).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().HealthCheck(nil).Return(nil).After(c)
 
 	p := &plugin{
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 			return clusterUpgrader, nil
 		},
-		armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
-			return armGenerator, nil
+		configInterfaceFactory: func(cs *api.OpenShiftManagedCluster) (config.Interface, error) {
+			return configInterface, nil
 		},
-		configGenerator: configGenerator,
-		log:             logrus.NewEntry(logrus.StandardLogger()),
-		pluginConfig:    &pluginapi.Config{},
+		log:          logrus.NewEntry(logrus.StandardLogger()),
+		pluginConfig: &pluginapi.Config{},
 	}
 
 	if err := p.RotateClusterSecrets(nil, cs, deployer); err != nil {
@@ -231,30 +221,26 @@ func TestForceUpdate(t *testing.T) {
 	}
 
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
-	armGenerator := mock_arm.NewMockGenerator(gmc)
 
-	c := clusterUpgrader.EXPECT().ResetUpdateBlob(cs).Return(nil)
-	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil, cs).Return(nil).After(c)
-	c = armGenerator.EXPECT().Generate(nil, cs, "", true, gomock.Any()).Return(nil, nil).After(c)
-	c = clusterUpgrader.EXPECT().WriteStartupBlobs(cs).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().EnrichCSFromVault(nil, cs).Return(nil)
-	c = clusterUpgrader.EXPECT().EnrichCSStorageAccountKeys(nil, cs).Return(nil)
-	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
-	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
-	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(cs, api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
-	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, cs, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().CreateOrUpdateSyncPod(nil, cs).Return(nil).After(c)
+	c := clusterUpgrader.EXPECT().ResetUpdateBlob().Return(nil)
+	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().GenerateARM(nil, "", true, gomock.Any()).Return(nil, nil).After(c)
+	c = clusterUpgrader.EXPECT().WriteStartupBlobs().Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().EnrichCertificatesFromVault(nil).Return(nil)
+	c = clusterUpgrader.EXPECT().EnrichStorageAccountKeys(nil).Return(nil)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleMaster).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[0]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateMasterAgentPool(nil, &cs.Properties.AgentPoolProfiles[0]).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleInfra).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[2]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, &cs.Properties.AgentPoolProfiles[2], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().SortedAgentPoolProfilesForRole(api.AgentPoolProfileRoleCompute).Return([]api.AgentPoolProfile{cs.Properties.AgentPoolProfiles[1]}).After(c)
+	c = clusterUpgrader.EXPECT().UpdateWorkerAgentPool(nil, &cs.Properties.AgentPoolProfiles[1], gomock.Any()).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().CreateOrUpdateSyncPod(nil).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().WaitForReadySyncPod(nil).Return(nil).After(c)
-	c = clusterUpgrader.EXPECT().HealthCheck(nil, cs).Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().HealthCheck(nil).Return(nil).After(c)
 
 	p := &plugin{
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 			return clusterUpgrader, nil
-		},
-		armGeneratorFactory: func(ctx context.Context, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (arm.Generator, error) {
-			return armGenerator, nil
 		},
 		log: logrus.NewEntry(logrus.StandardLogger()),
 	}
@@ -270,7 +256,7 @@ func TestListClusterVMs(t *testing.T) {
 
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 
-	clusterUpgrader.EXPECT().ListVMHostnames(nil, nil).Return(nil, nil)
+	clusterUpgrader.EXPECT().ListVMHostnames(nil).Return(nil, nil)
 
 	p := &plugin{
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
@@ -319,7 +305,7 @@ func TestReimage(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			c := clusterUpgrader.EXPECT().Reimage(nil, nil, scaleset, instanceID).Return(nil)
+			c := clusterUpgrader.EXPECT().Reimage(nil, scaleset, instanceID).Return(nil)
 
 			if tt.isMaster {
 				c = clusterUpgrader.EXPECT().WaitForReadyMaster(nil, tt.hostname).Return(nil).After(c)
@@ -393,16 +379,26 @@ func errorsContains(errs []error, substr string) bool {
 }
 
 func TestValidateUpdateBlock(t *testing.T) {
+	const currentVersion = "current"
+
 	p := &plugin{
 		log:          logrus.NewEntry(logrus.StandardLogger()),
-		pluginConfig: &pluginapi.Config{PluginVersion: "v0.0"},
+		pluginConfig: &pluginapi.Config{PluginVersion: currentVersion},
+		configInterfaceFactory: func(cs *api.OpenShiftManagedCluster) (c config.Interface, err error) {
+			if cs.Config.PluginVersion != currentVersion {
+				err = fmt.Errorf("bad")
+			}
+			return
+		},
 	}
-	old := &api.OpenShiftManagedCluster{}
-	current := &api.OpenShiftManagedCluster{Config: api.Config{PluginVersion: p.pluginConfig.PluginVersion}}
+
+	old := &api.OpenShiftManagedCluster{Config: api.Config{PluginVersion: "old"}}
 	errs := p.Validate(context.Background(), old, old, true)
 	if !errorsContains(errs, "cannot be updated by resource provider") {
 		t.Error("expected old cluster to fail update validation")
 	}
+
+	current := &api.OpenShiftManagedCluster{Config: api.Config{PluginVersion: p.pluginConfig.PluginVersion}}
 	errs = p.Validate(context.Background(), current, current, true)
 	if errorsContains(errs, "cannot be updated by resource provider") {
 		t.Error("expected current cluster to pass update validation")

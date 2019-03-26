@@ -130,9 +130,9 @@ func convertConfigToAdmin(cs *Config) *admin.Config {
 
 func convertComponentLogLevelToAdmin(in ComponentLogLevel) *admin.ComponentLogLevel {
 	return &admin.ComponentLogLevel{
-		APIServer:         &in.APIServer,
-		ControllerManager: &in.ControllerManager,
-		Node:              &in.Node,
+		APIServer:         in.APIServer,
+		ControllerManager: in.ControllerManager,
+		Node:              in.Node,
 	}
 }
 

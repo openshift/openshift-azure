@@ -13,7 +13,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/arm"
+	"github.com/openshift/openshift-azure/pkg/util/arm"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
@@ -89,7 +89,11 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	arm.FixupAPIVersions(template)
+	err = arm.FixupAPIVersions(template, versionMap)
+	if err != nil {
+		return nil, err
+	}
+
 	arm.FixupDepends(builder.SubscriptionID, builder.BuildResourceGroup, template)
 
 	return template, nil

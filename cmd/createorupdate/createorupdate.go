@@ -88,24 +88,29 @@ func createOrUpdatev20180930preview(ctx context.Context, log *logrus.Entry, rpc 
 	return &resp, nil
 }
 
-func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, rpc *adminclient.Client, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) error {
+func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, ac *adminclient.Client, rpc v20180930previewclient.OpenShiftManagedClustersClient, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) (*v20180930preview.OpenShiftManagedCluster, error) {
 	log.Info("creating/updating cluster")
 	if oc.Properties != nil {
 		oc.Properties.ProvisioningState = nil // TODO: should not need to do this
 	}
-	resp, err := rpc.CreateOrUpdate(ctx, resourceGroup, resourceGroup, oc)
+	resp, err := ac.CreateOrUpdate(ctx, resourceGroup, resourceGroup, oc)
 	if err != nil {
-		return err
-	}
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected response: %s", resp.Status)
+		return nil, err
 	}
 	data, err := yaml.Marshal(resp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	log.Info("created/updated cluster")
-	return ioutil.WriteFile(manifestFile, data, 0600)
+	err = ioutil.WriteFile(manifestFile, data, 0600)
+	if err != nil {
+		return nil, err
+	}
+	cluster, err := rpc.Get(ctx, resourceGroup, resourceGroup)
+	if err != nil {
+		return nil, err
+	}
+	return &cluster, nil
 }
 
 func execute(
@@ -122,7 +127,7 @@ func execute(
 			return nil, fmt.Errorf("failed reading admin manifest: %v", err)
 		}
 		defaultAdminManifest := "_data/manifest-admin.yaml"
-		return nil, createOrUpdateAdmin(ctx, log, ac, conf.ResourceGroup, oc, defaultAdminManifest)
+		return createOrUpdateAdmin(ctx, log, ac, rpc, conf.ResourceGroup, oc, defaultAdminManifest)
 	}
 
 	defaultManifestFile := "_data/manifest.yaml"
@@ -186,12 +191,13 @@ func updateAadApplication(ctx context.Context, oc *v20180930preview.OpenShiftMan
 
 func isConnectionRefused(err error) bool {
 	if autoRestErr, ok := err.(autorest.DetailedError); ok {
-		if urlErr, ok := autoRestErr.Original.(*url.Error); ok {
-			if netErr, ok := urlErr.Err.(*net.OpError); ok {
-				if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
-					if sysErr.Err == syscall.ECONNREFUSED {
-						return true
-					}
+		err = autoRestErr.Original
+	}
+	if urlErr, ok := err.(*url.Error); ok {
+		if netErr, ok := urlErr.Err.(*net.OpError); ok {
+			if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
+				if sysErr.Err == syscall.ECONNREFUSED {
+					return true
 				}
 			}
 		}
@@ -210,7 +216,6 @@ func main() {
 	}
 
 	isDelete := strings.ToUpper(*method) == http.MethodDelete
-	isUpdate := shared.IsUpdate()
 	conf, err := fakerp.NewConfig(log, !isDelete)
 	if err != nil {
 		log.Fatal(err)
@@ -286,10 +291,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if !isUpdate {
-		if err := updateAadApplication(ctx, oc, log, conf); err != nil {
-			log.Fatal(err)
-		}
+	if err := updateAadApplication(ctx, oc, log, conf); err != nil {
+		log.Fatal(err)
 	}
 
 	fmt.Printf("\nCluster available at https://%s/\n", *oc.Properties.PublicHostname)

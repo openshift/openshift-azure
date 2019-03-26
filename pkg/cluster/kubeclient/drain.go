@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,7 +34,11 @@ func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, hostname string) 
 }
 
 func (u *kubeclient) DeleteMaster(hostname string) error {
-	return u.client.CoreV1().Nodes().Delete(hostname, &metav1.DeleteOptions{})
+	err := u.client.CoreV1().Nodes().Delete(hostname, &metav1.DeleteOptions{})
+	if kerrors.IsNotFound(err) {
+		err = nil
+	}
+	return err
 }
 
 func (u *kubeclient) setUnschedulable(hostname string, unschedulable bool) error {

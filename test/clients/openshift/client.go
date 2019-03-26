@@ -15,7 +15,7 @@ import (
 	policyv1beta1client "k8s.io/client-go/kubernetes/typed/policy/v1beta1"
 	rbacv1client "k8s.io/client-go/kubernetes/typed/rbac/v1"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd/api/v1"
+	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"

@@ -41,6 +41,7 @@ spec:
         - name: HOSTNAME
           valueFrom:
             fieldRef:
+              apiVersion: v1
               fieldPath: spec.nodeName
         - name: USERNAME
           valueFrom:

@@ -49,8 +49,6 @@ type Config struct {
 	SessionSecretAuth []byte          `json:"sessionSecretAuth,omitempty"`
 	SessionSecretEnc  []byte          `json:"sessionSecretEnc,omitempty"`
 
-	RunningUnderTest bool `json:"runningUnderTest,omitempty"`
-
 	// misc infra configurables
 	RegistryHTTPSecret             []byte    `json:"registryHttpSecret,omitempty"`
 	PrometheusProxySessionSecret   []byte    `json:"prometheusProxySessionSecret,omitempty"`
@@ -85,9 +83,9 @@ type Config struct {
 // ComponentLogLevel represents the log levels for the various components of a
 // cluster
 type ComponentLogLevel struct {
-	APIServer         int `json:"apiServer,omitempty"`
-	ControllerManager int `json:"controllerManager,omitempty"`
-	Node              int `json:"node,omitempty"`
+	APIServer         *int `json:"apiServer,omitempty"`
+	ControllerManager *int `json:"controllerManager,omitempty"`
+	Node              *int `json:"node,omitempty"`
 }
 
 // ImageConfig contains all images for the pods

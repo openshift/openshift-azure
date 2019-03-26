@@ -49,18 +49,16 @@ func (v *APIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftMa
 
 	old := oldCs.DeepCopy()
 
-	newAgents := make(map[string]*api.AgentPoolProfile)
-	for i := range cs.Properties.AgentPoolProfiles {
-		newAgent := cs.Properties.AgentPoolProfiles[i]
-		newAgents[newAgent.Name] = &newAgent
-	}
-
-	for i, o := range old.Properties.AgentPoolProfiles {
-		new, ok := newAgents[o.Name]
-		if !ok {
-			continue // we know we are going to fail the DeepEqual test below.
+	for i, app := range old.Properties.AgentPoolProfiles {
+		if app.Role != api.AgentPoolProfileRoleCompute {
+			continue
 		}
-		old.Properties.AgentPoolProfiles[i].Count = new.Count
+
+		for _, newApp := range cs.Properties.AgentPoolProfiles {
+			if newApp.Name == app.Name {
+				old.Properties.AgentPoolProfiles[i].Count = newApp.Count
+			}
+		}
 	}
 
 	if !reflect.DeepEqual(cs, old) {

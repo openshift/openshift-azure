@@ -24,8 +24,8 @@ const (
 	PluginStepResetUpdateBlob                     PluginStep = "ResetUpdateBlob"
 	PluginStepCheckEtcdBlobExists                 PluginStep = "CheckEtcdBlobExists"
 	PluginStepClientCreation                      PluginStep = "ClientCreation"
-	PluginStepEnrichFromVault                     PluginStep = "EnrichFromVault"
-	PluginStepEnrichKeys                          PluginStep = "EnrichKeys"
+	PluginStepEnrichCertificatesFromVault         PluginStep = "EnrichCertificatesFromVault"
+	PluginStepEnrichStorageAccountKeys            PluginStep = "EnrichStorageAccountKeys"
 	PluginStepScaleSetDelete                      PluginStep = "ScaleSetDelete"
 	PluginStepWriteStartupBlobs                   PluginStep = "WriteStartupBlobs"
 	PluginStepCreateOrUpdateConfigStorageAccount  PluginStep = "CreateOrUpdateConfigStorageAccount"
@@ -116,7 +116,7 @@ type Plugin interface {
 
 	// GenerateConfig ensures all the necessary in-cluster config is generated
 	// for an Openshift cluster.
-	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster) error
+	GenerateConfig(ctx context.Context, cs *OpenShiftManagedCluster, isUpdate bool) error
 
 	// CreateOrUpdate either deploys or runs the update depending on the isUpdate argument
 	// this will call the deployer.

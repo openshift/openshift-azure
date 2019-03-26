@@ -121,7 +121,7 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err := writeHelpers(cs)
+	err := writeHelpers(s.log, cs)
 	s.adminreply(w, err, nil)
 }
 

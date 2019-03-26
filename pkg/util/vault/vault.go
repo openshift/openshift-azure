@@ -16,22 +16,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
-func EnrichCSFromVault(ctx context.Context, kvc azureclient.KeyVaultClient, cs *api.OpenShiftManagedCluster) error {
-	kp, err := getSecret(ctx, kvc, cs.Properties.APICertProfile.KeyVaultSecretURL)
-	if err != nil {
-		return err
-	}
-	cs.Config.Certificates.OpenShiftConsole = *kp
-
-	kp, err = getSecret(ctx, kvc, cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL)
-	if err != nil {
-		return err
-	}
-	cs.Config.Certificates.Router = *kp
-
-	return nil
-}
-
 // SplitSecretURL parses a key vault secret URL, e.g.
 // https://myvault.vault.azure.net/secrets/mysecret, and returns the root vault
 // URL and secret name, e.g. https://myvault.vault.azure.net/ and mysecret.
@@ -48,7 +32,7 @@ func SplitSecretURL(kvURL string) (string, string, error) {
 	return vaultURL, secretName, nil
 }
 
-func getSecret(ctx context.Context, kvc azureclient.KeyVaultClient, secretURL string) (*api.CertKeyPairChain, error) {
+func GetSecret(ctx context.Context, kvc azureclient.KeyVaultClient, secretURL string) (*api.CertKeyPairChain, error) {
 	vaultURL, secretName, err := SplitSecretURL(secretURL)
 	if err != nil {
 		return nil, err

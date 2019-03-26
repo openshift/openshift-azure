@@ -19,9 +19,15 @@ func ConvertFromPlugin(in *plugin.Config, old *Config, version string) (*Config,
 
 	c.PluginVersion = in.PluginVersion
 
-	c.ComponentLogLevel.APIServer = in.ComponentLogLevel.APIServer
-	c.ComponentLogLevel.ControllerManager = in.ComponentLogLevel.ControllerManager
-	c.ComponentLogLevel.Node = in.ComponentLogLevel.Node
+	if c.ComponentLogLevel.APIServer == nil {
+		c.ComponentLogLevel.APIServer = &in.ComponentLogLevel.APIServer
+	}
+	if c.ComponentLogLevel.ControllerManager == nil {
+		c.ComponentLogLevel.ControllerManager = &in.ComponentLogLevel.ControllerManager
+	}
+	if c.ComponentLogLevel.Node == nil {
+		c.ComponentLogLevel.Node = &in.ComponentLogLevel.Node
+	}
 
 	c.SSHSourceAddressPrefixes = in.SSHSourceAddressPrefixes
 

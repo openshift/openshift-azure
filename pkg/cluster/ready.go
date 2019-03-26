@@ -9,8 +9,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 )
 
-func (u *simpleUpgrader) WaitForNodesInAgentPoolProfile(ctx context.Context, cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile, suffix string) error {
-	vms, err := u.vmc.List(ctx, cs.Properties.AzProfile.ResourceGroup, names.GetScalesetName(app, suffix), "", "", "")
+func (u *simpleUpgrader) WaitForNodesInAgentPoolProfile(ctx context.Context, app *api.AgentPoolProfile, suffix string) error {
+	vms, err := u.vmc.List(ctx, u.cs.Properties.AzProfile.ResourceGroup, names.GetScalesetName(app, suffix), "", "", "")
 	if err != nil {
 		return err
 	}
@@ -31,8 +31,8 @@ func (u *simpleUpgrader) WaitForNodesInAgentPoolProfile(ctx context.Context, cs 
 
 // SortedAgentPoolProfilesForRole returns a shallow copy of the
 // AgentPoolProfiles of a given role, sorted by name
-func (u *simpleUpgrader) SortedAgentPoolProfilesForRole(cs *api.OpenShiftManagedCluster, role api.AgentPoolProfileRole) (apps []api.AgentPoolProfile) {
-	for _, app := range cs.Properties.AgentPoolProfiles {
+func (u *simpleUpgrader) SortedAgentPoolProfilesForRole(role api.AgentPoolProfileRole) (apps []api.AgentPoolProfile) {
+	for _, app := range u.cs.Properties.AgentPoolProfiles {
 		if app.Role == role {
 			apps = append(apps, app)
 		}
