@@ -68,6 +68,8 @@ func toTag(s string) string {
 		return "vnetSubnetID"
 	}
 
+	s = strings.TrimPrefix(s, "Deprecated")
+
 	for _, acronym := range []string{"API", "CIDR", "FQDN", "HTTP", "ID", "SDN", "SKU", "SSH", "TLS", "VM"} {
 		lower := string(acronym[0]) + strings.Map(unicode.ToLower, acronym[1:])
 		s = strings.Replace(s, acronym, lower, -1)
