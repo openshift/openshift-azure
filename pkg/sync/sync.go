@@ -19,12 +19,12 @@ type Interface interface {
 	Hash() ([]byte, error)
 }
 
-func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (Interface, error) {
+func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (Interface, error) {
 	switch cs.Config.PluginVersion {
 	case "v3.2":
-		return v3.New(log, cs)
+		return v3.New(log, cs, initClients)
 	case "v4.0":
-		return v4.New(log, cs)
+		return v4.New(log, cs, initClients)
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)

@@ -95,7 +95,7 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 
 // HashSyncPod returns the hash of the sync pod output
 func (h *hasher) HashSyncPod(cs *api.OpenShiftManagedCluster) ([]byte, error) {
-	s, err := sync.New(h.log, cs)
+	s, err := sync.New(h.log, cs, false)
 	if err != nil {
 		return nil, err
 	}

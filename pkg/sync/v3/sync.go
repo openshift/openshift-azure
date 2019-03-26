@@ -464,42 +464,44 @@ type sync struct {
 	grs        []*discovery.APIGroupResources
 }
 
-func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*sync, error) {
+func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (*sync, error) {
 	s := &sync{
 		log: log,
 		cs:  cs,
 	}
 
-	var err error
-	s.restconfig, err = managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
-	if err != nil {
-		return nil, err
-	}
-	s.restconfig.RateLimiter = flowcontrol.NewFakeAlwaysRateLimiter()
+	if initClients {
+		var err error
+		s.restconfig, err = managedcluster.RestConfigFromV1Config(cs.Config.AdminKubeconfig)
+		if err != nil {
+			return nil, err
+		}
+		s.restconfig.RateLimiter = flowcontrol.NewFakeAlwaysRateLimiter()
 
-	s.kc, err = kubernetes.NewForConfig(s.restconfig)
-	if err != nil {
-		return nil, err
-	}
+		s.kc, err = kubernetes.NewForConfig(s.restconfig)
+		if err != nil {
+			return nil, err
+		}
 
-	s.ac, err = kaggregator.NewForConfig(s.restconfig)
-	if err != nil {
-		return nil, err
-	}
+		s.ac, err = kaggregator.NewForConfig(s.restconfig)
+		if err != nil {
+			return nil, err
+		}
 
-	s.ae, err = kapiextensions.NewForConfig(s.restconfig)
-	if err != nil {
-		return nil, err
-	}
+		s.ae, err = kapiextensions.NewForConfig(s.restconfig)
+		if err != nil {
+			return nil, err
+		}
 
-	s.cli, err = discovery.NewDiscoveryClientForConfig(s.restconfig)
-	if err != nil {
-		return nil, err
+		s.cli, err = discovery.NewDiscoveryClientForConfig(s.restconfig)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	s.ready.Store(false)
 
-	err = s.readDB()
+	err := s.readDB()
 	if err != nil {
 		return nil, err
 	}

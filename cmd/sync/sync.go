@@ -80,7 +80,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
-	s, err := sync.New(log, cs)
+	s, err := sync.New(log, cs, true)
 	if err != nil {
 		return err
 	}
