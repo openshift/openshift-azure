@@ -16,7 +16,7 @@ go run -ldflags "-X main.gitCommit=$COMMIT" ./cmd/vmimage -imageResourceGroup "$
 export AZURE_REGION=eastus
 export RESOURCEGROUP="${IMAGE_RESOURCENAME//./}-e2e"
 
-trap '[[ -z "$NO_DELETE" ]] && make delete' EXIT
+trap '[[ -z "$NO_DELETE" ]] && make artifacts; make delete' EXIT
 
 make create
 

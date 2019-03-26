@@ -23,11 +23,12 @@ import (
 )
 
 var (
-	gitCommit = "unknown"
-	logLevel  = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
-	interval  = flag.Duration("interval", 100*time.Millisecond, "check interval with dimension. Example: 1000ms ")
-	logerrors = flag.Bool("logerrors", false, "log initial errors")
-	outputdir = flag.String("outputdir", "./", "output directory")
+	gitCommit  = "unknown"
+	logLevel   = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
+	interval   = flag.Duration("interval", 100*time.Millisecond, "check interval with dimension. Example: 1000ms ")
+	logerrors  = flag.Bool("logerrors", false, "log initial errors")
+	outputdir  = flag.String("outputdir", "./", "output directory")
+	configfile = flag.String("configfile", "_data/containerservice.yaml", "container services config file location")
 )
 
 type monitor struct {
@@ -163,7 +164,7 @@ func (m *monitor) persist(instances []instance) error {
 }
 
 func loadOCConfig() (*api.OpenShiftManagedCluster, error) {
-	b, err := ioutil.ReadFile("_data/containerservice.yaml")
+	b, err := ioutil.ReadFile(*configfile)
 	if err != nil {
 		return nil, err
 	}

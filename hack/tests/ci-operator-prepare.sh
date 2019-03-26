@@ -3,9 +3,7 @@
 export ARTIFACT_DIR=/tmp/artifacts
 export GOPATH=/go # our prow configuration overrides our image setting to /home/prow/go
 
-ln -s /usr/local/e2e-secrets/azure secrets
 set +x
-. ./secrets/secret
 az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} >/dev/null
 set -x
 
