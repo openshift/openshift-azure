@@ -33,80 +33,8 @@ func adminManagedCluster() *admin.OpenShiftManagedCluster {
 	return &omc
 }
 
-func internalManagedCluster() *api.OpenShiftManagedCluster {
-	// this is the expected internal equivalent to
-	// v20180930previewManagedCluster()
-
-	return &api.OpenShiftManagedCluster{
-		ID:       "ID",
-		Location: "Location",
-		Name:     "Name",
-		Plan: &api.ResourcePurchasePlan{
-			Name:          to.StringPtr("Plan.Name"),
-			Product:       to.StringPtr("Plan.Product"),
-			PromotionCode: to.StringPtr("Plan.PromotionCode"),
-			Publisher:     to.StringPtr("Plan.Publisher"),
-		},
-		Tags: map[string]string{
-			"Tags.key": "Tags.val",
-		},
-		Type: "Type",
-		Properties: api.Properties{
-			ProvisioningState: "Properties.ProvisioningState",
-			OpenShiftVersion:  "Properties.OpenShiftVersion",
-			ClusterVersion:    "Properties.ClusterVersion",
-			PublicHostname:    "Properties.PublicHostname",
-			RouterProfiles: []api.RouterProfile{
-				{
-					Name:            "Properties.RouterProfiles[0].Name",
-					PublicSubdomain: "Properties.RouterProfiles[0].PublicSubdomain",
-					FQDN:            "Properties.RouterProfiles[0].FQDN",
-				},
-			},
-			FQDN: "Properties.FQDN",
-			AuthProfile: api.AuthProfile{
-				IdentityProviders: []api.IdentityProvider{
-					{
-						Name: "Properties.AuthProfile.IdentityProviders[0].Name",
-						Provider: &api.AADIdentityProvider{
-							Kind:                 "AADIdentityProvider",
-							ClientID:             "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
-							Secret:               "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
-							TenantID:             "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
-							CustomerAdminGroupID: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Provider.CustomerAdminGroupID"),
-						},
-					},
-				},
-			},
-			NetworkProfile: api.NetworkProfile{
-				VnetID:     "Properties.NetworkProfile.VnetID",
-				VnetCIDR:   "Properties.NetworkProfile.VnetCIDR",
-				PeerVnetID: to.StringPtr("Properties.NetworkProfile.PeerVnetID"),
-			},
-			AgentPoolProfiles: []api.AgentPoolProfile{
-				{
-					Name:       string(api.AgentPoolProfileRoleMaster),
-					Count:      1,
-					VMSize:     "Properties.MasterPoolProfile.VMSize",
-					SubnetCIDR: "Properties.MasterPoolProfile.SubnetCIDR",
-					OSType:     api.OSTypeLinux,
-					Role:       api.AgentPoolProfileRoleMaster,
-				},
-				{
-					Name:       "Properties.AgentPoolProfiles[0].Name",
-					Count:      1,
-					VMSize:     "Properties.AgentPoolProfiles[0].VMSize",
-					SubnetCIDR: "Properties.AgentPoolProfiles[0].SubnetCIDR",
-					OSType:     "Properties.AgentPoolProfiles[0].OSType",
-					Role:       "Properties.AgentPoolProfiles[0].Role",
-				},
-			},
-		},
-	}
-}
-
 func internalManagedClusterAdmin() *api.OpenShiftManagedCluster {
-	cs := internalManagedCluster()
+	cs := api.GetInternalMockCluster()
 
 	prepare := func(v reflect.Value) {
 		switch v.Interface().(type) {

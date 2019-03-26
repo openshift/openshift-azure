@@ -10,7 +10,7 @@ import (
 	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30/api"
 )
 
-// internalManagedCluster and v20190430ManagedCluster are defined in
+// api.GetInternalMockCluster and v20190430ManagedCluster are defined in
 // converterfromv20190430_test.go.
 
 func TestConvertTov20190430(t *testing.T) {
@@ -19,7 +19,7 @@ func TestConvertTov20190430(t *testing.T) {
 		oc *v20190430.OpenShiftManagedCluster
 	}{
 		{
-			cs: internalManagedCluster(),
+			cs: api.GetInternalMockCluster(),
 			oc: v20190430ManagedCluster(),
 		},
 	}
