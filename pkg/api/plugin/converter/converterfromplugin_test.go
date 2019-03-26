@@ -7,6 +7,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/go-test/deep"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	plugin "github.com/openshift/openshift-azure/pkg/api/plugin/api"
 	"github.com/openshift/openshift-azure/test/util/populate"
 	"github.com/openshift/openshift-azure/test/util/tls"
@@ -20,12 +21,12 @@ func externalPluginConfig() *plugin.Config {
 	return &pc
 }
 
-func internalPluginConfig() Config {
+func internalPluginConfig() api.Config {
 	// this is the expected internal equivalent to
 	// internal API Config
-	return Config{
+	return api.Config{
 		PluginVersion: "PluginVersion",
-		ComponentLogLevel: ComponentLogLevel{
+		ComponentLogLevel: api.ComponentLogLevel{
 			APIServer:         to.IntPtr(1),
 			ControllerManager: to.IntPtr(1),
 			Node:              to.IntPtr(1),
@@ -45,18 +46,18 @@ func internalPluginConfig() Config {
 		GenevaLoggingControlPlaneAccount:     "GenevaLoggingControlPlaneAccount",
 		GenevaLoggingControlPlaneEnvironment: "GenevaLoggingControlPlaneEnvironment",
 		GenevaLoggingControlPlaneRegion:      "GenevaLoggingControlPlaneRegion",
-		Certificates: CertificateConfig{
-			GenevaLogging: CertKeyPair{
+		Certificates: api.CertificateConfig{
+			GenevaLogging: api.CertKeyPair{
 				Cert: tls.GetDummyCertificate(),
 				Key:  tls.GetDummyPrivateKey(),
 			},
-			GenevaMetrics: CertKeyPair{
+			GenevaMetrics: api.CertKeyPair{
 				Cert: tls.GetDummyCertificate(),
 				Key:  tls.GetDummyPrivateKey(),
 			},
 		},
 		// Container images configuration
-		Images: ImageConfig{
+		Images: api.ImageConfig{
 			ImagePullSecret:           []byte("ImagePullSecret"),
 			GenevaImagePullSecret:     []byte("GenevaImagePullSecret"),
 			Format:                    "Versions.key.Images.Format",

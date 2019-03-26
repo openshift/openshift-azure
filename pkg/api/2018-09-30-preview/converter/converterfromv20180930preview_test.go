@@ -1,4 +1,4 @@
-package api
+package converter
 
 import (
 	"errors"
@@ -8,6 +8,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/go-test/deep"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
@@ -30,15 +31,15 @@ func v20180930previewManagedCluster() *v20180930preview.OpenShiftManagedCluster 
 	return &omc
 }
 
-func internalManagedCluster() *OpenShiftManagedCluster {
+func internalManagedCluster() *api.OpenShiftManagedCluster {
 	// this is the expected internal equivalent to
 	// v20180930previewManagedCluster()
 
-	return &OpenShiftManagedCluster{
+	return &api.OpenShiftManagedCluster{
 		ID:       "ID",
 		Location: "Location",
 		Name:     "Name",
-		Plan: &ResourcePurchasePlan{
+		Plan: &api.ResourcePurchasePlan{
 			Name:          to.StringPtr("Plan.Name"),
 			Product:       to.StringPtr("Plan.Product"),
 			PromotionCode: to.StringPtr("Plan.PromotionCode"),
@@ -48,12 +49,12 @@ func internalManagedCluster() *OpenShiftManagedCluster {
 			"Tags.key": "Tags.val",
 		},
 		Type: "Type",
-		Properties: Properties{
+		Properties: api.Properties{
 			ProvisioningState: "Properties.ProvisioningState",
 			OpenShiftVersion:  "Properties.OpenShiftVersion",
 			ClusterVersion:    "Properties.ClusterVersion",
 			PublicHostname:    "Properties.PublicHostname",
-			RouterProfiles: []RouterProfile{
+			RouterProfiles: []api.RouterProfile{
 				{
 					Name:            "Properties.RouterProfiles[0].Name",
 					PublicSubdomain: "Properties.RouterProfiles[0].PublicSubdomain",
@@ -61,11 +62,11 @@ func internalManagedCluster() *OpenShiftManagedCluster {
 				},
 			},
 			FQDN: "Properties.FQDN",
-			AuthProfile: AuthProfile{
-				IdentityProviders: []IdentityProvider{
+			AuthProfile: api.AuthProfile{
+				IdentityProviders: []api.IdentityProvider{
 					{
 						Name: "Properties.AuthProfile.IdentityProviders[0].Name",
-						Provider: &AADIdentityProvider{
+						Provider: &api.AADIdentityProvider{
 							Kind:                 "AADIdentityProvider",
 							ClientID:             "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
 							Secret:               "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
@@ -75,19 +76,19 @@ func internalManagedCluster() *OpenShiftManagedCluster {
 					},
 				},
 			},
-			NetworkProfile: NetworkProfile{
+			NetworkProfile: api.NetworkProfile{
 				VnetID:     "Properties.NetworkProfile.VnetID",
 				VnetCIDR:   "Properties.NetworkProfile.VnetCIDR",
 				PeerVnetID: to.StringPtr("Properties.NetworkProfile.PeerVnetID"),
 			},
-			AgentPoolProfiles: []AgentPoolProfile{
+			AgentPoolProfiles: []api.AgentPoolProfile{
 				{
-					Name:       string(AgentPoolProfileRoleMaster),
+					Name:       string(api.AgentPoolProfileRoleMaster),
 					Count:      1,
 					VMSize:     "Properties.MasterPoolProfile.VMSize",
 					SubnetCIDR: "Properties.MasterPoolProfile.SubnetCIDR",
-					OSType:     OSTypeLinux,
-					Role:       AgentPoolProfileRoleMaster,
+					OSType:     api.OSTypeLinux,
+					Role:       api.AgentPoolProfileRoleMaster,
 				},
 				{
 					Name:       "Properties.AgentPoolProfiles[0].Name",
@@ -106,8 +107,8 @@ func TestConvertFromV20180930preview(t *testing.T) {
 	tests := []struct {
 		name           string
 		input          *v20180930preview.OpenShiftManagedCluster
-		base           *OpenShiftManagedCluster
-		expectedChange func(*OpenShiftManagedCluster)
+		base           *api.OpenShiftManagedCluster
+		expectedChange func(*api.OpenShiftManagedCluster)
 		err            error
 	}{
 		{
@@ -127,7 +128,7 @@ func TestConvertFromV20180930preview(t *testing.T) {
 				},
 			},
 			base: internalManagedCluster(),
-			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
+			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
 				expectedCs.Properties.RouterProfiles[0].PublicSubdomain = "NewPublicSubdomain"
 			},
 		},
@@ -162,15 +163,15 @@ func TestConvertFromV20180930preview(t *testing.T) {
 				},
 			},
 			base: internalManagedCluster(),
-			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
+			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
 				expectedCs.Properties.AgentPoolProfiles = append(expectedCs.Properties.AgentPoolProfiles,
-					AgentPoolProfile{
+					api.AgentPoolProfile{
 						Name:       "NewName",
 						Count:      2,
-						VMSize:     VMSize("NewVMSize"),
+						VMSize:     api.VMSize("NewVMSize"),
 						SubnetCIDR: "NewSubnetCIDR",
-						OSType:     OSType("NewOSType"),
-						Role:       AgentPoolProfileRole("NewRole"),
+						OSType:     api.OSType("NewOSType"),
+						Role:       api.AgentPoolProfileRole("NewRole"),
 					})
 			},
 		},
@@ -209,12 +210,12 @@ func TestConvertFromV20180930preview(t *testing.T) {
 				},
 			},
 			base: internalManagedCluster(),
-			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
-				expectedCs.Properties.AuthProfile = AuthProfile{
-					IdentityProviders: []IdentityProvider{
+			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
+				expectedCs.Properties.AuthProfile = api.AuthProfile{
+					IdentityProviders: []api.IdentityProvider{
 						{
 							Name: "Properties.AuthProfile.IdentityProviders[0].Name",
-							Provider: &AADIdentityProvider{
+							Provider: &api.AADIdentityProvider{
 								Kind:     "AADIdentityProvider",
 								ClientID: "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
 								Secret:   "NewSecret",
@@ -268,7 +269,7 @@ func TestConvertFromV20180930preview(t *testing.T) {
 				Plan: nil,
 			},
 			base: internalManagedCluster(),
-			expectedChange: func(expectedCs *OpenShiftManagedCluster) {
+			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
 			},
 		},
 	}

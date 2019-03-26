@@ -16,7 +16,9 @@ import (
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	v20180930previewconverter "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/converter"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
+	adminconverter "github.com/openshift/openshift-azure/pkg/api/admin/converter"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
@@ -125,13 +127,13 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		var oc *admin.OpenShiftManagedCluster
 		oc, err = s.readAdminRequest(req.Body)
 		if err == nil {
-			cs, err = internalapi.ConvertFromAdmin(oc, oldCs)
+			cs, err = adminconverter.ConvertFromAdmin(oc, oldCs)
 		}
 	} else {
 		var oc *v20180930preview.OpenShiftManagedCluster
 		oc, err = s.read20180930previewRequest(req.Body)
 		if err == nil {
-			cs, err = internalapi.ConvertFromV20180930preview(oc, oldCs)
+			cs, err = v20180930previewconverter.ConvertFromV20180930preview(oc, oldCs)
 		}
 	}
 	if err != nil {
@@ -167,10 +169,10 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 	var res []byte
 	var err error
 	if strings.HasPrefix(req.URL.Path, "/admin") {
-		oc := internalapi.ConvertToAdmin(cs)
+		oc := adminconverter.ConvertToAdmin(cs)
 		res, err = json.Marshal(oc)
 	} else {
-		oc := internalapi.ConvertToV20180930preview(cs)
+		oc := v20180930previewconverter.ConvertToV20180930preview(cs)
 		res, err = json.Marshal(oc)
 	}
 	if err != nil {

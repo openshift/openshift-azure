@@ -1,4 +1,4 @@
-package api
+package converter
 
 import (
 	"reflect"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
@@ -14,7 +15,7 @@ import (
 
 func TestConvertToV20180930preview(t *testing.T) {
 	tests := []struct {
-		cs *OpenShiftManagedCluster
+		cs *api.OpenShiftManagedCluster
 		oc *v20180930preview.OpenShiftManagedCluster
 	}{
 		{

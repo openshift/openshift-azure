@@ -3,12 +3,13 @@ package api
 import (
 	"errors"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 )
 
 // ConvertFromAdmin converts from admin API representation to public API
-func ConvertFromAdmin(oc *admin.OpenShiftManagedCluster, old *OpenShiftManagedCluster) (*OpenShiftManagedCluster, error) {
-	cs := &OpenShiftManagedCluster{}
+func ConvertFromAdmin(oc *admin.OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
+	cs := &api.OpenShiftManagedCluster{}
 	if old != nil {
 		cs = old.DeepCopy()
 	}
@@ -52,9 +53,9 @@ func ConvertFromAdmin(oc *admin.OpenShiftManagedCluster, old *OpenShiftManagedCl
 
 // mergeFromResourcePurchasePlanAdmin merges filled out fields from the admin API to the internal representation, doesn't change fields which are nil in the input.
 // This reflects the behaviour of the external API.
-func mergeFromResourcePurchasePlanAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) {
+func mergeFromResourcePurchasePlanAdmin(oc *admin.OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) {
 	if cs.Plan == nil {
-		cs.Plan = &ResourcePurchasePlan{}
+		cs.Plan = &api.ResourcePurchasePlan{}
 	}
 	if oc.Plan.Name != nil {
 		cs.Plan.Name = oc.Plan.Name
@@ -70,9 +71,9 @@ func mergeFromResourcePurchasePlanAdmin(oc *admin.OpenShiftManagedCluster, cs *O
 	}
 }
 
-func mergePropertiesAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) error {
+func mergePropertiesAdmin(oc *admin.OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) error {
 	if oc.Properties.ProvisioningState != nil {
-		cs.Properties.ProvisioningState = ProvisioningState(*oc.Properties.ProvisioningState)
+		cs.Properties.ProvisioningState = api.ProvisioningState(*oc.Properties.ProvisioningState)
 	}
 	if oc.Properties.OpenShiftVersion != nil {
 		cs.Properties.OpenShiftVersion = *oc.Properties.OpenShiftVersion
@@ -112,9 +113,9 @@ func mergePropertiesAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManage
 	return nil
 }
 
-func mergeRouterProfilesAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) error {
+func mergeRouterProfilesAdmin(oc *admin.OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) error {
 	if cs.Properties.RouterProfiles == nil && len(oc.Properties.RouterProfiles) > 0 {
-		cs.Properties.RouterProfiles = make([]RouterProfile, 0, len(oc.Properties.RouterProfiles))
+		cs.Properties.RouterProfiles = make([]api.RouterProfile, 0, len(oc.Properties.RouterProfiles))
 	}
 	for _, rp := range oc.Properties.RouterProfiles {
 		if rp.Name == nil || *rp.Name == "" {
@@ -135,7 +136,16 @@ func mergeRouterProfilesAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftMa
 	return nil
 }
 
-func convertRouterProfileAdmin(in admin.RouterProfile, old *RouterProfile) (out RouterProfile) {
+func routerProfileIndex(name string, profiles []api.RouterProfile) int {
+	for i, profile := range profiles {
+		if profile.Name == name {
+			return i
+		}
+	}
+	return -1
+}
+
+func convertRouterProfileAdmin(in admin.RouterProfile, old *api.RouterProfile) (out api.RouterProfile) {
 	if old != nil {
 		out = *old
 	}
@@ -151,13 +161,13 @@ func convertRouterProfileAdmin(in admin.RouterProfile, old *RouterProfile) (out 
 	return
 }
 
-func mergeAgentPoolProfilesAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) error {
+func mergeAgentPoolProfilesAdmin(oc *admin.OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) error {
 	if cs.Properties.AgentPoolProfiles == nil && len(oc.Properties.AgentPoolProfiles) > 0 {
-		cs.Properties.AgentPoolProfiles = make([]AgentPoolProfile, 0, len(oc.Properties.AgentPoolProfiles)+1)
+		cs.Properties.AgentPoolProfiles = make([]api.AgentPoolProfile, 0, len(oc.Properties.AgentPoolProfiles)+1)
 	}
 
 	if p := oc.Properties.MasterPoolProfile; p != nil {
-		index := agentPoolProfileIndex(string(AgentPoolProfileRoleMaster), cs.Properties.AgentPoolProfiles)
+		index := agentPoolProfileIndex(string(api.AgentPoolProfileRoleMaster), cs.Properties.AgentPoolProfiles)
 		// the master profile does not exist, add it as is
 		if index == -1 {
 			cs.Properties.AgentPoolProfiles = append(cs.Properties.AgentPoolProfiles, convertMasterPoolProfileAdmin(*p, nil))
@@ -185,18 +195,27 @@ func mergeAgentPoolProfilesAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShif
 	return nil
 }
 
-func convertMasterPoolProfileAdmin(in admin.MasterPoolProfile, old *AgentPoolProfile) (out AgentPoolProfile) {
+func agentPoolProfileIndex(name string, profiles []api.AgentPoolProfile) int {
+	for i, profile := range profiles {
+		if profile.Name == name {
+			return i
+		}
+	}
+	return -1
+}
+
+func convertMasterPoolProfileAdmin(in admin.MasterPoolProfile, old *api.AgentPoolProfile) (out api.AgentPoolProfile) {
 	if old != nil {
 		out = *old
 	}
-	out.Name = string(AgentPoolProfileRoleMaster)
-	out.Role = AgentPoolProfileRoleMaster
-	out.OSType = OSTypeLinux
+	out.Name = string(api.AgentPoolProfileRoleMaster)
+	out.Role = api.AgentPoolProfileRoleMaster
+	out.OSType = api.OSTypeLinux
 	if in.Count != nil {
 		out.Count = *in.Count
 	}
 	if in.VMSize != nil {
-		out.VMSize = VMSize(*in.VMSize)
+		out.VMSize = api.VMSize(*in.VMSize)
 	}
 	if in.SubnetCIDR != nil {
 		out.SubnetCIDR = *in.SubnetCIDR
@@ -204,7 +223,7 @@ func convertMasterPoolProfileAdmin(in admin.MasterPoolProfile, old *AgentPoolPro
 	return
 }
 
-func convertAgentPoolProfileAdmin(in admin.AgentPoolProfile, old *AgentPoolProfile) (out AgentPoolProfile) {
+func convertAgentPoolProfileAdmin(in admin.AgentPoolProfile, old *api.AgentPoolProfile) (out api.AgentPoolProfile) {
 	if old != nil {
 		out = *old
 	}
@@ -215,27 +234,27 @@ func convertAgentPoolProfileAdmin(in admin.AgentPoolProfile, old *AgentPoolProfi
 		out.Count = *in.Count
 	}
 	if in.VMSize != nil {
-		out.VMSize = VMSize(*in.VMSize)
+		out.VMSize = api.VMSize(*in.VMSize)
 	}
 	if in.SubnetCIDR != nil {
 		out.SubnetCIDR = *in.SubnetCIDR
 	}
 	if in.OSType != nil {
-		out.OSType = OSType(*in.OSType)
+		out.OSType = api.OSType(*in.OSType)
 	}
 	if in.Role != nil {
-		out.Role = AgentPoolProfileRole(*in.Role)
+		out.Role = api.AgentPoolProfileRole(*in.Role)
 	}
 	return
 }
 
-func mergeAuthProfileAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) error {
+func mergeAuthProfileAdmin(oc *admin.OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) error {
 	if oc.Properties.AuthProfile == nil {
 		return nil
 	}
 
 	if cs.Properties.AuthProfile.IdentityProviders == nil && len(oc.Properties.AuthProfile.IdentityProviders) > 0 {
-		cs.Properties.AuthProfile.IdentityProviders = make([]IdentityProvider, 0, len(oc.Properties.AuthProfile.IdentityProviders))
+		cs.Properties.AuthProfile.IdentityProviders = make([]api.IdentityProvider, 0, len(oc.Properties.AuthProfile.IdentityProviders))
 	}
 
 	for _, ip := range oc.Properties.AuthProfile.IdentityProviders {
@@ -251,7 +270,7 @@ func mergeAuthProfileAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManag
 		} else {
 			provider := cs.Properties.AuthProfile.IdentityProviders[index].Provider
 			switch out := provider.(type) {
-			case (*AADIdentityProvider):
+			case (*api.AADIdentityProvider):
 				in := ip.Provider.(*admin.AADIdentityProvider)
 				if in.Kind != nil {
 					if out.Kind != "" && out.Kind != *in.Kind {
@@ -268,7 +287,16 @@ func mergeAuthProfileAdmin(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManag
 	return nil
 }
 
-func convertIdentityProviderAdmin(in admin.IdentityProvider, old *IdentityProvider) (out IdentityProvider) {
+func identityProviderIndex(name string, providers []api.IdentityProvider) int {
+	for i, provider := range providers {
+		if provider.Name == name {
+			return i
+		}
+	}
+	return -1
+}
+
+func convertIdentityProviderAdmin(in admin.IdentityProvider, old *api.IdentityProvider) (out api.IdentityProvider) {
 	if old != nil {
 		out = *old
 	}
@@ -278,9 +306,9 @@ func convertIdentityProviderAdmin(in admin.IdentityProvider, old *IdentityProvid
 	if in.Provider != nil {
 		switch provider := in.Provider.(type) {
 		case *admin.AADIdentityProvider:
-			p := &AADIdentityProvider{}
+			p := &api.AADIdentityProvider{}
 			if out.Provider != nil {
-				p = out.Provider.(*AADIdentityProvider)
+				p = out.Provider.(*api.AADIdentityProvider)
 			}
 			if provider.Kind != nil {
 				p.Kind = *provider.Kind
@@ -301,7 +329,7 @@ func convertIdentityProviderAdmin(in admin.IdentityProvider, old *IdentityProvid
 	return
 }
 
-func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster) {
+func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) {
 	in, out := oc.Config, &cs.Config
 
 	if in.PluginVersion != nil {
@@ -370,7 +398,7 @@ func mergeConfig(oc *admin.OpenShiftManagedCluster, cs *OpenShiftManagedCluster)
 	return
 }
 
-func mergeComponentLogLevel(in *admin.ComponentLogLevel, out *ComponentLogLevel) {
+func mergeComponentLogLevel(in *admin.ComponentLogLevel, out *api.ComponentLogLevel) {
 	if in.APIServer != nil {
 		out.APIServer = in.APIServer
 	}
@@ -382,7 +410,7 @@ func mergeComponentLogLevel(in *admin.ComponentLogLevel, out *ComponentLogLevel)
 	}
 }
 
-func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig) {
+func mergeCertificateConfig(in *admin.CertificateConfig, out *api.CertificateConfig) {
 	if in.EtcdCa != nil {
 		mergeCertKeyPair(in.EtcdCa, &out.EtcdCa)
 	}
@@ -458,7 +486,7 @@ func mergeCertificateConfig(in *admin.CertificateConfig, out *CertificateConfig)
 	return
 }
 
-func mergeCertKeyPair(in *admin.Certificate, out *CertKeyPair) {
+func mergeCertKeyPair(in *admin.Certificate, out *api.CertKeyPair) {
 	if in.Cert != nil {
 		out.Cert = in.Cert
 	}
@@ -466,13 +494,13 @@ func mergeCertKeyPair(in *admin.Certificate, out *CertKeyPair) {
 }
 
 // TODO: this is not a great semantic - revisit if this field is ever enabled for write
-func mergeCertKeyPairChain(in *admin.CertificateChain, out *CertKeyPairChain) {
+func mergeCertKeyPairChain(in *admin.CertificateChain, out *api.CertKeyPairChain) {
 	if in.Certs != nil {
 		out.Certs = in.Certs
 	}
 }
 
-func mergeImageConfig(in *admin.ImageConfig, out *ImageConfig) {
+func mergeImageConfig(in *admin.ImageConfig, out *api.ImageConfig) {
 	if in.Format != nil {
 		out.Format = *in.Format
 	}

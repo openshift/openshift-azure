@@ -1,12 +1,13 @@
-package api
+package converter
 
 import (
+	"github.com/openshift/openshift-azure/pkg/api"
 	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
 )
 
 // ConvertToV20180930preview converts from an OpenShiftManagedCluster to a
 // v20180930preview.OpenShiftManagedCluster.
-func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.OpenShiftManagedCluster {
+func ConvertToV20180930preview(cs *api.OpenShiftManagedCluster) *v20180930preview.OpenShiftManagedCluster {
 	oc := &v20180930preview.OpenShiftManagedCluster{
 		ID:       &cs.ID,
 		Location: &cs.Location,
@@ -57,7 +58,7 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 		app := cs.Properties.AgentPoolProfiles[i]
 		vmSize := v20180930preview.VMSize(app.VMSize)
 
-		if app.Role == AgentPoolProfileRoleMaster {
+		if app.Role == api.AgentPoolProfileRoleMaster {
 			oc.Properties.MasterPoolProfile = &v20180930preview.MasterPoolProfile{
 				Count:      &app.Count,
 				VMSize:     &vmSize,
@@ -84,7 +85,7 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 		ip := cs.Properties.AuthProfile.IdentityProviders[i]
 		oc.Properties.AuthProfile.IdentityProviders[i].Name = &ip.Name
 		switch provider := ip.Provider.(type) {
-		case (*AADIdentityProvider):
+		case (*api.AADIdentityProvider):
 			oc.Properties.AuthProfile.IdentityProviders[i].Provider = &v20180930preview.AADIdentityProvider{
 				Kind:                 &provider.Kind,
 				ClientID:             &provider.ClientID,

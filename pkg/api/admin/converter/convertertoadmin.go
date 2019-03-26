@@ -1,11 +1,12 @@
 package api
 
 import (
+	"github.com/openshift/openshift-azure/pkg/api"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
 )
 
 // ConvertToAdmin converts the config representation for the admin API
-func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster {
+func ConvertToAdmin(cs *api.OpenShiftManagedCluster) *admin.OpenShiftManagedCluster {
 	oc := &admin.OpenShiftManagedCluster{
 		ID:       &cs.ID,
 		Location: &cs.Location,
@@ -57,7 +58,7 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 		app := cs.Properties.AgentPoolProfiles[i]
 		vmSize := admin.VMSize(app.VMSize)
 
-		if app.Role == AgentPoolProfileRoleMaster {
+		if app.Role == api.AgentPoolProfileRoleMaster {
 			oc.Properties.MasterPoolProfile = &admin.MasterPoolProfile{
 				Count:      &app.Count,
 				VMSize:     &vmSize,
@@ -84,7 +85,7 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 		ip := cs.Properties.AuthProfile.IdentityProviders[i]
 		oc.Properties.AuthProfile.IdentityProviders[i].Name = &ip.Name
 		switch provider := ip.Provider.(type) {
-		case *AADIdentityProvider:
+		case *api.AADIdentityProvider:
 			oc.Properties.AuthProfile.IdentityProviders[i].Provider = &admin.AADIdentityProvider{
 				Kind:                 &provider.Kind,
 				ClientID:             &provider.ClientID,
@@ -102,7 +103,7 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 	return oc
 }
 
-func convertConfigToAdmin(cs *Config) *admin.Config {
+func convertConfigToAdmin(cs *api.Config) *admin.Config {
 	return &admin.Config{
 		PluginVersion:                        &cs.PluginVersion,
 		ComponentLogLevel:                    convertComponentLogLevelToAdmin(cs.ComponentLogLevel),
@@ -128,7 +129,7 @@ func convertConfigToAdmin(cs *Config) *admin.Config {
 	}
 }
 
-func convertComponentLogLevelToAdmin(in ComponentLogLevel) *admin.ComponentLogLevel {
+func convertComponentLogLevelToAdmin(in api.ComponentLogLevel) *admin.ComponentLogLevel {
 	return &admin.ComponentLogLevel{
 		APIServer:         in.APIServer,
 		ControllerManager: in.ControllerManager,
@@ -136,7 +137,7 @@ func convertComponentLogLevelToAdmin(in ComponentLogLevel) *admin.ComponentLogLe
 	}
 }
 
-func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateConfig {
+func convertCertificateConfigToAdmin(in api.CertificateConfig) *admin.CertificateConfig {
 	return &admin.CertificateConfig{
 		EtcdCa:               convertCertKeyPairToAdmin(in.EtcdCa),
 		Ca:                   convertCertKeyPairToAdmin(in.Ca),
@@ -165,19 +166,19 @@ func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateCon
 	}
 }
 
-func convertCertKeyPairToAdmin(in CertKeyPair) *admin.Certificate {
+func convertCertKeyPairToAdmin(in api.CertKeyPair) *admin.Certificate {
 	return &admin.Certificate{
 		Cert: in.Cert,
 	}
 }
 
-func convertCertKeyPairChainToAdmin(in CertKeyPairChain) *admin.CertificateChain {
+func convertCertKeyPairChainToAdmin(in api.CertKeyPairChain) *admin.CertificateChain {
 	return &admin.CertificateChain{
 		Certs: in.Certs,
 	}
 }
 
-func convertImageConfigToAdmin(in ImageConfig) *admin.ImageConfig {
+func convertImageConfigToAdmin(in api.ImageConfig) *admin.ImageConfig {
 	return &admin.ImageConfig{
 		Format:                    &in.Format,
 		ClusterMonitoringOperator: &in.ClusterMonitoringOperator,
