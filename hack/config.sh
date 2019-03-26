@@ -26,8 +26,8 @@ get-config)
 
     export AZURE_STORAGE_ACCOUNT=$(az storage account list --subscription $AZURE_SUBSCRIPTION_ID -g $2 | jq '.[] | select(.tags.type == "config") | .name ' | tr -d '"')
     export AZURE_STORAGE_KEY=$(az storage account keys list --subscription $AZURE_SUBSCRIPTION_ID -n $AZURE_STORAGE_ACCOUNT -g $2 --query '[0].value' | tr -d '"')
-    az storage blob download --subscription $AZURE_SUBSCRIPTION_ID --file $OSACONFIG/sync -c config -n sync --no-progress >/dev/null
-    cat $OSACONFIG/sync
+    az storage blob download --subscription $AZURE_SUBSCRIPTION_ID --file $OSACONFIG/master-startup -c config -n master-startup --no-progress >/dev/null
+    cat $OSACONFIG/master-startup
     ;;
 
 *)
