@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 
+	csbv1beta1 "github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
+	csbv1beta1client "github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
 	oappsv1 "github.com/openshift/api/apps/v1"
 	templatev1 "github.com/openshift/api/template/v1"
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
@@ -76,6 +78,34 @@ func CheckCustomResourceDefinitionIsReady(cli kapiextensionsv1beta1client.Custom
 		}
 
 		return CustomResourceDefinitionIsReady(crd), nil
+	}
+}
+
+// ClusterServiceBrokerIsReady returns true if a ClusterServiceBroker is
+// considered ready
+func ClusterServiceBrokerIsReady(csb *csbv1beta1.ClusterServiceBroker) bool {
+	for _, cond := range csb.Status.Conditions {
+		if cond.Status == csbv1beta1.ConditionTrue {
+			return true
+		}
+	}
+
+	return false
+}
+
+// CheckClusterServiceBrokerIsReady returns a function which polls a
+// CheckClusterServiceBroker and returns its readiness
+func CheckClusterServiceBrokerIsReady(cli csbv1beta1client.ClusterServiceBrokerInterface, name string) func() (bool, error) {
+	return func() (bool, error) {
+		csb, err := cli.Get(name, metav1.GetOptions{})
+		switch {
+		case errors.IsNotFound(err):
+			return false, nil
+		case err != nil:
+			return false, err
+		}
+
+		return ClusterServiceBrokerIsReady(csb), nil
 	}
 }
 

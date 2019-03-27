@@ -1,6 +1,7 @@
 package openshift
 
 import (
+	servicecatalogv1beta1client "github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	buildv1client "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
 	networkv1client "github.com/openshift/client-go/network/clientset/versioned/typed/network/v1"
@@ -8,6 +9,7 @@ import (
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
 	userv1client "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
+	"k8s.io/client-go/discovery"
 	appsv1client "k8s.io/client-go/kubernetes/typed/apps/v1"
 	authorizationv1client "k8s.io/client-go/kubernetes/typed/authorization/v1"
 	batchv1client "k8s.io/client-go/kubernetes/typed/batch/v1"
@@ -22,13 +24,16 @@ import (
 )
 
 type Client struct {
-	AppsV1          appsv1client.AppsV1Interface
-	AuthorizationV1 authorizationv1client.AuthorizationV1Interface
-	CoreV1          corev1client.CoreV1Interface
-	BatchV1         batchv1client.BatchV1Interface
-	NetworkV1       networkv1client.NetworkV1Interface
-	PolicyV1beta1   policyv1beta1client.PolicyV1beta1Interface
-	RbacV1          rbacv1client.RbacV1Interface
+	config                *rest.Config
+	Discovery             discovery.DiscoveryInterface
+	AppsV1                appsv1client.AppsV1Interface
+	AuthorizationV1       authorizationv1client.AuthorizationV1Interface
+	CoreV1                corev1client.CoreV1Interface
+	BatchV1               batchv1client.BatchV1Interface
+	NetworkV1             networkv1client.NetworkV1Interface
+	PolicyV1beta1         policyv1beta1client.PolicyV1beta1Interface
+	RbacV1                rbacv1client.RbacV1Interface
+	ServicecatalogV1beta1 servicecatalogv1beta1client.ServicecatalogV1beta1Interface
 
 	OAppsV1    oappsv1client.AppsV1Interface
 	BuildV1    buildv1client.BuildV1Interface
@@ -40,13 +45,16 @@ type Client struct {
 
 func newClientFromRestConfig(config *rest.Config) *Client {
 	return &Client{
-		AppsV1:          appsv1client.NewForConfigOrDie(config),
-		AuthorizationV1: authorizationv1client.NewForConfigOrDie(config),
-		CoreV1:          corev1client.NewForConfigOrDie(config),
-		NetworkV1:       networkv1client.NewForConfigOrDie(config),
-		PolicyV1beta1:   policyv1beta1client.NewForConfigOrDie(config),
-		RbacV1:          rbacv1client.NewForConfigOrDie(config),
-		BatchV1:         batchv1client.NewForConfigOrDie(config),
+		config:                config,
+		Discovery:             discovery.NewDiscoveryClientForConfigOrDie(config),
+		AppsV1:                appsv1client.NewForConfigOrDie(config),
+		AuthorizationV1:       authorizationv1client.NewForConfigOrDie(config),
+		CoreV1:                corev1client.NewForConfigOrDie(config),
+		NetworkV1:             networkv1client.NewForConfigOrDie(config),
+		PolicyV1beta1:         policyv1beta1client.NewForConfigOrDie(config),
+		RbacV1:                rbacv1client.NewForConfigOrDie(config),
+		BatchV1:               batchv1client.NewForConfigOrDie(config),
+		ServicecatalogV1beta1: servicecatalogv1beta1client.NewForConfigOrDie(config),
 
 		OAppsV1:    oappsv1client.NewForConfigOrDie(config),
 		BuildV1:    buildv1client.NewForConfigOrDie(config),
