@@ -1,6 +1,7 @@
 #!/bin/bash -ex
 
-export RESOURCEGROUP=e2e-$(cat /dev/urandom | tr -dc 'a-z' | fold -w 6 | head -n 1)
+prdetail="$(python -c 'import json, os; o=json.loads(os.environ["CLONEREFS_OPTIONS"]); print "%s-%s-" % (o["refs"][0]["pulls"][0]["author"].lower(), o["refs"][0]["pulls"][0]["number"])' 2>/dev/null || true)"
+export RESOURCEGROUP="e2e-$prdetail$(cat /dev/urandom | tr -dc 'a-z' | fold -w 6 | head -n 1)"
 
 cd $GOPATH/src/github.com/openshift/openshift-azure
 
