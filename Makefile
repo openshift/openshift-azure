@@ -25,6 +25,9 @@ all: $(ALL_BINARIES)
 version:
 	echo ${TAG}
 
+confirm:
+	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} == y ]
+
 clean:
 	rm -f coverage.out $(ALL_BINARIES) releasenotes
 
@@ -45,6 +48,22 @@ upgrade:
 
 artifacts:
 	./hack/artifacts.sh
+
+download-secrets: confirm
+	oc extract secret/cluster-secrets-azure --to=./secrets --confirm -n azure
+
+upload-secrets: confirm
+	oc create secret generic cluster-secrets-azure \
+	--from-file=./secrets/certs.yaml \
+	--from-file=./secrets/logging-int.cert \
+	--from-file=./secrets/metrics-int.cert \
+	--from-file=./secrets/secret \
+	--from-file=./secrets/system-docker-config.json \
+	--from-file=./secrets/.dockerconfigjson \
+	--from-file=./secrets/logging-int.key \
+	--from-file=./secrets/metrics-int.key \
+	--from-file=./secrets/ssh-privatekey \
+	--dry-run -o yaml | oc apply -n azure -f - 
 
 azure-controllers: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
