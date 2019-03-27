@@ -15,9 +15,9 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
-	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30/api"
-	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
+	admin "github.com/openshift/openshift-azure/pkg/api/admin"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 )
 

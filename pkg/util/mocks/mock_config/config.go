@@ -9,7 +9,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 
-	api "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	plugin "github.com/openshift/openshift-azure/pkg/api/plugin"
 )
 
 // MockInterface is a mock of Interface interface
@@ -36,7 +36,7 @@ func (m *MockInterface) EXPECT() *MockInterfaceMockRecorder {
 }
 
 // Generate mocks base method
-func (m *MockInterface) Generate(template *api.Config) error {
+func (m *MockInterface) Generate(template *plugin.Config) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Generate", template)
 	ret0, _ := ret[0].(error)

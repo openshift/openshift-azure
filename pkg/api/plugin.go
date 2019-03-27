@@ -3,8 +3,6 @@ package api
 
 import (
 	"context"
-
-	adminapi "github.com/openshift/openshift-azure/pkg/api/admin/api"
 )
 
 // ContextKey is a type for context property bag payload keys
@@ -140,7 +138,7 @@ type GenevaActions interface {
 	ForceUpdate(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
 
 	// ListClusterVMs returns the hostnames of all vms in a cluster
-	ListClusterVMs(ctx context.Context, cs *OpenShiftManagedCluster) (*adminapi.GenevaActionListClusterVMs, error)
+	ListClusterVMs(ctx context.Context, cs *OpenShiftManagedCluster) (*GenevaActionListClusterVMs, error)
 
 	// Reimage reimages a virtual machine in the cluster
 	Reimage(ctx context.Context, oc *OpenShiftManagedCluster, hostname string) error
@@ -152,5 +150,5 @@ type GenevaActions interface {
 	RunCommand(ctx context.Context, cs *OpenShiftManagedCluster, hostname string, command Command) error
 
 	// GetPluginVersion fetches the RP plugin version
-	GetPluginVersion(ctx context.Context) *adminapi.GenevaActionPluginVersion
+	GetPluginVersion(ctx context.Context) *GenevaActionPluginVersion
 }

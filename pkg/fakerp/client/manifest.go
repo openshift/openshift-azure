@@ -7,8 +7,8 @@ import (
 
 	"github.com/ghodss/yaml"
 
-	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30/api"
-	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
+	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
+	admin "github.com/openshift/openshift-azure/pkg/api/admin"
 	utiltemplate "github.com/openshift/openshift-azure/pkg/util/template"
 )
 

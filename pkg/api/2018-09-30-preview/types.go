@@ -1,22 +1,26 @@
-package api
+package v20180930preview
+
+import (
+	"github.com/Azure/go-autorest/autorest"
+)
 
 const (
 	// APIVersion is the version of this API
-	APIVersion = "internal"
+	APIVersion = "2018-09-30-preview"
 )
 
 // OpenShiftManagedCluster complies with the ARM model of resource definition in
 // a JSON template.
 type OpenShiftManagedCluster struct {
-	Plan       *ResourcePurchasePlan `json:"plan,omitempty"`
-	Properties Properties            `json:"properties,omitempty"`
-	ID         string                `json:"id,omitempty"`
-	Name       string                `json:"name,omitempty"`
-	Type       string                `json:"type,omitempty"`
-	Location   string                `json:"location,omitempty"`
-	Tags       map[string]string     `json:"tags"`
+	autorest.Response `json:"-"`
 
-	Config Config `json:"config,omitempty"`
+	Plan       *ResourcePurchasePlan `json:"plan,omitempty"`
+	Properties *Properties           `json:"properties,omitempty"`
+	ID         *string               `json:"id,omitempty"`
+	Name       *string               `json:"name,omitempty"`
+	Type       *string               `json:"type,omitempty"`
+	Location   *string               `json:"location,omitempty"`
+	Tags       map[string]*string    `json:"tags"`
 }
 
 // ResourcePurchasePlan defines the resource plan as required by ARM for billing
@@ -31,44 +35,36 @@ type ResourcePurchasePlan struct {
 // Properties represents the cluster definition.
 type Properties struct {
 	// ProvisioningState (out): current state of the OSA resource.
-	ProvisioningState ProvisioningState `json:"provisioningState,omitempty"`
+	ProvisioningState *ProvisioningState `json:"provisioningState,omitempty"`
 
 	// OpenShiftVersion (in): OpenShift version to be created/updated, e.g.
 	// `v3.11`.
-	OpenShiftVersion string `json:"openShiftVersion,omitempty"`
+	OpenShiftVersion *string `json:"openShiftVersion,omitempty"`
 
 	// ClusterVersion (out): RP version at which cluster was last
 	// created/updated
-	ClusterVersion string `json:"clusterVersion,omitempty"`
+	ClusterVersion *string `json:"clusterVersion,omitempty"`
 
 	// PublicHostname (out): public hostname of OpenShift API server.
-	PublicHostname string `json:"publicHostname,omitempty"`
+	PublicHostname *string `json:"publicHostname,omitempty"`
 
 	// FQDN (out): Auto-allocated internal FQDN for OpenShift API server.
-	FQDN string `json:"fqdn,omitempty"`
+	FQDN *string `json:"fqdn,omitempty"`
 
 	// NetworkProfile (in): Configuration for OpenShift networking.
-	NetworkProfile NetworkProfile `json:"networkProfile,omitempty"`
+	NetworkProfile *NetworkProfile `json:"networkProfile,omitempty"`
 
 	// RouterProfiles (in,optional/out): Configuration for OpenShift router(s).
 	RouterProfiles []RouterProfile `json:"routerProfiles,omitempty"`
+
+	// MasterPoolProfile (in): Configuration for OpenShift master VMs.
+	MasterPoolProfile *MasterPoolProfile `json:"masterPoolProfile,omitempty"`
 
 	// AgentPoolProfiles (in): configuration of OpenShift cluster VMs.
 	AgentPoolProfiles []AgentPoolProfile `json:"agentPoolProfiles,omitempty"`
 
 	// AuthProfile (in): configures OpenShift authentication
-	AuthProfile AuthProfile `json:"authProfile,omitempty"`
-
-	// MasterServicePrincipalProfile service principle used on the masters
-	MasterServicePrincipalProfile ServicePrincipalProfile `json:"masterServicePrincipalProfile,omitempty"`
-
-	// WorkerServicePrincipalProfile service principle used on the nodes
-	WorkerServicePrincipalProfile ServicePrincipalProfile `json:"workerServicePrincipalProfile,omitempty"`
-
-	AzProfile AzProfile `json:"azProfile,omitempty"`
-
-	// APICertProfile (in, optional): configures OpenShift API certificate
-	APICertProfile CertProfile `json:"apiCertProfile,omitempty"`
+	AuthProfile *AuthProfile `json:"authProfile,omitempty"`
 }
 
 // ProvisioningState represents the current state of the OSA resource.
@@ -97,10 +93,10 @@ const (
 // NetworkProfile contains configuration for OpenShift networking.
 type NetworkProfile struct {
 	// VnetCIDR (in): the CIDR with which the OSA cluster's Vnet is configured
-	VnetCIDR string `json:"vnetCidr,omitempty"`
+	VnetCIDR *string `json:"vnetCidr,omitempty"`
 
 	// VnetID (out): the ID of the Vnet created for the OSA cluster
-	VnetID string `json:"vnetId,omitempty"`
+	VnetID *string `json:"vnetId,omitempty"`
 
 	// PeerVnetID (in, optional): ID of a Vnet with which the OSA cluster Vnet should be peered.
 	// If specified, this should match
@@ -113,35 +109,33 @@ type NetworkProfile struct {
 
 // RouterProfile represents an OpenShift router.
 type RouterProfile struct {
-	Name string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty"`
 
 	// PublicSubdomain (out): DNS subdomain for OpenShift router.  The OpenShift
 	// master is configured with the PublicSubdomain of the "default"
 	// RouterProfile.
-	PublicSubdomain string `json:"publicSubdomain,omitempty"`
+	PublicSubdomain *string `json:"publicSubdomain,omitempty"`
 
 	// FQDN (out): Auto-allocated internal FQDN for the OpenShift router.
-	FQDN string `json:"fqdn,omitempty"`
-
-	// RouterCertProfile (in, optional): configures OpenShift Router certificate
-	RouterCertProfile CertProfile `json:"routerCertProfile,omitempty"`
+	FQDN *string `json:"fqdn,omitempty"`
 }
 
-// CertProfile contains the vault location for OpenShift certificates.
-type CertProfile struct {
-	// KeyVaultSecretURL (in, optional): the customer secret URL
-	KeyVaultSecretURL string `json:"keyVaultSecretURL,omitempty"`
+// MasterPoolProfile contains configuration for OpenShift master VMs.
+type MasterPoolProfile struct {
+	Count      *int64  `json:"count,omitempty"`
+	VMSize     *VMSize `json:"vmSize,omitempty"`
+	SubnetCIDR *string `json:"subnetCidr,omitempty"`
 }
 
 // AgentPoolProfile represents configuration of OpenShift cluster VMs.
 type AgentPoolProfile struct {
-	Name       string `json:"name,omitempty"`
-	Count      int64  `json:"count,omitempty"`
-	VMSize     VMSize `json:"vmSize,omitempty"`
-	SubnetCIDR string `json:"subnetCidr,omitempty"`
-	OSType     OSType `json:"osType,omitempty"`
+	Name       *string `json:"name,omitempty"`
+	Count      *int64  `json:"count,omitempty"`
+	VMSize     *VMSize `json:"vmSize,omitempty"`
+	SubnetCIDR *string `json:"subnetCidr,omitempty"`
+	OSType     *OSType `json:"osType,omitempty"`
 
-	Role AgentPoolProfileRole `json:"role,omitempty"`
+	Role *AgentPoolProfileRole `json:"role,omitempty"`
 }
 
 // OSType represents the OS type of VMs in an AgentPool.
@@ -162,8 +156,6 @@ const (
 	AgentPoolProfileRoleCompute AgentPoolProfileRole = "compute"
 	// AgentPoolProfileRoleInfra is the infra role.
 	AgentPoolProfileRoleInfra AgentPoolProfileRole = "infra"
-	// AgentPoolProfileRoleMaster is the master role.
-	AgentPoolProfileRoleMaster AgentPoolProfileRole = "master"
 )
 
 // VMSize represents supported VMSizes
@@ -199,43 +191,17 @@ type AuthProfile struct {
 // IdentityProvider is heavily cut down equivalent to IdentityProvider in the
 // upstream.
 type IdentityProvider struct {
-	Name     string      `json:"name,omitempty"`
+	Name     *string     `json:"name,omitempty"`
 	Provider interface{} `json:"provider,omitempty"`
 }
 
 // AADIdentityProvider defines Identity provider for MS AAD.  It is based on
 // OpenID IdentityProvider.
 type AADIdentityProvider struct {
-	Kind     string `json:"kind,omitempty"`
-	ClientID string `json:"clientId,omitempty"`
-	Secret   string `json:"secret,omitempty"`
-	TenantID string `json:"tenantId,omitempty"`
+	Kind     *string `json:"kind,omitempty"`
+	ClientID *string `json:"clientId,omitempty"`
+	Secret   *string `json:"secret,omitempty"`
+	TenantID *string `json:"tenantId,omitempty"`
 	// CustomerAdminGroupID group memberships will get synced into the OpenShift group "osa-customer-admins"
 	CustomerAdminGroupID *string `json:"customerAdminGroupId,omitempty"`
-}
-
-// ServicePrincipalProfile contains the client and secret used by the cluster
-// for Azure Resource CRUD.
-type ServicePrincipalProfile struct {
-	ClientID string `json:"clientId,omitempty"`
-	Secret   string `json:"secret,omitempty"`
-}
-
-// AzProfile holds the azure context for where the cluster resides
-type AzProfile struct {
-	TenantID       string `json:"tenantId,omitempty"`
-	SubscriptionID string `json:"subscriptionId,omitempty"`
-	ResourceGroup  string `json:"resourceGroup,omitempty"`
-}
-
-// GenevaActionPluginVersion is the struct returned by the GetPluginVersion
-// Geneva action API
-type GenevaActionPluginVersion struct {
-	PluginVersion *string `json:"pluginVersion,omitempty"`
-}
-
-// GenevaActionListClusterVMs is the struct returned by the ListClusterVMs
-// Geneva action API
-type GenevaActionListClusterVMs struct {
-	VMs *[]string `json:"vms,omitempty"`
 }

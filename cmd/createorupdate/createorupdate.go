@@ -20,8 +20,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30/api"
-	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
+	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
+	admin "github.com/openshift/openshift-azure/pkg/api/admin"
 	fakerp "github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/aadapp"

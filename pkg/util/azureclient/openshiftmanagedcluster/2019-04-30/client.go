@@ -9,7 +9,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/validation"
 
-	"github.com/openshift/openshift-azure/pkg/api/2019-04-30/api"
+	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 )
 
 const (
@@ -71,7 +71,7 @@ type OpenShiftManagedClustersUpdateTagsFuture struct {
 
 // Result returns the result of the asynchronous operation.
 // If the operation has not completed it will return an error.
-func (future *OpenShiftManagedClustersUpdateTagsFuture) Result(client OpenShiftManagedClustersClient) (osmc api.OpenShiftManagedCluster, err error) {
+func (future *OpenShiftManagedClustersUpdateTagsFuture) Result(client OpenShiftManagedClustersClient) (osmc v20190430.OpenShiftManagedCluster, err error) {
 	var done bool
 	done, err = future.Done(client)
 	if err != nil {
@@ -109,7 +109,7 @@ func NewOpenShiftManagedClustersClientWithBaseURI(baseURI string, subscriptionID
 
 // CreateOrUpdateAndWait creates or updates a openshift managed cluster and waits for the
 // request to complete before returning.
-func (client OpenShiftManagedClustersClient) CreateOrUpdateAndWait(ctx context.Context, resourceGroupName, resourceName string, parameters api.OpenShiftManagedCluster) (osmc api.OpenShiftManagedCluster, err error) {
+func (client OpenShiftManagedClustersClient) CreateOrUpdateAndWait(ctx context.Context, resourceGroupName, resourceName string, parameters v20190430.OpenShiftManagedCluster) (osmc v20190430.OpenShiftManagedCluster, err error) {
 	var future OpenShiftManagedClustersCreateOrUpdateFuture
 	future, err = client.CreateOrUpdate(ctx, resourceGroupName, resourceName, parameters)
 	if err != nil {
@@ -127,7 +127,7 @@ func (client OpenShiftManagedClustersClient) CreateOrUpdateAndWait(ctx context.C
 // resourceGroupName - the name of the resource group.
 // resourceName - the name of the openshift managed cluster resource.
 // parameters - parameters supplied to the Create or Update an OpenShift Managed Cluster operation.
-func (client OpenShiftManagedClustersClient) CreateOrUpdate(ctx context.Context, resourceGroupName, resourceName string, parameters api.OpenShiftManagedCluster) (result OpenShiftManagedClustersCreateOrUpdateFuture, err error) {
+func (client OpenShiftManagedClustersClient) CreateOrUpdate(ctx context.Context, resourceGroupName, resourceName string, parameters v20190430.OpenShiftManagedCluster) (result OpenShiftManagedClustersCreateOrUpdateFuture, err error) {
 	if err := validation.Validate([]validation.Validation{
 		{TargetValue: parameters,
 			Constraints: []validation.Constraint{{Target: "parameters.Properties", Name: validation.Null, Rule: false}}}}); err != nil {
@@ -150,7 +150,7 @@ func (client OpenShiftManagedClustersClient) CreateOrUpdate(ctx context.Context,
 }
 
 // CreateOrUpdatePreparer prepares the CreateOrUpdate request.
-func (client OpenShiftManagedClustersClient) CreateOrUpdatePreparer(ctx context.Context, resourceGroupName string, resourceName string, parameters api.OpenShiftManagedCluster) (*http.Request, error) {
+func (client OpenShiftManagedClustersClient) CreateOrUpdatePreparer(ctx context.Context, resourceGroupName string, resourceName string, parameters v20190430.OpenShiftManagedCluster) (*http.Request, error) {
 	pathParameters := map[string]interface{}{
 		"resourceGroupName": autorest.Encode("path", resourceGroupName),
 		"resourceName":      autorest.Encode("path", resourceName),
@@ -158,7 +158,7 @@ func (client OpenShiftManagedClustersClient) CreateOrUpdatePreparer(ctx context.
 	}
 
 	queryParameters := map[string]interface{}{
-		"api-version": api.APIVersion,
+		"api-version": v20190430.APIVersion,
 	}
 
 	preparer := autorest.CreatePreparer(
@@ -190,7 +190,7 @@ func (client OpenShiftManagedClustersClient) CreateOrUpdateSender(req *http.Requ
 
 // CreateOrUpdateResponder handles the response to the CreateOrUpdate request. The method always
 // closes the http.Response Body.
-func (client OpenShiftManagedClustersClient) CreateOrUpdateResponder(resp *http.Response) (result api.OpenShiftManagedCluster, err error) {
+func (client OpenShiftManagedClustersClient) CreateOrUpdateResponder(resp *http.Response) (result v20190430.OpenShiftManagedCluster, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
@@ -230,7 +230,7 @@ func (client OpenShiftManagedClustersClient) DeletePreparer(ctx context.Context,
 	}
 
 	queryParameters := map[string]interface{}{
-		"api-version": api.APIVersion,
+		"api-version": v20190430.APIVersion,
 	}
 
 	preparer := autorest.CreatePreparer(
@@ -274,7 +274,7 @@ func (client OpenShiftManagedClustersClient) DeleteResponder(resp *http.Response
 // Parameters:
 // resourceGroupName - the name of the resource group.
 // resourceName - the name of the openshift managed cluster resource.
-func (client OpenShiftManagedClustersClient) Get(ctx context.Context, resourceGroupName string, resourceName string) (result api.OpenShiftManagedCluster, err error) {
+func (client OpenShiftManagedClustersClient) Get(ctx context.Context, resourceGroupName string, resourceName string) (result v20190430.OpenShiftManagedCluster, err error) {
 	req, err := client.GetPreparer(ctx, resourceGroupName, resourceName)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "containerservice.OpenShiftManagedClustersClient", "Get", nil, "Failure preparing request")
@@ -305,7 +305,7 @@ func (client OpenShiftManagedClustersClient) GetPreparer(ctx context.Context, re
 	}
 
 	queryParameters := map[string]interface{}{
-		"api-version": api.APIVersion,
+		"api-version": v20190430.APIVersion,
 	}
 
 	preparer := autorest.CreatePreparer(
@@ -325,7 +325,7 @@ func (client OpenShiftManagedClustersClient) GetSender(req *http.Request) (*http
 
 // GetResponder handles the response to the Get request. The method always
 // closes the http.Response Body.
-func (client OpenShiftManagedClustersClient) GetResponder(resp *http.Response) (result api.OpenShiftManagedCluster, err error) {
+func (client OpenShiftManagedClustersClient) GetResponder(resp *http.Response) (result v20190430.OpenShiftManagedCluster, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
@@ -366,7 +366,7 @@ func (client OpenShiftManagedClustersClient) UpdateTagsPreparer(ctx context.Cont
 	}
 
 	queryParameters := map[string]interface{}{
-		"api-version": api.APIVersion,
+		"api-version": v20190430.APIVersion,
 	}
 
 	preparer := autorest.CreatePreparer(
@@ -398,7 +398,7 @@ func (client OpenShiftManagedClustersClient) UpdateTagsSender(req *http.Request)
 
 // UpdateTagsResponder handles the response to the UpdateTags request. The method always
 // closes the http.Response Body.
-func (client OpenShiftManagedClustersClient) UpdateTagsResponder(resp *http.Response) (result api.OpenShiftManagedCluster, err error) {
+func (client OpenShiftManagedClustersClient) UpdateTagsResponder(resp *http.Response) (result v20190430.OpenShiftManagedCluster, err error) {
 	err = autorest.Respond(
 		resp,
 		client.ByInspecting(),
@@ -417,7 +417,7 @@ type OpenShiftManagedClustersCreateOrUpdateFuture struct {
 
 // Result returns the result of the asynchronous operation.
 // If the operation has not completed it will return an error.
-func (future *OpenShiftManagedClustersCreateOrUpdateFuture) Result(client OpenShiftManagedClustersClient) (osmc api.OpenShiftManagedCluster, err error) {
+func (future *OpenShiftManagedClustersCreateOrUpdateFuture) Result(client OpenShiftManagedClustersClient) (osmc v20190430.OpenShiftManagedCluster, err error) {
 	var done bool
 	done, err = future.Done(client)
 	if err != nil {

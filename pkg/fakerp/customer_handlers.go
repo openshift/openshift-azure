@@ -15,10 +15,8 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
-	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30/api"
-	v20190430converter "github.com/openshift/openshift-azure/pkg/api/2019-04-30/converter"
-	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
-	adminconverter "github.com/openshift/openshift-azure/pkg/api/admin/converter"
+	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
+	admin "github.com/openshift/openshift-azure/pkg/api/admin"
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
@@ -127,13 +125,13 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		var oc *admin.OpenShiftManagedCluster
 		oc, err = s.readAdminRequest(req.Body)
 		if err == nil {
-			cs, err = adminconverter.ConvertFromAdmin(oc, oldCs)
+			cs, err = admin.ConvertFromAdmin(oc, oldCs)
 		}
 	} else {
 		var oc *v20190430.OpenShiftManagedCluster
 		oc, err = s.read20190430Request(req.Body)
 		if err == nil {
-			cs, err = v20190430converter.ConvertFromv20190430(oc, oldCs)
+			cs, err = v20190430.ConvertFromv20190430(oc, oldCs)
 		}
 	}
 	if err != nil {
@@ -169,10 +167,10 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 	var res []byte
 	var err error
 	if strings.HasPrefix(req.URL.Path, "/admin") {
-		oc := adminconverter.ConvertToAdmin(cs)
+		oc := admin.ConvertToAdmin(cs)
 		res, err = json.Marshal(oc)
 	} else {
-		oc := v20190430converter.ConvertTov20190430(cs)
+		oc := v20190430.ConvertTov20190430(cs)
 		res, err = json.Marshal(oc)
 	}
 	if err != nil {

@@ -11,15 +11,14 @@ import (
 	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
-	pluginapiconverter "github.com/openshift/openshift-azure/pkg/api/plugin/converter"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/pkg/util/kubeconfig"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
 func (g *simpleGenerator) Generate(template *pluginapi.Config) (err error) {
-	config, err := pluginapiconverter.ConvertFromPlugin(template, &g.cs.Config, g.cs.Config.PluginVersion)
+	config, err := pluginapi.ConvertFromPlugin(template, &g.cs.Config, g.cs.Config.PluginVersion)
 	if err != nil {
 		return err
 	}
