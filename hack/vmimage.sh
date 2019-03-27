@@ -1,5 +1,17 @@
 #!/bin/bash -ex
 
+cleanup() {
+  set +e
+  if [[ -n "$NO_DELETE" ]]; then
+    return
+  fi
+
+  make artifacts
+  make delete
+  az group delete -g "$RESOURCEGROUP" --yes --no-wait
+}
+trap cleanup EXIT
+
 COMMIT=$(git rev-parse --short HEAD)
 if [[ $(git status --porcelain) = "" ]]; then
   COMMIT="$COMMIT-clean"
@@ -15,8 +27,6 @@ go run -ldflags "-X main.gitCommit=$COMMIT" ./cmd/vmimage -imageResourceGroup "$
 
 export AZURE_REGION=eastus
 export RESOURCEGROUP="${IMAGE_RESOURCENAME//./}-e2e"
-
-trap '[[ -z "$NO_DELETE" ]] && make artifacts; make delete' EXIT
 
 make create
 

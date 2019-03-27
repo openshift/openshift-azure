@@ -11,6 +11,7 @@ cleanup() {
     stop_monitoring
     make artifacts
     make delete
+    az group delete -g "$RESOURCEGROUP" --yes --no-wait
 
     if [[ -n "$T" ]]; then
         rm -rf "$T"
