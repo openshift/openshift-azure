@@ -101,6 +101,7 @@ func TestConvertFromPlugin(t *testing.T) {
 	// prepare external type
 	var external plugin.Config
 	populate.Walk(&external, func(v reflect.Value) {})
+	external.PluginVersion = "should not be copied"
 	// prepare internal type
 	internal := internalPluginConfig()
 	output, _ := ConvertFromPlugin(&external, &internal, "Versions.key")

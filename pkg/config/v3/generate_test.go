@@ -28,7 +28,7 @@ func TestGenerate(t *testing.T) {
 	var template *pluginapi.Config
 	populate.Walk(&template, prepare)
 
-	cg := simpleGenerator{cs: cs}
+	cg := simpleGenerator{cs: cs, runningUnderTest: true}
 	err := cg.Generate(template)
 	if err != nil {
 		t.Fatal(err)
@@ -122,6 +122,7 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 
 	assert(len(c.SessionSecretAuth) != 0, "SessionSecretAuth")
 	assert(len(c.SessionSecretEnc) != 0, "SessionSecretEnc")
+	assert(c.DeprecatedRunningUnderTest, "DeprecatedRunningUnderTest")
 	assert(len(c.RegistryHTTPSecret) != 0, "RegistryHTTPSecret")
 	assert(len(c.AlertManagerProxySessionSecret) != 0, "AlertManagerProxySessionSecret")
 	assert(len(c.AlertsProxySessionSecret) != 0, "AlertsProxySessionSecret")

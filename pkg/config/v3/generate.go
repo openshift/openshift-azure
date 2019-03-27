@@ -371,6 +371,8 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config) (err error) {
 		}
 	}
 
+	c.DeprecatedRunningUnderTest = g.runningUnderTest
+
 	if c.SSHKey == nil {
 		if c.SSHKey, err = tls.NewPrivateKey(); err != nil {
 			return

@@ -49,6 +49,8 @@ type Config struct {
 	SessionSecretAuth []byte          `json:"sessionSecretAuth,omitempty"`
 	SessionSecretEnc  []byte          `json:"sessionSecretEnc,omitempty"`
 
+	DeprecatedRunningUnderTest bool `json:"runningUnderTest,omitempty"` // TODO: remove once v3 is dead
+
 	// misc infra configurables
 	RegistryHTTPSecret             []byte    `json:"registryHttpSecret,omitempty"`
 	PrometheusProxySessionSecret   []byte    `json:"prometheusProxySessionSecret,omitempty"`

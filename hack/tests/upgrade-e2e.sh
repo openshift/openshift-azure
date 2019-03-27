@@ -35,7 +35,7 @@ link_secret(){
     fi
 }
 
-preprare_ci_env(){
+prepare_ci_env(){
     # running in ci
     if [[ -f /usr/local/e2e-secrets/azure/secret ]];then
        . hack/tests/ci-operator-prepare.sh
@@ -74,11 +74,11 @@ make create
 export GOPATH=${ORG_GOPATH}
 cd ${GOPATH}/src/github.com/openshift/openshift-azure
 
-preprare_ci_env
+prepare_ci_env
 link_secret
 
 cp -a $T/src/github.com/openshift/openshift-azure/_data .
 
-make upgrade
+ADMIN_MANIFEST=test/manifests/fakerp/admin-update.yaml make upgrade
 
 make e2e

@@ -20,10 +20,11 @@ type Interface interface {
 	InvalidateSecrets() error
 }
 
-func New(cs *api.OpenShiftManagedCluster) (Interface, error) {
+// TODO: remove runningUnderTest once v3 is dead
+func New(cs *api.OpenShiftManagedCluster, runningUnderTest bool) (Interface, error) {
 	switch cs.Config.PluginVersion {
 	case "v3.2":
-		return v3.New(cs), nil
+		return v3.New(cs, runningUnderTest), nil
 	case "v4.0":
 		return v4.New(cs), nil
 	}

@@ -26,7 +26,7 @@ type plugin struct {
 	pluginConfig           *pluginapi.Config
 	testConfig             api.TestConfig
 	upgraderFactory        func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error)
-	configInterfaceFactory func(cs *api.OpenShiftManagedCluster) (config.Interface, error)
+	configInterfaceFactory func(cs *api.OpenShiftManagedCluster, runningUnderTest bool) (config.Interface, error)
 }
 
 var _ api.Plugin = &plugin{}
@@ -50,7 +50,7 @@ func (p *plugin) Validate(ctx context.Context, new, old *api.OpenShiftManagedClu
 	// if this is an update and not an upgrade, check if we can service it, and
 	// if not, fail early
 	if old != nil && new.Config.PluginVersion != "latest" {
-		_, err := p.configInterfaceFactory(new)
+		_, err := p.configInterfaceFactory(new, p.testConfig.RunningUnderTest)
 		if err != nil {
 			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
 		}
@@ -67,7 +67,7 @@ func (p *plugin) ValidateAdmin(ctx context.Context, new, old *api.OpenShiftManag
 	// if this is an update and not an upgrade, check if we can service it, and
 	// if not, fail early
 	if old != nil && new.Config.PluginVersion != "latest" {
-		_, err := p.configInterfaceFactory(new)
+		_, err := p.configInterfaceFactory(new, p.testConfig.RunningUnderTest)
 		if err != nil {
 			errs = append(errs, fmt.Errorf(`cluster with version %q cannot be updated by resource provider with version %q`, new.Config.PluginVersion, p.pluginConfig.PluginVersion))
 		}
@@ -88,7 +88,7 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	}
 
 	p.log.Info("generating configs")
-	configInterface, err := p.configInterfaceFactory(cs)
+	configInterface, err := p.configInterfaceFactory(cs, p.testConfig.RunningUnderTest)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
@@ -270,7 +270,7 @@ func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedClu
 
 func (p *plugin) RotateClusterSecrets(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn) *api.PluginError {
 	p.log.Info("invalidating non-ca certificates, private keys and secrets")
-	configInterface, err := p.configInterfaceFactory(cs)
+	configInterface, err := p.configInterfaceFactory(cs, p.testConfig.RunningUnderTest)
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}

@@ -101,14 +101,14 @@ func (m *monitor) listResourceGroupMonitoringHostnames(ctx context.Context, subs
 }
 
 func (m *monitor) run(ctx context.Context) error {
-	m.log.Info("fetching URLs\n")
+	m.log.Info("fetching URLs")
 	hostnames, err := m.listResourceGroupMonitoringHostnames(ctx, m.subscriptionID, m.resourceGroup)
 	if err != nil {
 		return err
 	}
 
 	for _, hostname := range hostnames {
-		m.log.Debugf("initiate blackbox monitor %s \n", hostname)
+		m.log.Debugf("initiate blackbox monitor %s", hostname)
 		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://%s/healthz", hostname), nil)
 		if err != nil {
 			return err
@@ -141,7 +141,7 @@ func (m *monitor) run(ctx context.Context) error {
 		mon.b.Start(ctx)
 	}
 
-	m.log.Info("collecting metrics... CTRL+C to stop\n")
+	m.log.Info("collecting metrics... CTRL+C to stop")
 	ch := make(chan os.Signal)
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 	<-ch
@@ -152,7 +152,7 @@ func (m *monitor) run(ctx context.Context) error {
 func (m *monitor) persist(instances []instance) error {
 	for _, mon := range instances {
 		path := path.Join(*outputdir, fmt.Sprintf("%s.log", mon.hostname))
-		m.log.Infof("writing %s\n", path)
+		m.log.Infof("writing %s", path)
 		f, err := os.Create(path)
 		if err != nil {
 			return err

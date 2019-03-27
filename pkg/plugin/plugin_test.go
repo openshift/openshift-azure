@@ -191,7 +191,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
 			return clusterUpgrader, nil
 		},
-		configInterfaceFactory: func(cs *api.OpenShiftManagedCluster) (config.Interface, error) {
+		configInterfaceFactory: func(cs *api.OpenShiftManagedCluster, runningUnderTest bool) (config.Interface, error) {
 			return configInterface, nil
 		},
 		log:          logrus.NewEntry(logrus.StandardLogger()),
@@ -384,7 +384,7 @@ func TestValidateUpdateBlock(t *testing.T) {
 	p := &plugin{
 		log:          logrus.NewEntry(logrus.StandardLogger()),
 		pluginConfig: &pluginapi.Config{PluginVersion: currentVersion},
-		configInterfaceFactory: func(cs *api.OpenShiftManagedCluster) (c config.Interface, err error) {
+		configInterfaceFactory: func(cs *api.OpenShiftManagedCluster, runningUnderTest bool) (c config.Interface, err error) {
 			if cs.Config.PluginVersion != currentVersion {
 				err = fmt.Errorf("bad")
 			}

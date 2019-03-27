@@ -5,9 +5,13 @@ import (
 )
 
 type simpleGenerator struct {
-	cs *api.OpenShiftManagedCluster
+	cs               *api.OpenShiftManagedCluster
+	runningUnderTest bool
 }
 
-func New(cs *api.OpenShiftManagedCluster) *simpleGenerator {
-	return &simpleGenerator{cs: cs}
+func New(cs *api.OpenShiftManagedCluster, runningUnderTest bool) *simpleGenerator {
+	return &simpleGenerator{
+		cs:               cs,
+		runningUnderTest: runningUnderTest,
+	}
 }
