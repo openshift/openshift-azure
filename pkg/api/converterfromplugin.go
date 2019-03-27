@@ -17,7 +17,8 @@ func ConvertFromPlugin(in *plugin.Config, old *Config, version string) (*Config,
 		c = old.DeepCopy()
 	}
 
-	c.PluginVersion = in.PluginVersion
+	// do not set c.PluginVersion = in.PluginVersion: this is decided by the
+	// upgrade code!
 
 	if c.ComponentLogLevel.APIServer == nil {
 		c.ComponentLogLevel.APIServer = &in.ComponentLogLevel.APIServer
