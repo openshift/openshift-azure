@@ -4,8 +4,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// ConvertToAdmin converts the config representation for the admin API
-func ConvertToAdmin(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
+// ConvertTo converts from a
+// internal.OpenShiftManagedCluster to an admin.OpenShiftManagedCluster.
+func ConvertTo(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 	oc := &OpenShiftManagedCluster{
 		ID:       &cs.ID,
 		Location: &cs.Location,

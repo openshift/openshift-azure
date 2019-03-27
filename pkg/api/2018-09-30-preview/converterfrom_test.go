@@ -1,4 +1,4 @@
-package v20190430
+package v20180930preview
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
-func v20190430ManagedCluster() *OpenShiftManagedCluster {
+func managedCluster() *OpenShiftManagedCluster {
 	// use populate.Walk to generate a fully populated
 	// OpenShiftManagedCluster
 
@@ -30,7 +30,7 @@ func v20190430ManagedCluster() *OpenShiftManagedCluster {
 	return &omc
 }
 
-func TestConvertFromv20190430(t *testing.T) {
+func TestConvertFrom(t *testing.T) {
 	tests := []struct {
 		name           string
 		input          *OpenShiftManagedCluster
@@ -40,7 +40,7 @@ func TestConvertFromv20190430(t *testing.T) {
 	}{
 		{
 			name:  "create",
-			input: v20190430ManagedCluster(),
+			input: managedCluster(),
 		},
 		{
 			name: "router profile update",
@@ -207,7 +207,7 @@ func TestConvertFromv20190430(t *testing.T) {
 			test.expectedChange(expected)
 		}
 
-		output, err := ConvertFromv20190430(test.input, test.base)
+		output, err := ConvertFrom(test.input, test.base)
 		if !reflect.DeepEqual(err, test.err) {
 			t.Errorf("%s: expected error: %v, got error: %v", test.name, test.err, err)
 		}
@@ -219,13 +219,13 @@ func TestConvertFromv20190430(t *testing.T) {
 	}
 }
 
-func TestRoundTripv20190430(t *testing.T) {
-	start := v20190430ManagedCluster()
-	internal, err := ConvertFromv20190430(start, nil)
+func TestRoundTrip(t *testing.T) {
+	start := managedCluster()
+	internal, err := ConvertFrom(start, nil)
 	if err != nil {
 		t.Error(err)
 	}
-	end := ConvertTov20190430(internal)
+	end := ConvertTo(internal)
 	if !reflect.DeepEqual(start, end) {
 		t.Errorf("unexpected diff %s", deep.Equal(start, end))
 	}

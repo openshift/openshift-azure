@@ -97,14 +97,14 @@ func internalPluginConfig() api.Config {
 	}
 }
 
-func TestConvertFromPlugin(t *testing.T) {
+func TestConvertFrom(t *testing.T) {
 	// prepare external type
 	var external Config
 	populate.Walk(&external, func(v reflect.Value) {})
 	external.PluginVersion = "should not be copied"
 	// prepare internal type
 	internal := internalPluginConfig()
-	output, _ := ConvertFromPlugin(&external, &internal, "Versions.key")
+	output, _ := ConvertFrom(&external, &internal, "Versions.key")
 	if !reflect.DeepEqual(*output, internal) {
 		t.Errorf("unexpected diff %s", deep.Equal(*output, internal))
 	}

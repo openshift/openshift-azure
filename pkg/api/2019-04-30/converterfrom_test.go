@@ -1,7 +1,6 @@
-package admin
+package v20190430
 
 import (
-	"crypto/x509"
 	"errors"
 	"reflect"
 	"testing"
@@ -10,11 +9,10 @@ import (
 	"github.com/go-test/deep"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/tls"
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
 
-func adminManagedCluster() *OpenShiftManagedCluster {
+func managedCluster() *OpenShiftManagedCluster {
 	// use populate.Walk to generate a fully populated
 	// OpenShiftManagedCluster
 
@@ -32,26 +30,7 @@ func adminManagedCluster() *OpenShiftManagedCluster {
 	return &omc
 }
 
-func internalManagedClusterAdmin() *api.OpenShiftManagedCluster {
-	cs := api.GetInternalMockCluster()
-
-	prepare := func(v reflect.Value) {
-		switch v.Interface().(type) {
-		case []api.IdentityProvider:
-			// set the Provider to AADIdentityProvider
-			v.Set(reflect.ValueOf([]api.IdentityProvider{{Provider: &api.AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
-		}
-	}
-	populate.Walk(&cs, prepare)
-	return cs
-}
-
-func TestConvertFromAdmin(t *testing.T) {
-	_, dummyCA, err := tls.NewCA("dummy")
-	if err != nil {
-		t.Fatal(err)
-	}
-
+func TestConvertFrom(t *testing.T) {
 	tests := []struct {
 		name           string
 		input          *OpenShiftManagedCluster
@@ -59,6 +38,10 @@ func TestConvertFromAdmin(t *testing.T) {
 		expectedChange func(*api.OpenShiftManagedCluster)
 		err            error
 	}{
+		{
+			name:  "create",
+			input: managedCluster(),
+		},
 		{
 			name: "router profile update",
 			input: &OpenShiftManagedCluster{
@@ -71,7 +54,7 @@ func TestConvertFromAdmin(t *testing.T) {
 					},
 				},
 			},
-			base: internalManagedClusterAdmin(),
+			base: api.GetInternalMockCluster(),
 			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
 				expectedCs.Properties.RouterProfiles[0].PublicSubdomain = "NewPublicSubdomain"
 			},
@@ -87,7 +70,7 @@ func TestConvertFromAdmin(t *testing.T) {
 					},
 				},
 			},
-			base: internalManagedClusterAdmin(),
+			base: api.GetInternalMockCluster(),
 			err:  errors.New("invalid router profile - name is missing"),
 		},
 		{
@@ -106,7 +89,7 @@ func TestConvertFromAdmin(t *testing.T) {
 					},
 				},
 			},
-			base: internalManagedClusterAdmin(),
+			base: api.GetInternalMockCluster(),
 			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
 				expectedCs.Properties.AgentPoolProfiles = append(expectedCs.Properties.AgentPoolProfiles,
 					api.AgentPoolProfile{
@@ -134,7 +117,7 @@ func TestConvertFromAdmin(t *testing.T) {
 					},
 				},
 			},
-			base: internalManagedClusterAdmin(),
+			base: api.GetInternalMockCluster(),
 			err:  errors.New("invalid agent pool profile - name is missing"),
 		},
 		{
@@ -146,14 +129,14 @@ func TestConvertFromAdmin(t *testing.T) {
 							{
 								Name: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Name"),
 								Provider: &AADIdentityProvider{
-									ClientID: to.StringPtr("NewClientID"),
+									Secret: to.StringPtr("NewSecret"),
 								},
 							},
 						},
 					},
 				},
 			},
-			base: internalManagedClusterAdmin(),
+			base: api.GetInternalMockCluster(),
 			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
 				expectedCs.Properties.AuthProfile = api.AuthProfile{
 					IdentityProviders: []api.IdentityProvider{
@@ -161,43 +144,9 @@ func TestConvertFromAdmin(t *testing.T) {
 							Name: "Properties.AuthProfile.IdentityProviders[0].Name",
 							Provider: &api.AADIdentityProvider{
 								Kind:     "AADIdentityProvider",
-								ClientID: "NewClientID",
-								Secret:   "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
+								ClientID: "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
+								Secret:   "NewSecret",
 								TenantID: "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
-							},
-						},
-					},
-				}
-			},
-		},
-		{
-			name: "auth profile update aad groups",
-			input: &OpenShiftManagedCluster{
-				Properties: &Properties{
-					AuthProfile: &AuthProfile{
-						IdentityProviders: []IdentityProvider{
-							{
-								Name: to.StringPtr("Properties.AuthProfile.IdentityProviders[0].Name"),
-								Provider: &AADIdentityProvider{
-									CustomerAdminGroupID: to.StringPtr("admin"),
-								},
-							},
-						},
-					},
-				},
-			},
-			base: internalManagedClusterAdmin(),
-			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
-				expectedCs.Properties.AuthProfile = api.AuthProfile{
-					IdentityProviders: []api.IdentityProvider{
-						{
-							Name: "Properties.AuthProfile.IdentityProviders[0].Name",
-							Provider: &api.AADIdentityProvider{
-								Kind:                 "AADIdentityProvider",
-								ClientID:             "Properties.AuthProfile.IdentityProviders[0].Provider.ClientID",
-								Secret:               "Properties.AuthProfile.IdentityProviders[0].Provider.Secret",
-								TenantID:             "Properties.AuthProfile.IdentityProviders[0].Provider.TenantID",
-								CustomerAdminGroupID: to.StringPtr("admin"),
 							},
 						},
 					},
@@ -220,7 +169,7 @@ func TestConvertFromAdmin(t *testing.T) {
 					},
 				},
 			},
-			base: internalManagedClusterAdmin(),
+			base: api.GetInternalMockCluster(),
 			err:  errors.New("cannot update the kind of the identity provider"),
 		},
 		{
@@ -238,60 +187,27 @@ func TestConvertFromAdmin(t *testing.T) {
 					},
 				},
 			},
-			base: internalManagedClusterAdmin(),
+			base: api.GetInternalMockCluster(),
 			err:  errors.New("invalid identity provider - name is missing"),
 		},
 		{
-			name: "image offer update",
+			name: "nil ResourcePurchasPlan update",
 			input: &OpenShiftManagedCluster{
-				Config: &Config{
-					ImageOffer: to.StringPtr("NewOffer"),
-				},
+				Plan: nil,
 			},
-			base: internalManagedClusterAdmin(),
+			base: api.GetInternalMockCluster(),
 			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
-				expectedCs.Config.ImageOffer = "NewOffer"
-			},
-		},
-		{
-			name: "certificate update",
-			input: &OpenShiftManagedCluster{
-				Config: &Config{
-					Certificates: &CertificateConfig{
-						OpenShiftConsole: &CertificateChain{
-							Certs: []*x509.Certificate{dummyCA},
-						},
-					},
-				},
-			},
-			base: internalManagedClusterAdmin(),
-			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
-				expectedCs.Config.Certificates.OpenShiftConsole.Certs = []*x509.Certificate{dummyCA}
-			},
-		},
-		{
-			name: "loglevel update",
-			input: &OpenShiftManagedCluster{
-				Config: &Config{
-					ComponentLogLevel: &ComponentLogLevel{
-						Node: to.IntPtr(2),
-					},
-				},
-			},
-			base: internalManagedClusterAdmin(),
-			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
-				expectedCs.Config.ComponentLogLevel.Node = to.IntPtr(2)
 			},
 		},
 	}
 
 	for _, test := range tests {
-		expected := internalManagedClusterAdmin()
+		expected := api.GetInternalMockCluster()
 		if test.expectedChange != nil {
 			test.expectedChange(expected)
 		}
 
-		output, err := ConvertFromAdmin(test.input, test.base)
+		output, err := ConvertFrom(test.input, test.base)
 		if !reflect.DeepEqual(err, test.err) {
 			t.Errorf("%s: expected error: %v, got error: %v", test.name, test.err, err)
 		}
@@ -303,13 +219,13 @@ func TestConvertFromAdmin(t *testing.T) {
 	}
 }
 
-func TestRoundTripAdmin(t *testing.T) {
-	start := adminManagedCluster()
-	internal, err := ConvertFromAdmin(start, nil)
+func TestRoundTrip(t *testing.T) {
+	start := managedCluster()
+	internal, err := ConvertFrom(start, nil)
 	if err != nil {
 		t.Error(err)
 	}
-	end := ConvertToAdmin(internal)
+	end := ConvertTo(internal)
 	if !reflect.DeepEqual(start, end) {
 		t.Errorf("unexpected diff %s", deep.Equal(start, end))
 	}

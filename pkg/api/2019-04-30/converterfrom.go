@@ -1,4 +1,4 @@
-package v20180930preview
+package v20190430
 
 import (
 	"errors"
@@ -6,11 +6,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// ConvertFromV20180930preview converts from a
-// OpenShiftManagedCluster to an OpenShiftManagedCluster.
+// ConvertFrom converts from a
+// v20190430.OpenShiftManagedCluster to an internal.OpenShiftManagedCluster.
 // If old is non-nil, it is going to be used as the base for the internal
 // output where the external request is merged on top of.
-func ConvertFromV20180930preview(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
+func ConvertFrom(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
 	cs := &api.OpenShiftManagedCluster{}
 	if old != nil {
 		cs = old.DeepCopy()
@@ -37,7 +37,7 @@ func ConvertFromV20180930preview(oc *OpenShiftManagedCluster, old *api.OpenShift
 	}
 
 	if oc.Plan != nil {
-		mergeFromResourcePurchasePlanv20180930preview(oc, cs)
+		mergeFromResourcePurchasePlan(oc, cs)
 	}
 
 	if err := mergeProperties(oc, cs); err != nil {
@@ -47,9 +47,9 @@ func ConvertFromV20180930preview(oc *OpenShiftManagedCluster, old *api.OpenShift
 	return cs, nil
 }
 
-// mergeFromResourcePurchasePlanv20180930preview merges filled out fields from the external API to the internal representation, doesn't change fields which are nil in the input.
+// mergeFromResourcePurchasePlan merges filled out fields from the external API to the internal representation, doesn't change fields which are nil in the input.
 // The user is allowed to provide partial PurchasePlan via the API.
-func mergeFromResourcePurchasePlanv20180930preview(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) {
+func mergeFromResourcePurchasePlan(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) {
 	if cs.Plan == nil {
 		cs.Plan = &api.ResourcePurchasePlan{}
 	}

@@ -6,8 +6,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// ConvertFromAdmin converts from admin API representation to public API
-func ConvertFromAdmin(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
+// ConvertFrom converts from a
+// admin.OpenShiftManagedCluster to an internal.OpenShiftManagedCluster.
+// If old is non-nil, it is going to be used as the base for the internal
+// output where the external request is merged on top of.
+func ConvertFrom(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
 	cs := &api.OpenShiftManagedCluster{}
 	if old != nil {
 		cs = old.DeepCopy()
@@ -101,11 +104,11 @@ func mergePropertiesAdmin(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedC
 		return err
 	}
 
-	if err := mergeAgentPoolProfilesAdmin(oc, cs); err != nil {
+	if err := mergeAgentPoolProfiles(oc, cs); err != nil {
 		return err
 	}
 
-	if err := mergeAuthProfileAdmin(oc, cs); err != nil {
+	if err := mergeAuthProfile(oc, cs); err != nil {
 		return err
 	}
 
@@ -126,9 +129,9 @@ func mergeRouterProfilesAdmin(oc *OpenShiftManagedCluster, cs *api.OpenShiftMana
 		// in cs as is, otherwise merge it in the existing
 		// profile.
 		if index == -1 {
-			cs.Properties.RouterProfiles = append(cs.Properties.RouterProfiles, convertRouterProfileAdmin(rp, nil))
+			cs.Properties.RouterProfiles = append(cs.Properties.RouterProfiles, convertRouterProfile(rp, nil))
 		} else {
-			head := append(cs.Properties.RouterProfiles[:index], convertRouterProfileAdmin(rp, &cs.Properties.RouterProfiles[index]))
+			head := append(cs.Properties.RouterProfiles[:index], convertRouterProfile(rp, &cs.Properties.RouterProfiles[index]))
 			cs.Properties.RouterProfiles = append(head, cs.Properties.RouterProfiles[index+1:]...)
 		}
 	}
@@ -144,7 +147,7 @@ func routerProfileIndex(name string, profiles []api.RouterProfile) int {
 	return -1
 }
 
-func convertRouterProfileAdmin(in RouterProfile, old *api.RouterProfile) (out api.RouterProfile) {
+func convertRouterProfile(in RouterProfile, old *api.RouterProfile) (out api.RouterProfile) {
 	if old != nil {
 		out = *old
 	}
@@ -160,7 +163,7 @@ func convertRouterProfileAdmin(in RouterProfile, old *api.RouterProfile) (out ap
 	return
 }
 
-func mergeAgentPoolProfilesAdmin(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) error {
+func mergeAgentPoolProfiles(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) error {
 	if cs.Properties.AgentPoolProfiles == nil && len(oc.Properties.AgentPoolProfiles) > 0 {
 		cs.Properties.AgentPoolProfiles = make([]api.AgentPoolProfile, 0, len(oc.Properties.AgentPoolProfiles)+1)
 	}
@@ -247,7 +250,7 @@ func convertAgentPoolProfileAdmin(in AgentPoolProfile, old *api.AgentPoolProfile
 	return
 }
 
-func mergeAuthProfileAdmin(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) error {
+func mergeAuthProfile(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) error {
 	if oc.Properties.AuthProfile == nil {
 		return nil
 	}

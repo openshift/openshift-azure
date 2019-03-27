@@ -4,9 +4,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// ConvertTov20190430 converts from an OpenShiftManagedCluster to a
-// OpenShiftManagedCluster.
-func ConvertTov20190430(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
+// ConvertTo converts from an internal.OpenShiftManagedCluster to a
+// v20190430.OpenShiftManagedCluster.
+func ConvertTo(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
 	oc := &OpenShiftManagedCluster{
 		ID:       &cs.ID,
 		Location: &cs.Location,
