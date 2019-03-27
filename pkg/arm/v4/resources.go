@@ -267,6 +267,9 @@ func (g *simpleGenerator) storageAccount(name string, tags map[string]*string) *
 		Type:     to.StringPtr("Microsoft.Storage/storageAccounts"),
 		Location: to.StringPtr(g.cs.Location),
 		Tags:     tags,
+		AccountProperties: &storage.AccountProperties{
+			EnableHTTPSTrafficOnly: to.BoolPtr(true),
+		},
 	}
 }
 

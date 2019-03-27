@@ -112,6 +112,9 @@ func (u *simpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context)
 		Tags: map[string]*string{
 			"type": to.StringPtr("config"),
 		},
+		AccountPropertiesCreateParameters: &azstorage.AccountPropertiesCreateParameters{
+			EnableHTTPSTrafficOnly: to.BoolPtr(true),
+		},
 	})
 	if err != nil {
 		return err
