@@ -79,6 +79,6 @@ link_secret
 
 cp -a $T/src/github.com/openshift/openshift-azure/_data .
 
-make upgrade
+ADMIN_MANIFEST=test/manifests/fakerp/admin-update.yaml make upgrade
 
 make e2e
