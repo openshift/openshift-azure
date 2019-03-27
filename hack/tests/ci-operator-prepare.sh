@@ -23,7 +23,11 @@ setup_secrets() {
 
 start_monitoring() {
     make monitoring-build
-    ./monitoring -outputdir=$ARTIFACTS &
+    if [ $# -eq 1 ]; then
+        ./monitoring -outputdir=$ARTIFACTS -configfile=$1 &
+    else
+        ./monitoring -outputdir=$ARTIFACTS &
+    fi
     MON_PID=$!
 }
 

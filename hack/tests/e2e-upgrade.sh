@@ -20,9 +20,9 @@ trap cleanup EXIT
 
 . hack/tests/ci-operator-prepare.sh
 
-start_monitoring
-
 T="$(mktemp -d)"
+start_monitoring $T/src/github.com/openshift/openshift-azure/_data/containerservice.yaml
+
 git clone -b "$1" https://github.com/openshift/openshift-azure.git $T/src/github.com/openshift/openshift-azure
 pushd "$T/src/github.com/openshift/openshift-azure"
 setup_secrets
