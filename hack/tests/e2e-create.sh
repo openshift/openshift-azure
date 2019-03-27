@@ -6,6 +6,7 @@ cleanup() {
     stop_monitoring
     make artifacts
     make delete
+    az group delete -g "$RESOURCEGROUP" --yes --no-wait
 }
 trap cleanup EXIT
 
