@@ -10,12 +10,16 @@ cleanup() {
 
     stop_monitoring
     make artifacts
-    make delete
-    az group delete -g "$RESOURCEGROUP" --yes --no-wait
 
     if [[ -n "$T" ]]; then
         rm -rf "$T"
     fi
+
+    if [[ -n "$NO_DELETE" ]]; then
+        return
+    fi
+    make delete
+    az group delete -g "$RESOURCEGROUP" --yes --no-wait
 }
 trap cleanup EXIT
 
