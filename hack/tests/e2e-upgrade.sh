@@ -25,10 +25,11 @@ start_monitoring
 
 T="$(mktemp -d)"
 git clone -b "$1" https://github.com/openshift/openshift-azure.git $T/src/github.com/openshift/openshift-azure
-pushd "$T/src/github.com/openshift/openshift-azure"
-setup_secrets
-GOPATH="$T" make create
-popd
+(
+    cd "$T/src/github.com/openshift/openshift-azure"
+    setup_secrets
+    GOPATH="$T" make create
+)
 
 cp -a "$T/src/github.com/openshift/openshift-azure/_data" .
 
