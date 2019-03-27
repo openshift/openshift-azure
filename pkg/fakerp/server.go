@@ -59,7 +59,10 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	if err != nil {
 		s.log.Fatal(err)
 	}
-	overridePluginTemplate(s.pluginTemplate)
+	err = overridePluginTemplate(s.pluginTemplate)
+	if err != nil && !os.IsNotExist(err) {
+		s.log.Warnf("error overriding plugin config template: %v", err)
+	}
 	s.plugin, errs = plugin.NewPlugin(s.log, s.pluginTemplate, s.testConfig)
 	if len(errs) > 0 {
 		s.log.Fatal(errs)

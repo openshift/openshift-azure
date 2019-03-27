@@ -67,41 +67,63 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 	return template, nil
 }
 
-func overridePluginTemplate(template *pluginapi.Config) {
+func overridePluginTemplate(template *pluginapi.Config) error {
 	v := template.Versions[template.PluginVersion]
 
-	if os.Getenv("SYNC_IMAGE") != "" {
-		v.Images.Sync = os.Getenv("SYNC_IMAGE")
+	// read plugin template override
+	data, err := ioutil.ReadFile("pluginconfig/override.yaml")
+	if err != nil {
+		return err
 	}
-	if os.Getenv("METRICSBRIDGE_IMAGE") != "" {
-		v.Images.MetricsBridge = os.Getenv("METRICSBRIDGE_IMAGE")
+	var override *pluginapi.Config
+	if err := yaml.Unmarshal(data, &override); err != nil {
+		return err
 	}
-	if os.Getenv("ETCDBACKUP_IMAGE") != "" {
-		v.Images.EtcdBackup = os.Getenv("ETCDBACKUP_IMAGE")
+	o := override.Versions[override.PluginVersion]
+
+	if o.Images.Sync != "" {
+		v.Images.Sync = o.Images.Sync
 	}
-	if os.Getenv("TLSPROXY_IMAGE") != "" {
-		v.Images.TLSProxy = os.Getenv("TLSPROXY_IMAGE")
+	if o.Images.MetricsBridge != "" {
+		v.Images.MetricsBridge = o.Images.MetricsBridge
 	}
-	if os.Getenv("CANARY_IMAGE") != "" {
-		v.Images.Canary = os.Getenv("CANARY_IMAGE")
+	if o.Images.EtcdBackup != "" {
+		v.Images.EtcdBackup = o.Images.EtcdBackup
 	}
-	if os.Getenv("AZURE_CONTROLLERS_IMAGE") != "" {
-		v.Images.AzureControllers = os.Getenv("AZURE_CONTROLLERS_IMAGE")
+	if o.Images.TLSProxy != "" {
+		v.Images.TLSProxy = o.Images.TLSProxy
 	}
-	if os.Getenv("STARTUP_IMAGE") != "" {
-		v.Images.Startup = os.Getenv("STARTUP_IMAGE")
+	if o.Images.Canary != "" {
+		v.Images.Canary = o.Images.Canary
 	}
-	if os.Getenv("OREG_URL") != "" {
-		v.Images.Format = os.Getenv("OREG_URL")
+	if o.Images.AzureControllers != "" {
+		v.Images.AzureControllers = o.Images.AzureControllers
 	}
-	if os.Getenv("IMAGE_VERSION") != "" {
-		v.ImageVersion = os.Getenv("IMAGE_VERSION")
+	if o.Images.Startup != "" {
+		v.Images.Startup = o.Images.Startup
 	}
-	if os.Getenv("IMAGE_OFFER") != "" {
-		v.ImageOffer = os.Getenv("IMAGE_OFFER")
+	if o.Images.Format != "" {
+		v.Images.Format = o.Images.Format
+	}
+	if o.ImageVersion != "" {
+		v.ImageVersion = o.ImageVersion
+	}
+	if o.ImageOffer != "" {
+		v.ImageOffer = o.ImageOffer
+	}
+	template.Versions[template.PluginVersion] = v
+
+	if override.ComponentLogLevel.APIServer >= 0 {
+		template.ComponentLogLevel.APIServer = override.ComponentLogLevel.APIServer
+	}
+	if override.ComponentLogLevel.ControllerManager >= 0 {
+		template.ComponentLogLevel.ControllerManager = override.ComponentLogLevel.ControllerManager
+	}
+	if override.ComponentLogLevel.Node >= 0 {
+		template.ComponentLogLevel.Node = override.ComponentLogLevel.Node
 	}
 
-	template.Versions[template.PluginVersion] = v
+	return nil
 }
 
 func readCert(path string) (*x509.Certificate, error) {

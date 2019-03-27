@@ -24,3 +24,4 @@ cscope.out
 /id_rsa
 /releasenotes
 /vmimage
+/pluginconfig/override.yaml
