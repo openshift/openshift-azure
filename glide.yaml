@@ -71,3 +71,6 @@ import:
 - package: github.com/beorn7/perks
   subpackages:
   - quantile
+- package: github.com/Microsoft/ApplicationInsights-Go
+  subpackages:
+  - appinsights
