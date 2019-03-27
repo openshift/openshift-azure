@@ -18,7 +18,7 @@
 coverage.out
 cscope.files
 cscope.out
-/secrets/*
+/secrets
 /fakerp
 /artifacts
 /id_rsa
