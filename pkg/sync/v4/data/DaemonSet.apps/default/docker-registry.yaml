@@ -21,7 +21,10 @@ spec:
         - name: REGISTRY_HTTP_NET
           value: tcp
         - name: REGISTRY_HTTP_SECRET
-          value: '*** GENERATED ***'
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: docker-registry-http
         - name: REGISTRY_MIDDLEWARE_REPOSITORY_OPENSHIFT_ENFORCEQUOTA
           value: "false"
         - name: REGISTRY_HTTP_TLS_KEY
