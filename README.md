@@ -150,6 +150,10 @@ properties:
 
 ## Dependency management
 To add a new dependency to the project, add the package information to glide.yaml and execute `glide up -v`
+* NOTE: some versions of glide might crash or generate an incomplete vendor/ folder when ran against this repo. In this case you may want to try getting the latest version:
+```
+go get github.com/Masterminds/glide
+```
 
 ## CI infrastructure
 Read more about how to work with our CI system [here](https://github.com/openshift/release/blob/master/projects/azure/README.md).
