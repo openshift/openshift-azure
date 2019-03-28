@@ -15,7 +15,8 @@ set_build_images() {
 }
 
 setup_secrets() {
-    ln -s /usr/local/e2e-secrets/azure secrets
+    ln -sf $SECRET_DIR secrets
+
     set +x
     . ./secrets/secret
     set -x
@@ -42,7 +43,10 @@ stop_monitoring() {
     fi
 }
 
+export SECRET_DIR=/usr/local/e2e-secrets/azure
 if [[ ! -e /usr/local/e2e-secrets/azure/secret ]]; then
+    # for local development
+    export SECRET_DIR=$PWD/secrets
     return
 fi
 
