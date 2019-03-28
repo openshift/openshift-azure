@@ -3,7 +3,7 @@ package plugin
 import (
 	"testing"
 
-	"github.com/openshift/openshift-azure/pkg/util/structs"
+	"github.com/openshift/openshift-azure/test/util/structs"
 )
 
 // TestJSONTags ensures that all the `json:"..."` struct field tags under
