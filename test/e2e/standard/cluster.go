@@ -28,35 +28,35 @@ import (
 )
 
 func (sc *SanityChecker) checkMonitoringStackHealth(ctx context.Context) error {
-	err := wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "cluster-monitoring-operator"))
+	err := wait.Poll(2*time.Second, 60*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "cluster-monitoring-operator"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "prometheus-operator"))
+	err = wait.Poll(2*time.Second, 60*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "prometheus-operator"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "grafana"))
+	err = wait.Poll(2*time.Second, 60*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "grafana"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "kube-state-metrics"))
+	err = wait.Poll(2*time.Second, 60*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-monitoring"), "kube-state-metrics"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckStatefulSetIsReady(sc.Client.Admin.AppsV1.StatefulSets("openshift-monitoring"), "prometheus-k8s"))
+	err = wait.Poll(2*time.Second, 60*time.Minute, ready.CheckStatefulSetIsReady(sc.Client.Admin.AppsV1.StatefulSets("openshift-monitoring"), "prometheus-k8s"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckStatefulSetIsReady(sc.Client.Admin.AppsV1.StatefulSets("openshift-monitoring"), "alertmanager-main"))
+	err = wait.Poll(2*time.Second, 60*time.Minute, ready.CheckStatefulSetIsReady(sc.Client.Admin.AppsV1.StatefulSets("openshift-monitoring"), "alertmanager-main"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDaemonSetIsReady(sc.Client.Admin.AppsV1.DaemonSets("openshift-monitoring"), "node-exporter"))
+	err = wait.Poll(2*time.Second, 60*time.Minute, ready.CheckDaemonSetIsReady(sc.Client.Admin.AppsV1.DaemonSets("openshift-monitoring"), "node-exporter"))
 	if err != nil {
 		return err
 	}
-	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-azure-monitoring"), "metrics-bridge"))
+	err = wait.Poll(2*time.Second, 60*time.Minute, ready.CheckDeploymentIsReady(sc.Client.Admin.AppsV1.Deployments("openshift-azure-monitoring"), "metrics-bridge"))
 	if err != nil {
 		return err
 	}
