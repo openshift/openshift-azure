@@ -33,6 +33,7 @@ type startup struct {
 	testConfig api.TestConfig
 }
 
+// New returns a new startup struct
 func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) *startup {
 	return &startup{log: log, cs: cs, testConfig: testConfig}
 }

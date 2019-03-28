@@ -24,6 +24,7 @@ import (
 //go:generate go-bindata -nometadata -pkg $GOPACKAGE -prefix data data
 //go:generate gofmt -s -l -w bindata.go
 
+// Builder is the VM image configuration struct
 type Builder struct {
 	GitCommit                string
 	Log                      *logrus.Entry
@@ -99,6 +100,7 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 	return template, nil
 }
 
+// Run is the main entry point
 func (builder *Builder) Run(ctx context.Context) error {
 	template, err := builder.generateTemplate()
 	if err != nil {
