@@ -172,7 +172,7 @@ func TestJSONTags(t *testing.T) {
 	}
 }
 
-func Test20180930previewAPIParity(t *testing.T) {
+func TestAPIParity(t *testing.T) {
 	// the algorithm is: list the fields of both types.  If the head of either
 	// list is expected not to be matched in the other, pop it.  If the heads of
 	// both lists match, pop them.  In any other case, error out.
@@ -197,7 +197,7 @@ func Test20180930previewAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Properties\.MasterPoolProfile`),
 	}
 
-	notInv20180930 := []*regexp.Regexp{
+	notInExternal := []*regexp.Regexp{
 		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile`),
 		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile`),
 		regexp.MustCompile(`^\.Properties\.AzProfile`),
@@ -218,7 +218,7 @@ loop:
 		}
 
 		if len(ifields) > 0 {
-			for _, rx := range notInv20180930 {
+			for _, rx := range notInExternal {
 				if rx.MatchString(ifields[0]) {
 					ifields = ifields[1:]
 					continue loop
@@ -238,6 +238,6 @@ loop:
 		if len(ifields) > 0 {
 			ifield = ifields[0]
 		}
-		t.Fatalf("mismatch between internal and v20180930 API fields: pfield=%q, ifield=%q", pfield, ifield)
+		t.Fatalf("mismatch between internal and external API fields: pfield=%q, ifield=%q", pfield, ifield)
 	}
 }

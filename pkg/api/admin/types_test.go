@@ -302,7 +302,7 @@ func TestEnsureMasterProfileExists(t *testing.T) {
 	}
 }
 
-func TestAdminAPIParity(t *testing.T) {
+func TestAPIParity(t *testing.T) {
 	// the algorithm is: list the fields of both types.  If the head of either
 	// list is expected not to be matched in the other, pop it.  If the heads of
 	// both lists match, pop them.  In any other case, error out.
@@ -329,7 +329,7 @@ func TestAdminAPIParity(t *testing.T) {
 	}
 
 	// TODO: why don't we just include all of these in the admin type?
-	notInAdmin := []*regexp.Regexp{
+	notInExternal := []*regexp.Regexp{
 		regexp.MustCompile(`^\.Config\.DeprecatedRunningUnderTest$`),
 		regexp.MustCompile(`^\.Config\.Images\.ImagePullSecret$`),
 		regexp.MustCompile(`^\.Config\.EtcdMetrics`),
@@ -360,7 +360,7 @@ loop:
 				continue
 			}
 
-			for _, rx := range notInAdmin {
+			for _, rx := range notInExternal {
 				if rx.MatchString(ifields[0]) {
 					ifields = ifields[1:]
 					continue loop
@@ -380,6 +380,6 @@ loop:
 		if len(ifields) > 0 {
 			ifield = ifields[0]
 		}
-		t.Fatalf("mismatch between internal and admin API fields: afield=%q, ifield=%q", afield, ifield)
+		t.Fatalf("mismatch between internal and external API fields: afield=%q, ifield=%q", afield, ifield)
 	}
 }
