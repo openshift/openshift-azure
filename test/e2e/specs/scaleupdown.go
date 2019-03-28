@@ -16,7 +16,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
-	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
@@ -159,9 +159,9 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 	})
 })
 
-func setCount(oc *v20180930preview.OpenShiftManagedCluster, count int64) error {
+func setCount(oc *v20190430.OpenShiftManagedCluster, count int64) error {
 	for _, p := range oc.Properties.AgentPoolProfiles {
-		if *p.Role == v20180930preview.AgentPoolProfileRoleCompute {
+		if *p.Role == v20190430.AgentPoolProfileRoleCompute {
 			*p.Count = count
 			return nil
 		}

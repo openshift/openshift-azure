@@ -1,13 +1,19 @@
-package api
+package v20180930preview
+
+import (
+	"github.com/Azure/go-autorest/autorest"
+)
 
 const (
 	// APIVersion is the version of this API
-	APIVersion = "admin"
+	APIVersion = "2018-09-30-preview"
 )
 
 // OpenShiftManagedCluster complies with the ARM model of resource definition in
 // a JSON template.
 type OpenShiftManagedCluster struct {
+	autorest.Response `json:"-"`
+
 	Plan       *ResourcePurchasePlan `json:"plan,omitempty"`
 	Properties *Properties           `json:"properties,omitempty"`
 	ID         *string               `json:"id,omitempty"`
@@ -15,8 +21,6 @@ type OpenShiftManagedCluster struct {
 	Type       *string               `json:"type,omitempty"`
 	Location   *string               `json:"location,omitempty"`
 	Tags       map[string]*string    `json:"tags"`
-
-	Config *Config `json:"config,omitempty"`
 }
 
 // ResourcePurchasePlan defines the resource plan as required by ARM for billing
@@ -152,8 +156,6 @@ const (
 	AgentPoolProfileRoleCompute AgentPoolProfileRole = "compute"
 	// AgentPoolProfileRoleInfra is the infra role.
 	AgentPoolProfileRoleInfra AgentPoolProfileRole = "infra"
-	// AgentPoolProfileRoleMaster is the master role.
-	AgentPoolProfileRoleMaster AgentPoolProfileRole = "master"
 )
 
 // VMSize represents supported VMSizes
@@ -198,19 +200,8 @@ type IdentityProvider struct {
 type AADIdentityProvider struct {
 	Kind     *string `json:"kind,omitempty"`
 	ClientID *string `json:"clientId,omitempty"`
+	Secret   *string `json:"secret,omitempty"`
 	TenantID *string `json:"tenantId,omitempty"`
 	// CustomerAdminGroupID group memberships will get synced into the OpenShift group "osa-customer-admins"
 	CustomerAdminGroupID *string `json:"customerAdminGroupId,omitempty"`
-}
-
-// GenevaActionPluginVersion is the struct returned by the GetPluginVersion
-// Geneva action API
-type GenevaActionPluginVersion struct {
-	PluginVersion *string `json:"pluginVersion,omitempty"`
-}
-
-// GenevaActionListClusterVMs is the struct returned by the ListClusterVMs
-// Geneva action API
-type GenevaActionListClusterVMs struct {
-	VMs *[]string `json:"vms,omitempty"`
 }

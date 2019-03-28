@@ -1,13 +1,13 @@
-package api
+package v20180930preview
 
 import (
-	v20180930preview "github.com/openshift/openshift-azure/pkg/api/2018-09-30-preview/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// ConvertToV20180930preview converts from an OpenShiftManagedCluster to a
+// FromInternal converts from an internal.OpenShiftManagedCluster to a
 // v20180930preview.OpenShiftManagedCluster.
-func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.OpenShiftManagedCluster {
-	oc := &v20180930preview.OpenShiftManagedCluster{
+func FromInternal(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
+	oc := &OpenShiftManagedCluster{
 		ID:       &cs.ID,
 		Location: &cs.Location,
 		Name:     &cs.Name,
@@ -19,7 +19,7 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 		oc.Tags[k] = &v
 	}
 	if cs.Plan != nil {
-		oc.Plan = &v20180930preview.ResourcePurchasePlan{
+		oc.Plan = &ResourcePurchasePlan{
 			Name:          cs.Plan.Name,
 			Product:       cs.Plan.Product,
 			PromotionCode: cs.Plan.PromotionCode,
@@ -27,8 +27,8 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 		}
 	}
 
-	provisioningState := v20180930preview.ProvisioningState(cs.Properties.ProvisioningState)
-	oc.Properties = &v20180930preview.Properties{
+	provisioningState := ProvisioningState(cs.Properties.ProvisioningState)
+	oc.Properties = &Properties{
 		ProvisioningState: &provisioningState,
 		OpenShiftVersion:  &cs.Properties.OpenShiftVersion,
 		ClusterVersion:    &cs.Properties.ClusterVersion,
@@ -36,38 +36,38 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 		FQDN:              &cs.Properties.FQDN,
 	}
 
-	oc.Properties.NetworkProfile = &v20180930preview.NetworkProfile{
+	oc.Properties.NetworkProfile = &NetworkProfile{
 		VnetID:     &cs.Properties.NetworkProfile.VnetID,
 		VnetCIDR:   &cs.Properties.NetworkProfile.VnetCIDR,
 		PeerVnetID: cs.Properties.NetworkProfile.PeerVnetID,
 	}
 
-	oc.Properties.RouterProfiles = make([]v20180930preview.RouterProfile, len(cs.Properties.RouterProfiles))
+	oc.Properties.RouterProfiles = make([]RouterProfile, len(cs.Properties.RouterProfiles))
 	for i := range cs.Properties.RouterProfiles {
 		rp := cs.Properties.RouterProfiles[i]
-		oc.Properties.RouterProfiles[i] = v20180930preview.RouterProfile{
+		oc.Properties.RouterProfiles[i] = RouterProfile{
 			Name:            &rp.Name,
 			PublicSubdomain: &rp.PublicSubdomain,
 			FQDN:            &rp.FQDN,
 		}
 	}
 
-	oc.Properties.AgentPoolProfiles = make([]v20180930preview.AgentPoolProfile, 0, len(cs.Properties.AgentPoolProfiles))
+	oc.Properties.AgentPoolProfiles = make([]AgentPoolProfile, 0, len(cs.Properties.AgentPoolProfiles))
 	for i := range cs.Properties.AgentPoolProfiles {
 		app := cs.Properties.AgentPoolProfiles[i]
-		vmSize := v20180930preview.VMSize(app.VMSize)
+		vmSize := VMSize(app.VMSize)
 
-		if app.Role == AgentPoolProfileRoleMaster {
-			oc.Properties.MasterPoolProfile = &v20180930preview.MasterPoolProfile{
+		if app.Role == api.AgentPoolProfileRoleMaster {
+			oc.Properties.MasterPoolProfile = &MasterPoolProfile{
 				Count:      &app.Count,
 				VMSize:     &vmSize,
 				SubnetCIDR: &app.SubnetCIDR,
 			}
 		} else {
-			osType := v20180930preview.OSType(app.OSType)
-			role := v20180930preview.AgentPoolProfileRole(app.Role)
+			osType := OSType(app.OSType)
+			role := AgentPoolProfileRole(app.Role)
 
-			oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, v20180930preview.AgentPoolProfile{
+			oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, AgentPoolProfile{
 				Name:       &app.Name,
 				Count:      &app.Count,
 				VMSize:     &vmSize,
@@ -78,14 +78,14 @@ func ConvertToV20180930preview(cs *OpenShiftManagedCluster) *v20180930preview.Op
 		}
 	}
 
-	oc.Properties.AuthProfile = &v20180930preview.AuthProfile{}
-	oc.Properties.AuthProfile.IdentityProviders = make([]v20180930preview.IdentityProvider, len(cs.Properties.AuthProfile.IdentityProviders))
+	oc.Properties.AuthProfile = &AuthProfile{}
+	oc.Properties.AuthProfile.IdentityProviders = make([]IdentityProvider, len(cs.Properties.AuthProfile.IdentityProviders))
 	for i := range cs.Properties.AuthProfile.IdentityProviders {
 		ip := cs.Properties.AuthProfile.IdentityProviders[i]
 		oc.Properties.AuthProfile.IdentityProviders[i].Name = &ip.Name
 		switch provider := ip.Provider.(type) {
-		case (*AADIdentityProvider):
-			oc.Properties.AuthProfile.IdentityProviders[i].Provider = &v20180930preview.AADIdentityProvider{
+		case (*api.AADIdentityProvider):
+			oc.Properties.AuthProfile.IdentityProviders[i].Provider = &AADIdentityProvider{
 				Kind:                 &provider.Kind,
 				ClientID:             &provider.ClientID,
 				Secret:               &provider.Secret,

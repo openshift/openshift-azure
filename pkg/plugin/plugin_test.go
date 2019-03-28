@@ -10,7 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/config"

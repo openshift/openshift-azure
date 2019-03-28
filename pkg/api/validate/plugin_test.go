@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 )
 
 func TestPluginTemplateValidate(t *testing.T) {

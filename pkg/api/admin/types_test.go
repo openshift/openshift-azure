@@ -1,17 +1,20 @@
-package api
+package admin
 
 import (
 	"bytes"
 	"encoding/json"
 	"reflect"
+	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-test/deep"
 
-	"github.com/openshift/openshift-azure/pkg/util/structtags"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/test/util/populate"
+	"github.com/openshift/openshift-azure/test/util/structs"
 )
 
 var marshalled = []byte(`{
@@ -263,7 +266,7 @@ func TestUnmarshal(t *testing.T) {
 // OpenShiftManagedCluster correspond with their field names
 func TestJSONTags(t *testing.T) {
 	o := OpenShiftManagedCluster{}
-	for _, err := range structtags.CheckJsonTags(o) {
+	for _, err := range structs.CheckJsonTags(o) {
 		t.Errorf("mismatch in struct tags for %T: %s", o, err.Error())
 	}
 }
@@ -296,5 +299,87 @@ func TestEnsureMasterProfileExists(t *testing.T) {
 
 	if !reflect.DeepEqual(unmarshalledOc.Properties.MasterPoolProfile, populatedOc.Properties.MasterPoolProfile) {
 		t.Errorf("json.Unmarshal returned unexpected result\n%#v\n", deep.Equal(unmarshalledOc.Properties.MasterPoolProfile, populatedOc.Properties.MasterPoolProfile))
+	}
+}
+
+func TestAPIParity(t *testing.T) {
+	// the algorithm is: list the fields of both types.  If the head of either
+	// list is expected not to be matched in the other, pop it.  If the heads of
+	// both lists match, pop them.  In any other case, error out.
+
+	afields := structs.Walk(reflect.TypeOf(OpenShiftManagedCluster{}),
+		map[string][]reflect.Type{
+			".Properties.AuthProfile.IdentityProviders.Provider": {
+				reflect.TypeOf(AADIdentityProvider{}),
+			},
+		},
+	)
+	ifields := structs.Walk(reflect.TypeOf(api.OpenShiftManagedCluster{}),
+		map[string][]reflect.Type{
+			".Properties.AuthProfile.IdentityProviders.Provider": {
+				reflect.TypeOf(AADIdentityProvider{}),
+			},
+		},
+	)
+
+	// TODO: I don't believe this should be in the admin type at all
+	notInInternal := []*regexp.Regexp{
+		regexp.MustCompile(`^\.Response$`),
+		regexp.MustCompile(`^\.Properties\.MasterPoolProfile\.`),
+	}
+
+	// TODO: why don't we just include all of these in the admin type?
+	notInExternal := []*regexp.Regexp{
+		regexp.MustCompile(`^\.Config\.DeprecatedRunningUnderTest$`),
+		regexp.MustCompile(`^\.Config\.Images\.ImagePullSecret$`),
+		regexp.MustCompile(`^\.Config\.EtcdMetrics`),
+		regexp.MustCompile(`^\.Config\.(Master|Worker)StartupSASURI$`),
+		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
+		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile\.`),
+		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile\.`),
+	}
+
+loop:
+	for len(afields) > 0 || len(ifields) > 0 {
+		if len(afields) > 0 {
+			for _, rx := range notInInternal {
+				if rx.MatchString(afields[0]) {
+					afields = afields[1:]
+					continue loop
+				}
+			}
+		}
+
+		if len(ifields) > 0 {
+			if strings.Contains(ifields[0], "Key") ||
+				strings.Contains(ifields[0], "Kubeconfig") ||
+				strings.Contains(ifields[0], "Passwd") ||
+				strings.Contains(ifields[0], "Password") ||
+				strings.Contains(ifields[0], "Secret") {
+				ifields = ifields[1:]
+				continue
+			}
+
+			for _, rx := range notInExternal {
+				if rx.MatchString(ifields[0]) {
+					ifields = ifields[1:]
+					continue loop
+				}
+			}
+		}
+
+		if len(afields) > 0 && len(ifields) > 0 && afields[0] == ifields[0] {
+			afields, ifields = afields[1:], ifields[1:]
+			continue
+		}
+
+		var afield, ifield string
+		if len(afields) > 0 {
+			afield = afields[0]
+		}
+		if len(ifields) > 0 {
+			ifield = ifields[0]
+		}
+		t.Fatalf("mismatch between internal and external API fields: afield=%q, ifield=%q", afield, ifield)
 	}
 }

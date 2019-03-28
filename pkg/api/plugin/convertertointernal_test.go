@@ -1,4 +1,4 @@
-package api
+package plugin
 
 import (
 	"reflect"
@@ -7,25 +7,25 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/go-test/deep"
 
-	plugin "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/test/util/populate"
 	"github.com/openshift/openshift-azure/test/util/tls"
 )
 
-func externalPluginConfig() *plugin.Config {
+func externalPluginConfig() *Config {
 	// use populate.Walk to generate a fully populated
-	// plugin.Config
-	pc := plugin.Config{}
+	// Config
+	pc := Config{}
 	populate.Walk(&pc, func(v reflect.Value) {})
 	return &pc
 }
 
-func internalPluginConfig() Config {
+func internalPluginConfig() api.Config {
 	// this is the expected internal equivalent to
 	// internal API Config
-	return Config{
+	return api.Config{
 		PluginVersion: "PluginVersion",
-		ComponentLogLevel: ComponentLogLevel{
+		ComponentLogLevel: api.ComponentLogLevel{
 			APIServer:         to.IntPtr(1),
 			ControllerManager: to.IntPtr(1),
 			Node:              to.IntPtr(1),
@@ -45,18 +45,18 @@ func internalPluginConfig() Config {
 		GenevaLoggingControlPlaneAccount:     "GenevaLoggingControlPlaneAccount",
 		GenevaLoggingControlPlaneEnvironment: "GenevaLoggingControlPlaneEnvironment",
 		GenevaLoggingControlPlaneRegion:      "GenevaLoggingControlPlaneRegion",
-		Certificates: CertificateConfig{
-			GenevaLogging: CertKeyPair{
+		Certificates: api.CertificateConfig{
+			GenevaLogging: api.CertKeyPair{
 				Cert: tls.GetDummyCertificate(),
 				Key:  tls.GetDummyPrivateKey(),
 			},
-			GenevaMetrics: CertKeyPair{
+			GenevaMetrics: api.CertKeyPair{
 				Cert: tls.GetDummyCertificate(),
 				Key:  tls.GetDummyPrivateKey(),
 			},
 		},
 		// Container images configuration
-		Images: ImageConfig{
+		Images: api.ImageConfig{
 			ImagePullSecret:           []byte("ImagePullSecret"),
 			GenevaImagePullSecret:     []byte("GenevaImagePullSecret"),
 			Format:                    "Versions.key.Images.Format",
@@ -97,14 +97,14 @@ func internalPluginConfig() Config {
 	}
 }
 
-func TestConvertFromPlugin(t *testing.T) {
+func TestToInternal(t *testing.T) {
 	// prepare external type
-	var external plugin.Config
+	var external Config
 	populate.Walk(&external, func(v reflect.Value) {})
 	external.PluginVersion = "should not be copied"
 	// prepare internal type
 	internal := internalPluginConfig()
-	output, _ := ConvertFromPlugin(&external, &internal, "Versions.key")
+	output, _ := ToInternal(&external, &internal, "Versions.key")
 	if !reflect.DeepEqual(*output, internal) {
 		t.Errorf("unexpected diff %s", deep.Equal(*output, internal))
 	}

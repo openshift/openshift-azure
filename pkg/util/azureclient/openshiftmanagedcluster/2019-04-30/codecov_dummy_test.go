@@ -1,4 +1,4 @@
-package structtags
+package api
 
 import (
 	"testing"

@@ -1,12 +1,13 @@
-package api
+package admin
 
 import (
-	admin "github.com/openshift/openshift-azure/pkg/api/admin/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// ConvertToAdmin converts the config representation for the admin API
-func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster {
-	oc := &admin.OpenShiftManagedCluster{
+// FromInternal converts from a
+// internal.OpenShiftManagedCluster to an admin.OpenShiftManagedCluster.
+func FromInternal(cs *api.OpenShiftManagedCluster) *OpenShiftManagedCluster {
+	oc := &OpenShiftManagedCluster{
 		ID:       &cs.ID,
 		Location: &cs.Location,
 		Name:     &cs.Name,
@@ -19,7 +20,7 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 	}
 
 	if cs.Plan != nil {
-		oc.Plan = &admin.ResourcePurchasePlan{
+		oc.Plan = &ResourcePurchasePlan{
 			Name:          cs.Plan.Name,
 			Product:       cs.Plan.Product,
 			PromotionCode: cs.Plan.PromotionCode,
@@ -27,8 +28,8 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 		}
 	}
 
-	provisioningState := admin.ProvisioningState(cs.Properties.ProvisioningState)
-	oc.Properties = &admin.Properties{
+	provisioningState := ProvisioningState(cs.Properties.ProvisioningState)
+	oc.Properties = &Properties{
 		ProvisioningState: &provisioningState,
 		OpenShiftVersion:  &cs.Properties.OpenShiftVersion,
 		ClusterVersion:    &cs.Properties.ClusterVersion,
@@ -36,38 +37,38 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 		FQDN:              &cs.Properties.FQDN,
 	}
 
-	oc.Properties.NetworkProfile = &admin.NetworkProfile{
+	oc.Properties.NetworkProfile = &NetworkProfile{
 		VnetID:     &cs.Properties.NetworkProfile.VnetID,
 		VnetCIDR:   &cs.Properties.NetworkProfile.VnetCIDR,
 		PeerVnetID: cs.Properties.NetworkProfile.PeerVnetID,
 	}
 
-	oc.Properties.RouterProfiles = make([]admin.RouterProfile, len(cs.Properties.RouterProfiles))
+	oc.Properties.RouterProfiles = make([]RouterProfile, len(cs.Properties.RouterProfiles))
 	for i := range cs.Properties.RouterProfiles {
 		rp := cs.Properties.RouterProfiles[i]
-		oc.Properties.RouterProfiles[i] = admin.RouterProfile{
+		oc.Properties.RouterProfiles[i] = RouterProfile{
 			Name:            &rp.Name,
 			PublicSubdomain: &rp.PublicSubdomain,
 			FQDN:            &rp.FQDN,
 		}
 	}
 
-	oc.Properties.AgentPoolProfiles = make([]admin.AgentPoolProfile, 0, len(cs.Properties.AgentPoolProfiles))
+	oc.Properties.AgentPoolProfiles = make([]AgentPoolProfile, 0, len(cs.Properties.AgentPoolProfiles))
 	for i := range cs.Properties.AgentPoolProfiles {
 		app := cs.Properties.AgentPoolProfiles[i]
-		vmSize := admin.VMSize(app.VMSize)
+		vmSize := VMSize(app.VMSize)
 
-		if app.Role == AgentPoolProfileRoleMaster {
-			oc.Properties.MasterPoolProfile = &admin.MasterPoolProfile{
+		if app.Role == api.AgentPoolProfileRoleMaster {
+			oc.Properties.MasterPoolProfile = &MasterPoolProfile{
 				Count:      &app.Count,
 				VMSize:     &vmSize,
 				SubnetCIDR: &app.SubnetCIDR,
 			}
 		} else {
-			osType := admin.OSType(app.OSType)
-			role := admin.AgentPoolProfileRole(app.Role)
+			osType := OSType(app.OSType)
+			role := AgentPoolProfileRole(app.Role)
 
-			oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, admin.AgentPoolProfile{
+			oc.Properties.AgentPoolProfiles = append(oc.Properties.AgentPoolProfiles, AgentPoolProfile{
 				Name:       &app.Name,
 				Count:      &app.Count,
 				VMSize:     &vmSize,
@@ -78,14 +79,14 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 		}
 	}
 
-	oc.Properties.AuthProfile = &admin.AuthProfile{}
-	oc.Properties.AuthProfile.IdentityProviders = make([]admin.IdentityProvider, len(cs.Properties.AuthProfile.IdentityProviders))
+	oc.Properties.AuthProfile = &AuthProfile{}
+	oc.Properties.AuthProfile.IdentityProviders = make([]IdentityProvider, len(cs.Properties.AuthProfile.IdentityProviders))
 	for i := range cs.Properties.AuthProfile.IdentityProviders {
 		ip := cs.Properties.AuthProfile.IdentityProviders[i]
 		oc.Properties.AuthProfile.IdentityProviders[i].Name = &ip.Name
 		switch provider := ip.Provider.(type) {
-		case *AADIdentityProvider:
-			oc.Properties.AuthProfile.IdentityProviders[i].Provider = &admin.AADIdentityProvider{
+		case *api.AADIdentityProvider:
+			oc.Properties.AuthProfile.IdentityProviders[i].Provider = &AADIdentityProvider{
 				Kind:                 &provider.Kind,
 				ClientID:             &provider.ClientID,
 				TenantID:             &provider.TenantID,
@@ -102,8 +103,8 @@ func ConvertToAdmin(cs *OpenShiftManagedCluster) *admin.OpenShiftManagedCluster 
 	return oc
 }
 
-func convertConfigToAdmin(cs *Config) *admin.Config {
-	return &admin.Config{
+func convertConfigToAdmin(cs *api.Config) *Config {
+	return &Config{
 		PluginVersion:                        &cs.PluginVersion,
 		ComponentLogLevel:                    convertComponentLogLevelToAdmin(cs.ComponentLogLevel),
 		SSHSourceAddressPrefixes:             &cs.SSHSourceAddressPrefixes,
@@ -128,16 +129,16 @@ func convertConfigToAdmin(cs *Config) *admin.Config {
 	}
 }
 
-func convertComponentLogLevelToAdmin(in ComponentLogLevel) *admin.ComponentLogLevel {
-	return &admin.ComponentLogLevel{
+func convertComponentLogLevelToAdmin(in api.ComponentLogLevel) *ComponentLogLevel {
+	return &ComponentLogLevel{
 		APIServer:         in.APIServer,
 		ControllerManager: in.ControllerManager,
 		Node:              in.Node,
 	}
 }
 
-func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateConfig {
-	return &admin.CertificateConfig{
+func convertCertificateConfigToAdmin(in api.CertificateConfig) *CertificateConfig {
+	return &CertificateConfig{
 		EtcdCa:               convertCertKeyPairToAdmin(in.EtcdCa),
 		Ca:                   convertCertKeyPairToAdmin(in.Ca),
 		FrontProxyCa:         convertCertKeyPairToAdmin(in.FrontProxyCa),
@@ -165,20 +166,20 @@ func convertCertificateConfigToAdmin(in CertificateConfig) *admin.CertificateCon
 	}
 }
 
-func convertCertKeyPairToAdmin(in CertKeyPair) *admin.Certificate {
-	return &admin.Certificate{
+func convertCertKeyPairToAdmin(in api.CertKeyPair) *Certificate {
+	return &Certificate{
 		Cert: in.Cert,
 	}
 }
 
-func convertCertKeyPairChainToAdmin(in CertKeyPairChain) *admin.CertificateChain {
-	return &admin.CertificateChain{
+func convertCertKeyPairChainToAdmin(in api.CertKeyPairChain) *CertificateChain {
+	return &CertificateChain{
 		Certs: in.Certs,
 	}
 }
 
-func convertImageConfigToAdmin(in ImageConfig) *admin.ImageConfig {
-	return &admin.ImageConfig{
+func convertImageConfigToAdmin(in api.ImageConfig) *ImageConfig {
+	return &ImageConfig{
 		Format:                    &in.Format,
 		ClusterMonitoringOperator: &in.ClusterMonitoringOperator,
 		AzureControllers:          &in.AzureControllers,

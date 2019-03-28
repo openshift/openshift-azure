@@ -1,18 +1,20 @@
-package api
+package plugin
 
 import (
 	"fmt"
 
-	plugin "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// ConvertFromPlugin converts external plugin API config type into
-// internal API Config type
-func ConvertFromPlugin(in *plugin.Config, old *Config, version string) (*Config, error) {
+// ToInternal converts from a
+// plugin.OpenShiftManagedCluster.Config to an internal.OpenShiftManagedCluster.Config
+// If old is non-nil, it is going to be used as the base for the internal
+// output where the external request is merged on top of.
+func ToInternal(in *Config, old *api.Config, version string) (*api.Config, error) {
 	if _, found := in.Versions[version]; !found {
 		return nil, fmt.Errorf("version %q not found", version)
 	}
-	c := &Config{}
+	c := &api.Config{}
 	if old != nil {
 		c = old.DeepCopy()
 	}

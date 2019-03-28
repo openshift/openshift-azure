@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	v3 "github.com/openshift/openshift-azure/pkg/config/v3"
 	v4 "github.com/openshift/openshift-azure/pkg/config/v4"
 )

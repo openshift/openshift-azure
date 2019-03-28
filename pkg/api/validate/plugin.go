@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 )
 
 // PluginAPIValidator validator for external Plugin API

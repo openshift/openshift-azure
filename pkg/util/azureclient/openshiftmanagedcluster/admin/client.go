@@ -9,7 +9,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/openshift/openshift-azure/pkg/api/admin/api"
+	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api/admin"
 )
 
 type Client struct {
@@ -81,7 +82,7 @@ func (c *Client) Backup(ctx context.Context, resourceGroupName, resourceName, bl
 	return
 }
 
-func (c *Client) CreateOrUpdate(ctx context.Context, resourceGroupName, resourceName string, oc *api.OpenShiftManagedCluster) (out *api.OpenShiftManagedCluster, err error) {
+func (c *Client) CreateOrUpdate(ctx context.Context, resourceGroupName, resourceName string, oc *admin.OpenShiftManagedCluster) (out *admin.OpenShiftManagedCluster, err error) {
 	err = c.do(http.MethodPut, resourceGroupName, resourceName, "", oc, &out)
 	return
 }
@@ -91,7 +92,7 @@ func (c *Client) ForceUpdate(ctx context.Context, resourceGroupName, resourceNam
 	return
 }
 
-func (c *Client) Get(ctx context.Context, resourceGroupName, resourceName string) (out *api.OpenShiftManagedCluster, err error) {
+func (c *Client) Get(ctx context.Context, resourceGroupName, resourceName string) (out *admin.OpenShiftManagedCluster, err error) {
 	err = c.do(http.MethodGet, resourceGroupName, resourceName, "", nil, &out)
 	return
 }

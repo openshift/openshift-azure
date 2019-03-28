@@ -11,8 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	adminapi "github.com/openshift/openshift-azure/pkg/api/admin/api"
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/pkg/api/validate"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
@@ -326,7 +325,7 @@ func (p *plugin) ForceUpdate(ctx context.Context, cs *api.OpenShiftManagedCluste
 	return nil
 }
 
-func (p *plugin) ListClusterVMs(ctx context.Context, cs *api.OpenShiftManagedCluster) (*adminapi.GenevaActionListClusterVMs, error) {
+func (p *plugin) ListClusterVMs(ctx context.Context, cs *api.OpenShiftManagedCluster) (*api.GenevaActionListClusterVMs, error) {
 	p.log.Info("creating clients")
 	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
 	if err != nil {
@@ -339,7 +338,7 @@ func (p *plugin) ListClusterVMs(ctx context.Context, cs *api.OpenShiftManagedClu
 		return nil, err
 	}
 
-	return &adminapi.GenevaActionListClusterVMs{VMs: &pods}, nil
+	return &api.GenevaActionListClusterVMs{VMs: &pods}, nil
 }
 
 func (p *plugin) Reimage(ctx context.Context, cs *api.OpenShiftManagedCluster, hostname string) error {
@@ -424,8 +423,8 @@ func (p *plugin) RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster
 	return clusterUpgrader.RunCommand(ctx, scaleset, instanceID, script)
 }
 
-func (p *plugin) GetPluginVersion(ctx context.Context) *adminapi.GenevaActionPluginVersion {
-	return &adminapi.GenevaActionPluginVersion{
+func (p *plugin) GetPluginVersion(ctx context.Context) *api.GenevaActionPluginVersion {
+	return &api.GenevaActionPluginVersion{
 		PluginVersion: &p.pluginConfig.PluginVersion,
 	}
 }

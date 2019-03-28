@@ -7,7 +7,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/test/util/populate"
 )
 

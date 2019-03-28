@@ -1,4 +1,4 @@
-package api
+package admin
 
 import (
 	"crypto/x509"

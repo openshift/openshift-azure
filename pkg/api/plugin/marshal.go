@@ -1,4 +1,4 @@
-package api
+package plugin
 
 import (
 	"reflect"
