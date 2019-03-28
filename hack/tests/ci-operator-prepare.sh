@@ -38,7 +38,7 @@ stop_monitoring() {
     fi
 }
 
-export ARTIFACT_DIR=.
+export ARTIFACT_DIR=$PWD
 
 if [[ ! -e /usr/local/e2e-secrets/azure/secret ]]; then
     return
