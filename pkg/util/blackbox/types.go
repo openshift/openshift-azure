@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Microsoft/ApplicationInsights-Go/appinsights"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/insights"
 )
 
 // Blackbox is interface for blackbox monitoring
@@ -25,7 +25,7 @@ type Blackbox interface {
 // Config defines blackbox instance configuration
 type Config struct {
 	Cli              *http.Client
-	Icli             appinsights.TelemetryClient
+	Icli             insights.TelemetryClient
 	Req              *http.Request
 	Interval         time.Duration
 	LogInitialErrors bool
@@ -75,12 +75,12 @@ func (c *Config) Start(ctx context.Context) {
 
 			if c.Icli != nil {
 				if resp != nil {
-					request := appinsights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, resp.Status)
+					request := insights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, resp.Status)
 					request.Id = os.Getenv("RESOURCEGROUP")
 					request.MarkTime(start, end)
 					c.Icli.Track(request)
 				} else {
-					request := appinsights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, "error")
+					request := insights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, "error")
 					request.Id = os.Getenv("RESOURCEGROUP")
 					request.MarkTime(start, end)
 					c.Icli.Track(request)

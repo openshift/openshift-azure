@@ -11,6 +11,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/insights"
 	externalapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2019-04-30"
 	adminapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
@@ -47,6 +48,7 @@ type Client struct {
 	VirtualNetworks                  azureclient.VirtualNetworksClient
 	VirtualNetworksPeerings          azureclient.VirtualNetworksPeeringsClient
 	Groups                           azureclient.GroupsClient
+	Insights                         insights.TelemetryClient
 }
 
 // NewClientFromEnvironment creates a new azure client from environment variables.
@@ -111,5 +113,6 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 		VirtualNetworks:                  azureclient.NewVirtualNetworkClient(ctx, subscriptionID, authorizer),
 		VirtualNetworksPeerings:          azureclient.NewVirtualNetworksPeeringsClient(ctx, subscriptionID, authorizer),
 		Groups:                           azureclient.NewGroupsClient(ctx, subscriptionID, authorizer),
+		Insights:                         insights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY")),
 	}, nil
 }

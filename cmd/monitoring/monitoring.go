@@ -14,12 +14,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Microsoft/ApplicationInsights-Go/appinsights"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/insights"
 	"github.com/openshift/openshift-azure/pkg/util/blackbox"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
@@ -36,7 +36,7 @@ var (
 type monitor struct {
 	log    *logrus.Entry
 	pipcli azureclient.PublicIPAddressesClient
-	icli   appinsights.TelemetryClient
+	icli   insights.TelemetryClient
 
 	resourceGroup  string
 	subscriptionID string
@@ -64,7 +64,7 @@ func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
 
 	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
 		m.log.Info("application insights configured")
-		m.icli = appinsights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
+		m.icli = insights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
 	}
 
 	return nil

@@ -15,6 +15,7 @@ import (
 	_ "github.com/openshift/openshift-azure/test/e2e/specs"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/fakerp"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/realrp"
+	azreporters "github.com/openshift/openshift-azure/test/reporters"
 )
 
 var (
@@ -30,5 +31,8 @@ func TestE2E(t *testing.T) {
 	logrus.SetReportCaller(true)
 
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "e2e tests")
+
+	var reporters []Reporter
+	azureReporters := append(reporters, azreporters.NewAzureAppInsightsReporter())
+	RunSpecsWithDefaultAndCustomReporters(t, "e2e tests", azureReporters)
 }
