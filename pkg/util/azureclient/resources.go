@@ -11,7 +11,6 @@ import (
 type DeploymentsClient interface {
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, deploymentName string, parameters resources.Deployment) (result resources.DeploymentsCreateOrUpdateFuture, err error)
 	Client
-	DeploymentClient() resources.DeploymentsClient
 }
 
 type deploymentsClient struct {
@@ -34,8 +33,25 @@ func (c *deploymentsClient) Client() autorest.Client {
 	return c.DeploymentsClient.Client
 }
 
-func (c *deploymentsClient) DeploymentClient() resources.DeploymentsClient {
-	return c.DeploymentsClient
+// DeploymentOperationsClient is a minimal interface for azure DeploymentOperationsClient
+type DeploymentOperationsClient interface {
+	DeploymentOperationsClientAddons
+}
+
+type deploymentOperationsClient struct {
+	resources.DeploymentOperationsClient
+}
+
+var _ DeploymentOperationsClient = &deploymentOperationsClient{}
+
+// NewDeploymentOperationsClient creates a new DeploymentOperationsClient
+func NewDeploymentOperationsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) DeploymentOperationsClient {
+	client := resources.NewDeploymentOperationsClient(subscriptionID)
+	setupClient(ctx, &client.Client, authorizer)
+
+	return &deploymentOperationsClient{
+		DeploymentOperationsClient: client,
+	}
 }
 
 // ResourcesClient is a minimal interface for azure Resources Client

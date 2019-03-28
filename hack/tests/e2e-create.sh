@@ -5,6 +5,10 @@ cleanup() {
 
     stop_monitoring
     make artifacts
+
+    if [[ -n "$NO_DELETE" ]]; then
+        return
+    fi
     make delete
     az group delete -g "$RESOURCEGROUP" --yes --no-wait
 }

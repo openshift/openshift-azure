@@ -6,4 +6,4 @@ if [ $# -eq 1 ]; then
   exit 0
 fi
 
-./monitoring -outputdir=$ARTIFACTS &
+./monitoring -outputdir=$ARTIFACT_DIR &

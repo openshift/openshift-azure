@@ -3,6 +3,7 @@ package fakerp
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -46,12 +47,20 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployF
 		cli.PollingDuration = 30 * time.Minute
 
 		log.Info("waiting for arm template deployment to complete")
-		if err := future.WaitForCompletionRef(ctx, cli); err != nil {
-			return fmt.Errorf("failed waiting for arm template deployment to complete: %#v", err)
+		err = future.WaitForCompletionRef(ctx, cli)
+		if err != nil {
+			log.Warnf("deployment failed: %#v", err)
+			deploymentOperations := azureclient.NewDeploymentOperationsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
+			operations, listErr := deploymentOperations.List(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", nil)
+			if listErr == nil {
+				b, _ := json.MarshalIndent(operations, "", "  ")
+				log.Debug(string(b))
+			} else {
+				log.Warnf("failed to get deployment operations: %#v", listErr)
+			}
+			return err
 		}
-		if _, err := future.Result(deployments.DeploymentClient()); err != nil {
-			return fmt.Errorf("failed to get arm template deloyment result: %#v", err)
-		}
+
 		return nil
 	}
 }
