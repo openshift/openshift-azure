@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
@@ -160,7 +160,7 @@ func vnetContainsSubnet(vnet, subnet *net.IPNet) bool {
 }
 
 func isValidUUID(u string) bool {
-	_, err := uuid.Parse(u)
+	_, err := uuid.FromString(u)
 	return err == nil
 }
 
