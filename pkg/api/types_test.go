@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/openshift/openshift-azure/pkg/util/structs"
 	"github.com/openshift/openshift-azure/test/util/populate"
+	"github.com/openshift/openshift-azure/test/util/structs"
 )
 
 var marshalled = []byte(`{
