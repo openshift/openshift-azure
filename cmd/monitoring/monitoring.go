@@ -176,7 +176,7 @@ func (m *monitor) run(ctx context.Context) error {
 				},
 				Timeout: 5 * time.Second,
 			},
-			Icli:             m.icli,
+			ICli:             m.icli,
 			Req:              req,
 			Interval:         *interval,
 			LogInitialErrors: *logerrors,

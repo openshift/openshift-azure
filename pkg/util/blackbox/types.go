@@ -25,7 +25,7 @@ type Blackbox interface {
 // Config defines blackbox instance configuration
 type Config struct {
 	Cli              *http.Client
-	Icli             insights.TelemetryClient
+	ICli             insights.TelemetryClient
 	Req              *http.Request
 	Interval         time.Duration
 	LogInitialErrors bool
@@ -73,17 +73,17 @@ func (c *Config) Start(ctx context.Context) {
 			resp, err := c.Cli.Do(c.Req)
 			end := time.Now()
 
-			if c.Icli != nil {
+			if c.ICli != nil {
 				if resp != nil {
 					request := insights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, resp.Status)
 					request.Id = os.Getenv("RESOURCEGROUP")
 					request.MarkTime(start, end)
-					c.Icli.Track(request)
+					c.ICli.Track(request)
 				} else {
 					request := insights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, "error")
 					request.Id = os.Getenv("RESOURCEGROUP")
 					request.MarkTime(start, end)
-					c.Icli.Track(request)
+					c.ICli.Track(request)
 				}
 			}
 

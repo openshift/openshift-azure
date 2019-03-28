@@ -20,7 +20,7 @@ result := map[string]interface{}{
 
 Results can be queries using Kusto queries below:
 
-Get all Passed & failed test count in last 30 minutes
+Get all passed & failed test count in last 30 minutes
 ```
 customEvents
 | extend componentText = extractjson('$.ComponentTexts', name)
