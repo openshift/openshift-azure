@@ -1,4 +1,5 @@
 #!/bin/bash -ex
+curl -o /bin/hyperkube https://hyperkubebin.blob.core.windows.net/hyperkube/hyperkube
 
 if ! grep /var/lib/docker /etc/fstab; then
   systemctl stop docker.service
