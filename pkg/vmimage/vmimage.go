@@ -147,10 +147,5 @@ func (builder *Builder) Run(ctx context.Context) error {
 		return err
 	}
 
-	_, err = future.Result(builder.Deployments.DeploymentClient())
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
