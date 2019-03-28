@@ -9,7 +9,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-func TestConvertTo(t *testing.T) {
+func TestFromInternal(t *testing.T) {
 	tests := []struct {
 		cs *api.OpenShiftManagedCluster
 		oc *OpenShiftManagedCluster
@@ -21,7 +21,7 @@ func TestConvertTo(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		oc := ConvertTo(test.cs)
+		oc := FromInternal(test.cs)
 		if !reflect.DeepEqual(oc, test.oc) {
 			t.Errorf("unexpected result:\n%#v\nexpected:\n%#v", spew.Sprint(oc), spew.Sprint(test.oc))
 		}

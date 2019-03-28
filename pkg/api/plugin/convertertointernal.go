@@ -6,11 +6,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// ConvertFrom converts from a
+// ToInternal converts from a
 // plugin.OpenShiftManagedCluster.Config to an internal.OpenShiftManagedCluster.Config
 // If old is non-nil, it is going to be used as the base for the internal
 // output where the external request is merged on top of.
-func ConvertFrom(in *Config, old *api.Config, version string) (*api.Config, error) {
+func ToInternal(in *Config, old *api.Config, version string) (*api.Config, error) {
 	if _, found := in.Versions[version]; !found {
 		return nil, fmt.Errorf("version %q not found", version)
 	}

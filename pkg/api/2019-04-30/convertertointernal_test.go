@@ -30,7 +30,7 @@ func managedCluster() *OpenShiftManagedCluster {
 	return &omc
 }
 
-func TestConvertFrom(t *testing.T) {
+func TestToInternal(t *testing.T) {
 	tests := []struct {
 		name           string
 		input          *OpenShiftManagedCluster
@@ -207,7 +207,7 @@ func TestConvertFrom(t *testing.T) {
 			test.expectedChange(expected)
 		}
 
-		output, err := ConvertFrom(test.input, test.base)
+		output, err := ToInternal(test.input, test.base)
 		if !reflect.DeepEqual(err, test.err) {
 			t.Errorf("%s: expected error: %v, got error: %v", test.name, test.err, err)
 		}
@@ -221,11 +221,11 @@ func TestConvertFrom(t *testing.T) {
 
 func TestRoundTrip(t *testing.T) {
 	start := managedCluster()
-	internal, err := ConvertFrom(start, nil)
+	internal, err := ToInternal(start, nil)
 	if err != nil {
 		t.Error(err)
 	}
-	end := ConvertTo(internal)
+	end := FromInternal(internal)
 	if !reflect.DeepEqual(start, end) {
 		t.Errorf("unexpected diff %s", deep.Equal(start, end))
 	}

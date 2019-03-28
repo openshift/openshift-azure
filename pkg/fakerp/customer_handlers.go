@@ -125,13 +125,13 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		var oc *admin.OpenShiftManagedCluster
 		oc, err = s.readAdminRequest(req.Body)
 		if err == nil {
-			cs, err = admin.ConvertFrom(oc, oldCs)
+			cs, err = admin.ToInternal(oc, oldCs)
 		}
 	} else {
 		var oc *v20190430.OpenShiftManagedCluster
 		oc, err = s.read20190430Request(req.Body)
 		if err == nil {
-			cs, err = v20190430.ConvertFrom(oc, oldCs)
+			cs, err = v20190430.ToInternal(oc, oldCs)
 		}
 	}
 	if err != nil {
@@ -167,10 +167,10 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 	var res []byte
 	var err error
 	if strings.HasPrefix(req.URL.Path, "/admin") {
-		oc := admin.ConvertTo(cs)
+		oc := admin.FromInternal(cs)
 		res, err = json.Marshal(oc)
 	} else {
-		oc := v20190430.ConvertTo(cs)
+		oc := v20190430.FromInternal(cs)
 		res, err = json.Marshal(oc)
 	}
 	if err != nil {

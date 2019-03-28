@@ -6,11 +6,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// ConvertFrom converts from a
+// ToInternal converts from a
 // v20190430.OpenShiftManagedCluster to an internal.OpenShiftManagedCluster.
 // If old is non-nil, it is going to be used as the base for the internal
 // output where the external request is merged on top of.
-func ConvertFrom(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
+func ToInternal(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
 	cs := &api.OpenShiftManagedCluster{}
 	if old != nil {
 		cs = old.DeepCopy()

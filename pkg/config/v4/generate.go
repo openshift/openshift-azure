@@ -18,7 +18,7 @@ import (
 )
 
 func (g *simpleGenerator) Generate(template *pluginapi.Config) (err error) {
-	config, err := pluginapi.ConvertFrom(template, &g.cs.Config, g.cs.Config.PluginVersion)
+	config, err := pluginapi.ToInternal(template, &g.cs.Config, g.cs.Config.PluginVersion)
 	if err != nil {
 		return err
 	}
