@@ -24,9 +24,9 @@ setup_secrets() {
 start_monitoring() {
     make monitoring-build
     if [ $# -eq 1 ]; then
-        ./monitoring -outputdir=$ARTIFACTS -configfile=$1 &
+        ./monitoring -outputdir=$ARTIFACT_DIR -configfile=$1 &
     else
-        ./monitoring -outputdir=$ARTIFACTS &
+        ./monitoring -outputdir=$ARTIFACT_DIR &
     fi
     MON_PID=$!
 }
