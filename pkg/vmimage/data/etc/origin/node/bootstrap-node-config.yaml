@@ -20,14 +20,8 @@ imageConfig:
   latest: false
 iptablesSyncPeriod: "30s"
 kubeletArguments:
-  pod-manifest-path:
-  - /etc/origin/node/pods
   bootstrap-kubeconfig:
   - /etc/origin/node/bootstrap.kubeconfig
-  feature-gates:
-  - RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true
-  rotate-certificates:
-  - "true"
   cert-dir:
   - /etc/origin/node/certificates
   cloud-config:
@@ -35,7 +29,17 @@ kubeletArguments:
   cloud-provider:
   - azure
   enable-controller-attach-detach:
-  - 'true'
+  - "true"
+  feature-gates:
+  - RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true
+  max-pods:
+  - "50"
+  pod-manifest-path:
+  - /etc/origin/node/pods
+  rotate-certificates:
+  - "true"
+  runtime-request-timeout:
+  - 10m
 masterClientConnectionOverrides:
   acceptContentTypes: application/vnd.kubernetes.protobuf,application/json
   burst: 40
