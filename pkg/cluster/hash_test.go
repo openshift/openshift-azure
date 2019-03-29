@@ -9,7 +9,7 @@ import (
 	"github.com/ghodss/yaml"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin/api"
+	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/startup"
 	"github.com/openshift/openshift-azure/pkg/sync"
