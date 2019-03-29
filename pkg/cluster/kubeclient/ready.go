@@ -38,7 +38,7 @@ func (u *kubeclient) WaitForReadyWorker(ctx context.Context, hostname string) er
 }
 
 func (u *kubeclient) WaitForReadySyncPod(ctx context.Context) error {
-	return wait.PollImmediateUntil(time.Second,
+	return wait.PollImmediateUntil(10*time.Second,
 		func() (bool, error) {
 			_, err := u.client.CoreV1().
 				Services("kube-system").
