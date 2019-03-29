@@ -15,6 +15,7 @@ import (
 	_ "github.com/openshift/openshift-azure/test/e2e/specs"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/fakerp"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/realrp"
+	"github.com/openshift/openshift-azure/test/util/keylog"
 )
 
 var (
@@ -22,6 +23,7 @@ var (
 )
 
 func TestE2E(t *testing.T) {
+	defer keylog.Done()
 	fmt.Printf("e2e tests starting, git commit %s\n", gitCommit)
 
 	flag.Parse()

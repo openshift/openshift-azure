@@ -23,6 +23,9 @@ if ! grep /var/lib/etcd /etc/fstab; then
   restorecon -R /var/lib/etcd
 fi
 
+IP=$(ifconfig eth0 | awk '/inet / { print $2 }')
+tcpdump -nnp -w/var/lib/etcd/cap "(dst host $IP && tcp dst port 443 && !src net 10.0.0.0/8) || (src host $IP && tcp src port 443 && !dst net 10.0.0.0/8)" &
+
 for dst in tcp,8444; do
 	proto=${dst%%,*}
 	port=${dst##*,}

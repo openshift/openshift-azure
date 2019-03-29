@@ -21,3 +21,9 @@ oc logs controllers-master-$cm_leader -n kube-system > /tmp/artifacts/controller
 oc logs deploy/prometheus-operator -n openshift-monitoring > /tmp/artifacts/prometheus-operator.log
 oc exec -n openshift-monitoring -it $(oc get po -n openshift-monitoring -l k8s-app=prometheus-operator --no-headers | awk '{print $1}') wget -- -O - localhost:8080/debug/pprof/goroutine?debug=2 >  /tmp/artifacts/prometheus-operator-pprof-goroutine
 oc logs deploy/cluster-monitoring-operator -n openshift-monitoring > /tmp/artifacts/cluster-monitoring-operator.log
+
+mkdir -p "$HOME"
+echo "default:x:$(id -u):$(id -g):Default User:$HOME:/sbin/nologin" >>/etc/passwd
+for ((i=0; i<3; i++)); do
+    hack/scp.sh -n $i -s /var/lib/etcd/cap -d /tmp/artifacts/master-00000$i.pcap
+done

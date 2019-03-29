@@ -1,6 +1,9 @@
 package openshift
 
 import (
+	"crypto/tls"
+	"net/http"
+
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	buildv1client "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
 	networkv1client "github.com/openshift/client-go/network/clientset/versioned/typed/network/v1"
@@ -19,6 +22,7 @@ import (
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
+	"github.com/openshift/openshift-azure/test/util/keylog"
 )
 
 type Client struct {
@@ -39,6 +43,15 @@ type Client struct {
 }
 
 func newClientFromRestConfig(config *rest.Config) *Client {
+	config.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
+		t := rt.(*http.Transport)
+		if t.TLSClientConfig == nil {
+			t.TLSClientConfig = &tls.Config{}
+		}
+		t.TLSClientConfig.KeyLogWriter = keylog.Writer()
+		return t
+	}
+
 	return &Client{
 		AppsV1:          appsv1client.NewForConfigOrDie(config),
 		AuthorizationV1: authorizationv1client.NewForConfigOrDie(config),
