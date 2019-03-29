@@ -207,6 +207,26 @@ sed -i -e 's/^ResourceDisk.Format=.*/ResourceDisk.Format=n/' /etc/waagent.conf
 rpm -q kernel --last | sed -n '1 {s/^[^-]*-//; s/ .*$//; p}' >/var/tmp/kernel-version
 rpm -q atomic-openshift-node --qf '%{VERSION}-%{RELEASE}.%{ARCH}' >/var/tmp/openshift-version
 
+# HACK: We replace hyperkube binary with our custom binary to include backports we waiting to be ported to 3.11.
+# Binary delta: https://github.com/mjudeikis/ose/commit/07a01264d5afc9b3e17e35c7777148eaf01ea2bf
+# Related issues: 
+# https://github.com/openshift/openshift-azure/issues/1362
+# https://github.com/kubernetes/kubernetes/pull/70002
+
+curl -o /bin/hyperkube https://hyperkubebin.blob.core.windows.net/hyperkube/hyperkube
+
+# check if binary was not tampered with
+if ! echo "ff1fd9512d22fe1f772c6971b38026a589400fa62f2b5b4842f87e0e84a60932 /bin/hyperkube" | sha256sum --check ; then
+    echo "sha256sum does not match. Update node build script"
+    exit 1
+fi
+
+if [ `cat /var/tmp/openshift-version` != "3.11.82-1.git.0.08bc31b.el7.x86_64" ]; then 
+    echo "new rpm detected. Update node build script"
+    exit 1
+fi
+
+
 >/var/tmp/kickstart_completed
 %end
 KICKSTART
