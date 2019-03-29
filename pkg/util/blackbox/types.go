@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/Microsoft/ApplicationInsights-Go/appinsights"
 )
 
 // Blackbox is interface for blackbox monitoring
@@ -22,6 +25,7 @@ type Blackbox interface {
 // Config defines blackbox instance configuration
 type Config struct {
 	Cli              *http.Client
+	Icli             appinsights.TelemetryClient
 	Req              *http.Request
 	Interval         time.Duration
 	LogInitialErrors bool
@@ -66,10 +70,22 @@ func (c *Config) Start(ctx context.Context) {
 			}
 
 			start := time.Now()
-
 			resp, err := c.Cli.Do(c.Req)
-
 			end := time.Now()
+
+			if c.Icli != nil {
+				if resp != nil {
+					request := appinsights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, resp.Status)
+					request.Id = os.Getenv("RESOURCEGROUP")
+					request.MarkTime(start, end)
+					c.Icli.Track(request)
+				} else {
+					request := appinsights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, "error")
+					request.Id = os.Getenv("RESOURCEGROUP")
+					request.MarkTime(start, end)
+					c.Icli.Track(request)
+				}
+			}
 
 			if err == nil && resp.StatusCode != http.StatusOK {
 				err = fmt.Errorf("invalid status %d", resp.StatusCode)

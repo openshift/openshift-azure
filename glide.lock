@@ -1,6 +1,8 @@
-hash: b79837fbfd7869061763f0107714144a79b2cc9b225134add0762921aaf8f7d2
-updated: 2019-03-20T13:44:42.769971658-07:00
+hash: e592c2d0fac741e4e73d18acd28057d30d8b9d04e5f55ea59aa8717cd211214a
+updated: 2019-03-27T15:58:55.662200072Z
 imports:
+- name: code.cloudfoundry.org/clock
+  version: 02e53af36e6c978af692887ed449b74026d76fec
 - name: contrib.go.opencensus.io/exporter/ocagent
   version: 00af367e65149ff1f2f4b93bbfbb84fd9297170d
 - name: github.com/Azure/azure-sdk-for-go
@@ -106,7 +108,7 @@ imports:
   - ptypes/timestamp
   - ptypes/wrappers
 - name: github.com/google/go-github
-  version: 7462feb2032c2da9e3b85e9b04e6853a6e9e14ca
+  version: fc51e0a08ebd23dfaa8cacd77444a8ca57df151f
   subpackages:
   - github
 - name: github.com/google/go-querystring
@@ -150,6 +152,11 @@ imports:
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
   - pbutil
+- name: github.com/Microsoft/ApplicationInsights-Go
+  version: d2df5d440eda5372f24fcac03839a64d6cb5f7e5
+  subpackages:
+  - appinsights
+  - appinsights/contracts
 - name: github.com/mitchellh/go-homedir
   version: b8bc1bf767474819792c23f32d8286a45736f1c6
 - name: github.com/modern-go/concurrent

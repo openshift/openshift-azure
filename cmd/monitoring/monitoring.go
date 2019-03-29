@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Microsoft/ApplicationInsights-Go/appinsights"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 
@@ -34,6 +35,7 @@ var (
 type monitor struct {
 	log    *logrus.Entry
 	pipcli azureclient.PublicIPAddressesClient
+	icli   appinsights.TelemetryClient
 
 	resourceGroup  string
 	subscriptionID string
@@ -47,6 +49,7 @@ type instance struct {
 }
 
 func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
+	m.log = log
 	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
 	if err != nil {
 		return err
@@ -57,7 +60,11 @@ func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
 	m.resourceGroup = os.Getenv("RESOURCEGROUP")
 	m.subscriptionID = os.Getenv("AZURE_SUBSCRIPTION_ID")
 	m.pipcli = azureclient.NewPublicIPAddressesClient(ctx, m.subscriptionID, authorizer)
-	m.log = log
+
+	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
+		m.log.Info("application insights configured")
+		m.icli = appinsights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
+	}
 
 	return nil
 }
@@ -93,7 +100,7 @@ func (m *monitor) listResourceGroupMonitoringHostnames(ctx context.Context, subs
 	// these routes will not be available at creation time, so we will not check for their availability
 	oc, err := loadOCConfig()
 	if err != nil {
-		m.log.Warn("failed to load OpenShiftManagedCluster config, will not monitor routes")
+		m.log.Warnf("failed to load OpenShiftManagedCluster config, will not monitor routes. Error %s", err.Error())
 	} else {
 		hostnames = append(hostnames, fmt.Sprintf("canary-openshift-azure-monitoring.%s", oc.Properties.RouterProfiles[0].PublicSubdomain))
 	}
@@ -123,6 +130,7 @@ func (m *monitor) run(ctx context.Context) error {
 				},
 				Timeout: time.Second,
 			},
+			Icli:             m.icli,
 			Req:              req,
 			Interval:         *interval,
 			LogInitialErrors: *logerrors,
