@@ -22,12 +22,12 @@ type Interface interface {
 	Hash(role api.AgentPoolProfileRole) ([]byte, error)
 }
 
-func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster) (Interface, error) {
+func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Interface, error) {
 	switch cs.Config.PluginVersion {
 	case "v3.2":
-		return v3.New(log, cs), nil
+		return v3.New(log, cs, testConfig), nil
 	case "v4.0":
-		return v4.New(log, cs), nil
+		return v4.New(log, cs, testConfig), nil
 	}
 
 	return nil, fmt.Errorf("version %q not found", cs.Config.PluginVersion)

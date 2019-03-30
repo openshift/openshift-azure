@@ -9,6 +9,9 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"time"
 
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
@@ -103,6 +106,13 @@ func (g *simpleGenerator) HashData(app *api.AgentPoolProfile) ([]byte, error) {
 	err = json.NewEncoder(buf).Encode(vmss)
 	if err != nil {
 		return nil, err
+	}
+
+	if g.testConfig.DebugHashFunctions {
+		err = ioutil.WriteFile(fmt.Sprintf("vmss-%s-%d", app.Role, time.Now().Unix()), buf.Bytes(), 0666)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return buf.Bytes(), nil

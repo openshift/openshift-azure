@@ -8,11 +8,14 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"fmt"
+	"io/ioutil"
 	"net"
 	"os"
 	"path"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -25,12 +28,13 @@ import (
 )
 
 type startup struct {
-	log *logrus.Entry
-	cs  *api.OpenShiftManagedCluster
+	log        *logrus.Entry
+	cs         *api.OpenShiftManagedCluster
+	testConfig api.TestConfig
 }
 
-func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster) *startup {
-	return &startup{log: log, cs: cs}
+func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) *startup {
+	return &startup{log: log, cs: cs, testConfig: testConfig}
 }
 
 func (s *startup) WriteFiles(ctx context.Context) error {
@@ -75,6 +79,13 @@ func (s *startup) HashData(role api.AgentPoolProfileRole) ([]byte, error) {
 	err := s.writeFiles(role, writers.NewTarWriter(buf), "", "")
 	if err != nil {
 		return nil, err
+	}
+
+	if s.testConfig.DebugHashFunctions {
+		err = ioutil.WriteFile(fmt.Sprintf("startup-%s-%d.tar", role, time.Now().Unix()), buf.Bytes(), 0666)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return buf.Bytes(), nil

@@ -8,6 +8,9 @@ package cluster
 
 import (
 	"crypto/sha256"
+	"fmt"
+	"io/ioutil"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -25,7 +28,7 @@ type Hasher interface {
 type hasher struct {
 	log            *logrus.Entry
 	testConfig     api.TestConfig
-	startupFactory func(*logrus.Entry, *api.OpenShiftManagedCluster) (startup.Interface, error)
+	startupFactory func(*logrus.Entry, *api.OpenShiftManagedCluster, api.TestConfig) (startup.Interface, error)
 	arm            arm.Interface
 }
 
@@ -52,7 +55,7 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 		hash.Write(b)
 	}
 
-	s, err := h.startupFactory(h.log, cs)
+	s, err := h.startupFactory(h.log, cs, h.testConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +91,17 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 		// https://crypto.stackexchange.com/a/46572.
 		hash.Write(cs.Config.Certificates.OpenShiftConsole.Certs[0].Raw)
 		hash.Write(cs.Config.Certificates.Router.Certs[0].Raw)
+
+		if h.testConfig.DebugHashFunctions {
+			err = ioutil.WriteFile(fmt.Sprintf("cert-console-%d", time.Now().Unix()), cs.Config.Certificates.OpenShiftConsole.Certs[0].Raw, 0666)
+			if err != nil {
+				return nil, err
+			}
+			err = ioutil.WriteFile(fmt.Sprintf("cert-router-%d", time.Now().Unix()), cs.Config.Certificates.Router.Certs[0].Raw, 0666)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	return hash.Sum(nil), nil
