@@ -20,6 +20,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 // here follow well known container and blob names
@@ -73,6 +74,9 @@ type simpleUpgrader struct {
 	arm               arm.Interface
 
 	cs *api.OpenShiftManagedCluster
+
+	getConsoleClient   func(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient
+	getAPIServerClient func(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient
 }
 
 var _ Upgrader = &simpleUpgrader{}
@@ -115,8 +119,10 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 			startupFactory: startup.New,
 			arm:            arm,
 		},
-		arm: arm,
-		cs:  cs,
+		arm:                arm,
+		cs:                 cs,
+		getConsoleClient:   getConsoleClient,
+		getAPIServerClient: getAPIServerClient,
 	}
 
 	if initializeStorageClients {

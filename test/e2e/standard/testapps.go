@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
@@ -13,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/util/ready"
-	waitutil "github.com/openshift/openshift-azure/pkg/util/wait"
+	utilwait "github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 const (
@@ -46,7 +47,7 @@ func (sc *SanityChecker) validateStatefulApp(ctx context.Context, namespace stri
 		defer cancel()
 
 		for i := 0; i < times; i++ {
-			resp, err := waitutil.ForHTTPStatusOk(timeout, sc.Log, nil, url)
+			resp, err := utilwait.ForHTTPStatusOk(timeout, sc.Log, &http.Client{Timeout: 10 * time.Second}, url, time.Second)
 			if err != nil {
 				return err
 			}
@@ -144,7 +145,7 @@ func (sc *SanityChecker) validateStatelessApp(ctx context.Context, namespace str
 	sc.Log.Debugf("hitting the route %s and verifying the response", url)
 	timeout, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
-	resp, err := waitutil.ForHTTPStatusOk(timeout, sc.Log, nil, url)
+	resp, err := utilwait.ForHTTPStatusOk(timeout, sc.Log, &http.Client{Timeout: 10 * time.Second}, url, time.Second)
 	if err != nil {
 		return err
 	}
