@@ -181,7 +181,7 @@ func (m *monitor) run(ctx context.Context) error {
 					},
 					DisableKeepAlives: true,
 				},
-				Timeout: time.Second,
+				Timeout: 5 * time.Second,
 			},
 			Icli:             m.icli,
 			Req:              req,
