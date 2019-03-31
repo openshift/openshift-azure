@@ -119,6 +119,7 @@ func (c *Config) Stop(w io.Writer) {
 	}
 
 	var sum time.Duration
+	var errors int
 	for _, sample := range c.samples {
 		sum += sample.latency
 
@@ -136,12 +137,18 @@ func (c *Config) Stop(w io.Writer) {
 
 		if sample.err != nil {
 			fmt.Fprintf(w, " %s", sample.err)
+			errors++
 		}
 
 		fmt.Fprintln(w)
 	}
 
 	fmt.Fprintln(w)
+
+	fmt.Fprintf(w, "start time:     %v\n", c.startTime.UTC().Format("2006-01-02T15:04:05.000"))
+	fmt.Fprintf(w, "stop time:      %v\n", c.stopTime.UTC().Format("2006-01-02T15:04:05.000"))
+
+	fmt.Fprintf(w, "errors:         %d\n", errors)
 
 	fmt.Fprintf(w, "mean   latency: %-4dms\n", sum/time.Duration(len(c.samples))/time.Millisecond)
 
@@ -152,7 +159,6 @@ func (c *Config) Stop(w io.Writer) {
 	fmt.Fprintf(w, "95%%ile latency: %-4dms\n", c.samples[len(c.samples)*95/100].latency/time.Millisecond)
 
 	fmt.Fprintf(w, "99%%ile latency: %-4dms\n", c.samples[len(c.samples)*99/100].latency/time.Millisecond)
-	fmt.Fprintf(w, "start time: %v . end time: %v\n", c.startTime, c.stopTime)
 }
 
 func min(a, b int) int {

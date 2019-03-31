@@ -1,23 +1,49 @@
 #!/bin/bash -x
 
-mkdir -p /tmp/artifacts
+# TODO: we should consider dropping most of this in favour of using Geneva more.
+
+if [[ -z "$ARTIFACT_DIR" ]]; then
+    exit 0
+fi
+
+mkdir -p "$ARTIFACT_DIR"
 
 export KUBECONFIG=$PWD/_data/_out/admin.kubeconfig
-oc get po --all-namespaces -o wide > /tmp/artifacts/pods
-oc get deployments --all-namespaces -o wide > /tmp/artifacts/deployments
-oc get statefulsets --all-namespaces -o wide > /tmp/artifacts/statefulsets
-oc get daemonsets --all-namespaces -o wide > /tmp/artifacts/daemonsets
-oc get no -o wide > /tmp/artifacts/nodes
-oc get events --all-namespaces > /tmp/artifacts/events
-oc logs deployment/sync -n kube-system > /tmp/artifacts/sync.log
-oc logs master-api-master-000000 -n kube-system > /tmp/artifacts/api-master-000000.log
-oc logs master-api-master-000001 -n kube-system > /tmp/artifacts/api-master-000001.log
-oc logs master-api-master-000002 -n kube-system > /tmp/artifacts/api-master-000002.log
-oc logs master-etcd-master-000000 -n kube-system > /tmp/artifacts/etcd-master-000000.log
-oc logs master-etcd-master-000001 -n kube-system > /tmp/artifacts/etcd-master-000001.log
-oc logs master-etcd-master-000002 -n kube-system > /tmp/artifacts/etcd-master-000002.log
-cm_leader=$(oc get cm -n kube-system kube-controller-manager -o yaml | grep -o 00000[0-3])
-oc logs controllers-master-$cm_leader -n kube-system > /tmp/artifacts/controller-manager.log
-oc logs deploy/prometheus-operator -n openshift-monitoring > /tmp/artifacts/prometheus-operator.log
-oc exec -n openshift-monitoring -it $(oc get po -n openshift-monitoring -l k8s-app=prometheus-operator --no-headers | awk '{print $1}') wget -- -O - localhost:8080/debug/pprof/goroutine?debug=2 >  /tmp/artifacts/prometheus-operator-pprof-goroutine
-oc logs deploy/cluster-monitoring-operator -n openshift-monitoring > /tmp/artifacts/cluster-monitoring-operator.log
+
+for ((i=0; i<3; i++)); do
+    oc logs -n kube-system master-api-master-00000$i >"$ARTIFACT_DIR/api-master-00000$i.log"
+    oc logs -n kube-system master-etcd-master-00000$i >"$ARTIFACT_DIR/etcd-master-00000$i.log"
+    true
+done
+
+cm_leader=$(oc get configmap -n kube-system kube-controller-manager -o yaml | grep -o 00000[0-3])
+oc logs controllers-master-$cm_leader -n kube-system >"$ARTIFACT_DIR/controller-manager.log"
+
+for deployment in \
+        kube-system/sync \
+        openshift-monitoring/cluster-monitoring-operator \
+        openshift-monitoring/prometheus-operator \
+        ; do
+	namespace="${deployment%%/*}"
+	name="${deployment##*/}"
+
+    oc logs -n "$namespace" "deployment/$name" >"$ARTIFACT_DIR/$name.log"
+done
+
+for kind in \
+        daemonsets \
+        deployments \
+        events \
+        nodes \
+        pods \
+        statefulsets \
+        ; do
+    oc get "$kind" --all-namespaces -o wide >"$ARTIFACT_DIR/$kind"
+done
+
+for node in $(oc get nodes -o jsonpath='{.items[*].metadata.name}'); do
+    oc get --raw "/api/v1/nodes/$node/proxy/debug/pprof/goroutine?debug=2" >"$ARTIFACT_DIR/$node-goroutines"
+done
+
+po_pod=$(oc get pod -n openshift-monitoring -l k8s-app=prometheus-operator -o jsonpath='{.items[0].metadata.name}')
+oc get --raw "/api/v1/namespaces/openshift-monitoring/pods/$po_pod/proxy/debug/pprof/goroutine?debug=2"

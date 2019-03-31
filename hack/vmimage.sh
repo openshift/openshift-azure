@@ -2,6 +2,11 @@
 
 cleanup() {
   set +e
+
+  if [[ -n "$ARTIFACT_DIR" ]]; then
+    exec &>"$ARTIFACT_DIR/cleanup"
+  fi
+
   make artifacts
 
   if [[ -n "$NO_DELETE" ]]; then

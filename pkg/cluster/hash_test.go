@@ -52,7 +52,7 @@ func TestHashScaleSetStability(t *testing.T) {
 		"v4.0": {
 			{
 				role:         api.AgentPoolProfileRoleMaster,
-				expectedHash: "e8cdb86975df3daf66ce9e2e2d22e2fbf375c19750ffd6947b4f1997abfcf617",
+				expectedHash: "cea9bef3e47ddec4b1d87b0eb1c3d896208b77fd437451508506b7b812373093",
 			},
 			{
 				role:         api.AgentPoolProfileRoleInfra,

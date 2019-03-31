@@ -3,6 +3,10 @@
 cleanup() {
     set +e
 
+    if [[ -n "$ARTIFACT_DIR" ]]; then
+        exec &>"$ARTIFACT_DIR/cleanup"
+    fi
+
     stop_monitoring
     make artifacts
 

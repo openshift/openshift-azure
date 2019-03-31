@@ -23,10 +23,14 @@ setup_secrets() {
 
 start_monitoring() {
     make monitoring-build
+    if [[ -n "$ARTIFACT_DIR" ]]; then
+        outputdir="-outputdir=$ARTIFACT_DIR"
+    fi
+
     if [ $# -eq 1 ]; then
-        ./monitoring -outputdir=$ARTIFACT_DIR -configfile=$1 &
+        ./monitoring "$outputdir" -configfile=$1 &
     else
-        ./monitoring -outputdir=$ARTIFACT_DIR &
+        ./monitoring "$outputdir" &
     fi
     MON_PID=$!
 }
@@ -37,8 +41,6 @@ stop_monitoring() {
         wait
     fi
 }
-
-export ARTIFACT_DIR=$PWD
 
 if [[ ! -e /usr/local/e2e-secrets/azure/secret ]]; then
     return

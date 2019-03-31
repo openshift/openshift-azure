@@ -168,6 +168,8 @@ func (m *monitor) run(ctx context.Context) error {
 		b := &blackbox.Config{
 			Cli: &http.Client{
 				Transport: &http.Transport{
+					// see net/http/transport.go: all Dialer values are default
+					// except for LocalAddr.
 					DialContext: (&net.Dialer{
 						Timeout:   30 * time.Second,
 						KeepAlive: 30 * time.Second,
@@ -179,7 +181,7 @@ func (m *monitor) run(ctx context.Context) error {
 					},
 					DisableKeepAlives: true,
 				},
-				Timeout: time.Second,
+				Timeout: 5 * time.Second,
 			},
 			Icli:             m.icli,
 			Req:              req,

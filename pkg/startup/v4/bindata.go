@@ -7,6 +7,8 @@
 // data/master/etc/etcd/server.crt
 // data/master/etc/etcd/server.key
 // data/master/etc/origin/cloudprovider/azure.conf
+// data/master/etc/origin/master/admin.crt
+// data/master/etc/origin/master/admin.key
 // data/master/etc/origin/master/admin.kubeconfig
 // data/master/etc/origin/master/aggregator-front-proxy.crt
 // data/master/etc/origin/master/aggregator-front-proxy.key
@@ -262,6 +264,46 @@ func masterEtcOriginCloudproviderAzureConf() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "master/etc/origin/cloudprovider/azure.conf", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _masterEtcOriginMasterAdminCrt = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xaa\xae\x56\x70\x4e\x2d\x2a\x71\x2c\x76\xaa\x2c\x49\x2d\x56\xd0\x73\xce\xcf\x4b\xcb\x4c\xd7\x03\x89\x65\xa6\x65\x26\x27\x96\xa4\x16\xeb\x39\xa6\xe4\x66\xe6\x81\x85\x14\x6a\x14\x82\x4b\x8a\x32\xf3\xd2\x15\x6a\x6b\xb9\x00\x01\x00\x00\xff\xff\x21\x3e\xf2\xe6\x3b\x00\x00\x00")
+
+func masterEtcOriginMasterAdminCrtBytes() ([]byte, error) {
+	return bindataRead(
+		_masterEtcOriginMasterAdminCrt,
+		"master/etc/origin/master/admin.crt",
+	)
+}
+
+func masterEtcOriginMasterAdminCrt() (*asset, error) {
+	bytes, err := masterEtcOriginMasterAdminCrtBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "master/etc/origin/master/admin.crt", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _masterEtcOriginMasterAdminKey = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xaa\xae\x56\x08\x28\xca\x2c\x4b\x2c\x49\xf5\x4e\xad\x74\x2c\x76\xaa\x2c\x49\x2d\x56\xd0\x73\xce\xcf\x4b\xcb\x4c\xd7\x73\x4e\x2d\x2a\xc9\x4c\xcb\x4c\x4e\x2c\x49\x2d\xd6\x73\x4c\xc9\xcd\xcc\xd3\xf3\x4e\xad\x54\xa8\x51\x08\x2e\x29\xca\xcc\x4b\x57\xa8\xad\xe5\x02\x04\x00\x00\xff\xff\x26\xc6\x1f\xc6\x40\x00\x00\x00")
+
+func masterEtcOriginMasterAdminKeyBytes() ([]byte, error) {
+	return bindataRead(
+		_masterEtcOriginMasterAdminKey,
+		"master/etc/origin/master/admin.key",
+	)
+}
+
+func masterEtcOriginMasterAdminKey() (*asset, error) {
+	bytes, err := masterEtcOriginMasterAdminKeyBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "master/etc/origin/master/admin.key", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -1405,6 +1447,8 @@ var _bindata = map[string]func() (*asset, error){
 	"master/etc/etcd/server.crt":                              masterEtcEtcdServerCrt,
 	"master/etc/etcd/server.key":                              masterEtcEtcdServerKey,
 	"master/etc/origin/cloudprovider/azure.conf":              masterEtcOriginCloudproviderAzureConf,
+	"master/etc/origin/master/admin.crt":                      masterEtcOriginMasterAdminCrt,
+	"master/etc/origin/master/admin.key":                      masterEtcOriginMasterAdminKey,
 	"master/etc/origin/master/admin.kubeconfig":               masterEtcOriginMasterAdminKubeconfig,
 	"master/etc/origin/master/aggregator-front-proxy.crt":     masterEtcOriginMasterAggregatorFrontProxyCrt,
 	"master/etc/origin/master/aggregator-front-proxy.key":     masterEtcOriginMasterAggregatorFrontProxyKey,
@@ -1517,6 +1561,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 					"azure.conf": {masterEtcOriginCloudproviderAzureConf, map[string]*bintree{}},
 				}},
 				"master": {nil, map[string]*bintree{
+					"admin.crt":                  {masterEtcOriginMasterAdminCrt, map[string]*bintree{}},
+					"admin.key":                  {masterEtcOriginMasterAdminKey, map[string]*bintree{}},
 					"admin.kubeconfig":           {masterEtcOriginMasterAdminKubeconfig, map[string]*bintree{}},
 					"aggregator-front-proxy.crt": {masterEtcOriginMasterAggregatorFrontProxyCrt, map[string]*bintree{}},
 					"aggregator-front-proxy.key": {masterEtcOriginMasterAggregatorFrontProxyKey, map[string]*bintree{}},
