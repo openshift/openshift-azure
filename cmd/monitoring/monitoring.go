@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -120,9 +121,59 @@ func (m *monitor) run(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
+
+		// Monitoring opens a lot of short-lived TCP connections to the LB IP
+		// and to backend IPs simultaneously.  Note the following:
+		//
+		// 1. Linux allows reuse of local TCP source ports as long as the
+		//    remote IP/port tuples are unique across the local IP/port tuple.
+		//
+		// 2. Azure external LBs work by NATing, not by proxying.  The LB
+		//    backend always sees the client IP/port tuple unchanged.
+		//
+		// The `LocalAddr` setting below, which is essential, causes
+		// bind("0.0.0.0:0") to be called before connect() for each new
+		// monitoring connection.  This guarantees that the local source port
+		// for the monitoring connection in question is unique across all
+		// connections on the local system.
+		//
+		// If bind() is not called here, it is possible for a local->backend
+		// monitoring connection and a local->LB connection, perhaps in the fake
+		// RP or in a test process, to share the same source port.  This is
+		// acceptable to the client, but because of rule (2) above, the remote
+		// end will see two different connections with identical endpoints.
+		//
+		// If there is an existing local->LB connection and a subsequent
+		// local->backend connection is attempted, the remote end ignores the
+		// new connection attempt (as it's on a connection which as far as it's
+		// concerned already exists) and resends an acknowledgement on the
+		// original connection.  However, for some reason the acknowledgement
+		// packet is not NATed (the incoming connection attempt has reset the LB
+		// NAT table?) and appears to the client to be an erroneous packet on
+		// the new connection.  The client replies with a reset, which bypasses
+		// the LB and has the effect of resetting the old connection on the
+		// server end.
+		//
+		// At this point, the server is not aware of any live connections.  The
+		// client believes the old connection is still live.  The client now
+		// attempts the new connection again, and the second time around it
+		// succeeds.
+		//
+		// All further local->LB packets on the old connection are silently
+		// dropped by the LB (the public preview "TCP Reset on Idle" feature
+		// would probably help us here).  Dependent on the setting of
+		// tcp_retries2 (see tcp(7)), a timeout error is returned to the client
+		// around 15 minutes later.
+
 		b := &blackbox.Config{
 			Cli: &http.Client{
 				Transport: &http.Transport{
+					DialContext: (&net.Dialer{
+						Timeout:   30 * time.Second,
+						KeepAlive: 30 * time.Second,
+						DualStack: true,
+						LocalAddr: &net.TCPAddr{},
+					}).DialContext,
 					TLSClientConfig: &tls.Config{
 						InsecureSkipVerify: true,
 					},
