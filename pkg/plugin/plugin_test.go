@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
@@ -99,6 +100,7 @@ func TestCreateOrUpdate(t *testing.T) {
 					return clusterUpgrader, nil
 				},
 				log: logrus.NewEntry(logrus.StandardLogger()),
+				now: time.Now,
 			}
 			if err := p.CreateOrUpdate(nil, cs, tt.isUpdate, deployer); err != nil {
 				t.Errorf("plugin.CreateOrUpdate(%s) error = %v", tt.name, err)
@@ -143,6 +145,7 @@ func TestRecoverEtcdCluster(t *testing.T) {
 			return clusterUpgrader, nil
 		},
 		log: logrus.NewEntry(logrus.StandardLogger()),
+		now: time.Now,
 	}
 
 	if err := p.RecoverEtcdCluster(nil, cs, deployer, "test-backup"); err != nil {
@@ -183,6 +186,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 		},
 		log:          logrus.NewEntry(logrus.StandardLogger()),
 		pluginConfig: &pluginapi.Config{},
+		now:          time.Now,
 	}
 
 	if err := p.RotateClusterSecrets(nil, cs, deployer); err != nil {
@@ -217,6 +221,7 @@ func TestForceUpdate(t *testing.T) {
 			return clusterUpgrader, nil
 		},
 		log: logrus.NewEntry(logrus.StandardLogger()),
+		now: time.Now,
 	}
 
 	if err := p.ForceUpdate(nil, cs, deployer); err != nil {
