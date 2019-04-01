@@ -245,32 +245,26 @@ func (sc *SanityChecker) checkCanCreateLB(ctx context.Context) error {
 	}
 	defer sc.deleteProject(ctx, namespace)
 
-	lb := "elb"
 	// create standard external loadbalancer
-	err = sc.createService(lb, namespace, corev1.ServiceTypeLoadBalancer, map[string]string{})
+	err = sc.createService("elb", namespace, corev1.ServiceTypeLoadBalancer, map[string]string{})
 	if err != nil {
 		return err
 	}
-	By(fmt.Sprintf("waiting for %s to be ready (%v)", lb, time.Now()))
-	err = wait.PollImmediate(2*time.Second, 5*time.Minute, ready.CheckServiceIsReady(sc.Client.EndUser.CoreV1.Services(namespace), lb))
-	if err != nil {
-		sc.Client.EndUser.DumpInfo(namespace)
-		return err
-	}
-
-	lb = "ilb"
 	// create azure internal loadbalancer
-	err = sc.createService(lb, namespace, corev1.ServiceTypeLoadBalancer, map[string]string{
+	err = sc.createService("ilb", namespace, corev1.ServiceTypeLoadBalancer, map[string]string{
 		"service.beta.kubernetes.io/azure-load-balancer-internal": "true",
 	})
 	if err != nil {
 		return err
 	}
-	By(fmt.Sprintf("waiting for %s to be ready (%v)", lb, time.Now()))
-	err = wait.PollImmediate(2*time.Second, 5*time.Minute, ready.CheckServiceIsReady(sc.Client.EndUser.CoreV1.Services(namespace), lb))
-	if err != nil {
-		sc.Client.EndUser.DumpInfo(namespace)
-		return err
+
+	for _, lb := range []string{"elb", "ilb"} {
+		By(fmt.Sprintf("waiting for %s to be ready (%v)", lb, time.Now()))
+		err = wait.PollImmediate(2*time.Second, 5*time.Minute, ready.CheckServiceIsReady(sc.Client.EndUser.CoreV1.Services(namespace), lb))
+		if err != nil {
+			sc.Client.EndUser.DumpInfo(namespace)
+			return err
+		}
 	}
 
 	return nil
