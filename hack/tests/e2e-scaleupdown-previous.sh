@@ -33,9 +33,9 @@ T="$(mktemp -d)"
 start_monitoring $T/src/github.com/openshift/openshift-azure/_data/containerservice.yaml
 
 git clone -b "$1" https://github.com/openshift/openshift-azure.git $T/src/github.com/openshift/openshift-azure
+ln -sf "$PWD/secrets" "$T/src/github.com/openshift/openshift-azure"
 (
     cd "$T/src/github.com/openshift/openshift-azure"
-    setup_secrets
     GOPATH="$T" make create
 )
 
