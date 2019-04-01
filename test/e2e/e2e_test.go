@@ -5,6 +5,7 @@ package e2e
 import (
 	"flag"
 	"fmt"
+	"os"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -34,5 +35,9 @@ func TestE2E(t *testing.T) {
 
 	var reporters []Reporter
 	azureReporters := append(reporters, azreporters.NewAzureAppInsightsReporter())
-	RunSpecsWithDefaultAndCustomReporters(t, "e2e tests", azureReporters)
+	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
+		RunSpecsWithDefaultAndCustomReporters(t, "e2e tests", azureReporters)
+	} else {
+		RunSpecs(t, "e2e tests")
+	}
 }

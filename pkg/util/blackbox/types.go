@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/openshift/openshift-azure/pkg/util/azureclient/insights"
+	"github.com/Microsoft/ApplicationInsights-Go/appinsights"
 )
 
 // Blackbox is interface for blackbox monitoring
@@ -25,7 +25,7 @@ type Blackbox interface {
 // Config defines blackbox instance configuration
 type Config struct {
 	Cli              *http.Client
-	ICli             insights.TelemetryClient
+	ICli             appinsights.TelemetryClient
 	Req              *http.Request
 	Interval         time.Duration
 	LogInitialErrors bool
@@ -35,11 +35,6 @@ type Config struct {
 
 	done      chan struct{}
 	collected chan struct{}
-
-	// cluster creation e2e time
-	startTime time.Time
-	stopTime  time.Time
-	duration  time.Time
 
 	logfile string
 }
@@ -54,7 +49,6 @@ type sample struct {
 func (c *Config) Start(ctx context.Context) {
 	c.done = make(chan struct{})
 	c.collected = make(chan struct{})
-	c.startTime = time.Now().UTC()
 
 	t := time.NewTicker(c.Interval)
 
@@ -75,12 +69,12 @@ func (c *Config) Start(ctx context.Context) {
 
 			if c.ICli != nil {
 				if resp != nil {
-					request := insights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, resp.Status)
+					request := appinsights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, resp.Status)
 					request.Id = os.Getenv("RESOURCEGROUP")
 					request.MarkTime(start, end)
 					c.ICli.Track(request)
 				} else {
-					request := insights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, "error")
+					request := appinsights.NewRequestTelemetry(c.Req.Method, c.Req.URL.String(), time.Second, "error")
 					request.Id = os.Getenv("RESOURCEGROUP")
 					request.MarkTime(start, end)
 					c.ICli.Track(request)
@@ -112,8 +106,6 @@ func (c *Config) Stop(w io.Writer) {
 	close(c.done)
 	<-c.collected
 
-	c.stopTime = time.Now().UTC()
-
 	if len(c.samples) == 0 {
 		return
 	}
@@ -144,9 +136,6 @@ func (c *Config) Stop(w io.Writer) {
 	}
 
 	fmt.Fprintln(w)
-
-	fmt.Fprintf(w, "start time:     %v\n", c.startTime.UTC().Format("2006-01-02T15:04:05.000"))
-	fmt.Fprintf(w, "stop time:      %v\n", c.stopTime.UTC().Format("2006-01-02T15:04:05.000"))
 
 	fmt.Fprintf(w, "errors:         %d\n", errors)
 

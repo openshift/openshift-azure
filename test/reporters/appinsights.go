@@ -1,8 +1,4 @@
-/*
-
-Azure App Insights Reporter for Ginkgo
-*/
-
+// Package reporters implements gingo Reporter for  Azure App Insights
 package reporters
 
 import (
@@ -11,41 +7,43 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Microsoft/ApplicationInsights-Go/appinsights"
+	"github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/config"
 	"github.com/onsi/ginkgo/types"
-
-	"github.com/openshift/openshift-azure/pkg/util/azureclient/insights"
 )
 
-type AzureAppInsightsReporter struct {
-	icli insights.TelemetryClient
+type azureAppInsightsReporter struct {
+	icli appinsights.TelemetryClient
 }
 
-func NewAzureAppInsightsReporter() *AzureAppInsightsReporter {
-	icli := insights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
-	icli.Context().CommonProperties["type"] = "gotest"
+var _ ginkgo.Reporter = &azureAppInsightsReporter{}
+
+func NewAzureAppInsightsReporter() ginkgo.Reporter {
+	icli := appinsights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
+	icli.Context().CommonProperties["type"] = "ginkgo"
 	icli.Context().CommonProperties["resourcegroup"] = os.Getenv("RESOURCEGROUP")
-	return &AzureAppInsightsReporter{
+	return &azureAppInsightsReporter{
 		icli: icli,
 	}
 }
 
-func (r *AzureAppInsightsReporter) SpecSuiteWillBegin(config config.GinkgoConfigType, summary *types.SuiteSummary) {
+func (r *azureAppInsightsReporter) SpecSuiteWillBegin(config config.GinkgoConfigType, summary *types.SuiteSummary) {
 }
 
-func (r *AzureAppInsightsReporter) BeforeSuiteDidRun(setupSummary *types.SetupSummary) {
+func (r *azureAppInsightsReporter) BeforeSuiteDidRun(setupSummary *types.SetupSummary) {
 }
 
-func (r *AzureAppInsightsReporter) AfterSuiteDidRun(setupSummary *types.SetupSummary) {
+func (r *azureAppInsightsReporter) AfterSuiteDidRun(setupSummary *types.SetupSummary) {
 }
 
-func (r *AzureAppInsightsReporter) handleSetupSummary(name string, setupSummary *types.SetupSummary) {
+func (r *azureAppInsightsReporter) handleSetupSummary(name string, setupSummary *types.SetupSummary) {
 }
 
-func (r *AzureAppInsightsReporter) SpecWillRun(specSummary *types.SpecSummary) {
+func (r *azureAppInsightsReporter) SpecWillRun(specSummary *types.SpecSummary) {
 }
 
-func (r *AzureAppInsightsReporter) SpecDidComplete(specSummary *types.SpecSummary) {
+func (r *azureAppInsightsReporter) SpecDidComplete(specSummary *types.SpecSummary) {
 	result := map[string]interface{}{
 		"ComponentTexts": strings.Join(specSummary.ComponentTexts, " "),
 		"RunTime":        specSummary.RunTime.String(),
@@ -63,5 +61,5 @@ func (r *AzureAppInsightsReporter) SpecDidComplete(specSummary *types.SpecSummar
 	// fmt.Println(string(resultJSON))
 }
 
-func (r *AzureAppInsightsReporter) SpecSuiteDidEnd(summary *types.SuiteSummary) {
+func (r *azureAppInsightsReporter) SpecSuiteDidEnd(summary *types.SuiteSummary) {
 }
