@@ -8,14 +8,22 @@ fi
 cleanup() {
     set +e
 
+    if [[ -n "$ARTIFACT_DIR" ]]; then
+        exec &>"$ARTIFACT_DIR/cleanup"
+    fi
+
     stop_monitoring
     make artifacts
-    make delete
-    az group delete -g "$RESOURCEGROUP" --yes --no-wait
 
     if [[ -n "$T" ]]; then
         rm -rf "$T"
     fi
+
+    if [[ -n "$NO_DELETE" ]]; then
+        return
+    fi
+    make delete
+    az group delete -g "$RESOURCEGROUP" --yes --no-wait
 }
 trap cleanup EXIT
 
@@ -35,4 +43,4 @@ cp -a "$T/src/github.com/openshift/openshift-azure/_data" .
 
 set_build_images
 
-ADMIN_MANIFEST=test/manifests/fakerp/admin-update.yaml make e2e-scaleupdown
+make e2e-scaleupdown
