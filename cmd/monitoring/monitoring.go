@@ -71,39 +71,32 @@ func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
 }
 
 func (m *monitor) listResourceGroupMonitoringHostnames(ctx context.Context, subscriptionID, resourceGroup string) (hostnames []string, err error) {
-	// get all external IP's used by VMSS
+	// get dedicated routes we want to monitor
 	for {
-		hostnames = []string{}
-		for iter, err := m.pipcli.ListVirtualMachineScaleSetPublicIPAddressesComplete(ctx, resourceGroup, "ss-master"); iter.NotDone(); err = iter.Next() {
-			if err != nil {
-				m.log.Debug("waiting for url")
-				time.Sleep(5 * time.Second)
-			} else if iter.Value().IPAddress != nil {
-				hostnames = append(hostnames, *iter.Value().IPAddress)
-			}
-		}
-		if err == nil && len(hostnames) == 3 {
+		m.log.Debug("waiting for OpenShiftManagedCluster config to be persisted")
+		oc, err := loadOCConfig()
+		if err != nil {
+			time.Sleep(5 * time.Second)
+		} else {
+			hostnames = append(hostnames, fmt.Sprintf("canary-openshift-azure-monitoring.%s", oc.Properties.RouterProfiles[0].PublicSubdomain))
 			break
+		}
+	}
+	// get all external IP's used by VMSS
+	hostnames = []string{}
+	for iter, err := m.pipcli.ListVirtualMachineScaleSetPublicIPAddressesComplete(ctx, resourceGroup, "ss-master"); iter.NotDone(); err = iter.Next() {
+		if err != nil {
+			return nil, err
+		} else if iter.Value().IPAddress != nil {
+			hostnames = append(hostnames, *iter.Value().IPAddress)
 		}
 	}
 	// get api server hostname
-	for {
-		ip, err := m.pipcli.Get(ctx, resourceGroup, "ip-apiserver", "")
-		if err != nil {
-			m.log.Debug("waiting for url")
-			time.Sleep(5 * time.Second)
-		} else if err == nil && ip.Location != nil {
-			hostnames = append(hostnames, fmt.Sprintf("%s.%s.cloudapp.azure.com", *ip.DNSSettings.DomainNameLabel, *ip.Location))
-			break
-		}
-	}
-	// get dedicated routes we want to monitor
-	// these routes will not be available at creation time, so we will not check for their availability
-	oc, err := loadOCConfig()
+	ip, err := m.pipcli.Get(ctx, resourceGroup, "ip-apiserver", "")
 	if err != nil {
-		m.log.Warnf("failed to load OpenShiftManagedCluster config, will not monitor routes. Error %s", err.Error())
-	} else {
-		hostnames = append(hostnames, fmt.Sprintf("canary-openshift-azure-monitoring.%s", oc.Properties.RouterProfiles[0].PublicSubdomain))
+		return nil, err
+	} else if err == nil && ip.Location != nil {
+		hostnames = append(hostnames, fmt.Sprintf("%s.%s.cloudapp.azure.com", *ip.DNSSettings.DomainNameLabel, *ip.Location))
 	}
 	return hostnames, nil
 }
