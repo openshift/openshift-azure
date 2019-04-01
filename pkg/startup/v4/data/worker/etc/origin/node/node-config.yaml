@@ -31,6 +31,8 @@ kubeletArguments:
   - "true"
   feature-gates:
   - RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true
+  max-pods:
+  - "50"
   node-labels:
   - {{ print "node-role.kubernetes.io/" .Role "=true" | quote }}
   pod-manifest-path:
