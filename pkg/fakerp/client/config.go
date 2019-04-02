@@ -33,7 +33,6 @@ type Config struct {
 	Region        string `envconfig:"AZURE_REGION"`
 	ResourceGroup string `envconfig:"RESOURCEGROUP"`
 
-	NoGroupTags      bool   `envconfig:"NOGROUPTAGS"`
 	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
 	Manifest         string `envconfig:"MANIFEST"`
 	NoWait           bool   `envconfig:"NO_WAIT"`
