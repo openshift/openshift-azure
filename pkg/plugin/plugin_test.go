@@ -171,7 +171,7 @@ func TestRotateClusterSecrets(t *testing.T) {
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 
 	c := configInterface.EXPECT().InvalidateSecrets().Return(nil)
-	c = configInterface.EXPECT().Generate(gomock.Any()).Return(nil).After(c)
+	c = configInterface.EXPECT().Generate(gomock.Any(), false).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().CreateOrUpdateConfigStorageAccount(nil).Return(nil).After(c)
 	c = clusterUpgrader.EXPECT().GenerateARM(nil, "", true, gomock.Any()).Return(nil, nil).After(c)
 	c = clusterUpgrader.EXPECT().WriteStartupBlobs().Return(nil).After(c)
