@@ -1,0 +1,370 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  template: s2i-fuse71-eap-camel-amq
+metadata:
+  annotations:
+    description: Red Hat Fuse on EAP Camel A-MQ quickstart. This example demonstrates
+      using the camel-activemq component to connect to A-MQ xPaaS message broker running
+      in OpenShift. It is assumed that the broker is already deployed. More more information,
+      refer to the documentation for the A-MQ xPaaS image related to the amq63-basic
+      template.
+    iconClass: icon-rh-integration
+    openshift.io/display-name: Red Hat Fuse 7.1 Camel A-MQ with EAP
+    openshift.io/provider-display-name: Red Hat, Inc.
+    tags: quickstart,javaee,java,jboss-fuse,fis
+    version: "1.1"
+  name: s2i-fuse71-eap-camel-amq
+  namespace: openshift
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: The web server's http port.
+    labels:
+      app: ${APP_NAME}
+      component: ${APP_NAME}
+      container: eap
+      group: quickstarts
+      provider: s2i
+      version: ${APP_VERSION}
+    name: ${APP_NAME}
+  spec:
+    ports:
+    - port: 8080
+      targetPort: 8080
+    selector:
+      deploymentConfig: ${APP_NAME}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: The JGroups ping port for clustering.
+      service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+    labels:
+      app: ${APP_NAME}
+      component: ${APP_NAME}
+      container: eap
+      group: quickstarts
+      provider: s2i
+      version: ${APP_VERSION}
+    name: ${APP_NAME}-ping
+  spec:
+    clusterIP: None
+    ports:
+    - name: ping
+      port: 8888
+    selector:
+      deploymentConfig: ${APP_NAME}
+- apiVersion: v1
+  id: ${APP_NAME}-http
+  kind: Route
+  metadata:
+    annotations:
+      description: Route for application's http service.
+    labels:
+      app: ${APP_NAME}
+      component: ${APP_NAME}
+      container: eap
+      group: quickstarts
+      provider: s2i
+      version: ${APP_VERSION}
+    name: ${APP_NAME}
+  spec:
+    host: ${HOSTNAME_HTTP}
+    to:
+      name: ${APP_NAME}
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: ${APP_NAME}
+      component: ${APP_NAME}
+      container: eap
+      group: quickstarts
+      provider: s2i
+      version: ${APP_VERSION}
+    name: ${APP_NAME}
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${APP_NAME}:latest
+    resources:
+      limits:
+        memory: ${BUILD_MEMORY_LIMIT}
+      requests:
+        memory: ${BUILD_MEMORY_REQUEST}
+    source:
+      contextDir: ${CONTEXT_DIR}
+      git:
+        ref: ${GIT_REF}
+        uri: ${GIT_REPO}
+      type: Git
+    strategy:
+      sourceStrategy:
+        env:
+        - name: MAVEN_ARGS_APPEND
+          value: ${MAVEN_ARGS_APPEND}
+        - name: MAVEN_MIRROR_URL
+          value: ${MAVEN_MIRROR_URL}
+        - name: ARTIFACT_DIR
+          value: ${ARTIFACT_DIR}
+        forcePull: true
+        from:
+          kind: ImageStreamTag
+          name: fuse7-eap-openshift:${BUILDER_VERSION}
+          namespace: ${IMAGE_STREAM_NAMESPACE}
+        incremental: true
+      type: Source
+    triggers:
+    - github:
+        secret: ${GITHUB_WEBHOOK_SECRET}
+      type: GitHub
+    - generic:
+        secret: ${GENERIC_WEBHOOK_SECRET}
+      type: Generic
+    - imageChange: {}
+      type: ImageChange
+    - type: ConfigChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: ${APP_NAME}
+      component: ${APP_NAME}
+      container: eap
+      group: quickstarts
+      provider: s2i
+      version: ${APP_VERSION}
+    name: ${APP_NAME}
+  spec:
+    replicas: 1
+    selector:
+      deploymentConfig: ${APP_NAME}
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: ${APP_NAME}
+          component: ${APP_NAME}
+          container: eap
+          deploymentConfig: ${APP_NAME}
+          group: quickstarts
+          provider: s2i
+          version: ${APP_VERSION}
+        name: ${APP_NAME}
+      spec:
+        containers:
+        - env:
+          - name: JGROUPS_PING_PROTOCOL
+            value: openshift.DNS_PING
+          - name: OPENSHIFT_DNS_PING_SERVICE_NAME
+            value: ${APP_NAME}-ping
+          - name: OPENSHIFT_DNS_PING_SERVICE_PORT
+            value: "8888"
+          - name: MQ_SERVICE_PREFIX_MAPPING
+            value: ${MQ_SERVICE_PREFIX}=MQ
+          - name: MQ_QUEUES
+            value: ${MQ_QUEUES}
+          - name: MQ_TOPICS
+            value: ${MQ_TOPICS}
+          - name: MQ_USERNAME
+            value: ${MQ_USERNAME}
+          - name: MQ_PASSWORD
+            value: ${MQ_PASSWORD}
+          - name: MQ_JNDI
+            value: ${MQ_JNDI}
+          - name: MQ_PROTOCOL
+            value: tcp
+          - name: JGROUPS_CLUSTER_PASSWORD
+            value: ${JGROUPS_CLUSTER_PASSWORD}
+          - name: AUTO_DEPLOY_EXPLODED
+            value: ${AUTO_DEPLOY_EXPLODED}
+          image: ${APP_NAME}
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - /opt/eap/bin/livenessProbe.sh
+            initialDelaySeconds: 60
+          name: ${APP_NAME}
+          ports:
+          - containerPort: 8778
+            name: jolokia
+            protocol: TCP
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          - containerPort: 8888
+            name: ping
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - /opt/eap/bin/readinessProbe.sh
+          resources:
+            limits:
+              cpu: ${CPU_LIMIT}
+              memory: ${MEMORY_LIMIT}
+            requests:
+              cpu: ${CPU_REQUEST}
+              memory: ${MEMORY_REQUEST}
+        terminationGracePeriodSeconds: 75
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APP_NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${APP_NAME}:latest
+      type: ImageChange
+    - type: ConfigChange
+parameters:
+- description: The name for the application.
+  displayName: Application Name
+  name: APP_NAME
+  required: true
+  value: s2i-fuse71-eap-camel-amq
+- description: The application version.
+  displayName: Application Version
+  name: APP_VERSION
+  required: true
+  value: 5.2.0.fuse-710018-redhat-00001
+- description: 'Custom hostname for http service route.  Leave blank for default hostname,
+    e.g.: <application-name>-<project>.<default-domain-suffix>'
+  displayName: Custom http Route Hostname.
+  name: HOSTNAME_HTTP
+- description: Git source URI for application.
+  displayName: Git Repository URL
+  name: GIT_REPO
+  required: true
+  value: https://github.com/jboss-fuse/wildfly-camel-examples.git
+- description: Git branch/tag reference
+  displayName: Git Reference
+  name: GIT_REF
+  value: wildfly-camel-examples-5.2.0.fuse-710018-redhat-00001
+- description: Path within Git project to build; empty for root project directory.
+  displayName: Context Directory
+  name: CONTEXT_DIR
+- description: The version of the FIS S2I builder image to use.
+  displayName: Builder version
+  name: BUILDER_VERSION
+  value: "1.1"
+- description: The prefix of the TCP service for the A-MQ broker without the protocol
+    part. E.g for broker-amq-tcp the prefix is broker-amq. You may need to create
+    a broker first.
+  displayName: A-MQ Service Prefix
+  name: MQ_SERVICE_PREFIX
+  required: true
+  value: broker-amq
+- description: The username used to authenticate with the broker. Leave it empty if
+    authentication is disabled.
+  displayName: A-MQ Username
+  name: MQ_USERNAME
+- description: The password used to authenticate with the broker. Leave it empty if
+    authentication is disabled.
+  displayName: A-MQ Password
+  name: MQ_PASSWORD
+- description: JNDI name for connection factory used by applications to connect to
+    the broker, e.g. java:/ActiveMQConnectionFactory
+  displayName: JMS Connection Factory JNDI Name
+  name: MQ_JNDI
+  value: java:/ActiveMQConnectionFactory
+- description: Queue names.
+  displayName: Queues
+  name: MQ_QUEUES
+- description: Topic names.
+  displayName: Topics
+  name: MQ_TOPICS
+- description: A-MQ cluster admin password.
+  displayName: A-MQ cluster password
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  name: MQ_CLUSTER_PASSWORD
+  required: true
+- description: GitHub trigger secret.
+  displayName: Github Webhook Secret
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  name: GITHUB_WEBHOOK_SECRET
+  required: true
+- description: Generic build trigger secret.
+  displayName: Generic Webhook Secret
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  name: GENERIC_WEBHOOK_SECRET
+  required: true
+- description: Namespace in which the Fuse ImageStreams are installed. These ImageStreams
+    are normally installed in the openshift namespace. You should only need to modify
+    this if you've installed the ImageStreams in a different namespace/project.
+  displayName: ImageStream Namespace
+  name: IMAGE_STREAM_NAMESPACE
+  required: true
+  value: openshift
+- description: JGroups cluster password.
+  displayName: JGroups Cluster Password
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  name: JGROUPS_CLUSTER_PASSWORD
+  required: true
+- description: Controls whether exploded deployment content should be automatically
+    deployed.
+  displayName: Deploy Exploded Archives
+  name: AUTO_DEPLOY_EXPLODED
+  value: "false"
+- description: Additional arguments passed to mvn, e.g. for multi-module builds.
+  displayName: Maven Arguments To Append
+  name: MAVEN_ARGS_APPEND
+  value: -pl camel-activemq -am
+- description: Maven mirror to use for S2I builds.
+  displayName: Maven mirror URL
+  name: MAVEN_MIRROR_URL
+- description: List of directories from which archives will be copied into the deployment
+    folder. If unspecified, all archives in /target will be copied.
+  displayName: Artifact Directories
+  name: ARTIFACT_DIR
+  value: camel-activemq/target
+- description: The amount of CPU to request.
+  displayName: CPU request
+  name: CPU_REQUEST
+  required: true
+  value: "0.2"
+- description: The amount of CPU the container is limited to use.
+  displayName: CPU limit
+  name: CPU_LIMIT
+  required: true
+  value: "1.0"
+- description: The amount of memory required for the container to run.
+  displayName: Memory request
+  name: MEMORY_REQUEST
+  required: true
+  value: 256Mi
+- description: The amount of memory the container is limited to use.
+  displayName: Memory limit
+  name: MEMORY_LIMIT
+  required: true
+  value: 1Gi
+- description: The amount of memory to request for builds.
+  displayName: Build Memory request
+  name: BUILD_MEMORY_REQUEST
+  required: true
+  value: 0.7G
+- description: The amount of memory the build container is limited to use.
+  displayName: Build Memory limit
+  name: BUILD_MEMORY_LIMIT
+  required: true
+  value: 0.8G
