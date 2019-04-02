@@ -1,24 +1,14 @@
 package client
 
 import (
-	"fmt"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 )
-
-var supportedRegions = []string{
-	//"australiaeast",
-	//"canadacentral",
-	//"canadaeast",
-	"eastus",
-	//"westcentralus",
-	"westeurope",
-	//"westus",
-}
 
 type Config struct {
 	SubscriptionID  string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
@@ -36,30 +26,21 @@ type Config struct {
 	NoWait           bool   `envconfig:"NO_WAIT"`
 }
 
-func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
+func NewConfig(log *logrus.Entry) (*Config, error) {
 	var c Config
 	if err := envconfig.Process("", &c); err != nil {
 		return nil, err
 	}
-	if needRegion {
-		if c.Region == "" {
-			// Randomly assign a supported region
-			rand.Seed(time.Now().UTC().UnixNano())
-			c.Region = supportedRegions[rand.Intn(len(supportedRegions))]
-			log.Infof("using randomly selected region %s", c.Region)
-			os.Setenv("AZURE_REGION", c.Region)
-		}
-
-		var supported bool
-		for _, region := range supportedRegions {
-			if c.Region == region {
-				supported = true
-			}
-		}
-		if !supported {
-			return nil, fmt.Errorf("%s is not a supported region (supported regions: %v)", c.Region, supportedRegions)
-		}
+	if c.Region == "" {
+		c.Region = "eastus" // remove in a follow-up and set Region required:"true"
 	}
+	regions := strings.Split(c.Region, ",")
+	if len(regions) > 1 {
+		rand.Seed(time.Now().UTC().UnixNano())
+		c.Region = regions[rand.Intn(len(regions))]
+		os.Setenv("AZURE_REGION", c.Region)
+	}
+	log.Infof("using region %s", c.Region)
 	if c.AADClientID == "" {
 		c.AADClientID = c.ClientID
 		c.AADClientSecret = c.ClientSecret

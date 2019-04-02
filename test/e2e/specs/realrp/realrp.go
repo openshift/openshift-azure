@@ -34,7 +34,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 		// setting dummy aad
 		os.Setenv("AZURE_AAD_CLIENT_ID", os.Getenv("AZURE_CLIENT_ID"))
 		os.Setenv("AZURE_AAD_CLIENT_SECRET", os.Getenv("AZURE_CLIENT_SECRET"))
-		cfg, err = client.NewConfig(log.GetTestLogger(), true)
+		cfg, err = client.NewConfig(log.GetTestLogger())
 		Expect(err).NotTo(HaveOccurred())
 
 		// create a new resource group

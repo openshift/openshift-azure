@@ -33,7 +33,7 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 		os.Setenv("AZURE_AAD_CLIENT_ID", os.Getenv("AZURE_CLIENT_ID"))
 		os.Setenv("AZURE_AAD_CLIENT_SECRET", os.Getenv("AZURE_CLIENT_SECRET"))
 
-		cfg, err = client.NewConfig(tlog.GetTestLogger(), true)
+		cfg, err = client.NewConfig(tlog.GetTestLogger())
 		Expect(err).NotTo(HaveOccurred())
 
 		// create a new resource group
