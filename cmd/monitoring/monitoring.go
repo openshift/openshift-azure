@@ -72,8 +72,8 @@ func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
 
 func (m *monitor) listResourceGroupMonitoringHostnames(ctx context.Context, subscriptionID, resourceGroup string) (hostnames []string, err error) {
 	// get dedicated routes we want to monitor
+	m.log.Debug("waiting for OpenShiftManagedCluster config to be persisted")
 	for {
-		m.log.Debug("waiting for OpenShiftManagedCluster config to be persisted")
 		oc, err := loadOCConfig()
 		if err != nil {
 			time.Sleep(5 * time.Second)
@@ -83,6 +83,7 @@ func (m *monitor) listResourceGroupMonitoringHostnames(ctx context.Context, subs
 		}
 	}
 	// get all external IP's used by VMSS
+	m.log.Debug("waiting for ss-masters ip addresses")
 	hostnames = []string{}
 	for iter, err := m.pipcli.ListVirtualMachineScaleSetPublicIPAddressesComplete(ctx, resourceGroup, "ss-master"); iter.NotDone(); err = iter.Next() {
 		if err != nil {
@@ -92,6 +93,7 @@ func (m *monitor) listResourceGroupMonitoringHostnames(ctx context.Context, subs
 		}
 	}
 	// get api server hostname
+	m.log.Debug("waiting for ip-apiserver server hostname")
 	ip, err := m.pipcli.Get(ctx, resourceGroup, "ip-apiserver", "")
 	if err != nil {
 		return nil, err
