@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: asb-access
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: asb-access
+subjects:
+- kind: ServiceAccount
+  name: asb-client
+  namespace: openshift-ansible-service-broker

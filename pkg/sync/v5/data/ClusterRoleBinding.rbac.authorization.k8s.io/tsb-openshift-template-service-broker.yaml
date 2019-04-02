@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tsb-openshift-template-service-broker
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:controller:template-service-broker
+subjects:
+- kind: ServiceAccount
+  name: apiserver
+  namespace: openshift-template-service-broker
