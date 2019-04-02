@@ -8,8 +8,6 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
-
-	"github.com/openshift/openshift-azure/pkg/util/random"
 )
 
 var supportedRegions = []string{
@@ -31,7 +29,7 @@ type Config struct {
 	AADClientSecret string `envconfig:"AZURE_AAD_CLIENT_SECRET"`
 
 	Region        string `envconfig:"AZURE_REGION"`
-	ResourceGroup string `envconfig:"RESOURCEGROUP"`
+	ResourceGroup string `envconfig:"RESOURCEGROUP" required:"true"`
 
 	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
 	Manifest         string `envconfig:"MANIFEST"`
@@ -61,16 +59,6 @@ func NewConfig(log *logrus.Entry, needRegion bool) (*Config, error) {
 		if !supported {
 			return nil, fmt.Errorf("%s is not a supported region (supported regions: %v)", c.Region, supportedRegions)
 		}
-	}
-	if c.ResourceGroup == "" {
-		// Generate a resource group name
-		suffix, err := random.LowerCaseAlphanumericString(8)
-		if err != nil {
-			return nil, err
-		}
-		c.ResourceGroup = fmt.Sprintf("generated-%s", suffix)
-		log.Infof("using generated resource group name %s", c.ResourceGroup)
-		os.Setenv("RESOURCEGROUP", c.ResourceGroup)
 	}
 	if c.AADClientID == "" {
 		c.AADClientID = c.ClientID
