@@ -36,7 +36,7 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		// create a new resource group
-		_, err = client.CreateResourceGroup(cfg)
+		err = client.EnsureResourceGroup(cfg)
 		Expect(err).ToNot(HaveOccurred())
 	})
 

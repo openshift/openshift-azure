@@ -11,18 +11,18 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-// CreateResourceGroup creates a resource group and returns whether the
+// EnsureResourceGroup creates a resource group and returns whether the
 // resource group was actually created or not and any error encountered.
-func CreateResourceGroup(conf *Config) (bool, error) {
+func EnsureResourceGroup(conf *Config) error {
 	authorizer, err := azureclient.NewAuthorizer(conf.ClientID, conf.ClientSecret, conf.TenantID, "")
 	if err != nil {
-		return false, err
+		return err
 	}
 	gc := resources.NewGroupsClient(conf.SubscriptionID)
 	gc.Authorizer = authorizer
 
 	if _, err := gc.Get(context.Background(), conf.ResourceGroup); err == nil {
-		return false, nil
+		return nil
 	}
 
 	tags := map[string]*string{
@@ -31,12 +31,11 @@ func CreateResourceGroup(conf *Config) (bool, error) {
 	}
 	if conf.ResourceGroupTTL != "" {
 		if _, err := time.ParseDuration(conf.ResourceGroupTTL); err != nil {
-			return false, fmt.Errorf("invalid ttl provided: %q - %v", conf.ResourceGroupTTL, err)
+			return fmt.Errorf("invalid ttl provided: %q - %v", conf.ResourceGroupTTL, err)
 		}
 		tags["ttl"] = &conf.ResourceGroupTTL
 	}
 
-	rg := resources.Group{Location: &conf.Region, Tags: tags}
-	_, err = gc.CreateOrUpdate(context.Background(), conf.ResourceGroup, rg)
-	return true, err
+	_, err = gc.CreateOrUpdate(context.Background(), conf.ResourceGroup, resources.Group{Location: &conf.Region, Tags: tags})
+	return err
 }

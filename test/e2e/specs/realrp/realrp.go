@@ -37,7 +37,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		// create a new resource group
-		_, err = client.CreateResourceGroup(cfg)
+		err = client.EnsureResourceGroup(cfg)
 		Expect(err).ToNot(HaveOccurred())
 
 		By("creating an OSA cluster")

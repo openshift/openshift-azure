@@ -222,11 +222,10 @@ func main() {
 	}
 
 	if !isDelete {
-		log.Infof("creating resource group %s", conf.ResourceGroup)
-		if isCreate, err := fakerp.CreateResourceGroup(conf); err != nil {
+		log.Infof("ensuring resource group %s", conf.ResourceGroup)
+		err = fakerp.EnsureResourceGroup(conf)
+		if err != nil {
 			log.Fatal(err)
-		} else if !isCreate {
-			log.Infof("reusing existing resource group %s", conf.ResourceGroup)
 		}
 	}
 
