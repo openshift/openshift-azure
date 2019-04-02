@@ -2,7 +2,6 @@ package client
 
 import (
 	"math/rand"
-	"os"
 	"strings"
 	"time"
 
@@ -11,12 +10,15 @@ import (
 )
 
 type Config struct {
-	SubscriptionID  string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
-	TenantID        string `envconfig:"AZURE_TENANT_ID" required:"true"`
-	ClientID        string `envconfig:"AZURE_CLIENT_ID" required:"true"`
-	ClientSecret    string `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
-	AADClientID     string `envconfig:"AZURE_AAD_CLIENT_ID"`
-	AADClientSecret string `envconfig:"AZURE_AAD_CLIENT_SECRET"`
+	SubscriptionID   string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
+	TenantID         string `envconfig:"AZURE_TENANT_ID" required:"true"`
+	ClientID         string `envconfig:"AZURE_CLIENT_ID" required:"true"`
+	ClientSecret     string `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
+	AADClientID      string `envconfig:"AZURE_AAD_CLIENT_ID"`
+	AADClientSecret  string `envconfig:"AZURE_AAD_CLIENT_SECRET"`
+	AADGroupAdminsID string `envconfig:"AZURE_AAD_GROUP_ADMINS_ID"`
+	DeployVersion    string `envconfig:"DEPLOY_VERSION" required:"true"`
+	RunningUnderTest string `envconfig:"RUNNING_UNDER_TEST"`
 
 	Region        string `envconfig:"AZURE_REGION"`
 	ResourceGroup string `envconfig:"RESOURCEGROUP" required:"true"`
@@ -38,14 +40,11 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 	if len(regions) > 1 {
 		rand.Seed(time.Now().UTC().UnixNano())
 		c.Region = regions[rand.Intn(len(regions))]
-		os.Setenv("AZURE_REGION", c.Region)
 	}
 	log.Infof("using region %s", c.Region)
 	if c.AADClientID == "" {
 		c.AADClientID = c.ClientID
 		c.AADClientSecret = c.ClientSecret
-		os.Setenv("AZURE_AAD_CLIENT_ID", c.AADClientID)
-		os.Setenv("AZURE_AAD_CLIENT_SECRET", c.AADClientSecret)
 	}
 	return &c, nil
 }

@@ -3,7 +3,6 @@ package realrp
 import (
 	"context"
 	"fmt"
-	"os"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -28,10 +27,6 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 		var err error
 		cli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).NotTo(HaveOccurred())
-
-		// setting dummy aad
-		os.Setenv("AZURE_AAD_CLIENT_ID", os.Getenv("AZURE_CLIENT_ID"))
-		os.Setenv("AZURE_AAD_CLIENT_SECRET", os.Getenv("AZURE_CLIENT_SECRET"))
 
 		cfg, err = client.NewConfig(tlog.GetTestLogger())
 		Expect(err).NotTo(HaveOccurred())
@@ -87,7 +82,7 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 
 		// load cluster config
 		var config v20190430.OpenShiftManagedCluster
-		err = client.GenerateManifest("../../test/manifests/realrp/create.yaml", &config)
+		err = client.GenerateManifest(cfg, "../../test/manifests/realrp/create.yaml", &config)
 		Expect(err).ToNot(HaveOccurred())
 
 		// Set pre-created peer vnetid in cluster config

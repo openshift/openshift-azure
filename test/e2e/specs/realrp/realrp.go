@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -31,9 +30,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 		var err error
 		cli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).ToNot(HaveOccurred())
-		// setting dummy aad
-		os.Setenv("AZURE_AAD_CLIENT_ID", os.Getenv("AZURE_CLIENT_ID"))
-		os.Setenv("AZURE_AAD_CLIENT_SECRET", os.Getenv("AZURE_CLIENT_SECRET"))
+
 		cfg, err = client.NewConfig(log.GetTestLogger())
 		Expect(err).NotTo(HaveOccurred())
 
@@ -43,7 +40,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 
 		By("creating an OSA cluster")
 		var config v20190430.OpenShiftManagedCluster
-		err = client.GenerateManifest("../../test/manifests/realrp/create.yaml", &config)
+		err = client.GenerateManifest(cfg, "../../test/manifests/realrp/create.yaml", &config)
 		Expect(err).ToNot(HaveOccurred())
 		deployCtx, cancelFn := context.WithTimeout(context.Background(), 30*time.Minute)
 		defer cancelFn()

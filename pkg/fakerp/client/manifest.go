@@ -2,8 +2,6 @@ package client
 
 import (
 	"io/ioutil"
-	"os"
-	"text/template"
 
 	"github.com/ghodss/yaml"
 
@@ -23,15 +21,13 @@ func WriteClusterConfigToManifest(oc *v20190430.OpenShiftManagedCluster, manifes
 // GenerateManifest accepts a manifest file and returns a OSA struct of the type
 // requested by the caller.  If the provided manifest is templatized, it will be
 // parsed appropriately.
-func GenerateManifest(manifestFile string, i interface{}) error {
+func GenerateManifest(conf *Config, manifestFile string, i interface{}) error {
 	b, err := ioutil.ReadFile(manifestFile)
 	if err != nil {
 		return err
 	}
 
-	b, err = utiltemplate.Template(manifestFile, string(b), template.FuncMap{
-		"Getenv": os.Getenv,
-	}, nil)
+	b, err = utiltemplate.Template(manifestFile, string(b), nil, conf)
 	if err != nil {
 		return err
 	}
