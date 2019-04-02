@@ -8,13 +8,11 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 	"syscall"
 	"time"
 
-	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
@@ -189,22 +187,6 @@ func updateAadApplication(ctx context.Context, oc *v20190430.OpenShiftManagedClu
 	return nil
 }
 
-func isConnectionRefused(err error) bool {
-	if autoRestErr, ok := err.(autorest.DetailedError); ok {
-		err = autoRestErr.Original
-	}
-	if urlErr, ok := err.(*url.Error); ok {
-		if netErr, ok := urlErr.Err.(*net.OpError); ok {
-			if sysErr, ok := netErr.Err.(*os.SyscallError); ok {
-				if sysErr.Err == syscall.ECONNREFUSED {
-					return true
-				}
-			}
-		}
-	}
-	return false
-}
-
 func main() {
 	flag.Parse()
 	logrus.SetLevel(logrus.DebugLevel)
@@ -233,6 +215,25 @@ func main() {
 	rpURL := v20190430client.DefaultBaseURI
 	if !*useProd {
 		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
+
+		// wait for the fake RP to start
+		err := wait.PollImmediate(time.Second, time.Minute, func() (bool, error) {
+			c, err := net.Dial("tcp", shared.LocalHttpAddr)
+			if err, ok := err.(*net.OpError); ok {
+				if err, ok := err.Err.(*os.SyscallError); ok {
+					if err.Err == syscall.ECONNREFUSED {
+						return false, nil
+					}
+				}
+			}
+			if err != nil {
+				return false, err
+			}
+			return true, c.Close()
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	// setup the osa clients
@@ -246,46 +247,21 @@ func main() {
 
 	ctx := context.Background()
 	if isDelete {
-		if err := wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
-			if err := delete(ctx, log, v20190430Client, conf.ResourceGroup, conf.NoWait); err != nil {
-				if isConnectionRefused(err) {
-					return false, nil
-				}
-				return false, err
-			}
-			return true, nil
-		}); err != nil {
+		err = delete(ctx, log, v20190430Client, conf.ResourceGroup, conf.NoWait)
+		if err != nil {
 			log.Fatal(err)
 		}
 		return
 	}
 
 	if *restoreFromBlob != "" {
-		err = wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
-			err = adminClient.Restore(ctx, conf.ResourceGroup, conf.ResourceGroup, *restoreFromBlob)
-			if isConnectionRefused(err) {
-				return false, nil
-			}
-			if err != nil {
-				return false, err
-			}
-			return true, nil
-		})
+		err = adminClient.Restore(ctx, conf.ResourceGroup, conf.ResourceGroup, *restoreFromBlob)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	var oc *v20190430.OpenShiftManagedCluster
-	err = wait.PollImmediate(time.Second, 1*time.Hour, func() (bool, error) {
-		if oc, err = execute(ctx, log, adminClient, v20190430Client, conf, *adminManifest); err != nil {
-			if isConnectionRefused(err) {
-				return false, nil
-			}
-			return false, err
-		}
-		return true, nil
-	})
+	oc, err := execute(ctx, log, adminClient, v20190430Client, conf, *adminManifest)
 	if err != nil {
 		log.Fatal(err)
 	}
