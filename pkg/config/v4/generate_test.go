@@ -29,7 +29,7 @@ func TestGenerate(t *testing.T) {
 	populate.Walk(&template, prepare)
 
 	cg := simpleGenerator{cs: cs}
-	err := cg.Generate(template)
+	err := cg.Generate(template, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -153,7 +153,7 @@ func TestInvalidateSecrets(t *testing.T) {
 	if err := g.InvalidateSecrets(); err != nil {
 		t.Errorf("configGenerator.InvalidateSecrets error = %v", err)
 	}
-	g.Generate(template)
+	g.Generate(template, true)
 
 	// compare fields that are expected to be different
 	if reflect.DeepEqual(saved.Config.Certificates.Admin, cs.Config.Certificates.Admin) {

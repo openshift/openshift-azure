@@ -24,7 +24,7 @@ func internalPluginConfig() api.Config {
 	// this is the expected internal equivalent to
 	// internal API Config
 	return api.Config{
-		PluginVersion: "PluginVersion",
+		PluginVersion: "Versions.key",
 		ComponentLogLevel: api.ComponentLogLevel{
 			APIServer:         to.IntPtr(1),
 			ControllerManager: to.IntPtr(1),
@@ -104,7 +104,7 @@ func TestToInternal(t *testing.T) {
 	external.PluginVersion = "should not be copied"
 	// prepare internal type
 	internal := internalPluginConfig()
-	output, _ := ToInternal(&external, &internal, "Versions.key")
+	output, _ := ToInternal(&external, &api.Config{PluginVersion: "Versions.key"}, true)
 	if !reflect.DeepEqual(*output, internal) {
 		t.Errorf("unexpected diff %s", deep.Equal(*output, internal))
 	}

@@ -6,21 +6,20 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-// ToInternal converts from a
-// plugin.OpenShiftManagedCluster.Config to an internal.OpenShiftManagedCluster.Config
-// If old is non-nil, it is going to be used as the base for the internal
-// output where the external request is merged on top of.
-func ToInternal(in *Config, old *api.Config, version string) (*api.Config, error) {
-	if _, found := in.Versions[version]; !found {
-		return nil, fmt.Errorf("version %q not found", version)
-	}
+// ToInternal converts from a plugin.Config to an internal.Config.  If old is
+// non-nil, it is going to be used as the base for the internal output where the
+// external request is merged on top of.  The argument setVersionFields is used
+// on cluster creation or upgrade (not update) to indicate that we should
+// overwrite version-related fields from the plugin config.
+func ToInternal(in *Config, old *api.Config, setVersionFields bool) (*api.Config, error) {
 	c := &api.Config{}
 	if old != nil {
 		c = old.DeepCopy()
 	}
 
-	// do not set c.PluginVersion = in.PluginVersion: this is decided by the
-	// upgrade code!
+	// setting c.PluginVersion = in.PluginVersion is done up-front by the plugin
+	// code.  It could be done here as well (gated by setVersionFields) but
+	// would/should be a no-op.  To simplify the logic, we don't do it.
 
 	if c.ComponentLogLevel.APIServer == nil {
 		c.ComponentLogLevel.APIServer = &in.ComponentLogLevel.APIServer
@@ -32,71 +31,108 @@ func ToInternal(in *Config, old *api.Config, version string) (*api.Config, error
 		c.ComponentLogLevel.Node = &in.ComponentLogLevel.Node
 	}
 
-	c.SSHSourceAddressPrefixes = in.SSHSourceAddressPrefixes
+	if c.SSHSourceAddressPrefixes == nil {
+		c.SSHSourceAddressPrefixes = in.SSHSourceAddressPrefixes
+	}
 
-	// Generic offering configurables
-	c.ImageOffer = in.Versions[version].ImageOffer
-	c.ImagePublisher = in.Versions[version].ImagePublisher
-	c.ImageSKU = in.Versions[version].ImageSKU
-	c.ImageVersion = in.Versions[version].ImageVersion
+	if setVersionFields {
+		inVersion, found := in.Versions[c.PluginVersion]
+		if !found {
+			return nil, fmt.Errorf("version %q not found", c.PluginVersion)
+		}
 
-	// Container images configuration
-	c.Images.AlertManager = in.Versions[version].Images.AlertManager
-	c.Images.AnsibleServiceBroker = in.Versions[version].Images.AnsibleServiceBroker
-	c.Images.ClusterMonitoringOperator = in.Versions[version].Images.ClusterMonitoringOperator
-	c.Images.ConfigReloader = in.Versions[version].Images.ConfigReloader
-	c.Images.Console = in.Versions[version].Images.Console
-	c.Images.ControlPlane = in.Versions[version].Images.ControlPlane
-	c.Images.Grafana = in.Versions[version].Images.Grafana
-	c.Images.KubeRbacProxy = in.Versions[version].Images.KubeRbacProxy
-	c.Images.KubeStateMetrics = in.Versions[version].Images.KubeStateMetrics
-	c.Images.Node = in.Versions[version].Images.Node
-	c.Images.NodeExporter = in.Versions[version].Images.NodeExporter
-	c.Images.OAuthProxy = in.Versions[version].Images.OAuthProxy
-	c.Images.Prometheus = in.Versions[version].Images.Prometheus
-	c.Images.PrometheusConfigReloader = in.Versions[version].Images.PrometheusConfigReloader
-	c.Images.PrometheusOperator = in.Versions[version].Images.PrometheusOperator
-	c.Images.Registry = in.Versions[version].Images.Registry
-	c.Images.RegistryConsole = in.Versions[version].Images.RegistryConsole
-	c.Images.Router = in.Versions[version].Images.Router
-	c.Images.ServiceCatalog = in.Versions[version].Images.ServiceCatalog
-	c.Images.TemplateServiceBroker = in.Versions[version].Images.TemplateServiceBroker
-	c.Images.WebConsole = in.Versions[version].Images.WebConsole
+		// Generic offering configurables
+		c.ImageOffer = inVersion.ImageOffer
+		c.ImagePublisher = inVersion.ImagePublisher
+		c.ImageSKU = inVersion.ImageSKU
+		c.ImageVersion = inVersion.ImageVersion
 
-	c.Images.Format = in.Versions[version].Images.Format
+		// Container images configuration
+		c.Images.AlertManager = inVersion.Images.AlertManager
+		c.Images.AnsibleServiceBroker = inVersion.Images.AnsibleServiceBroker
+		c.Images.ClusterMonitoringOperator = inVersion.Images.ClusterMonitoringOperator
+		c.Images.ConfigReloader = inVersion.Images.ConfigReloader
+		c.Images.Console = inVersion.Images.Console
+		c.Images.ControlPlane = inVersion.Images.ControlPlane
+		c.Images.Grafana = inVersion.Images.Grafana
+		c.Images.KubeRbacProxy = inVersion.Images.KubeRbacProxy
+		c.Images.KubeStateMetrics = inVersion.Images.KubeStateMetrics
+		c.Images.Node = inVersion.Images.Node
+		c.Images.NodeExporter = inVersion.Images.NodeExporter
+		c.Images.OAuthProxy = inVersion.Images.OAuthProxy
+		c.Images.Prometheus = inVersion.Images.Prometheus
+		c.Images.PrometheusConfigReloader = inVersion.Images.PrometheusConfigReloader
+		c.Images.PrometheusOperator = inVersion.Images.PrometheusOperator
+		c.Images.Registry = inVersion.Images.Registry
+		c.Images.RegistryConsole = inVersion.Images.RegistryConsole
+		c.Images.Router = inVersion.Images.Router
+		c.Images.ServiceCatalog = inVersion.Images.ServiceCatalog
+		c.Images.TemplateServiceBroker = inVersion.Images.TemplateServiceBroker
+		c.Images.WebConsole = inVersion.Images.WebConsole
 
-	c.Images.Httpd = in.Versions[version].Images.Httpd
-	c.Images.MasterEtcd = in.Versions[version].Images.MasterEtcd
+		c.Images.Format = inVersion.Images.Format
 
-	c.Images.GenevaLogging = in.Versions[version].Images.GenevaLogging
-	c.Images.GenevaStatsd = in.Versions[version].Images.GenevaStatsd
-	c.Images.GenevaTDAgent = in.Versions[version].Images.GenevaTDAgent
+		c.Images.Httpd = inVersion.Images.Httpd
+		c.Images.MasterEtcd = inVersion.Images.MasterEtcd
 
-	c.Images.AzureControllers = in.Versions[version].Images.AzureControllers
-	c.Images.Canary = in.Versions[version].Images.Canary
-	c.Images.EtcdBackup = in.Versions[version].Images.EtcdBackup
-	c.Images.MetricsBridge = in.Versions[version].Images.MetricsBridge
-	c.Images.Startup = in.Versions[version].Images.Startup
-	c.Images.Sync = in.Versions[version].Images.Sync
-	c.Images.TLSProxy = in.Versions[version].Images.TLSProxy
+		c.Images.GenevaLogging = inVersion.Images.GenevaLogging
+		c.Images.GenevaStatsd = inVersion.Images.GenevaStatsd
+		c.Images.GenevaTDAgent = inVersion.Images.GenevaTDAgent
 
-	c.Certificates.GenevaLogging.Key = in.Certificates.GenevaLogging.Key
-	c.Certificates.GenevaLogging.Cert = in.Certificates.GenevaLogging.Cert
-	c.Certificates.GenevaMetrics.Key = in.Certificates.GenevaMetrics.Key
-	c.Certificates.GenevaMetrics.Cert = in.Certificates.GenevaMetrics.Cert
+		c.Images.AzureControllers = inVersion.Images.AzureControllers
+		c.Images.Canary = inVersion.Images.Canary
+		c.Images.EtcdBackup = inVersion.Images.EtcdBackup
+		c.Images.MetricsBridge = inVersion.Images.MetricsBridge
+		c.Images.Startup = inVersion.Images.Startup
+		c.Images.Sync = inVersion.Images.Sync
+		c.Images.TLSProxy = inVersion.Images.TLSProxy
+	}
+
+	if c.Certificates.GenevaLogging.Key == nil {
+		c.Certificates.GenevaLogging.Key = in.Certificates.GenevaLogging.Key
+	}
+	if c.Certificates.GenevaLogging.Cert == nil {
+		c.Certificates.GenevaLogging.Cert = in.Certificates.GenevaLogging.Cert
+	}
+	if c.Certificates.GenevaMetrics.Key == nil {
+		c.Certificates.GenevaMetrics.Key = in.Certificates.GenevaMetrics.Key
+	}
+	if c.Certificates.GenevaMetrics.Cert == nil {
+		c.Certificates.GenevaMetrics.Cert = in.Certificates.GenevaMetrics.Cert
+	}
 
 	// Geneva integration configurables
-	c.GenevaLoggingSector = in.GenevaLoggingSector
-	c.GenevaLoggingAccount = in.GenevaLoggingAccount
-	c.GenevaLoggingNamespace = in.GenevaLoggingNamespace
-	c.GenevaLoggingControlPlaneAccount = in.GenevaLoggingControlPlaneAccount
-	c.GenevaLoggingControlPlaneEnvironment = in.GenevaLoggingControlPlaneEnvironment
-	c.GenevaLoggingControlPlaneRegion = in.GenevaLoggingControlPlaneRegion
-	c.GenevaMetricsAccount = in.GenevaMetricsAccount
-	c.GenevaMetricsEndpoint = in.GenevaMetricsEndpoint
+	if c.GenevaLoggingSector == "" {
+		c.GenevaLoggingSector = in.GenevaLoggingSector
+	}
+	if c.GenevaLoggingAccount == "" {
+		c.GenevaLoggingAccount = in.GenevaLoggingAccount
+	}
+	if c.GenevaLoggingNamespace == "" {
+		c.GenevaLoggingNamespace = in.GenevaLoggingNamespace
+	}
+	if c.GenevaLoggingControlPlaneAccount == "" {
+		c.GenevaLoggingControlPlaneAccount = in.GenevaLoggingControlPlaneAccount
+	}
+	if c.GenevaLoggingControlPlaneEnvironment == "" {
+		c.GenevaLoggingControlPlaneEnvironment = in.GenevaLoggingControlPlaneEnvironment
+	}
+	if c.GenevaLoggingControlPlaneRegion == "" {
+		c.GenevaLoggingControlPlaneRegion = in.GenevaLoggingControlPlaneRegion
+	}
+	if c.GenevaMetricsAccount == "" {
+		c.GenevaMetricsAccount = in.GenevaMetricsAccount
+	}
+	if c.GenevaMetricsEndpoint == "" {
+		c.GenevaMetricsEndpoint = in.GenevaMetricsEndpoint
+	}
 
-	c.Images.ImagePullSecret = in.ImagePullSecret
-	c.Images.GenevaImagePullSecret = in.GenevaImagePullSecret
+	if c.Images.ImagePullSecret == nil {
+		c.Images.ImagePullSecret = in.ImagePullSecret
+	}
+	if c.Images.GenevaImagePullSecret == nil {
+		c.Images.GenevaImagePullSecret = in.GenevaImagePullSecret
+	}
 
 	return c, nil
 }

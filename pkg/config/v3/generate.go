@@ -17,8 +17,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
-func (g *simpleGenerator) Generate(template *pluginapi.Config) (err error) {
-	config, err := pluginapi.ToInternal(template, &g.cs.Config, g.cs.Config.PluginVersion)
+func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields bool) (err error) {
+	config, err := pluginapi.ToInternal(template, &g.cs.Config, setVersionFields)
 	if err != nil {
 		return err
 	}

@@ -16,7 +16,7 @@ import (
 )
 
 type Interface interface {
-	Generate(template *pluginapi.Config) error
+	Generate(template *pluginapi.Config, setVersionFields bool) error
 	InvalidateSecrets() error
 }
 
