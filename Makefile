@@ -1,8 +1,5 @@
-COMMIT=$(shell git rev-parse --short HEAD)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
-PLUGIN_VERSION=$(shell awk '/^pluginVersion: /{ print $$2 }' <pluginconfig/pluginconfig-311.yaml)
-$(info PLUGIN_VERSION is ${PLUGIN_VERSION})
-$(info TAG set to ${TAG})
-LDFLAGS="-X main.gitCommit=$(COMMIT)"
+TAG=$(shell git describe --tags HEAD)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
+LDFLAGS="-X main.gitCommit=$(TAG)"
 E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
 AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
 ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
