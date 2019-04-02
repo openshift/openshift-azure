@@ -120,7 +120,8 @@ func execute(
 	adminManifest string,
 ) (*v20190430.OpenShiftManagedCluster, error) {
 	if adminManifest != "" {
-		oc, err := fakerp.GenerateManifestAdmin(adminManifest)
+		var oc *admin.OpenShiftManagedCluster
+		err := fakerp.GenerateManifest(adminManifest, &oc)
 		if err != nil {
 			return nil, fmt.Errorf("failed reading admin manifest: %v", err)
 		}
@@ -145,7 +146,8 @@ func execute(
 		manifest = defaultManifestFile
 	}
 
-	oc, err := fakerp.GenerateManifest(manifest)
+	var oc *v20190430.OpenShiftManagedCluster
+	err := fakerp.GenerateManifest(manifest, &oc)
 	if err != nil {
 		return nil, fmt.Errorf("failed reading manifest: %v", err)
 	}

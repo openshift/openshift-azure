@@ -11,6 +11,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-06-01/network"
 
+	"github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	tlog "github.com/openshift/openshift-azure/test/util/log"
@@ -85,7 +86,8 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 		Expect(len(*vnet.VirtualNetworkPeerings)).To(Equal(0))
 
 		// load cluster config
-		config, err := client.GenerateManifest("../../test/manifests/realrp/create.yaml")
+		var config v20190430.OpenShiftManagedCluster
+		err = client.GenerateManifest("../../test/manifests/realrp/create.yaml", &config)
 		Expect(err).ToNot(HaveOccurred())
 
 		// Set pre-created peer vnetid in cluster config
@@ -93,7 +95,7 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 
 		// create a cluster with the peerVnet
 		By("creating an OSA cluster")
-		_, err = cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(ctx, cfg.ResourceGroup, cfg.ResourceGroup, *config)
+		_, err = cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(ctx, cfg.ResourceGroup, cfg.ResourceGroup, config)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("ensuring the OSA cluster vnet is peered with the custom vnet")

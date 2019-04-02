@@ -8,7 +8,6 @@ import (
 	"github.com/ghodss/yaml"
 
 	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
-	admin "github.com/openshift/openshift-azure/pkg/api/admin"
 	utiltemplate "github.com/openshift/openshift-azure/pkg/util/template"
 )
 
@@ -21,58 +20,21 @@ func WriteClusterConfigToManifest(oc *v20190430.OpenShiftManagedCluster, manifes
 	return ioutil.WriteFile(manifestFile, out, 0666)
 }
 
-// GenerateManifest accepts a manifest file and returns a typed OSA
-// v20190430 struct that can be used to request OSA creates
-// and updates. If the provided manifest is templatized, it will be
+// GenerateManifest accepts a manifest file and returns a OSA struct of the type
+// requested by the caller.  If the provided manifest is templatized, it will be
 // parsed appropriately.
-func GenerateManifest(manifestFile string) (*v20190430.OpenShiftManagedCluster, error) {
+func GenerateManifest(manifestFile string, i interface{}) error {
 	b, err := ioutil.ReadFile(manifestFile)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	b, err = utiltemplate.Template(manifestFile, string(b), template.FuncMap{
 		"Getenv": os.Getenv,
 	}, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	oc := &v20190430.OpenShiftManagedCluster{}
-	if err = yaml.Unmarshal(b, oc); err != nil {
-		return nil, err
-	}
-
-	if oc.Properties != nil {
-		oc.Properties.ProvisioningState = nil // TODO: should not need to do this
-	}
-	return oc, nil
-}
-
-// GenerateManifestAdmin accepts a manifest file and returns a typed
-// OSA admin struct that can be used to request OSA admin updates.
-// If the provided manifest is templatized, it will be parsed
-// appropriately.
-func GenerateManifestAdmin(manifestFile string) (*admin.OpenShiftManagedCluster, error) {
-	b, err := ioutil.ReadFile(manifestFile)
-	if err != nil {
-		return nil, err
-	}
-
-	b, err = utiltemplate.Template(manifestFile, string(b), template.FuncMap{
-		"Getenv": os.Getenv,
-	}, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	oc := &admin.OpenShiftManagedCluster{}
-	if err = yaml.Unmarshal(b, oc); err != nil {
-		return nil, err
-	}
-
-	if oc.Properties != nil {
-		oc.Properties.ProvisioningState = nil // TODO: should not need to do this
-	}
-	return oc, nil
+	return yaml.Unmarshal(b, i)
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	"github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/util/log"
@@ -41,11 +42,12 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		By("creating an OSA cluster")
-		config, err := client.GenerateManifest("../../test/manifests/realrp/create.yaml")
+		var config v20190430.OpenShiftManagedCluster
+		err = client.GenerateManifest("../../test/manifests/realrp/create.yaml", &config)
 		Expect(err).ToNot(HaveOccurred())
 		deployCtx, cancelFn := context.WithTimeout(context.Background(), 30*time.Minute)
 		defer cancelFn()
-		_, err = cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(deployCtx, cfg.ResourceGroup, cfg.ResourceGroup, *config)
+		_, err = cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(deployCtx, cfg.ResourceGroup, cfg.ResourceGroup, config)
 		Expect(err).NotTo(HaveOccurred())
 	})
 
