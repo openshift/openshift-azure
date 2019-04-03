@@ -7,8 +7,10 @@ import (
 	"time"
 
 	security "github.com/openshift/client-go/security/clientset/versioned"
+	fakesec "github.com/openshift/client-go/security/clientset/versioned/fake"
 	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/fake"
 	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
@@ -167,5 +169,12 @@ func NewKubeclient(log *logrus.Entry, config *v1.Config, disableKeepAlives bool)
 		client: cli,
 		seccli: seccli,
 	}, nil
+}
 
+func NewFakeKubeclient(log *logrus.Entry, cli *fake.Clientset, seccli *fakesec.Clientset) Kubeclient {
+	return &kubeclient{
+		log:    log,
+		client: cli,
+		seccli: seccli,
+	}
 }
