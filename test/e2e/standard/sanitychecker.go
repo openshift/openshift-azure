@@ -2,6 +2,10 @@ package standard
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
@@ -83,6 +87,37 @@ func (sc *SanityChecker) CreateTestApp(ctx context.Context) (interface{}, []*Tes
 	return namespace, errs
 }
 
+func (sc *SanityChecker) debugValidateTestApp() error {
+	nodes, err := sc.Client.Admin.CoreV1.Nodes().List(metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	var nodename string
+	for _, node := range nodes.Items {
+		if strings.HasPrefix(node.Name, "compute-") {
+			nodename = node.Name
+			break
+		}
+	}
+	if nodename == "" {
+		return fmt.Errorf("could not find compute node")
+	}
+
+	b, err := sc.Client.Admin.CoreV1.RESTClient().Get().
+		Resource("nodes").
+		Name(nodename).
+		SubResource("proxy").
+		Suffix("/debug/pprof/goroutine").
+		Param("debug", "2").
+		DoRaw()
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(os.Getenv("ARTIFACT_DIR")+"/compute-testapp-goroutine-dump", b, 0666)
+}
+
 func (sc *SanityChecker) ValidateTestApp(ctx context.Context, cookie interface{}) (errs []*TestError) {
 	namespace := cookie.(string)
 	sc.log.Debugf("validating stateful test app in %s", namespace)
@@ -90,6 +125,12 @@ func (sc *SanityChecker) ValidateTestApp(ctx context.Context, cookie interface{}
 	if err != nil {
 		sc.log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "validateStatefulApp"})
+	}
+	if os.Getenv("ARTIFACT_DIR") != "" && err != nil {
+		err = sc.debugValidateTestApp()
+		if err != nil {
+			errs = append(errs, &TestError{Err: err, Bucket: "validateStatefulApp"})
+		}
 	}
 	return
 }
