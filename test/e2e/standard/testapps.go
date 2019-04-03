@@ -112,6 +112,12 @@ func (sc *SanityChecker) validateStatefulApp(ctx context.Context, namespace stri
 			return waitErr
 		}
 	}
+	sc.log.Debug("waiting for app to recover from database outage") // it might be crash looping
+	waitErr := wait.PollImmediate(2*time.Second, 10*time.Minute, ready.CheckDeploymentConfigIsReady(sc.Client.EndUser.OAppsV1.DeploymentConfigs(namespace), "django-psql-persistent"))
+	if waitErr != nil {
+		return waitErr
+	}
+
 	// hit it again, will hit 3 times as specified initially
 	sc.log.Debugf("hitting the route again, expecting counter to increment from last")
 	err = loopHTTPGet(url, regex, 3)
