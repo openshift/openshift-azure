@@ -7,6 +7,7 @@ data:
         @type local
         path /var/log/journald.pos
       </storage>
+      read_from_head true
       tag logs
     </source>
     <match logs>
