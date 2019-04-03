@@ -209,6 +209,7 @@ Prepare a new PR to master which does the following:
 * updates pluginconfig-311.yaml as follows:
   - sets pluginVersion to v(x+1).0
   - copies versions/vx.n to versions/v(x+1).0
+  - changes versions/vx.n images from :latest to :vx.n
 * copies pkg/{arm,config,startup,sync}/vx directories to
   pkg/{arm,config,startup,sync}/v(x+1)
 * adds new directory mappings for v(x+1).0 in
