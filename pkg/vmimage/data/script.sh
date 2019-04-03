@@ -78,7 +78,6 @@ zerombr
 -jansson
 -kbd*
 -kernel-tools*
--kexec-tools
 -libdaemon
 -libnl3-cli
 -libsysfs
@@ -150,6 +149,7 @@ yum -y install \
     irqbalance \
     iscsi-initiator-utils \
     kernel \
+    kexec-tools \
     lsof \
     NetworkManager-config-server \
     NetworkManager \
@@ -207,10 +207,15 @@ sed -i -e 's/^ResourceDisk.Format=.*/ResourceDisk.Format=n/' /etc/waagent.conf
 rpm -q kernel --last | sed -n '1 {s/^[^-]*-//; s/ .*$//; p}' >/var/tmp/kernel-version
 rpm -q atomic-openshift-node --qf '%{VERSION}-%{RELEASE}.%{ARCH}' >/var/tmp/openshift-version
 
+# enabling kdump
+grub2-mkconfig -o /boot/grub2/grub.cfg
+systemctl enable kdump.service
+
 >/var/tmp/kickstart_completed
 %end
 KICKSTART
 
+# virt-install insists it needs a pty, so we give it one
 python -c "import pty; pty.spawn([
     'virt-install',
     '--disk', '/var/lib/libvirt/images/$IMAGE.raw,size=$DISKGIB,format=raw',
