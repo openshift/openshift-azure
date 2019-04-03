@@ -33,7 +33,7 @@ type DeepTestInterface interface {
 }
 
 type SanityChecker struct {
-	log    *logrus.Entry
+	Log    *logrus.Entry
 	cs     *internalapi.OpenShiftManagedCluster
 	Client *openshift.ClientSet
 }
@@ -43,7 +43,7 @@ var _ DeepTestInterface = &SanityChecker{}
 // NewSanityChecker creates a new deep test sanity checker for OpenshiftManagedCluster resources.
 func NewSanityChecker(ctx context.Context, log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*SanityChecker, error) {
 	scc := &SanityChecker{
-		log: log,
+		Log: log,
 		cs:  cs,
 	}
 
@@ -67,17 +67,17 @@ func NewSanityChecker(ctx context.Context, log *logrus.Entry, cs *internalapi.Op
 
 func (sc *SanityChecker) CreateTestApp(ctx context.Context) (interface{}, []*TestError) {
 	var errs []*TestError
-	sc.log.Debugf("creating openshift project for test apps")
+	sc.Log.Debugf("creating openshift project for test apps")
 	namespace, err := sc.createProject(ctx)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "createProject"})
 		return nil, errs
 	}
-	sc.log.Debugf("creating stateful test app in %s", namespace)
+	sc.Log.Debugf("creating stateful test app in %s", namespace)
 	err = sc.createStatefulApp(ctx, namespace)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "createStatefulApp"})
 	}
 	return namespace, errs
@@ -85,68 +85,68 @@ func (sc *SanityChecker) CreateTestApp(ctx context.Context) (interface{}, []*Tes
 
 func (sc *SanityChecker) ValidateTestApp(ctx context.Context, cookie interface{}) (errs []*TestError) {
 	namespace := cookie.(string)
-	sc.log.Debugf("validating stateful test app in %s", namespace)
+	sc.Log.Debugf("validating stateful test app in %s", namespace)
 	err := sc.validateStatefulApp(ctx, namespace)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "validateStatefulApp"})
 	}
 	return
 }
 
 func (sc *SanityChecker) ValidateCluster(ctx context.Context) (errs []*TestError) {
-	sc.log.Debugf("validating that nodes are labelled correctly")
+	sc.Log.Debugf("validating that nodes are labelled correctly")
 	err := sc.checkNodesLabelledCorrectly(ctx)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkNodesLabelledCorrectly"})
 	}
-	sc.log.Debugf("validating that all monitoring components are healthy")
+	sc.Log.Debugf("validating that all monitoring components are healthy")
 	err = sc.checkMonitoringStackHealth(ctx)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkMonitoringStackHealth"})
 	}
-	sc.log.Debugf("validating that pod disruption budgets are immutable")
+	sc.Log.Debugf("validating that pod disruption budgets are immutable")
 	err = sc.checkDisallowsPdbMutations(ctx)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkDisallowsPdbMutations"})
 	}
-	sc.log.Debugf("validating that an end user cannot access infrastructure components")
+	sc.Log.Debugf("validating that an end user cannot access infrastructure components")
 	err = sc.checkCannotAccessInfraResources(ctx)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCannotAccessInfraResources"})
 	}
-	sc.log.Debugf("validating that the cluster can pull redhat.io images")
+	sc.Log.Debugf("validating that the cluster can pull redhat.io images")
 	err = sc.checkCanDeployRedhatIoImages(ctx)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanDeployRedhatIoImages"})
 	}
-	sc.log.Debugf("validating that the cluster can create ELB and ILB")
+	sc.Log.Debugf("validating that the cluster can create ELB and ILB")
 	err = sc.checkCanCreateLB(ctx)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanCreateLB"})
 	}
-	sc.log.Debugf("validating that cluster services are available")
+	sc.Log.Debugf("validating that cluster services are available")
 	err = sc.checkCanAccessServices(ctx)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanAccessServices"})
 	}
-	sc.log.Debugf("validating that the cluster can use azure-file storage")
+	sc.Log.Debugf("validating that the cluster can use azure-file storage")
 	err = sc.checkCanUseAzureFileStorage(ctx)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanUseAzureFile"})
 	}
-	sc.log.Debugf("validating that Docker builds are not permitted")
+	sc.Log.Debugf("validating that Docker builds are not permitted")
 	err = sc.checkCantDoDockerBuild(ctx)
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCantDoDockerBuild"})
 	}
 	return
@@ -154,10 +154,10 @@ func (sc *SanityChecker) ValidateCluster(ctx context.Context) (errs []*TestError
 
 func (sc *SanityChecker) DeleteTestApp(ctx context.Context, cookie interface{}) []*TestError {
 	var errs []*TestError
-	sc.log.Debugf("deleting openshift project for test apps")
+	sc.Log.Debugf("deleting openshift project for test apps")
 	err := sc.deleteProject(ctx, cookie.(string))
 	if err != nil {
-		sc.log.Error(err)
+		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "deleteProject"})
 	}
 	return errs
