@@ -65,6 +65,8 @@ func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
 	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
 		m.log.Info("application insights configured")
 		m.icli = appinsights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
+		m.icli.Context().CommonProperties["type"] = "monitoring"
+		m.icli.Context().CommonProperties["resourcegroup"] = os.Getenv("RESOURCEGROUP")
 	}
 
 	return nil
@@ -176,7 +178,7 @@ func (m *monitor) run(ctx context.Context) error {
 				},
 				Timeout: 5 * time.Second,
 			},
-			Icli:             m.icli,
+			ICli:             m.icli,
 			Req:              req,
 			Interval:         *interval,
 			LogInitialErrors: *logerrors,
@@ -199,6 +201,7 @@ func (m *monitor) run(ctx context.Context) error {
 	ch := make(chan os.Signal)
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 	<-ch
+	// persist blackbox monitors
 	return m.persist(m.instances)
 
 }
