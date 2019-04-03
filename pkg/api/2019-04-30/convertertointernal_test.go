@@ -31,6 +31,7 @@ func managedCluster() *OpenShiftManagedCluster {
 }
 
 func TestToInternal(t *testing.T) {
+	provisioningState := ProvisioningState(Creating)
 	tests := []struct {
 		name           string
 		input          *OpenShiftManagedCluster
@@ -54,7 +55,7 @@ func TestToInternal(t *testing.T) {
 					},
 				},
 			},
-			base: api.GetInternalMockCluster(),
+			base: api.GetInternalMockCluster(false),
 			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
 				expectedCs.Properties.RouterProfiles[0].PublicSubdomain = "NewPublicSubdomain"
 			},
@@ -70,7 +71,7 @@ func TestToInternal(t *testing.T) {
 					},
 				},
 			},
-			base: api.GetInternalMockCluster(),
+			base: api.GetInternalMockCluster(false),
 			err:  errors.New("invalid router profile - name is missing"),
 		},
 		{
@@ -89,7 +90,7 @@ func TestToInternal(t *testing.T) {
 					},
 				},
 			},
-			base: api.GetInternalMockCluster(),
+			base: api.GetInternalMockCluster(false),
 			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
 				expectedCs.Properties.AgentPoolProfiles = append(expectedCs.Properties.AgentPoolProfiles,
 					api.AgentPoolProfile{
@@ -117,7 +118,7 @@ func TestToInternal(t *testing.T) {
 					},
 				},
 			},
-			base: api.GetInternalMockCluster(),
+			base: api.GetInternalMockCluster(false),
 			err:  errors.New("invalid agent pool profile - name is missing"),
 		},
 		{
@@ -136,7 +137,7 @@ func TestToInternal(t *testing.T) {
 					},
 				},
 			},
-			base: api.GetInternalMockCluster(),
+			base: api.GetInternalMockCluster(false),
 			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
 				expectedCs.Properties.AuthProfile = api.AuthProfile{
 					IdentityProviders: []api.IdentityProvider{
@@ -169,7 +170,7 @@ func TestToInternal(t *testing.T) {
 					},
 				},
 			},
-			base: api.GetInternalMockCluster(),
+			base: api.GetInternalMockCluster(false),
 			err:  errors.New("cannot update the kind of the identity provider"),
 		},
 		{
@@ -187,7 +188,7 @@ func TestToInternal(t *testing.T) {
 					},
 				},
 			},
-			base: api.GetInternalMockCluster(),
+			base: api.GetInternalMockCluster(false),
 			err:  errors.New("invalid identity provider - name is missing"),
 		},
 		{
@@ -195,14 +196,25 @@ func TestToInternal(t *testing.T) {
 			input: &OpenShiftManagedCluster{
 				Plan: nil,
 			},
-			base: api.GetInternalMockCluster(),
+			base: api.GetInternalMockCluster(false),
+			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
+			},
+		},
+		{
+			name: "dropped ProvisioningState",
+			input: &OpenShiftManagedCluster{
+				Properties: &Properties{
+					ProvisioningState: &provisioningState,
+				},
+			},
+			base: api.GetInternalMockCluster(false),
 			expectedChange: func(expectedCs *api.OpenShiftManagedCluster) {
 			},
 		},
 	}
 
 	for _, test := range tests {
-		expected := api.GetInternalMockCluster()
+		expected := api.GetInternalMockCluster(false)
 		if test.expectedChange != nil {
 			test.expectedChange(expected)
 		}
@@ -225,6 +237,11 @@ func TestRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
+	// dropped fields might be in the start,
+	// but they will be dropped in the final result
+	*start.Properties.ProvisioningState = ""
+
 	end := FromInternal(internal)
 	if !reflect.DeepEqual(start, end) {
 		t.Errorf("unexpected diff %s", deep.Equal(start, end))

@@ -71,9 +71,8 @@ func mergeProperties(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluste
 	if oc.Properties == nil {
 		return nil
 	}
-	if oc.Properties.ProvisioningState != nil {
-		cs.Properties.ProvisioningState = api.ProvisioningState(*oc.Properties.ProvisioningState)
-	}
+	// ProvisioningState field is dropped from customer API payloads
+	// oc.Properties.ProvisioningState
 	if oc.Properties.OpenShiftVersion != nil {
 		cs.Properties.OpenShiftVersion = *oc.Properties.OpenShiftVersion
 	}

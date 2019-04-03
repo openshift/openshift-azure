@@ -33,7 +33,7 @@ func managedCluster() *OpenShiftManagedCluster {
 }
 
 func internalManagedCluster() *api.OpenShiftManagedCluster {
-	cs := api.GetInternalMockCluster()
+	cs := api.GetInternalMockCluster(false)
 
 	prepare := func(v reflect.Value) {
 		switch v.Interface().(type) {
@@ -309,6 +309,11 @@ func TestRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
+	// dropped fields might be in the start,
+	// but they will be dropped in the final result
+	*start.Properties.ProvisioningState = ""
+
 	end := FromInternal(internal)
 	if !reflect.DeepEqual(start, end) {
 		t.Errorf("unexpected diff %s", deep.Equal(start, end))

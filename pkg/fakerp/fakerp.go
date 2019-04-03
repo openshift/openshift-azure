@@ -72,6 +72,15 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
+	// set right provisioning state in the internal model
+	if isAdmin {
+		cs.Properties.ProvisioningState = api.AdminUpdating
+	} else if oldCs != nil {
+		cs.Properties.ProvisioningState = api.Updating
+	} else {
+		cs.Properties.ProvisioningState = api.Creating
+	}
+
 	// validate the internal API representation (with reference to the previous
 	// internal API representation)
 	// we set fqdn during enrichment which is slightly different than what the RP
@@ -142,7 +151,6 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 	if err != nil {
 		return nil, err
 	}
-
 	log.Info("plugin createorupdate")
 	deployer := GetDeployer(log, cs)
 	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
@@ -151,11 +159,11 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 
 	// persist the OpenShift container service with final fields
 	log.Info("persist final config")
+	cs.Properties.ProvisioningState = api.Succeeded
 	err = writeHelpers(log, cs)
 	if err != nil {
 		return nil, err
 	}
-
 	return cs, nil
 }
 

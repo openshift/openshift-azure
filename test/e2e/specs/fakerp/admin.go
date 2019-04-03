@@ -74,7 +74,6 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake]", func() {
 		external, err := azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
-		external.Properties.ProvisioningState = nil // TODO: should not need to do this
 
 		updated, err := azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
 		Expect(err).NotTo(HaveOccurred())

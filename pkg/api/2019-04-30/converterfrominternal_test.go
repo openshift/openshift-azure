@@ -15,7 +15,7 @@ func TestFromInternal(t *testing.T) {
 		oc *OpenShiftManagedCluster
 	}{
 		{
-			cs: api.GetInternalMockCluster(),
+			cs: api.GetInternalMockCluster(true),
 			oc: managedCluster(),
 		},
 	}

@@ -43,9 +43,6 @@ func GenerateManifest(manifestFile string) (*v20190430.OpenShiftManagedCluster, 
 		return nil, err
 	}
 
-	if oc.Properties != nil {
-		oc.Properties.ProvisioningState = nil // TODO: should not need to do this
-	}
 	return oc, nil
 }
 
@@ -71,8 +68,5 @@ func GenerateManifestAdmin(manifestFile string) (*admin.OpenShiftManagedCluster,
 		return nil, err
 	}
 
-	if oc.Properties != nil {
-		oc.Properties.ProvisioningState = nil // TODO: should not need to do this
-	}
 	return oc, nil
 }

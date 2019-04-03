@@ -74,9 +74,6 @@ func mergeFromResourcePurchasePlanAdmin(oc *OpenShiftManagedCluster, cs *api.Ope
 }
 
 func mergePropertiesAdmin(oc *OpenShiftManagedCluster, cs *api.OpenShiftManagedCluster) error {
-	if oc.Properties.ProvisioningState != nil {
-		cs.Properties.ProvisioningState = api.ProvisioningState(*oc.Properties.ProvisioningState)
-	}
 	if oc.Properties.OpenShiftVersion != nil {
 		cs.Properties.OpenShiftVersion = *oc.Properties.OpenShiftVersion
 	}

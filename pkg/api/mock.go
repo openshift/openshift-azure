@@ -5,12 +5,12 @@ import (
 )
 
 // GetInternalMockCluster returns mock object of the
-// internal API model
-func GetInternalMockCluster() *OpenShiftManagedCluster {
+// internal API model. droppableFields defines if we want to return fields
+// which are dropped when converting from external to internal representation
+func GetInternalMockCluster(droppableFields bool) *OpenShiftManagedCluster {
 	// this is the expected internal equivalent to
 	// v20190430ManagedCluster()
-
-	return &OpenShiftManagedCluster{
+	oc := &OpenShiftManagedCluster{
 		ID:       "ID",
 		Location: "Location",
 		Name:     "Name",
@@ -25,10 +25,9 @@ func GetInternalMockCluster() *OpenShiftManagedCluster {
 		},
 		Type: "Type",
 		Properties: Properties{
-			ProvisioningState: "Properties.ProvisioningState",
-			OpenShiftVersion:  "Properties.OpenShiftVersion",
-			ClusterVersion:    "Properties.ClusterVersion",
-			PublicHostname:    "Properties.PublicHostname",
+			OpenShiftVersion: "Properties.OpenShiftVersion",
+			ClusterVersion:   "Properties.ClusterVersion",
+			PublicHostname:   "Properties.PublicHostname",
 			RouterProfiles: []RouterProfile{
 				{
 					Name:            "Properties.RouterProfiles[0].Name",
@@ -76,4 +75,10 @@ func GetInternalMockCluster() *OpenShiftManagedCluster {
 			},
 		},
 	}
+
+	if droppableFields {
+		oc.Properties.ProvisioningState = "Properties.ProvisioningState"
+	}
+
+	return oc
 }
