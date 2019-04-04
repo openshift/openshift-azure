@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,35 @@
 
 // Package androidpublisher provides access to the Google Play Developer API.
 //
-// See https://developers.google.com/android-publisher
+// For product documentation, see: https://developers.google.com/android-publisher
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/androidpublisher/v3"
 //   ...
-//   androidpublisherService, err := androidpublisher.New(oauthHttpClient)
+//   ctx := context.Background()
+//   androidpublisherService, err := androidpublisher.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   androidpublisherService, err := androidpublisher.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   androidpublisherService, err := androidpublisher.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package androidpublisher // import "google.golang.org/api/androidpublisher/v3"
 
 import (
@@ -29,6 +51,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -56,6 +80,32 @@ const (
 	AndroidpublisherScope = "https://www.googleapis.com/auth/androidpublisher"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/androidpublisher",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -626,6 +676,34 @@ type Comment struct {
 
 func (s *Comment) MarshalJSON() ([]byte, error) {
 	type NoMethod Comment
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+type CountryTargeting struct {
+	Countries []string `json:"countries,omitempty"`
+
+	IncludeRestOfWorld bool `json:"includeRestOfWorld,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Countries") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Countries") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *CountryTargeting) MarshalJSON() ([]byte, error) {
+	type NoMethod CountryTargeting
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -2187,6 +2265,8 @@ func (s *Track) MarshalJSON() ([]byte, error) {
 }
 
 type TrackRelease struct {
+	CountryTargeting *CountryTargeting `json:"countryTargeting,omitempty"`
+
 	// Name: The release name, used to identify this release in the Play
 	// Console UI. Not required to be unique. This is optional, if not set
 	// it will be generated from the version_name in the APKs.
@@ -2210,7 +2290,7 @@ type TrackRelease struct {
 	// active, including those you wish to retain from previous releases.
 	VersionCodes googleapi.Int64s `json:"versionCodes,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "Name") to
+	// ForceSendFields is a list of field names (e.g. "CountryTargeting") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -2218,12 +2298,13 @@ type TrackRelease struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "Name") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
+	// NullFields is a list of field names (e.g. "CountryTargeting") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
 	NullFields []string `json:"-"`
 }
 
@@ -3522,7 +3603,7 @@ func (c *EditsApksUploadCall) doRequest(alt string) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header = reqHeaders
-	gensupport.SetGetBody(req, getBody)
+	req.GetBody = getBody
 	googleapi.Expand(req.URL, map[string]string{
 		"packageName": c.packageNameid,
 		"editId":      c.editId,
@@ -3908,7 +3989,7 @@ func (c *EditsBundlesUploadCall) doRequest(alt string) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header = reqHeaders
-	gensupport.SetGetBody(req, getBody)
+	req.GetBody = getBody
 	googleapi.Expand(req.URL, map[string]string{
 		"packageName": c.packageNameid,
 		"editId":      c.editId,
@@ -4140,7 +4221,7 @@ func (c *EditsDeobfuscationfilesUploadCall) doRequest(alt string) (*http.Respons
 		return nil, err
 	}
 	req.Header = reqHeaders
-	gensupport.SetGetBody(req, getBody)
+	req.GetBody = getBody
 	googleapi.Expand(req.URL, map[string]string{
 		"packageName":           c.packageNameid,
 		"editId":                c.editId,
@@ -5369,7 +5450,7 @@ func (c *EditsExpansionfilesUploadCall) doRequest(alt string) (*http.Response, e
 		return nil, err
 	}
 	req.Header = reqHeaders
-	gensupport.SetGetBody(req, getBody)
+	req.GetBody = getBody
 	googleapi.Expand(req.URL, map[string]string{
 		"packageName":       c.packageNameid,
 		"editId":            c.editId,
@@ -6151,7 +6232,7 @@ func (c *EditsImagesUploadCall) doRequest(alt string) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header = reqHeaders
-	gensupport.SetGetBody(req, getBody)
+	req.GetBody = getBody
 	googleapi.Expand(req.URL, map[string]string{
 		"packageName": c.packageNameid,
 		"editId":      c.editId,

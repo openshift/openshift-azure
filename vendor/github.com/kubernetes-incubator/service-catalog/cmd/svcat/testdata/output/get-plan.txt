@@ -1,0 +1,3 @@
+   NAME     NAMESPACE           CLASS                 DESCRIPTION        
++---------+-----------+-----------------------+-------------------------+
+  default               user-provided-service   Sample plan description  

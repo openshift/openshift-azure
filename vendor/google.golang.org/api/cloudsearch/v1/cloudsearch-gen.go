@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,39 @@
 
 // Package cloudsearch provides access to the Cloud Search API.
 //
-// See https://gsuite.google.com/products/cloud-search/
+// For product documentation, see: https://gsuite.google.com/products/cloud-search/
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/cloudsearch/v1"
 //   ...
-//   cloudsearchService, err := cloudsearch.New(oauthHttpClient)
+//   ctx := context.Background()
+//   cloudsearchService, err := cloudsearch.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
+//
+//   cloudsearchService, err := cloudsearch.NewService(ctx, option.WithScopes(cloudsearch.CloudSearchStatsIndexingScope))
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   cloudsearchService, err := cloudsearch.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   cloudsearchService, err := cloudsearch.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package cloudsearch // import "google.golang.org/api/cloudsearch/v1"
 
 import (
@@ -29,6 +55,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -83,6 +111,40 @@ const (
 	CloudSearchStatsIndexingScope = "https://www.googleapis.com/auth/cloud_search.stats.indexing"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/cloud_search",
+		"https://www.googleapis.com/auth/cloud_search.debug",
+		"https://www.googleapis.com/auth/cloud_search.indexing",
+		"https://www.googleapis.com/auth/cloud_search.query",
+		"https://www.googleapis.com/auth/cloud_search.settings",
+		"https://www.googleapis.com/auth/cloud_search.settings.indexing",
+		"https://www.googleapis.com/auth/cloud_search.settings.query",
+		"https://www.googleapis.com/auth/cloud_search.stats",
+		"https://www.googleapis.com/auth/cloud_search.stats.indexing",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -564,7 +626,8 @@ type DataSource struct {
 	Name string `json:"name,omitempty"`
 
 	// OperationIds: IDs of the Long Running Operations (LROs) currently
-	// running for this schema.
+	// running for this
+	// schema.
 	OperationIds []string `json:"operationIds,omitempty"`
 
 	// ShortName: A short name or alias for the source.  This value will be
@@ -1530,13 +1593,18 @@ func (s *ErrorMessage) MarshalJSON() ([]byte, error) {
 // type of the field bucketed.
 // FacetBucket is currently used only for returning the response object.
 type FacetBucket struct {
-	// Count: Number of results that match the bucket value.
+	// Count: Number of results that match the bucket value. Counts are only
+	// returned
+	// for searches when count accuracy is ensured. Can be empty.
 	Count int64 `json:"count,omitempty"`
 
 	// Percentage: Percent of results that match the bucket value. This
 	// value is between
-	// (0-100].
-	// This may not be accurate and is a best effort estimate.
+	// (0-100]. Percentages are returned for all searches, but are an
+	// estimate.
+	// Because percentages are always returned, you should render
+	// percentages
+	// instead of counts.
 	Percentage int64 `json:"percentage,omitempty"`
 
 	Value *Value `json:"value,omitempty"`
@@ -1569,6 +1637,12 @@ func (s *FacetBucket) MarshalJSON() ([]byte, error) {
 // FacetResult for every source_name/object_type/operator_name
 // combination.
 type FacetOptions struct {
+	// NumFacetBuckets: Maximum number of facet buckets that should be
+	// returned for this facet.
+	// Defaults to 10.
+	// Maximum value is 100.
+	NumFacetBuckets int64 `json:"numFacetBuckets,omitempty"`
+
 	// ObjectType: If object_type is set, only those objects of that type
 	// will be used to
 	// compute facets. If empty, then all objects will be used to compute
@@ -1585,7 +1659,7 @@ type FacetOptions struct {
 	// If empty, all data sources will be used.
 	SourceName string `json:"sourceName,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "ObjectType") to
+	// ForceSendFields is a list of field names (e.g. "NumFacetBuckets") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -1593,12 +1667,13 @@ type FacetOptions struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "ObjectType") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
+	// NullFields is a list of field names (e.g. "NumFacetBuckets") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
 	NullFields []string `json:"-"`
 }
 
@@ -1610,7 +1685,7 @@ func (s *FacetOptions) MarshalJSON() ([]byte, error) {
 
 // FacetResult: Source specific facet response
 type FacetResult struct {
-	// Buckets: FacetBuckets for values in response containing atleast a
+	// Buckets: FacetBuckets for values in response containing at least a
 	// single result.
 	Buckets []*FacetBucket `json:"buckets,omitempty"`
 
@@ -2219,6 +2294,37 @@ func (s *HtmlValues) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+type IndexItemOptions struct {
+	// AllowUnknownGsuitePrincipals: Specifies if the index request should
+	// allow gsuite principals that do not
+	// exist or are deleted in the index request.
+	AllowUnknownGsuitePrincipals bool `json:"allowUnknownGsuitePrincipals,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "AllowUnknownGsuitePrincipals") to unconditionally include in API
+	// requests. By default, fields with empty values are omitted from API
+	// requests. However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g.
+	// "AllowUnknownGsuitePrincipals") to include in API requests with the
+	// JSON null value. By default, fields with empty values are omitted
+	// from API requests. However, any field with an empty value appearing
+	// in NullFields will be sent to the server as null. It is an error if a
+	// field in this list has a non-empty value. This may be used to include
+	// null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *IndexItemOptions) MarshalJSON() ([]byte, error) {
+	type NoMethod IndexItemOptions
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 type IndexItemRequest struct {
 	// ConnectorName: Name of connector making this call.
 	// <br />Format: datasources/{source_id}/connectors/{ID}
@@ -2226,6 +2332,8 @@ type IndexItemRequest struct {
 
 	// DebugOptions: Common debug options.
 	DebugOptions *DebugOptions `json:"debugOptions,omitempty"`
+
+	IndexItemOptions *IndexItemOptions `json:"indexItemOptions,omitempty"`
 
 	// Item: Name of the item.
 	// Format:
@@ -2652,7 +2760,8 @@ type ItemAcl struct {
 	// Optional if inheriting permissions from another item or if the
 	// item
 	// is not intended to be visible, such as
-	// virtual containers.
+	// virtual
+	// containers.
 	// The maximum number of elements is 1000.
 	Readers []*Principal `json:"readers,omitempty"`
 
@@ -4025,18 +4134,18 @@ type PropertyDefinition struct {
 	IsRepeatable bool `json:"isRepeatable,omitempty"`
 
 	// IsReturnable: Indicates that the property identifies data that should
-	// be returned in search
-	// results via the Query API. If set to *true*, indicates that Query
-	// API
-	// users can use matching property fields in results. However, storing
-	// fields
-	// requires more space allocation and uses more bandwidth for search
-	// queries,
-	// which impacts performance over large datasets. Set to *true* here
-	// only if
-	// the field is needed for search results. Cannot be true for
-	// properties
-	// whose type is an object.
+	// be returned in
+	// search results via the Query API. If set to *true*, indicates that
+	// Query
+	// API users can use matching property fields in results. However,
+	// storing
+	// fields requires more space allocation and uses more bandwidth for
+	// search
+	// queries, which impacts performance over large datasets. Set to *true*
+	// here
+	// only if the field is needed for search results. Cannot be true
+	// for
+	// properties whose type is an object.
 	IsReturnable bool `json:"isReturnable,omitempty"`
 
 	// IsSortable: Indicates that the property can be used for sorting.
@@ -4929,7 +5038,7 @@ type Schema struct {
 
 	// OperationIds: IDs of the Long Running Operations (LROs) currently
 	// running for this
-	// schema. After modifying the schema, wait for opeations to
+	// schema. After modifying the schema, wait for operations to
 	// complete
 	// before indexing additional content.
 	OperationIds []string `json:"operationIds,omitempty"`
@@ -4969,7 +5078,9 @@ func (s *Schema) MarshalJSON() ([]byte, error) {
 type ScoringConfig struct {
 	// DisableFreshness: Whether to use freshness as a ranking signal. By
 	// default, freshness is used
-	// as a ranking signal.
+	// as a ranking signal. Note that this setting is not available in the
+	// Admin
+	// UI.
 	DisableFreshness bool `json:"disableFreshness,omitempty"`
 
 	// DisablePersonalization: Whether to personalize the results. By
@@ -5029,8 +5140,8 @@ type SearchApplication struct {
 	Name string `json:"name,omitempty"`
 
 	// OperationIds: IDs of the Long Running Operations (LROs) currently
-	// running for this schema.
-	// Output only field.
+	// running for this
+	// schema. Output only field.
 	OperationIds []string `json:"operationIds,omitempty"`
 
 	// ScoringConfig: Configuration for ranking results.
@@ -5337,7 +5448,9 @@ type SearchResult struct {
 	// Title: Title of the search result.
 	Title string `json:"title,omitempty"`
 
-	// Url: The URL of the result.
+	// Url: The URL of the search result. The URL contains a Google redirect
+	// to the
+	// actual item.
 	Url string `json:"url,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "ClusteredResults") to
@@ -5717,20 +5830,20 @@ func (s *StartUploadItemRequest) MarshalJSON() ([]byte, error) {
 }
 
 // Status: The `Status` type defines a logical error model that is
-// suitable for different
-// programming environments, including REST APIs and RPC APIs. It is
-// used by
-// [gRPC](https://github.com/grpc). The error model is designed to
-// be:
+// suitable for
+// different programming environments, including REST APIs and RPC APIs.
+// It is
+// used by [gRPC](https://github.com/grpc). The error model is designed
+// to be:
 //
 // - Simple to use and understand for most users
 // - Flexible enough to meet unexpected needs
 //
 // # Overview
 //
-// The `Status` message contains three pieces of data: error code, error
-// message,
-// and error details. The error code should be an enum value
+// The `Status` message contains three pieces of data: error code,
+// error
+// message, and error details. The error code should be an enum value
 // of
 // google.rpc.Code, but it may accept additional error codes if needed.
 // The
@@ -5868,6 +5981,7 @@ func (s *StructuredDataObject) MarshalJSON() ([]byte, error) {
 // StructuredResult: Structured results that are returned as part of
 // search request.
 type StructuredResult struct {
+	// Person: Representation of a person
 	Person *Person `json:"person,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Person") to
@@ -9451,7 +9565,7 @@ func (c *IndexingDatasourcesItemsUploadCall) Do(opts ...googleapi.CallOption) (*
 	//   ],
 	//   "parameters": {
 	//     "name": {
-	//       "description": "Name of the Data Source to start a resumable upload.\nFormat: datasources/{source_id}",
+	//       "description": "Name of the Item to start a resumable upload.\nFormat: datasources/{source_id}/items/{item_id}.",
 	//       "location": "path",
 	//       "pattern": "^datasources/[^/]+/items/[^/]+$",
 	//       "required": true,
@@ -9605,7 +9719,7 @@ func (c *MediaUploadCall) doRequest(alt string) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header = reqHeaders
-	gensupport.SetGetBody(req, getBody)
+	req.GetBody = getBody
 	googleapi.Expand(req.URL, map[string]string{
 		"resourceName": c.resourceName,
 	})
@@ -12029,7 +12143,10 @@ type StatsGetIndexCall struct {
 }
 
 // GetIndex: Gets indexed item statistics aggreggated across all data
-// sources.
+// sources. This
+// API only returns statistics for previous dates; it doesn't
+// return
+// statistics for the current day.
 func (r *StatsService) GetIndex() *StatsGetIndexCall {
 	c := &StatsGetIndexCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	return c
@@ -12172,7 +12289,7 @@ func (c *StatsGetIndexCall) Do(opts ...googleapi.CallOption) (*GetCustomerIndexS
 	}
 	return ret, nil
 	// {
-	//   "description": "Gets indexed item statistics aggreggated across all data sources.",
+	//   "description": "Gets indexed item statistics aggreggated across all data sources. This\nAPI only returns statistics for previous dates; it doesn't return\nstatistics for the current day.",
 	//   "flatPath": "v1/stats/index",
 	//   "httpMethod": "GET",
 	//   "id": "cloudsearch.stats.getIndex",

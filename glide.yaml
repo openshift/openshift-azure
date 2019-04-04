@@ -74,3 +74,8 @@ import:
 - package: github.com/Microsoft/ApplicationInsights-Go
   subpackages:
   - appinsights
+- package: github.com/grpc-ecosystem/grpc-gateway
+  version: ^v1.8.0
+- package: github.com/kubernetes-incubator/service-catalog
+  repo:    https://github.com/openshift/service-catalog.git
+  version: 3.11
