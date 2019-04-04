@@ -22,7 +22,7 @@ const (
 )
 
 func (sc *SanityChecker) createStatefulApp(ctx context.Context, namespace string) error {
-	sc.log.Debugf("instantiating %s template", statefulApp)
+	sc.Log.Debugf("instantiating %s template", statefulApp)
 	err := sc.Client.EndUser.InstantiateTemplate(statefulApp, namespace)
 	if err != nil {
 		return err
@@ -31,7 +31,7 @@ func (sc *SanityChecker) createStatefulApp(ctx context.Context, namespace string
 }
 
 func (sc *SanityChecker) createStatelessApp(ctx context.Context, namespace string) error {
-	sc.log.Debugf("instantiating %s template", statelessApp)
+	sc.Log.Debugf("instantiating %s template", statelessApp)
 	err := sc.Client.EndUser.InstantiateTemplate(statelessApp, namespace)
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func (sc *SanityChecker) validateStatefulApp(ctx context.Context, namespace stri
 		defer cancel()
 
 		for i := 0; i < times; i++ {
-			resp, err := waitutil.ForHTTPStatusOk(timeout, sc.log, nil, url)
+			resp, err := waitutil.ForHTTPStatusOk(timeout, sc.Log, nil, url)
 			if err != nil {
 				return err
 			}
@@ -86,7 +86,7 @@ func (sc *SanityChecker) validateStatefulApp(ctx context.Context, namespace stri
 	host := route.Status.Ingress[0].Host
 	url := fmt.Sprintf("http://%s", host)
 	regex := regexp.MustCompile(`Page views:\s*(\d+)`)
-	sc.log.Debugf("hitting the route 3 times, expecting counter to increment")
+	sc.Log.Debugf("hitting the route 3 times, expecting counter to increment")
 	err = loopHTTPGet(url, regex, 3)
 	if err != nil {
 		return err
@@ -95,31 +95,31 @@ func (sc *SanityChecker) validateStatefulApp(ctx context.Context, namespace stri
 	// Find the database deploymentconfig and scale down to 0, then back up to 1
 	dcName := "postgresql"
 	for _, i := range []int32{0, 1} {
-		sc.log.Debugf("searching for the database deploymentconfig")
+		sc.Log.Debugf("searching for the database deploymentconfig")
 		dc, err := sc.Client.EndUser.OAppsV1.DeploymentConfigs(namespace).Get(dcName, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
-		sc.log.Debugf("scaling the database deploymentconfig to %d", i)
+		sc.Log.Debugf("scaling the database deploymentconfig to %d", i)
 		dc.Spec.Replicas = int32(i)
 		_, err = sc.Client.EndUser.OAppsV1.DeploymentConfigs(namespace).Update(dc)
 		if err != nil {
 			return err
 		}
-		sc.log.Debugf("waiting for database deploymentconfig to reflect %d replicas", i)
+		sc.Log.Debugf("waiting for database deploymentconfig to reflect %d replicas", i)
 		waitErr := wait.PollImmediate(2*time.Second, 10*time.Minute, ready.CheckDeploymentConfigIsReady(sc.Client.EndUser.OAppsV1.DeploymentConfigs(namespace), dcName))
 		if waitErr != nil {
 			return waitErr
 		}
 	}
-	sc.log.Debug("waiting for app to recover from database outage") // it might be crash looping
+	sc.Log.Debug("waiting for app to recover from database outage") // it might be crash looping
 	waitErr := wait.PollImmediate(2*time.Second, 10*time.Minute, ready.CheckDeploymentConfigIsReady(sc.Client.EndUser.OAppsV1.DeploymentConfigs(namespace), "django-psql-persistent"))
 	if waitErr != nil {
 		return waitErr
 	}
 
 	// hit it again, will hit 3 times as specified initially
-	sc.log.Debugf("hitting the route again, expecting counter to increment from last")
+	sc.Log.Debugf("hitting the route again, expecting counter to increment from last")
 	err = loopHTTPGet(url, regex, 3)
 	if err != nil {
 		return err
@@ -141,10 +141,10 @@ func (sc *SanityChecker) validateStatelessApp(ctx context.Context, namespace str
 	url := fmt.Sprintf("http://%s", host)
 
 	// Curl the endpoint and search for a string
-	sc.log.Debugf("hitting the route %s and verifying the response", url)
+	sc.Log.Debugf("hitting the route %s and verifying the response", url)
 	timeout, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
-	resp, err := waitutil.ForHTTPStatusOk(timeout, sc.log, nil, url)
+	resp, err := waitutil.ForHTTPStatusOk(timeout, sc.Log, nil, url)
 	if err != nil {
 		return err
 	}
