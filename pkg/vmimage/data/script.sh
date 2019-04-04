@@ -63,8 +63,6 @@ text
 timezone Etc/UTC
 url --url=http://$IP:8080/content/dist/rhel/server/7/7.6/x86_64/kickstart
 zerombr
-%addon com_redhat_kdump --disable
-%end
 %packages --excludedocs --nocore
 @^minimal
 -NetworkManager-team
@@ -149,7 +147,6 @@ yum -y install \
     irqbalance \
     iscsi-initiator-utils \
     kernel \
-    kexec-tools \
     lsof \
     NetworkManager-config-server \
     NetworkManager \
@@ -206,10 +203,6 @@ sed -i -e 's/^ResourceDisk.Format=.*/ResourceDisk.Format=n/' /etc/waagent.conf
 
 rpm -q kernel --last | sed -n '1 {s/^[^-]*-//; s/ .*$//; p}' >/var/tmp/kernel-version
 rpm -q atomic-openshift-node --qf '%{VERSION}-%{RELEASE}.%{ARCH}' >/var/tmp/openshift-version
-
-# enabling kdump
-grub2-mkconfig -o /boot/grub2/grub.cfg
-systemctl enable kdump.service
 
 >/var/tmp/kickstart_completed
 %end
