@@ -7,7 +7,7 @@ pluginVersion: v5.0
 componentLogLevel:
   apiServer: 2
   controllerManager: 2
-  node: 2
+  node: 5
 ## Change this for an address range using CIDR notation (e.g. 192.168.99.0/24); an IP address (e.g. 192.168.99.0);
 ## or a list of address ranges or IP addresses (e.g. 192.168.99.0/24,10.0.0.0/24,44.66.0.0/24)
 ## having access to system nodes: default (any ip address)
