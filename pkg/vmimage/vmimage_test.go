@@ -8,9 +8,9 @@ import (
 
 func TestGenerateTemplate(t *testing.T) {
 	builder := Builder{
-		SSHKey:     tls.GetDummyPrivateKey(),
-		ClientKey:  tls.GetDummyPrivateKey(),
-		ClientCert: tls.GetDummyCertificate(),
+		SSHKey:     tls.DummyPrivateKey,
+		ClientKey:  tls.DummyPrivateKey,
+		ClientCert: tls.DummyCertificate,
 	}
 	_, err := builder.generateTemplate()
 	if err != nil {
