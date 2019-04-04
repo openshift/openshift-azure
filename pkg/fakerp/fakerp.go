@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
@@ -16,6 +18,7 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/derived"
 	"github.com/openshift/openshift-azure/pkg/util/random"
@@ -24,7 +27,76 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
-func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployFn {
+func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, err error, testConfig api.TestConfig) error {
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
+	if err != nil {
+		return err
+	}
+
+	deploymentOperations := azureclient.NewDeploymentOperationsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
+
+	operations, err := deploymentOperations.List(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", nil)
+	if err != nil {
+		log.Warnf("failed to get deployment operations: %v", err)
+		return err
+	}
+
+	for _, op := range operations {
+		if *op.Properties.ProvisioningState == "Succeeded" {
+			continue
+		}
+
+		b, _ := json.MarshalIndent(op, "", "  ")
+		log.Debug(string(b))
+
+		if testConfig.ArtifactDir != "" &&
+			*op.Properties.TargetResource.ResourceType == "Microsoft.Compute/virtualMachineScaleSets" {
+			s, err := newSSHer(ctx, cs)
+			if err != nil {
+				log.Warnf("newSSHer failed: %v", err)
+				continue
+			}
+
+			for _, app := range cs.Properties.AgentPoolProfiles {
+				prefix := names.GetScalesetName(&app, "")
+				if !strings.HasPrefix(*op.Properties.TargetResource.ResourceName, prefix) {
+					continue
+				}
+
+				for i := int64(0); i < app.Count; i++ {
+					hostname := *op.Properties.TargetResource.ResourceName + fmt.Sprintf("%06s", strconv.FormatInt(i, 36))
+					cli, err := s.Dial(ctx, hostname)
+					if err != nil {
+						log.Warnf("Dial failed: %v", err)
+						continue
+					}
+
+					err = s.RunRemoteCommandAndSaveToFile(cli, "sudo journalctl", testConfig.ArtifactDir+"/"+hostname+"-early-journal")
+					if err != nil {
+						log.Warnf("RunRemoteCommandAndSaveToFile failed: %v", err)
+						continue
+					}
+
+					err = s.RunRemoteCommandAndSaveToFile(cli, "sudo cat /var/lib/waagent/custom-script/download/1/stdout", testConfig.ArtifactDir+"/"+hostname+"-waagent-stdout")
+					if err != nil {
+						log.Warnf("RunRemoteCommandAndSaveToFile failed: %v", err)
+						continue
+					}
+
+					err = s.RunRemoteCommandAndSaveToFile(cli, "sudo cat /var/lib/waagent/custom-script/download/1/stderr", testConfig.ArtifactDir+"/"+hostname+"-waagent-stderr")
+					if err != nil {
+						log.Warnf("RunRemoteCommandAndSaveToFile failed: %v", err)
+						continue
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) api.DeployFn {
 	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
 		log.Info("applying arm template deployment")
 		authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
@@ -50,18 +122,9 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployF
 		err = future.WaitForCompletionRef(ctx, cli)
 		if err != nil {
 			log.Warnf("deployment failed: %#v", err)
-			deploymentOperations := azureclient.NewDeploymentOperationsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
-			operations, listErr := deploymentOperations.List(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", nil)
-			if listErr == nil {
-				b, _ := json.MarshalIndent(operations, "", "  ")
-				log.Debug(string(b))
-			} else {
-				log.Warnf("failed to get deployment operations: %#v", listErr)
-			}
-			return err
+			debugDeployerError(ctx, log, cs, err, testConfig)
 		}
-
-		return nil
+		return err
 	}
 }
 
@@ -144,7 +207,7 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 	}
 
 	log.Info("plugin createorupdate")
-	deployer := GetDeployer(log, cs)
+	deployer := GetDeployer(log, cs, testConfig)
 	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
 		return nil, err
 	}

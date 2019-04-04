@@ -95,6 +95,7 @@ type TestConfig struct {
 	DebugHashFunctions bool
 	ImageResourceGroup string
 	ImageResourceName  string
+	ArtifactDir        string
 }
 
 // Plugin is the main interface to openshift-azure

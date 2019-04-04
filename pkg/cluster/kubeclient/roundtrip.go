@@ -2,7 +2,6 @@ package kubeclient
 
 import (
 	"errors"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
@@ -68,11 +67,6 @@ type retryingRoundTripper struct {
 func (rt *retryingRoundTripper) RoundTrip(req *http.Request) (resp *http.Response, err error) {
 	var retry int
 	for {
-		if retry > 0 {
-			b, _ := ioutil.ReadFile("/proc/net/tcp")
-			rt.log.Debug(string(b))
-		}
-
 		retry++
 
 		if req.Method == http.MethodGet {
