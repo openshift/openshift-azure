@@ -164,7 +164,6 @@
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-admin.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-project-admin.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-sa.yaml
-// data/ClusterRoleBinding.rbac.authorization.k8s.io/geneva-cluster-reader.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/router-metrics.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/router-router-role.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/sdn-cluster-reader.yaml
@@ -4028,26 +4027,6 @@ func clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerSaYaml() (*a
 	}
 
 	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-sa.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xac\x8f\xb1\x4e\x03\x31\x0c\x86\xf7\x3c\x45\x5e\x20\x87\xd8\x50\x36\x60\x60\x2f\x12\xbb\x9b\xfb\x7b\x35\xcd\xd9\x91\xe3\xdc\xd0\xa7\x47\x27\x2a\x86\x22\x31\x31\x5a\xfa\xfc\x7d\x36\x35\xfe\x80\x75\x56\xc9\xd1\x8e\x54\x26\x1a\x7e\x56\xe3\x2b\x39\xab\x4c\x97\xa7\x3e\xb1\x3e\x6c\x8f\xe1\xc2\x32\xe7\xf8\x5a\x47\x77\xd8\x41\x2b\x5e\x58\x66\x96\x25\xac\x70\x9a\xc9\x29\x87\x18\x85\x56\xe4\xb8\x40\xb0\x51\x2a\xdf\x6c\x32\xd0\x0c\x0b\xa6\x15\x07\x9c\x76\x8c\x1a\xbf\x99\x8e\xf6\x47\x32\xc4\xf8\xab\xf8\x13\xb8\x33\xf7\x71\xfc\x44\xf1\x9e\x43\xba\x2d\xbd\xc3\x36\x2e\x78\x2e\x45\x87\xf8\xdd\x61\xb7\xb1\x37\x2a\xc8\x51\x1b\xa4\x9f\xf9\xe4\x89\xae\xc3\x90\xaa\x2e\xcb\xfe\xd6\x3f\xa8\x56\x15\x76\xb5\xdd\xf6\x15\x00\x00\xff\xff\x44\x12\xf1\x66\x67\x01\x00\x00")
-
-func clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYaml,
-		"ClusterRoleBinding.rbac.authorization.k8s.io/geneva-cluster-reader.yaml",
-	)
-}
-
-func clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYaml() (*asset, error) {
-	bytes, err := clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/geneva-cluster-reader.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -14708,7 +14687,6 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-admin.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerAdminYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-project-admin.yaml":                                  clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerProjectAdminYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-sa.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerSaYaml,
-	"ClusterRoleBinding.rbac.authorization.k8s.io/geneva-cluster-reader.yaml":                                                    clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/router-metrics.yaml":                                                           clusterrolebindingRbacAuthorizationK8sIoRouterMetricsYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/router-router-role.yaml":                                                       clusterrolebindingRbacAuthorizationK8sIoRouterRouterRoleYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/sdn-cluster-reader.yaml":                                                       clusterrolebindingRbacAuthorizationK8sIoSdnClusterReaderYaml,
@@ -15443,7 +15421,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"customer-admin-controller-admin.yaml":                                          {clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerAdminYaml, map[string]*bintree{}},
 		"customer-admin-controller-project-admin.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerProjectAdminYaml, map[string]*bintree{}},
 		"customer-admin-controller-sa.yaml":                                             {clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerSaYaml, map[string]*bintree{}},
-		"geneva-cluster-reader.yaml":                                                    {clusterrolebindingRbacAuthorizationK8sIoGenevaClusterReaderYaml, map[string]*bintree{}},
 		"router-metrics.yaml":                                                           {clusterrolebindingRbacAuthorizationK8sIoRouterMetricsYaml, map[string]*bintree{}},
 		"router-router-role.yaml":                                                       {clusterrolebindingRbacAuthorizationK8sIoRouterRouterRoleYaml, map[string]*bintree{}},
 		"sdn-cluster-reader.yaml":                                                       {clusterrolebindingRbacAuthorizationK8sIoSdnClusterReaderYaml, map[string]*bintree{}},
