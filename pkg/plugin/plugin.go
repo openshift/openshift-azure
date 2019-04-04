@@ -26,6 +26,7 @@ type plugin struct {
 	testConfig             api.TestConfig
 	upgraderFactory        func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error)
 	configInterfaceFactory func(cs *api.OpenShiftManagedCluster, runningUnderTest bool) (config.Interface, error)
+	now                    func() time.Time
 }
 
 var _ api.Plugin = &plugin{}
@@ -43,6 +44,7 @@ func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, optionalTestCo
 		testConfig:             testConfig,
 		upgraderFactory:        cluster.NewSimpleUpgrader,
 		configInterfaceFactory: config.New,
+		now:                    time.Now,
 	}, nil
 }
 
@@ -107,7 +109,7 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 }
 
 func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, backupBlob string) *api.PluginError {
-	suffix := fmt.Sprintf("%d", time.Now().Unix())
+	suffix := fmt.Sprintf("%d", p.now().Unix())
 
 	p.log.Info("creating clients")
 	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
@@ -156,7 +158,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 }
 
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
-	suffix := fmt.Sprintf("%d", time.Now().Unix())
+	suffix := fmt.Sprintf("%d", p.now().Unix())
 
 	p.log.Info("creating clients")
 	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, false, true, p.testConfig)

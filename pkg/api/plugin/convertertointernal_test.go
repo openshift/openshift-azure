@@ -47,12 +47,12 @@ func internalPluginConfig() api.Config {
 		GenevaLoggingControlPlaneRegion:      "GenevaLoggingControlPlaneRegion",
 		Certificates: api.CertificateConfig{
 			GenevaLogging: api.CertKeyPair{
-				Cert: tls.GetDummyCertificate(),
-				Key:  tls.GetDummyPrivateKey(),
+				Cert: tls.DummyCertificate,
+				Key:  tls.DummyPrivateKey,
 			},
 			GenevaMetrics: api.CertKeyPair{
-				Cert: tls.GetDummyCertificate(),
-				Key:  tls.GetDummyPrivateKey(),
+				Cert: tls.DummyCertificate,
+				Key:  tls.DummyPrivateKey,
 			},
 		},
 		// Container images configuration

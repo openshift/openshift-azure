@@ -162,8 +162,8 @@ func TestInvalidateSecrets(t *testing.T) {
 
 	pluginConfig.GenevaImagePullSecret = []byte("genevaImagePullSecret")
 	pluginConfig.ImagePullSecret = []byte("imagePullSecret")
-	pluginConfig.Certificates.GenevaLogging.Cert = tls.GetDummyCertificate()
-	pluginConfig.Certificates.GenevaMetrics.Cert = tls.GetDummyCertificate()
+	pluginConfig.Certificates.GenevaLogging.Cert = tls.DummyCertificate
+	pluginConfig.Certificates.GenevaMetrics.Cert = tls.DummyCertificate
 
 	err = g.Generate(pluginConfig, false)
 	if err != nil {
