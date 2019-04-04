@@ -87,8 +87,10 @@ func (p *plugin) ValidatePluginTemplate(ctx context.Context) []error {
 }
 
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) error {
+	var setVersionFields bool
 	if !isUpdate || cs.Config.PluginVersion == "latest" {
 		cs.Config.PluginVersion = p.pluginConfig.PluginVersion
+		setVersionFields = true
 	}
 
 	p.log.Info("generating configs")
@@ -97,7 +99,7 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
-	err = configInterface.Generate(p.pluginConfig)
+	err = configInterface.Generate(p.pluginConfig, setVersionFields)
 	if err != nil {
 		return err
 	}
