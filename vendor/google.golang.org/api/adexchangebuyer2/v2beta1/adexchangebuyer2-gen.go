@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,35 @@
 
 // Package adexchangebuyer2 provides access to the Ad Exchange Buyer API II.
 //
-// See https://developers.google.com/authorized-buyers/apis/reference/rest/
+// For product documentation, see: https://developers.google.com/authorized-buyers/apis/reference/rest/
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/adexchangebuyer2/v2beta1"
 //   ...
-//   adexchangebuyer2Service, err := adexchangebuyer2.New(oauthHttpClient)
+//   ctx := context.Background()
+//   adexchangebuyer2Service, err := adexchangebuyer2.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   adexchangebuyer2Service, err := adexchangebuyer2.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   adexchangebuyer2Service, err := adexchangebuyer2.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package adexchangebuyer2 // import "google.golang.org/api/adexchangebuyer2/v2beta1"
 
 import (
@@ -29,6 +51,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -56,6 +80,32 @@ const (
 	AdexchangeBuyerScope = "https://www.googleapis.com/auth/adexchange.buyer"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/adexchange.buyer",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -995,6 +1045,9 @@ type Client struct {
 	//   "ADVERTISER" - An advertiser.
 	//   "BRAND" - A brand.
 	//   "AGENCY" - An advertising agency.
+	//   "ENTITY_TYPE_UNCLASSIFIED" - An explicit value for a client that
+	// was not yet classified
+	// as any particular entity.
 	EntityType string `json:"entityType,omitempty"`
 
 	// PartnerClientId: Optional arbitrary unique identifier of this client
@@ -1306,8 +1359,6 @@ func (s *Correction) MarshalJSON() ([]byte, error) {
 }
 
 // Creative: A creative and its classification data.
-//
-// Next ID: 40
 type Creative struct {
 	// AccountId: The account that this creative belongs to.
 	// Can be used to filter the response of the
@@ -1338,6 +1389,10 @@ type Creative struct {
 	// Possible values:
 	//   "ATTRIBUTE_UNSPECIFIED" - Do not use. This is a placeholder value
 	// only.
+	//   "IMAGE_RICH_MEDIA" - The creative is of type image/rich media. For
+	// pretargeting.
+	//   "ADOBE_FLASH_FLV" - The creative is of video type Adobe Flash FLV.
+	// For pretargeting.
 	//   "IS_TAGGED" - The creative is tagged.
 	//   "IS_COOKIE_TARGETED" - The creative is cookie targeted.
 	//   "IS_USER_INTEREST_TARGETED" - The creative is user interest
@@ -1367,14 +1422,29 @@ type Creative struct {
 	//   "RICH_MEDIA_CAPABILITY_TYPE_MRAID" - The creative is MRAID.
 	//   "RICH_MEDIA_CAPABILITY_TYPE_FLASH" - The creative is Flash.
 	//   "RICH_MEDIA_CAPABILITY_TYPE_HTML5" - The creative is HTML5.
+	//   "SKIPPABLE_INSTREAM_VIDEO" - The creative has an instream VAST
+	// video type of skippable instream video.
+	// For pretargeting.
 	//   "RICH_MEDIA_CAPABILITY_TYPE_SSL" - The creative is SSL.
 	//   "RICH_MEDIA_CAPABILITY_TYPE_NON_SSL" - The creative is non-SSL.
 	//   "RICH_MEDIA_CAPABILITY_TYPE_INTERSTITIAL" - The creative is an
 	// interstitial.
+	//   "NON_SKIPPABLE_INSTREAM_VIDEO" - The creative has an instream VAST
+	// video type of non-skippable instream
+	// video. For pretargeting.
 	//   "NATIVE_ELIGIBILITY_ELIGIBLE" - The creative is eligible for
 	// native.
+	//   "NON_VPAID" - The creative has an instream VAST video type of
+	// non-VPAID. For
+	// pretargeting.
 	//   "NATIVE_ELIGIBILITY_NOT_ELIGIBLE" - The creative is not eligible
 	// for native.
+	//   "ANY_INTERSTITIAL" - The creative has an interstitial size of any
+	// interstitial. For
+	// pretargeting.
+	//   "NON_INTERSTITIAL" - The creative has an interstitial size of non
+	// interstitial. For
+	// pretargeting.
 	//   "IN_BANNER_VIDEO" - The video type is in-banner video.
 	//   "RENDERING_SIZELESS_ADX" - The creative can dynamically resize to
 	// fill a variety of slot sizes.
@@ -1453,7 +1523,12 @@ type Creative struct {
 	// bids.
 	DetectedSensitiveCategories []int64 `json:"detectedSensitiveCategories,omitempty"`
 
-	// FilteringStats: @OutputOnly The filtering stats for this creative.
+	// FilteringStats: @OutputOnly The filtering stats for this
+	// creative.
+	// Deprecated; please
+	// use
+	// bidders.accounts.filterSets.filteredBids.creatives.list
+	// method instead.
 	FilteringStats *FilteringStats `json:"filteringStats,omitempty"`
 
 	// Html: An HTML creative.

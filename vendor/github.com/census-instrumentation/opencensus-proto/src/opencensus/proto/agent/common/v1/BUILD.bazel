@@ -14,10 +14,21 @@
 
 package(default_visibility = ["//visibility:public"])
 
+load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+
 proto_library(
     name = "common_proto",
     srcs = ["common.proto"],
     deps = [
         "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+go_proto_library(
+    name = "common_proto_go",
+    proto = ":common_proto",
+    importpath = "github.com/census-instrumentation/opencensus-proto/gen-go/agent/common/v1",
+    deps = [
+        "@com_github_golang_protobuf//ptypes/timestamp:go_default_library",
     ],
 )
