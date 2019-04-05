@@ -101,7 +101,9 @@ func (m *monitor) listResourceGroupMonitoringHostnames(ctx context.Context, subs
 				return false, nil
 			}
 
-			ips = append(ips, *iter.Value().IPAddress)
+			if iter.Value().IPAddress != nil {
+				ips = append(ips, *iter.Value().IPAddress)
+			}
 		}
 		if len(ips) == 3 {
 			hostnames = append(hostnames, ips...)
