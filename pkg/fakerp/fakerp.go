@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
-	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
@@ -187,11 +186,6 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
-	err = acceptMarketplaceAgreement(ctx, log, cs, testConfig)
-	if err != nil {
-		return nil, err
-	}
-
 	// write out development files
 	log.Info("write helpers")
 	err = os.MkdirAll("_data/_out", 0777)
@@ -220,35 +214,6 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 	}
 
 	return cs, nil
-}
-
-func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) error {
-	if testConfig.ImageResourceName != "" ||
-		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
-		return nil
-	}
-
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
-	if err != nil {
-		return err
-	}
-
-	marketPlaceAgreements := azureclient.NewMarketPlaceAgreementsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
-	log.Info("checking marketplace agreement")
-	terms, err := marketPlaceAgreements.Get(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU)
-	if err != nil {
-		return err
-	}
-
-	if *terms.AgreementProperties.Accepted {
-		return nil
-	}
-
-	terms.AgreementProperties.Accepted = to.BoolPtr(true)
-
-	log.Info("accepting marketplace agreement")
-	_, err = marketPlaceAgreements.Create(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU, terms)
-	return err
 }
 
 func enrich(cs *api.OpenShiftManagedCluster) error {
