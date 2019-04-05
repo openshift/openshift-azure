@@ -69,20 +69,6 @@ func TestHashScaleSetStability(t *testing.T) {
 				expectedHash: "90abb10d7670b484d65bf107102b44164284db52ee7038b1753c7f15000c0abc",
 			},
 		},
-		"v5.0": {
-			{
-				role:         api.AgentPoolProfileRoleMaster,
-				expectedHash: "49de607e3b50aff9f2fa1a64e7a6173ab2c13969dcdc9036623ddc0666ca99af",
-			},
-			{
-				role:         api.AgentPoolProfileRoleInfra,
-				expectedHash: "a8236fac988b1e73d7685bb70f5c7ec2c17a0bdd41f60e4d92f216c9f4961f50",
-			},
-			{
-				role:         api.AgentPoolProfileRoleCompute,
-				expectedHash: "90abb10d7670b484d65bf107102b44164284db52ee7038b1753c7f15000c0abc",
-			},
-		},
 	}
 
 	// check we're testing all versions in our pluginconfig
@@ -98,7 +84,7 @@ func TestHashScaleSetStability(t *testing.T) {
 	}
 
 	for version := range template.Versions {
-		if _, found := tests[version]; !found {
+		if _, found := tests[version]; !found && version != template.PluginVersion {
 			t.Errorf("update tests to include version %s", version)
 		}
 	}
@@ -176,9 +162,6 @@ func TestHashSyncPodStability(t *testing.T) {
 			// this value should not change
 			expectedHash: "94c9eefd9c847c49834925c5f7dd87b21765fe8a3952f8190f9b352a8a3cba37",
 		},
-		"v5.0": {
-			expectedHash: "4baa0e9115ff4edb20eef6d8267d635cd016ce4e8babdaabe0a56ea5c7364a0a",
-		},
 	}
 
 	// check we're testing all versions in our pluginconfig
@@ -194,7 +177,7 @@ func TestHashSyncPodStability(t *testing.T) {
 	}
 
 	for version := range template.Versions {
-		if _, found := tests[version]; !found {
+		if _, found := tests[version]; !found && version != template.PluginVersion {
 			t.Errorf("update tests to include version %s", version)
 		}
 	}
