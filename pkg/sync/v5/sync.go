@@ -300,22 +300,27 @@ func (s *sync) writeDB() error {
 	sort.Strings(keys)
 
 	// crd needs to land early to get initialized
+	s.log.Debug("applying crd resources")
 	if err := s.applyResources(crdFilter, keys); err != nil {
 		return err
 	}
 	// namespaces must exist before namespaced objects.
+	s.log.Debug("applying ns resources")
 	if err := s.applyResources(nsFilter, keys); err != nil {
 		return err
 	}
 	// create serviceaccounts
+	s.log.Debug("applying sa resources")
 	if err := s.applyResources(saFilter, keys); err != nil {
 		return err
 	}
 	// create all secrets and configmaps
+	s.log.Debug("applying cfg resources")
 	if err := s.applyResources(cfgFilter, keys); err != nil {
 		return err
 	}
 	// default storage class must be created before PVCs as the admission controller is edge-triggered
+	s.log.Debug("applying storageClass resources")
 	if err := s.applyResources(storageClassFilter, keys); err != nil {
 		return err
 	}
@@ -326,6 +331,7 @@ func (s *sync) writeDB() error {
 	}
 
 	// create all, except targeted CRDs resources
+	s.log.Debug("applying other resources")
 	if err := s.applyResources(everythingElseFilter, keys); err != nil {
 		return err
 	}
@@ -346,6 +352,7 @@ func (s *sync) writeDB() error {
 	}
 
 	// now write the servicecatalog configurables.
+	s.log.Debug("applying sc resources")
 	if err := s.applyResources(scFilter, keys); err != nil {
 		return err
 	}
@@ -367,6 +374,7 @@ func (s *sync) writeDB() error {
 	}
 
 	// write all post boostrap objects depending on monitoring CRDs, managed by operators
+	s.log.Debug("applying monitoring crd resources")
 	return s.applyResources(monitoringCrdFilter, keys)
 }
 

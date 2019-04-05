@@ -68,6 +68,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 	if err != nil {
 		return err
 	}
+	log.Printf("running sync for plugin %s", cs.Config.PluginVersion)
 
 	log.Print("enriching config")
 	err = enrich.CertificatesFromVault(ctx, kvc, cs)
@@ -75,11 +76,13 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
+	log.Print("enriching storage account keys")
 	err = enrich.StorageAccountKeys(ctx, azs, cs)
 	if err != nil {
 		return err
 	}
 
+	log.Print("creating new sync")
 	s, err := sync.New(log, cs, true)
 	if err != nil {
 		return err
