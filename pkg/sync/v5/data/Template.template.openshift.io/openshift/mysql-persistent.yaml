@@ -19,7 +19,7 @@ metadata:
       NOTE: Scaling to more than one replica is not supported. You must have persistent volumes available in your cluster to use this template.
     iconClass: icon-mysql-database
     openshift.io/display-name: MySQL
-    openshift.io/documentation-url: https://docs.openshift.org/latest/using_images/db_images/mysql.html
+    openshift.io/documentation-url: https://docs.okd.io/latest/using_images/db_images/mysql.html
     openshift.io/long-description: This template provides a standalone MySQL server
       with a database created.  The database is stored on persistent storage.  The
       database name, username, and password are chosen via parameters when provisioning

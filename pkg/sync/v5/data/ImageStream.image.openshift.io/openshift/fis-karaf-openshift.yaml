@@ -19,12 +19,11 @@ spec:
       version: "1.0"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/jboss-fuse-6/fis-karaf-openshift:1.0
-    generation: 2
+      name: registry.redhat.io/jboss-fuse-6/fis-karaf-openshift:1.0
     importPolicy: {}
     name: "1.0"
     referencePolicy:
-      type: Source
+      type: Local
   - annotations:
       description: Red Hat Fuse 6.3 Karaf S2I images.
       iconClass: icon-rh-integration
@@ -34,9 +33,8 @@ spec:
       version: "2.0"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/jboss-fuse-6/fis-karaf-openshift:2.0
-    generation: 2
+      name: registry.redhat.io/jboss-fuse-6/fis-karaf-openshift:2.0
     importPolicy: {}
     name: "2.0"
     referencePolicy:
-      type: Source
+      type: Local

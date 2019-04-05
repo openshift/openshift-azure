@@ -19,7 +19,7 @@ metadata:
       WARNING: Any data stored will be lost upon pod destruction. Only use this template for testing
     iconClass: icon-mysql-database
     openshift.io/display-name: MySQL (Ephemeral)
-    openshift.io/documentation-url: https://docs.openshift.org/latest/using_images/db_images/mysql.html
+    openshift.io/documentation-url: https://docs.okd.io/latest/using_images/db_images/mysql.html
     openshift.io/long-description: This template provides a standalone MySQL server
       with a database created.  The database is not stored on persistent storage,
       so any restart of the service will result in all data being lost.  The database

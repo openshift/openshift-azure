@@ -2,7 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 labels:
   template: processserver64-basic-s2i
-  xpaas: 1.4.14
+  xpaas: 1.4.16
 message: A new BPMS application has been created in your project. The username/password
   for accessing the KIE Server REST or JMS interface is ${KIE_SERVER_USER}/${KIE_SERVER_PASSWORD}.
 metadata:
@@ -20,7 +20,7 @@ metadata:
       application, including a build configuration, application deployment configuration
       and insecure communication using http.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.14
+    version: 1.4.16
   name: processserver64-basic-s2i
   namespace: openshift
 objects:
@@ -173,7 +173,7 @@ parameters:
 - description: 'The KIE Container deployment configuration in format: containerId=groupId:artifactId:version|c2=g2:a2:v2'
   displayName: KIE Container Deployment
   name: KIE_CONTAINER_DEPLOYMENT
-  value: processserver-library=org.openshift.quickstarts:processserver-library:1.3.0.Final
+  value: processserver-library=org.openshift.quickstarts:processserver-library:1.4.0.Final
 - description: The user name to access the KIE Server REST or JMS interface.
   displayName: KIE Server Username
   name: KIE_SERVER_USER

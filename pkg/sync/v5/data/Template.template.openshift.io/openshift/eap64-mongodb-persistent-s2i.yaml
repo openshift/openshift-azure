@@ -2,7 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 labels:
   template: eap64-mongodb-persistent-s2i
-  xpaas: 1.4.14
+  xpaas: 1.4.18
 message: 'A new EAP 6 and MongoDB persistent based application with SSL support has
   been created in your project. The username/password for accessing the MongoDB database
   "${DB_DATABASE}" is ${DB_USERNAME}/${DB_PASSWORD} (Admin password is "${DB_ADMIN_PASSWORD}").
@@ -23,7 +23,7 @@ metadata:
       a build configuration, application deployment configuration, database deployment
       configuration for MongoDB using persistence and secure communication using https.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.14
+    version: 1.4.18
   name: eap64-mongodb-persistent-s2i
   namespace: openshift
 objects:
@@ -150,7 +150,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-eap64-openshift:1.8
+          name: jboss-eap64-openshift:1.9
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:

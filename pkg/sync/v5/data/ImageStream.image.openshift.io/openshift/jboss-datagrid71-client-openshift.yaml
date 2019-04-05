@@ -4,7 +4,7 @@ metadata:
   annotations:
     openshift.io/display-name: Red Hat JBoss Data Grid 7.1 Client Modules for EAP
     openshift.io/provider-display-name: Red Hat, Inc.
-    version: 1.4.14
+    version: 1.4.16
   name: jboss-datagrid71-client-openshift
   namespace: openshift
 spec:
@@ -19,8 +19,7 @@ spec:
       version: "1.0"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/jboss-datagrid-7/datagrid71-client-openshift:1.0
-    generation: 2
+      name: registry.redhat.io/jboss-datagrid-7/datagrid71-client-openshift:1.0
     importPolicy: {}
     name: "1.0"
     referencePolicy:

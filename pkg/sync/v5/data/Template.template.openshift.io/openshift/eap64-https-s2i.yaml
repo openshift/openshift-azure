@@ -2,7 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 labels:
   template: eap64-https-s2i
-  xpaas: 1.4.14
+  xpaas: 1.4.18
 message: 'A new EAP 6 based application with SSL support has been created in your
   project. Please be sure to create the following secrets: "${HTTPS_SECRET}" containing
   the ${HTTPS_KEYSTORE} file used for serving secure content; "${JGROUPS_ENCRYPT_SECRET}"
@@ -21,7 +21,7 @@ metadata:
       a build configuration, application deployment configuration and secure communication
       using https.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.14
+    version: 1.4.18
   name: eap64-https-s2i
   namespace: openshift
 objects:
@@ -130,7 +130,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-eap64-openshift:1.8
+          name: jboss-eap64-openshift:1.9
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:

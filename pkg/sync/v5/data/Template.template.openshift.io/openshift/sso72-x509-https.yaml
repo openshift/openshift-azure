@@ -1,8 +1,8 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
+  rh-sso: 7.2-v1.4.0
   template: sso72-x509-https
-  xpaas: 1.4.14
 message: A new RH-SSO service has been created in your project. The admin username/password
   for accessing the master realm via the RH-SSO console is ${SSO_ADMIN_USERNAME}/${SSO_ADMIN_PASSWORD}.
   The HTTPS keystore used for serving secure content, the JGroups keystore used for
@@ -22,7 +22,7 @@ metadata:
       to develop Red Hat Single Sign-On 7.2 server based deployment, securing RH-SSO
       communication using re-encrypt TLS.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.14
+    version: rh-sso-7.2-v1.4.0
   name: sso72-x509-https
   namespace: openshift
 objects:
@@ -47,7 +47,6 @@ objects:
     annotations:
       description: The JGroups ping port for clustering.
       service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-      service.alpha.openshift.io/serving-cert-secret-name: sso-x509-jgroups-secret
     labels:
       application: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}-ping
@@ -109,6 +108,8 @@ objects:
             value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
           - name: JGROUPS_CLUSTER_PASSWORD
             value: ${JGROUPS_CLUSTER_PASSWORD}
+          - name: JGROUPS_ENCRYPT_PROTOCOL
+            value: ASYM_ENCRYPT
           - name: SSO_ADMIN_USERNAME
             value: ${SSO_ADMIN_USERNAME}
           - name: SSO_ADMIN_PASSWORD
@@ -155,17 +156,11 @@ objects:
           - mountPath: /etc/x509/https
             name: sso-x509-https-volume
             readOnly: true
-          - mountPath: /etc/x509/jgroups
-            name: sso-x509-jgroups-volume
-            readOnly: true
         terminationGracePeriodSeconds: 75
         volumes:
         - name: sso-x509-https-volume
           secret:
             secretName: sso-x509-https-secret
-        - name: sso-x509-jgroups-volume
-          secret:
-            secretName: sso-x509-jgroups-secret
     triggers:
     - imageChangeParams:
         automatic: true
@@ -173,7 +168,7 @@ objects:
         - ${APPLICATION_NAME}
         from:
           kind: ImageStreamTag
-          name: redhat-sso72-openshift:1.2
+          name: redhat-sso72-openshift:1.4
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange

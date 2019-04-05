@@ -2,7 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 labels:
   template: eap64-tx-recovery-s2i
-  xpaas: 1.4.14
+  xpaas: 1.4.18
 message: A new EAP 6 based application has been created in your project.
 metadata:
   annotations:
@@ -20,10 +20,24 @@ metadata:
       recovery on scale down of application pods.  Automated transaction recovery
       is currently Technology Preview.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.14
+    version: 1.4.18
   name: eap64-tx-recovery-s2i
   namespace: openshift
 objects:
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: ${APPLICATION_NAME}-sa
+- apiVersion: v1
+  kind: RoleBinding
+  metadata:
+    name: ${APPLICATION_NAME}-role-binding
+  roleRef:
+    kind: Role
+    name: view
+  subjects:
+  - kind: ServiceAccount
+    name: ${APPLICATION_NAME}-sa
 - apiVersion: v1
   kind: Service
   metadata:
@@ -100,7 +114,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-eap64-openshift:1.8
+          name: jboss-eap64-openshift:1.9
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:
@@ -184,6 +198,7 @@ objects:
           volumeMounts:
           - mountPath: /opt/eap/standalone/partitioned_data
             name: ${APPLICATION_NAME}-eap-pvol
+        serviceAccountName: ${APPLICATION_NAME}-sa
         terminationGracePeriodSeconds: 60
         volumes:
         - name: ${APPLICATION_NAME}-eap-pvol
@@ -259,6 +274,7 @@ objects:
           volumeMounts:
           - mountPath: /opt/eap/standalone/partitioned_data
             name: ${APPLICATION_NAME}-eap-pvol
+        serviceAccountName: ${APPLICATION_NAME}-sa
         terminationGracePeriodSeconds: 60
         volumes:
         - name: ${APPLICATION_NAME}-eap-pvol

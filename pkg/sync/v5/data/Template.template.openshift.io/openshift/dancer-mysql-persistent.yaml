@@ -6,14 +6,14 @@ labels:
 message: |-
   The following service(s) have been created in your project: ${NAME}, ${DATABASE_SERVICE_NAME}.
 
-  For more information about using this template, including OpenShift considerations, see https://github.com/openshift/dancer-ex/blob/master/README.md.
+  For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/dancer-ex/blob/master/README.md.
 metadata:
   annotations:
     description: An example Dancer application with a MySQL database. For more information
-      about using this template, including OpenShift considerations, see https://github.com/openshift/dancer-ex/blob/master/README.md.
+      about using this template, including OpenShift considerations, see https://github.com/sclorg/dancer-ex/blob/master/README.md.
     iconClass: icon-perl
     openshift.io/display-name: Dancer + MySQL
-    openshift.io/documentation-url: https://github.com/openshift/dancer-ex
+    openshift.io/documentation-url: https://github.com/sclorg/dancer-ex
     openshift.io/long-description: This template defines resources needed to develop
       a Dancer based application, including a build configuration, application deployment
       configuration, and database deployment configuration.
@@ -89,7 +89,7 @@ objects:
           value: ${CPAN_MIRROR}
         from:
           kind: ImageStreamTag
-          name: perl:5.24
+          name: perl:5.26
           namespace: ${NAMESPACE}
       type: Source
     triggers:
@@ -295,7 +295,7 @@ parameters:
   displayName: Git Repository URL
   name: SOURCE_REPOSITORY_URL
   required: true
-  value: https://github.com/openshift/dancer-ex.git
+  value: https://github.com/sclorg/dancer-ex.git
 - description: Set this to a branch name, tag or other ref of your repository if you
     are not using the default branch.
   displayName: Git Reference

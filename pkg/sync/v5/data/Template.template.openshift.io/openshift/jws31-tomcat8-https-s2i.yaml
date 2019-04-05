@@ -2,7 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 labels:
   template: jws31-tomcat8-https-s2i
-  xpaas: 1.4.14
+  xpaas: 1.4.16
 message: A new JWS application for Apache Tomcat 8 has been created in your project.
   The username/password for administering your JWS is ${JWS_ADMIN_USERNAME}/${JWS_ADMIN_PASSWORD}.
   Please be sure to create the secret named "${JWS_HTTPS_SECRET}" containing the ${JWS_HTTPS_CERTIFICATE}
@@ -21,7 +21,7 @@ metadata:
       a build configuration, application deployment configuration, and secure communication
       using https.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.14
+    version: 1.4.16
   name: jws31-tomcat8-https-s2i
   namespace: openshift
 objects:

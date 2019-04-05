@@ -16,31 +16,29 @@ spec:
       iconClass: icon-nodejs
       openshift.io/display-name: Node.js 0.10
       openshift.io/provider-display-name: Red Hat, Inc.
-      sampleRepo: https://github.com/openshift/nodejs-ex.git
+      sampleRepo: https://github.com/sclorg/nodejs-ex.git
       supports: nodejs:0.10,nodejs:0.1,nodejs
       tags: hidden,nodejs
       version: "0.10"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/openshift3/nodejs-010-rhel7:latest
-    generation: 2
+      name: registry.redhat.io/openshift3/nodejs-010-rhel7:latest
     importPolicy: {}
     name: "0.10"
     referencePolicy:
       type: Local
   - annotations:
       description: Build and run Node.js 10 applications on RHEL 7. For more information
-        about using this builder image, including OpenShift considerations, see https://github.com/bucharest-gold/centos7-s2i-nodejs.
+        about using this builder image, including OpenShift considerations, see https://github.com/nodeshift/centos7-s2i-nodejs.
       iconClass: icon-nodejs
       openshift.io/display-name: OpenShift Application Runtimes Node.js 10
       openshift.io/provider-display-name: Red Hat, Inc.
-      sampleRepo: https://github.com/openshift/nodejs-ex.git
+      sampleRepo: https://github.com/sclorg/nodejs-ex.git
       tags: builder,nodejs
       version: "10"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/rhoar-nodejs/nodejs-10
-    generation: 2
+      name: registry.redhat.io/rhoar-nodejs/nodejs-10
     importPolicy: {}
     name: "10"
     referencePolicy:
@@ -51,14 +49,13 @@ spec:
       iconClass: icon-nodejs
       openshift.io/display-name: Node.js 4
       openshift.io/provider-display-name: Red Hat, Inc.
-      sampleRepo: https://github.com/openshift/nodejs-ex.git
+      sampleRepo: https://github.com/sclorg/nodejs-ex.git
       supports: nodejs:4,nodejs
       tags: hidden,builder,nodejs
       version: "4"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/rhscl/nodejs-4-rhel7:latest
-    generation: 2
+      name: registry.redhat.io/rhscl/nodejs-4-rhel7:latest
     importPolicy: {}
     name: "4"
     referencePolicy:
@@ -69,14 +66,13 @@ spec:
       iconClass: icon-nodejs
       openshift.io/display-name: Node.js 6
       openshift.io/provider-display-name: Red Hat, Inc.
-      sampleRepo: https://github.com/openshift/nodejs-ex.git
+      sampleRepo: https://github.com/sclorg/nodejs-ex.git
       supports: nodejs:6,nodejs
       tags: builder,nodejs
       version: "6"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/rhscl/nodejs-6-rhel7:latest
-    generation: 2
+      name: registry.redhat.io/rhscl/nodejs-6-rhel7:latest
     importPolicy: {}
     name: "6"
     referencePolicy:
@@ -87,49 +83,46 @@ spec:
       iconClass: icon-nodejs
       openshift.io/display-name: Node.js 8
       openshift.io/provider-display-name: Red Hat, Inc.
-      sampleRepo: https://github.com/openshift/nodejs-ex.git
+      sampleRepo: https://github.com/sclorg/nodejs-ex.git
       tags: builder,nodejs
       version: "8"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/rhscl/nodejs-8-rhel7:latest
-    generation: 2
+      name: registry.redhat.io/rhscl/nodejs-8-rhel7:latest
     importPolicy: {}
     name: "8"
     referencePolicy:
       type: Local
   - annotations:
       description: Build and run Node.js 8 applications on RHEL 7. For more information
-        about using this builder image, including OpenShift considerations, see https://github.com/bucharest-gold/centos7-s2i-nodejs.
+        about using this builder image, including OpenShift considerations, see https://github.com/nodeshift/centos7-s2i-nodejs.
       iconClass: icon-nodejs
       openshift.io/display-name: OpenShift Application Runtimes Node.js 8
       openshift.io/provider-display-name: Red Hat, Inc.
-      sampleRepo: https://github.com/openshift/nodejs-ex.git
+      sampleRepo: https://github.com/sclorg/nodejs-ex.git
       tags: builder,nodejs
       version: "8"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/rhoar-nodejs/nodejs-8
-    generation: 2
+      name: registry.redhat.io/rhoar-nodejs/nodejs-8
     importPolicy: {}
     name: 8-RHOAR
     referencePolicy:
       type: Local
   - annotations:
       description: |-
-        Build and run Node.js 10 applications on RHEL 7. For more information about using this builder image, including OpenShift considerations, see https://github.com/bucharest-gold/centos7-s2i-nodejs.
+        Build and run Node.js 10 applications on RHEL 7. For more information about using this builder image, including OpenShift considerations, see https://github.com/nodeshift/centos7-s2i-nodejs.
 
         WARNING: By selecting this tag, your application will automatically update to use the latest version of Node.js available on OpenShift, including major versions updates.
       iconClass: icon-nodejs
       openshift.io/display-name: Node.js (Latest)
       openshift.io/provider-display-name: Red Hat, Inc.
-      sampleRepo: https://github.com/openshift/nodejs-ex.git
+      sampleRepo: https://github.com/sclorg/nodejs-ex.git
       supports: nodejs
       tags: builder,nodejs
     from:
       kind: ImageStreamTag
       name: "10"
-    generation: 1
     importPolicy: {}
     name: latest
     referencePolicy:

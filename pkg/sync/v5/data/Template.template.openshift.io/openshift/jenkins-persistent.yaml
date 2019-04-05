@@ -14,7 +14,7 @@ metadata:
       NOTE: You must have persistent volumes available in your cluster to use this template.
     iconClass: icon-jenkins
     openshift.io/display-name: Jenkins
-    openshift.io/documentation-url: https://docs.openshift.org/latest/using_images/other_images/jenkins.html
+    openshift.io/documentation-url: https://docs.okd.io/latest/using_images/other_images/jenkins.html
     openshift.io/long-description: This template deploys a Jenkins server capable
       of managing OpenShift Pipeline builds and supporting OpenShift-based oauth login.
     openshift.io/provider-display-name: Red Hat, Inc.
@@ -196,7 +196,7 @@ parameters:
 - description: Maximum amount of memory the container can use.
   displayName: Memory Limit
   name: MEMORY_LIMIT
-  value: 512Mi
+  value: 1Gi
 - description: Volume space available for data, e.g. 512Mi, 2Gi.
   displayName: Volume Capacity
   name: VOLUME_CAPACITY

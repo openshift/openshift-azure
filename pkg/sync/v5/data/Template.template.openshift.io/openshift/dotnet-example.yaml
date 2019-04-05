@@ -62,8 +62,6 @@ objects:
         env:
         - name: DOTNET_STARTUP_PROJECT
           value: ${DOTNET_STARTUP_PROJECT}
-        - name: DOTNET_SDK_VERSION
-          value: ${DOTNET_SDK_VERSION}
         - name: DOTNET_ASSEMBLY_NAME
           value: ${DOTNET_ASSEMBLY_NAME}
         - name: DOTNET_NPM_TOOLS
@@ -156,7 +154,7 @@ parameters:
   displayName: .NET builder
   name: DOTNET_IMAGE_STREAM_TAG
   required: true
-  value: dotnet:2.1
+  value: dotnet:2.2
 - description: The OpenShift Namespace where the ImageStream resides.
   displayName: Namespace
   name: NAMESPACE
@@ -171,7 +169,7 @@ parameters:
     are not using the default branch.
   displayName: Git Reference
   name: SOURCE_REPOSITORY_REF
-  value: dotnetcore-2.1
+  value: dotnetcore-2.2
 - description: Set this to use a subdirectory of the source code repository
   displayName: Context Directory
   name: CONTEXT_DIR
@@ -189,10 +187,6 @@ parameters:
   from: '[a-zA-Z0-9]{40}'
   generate: expression
   name: GENERIC_WEBHOOK_SECRET
-- description: Set this to configure the default SDK version. This can be set to a
-    specific version, '' (lowest version) or 'latest' (highest version).
-  displayName: SDK Version
-  name: DOTNET_SDK_VERSION
 - description: Set this to a project file (e.g. csproj) or a folder containing a single
     project file.
   displayName: Startup Project
