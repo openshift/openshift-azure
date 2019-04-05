@@ -19,6 +19,7 @@ func (s *Server) SetupRoutes() {
 	s.router.Put(s.basePath, s.handlePut)
 	s.router.Get(filepath.Join("/admin", s.basePath), s.handleGet)
 	s.router.Put(filepath.Join("/admin", s.basePath), s.handlePut)
+	s.router.Get(filepath.Join("/admin", s.basePath, "/listBackups"), s.handleListBackups)
 	s.router.Put(filepath.Join("/admin", s.basePath, "/restore/{backupName}"), s.handleRestore)
 	s.router.Put(filepath.Join("/admin", s.basePath, "/rotate/secrets"), s.handleRotateSecrets)
 	s.router.Get(filepath.Join("/admin", s.basePath, "/status"), s.handleGetControlPlanePods)

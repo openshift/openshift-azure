@@ -53,7 +53,9 @@ func validateImport(imp *ast.ImportSpec) (errs []error) {
 	switch typeForImport(imp) {
 	case importDot:
 		switch path {
-		case "github.com/onsi/ginkgo", "github.com/onsi/gomega":
+		case "github.com/onsi/ginkgo",
+			"github.com/onsi/gomega",
+			"github.com/onsi/gomega/gstruct":
 		default:
 			errs = append(errs, fmt.Errorf("invalid . import %s", imp.Path.Value))
 		}

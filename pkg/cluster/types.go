@@ -9,6 +9,7 @@ package cluster
 import (
 	"context"
 
+	azstorage "github.com/Azure/azure-sdk-for-go/storage"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -45,7 +46,7 @@ type Upgrader interface {
 	UpdateMasterAgentPool(ctx context.Context, app *api.AgentPoolProfile) *api.PluginError
 	UpdateWorkerAgentPool(ctx context.Context, app *api.AgentPoolProfile, suffix string) *api.PluginError
 	CreateOrUpdateSyncPod(ctx context.Context) error
-	EtcdBlobExists(ctx context.Context, blobName string) error
+	EtcdListBackups(ctx context.Context) ([]azstorage.Blob, error)
 	EtcdRestoreDeleteMasterScaleSet(ctx context.Context) *api.PluginError
 	EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context) *api.PluginError
 	ResetUpdateBlob() error

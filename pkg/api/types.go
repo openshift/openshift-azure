@@ -1,5 +1,9 @@
 package api
 
+import (
+	"time"
+)
+
 const (
 	// APIVersion is the version of this API
 	APIVersion = "internal"
@@ -238,4 +242,11 @@ type GenevaActionPluginVersion struct {
 // Geneva action API
 type GenevaActionListClusterVMs struct {
 	VMs *[]string `json:"vms,omitempty"`
+}
+
+// GenevaActionListEtcdBackups is returned by the ListEtcdBackups Geneva action
+// API
+type GenevaActionListEtcdBackups struct {
+	Name         string    `json:"name,omitempty"`
+	LastModified time.Time `json:"lastModified,omitempty"`
 }
