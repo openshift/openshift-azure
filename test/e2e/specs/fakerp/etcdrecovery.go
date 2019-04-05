@@ -8,6 +8,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -71,7 +72,10 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 		err = azurecli.OpenShiftManagedClustersAdmin.Backup(context.Background(), resourceGroup, resourceGroup, backup)
 		Expect(err).NotTo(HaveOccurred())
 
-		// wait for it to exist
+		backups, err := azurecli.OpenShiftManagedClustersAdmin.ListBackups(context.Background(), resourceGroup, resourceGroup)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(backups).To(ContainElement(MatchFields(IgnoreExtras, Fields{"Name": Equal(backup)})))
+
 		By("Overwrite the test configmap with value=second")
 		cm2, err := sanity.Checker.Client.EndUser.CoreV1.ConfigMaps(namespace).Update(&v1.ConfigMap{
 			ObjectMeta: metav1.ObjectMeta{

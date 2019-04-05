@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	storage "github.com/Azure/azure-sdk-for-go/storage"
 	gomock "github.com/golang/mock/gomock"
 	v1 "k8s.io/api/core/v1"
 
@@ -149,18 +150,19 @@ func (mr *MockUpgraderMockRecorder) EnsureSyncPod(arg0, arg1, arg2 interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EnsureSyncPod", reflect.TypeOf((*MockUpgrader)(nil).EnsureSyncPod), arg0, arg1, arg2)
 }
 
-// EtcdBlobExists mocks base method
-func (m *MockUpgrader) EtcdBlobExists(arg0 context.Context, arg1 string) error {
+// EtcdListBackups mocks base method
+func (m *MockUpgrader) EtcdListBackups(arg0 context.Context) ([]storage.Blob, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EtcdBlobExists", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "EtcdListBackups", arg0)
+	ret0, _ := ret[0].([]storage.Blob)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// EtcdBlobExists indicates an expected call of EtcdBlobExists
-func (mr *MockUpgraderMockRecorder) EtcdBlobExists(arg0, arg1 interface{}) *gomock.Call {
+// EtcdListBackups indicates an expected call of EtcdListBackups
+func (mr *MockUpgraderMockRecorder) EtcdListBackups(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EtcdBlobExists", reflect.TypeOf((*MockUpgrader)(nil).EtcdBlobExists), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EtcdListBackups", reflect.TypeOf((*MockUpgrader)(nil).EtcdListBackups), arg0)
 }
 
 // EtcdRestoreDeleteMasterScaleSet mocks base method

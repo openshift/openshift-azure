@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/storage"
 	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
 
@@ -109,6 +110,29 @@ func TestCreateOrUpdate(t *testing.T) {
 	}
 }
 
+func TestListEtcdBackups(t *testing.T) {
+	gmc := gomock.NewController(t)
+	defer gmc.Finish()
+
+	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
+	clusterUpgrader.EXPECT().EtcdListBackups(nil).Return([]storage.Blob{{Name: "test-backup"}}, nil)
+
+	p := &plugin{
+		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
+			return clusterUpgrader, nil
+		},
+		log: logrus.NewEntry(logrus.StandardLogger()),
+	}
+
+	backups, err := p.ListEtcdBackups(nil, nil)
+	if err != nil {
+		t.Errorf("plugin.ListEtcdBackups error = %v", err)
+	}
+	if len(backups) != 1 || backups[0].Name != "test-backup" {
+		t.Errorf("plugin.ListEtcdBackups unexpected response %v", backups)
+	}
+}
+
 func TestRecoverEtcdCluster(t *testing.T) {
 	gmc := gomock.NewController(t)
 	defer gmc.Finish()
@@ -129,7 +153,7 @@ func TestRecoverEtcdCluster(t *testing.T) {
 	clusterUpgrader := mock_cluster.NewMockUpgrader(gmc)
 
 	c := clusterUpgrader.EXPECT().GenerateARM(nil, gomock.Any(), true, gomock.Any()).Return(nil, nil)
-	c = clusterUpgrader.EXPECT().EtcdBlobExists(nil, "test-backup").Return(nil).After(c)
+	c = clusterUpgrader.EXPECT().EtcdListBackups(nil).Return([]storage.Blob{{Name: "test-backup"}}, nil).After(c)
 	c = clusterUpgrader.EXPECT().EtcdRestoreDeleteMasterScaleSet(nil).Return(nil).After(c)
 
 	// deploy masters

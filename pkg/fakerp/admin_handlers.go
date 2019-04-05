@@ -87,6 +87,23 @@ func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
 	s.adminreply(w, err, nil)
 }
 
+// handleListBackups handles admin requests to list etcd backups
+func (s *Server) handleListBackups(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+
+	backups, pluginErr := s.plugin.ListEtcdBackups(req.Context(), cs)
+	var err error
+	if pluginErr != nil {
+		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error
+		err = pluginErr
+	}
+	s.adminreply(w, err, backups)
+}
+
 // handleRestore handles admin requests to restore an etcd cluster from a backup
 func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
