@@ -32,13 +32,13 @@ var _ = Describe("Control Plane Pods Status E2E tests [Fake][EveryPR]", func() {
 		Expect(b).NotTo(BeNil())
 
 		By("Unmarshalling the returned raw cluster status to a Pod slice")
-		var podlist v1.PodList
-		err = json.Unmarshal(b, &podlist)
+		var podArray []v1.Pod
+		err = json.Unmarshal(b, &podArray)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Constructing a mapping of namespaces to pods")
 		podnames := make(map[string][]string)
-		for _, pod := range podlist.Items {
+		for _, pod := range podArray {
 			list := append(podnames[pod.Namespace], pod.Name)
 			sort.Strings(list)
 			podnames[pod.Namespace] = list
@@ -55,6 +55,6 @@ var _ = Describe("Control Plane Pods Status E2E tests [Fake][EveryPR]", func() {
 		Expect(sort.SearchStrings(podnames[namespace], "master-etcd-master-000000")).NotTo(Equal(len(podnames[namespace])))
 		Expect(sort.SearchStrings(podnames[namespace], "master-etcd-master-000001")).NotTo(Equal(len(podnames[namespace])))
 		Expect(sort.SearchStrings(podnames[namespace], "master-etcd-master-000002")).NotTo(Equal(len(podnames[namespace])))
-		Expect(sort.SearchStrings(podnames[namespace], "sync-master-000000")).NotTo(Equal(len(podnames[namespace])))
+		Expect(sort.SearchStrings(podnames[namespace], "sync-")).NotTo(Equal(len(podnames[namespace])))
 	})
 })
