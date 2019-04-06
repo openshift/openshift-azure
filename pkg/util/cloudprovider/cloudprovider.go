@@ -8,17 +8,18 @@ import (
 )
 
 type Config struct {
-	TenantID          string `json:"tenantId,omitempty"`
-	SubscriptionID    string `json:"subscriptionId,omitempty"`
-	AadClientID       string `json:"aadClientId,omitempty"`
-	AadClientSecret   string `json:"aadClientSecret,omitempty"`
-	ResourceGroup     string `json:"resourceGroup,omitempty"`
-	Location          string `json:"location,omitempty"`
-	LoadBalancerSku   string `json:"loadBalancerSku,omitempty"`
-	SecurityGroupName string `json:"securityGroupName,omitempty"`
-	VMType            string `json:"vmType,omitempty"`
-	SubnetName        string `json:"subnetName,omitempty"`
-	VnetName          string `json:"vnetName,omitempty"`
+	TenantID            string `json:"tenantId,omitempty"`
+	SubscriptionID      string `json:"subscriptionId,omitempty"`
+	AadClientID         string `json:"aadClientId,omitempty"`
+	AadClientSecret     string `json:"aadClientSecret,omitempty"`
+	ResourceGroup       string `json:"resourceGroup,omitempty"`
+	Location            string `json:"location,omitempty"`
+	LoadBalancerSku     string `json:"loadBalancerSku,omitempty"`
+	SecurityGroupName   string `json:"securityGroupName,omitempty"`
+	VMType              string `json:"vmType,omitempty"`
+	SubnetName          string `json:"subnetName,omitempty"`
+	VnetName            string `json:"vnetName,omitempty"`
+	UseInstanceMetadata bool   `json:"useInstanceMetadata,omitempty"`
 }
 
 // Load returns Config unmarshalled from the file provided
