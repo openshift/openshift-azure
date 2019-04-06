@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -13,6 +12,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	"github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/util/log"
@@ -30,22 +30,21 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 		var err error
 		cli, err = azure.NewClientFromEnvironment(false)
 		Expect(err).ToNot(HaveOccurred())
-		// setting dummy aad
-		os.Setenv("AZURE_AAD_CLIENT_ID", os.Getenv("AZURE_CLIENT_ID"))
-		os.Setenv("AZURE_AAD_CLIENT_SECRET", os.Getenv("AZURE_CLIENT_SECRET"))
-		cfg, err = client.NewConfig(log.GetTestLogger(), true)
+
+		cfg, err = client.NewConfig(log.GetTestLogger())
 		Expect(err).NotTo(HaveOccurred())
 
 		// create a new resource group
-		_, err = client.CreateResourceGroup(cfg)
+		err = client.EnsureResourceGroup(cfg)
 		Expect(err).ToNot(HaveOccurred())
 
 		By("creating an OSA cluster")
-		config, err := client.GenerateManifest("../../test/manifests/realrp/create.yaml")
+		var config v20190430.OpenShiftManagedCluster
+		err = client.GenerateManifest(cfg, "../../test/manifests/realrp/create.yaml", &config)
 		Expect(err).ToNot(HaveOccurred())
 		deployCtx, cancelFn := context.WithTimeout(context.Background(), 30*time.Minute)
 		defer cancelFn()
-		_, err = cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(deployCtx, cfg.ResourceGroup, cfg.ResourceGroup, *config)
+		_, err = cli.OpenShiftManagedClusters.CreateOrUpdateAndWait(deployCtx, cfg.ResourceGroup, cfg.ResourceGroup, config)
 		Expect(err).NotTo(HaveOccurred())
 	})
 

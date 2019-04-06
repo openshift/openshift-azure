@@ -84,6 +84,7 @@ func ensureRoleDefinitions(ctx context.Context) error {
 						"Microsoft.Compute/disks/read",
 						"Microsoft.Compute/disks/write",
 						"Microsoft.Compute/disks/delete",
+						"Microsoft.Compute/images/read", // e2e lb test when running from an image
 						"Microsoft.Compute/virtualMachineScaleSets/read",
 						"Microsoft.Compute/virtualMachineScaleSets/write",
 						"Microsoft.Compute/virtualMachineScaleSets/manualUpgrade/action",

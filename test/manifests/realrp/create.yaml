@@ -1,25 +1,21 @@
-name: {{ Getenv "RESOURCEGROUP" | quote }}
-location: {{ Getenv "AZURE_REGION" | quote }}
+name: {{ .ResourceGroup | quote }}
+location: {{ .Region | quote }}
 properties:
-  openShiftVersion: {{ Getenv "DEPLOY_VERSION" | quote }}
-  fqdn: {{ print (Getenv "RESOURCEGROUP") "." (Getenv "AZURE_REGION") ".cloudapp.azure.com" | quote }}
+  openShiftVersion: {{ .DeployVersion | quote }}
+  fqdn: {{ print .ResourceGroup "." .Region ".cloudapp.azure.com" | quote }}
   authProfile:
     identityProviders:
     - name: Azure AD
       provider:
         kind: AADIdentityProvider
-        clientId: {{ Getenv "AZURE_AAD_CLIENT_ID" | quote }}
-        secret: {{ Getenv "AZURE_AAD_CLIENT_SECRET" | quote }}
-        tenantId: {{ Getenv "AZURE_TENANT_ID" | quote }}
-{{- if ne (Getenv "AZURE_AAD_GROUP_ADMINS_ID") "" }}
-        customerAdminGroupId: {{ Getenv "AZURE_AAD_GROUP_ADMINS_ID" | quote }}
+        clientId: {{ .AADClientID | quote }}
+        secret: {{ .AADClientSecret | quote }}
+        tenantId: {{ .TenantID | quote }}
+{{- if ne .AADGroupAdminsID "" }}
+        customerAdminGroupId: {{ .AADGroupAdminsID | quote }}
 {{- end }}
   networkProfile:
     vnetCidr: 10.0.0.0/8
-  routerProfiles:
-  - name: default
-    publicSubdomain: {{ Getenv "ROUTER_SUBDOMAIN" | quote }}
-    fqdn: {{ Getenv "ROUTER_FQDN" | quote }}
   masterPoolProfile:
     count: 3
     vmSize: Standard_D4s_v3
