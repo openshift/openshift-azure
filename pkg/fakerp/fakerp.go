@@ -134,18 +134,25 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
-	// validate the internal API representation (with reference to the previous
-	// internal API representation)
-	// we set fqdn during enrichment which is slightly different than what the RP
-	// will do so we are only validating once.
 	var errs []error
 	if isAdmin {
 		errs = p.ValidateAdmin(ctx, cs, oldCs)
 	} else {
-		errs = p.Validate(ctx, cs, oldCs, false)
+		errs = p.Validate(ctx, cs, oldCs, true)
 	}
 	if len(errs) > 0 {
 		return nil, kerrors.NewAggregate(errs)
+	}
+
+	am, err := newAADManager(ctx, cs)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Info("setting up service principals")
+	err = am.ensureApps(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	dm, err := newDNSManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
@@ -178,6 +185,13 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 	err = vm.writeTLSCertsToVault(ctx, cs, vaultURL)
 	if err != nil {
 		return nil, err
+	}
+
+	if !isAdmin {
+		errs = p.Validate(ctx, cs, oldCs, false)
+	}
+	if len(errs) > 0 {
+		return nil, kerrors.NewAggregate(errs)
 	}
 
 	// generate or update the OpenShift config blob
@@ -235,15 +249,6 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 		TenantID:       os.Getenv("AZURE_TENANT_ID"),
 		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
 		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
-	}
-
-	cs.Properties.MasterServicePrincipalProfile = api.ServicePrincipalProfile{
-		ClientID: os.Getenv("AZURE_MASTER_CLIENT_ID"),
-		Secret:   os.Getenv("AZURE_MASTER_CLIENT_SECRET"),
-	}
-	cs.Properties.WorkerServicePrincipalProfile = api.ServicePrincipalProfile{
-		ClientID: os.Getenv("AZURE_WORKER_CLIENT_ID"),
-		Secret:   os.Getenv("AZURE_WORKER_CLIENT_SECRET"),
 	}
 
 	// /subscriptions/{subscription}/resourcegroups/{resource_group}/providers/Microsoft.ContainerService/openshiftmanagedClusters/{cluster_name}
