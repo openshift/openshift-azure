@@ -32,8 +32,7 @@
 1. **Secrets**.  Retrieve cluster creation secrets from the CI cluster:
    ```
    cd ${GOPATH:-$HOME/go}/src/github.com/openshift/openshift-azure
-   mkdir secrets
-   oc extract -n azure secrets/cluster-secrets-azure --to=secrets
+   make secrets
    ```
 
 1. **Environment file**.  Create an environment file:
