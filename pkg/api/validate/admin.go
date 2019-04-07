@@ -71,12 +71,19 @@ func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenSh
 		}
 	}
 
-	old.Config.ComponentLogLevel = cs.Config.ComponentLogLevel
-
 	oldMajor, _, err := parsePluginVersion(oldCs.Config.PluginVersion)
 	if cs.Config.PluginVersion == "latest" && err == nil && oldMajor >= 3 {
 		old.Config.PluginVersion = cs.Config.PluginVersion
 	}
+
+	old.Config.ComponentLogLevel = cs.Config.ComponentLogLevel
+
+	old.Config.ImageOffer = cs.Config.ImageOffer
+	old.Config.ImagePublisher = cs.Config.ImagePublisher
+	old.Config.ImageSKU = cs.Config.ImageSKU
+	old.Config.ImageVersion = cs.Config.ImageVersion
+
+	old.Config.Images = cs.Config.Images
 
 	if !reflect.DeepEqual(cs, old) {
 		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
