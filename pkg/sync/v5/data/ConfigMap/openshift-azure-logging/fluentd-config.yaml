@@ -7,7 +7,17 @@ data:
         @type local
         path /var/log/journald.pos
       </storage>
-      tag logs
+      tag journald
+    </source>
+    <source>
+      @type tail
+      format json
+      path /var/log/openshift-audit/*
+      pos_file /var/log/openshift-audit.pos
+      refresh_interval 10
+      tag audit
+      time_key timestamp
+      time_format %Y-%m-%dT%H:%M:%SZ
     </source>
     <match logs>
       @type rewrite_tag_filter

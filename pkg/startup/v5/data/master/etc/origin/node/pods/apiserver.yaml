@@ -48,6 +48,8 @@ spec:
       name: master-data
     - mountPath: /etc/pki
       name: master-pki
+    - mountPath: /var/log
+      name: master-log
   hostNetwork: true
   priorityClassName: system-node-critical
   volumes:
@@ -63,3 +65,6 @@ spec:
   - hostPath:
       path: /etc/pki
     name: master-pki
+  - hostPath:
+      path: /var/log
+    name: master-log
