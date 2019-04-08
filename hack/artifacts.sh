@@ -6,6 +6,11 @@ if [[ -z "$ARTIFACT_DIR" ]]; then
     exit 0
 fi
 
+if [[ ! -e $PWD/_data/_out/admin.kubeconfig ]]; then
+    echo "admin.kubeconfig not found, exiting"
+    exit 0
+fi
+
 mkdir -p "$ARTIFACT_DIR"
 
 export KUBECONFIG=$PWD/_data/_out/admin.kubeconfig
