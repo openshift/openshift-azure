@@ -43,4 +43,19 @@ cp -a "$T/src/github.com/openshift/openshift-azure/_data" .
 
 set_build_images
 
+# try upgrading just a single image to latest - TODO: need to improve this hack
+WEBCONSOLE=$(python -c 'import yaml; c=yaml.safe_load(open("pluginconfig/pluginconfig-311.yaml")); print c["versions"][c["pluginVersion"]]["images"]["webConsole"]')
+cat >/tmp/admin-update-console.yaml <<EOF
+config:
+  images:
+    webConsole: $WEBCONSOLE
+EOF
+ADMIN_MANIFEST=/tmp/admin-update-console.yaml make upgrade
+RUNNING_WEBCONSOLE=$(KUBECONFIG=_data/_out/admin.kubeconfig oc get deployment -n openshift-web-console webconsole -o jsonpath='{.spec.template.spec.containers[0].image}')
+if [[ "$WEBCONSOLE" != "$RUNNING_WEBCONSOLE" ]]; then
+    echo "expected webconsole image $WEBCONSOLE, got $RUNNING_WEBCONSOLE"
+    exit 1
+fi
+
+# now upgrade the whole lot
 ADMIN_MANIFEST=test/manifests/fakerp/admin-update.yaml make upgrade e2e
