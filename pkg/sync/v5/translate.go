@@ -566,6 +566,12 @@ var translations = map[string][]struct {
 			Template: "{{ String (PrivateKeyAsBytes .Config.Certificates.ServiceCatalogServer.Key) }}",
 		},
 	},
+	"Secret/openshift/redhat-registry": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.'.dockerconfigjson'"),
+			Template: "{{ String .Config.Images.ImagePullSecret }}",
+		},
+	},
 	"Secret/openshift-azure-logging/gcs-cert": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'gcscert.pem'"),

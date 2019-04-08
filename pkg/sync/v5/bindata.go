@@ -414,6 +414,7 @@
 // data/Secret/default/router-certs.yaml
 // data/Secret/default/router-stats.yaml
 // data/Secret/kube-service-catalog/apiserver-ssl.yaml
+// data/Secret/openshift/redhat-registry.yaml
 // data/Secret/openshift-ansible-service-broker/asb-client.yaml
 // data/Secret/openshift-azure-logging/azure-registry.yaml
 // data/Secret/openshift-azure-logging/gcs-cert.yaml
@@ -9006,6 +9007,26 @@ func secretKubeServiceCatalogApiserverSslYaml() (*asset, error) {
 	return a, nil
 }
 
+var _secretOpenshiftRedhatRegistryYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x5c\xcd\xb1\x6a\xc3\x30\x10\x87\xf1\x5d\x4f\x71\x9b\x41\x50\x97\xae\xda\x0a\x36\xdd\x3a\x24\x21\xbb\x22\xfd\x6d\x5f\x8c\x25\x71\x77\x09\xf8\xed\x43\xc0\x53\xd6\x0f\x7e\x7c\xb1\xf1\x15\xa2\x5c\x4b\xa0\xe7\x8f\x5b\xb9\xe4\x40\x67\x24\x81\xb9\x0d\x16\x73\xb4\x18\x1c\x51\x89\x1b\x02\x09\xf2\x12\xed\x4b\x30\xb3\x9a\xec\x47\xd7\x16\x13\x02\xd5\x86\xa2\x0b\x4f\xe6\xd4\x84\xcb\x3c\x1c\xb4\xcf\x35\xad\x90\x54\xcb\xc4\xf3\x5d\xdf\xa7\xce\x7b\x4f\x7f\xe3\xff\x78\xfa\xbd\x8c\x03\x79\xef\x3b\x67\x7b\x43\xa0\xf5\x71\x83\x14\x18\xb4\xe7\xfa\xfd\x29\xdd\x2b\x00\x00\xff\xff\x41\xd5\x88\xdb\xaf\x00\x00\x00")
+
+func secretOpenshiftRedhatRegistryYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_secretOpenshiftRedhatRegistryYaml,
+		"Secret/openshift/redhat-registry.yaml",
+	)
+}
+
+func secretOpenshiftRedhatRegistryYaml() (*asset, error) {
+	bytes, err := secretOpenshiftRedhatRegistryYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Secret/openshift/redhat-registry.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _secretOpenshiftAnsibleServiceBrokerAsbClientYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\x8d\x31\x0e\xc2\x30\x0c\x45\xf7\x9c\xc2\x17\x48\x11\x6b\xae\x81\xc4\xee\xa4\x1f\x61\xa5\xb5\xa3\xd8\xad\xc4\xed\x11\x03\x23\x8c\xef\x0d\xef\xf1\x90\x3b\xa6\x8b\x69\xa1\xf3\x9a\xba\xe8\x5a\xe8\x86\x36\x11\x69\x47\xf0\xca\xc1\x25\x11\xb1\xaa\x05\x87\x98\xfa\x07\x89\xfa\x51\x31\x15\x01\x5f\xc4\x2e\x8e\x79\x4a\x43\xe6\xd6\xec\xd0\x58\x94\x77\x14\x62\xaf\xb9\x6d\x02\x8d\x44\xf4\x43\xf9\xe0\x86\x42\x36\xa0\xfe\x94\x47\x64\x56\x97\xba\x21\x7f\x93\x75\x5a\xc7\x4c\xf1\x1a\x28\xff\xaf\x39\xac\x43\xd3\x3b\x00\x00\xff\xff\xba\xb1\x09\xad\xd3\x00\x00\x00")
 
 func secretOpenshiftAnsibleServiceBrokerAsbClientYamlBytes() ([]byte, error) {
@@ -14412,6 +14433,7 @@ var _bindata = map[string]func() (*asset, error){
 	"Secret/default/router-certs.yaml":                                                                                                   secretDefaultRouterCertsYaml,
 	"Secret/default/router-stats.yaml":                                                                                                   secretDefaultRouterStatsYaml,
 	"Secret/kube-service-catalog/apiserver-ssl.yaml":                                                                                     secretKubeServiceCatalogApiserverSslYaml,
+	"Secret/openshift/redhat-registry.yaml":                                                                                              secretOpenshiftRedhatRegistryYaml,
 	"Secret/openshift-ansible-service-broker/asb-client.yaml":                                                                            secretOpenshiftAnsibleServiceBrokerAsbClientYaml,
 	"Secret/openshift-azure-logging/azure-registry.yaml":                                                                                 secretOpenshiftAzureLoggingAzureRegistryYaml,
 	"Secret/openshift-azure-logging/gcs-cert.yaml":                                                                                       secretOpenshiftAzureLoggingGcsCertYaml,
@@ -15232,6 +15254,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"kube-service-catalog": {nil, map[string]*bintree{
 			"apiserver-ssl.yaml": {secretKubeServiceCatalogApiserverSslYaml, map[string]*bintree{}},
+		}},
+		"openshift": {nil, map[string]*bintree{
+			"redhat-registry.yaml": {secretOpenshiftRedhatRegistryYaml, map[string]*bintree{}},
 		}},
 		"openshift-ansible-service-broker": {nil, map[string]*bintree{
 			"asb-client.yaml": {secretOpenshiftAnsibleServiceBrokerAsbClientYaml, map[string]*bintree{}},
