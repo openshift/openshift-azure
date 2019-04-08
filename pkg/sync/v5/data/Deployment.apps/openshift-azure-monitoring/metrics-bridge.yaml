@@ -39,7 +39,7 @@ spec:
         - mountPath: /var/etw
           name: socket
       - command:
-        - /metricsbridge
+        - metricsbridge
         - /config/config.yaml
         image: '*** GENERATED ***'
         name: metricsbridge

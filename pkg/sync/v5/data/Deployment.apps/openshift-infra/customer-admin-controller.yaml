@@ -14,7 +14,8 @@ spec:
         app: customer-admin-controller
     spec:
       containers:
-      - image: '*** GENERATED ***'
+      - command: ["azure-controllers"]
+        image: '*** GENERATED ***'
         name: customer-admin-controller
         volumeMounts:
         - mountPath: /_data/_out

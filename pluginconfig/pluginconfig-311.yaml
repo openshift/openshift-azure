@@ -128,13 +128,13 @@ versions:
       genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
       genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
       genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
-      azureControllers: quay.io/openshift-on-azure/azure-controllers:latest
-      canary: quay.io/openshift-on-azure/canary:latest
-      etcdBackup: quay.io/openshift-on-azure/etcdbackup:latest
-      metricsBridge: quay.io/openshift-on-azure/metricsbridge:latest
-      startup: quay.io/openshift-on-azure/startup:latest
-      sync: quay.io/openshift-on-azure/sync:latest
-      tlsProxy: quay.io/openshift-on-azure/tlsproxy:latest
+      azureControllers: quay.io/openshift-on-azure/arho:latest
+      canary: quay.io/openshift-on-azure/arho:latest
+      etcdBackup: quay.io/openshift-on-azure/arho:latest
+      metricsBridge: quay.io/openshift-on-azure/arho:latest
+      startup: quay.io/openshift-on-azure/arho:latest
+      sync: quay.io/openshift-on-azure/arho:latest
+      tlsProxy: quay.io/openshift-on-azure/arho:latest
 ## certificates, used to authenticate to external systems
 ## Geneva integration certificates. Example:
 #certificates:

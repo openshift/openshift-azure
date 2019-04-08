@@ -72,26 +72,14 @@ func GetPluginTemplate() (*pluginapi.Config, error) {
 func overridePluginTemplate(template *pluginapi.Config) {
 	v := template.Versions[template.PluginVersion]
 
-	if os.Getenv("SYNC_IMAGE") != "" {
-		v.Images.Sync = os.Getenv("SYNC_IMAGE")
-	}
-	if os.Getenv("METRICSBRIDGE_IMAGE") != "" {
-		v.Images.MetricsBridge = os.Getenv("METRICSBRIDGE_IMAGE")
-	}
-	if os.Getenv("ETCDBACKUP_IMAGE") != "" {
-		v.Images.EtcdBackup = os.Getenv("ETCDBACKUP_IMAGE")
-	}
-	if os.Getenv("TLSPROXY_IMAGE") != "" {
-		v.Images.TLSProxy = os.Getenv("TLSPROXY_IMAGE")
-	}
-	if os.Getenv("CANARY_IMAGE") != "" {
-		v.Images.Canary = os.Getenv("CANARY_IMAGE")
-	}
-	if os.Getenv("AZURE_CONTROLLERS_IMAGE") != "" {
-		v.Images.AzureControllers = os.Getenv("AZURE_CONTROLLERS_IMAGE")
-	}
-	if os.Getenv("STARTUP_IMAGE") != "" {
-		v.Images.Startup = os.Getenv("STARTUP_IMAGE")
+	if os.Getenv("AZURE_IMAGE") != "" {
+		v.Images.Sync = os.Getenv("AZURE_IMAGE")
+		v.Images.MetricsBridge = os.Getenv("AZURE_IMAGE")
+		v.Images.EtcdBackup = os.Getenv("AZURE_IMAGE")
+		v.Images.TLSProxy = os.Getenv("AZURE_IMAGE")
+		v.Images.Canary = os.Getenv("AZURE_IMAGE")
+		v.Images.AzureControllers = os.Getenv("AZURE_IMAGE")
+		v.Images.Startup = os.Getenv("AZURE_IMAGE")
 	}
 	if os.Getenv("OREG_URL") != "" {
 		v.Images.Format = os.Getenv("OREG_URL")

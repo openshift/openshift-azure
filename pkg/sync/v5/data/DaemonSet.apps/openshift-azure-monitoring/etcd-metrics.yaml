@@ -36,7 +36,7 @@ spec:
         - -whitelist
         - ^/metrics(/|$)
         command:
-        - /tlsproxy
+        - tlsproxy
         env:
         - name: HOSTNAME
           valueFrom:
