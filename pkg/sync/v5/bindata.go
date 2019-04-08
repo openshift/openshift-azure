@@ -157,6 +157,7 @@
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-admin.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-admins.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-monitoring-operator.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-monitoring-view.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-reader.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-readers.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/cluster-status-binding.yaml
@@ -3887,6 +3888,26 @@ func clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringOperatorYaml() (*a
 	}
 
 	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/cluster-monitoring-operator.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringViewYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x84\x8d\x41\x4a\xc4\x40\x10\x45\xf7\x7d\x8a\xba\x40\x22\xee\xa4\x77\xea\xc2\xfd\x08\xee\x6b\x3a\x7f\x32\xe5\x24\x55\x4d\x75\x75\x84\x39\xbd\x88\x41\x04\xc1\x59\x7e\x78\xff\x3d\xae\xf2\x06\x6f\x62\x9a\xc9\x8f\x5c\x46\xee\x71\x36\x97\x2b\x87\x98\x8e\x97\x87\x36\x8a\xdd\x6d\xf7\xe9\x22\x3a\x65\x7a\x5e\x7a\x0b\xf8\xc1\x16\x3c\x89\x4e\xa2\x73\x5a\x11\x3c\x71\x70\x4e\x44\xca\x2b\x32\x95\x6f\x68\x58\x4d\x25\xcc\x45\xe7\x61\x13\x7c\x24\xb7\x05\x07\x9c\xbe\x40\xae\xf2\xe2\xd6\xeb\x3f\xd1\x44\xf4\xa7\x79\x33\xd1\xfa\xf1\x1d\x25\x5a\x4e\xc3\xfe\x7e\x85\x6f\x52\xf0\x58\x8a\x75\x8d\x1f\xc1\x0c\xc5\xc6\xfb\x6c\x95\x0b\x32\x59\x85\xb6\xb3\x9c\x62\xe0\x6b\x77\xfc\x92\xa7\xcf\x00\x00\x00\xff\xff\x1b\x2e\x8a\x83\x27\x01\x00\x00")
+
+func clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringViewYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringViewYaml,
+		"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-monitoring-view.yaml",
+	)
+}
+
+func clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringViewYaml() (*asset, error) {
+	bytes, err := clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringViewYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/cluster-monitoring-view.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -14680,6 +14701,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-admin.yaml":                                                            clusterrolebindingRbacAuthorizationK8sIoClusterAdminYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-admins.yaml":                                                           clusterrolebindingRbacAuthorizationK8sIoClusterAdminsYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-monitoring-operator.yaml":                                              clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringOperatorYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-monitoring-view.yaml":                                                  clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringViewYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-reader.yaml":                                                           clusterrolebindingRbacAuthorizationK8sIoClusterReaderYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-readers.yaml":                                                          clusterrolebindingRbacAuthorizationK8sIoClusterReadersYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/cluster-status-binding.yaml":                                                   clusterrolebindingRbacAuthorizationK8sIoClusterStatusBindingYaml,
@@ -15414,6 +15436,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"cluster-admin.yaml":                                                            {clusterrolebindingRbacAuthorizationK8sIoClusterAdminYaml, map[string]*bintree{}},
 		"cluster-admins.yaml":                                                           {clusterrolebindingRbacAuthorizationK8sIoClusterAdminsYaml, map[string]*bintree{}},
 		"cluster-monitoring-operator.yaml":                                              {clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringOperatorYaml, map[string]*bintree{}},
+		"cluster-monitoring-view.yaml":                                                  {clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringViewYaml, map[string]*bintree{}},
 		"cluster-reader.yaml":                                                           {clusterrolebindingRbacAuthorizationK8sIoClusterReaderYaml, map[string]*bintree{}},
 		"cluster-readers.yaml":                                                          {clusterrolebindingRbacAuthorizationK8sIoClusterReadersYaml, map[string]*bintree{}},
 		"cluster-status-binding.yaml":                                                   {clusterrolebindingRbacAuthorizationK8sIoClusterStatusBindingYaml, map[string]*bintree{}},
