@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -21,6 +22,7 @@ type Config struct {
 	RunningUnderTest string `envconfig:"RUNNING_UNDER_TEST"`
 
 	Region        string `envconfig:"AZURE_REGION"`
+	Regions       string `envconfig:"AZURE_REGIONS"`
 	ResourceGroup string `envconfig:"RESOURCEGROUP" required:"true"`
 
 	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
@@ -33,13 +35,19 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 	if err := envconfig.Process("", &c); err != nil {
 		return nil, err
 	}
-	if c.Region == "" {
-		c.Region = "eastus" // remove in a follow-up and set Region required:"true"
-	}
-	regions := strings.Split(c.Region, ",")
-	if len(regions) > 1 {
+	// After v3/v4 die, goal here is to use AZURE_REGIONS both to define the
+	// region set externally via secrets/secret and allow restricting it.  In
+	// the interim, v3/v4 has a hard-coded region set which can be overridden by
+	// AZURE_REGION; v5 (and presumably v4.1) will use AZURE_REGIONS.  Also
+	// allow a cross-over period during which AZURE_REGIONS is not yet defined
+	// in developer environments.
+	if c.Regions != "" {
+		regions := strings.Split(c.Regions, ",")
 		rand.Seed(time.Now().UTC().UnixNano())
 		c.Region = regions[rand.Intn(len(regions))]
+	}
+	if c.Region == "" {
+		return nil, fmt.Errorf("must set AZURE_REGION and/or AZURE_REGIONS")
 	}
 	log.Infof("using region %s", c.Region)
 	if c.AADClientID == "" {

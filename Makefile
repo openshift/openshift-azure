@@ -15,12 +15,17 @@ ALL_PUSHES = $(addsuffix -push, $(ALL_BINARIES))
 
 IMAGEBUILDER = ${GOPATH}/bin/imagebuilder
 
-.PHONY: $(ALL_PUSHES) $(ALL_IMAGES) all version clean test unit generate pullregistry
+.PHONY: $(ALL_PUSHES) $(ALL_IMAGES) all version clean test unit generate pullregistry secrets
 # all is the default target to build everything
 all: $(ALL_BINARIES)
 
 version:
 	echo ${TAG}
+
+secrets:
+	rm -rf secrets
+	mkdir secrets
+	oc extract secret/cluster-secrets-azure --to=secrets
 
 clean:
 	rm -f coverage.out $(ALL_BINARIES) releasenotes

@@ -31,7 +31,7 @@ export IMAGE_STORAGEACCOUNT="${IMAGE_STORAGEACCOUNT:-openshiftimages}"
 go generate ./...
 go run -ldflags "-X main.gitCommit=$COMMIT" ./cmd/vmimage -imageResourceGroup "$IMAGE_RESOURCEGROUP" -image "$IMAGE_RESOURCENAME" -imageStorageAccount "$IMAGE_STORAGEACCOUNT"
 
-export AZURE_REGION=eastus
+export AZURE_REGIONS=eastus
 export RESOURCEGROUP="${IMAGE_RESOURCENAME//./}-e2e"
 
 make create

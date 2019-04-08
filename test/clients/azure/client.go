@@ -65,7 +65,6 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 		AadClientID:     os.Getenv("AZURE_CLIENT_ID"),
 		AadClientSecret: os.Getenv("AZURE_CLIENT_SECRET"),
 		ResourceGroup:   os.Getenv("RESOURCEGROUP"),
-		Location:        os.Getenv("AZURE_REGION"),
 	}
 	subscriptionID := cfg.SubscriptionID
 
