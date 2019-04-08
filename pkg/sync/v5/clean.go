@@ -148,6 +148,10 @@ func clean(o unstructured.Unstructured) error {
 
 	case "StatefulSet.apps":
 		cleanPodTemplate(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
+		for _, vct := range jsonpath.MustCompile("$.spec.volumeClaimTemplates[*]").Get(o.Object) {
+			cleanMetadata(vct.(map[string]interface{}))
+		}
+		jsonpath.MustCompile("$.spec.volumeClaimTemplates[*].status").Delete(o.Object)
 	}
 
 	cleanMetadata(o.Object)
