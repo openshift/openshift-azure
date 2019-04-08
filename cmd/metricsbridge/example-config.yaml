@@ -15,11 +15,15 @@ queries:
   name: cloudprovider_azure_api_request_duration_seconds_count
 - query: 'sum(cloudprovider_azure_api_request_duration_seconds_sum) without (instance)'
   name: cloudprovider_azure_api_request_duration_seconds_sum
-- query: 'container_cpu_system_seconds_total{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"}'
-- query: 'container_cpu_user_seconds_total{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"}'
+- query: 'rate(container_cpu_system_seconds_total{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"}[1m])'
+  name: container_cpu_system_seconds_rate
+- query: 'rate(container_cpu_user_seconds_total{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"}[1m])'
+  name: container_cpu_user_seconds_rate
 - query: 'container_fs_limit_bytes{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"}'
-- query: 'container_fs_sector_reads_total{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"} != 0'
-- query: 'container_fs_sector_writes_total{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"} != 0'
+- query: 'rate(container_fs_sector_reads_total{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"}[1m]) != 0'
+  name: container_fs_sector_reads_rate
+- query: 'rate(container_fs_sector_writes_total{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"}[1m]) != 0'
+  name: container_fs_sector_writes_rate
 - query: 'container_fs_usage_bytes{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"}'
 - query: 'container_memory_cache{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"}'
 - query: 'container_memory_failcnt{namespace=~"default|openshift|openshift-.+|kube-.+|", container_name!="", container_name!="POD"} != 0'
@@ -57,7 +61,8 @@ queries:
 - query: 'kube_pod_container_resource_limits_cpu_cores{namespace=~"default|openshift|openshift-.+|kube-.+|"}'
 - query: 'kube_pod_container_resource_limits_memory_bytes{namespace=~"default|openshift|openshift-.+|kube-.+|"}'
 - query: 'kube_pod_container_status_ready{namespace=~"default|openshift|openshift-.+|kube-.+|"}'
-- query: 'kube_pod_container_status_restarts_total{namespace=~"default|openshift|openshift-.+|kube-.+|"} != 0'
+- query: 'rate(kube_pod_container_status_restarts_total{namespace=~"default|openshift|openshift-.+|kube-.+|"}[1m]) != 0'
+  name: kube_pod_container_status_restarts_rate
 - query: 'kube_pod_container_status_terminated_reason{namespace=~"default|openshift|openshift-.+|kube-.+|"} != 0'
 - query: 'kube_pod_container_status_terminated{namespace=~"default|openshift|openshift-.+|kube-.+|"} != 0'
 - query: 'kube_pod_container_status_waiting_reason{namespace=~"default|openshift|openshift-.+|kube-.+|"} != 0'
@@ -74,10 +79,12 @@ queries:
 - query: 'kubelet_docker_operations_errors != 0'
 - query: 'kubelet_runtime_operations_errors != 0'
 - query: 'node_boot_time_seconds'
-- query: 'avg(node_cpu_seconds_total) without (cpu)'
-  name: node_cpu_seconds_total
-- query: 'node_disk_read_bytes_total{device!~"sr0"}'
-- query: 'node_disk_written_bytes_total{device!~"sr0"}'
+- query: 'avg(rate(node_cpu_seconds_total[1m])) without (cpu)'
+  name: node_cpu_seconds_rate
+- query: 'rate(node_disk_read_bytes_total{device!~"sr0"}[1m])'
+  name: node_disk_read_bytes_rate
+- query: 'rate(node_disk_written_bytes_total{device!~"sr0"}[1m])'
+  name: node_disk_written_bytes_rate
 - query: 'node_filesystem_device_error{device=~"/dev/sd.+", mountpoint=~"/host/root.*"} != 0'
 - query: 'node_filesystem_free_bytes{device=~"/dev/sd.+", mountpoint=~"/host/root.*"}'
 - query: 'node_filesystem_readonly{device=~"/dev/sd.+", mountpoint=~"/host/root.*"} != 0'
@@ -117,20 +124,41 @@ queries:
 - query: 'node_memory_VmallocTotal_bytes'
 - query: 'node_memory_VmallocUsed_bytes'
 - query: 'node_memory_Writeback_bytes'
-- query: 'node_network_receive_bytes_total{device!~"veth.+"} != 0'
-- query: 'node_network_receive_drop_total{device!~"veth.+"} != 0'
-- query: 'node_network_receive_errs_total{device!~"veth.+"} != 0'
-- query: 'node_network_receive_packets_total{device!~"veth.+"} != 0'
-- query: 'node_network_transmit_bytes_total{device!~"veth.+"} != 0'
-- query: 'node_network_transmit_drop_total{device!~"veth.+"} != 0'
-- query: 'node_network_transmit_errs_total{device!~"veth.+"} != 0'
-- query: 'node_network_transmit_packets_total{device!~"veth.+"} != 0'
+- query: 'rate(node_network_receive_bytes_total{device!~"veth.+"}[1m]) != 0'
+  name: node_network_receive_bytes_rate
+- query: 'rate(node_network_receive_drop_total{device!~"veth.+"}[1m]) != 0'
+  name: node_network_receive_drop_rate
+- query: 'rate(node_network_receive_errs_total{device!~"veth.+"}[1m]) != 0'
+  name: node_network_receive_errs_rate
+- query: 'rate(node_network_receive_packets_total{device!~"veth.+"}[1m]) != 0'
+  name: node_network_receive_packets_rate
+- query: 'rate(node_network_transmit_bytes_total{device!~"veth.+"}[1m]) != 0'
+  name: node_network_transmit_bytes_rate
+- query: 'rate(node_network_transmit_drop_total{device!~"veth.+"}[1m]) != 0'
+  name: node_network_transmit_drop_rate
+- query: 'rate(node_network_transmit_errs_total{device!~"veth.+"}[1m]) != 0'
+  name: node_network_transmit_errs_rate
+- query: 'rate(node_network_transmit_packets_total{device!~"veth.+"}[1m]) != 0'
+  name: node_network_transmit_packets_rate
 - query: 'node_uname_info'
 - query: 'storage_operation_duration_seconds_bucket{namespace=~"default|openshift|openshift-.+|kube-.+|", volume_plugin="kubernetes.io/azure-disk", le=~"1|15|50|\\+Inf"}'
 - query: 'storage_operation_duration_seconds_count{namespace=~"default|openshift|openshift-.+|kube-.+|", volume_plugin="kubernetes.io/azure-disk"}'
 - query: 'storage_operation_duration_seconds_sum{namespace=~"default|openshift|openshift-.+|kube-.+|", volume_plugin="kubernetes.io/azure-disk"}'
-- query: 'storage_operation_errors_total{namespace=~"default|openshift|openshift-.+|kube-.+|", volume_plugin="kubernetes.io/azure-disk"}'
+- query: 'rate(storage_operation_errors_total{namespace=~"default|openshift|openshift-.+|kube-.+|", volume_plugin="kubernetes.io/azure-disk"}[1m])'
+  name: storage_operation_errors_rate
 - query: 'up'
+- query: 'etcd_server_proposals_pending{namespace="openshift-azure-monitoring"} != 0'
+- query: 'rate(etcd_server_proposals_failed_total{namespace="openshift-azure-monitoring"}[1m]) != 0'
+  name: etcd_server_proposals_failed_rate
+- query: 'etcd_server_has_leader{namespace="openshift-azure-monitoring"}'
+- query: 'rate(etcd_server_leader_changes_seen_total{namespace="openshift-azure-monitoring"}[1m]) != 0'
+  name: etcd_server_leader_changes_seen_rate
+- query: 'rate(grpc_server_started_total{namespace="openshift-azure-monitoring"}[1m]) != 0'
+  name: grpc_server_started_rate
+- query: 'rate(grpc_server_handled_total{namespace="openshift-azure-monitoring"}[1m]) != 0'
+  name: grpc_server_handled_rate
+- query: 'etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-azure-monitoring"} != 0'
+- query: 'etcd_disk_backend_commit_duration_seconds_total{namespace="openshift-azure-monitoring"} != 0'
 # account: RPOpenShift
 # namespace: Prometheus
 # region: eastus
