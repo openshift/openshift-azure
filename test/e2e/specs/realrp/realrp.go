@@ -12,7 +12,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
 
-	"github.com/openshift/openshift-azure/pkg/api/2019-04-30"
+	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/util/log"

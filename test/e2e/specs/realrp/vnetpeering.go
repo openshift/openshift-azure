@@ -10,7 +10,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-06-01/network"
 
-	"github.com/openshift/openshift-azure/pkg/api/2019-04-30"
+	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	tlog "github.com/openshift/openshift-azure/test/util/log"
