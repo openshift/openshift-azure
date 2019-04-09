@@ -17,11 +17,11 @@ cleanup() {
 }
 trap cleanup EXIT
 
-COMMIT=$(git rev-parse --short HEAD)
+TAG=$(git describe --tags HEAD)
 if [[ $(git status --porcelain) = "" ]]; then
-  COMMIT="$COMMIT-clean"
+  GITCOMMIT="$TAG-clean"
 else
-  COMMIT="$COMMIT-dirty"
+  GITCOMMIT="$TAG-dirty"
 fi
 
 export IMAGE_RESOURCEGROUP="${IMAGE_RESOURCEGROUP:-images}"
@@ -29,7 +29,7 @@ export IMAGE_RESOURCENAME="${IMAGE_RESOURCENAME:-rhel7-3.11-$(TZ=Etc/UTC date +%
 export IMAGE_STORAGEACCOUNT="${IMAGE_STORAGEACCOUNT:-openshiftimages}"
 
 go generate ./...
-go run -ldflags "-X main.gitCommit=$COMMIT" ./cmd/vmimage -imageResourceGroup "$IMAGE_RESOURCEGROUP" -image "$IMAGE_RESOURCENAME" -imageStorageAccount "$IMAGE_STORAGEACCOUNT"
+go run -ldflags "-X main.gitCommit=$GITCOMMIT" ./cmd/vmimage -imageResourceGroup "$IMAGE_RESOURCEGROUP" -image "$IMAGE_RESOURCENAME" -imageStorageAccount "$IMAGE_STORAGEACCOUNT"
 
 export AZURE_REGIONS=eastus
 export RESOURCEGROUP="${IMAGE_RESOURCENAME//./}-e2e"
