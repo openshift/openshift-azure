@@ -25,7 +25,7 @@ version:
 secrets:
 	rm -rf secrets
 	mkdir secrets
-	oc extract secret/cluster-secrets-azure --to=secrets
+	oc extract -n azure secret/cluster-secrets-azure --to=secrets
 
 clean:
 	rm -f coverage.out $(ALL_BINARIES) releasenotes
