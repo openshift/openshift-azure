@@ -63,8 +63,6 @@ text
 timezone Etc/UTC
 url --url=http://$IP:8080/content/dist/rhel/server/7/7.6/x86_64/kickstart
 zerombr
-%addon com_redhat_kdump --disable
-%end
 %packages --excludedocs --nocore
 @^minimal
 -NetworkManager-team
@@ -78,7 +76,6 @@ zerombr
 -jansson
 -kbd*
 -kernel-tools*
--kexec-tools
 -libdaemon
 -libnl3-cli
 -libsysfs
@@ -211,6 +208,7 @@ rpm -q atomic-openshift-node --qf '%{VERSION}-%{RELEASE}.%{ARCH}' >/var/tmp/open
 %end
 KICKSTART
 
+# virt-install insists it needs a pty, so we give it one
 python -c "import pty; pty.spawn([
     'virt-install',
     '--disk', '/var/lib/libvirt/images/$IMAGE.raw,size=$DISKGIB,format=raw',

@@ -87,6 +87,23 @@ func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
 	s.adminreply(w, err, nil)
 }
 
+// handleListBackups handles admin requests to list etcd backups
+func (s *Server) handleListBackups(w http.ResponseWriter, req *http.Request) {
+	cs := s.read()
+	if cs == nil {
+		s.internalError(w, "Failed to read the internal config")
+		return
+	}
+
+	backups, pluginErr := s.plugin.ListEtcdBackups(req.Context(), cs)
+	var err error
+	if pluginErr != nil {
+		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error
+		err = pluginErr
+	}
+	s.adminreply(w, err, backups)
+}
+
 // handleRestore handles admin requests to restore an etcd cluster from a backup
 func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
@@ -97,7 +114,7 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 
 	backupName := chi.URLParam(req, "backupName")
 
-	pluginErr := s.plugin.RecoverEtcdCluster(req.Context(), cs, GetDeployer(s.log, cs), backupName)
+	pluginErr := s.plugin.RecoverEtcdCluster(req.Context(), cs, GetDeployer(s.log, cs, s.testConfig), backupName)
 	var err error
 	if pluginErr != nil {
 		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error
@@ -114,7 +131,7 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	deployer := GetDeployer(s.log, cs)
+	deployer := GetDeployer(s.log, cs, s.testConfig)
 	pluginErr := s.plugin.RotateClusterSecrets(req.Context(), cs, deployer)
 	if pluginErr != nil {
 		s.internalError(w, pluginErr.Error())
@@ -133,7 +150,7 @@ func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	pluginErr := s.plugin.ForceUpdate(req.Context(), cs, GetDeployer(s.log, cs))
+	pluginErr := s.plugin.ForceUpdate(req.Context(), cs, GetDeployer(s.log, cs, s.testConfig))
 	var err error
 	if pluginErr != nil {
 		// TODO: fix this nastiness: https://golang.org/doc/faq#nil_error

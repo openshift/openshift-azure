@@ -36,17 +36,17 @@ func (m *MockInterface) EXPECT() *MockInterfaceMockRecorder {
 }
 
 // Generate mocks base method
-func (m *MockInterface) Generate(template *plugin.Config) error {
+func (m *MockInterface) Generate(template *plugin.Config, setVersionFields bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Generate", template)
+	ret := m.ctrl.Call(m, "Generate", template, setVersionFields)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Generate indicates an expected call of Generate
-func (mr *MockInterfaceMockRecorder) Generate(template interface{}) *gomock.Call {
+func (mr *MockInterfaceMockRecorder) Generate(template, setVersionFields interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockInterface)(nil).Generate), template)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Generate", reflect.TypeOf((*MockInterface)(nil).Generate), template, setVersionFields)
 }
 
 // InvalidateSecrets mocks base method

@@ -101,22 +101,22 @@ func TestDerivedKubeAndSystemReserved(t *testing.T) {
 
 func TestCaBundle(t *testing.T) {
 	expected := []*x509.Certificate{
-		tls.GetDummyCertificate(),
+		tls.DummyCertificate,
 	}
 	cs := api.OpenShiftManagedCluster{
 		Config: api.Config{
 			Certificates: api.CertificateConfig{
 				Ca: api.CertKeyPair{
-					Cert: tls.GetDummyCertificate(),
-					Key:  tls.GetDummyPrivateKey(),
+					Cert: tls.DummyCertificate,
+					Key:  tls.DummyPrivateKey,
 				},
 				OpenShiftConsole: api.CertKeyPairChain{
 					Certs: []*x509.Certificate{
-						tls.GetDummyCertificate(), tls.GetDummyCertificate(),
+						tls.DummyCertificate, tls.DummyCertificate,
 					},
 				},
 				Router: api.CertKeyPairChain{
-					Certs: []*x509.Certificate{tls.GetDummyCertificate()},
+					Certs: []*x509.Certificate{tls.DummyCertificate},
 				},
 			},
 		},

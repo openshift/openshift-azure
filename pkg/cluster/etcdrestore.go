@@ -2,25 +2,26 @@ package cluster
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/Azure/azure-sdk-for-go/storage"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 )
 
-func (u *simpleUpgrader) EtcdBlobExists(ctx context.Context, blobName string) error {
+func (u *simpleUpgrader) EtcdListBackups(ctx context.Context) ([]storage.Blob, error) {
 	bsc := u.storageClient.GetBlobService()
 	etcdContainer := bsc.GetContainerReference(EtcdBackupContainerName)
-	blob := etcdContainer.GetBlobReference(blobName)
-	exists, err := blob.Exists()
+	resp, err := etcdContainer.ListBlobs(storage.ListBlobsParameters{})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if !exists {
-		return fmt.Errorf("Blob %s does not exist", blobName)
+	blobs := make([]storage.Blob, 0, len(resp.Blobs))
+	for _, blob := range resp.Blobs {
+		blobs = append(blobs, blob)
 	}
-	return nil
+	return blobs, nil
 }
 
 func (u *simpleUpgrader) EtcdRestoreDeleteMasterScaleSet(ctx context.Context) *api.PluginError {

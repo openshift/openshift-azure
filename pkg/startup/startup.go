@@ -17,16 +17,18 @@ import (
 	v4 "github.com/openshift/openshift-azure/pkg/startup/v4"
 )
 
+// Interface is a singleton interface to interact with startup
 type Interface interface {
 	WriteFiles(ctx context.Context) error
 	Hash(role api.AgentPoolProfileRole) ([]byte, error)
 }
 
+// New returns a new startup Interface according to the cluster version running
 func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Interface, error) {
 	switch cs.Config.PluginVersion {
 	case "v3.2":
 		return v3.New(log, cs, testConfig), nil
-	case "v4.0":
+	case "v4.1":
 		return v4.New(log, cs, testConfig), nil
 	}
 

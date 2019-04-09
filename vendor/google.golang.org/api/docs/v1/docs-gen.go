@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,39 @@
 
 // Package docs provides access to the Google Docs API.
 //
-// See https://developers.google.com/docs/
+// For product documentation, see: https://developers.google.com/docs/
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/docs/v1"
 //   ...
-//   docsService, err := docs.New(oauthHttpClient)
+//   ctx := context.Background()
+//   docsService, err := docs.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
+//
+//   docsService, err := docs.NewService(ctx, option.WithScopes(docs.DriveReadonlyScope))
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   docsService, err := docs.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   docsService, err := docs.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package docs // import "google.golang.org/api/docs/v1"
 
 import (
@@ -29,6 +55,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -69,6 +97,36 @@ const (
 	DriveReadonlyScope = "https://www.googleapis.com/auth/drive.readonly"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/documents",
+		"https://www.googleapis.com/auth/documents.readonly",
+		"https://www.googleapis.com/auth/drive",
+		"https://www.googleapis.com/auth/drive.file",
+		"https://www.googleapis.com/auth/drive.readonly",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -2376,6 +2434,120 @@ func (s *InsertInlineSheetsChartResponse) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// InsertPageBreakRequest: Inserts a page break followed by a newline at
+// the specified location.
+type InsertPageBreakRequest struct {
+	// EndOfSegmentLocation: Inserts the page break at the end of the
+	// document body.
+	//
+	// Page breaks cannot be inserted inside a footnote, header or
+	// footer.
+	// Since page breaks can only be inserted inside the body, the segment
+	// ID field must be
+	// empty.
+	EndOfSegmentLocation *EndOfSegmentLocation `json:"endOfSegmentLocation,omitempty"`
+
+	// Location: Inserts the page break at a specific index in the
+	// document.
+	//
+	// The page break must be inserted inside the bounds of an
+	// existing
+	// Paragraph. For instance, it cannot be
+	// inserted at a table's start index (i.e. between the table and
+	// its
+	// preceding paragraph).
+	//
+	// Page breaks cannot be inserted inside a table, equation, footnote,
+	// header
+	// or footer. Since page breaks can only be inserted inside the body,
+	// the
+	// segment ID field must be
+	// empty.
+	Location *Location `json:"location,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g.
+	// "EndOfSegmentLocation") to unconditionally include in API requests.
+	// By default, fields with empty values are omitted from API requests.
+	// However, any non-pointer, non-interface field appearing in
+	// ForceSendFields will be sent to the server regardless of whether the
+	// field is empty or not. This may be used to include empty fields in
+	// Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "EndOfSegmentLocation") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *InsertPageBreakRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod InsertPageBreakRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// InsertTableRequest: Inserts a table at the specified location.
+//
+// A newline character will be inserted before the inserted table.
+type InsertTableRequest struct {
+	// Columns: The number of columns in the table.
+	Columns int64 `json:"columns,omitempty"`
+
+	// EndOfSegmentLocation: Inserts the table at the end of the given
+	// header, footer or document
+	// body. A newline character will be inserted before the inserted
+	// table.
+	//
+	// Tables cannot be inserted inside a footnote.
+	EndOfSegmentLocation *EndOfSegmentLocation `json:"endOfSegmentLocation,omitempty"`
+
+	// Location: Inserts the table at a specific model index.
+	//
+	// A newline character will be inserted before the inserted table,
+	// therefore
+	// the table start index will be at the specified location index +
+	// 1.
+	//
+	// The table must be inserted inside the bounds of an
+	// existing
+	// Paragraph. For instance, it cannot be
+	// inserted at a table's start index (i.e. between an existing table and
+	// its
+	// preceding paragraph).
+	//
+	// Tables cannot be inserted inside a footnote or equation.
+	Location *Location `json:"location,omitempty"`
+
+	// Rows: The number of rows in the table.
+	Rows int64 `json:"rows,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Columns") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Columns") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *InsertTableRequest) MarshalJSON() ([]byte, error) {
+	type NoMethod InsertTableRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // InsertTableRowRequest: Inserts an empty row into a table.
 type InsertTableRowRequest struct {
 	// InsertBelow: Whether to insert new row below the reference cell
@@ -4256,6 +4428,12 @@ type Request struct {
 
 	// InsertInlineImage: Inserts an inline image at the specified location.
 	InsertInlineImage *InsertInlineImageRequest `json:"insertInlineImage,omitempty"`
+
+	// InsertPageBreak: Inserts a page break at the specified location.
+	InsertPageBreak *InsertPageBreakRequest `json:"insertPageBreak,omitempty"`
+
+	// InsertTable: Inserts a table at the specified location.
+	InsertTable *InsertTableRequest `json:"insertTable,omitempty"`
 
 	// InsertTableRow: Inserts an empty row into a table.
 	InsertTableRow *InsertTableRowRequest `json:"insertTableRow,omitempty"`
@@ -6279,17 +6457,49 @@ func (s *WeightedFontFamily) MarshalJSON() ([]byte, error) {
 
 // WriteControl: Provides control over how write requests are executed.
 type WriteControl struct {
-	// RequiredRevisionId: The ID of the revision of the document that the
-	// write request will be
-	// applied to. If this is not the latest revision of the document,
+	// RequiredRevisionId: The revision ID of the
+	// document that the write request will be applied to. If this is not
 	// the
-	// request will not be processed and will return a 400 bad request
-	// error.
+	// latest revision of the document, the request will not be processed
+	// and
+	// will return a 400 bad request error.
 	//
 	// When a required revision ID is returned in a response, it indicates
 	// the
 	// revision ID of the document after the request was applied.
 	RequiredRevisionId string `json:"requiredRevisionId,omitempty"`
+
+	// TargetRevisionId: The target revision ID of the
+	// document that the write request will be applied to.
+	//
+	// If collaborator changes have occurred after the document was read
+	// using
+	// the API, the changes produced by this write request will be
+	// transformed
+	// against the collaborator changes. This results in a new revision of
+	// the
+	// document which incorporates both the changes in the request and
+	// the
+	// collaborator changes, and the Docs server will resolve
+	// conflicting
+	// changes. When using `target_revision_id`, the API client can be
+	// thought
+	// of as another collaborator of the document.
+	//
+	// The target revision ID may only be used to write to recent versions
+	// of a
+	// document. If the target revision is too far behind the latest
+	// revision,
+	// the request will not be processed and will return a 400 bad request
+	// error
+	// and the request should be retried after reading the latest version of
+	// the
+	// document. In most cases a `revision_id` will remain valid for use as
+	// a
+	// target revision for several minutes after it is read, but
+	// for
+	// frequently-edited documents this window may be shorter.
+	TargetRevisionId string `json:"targetRevisionId,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "RequiredRevisionId")
 	// to unconditionally include in API requests. By default, fields with

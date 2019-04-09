@@ -12,7 +12,7 @@ Per stream:
 * Openshift-azure container images (sync, etcdbackup, azure-controllers, etc.)
 * Openshift-azure repository, including plugin and manifest per stream
 
-For each stream, the configuration manifest combines the version numbers of all of the above (except the openshift-azure repository) and is checked into the openshift-azure repository. 
+For each stream, the configuration manifest combines the version numbers of all of the above (except the openshift-azure repository) and is checked into the openshift-azure repository.
 It is set as `clusterVersion` field.
 
 OSA is an evolving service. During normal operations, our goal is to release the RP infrastructure on a three-weekly basis, although emergency changes can be expedited.
@@ -67,7 +67,7 @@ Branching model
 1. Create a branch from master and push it. This will create branch for us to do release in.
 
 ```
-git checkout <required commit> 
+git checkout <required commit>
 git checkout -b release-vx
 # we create release branch for first weekly only
 git push upstream release-vx
@@ -88,8 +88,8 @@ Open a PR into release branch.
 
 ```
 git checkout master
-git fetch upstream 
-git rebase upstream/master 
+git fetch upstream
+git rebase upstream/master
 git checkout -b osa.vx.y.release
 ```
 
@@ -134,7 +134,7 @@ scrape and append release-notes to `CHANGELOG.md`
 ```
 make releasenotes
 export GITHUB_TOKEN=<github_token_from_team_secret>
-./releasenotes -repopath . -commitrange (vx.y)-1..HEAD >> CHANGELOG.md
+./releasenotes -repopath . -commitrange (vx.y)-1..HEAD >CHANGELOG.md
 git add CHANGELOG.md
 ```
 note about release numbers to use as commitrange with releasenotes above:
@@ -191,16 +191,31 @@ Add vx.y target to `ci-operator/config/openshift/openshift-azure/openshift-opens
 
 Run prowgen to generate test jobs:
 ```
-docker pull registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest 
+docker pull registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest
 docker run -it -v $(pwd)/ci-operator:/ci-operator:z registry.svc.ci.openshift.org/ci/ci-operator-prowgen:latest --from-dir /ci-operator/config/ --to-dir /ci-operator/jobs
 ```
 
-Change generated jobs to `always_run: false` and `optional: true`. This will make upgrade tests on master branch optional! 
+Change generated jobs to `always_run: false` and `optional: true`. This will make upgrade tests on master branch optional!
 
-We are not going to use automatic generated jobs with `e2e-upgrade-vx.y` because of lack of targets in the jobs. This should change in the future. See https://github.com/openshift/ci-operator/issues/276 for more details. 
+We are not going to use automatic generated jobs with `e2e-upgrade-vx.y` because of lack of targets in the jobs. This should change in the future. See https://github.com/openshift/ci-operator/issues/276 for more details.
 
-Copy existing `upgrade` jobs and create new job with `upgrade-vx.y` syntax. This is consequence of the issue above. `e2e-upgrade-vx.y` jobs lacks necessary targets so they cant complete if ran independently. 
+Copy existing `upgrade` jobs and create new job with `upgrade-vx.y` syntax. This is consequence of the issue above. `e2e-upgrade-vx.y` jobs lacks necessary targets so they cant complete if ran independently.
 Merge the PR. After this test command `/test upgrade-vx.y` should work on PR's.
+
+7. Start development of v(x+1).0!
+
+Prepare a new PR to master which does the following:
+
+* updates pluginconfig-311.yaml as follows:
+  - sets pluginVersion to v(x+1).0
+  - copies versions/vx.n to versions/v(x+1).0
+  - changes versions/vx.n images from :latest to :vx.n
+* copies pkg/{arm,config,startup,sync}/vx directories to
+  pkg/{arm,config,startup,sync}/v(x+1)
+* adds new directory mappings for v(x+1).0 in
+   pkg/{arm,config,startup,sync}/{arm,config,startup,sync}.New()
+* marks the hashes for vx.n in pkg/cluster/hash_test.go as immutable
+* copies those hashes to v(x+1).0
 
 # Cleaning old release
 

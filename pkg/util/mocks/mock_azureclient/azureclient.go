@@ -562,6 +562,36 @@ func (m *MockRBACApplicationsClient) EXPECT() *MockRBACApplicationsClientMockRec
 	return m.recorder
 }
 
+// Create mocks base method
+func (m *MockRBACApplicationsClient) Create(arg0 context.Context, arg1 graphrbac.ApplicationCreateParameters) (graphrbac.Application, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", arg0, arg1)
+	ret0, _ := ret[0].(graphrbac.Application)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create
+func (mr *MockRBACApplicationsClientMockRecorder) Create(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRBACApplicationsClient)(nil).Create), arg0, arg1)
+}
+
+// Delete mocks base method
+func (m *MockRBACApplicationsClient) Delete(arg0 context.Context, arg1 string) (autorest.Response, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
+	ret0, _ := ret[0].(autorest.Response)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Delete indicates an expected call of Delete
+func (mr *MockRBACApplicationsClientMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRBACApplicationsClient)(nil).Delete), arg0, arg1)
+}
+
 // List mocks base method
 func (m *MockRBACApplicationsClient) List(arg0 context.Context, arg1 string) (graphrbac.ApplicationListResultPage, error) {
 	m.ctrl.T.Helper()
@@ -772,6 +802,21 @@ func NewMockServicePrincipalsClient(ctrl *gomock.Controller) *MockServicePrincip
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockServicePrincipalsClient) EXPECT() *MockServicePrincipalsClientMockRecorder {
 	return m.recorder
+}
+
+// Create mocks base method
+func (m *MockServicePrincipalsClient) Create(arg0 context.Context, arg1 graphrbac.ServicePrincipalCreateParameters) (graphrbac.ServicePrincipal, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", arg0, arg1)
+	ret0, _ := ret[0].(graphrbac.ServicePrincipal)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create
+func (mr *MockServicePrincipalsClientMockRecorder) Create(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockServicePrincipalsClient)(nil).Create), arg0, arg1)
 }
 
 // List mocks base method

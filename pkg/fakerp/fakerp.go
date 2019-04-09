@@ -7,15 +7,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
-	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/derived"
 	"github.com/openshift/openshift-azure/pkg/util/random"
@@ -24,7 +26,76 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
-func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployFn {
+func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, err error, testConfig api.TestConfig) error {
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
+	if err != nil {
+		return err
+	}
+
+	deploymentOperations := azureclient.NewDeploymentOperationsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
+
+	operations, err := deploymentOperations.List(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", nil)
+	if err != nil {
+		log.Warnf("failed to get deployment operations: %v", err)
+		return err
+	}
+
+	for _, op := range operations {
+		if *op.Properties.ProvisioningState == "Succeeded" {
+			continue
+		}
+
+		b, _ := json.MarshalIndent(op, "", "  ")
+		log.Debug(string(b))
+
+		if testConfig.ArtifactDir != "" &&
+			*op.Properties.TargetResource.ResourceType == "Microsoft.Compute/virtualMachineScaleSets" {
+			s, err := newSSHer(ctx, cs)
+			if err != nil {
+				log.Warnf("newSSHer failed: %v", err)
+				continue
+			}
+
+			for _, app := range cs.Properties.AgentPoolProfiles {
+				prefix := names.GetScalesetName(&app, "")
+				if !strings.HasPrefix(*op.Properties.TargetResource.ResourceName, prefix) {
+					continue
+				}
+
+				for i := int64(0); i < app.Count; i++ {
+					hostname := *op.Properties.TargetResource.ResourceName + fmt.Sprintf("%06s", strconv.FormatInt(i, 36))
+					cli, err := s.Dial(ctx, hostname)
+					if err != nil {
+						log.Warnf("Dial failed: %v", err)
+						continue
+					}
+
+					err = s.RunRemoteCommandAndSaveToFile(cli, "sudo journalctl", testConfig.ArtifactDir+"/"+hostname+"-early-journal")
+					if err != nil {
+						log.Warnf("RunRemoteCommandAndSaveToFile failed: %v", err)
+						continue
+					}
+
+					err = s.RunRemoteCommandAndSaveToFile(cli, "sudo cat /var/lib/waagent/custom-script/download/1/stdout", testConfig.ArtifactDir+"/"+hostname+"-waagent-stdout")
+					if err != nil {
+						log.Warnf("RunRemoteCommandAndSaveToFile failed: %v", err)
+						continue
+					}
+
+					err = s.RunRemoteCommandAndSaveToFile(cli, "sudo cat /var/lib/waagent/custom-script/download/1/stderr", testConfig.ArtifactDir+"/"+hostname+"-waagent-stderr")
+					if err != nil {
+						log.Warnf("RunRemoteCommandAndSaveToFile failed: %v", err)
+						continue
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) api.DeployFn {
 	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
 		log.Info("applying arm template deployment")
 		authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
@@ -50,18 +121,9 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster) api.DeployF
 		err = future.WaitForCompletionRef(ctx, cli)
 		if err != nil {
 			log.Warnf("deployment failed: %#v", err)
-			deploymentOperations := azureclient.NewDeploymentOperationsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
-			operations, listErr := deploymentOperations.List(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", nil)
-			if listErr == nil {
-				b, _ := json.MarshalIndent(operations, "", "  ")
-				log.Debug(string(b))
-			} else {
-				log.Warnf("failed to get deployment operations: %#v", listErr)
-			}
-			return err
+			debugDeployerError(ctx, log, cs, err, testConfig)
 		}
-
-		return nil
+		return err
 	}
 }
 
@@ -72,18 +134,25 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
-	// validate the internal API representation (with reference to the previous
-	// internal API representation)
-	// we set fqdn during enrichment which is slightly different than what the RP
-	// will do so we are only validating once.
 	var errs []error
 	if isAdmin {
 		errs = p.ValidateAdmin(ctx, cs, oldCs)
 	} else {
-		errs = p.Validate(ctx, cs, oldCs, false)
+		errs = p.Validate(ctx, cs, oldCs, true)
 	}
 	if len(errs) > 0 {
 		return nil, kerrors.NewAggregate(errs)
+	}
+
+	am, err := newAADManager(ctx, cs)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Info("setting up service principals")
+	err = am.ensureApps(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	dm, err := newDNSManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
@@ -118,13 +187,15 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
-	// generate or update the OpenShift config blob
-	err = p.GenerateConfig(ctx, cs, oldCs != nil)
-	if err != nil {
-		return nil, err
+	if !isAdmin {
+		errs = p.Validate(ctx, cs, oldCs, false)
+	}
+	if len(errs) > 0 {
+		return nil, kerrors.NewAggregate(errs)
 	}
 
-	err = acceptMarketplaceAgreement(ctx, log, cs, testConfig)
+	// generate or update the OpenShift config blob
+	err = p.GenerateConfig(ctx, cs, oldCs != nil)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +215,7 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 	}
 
 	log.Info("plugin createorupdate")
-	deployer := GetDeployer(log, cs)
+	deployer := GetDeployer(log, cs, testConfig)
 	if err := p.CreateOrUpdate(ctx, cs, oldCs != nil, deployer); err != nil {
 		return nil, err
 	}
@@ -157,35 +228,6 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 	}
 
 	return cs, nil
-}
-
-func acceptMarketplaceAgreement(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) error {
-	if testConfig.ImageResourceName != "" ||
-		os.Getenv("AUTOACCEPT_MARKETPLACE_AGREEMENT") != "yes" {
-		return nil
-	}
-
-	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
-	if err != nil {
-		return err
-	}
-
-	marketPlaceAgreements := azureclient.NewMarketPlaceAgreementsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
-	log.Info("checking marketplace agreement")
-	terms, err := marketPlaceAgreements.Get(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU)
-	if err != nil {
-		return err
-	}
-
-	if *terms.AgreementProperties.Accepted {
-		return nil
-	}
-
-	terms.AgreementProperties.Accepted = to.BoolPtr(true)
-
-	log.Info("accepting marketplace agreement")
-	_, err = marketPlaceAgreements.Create(ctx, cs.Config.ImagePublisher, cs.Config.ImageOffer, cs.Config.ImageSKU, terms)
-	return err
 }
 
 func enrich(cs *api.OpenShiftManagedCluster) error {
@@ -207,15 +249,6 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 		TenantID:       os.Getenv("AZURE_TENANT_ID"),
 		SubscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
 		ResourceGroup:  os.Getenv("RESOURCEGROUP"),
-	}
-
-	cs.Properties.MasterServicePrincipalProfile = api.ServicePrincipalProfile{
-		ClientID: os.Getenv("AZURE_MASTER_CLIENT_ID"),
-		Secret:   os.Getenv("AZURE_MASTER_CLIENT_SECRET"),
-	}
-	cs.Properties.WorkerServicePrincipalProfile = api.ServicePrincipalProfile{
-		ClientID: os.Getenv("AZURE_WORKER_CLIENT_ID"),
-		Secret:   os.Getenv("AZURE_WORKER_CLIENT_SECRET"),
 	}
 
 	// /subscriptions/{subscription}/resourcegroups/{resource_group}/providers/Microsoft.ContainerService/openshiftmanagedClusters/{cluster_name}
@@ -267,7 +300,7 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 }
 
 func writeHelpers(log *logrus.Entry, cs *api.OpenShiftManagedCluster) error {
-	b, err := derived.MasterCloudProviderConf(cs)
+	b, err := derived.MasterCloudProviderConf(cs, true)
 	if err != nil {
 		return err
 	}

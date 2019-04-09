@@ -2,7 +2,7 @@
 ## Plugin config template.
 ## This template file is manually curated for the particular OSA version
 ##
-pluginVersion: v4.0
+pluginVersion: v4.1
 ## Openshift component logging levels
 componentLogLevel:
   apiServer: 2
@@ -53,7 +53,7 @@ versions:
       startup: quay.io/openshift-on-azure/startup:v3.2
       sync: quay.io/openshift-on-azure/sync:v3.2
       tlsProxy: quay.io/openshift-on-azure/tlsproxy:v3.2
-  v4.0:
+  v4.1:
     ## Node image and version configurables
     imageOffer: osa
     imagePublisher: redhat
@@ -87,13 +87,13 @@ versions:
       genevaLogging: osarpint.azurecr.io/acs/mdsd:master.20190228.1
       genevaStatsd: osarpint.azurecr.io/acs/mdm:git-a909a2e76
       genevaTDAgent: osarpint.azurecr.io/acs/td-agent:master.20190228.1
-      azureControllers: quay.io/openshift-on-azure/azure-controllers:v4.0
-      canary: quay.io/openshift-on-azure/canary:v4.0
-      etcdBackup: quay.io/openshift-on-azure/etcdbackup:v4.0
-      metricsBridge: quay.io/openshift-on-azure/metricsbridge:v4.0
-      startup: quay.io/openshift-on-azure/startup:v4.0
-      sync: quay.io/openshift-on-azure/sync:v4.0
-      tlsProxy: quay.io/openshift-on-azure/tlsproxy:v4.0
+      azureControllers: quay.io/openshift-on-azure/azure-controllers:v4.1
+      canary: quay.io/openshift-on-azure/canary:v4.1
+      etcdBackup: quay.io/openshift-on-azure/etcdbackup:v4.1
+      metricsBridge: quay.io/openshift-on-azure/metricsbridge:v4.1
+      startup: quay.io/openshift-on-azure/startup:v4.1
+      sync: quay.io/openshift-on-azure/sync:v4.1
+      tlsProxy: quay.io/openshift-on-azure/tlsproxy:v4.1
 ## certificates, used to authenticate to external systems
 ## Geneva integration certificates. Example:
 #certificates:

@@ -20,7 +20,7 @@ const (
 	PluginStepDeploy                              PluginStep = "Deploy"
 	PluginStepInitializeUpdateBlob                PluginStep = "InitializeUpdateBlob"
 	PluginStepResetUpdateBlob                     PluginStep = "ResetUpdateBlob"
-	PluginStepCheckEtcdBlobExists                 PluginStep = "CheckEtcdBlobExists"
+	PluginStepEtcdListBackups                     PluginStep = "EtcdListBackups"
 	PluginStepClientCreation                      PluginStep = "ClientCreation"
 	PluginStepEnrichCertificatesFromVault         PluginStep = "EnrichCertificatesFromVault"
 	PluginStepEnrichStorageAccountKeys            PluginStep = "EnrichStorageAccountKeys"
@@ -95,6 +95,7 @@ type TestConfig struct {
 	DebugHashFunctions bool
 	ImageResourceGroup string
 	ImageResourceName  string
+	ArtifactDir        string
 }
 
 // Plugin is the main interface to openshift-azure
@@ -126,6 +127,9 @@ type Plugin interface {
 
 // GenevaActions is the interface for all geneva actions
 type GenevaActions interface {
+	// ListEtcdBackups lists available etcd backup
+	ListEtcdBackups(ctx context.Context, cs *OpenShiftManagedCluster) ([]GenevaActionListEtcdBackups, error)
+
 	// RecoverEtcdCluster recovers the cluster's etcd using the backup specified in the pluginConfig
 	RecoverEtcdCluster(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn, backupBlob string) *PluginError
 

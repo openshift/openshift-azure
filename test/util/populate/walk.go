@@ -52,11 +52,11 @@ func (w walker) walk(v reflect.Value, path string) {
 		return
 	case *rsa.PrivateKey:
 		// use a dummy value because the zero value cannot be marshalled
-		v.Set(reflect.ValueOf(tls.GetDummyPrivateKey()))
+		v.Set(reflect.ValueOf(tls.DummyPrivateKey))
 		return
 	case *x509.Certificate:
 		// use a dummy value because the zero value cannot be unmarshalled
-		v.Set(reflect.ValueOf(tls.GetDummyCertificate()))
+		v.Set(reflect.ValueOf(tls.DummyCertificate))
 		return
 	}
 

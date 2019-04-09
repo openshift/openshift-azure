@@ -117,6 +117,11 @@ func (c *Client) Reimage(ctx context.Context, resourceGroupName, resourceName, h
 	return
 }
 
+func (c *Client) ListBackups(ctx context.Context, resourceGroupName, resourceName string) (out []api.GenevaActionListEtcdBackups, err error) {
+	err = c.do(http.MethodGet, resourceGroupName, resourceName, "/listBackups", nil, &out)
+	return
+}
+
 func (c *Client) Restore(ctx context.Context, resourceGroupName, resourceName, blobName string) (err error) {
 	err = c.do(http.MethodPut, resourceGroupName, resourceName, "/restore/"+blobName, nil, nil)
 	return

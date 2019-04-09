@@ -9,13 +9,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/authorization/mgmt/2015-07-01/authorization"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-)
-
-const (
-	// IDs picked out of thin air
-	osaMasterRoleDefinitionID = "9bc35064-26cf-4536-8e65-40bd22a41071"
-	osaWorkerRoleDefinitionID = "7c1a95fb-9825-4039-b67c-a3644e872c04"
 )
 
 // listActions lists all the mutating actions carried out on a resource group in
@@ -71,11 +66,10 @@ func ensureRoleDefinitions(ctx context.Context) error {
 		return err
 	}
 
-	cli := authorization.NewRoleDefinitionsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
-	cli.Authorizer = authorizer
+	cli := azureclient.NewRoleDefinitionsClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
 
-	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), osaMasterRoleDefinitionID, authorization.RoleDefinition{
-		Name: to.StringPtr(osaMasterRoleDefinitionID),
+	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), fakerp.OSAMasterRoleDefinitionID, authorization.RoleDefinition{
+		Name: to.StringPtr(fakerp.OSAMasterRoleDefinitionID),
 		Properties: &authorization.RoleDefinitionProperties{
 			RoleName: to.StringPtr("OSA Master"),
 			Permissions: &[]authorization.Permission{
@@ -84,6 +78,7 @@ func ensureRoleDefinitions(ctx context.Context) error {
 						"Microsoft.Compute/disks/read",
 						"Microsoft.Compute/disks/write",
 						"Microsoft.Compute/disks/delete",
+						"Microsoft.Compute/images/read", // e2e lb test when running from an image
 						"Microsoft.Compute/virtualMachineScaleSets/read",
 						"Microsoft.Compute/virtualMachineScaleSets/write",
 						"Microsoft.Compute/virtualMachineScaleSets/manualUpgrade/action",
@@ -114,8 +109,8 @@ func ensureRoleDefinitions(ctx context.Context) error {
 		},
 	})
 
-	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), osaWorkerRoleDefinitionID, authorization.RoleDefinition{
-		Name: to.StringPtr(osaMasterRoleDefinitionID),
+	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), fakerp.OSAWorkerRoleDefinitionID, authorization.RoleDefinition{
+		Name: to.StringPtr(fakerp.OSAMasterRoleDefinitionID),
 		Properties: &authorization.RoleDefinitionProperties{
 			RoleName: to.StringPtr("OSA Worker"),
 			Permissions: &[]authorization.Permission{

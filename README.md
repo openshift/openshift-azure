@@ -6,113 +6,70 @@
 
 ## Prerequisites
 
-1. **Utilities**.  You'll need recent versions of [Azure
-   CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) and
-   [Golang](https://golang.org/dl) installed.
+1. **Utilities**.  Install the following:
+   1. [Golang 1.11.6](https://golang.org/dl)
+   1. Latest [Azure
+      CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+   1. [OpenShift Origin 3.11 client
+      tools](https://github.com/openshift/origin/releases/tag/v3.11.0)
+   1. Latest [Glide](https://github.com/Masterminds/glide/releases).  Note:
+      Glide 0.13.1 is known to be broken.
 
-1. Check out the codebase
-   1. If running Linux, ensure you have the systemd-devel RPM installed: `sudo
-      dnf -y install systemd-devel`.
+1. **Environment variables**.  Ensure that $GOPATH/bin is in your path:
 
-   1. Ensure that $GOPATH/bin is in your path: `export
-      PATH=$PATH:${GOPATH:-$HOME/go}/bin`.
+   `export PATH=$PATH:${GOPATH:-$HOME/go}/bin`.
 
-   1. Check out the codebase: `go get github.com/openshift/openshift-azure/...`.
+1. **Azure CLI access**.  Log into Azure using the CLI using `az login` and your
+   credentials.
 
-   1. Navigate to the codebase directory: `cd
-      ${GOPATH:-$HOME/go}/src/github.com/openshift/openshift-azure`.
+1. **OpenShift CI cluster access**.  Log in to the [CI
+   cluster](https://api.ci.openshift.org/console/catalog) using `oc login` and a
+   token from the CI cluster web interface. You can copy the required command by
+   clicking on your username and the "Copy Login Command" option in the web
+   portal.
 
-1. **Azure CLI access**.  You'll need to be logged into Azure using the CLI.
+1. **Codebase**.  Check out the codebase:
 
-1. **Subscription and Tenant ID**.  You'll need to know the subscription and
-   tenant IDs of the Azure subscription where your OpenShift nodes will run.
+   `go get github.com/openshift/openshift-azure/...`
 
-1. **Node image**.  Your Azure subscription will need to contain an OpenShift
-   node Image resource, or to have whitelisted access to the OpenShift node
-   marketplace image.
+1. **Secrets**.  Retrieve cluster creation secrets from the CI cluster:
+   ```
+   cd ${GOPATH:-$HOME/go}/src/github.com/openshift/openshift-azure
+   make secrets
+   ```
 
-   Before you deploy for the first time in a subscription using whitelisted
-   access to the OpenShift node marketplace image, you will need to enable
-   programmatic deployment of the image.
+1. **Environment file**.  Create an environment file:
 
-   In the Azure web console, click `Create a resource`.  Search for `OpenShift
-   Origin 3.11 on Azure (Staged)` and click the result.  At the bottom of the
-   resulting screen, click `Want to deploy programmatically?  Get started`.
-   Click `Enable`, then `Save`.
+   `cp env.example env`.
 
-1. **DNS domain**.  You'll need a DNS domain hosted using Azure DNS in the same
-   subscription.  Deploying a cluster will create a dedicated child DNS zone
-   resource for the cluster.  It is assumed that the name of the DNS zone
-   resource for the parent DNS domain matches the name of the DNS domain.
-
-1. **AAD Application / Service principal**.  The deployed OpenShift cluster
-   needs a valid AAD application and service principal to call back into the
-   Azure API, and optionally in order to enable AAD authentication.  There are a
-   few options here:
-
-   1. (Ask your Azure subscription administrator to) precreate a generic AAD
-      application and service principal with secret and grant it *Contributor*
-      access to the subscription.  Record the service principal client ID and
-      secret.  Good enough to deploy OpenShift clusters, but AAD authentication
-      won't work.
-
-   1. Automatically create an AAD application and service principal.  Your Azure
-      user will need *Contributor* and *User Access Administrator* roles, and
-      your AAD will need to have *Users can register applications* enabled.
-
-   1. (Ask your Azure subscription administrator to) precreate a specific AAD
-      application and service principal with secret.  You can use `hack/aad.sh`
-      to help with this process.  For AAD authentication to work, the public
-      hostname of the OpenShift cluster must match the AAD application created.
-      Record the service principal client ID and secret.
-
-   1. (optional) For AAD Web-UI sign-in integration to work we will need to have
-      second AAD Web-App created, with callback url to OpenShift and right
-      permissions enabled. `hack/aad.sh` can help you to do so.
-
-      AAD WebApp Flow:
-      1. Create an application (you can use `hack/aad.sh` to create app with
-      right permissions)
-      2. Add `$AZURE_AAD_CLIENT_ID` variable with application ID to `env` file.
-      3. Create the cluster. `create.sh` script will update your application with
-      required details.
-      4. Get your application permissions approved by organization administrator.
-      Without approval cluster will start, just login will not work.
-
-  Once you have application with approved/granted permissions it can be re-used
-  for all future clusters.
+1. **AAD Application / Service principal**.  Create a personal AAD Application:
+   1. `hack/aad.sh app-create user-$USER-aad jminter-team-shared`
+   1. Update env to include the AZURE_AAD_CLIENT_ID and AZURE_AAD_CLIENT_SECRET
+      values output by aad.sh.
+   1. Ask an AAD administrator to grant permissions to your application.
 
 ## Deploy an OpenShift cluster
 
-1. Copy the `env.example` file to `env` and edit according to your requirements.
-   Source the `env` file: `. ./env`.
+1. Source the `env` file: `. ./env`.
 
-1. Run `./hack/create.sh $RESOURCEGROUP` to deploy a cluster.
+1. Determine an appropriate resource group name for your cluster (e.g. for a test
+   cluster, you could call it `$USER-test`). Then `export RESOURCEGROUP` and run
+   `./hack/create.sh $RESOURCEGROUP` to deploy a cluster.
+
+1. Access the web console via the link printed by create.sh, logging in with
+   your Azure credentials.
 
 1. To inspect pods running on the OpenShift cluster, run
    `KUBECONFIG=_data/_out/admin.kubeconfig oc get pods`.
 
-1. To ssh into any OpenShift master node, run
-   `./hack/ssh.sh`. You will be able to jump to other hosts from there.
+1. To ssh into any OpenShift master node, run `./hack/ssh.sh`.  You can directly
+   ssh to any other host from the master.  `sudo -i` will give root.
 
 1. Run `./hack/delete.sh` to delete the deployed cluster.
 
-## Access the cluster
-A cluster can be accessed via the `UI` or `CLI`. If it was created using AAD
-integration ([Pre-requisites](#prerequisites) 7.iv), you can login using Azure AD. Another option,
-which will be deprecated in the future, is `htpasswd`. The username that is used
-is `osadmin` and the password is randomly generated. To get the password execute:
-```console
-./hack/config.sh get-config $RESOURCEGROUP | jq -r .config.adminPasswd
-```
-You can also get the admin kubeconfig with:
-```console
-./hack/config.sh get-config $RESOURCEGROUP | jq -r .config.adminKubeconfig
-```
-
 ### Examples
 
-Basic OpenShift configuration:
+Basic OpenShift configuration (also see test/manifests/fakerp/create.yaml):
 
 ```yaml
 name: openshift
@@ -146,13 +103,6 @@ properties:
     vmSize: Standard_D2s_v3
     subnetCidr: 10.0.0.0/24
     osType: Linux
-```
-
-## Dependency management
-To add a new dependency to the project, add the package information to glide.yaml and execute `glide up -v`
-* NOTE: some versions of glide might crash or generate an incomplete vendor/ folder when ran against this repo. In this case you may want to try getting the latest version:
-```
-go get github.com/Masterminds/glide
 ```
 
 ## CI infrastructure

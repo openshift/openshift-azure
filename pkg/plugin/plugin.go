@@ -26,6 +26,7 @@ type plugin struct {
 	testConfig             api.TestConfig
 	upgraderFactory        func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error)
 	configInterfaceFactory func(cs *api.OpenShiftManagedCluster, runningUnderTest bool) (config.Interface, error)
+	now                    func() time.Time
 }
 
 var _ api.Plugin = &plugin{}
@@ -43,6 +44,7 @@ func NewPlugin(log *logrus.Entry, pluginConfig *pluginapi.Config, optionalTestCo
 		testConfig:             testConfig,
 		upgraderFactory:        cluster.NewSimpleUpgrader,
 		configInterfaceFactory: config.New,
+		now:                    time.Now,
 	}, nil
 }
 
@@ -87,8 +89,10 @@ func (p *plugin) ValidatePluginTemplate(ctx context.Context) []error {
 }
 
 func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool) error {
+	var setVersionFields bool
 	if !isUpdate || cs.Config.PluginVersion == "latest" {
 		cs.Config.PluginVersion = p.pluginConfig.PluginVersion
+		setVersionFields = true
 	}
 
 	p.log.Info("generating configs")
@@ -97,15 +101,38 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 		return &api.PluginError{Err: err, Step: api.PluginStepClientCreation}
 	}
 
-	err = configInterface.Generate(p.pluginConfig)
+	err = configInterface.Generate(p.pluginConfig, setVersionFields)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
+func (p *plugin) ListEtcdBackups(ctx context.Context, cs *api.OpenShiftManagedCluster) ([]api.GenevaActionListEtcdBackups, error) {
+	p.log.Info("creating clients")
+	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	blobs, err := clusterUpgrader.EtcdListBackups(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := make([]api.GenevaActionListEtcdBackups, 0, len(blobs))
+	for _, blob := range blobs {
+		resp = append(resp, api.GenevaActionListEtcdBackups{
+			Name:         blob.Name,
+			LastModified: time.Time(blob.Properties.LastModified),
+		})
+	}
+
+	return resp, nil
+}
+
 func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManagedCluster, deployFn api.DeployFn, backupBlob string) *api.PluginError {
-	suffix := fmt.Sprintf("%d", time.Now().Unix())
+	suffix := fmt.Sprintf("%d", p.now().Unix())
 
 	p.log.Info("creating clients")
 	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, true, true, p.testConfig)
@@ -119,9 +146,19 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 		return &api.PluginError{Err: err, Step: api.PluginStepGenerateARM}
 	}
 
-	err = clusterUpgrader.EtcdBlobExists(ctx, backupBlob)
+	backups, err := clusterUpgrader.EtcdListBackups(ctx)
 	if err != nil {
-		return &api.PluginError{Err: err, Step: api.PluginStepCheckEtcdBlobExists}
+		return &api.PluginError{Err: err, Step: api.PluginStepEtcdListBackups}
+	}
+	var found bool
+	for _, backup := range backups {
+		if backup.Name == backupBlob {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return &api.PluginError{Err: fmt.Errorf("backup %s does not exist", backupBlob), Step: api.PluginStepEtcdListBackups}
 	}
 
 	p.log.Info("restoring the cluster")
@@ -154,7 +191,7 @@ func (p *plugin) RecoverEtcdCluster(ctx context.Context, cs *api.OpenShiftManage
 }
 
 func (p *plugin) CreateOrUpdate(ctx context.Context, cs *api.OpenShiftManagedCluster, isUpdate bool, deployFn api.DeployFn) *api.PluginError {
-	suffix := fmt.Sprintf("%d", time.Now().Unix())
+	suffix := fmt.Sprintf("%d", p.now().Unix())
 
 	p.log.Info("creating clients")
 	clusterUpgrader, err := p.upgraderFactory(ctx, p.log, cs, false, true, p.testConfig)

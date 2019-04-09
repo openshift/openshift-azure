@@ -9,6 +9,7 @@ package cluster
 import (
 	"context"
 
+	azstorage "github.com/Azure/azure-sdk-for-go/storage"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -20,6 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 // here follow well known container and blob names
@@ -44,7 +46,7 @@ type Upgrader interface {
 	UpdateMasterAgentPool(ctx context.Context, app *api.AgentPoolProfile) *api.PluginError
 	UpdateWorkerAgentPool(ctx context.Context, app *api.AgentPoolProfile, suffix string) *api.PluginError
 	CreateOrUpdateSyncPod(ctx context.Context) error
-	EtcdBlobExists(ctx context.Context, blobName string) error
+	EtcdListBackups(ctx context.Context) ([]azstorage.Blob, error)
 	EtcdRestoreDeleteMasterScaleSet(ctx context.Context) *api.PluginError
 	EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context) *api.PluginError
 	ResetUpdateBlob() error
@@ -73,6 +75,9 @@ type simpleUpgrader struct {
 	arm               arm.Interface
 
 	cs *api.OpenShiftManagedCluster
+
+	getConsoleClient   func(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient
+	getAPIServerClient func(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient
 }
 
 var _ Upgrader = &simpleUpgrader{}
@@ -115,8 +120,10 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 			startupFactory: startup.New,
 			arm:            arm,
 		},
-		arm: arm,
-		cs:  cs,
+		arm:                arm,
+		cs:                 cs,
+		getConsoleClient:   getConsoleClient,
+		getAPIServerClient: getAPIServerClient,
 	}
 
 	if initializeStorageClients {

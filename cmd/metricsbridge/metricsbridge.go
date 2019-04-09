@@ -133,6 +133,7 @@ func (c *config) defaultAndValidate() (errs []error) {
 func (c *config) init() error {
 	for {
 		var err error
+		c.log.Debug("dialing statsd socket")
 		c.conn, err = net.Dial("unix", c.StatsdSocket)
 		if err == nil {
 			break
@@ -149,6 +150,7 @@ func (c *config) init() error {
 		return err
 	}
 
+	c.log.Debug("dialing prometheus endpoint")
 	cli, err := api.NewClient(api.Config{
 		Address: c.PrometheusEndpoint,
 		RoundTripper: &authorizingRoundTripper{
@@ -173,10 +175,12 @@ func (c *config) init() error {
 func run(log *logrus.Entry, configpath string) error {
 	c := &config{log: log}
 
+	log.Infof("loading config from %s", configpath)
 	if err := c.load(configpath); err != nil {
 		return err
 	}
 
+	log.Info("validating configuration and adding defaults")
 	if errs := c.defaultAndValidate(); len(errs) > 0 {
 		var sb strings.Builder
 		for _, err := range errs {
@@ -185,11 +189,11 @@ func run(log *logrus.Entry, configpath string) error {
 		}
 		return errors.New(sb.String())
 	}
-
 	if c.Interval != time.Minute {
 		log.Warnf("intervalNanoseconds is set to %q.  It must be set to %q in production", int64(c.Interval), int64(time.Minute))
 	}
 
+	log.Info("initializing...")
 	if err := c.init(); err != nil {
 		return err
 	}
@@ -214,6 +218,7 @@ func (c *config) runOnce(ctx context.Context) error {
 	var metricsCount int
 	hostnameMap := make(map[string]string)
 
+	c.log.Debug("fetching nodename")
 	value, err := c.prometheus.Query(ctx, "node_uname_info", time.Time{})
 	if err != nil {
 		return err
@@ -221,6 +226,7 @@ func (c *config) runOnce(ctx context.Context) error {
 	for _, nodeSample := range value.(model.Vector) {
 		hostnameMap[strings.Split(string(nodeSample.Metric["instance"]), ":")[0]] = string(nodeSample.Metric["nodename"])
 	}
+	c.log.Debugf("querying %d items", len(c.Queries))
 	for _, query := range c.Queries {
 		value, err := c.prometheus.Query(ctx, query.Query, time.Time{})
 		if err != nil {
