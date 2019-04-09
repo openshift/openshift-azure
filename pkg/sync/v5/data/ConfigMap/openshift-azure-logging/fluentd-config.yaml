@@ -22,17 +22,6 @@ data:
         tag journald
       </rule>
     </match>
-    <filter journald>
-      @type record_transformer
-      enable_ruby true
-      <record>
-       #k8s_apiserver_apiserver-vqxg4_kube-service-catalog_72ce4d73-5224-11e9-98d0-000d3a196756_0
-       CONTAINER ${record["CONTAINER_NAME"].split("_")[1]}
-       POD ${record["CONTAINER_NAME"].split("_")[2]}
-       NAMESPACE ${record["CONTAINER_NAME"].split("_")[3]}
-       CONTAINER_ID ${record["CONTAINER_NAME"].split("_")[4]}
-      </record>
-    </filter>
     <match **>
       @type mdsd
       djsonsocket /var/run/mdsd/default_djson.socket
