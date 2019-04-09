@@ -35,38 +35,35 @@ func TestHashScaleSetStability(t *testing.T) {
 		"v3.2": {
 			{
 				role: api.AgentPoolProfileRoleMaster,
-				// jminter: e436... value verified manually against v3.2
 				// this value should not change
 				expectedHash: "e43619d6476b958470ec8e95f83c1023f15c63bb7d896adc2246cc1d9da68d0e",
 			},
 			{
 				role: api.AgentPoolProfileRoleInfra,
-				// jminter: d438... value verified manually against v3.2
 				// this value should not change
 				expectedHash: "d438d7076d6a3495d0663323dd81600b389f992499750df0a859d208d9fa42f7",
 			},
 			{
 				role: api.AgentPoolProfileRoleCompute,
-				// jminter: fc64... value verified manually against v3.2
 				// this value should not change
 				expectedHash: "fc64527a7a3fc02568083f200de97c9fcb22aea448e57ae46e58f1a76ba1f6f6",
 			},
 		},
-		"v4.0": {
+		"v4.1": {
 			{
 				role: api.AgentPoolProfileRoleMaster,
 				// this value should not change
-				expectedHash: "49de607e3b50aff9f2fa1a64e7a6173ab2c13969dcdc9036623ddc0666ca99af",
+				expectedHash: "9a4b049bda1bda0bf394b6e5a21c89bb8b219346261de0e6b01d2efb100f3e01",
 			},
 			{
 				role: api.AgentPoolProfileRoleInfra,
 				// this value should not change
-				expectedHash: "a8236fac988b1e73d7685bb70f5c7ec2c17a0bdd41f60e4d92f216c9f4961f50",
+				expectedHash: "a3dd5cb39b243e4e67a2d59cdda59d9179e39a87d6b6201ae7e6ce78c6317a72",
 			},
 			{
 				role: api.AgentPoolProfileRoleCompute,
 				// this value should not change
-				expectedHash: "90abb10d7670b484d65bf107102b44164284db52ee7038b1753c7f15000c0abc",
+				expectedHash: "0b9ada416dcffb9b0ecc5e96bc21b2a9ceaa78e74af82819040cdc14854a3a12",
 			},
 		},
 	}
@@ -154,13 +151,12 @@ func TestHashSyncPodStability(t *testing.T) {
 		expectedHash string
 	}{
 		"v3.2": {
-			// jminter: 302c... value verified manually against v3.2
 			// this value should not change
 			expectedHash: "302c52d35602ad1c4a6078953abccc36ecd92ba8256b6e118837712a69d7f028",
 		},
-		"v4.0": {
+		"v4.1": {
 			// this value should not change
-			expectedHash: "94c9eefd9c847c49834925c5f7dd87b21765fe8a3952f8190f9b352a8a3cba37",
+			expectedHash: "2de7468c30303c7549c378da2412b2ebdfe18749b770a92874bb878d26b4d234",
 		},
 	}
 

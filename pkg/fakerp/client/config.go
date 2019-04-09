@@ -35,12 +35,12 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 	if err := envconfig.Process("", &c); err != nil {
 		return nil, err
 	}
-	// After v3/v4 die, goal here is to use AZURE_REGIONS both to define the
+	// After v3 dies, goal here is to use AZURE_REGIONS both to define the
 	// region set externally via secrets/secret and allow restricting it.  In
-	// the interim, v3/v4 has a hard-coded region set which can be overridden by
-	// AZURE_REGION; v5 (and presumably v4.1) will use AZURE_REGIONS.  Also
-	// allow a cross-over period during which AZURE_REGIONS is not yet defined
-	// in developer environments.
+	// the interim, v3 has a hard-coded region set which can be overridden by
+	// AZURE_REGION; v4.1 and v5 will use AZURE_REGIONS.  Also allow a
+	// cross-over period during which AZURE_REGIONS is not yet defined in
+	// developer environments.
 	if c.Regions != "" {
 		regions := strings.Split(c.Regions, ",")
 		rand.Seed(time.Now().UTC().UnixNano())
