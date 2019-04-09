@@ -1,8 +1,7 @@
-package main
+package azurecontrollers
 
 import (
 	"context"
-	"flag"
 
 	"github.com/sirupsen/logrus"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
@@ -13,40 +12,33 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
-var (
-	logLevel  = flag.String("loglevel", "Debug", "Valid values are Debug, Info, Warning, Error")
-	gitCommit = "unknown"
-)
-
-func main() {
+func start(cfg *Config) error {
 	ctx := context.Background()
-
-	flag.Parse()
-	logrus.SetLevel(log.SanitizeLogLevel(*logLevel))
+	logrus.SetLevel(log.SanitizeLogLevel(cfg.LogLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-
 	log := logrus.NewEntry(logrus.StandardLogger())
-	log.Printf("azure-controller pod starting, git commit %s", gitCommit)
+
+	log.Print("azure-controller pod starting")
 
 	// TODO: Expose metrics port after SDK uses controller-runtime's dynamic client
 	// sdk.ExposeMetricsPort()
 
-	cfg, err := config.GetConfig()
+	kCfg, err := config.GetConfig()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	m, err := manager.New(cfg, manager.Options{})
+	m, err := manager.New(kCfg, manager.Options{})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	stopCh := signals.SetupSignalHandler()
 
 	if err := customeradmin.AddToManager(ctx, log, m, stopCh); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	log.Print("starting manager")
-	log.Fatal(m.Start(stopCh))
+	return m.Start(stopCh)
 }

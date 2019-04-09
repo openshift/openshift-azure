@@ -4,16 +4,12 @@ LDFLAGS="-X main.gitCommit=$(GITCOMMIT)"
 
 AZURE_IMAGE ?= quay.io/openshift-on-azure/arho:$(TAG)
 
-ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup tlsproxy canary 
-ALL_IMAGES = azure-image e2e-tests-image
-ALL_PUSHES = azure-push e2e-tests-push
-
 GOPATH ?= $(HOME)/go
 IMAGEBUILDER = ${GOPATH}/bin/imagebuilder
 
-.PHONY: $(ALL_PUSHES) $(ALL_IMAGES) all version clean test unit generate pullregistry secrets
+.PHONY: azure-image azure-push all version clean test unit generate pullregistry secrets
 # all is the default target to build everything
-all: $(ALL_BINARIES)
+all: azure
 
 version:
 	@echo $(GITCOMMIT)
@@ -44,50 +40,17 @@ upgrade:
 artifacts:
 	./hack/artifacts.sh
 
-# for backwards compat
-.PHONY: e2e-bin e2e-image e2e-push
-e2e-bin: e2e-tests
-e2e-image: e2e-tests-image
-e2e-push: e2e-tests-push
-
-e2e-tests: generate
-	go test -ldflags ${LDFLAGS} -tags e2e -c -o ./e2e-tests ./test/e2e
-
-e2e-tests-image: e2e-tests $(IMAGEBUILDER) pullregistry
-	$(IMAGEBUILDER) -f images/e2e-tests/Dockerfile -t $(E2E_IMAGE) .
-
-e2e-tests-push: e2e-tests-image
-	docker push $(E2E_IMAGE)
-
-azure-image: azure-controllers etcdbackup tlsproxy metricsbridge startup sync
+azure-image: azure
 	$(IMAGEBUILDER) -f images/azure/Dockerfile -t $(AZURE_IMAGE) .
 
 azure-push: azure-image
 	docker push $(AZURE_IMAGE)
 
-azure-controllers: generate
-	go build -ldflags ${LDFLAGS} ./cmd/$@
-
-etcdbackup: generate
-	go build -ldflags ${LDFLAGS} ./cmd/$@
-
-tlsproxy: generate
-	go build -ldflags ${LDFLAGS} ./cmd/$@
-
-metricsbridge:
-	go build -ldflags ${LDFLAGS} ./cmd/$@
-
-startup: generate
-	go build -ldflags ${LDFLAGS} ./cmd/$@
-
-canary: generate
-	go build -ldflags ${LDFLAGS} ./cmd/$@
-
-sync: generate
+azure: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
 sync-run: generate
-	go run -ldflags ${LDFLAGS} ./cmd/sync -run-once -loglevel Debug
+	go run -ldflags ${LDFLAGS} ./cmd/azure sync --run-once --logLevel Debug
 
 .PHONY: sync-run
 
@@ -99,10 +62,6 @@ monitoring-run: monitoring
 
 monitoring-stop:
 	./hack/monitoring.sh clean
-
-all-image: $(ALL_IMAGES)
-
-all-push: $(ALL_PUSHES)
 
 releasenotes:
 	go build -tags releasenotes ./cmd/$@

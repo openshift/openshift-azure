@@ -1,9 +1,8 @@
-package main
+package tlsproxy
 
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -19,33 +18,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
-var (
-	logLevel    = flag.String("loglevel", "Info", "Valid values are Debug, Info, Warning, Error")
-	listen      = flag.String("listen", ":8080", "IP/port to listen on")
-	insecure    = flag.Bool("insecure", false, "don't validate CA certificate")
-	cacert      = flag.String("cacert", "", "file containing CA certificate(s) for the rewrite hostname")
-	cert        = flag.String("cert", "", "file containing client certificate for the rewrite hostname")
-	key         = flag.String("key", "", "file containing client key for the rewrite hostname")
-	servingkey  = flag.String("servingkey", "", "file containing serving key for re-encryption")
-	servingcert = flag.String("servingcert", "", "file containing serving certificate for re-encryption")
-	whitelist   = flag.String("whitelist", "", "URL whitelist regular expression")
-	hostname    = flag.String("hostname", "", "Hostname value to rewrite. Example: https://hostname.to.rewrite/")
-	gitCommit   = "unknown"
-)
-
-type config struct {
-	username string
-	password string
-	// transformed fields
-	log             *logrus.Entry
-	cli             *http.Client
-	redirectURL     *url.URL
-	whitelistRegexp *regexp.Regexp
-}
-
-func (c *config) validate() (errs []error) {
-	if _, err := url.Parse(*hostname); err != nil {
-		errs = append(errs, fmt.Errorf("invalid hostname %q", *hostname))
+func (c *Config) validate() (errs []error) {
+	if _, err := url.Parse(c.hostname); err != nil {
+		errs = append(errs, fmt.Errorf("invalid hostname %q", c.hostname))
 	}
 	if c.password == "" && c.username != "" ||
 		c.password != "" && c.username == "" {
@@ -55,8 +30,8 @@ func (c *config) validate() (errs []error) {
 	return
 }
 
-func (c *config) Init() error {
-	logrus.SetLevel(log.SanitizeLogLevel(*logLevel))
+func (c *Config) Init() error {
+	logrus.SetLevel(log.SanitizeLogLevel(c.LogLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 	c.log = logrus.NewEntry(logrus.StandardLogger())
 
@@ -70,28 +45,28 @@ func (c *config) Init() error {
 
 	// sanitize inputs
 	var err error
-	c.redirectURL, err = url.Parse(*hostname)
+	c.redirectURL, err = url.Parse(c.hostname)
 	if err != nil {
 		return err
 	}
 
-	c.whitelistRegexp, err = regexp.Compile(*whitelist)
+	c.whitelistRegexp, err = regexp.Compile(c.whitelist)
 	if err != nil {
 		return err
 	}
 
-	cert, err := tls.LoadX509KeyPair(*cert, *key)
+	cert, err := tls.LoadX509KeyPair(c.cert, c.key)
 	if err != nil {
 		return err
 	}
 
 	tlsClientConfig := &tls.Config{
-		InsecureSkipVerify: *insecure,
+		InsecureSkipVerify: c.insecure,
 		Certificates:       []tls.Certificate{cert},
 	}
 
-	if *cacert != "" {
-		b, err := ioutil.ReadFile(*cacert)
+	if c.caCert != "" {
+		b, err := ioutil.ReadFile(c.caCert)
 		if err != nil {
 			return err
 		}
@@ -109,7 +84,7 @@ func (c *config) Init() error {
 	return nil
 }
 
-func (c *config) Run() error {
+func (c *Config) Run() error {
 	handlerFunc := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		req.URL.Scheme = c.redirectURL.Scheme
 		req.URL.Host = c.redirectURL.Host
@@ -143,30 +118,31 @@ func (c *config) Run() error {
 		io.Copy(rw, resp.Body)
 	})
 
-	if *servingcert != "" && *servingkey != "" {
+	if c.servingCert != "" && c.servingKey != "" {
 		c.log.Debug("starting in reencrypt mode")
-		return http.ListenAndServeTLS(*listen, *servingcert, *servingkey, handlerFunc)
+		return http.ListenAndServeTLS(c.listen, c.servingCert, c.servingKey, handlerFunc)
 	}
 	c.log.Debug("starting in plain text mode")
-	return http.ListenAndServe(*listen, handlerFunc)
+	return http.ListenAndServe(c.listen, handlerFunc)
 }
 
-func (c *config) authIsOK(rw http.ResponseWriter, req *http.Request) bool {
+func (c *Config) authIsOK(rw http.ResponseWriter, req *http.Request) bool {
 	username, password, _ := req.BasicAuth()
 	return username == c.username && password == c.password
 }
 
-func main() {
-	flag.Parse()
+func start(cfg *Config) error {
+	logrus.SetLevel(log.SanitizeLogLevel(cfg.LogLevel))
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+	log := logrus.NewEntry(logrus.StandardLogger())
 
-	c := config{}
-	err := c.Init()
+	cfg.log = log
+
+	err := cfg.Init()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	c.log.Infof("tlsproxy starting at %s, git commit %s", *listen, gitCommit)
-	if err := c.Run(); err != nil {
-		c.log.Fatal(err)
-	}
+	cfg.log.Infof("tlsproxy starting at %s", cfg.listen)
+	return cfg.Run()
 }

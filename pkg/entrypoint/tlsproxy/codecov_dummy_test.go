@@ -1,4 +1,4 @@
-package main
+package tlsproxy
 
 import (
 	"testing"

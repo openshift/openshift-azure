@@ -1,9 +1,8 @@
-package main
+package sync
 
 import (
 	"context"
 	"encoding/json"
-	"flag"
 	"net"
 	"net/http"
 	"time"
@@ -12,7 +11,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster"
-	"github.com/openshift/openshift-azure/pkg/sync"
+	syncapi "github.com/openshift/openshift-azure/pkg/sync"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
@@ -20,15 +19,14 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
-var (
-	dryRun    = flag.Bool("dry-run", false, "Print resources to be synced instead of mutating cluster state.")
-	once      = flag.Bool("run-once", false, "If true, run only once then quit.")
-	interval  = flag.Duration("interval", 3*time.Minute, "How often the sync process going to be rerun.")
-	logLevel  = flag.String("loglevel", "Info", "valid values are Debug, Info, Warning, Error")
-	gitCommit = "unknown"
-)
+func start(cfg *Config) error {
+	ctx := context.Background()
+	logrus.SetLevel(log.SanitizeLogLevel(cfg.LogLevel))
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+	log := logrus.NewEntry(logrus.StandardLogger())
 
-func run(ctx context.Context, log *logrus.Entry) error {
+	log.Print("sync pod starting")
+
 	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
 	if err != nil {
 		return err
@@ -82,13 +80,12 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
-	log.Print("creating new sync")
-	s, err := sync.New(log, cs, true)
+	s, err := syncapi.New(log, cs, true)
 	if err != nil {
 		return err
 	}
 
-	if *dryRun {
+	if cfg.DryRun {
 		return s.PrintDB()
 	}
 
@@ -102,7 +99,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 
 	go http.Serve(l, mux)
 
-	t := time.NewTicker(*interval)
+	t := time.NewTicker(cfg.Interval)
 	for {
 		log.Print("starting sync")
 		if err := s.Sync(ctx); err != nil {
@@ -110,22 +107,9 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		} else {
 			log.Print("sync done")
 		}
-		if *once {
+		if cfg.Once {
 			return nil
 		}
 		<-t.C
-	}
-}
-
-func main() {
-	flag.Parse()
-	logger := logrus.New()
-	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
-	logger.SetLevel(log.SanitizeLogLevel(*logLevel))
-	log := logrus.NewEntry(logger)
-	log.Printf("sync pod starting, git commit %s", gitCommit)
-
-	if err := run(context.Background(), log); err != nil {
-		log.Fatal(err)
 	}
 }

@@ -1,9 +1,8 @@
-package main
+package startup
 
 import (
 	"context"
 	"encoding/json"
-	"flag"
 	"net/http"
 	"os"
 	"time"
@@ -16,12 +15,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-var (
-	logLevel  = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
-	gitCommit = "unknown"
-)
-
-func run(ctx context.Context, log *logrus.Entry) error {
+func runStartup(ctx context.Context, log *logrus.Entry) error {
 	log.Infof("reading config")
 	var cs *api.OpenShiftManagedCluster
 	err := wait.PollImmediateUntil(10*time.Second, func() (bool, error) {
@@ -55,17 +49,17 @@ func run(ctx context.Context, log *logrus.Entry) error {
 	return s.WriteFiles(ctx)
 }
 
-func main() {
-	flag.Parse()
+func start(cfg *Config) error {
 	logger := logrus.New()
 	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
-	logger.SetLevel(log.SanitizeLogLevel(*logLevel))
+	logger.SetLevel(log.SanitizeLogLevel(cfg.LogLevel))
 	log := logrus.NewEntry(logger)
-	log.Infof("startup pod starting, git commit %s", gitCommit)
+	log.Info("startup pod starting")
 
-	if err := run(context.Background(), log); err != nil {
-		log.Fatal(err)
+	if err := runStartup(context.Background(), log); err != nil {
+		return err
 	}
 
 	log.Info("all done successfully")
+	return nil
 }

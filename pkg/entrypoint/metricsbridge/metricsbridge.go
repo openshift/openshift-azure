@@ -1,11 +1,10 @@
-package main
+package metricsbridge
 
 import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -34,11 +33,6 @@ curl -Gks \
   https://prometheus-k8s.openshift-monitoring.svc:9091/federate
 */
 
-var (
-	logLevel  = flag.String("loglevel", "Debug", "Valid values are Debug, Info, Warning, Error")
-	gitCommit = "unknown"
-)
-
 type authorizingRoundTripper struct {
 	http.RoundTripper
 	token string
@@ -49,7 +43,7 @@ func (rt authorizingRoundTripper) RoundTrip(req *http.Request) (*http.Response, 
 	return rt.RoundTripper.RoundTrip(req)
 }
 
-type config struct {
+type metricsConfig struct {
 	Interval           time.Duration `json:"intervalNanoseconds,omitempty"`
 	PrometheusEndpoint string        `json:"prometheusEndpoint,omitempty"`
 	StatsdSocket       string        `json:"statsdSocket,omitempty"`
@@ -77,7 +71,7 @@ type config struct {
 	conn       net.Conn
 }
 
-func (c *config) load(path string) error {
+func (c *metricsConfig) load(path string) error {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
@@ -109,7 +103,7 @@ func (c *config) load(path string) error {
 	return nil
 }
 
-func (c *config) defaultAndValidate() (errs []error) {
+func (c *metricsConfig) defaultAndValidate() (errs []error) {
 	if c.Interval == 0 {
 		c.Interval = time.Minute
 	}
@@ -130,7 +124,7 @@ func (c *config) defaultAndValidate() (errs []error) {
 	return
 }
 
-func (c *config) init() error {
+func (c *metricsConfig) init() error {
 	for {
 		var err error
 		c.log.Debug("dialing statsd socket")
@@ -173,7 +167,7 @@ func (c *config) init() error {
 }
 
 func run(log *logrus.Entry, configpath string) error {
-	c := &config{log: log}
+	c := &metricsConfig{log: log}
 
 	log.Infof("loading config from %s", configpath)
 	if err := c.load(configpath); err != nil {
@@ -202,7 +196,7 @@ func run(log *logrus.Entry, configpath string) error {
 	return c.run()
 }
 
-func (c *config) run() error {
+func (c *metricsConfig) run() error {
 	t := time.NewTicker(c.Interval)
 	defer t.Stop()
 
@@ -214,7 +208,7 @@ func (c *config) run() error {
 	}
 }
 
-func (c *config) runOnce(ctx context.Context) error {
+func (c *metricsConfig) runOnce(ctx context.Context) error {
 	var metricsCount int
 	hostnameMap := make(map[string]string)
 
@@ -288,19 +282,19 @@ func (c *config) runOnce(ctx context.Context) error {
 	return nil
 }
 
-func main() {
-	flag.Parse()
-	logrus.SetLevel(log.SanitizeLogLevel(*logLevel))
+func start(cfg *Config) error {
+	logrus.SetLevel(log.SanitizeLogLevel(cfg.LogLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-
 	log := logrus.NewEntry(logrus.StandardLogger())
-	log.Printf("metricsbridge starting, git commit %s", gitCommit)
 
-	if len(os.Args) != 2 {
-		log.Fatalf("usage: %s config.yaml", os.Args[0])
+	log.Printf("metricsbridge starting")
+
+	if cfg.ConfigDir == "" {
+		return fmt.Errorf("config value cant be empty")
 	}
 
-	if err := run(log, os.Args[1]); err != nil {
-		log.Fatal(err)
+	if err := run(log, cfg.ConfigDir); err != nil {
+		return err
 	}
+	return nil
 }
