@@ -34,16 +34,13 @@ data:
     </match>
     <match **>
       @type mdsd
+      acktimeoutms 0
+      buffer_type memory
+      buffer_queue_full_action block
+      disable_retry_limit true
       djsonsocket /var/run/mdsd/default_djson.socket
-      acktimeoutms 5000
-      buffer_chunk_limit 1000k
-      buffer_type file
-      buffer_path /var/log/td-agent/buffer
-      buffer_queue_limit 128
       emit_timestamp_name time
       flush_interval 10s
-      retry_limit 3
-      retry_wait 10s
     </match>
 kind: ConfigMap
 metadata:
