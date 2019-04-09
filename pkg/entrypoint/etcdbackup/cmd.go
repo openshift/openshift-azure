@@ -6,7 +6,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
-// NewCommand returns the cobra command for "azure-controllers".
+// NewCommand returns the cobra command for "etcdbackup".
 func NewCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:  "etcdbackup",
@@ -20,12 +20,10 @@ func NewCommand() *cobra.Command {
 			return start(cfg)
 		},
 	}
-	cc.Flags().String("blobName", "", "Name of the blob (without the container)")
+	cc.Flags().String("blobname", "", "Name of the blob (without the container)")
 	cc.Flags().String("destination", "", "Where to place the blob on the filesystem")
 	cc.Flags().Int("maxBackups", 6, "Maximum number of backups to keep")
 	cc.Flags().StringP("action", "a", "save", "Action to be executed [save, download]")
-	cobra.MarkFlagRequired(cc.Flags(), "blobName")
-	cobra.MarkFlagRequired(cc.Flags(), "destination")
 
 	return cc
 }
@@ -37,27 +35,21 @@ func configFromCmd(cmd *cobra.Command) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	action, err := cmd.Flags().GetString("action")
+	c.action, err = cmd.Flags().GetString("action")
 	if err != nil {
 		return nil, err
 	}
-	blobName, err := cmd.Flags().GetString("blobName")
+	c.blobName, err = cmd.Flags().GetString("blobName")
 	if err != nil {
 		return nil, err
 	}
-	maxBackups, err := cmd.Flags().GetInt("maxBackups")
+	c.maxBackups, err = cmd.Flags().GetInt("maxBackups")
 	if err != nil {
 		return nil, err
 	}
-	destination, err := cmd.Flags().GetString("destination")
+	c.destination, err = cmd.Flags().GetString("destination")
 	if err != nil {
 		return nil, err
 	}
-
-	c.Action = action
-	c.BlobName = blobName
-	c.Destination = destination
-	c.MaxBackups = maxBackups
-
 	return c, nil
 }

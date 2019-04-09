@@ -41,7 +41,7 @@ done
 set +x
 export SASURI='{{ .Config.MasterStartupSASURI }}'
 set -x
-docker run --privileged --rm --network host -v /:/host:z -e SASURI --entrypoint startup {{ .Config.Images.Startup }}
+docker run --privileged --rm --network host -v /:/host:z -e SASURI {{ .Config.Images.Startup }} startup
 unset SASURI
 
 update-ca-trust
@@ -65,10 +65,10 @@ docker run --rm --network host \
   -v /etc/origin/master:/etc/origin/master \
   -v /etc/origin/cloudprovider/:/_data/_out \
   -v $tempBackDir:/out:z \
-  --entrypoint etcdbackup \
-  {{ .Config.Images.EtcdBackup }} \
-  -blobname={{ .BackupBlobName }} \
-  -destination=/out/backup.db download
+  {{ .Config.Images.EtcdBackup }} etcdbackup \
+  --blobname={{ .BackupBlobName }} \
+  --destination=/out/backup.db \
+  --action download \
 logger -t master-startup.sh "backup downloaded"
 
 # step 2 restore

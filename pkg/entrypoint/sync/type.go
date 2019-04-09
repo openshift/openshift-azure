@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	config.Common
-	DryRun   bool
-	Once     bool
-	Interval time.Duration
+	dryRun   bool
+	once     bool
+	interval time.Duration
 }

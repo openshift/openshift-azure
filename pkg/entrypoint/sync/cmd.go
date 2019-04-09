@@ -8,7 +8,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
-// NewCommand returns the cobra command for "azure-controllers".
+// NewCommand returns the cobra command for "sync".
 func NewCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:  "sync",
@@ -35,22 +35,18 @@ func configFromCmd(cmd *cobra.Command) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	dryRun, err := cmd.Flags().GetBool("dry-run")
+	c.dryRun, err = cmd.Flags().GetBool("dry-run")
 	if err != nil {
 		return nil, err
 	}
-	runOnce, err := cmd.Flags().GetBool("run-once")
+	c.once, err = cmd.Flags().GetBool("run-once")
 	if err != nil {
 		return nil, err
 	}
-	interval, err := cmd.Flags().GetDuration("interval")
+	c.interval, err = cmd.Flags().GetDuration("interval")
 	if err != nil {
 		return nil, err
 	}
-
-	c.DryRun = dryRun
-	c.DryRun = runOnce
-	c.Interval = interval
 
 	return c, nil
 }

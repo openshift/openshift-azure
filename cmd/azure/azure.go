@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
 
 	azurecontrollers "github.com/openshift/openshift-azure/pkg/entrypoint/azure-controllers"
@@ -25,8 +23,8 @@ func run() {
 		Use:  "./azure [component]",
 		Long: "Azure Red Hat OpenShift dispatcher",
 	}
-	rootCmd.PersistentFlags().StringP("logLevel", "l", "Info", "Valid values are [Debug, Info, Warning, Error]")
-	rootCmd.Printf("gitCommit %s", gitCommit)
+	rootCmd.PersistentFlags().StringP("loglevel", "l", "Debug", "Valid values are [Debug, Info, Warning, Error]")
+	rootCmd.Printf("gitCommit %s\n", gitCommit)
 
 	rootCmd.AddCommand(azurecontrollers.NewCommand())
 	rootCmd.AddCommand(canary.NewCommand())
@@ -38,6 +36,5 @@ func run() {
 
 	if err := rootCmd.Execute(); err != nil {
 		panic(err)
-		os.Exit(1)
 	}
 }

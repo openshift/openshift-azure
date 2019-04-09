@@ -6,10 +6,10 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
-// NewCommand returns the cobra command for "azure-controllers".
+// NewCommand returns the cobra command for "startup".
 func NewCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:  "startups",
+		Use:  "startup",
 		Long: "Start startup application",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := configFromCmd(cmd)

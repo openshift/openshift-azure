@@ -9,7 +9,7 @@ type Common struct {
 }
 
 func CommonConfigFromCmd(cmd *cobra.Command) (Common, error) {
-	logLevel, err := cmd.Flags().GetString("logLevel")
+	logLevel, err := cmd.Flags().GetString("loglevel")
 	if err != nil {
 		return Common{}, err
 	}

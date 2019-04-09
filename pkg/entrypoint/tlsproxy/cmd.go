@@ -6,7 +6,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
-// NewCommand returns the cobra command for "azure-controllers".
+// NewCommand returns the cobra command for "tlsproxy".
 func NewCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:  "tlsproxy",
@@ -40,52 +40,41 @@ func configFromCmd(cmd *cobra.Command) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	listen, err := cmd.Flags().GetString("listen")
+	c.listen, err = cmd.Flags().GetString("listen")
 	if err != nil {
 		return nil, err
 	}
-	insecure, err := cmd.Flags().GetBool("insecure")
+	c.insecure, err = cmd.Flags().GetBool("insecure")
 	if err != nil {
 		return nil, err
 	}
-	cacert, err := cmd.Flags().GetString("cacert")
+	c.caCert, err = cmd.Flags().GetString("cacert")
 	if err != nil {
 		return nil, err
 	}
-	cert, err := cmd.Flags().GetString("cert")
+	c.cert, err = cmd.Flags().GetString("cert")
 	if err != nil {
 		return nil, err
 	}
-	key, err := cmd.Flags().GetString("key")
+	c.key, err = cmd.Flags().GetString("key")
 	if err != nil {
 		return nil, err
 	}
-	servingkey, err := cmd.Flags().GetString("servingkey")
+	c.servingKey, err = cmd.Flags().GetString("servingkey")
 	if err != nil {
 		return nil, err
 	}
-	servingcert, err := cmd.Flags().GetString("servingcert")
+	c.servingCert, err = cmd.Flags().GetString("servingcert")
 	if err != nil {
 		return nil, err
 	}
-	whitelist, err := cmd.Flags().GetString("whitelist")
+	c.whitelist, err = cmd.Flags().GetString("whitelist")
 	if err != nil {
 		return nil, err
 	}
-	hostname, err := cmd.Flags().GetString("hostname")
+	c.hostname, err = cmd.Flags().GetString("hostname")
 	if err != nil {
 		return nil, err
 	}
-
-	c.listen = listen
-	c.insecure = insecure
-	c.caCert = cacert
-	c.cert = cert
-	c.key = key
-	c.servingCert = servingcert
-	c.servingKey = servingkey
-	c.whitelist = whitelist
-	c.hostname = hostname
-
 	return c, nil
 }

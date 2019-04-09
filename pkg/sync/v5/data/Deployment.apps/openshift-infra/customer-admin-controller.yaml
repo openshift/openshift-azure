@@ -14,7 +14,8 @@ spec:
         app: customer-admin-controller
     spec:
       containers:
-      - command: ["azure-controllers"]
+      - args:
+        - azure-controllers
         image: '*** GENERATED ***'
         name: customer-admin-controller
         volumeMounts:

@@ -6,7 +6,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
-// NewCommand returns the cobra command for "azure-controllers".
+// NewCommand returns the cobra command for "canary".
 func NewCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:  "canary",

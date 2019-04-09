@@ -6,8 +6,8 @@ import (
 
 type Config struct {
 	config.Common
-	BlobName    string
-	Destination string
-	MaxBackups  int
-	Action      string
+	blobName    string
+	destination string
+	maxBackups  int
+	action      string
 }

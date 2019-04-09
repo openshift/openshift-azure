@@ -85,7 +85,7 @@ func start(cfg *Config) error {
 		return err
 	}
 
-	if cfg.DryRun {
+	if cfg.dryRun {
 		return s.PrintDB()
 	}
 
@@ -99,7 +99,7 @@ func start(cfg *Config) error {
 
 	go http.Serve(l, mux)
 
-	t := time.NewTicker(cfg.Interval)
+	t := time.NewTicker(cfg.interval)
 	for {
 		log.Print("starting sync")
 		if err := s.Sync(ctx); err != nil {
@@ -107,7 +107,7 @@ func start(cfg *Config) error {
 		} else {
 			log.Print("sync done")
 		}
-		if cfg.Once {
+		if cfg.once {
 			return nil
 		}
 		<-t.C

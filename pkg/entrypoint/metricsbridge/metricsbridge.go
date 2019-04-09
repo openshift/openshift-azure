@@ -289,11 +289,11 @@ func start(cfg *Config) error {
 
 	log.Printf("metricsbridge starting")
 
-	if cfg.ConfigDir == "" {
+	if cfg.configDir == "" {
 		return fmt.Errorf("config value cant be empty")
 	}
 
-	if err := run(log, cfg.ConfigDir); err != nil {
+	if err := run(log, cfg.configDir); err != nil {
 		return err
 	}
 	return nil

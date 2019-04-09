@@ -9,7 +9,7 @@ import (
 // NewCommand returns the cobra command for "azure-controllers".
 func NewCommand() *cobra.Command {
 	cc := &cobra.Command{
-		Use:  "azure-controller",
+		Use:  "azure-controllers",
 		Long: "Start Azure Controllers",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := configFromCmd(cmd)

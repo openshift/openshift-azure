@@ -6,7 +6,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
-// NewCommand returns the cobra command for "azure-controllers".
+// NewCommand returns the cobra command for "metricsbridge".
 func NewCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:  "metricsbridge",
@@ -29,6 +29,10 @@ func configFromCmd(cmd *cobra.Command) (*Config, error) {
 	c := &Config{}
 	var err error
 	c.Common, err = config.CommonConfigFromCmd(cmd)
+	if err != nil {
+		return nil, err
+	}
+	c.configDir, err = cmd.Flags().GetString("config")
 	if err != nil {
 		return nil, err
 	}

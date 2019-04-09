@@ -6,5 +6,4 @@ import (
 
 type Config struct {
 	config.Common
-	dryRun bool
 }

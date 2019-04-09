@@ -50,7 +50,7 @@ azure: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
 sync-run: generate
-	go run -ldflags ${LDFLAGS} ./cmd/azure sync --run-once --logLevel Debug
+	go run -ldflags ${LDFLAGS} ./cmd/azure sync --run-once --loglevel Debug
 
 .PHONY: sync-run
 

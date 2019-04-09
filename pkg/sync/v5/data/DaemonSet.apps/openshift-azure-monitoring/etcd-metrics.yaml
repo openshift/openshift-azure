@@ -17,26 +17,25 @@ spec:
     spec:
       containers:
       - args:
-        - -loglevel
-        - debug
-        - -hostname
-        - https://$(HOSTNAME):2379
-        - -listen
-        - :8443
-        - -cacert
-        - /etc/etcd/ca.crt
-        - -cert
-        - /etc/etcd/peer.crt
-        - -key
-        - /etc/etcd/peer.key
-        - -servingkey
-        - /var/serving-cert/tls.key
-        - -servingcert
-        - /var/serving-cert/tls.crt
-        - -whitelist
-        - ^/metrics(/|$)
-        command:
         - tlsproxy
+        - --loglevel
+        - debug
+        - --hostname
+        - https://$(HOSTNAME):2379
+        - --listen
+        - :8443
+        - --cacert
+        - /etc/etcd/ca.crt
+        - --cert
+        - /etc/etcd/peer.crt
+        - --key
+        - /etc/etcd/peer.key
+        - --servingkey
+        - /var/serving-cert/tls.key
+        - --servingcert
+        - /var/serving-cert/tls.crt
+        - --whitelist
+        - ^/metrics(/|$)
         env:
         - name: HOSTNAME
           valueFrom:

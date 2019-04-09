@@ -47,27 +47,27 @@ func start(cfg *Config) error {
 
 	cpc, err := cloudprovider.Load("_data/_out/azure.conf")
 	if err != nil {
-		return fmt.Errorf("could not read azure.conf", err)
+		return fmt.Errorf("could not read azure.conf %v", err)
 	}
 
 	bsc, err := configblob.GetService(ctx, cpc)
 	if err != nil {
-		return fmt.Errorf("could not find storage account", err)
+		return fmt.Errorf("could not find storage account %v", err)
 	}
 	etcdContainer := bsc.GetContainerReference(cluster.EtcdBackupContainerName)
 
 	etcdcli, err := getEtcdClient()
 	if err != nil {
-		return fmt.Errorf("create etcd client failed", err)
+		return fmt.Errorf("create etcd client failed %v", err)
 	}
 	defer etcdcli.Close()
-	b := etcdbackup.NewEtcdBackup(log, etcdContainer, etcdcli, cfg.MaxBackups)
+	b := etcdbackup.NewEtcdBackup(log, etcdContainer, etcdcli, cfg.maxBackups)
 
-	switch cfg.Action {
+	switch cfg.action {
 	case "save":
 		path := fmt.Sprintf("backup-%s", time.Now().UTC().Format("2006-01-02T15-04-05"))
-		if len(cfg.BlobName) > 0 {
-			path = cfg.BlobName
+		if len(cfg.blobName) > 0 {
+			path = cfg.blobName
 		}
 		log.Infof("backing up etcd to %s", path)
 		err = b.SaveSnapshot(ctx, path)
@@ -81,11 +81,11 @@ func start(cfg *Config) error {
 			err = b.Prune()
 		}
 	case "download":
-		if len(cfg.Destination) == 0 || len(cfg.BlobName) == 0 {
+		if len(cfg.destination) == 0 || len(cfg.blobName) == 0 {
 			return fmt.Errorf("destination and blobName can't be empty")
 		}
-		log.Infof("copying backup from %s to %s", cfg.BlobName, cfg.Destination)
-		err = b.Retrieve(cfg.BlobName, cfg.Destination)
+		log.Infof("copying backup from %s to %s", cfg.blobName, cfg.destination)
+		err = b.Retrieve(cfg.blobName, cfg.destination)
 	default:
 		flag.Usage()
 	}
