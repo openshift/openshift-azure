@@ -296,7 +296,7 @@ func TemplateInstanceIsReady(ti *templatev1.TemplateInstance) (bool, error) {
 			return true, nil
 		} else if cond.Type == templatev1.TemplateInstanceInstantiateFailure &&
 			cond.Status == corev1.ConditionTrue {
-			return false, fmt.Errorf("templateinstance %s/%s failed", ti.Namespace, ti.Name)
+			return false, fmt.Errorf("templateinstance %s/%s failed: %s (%s)", ti.Namespace, ti.Name, cond.Reason, cond.Message)
 		}
 	}
 
