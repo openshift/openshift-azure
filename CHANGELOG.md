@@ -112,3 +112,8 @@ make TestConfig optional in NewPlugin
 make vm image configuration and individual container image configuration writeable via the admin API
 
 
+## validate canary image empty on v3.2 ([#1477](https://github.com/openshift/openshift-azure/pull/1477), [@jim-minter](https://github.com/jim-minter), 09/04/2019)
+
+validate canary image empty on v3.2
+
+

@@ -1,6 +1,7 @@
 package fakerp
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -61,6 +62,10 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	}
 	overridePluginTemplate(s.pluginTemplate)
 	s.plugin, errs = plugin.NewPlugin(s.log, s.pluginTemplate, s.testConfig)
+	if len(errs) > 0 {
+		s.log.Fatal(errs)
+	}
+	errs = s.plugin.ValidatePluginTemplate(context.Background())
 	if len(errs) > 0 {
 		s.log.Fatal(errs)
 	}
