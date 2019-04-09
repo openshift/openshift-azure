@@ -32,6 +32,13 @@ data:
         tag journald
       </rule>
     </match>
+    <filter journald>
+      @type record_transformer
+      enable_ruby true
+      <record>
+        MESSAGE ${record["MESSAGE"].nil? ? nil : record["MESSAGE"].force_encoding("UTF-8").encode("ASCII", invalid: :replace, undef: :replace)}
+      </record>
+    </filter>
     <match **>
       @type mdsd
       acktimeoutms 0
