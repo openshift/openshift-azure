@@ -22,12 +22,15 @@
 1. **Azure CLI access**.  Log into Azure using the CLI using `az login` and your
    credentials.
 
-1. **OpenShift CI cluster access**.  Log in to the CI cluster using `oc login`
-   and a token from the CI cluster web interface.
+1. **OpenShift CI cluster access**.  Log in to the [CI
+   cluster](https://api.ci.openshift.org/console/catalog) using `oc login` and a
+   token from the CI cluster web interface. You can copy the required command by
+   clicking on your username and the "Copy Login Command" option in the web
+   portal.
 
 1. **Codebase**.  Check out the codebase:
 
-   `go get github.com/openshift/openshift-azure/...`.
+   `go get github.com/openshift/openshift-azure/...`
 
 1. **Secrets**.  Retrieve cluster creation secrets from the CI cluster:
    ```
@@ -49,7 +52,9 @@
 
 1. Source the `env` file: `. ./env`.
 
-1. Run `./hack/create.sh $RESOURCEGROUP` to deploy a cluster.
+1. Determine an appropriate resource group name for your cluster (e.g. for a test
+   cluster, you could call it `$USER-test`). Then `export RESOURCEGROUP` and run
+   `./hack/create.sh $RESOURCEGROUP` to deploy a cluster.
 
 1. Access the web console via the link printed by create.sh, logging in with
    your Azure credentials.
