@@ -17,8 +17,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
-func (g *simpleGenerator) Generate(template *pluginapi.Config) (err error) {
-	config, err := pluginapi.ToInternal(template, &g.cs.Config, g.cs.Config.PluginVersion)
+func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields bool) (err error) {
+	config, err := pluginapi.ToInternal(template, &g.cs.Config, setVersionFields)
 	if err != nil {
 		return err
 	}
@@ -435,37 +435,28 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config) (err error) {
 	return
 }
 
-// InvalidateSecrets removes all non-ca certificates, private keys and secrets from an
-// OpenShiftManagedCluster's Config
+// InvalidateSecrets removes some secrets from an OpenShiftManagedCluster.Config
 func (g *simpleGenerator) InvalidateSecrets() (err error) {
-	g.cs.Config.Certificates.Admin = api.CertKeyPair{}
-	g.cs.Config.Certificates.AggregatorFrontProxy = api.CertKeyPair{}
-	g.cs.Config.Certificates.BlackBoxMonitor = api.CertKeyPair{}
-	g.cs.Config.Certificates.EtcdClient = api.CertKeyPair{}
-	g.cs.Config.Certificates.EtcdPeer = api.CertKeyPair{}
-	g.cs.Config.Certificates.EtcdServer = api.CertKeyPair{}
+	g.cs.Config.SSHKey = nil
+
 	g.cs.Config.Certificates.GenevaLogging = api.CertKeyPair{}
 	g.cs.Config.Certificates.GenevaMetrics = api.CertKeyPair{}
-	g.cs.Config.Certificates.MasterKubeletClient = api.CertKeyPair{}
-	g.cs.Config.Certificates.MasterProxyClient = api.CertKeyPair{}
-	g.cs.Config.Certificates.MasterServer = api.CertKeyPair{}
-	g.cs.Config.Certificates.NodeBootstrap = api.CertKeyPair{}
-	g.cs.Config.Certificates.SDN = api.CertKeyPair{}
-	g.cs.Config.Certificates.OpenShiftMaster = api.CertKeyPair{}
-	g.cs.Config.Certificates.Registry = api.CertKeyPair{}
-	g.cs.Config.Certificates.RegistryConsole = api.CertKeyPair{}
-	g.cs.Config.Certificates.ServiceCatalogServer = api.CertKeyPair{}
 
-	g.cs.Config.SSHKey = nil
-	g.cs.Config.RegistryHTTPSecret = nil
-	g.cs.Config.RegistryConsoleOAuthSecret = ""
-	g.cs.Config.ConsoleOAuthSecret = ""
-	g.cs.Config.AlertManagerProxySessionSecret = nil
-	g.cs.Config.AlertsProxySessionSecret = nil
-	g.cs.Config.PrometheusProxySessionSecret = nil
+	g.cs.Config.Images.GenevaImagePullSecret = nil
+	g.cs.Config.Images.ImagePullSecret = nil
+
 	g.cs.Config.SessionSecretAuth = nil
 	g.cs.Config.SessionSecretEnc = nil
-	g.cs.Config.Images.GenevaImagePullSecret = nil
+
+	g.cs.Config.RegistryHTTPSecret = nil
+	g.cs.Config.PrometheusProxySessionSecret = nil
+	g.cs.Config.AlertManagerProxySessionSecret = nil
+	g.cs.Config.AlertsProxySessionSecret = nil
+	g.cs.Config.RegistryConsoleOAuthSecret = ""
+	g.cs.Config.ConsoleOAuthSecret = ""
+	g.cs.Config.RouterStatsPassword = ""
+	g.cs.Config.EtcdMetricsPassword = ""
+	g.cs.Config.EtcdMetricsUsername = ""
 
 	return
 }

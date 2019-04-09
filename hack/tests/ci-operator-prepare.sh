@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
 set_build_images() {
-    if [[ ! -e /usr/local/e2e-secrets/azure/secret ]]; then
+    if [[ ! -e /usr/local/e2e-secrets/azure ]]; then
         return
     fi
 
@@ -12,14 +12,6 @@ set_build_images() {
     export STARTUP_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:startup
     export TLSPROXY_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:tlsproxy
     export CANARY_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:canary
-}
-
-setup_secrets() {
-    ln -sf $SECRET_DIR secrets
-
-    set +x
-    . ./secrets/secret
-    set -x
 }
 
 start_monitoring() {
@@ -43,10 +35,7 @@ stop_monitoring() {
     fi
 }
 
-export SECRET_DIR=/usr/local/e2e-secrets/azure
-if [[ ! -e /usr/local/e2e-secrets/azure/secret ]]; then
-    # for local development
-    export SECRET_DIR=$PWD/secrets
+if [[ ! -e /usr/local/e2e-secrets/azure ]]; then
     return
 fi
 
@@ -58,8 +47,16 @@ export RESOURCEGROUP_TTL=4h
 prdetail="$(python -c 'import json, os; o=json.loads(os.environ["CLONEREFS_OPTIONS"]); print "%s-%s-" % (o["refs"][0]["pulls"][0]["author"].lower(), o["refs"][0]["pulls"][0]["number"])' 2>/dev/null || true)"
 export RESOURCEGROUP="$(basename "$0" .sh)-$prdetail$(cat /dev/urandom | tr -dc 'a-z' | fold -w 6 | head -n 1)"
 
-setup_secrets
+ln -sf /usr/local/e2e-secrets/azure secrets
 
 set +x
+. ./secrets/secret
+export AZURE_CLIENT_ID="$AZURE_CI_CLIENT_ID"
+export AZURE_CLIENT_SECRET="$AZURE_CI_CLIENT_SECRET"
+export AZURE_LEGACY_MASTER_CLIENT_ID="$AZURE_CI_LEGACY_MASTER_CLIENT_ID"
+export AZURE_LEGACY_MASTER_CLIENT_SECRET="$AZURE_CI_LEGACY_MASTER_CLIENT_SECRET"
+export AZURE_LEGACY_WORKER_CLIENT_ID="$AZURE_CI_LEGACY_WORKER_CLIENT_ID"
+export AZURE_LEGACY_WORKER_CLIENT_SECRET="$AZURE_CI_LEGACY_WORKER_CLIENT_SECRET"
+
 az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} >/dev/null
 set -x

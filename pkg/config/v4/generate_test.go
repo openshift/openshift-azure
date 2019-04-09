@@ -1,14 +1,17 @@
 package config
 
 import (
+	"bytes"
 	"reflect"
 	"testing"
 
+	"github.com/go-test/deep"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/test/util/populate"
+	"github.com/openshift/openshift-azure/test/util/tls"
 )
 
 func TestGenerate(t *testing.T) {
@@ -29,7 +32,7 @@ func TestGenerate(t *testing.T) {
 	populate.Walk(&template, prepare)
 
 	cg := simpleGenerator{cs: cs}
-	err := cg.Generate(template)
+	err := cg.Generate(template, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -135,132 +138,76 @@ func testRequiredFields(cs *api.OpenShiftManagedCluster, t *testing.T) {
 }
 
 func TestInvalidateSecrets(t *testing.T) {
-	prepare := func(v reflect.Value) {
-		switch v.Interface().(type) {
-		case []api.IdentityProvider:
-			// set the Provider to AADIdentityProvider
-			v.Set(reflect.ValueOf([]api.IdentityProvider{{Provider: &api.AADIdentityProvider{Kind: "AADIdentityProvider"}}}))
+	assert := func(c bool, name string) {
+		if !c {
+			t.Errorf("%s same", name)
 		}
 	}
+
 	cs := &api.OpenShiftManagedCluster{}
-	template := &pluginapi.Config{}
-	populate.Walk(cs, prepare)
-	populate.Walk(template, prepare)
-	cs.Config.PluginVersion = "Versions.key"
+	pluginConfig := &pluginapi.Config{}
 
 	g := simpleGenerator{cs: cs}
-	saved := cs.DeepCopy()
-	if err := g.InvalidateSecrets(); err != nil {
-		t.Errorf("configGenerator.InvalidateSecrets error = %v", err)
+	err := g.Generate(pluginConfig, false)
+	if err != nil {
+		t.Error(err)
 	}
-	g.Generate(template)
+
+	saved := cs.DeepCopy()
+
+	err = g.InvalidateSecrets()
+	if err != nil {
+		t.Error(err)
+	}
+
+	pluginConfig.GenevaImagePullSecret = []byte("genevaImagePullSecret")
+	pluginConfig.ImagePullSecret = []byte("imagePullSecret")
+	pluginConfig.Certificates.GenevaLogging.Cert = tls.DummyCertificate
+	pluginConfig.Certificates.GenevaMetrics.Cert = tls.DummyCertificate
+
+	err = g.Generate(pluginConfig, false)
+	if err != nil {
+		t.Error(err)
+	}
 
 	// compare fields that are expected to be different
-	if reflect.DeepEqual(saved.Config.Certificates.Admin, cs.Config.Certificates.Admin) {
-		t.Errorf("expected change to Admin certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.AggregatorFrontProxy, cs.Config.Certificates.AggregatorFrontProxy) {
-		t.Errorf("expected change to AggregatorFrontProxy certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.BlackBoxMonitor, cs.Config.Certificates.BlackBoxMonitor) {
-		t.Errorf("expected change to BlackBoxMonitor certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.EtcdClient, cs.Config.Certificates.EtcdClient) {
-		t.Errorf("expected change to EtcdClient certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.EtcdPeer, cs.Config.Certificates.EtcdPeer) {
-		t.Errorf("expected change to EtcdPeer certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.EtcdServer, cs.Config.Certificates.EtcdServer) {
-		t.Errorf("expected change to EtcdServer certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.MasterKubeletClient, cs.Config.Certificates.MasterKubeletClient) {
-		t.Errorf("expected change to MasterKubeletClient certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.MasterProxyClient, cs.Config.Certificates.MasterProxyClient) {
-		t.Errorf("expected change to MasterProxyClient certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.MasterServer, cs.Config.Certificates.MasterServer) {
-		t.Errorf("expected change to MasterProxyClient certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.NodeBootstrap, cs.Config.Certificates.NodeBootstrap) {
-		t.Errorf("expected change to NodeBootstrap certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.SDN, cs.Config.Certificates.SDN) {
-		t.Errorf("expected change to SDN certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.OpenShiftMaster, cs.Config.Certificates.OpenShiftMaster) {
-		t.Errorf("expected change to OpenShiftMaster certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.Registry, cs.Config.Certificates.Registry) {
-		t.Errorf("expected change to Registry certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.RegistryConsole, cs.Config.Certificates.RegistryConsole) {
-		t.Errorf("expected change to RegistryConsole certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Certificates.ServiceCatalogServer, cs.Config.Certificates.ServiceCatalogServer) {
-		t.Errorf("expected change to ServiceCatalogServer certificates after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.SSHKey, cs.Config.SSHKey) {
-		t.Errorf("expected change to SSHKey after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.RegistryHTTPSecret, cs.Config.RegistryHTTPSecret) {
-		t.Errorf("expected change to RegistryHTTPSecret after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.RegistryConsoleOAuthSecret, cs.Config.RegistryConsoleOAuthSecret) {
-		t.Errorf("expected change to RegistryConsoleOAuthSecret after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.ConsoleOAuthSecret, cs.Config.ConsoleOAuthSecret) {
-		t.Errorf("expected change to ConsoleOAuthSecret after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.AlertManagerProxySessionSecret, cs.Config.AlertManagerProxySessionSecret) {
-		t.Errorf("expected change to AlertManagerProxySessionSecret after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.AlertsProxySessionSecret, cs.Config.AlertsProxySessionSecret) {
-		t.Errorf("expected change to AlertsProxySessionSecret after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.PrometheusProxySessionSecret, cs.Config.PrometheusProxySessionSecret) {
-		t.Errorf("expected change to PrometheusProxySessionSecret after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.SessionSecretAuth, cs.Config.SessionSecretAuth) {
-		t.Errorf("expected change to SessionSecretAuth after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.SessionSecretEnc, cs.Config.SessionSecretEnc) {
-		t.Errorf("expected change to SessionSecretEnc after secret invalidation")
-	}
-	if reflect.DeepEqual(saved.Config.Images.GenevaImagePullSecret, cs.Config.Images.GenevaImagePullSecret) {
-		t.Errorf("expected change to GenevaImagePullSecret after secret invalidation")
-	}
-
-	// compare fields that are expected to be the same
-	if !reflect.DeepEqual(saved.Config.Certificates.GenevaMetrics, cs.Config.Certificates.GenevaMetrics) {
-		t.Errorf("unexpected change to GenevaMetrics certificates after secret invalidation")
-	}
-	if !reflect.DeepEqual(saved.Config.Certificates.GenevaLogging, cs.Config.Certificates.GenevaLogging) {
-		t.Errorf("unexpected change to GenevaLogging after secret invalidation")
-	}
+	assert(!reflect.DeepEqual(cs.Config.SSHKey, saved.Config.SSHKey), "sshKey")
+	assert(!reflect.DeepEqual(cs.Config.Certificates.GenevaLogging, saved.Config.Certificates.GenevaLogging), "certificates.genevaLogging")
+	assert(!reflect.DeepEqual(cs.Config.Certificates.GenevaMetrics, saved.Config.Certificates.GenevaMetrics), "certificates.genevaMetrics")
+	assert(!bytes.Equal(cs.Config.Images.GenevaImagePullSecret, saved.Config.Images.GenevaImagePullSecret), "images.genevaImagePullSecret")
+	assert(!bytes.Equal(cs.Config.Images.ImagePullSecret, saved.Config.Images.ImagePullSecret), "images.imagePullSecret")
+	assert(!bytes.Equal(cs.Config.SessionSecretAuth, saved.Config.SessionSecretAuth), "sessionSecretAuth")
+	assert(!bytes.Equal(cs.Config.SessionSecretEnc, saved.Config.SessionSecretEnc), "sessionSecreteEnc")
+	assert(!bytes.Equal(cs.Config.RegistryHTTPSecret, saved.Config.RegistryHTTPSecret), "registryHTTPSecret")
+	assert(!bytes.Equal(cs.Config.PrometheusProxySessionSecret, saved.Config.PrometheusProxySessionSecret), "prometheusProxySessionSecret")
+	assert(!bytes.Equal(cs.Config.AlertManagerProxySessionSecret, saved.Config.AlertManagerProxySessionSecret), "alertManagerProxySessionSecret")
+	assert(!bytes.Equal(cs.Config.AlertsProxySessionSecret, saved.Config.AlertsProxySessionSecret), "alertsProxySessionSecret")
+	assert(cs.Config.RegistryConsoleOAuthSecret != saved.Config.RegistryConsoleOAuthSecret, "registryConsoleOAuthSecret")
+	assert(cs.Config.ConsoleOAuthSecret != saved.Config.ConsoleOAuthSecret, "consoleOAuthSecret")
+	assert(cs.Config.RouterStatsPassword != saved.Config.RouterStatsPassword, "routerStatsPassword")
+	assert(cs.Config.EtcdMetricsPassword != saved.Config.EtcdMetricsPassword, "etcdMetricsPassword")
+	assert(cs.Config.EtcdMetricsUsername != saved.Config.EtcdMetricsUsername, "etcdMetricsUsername")
 
 	// assign saved values back to those changed in cs
-	cs.Config.Certificates.Admin = saved.Config.Certificates.Admin
-	cs.Config.Certificates.AggregatorFrontProxy = saved.Config.Certificates.AggregatorFrontProxy
-	cs.Config.Certificates.BlackBoxMonitor = saved.Config.Certificates.BlackBoxMonitor
-	cs.Config.Certificates.EtcdClient = saved.Config.Certificates.EtcdClient
-	cs.Config.Certificates.EtcdPeer = saved.Config.Certificates.EtcdPeer
-	cs.Config.Certificates.EtcdServer = saved.Config.Certificates.EtcdServer
-	cs.Config.Certificates.MasterKubeletClient = saved.Config.Certificates.MasterKubeletClient
-	cs.Config.Certificates.MasterProxyClient = saved.Config.Certificates.MasterProxyClient
-	cs.Config.Certificates.MasterServer = saved.Config.Certificates.MasterServer
-	cs.Config.Certificates.NodeBootstrap = saved.Config.Certificates.NodeBootstrap
-	cs.Config.Certificates.SDN = saved.Config.Certificates.SDN
-	cs.Config.Certificates.OpenShiftMaster = saved.Config.Certificates.OpenShiftMaster
-	cs.Config.Certificates.Registry = saved.Config.Certificates.Registry
-	cs.Config.Certificates.RegistryConsole = saved.Config.Certificates.RegistryConsole
-	cs.Config.Certificates.ServiceCatalogServer = saved.Config.Certificates.ServiceCatalogServer
+	cs.Config.SSHKey = saved.Config.SSHKey
 	cs.Config.Certificates.GenevaLogging = saved.Config.Certificates.GenevaLogging
 	cs.Config.Certificates.GenevaMetrics = saved.Config.Certificates.GenevaMetrics
+	cs.Config.Images.GenevaImagePullSecret = saved.Config.Images.GenevaImagePullSecret
+	cs.Config.Images.ImagePullSecret = saved.Config.Images.ImagePullSecret
+	cs.Config.SessionSecretAuth = saved.Config.SessionSecretAuth
+	cs.Config.SessionSecretEnc = saved.Config.SessionSecretEnc
+	cs.Config.RegistryHTTPSecret = saved.Config.RegistryHTTPSecret
+	cs.Config.PrometheusProxySessionSecret = saved.Config.PrometheusProxySessionSecret
+	cs.Config.AlertManagerProxySessionSecret = saved.Config.AlertManagerProxySessionSecret
+	cs.Config.AlertsProxySessionSecret = saved.Config.AlertsProxySessionSecret
+	cs.Config.RegistryConsoleOAuthSecret = saved.Config.RegistryConsoleOAuthSecret
+	cs.Config.ConsoleOAuthSecret = saved.Config.ConsoleOAuthSecret
+	cs.Config.RouterStatsPassword = saved.Config.RouterStatsPassword
+	cs.Config.EtcdMetricsPassword = saved.Config.EtcdMetricsPassword
+	cs.Config.EtcdMetricsUsername = saved.Config.EtcdMetricsUsername
 
 	// compare certs from saved and cs
-	if !reflect.DeepEqual(saved.Config.Certificates, cs.Config.Certificates) {
-		t.Errorf("expected saved and cs config blobs to be equal")
+	if !reflect.DeepEqual(cs, saved) {
+		t.Errorf("expected saved and cs config blobs to be equal: %s", deep.Equal(cs, saved))
 	}
 }

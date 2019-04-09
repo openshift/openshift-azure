@@ -5,6 +5,7 @@ package e2e
 import (
 	"flag"
 	"fmt"
+	"os"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -15,6 +16,7 @@ import (
 	_ "github.com/openshift/openshift-azure/test/e2e/specs"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/fakerp"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/realrp"
+	"github.com/openshift/openshift-azure/test/reporters"
 )
 
 var (
@@ -30,5 +32,10 @@ func TestE2E(t *testing.T) {
 	logrus.SetReportCaller(true)
 
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "e2e tests")
+
+	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
+		RunSpecsWithDefaultAndCustomReporters(t, "e2e tests", []Reporter{reporters.NewAzureAppInsightsReporter()})
+	} else {
+		RunSpecs(t, "e2e tests")
+	}
 }

@@ -37,6 +37,19 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	gc := resources.NewGroupsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
 	gc.Authorizer = authorizer
 
+	am, err := newAADManager(req.Context(), cs)
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to delete service principals: %v", err))
+		return
+	}
+
+	s.log.Info("deleting service principals")
+	err = am.deleteApps(req.Context())
+	if err != nil {
+		s.internalError(w, fmt.Sprintf("Failed to delete service principals: %v", err))
+		return
+	}
+
 	// delete dns records
 	// TODO: get resource group from request path
 	dm, err := newDNSManager(req.Context(), os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))

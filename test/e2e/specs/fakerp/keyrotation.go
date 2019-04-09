@@ -3,7 +3,6 @@ package fakerp
 import (
 	"context"
 	"os"
-	"reflect"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -40,33 +39,11 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 		Expect(after).NotTo(BeNil())
 
 		By("Verifying that ca certificates have not been updated")
-		Expect(reflect.DeepEqual(before.Config.Certificates.ServiceSigningCa.Cert, after.Config.Certificates.ServiceSigningCa.Cert)).To(BeTrue())
-		Expect(reflect.DeepEqual(before.Config.Certificates.ServiceCatalogCa.Cert, after.Config.Certificates.ServiceCatalogCa.Cert)).To(BeTrue())
-		Expect(reflect.DeepEqual(before.Config.Certificates.FrontProxyCa.Cert, after.Config.Certificates.FrontProxyCa.Cert)).To(BeTrue())
-		Expect(reflect.DeepEqual(before.Config.Certificates.EtcdCa.Cert, after.Config.Certificates.EtcdCa.Cert)).To(BeTrue())
-		Expect(reflect.DeepEqual(before.Config.Certificates.Ca.Cert, after.Config.Certificates.Ca.Cert)).To(BeTrue())
-
-		By("Verifying that certain non-ca public certificates have been updated")
-		Expect(reflect.DeepEqual(before.Config.Certificates.Admin.Cert, after.Config.Certificates.Admin.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.AggregatorFrontProxy.Cert, after.Config.Certificates.AggregatorFrontProxy.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.BlackBoxMonitor.Cert, after.Config.Certificates.BlackBoxMonitor.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.EtcdClient.Cert, after.Config.Certificates.EtcdClient.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.EtcdPeer.Cert, after.Config.Certificates.EtcdPeer.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.EtcdServer.Cert, after.Config.Certificates.EtcdServer.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.MasterKubeletClient.Cert, after.Config.Certificates.MasterKubeletClient.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.MasterProxyClient.Cert, after.Config.Certificates.MasterProxyClient.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.MasterServer.Cert, after.Config.Certificates.MasterServer.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.NodeBootstrap.Cert, after.Config.Certificates.NodeBootstrap.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.SDN.Cert, after.Config.Certificates.SDN.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.OpenShiftMaster.Cert, after.Config.Certificates.OpenShiftMaster.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.Registry.Cert, after.Config.Certificates.Registry.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.RegistryConsole.Cert, after.Config.Certificates.RegistryConsole.Cert)).To(BeFalse())
-		Expect(reflect.DeepEqual(before.Config.Certificates.ServiceCatalogServer.Cert, after.Config.Certificates.ServiceCatalogServer.Cert)).To(BeFalse())
-
-		// TODO: work towards moving the certs below to the updated section above
-		By("Verifying that certain non-ca public certificates have not been updated")
-		Expect(reflect.DeepEqual(before.Config.Certificates.GenevaLogging.Cert, after.Config.Certificates.GenevaLogging.Cert)).To(BeTrue())
-		Expect(reflect.DeepEqual(before.Config.Certificates.GenevaMetrics.Cert, after.Config.Certificates.GenevaMetrics.Cert)).To(BeTrue())
+		Expect(before.Config.Certificates.ServiceSigningCa.Cert).To(Equal(after.Config.Certificates.ServiceSigningCa.Cert))
+		Expect(before.Config.Certificates.ServiceCatalogCa.Cert).To(Equal(after.Config.Certificates.ServiceCatalogCa.Cert))
+		Expect(before.Config.Certificates.FrontProxyCa.Cert).To(Equal(after.Config.Certificates.FrontProxyCa.Cert))
+		Expect(before.Config.Certificates.EtcdCa.Cert).To(Equal(after.Config.Certificates.EtcdCa.Cert))
+		Expect(before.Config.Certificates.Ca.Cert).To(Equal(after.Config.Certificates.Ca.Cert))
 
 		By("Validating the cluster")
 		errs := sanity.Checker.ValidateCluster(context.Background())

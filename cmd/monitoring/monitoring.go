@@ -17,6 +17,7 @@ import (
 	"github.com/Microsoft/ApplicationInsights-Go/appinsights"
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
@@ -65,6 +66,8 @@ func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
 	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
 		m.log.Info("application insights configured")
 		m.icli = appinsights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
+		m.icli.Context().CommonProperties["type"] = "monitoring"
+		m.icli.Context().CommonProperties["resourcegroup"] = os.Getenv("RESOURCEGROUP")
 	}
 
 	return nil
@@ -72,32 +75,54 @@ func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
 
 func (m *monitor) listResourceGroupMonitoringHostnames(ctx context.Context, subscriptionID, resourceGroup string) (hostnames []string, err error) {
 	// get dedicated routes we want to monitor
-	for {
-		m.log.Debug("waiting for OpenShiftManagedCluster config to be persisted")
+	m.log.Debug("waiting for OpenShiftManagedCluster config to be persisted")
+	// TODO: once we can read provisioningState from disk file, remove network
+	// polls
+	err = wait.PollImmediateInfinite(time.Second, func() (bool, error) {
 		oc, err := loadOCConfig()
 		if err != nil {
-			time.Sleep(5 * time.Second)
-		} else {
-			hostnames = append(hostnames, fmt.Sprintf("canary-openshift-azure-monitoring.%s", oc.Properties.RouterProfiles[0].PublicSubdomain))
-			break
+			return false, nil
 		}
+
+		hostnames = append(hostnames, fmt.Sprintf("canary-openshift-azure-monitoring.%s", oc.Properties.RouterProfiles[0].PublicSubdomain))
+		return true, nil
+	})
+	if err != nil {
+		return nil, err
 	}
+
 	// get all external IP's used by VMSS
-	hostnames = []string{}
-	for iter, err := m.pipcli.ListVirtualMachineScaleSetPublicIPAddressesComplete(ctx, resourceGroup, "ss-master"); iter.NotDone(); err = iter.Next() {
-		if err != nil {
-			return nil, err
-		} else if iter.Value().IPAddress != nil {
-			hostnames = append(hostnames, *iter.Value().IPAddress)
+	m.log.Debug("waiting for ss-masters ip addresses")
+	err = wait.PollImmediateInfinite(10*time.Second, func() (bool, error) {
+		var ips []string
+		for iter, err := m.pipcli.ListVirtualMachineScaleSetPublicIPAddressesComplete(ctx, resourceGroup, "ss-master"); iter.NotDone(); err = iter.Next() {
+			if err != nil {
+				m.log.Error(err)
+				return false, nil
+			}
+
+			if iter.Value().IPAddress != nil {
+				ips = append(ips, *iter.Value().IPAddress)
+			}
 		}
+		if len(ips) == 3 {
+			hostnames = append(hostnames, ips...)
+			return true, nil
+		}
+		return false, nil
+	})
+	if err != nil {
+		return nil, err
 	}
+
 	// get api server hostname
+	m.log.Debug("waiting for ip-apiserver server hostname")
 	ip, err := m.pipcli.Get(ctx, resourceGroup, "ip-apiserver", "")
 	if err != nil {
 		return nil, err
-	} else if err == nil && ip.Location != nil {
-		hostnames = append(hostnames, fmt.Sprintf("%s.%s.cloudapp.azure.com", *ip.DNSSettings.DomainNameLabel, *ip.Location))
 	}
+	hostnames = append(hostnames, fmt.Sprintf("%s.%s.cloudapp.azure.com", *ip.DNSSettings.DomainNameLabel, *ip.Location))
+
 	return hostnames, nil
 }
 
@@ -176,7 +201,7 @@ func (m *monitor) run(ctx context.Context) error {
 				},
 				Timeout: 5 * time.Second,
 			},
-			Icli:             m.icli,
+			ICli:             m.icli,
 			Req:              req,
 			Interval:         *interval,
 			LogInitialErrors: *logerrors,
@@ -199,6 +224,7 @@ func (m *monitor) run(ctx context.Context) error {
 	ch := make(chan os.Signal)
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 	<-ch
+	// persist blackbox monitors
 	return m.persist(m.instances)
 
 }

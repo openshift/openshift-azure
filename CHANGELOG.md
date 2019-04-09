@@ -89,3 +89,26 @@ restrict #pods/node to 50 as a starting point for GA
 make TestConfig optional in NewPlugin
 
 
+# v4.1
+
+## latch all configurables that come from the plugin config ([#1407](https://github.com/openshift/openshift-azure/pull/1407), [@jim-minter](https://github.com/jim-minter), 04/04/2019)
+
+* latch all configurables that come from the plugin config, such that a plugin config change won't cause unexpected cluster rotations
+* secret rotation geneva action stub re-reads geneva certs from plugin config, among resetting a few other secrets
+
+
+## Export 'Log' from the SanityChecker struct. ([#1422](https://github.com/openshift/openshift-azure/pull/1422), [@y-cote](https://github.com/y-cote), 04/04/2019)
+
+- E2E: standard exports the Log field from the SanityChecker for better reusability
+
+
+## add geneva action to list backup blobs ([#1432](https://github.com/openshift/openshift-azure/pull/1432), [@jim-minter](https://github.com/jim-minter), 05/04/2019)
+
+* add geneva action to list backup blobs
+
+
+## allow admin API to change image versions ([#1456](https://github.com/openshift/openshift-azure/pull/1456), [@jim-minter](https://github.com/jim-minter), 08/04/2019)
+
+make vm image configuration and individual container image configuration writeable via the admin API
+
+

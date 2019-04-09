@@ -9,6 +9,8 @@ import (
 
 // RBACApplicationsClient is a minimal interface for azure ApplicationsClient
 type RBACApplicationsClient interface {
+	Create(ctx context.Context, parameters graphrbac.ApplicationCreateParameters) (result graphrbac.Application, err error)
+	Delete(ctx context.Context, applicationObjectID string) (result autorest.Response, err error)
 	List(ctx context.Context, filter string) (result graphrbac.ApplicationListResultPage, err error)
 	Patch(ctx context.Context, applicationObjectID string, parameters graphrbac.ApplicationUpdateParameters) (result autorest.Response, err error)
 }
@@ -51,6 +53,7 @@ func NewRBACGroupsClient(ctx context.Context, tenantID string, authorizer autore
 }
 
 type ServicePrincipalsClient interface {
+	Create(ctx context.Context, parameters graphrbac.ServicePrincipalCreateParameters) (result graphrbac.ServicePrincipal, err error)
 	List(ctx context.Context, filter string) (graphrbac.ServicePrincipalListResultPage, error)
 }
 

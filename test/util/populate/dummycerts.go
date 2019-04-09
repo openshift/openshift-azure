@@ -14,15 +14,15 @@ func DummyCertsAndKeys(v interface{}) {
 	walk = func(v reflect.Value) {
 		switch v.Interface().(type) {
 		case *rsa.PrivateKey:
-			v.Set(reflect.ValueOf(tls.GetDummyPrivateKey()))
+			v.Set(reflect.ValueOf(tls.DummyPrivateKey))
 			return
 
 		case *x509.Certificate:
-			v.Set(reflect.ValueOf(tls.GetDummyCertificate()))
+			v.Set(reflect.ValueOf(tls.DummyCertificate))
 			return
 
 		case []*x509.Certificate:
-			v.Set(reflect.ValueOf([]*x509.Certificate{tls.GetDummyCertificate(), tls.GetDummyCertificate()}))
+			v.Set(reflect.ValueOf([]*x509.Certificate{tls.DummyCertificate, tls.DummyCertificate}))
 			return
 		}
 

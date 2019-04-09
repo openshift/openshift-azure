@@ -377,7 +377,7 @@ func (s *sync) Sync(ctx context.Context) error {
 		return err
 	}
 
-	_, err = utilwait.ForHTTPStatusOk(ctx, s.log, transport, s.restconfig.Host+"/healthz")
+	_, err = utilwait.ForHTTPStatusOk(ctx, s.log, &http.Client{Transport: transport, Timeout: 10 * time.Second}, s.restconfig.Host+"/healthz", time.Second)
 	if err != nil {
 		return err
 	}

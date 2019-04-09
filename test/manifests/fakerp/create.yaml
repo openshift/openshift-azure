@@ -1,34 +1,34 @@
-name: {{ Getenv "RESOURCEGROUP" | quote }}
-location: {{ Getenv "AZURE_REGION" | quote }}
+name: {{ .ResourceGroup | quote }}
+location: {{ .Region | quote }}
 properties:
-  openShiftVersion: {{ Getenv "DEPLOY_VERSION" | quote }}
+  openShiftVersion: {{ .DeployVersion | quote }}
   authProfile:
     identityProviders:
     - name: Azure AD
       provider:
         kind: AADIdentityProvider
-        clientId: {{ Getenv "AZURE_AAD_CLIENT_ID" | quote }}
-        secret: {{ Getenv "AZURE_AAD_CLIENT_SECRET" | quote }}
-        tenantId: {{ Getenv "AZURE_TENANT_ID" | quote }}
-{{- if ne (Getenv "AZURE_AAD_GROUP_ADMINS_ID") "" }}
-        customerAdminGroupId: {{ Getenv "AZURE_AAD_GROUP_ADMINS_ID" | quote }}
+        clientId: {{ .AADClientID | quote }}
+        secret: {{ .AADClientSecret | quote }}
+        tenantId: {{ .TenantID | quote }}
+{{- if ne .AADGroupAdminsID "" }}
+        customerAdminGroupId: {{ .AADGroupAdminsID | quote }}
 {{- end }}
   networkProfile:
     vnetCidr: 10.0.0.0/8
   masterPoolProfile:
     count: 3
-    vmSize: {{ if eq (Getenv "RUNNING_UNDER_TEST") "true" }}Standard_D2s_v3{{ else }}Standard_D4s_v3{{ end }}
+    vmSize: {{ if eq .RunningUnderTest "true" }}Standard_D2s_v3{{ else }}Standard_D4s_v3{{ end }}
     subnetCidr: 10.0.0.0/24
   agentPoolProfiles:
   - name: infra
     role: infra
     count: 3
-    vmSize: {{ if eq (Getenv "RUNNING_UNDER_TEST") "true" }}Standard_D2s_v3{{ else }}Standard_D4s_v3{{ end }}
+    vmSize: {{ if eq .RunningUnderTest "true" }}Standard_D2s_v3{{ else }}Standard_D4s_v3{{ end }}
     subnetCidr: 10.0.0.0/24
     osType: Linux
   - name: compute
     role: compute
     count: 1
-    vmSize: {{ if eq (Getenv "RUNNING_UNDER_TEST") "true" }}Standard_D2s_v3{{ else }}Standard_D4s_v3{{ end }}
+    vmSize: {{ if eq .RunningUnderTest "true" }}Standard_D2s_v3{{ else }}Standard_D4s_v3{{ end }}
     subnetCidr: 10.0.0.0/24
     osType: Linux

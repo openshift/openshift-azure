@@ -16,7 +16,7 @@ import (
 )
 
 type Interface interface {
-	Generate(template *pluginapi.Config) error
+	Generate(template *pluginapi.Config, setVersionFields bool) error
 	InvalidateSecrets() error
 }
 
@@ -25,7 +25,7 @@ func New(cs *api.OpenShiftManagedCluster, runningUnderTest bool) (Interface, err
 	switch cs.Config.PluginVersion {
 	case "v3.2":
 		return v3.New(cs, runningUnderTest), nil
-	case "v4.0":
+	case "v4.1":
 		return v4.New(cs), nil
 	}
 

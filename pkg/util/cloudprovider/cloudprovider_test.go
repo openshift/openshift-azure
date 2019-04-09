@@ -17,18 +17,20 @@ resourceGroup: e
 location: f
 loadBalancerSku: g
 securityGroupName: h
-vmType: i`)
+vmType: i
+useInstanceMetadata: true`)
 
 	want := Config{
-		TenantID:          "a",
-		SubscriptionID:    "b",
-		AadClientID:       "c",
-		AadClientSecret:   "d",
-		ResourceGroup:     "e",
-		Location:          "f",
-		LoadBalancerSku:   "g",
-		SecurityGroupName: "h",
-		VMType:            "i",
+		TenantID:            "a",
+		SubscriptionID:      "b",
+		AadClientID:         "c",
+		AadClientSecret:     "d",
+		ResourceGroup:       "e",
+		Location:            "f",
+		LoadBalancerSku:     "g",
+		SecurityGroupName:   "h",
+		VMType:              "i",
+		UseInstanceMetadata: true,
 	}
 
 	var got Config
