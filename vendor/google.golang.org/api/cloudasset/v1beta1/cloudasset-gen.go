@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,35 @@
 
 // Package cloudasset provides access to the Cloud Asset API.
 //
-// See https://console.cloud.google.com/apis/api/cloudasset.googleapis.com/overview
+// For product documentation, see: https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/quickstart-cloud-asset-inventory
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/cloudasset/v1beta1"
 //   ...
-//   cloudassetService, err := cloudasset.New(oauthHttpClient)
+//   ctx := context.Background()
+//   cloudassetService, err := cloudasset.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   cloudassetService, err := cloudasset.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   cloudassetService, err := cloudasset.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package cloudasset // import "google.golang.org/api/cloudasset/v1beta1"
 
 import (
@@ -29,6 +51,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -56,6 +80,32 @@ const (
 	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/cloud-platform",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -157,16 +207,18 @@ type Asset struct {
 	AssetType string `json:"assetType,omitempty"`
 
 	// IamPolicy: Representation of the actual Cloud IAM policy set on a
-	// cloud resource. For each
-	// resource, there must be at most one Cloud IAM policy set on it.
+	// cloud resource. For
+	// each resource, there must be at most one Cloud IAM policy set on it.
 	IamPolicy *Policy `json:"iamPolicy,omitempty"`
 
-	// Name: The full name of the asset. For example:
-	// `//compute.googleapis.com/projects/my_project_123/zones/zone1/instance
-	// s/instance1`.
-	// See [Resource
-	// Names](https://cloud.google.com/apis/design/resource_names#full_resour
-	// ce_name)
+	// Name: The full name of the asset. For
+	// example:
+	// `//compute.googleapis.com/projects/my_project_123/zones/zone1
+	// /instances/instance1`.
+	// See
+	// [Resource
+	// Names](https://cloud.google.com/apis/design/resource_names#f
+	// ull_resource_name)
 	// for more information.
 	Name string `json:"name,omitempty"`
 
@@ -384,8 +436,7 @@ func (s *BatchGetAssetsHistoryResponse) MarshalJSON() ([]byte, error) {
 
 // Binding: Associates `members` with a `role`.
 type Binding struct {
-	// Condition: Unimplemented. The condition that is associated with this
-	// binding.
+	// Condition: The condition that is associated with this binding.
 	// NOTE: an unsatisfied condition will not allow user access via
 	// current
 	// binding. Different bindings, including their conditions, are
@@ -420,7 +471,7 @@ type Binding struct {
 	//    For example, `admins@example.com`.
 	//
 	//
-	// * `domain:{domain}`: A Google Apps domain name that represents all
+	// * `domain:{domain}`: The G Suite domain (primary) that represents all
 	// the
 	//    users of that domain. For example, `google.com` or
 	// `example.com`.
@@ -844,19 +895,20 @@ type Resource struct {
 	// Parent: The full name of the immediate parent of this resource.
 	// See
 	// [Resource
-	// Names](https://cloud.google.com/apis/design/resource_names#full_resour
-	// ce_name)
+	// Names](https://cloud.google.com/apis/design/resource_nam
+	// es#full_resource_name)
 	// for more information.
 	//
 	// For GCP assets, it is the parent resource defined in the [Cloud IAM
 	// policy
 	// hierarchy](https://cloud.google.com/iam/docs/overview#policy_hi
 	// erarchy).
-	// For example:
-	// "//cloudresourcemanager.googleapis.com/projects/my_project_123".
+	// For
+	// example:
+	// "//cloudresourcemanager.googleapis.com/projects/my_project_1
+	// 23".
 	//
-	// Fo
-	// r third-party assets, it is up to the users to define.
+	// For third-party assets, it is up to the users to define.
 	Parent string `json:"parent,omitempty"`
 
 	// ResourceUrl: The REST URL for accessing the resource. An HTTP GET
@@ -896,20 +948,20 @@ func (s *Resource) MarshalJSON() ([]byte, error) {
 }
 
 // Status: The `Status` type defines a logical error model that is
-// suitable for different
-// programming environments, including REST APIs and RPC APIs. It is
-// used by
-// [gRPC](https://github.com/grpc). The error model is designed to
-// be:
+// suitable for
+// different programming environments, including REST APIs and RPC APIs.
+// It is
+// used by [gRPC](https://github.com/grpc). The error model is designed
+// to be:
 //
 // - Simple to use and understand for most users
 // - Flexible enough to meet unexpected needs
 //
 // # Overview
 //
-// The `Status` message contains three pieces of data: error code, error
-// message,
-// and error details. The error code should be an enum value
+// The `Status` message contains three pieces of data: error code,
+// error
+// message, and error details. The error code should be an enum value
 // of
 // google.rpc.Code, but it may accept additional error codes if needed.
 // The
@@ -1407,9 +1459,10 @@ func (r *OrganizationsService) BatchGetAssetsHistory(parent string) *Organizatio
 // example:
 // `//compute.googleapis.com/projects/my_project_123/zones/zone1
 // /instances/instance1`.
-// See [Resource
-// Names](https://cloud.google.com/apis/design/resource_names#full_resour
-// ce_name)
+// See
+// [Resource
+// Names](https://cloud.google.com/apis/design/resource_names#f
+// ull_resource_name)
 // for more info.
 //
 // The request becomes a no-op if the asset name list is empty, and the
@@ -1556,7 +1609,7 @@ func (c *OrganizationsBatchGetAssetsHistoryCall) Do(opts ...googleapi.CallOption
 	//   ],
 	//   "parameters": {
 	//     "assetNames": {
-	//       "description": "A list of the full names of the assets. For example:\n`//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.\nSee [Resource Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)\nfor more info.\n\nThe request becomes a no-op if the asset name list is empty, and the max\nsize of the asset name list is 100 in one request.",
+	//       "description": "A list of the full names of the assets. For example:\n`//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.\nSee [Resource\nNames](https://cloud.google.com/apis/design/resource_names#full_resource_name)\nfor more info.\n\nThe request becomes a no-op if the asset name list is empty, and the max\nsize of the asset name list is 100 in one request.",
 	//       "location": "query",
 	//       "repeated": true,
 	//       "type": "string"
@@ -1927,9 +1980,10 @@ func (r *ProjectsService) BatchGetAssetsHistory(parent string) *ProjectsBatchGet
 // example:
 // `//compute.googleapis.com/projects/my_project_123/zones/zone1
 // /instances/instance1`.
-// See [Resource
-// Names](https://cloud.google.com/apis/design/resource_names#full_resour
-// ce_name)
+// See
+// [Resource
+// Names](https://cloud.google.com/apis/design/resource_names#f
+// ull_resource_name)
 // for more info.
 //
 // The request becomes a no-op if the asset name list is empty, and the
@@ -2076,7 +2130,7 @@ func (c *ProjectsBatchGetAssetsHistoryCall) Do(opts ...googleapi.CallOption) (*B
 	//   ],
 	//   "parameters": {
 	//     "assetNames": {
-	//       "description": "A list of the full names of the assets. For example:\n`//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.\nSee [Resource Names](https://cloud.google.com/apis/design/resource_names#full_resource_name)\nfor more info.\n\nThe request becomes a no-op if the asset name list is empty, and the max\nsize of the asset name list is 100 in one request.",
+	//       "description": "A list of the full names of the assets. For example:\n`//compute.googleapis.com/projects/my_project_123/zones/zone1/instances/instance1`.\nSee [Resource\nNames](https://cloud.google.com/apis/design/resource_names#full_resource_name)\nfor more info.\n\nThe request becomes a no-op if the asset name list is empty, and the max\nsize of the asset name list is 100 in one request.",
 	//       "location": "query",
 	//       "repeated": true,
 	//       "type": "string"
