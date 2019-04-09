@@ -16,7 +16,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
-	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Etcd Recovery E2E tests [EtcdBackupRecovery][Fake][LongRunning]", func() {
@@ -24,17 +23,12 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdBackupRecovery][Fake][LongRunning
 		configMapName = "recovery-test-data"
 	)
 	var (
-		azurecli  *azure.Client
 		backup    string
 		namespace string
 	)
 
 	BeforeEach(func() {
-		var err error
-		azurecli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), false)
-		Expect(err).ToNot(HaveOccurred())
-
-		backup, err = random.LowerCaseAlphanumericString(5)
+		backup, err := random.LowerCaseAlphanumericString(5)
 		Expect(err).ToNot(HaveOccurred())
 		backup = "e2e-test-" + backup
 		namespace, err = random.LowerCaseAlphanumericString(5)
@@ -70,10 +64,10 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdBackupRecovery][Fake][LongRunning
 		Expect(cm1.Data).To(HaveKeyWithValue("value", "before-backup"))
 
 		By(fmt.Sprintf("Running an etcd backup"))
-		err = azurecli.OpenShiftManagedClustersAdmin.Backup(context.Background(), resourceGroup, resourceGroup, backup)
+		err = azure.FakeRPClient.OpenShiftManagedClustersAdmin.Backup(context.Background(), resourceGroup, resourceGroup, backup)
 		Expect(err).NotTo(HaveOccurred())
 
-		backups, err := azurecli.OpenShiftManagedClustersAdmin.ListBackups(context.Background(), resourceGroup, resourceGroup)
+		backups, err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.ListBackups(context.Background(), resourceGroup, resourceGroup)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(backups).To(ContainElement(MatchFields(IgnoreExtras, Fields{"Name": Equal(backup)})))
 
@@ -91,7 +85,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdBackupRecovery][Fake][LongRunning
 		Expect(cm2.Data).To(HaveKeyWithValue("value", "after-backup"))
 
 		By("Restore from the backup")
-		err = azurecli.OpenShiftManagedClustersAdmin.Restore(context.Background(), resourceGroup, resourceGroup, backup)
+		err = azure.FakeRPClient.OpenShiftManagedClustersAdmin.Restore(context.Background(), resourceGroup, resourceGroup, backup)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Confirm the state of the backup")

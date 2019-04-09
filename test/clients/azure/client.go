@@ -4,10 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"regexp"
-	"strings"
 
-	"github.com/onsi/ginkgo/config"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
@@ -24,19 +21,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 )
 
-// rpFocus represents the supported RP APIs which e2e tests use to create their azure clients,
-// The client will be configured to work either against the real, fake or admin apis
-type rpFocus string
+// FakeRPClient is a singleton Azure Client used by all tests which run against the FakeRP
+var FakeRPClient *Client
 
-var (
-	adminRpFocus = rpFocus(regexp.QuoteMeta("[Admin]"))
-	fakeRpFocus  = rpFocus(regexp.QuoteMeta("[Fake]"))
-	realRpFocus  = rpFocus(regexp.QuoteMeta("[Real]"))
-)
-
-func (tf rpFocus) match(focusString string) bool {
-	return strings.Contains(focusString, string(tf))
-}
+// RealRPClient is a singleton Azure Client used by all tests which run against the RealRP
+var RealRPClient *Client
 
 // Client is the main controller for azure client objects
 type Client struct {
@@ -59,7 +48,7 @@ type Client struct {
 // Setting the storage client is optional and should only be used selectively by
 // tests that need access to the config storage blob because configblob.GetService
 // makes api calls to Azure in order to setup the blob client.
-func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorageClient bool) (*Client, error) {
+func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorageClient bool, realRP bool) (*Client, error) {
 	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
 	if err != nil {
 		return nil, err
@@ -83,16 +72,12 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorage
 	}
 
 	var rpURL string
-	focus := config.GinkgoConfig.FocusString
-	switch {
-	case adminRpFocus.match(focus), fakeRpFocus.match(focus):
-		fmt.Println("configuring the fake resource provider")
-		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
-	case realRpFocus.match(focus):
+	if realRP {
 		fmt.Println("configuring the real resource provider")
 		rpURL = externalapi.DefaultBaseURI
-	default:
-		panic(fmt.Sprintf("invalid focus %q - need to -ginkgo.focus=\\[Admin\\], -ginkgo.focus=\\[Fake\\] or -ginkgo.focus=\\[Real\\]", config.GinkgoConfig.FocusString))
+	} else {
+		fmt.Println("configuring the fake resource provider")
+		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
 	}
 
 	rpc := externalapi.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, subscriptionID)

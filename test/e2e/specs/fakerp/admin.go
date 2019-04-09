@@ -17,7 +17,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
-	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
@@ -58,10 +57,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
 
 	It("should ensure no unnecessary VM rotations occured", func() {
 		Expect(os.Getenv("RESOURCEGROUP")).ToNot(BeEmpty())
-		azurecli, err := azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), true)
-		Expect(err).ToNot(HaveOccurred())
-
-		ubs := updateblob.NewBlobService(azurecli.BlobStorage)
+		ubs := updateblob.NewBlobService(azure.FakeRPClient.BlobStorage)
 
 		By("reading the update blob before running an update")
 		before, err := ubs.Read()
@@ -72,11 +68,11 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
 		Expect(len(before.ScalesetHashes)).To(Equal(2)) // one per worker scaleset
 
 		By("running an update")
-		external, err := azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		external, err := azure.FakeRPClient.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
 
-		updated, err := azurecli.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
+		updated, err := azure.FakeRPClient.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updated.StatusCode).To(Equal(http.StatusOK))
 		Expect(updated).NotTo(BeNil())
@@ -91,11 +87,8 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
 
 	It("should be possible for an SRE to fetch the RP plugin version", func() {
 		Expect(os.Getenv("RESOURCEGROUP")).ToNot(BeEmpty())
-		azurecli, err := azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), true)
-		Expect(err).ToNot(HaveOccurred())
-
 		By("Using the OSA admin client to fetch the RP plugin version")
-		result, err := azurecli.OpenShiftManagedClustersAdmin.GetPluginVersion(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		result, err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.GetPluginVersion(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(result).NotTo(BeNil())
 		Expect(*result.PluginVersion).NotTo(BeEmpty())

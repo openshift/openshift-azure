@@ -16,21 +16,12 @@ import (
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
-	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Change a single image to latest E2E tests [ChangeImage][Fake][LongRunning]", func() {
 	var (
-		azurecli *azure.Client
-		ctx      = context.Background()
+		ctx = context.Background()
 	)
-
-	BeforeEach(func() {
-		var err error
-		azurecli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), false)
-		Expect(err).NotTo(HaveOccurred())
-	})
-
 	It("should be possible for an SRE to update a single container image", func() {
 		By("Executing a cluster update with updated image.")
 		data, err := ioutil.ReadFile("../../pluginconfig/pluginconfig-311.yaml")
@@ -47,7 +38,7 @@ var _ = Describe("Change a single image to latest E2E tests [ChangeImage][Fake][
 			},
 		}
 
-		update, err := azurecli.OpenShiftManagedClustersAdmin.CreateOrUpdate(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), &before)
+		update, err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.CreateOrUpdate(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), &before)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(update).NotTo(BeNil())
 
