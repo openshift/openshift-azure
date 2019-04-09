@@ -39,7 +39,7 @@ func (v *PluginAPIValidator) Validate(c *pluginapi.Config) (errs []error) {
 			errs = append(errs, fmt.Errorf("invalid versions[%q]", version))
 		}
 
-		errs = append(errs, validateVersionConfig(fmt.Sprintf("versions[%q]", version), &versionConfig)...)
+		errs = append(errs, validateVersionConfig(fmt.Sprintf("versions[%q]", version), version, &versionConfig)...)
 	}
 	if _, found := c.Versions[c.PluginVersion]; !found {
 		errs = append(errs, fmt.Errorf("missing versions key %q", c.PluginVersion))
@@ -108,7 +108,7 @@ func validateComponentLogLevel(c *pluginapi.ComponentLogLevel) (errs []error) {
 	return
 }
 
-func validateVersionConfig(path string, vc *pluginapi.VersionConfig) (errs []error) {
+func validateVersionConfig(path string, version string, vc *pluginapi.VersionConfig) (errs []error) {
 	if vc.ImageOffer != "osa" {
 		errs = append(errs, fmt.Errorf("invalid %s.imageOffer %q", path, vc.ImageOffer))
 	}
@@ -127,12 +127,12 @@ func validateVersionConfig(path string, vc *pluginapi.VersionConfig) (errs []err
 		errs = append(errs, fmt.Errorf("invalid %s.imageVersion %q", path, vc.ImageVersion))
 	}
 
-	errs = append(errs, validateImageConfig(fmt.Sprintf("%s.images", path), &vc.Images)...)
+	errs = append(errs, validateImageConfig(fmt.Sprintf("%s.images", path), version, &vc.Images)...)
 
 	return
 }
 
-func validateImageConfig(path string, i *pluginapi.ImageConfig) (errs []error) {
+func validateImageConfig(path, version string, i *pluginapi.ImageConfig) (errs []error) {
 	if i == nil {
 		errs = append(errs, fmt.Errorf("imageConfig cannot be nil"))
 		return
@@ -250,7 +250,7 @@ func validateImageConfig(path string, i *pluginapi.ImageConfig) (errs []error) {
 		errs = append(errs, fmt.Errorf("invalid %s.azureControllers %q", path, i.AzureControllers))
 	}
 
-	if i.Canary == "" {
+	if (i.Canary == "") != (version == "v3.2") {
 		errs = append(errs, fmt.Errorf("invalid %s.canary %q", path, i.Canary))
 	}
 
