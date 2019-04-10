@@ -117,7 +117,7 @@ sync-image: sync $(IMAGEBUILDER) pullregistry
 
 .PHONY: sync-run
 sync-run: generate
-	go run -ldflags ${LDFLAGS} ./cmd/sync -run-once
+	go run -ldflags ${LDFLAGS} ./cmd/sync -run-once -loglevel Debug
 
 sync-push: sync-image
 	docker push $(SYNC_IMAGE)
