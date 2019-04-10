@@ -117,3 +117,10 @@ make vm image configuration and individual container image configuration writeab
 validate canary image empty on v3.2
 
 
+# v4.2
+
+## fluentd rollback and cluster upgrade integration fixes ([#1483](https://github.com/openshift/openshift-azure/pull/1483), [@jim-minter](https://github.com/jim-minter), 09/04/2019)
+
+* roll back change which caused NPE in fluentd for non-container logs
+* modify cluster upgrade mechanism - set clusterVersion: latest, not pluginVersion: latest.  PluginVersion remains in admin API, but r/o
+
