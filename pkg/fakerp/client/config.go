@@ -38,7 +38,7 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 	// After v3 dies, goal here is to use AZURE_REGIONS both to define the
 	// region set externally via secrets/secret and allow restricting it.  In
 	// the interim, v3 has a hard-coded region set which can be overridden by
-	// AZURE_REGION; v4.1 and v5 will use AZURE_REGIONS.  Also allow a
+	// AZURE_REGION; v4.2 and v5 will use AZURE_REGIONS.  Also allow a
 	// cross-over period during which AZURE_REGIONS is not yet defined in
 	// developer environments.
 	if c.Regions != "" {
