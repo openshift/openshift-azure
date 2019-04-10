@@ -21,10 +21,9 @@ func TestAdminAPIValidate(t *testing.T) {
 
 func TestAdminAPIValidateUpdate(t *testing.T) {
 	tests := map[string]struct {
-		pluginVersion string
-		oldf          func(*api.OpenShiftManagedCluster)
-		f             func(*api.OpenShiftManagedCluster)
-		expectedErrs  []error
+		oldf         func(*api.OpenShiftManagedCluster)
+		f            func(*api.OpenShiftManagedCluster)
+		expectedErrs []error
 	}{
 		"no-op": {},
 		"change log level": {
@@ -34,19 +33,17 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 				oc.Config.ComponentLogLevel.Node = to.IntPtr(1)
 			},
 		},
-		"invalid upgrade": {
-			pluginVersion: "v2.0",
+		"clusterversion is mutable": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Config.PluginVersion = "latest"
-			},
-			expectedErrs: []error{
-				errors.New(`invalid change [Config.PluginVersion: latest != v2.0]`),
+				oc.Properties.ClusterVersion = "foo" // the RP is responsible for checking this
 			},
 		},
-		"permitted upgrade": {
-			pluginVersion: "v3.0",
+		"pluginversion is immutable": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Config.PluginVersion = "latest"
+				oc.Config.PluginVersion = "latest" // the RP does this, but after validation: the user can't do this
+			},
+			expectedErrs: []error{
+				errors.New(`invalid change [Config.PluginVersion: latest != ]`),
 			},
 		},
 		"permitted infra scale up": {
@@ -98,7 +95,6 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		oldCs.Config.PluginVersion = test.pluginVersion
 		cs := oldCs.DeepCopy()
 
 		if test.oldf != nil {
