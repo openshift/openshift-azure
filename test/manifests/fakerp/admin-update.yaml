@@ -1,3 +1,3 @@
 # ADMIN_MANIFEST=test/manifests/fakerp/admin-update.yaml hack/upgrade.sh
-config:
-  pluginVersion: latest
+properties:
+  clusterVersion: latest

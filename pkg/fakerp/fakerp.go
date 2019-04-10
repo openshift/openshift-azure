@@ -127,6 +127,11 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig 
 	}
 }
 
+func parsePluginVersion(pluginVersion string) (major, minor int, err error) {
+	_, err = fmt.Sscanf(pluginVersion, "v%d.%d", &major, &minor)
+	return
+}
+
 func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
 	log.Info("enrich")
 	err := enrich(cs)
@@ -142,6 +147,22 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 	}
 	if len(errs) > 0 {
 		return nil, kerrors.NewAggregate(errs)
+	}
+
+	// the real RP is responsible for validating ClusterVersion and twiddling
+	// PluginVersion; this is our fake equivalent
+	switch {
+	case cs.Properties.ClusterVersion == "":
+	case isAdmin && cs.Properties.ClusterVersion == "latest":
+		oldMajor, _, err := parsePluginVersion(cs.Config.PluginVersion)
+		if err != nil {
+			return nil, err
+		}
+		if oldMajor < 3 {
+			return nil, fmt.Errorf("tried to upgrade a cluster that is too old")
+		}
+		cs.Properties.ClusterVersion = ""
+		cs.Config.PluginVersion = "latest"
 	}
 
 	am, err := newAADManager(ctx, cs)
