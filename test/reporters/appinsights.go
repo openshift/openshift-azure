@@ -56,10 +56,17 @@ func (r *azureAppInsightsReporter) SpecDidComplete(specSummary *types.SpecSummar
 	if err != nil {
 		fmt.Println(err)
 	}
-	r.icli.TrackEvent(string(resultJSON))
+	r.icli.TrackMetric(string(resultJSON), btof(specSummary.Failed()))
 	// For debug comment out TrackEvent and output to stdout
 	// fmt.Println(string(resultJSON))
 }
 
 func (r *azureAppInsightsReporter) SpecSuiteDidEnd(summary *types.SuiteSummary) {
+}
+
+func btof(b bool) float64 {
+	if b {
+		return 1
+	}
+	return 0
 }

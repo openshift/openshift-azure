@@ -23,13 +23,14 @@ Results can be queries using Kusto queries below:
 ### Get all passed & failed test count in last 30 minutes
 
 ```
-customEvents
+customMetrics
 | extend componentText = extractjson('$.ComponentTexts', name)
 | extend failed = extractjson('$.Failed', name)
 | extend failureMessage = extractjson('$.FailureMessage', name)
-| where timestamp > ago(30m) 
+| where failed = true
+| where timestamp > ago(7d) 
 | summarize count(componentText) by failed, componentText
-| render barchart
+
 ```
 
 
