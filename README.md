@@ -7,13 +7,15 @@
 ## Prerequisites
 
 1. **Utilities**.  Install the following:
-   1. [Golang 1.11.6](https://golang.org/dl)
+   1. [Golang 1.11.6](https://golang.org/dl) (can also use package manager)
    1. Latest [Azure
       CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
    1. [OpenShift Origin 3.11 client
-      tools](https://github.com/openshift/origin/releases/tag/v3.11.0)
+      tools](https://github.com/openshift/origin/releases/tag/v3.11.0) (can also
+      use package manager)
    1. Latest [Glide](https://github.com/Masterminds/glide/releases).  Note:
       Glide 0.13.1 is known to be broken.
+   1. [jq](https://stedolan.github.io/jq/) (can also use package manager)
 
 1. **Environment variables**.  Ensure that $GOPATH/bin is in your path:
 
