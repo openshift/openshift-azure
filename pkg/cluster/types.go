@@ -10,6 +10,7 @@ import (
 	"context"
 
 	azstorage "github.com/Azure/azure-sdk-for-go/storage"
+	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -19,6 +20,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/startup"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/fake"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
@@ -132,6 +134,47 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 			return nil, err
 		}
 	}
+
+	return u, nil
+}
+
+func getFakeHTTPClient(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient {
+	return wait.NewFakeHTTPClient()
+}
+
+func NewFakeUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig, kubeclient kubeclient.Kubeclient, azs *fake.AzureCloud) (Upgrader, error) {
+	arm, err := arm.New(ctx, log, cs, testConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	u := &simpleUpgrader{
+		Kubeclient: kubeclient,
+
+		testConfig:     testConfig,
+		accountsClient: azs.AccountsClient,
+		storageClient:  azs.StorageClient,
+		vmc:            azs.VirtualMachineScaleSetVMsClient,
+		ssc:            azs.VirtualMachineScaleSetsClient,
+		kvc:            azs.KeyVaultClient,
+		log:            log,
+		scalerFactory:  scaler.NewFactory(),
+		hasher: &hasher{
+			log:            log,
+			testConfig:     testConfig,
+			startupFactory: startup.New,
+			arm:            arm,
+		},
+		arm:                arm,
+		getConsoleClient:   getFakeHTTPClient,
+		getAPIServerClient: getFakeHTTPClient,
+		cs:                 cs,
+	}
+
+	u.cs.Config.ConfigStorageAccountKey = "config"
+	u.cs.Config.ConfigStorageAccountKey = uuid.NewV4().String()
+	bsc := u.storageClient.GetBlobService()
+	u.updateBlobService = updateblob.NewBlobService(bsc)
 
 	return u, nil
 }

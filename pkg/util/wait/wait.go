@@ -38,7 +38,18 @@ type SimpleHTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-// ForHTTPStatusOk polls until URL returns 200
+func NewFakeHTTPClient() SimpleHTTPClient {
+	return &fakeHTTPClient{}
+}
+
+type fakeHTTPClient struct {
+}
+
+func (f *fakeHTTPClient) Do(req *http.Request) (*http.Response, error) {
+	return &http.Response{StatusCode: 200}, nil
+}
+
+// ForHTTPStatusOk poll until URL returns 200
 func ForHTTPStatusOk(ctx context.Context, log *logrus.Entry, cli SimpleHTTPClient, urltocheck string, interval time.Duration) (*http.Response, error) {
 	req, err := http.NewRequest("GET", urltocheck, nil)
 	if err != nil {
