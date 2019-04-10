@@ -13,55 +13,45 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/util/ready"
-	"github.com/openshift/openshift-azure/test/e2e/standard"
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
 // ValidateOSBAApp verifies that the created application runs normally
-func validateOSBAApp(ctx context.Context, cookie interface{}) []*standard.TestError {
-	var errs []*standard.TestError
-
+func validateOSBAApp(ctx context.Context) (err error) {
 	sanity.Checker.Log.Debugf("validating that all osba components are healthy")
-	err := wait.Poll(2*time.Second, 20*time.Minute, ready.CheckClusterServiceBrokerIsReady(sanity.Checker.Client.CustomerAdmin.ServicecatalogV1beta1.ClusterServiceBrokers(), "osba"))
+	err = wait.Poll(2*time.Second, 20*time.Minute, ready.CheckClusterServiceBrokerIsReady(sanity.Checker.Client.CustomerAdmin.ServicecatalogV1beta1.ClusterServiceBrokers(), "osba"))
 	if err != nil {
 		sanity.Checker.Log.Error(err)
-		errs = append(errs, &standard.TestError{Err: err, Bucket: "ready.CheckClusterServiceBrokerIsReady"})
 	}
-	return errs
+	return
 }
 
 // DeleteOSBAApp deletes the OSBA Application after tests completed
-func deleteOSBAApp(ctx context.Context, cookie interface{}) []*standard.TestError {
-	var errs []*standard.TestError
-
+func deleteOSBAApp(ctx context.Context) (err error) {
 	// the OSBA clusterservicebroker is not namespaced, remove it
 	sanity.Checker.Log.Debugf("deleting azure cluster service broker")
-	err := sanity.Checker.Client.CustomerAdmin.ServicecatalogV1beta1.ClusterServiceBrokers().Delete("osba", &metav1.DeleteOptions{})
+	err = sanity.Checker.Client.CustomerAdmin.ServicecatalogV1beta1.ClusterServiceBrokers().Delete("osba", &metav1.DeleteOptions{})
 	if err != nil {
 		sanity.Checker.Log.Error(err)
-		errs = append(errs, &standard.TestError{Err: err, Bucket: "sanity.Checker.Client.CustomerAdmin.ServicecatalogV1beta1.ClusterServiceBrokers().Delete"})
+		return
 	}
 
 	sanity.Checker.Log.Debugf("deleting openshift project for broker apps")
-	err = sanity.Checker.Client.CustomerAdmin.CleanupProject(cookie.(string))
+	err = sanity.Checker.Client.CustomerAdmin.CleanupProject("osba")
 	if err != nil {
 		sanity.Checker.Log.Error(err)
-		errs = append(errs, &standard.TestError{Err: err, Bucket: "sanity.Checker.Client.CustomerAdmin.CleanupProject"})
 	}
-
-	return errs
+	return
 }
 
 // CreateOSBAApp creates the OSBA Application under test
-func createOSBAApp(ctx context.Context) (interface{}, []*standard.TestError) {
-	var errs []*standard.TestError
+func createOSBAApp(ctx context.Context) (err error) {
 	sanity.Checker.Log.Debugf("creating openshift project for broker app")
 
-	err := sanity.Checker.Client.CustomerAdmin.CreateProject("osba")
+	err = sanity.Checker.Client.CustomerAdmin.CreateProject("osba")
 	if err != nil {
 		sanity.Checker.Log.Error(err)
-		errs = append(errs, &standard.TestError{Err: err, Bucket: "sanity.Checker.Client.CustomerAdmin.CreateProject"})
-		return nil, errs
+		return
 	}
 
 	// Get IDs and Credentials for template substitution
@@ -80,33 +70,35 @@ func createOSBAApp(ctx context.Context) (interface{}, []*standard.TestError) {
 	}
 	if err != nil {
 		sanity.Checker.Log.Error(err)
-		errs = append(errs, &standard.TestError{Err: err, Bucket: "sanity.Checker.Client.CustomerAdmin.CreateProject"})
-		return nil, errs
+		return
 	}
 
 	err = sanity.Checker.Client.CustomerAdmin.InstantiateTemplateFromBytes(templdata, "osba", parameters)
 	if err != nil {
 		sanity.Checker.Log.Error(err)
-		errs = append(errs, &standard.TestError{Err: err, Bucket: "sanity.Checker.Client.CustomerAdmin.InstantiateTemplateFromBytes"})
-		return nil, errs
 	}
-
-	return "osba", errs
+	return
 }
 
 var _ = Describe("Openshift on Azure end user e2e tests [CostumerAdmin][Fake]", func() {
 	It("should create and validate an OpenShift Broker App [CustomerAdmin][Fake][OSBA]", func() {
+		var errs []error
 		ctx := context.Background()
 		By("creating openshift broker app")
-		namespace, errs := createOSBAApp(ctx)
+		err := createOSBAApp(ctx)
+		if err != nil {
+			errs = append(errs, err)
+		}
 		Expect(errs).To(BeEmpty())
 		defer func() {
 			By("deleting openshift broker app")
-			_ = deleteOSBAApp(ctx, namespace)
+			_ = deleteOSBAApp(ctx)
 		}()
 
 		By("validating openshift broker app")
-		errs = validateOSBAApp(ctx, namespace)
+		if err = validateOSBAApp(ctx); err != nil {
+			errs = append(errs, err)
+		}
 		Expect(errs).To(BeEmpty())
 	})
 })
