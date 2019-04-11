@@ -31,7 +31,7 @@ func fromMSGraphGroup(log *logrus.Entry, kubeGroup *v1.Group, kubeGroupName stri
 	}
 	g.Users = []string{}
 	for _, user := range msGroupMembers {
-		g.Users = append(g.Users, *user.UserPrincipalName)
+		g.Users = append(g.Users, *user.Mail)
 	}
 	sort.Strings(g.Users)
 	return g, !reflect.DeepEqual(kubeGroup, g)
