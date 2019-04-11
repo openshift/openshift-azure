@@ -14,6 +14,7 @@ ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup
 ALL_IMAGES = $(addsuffix -image, $(ALL_BINARIES))
 ALL_PUSHES = $(addsuffix -push, $(ALL_BINARIES))
 
+GOPATH ?= $(HOME)/go
 IMAGEBUILDER = ${GOPATH}/bin/imagebuilder
 
 .PHONY: $(ALL_PUSHES) $(ALL_IMAGES) all version clean test unit generate pullregistry secrets
@@ -199,7 +200,7 @@ e2e-vnet:
 	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
 
 $(IMAGEBUILDER):
-	go get -u github.com/openshift/imagebuilder/cmd/imagebuilder
+	go get github.com/openshift/imagebuilder/cmd/imagebuilder
 
 pullregistry: $(IMAGEBUILDER)
 	docker pull registry.access.redhat.com/rhel7:latest

@@ -7,7 +7,17 @@ data:
         @type local
         path /var/log/journald.pos
       </storage>
-      tag logs
+      tag journald
+    </source>
+    <source>
+      @type tail
+      format json
+      path /var/log/openshift-audit/*
+      pos_file /var/log/openshift-audit.pos
+      refresh_interval 10
+      tag audit
+      time_key timestamp
+      time_format %Y-%m-%dT%H:%M:%SZ
     </source>
     <match logs>
       @type rewrite_tag_filter
@@ -22,18 +32,22 @@ data:
         tag journald
       </rule>
     </match>
+    <filter journald>
+      @type record_transformer
+      enable_ruby true
+      <record>
+        MESSAGE ${record["MESSAGE"].nil? ? nil : record["MESSAGE"].force_encoding("UTF-8").encode("ASCII", invalid: :replace, undef: :replace)}
+      </record>
+    </filter>
     <match **>
       @type mdsd
+      acktimeoutms 0
+      buffer_type memory
+      buffer_queue_full_action block
+      disable_retry_limit true
       djsonsocket /var/run/mdsd/default_djson.socket
-      acktimeoutms 5000
-      buffer_chunk_limit 1000k
-      buffer_type file
-      buffer_path /var/log/td-agent/buffer
-      buffer_queue_limit 128
       emit_timestamp_name time
       flush_interval 10s
-      retry_limit 3
-      retry_wait 10s
     </match>
 kind: ConfigMap
 metadata:

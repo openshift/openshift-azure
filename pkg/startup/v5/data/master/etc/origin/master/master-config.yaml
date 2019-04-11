@@ -28,6 +28,8 @@ admissionConfig:
         kind: ImagePolicyConfig
 auditConfig:
   enabled: true
+  auditFilePath: /var/log/openshift-audit/openshift-audit.log
+  maximumRetainedFiles: 10
 aggregatorConfig:
   proxyClientInfo:
     certFile: aggregator-front-proxy.crt

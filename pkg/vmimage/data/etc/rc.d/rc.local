@@ -1,0 +1,13 @@
+#!/bin/bash -ex
+
+# https://github.com/openshift/openshift-azure/issues/1454
+for pos in /var/log/journald.pos/worker0/storage.json /var/log/openshift-audit.pos; do
+    if [[ -e $pos && ! -s $pos ]]; then
+        rm $pos
+    fi
+done
+
+# if there are multiple crashes, remove all but the most recent
+for crash in $(ls -dt /var/crash/* | tail -n +2); do
+    rm -rf $crash
+done
