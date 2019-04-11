@@ -24,6 +24,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	utilerrors "github.com/openshift/openshift-azure/pkg/util/errors"
 	"github.com/openshift/openshift-azure/pkg/util/log"
+	"github.com/openshift/openshift-azure/pkg/util/roundtrippers"
 	"github.com/openshift/openshift-azure/pkg/util/statsd"
 )
 
@@ -44,7 +45,8 @@ func (rt authorizingRoundTripper) RoundTrip(req *http.Request) (*http.Response, 
 	return rt.RoundTripper.RoundTrip(req)
 }
 
-type metricsConfig struct {
+//MetricsConfig stores the configuration of the metricsbridge application
+type MetricsConfig struct {
 	Interval           time.Duration `json:"intervalNanoseconds,omitempty"`
 	PrometheusEndpoint string        `json:"prometheusEndpoint,omitempty"`
 	StatsdSocket       string        `json:"statsdSocket,omitempty"`
@@ -72,7 +74,7 @@ type metricsConfig struct {
 	conn       net.Conn
 }
 
-func (c *metricsConfig) load(path string) error {
+func (c *MetricsConfig) load(path string) error {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
@@ -104,7 +106,7 @@ func (c *metricsConfig) load(path string) error {
 	return nil
 }
 
-func (c *metricsConfig) defaultAndValidate() (errs []error) {
+func (c *MetricsConfig) defaultAndValidate() (errs []error) {
 	if c.Interval == 0 {
 		c.Interval = time.Minute
 	}
@@ -125,7 +127,7 @@ func (c *metricsConfig) defaultAndValidate() (errs []error) {
 	return
 }
 
-func (c *metricsConfig) init() error {
+func (c *MetricsConfig) init() error {
 	for {
 		var err error
 		c.log.Debug("dialing statsd socket")
@@ -144,14 +146,14 @@ func (c *metricsConfig) init() error {
 	c.log.Debug("dialing prometheus endpoint")
 	cli, err := api.NewClient(api.Config{
 		Address: c.PrometheusEndpoint,
-		RoundTripper: &authorizingRoundTripper{
+		RoundTripper: &roundtrippers.AuthorizingRoundTripper{
 			RoundTripper: &http.Transport{
 				TLSClientConfig: &tls.Config{
 					RootCAs:            c.rootCAs,
 					InsecureSkipVerify: c.InsecureSkipVerify,
 				},
 			},
-			token: c.Token,
+			Token: c.Token,
 		},
 	})
 	if err != nil {
@@ -164,7 +166,7 @@ func (c *metricsConfig) init() error {
 }
 
 func run(log *logrus.Entry, configpath string) error {
-	c := &metricsConfig{log: log}
+	c := &MetricsConfig{log: log}
 
 	log.Infof("loading config from %s", configpath)
 	if err := c.load(configpath); err != nil {
@@ -193,7 +195,7 @@ func run(log *logrus.Entry, configpath string) error {
 	return c.run()
 }
 
-func (c *metricsConfig) run() error {
+func (c *MetricsConfig) run() error {
 	t := time.NewTicker(c.Interval)
 	defer t.Stop()
 
@@ -205,7 +207,7 @@ func (c *metricsConfig) run() error {
 	}
 }
 
-func (c *metricsConfig) runOnce(ctx context.Context) error {
+func (c *MetricsConfig) runOnce(ctx context.Context) error {
 	var metricsCount int
 	hostnameMap := make(map[string]string)
 
