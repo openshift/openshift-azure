@@ -42,7 +42,7 @@ func (m *MockFactory) EXPECT() *MockFactoryMockRecorder {
 }
 
 // New mocks base method
-func (m *MockFactory) New(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Kubeclient, resourceGroup string, ss *compute.VirtualMachineScaleSet) scaler.Scaler {
+func (m *MockFactory) New(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *compute.VirtualMachineScaleSet) scaler.Scaler {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "New", log, ssc, vmc, kubeclient, resourceGroup, ss)
 	ret0, _ := ret[0].(scaler.Scaler)

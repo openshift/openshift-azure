@@ -80,7 +80,7 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 			ubs := mock_updateblob.NewMockBlobService(gmc)
 			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
-			kc := mock_kubeclient.NewMockKubeclient(gmc)
+			kc := mock_kubeclient.NewMockInterface(gmc)
 			hasher := mock_cluster.NewMockHasher(gmc)
 			sss := []compute.VirtualMachineScaleSet{
 				{
@@ -121,18 +121,18 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 			// last scale
 			c = targetScaler.EXPECT().Scale(ctx, int64(2)).After(c)
 
-			u := &simpleUpgrader{
-				updateBlobService: ubs,
-				scalerFactory:     scalerFactory,
-				vmc:               vmc,
-				ssc:               ssc,
-				Kubeclient:        kc,
-				log:               log,
-				hasher:            hasher,
-				cs:                tt.cs,
+			u := &SimpleUpgrader{
+				UpdateBlobService: ubs,
+				ScalerFactory:     scalerFactory,
+				Vmc:               vmc,
+				Ssc:               ssc,
+				Interface:         kc,
+				Log:               log,
+				Hasher:            hasher,
+				Cs:                tt.cs,
 			}
 			if got := u.UpdateWorkerAgentPool(ctx, &tt.cs.Properties.AgentPoolProfiles[0], tt.suffix); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("simpleUpgrader.UpdateWorkerAgentPool() = %v, want %v", got, tt.want)
+				t.Errorf("SimpleUpgrader.UpdateWorkerAgentPool() = %v, want %v", got, tt.want)
 			}
 		})
 	}

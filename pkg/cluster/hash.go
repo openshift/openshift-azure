@@ -25,7 +25,7 @@ type Hasher interface {
 	HashSyncPod(cs *api.OpenShiftManagedCluster) ([]byte, error)
 }
 
-type hasher struct {
+type Hash struct {
 	log            *logrus.Entry
 	testConfig     api.TestConfig
 	startupFactory func(*logrus.Entry, *api.OpenShiftManagedCluster, api.TestConfig) (startup.Interface, error)
@@ -33,7 +33,7 @@ type hasher struct {
 }
 
 // HashScaleSet returns the hash of a scale set
-func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
+func (h *Hash) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
 	hash := sha256.New()
 
 	if armhd, ok := h.arm.(interface {
@@ -108,7 +108,7 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 }
 
 // HashSyncPod returns the hash of the sync pod output
-func (h *hasher) HashSyncPod(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+func (h *Hash) HashSyncPod(cs *api.OpenShiftManagedCluster) ([]byte, error) {
 	s, err := sync.New(h.log, cs, false)
 	if err != nil {
 		return nil, err

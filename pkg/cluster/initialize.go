@@ -14,31 +14,31 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
-func (u *simpleUpgrader) initializeStorageClients(ctx context.Context) error {
-	if u.storageClient == nil {
-		if u.cs.Config.ConfigStorageAccountKey == "" {
-			keys, err := u.accountsClient.ListKeys(ctx, u.cs.Properties.AzProfile.ResourceGroup, u.cs.Config.ConfigStorageAccount)
+func (u *SimpleUpgrader) initializeStorageClients(ctx context.Context) error {
+	if u.StorageClient == nil {
+		if u.Cs.Config.ConfigStorageAccountKey == "" {
+			keys, err := u.AccountsClient.ListKeys(ctx, u.Cs.Properties.AzProfile.ResourceGroup, u.Cs.Config.ConfigStorageAccount)
 			if err != nil {
 				return err
 			}
-			u.cs.Config.ConfigStorageAccountKey = *(*keys.Keys)[0].Value
+			u.Cs.Config.ConfigStorageAccountKey = *(*keys.Keys)[0].Value
 		}
 
 		var err error
-		u.storageClient, err = storage.NewClient(u.log, u.cs.Config.ConfigStorageAccount, u.cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
+		u.StorageClient, err = storage.NewClient(u.log, u.Cs.Config.ConfigStorageAccount, u.Cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
 		if err != nil {
 			return err
 		}
 
-		bsc := u.storageClient.GetBlobService()
-		u.updateBlobService = updateblob.NewBlobService(bsc)
+		bsc := u.StorageClient.GetBlobService()
+		u.UpdateBlobService = updateblob.NewBlobService(bsc)
 	}
 
 	return nil
 }
 
-func (u *simpleUpgrader) writeBlob(blobName string, cs *api.OpenShiftManagedCluster) error {
-	bsc := u.storageClient.GetBlobService()
+func (u *SimpleUpgrader) writeBlob(blobName string, cs *api.OpenShiftManagedCluster) error {
+	bsc := u.StorageClient.GetBlobService()
 	c := bsc.GetContainerReference(ConfigContainerName)
 	b := c.GetBlobReference(blobName)
 
@@ -50,9 +50,9 @@ func (u *simpleUpgrader) writeBlob(blobName string, cs *api.OpenShiftManagedClus
 	return b.CreateBlockBlobFromReader(bytes.NewReader(json), nil)
 }
 
-func (u *simpleUpgrader) WriteStartupBlobs() error {
-	u.log.Info("writing startup blobs")
-	err := u.writeBlob(MasterStartupBlobName, u.cs)
+func (u *SimpleUpgrader) WriteStartupBlobs() error {
+	u.Log.Info("writing startup blobs")
+	err := u.writeBlob(MasterStartupBlobName, u.Cs)
 	if err != nil {
 		return err
 	}
@@ -60,37 +60,37 @@ func (u *simpleUpgrader) WriteStartupBlobs() error {
 	workerCS := &api.OpenShiftManagedCluster{
 		Properties: api.Properties{
 			WorkerServicePrincipalProfile: api.ServicePrincipalProfile{
-				ClientID: u.cs.Properties.WorkerServicePrincipalProfile.ClientID,
-				Secret:   u.cs.Properties.WorkerServicePrincipalProfile.Secret,
+				ClientID: u.Cs.Properties.WorkerServicePrincipalProfile.ClientID,
+				Secret:   u.Cs.Properties.WorkerServicePrincipalProfile.Secret,
 			},
 			AzProfile: api.AzProfile{
-				TenantID:       u.cs.Properties.AzProfile.TenantID,
-				SubscriptionID: u.cs.Properties.AzProfile.SubscriptionID,
-				ResourceGroup:  u.cs.Properties.AzProfile.ResourceGroup,
+				TenantID:       u.Cs.Properties.AzProfile.TenantID,
+				SubscriptionID: u.Cs.Properties.AzProfile.SubscriptionID,
+				ResourceGroup:  u.Cs.Properties.AzProfile.ResourceGroup,
 			},
 		},
-		Location: u.cs.Location,
+		Location: u.Cs.Location,
 		Config: api.Config{
-			PluginVersion: u.cs.Config.PluginVersion,
+			PluginVersion: u.Cs.Config.PluginVersion,
 			ComponentLogLevel: api.ComponentLogLevel{
-				Node: u.cs.Config.ComponentLogLevel.Node,
+				Node: u.Cs.Config.ComponentLogLevel.Node,
 			},
 			Certificates: api.CertificateConfig{
 				Ca: api.CertKeyPair{
-					Cert: u.cs.Config.Certificates.Ca.Cert,
+					Cert: u.Cs.Config.Certificates.Ca.Cert,
 				},
-				NodeBootstrap: u.cs.Config.Certificates.NodeBootstrap,
+				NodeBootstrap: u.Cs.Config.Certificates.NodeBootstrap,
 			},
 			Images: api.ImageConfig{
-				Format:          u.cs.Config.Images.Format,
-				Node:            u.cs.Config.Images.Node,
-				ImagePullSecret: u.cs.Config.Images.ImagePullSecret,
+				Format:          u.Cs.Config.Images.Format,
+				Node:            u.Cs.Config.Images.Node,
+				ImagePullSecret: u.Cs.Config.Images.ImagePullSecret,
 			},
-			NodeBootstrapKubeconfig: u.cs.Config.NodeBootstrapKubeconfig,
-			SDNKubeconfig:           u.cs.Config.SDNKubeconfig,
+			NodeBootstrapKubeconfig: u.Cs.Config.NodeBootstrapKubeconfig,
+			SDNKubeconfig:           u.Cs.Config.SDNKubeconfig,
 		},
 	}
-	for _, app := range u.cs.Properties.AgentPoolProfiles {
+	for _, app := range u.Cs.Properties.AgentPoolProfiles {
 		workerCS.Properties.AgentPoolProfiles = append(workerCS.Properties.AgentPoolProfiles, api.AgentPoolProfile{
 			Role:   app.Role,
 			VMSize: app.VMSize,
@@ -100,15 +100,15 @@ func (u *simpleUpgrader) WriteStartupBlobs() error {
 	return u.writeBlob(WorkerStartupBlobName, workerCS)
 }
 
-func (u *simpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context) error {
-	u.log.Info("creating/updating storage account")
+func (u *SimpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context) error {
+	u.Log.Info("creating/updating storage account")
 
-	err := u.accountsClient.Create(ctx, u.cs.Properties.AzProfile.ResourceGroup, u.cs.Config.ConfigStorageAccount, azstorage.AccountCreateParameters{
+	err := u.AccountsClient.Create(ctx, u.Cs.Properties.AzProfile.ResourceGroup, u.Cs.Config.ConfigStorageAccount, azstorage.AccountCreateParameters{
 		Sku: &azstorage.Sku{
 			Name: azstorage.StandardLRS,
 		},
 		Kind:     azstorage.Storage,
-		Location: &u.cs.Location,
+		Location: &u.Cs.Location,
 		Tags: map[string]*string{
 			"type": to.StringPtr("config"),
 		},
@@ -125,7 +125,7 @@ func (u *simpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context)
 		return err
 	}
 
-	bsc := u.storageClient.GetBlobService()
+	bsc := u.StorageClient.GetBlobService()
 
 	// cluster config container
 	c := bsc.GetContainerReference(ConfigContainerName)
@@ -151,10 +151,10 @@ func (u *simpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context)
 	return nil
 }
 
-func (u *simpleUpgrader) InitializeUpdateBlob(suffix string) error {
+func (u *SimpleUpgrader) InitializeUpdateBlob(suffix string) error {
 	blob := updateblob.NewUpdateBlob()
-	for _, app := range u.cs.Properties.AgentPoolProfiles {
-		h, err := u.hasher.HashScaleSet(u.cs, &app)
+	for _, app := range u.Cs.Properties.AgentPoolProfiles {
+		h, err := u.Hasher.HashScaleSet(u.Cs, &app)
 		if err != nil {
 			return err
 		}
@@ -170,10 +170,10 @@ func (u *simpleUpgrader) InitializeUpdateBlob(suffix string) error {
 			blob.ScalesetHashes[names.GetScalesetName(&app, suffix)] = h
 		}
 	}
-	return u.updateBlobService.Write(blob)
+	return u.UpdateBlobService.Write(blob)
 }
 
-func (u *simpleUpgrader) ResetUpdateBlob() error {
+func (u *SimpleUpgrader) ResetUpdateBlob() error {
 	blob := updateblob.NewUpdateBlob()
-	return u.updateBlobService.Write(blob)
+	return u.UpdateBlobService.Write(blob)
 }

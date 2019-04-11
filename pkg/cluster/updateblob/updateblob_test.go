@@ -74,14 +74,14 @@ func TestReadUpdateBlob(t *testing.T) {
 
 		got, err := u.Read()
 		if (err != nil) != (tt.wantErr != nil) {
-			t.Errorf("simpleUpgrader.readUpdateBlob() error = %#v, wantErr %#v", err, tt.wantErr)
+			t.Errorf("SimpleUpgrader.readUpdateBlob() error = %#v, wantErr %#v", err, tt.wantErr)
 			return
 		}
 		if tt.wantErr != nil && err != tt.wantErr {
-			t.Errorf("simpleUpgrader.readUpdateBlob() error = %#v, wantErr %#v", err, tt.wantErr)
+			t.Errorf("SimpleUpgrader.readUpdateBlob() error = %#v, wantErr %#v", err, tt.wantErr)
 		}
 		if tt.wantErr == nil && !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("simpleUpgrader.readUpdateBlob() = %#v, want %#v", got, tt.want)
+			t.Errorf("SimpleUpgrader.readUpdateBlob() = %#v, want %#v", got, tt.want)
 		}
 	}
 }
@@ -121,7 +121,7 @@ func TestWriteUpdateBlob(t *testing.T) {
 		}
 
 		if err := u.Write(tt.blob); (err != nil) != (tt.wantErr != "") {
-			t.Errorf("simpleUpgrader.writeUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
+			t.Errorf("SimpleUpgrader.writeUpdateBlob() error = %v, wantErr %v", err, tt.wantErr)
 		}
 	}
 }

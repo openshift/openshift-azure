@@ -64,12 +64,12 @@ func TestDrainAndDeleteWorker(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		u := &kubeclient{
-			client: tt.kubeclient,
-			log:    logrus.NewEntry(logrus.StandardLogger()),
+		u := &Kubeclientset{
+			Client: tt.kubeclient,
+			Log:    logrus.NewEntry(logrus.StandardLogger()),
 		}
 		if err := u.DrainAndDeleteWorker(context.Background(), tt.hostname); err != tt.wantErr {
-			t.Errorf("[%v] simpleUpgrader.drain() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			t.Errorf("[%v] SimpleUpgrader.drain() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
 		actions := tt.kubeclient.Actions()
 		if len(actions) != len(tt.expectedActions) {

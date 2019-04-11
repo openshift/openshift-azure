@@ -118,7 +118,7 @@ func TestMasterIsReady(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		u := &kubeclient{client: tt.kc}
+		u := &Kubeclientset{Client: tt.kc}
 		got, err := u.masterIsReady(tt.hostname)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("masterIsReady() error = %v, wantErr %v. Test: %v", err, tt.wantErr, tt.name)

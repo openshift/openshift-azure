@@ -129,7 +129,7 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
 			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 
-			kc := mock_kubeclient.NewMockKubeclient(gmc)
+			kc := mock_kubeclient.NewMockInterface(gmc)
 			if tt.wantErr {
 				if tt.expectedErr == vmListErr {
 					vmc.EXPECT().List(ctx, testRg, names.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(nil, tt.expectedErr)
@@ -150,19 +150,19 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 				}
 			}
 
-			u := &simpleUpgrader{
-				vmc:        vmc,
-				ssc:        ssc,
-				Kubeclient: kc,
-				log:        logrus.NewEntry(logrus.StandardLogger()),
-				cs:         cs,
+			u := &SimpleUpgrader{
+				Vmc:       vmc,
+				Ssc:       ssc,
+				Interface: kc,
+				Log:       logrus.NewEntry(logrus.StandardLogger()),
+				Cs:        cs,
 			}
 			err := u.WaitForNodesInAgentPoolProfile(ctx, &cs.Properties.AgentPoolProfiles[tt.appIndex], "")
 			if tt.wantErr && tt.expectedErr != err {
-				t.Errorf("simpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
+				t.Errorf("SimpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
 			}
 			if !tt.wantErr && err != nil {
-				t.Errorf("simpleUpgrader.waitForNodes() unexpected error = %v", err)
+				t.Errorf("SimpleUpgrader.waitForNodes() unexpected error = %v", err)
 			}
 		})
 	}

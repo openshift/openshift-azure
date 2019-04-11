@@ -21,7 +21,7 @@ import (
 
 // Factory interface is to create new Scaler instances.
 type Factory interface {
-	New(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Kubeclient, resourceGroup string, ss *compute.VirtualMachineScaleSet) Scaler
+	New(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *compute.VirtualMachineScaleSet) Scaler
 }
 
 type scalerFactory struct{}
@@ -46,7 +46,7 @@ type workerScaler struct {
 
 	ssc        azureclient.VirtualMachineScaleSetsClient
 	vmc        azureclient.VirtualMachineScaleSetVMsClient
-	kubeclient kubeclient.Kubeclient
+	kubeclient kubeclient.Interface
 
 	resourceGroup string
 
@@ -57,7 +57,7 @@ type workerScaler struct {
 
 var _ Scaler = &workerScaler{}
 
-func (sf *scalerFactory) New(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Kubeclient, resourceGroup string, ss *compute.VirtualMachineScaleSet) Scaler {
+func (sf *scalerFactory) New(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *compute.VirtualMachineScaleSet) Scaler {
 	return &workerScaler{log: log, ssc: ssc, vmc: vmc, kubeclient: kubeclient, resourceGroup: resourceGroup, ss: ss}
 }
 

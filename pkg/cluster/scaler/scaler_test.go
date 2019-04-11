@@ -84,7 +84,7 @@ func TestScaleUp(t *testing.T) {
 			ctx := context.Background()
 			gmc := gomock.NewController(t)
 			defer gmc.Finish()
-			kc := mock_kubeclient.NewMockKubeclient(gmc)
+			kc := mock_kubeclient.NewMockInterface(gmc)
 			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
 			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 
@@ -205,7 +205,7 @@ func TestScaleDown(t *testing.T) {
 			defer gmc.Finish()
 			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
-			kc := mock_kubeclient.NewMockKubeclient(gmc)
+			kc := mock_kubeclient.NewMockInterface(gmc)
 
 			if len(tt.vmsBefore) != int(tt.count) {
 				// initial listing

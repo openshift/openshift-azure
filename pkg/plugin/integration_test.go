@@ -10,10 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/ghodss/yaml"
@@ -31,14 +29,18 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
+	"github.com/openshift/openshift-azure/pkg/arm"
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
+	"github.com/openshift/openshift-azure/pkg/cluster/scaler"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
+	"github.com/openshift/openshift-azure/pkg/startup"
 	fakecloud "github.com/openshift/openshift-azure/pkg/util/azureclient/fake"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 	testtls "github.com/openshift/openshift-azure/test/util/tls"
 )
 
@@ -51,20 +53,12 @@ func getFakeDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fak
 	return func(ctx context.Context, azuretemplate map[string]interface{}) error {
 		log.Info("applying arm template deployment")
 
-		future, err := az.DeploymentsClient.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
+		err := az.DeploymentsClient.CreateOrUpdateAndWait(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
 			Properties: &resources.DeploymentProperties{
 				Template: azuretemplate,
 				Mode:     resources.Incremental,
 			},
 		})
-		if err != nil {
-			return err
-		}
-
-		cli := az.DeploymentsClient.Client()
-
-		log.Info("waiting for arm template deployment to complete")
-		err = future.WaitForCompletionRef(ctx, cli)
 		if err != nil {
 			log.Warnf("deployment failed: %#v", err)
 			return err
@@ -142,19 +136,67 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 }
 
 func (w fakeResponseWrapper) DoRaw() ([]byte, error) {
-	return w.raw, nil
+	return w, nil
 }
 
 func (w fakeResponseWrapper) Stream() (io.ReadCloser, error) {
 	return nil, nil
 }
 
-func newFakeResponseWrapper(raw []byte) fakeResponseWrapper {
-	return fakeResponseWrapper{raw: raw}
+func newFakeResponseWrapper(raw []byte) restclient.ResponseWrapper {
+	var fr fakeResponseWrapper = raw
+	return fr
 }
 
-type fakeResponseWrapper struct {
-	raw []byte
+type fakeResponseWrapper []byte
+
+func getFakeHTTPClient(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient {
+	return wait.NewFakeHTTPClient()
+}
+
+func newFakeUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig, kubeclient kubeclient.Interface, azs *fakecloud.AzureCloud) (cluster.Upgrader, error) {
+	arm, err := arm.New(ctx, log, cs, testConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	u := &cluster.SimpleUpgrader{
+		Interface: kubeclient,
+
+		TestConfig:     testConfig,
+		AccountsClient: azs.AccountsClient,
+		StorageClient:  azs.StorageClient,
+		Vmc:            azs.VirtualMachineScaleSetVMsClient,
+		Ssc:            azs.VirtualMachineScaleSetsClient,
+		Kvc:            azs.KeyVaultClient,
+		Log:            log,
+		ScalerFactory:  scaler.NewFactory(),
+		Hasher: &cluster.Hasher{
+			Log:            log,
+			TestConfig:     testConfig,
+			StartupFactory: startup.New,
+			Arm:            arm,
+		},
+		Arm:                arm,
+		GetConsoleClient:   getFakeHTTPClient,
+		GetAPIServerClient: getFakeHTTPClient,
+		Cs:                 cs,
+	}
+
+	u.Cs.Config.ConfigStorageAccountKey = "config"
+	u.Cs.Config.ConfigStorageAccountKey = uuid.NewV4().String()
+	bsc := u.StorageClient.GetBlobService()
+	u.UpdateBlobService = updateblob.NewBlobService(bsc)
+
+	return u, nil
+}
+
+func newFakeKubeclient(log *logrus.Entry, cli *fake.Clientset, seccli *fakesec.Clientset) kubeclient.Interface {
+	return &kubeclient.Kubeclientset{
+		Log:    log,
+		Client: cli,
+		Seccli: seccli,
+	}
 }
 
 func TestCreateThenUpdateCausesNoRotations(t *testing.T) {
@@ -212,7 +254,7 @@ func TestCreateThenUpdateCausesNoRotations(t *testing.T) {
 	template.GenevaImagePullSecret = []byte("pullSecret")
 	template.ImagePullSecret = []byte("imagePullSecret")
 
-	az := fakecloud.NewFakeAzureCloud(log, []compute.VirtualMachineScaleSetVM{}, []compute.VirtualMachineScaleSet{}, secrets, []storage.Account{}, map[string]map[string][]byte{})
+	az := fakecloud.NewFakeAzureCloud(log, secrets)
 	cli := fake.NewSimpleClientset()
 	cli.PrependReactor("get", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {
 		get := action.(k8stesting.GetAction)
@@ -250,8 +292,7 @@ func TestCreateThenUpdateCausesNoRotations(t *testing.T) {
 		get := action.(k8stesting.GetAction)
 		node := &corev1.Node{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      get.GetName(),
-				Namespace: get.GetNamespace(),
+				Name: get.GetName(),
 			},
 			Status: corev1.NodeStatus{
 				Conditions: []corev1.NodeCondition{
@@ -280,6 +321,9 @@ func TestCreateThenUpdateCausesNoRotations(t *testing.T) {
 		Users:                    []string{"system:admin"},
 	}
 	seccli := fakesec.NewSimpleClientset()
+	// securitycontextconstraints gets mistakenly converted to securitycontextconstraints"es" by the generic
+	// plural converter and it's not in the list of exceptions as it's an openshift type. So
+	// we are using a reactor to return value.
 	seccli.PrependReactor("get", "*", func(action k8stesting.Action) (bool, runtime.Object, error) {
 		get := action.(k8stesting.GetAction)
 		if get.GetResource().Resource == "securitycontextconstraints" {
@@ -294,12 +338,12 @@ func TestCreateThenUpdateCausesNoRotations(t *testing.T) {
 		}
 		return false, nil, fmt.Errorf("does not exist")
 	})
-	kc := kubeclient.NewFakeKubeclient(log, cli, seccli)
+	kc := newFakeKubeclient(log, cli, seccli)
 	p := &plugin{
 		pluginConfig: template,
 		testConfig:   api.TestConfig{RunningUnderTest: true},
 		upgraderFactory: func(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (cluster.Upgrader, error) {
-			return cluster.NewFakeUpgrader(ctx, log, cs, testConfig, kc, az)
+			return newFakeUpgrader(ctx, log, cs, testConfig, kc, az)
 		},
 		configInterfaceFactory: config.New,
 		log:                    log,

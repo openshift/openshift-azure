@@ -53,17 +53,17 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			ubs := mock_updateblob.NewMockBlobService(gmc)
 			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
 			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
-			kc := mock_kubeclient.NewMockKubeclient(gmc)
+			kc := mock_kubeclient.NewMockInterface(gmc)
 			hasher := mock_cluster.NewMockHasher(gmc)
 
-			u := &simpleUpgrader{
-				updateBlobService: ubs,
-				vmc:               vmc,
-				ssc:               ssc,
-				Kubeclient:        kc,
-				log:               logrus.NewEntry(logrus.StandardLogger()),
-				hasher:            hasher,
-				cs:                tt.cs,
+			u := &SimpleUpgrader{
+				UpdateBlobService: ubs,
+				Vmc:               vmc,
+				Ssc:               ssc,
+				Interface:         kc,
+				Log:               logrus.NewEntry(logrus.StandardLogger()),
+				Hasher:            hasher,
+				Cs:                tt.cs,
 			}
 
 			hostnameHashes := map[string][]byte{}
@@ -106,7 +106,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				c = ubs.EXPECT().Write(uBlob).Return(nil).After(c)
 			}
 			if got := u.UpdateMasterAgentPool(ctx, &tt.cs.Properties.AgentPoolProfiles[0]); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("simpleUpgrader.updateInPlace() = %v, want %v", got, tt.want)
+				t.Errorf("SimpleUpgrader.updateInPlace() = %v, want %v", got, tt.want)
 			}
 		})
 	}

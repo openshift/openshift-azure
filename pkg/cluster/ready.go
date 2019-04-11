@@ -9,18 +9,18 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 )
 
-func (u *simpleUpgrader) WaitForNodesInAgentPoolProfile(ctx context.Context, app *api.AgentPoolProfile, suffix string) error {
-	vms, err := u.vmc.List(ctx, u.cs.Properties.AzProfile.ResourceGroup, names.GetScalesetName(app, suffix), "", "", "")
+func (u *SimpleUpgrader) WaitForNodesInAgentPoolProfile(ctx context.Context, app *api.AgentPoolProfile, suffix string) error {
+	vms, err := u.Vmc.List(ctx, u.Cs.Properties.AzProfile.ResourceGroup, names.GetScalesetName(app, suffix), "", "", "")
 	if err != nil {
 		return err
 	}
 	for _, vm := range vms {
 		hostname := strings.ToLower(*vm.VirtualMachineScaleSetVMProperties.OsProfile.ComputerName)
-		u.log.Infof("waiting for %s to be ready", hostname)
+		u.Log.Infof("waiting for %s to be ready", hostname)
 		if app.Role == api.AgentPoolProfileRoleMaster {
-			err = u.Kubeclient.WaitForReadyMaster(ctx, hostname)
+			err = u.Interface.WaitForReadyMaster(ctx, hostname)
 		} else {
-			err = u.Kubeclient.WaitForReadyWorker(ctx, hostname)
+			err = u.Interface.WaitForReadyWorker(ctx, hostname)
 		}
 		if err != nil {
 			return err
@@ -31,8 +31,8 @@ func (u *simpleUpgrader) WaitForNodesInAgentPoolProfile(ctx context.Context, app
 
 // SortedAgentPoolProfilesForRole returns a shallow copy of the
 // AgentPoolProfiles of a given role, sorted by name
-func (u *simpleUpgrader) SortedAgentPoolProfilesForRole(role api.AgentPoolProfileRole) (apps []api.AgentPoolProfile) {
-	for _, app := range u.cs.Properties.AgentPoolProfiles {
+func (u *SimpleUpgrader) SortedAgentPoolProfilesForRole(role api.AgentPoolProfileRole) (apps []api.AgentPoolProfile) {
+	for _, app := range u.Cs.Properties.AgentPoolProfiles {
 		if app.Role == role {
 			apps = append(apps, app)
 		}

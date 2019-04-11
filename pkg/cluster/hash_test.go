@@ -123,7 +123,7 @@ func TestHashScaleSetStability(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			hasher := hasher{
+			hasher := Hash{
 				startupFactory: startup.New,
 				arm:            arm,
 			}
