@@ -44,7 +44,10 @@ spec:
         - name: STATS_PORT
           value: "1936"
         - name: STATS_USERNAME
-          value: admin
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: router-stats
         - name: ROUTER_THREADS
           value: "0"
         - name: EXTENDED_VALIDATION

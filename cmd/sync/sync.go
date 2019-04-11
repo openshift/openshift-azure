@@ -24,7 +24,7 @@ var (
 	dryRun    = flag.Bool("dry-run", false, "Print resources to be synced instead of mutating cluster state.")
 	once      = flag.Bool("run-once", false, "If true, run only once then quit.")
 	interval  = flag.Duration("interval", 3*time.Minute, "How often the sync process going to be rerun.")
-	logLevel  = flag.String("loglevel", "Debug", "valid values are Debug, Info, Warning, Error")
+	logLevel  = flag.String("loglevel", "Info", "valid values are Debug, Info, Warning, Error")
 	gitCommit = "unknown"
 )
 
@@ -68,6 +68,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 	if err != nil {
 		return err
 	}
+	log.Printf("running sync for plugin %s", cs.Config.PluginVersion)
 
 	log.Print("enriching config")
 	err = enrich.CertificatesFromVault(ctx, kvc, cs)
@@ -75,11 +76,13 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
+	log.Print("enriching storage account keys")
 	err = enrich.StorageAccountKeys(ctx, azs, cs)
 	if err != nil {
 		return err
 	}
 
+	log.Print("creating new sync")
 	s, err := sync.New(log, cs, true)
 	if err != nil {
 		return err

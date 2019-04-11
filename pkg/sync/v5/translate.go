@@ -620,6 +620,12 @@ var translations = map[string][]struct {
 			Template: "{{ .Config.ConsoleOAuthSecret }}",
 		},
 	},
+	"Secret/openshift-monitoring/router-stats": {
+		{
+			Path:     jsonpath.MustCompile("$.stringData.password"),
+			Template: "{{ .Config.RouterStatsPassword }}",
+		},
+	},
 	"Secret/openshift-monitoring/etcd-metrics": {
 		{
 			Path:     jsonpath.MustCompile("$.stringData.'username'"),
