@@ -39,10 +39,10 @@ data:
         MESSAGE ${record["MESSAGE"].nil? ? nil : record["MESSAGE"].force_encoding("UTF-8").encode("ASCII", invalid: :replace, undef: :replace)}
         # data format:
         # k8s_apiserver_apiserver-vqxg4_kube-service-catalog_72ce4d73-5224-11e9-98d0-000d3a196756_0
-        CONTAINER ${unless record["CONTAINER_NAME"].nil? ; record["CONTAINER_NAME"].split("_")[1] ; end; }
-        POD ${unless record["CONTAINER_NAME"].nil?; record["CONTAINER_NAME"].split("_")[2] ; end; }
-        NAMESPACE ${unless record["CONTAINER_NAME"].nil? ; record["CONTAINER_NAME"].split("_")[3] ; end; }
-        CONTAINER_ID ${unless record["CONTAINER_NAME"].nil? ; record["CONTAINER_NAME"].split("_")[4] ; end; }
+        CONTAINER ${record["CONTAINER_NAME"].nil? ? nil : record["CONTAINER_NAME"].split("_")[1] }
+        POD ${record["CONTAINER_NAME"].nil? ? nil : record["CONTAINER_NAME"].split("_")[2] }
+        NAMESPACE ${record["CONTAINER_NAME"].nil? ? nil : record["CONTAINER_NAME"].split("_")[3] }
+        CONTAINER_ID ${record["CONTAINER_NAME"].nil? ? nil : record["CONTAINER_NAME"].split("_")[4] }
       </record>
     </filter>
     <match **>
