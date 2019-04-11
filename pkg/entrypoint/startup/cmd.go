@@ -6,6 +6,10 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
+type Config struct {
+	config.Common
+}
+
 // NewCommand returns the cobra command for "startup".
 func NewCommand() *cobra.Command {
 	cc := &cobra.Command{

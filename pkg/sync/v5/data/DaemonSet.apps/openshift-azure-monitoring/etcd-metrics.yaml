@@ -18,8 +18,6 @@ spec:
       containers:
       - args:
         - tlsproxy
-        - --loglevel
-        - debug
         - --hostname
         - https://$(HOSTNAME):2379
         - --listen

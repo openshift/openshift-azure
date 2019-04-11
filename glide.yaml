@@ -79,3 +79,6 @@ import:
 - package: github.com/kubernetes-incubator/service-catalog
   repo:    https://github.com/openshift/service-catalog.git
   version: 3.11
+- packate: github.com/spf13/cobra
+  # match upstream
+  version: v0.0.3

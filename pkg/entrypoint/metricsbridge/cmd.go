@@ -6,6 +6,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
+type Config struct {
+	config.Common
+	configDir string
+}
+
 // NewCommand returns the cobra command for "metricsbridge".
 func NewCommand() *cobra.Command {
 	cc := &cobra.Command{

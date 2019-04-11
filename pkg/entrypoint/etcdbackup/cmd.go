@@ -6,6 +6,14 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
+type Config struct {
+	config.Common
+	blobName    string
+	destination string
+	maxBackups  int
+	action      string
+}
+
 // NewCommand returns the cobra command for "etcdbackup".
 func NewCommand() *cobra.Command {
 	cc := &cobra.Command{

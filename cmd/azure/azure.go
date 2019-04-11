@@ -15,10 +15,12 @@ import (
 var gitCommit = "unknown"
 
 func main() {
-	run()
+	if err := run(); err != nil {
+		panic(err)
+	}
 }
 
-func run() {
+func run() error {
 	rootCmd := &cobra.Command{
 		Use:  "./azure [component]",
 		Long: "Azure Red Hat OpenShift dispatcher",
@@ -34,7 +36,5 @@ func run() {
 	rootCmd.AddCommand(sync.NewCommand())
 	rootCmd.AddCommand(tlsproxy.NewCommand())
 
-	if err := rootCmd.Execute(); err != nil {
-		panic(err)
-	}
+	return rootCmd.Execute()
 }

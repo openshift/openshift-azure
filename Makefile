@@ -2,7 +2,7 @@ TAG=$(shell git describe --tags HEAD)
 GITCOMMIT=$(TAG)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
 LDFLAGS="-X main.gitCommit=$(GITCOMMIT)"
 
-AZURE_IMAGE ?= quay.io/openshift-on-azure/arho:$(TAG)
+AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(TAG)
 
 GOPATH ?= $(HOME)/go
 IMAGEBUILDER = ${GOPATH}/bin/imagebuilder

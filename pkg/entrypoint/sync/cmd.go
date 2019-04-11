@@ -8,6 +8,13 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
+type Config struct {
+	config.Common
+	dryRun   bool
+	once     bool
+	interval time.Duration
+}
+
 // NewCommand returns the cobra command for "sync".
 func NewCommand() *cobra.Command {
 	cc := &cobra.Command{
