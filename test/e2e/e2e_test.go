@@ -1,10 +1,6 @@
-//+build e2e
-
 package e2e
 
 import (
-	"flag"
-	"fmt"
 	"os"
 	"testing"
 
@@ -13,6 +9,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/openshift/openshift-azure/pkg/util/log"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/fakerp"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/realrp"
@@ -24,17 +21,32 @@ var (
 )
 
 func TestE2E(t *testing.T) {
-	fmt.Printf("e2e tests starting, git commit %s\n", gitCommit)
+	logger := os.Stdout
+	fd := int(logger.Fd())
 
-	flag.Parse()
-	logrus.SetFormatter(&logrus.TextFormatter{})
-	logrus.SetOutput(GinkgoWriter)
-	logrus.SetReportCaller(true)
+	capture, err := reporters.NewCapture(fd)
+	if err != nil {
+		panic(err)
+	}
+
+	logrus.SetLevel(log.SanitizeLogLevel("Debug"))
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+	logrus.SetOutput(logger)
+	log := logrus.NewEntry(logrus.StandardLogger())
 
 	RegisterFailHandler(Fail)
 
+	// init reporter to see logs early
+	ar := reporters.NewAzureAppInsightsReporter(log, capture.Reader)
+
+	log.Debugf("e2e tests starting, git commit %s", gitCommit)
+
+	// IMPORTANT: Current AzureAppInsight reported does not support parallel tests
+	// This is due inability to distinguish betwean tests cases in the output.
+	// If at any point parallel execution is needed, GinkoWriter should be initiated
+	// at the spec level, and potentially handled via multiple buffers
 	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
-		RunSpecsWithDefaultAndCustomReporters(t, "e2e tests", []Reporter{reporters.NewAzureAppInsightsReporter()})
+		RunSpecsWithDefaultAndCustomReporters(t, "e2e tests", []Reporter{ar})
 	} else {
 		RunSpecs(t, "e2e tests")
 	}
