@@ -16,7 +16,7 @@ func login(username string, cs *internalapi.OpenShiftManagedCluster) (*v1.Config
 	var organization []string
 	switch username {
 	case "customer-cluster-admin":
-		organization = []string{"osa-customer-admins"}
+		organization = []string{"osa-customer-admins", "system:authenticated", "system:authenticated:oauth"}
 	case "enduser":
 		organization = []string{"system:authenticated", "system:authenticated:oauth"}
 	case "admin":
