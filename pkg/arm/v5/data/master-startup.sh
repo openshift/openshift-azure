@@ -26,7 +26,7 @@ fi
 for dst in tcp,8444; do
 	proto=${dst%%,*}
 	port=${dst##*,}
-	iptables -A OS_FIREWALL_ALLOW -p $proto -m state --state NEW -m $proto --dport $port -j ACCEPT
+	iptables -A OS_FIREWALL_ALLOW -p $proto -m state --state NEW -m $proto --dport $port -j ACCEPT -w
 done
 
 iptables-save >/etc/sysconfig/iptables

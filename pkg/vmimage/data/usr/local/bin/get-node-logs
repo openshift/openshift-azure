@@ -28,7 +28,7 @@ vmstat 2 20 > ${LOG_DIR}/vmstat_2_20.log
 mount > ${LOG_DIR}/mount.log
 
 for table in filter nat; do
-    iptables -t $table -nvL > ${LOG_DIR}/iptables_$table.log
+    iptables -t $table -nvL > ${LOG_DIR}/iptables_$table.log -w
 done
 
 # Dump system journal
