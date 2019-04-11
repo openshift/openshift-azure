@@ -43,6 +43,7 @@ done
 
 for node in $(oc get nodes -o jsonpath='{.items[*].metadata.name}'); do
     oc get --raw "/api/v1/nodes/$node/proxy/debug/pprof/goroutine?debug=2" >"$ARTIFACT_DIR/$node-goroutines"
+    hack/scp.sh "$node":'/var/crash/*/vmcore-dmesg.txt' "$ARTIFACT_DIR/$node-vmcore-dmesg.txt"
 done
 
 po_pod=$(oc get pod -n openshift-monitoring -l k8s-app=prometheus-operator -o jsonpath='{.items[0].metadata.name}')
