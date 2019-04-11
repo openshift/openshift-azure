@@ -31,5 +31,5 @@ func (kv *FakeKeyVaultClient) GetSecret(ctx context.Context, vaultBaseURL string
 
 // ImportCertificate Fakes base method
 func (kv *FakeKeyVaultClient) ImportCertificate(arg0 context.Context, arg1, arg2 string, arg3 keyvault.CertificateImportParameters) (keyvault.CertificateBundle, error) {
-	return keyvault.CertificateBundle{}, fmt.Errorf("not supported as a fake")
+	return keyvault.CertificateBundle{}, fmt.Errorf("fake not implemented")
 }

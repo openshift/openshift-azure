@@ -12,7 +12,6 @@ import (
 // VirtualMachineScaleSetsClient is a minimal interface for azure VirtualMachineScaleSetsClient
 type VirtualMachineScaleSetsClient interface {
 	VirtualMachineScaleSetsClientAddons
-	Client
 }
 
 type virtualMachineScaleSetsClient struct {

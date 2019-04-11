@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
-	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/to"
 	uuid "github.com/satori/go.uuid"
 )
@@ -20,14 +19,9 @@ func NewFakeVirtualMachineScaleSetVMsClient(az *AzureCloud) *FakeVirtualMachineS
 	return &FakeVirtualMachineScaleSetVMsClient{az: az}
 }
 
-// Client Fakes base method
-func (v *FakeVirtualMachineScaleSetVMsClient) Client() autorest.Client {
-	return allwaysDoneClient()
-}
-
 // Deallocate Fakes base method
 func (v *FakeVirtualMachineScaleSetVMsClient) Deallocate(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) error {
-	for _, vm := range v.az.Vms {
+	for _, vm := range v.az.Vms[VMScaleSetName] {
 		if *vm.InstanceID == instanceID {
 			vm.VirtualMachineScaleSetVMProperties.ProvisioningState = to.StringPtr("Stopped")
 			return nil
@@ -38,9 +32,9 @@ func (v *FakeVirtualMachineScaleSetVMsClient) Deallocate(ctx context.Context, re
 
 // Delete Fakes base method
 func (v *FakeVirtualMachineScaleSetVMsClient) Delete(ctx context.Context, resourceGroupName string, VMScaleSetName string, instanceID string) error {
-	for s, vm := range v.az.Vms {
+	for s, vm := range v.az.Vms[VMScaleSetName] {
 		if *vm.InstanceID == instanceID {
-			v.az.Vms = append(v.az.Vms[:s], v.az.Vms[s+1:]...)
+			v.az.Vms[VMScaleSetName] = append(v.az.Vms[VMScaleSetName][:s], v.az.Vms[VMScaleSetName][s+1:]...)
 			return nil
 		}
 	}
@@ -48,10 +42,10 @@ func (v *FakeVirtualMachineScaleSetVMsClient) Delete(ctx context.Context, resour
 }
 
 // List Fakes base method
-func (v *FakeVirtualMachineScaleSetVMsClient) List(ctx context.Context, resourceGroupName, virtualMachineScaleSetName, filter, selectParameter, expand string) ([]compute.VirtualMachineScaleSetVM, error) {
-	prefix := virtualMachineScaleSetName[3:]
+func (v *FakeVirtualMachineScaleSetVMsClient) List(ctx context.Context, resourceGroupName, VMScaleSetName, filter, selectParameter, expand string) ([]compute.VirtualMachineScaleSetVM, error) {
+	prefix := VMScaleSetName[3:]
 	result := []compute.VirtualMachineScaleSetVM{}
-	for _, vm := range v.az.Vms {
+	for _, vm := range v.az.Vms[VMScaleSetName] {
 		if strings.HasPrefix(*vm.Name, prefix) {
 			result = append(result, vm)
 		}
@@ -62,7 +56,7 @@ func (v *FakeVirtualMachineScaleSetVMsClient) List(ctx context.Context, resource
 
 // Reimage Fakes base method
 func (v *FakeVirtualMachineScaleSetVMsClient) Reimage(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string, VMScaleSetVMReimageInput *compute.VirtualMachineScaleSetVMReimageParameters) error {
-	for _, vm := range v.az.Vms {
+	for _, vm := range v.az.Vms[VMScaleSetName] {
 		if *vm.InstanceID == instanceID {
 			vm.VirtualMachineScaleSetVMProperties.ProvisioningState = to.StringPtr("Reimaged")
 			return nil
@@ -87,7 +81,7 @@ func (v *FakeVirtualMachineScaleSetVMsClient) RunCommand(ctx context.Context, re
 
 // Start Fakes base method
 func (v *FakeVirtualMachineScaleSetVMsClient) Start(ctx context.Context, resourceGroupName, VMScaleSetName, instanceID string) error {
-	for _, vm := range v.az.Vms {
+	for _, vm := range v.az.Vms[VMScaleSetName] {
 		if *vm.InstanceID == instanceID {
 			vm.VirtualMachineScaleSetVMProperties.ProvisioningState = to.StringPtr("Started")
 			return nil
@@ -107,23 +101,13 @@ func NewFakeVirtualMachineScaleSetsClient(az *AzureCloud) *FakeVirtualMachineSca
 	return &FakeVirtualMachineScaleSetsClient{az: az}
 }
 
-// Client Fakes base method
-func (s *FakeVirtualMachineScaleSetsClient) Client() autorest.Client {
-	return allwaysDoneClient()
-}
-
 func (s *FakeVirtualMachineScaleSetsClient) scale(ctx context.Context, resourceGroupName string, ss *compute.VirtualMachineScaleSet) error {
-	var have int64
-	for _, vm := range s.az.Vms {
-		if *ss.Name == *vm.Tags["scaleset"] {
-			have++
-		}
-	}
+	have := len(s.az.Vms[*ss.Name])
 	s.az.log.Debugf("scale have:%d, cap:%d", have, *ss.Sku.Capacity)
-	if have > *ss.Sku.Capacity {
+	if have > int(*ss.Sku.Capacity) {
 		return fmt.Errorf("should not be automatically scaling down")
 	}
-	for v := have; *ss.Sku.Capacity > have; v++ {
+	for v := have; int(*ss.Sku.Capacity) > have; v++ {
 		name := fmt.Sprintf("%s-%d", (*ss.Name)[3:], v)
 		compName := fmt.Sprintf("%s-%06d", (*ss.Name)[3:], v)
 		s.az.log.Infof("scale have:%d, cap:%d, v:%d, name:%s, compName:%s", have, *ss.Sku.Capacity, v, name, compName)
@@ -131,7 +115,6 @@ func (s *FakeVirtualMachineScaleSetsClient) scale(ctx context.Context, resourceG
 		if tags == nil {
 			tags = map[string]*string{}
 		}
-		tags["scaleset"] = ss.Name
 		vm := compute.VirtualMachineScaleSetVM{
 			ID:         to.StringPtr(uuid.NewV4().String()),
 			InstanceID: to.StringPtr(uuid.NewV4().String()),
@@ -144,7 +127,7 @@ func (s *FakeVirtualMachineScaleSetsClient) scale(ctx context.Context, resourceG
 			Tags:     tags,
 			Zones:    ss.Zones,
 		}
-		s.az.Vms = append(s.az.Vms, vm)
+		s.az.Vms[*ss.Name] = append(s.az.Vms[*ss.Name], vm)
 		s.az.VirtualMachineScaleSetVMsClient.Start(ctx, resourceGroupName, *ss.Name, *vm.InstanceID)
 		have++
 	}

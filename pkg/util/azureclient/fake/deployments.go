@@ -3,15 +3,14 @@ package fake
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/azure"
 )
 
 // FakeDeploymentsClient is a Fake of DeploymentsClient interface
@@ -24,38 +23,37 @@ func NewFakeDeploymentsClient(az *AzureCloud) *FakeDeploymentsClient {
 	return &FakeDeploymentsClient{az: az}
 }
 
-// Client Fakes base method
+func (d *FakeDeploymentsClient) CreateOrUpdate(ctx context.Context, resourceGroupName string, deploymentName string, parameters resources.Deployment) (resources.DeploymentsCreateOrUpdateFuture, error) {
+	return resources.DeploymentsCreateOrUpdateFuture{}, fmt.Errorf("not implemented")
+}
+
+type fakeClient struct {
+}
+
+func (f *fakeClient) Do(req *http.Request) (*http.Response, error) {
+	return &http.Response{StatusCode: 200}, nil
+}
+
 func (d *FakeDeploymentsClient) Client() autorest.Client {
-	return allwaysDoneClient()
+	return autorest.Client{Sender: &fakeClient{}}
 }
 
 // CreateOrUpdate Fakes base method
-func (d *FakeDeploymentsClient) CreateOrUpdate(ctx context.Context, resourceGroupName string, deploymentName string, parameters resources.Deployment) (result resources.DeploymentsCreateOrUpdateFuture, err error) {
-	var testURL *url.URL
-	testURL, err = url.Parse("https://example.com/nothing")
-
-	result.Future, _ = azure.NewFutureFromResponse(&http.Response{
-		StatusCode: 200,
-		Request: &http.Request{
-			Method: http.MethodPut,
-			URL:    testURL,
-		},
-	})
+// store in memory the resources that are created so that other api requests can work with them
+func (d *FakeDeploymentsClient) CreateOrUpdateAndWait(ctx context.Context, resourceGroupName string, deploymentName string, parameters resources.Deployment) error {
 	templ := parameters.Properties.Template.(map[string]interface{})
 	for _, r := range templ["resources"].([]interface{}) {
 		rMap := r.(map[string]interface{})
 		if strings.Contains(rMap["type"].(string), "Microsoft.Storage/storageAccounts") {
 			sa := storage.Account{}
 			var sab []byte
-			sab, err = json.Marshal(rMap)
+			sab, err := json.Marshal(rMap)
 			if err != nil {
-				result.Future.Response().StatusCode = 500
-				return
+				return err
 			}
 			err = sa.UnmarshalJSON(sab)
 			if err != nil {
-				result.Future.Response().StatusCode = 500
-				return
+				return err
 			}
 
 			updated := false
@@ -70,13 +68,19 @@ func (d *FakeDeploymentsClient) CreateOrUpdate(ctx context.Context, resourceGrou
 			}
 		} else if strings.Contains(rMap["type"].(string), "Microsoft.Compute/virtualMachineScaleSets") {
 			vm := compute.VirtualMachineScaleSet{}
-			rb, _ := json.Marshal(rMap)
-			vm.UnmarshalJSON(rb)
-			d.az.VirtualMachineScaleSetsClient.CreateOrUpdate(ctx, resourceGroupName, *vm.Name, vm)
+			rb, err := json.Marshal(rMap)
+			if err != nil {
+				return err
+			}
+			err = vm.UnmarshalJSON(rb)
+			if err != nil {
+				return err
+			}
+			err = d.az.VirtualMachineScaleSetsClient.CreateOrUpdate(ctx, resourceGroupName, *vm.Name, vm)
+			if err != nil {
+				return err
+			}
 		}
 	}
-
-	// store in memory the resources that are created so that other api requests can work with them
-	err = nil
-	return
+	return nil
 }

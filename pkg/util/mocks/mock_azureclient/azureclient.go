@@ -46,20 +46,6 @@ func (m *MockAccountsClient) EXPECT() *MockAccountsClientMockRecorder {
 	return m.recorder
 }
 
-// Client mocks base method
-func (m *MockAccountsClient) Client() autorest.Client {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Client")
-	ret0, _ := ret[0].(autorest.Client)
-	return ret0
-}
-
-// Client indicates an expected call of Client
-func (mr *MockAccountsClientMockRecorder) Client() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockAccountsClient)(nil).Client))
-}
-
 // Create mocks base method
 func (m *MockAccountsClient) Create(arg0 context.Context, arg1, arg2 string, arg3 storage.AccountCreateParameters) error {
 	m.ctrl.T.Helper()
@@ -349,6 +335,20 @@ func (m *MockDeploymentsClient) CreateOrUpdate(arg0 context.Context, arg1, arg2 
 func (mr *MockDeploymentsClientMockRecorder) CreateOrUpdate(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdate", reflect.TypeOf((*MockDeploymentsClient)(nil).CreateOrUpdate), arg0, arg1, arg2, arg3)
+}
+
+// CreateOrUpdateAndWait mocks base method
+func (m *MockDeploymentsClient) CreateOrUpdateAndWait(arg0 context.Context, arg1, arg2 string, arg3 resources.Deployment) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateOrUpdateAndWait", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateOrUpdateAndWait indicates an expected call of CreateOrUpdateAndWait
+func (mr *MockDeploymentsClientMockRecorder) CreateOrUpdateAndWait(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateOrUpdateAndWait", reflect.TypeOf((*MockDeploymentsClient)(nil).CreateOrUpdateAndWait), arg0, arg1, arg2, arg3)
 }
 
 // MockGroupsClient is a mock of GroupsClient interface
@@ -975,20 +975,6 @@ func NewMockVirtualMachineScaleSetsClient(ctrl *gomock.Controller) *MockVirtualM
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockVirtualMachineScaleSetsClient) EXPECT() *MockVirtualMachineScaleSetsClientMockRecorder {
 	return m.recorder
-}
-
-// Client mocks base method
-func (m *MockVirtualMachineScaleSetsClient) Client() autorest.Client {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Client")
-	ret0, _ := ret[0].(autorest.Client)
-	return ret0
-}
-
-// Client indicates an expected call of Client
-func (mr *MockVirtualMachineScaleSetsClientMockRecorder) Client() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockVirtualMachineScaleSetsClient)(nil).Client))
 }
 
 // CreateOrUpdate mocks base method

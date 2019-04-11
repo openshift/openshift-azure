@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
-	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/to"
 )
 
@@ -17,11 +16,6 @@ type FakeAccountsClient struct {
 // NewFakeAccountsClient creates a new mock instance
 func NewFakeAccountsClient(az *AzureCloud) *FakeAccountsClient {
 	return &FakeAccountsClient{az: az}
-}
-
-// Client mocks base method
-func (a *FakeAccountsClient) Client() autorest.Client {
-	return allwaysDoneClient()
 }
 
 // Create mocks base method

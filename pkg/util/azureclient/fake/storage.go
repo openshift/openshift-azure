@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 
 	"github.com/Azure/azure-sdk-for-go/storage"
-	"github.com/Azure/go-autorest/autorest"
 
 	azurestorage "github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
@@ -20,11 +19,6 @@ type FakeStorageClient struct {
 // NewFakeStorageClient creates a new mock instance
 func NewFakeStorageClient(az *AzureCloud) *FakeStorageClient {
 	return &FakeStorageClient{az: az}
-}
-
-// Client mocks base method
-func (s *FakeStorageClient) Client() autorest.Client {
-	return allwaysDoneClient()
 }
 
 func (s *FakeStorageClient) GetBlobService() azurestorage.BlobStorageClient {

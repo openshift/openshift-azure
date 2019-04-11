@@ -13,6 +13,7 @@ import (
 type DeploymentsClient interface {
 	CreateOrUpdate(ctx context.Context, resourceGroupName string, deploymentName string, parameters resources.Deployment) (result resources.DeploymentsCreateOrUpdateFuture, err error)
 	Client
+	DeploymentsClientAddons
 }
 
 type deploymentsClient struct {
