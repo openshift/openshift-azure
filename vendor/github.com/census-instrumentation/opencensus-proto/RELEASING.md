@@ -10,63 +10,20 @@ Other systems may also work, but we haven't verified them.
 
 ## Release Go files
 
-To generate the Go files from protos, you'll need to install protoc, protoc-gen-go and grpc-gateway plugins first.
-Follow the instructions [here](http://google.github.io/proto-lens/installing-protoc.html),
-[here](https://github.com/golang/protobuf#installation) and [here](https://github.com/grpc-ecosystem/grpc-gateway#installation).
+To generate the Go files from protos, you'll need to install protoc and protoc-gen-go plugin first.
+Follow the instructions [here](http://google.github.io/proto-lens/installing-protoc.html) and
+[here](https://github.com/golang/protobuf#installation).
 
 Then run the following commands to re-generate the gen-go files:
 
 ```bash
-$ cd $(go env GOPATH)/src/github.com/census-instrumentation/opencensus-proto
 $ git checkout -b update-gen-go
-$ rm -rf gen-go
 $ cd src
 $ ./mkgogen.sh
-$ git add -A
-$ git commit -m "Update gen-go files."
+$ git commit -a -m "Update gen-go files."
 ```
 
 Go through PR review and merge the changes to GitHub.
-
-## Release Ruby files
-
-To generate the Ruby files from protos, you'll need to install grpc-tools gem.
-
-```bash
-gem install grpc-tools
-```
-
-Then run the following commands to re-generate the gen-ruby files:
-
-```bash
-$ git@github.com:census-instrumentation/opencensus-proto.git
-$ cd opencensus-proto
-$ git checkout -b update-gen-ruby
-$ rm -rf gen-ruby
-$ cd src
-$ ./mkrubygen.sh
-$ git add -A
-$ git commit -m "Update gen-ruby files."
-```
-
-## Release Python files
-
-To generate the Python files from protos, you'll need to install grpc-tools from PIP.
-
-```bash
-python -m pip install grpcio-tools
-```
-
-Then run the following commands to re-generate the gen-python files:
-
-```bash
-$ git checkout -b update-gen-python # Assume you're under opencensus-proto/
-$ rm -rf gen-python
-$ cd src
-$ ./mkpygen.sh
-$ git add -A
-$ git commit -m "Update gen-python files."
-```
 
 ## Tagging the Release
 

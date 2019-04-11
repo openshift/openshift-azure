@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,39 +6,13 @@
 
 // Package people provides access to the People API.
 //
-// For product documentation, see: https://developers.google.com/people/
-//
-// Creating a client
+// See https://developers.google.com/people/
 //
 // Usage example:
 //
 //   import "google.golang.org/api/people/v1"
 //   ...
-//   ctx := context.Background()
-//   peopleService, err := people.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
-//
-//   peopleService, err := people.NewService(ctx, option.WithScopes(people.UserinfoProfileScope))
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   peopleService, err := people.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   peopleService, err := people.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   peopleService, err := people.New(oauthHttpClient)
 package people // import "google.golang.org/api/people/v1"
 
 import (
@@ -55,8 +29,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -86,7 +58,7 @@ const (
 	// See and download your contacts
 	ContactsReadonlyScope = "https://www.googleapis.com/auth/contacts.readonly"
 
-	// View your basic profile info, including your age range and language
+	// Know the list of people in your circles, your age range, and language
 	PlusLoginScope = "https://www.googleapis.com/auth/plus.login"
 
 	// View your street addresses
@@ -104,45 +76,10 @@ const (
 	// View your email address
 	UserinfoEmailScope = "https://www.googleapis.com/auth/userinfo.email"
 
-	// See your personal info, including any personal info you've made
-	// publicly available
+	// View your basic profile info
 	UserinfoProfileScope = "https://www.googleapis.com/auth/userinfo.profile"
 )
 
-// NewService creates a new Service.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/contacts",
-		"https://www.googleapis.com/auth/contacts.readonly",
-		"https://www.googleapis.com/auth/plus.login",
-		"https://www.googleapis.com/auth/user.addresses.read",
-		"https://www.googleapis.com/auth/user.birthday.read",
-		"https://www.googleapis.com/auth/user.emails.read",
-		"https://www.googleapis.com/auth/user.phonenumbers.read",
-		"https://www.googleapis.com/auth/userinfo.email",
-		"https://www.googleapis.com/auth/userinfo.profile",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new Service. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -1521,8 +1458,7 @@ type Organization struct {
 	Department string `json:"department,omitempty"`
 
 	// Domain: The domain name associated with the organization; for
-	// example,
-	// `google.com`.
+	// example, `google.com`.
 	Domain string `json:"domain,omitempty"`
 
 	// EndDate: The end date when the person left the organization.
@@ -1856,10 +1792,9 @@ func (s *PersonResponse) MarshalJSON() ([]byte, error) {
 
 // PhoneNumber: A person's phone number.
 type PhoneNumber struct {
-	// CanonicalForm: The read-only canonicalized
-	// [ITU-T
-	// E.164](https://law.resource.org/pub/us/cfr/ibr/004/itu-t.E.164.
-	// 1.2008.pdf)
+	// CanonicalForm: The read-only canonicalized [ITU-T
+	// E.164](https://law.resource.org/pub/us/cfr/ibr/004/itu-t.E.164.1.2008.
+	// pdf)
 	// form of the phone number.
 	CanonicalForm string `json:"canonicalForm,omitempty"`
 
@@ -2336,20 +2271,20 @@ func (s *Source) MarshalJSON() ([]byte, error) {
 }
 
 // Status: The `Status` type defines a logical error model that is
-// suitable for
-// different programming environments, including REST APIs and RPC APIs.
-// It is
-// used by [gRPC](https://github.com/grpc). The error model is designed
-// to be:
+// suitable for different
+// programming environments, including REST APIs and RPC APIs. It is
+// used by
+// [gRPC](https://github.com/grpc). The error model is designed to
+// be:
 //
 // - Simple to use and understand for most users
 // - Flexible enough to meet unexpected needs
 //
 // # Overview
 //
-// The `Status` message contains three pieces of data: error code,
-// error
-// message, and error details. The error code should be an enum value
+// The `Status` message contains three pieces of data: error code, error
+// message,
+// and error details. The error code should be an enum value
 // of
 // google.rpc.Code, but it may accept additional error codes if needed.
 // The
@@ -3534,12 +3469,6 @@ type ContactGroupsMembersModifyCall struct {
 
 // Modify: Modify the members of a contact group owned by the
 // authenticated user.
-// <br>
-// The only system contact groups that can have members added
-// are
-// `contactGroups/myContacts` and `contactGroups/starred`. Other
-// system
-// contact groups are deprecated and can only have contacts removed.
 func (r *ContactGroupsMembersService) Modify(resourceName string, modifycontactgroupmembersrequest *ModifyContactGroupMembersRequest) *ContactGroupsMembersModifyCall {
 	c := &ContactGroupsMembersModifyCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.resourceName = resourceName
@@ -3638,7 +3567,7 @@ func (c *ContactGroupsMembersModifyCall) Do(opts ...googleapi.CallOption) (*Modi
 	}
 	return ret, nil
 	// {
-	//   "description": "Modify the members of a contact group owned by the authenticated user.\n\u003cbr\u003e\nThe only system contact groups that can have members added are\n`contactGroups/myContacts` and `contactGroups/starred`. Other system\ncontact groups are deprecated and can only have contacts removed.",
+	//   "description": "Modify the members of a contact group owned by the authenticated user.",
 	//   "flatPath": "v1/contactGroups/{contactGroupsId}/members:modify",
 	//   "httpMethod": "POST",
 	//   "id": "people.contactGroups.members.modify",

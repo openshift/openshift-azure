@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,35 +6,13 @@
 
 // Package androidenterprise provides access to the Google Play EMM API.
 //
-// For product documentation, see: https://developers.google.com/android/work/play/emm-api
-//
-// Creating a client
+// See https://developers.google.com/android/work/play/emm-api
 //
 // Usage example:
 //
 //   import "google.golang.org/api/androidenterprise/v1"
 //   ...
-//   ctx := context.Background()
-//   androidenterpriseService, err := androidenterprise.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   androidenterpriseService, err := androidenterprise.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   androidenterpriseService, err := androidenterprise.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   androidenterpriseService, err := androidenterprise.New(oauthHttpClient)
 package androidenterprise // import "google.golang.org/api/androidenterprise/v1"
 
 import (
@@ -51,8 +29,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -80,32 +56,6 @@ const (
 	AndroidenterpriseScope = "https://www.googleapis.com/auth/androidenterprise"
 )
 
-// NewService creates a new Service.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/androidenterprise",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new Service. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -2768,9 +2718,6 @@ type ProductPolicy struct {
 	// AutoInstallPolicy: The auto-install policy for the product.
 	AutoInstallPolicy *AutoInstallPolicy `json:"autoInstallPolicy,omitempty"`
 
-	// ManagedConfiguration: The managed configuration for the product.
-	ManagedConfiguration *ManagedConfiguration `json:"managedConfiguration,omitempty"`
-
 	// ProductId: The ID of the product. For example,
 	// "app:com.google.android.gm".
 	ProductId string `json:"productId,omitempty"`
@@ -3722,23 +3669,9 @@ func (s *VariableSet) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// WebApp: A WebApps resource represents a web app created for an
-// enterprise. Web apps are published to managed Google Play and can be
-// distributed like other Android apps. On a user's device, a web app
-// opens its specified URL.
+// WebApp: WebApp resource info.
 type WebApp struct {
 	// DisplayMode: The display mode of the web app.
-	//
-	// Possible values include:
-	// - "minimalUi", the device's status bar, navigation bar, the app's
-	// URL, and a refresh button are visible when the app is open. For HTTP
-	// URLs, you can only select this option.
-	// - "standalone", the device's status bar and navigation bar are
-	// visible when the app is open.
-	// - "fullScreen", the app opens in full screen mode, hiding the
-	// device's status and navigation bars. All browser UI elements, page
-	// URL, system status bar and back button are not visible, and the web
-	// app takes up the entirety of the available display area.
 	DisplayMode string `json:"displayMode,omitempty"`
 
 	// Icons: A list of icons representing this website. If absent, a
@@ -3754,8 +3687,9 @@ type WebApp struct {
 	// opens the application.
 	StartUrl string `json:"startUrl,omitempty"`
 
-	// Title: The title of the web app as displayed to the user (e.g.,
-	// amongst a list of other applications, or as a label for an icon).
+	// Title: The title of the web application as displayed to the user
+	// (e.g., amongst a list of other applications, or as a label for an
+	// icon).
 	Title string `json:"title,omitempty"`
 
 	// VersionCode: The current version of the app.
@@ -3766,9 +3700,7 @@ type WebApp struct {
 	// web app up-to-date.
 	VersionCode int64 `json:"versionCode,omitempty,string"`
 
-	// WebAppId: The ID of the application. A string of the form
-	// "app:<package name>" where the package name always starts with the
-	// prefix "com.google.enterprise.webapp." followed by a random id.
+	// WebAppId: The ID of the application.
 	WebAppId string `json:"webAppId,omitempty"`
 
 	// ServerResponse contains the HTTP response code and headers from the

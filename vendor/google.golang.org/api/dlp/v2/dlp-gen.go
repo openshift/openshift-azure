@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,35 +8,13 @@
 //
 // This package is DEPRECATED. Use package cloud.google.com/go/dlp/apiv2 instead.
 //
-// For product documentation, see: https://cloud.google.com/dlp/docs/
-//
-// Creating a client
+// See https://cloud.google.com/dlp/docs/
 //
 // Usage example:
 //
 //   import "google.golang.org/api/dlp/v2"
 //   ...
-//   ctx := context.Background()
-//   dlpService, err := dlp.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   dlpService, err := dlp.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   dlpService, err := dlp.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   dlpService, err := dlp.New(oauthHttpClient)
 package dlp // import "google.golang.org/api/dlp/v2"
 
 import (
@@ -53,8 +31,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -82,32 +58,6 @@ const (
 	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 )
 
-// NewService creates a new Service.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/cloud-platform",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new Service. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -290,7 +240,7 @@ type ProjectsStoredInfoTypesService struct {
 // See https://cloud.google.com/dlp/docs/concepts-actions to learn more.
 type GooglePrivacyDlpV2Action struct {
 	// JobNotificationEmails: Enable email notification to project owners
-	// and editors on job's
+	// and editors on job‘s
 	// completion/failure.
 	JobNotificationEmails *GooglePrivacyDlpV2JobNotificationEmails `json:"jobNotificationEmails,omitempty"`
 
@@ -1301,9 +1251,7 @@ func (s *GooglePrivacyDlpV2Color) UnmarshalJSON(data []byte) error {
 // GooglePrivacyDlpV2Condition: The field type of `value` and `field` do
 // not need to match to be
 // considered equal, but not all comparisons are possible.
-// EQUAL_TO and NOT_EQUAL_TO attempt to compare even with incompatible
-// types,
-// but all other comparisons are invalid with incompatible types.
+//
 // A `value` of type:
 //
 // - `string` can be compared against all other types
@@ -1334,9 +1282,8 @@ type GooglePrivacyDlpV2Condition struct {
 	//
 	// Possible values:
 	//   "RELATIONAL_OPERATOR_UNSPECIFIED"
-	//   "EQUAL_TO" - Equal. Attempts to match even with incompatible types.
-	//   "NOT_EQUAL_TO" - Not equal to. Attempts to match even with
-	// incompatible types.
+	//   "EQUAL_TO" - Equal.
+	//   "NOT_EQUAL_TO" - Not equal to.
 	//   "GREATER_THAN" - Greater than.
 	//   "LESS_THAN" - Less than.
 	//   "GREATER_THAN_OR_EQUALS" - Greater than or equals.
@@ -1509,7 +1456,7 @@ type GooglePrivacyDlpV2CreateDeidentifyTemplateRequest struct {
 	// TemplateId: The template id can contain uppercase and lowercase
 	// letters,
 	// numbers, and hyphens; that is, it must match the regular
-	// expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
+	// expression: `[a-zA-Z\\d-]+`. The maximum length is 100
 	// characters. Can be empty to allow the system to generate one.
 	TemplateId string `json:"templateId,omitempty"`
 
@@ -1548,7 +1495,7 @@ type GooglePrivacyDlpV2CreateDlpJobRequest struct {
 	// JobId: The job id can contain uppercase and lowercase
 	// letters,
 	// numbers, and hyphens; that is, it must match the regular
-	// expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
+	// expression: `[a-zA-Z\\d-]+`. The maximum length is 100
 	// characters. Can be empty to allow the system to generate one.
 	JobId string `json:"jobId,omitempty"`
 
@@ -1586,7 +1533,7 @@ type GooglePrivacyDlpV2CreateInspectTemplateRequest struct {
 	// TemplateId: The template id can contain uppercase and lowercase
 	// letters,
 	// numbers, and hyphens; that is, it must match the regular
-	// expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
+	// expression: `[a-zA-Z\\d-]+`. The maximum length is 100
 	// characters. Can be empty to allow the system to generate one.
 	TemplateId string `json:"templateId,omitempty"`
 
@@ -1623,7 +1570,7 @@ type GooglePrivacyDlpV2CreateJobTriggerRequest struct {
 	// TriggerId: The trigger id can contain uppercase and lowercase
 	// letters,
 	// numbers, and hyphens; that is, it must match the regular
-	// expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
+	// expression: `[a-zA-Z\\d-]+`. The maximum length is 100
 	// characters. Can be empty to allow the system to generate one.
 	TriggerId string `json:"triggerId,omitempty"`
 
@@ -1659,7 +1606,7 @@ type GooglePrivacyDlpV2CreateStoredInfoTypeRequest struct {
 	// StoredInfoTypeId: The storedInfoType ID can contain uppercase and
 	// lowercase letters,
 	// numbers, and hyphens; that is, it must match the regular
-	// expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
+	// expression: `[a-zA-Z\\d-]+`. The maximum length is 100
 	// characters. Can be empty to allow the system to generate one.
 	StoredInfoTypeId string `json:"storedInfoTypeId,omitempty"`
 
@@ -1682,111 +1629,6 @@ type GooglePrivacyDlpV2CreateStoredInfoTypeRequest struct {
 
 func (s *GooglePrivacyDlpV2CreateStoredInfoTypeRequest) MarshalJSON() ([]byte, error) {
 	type NoMethod GooglePrivacyDlpV2CreateStoredInfoTypeRequest
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// GooglePrivacyDlpV2CryptoDeterministicConfig: Pseudonymization method
-// that generates deterministic encryption for the given
-// input. Outputs a base64 encoded representation of the encrypted
-// output.
-// Uses AES-SIV based on the RFC https://tools.ietf.org/html/rfc5297.
-type GooglePrivacyDlpV2CryptoDeterministicConfig struct {
-	// Context: Optional. A context may be used for higher security and
-	// maintaining
-	// referential integrity such that the same identifier in two
-	// different
-	// contexts will be given a distinct surrogate. The context is appended
-	// to
-	// plaintext value being encrypted. On decryption the provided context
-	// is
-	// validated against the value used during encryption. If a context
-	// was
-	// provided during encryption, same context must be provided during
-	// decryption
-	// as well.
-	//
-	// If the context is not set, plaintext would be used as is for
-	// encryption.
-	// If the context is set but:
-	//
-	// 1. there is no record present when transforming a given value or
-	// 2. the field is not present when transforming a given
-	// value,
-	//
-	// plaintext would be used as is for encryption.
-	//
-	// Note that case (1) is expected when an `InfoTypeTransformation`
-	// is
-	// applied to both structured and non-structured `ContentItem`s.
-	Context *GooglePrivacyDlpV2FieldId `json:"context,omitempty"`
-
-	// CryptoKey: The key used by the encryption function.
-	CryptoKey *GooglePrivacyDlpV2CryptoKey `json:"cryptoKey,omitempty"`
-
-	// SurrogateInfoType: The custom info type to annotate the surrogate
-	// with.
-	// This annotation will be applied to the surrogate by prefixing it
-	// with
-	// the name of the custom info type followed by the number of
-	// characters comprising the surrogate. The following scheme defines
-	// the
-	// format: <info type name>(<surrogate character
-	// count>):<surrogate>
-	//
-	// For example, if the name of custom info type is 'MY_TOKEN_INFO_TYPE'
-	// and
-	// the surrogate is 'abc', the full replacement value
-	// will be: 'MY_TOKEN_INFO_TYPE(3):abc'
-	//
-	// This annotation identifies the surrogate when inspecting content
-	// using the
-	// custom info type 'Surrogate'. This facilitates reversal of
-	// the
-	// surrogate when it occurs in free text.
-	//
-	// In order for inspection to work properly, the name of this info type
-	// must
-	// not occur naturally anywhere in your data; otherwise, inspection may
-	// either
-	//
-	// - reverse a surrogate that does not correspond to an actual
-	// identifier
-	// - be unable to parse the surrogate and result in an error
-	//
-	// Therefore, choose your custom info type name carefully after
-	// considering
-	// what your data looks like. One way to select a name that has a high
-	// chance
-	// of yielding reliable detection is to include one or more unicode
-	// characters
-	// that are highly improbable to exist in your data.
-	// For example, assuming your data is entered from a regular ASCII
-	// keyboard,
-	// the symbol with the hex code point 29DD might be used like
-	// so:
-	// ⧝MY_TOKEN_TYPE
-	SurrogateInfoType *GooglePrivacyDlpV2InfoType `json:"surrogateInfoType,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Context") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Context") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *GooglePrivacyDlpV2CryptoDeterministicConfig) MarshalJSON() ([]byte, error) {
-	type NoMethod GooglePrivacyDlpV2CryptoDeterministicConfig
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -1864,11 +1706,21 @@ func (s *GooglePrivacyDlpV2CryptoKey) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig: Note: We recommend using
-//  CryptoDeterministicConfig for all use cases which
-// do not require preserving the input alphabet space and size, plus
-// warrant
-// referential integrity.
+// GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig: Replaces an identifier
+// with a surrogate using FPE with the FFX
+// mode of operation; however when used in the `ReidentifyContent` API
+// method,
+// it serves the opposite function by reversing the surrogate back
+// into
+// the original identifier.
+// The identifier must be encoded as ASCII.
+// For a given crypto key and context, the same identifier will
+// be
+// replaced with the same surrogate.
+// Identifiers must be at least two characters long.
+// In the case that the identifier is the empty string, it will be
+// skipped.
+// See https://cloud.google.com/dlp/docs/pseudonymization to learn more.
 type GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig struct {
 	// Possible values:
 	//   "FFX_COMMON_NATIVE_ALPHABET_UNSPECIFIED"
@@ -3295,14 +3147,14 @@ type GooglePrivacyDlpV2FindingLimits struct {
 	// MaxFindingsPerItem: Max number of findings that will be returned for
 	// each item scanned.
 	// When set within `InspectDataSourceRequest`,
-	// the maximum returned is 2000 regardless if this is set higher.
+	// the maximum returned is 1000 regardless if this is set higher.
 	// When set within `InspectContentRequest`, this field is ignored.
 	MaxFindingsPerItem int64 `json:"maxFindingsPerItem,omitempty"`
 
 	// MaxFindingsPerRequest: Max number of findings that will be returned
 	// per request/job.
 	// When set within `InspectContentRequest`, the maximum returned is
-	// 2000
+	// 1000
 	// regardless if this is set higher.
 	MaxFindingsPerRequest int64 `json:"maxFindingsPerRequest,omitempty"`
 
@@ -4725,7 +4577,6 @@ func (s *GooglePrivacyDlpV2KindExpression) MarshalJSON() ([]byte, error) {
 
 // GooglePrivacyDlpV2KmsWrappedCryptoKey: Include to use an existing
 // data crypto key wrapped by KMS.
-// The wrapped key must be a 128/192/256 bit key.
 // Authorization requires the following IAM permissions when sending a
 // request
 // to perform a crypto transformation using a kms-wrapped crypto
@@ -5541,8 +5392,6 @@ type GooglePrivacyDlpV2PrimitiveTransformation struct {
 
 	CharacterMaskConfig *GooglePrivacyDlpV2CharacterMaskConfig `json:"characterMaskConfig,omitempty"`
 
-	CryptoDeterministicConfig *GooglePrivacyDlpV2CryptoDeterministicConfig `json:"cryptoDeterministicConfig,omitempty"`
-
 	CryptoHashConfig *GooglePrivacyDlpV2CryptoHashConfig `json:"cryptoHashConfig,omitempty"`
 
 	CryptoReplaceFfxFpeConfig *GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig `json:"cryptoReplaceFfxFpeConfig,omitempty"`
@@ -6356,8 +6205,6 @@ func (s *GooglePrivacyDlpV2RequestedOptions) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// GooglePrivacyDlpV2Result: All result fields mentioned below are
-// updated while the job is processing.
 type GooglePrivacyDlpV2Result struct {
 	// InfoTypeStats: Statistics of how many instances of each info type
 	// were found during
@@ -7139,7 +6986,7 @@ func (s *GooglePrivacyDlpV2TransformationOverview) MarshalJSON() ([]byte, error)
 }
 
 // GooglePrivacyDlpV2TransformationSummary: Summary of a single
-// transformation.
+// tranformation.
 // Only one of 'transformation', 'field_transformation', or
 // 'record_suppress'
 // will be set.
@@ -7264,7 +7111,7 @@ func (s *GooglePrivacyDlpV2Trigger) MarshalJSON() ([]byte, error) {
 // security risks due to accidentally
 // leaking the key. Choose another type of key if possible.
 type GooglePrivacyDlpV2UnwrappedCryptoKey struct {
-	// Key: A 128/192/256 bit key. [required]
+	// Key: The AES 128/192/256 bit key. [required]
 	Key string `json:"key,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Key") to
@@ -7582,20 +7429,20 @@ type GoogleProtobufEmpty struct {
 }
 
 // GoogleRpcStatus: The `Status` type defines a logical error model that
-// is suitable for
-// different programming environments, including REST APIs and RPC APIs.
-// It is
-// used by [gRPC](https://github.com/grpc). The error model is designed
-// to be:
+// is suitable for different
+// programming environments, including REST APIs and RPC APIs. It is
+// used by
+// [gRPC](https://github.com/grpc). The error model is designed to
+// be:
 //
 // - Simple to use and understand for most users
 // - Flexible enough to meet unexpected needs
 //
 // # Overview
 //
-// The `Status` message contains three pieces of data: error code,
-// error
-// message, and error details. The error code should be an enum value
+// The `Status` message contains three pieces of data: error code, error
+// message,
+// and error details. The error code should be an enum value
 // of
 // google.rpc.Code, but it may accept additional error codes if needed.
 // The

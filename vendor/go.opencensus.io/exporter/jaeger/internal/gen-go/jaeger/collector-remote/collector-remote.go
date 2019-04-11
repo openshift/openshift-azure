@@ -14,7 +14,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/apache/thrift/lib/go/thrift"
+	"git.apache.org/thrift.git/lib/go/thrift"
 	"go.opencensus.io/exporter/jaeger/internal/gen-go/jaeger"
 )
 

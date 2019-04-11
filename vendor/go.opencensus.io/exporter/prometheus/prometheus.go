@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 	"sync"
 
 	"go.opencensus.io/internal"
@@ -212,9 +213,25 @@ func (c *collector) toMetric(desc *prometheus.Desc, v *view.View, row *view.Row)
 	case *view.DistributionData:
 		points := make(map[float64]uint64)
 		// Histograms are cumulative in Prometheus.
-		// Get cumulative bucket counts.
-		cumCount := uint64(0)
+		// 1. Sort buckets in ascending order but, retain
+		// their indices for reverse lookup later on.
+		// TODO: If there is a guarantee that distribution elements
+		// are always sorted, then skip the sorting.
+		indicesMap := make(map[float64]int)
+		buckets := make([]float64, 0, len(v.Aggregation.Buckets))
 		for i, b := range v.Aggregation.Buckets {
+			if _, ok := indicesMap[b]; !ok {
+				indicesMap[b] = i
+				buckets = append(buckets, b)
+			}
+		}
+		sort.Float64s(buckets)
+
+		// 2. Now that the buckets are sorted by magnitude
+		// we can create cumulative indicesmap them back by reverse index
+		cumCount := uint64(0)
+		for _, b := range buckets {
+			i := indicesMap[b]
 			cumCount += uint64(data.CountPerBucket[i])
 			points[b] = cumCount
 		}

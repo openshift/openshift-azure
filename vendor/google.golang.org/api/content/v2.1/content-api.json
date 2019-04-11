@@ -15,7 +15,7 @@
   "description": "Manages product items, inventory, and Merchant Center accounts for Google Shopping.",
   "discoveryVersion": "v1",
   "documentationLink": "https://developers.google.com/shopping-content",
-  "etag": "\"VPK3KBfpaEgZ16pozGOoMYfKc0U/uh6pImLtAzfcW3qnOu2tIOip1lc\"",
+  "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/jJVwelwojeEb8U1BhXyIHAL-8XY\"",
   "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
     "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -357,7 +357,7 @@
           ]
         },
         "get": {
-          "description": "Retrieves the status of a Merchant Center account. No itemLevelIssues are returned for multi-client accounts.",
+          "description": "Retrieves the status of a Merchant Center account. Multi-client accounts can only call this method for sub-accounts.",
           "httpMethod": "GET",
           "id": "content.accountstatuses.get",
           "parameterOrder": [
@@ -561,7 +561,6 @@
     "datafeeds": {
       "methods": {
         "custombatch": {
-          "description": "Deletes, fetches, gets, inserts and updates multiple datafeeds in a single request.",
           "httpMethod": "POST",
           "id": "content.datafeeds.custombatch",
           "path": "datafeeds/batch",
@@ -770,7 +769,6 @@
     "datafeedstatuses": {
       "methods": {
         "custombatch": {
-          "description": "Gets multiple Merchant Center datafeed statuses in a single request.",
           "httpMethod": "POST",
           "id": "content.datafeedstatuses.custombatch",
           "path": "datafeedstatuses/batch",
@@ -1748,7 +1746,7 @@
           ]
         },
         "getbymerchantorderid": {
-          "description": "Retrieves an order using merchant order ID.",
+          "description": "Retrieves an order using merchant order id.",
           "httpMethod": "GET",
           "id": "content.orders.getbymerchantorderid",
           "parameterOrder": [
@@ -1764,7 +1762,7 @@
               "type": "string"
             },
             "merchantOrderId": {
-              "description": "The merchant order ID to be looked for.",
+              "description": "The merchant order id to be looked for.",
               "location": "path",
               "required": true,
               "type": "string"
@@ -1827,7 +1825,7 @@
           ]
         },
         "instorerefundlineitem": {
-          "description": "Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).\nNote: We recommend calling the returnrefundlineitem method to refund in-store returns. We will issue the refund directly to the customer. This helps to prevent possible differences arising between merchant and Google transaction records. We also recommend having the point of sale system communicate with Google to ensure that customers do not receive a double refund by first refunding via Google then via an in-store return.",
+          "description": "Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).",
           "httpMethod": "POST",
           "id": "content.orders.instorerefundlineitem",
           "parameterOrder": [
@@ -2024,7 +2022,7 @@
           ]
         },
         "setlineitemmetadata": {
-          "description": "Sets (or overrides if it already exists) merchant provided annotations in the form of key-value pairs. A common use case would be to supply us with additional structured information about a line item that cannot be provided via other methods. Submitted key-value pairs can be retrieved as part of the orders resource.",
+          "description": "Sets (overrides) merchant provided annotations on the line item.",
           "httpMethod": "POST",
           "id": "content.orders.setlineitemmetadata",
           "parameterOrder": [
@@ -2460,7 +2458,7 @@
               "type": "string"
             },
             "productId": {
-              "description": "The REST ID of the product.",
+              "description": "The REST id of the product.",
               "location": "path",
               "required": true,
               "type": "string"
@@ -2488,7 +2486,7 @@
               "type": "string"
             },
             "productId": {
-              "description": "The REST ID of the product.",
+              "description": "The REST id of the product.",
               "location": "path",
               "required": true,
               "type": "string"
@@ -2606,7 +2604,7 @@
               "type": "string"
             },
             "productId": {
-              "description": "The REST ID of the product.",
+              "description": "The REST id of the product.",
               "location": "path",
               "required": true,
               "type": "string"
@@ -2697,7 +2695,7 @@
               "type": "string"
             },
             "productId": {
-              "description": "The REST ID of the product for which to update the regional inventory.",
+              "description": "The REST id of the product for which to update the regional inventory.",
               "location": "path",
               "required": true,
               "type": "string"
@@ -2886,7 +2884,7 @@
       }
     }
   },
-  "revision": "20190327",
+  "revision": "20190215",
   "rootUrl": "https://www.googleapis.com/",
   "schemas": {
     "Account": {
@@ -3274,7 +3272,7 @@
               "content.accounttax.update"
             ]
           },
-          "description": "State (or province) is which the tax is applicable, described by its location ID (also called criteria ID).",
+          "description": "State (or province) is which the tax is applicable, described by its location id (also called criteria id).",
           "format": "uint64",
           "type": "string"
         },
@@ -5065,6 +5063,10 @@
           "$ref": "OrderAddress",
           "description": "The billing address."
         },
+        "channelType": {
+          "description": "The channel type of the order: \"purchaseOnGoogle\" or \"googleExpress\".",
+          "type": "string"
+        },
         "customer": {
           "$ref": "OrderCustomer",
           "description": "The details of the customer who placed the order."
@@ -5074,7 +5076,7 @@
           "description": "The details for the delivery."
         },
         "id": {
-          "description": "The REST ID of the order. Globally unique.",
+          "description": "The REST id of the order. Globally unique.",
           "type": "string"
         },
         "kind": {
@@ -5094,7 +5096,7 @@
           "type": "string"
         },
         "merchantOrderId": {
-          "description": "Merchant-provided ID of the order.",
+          "description": "Merchant-provided id of the order.",
           "type": "string"
         },
         "netPriceAmount": {
@@ -5141,6 +5143,10 @@
         "shippingCostTax": {
           "$ref": "Price",
           "description": "The tax for the total shipping cost."
+        },
+        "shippingOption": {
+          "description": "The requested shipping option.",
+          "type": "string"
         },
         "status": {
           "description": "The status of the order.",
@@ -5227,6 +5233,10 @@
     "OrderCustomer": {
       "id": "OrderCustomer",
       "properties": {
+        "email": {
+          "description": "Deprecated.",
+          "type": "string"
+        },
         "fullName": {
           "description": "Full name of the customer.",
           "type": "string"
@@ -5250,7 +5260,7 @@
           "type": "string"
         },
         "marketingEmailAddress": {
-          "description": "Email address that can be used for marketing purposes. The field may be empty even if explicitMarketingPreference is 'granted'. This happens when retrieving an old order from the customer who deleted their account.",
+          "description": "Email address that can be used for marketing purposes. This field is only filled when explicitMarketingPreference is equal to 'granted'.",
           "type": "string"
         }
       },
@@ -5288,7 +5298,7 @@
           "type": "array"
         },
         "id": {
-          "description": "The ID of the line item.",
+          "description": "The id of the line item.",
           "type": "string"
         },
         "price": {
@@ -5358,6 +5368,10 @@
           "description": "Brand of the item.",
           "type": "string"
         },
+        "channel": {
+          "description": "The item's channel (online or local).",
+          "type": "string"
+        },
         "condition": {
           "description": "Condition or state of the item.",
           "type": "string"
@@ -5378,7 +5392,7 @@
           "type": "string"
         },
         "id": {
-          "description": "The REST ID of the product.",
+          "description": "The REST id of the product.",
           "type": "string"
         },
         "imageLink": {
@@ -5749,11 +5763,11 @@
           "type": "string"
         },
         "merchantOrderId": {
-          "description": "Merchant-provided ID of the order.",
+          "description": "Merchant-provided id of the order.",
           "type": "string"
         },
         "orderId": {
-          "description": "The ID of the order.",
+          "description": "The id of the order.",
           "type": "string"
         },
         "productAmount": {
@@ -5810,7 +5824,7 @@
           "type": "string"
         },
         "id": {
-          "description": "The ID of the shipment.",
+          "description": "The id of the shipment.",
           "type": "string"
         },
         "lineItems": {
@@ -5825,7 +5839,7 @@
           "type": "string"
         },
         "trackingId": {
-          "description": "The tracking ID for the shipment.",
+          "description": "The tracking id for the shipment.",
           "type": "string"
         }
       },
@@ -5835,7 +5849,7 @@
       "id": "OrderShipmentLineItemShipment",
       "properties": {
         "lineItemId": {
-          "description": "The ID of the line item that is shipped. Either lineItemId or productId is required.",
+          "description": "The id of the line item that is shipped. Either lineItemId or productId is required.",
           "type": "string"
         },
         "productId": {
@@ -5873,7 +5887,7 @@
           "type": "string"
         },
         "shipmentGroupId": {
-          "description": "[required] ID of the shipment group. It is assigned by the merchant in the shipLineItems method and is used to group multiple line items that have the same kind of shipping charges.",
+          "description": "[required] ID of the shipment group.",
           "type": "string"
         }
       },
@@ -6256,11 +6270,11 @@
               "content.orders.shiplineitems"
             ]
           },
-          "description": "The ID of the shipment. This is assigned by the merchant and is unique to each shipment.",
+          "description": "The ID of the shipment.",
           "type": "string"
         },
         "trackingId": {
-          "description": "The tracking ID for the shipment.",
+          "description": "The tracking id for the shipment.",
           "type": "string"
         }
       },
@@ -6557,7 +6571,7 @@
       "id": "OrdersUpdateLineItemShippingDetailsRequest",
       "properties": {
         "deliverByDate": {
-          "description": "Updated delivery by date, in ISO 8601 format. If not specified only ship by date is updated.\n\nProvided date should be within 1 year timeframe and can not be a date in the past.",
+          "description": "Updated delivery by date, in ISO 8601 format. If not specified only ship by date is updated.",
           "type": "string"
         },
         "lineItemId": {
@@ -6573,7 +6587,7 @@
           "type": "string"
         },
         "shipByDate": {
-          "description": "Updated ship by date, in ISO 8601 format. If not specified only deliver by date is updated.\n\nProvided date should be within 1 year timeframe and can not be a date in the past.",
+          "description": "Updated ship by date, in ISO 8601 format. If not specified only deliver by date is updated.",
           "type": "string"
         }
       },
@@ -6647,7 +6661,7 @@
           "type": "string"
         },
         "trackingId": {
-          "description": "The tracking ID for the shipment. Not updated if missing.",
+          "description": "The tracking id for the shipment. Not updated if missing.",
           "type": "string"
         }
       },
@@ -7458,7 +7472,7 @@
           "description": "Cost of goods sold. Used for gross profit reporting."
         },
         "customAttributes": {
-          "description": "A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { \"name\": \"size type\", \"value\": \"regular\" }). This is useful for submitting attributes not explicitly exposed by the API.",
+          "description": "A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { \"name\": \"size type\", \"type\": \"text\", \"value\": \"regular\" }). This is useful for submitting attributes not explicitly exposed by the API.",
           "items": {
             "$ref": "CustomAttribute"
           },
@@ -7540,7 +7554,7 @@
           "type": "string"
         },
         "id": {
-          "description": "The REST ID of the product. Content API methods that operate on products take this as their productId parameter.\nThe REST ID for a product is of the form channel:contentLanguage:targetCountry:offerId.",
+          "description": "The REST id of the product. Content API methods that operate on products take this as their productId parameter.\nThe REST id for a product is of the form channel:contentLanguage:targetCountry:offerId.",
           "type": "string"
         },
         "identifierExists": {
@@ -7624,7 +7638,7 @@
               "content.products.insert"
             ]
           },
-          "description": "A unique identifier for the item. Leading and trailing whitespaces are stripped and multiple whitespaces are replaced by a single whitespace upon submission. Only valid unicode characters are accepted. See the products feed specification for details.\nNote: Content API methods that operate on products take the REST ID of the product, not this identifier.",
+          "description": "A unique identifier for the item. Leading and trailing whitespaces are stripped and multiple whitespaces are replaced by a single whitespace upon submission. Only valid unicode characters are accepted. See the products feed specification for details.\nNote: Content API methods that operate on products take the REST id of the product, not this identifier.",
           "type": "string"
         },
         "pattern": {
@@ -7769,7 +7783,7 @@
           "type": "string"
         },
         "locationId": {
-          "description": "The numeric ID of a location that the shipping rate applies to as defined in the AdWords API.",
+          "description": "The numeric id of a location that the shipping rate applies to as defined in the AdWords API.",
           "format": "int64",
           "type": "string"
         },
@@ -7823,7 +7837,7 @@
       "type": "object"
     },
     "ProductStatus": {
-      "description": "The status of a product, i.e., information about a product computed asynchronously.",
+      "description": "The status of a product, i.e., information about a product computed asynchronously by the data quality analysis.",
       "id": "ProductStatus",
       "properties": {
         "creationDate": {
@@ -7862,7 +7876,7 @@
           "type": "string"
         },
         "productId": {
-          "description": "The ID of the product for which status is reported.",
+          "description": "The id of the product for which status is reported.",
           "type": "string"
         },
         "title": {
@@ -7931,7 +7945,7 @@
           "type": "string"
         },
         "locationId": {
-          "description": "The numeric ID of a location that the tax rate applies to as defined in the AdWords API.",
+          "description": "The numeric id of a location that the tax rate applies to as defined in the AdWords API.",
           "format": "int64",
           "type": "string"
         },
@@ -8277,7 +8291,7 @@
           "description": "The price of the product."
         },
         "regionId": {
-          "description": "The ID (name) of the region.",
+          "description": "The id (name) of the region.",
           "type": "string"
         },
         "salePrice": {
@@ -8474,7 +8488,7 @@
           "type": "array"
         },
         "shipmentGroupId": {
-          "description": "[required] ID of the shipment group. It is assigned by the merchant in the shipLineItems method and is used to group multiple line items that have the same kind of shipping charges.",
+          "description": "[required] ID of the shipment group.",
           "type": "string"
         }
       },
@@ -8492,7 +8506,7 @@
           "type": "string"
         },
         "shipmentUnitIds": {
-          "description": "[required] The shipment unit ID is assigned by the merchant and defines individual quantities within a line item. The same ID can be assigned to units that are the same while units that differ must be assigned a different ID (for example: free or promotional units).",
+          "description": "[required] Unit IDs to define specific units within the line item.",
           "items": {
             "type": "string"
           },
@@ -8713,6 +8727,15 @@
     "TestOrder": {
       "id": "TestOrder",
       "properties": {
+        "customer": {
+          "$ref": "TestOrderCustomer",
+          "annotations": {
+            "required": [
+              "content.orders.createtestorder"
+            ]
+          },
+          "description": "The details of the customer who placed the order."
+        },
         "enableOrderinvoices": {
           "description": "Whether the orderinvoices service should support this order.",
           "type": "boolean"
@@ -8756,15 +8779,6 @@
           "description": "Identifier of one of the predefined delivery addresses for the delivery.",
           "type": "string"
         },
-        "predefinedEmail": {
-          "annotations": {
-            "required": [
-              "content.orders.createtestorder"
-            ]
-          },
-          "description": "Email address of the customer.",
-          "type": "string"
-        },
         "promotions": {
           "description": "Promotions associated with the order.",
           "items": {
@@ -8788,6 +8802,38 @@
             ]
           },
           "description": "The requested shipping option.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "TestOrderCustomer": {
+      "id": "TestOrderCustomer",
+      "properties": {
+        "email": {
+          "description": "Deprecated.",
+          "type": "string"
+        },
+        "fullName": {
+          "description": "Full name of the customer.",
+          "type": "string"
+        },
+        "marketingRightsInfo": {
+          "$ref": "TestOrderCustomerMarketingRightsInfo",
+          "description": "Customer's marketing preferences."
+        }
+      },
+      "type": "object"
+    },
+    "TestOrderCustomerMarketingRightsInfo": {
+      "id": "TestOrderCustomerMarketingRightsInfo",
+      "properties": {
+        "explicitMarketingPreference": {
+          "description": "Last know user use selection regards marketing preferences. In certain cases selection might not be known, so this field would be empty.",
+          "type": "string"
+        },
+        "lastUpdatedTimestamp": {
+          "description": "Timestamp when last time marketing preference was updated. Could be empty, if user wasn't offered a selection yet.",
           "type": "string"
         }
       },
@@ -8841,6 +8887,15 @@
             ]
           },
           "description": "Brand of the item.",
+          "type": "string"
+        },
+        "channel": {
+          "annotations": {
+            "required": [
+              "content.orders.createtestorder"
+            ]
+          },
+          "description": "The item's channel.",
           "type": "string"
         },
         "condition": {

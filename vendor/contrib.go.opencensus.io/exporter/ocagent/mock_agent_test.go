@@ -17,6 +17,7 @@ package ocagent_test
 import (
 	"fmt"
 	"net"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -45,7 +46,7 @@ type mockAgent struct {
 	configsToSend          chan *agenttracepb.UpdatedLibraryConfig
 	closeConfigsToSendOnce sync.Once
 
-	address  string
+	port     uint16
 	stopFunc func() error
 	stopOnce sync.Once
 }
@@ -184,8 +185,9 @@ func runMockAgentAtAddr(t *testing.T, addr string) *mockAgent {
 	}
 
 	_, agentPortStr, _ := net.SplitHostPort(ln.Addr().String())
+	agentPort, _ := strconv.Atoi(agentPortStr)
 
-	ma.address = "localhost:" + agentPortStr
+	ma.port = uint16(agentPort)
 	ma.stopFunc = deferFunc
 
 	return ma

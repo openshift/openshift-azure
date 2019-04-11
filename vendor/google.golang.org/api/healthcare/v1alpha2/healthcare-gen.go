@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,35 +6,13 @@
 
 // Package healthcare provides access to the Cloud Healthcare API.
 //
-// For product documentation, see: https://cloud.google.com/healthcare
-//
-// Creating a client
+// See https://cloud.google.com/healthcare
 //
 // Usage example:
 //
 //   import "google.golang.org/api/healthcare/v1alpha2"
 //   ...
-//   ctx := context.Background()
-//   healthcareService, err := healthcare.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   healthcareService, err := healthcare.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   healthcareService, err := healthcare.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   healthcareService, err := healthcare.New(oauthHttpClient)
 package healthcare // import "google.golang.org/api/healthcare/v1alpha2"
 
 import (
@@ -51,8 +29,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -80,32 +56,6 @@ const (
 	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 )
 
-// NewService creates a new Service.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/cloud-platform",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new Service. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -213,38 +163,38 @@ type ProjectsLocationsDatasetsDicomStoresService struct {
 
 func NewProjectsLocationsDatasetsDicomStoresDicomWebService(s *Service) *ProjectsLocationsDatasetsDicomStoresDicomWebService {
 	rs := &ProjectsLocationsDatasetsDicomStoresDicomWebService{s: s}
-	rs.Studies = NewProjectsLocationsDatasetsDicomStoresDicomWebStudiesService(s)
+	rs.Studies_ = NewProjectsLocationsDatasetsDicomStoresDicomWebStudiesService(s)
 	return rs
 }
 
 type ProjectsLocationsDatasetsDicomStoresDicomWebService struct {
 	s *Service
 
-	Studies *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesService
+	Studies_ *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesService
 }
 
 func NewProjectsLocationsDatasetsDicomStoresDicomWebStudiesService(s *Service) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesService {
 	rs := &ProjectsLocationsDatasetsDicomStoresDicomWebStudiesService{s: s}
-	rs.Series = NewProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesService(s)
+	rs.Series_ = NewProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesService(s)
 	return rs
 }
 
 type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesService struct {
 	s *Service
 
-	Series *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesService
+	Series_ *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesService
 }
 
 func NewProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesService(s *Service) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesService {
 	rs := &ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesService{s: s}
-	rs.Instances = NewProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesService(s)
+	rs.Instances_ = NewProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesService(s)
 	return rs
 }
 
 type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesService struct {
 	s *Service
 
-	Instances *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesService
+	Instances_ *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesService
 }
 
 func NewProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesService(s *Service) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesService {
@@ -270,7 +220,7 @@ type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesFramesSer
 
 func NewProjectsLocationsDatasetsFhirStoresService(s *Service) *ProjectsLocationsDatasetsFhirStoresService {
 	rs := &ProjectsLocationsDatasetsFhirStoresService{s: s}
-	rs.Fhir = NewProjectsLocationsDatasetsFhirStoresFhirService(s)
+	rs.Fhir_ = NewProjectsLocationsDatasetsFhirStoresFhirService(s)
 	rs.SecurityLabels = NewProjectsLocationsDatasetsFhirStoresSecurityLabelsService(s)
 	return rs
 }
@@ -278,7 +228,7 @@ func NewProjectsLocationsDatasetsFhirStoresService(s *Service) *ProjectsLocation
 type ProjectsLocationsDatasetsFhirStoresService struct {
 	s *Service
 
-	Fhir *ProjectsLocationsDatasetsFhirStoresFhirService
+	Fhir_ *ProjectsLocationsDatasetsFhirStoresFhirService
 
 	SecurityLabels *ProjectsLocationsDatasetsFhirStoresSecurityLabelsService
 }
@@ -648,7 +598,8 @@ func (s *AuditLogConfig) MarshalJSON() ([]byte, error) {
 
 // Binding: Associates `members` with a `role`.
 type Binding struct {
-	// Condition: The condition that is associated with this binding.
+	// Condition: Unimplemented. The condition that is associated with this
+	// binding.
 	// NOTE: an unsatisfied condition will not allow user access via
 	// current
 	// binding. Different bindings, including their conditions, are
@@ -683,7 +634,7 @@ type Binding struct {
 	//    For example, `admins@example.com`.
 	//
 	//
-	// * `domain:{domain}`: The G Suite domain (primary) that represents all
+	// * `domain:{domain}`: A Google Apps domain name that represents all
 	// the
 	//    users of that domain. For example, `google.com` or
 	// `example.com`.
@@ -747,37 +698,6 @@ func (s *BoundingPoly) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// CharacterMaskConfig: Mask a string by replacing its characters with a
-// fixed character.
-type CharacterMaskConfig struct {
-	// MaskingCharacter: Character to mask the sensitive values. If not
-	// supplied, defaults to "*".
-	MaskingCharacter string `json:"maskingCharacter,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "MaskingCharacter") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "MaskingCharacter") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *CharacterMaskConfig) MarshalJSON() ([]byte, error) {
-	type NoMethod CharacterMaskConfig
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
 // CloudHealthcareSource: Cloud Healthcare API resource.
 type CloudHealthcareSource struct {
 	// Name: Full path of a Cloud Healthcare API resource.
@@ -834,42 +754,6 @@ func (s *CreateMessageRequest) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// CryptoHashConfig: Pseudonymization method that generates surrogates
-// via cryptographic hashing.
-// Uses SHA-256.
-// Outputs a base64-encoded representation of the hashed output
-// (for example, `L7k0BHmF1ha5U3NfGykjro4xWi1MPVQPjhMAZbSV9mM=`).
-type CryptoHashConfig struct {
-	// CryptoKey: An AES 128/192/256 bit key. Causes the hash to be computed
-	// based on this
-	// key. A default key is generated for each DeidentifyDataset operation
-	// and is
-	// used wherever crypto_key is not specified.
-	CryptoKey string `json:"cryptoKey,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "CryptoKey") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "CryptoKey") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *CryptoHashConfig) MarshalJSON() ([]byte, error) {
-	type NoMethod CryptoHashConfig
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
 // Dataset: A message representing a health dataset.
 //
 // A health dataset represents a collection of healthcare data
@@ -920,42 +804,6 @@ func (s *Dataset) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// DateShiftConfig: Shift a date forward or backward in time by a random
-// amount which is
-// consistent for a given patient and crypto key combination.
-type DateShiftConfig struct {
-	// CryptoKey: An AES 128/192/256 bit key. Causes the shift to be
-	// computed based on this
-	// key and the patient ID. A default key is generated for
-	// each
-	// DeidentifyDataset operation and is used wherever crypto_key is
-	// not
-	// specified.
-	CryptoKey string `json:"cryptoKey,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "CryptoKey") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "CryptoKey") to include in
-	// API requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *DateShiftConfig) MarshalJSON() ([]byte, error) {
-	type NoMethod DateShiftConfig
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
 // DeidentifyConfig: Configures de-id options specific to different
 // types of content.
 // Each submessage customizes the handling of
@@ -974,11 +822,6 @@ type DeidentifyConfig struct {
 	// found in the
 	// source_dataset.
 	Image *ImageConfig `json:"image,omitempty"`
-
-	// Text: Configures de-identification of text wherever it is found in
-	// the
-	// source_dataset.
-	Text *TextConfig `json:"text,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Dicom") to
 	// unconditionally include in API requests. By default, fields with
@@ -1006,20 +849,16 @@ func (s *DeidentifyConfig) MarshalJSON() ([]byte, error) {
 // DeidentifyDatasetRequest: Redacts identifying information from the
 // specified dataset.
 type DeidentifyDatasetRequest struct {
-	// Config: Deidentify configuration.
+	// Config: Deidentify configuration
 	Config *DeidentifyConfig `json:"config,omitempty"`
 
-	// DestinationDataset: The name of the dataset resource to create and
-	// write the redacted data
-	// to
+	// DestinationDataset: The name of the dataset resource to which the
+	// redacted data should be
+	// written
 	// (e.g.,
-	// `projects/{project_id}/locations/{location_id}/datasets/{dat
-	// aset_id}`).
-	//
-	//  * The destination dataset must not exist.
-	//  * The destination dataset must be in the same project as the source
-	//    dataset. De-identifying data across multiple projects is not
-	// supported.
+	// `projects/{project_id}/locations/{location_id}/datasets/{datase
+	// t_id}`).
+	// The new dataset must not exist, or the request will fail.
 	DestinationDataset string `json:"destinationDataset,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Config") to
@@ -1041,80 +880,6 @@ type DeidentifyDatasetRequest struct {
 
 func (s *DeidentifyDatasetRequest) MarshalJSON() ([]byte, error) {
 	type NoMethod DeidentifyDatasetRequest
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// DeidentifyErrorDetails: Contains the status of the Deidentify
-// operation.
-type DeidentifyErrorDetails struct {
-	// FailureResourceCount: Number of resources failed to process.
-	FailureResourceCount int64 `json:"failureResourceCount,omitempty,string"`
-
-	// FailureStoreCount: Number of stores failed to process.
-	FailureStoreCount int64 `json:"failureStoreCount,omitempty,string"`
-
-	// SuccessResourceCount: Number of resources successfully processed.
-	SuccessResourceCount int64 `json:"successResourceCount,omitempty,string"`
-
-	// SuccessStoreCount: Number of stores successfully processed.
-	SuccessStoreCount int64 `json:"successStoreCount,omitempty,string"`
-
-	// ForceSendFields is a list of field names (e.g.
-	// "FailureResourceCount") to unconditionally include in API requests.
-	// By default, fields with empty values are omitted from API requests.
-	// However, any non-pointer, non-interface field appearing in
-	// ForceSendFields will be sent to the server regardless of whether the
-	// field is empty or not. This may be used to include empty fields in
-	// Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "FailureResourceCount") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *DeidentifyErrorDetails) MarshalJSON() ([]byte, error) {
-	type NoMethod DeidentifyErrorDetails
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// DeidentifySummary: Contains a detailed summary of the Deidentify
-// operation.
-type DeidentifySummary struct {
-	// SuccessResourceCount: Number of resources successfully processed.
-	SuccessResourceCount int64 `json:"successResourceCount,omitempty,string"`
-
-	// SuccessStoreCount: Number of stores successfully processed.
-	SuccessStoreCount int64 `json:"successStoreCount,omitempty,string"`
-
-	// ForceSendFields is a list of field names (e.g.
-	// "SuccessResourceCount") to unconditionally include in API requests.
-	// By default, fields with empty values are omitted from API requests.
-	// However, any non-pointer, non-interface field appearing in
-	// ForceSendFields will be sent to the server regardless of whether the
-	// field is empty or not. This may be used to include empty fields in
-	// Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "SuccessResourceCount") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *DeidentifySummary) MarshalJSON() ([]byte, error) {
-	type NoMethod DeidentifySummary
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -1150,33 +915,10 @@ func (s *Detail) MarshalJSON() ([]byte, error) {
 // DicomConfig: Specifies the parameters needed for de-identification of
 // DICOM stores.
 type DicomConfig struct {
-	// FilterProfile: Tag filtering profile that determines which tags to
-	// keep/remove.
-	//
-	// Possible values:
-	//   "TAG_FILTER_PROFILE_UNSPECIFIED" - No tag filtration profile
-	// provided. Same as KEEP_ALL_PROFILE.
-	//   "MINIMAL_KEEP_LIST_PROFILE" - Keep only tags required to produce
-	// valid DICOM.
-	//   "ATTRIBUTE_CONFIDENTIALITY_BASIC_PROFILE" - Remove tags based on
-	// DICOM Standard's Attribute Confidentiality Basic
-	// Profile (DICOM Standard Edition 2018e).
-	//   "KEEP_ALL_PROFILE" - Keep all tags.
-	//   "DEIDENTIFY_TAG_CONTENTS" - Inspects within tag contents and
-	// replaces sensitive text. The process
-	// can be configured using the TextConfig.
-	// Applies to all tags with the following Value Representation
-	// names:
-	// AE, LO, LT, PN, SH, ST, UC, UT, DA, DT, AS
-	FilterProfile string `json:"filterProfile,omitempty"`
-
 	// KeepList: List of tags to keep. Remove all other tags.
 	KeepList *TagFilterList `json:"keepList,omitempty"`
 
-	// RemoveList: List of tags to remove. Keep all other tags.
-	RemoveList *TagFilterList `json:"removeList,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "FilterProfile") to
+	// ForceSendFields is a list of field names (e.g. "KeepList") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -1184,10 +926,10 @@ type DicomConfig struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "FilterProfile") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
+	// NullFields is a list of field names (e.g. "KeepList") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -1201,24 +943,6 @@ func (s *DicomConfig) MarshalJSON() ([]byte, error) {
 
 // DicomStore: Represents a DICOM store.
 type DicomStore struct {
-	// Labels: User-supplied key-value pairs used to organize DICOM
-	// stores.
-	//
-	// Label keys must be between 1 and 63 characters long, have a UTF-8
-	// encoding
-	// of maximum 128 bytes, and must conform to the
-	// following PCRE regular expression:
-	// \p{Ll}\p{Lo}{0,62}
-	//
-	// Label values are optional, must be between 1 and 63 characters long,
-	// have
-	// a UTF-8 encoding of maximum 128 bytes, and must conform to
-	// the
-	// following PCRE regular expression: [\p{Ll}\p{Lo}\p{N}_-]{0,63}
-	//
-	// No more than 64 labels can be associated with a given store.
-	Labels map[string]string `json:"labels,omitempty"`
-
 	// Name: Output only. Resource name of the DICOM store, of the
 	// form
 	// `projects/{project_id}/locations/{location_id}/datasets/{dataset_
@@ -1234,7 +958,7 @@ type DicomStore struct {
 	// server.
 	googleapi.ServerResponse `json:"-"`
 
-	// ForceSendFields is a list of field names (e.g. "Labels") to
+	// ForceSendFields is a list of field names (e.g. "Name") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -1242,7 +966,7 @@ type DicomStore struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "Labels") to include in API
+	// NullFields is a list of field names (e.g. "Name") to include in API
 	// requests with the JSON null value. By default, fields with empty
 	// values are omitted from API requests. However, any field with an
 	// empty value appearing in NullFields will be sent to the server as
@@ -1370,6 +1094,17 @@ type ExportResourcesRequest struct {
 	// `roles/bigquery.dataEditor` and `roles/bigquery.jobUser`.
 	//
 	// The output will be one BigQuery table per resource type.
+	// The server implements a data-driven FHIR-to-SQL schema mapping in
+	// support
+	// of analytics workloads with BigQuery. Incompatible changes to the
+	// output
+	// schema may be introduced in the future as a result of
+	// continuous
+	// collaboration with the FHIR community to refine the
+	// [desired SQL projection of
+	// FHIR
+	// resources](https://github.com/rbrush/sql-on-fhir/blob/master/sql-
+	// on-fhir.md).
 	BigqueryDestination *GoogleCloudHealthcareV1alpha2FhirBigQueryDestination `json:"bigqueryDestination,omitempty"`
 
 	// GcsDestination: The Cloud Storage output destination.
@@ -1467,35 +1202,6 @@ func (s *Expr) MarshalJSON() ([]byte, error) {
 // FhirConfig: Specifies how de-identification of a FHIR store should be
 // handled.
 type FhirConfig struct {
-	// FieldMetadataList: Specifies FHIR paths to match and how to transform
-	// them. Any field that
-	// is not matched by a FieldMetadata will be passed through to the
-	// output
-	// dataset unmodified. All extensions are removed in the output.
-	FieldMetadataList []*FieldMetadata `json:"fieldMetadataList,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "FieldMetadataList")
-	// to unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "FieldMetadataList") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *FhirConfig) MarshalJSON() ([]byte, error) {
-	type NoMethod FhirConfig
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 // FhirStore: Represents a FHIR store.
@@ -1531,17 +1237,6 @@ type FhirStore struct {
 	// back errors for attempts to read the historical versions.
 	DisableResourceVersioning bool `json:"disableResourceVersioning,omitempty"`
 
-	// EnableHistoryImport: Whether to allow the bulk import API to accept
-	// history bundles and directly
-	// insert historical resource versions into the FHIR store. Importing
-	// resource
-	// histories creates resource interactions that appear to have occurred
-	// in the
-	// past, which clients may not want to allow. If set to false, history
-	// bundles
-	// within an import will fail with an error.
-	EnableHistoryImport bool `json:"enableHistoryImport,omitempty"`
-
 	// EnableUpdateCreate: Whether this FHIR store has the
 	// [updateCreate
 	// capability](https://www.hl7.org/fhir/capabilitystatement
@@ -1561,24 +1256,6 @@ type FhirStore struct {
 	// path
 	// recorded in Cloud audit logs and Cloud Pub/Sub notifications.
 	EnableUpdateCreate bool `json:"enableUpdateCreate,omitempty"`
-
-	// Labels: User-supplied key-value pairs used to organize FHIR
-	// stores.
-	//
-	// Label keys must be between 1 and 63 characters long, have a UTF-8
-	// encoding
-	// of maximum 128 bytes, and must conform to the
-	// following PCRE regular expression:
-	// \p{Ll}\p{Lo}{0,62}
-	//
-	// Label values are optional, must be between 1 and 63 characters long,
-	// have
-	// a UTF-8 encoding of maximum 128 bytes, and must conform to
-	// the
-	// following PCRE regular expression: [\p{Ll}\p{Lo}\p{N}_-]{0,63}
-	//
-	// No more than 64 labels can be associated with a given store.
-	Labels map[string]string `json:"labels,omitempty"`
 
 	// Name: Output only. Resource name of the FHIR store, of the
 	// form
@@ -1620,61 +1297,6 @@ type FhirStore struct {
 
 func (s *FhirStore) MarshalJSON() ([]byte, error) {
 	type NoMethod FhirStore
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// FieldMetadata: Specifies FHIR paths to match, and how to handle
-// de-identification of
-// matching fields.
-type FieldMetadata struct {
-	// Action: Deidentify action for one field.
-	//
-	// Possible values:
-	//   "ACTION_UNSPECIFIED" - No action specified.
-	//   "TRANSFORM" - Transform the entire field.
-	//   "INSPECT_AND_TRANSFORM" - Should be inspected and any PHI found
-	// should be
-	// transformed.
-	//   "DO_NOT_TRANSFORM" - Do not transform.
-	Action string `json:"action,omitempty"`
-
-	// Paths: List of paths to FHIR fields to be redacted. Each path is
-	// a
-	// period-separated list where each component is either a field name
-	// or
-	// FHIR type name, for example: Patient, HumanName.
-	// For "choice" types (those defined in the FHIR spec with the
-	// form:
-	// field[x]) we use two separate components. e.g. "deceasedAge.unit"
-	// is
-	// matched by "Deceased.Age.unit".
-	// Supported types are: AdministrativeGenderCode, Code, Date,
-	// DateTime,
-	// Decimal, HumanName, Id, LanguageCode, Markdown, MimeTypeCode,
-	// Oid,
-	// String, Uri, Uuid, Xhtml.
-	Paths []string `json:"paths,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Action") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Action") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *FieldMetadata) MarshalJSON() ([]byte, error) {
-	type NoMethod FieldMetadata
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -1730,9 +1352,10 @@ type GoogleCloudHealthcareV1alpha2DicomBigQueryDestination struct {
 	// error.
 	Force bool `json:"force,omitempty"`
 
-	// TableUri: BigQuery URI to a table, up to 2000 characters long, in the
-	// format
-	// `bq://projectId.bqDatasetId.tableId`
+	// TableUri: BigQuery URI to a table, up to 2000 characters
+	// long.
+	// Accepted forms:
+	// *  BigQuery gs path e.g. bq://projectId.bqDatasetId.tableId
 	TableUri string `json:"tableUri,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Force") to
@@ -1875,9 +1498,10 @@ func (s *GoogleCloudHealthcareV1alpha2DicomGcsSource) MarshalJSON() ([]byte, err
 // GoogleCloudHealthcareV1alpha2FhirBigQueryDestination: The
 // configuration for exporting to BigQuery.
 type GoogleCloudHealthcareV1alpha2FhirBigQueryDestination struct {
-	// DatasetUri: BigQuery URI to a dataset, up to 2000 characters long, in
-	// the format
-	// `bq://projectId.bqDatasetId`
+	// DatasetUri: BigQuery URI to a dataset, up to 2000 characters
+	// long.
+	// Accepted forms:
+	// *  BigQuery gs path e.g. bq://projectId.bqDatasetId
 	DatasetUri string `json:"datasetUri,omitempty"`
 
 	// SchemaConfig: The configuration for the exported BigQuery schema.
@@ -1985,17 +1609,18 @@ func (s *GoogleCloudHealthcareV1alpha2FhirRestGcsDestination) MarshalJSON() ([]b
 }
 
 // GoogleCloudHealthcareV1alpha2FhirRestGcsErrorDestination: Specifies
-// the Cloud Storage destination where errors will be recorded.
+// the Cloud Storage destination for exporting errors to.
 type GoogleCloudHealthcareV1alpha2FhirRestGcsErrorDestination struct {
-	// UriPrefix: URI for a Cloud Storage directory to which error report
-	// files should be
-	// written (in the format `gs://{bucket-id}/{path/to/destination/dir}`).
-	// If
-	// there is no trailing slash, the service will append one when
-	// composing the
-	// object path. The user is responsible for creating the Cloud Storage
-	// bucket
-	// referenced in `uri_prefix`.
+	// UriPrefix: URI for a Cloud Storage directory to which result
+	// files
+	// should be written (in the
+	// format `gs://{bucket-id}/{path/to/destination/dir}`). If there is
+	// no
+	// trailing slash, the service will append one when composing the object
+	// path.
+	// The user is responsible for creating the Cloud Storage bucket
+	// referenced in
+	// `uri_prefix`.
 	UriPrefix string `json:"uriPrefix,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "UriPrefix") to
@@ -2024,29 +1649,26 @@ func (s *GoogleCloudHealthcareV1alpha2FhirRestGcsErrorDestination) MarshalJSON()
 // GoogleCloudHealthcareV1alpha2FhirRestGcsSource: Specifies the
 // configuration for importing data from Cloud Storage.
 type GoogleCloudHealthcareV1alpha2FhirRestGcsSource struct {
-	// Uri: Points to a Cloud Storage URI containing file(s) to import.
-	//
-	// The URI must be in the following format:
-	// `gs://{bucket_id}/{object_id}`.
-	// The URI can include wildcards in `object_id` and thus identify
-	// multiple
-	// files. Supported wildcards:
-	//
-	// *  `*` to match 0 or more non-separator characters
-	// *  `**` to match 0 or more characters (including separators). Must be
-	// used
-	// at the end of a path and with no other wildcards in the
-	// path. Can also be used with a file extension (such as .ndjson),
+	// Uri: Points to a Cloud Storage URI containing file(s) with
+	// content only. The URI must be in the following
+	// format:
+	// `gs://{bucket_id}/{object_id}`. The URI can include wildcards
+	// in
+	// `object_id` and thus identify multiple files. Supported wildcards:
+	//  '*' to match 0 or more non-separator characters
+	//  '**' to match 0 or more characters (including separators). Must be
+	// used at
+	//       the end of a path and with no other wildcards in the
+	//       path. Can also be used with a file extension (such as .dcm),
 	// which
-	// imports all files with the extension in the specified directory
+	//       imports all files with the extension in the specified directory
 	// and
-	// its sub-directories. For example,
-	// `gs://my-bucket/my-directory/**.ndjson`
-	// imports all files with `.ndjson` extensions in `my-directory/` and
-	// its
-	// sub-directories.
-	// *  `?` to match 1 character
-	//
+	//       its sub-directories. For example,
+	//       `gs://my-bucket/my-directory/**.dcm` imports all files with
+	// .dcm
+	//       extensions in `my-directory/` and its sub-directories.
+	//  '?' to match 1 character
+	// All other URI formats are invalid.
 	// Files matching the wildcard are expected to contain content only,
 	// no
 	// metadata.
@@ -2168,24 +1790,6 @@ func (s *GoogleCloudHealthcareV1alpha2FhirRestImportResourcesResponse) MarshalJS
 
 // Hl7V2Store: Represents an HL7v2 store.
 type Hl7V2Store struct {
-	// Labels: User-supplied key-value pairs used to organize HL7v2
-	// stores.
-	//
-	// Label keys must be between 1 and 63 characters long, have a UTF-8
-	// encoding
-	// of maximum 128 bytes, and must conform to the
-	// following PCRE regular expression:
-	// \p{Ll}\p{Lo}{0,62}
-	//
-	// Label values are optional, must be between 1 and 63 characters long,
-	// have
-	// a UTF-8 encoding of maximum 128 bytes, and must conform to
-	// the
-	// following PCRE regular expression: [\p{Ll}\p{Lo}\p{N}_-]{0,63}
-	//
-	// No more than 64 labels can be associated with a given store.
-	Labels map[string]string `json:"labels,omitempty"`
-
 	// Name: Output only. Resource name of the HL7v2 store, of the
 	// form
 	// `projects/{project_id}/datasets/{dataset_id}/hl7V2Stores/{hl7v2_s
@@ -2208,7 +1812,7 @@ type Hl7V2Store struct {
 	// server.
 	googleapi.ServerResponse `json:"-"`
 
-	// ForceSendFields is a list of field names (e.g. "Labels") to
+	// ForceSendFields is a list of field names (e.g. "Name") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -2216,7 +1820,7 @@ type Hl7V2Store struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "Labels") to include in API
+	// NullFields is a list of field names (e.g. "Name") to include in API
 	// requests with the JSON null value. By default, fields with empty
 	// values are omitted from API requests. However, any field with an
 	// empty value appearing in NullFields will be sent to the server as
@@ -2355,8 +1959,6 @@ type ImageConfig struct {
 	//   "TEXT_REDACTION_MODE_UNSPECIFIED" - No text redaction specified.
 	// Same as REDACT_NO_TEXT.
 	//   "REDACT_ALL_TEXT" - Redact all text.
-	//   "REDACT_SENSITIVE_TEXT" - Redact sensitive text.
-	//   "REDACT_NO_TEXT" - Do not redact text.
 	TextRedactionMode string `json:"textRedactionMode,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "TextRedactionMode")
@@ -2386,14 +1988,20 @@ func (s *ImageConfig) MarshalJSON() ([]byte, error) {
 // ImportDicomDataErrorDetails: Returns the errors encountered during
 // DICOM store import.
 type ImportDicomDataErrorDetails struct {
-	// SampleErrors: Deprecated. Use only for debugging purposes.
-	//
-	// Contains sample errors encountered in imports of individual
-	// resources
-	// (for example, a Cloud Storage object).
+	// DicomStore: The name of the DICOM store where the resources have been
+	// imported, in
+	// the
+	// format
+	// `projects/{project_id}/locations/{location_id}/datasets/{da
+	// taset_id}/dicomStores/{dicom_store_id}`
+	DicomStore string `json:"dicomStore,omitempty"`
+
+	// SampleErrors: Contains sample errors encountered in imports of
+	// individual resources
+	// (e.g., a Cloud Storage object).
 	SampleErrors []*ErrorDetail `json:"sampleErrors,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "SampleErrors") to
+	// ForceSendFields is a list of field names (e.g. "DicomStore") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -2401,10 +2009,10 @@ type ImportDicomDataErrorDetails struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "SampleErrors") to include
-	// in API requests with the JSON null value. By default, fields with
-	// empty values are omitted from API requests. However, any field with
-	// an empty value appearing in NullFields will be sent to the server as
+	// NullFields is a list of field names (e.g. "DicomStore") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -2456,6 +2064,15 @@ func (s *ImportDicomDataRequest) MarshalJSON() ([]byte, error) {
 }
 
 // ImportResourcesRequest: Request to import resources.
+// The FHIR resources to be imported must have client supplied IDs. The
+// server
+// will retain the resource IDs. The import operation is idempotent.
+// Retry will
+// overwrite existing data identified by client supplied IDs. The
+// import
+// operation is not transactional. The server will not roll back any
+// committed
+// changes upon partial failures.
 type ImportResourcesRequest struct {
 	// ContentStructure: The content structure in the source location. The
 	// default is
@@ -2464,8 +2081,7 @@ type ImportResourcesRequest struct {
 	// Possible values:
 	//   "CONTENT_STRUCTURE_UNSPECIFIED"
 	//   "BUNDLE" - Each unit is a bundle, which contains one or more
-	// resources. Set the
-	// bundle type to `history` to import resource versions.
+	// resources.
 	//   "RESOURCE" - Each unit is a single resource.
 	ContentStructure string `json:"contentStructure,omitempty"`
 
@@ -2491,13 +2107,6 @@ type ImportResourcesRequest struct {
 	// Each Cloud Storage object should be a text file that contains
 	// newline
 	// delimited JSON structures conforming to FHIR standard.
-	//
-	// To improve performance, use multiple Cloud Storage objects where
-	// each
-	// object contains a subset of all of the newline-delimited JSON
-	// structures.
-	// You can select all of the objects using the uri as the
-	// prefix. The maximum number of objects is 1,000.
 	GcsSource *GoogleCloudHealthcareV1alpha2FhirRestGcsSource `json:"gcsSource,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "ContentStructure") to
@@ -2520,54 +2129,6 @@ type ImportResourcesRequest struct {
 
 func (s *ImportResourcesRequest) MarshalJSON() ([]byte, error) {
 	type NoMethod ImportResourcesRequest
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// InfoTypeTransformation: A transformation to apply to text that is
-// identified as a specific
-// info_type.
-type InfoTypeTransformation struct {
-	// CharacterMaskConfig: Config for character mask.
-	CharacterMaskConfig *CharacterMaskConfig `json:"characterMaskConfig,omitempty"`
-
-	// CryptoHashConfig: Config for crypto hash.
-	CryptoHashConfig *CryptoHashConfig `json:"cryptoHashConfig,omitempty"`
-
-	// DateShiftConfig: Config for date shift.
-	DateShiftConfig *DateShiftConfig `json:"dateShiftConfig,omitempty"`
-
-	// InfoTypes: InfoTypes to apply this transformation to. If this is not
-	// specified, the
-	// transformation applies to any info_type.
-	InfoTypes []string `json:"infoTypes,omitempty"`
-
-	// RedactConfig: Config for text redaction.
-	RedactConfig *RedactConfig `json:"redactConfig,omitempty"`
-
-	// ReplaceWithInfoTypeConfig: Config for replace with InfoType.
-	ReplaceWithInfoTypeConfig *ReplaceWithInfoTypeConfig `json:"replaceWithInfoTypeConfig,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "CharacterMaskConfig")
-	// to unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "CharacterMaskConfig") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *InfoTypeTransformation) MarshalJSON() ([]byte, error) {
-	type NoMethod InfoTypeTransformation
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -3527,20 +3088,6 @@ func (s *ProgressCounter) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// RedactConfig: Define how to redact sensitive values. Default
-// behaviour is erase,
-// e.g. "My name is Jake." becomes "My name is ."
-type RedactConfig struct {
-}
-
-// ReplaceWithInfoTypeConfig: When using the INSPECT_AND_TRANSFORM
-// action, each match is replaced with
-// the name of the info_type. For example, "My name is Jake" becomes "My
-// name is
-// [PERSON_NAME]." The TRANSFORM action is equivalent to redacting.
-type ReplaceWithInfoTypeConfig struct {
-}
-
 // ResourceAnnotation: Resource level annotation.
 type ResourceAnnotation struct {
 	Label string `json:"label,omitempty"`
@@ -3574,7 +3121,7 @@ func (s *ResourceAnnotation) MarshalJSON() ([]byte, error) {
 type SchemaConfig struct {
 	// RecursiveStructureDepth: The depth for all recursive structures in
 	// the output analytics
-	// schema. For example, `concept` in the CodeSystem resource is a
+	// schema. For example, concept in the CodeSystem resource is a
 	// recursive
 	// structure; when the depth is 2, the CodeSystem table will have a
 	// column
@@ -3590,11 +3137,9 @@ type SchemaConfig struct {
 	// Possible values:
 	//   "SCHEMA_TYPE_UNSPECIFIED" - No schema type specified. Same as
 	// `LOSSLESS`.
-	//   "LOSSLESS" - A data-driven schema generated from the fields present
-	// in the FHIR data
-	// being exported, with no additional simplification.
+	//   "LOSSLESS" - Schema generated from original FHIR data.
 	//   "ANALYTICS" - Analytics schema defined by the FHIR community.
-	// See https://github.com/FHIR/sql-on-fhir/blob/master/sql-on-fhir.md.
+	// See https://github.com/rbrush/sql-on-fhir/blob/master/sql-on-fhir.md.
 	SchemaType string `json:"schemaType,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g.
@@ -3778,20 +3323,20 @@ func (s *SetIamPolicyRequest) MarshalJSON() ([]byte, error) {
 }
 
 // Status: The `Status` type defines a logical error model that is
-// suitable for
-// different programming environments, including REST APIs and RPC APIs.
-// It is
-// used by [gRPC](https://github.com/grpc). The error model is designed
-// to be:
+// suitable for different
+// programming environments, including REST APIs and RPC APIs. It is
+// used by
+// [gRPC](https://github.com/grpc). The error model is designed to
+// be:
 //
 // - Simple to use and understand for most users
 // - Flexible enough to meet unexpected needs
 //
 // # Overview
 //
-// The `Status` message contains three pieces of data: error code,
-// error
-// message, and error details. The error code should be an enum value
+// The `Status` message contains three pieces of data: error code, error
+// message,
+// and error details. The error code should be an enum value
 // of
 // google.rpc.Code, but it may accept additional error codes if needed.
 // The
@@ -3998,39 +3543,6 @@ type TestIamPermissionsResponse struct {
 
 func (s *TestIamPermissionsResponse) MarshalJSON() ([]byte, error) {
 	type NoMethod TestIamPermissionsResponse
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-type TextConfig struct {
-	// ExperimentalConfig: Experimental de-identification config to use. For
-	// internal use only.
-	// If not specified, it is ignored and standard DLP is used.
-	ExperimentalConfig string `json:"experimentalConfig,omitempty"`
-
-	// Transformations: The transformations to apply to the detected data.
-	Transformations []*InfoTypeTransformation `json:"transformations,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "ExperimentalConfig")
-	// to unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "ExperimentalConfig") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *TextConfig) MarshalJSON() ([]byte, error) {
-	type NoMethod TextConfig
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -8684,18 +8196,6 @@ func (r *ProjectsLocationsDatasetsDicomStoresService) List(parent string) *Proje
 	return c
 }
 
-// Filter sets the optional parameter "filter": Restricts stores
-// returned to those matching a filter.
-// Syntax:
-// https://cloud.google.com/appengine/docs/standard/python/search
-// /query_strings
-// Only filtering on labels is supported, for example
-// `labels.key=value`.
-func (c *ProjectsLocationsDatasetsDicomStoresListCall) Filter(filter string) *ProjectsLocationsDatasetsDicomStoresListCall {
-	c.urlParams_.Set("filter", filter)
-	return c
-}
-
 // PageSize sets the optional parameter "pageSize": Limit on the number
 // of DICOM stores to return in a single response.
 // If zero the default page size of 100 is used.
@@ -8818,11 +8318,6 @@ func (c *ProjectsLocationsDatasetsDicomStoresListCall) Do(opts ...googleapi.Call
 	//     "parent"
 	//   ],
 	//   "parameters": {
-	//     "filter": {
-	//       "description": "Restricts stores returned to those matching a filter. Syntax:\nhttps://cloud.google.com/appengine/docs/standard/python/search/query_strings\nOnly filtering on labels is supported, for example `labels.key=value`.",
-	//       "location": "query",
-	//       "type": "string"
-	//     },
 	//     "pageSize": {
 	//       "description": "Limit on the number of DICOM stores to return in a single response.\nIf zero the default page size of 100 is used.",
 	//       "format": "int32",
@@ -9320,9 +8815,9 @@ func (c *ProjectsLocationsDatasetsDicomStoresTestIamPermissionsCall) Do(opts ...
 
 }
 
-// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.searchForInstances":
+// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.instances":
 
-type ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall struct {
+type ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall struct {
 	s            *Service
 	parent       string
 	dicomWebPath string
@@ -9332,13 +8827,12 @@ type ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall struct {
 	header_      http.Header
 }
 
-// SearchForInstances: SearchForInstances returns a list of matching
-// instances.
+// Instances: SearchForInstances returns a list of matching instances.
 // See
 // http://dicom.nema.org/medical/dicom/current/output/html/part18.htm
 // l#sect_6.7
-func (r *ProjectsLocationsDatasetsDicomStoresDicomWebService) SearchForInstances(parent string, dicomWebPath string) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall {
-	c := &ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+func (r *ProjectsLocationsDatasetsDicomStoresDicomWebService) Instances(parent string, dicomWebPath string) *ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall {
+	c := &ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
 	c.dicomWebPath = dicomWebPath
 	return c
@@ -9347,7 +8841,7 @@ func (r *ProjectsLocationsDatasetsDicomStoresDicomWebService) SearchForInstances
 // Fields allows partial responses to be retrieved. See
 // https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
 // for more information.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall {
 	c.urlParams_.Set("fields", googleapi.CombineFields(s))
 	return c
 }
@@ -9357,7 +8851,7 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall) Fie
 // getting updates only after the object has changed since the last
 // request. Use googleapi.IsNotModified to check whether the response
 // error from Do is the result of In-None-Match.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall) IfNoneMatch(entityTag string) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall) IfNoneMatch(entityTag string) *ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall {
 	c.ifNoneMatch_ = entityTag
 	return c
 }
@@ -9365,21 +8859,21 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall) IfN
 // Context sets the context to be used in this call's Do method. Any
 // pending HTTP request will be aborted if the provided context is
 // canceled.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall {
 	c.ctx_ = ctx
 	return c
 }
 
 // Header returns an http.Header that can be modified by the caller to
 // add HTTP headers to the request.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall) Header() http.Header {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall) Header() http.Header {
 	if c.header_ == nil {
 		c.header_ = make(http.Header)
 	}
 	return c.header_
 }
 
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall) doRequest(alt string) (*http.Response, error) {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
@@ -9405,14 +8899,14 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall) doR
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
-// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.searchForInstances" call.
+// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.instances" call.
 // Exactly one of *HttpBody or error will be non-nil. Any non-2xx status
 // code is an error. Response headers are in either
 // *HttpBody.ServerResponse.Header or (if a response was returned at
 // all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
 // to check whether the returned error was because
 // http.StatusNotModified was returned.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebInstancesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
 	gensupport.SetOptions(c.urlParams_, opts...)
 	res, err := c.doRequest("json")
 	if res != nil && res.StatusCode == http.StatusNotModified {
@@ -9446,7 +8940,7 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall) Do(
 	//   "description": "SearchForInstances returns a list of matching instances. See\nhttp://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/dicomStores/{dicomStoresId}/dicomWeb/instances",
 	//   "httpMethod": "GET",
-	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.searchForInstances",
+	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.instances",
 	//   "parameterOrder": [
 	//     "parent",
 	//     "dicomWebPath"
@@ -9478,9 +8972,9 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForInstancesCall) Do(
 
 }
 
-// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.searchForSeries":
+// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.series":
 
-type ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall struct {
+type ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall struct {
 	s            *Service
 	parent       string
 	dicomWebPath string
@@ -9490,12 +8984,12 @@ type ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall struct {
 	header_      http.Header
 }
 
-// SearchForSeries: SearchForSeries returns a list of matching series.
+// Series: SearchForSeries returns a list of matching series.
 // See
 // http://dicom.nema.org/medical/dicom/current/output/html/part18.htm
 // l#sect_6.7
-func (r *ProjectsLocationsDatasetsDicomStoresDicomWebService) SearchForSeries(parent string, dicomWebPath string) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall {
-	c := &ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+func (r *ProjectsLocationsDatasetsDicomStoresDicomWebService) Series(parent string, dicomWebPath string) *ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall {
+	c := &ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
 	c.dicomWebPath = dicomWebPath
 	return c
@@ -9504,7 +8998,7 @@ func (r *ProjectsLocationsDatasetsDicomStoresDicomWebService) SearchForSeries(pa
 // Fields allows partial responses to be retrieved. See
 // https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
 // for more information.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall {
 	c.urlParams_.Set("fields", googleapi.CombineFields(s))
 	return c
 }
@@ -9514,7 +9008,7 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall) Fields
 // getting updates only after the object has changed since the last
 // request. Use googleapi.IsNotModified to check whether the response
 // error from Do is the result of In-None-Match.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall) IfNoneMatch(entityTag string) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall) IfNoneMatch(entityTag string) *ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall {
 	c.ifNoneMatch_ = entityTag
 	return c
 }
@@ -9522,21 +9016,21 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall) IfNone
 // Context sets the context to be used in this call's Do method. Any
 // pending HTTP request will be aborted if the provided context is
 // canceled.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall {
 	c.ctx_ = ctx
 	return c
 }
 
 // Header returns an http.Header that can be modified by the caller to
 // add HTTP headers to the request.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall) Header() http.Header {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall) Header() http.Header {
 	if c.header_ == nil {
 		c.header_ = make(http.Header)
 	}
 	return c.header_
 }
 
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall) doRequest(alt string) (*http.Response, error) {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
@@ -9562,14 +9056,14 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall) doRequ
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
-// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.searchForSeries" call.
+// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.series" call.
 // Exactly one of *HttpBody or error will be non-nil. Any non-2xx status
 // code is an error. Response headers are in either
 // *HttpBody.ServerResponse.Header or (if a response was returned at
 // all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
 // to check whether the returned error was because
 // http.StatusNotModified was returned.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSeriesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
 	gensupport.SetOptions(c.urlParams_, opts...)
 	res, err := c.doRequest("json")
 	if res != nil && res.StatusCode == http.StatusNotModified {
@@ -9603,7 +9097,7 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall) Do(opt
 	//   "description": "SearchForSeries returns a list of matching series. See\nhttp://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/dicomStores/{dicomStoresId}/dicomWeb/series",
 	//   "httpMethod": "GET",
-	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.searchForSeries",
+	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.series",
 	//   "parameterOrder": [
 	//     "parent",
 	//     "dicomWebPath"
@@ -9635,167 +9129,9 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForSeriesCall) Do(opt
 
 }
 
-// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.searchForStudies":
+// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies":
 
-type ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall struct {
-	s            *Service
-	parent       string
-	dicomWebPath string
-	urlParams_   gensupport.URLParams
-	ifNoneMatch_ string
-	ctx_         context.Context
-	header_      http.Header
-}
-
-// SearchForStudies: SearchForStudies returns a list of matching
-// studies.
-// See
-// http://dicom.nema.org/medical/dicom/current/output/html/part18.htm
-// l#sect_6.7
-func (r *ProjectsLocationsDatasetsDicomStoresDicomWebService) SearchForStudies(parent string, dicomWebPath string) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall {
-	c := &ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
-	c.parent = parent
-	c.dicomWebPath = dicomWebPath
-	return c
-}
-
-// Fields allows partial responses to be retrieved. See
-// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
-// for more information.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall {
-	c.urlParams_.Set("fields", googleapi.CombineFields(s))
-	return c
-}
-
-// IfNoneMatch sets the optional parameter which makes the operation
-// fail if the object's ETag matches the given value. This is useful for
-// getting updates only after the object has changed since the last
-// request. Use googleapi.IsNotModified to check whether the response
-// error from Do is the result of In-None-Match.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall) IfNoneMatch(entityTag string) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall {
-	c.ifNoneMatch_ = entityTag
-	return c
-}
-
-// Context sets the context to be used in this call's Do method. Any
-// pending HTTP request will be aborted if the provided context is
-// canceled.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall {
-	c.ctx_ = ctx
-	return c
-}
-
-// Header returns an http.Header that can be modified by the caller to
-// add HTTP headers to the request.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall) Header() http.Header {
-	if c.header_ == nil {
-		c.header_ = make(http.Header)
-	}
-	return c.header_
-}
-
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall) doRequest(alt string) (*http.Response, error) {
-	reqHeaders := make(http.Header)
-	for k, v := range c.header_ {
-		reqHeaders[k] = v
-	}
-	reqHeaders.Set("User-Agent", c.s.userAgent())
-	if c.ifNoneMatch_ != "" {
-		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
-	}
-	var body io.Reader = nil
-	c.urlParams_.Set("alt", alt)
-	c.urlParams_.Set("prettyPrint", "false")
-	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha2/{+parent}/dicomWeb/{+dicomWebPath}")
-	urls += "?" + c.urlParams_.Encode()
-	req, err := http.NewRequest("GET", urls, body)
-	if err != nil {
-		return nil, err
-	}
-	req.Header = reqHeaders
-	googleapi.Expand(req.URL, map[string]string{
-		"parent":       c.parent,
-		"dicomWebPath": c.dicomWebPath,
-	})
-	return gensupport.SendRequest(c.ctx_, c.s.client, req)
-}
-
-// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.searchForStudies" call.
-// Exactly one of *HttpBody or error will be non-nil. Any non-2xx status
-// code is an error. Response headers are in either
-// *HttpBody.ServerResponse.Header or (if a response was returned at
-// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
-// to check whether the returned error was because
-// http.StatusNotModified was returned.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebSearchForStudiesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
-	gensupport.SetOptions(c.urlParams_, opts...)
-	res, err := c.doRequest("json")
-	if res != nil && res.StatusCode == http.StatusNotModified {
-		if res.Body != nil {
-			res.Body.Close()
-		}
-		return nil, &googleapi.Error{
-			Code:   res.StatusCode,
-			Header: res.Header,
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-	defer googleapi.CloseBody(res)
-	if err := googleapi.CheckResponse(res); err != nil {
-		return nil, err
-	}
-	ret := &HttpBody{
-		ServerResponse: googleapi.ServerResponse{
-			Header:         res.Header,
-			HTTPStatusCode: res.StatusCode,
-		},
-	}
-	target := &ret
-	if err := gensupport.DecodeResponse(target, res); err != nil {
-		return nil, err
-	}
-	return ret, nil
-	// {
-	//   "description": "SearchForStudies returns a list of matching studies. See\nhttp://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7",
-	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/dicomStores/{dicomStoresId}/dicomWeb/studies",
-	//   "httpMethod": "GET",
-	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.searchForStudies",
-	//   "parameterOrder": [
-	//     "parent",
-	//     "dicomWebPath"
-	//   ],
-	//   "parameters": {
-	//     "dicomWebPath": {
-	//       "description": "The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or\nQIDO-RS standard (e.g.,\n`studies`).",
-	//       "location": "path",
-	//       "pattern": "^studies$",
-	//       "required": true,
-	//       "type": "string"
-	//     },
-	//     "parent": {
-	//       "description": "The name of the DICOM store that is being accessed (e.g.,\n`projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).",
-	//       "location": "path",
-	//       "pattern": "^projects/[^/]+/locations/[^/]+/datasets/[^/]+/dicomStores/[^/]+$",
-	//       "required": true,
-	//       "type": "string"
-	//     }
-	//   },
-	//   "path": "v1alpha2/{+parent}/dicomWeb/{+dicomWebPath}",
-	//   "response": {
-	//     "$ref": "HttpBody"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-platform"
-	//   ]
-	// }
-
-}
-
-// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.storeInstances":
-
-type ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall struct {
+type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesCall struct {
 	s            *Service
 	parent       string
 	dicomWebPath string
@@ -9805,14 +9141,14 @@ type ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall struct {
 	header_      http.Header
 }
 
-// StoreInstances: StoreInstances stores DICOM instances associated with
-// study instance unique
+// Studies: StoreInstances stores DICOM instances associated with study
+// instance unique
 // identifiers (SUID).
 // See
 // http://dicom.nema.org/medical/dicom/current/output/html/part18.htm
 // l#sect_6.6.1.
-func (r *ProjectsLocationsDatasetsDicomStoresDicomWebService) StoreInstances(parent string, dicomWebPath string, httpbody *HttpBody) *ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall {
-	c := &ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+func (r *ProjectsLocationsDatasetsDicomStoresDicomWebService) Studies(parent string, dicomWebPath string, httpbody *HttpBody) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesCall {
+	c := &ProjectsLocationsDatasetsDicomStoresDicomWebStudiesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
 	c.dicomWebPath = dicomWebPath
 	c.httpbody = httpbody
@@ -9822,7 +9158,7 @@ func (r *ProjectsLocationsDatasetsDicomStoresDicomWebService) StoreInstances(par
 // Fields allows partial responses to be retrieved. See
 // https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
 // for more information.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesCall {
 	c.urlParams_.Set("fields", googleapi.CombineFields(s))
 	return c
 }
@@ -9830,21 +9166,21 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall) Fields(
 // Context sets the context to be used in this call's Do method. Any
 // pending HTTP request will be aborted if the provided context is
 // canceled.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesCall {
 	c.ctx_ = ctx
 	return c
 }
 
 // Header returns an http.Header that can be modified by the caller to
 // add HTTP headers to the request.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall) Header() http.Header {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesCall) Header() http.Header {
 	if c.header_ == nil {
 		c.header_ = make(http.Header)
 	}
 	return c.header_
 }
 
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall) doRequest(alt string) (*http.Response, error) {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
@@ -9872,14 +9208,14 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall) doReque
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
-// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.storeInstances" call.
+// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies" call.
 // Exactly one of *HttpBody or error will be non-nil. Any non-2xx status
 // code is an error. Response headers are in either
 // *HttpBody.ServerResponse.Header or (if a response was returned at
 // all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
 // to check whether the returned error was because
 // http.StatusNotModified was returned.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
 	gensupport.SetOptions(c.urlParams_, opts...)
 	res, err := c.doRequest("json")
 	if res != nil && res.StatusCode == http.StatusNotModified {
@@ -9913,7 +9249,7 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStoreInstancesCall) Do(opts
 	//   "description": "StoreInstances stores DICOM instances associated with study instance unique\nidentifiers (SUID). See\nhttp://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.6.1.",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/dicomStores/{dicomStoresId}/dicomWeb/studies",
 	//   "httpMethod": "POST",
-	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.storeInstances",
+	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies",
 	//   "parameterOrder": [
 	//     "parent",
 	//     "dicomWebPath"
@@ -10082,6 +9418,163 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesDeleteCall) Do(opts 
 	//   "path": "v1alpha2/{+parent}/dicomWeb/{+dicomWebPath}",
 	//   "response": {
 	//     "$ref": "Empty"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
+// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.instances":
+
+type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall struct {
+	s            *Service
+	parent       string
+	dicomWebPath string
+	urlParams_   gensupport.URLParams
+	ifNoneMatch_ string
+	ctx_         context.Context
+	header_      http.Header
+}
+
+// Instances: SearchForInstances returns a list of matching instances.
+// See
+// http://dicom.nema.org/medical/dicom/current/output/html/part18.htm
+// l#sect_6.7
+func (r *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesService) Instances(parent string, dicomWebPath string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall {
+	c := &ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.dicomWebPath = dicomWebPath
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// IfNoneMatch sets the optional parameter which makes the operation
+// fail if the object's ETag matches the given value. This is useful for
+// getting updates only after the object has changed since the last
+// request. Use googleapi.IsNotModified to check whether the response
+// error from Do is the result of In-None-Match.
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall) IfNoneMatch(entityTag string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall {
+	c.ifNoneMatch_ = entityTag
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	if c.ifNoneMatch_ != "" {
+		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
+	}
+	var body io.Reader = nil
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha2/{+parent}/dicomWeb/{+dicomWebPath}")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent":       c.parent,
+		"dicomWebPath": c.dicomWebPath,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.instances" call.
+// Exactly one of *HttpBody or error will be non-nil. Any non-2xx status
+// code is an error. Response headers are in either
+// *HttpBody.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesInstancesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &HttpBody{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "SearchForInstances returns a list of matching instances. See\nhttp://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7",
+	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/dicomStores/{dicomStoresId}/dicomWeb/studies/{studiesId}/instances",
+	//   "httpMethod": "GET",
+	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.instances",
+	//   "parameterOrder": [
+	//     "parent",
+	//     "dicomWebPath"
+	//   ],
+	//   "parameters": {
+	//     "dicomWebPath": {
+	//       "description": "The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or\nQIDO-RS standard (e.g.,\n`instances`).",
+	//       "location": "path",
+	//       "pattern": "^studies/[^/]+/instances$",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "parent": {
+	//       "description": "The name of the DICOM store that is being accessed (e.g.,\n`projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+/datasets/[^/]+/dicomStores/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1alpha2/{+parent}/dicomWeb/{+dicomWebPath}",
+	//   "response": {
+	//     "$ref": "HttpBody"
 	//   },
 	//   "scopes": [
 	//     "https://www.googleapis.com/auth/cloud-platform"
@@ -10407,9 +9900,9 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesRetrieveStudyCall) D
 
 }
 
-// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.searchForInstances":
+// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.series":
 
-type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall struct {
+type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall struct {
 	s            *Service
 	parent       string
 	dicomWebPath string
@@ -10419,13 +9912,12 @@ type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall s
 	header_      http.Header
 }
 
-// SearchForInstances: SearchForInstances returns a list of matching
-// instances.
+// Series: SearchForSeries returns a list of matching series.
 // See
 // http://dicom.nema.org/medical/dicom/current/output/html/part18.htm
 // l#sect_6.7
-func (r *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesService) SearchForInstances(parent string, dicomWebPath string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall {
-	c := &ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+func (r *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesService) Series(parent string, dicomWebPath string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall {
+	c := &ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
 	c.dicomWebPath = dicomWebPath
 	return c
@@ -10434,7 +9926,7 @@ func (r *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesService) SearchForIn
 // Fields allows partial responses to be retrieved. See
 // https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
 // for more information.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall {
 	c.urlParams_.Set("fields", googleapi.CombineFields(s))
 	return c
 }
@@ -10444,7 +9936,7 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCa
 // getting updates only after the object has changed since the last
 // request. Use googleapi.IsNotModified to check whether the response
 // error from Do is the result of In-None-Match.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall) IfNoneMatch(entityTag string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall) IfNoneMatch(entityTag string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall {
 	c.ifNoneMatch_ = entityTag
 	return c
 }
@@ -10452,21 +9944,21 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCa
 // Context sets the context to be used in this call's Do method. Any
 // pending HTTP request will be aborted if the provided context is
 // canceled.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall {
 	c.ctx_ = ctx
 	return c
 }
 
 // Header returns an http.Header that can be modified by the caller to
 // add HTTP headers to the request.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall) Header() http.Header {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall) Header() http.Header {
 	if c.header_ == nil {
 		c.header_ = make(http.Header)
 	}
 	return c.header_
 }
 
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall) doRequest(alt string) (*http.Response, error) {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders := make(http.Header)
 	for k, v := range c.header_ {
 		reqHeaders[k] = v
@@ -10492,171 +9984,14 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCa
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
 
-// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.searchForInstances" call.
+// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.series" call.
 // Exactly one of *HttpBody or error will be non-nil. Any non-2xx status
 // code is an error. Response headers are in either
 // *HttpBody.ServerResponse.Header or (if a response was returned at
 // all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
 // to check whether the returned error was because
 // http.StatusNotModified was returned.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForInstancesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
-	gensupport.SetOptions(c.urlParams_, opts...)
-	res, err := c.doRequest("json")
-	if res != nil && res.StatusCode == http.StatusNotModified {
-		if res.Body != nil {
-			res.Body.Close()
-		}
-		return nil, &googleapi.Error{
-			Code:   res.StatusCode,
-			Header: res.Header,
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-	defer googleapi.CloseBody(res)
-	if err := googleapi.CheckResponse(res); err != nil {
-		return nil, err
-	}
-	ret := &HttpBody{
-		ServerResponse: googleapi.ServerResponse{
-			Header:         res.Header,
-			HTTPStatusCode: res.StatusCode,
-		},
-	}
-	target := &ret
-	if err := gensupport.DecodeResponse(target, res); err != nil {
-		return nil, err
-	}
-	return ret, nil
-	// {
-	//   "description": "SearchForInstances returns a list of matching instances. See\nhttp://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7",
-	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/dicomStores/{dicomStoresId}/dicomWeb/studies/{studiesId}/instances",
-	//   "httpMethod": "GET",
-	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.searchForInstances",
-	//   "parameterOrder": [
-	//     "parent",
-	//     "dicomWebPath"
-	//   ],
-	//   "parameters": {
-	//     "dicomWebPath": {
-	//       "description": "The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or\nQIDO-RS standard (e.g.,\n`instances`).",
-	//       "location": "path",
-	//       "pattern": "^studies/[^/]+/instances$",
-	//       "required": true,
-	//       "type": "string"
-	//     },
-	//     "parent": {
-	//       "description": "The name of the DICOM store that is being accessed (e.g.,\n`projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).",
-	//       "location": "path",
-	//       "pattern": "^projects/[^/]+/locations/[^/]+/datasets/[^/]+/dicomStores/[^/]+$",
-	//       "required": true,
-	//       "type": "string"
-	//     }
-	//   },
-	//   "path": "v1alpha2/{+parent}/dicomWeb/{+dicomWebPath}",
-	//   "response": {
-	//     "$ref": "HttpBody"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-platform"
-	//   ]
-	// }
-
-}
-
-// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.searchForSeries":
-
-type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall struct {
-	s            *Service
-	parent       string
-	dicomWebPath string
-	urlParams_   gensupport.URLParams
-	ifNoneMatch_ string
-	ctx_         context.Context
-	header_      http.Header
-}
-
-// SearchForSeries: SearchForSeries returns a list of matching series.
-// See
-// http://dicom.nema.org/medical/dicom/current/output/html/part18.htm
-// l#sect_6.7
-func (r *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesService) SearchForSeries(parent string, dicomWebPath string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall {
-	c := &ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
-	c.parent = parent
-	c.dicomWebPath = dicomWebPath
-	return c
-}
-
-// Fields allows partial responses to be retrieved. See
-// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
-// for more information.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall {
-	c.urlParams_.Set("fields", googleapi.CombineFields(s))
-	return c
-}
-
-// IfNoneMatch sets the optional parameter which makes the operation
-// fail if the object's ETag matches the given value. This is useful for
-// getting updates only after the object has changed since the last
-// request. Use googleapi.IsNotModified to check whether the response
-// error from Do is the result of In-None-Match.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall) IfNoneMatch(entityTag string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall {
-	c.ifNoneMatch_ = entityTag
-	return c
-}
-
-// Context sets the context to be used in this call's Do method. Any
-// pending HTTP request will be aborted if the provided context is
-// canceled.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall {
-	c.ctx_ = ctx
-	return c
-}
-
-// Header returns an http.Header that can be modified by the caller to
-// add HTTP headers to the request.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall) Header() http.Header {
-	if c.header_ == nil {
-		c.header_ = make(http.Header)
-	}
-	return c.header_
-}
-
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall) doRequest(alt string) (*http.Response, error) {
-	reqHeaders := make(http.Header)
-	for k, v := range c.header_ {
-		reqHeaders[k] = v
-	}
-	reqHeaders.Set("User-Agent", c.s.userAgent())
-	if c.ifNoneMatch_ != "" {
-		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
-	}
-	var body io.Reader = nil
-	c.urlParams_.Set("alt", alt)
-	c.urlParams_.Set("prettyPrint", "false")
-	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha2/{+parent}/dicomWeb/{+dicomWebPath}")
-	urls += "?" + c.urlParams_.Encode()
-	req, err := http.NewRequest("GET", urls, body)
-	if err != nil {
-		return nil, err
-	}
-	req.Header = reqHeaders
-	googleapi.Expand(req.URL, map[string]string{
-		"parent":       c.parent,
-		"dicomWebPath": c.dicomWebPath,
-	})
-	return gensupport.SendRequest(c.ctx_, c.s.client, req)
-}
-
-// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.searchForSeries" call.
-// Exactly one of *HttpBody or error will be non-nil. Any non-2xx status
-// code is an error. Response headers are in either
-// *HttpBody.ServerResponse.Header or (if a response was returned at
-// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
-// to check whether the returned error was because
-// http.StatusNotModified was returned.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
 	gensupport.SetOptions(c.urlParams_, opts...)
 	res, err := c.doRequest("json")
 	if res != nil && res.StatusCode == http.StatusNotModified {
@@ -10690,7 +10025,7 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSearchForSeriesCall)
 	//   "description": "SearchForSeries returns a list of matching series. See\nhttp://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/dicomStores/{dicomStoresId}/dicomWeb/studies/{studiesId}/series",
 	//   "httpMethod": "GET",
-	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.searchForSeries",
+	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.series",
 	//   "parameterOrder": [
 	//     "parent",
 	//     "dicomWebPath"
@@ -11021,6 +10356,163 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesDeleteCall) Do
 
 }
 
+// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.series.instances":
+
+type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall struct {
+	s            *Service
+	parent       string
+	dicomWebPath string
+	urlParams_   gensupport.URLParams
+	ifNoneMatch_ string
+	ctx_         context.Context
+	header_      http.Header
+}
+
+// Instances: SearchForInstances returns a list of matching instances.
+// See
+// http://dicom.nema.org/medical/dicom/current/output/html/part18.htm
+// l#sect_6.7
+func (r *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesService) Instances(parent string, dicomWebPath string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall {
+	c := &ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.dicomWebPath = dicomWebPath
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// IfNoneMatch sets the optional parameter which makes the operation
+// fail if the object's ETag matches the given value. This is useful for
+// getting updates only after the object has changed since the last
+// request. Use googleapi.IsNotModified to check whether the response
+// error from Do is the result of In-None-Match.
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall) IfNoneMatch(entityTag string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall {
+	c.ifNoneMatch_ = entityTag
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	if c.ifNoneMatch_ != "" {
+		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
+	}
+	var body io.Reader = nil
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha2/{+parent}/dicomWeb/{+dicomWebPath}")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent":       c.parent,
+		"dicomWebPath": c.dicomWebPath,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.series.instances" call.
+// Exactly one of *HttpBody or error will be non-nil. Any non-2xx status
+// code is an error. Response headers are in either
+// *HttpBody.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesInstancesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &HttpBody{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "SearchForInstances returns a list of matching instances. See\nhttp://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7",
+	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/dicomStores/{dicomStoresId}/dicomWeb/studies/{studiesId}/series/{seriesId}/instances",
+	//   "httpMethod": "GET",
+	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.series.instances",
+	//   "parameterOrder": [
+	//     "parent",
+	//     "dicomWebPath"
+	//   ],
+	//   "parameters": {
+	//     "dicomWebPath": {
+	//       "description": "The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or\nQIDO-RS standard (e.g.,\n`instances`).",
+	//       "location": "path",
+	//       "pattern": "^studies/[^/]+/series/[^/]+/instances$",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "parent": {
+	//       "description": "The name of the DICOM store that is being accessed (e.g.,\n`projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+/datasets/[^/]+/dicomStores/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1alpha2/{+parent}/dicomWeb/{+dicomWebPath}",
+	//   "response": {
+	//     "$ref": "HttpBody"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
 // method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.series.metadata":
 
 type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesMetadataCall struct {
@@ -11316,164 +10808,6 @@ func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesRetrieveSeries
 	//       "description": "The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or\nQIDO-RS standard (e.g., `studies/{study_id}/series/{series_id}`).",
 	//       "location": "path",
 	//       "pattern": "^studies/[^/]+/series/[^/]+$",
-	//       "required": true,
-	//       "type": "string"
-	//     },
-	//     "parent": {
-	//       "description": "The name of the DICOM store that is being accessed (e.g.,\n`projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/dicomStores/{dicom_store_id}`).",
-	//       "location": "path",
-	//       "pattern": "^projects/[^/]+/locations/[^/]+/datasets/[^/]+/dicomStores/[^/]+$",
-	//       "required": true,
-	//       "type": "string"
-	//     }
-	//   },
-	//   "path": "v1alpha2/{+parent}/dicomWeb/{+dicomWebPath}",
-	//   "response": {
-	//     "$ref": "HttpBody"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-platform"
-	//   ]
-	// }
-
-}
-
-// method id "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.series.searchForInstances":
-
-type ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall struct {
-	s            *Service
-	parent       string
-	dicomWebPath string
-	urlParams_   gensupport.URLParams
-	ifNoneMatch_ string
-	ctx_         context.Context
-	header_      http.Header
-}
-
-// SearchForInstances: SearchForInstances returns a list of matching
-// instances.
-// See
-// http://dicom.nema.org/medical/dicom/current/output/html/part18.htm
-// l#sect_6.7
-func (r *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesService) SearchForInstances(parent string, dicomWebPath string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall {
-	c := &ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
-	c.parent = parent
-	c.dicomWebPath = dicomWebPath
-	return c
-}
-
-// Fields allows partial responses to be retrieved. See
-// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
-// for more information.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall {
-	c.urlParams_.Set("fields", googleapi.CombineFields(s))
-	return c
-}
-
-// IfNoneMatch sets the optional parameter which makes the operation
-// fail if the object's ETag matches the given value. This is useful for
-// getting updates only after the object has changed since the last
-// request. Use googleapi.IsNotModified to check whether the response
-// error from Do is the result of In-None-Match.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall) IfNoneMatch(entityTag string) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall {
-	c.ifNoneMatch_ = entityTag
-	return c
-}
-
-// Context sets the context to be used in this call's Do method. Any
-// pending HTTP request will be aborted if the provided context is
-// canceled.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall) Context(ctx context.Context) *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall {
-	c.ctx_ = ctx
-	return c
-}
-
-// Header returns an http.Header that can be modified by the caller to
-// add HTTP headers to the request.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall) Header() http.Header {
-	if c.header_ == nil {
-		c.header_ = make(http.Header)
-	}
-	return c.header_
-}
-
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall) doRequest(alt string) (*http.Response, error) {
-	reqHeaders := make(http.Header)
-	for k, v := range c.header_ {
-		reqHeaders[k] = v
-	}
-	reqHeaders.Set("User-Agent", c.s.userAgent())
-	if c.ifNoneMatch_ != "" {
-		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
-	}
-	var body io.Reader = nil
-	c.urlParams_.Set("alt", alt)
-	c.urlParams_.Set("prettyPrint", "false")
-	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha2/{+parent}/dicomWeb/{+dicomWebPath}")
-	urls += "?" + c.urlParams_.Encode()
-	req, err := http.NewRequest("GET", urls, body)
-	if err != nil {
-		return nil, err
-	}
-	req.Header = reqHeaders
-	googleapi.Expand(req.URL, map[string]string{
-		"parent":       c.parent,
-		"dicomWebPath": c.dicomWebPath,
-	})
-	return gensupport.SendRequest(c.ctx_, c.s.client, req)
-}
-
-// Do executes the "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.series.searchForInstances" call.
-// Exactly one of *HttpBody or error will be non-nil. Any non-2xx status
-// code is an error. Response headers are in either
-// *HttpBody.ServerResponse.Header or (if a response was returned at
-// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
-// to check whether the returned error was because
-// http.StatusNotModified was returned.
-func (c *ProjectsLocationsDatasetsDicomStoresDicomWebStudiesSeriesSearchForInstancesCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
-	gensupport.SetOptions(c.urlParams_, opts...)
-	res, err := c.doRequest("json")
-	if res != nil && res.StatusCode == http.StatusNotModified {
-		if res.Body != nil {
-			res.Body.Close()
-		}
-		return nil, &googleapi.Error{
-			Code:   res.StatusCode,
-			Header: res.Header,
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-	defer googleapi.CloseBody(res)
-	if err := googleapi.CheckResponse(res); err != nil {
-		return nil, err
-	}
-	ret := &HttpBody{
-		ServerResponse: googleapi.ServerResponse{
-			Header:         res.Header,
-			HTTPStatusCode: res.StatusCode,
-		},
-	}
-	target := &ret
-	if err := gensupport.DecodeResponse(target, res); err != nil {
-		return nil, err
-	}
-	return ret, nil
-	// {
-	//   "description": "SearchForInstances returns a list of matching instances. See\nhttp://dicom.nema.org/medical/dicom/current/output/html/part18.html#sect_6.7",
-	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/dicomStores/{dicomStoresId}/dicomWeb/studies/{studiesId}/series/{seriesId}/instances",
-	//   "httpMethod": "GET",
-	//   "id": "healthcare.projects.locations.datasets.dicomStores.dicomWeb.studies.series.searchForInstances",
-	//   "parameterOrder": [
-	//     "parent",
-	//     "dicomWebPath"
-	//   ],
-	//   "parameters": {
-	//     "dicomWebPath": {
-	//       "description": "The path of the DICOMweb request, as specified in the STOW-RS, WADO-RS, or\nQIDO-RS standard (e.g.,\n`instances`).",
-	//       "location": "path",
-	//       "pattern": "^studies/[^/]+/series/[^/]+/instances$",
 	//       "required": true,
 	//       "type": "string"
 	//     },
@@ -12602,8 +11936,9 @@ type ProjectsLocationsDatasetsFhirStoresDeleteCall struct {
 	header_    http.Header
 }
 
-// Delete: Deletes the specified FHIR store and removes all resources
-// within it.
+// Delete: Deletes the FHIR store and removes all resources that are
+// contained within
+// it.
 func (r *ProjectsLocationsDatasetsFhirStoresService) Delete(name string) *ProjectsLocationsDatasetsFhirStoresDeleteCall {
 	c := &ProjectsLocationsDatasetsFhirStoresDeleteCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.name = name
@@ -12695,7 +12030,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresDeleteCall) Do(opts ...googleapi.Cal
 	}
 	return ret, nil
 	// {
-	//   "description": "Deletes the specified FHIR store and removes all resources within it.",
+	//   "description": "Deletes the FHIR store and removes all resources that are contained within\nit.",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}",
 	//   "httpMethod": "DELETE",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.delete",
@@ -12722,145 +12057,6 @@ func (c *ProjectsLocationsDatasetsFhirStoresDeleteCall) Do(opts ...googleapi.Cal
 
 }
 
-// method id "healthcare.projects.locations.datasets.fhirStores.executeBundle":
-
-type ProjectsLocationsDatasetsFhirStoresExecuteBundleCall struct {
-	s          *Service
-	parent     string
-	httpbody   *HttpBody
-	urlParams_ gensupport.URLParams
-	ctx_       context.Context
-	header_    http.Header
-}
-
-// ExecuteBundle: Executes all the requests in the given Bundle.
-func (r *ProjectsLocationsDatasetsFhirStoresService) ExecuteBundle(parent string, httpbody *HttpBody) *ProjectsLocationsDatasetsFhirStoresExecuteBundleCall {
-	c := &ProjectsLocationsDatasetsFhirStoresExecuteBundleCall{s: r.s, urlParams_: make(gensupport.URLParams)}
-	c.parent = parent
-	c.httpbody = httpbody
-	return c
-}
-
-// Fields allows partial responses to be retrieved. See
-// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
-// for more information.
-func (c *ProjectsLocationsDatasetsFhirStoresExecuteBundleCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsFhirStoresExecuteBundleCall {
-	c.urlParams_.Set("fields", googleapi.CombineFields(s))
-	return c
-}
-
-// Context sets the context to be used in this call's Do method. Any
-// pending HTTP request will be aborted if the provided context is
-// canceled.
-func (c *ProjectsLocationsDatasetsFhirStoresExecuteBundleCall) Context(ctx context.Context) *ProjectsLocationsDatasetsFhirStoresExecuteBundleCall {
-	c.ctx_ = ctx
-	return c
-}
-
-// Header returns an http.Header that can be modified by the caller to
-// add HTTP headers to the request.
-func (c *ProjectsLocationsDatasetsFhirStoresExecuteBundleCall) Header() http.Header {
-	if c.header_ == nil {
-		c.header_ = make(http.Header)
-	}
-	return c.header_
-}
-
-func (c *ProjectsLocationsDatasetsFhirStoresExecuteBundleCall) doRequest(alt string) (*http.Response, error) {
-	reqHeaders := make(http.Header)
-	for k, v := range c.header_ {
-		reqHeaders[k] = v
-	}
-	reqHeaders.Set("User-Agent", c.s.userAgent())
-	var body io.Reader = nil
-	body, err := googleapi.WithoutDataWrapper.JSONReader(c.httpbody)
-	if err != nil {
-		return nil, err
-	}
-	reqHeaders.Set("Content-Type", "application/json")
-	c.urlParams_.Set("alt", alt)
-	c.urlParams_.Set("prettyPrint", "false")
-	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha2/{+parent}/fhir")
-	urls += "?" + c.urlParams_.Encode()
-	req, err := http.NewRequest("POST", urls, body)
-	if err != nil {
-		return nil, err
-	}
-	req.Header = reqHeaders
-	googleapi.Expand(req.URL, map[string]string{
-		"parent": c.parent,
-	})
-	return gensupport.SendRequest(c.ctx_, c.s.client, req)
-}
-
-// Do executes the "healthcare.projects.locations.datasets.fhirStores.executeBundle" call.
-// Exactly one of *HttpBody or error will be non-nil. Any non-2xx status
-// code is an error. Response headers are in either
-// *HttpBody.ServerResponse.Header or (if a response was returned at
-// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
-// to check whether the returned error was because
-// http.StatusNotModified was returned.
-func (c *ProjectsLocationsDatasetsFhirStoresExecuteBundleCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
-	gensupport.SetOptions(c.urlParams_, opts...)
-	res, err := c.doRequest("json")
-	if res != nil && res.StatusCode == http.StatusNotModified {
-		if res.Body != nil {
-			res.Body.Close()
-		}
-		return nil, &googleapi.Error{
-			Code:   res.StatusCode,
-			Header: res.Header,
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-	defer googleapi.CloseBody(res)
-	if err := googleapi.CheckResponse(res); err != nil {
-		return nil, err
-	}
-	ret := &HttpBody{
-		ServerResponse: googleapi.ServerResponse{
-			Header:         res.Header,
-			HTTPStatusCode: res.StatusCode,
-		},
-	}
-	target := &ret
-	if err := gensupport.DecodeResponse(target, res); err != nil {
-		return nil, err
-	}
-	return ret, nil
-	// {
-	//   "description": "Executes all the requests in the given Bundle.",
-	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/fhir",
-	//   "httpMethod": "POST",
-	//   "id": "healthcare.projects.locations.datasets.fhirStores.executeBundle",
-	//   "parameterOrder": [
-	//     "parent"
-	//   ],
-	//   "parameters": {
-	//     "parent": {
-	//       "description": "Name of the FHIR store in which this bundle will be executed.",
-	//       "location": "path",
-	//       "pattern": "^projects/[^/]+/locations/[^/]+/datasets/[^/]+/fhirStores/[^/]+$",
-	//       "required": true,
-	//       "type": "string"
-	//     }
-	//   },
-	//   "path": "v1alpha2/{+parent}/fhir",
-	//   "request": {
-	//     "$ref": "HttpBody"
-	//   },
-	//   "response": {
-	//     "$ref": "HttpBody"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-platform"
-	//   ]
-	// }
-
-}
-
 // method id "healthcare.projects.locations.datasets.fhirStores.export":
 
 type ProjectsLocationsDatasetsFhirStoresExportCall struct {
@@ -12874,20 +12070,15 @@ type ProjectsLocationsDatasetsFhirStoresExportCall struct {
 
 // Export: Export resources from the FHIR store to the specified
 // destination.
-//
-// This method returns an Operation that can
-// be used to track the status of the export by
-// calling
-// GetOperation.
-//
-// Immediate fatal errors appear in the
+// Fatal errors will be populated in the
 // error field.
-// Otherwise, when the operation finishes, a detailed response of
+// Otherwise a detailed response will be returned as of
 // type
-// ExportResourcesResponse is returned in the
-// response field.
-// The metadata field type for this
-// operation is OperationMetadata.
+// ExportResourcesResponse contained in the
+// response field when the operation
+// finishes.
+// The metadata field type is
+// OperationMetadata.
 func (r *ProjectsLocationsDatasetsFhirStoresService) Export(name string, exportresourcesrequest *ExportResourcesRequest) *ProjectsLocationsDatasetsFhirStoresExportCall {
 	c := &ProjectsLocationsDatasetsFhirStoresExportCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.name = name
@@ -12985,7 +12176,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresExportCall) Do(opts ...googleapi.Cal
 	}
 	return ret, nil
 	// {
-	//   "description": "Export resources from the FHIR store to the specified destination.\n\nThis method returns an Operation that can\nbe used to track the status of the export by calling\nGetOperation.\n\nImmediate fatal errors appear in the\nerror field.\nOtherwise, when the operation finishes, a detailed response of type\nExportResourcesResponse is returned in the\nresponse field.\nThe metadata field type for this\noperation is OperationMetadata.",
+	//   "description": "Export resources from the FHIR store to the specified destination.\nFatal errors will be populated in the\nerror field.\nOtherwise a detailed response will be returned as of type\nExportResourcesResponse contained in the\nresponse field when the operation\nfinishes.\nThe metadata field type is\nOperationMetadata.",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}:export",
 	//   "httpMethod": "POST",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.export",
@@ -13015,6 +12206,149 @@ func (c *ProjectsLocationsDatasetsFhirStoresExportCall) Do(opts ...googleapi.Cal
 
 }
 
+// method id "healthcare.projects.locations.datasets.fhirStores.fhir":
+
+type ProjectsLocationsDatasetsFhirStoresFhirCall struct {
+	s          *Service
+	parent     string
+	httpbody   *HttpBody
+	urlParams_ gensupport.URLParams
+	ctx_       context.Context
+	header_    http.Header
+}
+
+// Fhir: Executes all the requests in the given Bundle.  Conforms
+// to
+// http://hl7.org/fhir/http.html#transaction except that only the
+// transaction
+// update is supported.
+func (r *ProjectsLocationsDatasetsFhirStoresService) Fhir(parent string, httpbody *HttpBody) *ProjectsLocationsDatasetsFhirStoresFhirCall {
+	c := &ProjectsLocationsDatasetsFhirStoresFhirCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	c.httpbody = httpbody
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ProjectsLocationsDatasetsFhirStoresFhirCall) Fields(s ...googleapi.Field) *ProjectsLocationsDatasetsFhirStoresFhirCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *ProjectsLocationsDatasetsFhirStoresFhirCall) Context(ctx context.Context) *ProjectsLocationsDatasetsFhirStoresFhirCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *ProjectsLocationsDatasetsFhirStoresFhirCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ProjectsLocationsDatasetsFhirStoresFhirCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.httpbody)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "v1alpha2/{+parent}/fhir")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "healthcare.projects.locations.datasets.fhirStores.fhir" call.
+// Exactly one of *HttpBody or error will be non-nil. Any non-2xx status
+// code is an error. Response headers are in either
+// *HttpBody.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ProjectsLocationsDatasetsFhirStoresFhirCall) Do(opts ...googleapi.CallOption) (*HttpBody, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &HttpBody{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Executes all the requests in the given Bundle.  Conforms to\nhttp://hl7.org/fhir/http.html#transaction except that only the transaction\nupdate is supported.",
+	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/fhir",
+	//   "httpMethod": "POST",
+	//   "id": "healthcare.projects.locations.datasets.fhirStores.fhir",
+	//   "parameterOrder": [
+	//     "parent"
+	//   ],
+	//   "parameters": {
+	//     "parent": {
+	//       "description": "Name of the FHIR store in which this bundle will be executed.",
+	//       "location": "path",
+	//       "pattern": "^projects/[^/]+/locations/[^/]+/datasets/[^/]+/fhirStores/[^/]+$",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "v1alpha2/{+parent}/fhir",
+	//   "request": {
+	//     "$ref": "HttpBody"
+	//   },
+	//   "response": {
+	//     "$ref": "HttpBody"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform"
+	//   ]
+	// }
+
+}
+
 // method id "healthcare.projects.locations.datasets.fhirStores.get":
 
 type ProjectsLocationsDatasetsFhirStoresGetCall struct {
@@ -13026,7 +12360,7 @@ type ProjectsLocationsDatasetsFhirStoresGetCall struct {
 	header_      http.Header
 }
 
-// Get: Gets the configuration of the specified FHIR store.
+// Get: Gets the specified FHIR store.
 func (r *ProjectsLocationsDatasetsFhirStoresService) Get(name string) *ProjectsLocationsDatasetsFhirStoresGetCall {
 	c := &ProjectsLocationsDatasetsFhirStoresGetCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.name = name
@@ -13131,7 +12465,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresGetCall) Do(opts ...googleapi.CallOp
 	}
 	return ret, nil
 	// {
-	//   "description": "Gets the configuration of the specified FHIR store.",
+	//   "description": "Gets the specified FHIR store.",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}",
 	//   "httpMethod": "GET",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.get",
@@ -13323,9 +12657,7 @@ type ProjectsLocationsDatasetsFhirStoresGetMetadataCall struct {
 	header_      http.Header
 }
 
-// GetMetadata: Gets the FHIR capability statement for the store, which
-// contains a
-// description of functionality supported by the server.
+// GetMetadata: Gets the capabilities statement for the store.
 //
 func (r *ProjectsLocationsDatasetsFhirStoresService) GetMetadata(name string) *ProjectsLocationsDatasetsFhirStoresGetMetadataCall {
 	c := &ProjectsLocationsDatasetsFhirStoresGetMetadataCall{s: r.s, urlParams_: make(gensupport.URLParams)}
@@ -13431,7 +12763,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresGetMetadataCall) Do(opts ...googleap
 	}
 	return ret, nil
 	// {
-	//   "description": "Gets the FHIR capability statement for the store, which contains a\ndescription of functionality supported by the server.\n",
+	//   "description": "Gets the capabilities statement for the store.\n",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/metadata",
 	//   "httpMethod": "GET",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.getMetadata",
@@ -13471,43 +12803,16 @@ type ProjectsLocationsDatasetsFhirStoresImportCall struct {
 
 // Import: Import resources to the FHIR store by loading data from the
 // specified
-// sources. Each resource must have a client-supplied ID, which is
-// retained
-// by the server.
-//
-// The import operation is idempotent. Upon retry, the most recent
-// data
-// (matching the client-supplied ID) is overwritten, without creating a
-// new
-// resource version. If partial failures occur during the import,
-// successful
-// changes are not rolled back.
-//
-// If history imports are enabled
-// (enable_history_import is set in the
-// FHIR store's configuration), you can import historical versions of
-// a
-// resource by supplying a bundle of type `history`. The historical
-// versions
-// in the bundle must have `lastUpdated` timestamps. If a current
-// or
-// historical version with the supplied resource ID already exists,
-// the
-// bundle is rejected.
-//
-// This method returns an Operation that can
-// be used to track the status of the import by
-// calling
-// GetOperation.
-//
-// Immediate fatal errors appear in the
+// sources.
+// Fatal errors will be populated in the
 // error field.
-// Otherwise, when the operation finishes, a detailed response of
+// Otherwise a detailed response will be returned as of
 // type
-// ImportResourcesResponse is returned in the
-// response field.
-// The metadata field type for this
-// operation is OperationMetadata.
+// ImportResourcesResponse contained in the
+// response field when the operation
+// finishes.
+// The metadata field type is
+// OperationMetadata.
 func (r *ProjectsLocationsDatasetsFhirStoresService) Import(name string, importresourcesrequest *ImportResourcesRequest) *ProjectsLocationsDatasetsFhirStoresImportCall {
 	c := &ProjectsLocationsDatasetsFhirStoresImportCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.name = name
@@ -13605,7 +12910,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresImportCall) Do(opts ...googleapi.Cal
 	}
 	return ret, nil
 	// {
-	//   "description": "Import resources to the FHIR store by loading data from the specified\nsources. Each resource must have a client-supplied ID, which is retained\nby the server.\n\nThe import operation is idempotent. Upon retry, the most recent data\n(matching the client-supplied ID) is overwritten, without creating a new\nresource version. If partial failures occur during the import, successful\nchanges are not rolled back.\n\nIf history imports are enabled\n(enable_history_import is set in the\nFHIR store's configuration), you can import historical versions of a\nresource by supplying a bundle of type `history`. The historical versions\nin the bundle must have `lastUpdated` timestamps. If a current or\nhistorical version with the supplied resource ID already exists, the\nbundle is rejected.\n\nThis method returns an Operation that can\nbe used to track the status of the import by calling\nGetOperation.\n\nImmediate fatal errors appear in the\nerror field.\nOtherwise, when the operation finishes, a detailed response of type\nImportResourcesResponse is returned in the\nresponse field.\nThe metadata field type for this\noperation is OperationMetadata.",
+	//   "description": "Import resources to the FHIR store by loading data from the specified\nsources.\nFatal errors will be populated in the\nerror field.\nOtherwise a detailed response will be returned as of type\nImportResourcesResponse contained in the\nresponse field when the operation\nfinishes.\nThe metadata field type is\nOperationMetadata.",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}:import",
 	//   "httpMethod": "POST",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.import",
@@ -13650,18 +12955,6 @@ type ProjectsLocationsDatasetsFhirStoresListCall struct {
 func (r *ProjectsLocationsDatasetsFhirStoresService) List(parent string) *ProjectsLocationsDatasetsFhirStoresListCall {
 	c := &ProjectsLocationsDatasetsFhirStoresListCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
-	return c
-}
-
-// Filter sets the optional parameter "filter": Restricts stores
-// returned to those matching a filter.
-// Syntax:
-// https://cloud.google.com/appengine/docs/standard/python/search
-// /query_strings
-// Only filtering on labels is supported, for example
-// `labels.key=value`.
-func (c *ProjectsLocationsDatasetsFhirStoresListCall) Filter(filter string) *ProjectsLocationsDatasetsFhirStoresListCall {
-	c.urlParams_.Set("filter", filter)
 	return c
 }
 
@@ -13787,11 +13080,6 @@ func (c *ProjectsLocationsDatasetsFhirStoresListCall) Do(opts ...googleapi.CallO
 	//     "parent"
 	//   ],
 	//   "parameters": {
-	//     "filter": {
-	//       "description": "Restricts stores returned to those matching a filter. Syntax:\nhttps://cloud.google.com/appengine/docs/standard/python/search/query_strings\nOnly filtering on labels is supported, for example `labels.key=value`.",
-	//       "location": "query",
-	//       "type": "string"
-	//     },
 	//     "pageSize": {
 	//       "description": "Limit on the number of FHIR stores to return in a single response.  If zero\nthe default page size of 100 is used.",
 	//       "format": "int32",
@@ -13854,7 +13142,7 @@ type ProjectsLocationsDatasetsFhirStoresPatchCall struct {
 	header_    http.Header
 }
 
-// Patch: Updates the configuration of the specified FHIR store.
+// Patch: Updates the FHIR store.
 func (r *ProjectsLocationsDatasetsFhirStoresService) Patch(name string, fhirstore *FhirStore) *ProjectsLocationsDatasetsFhirStoresPatchCall {
 	c := &ProjectsLocationsDatasetsFhirStoresPatchCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.name = name
@@ -13963,7 +13251,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresPatchCall) Do(opts ...googleapi.Call
 	}
 	return ret, nil
 	// {
-	//   "description": "Updates the configuration of the specified FHIR store.",
+	//   "description": "Updates the FHIR store.",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}",
 	//   "httpMethod": "PATCH",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.patch",
@@ -14303,29 +13591,6 @@ type ProjectsLocationsDatasetsFhirStoresFhirSearchCall struct {
 }
 
 // Search: Searches resources in the given FHIR store.
-//
-// # Search Parameters
-//
-// The server's capability statement, retrieved
-// through
-// GetCapabilityStatement, indicates which search
-// parameters are supported on each FHIR resource.
-//
-// # Search Modifiers
-//
-// Modifier   | Supported
-// ----------- | ---------
-// `:missing`  | Yes
-// `:exact`    | Yes
-// `:contains` | Yes
-// `:text`     | Yes
-// `:in`       | Yes
-// `:not-in`   | Yes
-// `:above`    | Yes
-// `:below`    | Yes
-// `:[type]`   | Yes
-// `:not`      | Yes
-// `:recurse`  | No
 func (r *ProjectsLocationsDatasetsFhirStoresFhirService) Search(parent string, searchresourcesrequest *SearchResourcesRequest) *ProjectsLocationsDatasetsFhirStoresFhirSearchCall {
 	c := &ProjectsLocationsDatasetsFhirStoresFhirSearchCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
@@ -14423,7 +13688,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresFhirSearchCall) Do(opts ...googleapi
 	}
 	return ret, nil
 	// {
-	//   "description": "Searches resources in the given FHIR store.\n\n# Search Parameters\n\nThe server's capability statement, retrieved through\nGetCapabilityStatement, indicates which search\nparameters are supported on each FHIR resource.\n\n# Search Modifiers\n\nModifier   | Supported\n----------- | ---------\n`:missing`  | Yes\n`:exact`    | Yes\n`:contains` | Yes\n`:text`     | Yes\n`:in`       | Yes\n`:not-in`   | Yes\n`:above`    | Yes\n`:below`    | Yes\n`:[type]`   | Yes\n`:not`      | Yes\n`:recurse`  | No",
+	//   "description": "Searches resources in the given FHIR store.",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/fhir/_search",
 	//   "httpMethod": "POST",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.fhir._search",
@@ -14466,7 +13731,6 @@ type ProjectsLocationsDatasetsFhirStoresFhirConditionalDeleteResourceCall struct
 
 // ConditionalDeleteResource: Deletes FHIR resources matching a search
 // query.
-//
 // Note: unless resource versioning is disabled by setting
 // the
 // disable_resource_versioning flag
@@ -14570,7 +13834,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresFhirConditionalDeleteResourceCall) D
 	}
 	return ret, nil
 	// {
-	//   "description": "Deletes FHIR resources matching a search query.\n\nNote: unless resource versioning is disabled by setting the\ndisable_resource_versioning flag\non the FHIR store, the deleted resources will be moved to a history\nrepository that can still be retrieved through GetResourceVersion and\nrelated methods, unless they are removed by the DeleteResourceVersions\nmethod.",
+	//   "description": "Deletes FHIR resources matching a search query.\nNote: unless resource versioning is disabled by setting the\ndisable_resource_versioning flag\non the FHIR store, the deleted resources will be moved to a history\nrepository that can still be retrieved through GetResourceVersion and\nrelated methods, unless they are removed by the DeleteResourceVersions\nmethod.",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/fhir/{fhirId}",
 	//   "httpMethod": "DELETE",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.fhir.conditionalDeleteResource",
@@ -15072,7 +14336,6 @@ type ProjectsLocationsDatasetsFhirStoresFhirDeleteCall struct {
 }
 
 // Delete: Deletes a FHIR resource.
-//
 // Note: unless resource versioning is disabled by setting
 // the
 // disable_resource_versioning flag
@@ -15174,7 +14437,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresFhirDeleteCall) Do(opts ...googleapi
 	}
 	return ret, nil
 	// {
-	//   "description": "Deletes a FHIR resource.\n\nNote: unless resource versioning is disabled by setting the\ndisable_resource_versioning flag\non the FHIR store, the deleted resources will be moved to a history\nrepository that can still be retrieved through GetResourceVersion and\nrelated methods, unless they are removed by the DeleteResourceVersions\nmethod.",
+	//   "description": "Deletes a FHIR resource.\nNote: unless resource versioning is disabled by setting the\ndisable_resource_versioning flag\non the FHIR store, the deleted resources will be moved to a history\nrepository that can still be retrieved through GetResourceVersion and\nrelated methods, unless they are removed by the DeleteResourceVersions\nmethod.",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/fhir/{fhirId}/{fhirId1}",
 	//   "httpMethod": "DELETE",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.fhir.delete",
@@ -15215,7 +14478,7 @@ type ProjectsLocationsDatasetsFhirStoresFhirDeletePurgeCall struct {
 // (excluding current
 // version) from the FHIR store. To remove all versions of a resource,
 // first
-// delete the current version and call this method.
+// delete the current version and call this API.
 func (r *ProjectsLocationsDatasetsFhirStoresFhirService) DeletePurge(name string) *ProjectsLocationsDatasetsFhirStoresFhirDeletePurgeCall {
 	c := &ProjectsLocationsDatasetsFhirStoresFhirDeletePurgeCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.name = name
@@ -15307,7 +14570,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresFhirDeletePurgeCall) Do(opts ...goog
 	}
 	return ret, nil
 	// {
-	//   "description": "Deletes all the historical versions of a resource (excluding current\nversion) from the FHIR store. To remove all versions of a resource, first\ndelete the current version and call this method.",
+	//   "description": "Deletes all the historical versions of a resource (excluding current\nversion) from the FHIR store. To remove all versions of a resource, first\ndelete the current version and call this API.",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/fhir/{fhirId}/{fhirId1}/$purge",
 	//   "httpMethod": "DELETE",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.fhir.delete$purge",
@@ -15489,9 +14752,7 @@ type ProjectsLocationsDatasetsFhirStoresFhirGetMetadataCall struct {
 	header_      http.Header
 }
 
-// GetMetadata: Gets the FHIR capability statement for the store, which
-// contains a
-// description of functionality supported by the server.
+// GetMetadata: Gets the capabilities statement for the store.
 //
 func (r *ProjectsLocationsDatasetsFhirStoresFhirService) GetMetadata(name string) *ProjectsLocationsDatasetsFhirStoresFhirGetMetadataCall {
 	c := &ProjectsLocationsDatasetsFhirStoresFhirGetMetadataCall{s: r.s, urlParams_: make(gensupport.URLParams)}
@@ -15597,7 +14858,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresFhirGetMetadataCall) Do(opts ...goog
 	}
 	return ret, nil
 	// {
-	//   "description": "Gets the FHIR capability statement for the store, which contains a\ndescription of functionality supported by the server.\n",
+	//   "description": "Gets the capabilities statement for the store.\n",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/fhir/metadata",
 	//   "httpMethod": "GET",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.fhir.getMetadata",
@@ -15777,29 +15038,6 @@ type ProjectsLocationsDatasetsFhirStoresFhirSearchResourcesCall struct {
 }
 
 // SearchResources: Searches resources in the given FHIR store.
-//
-// # Search Parameters
-//
-// The server's capability statement, retrieved
-// through
-// GetCapabilityStatement, indicates which search
-// parameters are supported on each FHIR resource.
-//
-// # Search Modifiers
-//
-// Modifier   | Supported
-// ----------- | ---------
-// `:missing`  | Yes
-// `:exact`    | Yes
-// `:contains` | Yes
-// `:text`     | Yes
-// `:in`       | Yes
-// `:not-in`   | Yes
-// `:above`    | Yes
-// `:below`    | Yes
-// `:[type]`   | Yes
-// `:not`      | Yes
-// `:recurse`  | No
 func (r *ProjectsLocationsDatasetsFhirStoresFhirService) SearchResources(parent string, resourceType string) *ProjectsLocationsDatasetsFhirStoresFhirSearchResourcesCall {
 	c := &ProjectsLocationsDatasetsFhirStoresFhirSearchResourcesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
@@ -15906,7 +15144,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresFhirSearchResourcesCall) Do(opts ...
 	}
 	return ret, nil
 	// {
-	//   "description": "Searches resources in the given FHIR store.\n\n# Search Parameters\n\nThe server's capability statement, retrieved through\nGetCapabilityStatement, indicates which search\nparameters are supported on each FHIR resource.\n\n# Search Modifiers\n\nModifier   | Supported\n----------- | ---------\n`:missing`  | Yes\n`:exact`    | Yes\n`:contains` | Yes\n`:text`     | Yes\n`:in`       | Yes\n`:not-in`   | Yes\n`:above`    | Yes\n`:below`    | Yes\n`:[type]`   | Yes\n`:not`      | Yes\n`:recurse`  | No",
+	//   "description": "Searches resources in the given FHIR store.",
 	//   "flatPath": "v1alpha2/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/fhir/{fhirId}",
 	//   "httpMethod": "GET",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.fhir.searchResources",
@@ -16421,55 +15659,6 @@ func (r *ProjectsLocationsDatasetsFhirStoresFhirHistoryService) List(name string
 	return c
 }
 
-// At sets the optional parameter "at": Only include resource versions
-// that were current at some point during the
-// time period specified in the date time value. The date parameter
-// format is
-// yyyy-mm-ddThh:mm:ss[Z|(+|-)hh:mm]
-// Clients may specify any of the following:
-// An entire year: `_at=2019`
-// An entire month: `_at=2019-01`
-// A specific day: `_at=2019-01-20`
-// A specific second: `_at=2018-12-31T23:59:58Z`
-func (c *ProjectsLocationsDatasetsFhirStoresFhirHistoryListCall) At(at string) *ProjectsLocationsDatasetsFhirStoresFhirHistoryListCall {
-	c.urlParams_.Set("at", at)
-	return c
-}
-
-// Count sets the optional parameter "count": The maximum number of
-// search results on a page.
-func (c *ProjectsLocationsDatasetsFhirStoresFhirHistoryListCall) Count(count int64) *ProjectsLocationsDatasetsFhirStoresFhirHistoryListCall {
-	c.urlParams_.Set("count", fmt.Sprint(count))
-	return c
-}
-
-// Page sets the optional parameter "page": Used to retrieve the first,
-// previous, next, or last page of resource
-// versions when using pagination. Value should be set to the value of
-// the
-// `link.url` field returned in the response to the previous request,
-// where
-// `link.relation` is "first", "previous", "next" or "last".
-// Omit `page` if no previous request has been made.
-func (c *ProjectsLocationsDatasetsFhirStoresFhirHistoryListCall) Page(page string) *ProjectsLocationsDatasetsFhirStoresFhirHistoryListCall {
-	c.urlParams_.Set("page", page)
-	return c
-}
-
-// Since sets the optional parameter "since": Only include resource
-// versions that were created at or after the given
-// instant in time. The instant in time uses the
-// format
-// YYYY-MM-DDThh:mm:ss.sss+zz:zz (for example
-// 2015-02-07T13:28:17.239+02:00 or
-// 2017-01-01T00:00:00Z). The time must be specified to the second
-// and
-// include a time zone.
-func (c *ProjectsLocationsDatasetsFhirStoresFhirHistoryListCall) Since(since string) *ProjectsLocationsDatasetsFhirStoresFhirHistoryListCall {
-	c.urlParams_.Set("since", since)
-	return c
-}
-
 // Fields allows partial responses to be retrieved. See
 // https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
 // for more information.
@@ -16576,32 +15765,11 @@ func (c *ProjectsLocationsDatasetsFhirStoresFhirHistoryListCall) Do(opts ...goog
 	//     "name"
 	//   ],
 	//   "parameters": {
-	//     "at": {
-	//       "description": "Only include resource versions that were current at some point during the\ntime period specified in the date time value. The date parameter format is\nyyyy-mm-ddThh:mm:ss[Z|(+|-)hh:mm]\nClients may specify any of the following:\nAn entire year: `_at=2019`\nAn entire month: `_at=2019-01`\nA specific day: `_at=2019-01-20`\nA specific second: `_at=2018-12-31T23:59:58Z`",
-	//       "location": "query",
-	//       "type": "string"
-	//     },
-	//     "count": {
-	//       "description": "The maximum number of search results on a page.",
-	//       "format": "int32",
-	//       "location": "query",
-	//       "type": "integer"
-	//     },
 	//     "name": {
 	//       "description": "The name of the resource to retrieve.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/datasets/[^/]+/fhirStores/[^/]+/fhir/[^/]+/[^/]+$",
 	//       "required": true,
-	//       "type": "string"
-	//     },
-	//     "page": {
-	//       "description": "Used to retrieve the first, previous, next, or last page of resource\nversions when using pagination. Value should be set to the value of the\n`link.url` field returned in the response to the previous request, where\n`link.relation` is \"first\", \"previous\", \"next\" or \"last\".\nOmit `page` if no previous request has been made.",
-	//       "location": "query",
-	//       "type": "string"
-	//     },
-	//     "since": {
-	//       "description": "Only include resource versions that were created at or after the given\ninstant in time. The instant in time uses the format\nYYYY-MM-DDThh:mm:ss.sss+zz:zz (for example 2015-02-07T13:28:17.239+02:00 or\n2017-01-01T00:00:00Z). The time must be specified to the second and\ninclude a time zone.",
-	//       "location": "query",
 	//       "type": "string"
 	//     }
 	//   },
@@ -17508,18 +16676,6 @@ func (r *ProjectsLocationsDatasetsHl7V2StoresService) List(parent string) *Proje
 	return c
 }
 
-// Filter sets the optional parameter "filter": Restricts stores
-// returned to those matching a filter.
-// Syntax:
-// https://cloud.google.com/appengine/docs/standard/python/search
-// /query_strings
-// Only filtering on labels is supported, for example
-// `labels.key=value`.
-func (c *ProjectsLocationsDatasetsHl7V2StoresListCall) Filter(filter string) *ProjectsLocationsDatasetsHl7V2StoresListCall {
-	c.urlParams_.Set("filter", filter)
-	return c
-}
-
 // PageSize sets the optional parameter "pageSize": Limit on the number
 // of HL7v2 stores to return in a single response.
 // If zero the default page size of 100 is used.
@@ -17642,11 +16798,6 @@ func (c *ProjectsLocationsDatasetsHl7V2StoresListCall) Do(opts ...googleapi.Call
 	//     "parent"
 	//   ],
 	//   "parameters": {
-	//     "filter": {
-	//       "description": "Restricts stores returned to those matching a filter. Syntax:\nhttps://cloud.google.com/appengine/docs/standard/python/search/query_strings\nOnly filtering on labels is supported, for example `labels.key=value`.",
-	//       "location": "query",
-	//       "type": "string"
-	//     },
 	//     "pageSize": {
 	//       "description": "Limit on the number of HL7v2 stores to return in a single response.\nIf zero the default page size of 100 is used.",
 	//       "format": "int32",
@@ -18761,67 +17912,37 @@ func (r *ProjectsLocationsDatasetsHl7V2StoresMessagesService) List(parent string
 // Syntax:
 // https://cloud.google.com/appengine/docs/standard/python/search
 // /query_strings
-//
 // Fields/functions available for filtering are:
-//
-// *  `message_type`, from the MSH-9 segment; for example
-// `NOT message_type = "ADT"
-// *  `send_date` or `sendDate`, the YYYY-MM-DD date the message was
-// sent in
-// the dataset's time_zone, from the MSH-7 segment; for
-// example
-// `send_date < "2017-01-02"
-// *  `send_time`, the timestamp of when the message was sent, using
+// - message_type, from the MSH-9 segment, e.g. 'NOT message_type =
+// "ADT"'
+// - send_date or sendDate, the YYYY-MM-DD date the message was sent in
 // the
-// RFC3339 time format for comparisons, from the MSH-7 segment; for
-// example
-// `send_time < "2017-01-02T00:00:00-05:00"
-// *  `send_facility`, the care center that the message came from, from
+//   dataset's time_zone, from the MSH-7 segment; e.g.
+//   'send_date < "2017-01-02"'
+// - send_time, the timestamp of when the message was sent, using the
+// RFC3339
+//   time format for comparisons, from the MSH-7 segment; e.g.
+// 'send_time <
+//   "2017-01-02T00:00:00-05:00"'
+// - send_facility, the hospital/trust that the message came from, from
 // the
-// MSH-4 segment; for example `send_facility = "ABC"
-// *  `HL7RegExp(expr)`, which does regular expression matching of
-// `expr`
-// against the message payload using re2
-// (http://code.google.com/p/re2/)
-// syntax; for example `HL7RegExp("^.*\|.*\|EMERG")`
-// *  `PatientId(value, type)`, which matches if the message lists a
+//   MSH-4 segment, e.g. 'send_facility = "RAL"'
+// - HL7RegExp(expr), which does regular expression matching of expr
+// against
+//   the HL7 message payload using re2 (http://code.google.com/p/re2/)
+//   syntax; e.g. 'HL7RegExp("^.*\|.*\|CERNER")'
+// - PatientId(value, type), which matches if the message lists a
 // patient
-// having an ID of the given value and type in the PID-2, PID-3, or
+//   having an ID of the given value and type in the PID-2, PID-3, or
 // PID-4
-// segments; for example `PatientId("123456", "MRN")`
-// *  `labels.x`, a string value of the label with key `x` as set using
-// the
-// Message.labels
-// map, for example `labels."priority"="high". The operator `:*` can be
-// used
-// to assert the existence of a label, for example
-// `labels."priority":*`.
-//
-// Limitations on conjunctions:
-//
-// *  Negation on the patient ID function or the labels field is
-// not
-// supported, for example these queries are invalid:
-// `NOT PatientId("123456", "MRN")`, `NOT labels."tag1":*`,
-// `NOT labels."tag2"="val2".
-// *  Conjunction of multiple patient ID functions is not supported,
-// for
-// example this query is invalid:
-// `PatientId("123456", "MRN") AND PatientId("456789", "MRN")`.
-// *  Conjunction of multiple labels fields is also not supported,
-// for
-// example this query is invalid: `labels."tag1":* AND
-// labels."tag2"="val2".
-// *  Conjunction of one patient ID function, one labels field and
-// conditions
-// on other fields is supported, for example this query is
-// valid:
-// `PatientId("123456", "MRN") AND labels."tag1":* AND message_type =
-// "ADT".
-//
-// The HasLabel(x) and Label(x) syntax from previous API versions
-// are
-// deprecated; replaced by the `labels.x` syntax.
+//   segments; e.g. 'PatientId("123456", "MRN")'
+// - HasLabel(x), a boolean returning true if the message has a label
+// with
+//   key x (having any value) set using the labels map in Message; e.g.
+//   'HasLabel("priority")'
+// - Label(x), a string value of the label with key x as set using the
+// labels
+//   map in Message, e.g. 'Label("priority") = "high"'
 func (c *ProjectsLocationsDatasetsHl7V2StoresMessagesListCall) Filter(filter string) *ProjectsLocationsDatasetsHl7V2StoresMessagesListCall {
 	c.urlParams_.Set("filter", filter)
 	return c
@@ -18831,11 +17952,9 @@ func (c *ProjectsLocationsDatasetsHl7V2StoresMessagesListCall) Filter(filter str
 // returned by the specified order_by clause.
 // Syntax:
 // https://cloud.google.com/apis/design/design_patterns#sorting_order
-//
-// Fi
-// elds available for ordering are:
-//
-// *  `send_time`
+// Fie
+// lds available for ordering are:
+// - send_time
 func (c *ProjectsLocationsDatasetsHl7V2StoresMessagesListCall) OrderBy(orderBy string) *ProjectsLocationsDatasetsHl7V2StoresMessagesListCall {
 	c.urlParams_.Set("orderBy", orderBy)
 	return c
@@ -18964,12 +18083,12 @@ func (c *ProjectsLocationsDatasetsHl7V2StoresMessagesListCall) Do(opts ...google
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Restricts messages returned to those matching a filter. Syntax:\nhttps://cloud.google.com/appengine/docs/standard/python/search/query_strings\n\nFields/functions available for filtering are:\n\n*  `message_type`, from the MSH-9 segment; for example\n`NOT message_type = \"ADT\"`\n*  `send_date` or `sendDate`, the YYYY-MM-DD date the message was sent in\nthe dataset's time_zone, from the MSH-7 segment; for example\n`send_date \u003c \"2017-01-02\"`\n*  `send_time`, the timestamp of when the message was sent, using the\nRFC3339 time format for comparisons, from the MSH-7 segment; for example\n`send_time \u003c \"2017-01-02T00:00:00-05:00\"`\n*  `send_facility`, the care center that the message came from, from the\nMSH-4 segment; for example `send_facility = \"ABC\"`\n*  `HL7RegExp(expr)`, which does regular expression matching of `expr`\nagainst the message payload using re2 (http://code.google.com/p/re2/)\nsyntax; for example `HL7RegExp(\"^.*\\|.*\\|EMERG\")`\n*  `PatientId(value, type)`, which matches if the message lists a patient\nhaving an ID of the given value and type in the PID-2, PID-3, or PID-4\nsegments; for example `PatientId(\"123456\", \"MRN\")`\n*  `labels.x`, a string value of the label with key `x` as set using the\nMessage.labels\nmap, for example `labels.\"priority\"=\"high\"`. The operator `:*` can be used\nto assert the existence of a label, for example `labels.\"priority\":*`.\n\nLimitations on conjunctions:\n\n*  Negation on the patient ID function or the labels field is not\nsupported, for example these queries are invalid:\n`NOT PatientId(\"123456\", \"MRN\")`, `NOT labels.\"tag1\":*`,\n`NOT labels.\"tag2\"=\"val2\"`.\n*  Conjunction of multiple patient ID functions is not supported, for\nexample this query is invalid:\n`PatientId(\"123456\", \"MRN\") AND PatientId(\"456789\", \"MRN\")`.\n*  Conjunction of multiple labels fields is also not supported, for\nexample this query is invalid: `labels.\"tag1\":* AND labels.\"tag2\"=\"val2\"`.\n*  Conjunction of one patient ID function, one labels field and conditions\non other fields is supported, for example this query is valid:\n`PatientId(\"123456\", \"MRN\") AND labels.\"tag1\":* AND message_type = \"ADT\"`.\n\nThe HasLabel(x) and Label(x) syntax from previous API versions are\ndeprecated; replaced by the `labels.x` syntax.",
+	//       "description": "Restricts messages returned to those matching a filter. Syntax:\nhttps://cloud.google.com/appengine/docs/standard/python/search/query_strings\nFields/functions available for filtering are:\n- message_type, from the MSH-9 segment, e.g. 'NOT message_type = \"ADT\"'\n- send_date or sendDate, the YYYY-MM-DD date the message was sent in the\n  dataset's time_zone, from the MSH-7 segment; e.g.\n  'send_date \u003c \"2017-01-02\"'\n- send_time, the timestamp of when the message was sent, using the RFC3339\n  time format for comparisons, from the MSH-7 segment; e.g. 'send_time \u003c\n  \"2017-01-02T00:00:00-05:00\"'\n- send_facility, the hospital/trust that the message came from, from the\n  MSH-4 segment, e.g. 'send_facility = \"RAL\"'\n- HL7RegExp(expr), which does regular expression matching of expr against\n  the HL7 message payload using re2 (http://code.google.com/p/re2/)\n  syntax; e.g. 'HL7RegExp(\"^.*\\|.*\\|CERNER\")'\n- PatientId(value, type), which matches if the message lists a patient\n  having an ID of the given value and type in the PID-2, PID-3, or PID-4\n  segments; e.g. 'PatientId(\"123456\", \"MRN\")'\n- HasLabel(x), a boolean returning true if the message has a label with\n  key x (having any value) set using the labels map in Message; e.g.\n  'HasLabel(\"priority\")'\n- Label(x), a string value of the label with key x as set using the labels\n  map in Message, e.g. 'Label(\"priority\") = \"high\"'",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "orderBy": {
-	//       "description": "Orders messages returned by the specified order_by clause.\nSyntax: https://cloud.google.com/apis/design/design_patterns#sorting_order\n\nFields available for ordering are:\n\n*  `send_time`",
+	//       "description": "Orders messages returned by the specified order_by clause.\nSyntax: https://cloud.google.com/apis/design/design_patterns#sorting_order\nFields available for ordering are:\n- send_time",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
