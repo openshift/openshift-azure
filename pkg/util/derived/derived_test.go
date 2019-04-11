@@ -43,6 +43,14 @@ func TestDerivedCloudProviderConf(t *testing.T) {
 			},
 			wantMaster: []byte(`aadClientId: master_client_id
 aadClientSecret: master_client_secrett
+cloudProviderBackoff: true
+cloudProviderBackoffDuration: 6
+cloudProviderBackoffExponent: 1.5
+cloudProviderBackoffJitter: 1
+cloudProviderBackoffRetries: 6
+cloudProviderRateLimit: true
+cloudProviderRateLimitBucket: 10
+cloudProviderRateLimitQPS: 3
 loadBalancerSku: standard
 location: eastus
 resourceGroup: rg
@@ -56,6 +64,14 @@ vnetName: vnet
 `),
 			wantWorker: []byte(`aadClientId: worker_client_id
 aadClientSecret: worker_client_secrett
+cloudProviderBackoff: true
+cloudProviderBackoffDuration: 6
+cloudProviderBackoffExponent: 1.5
+cloudProviderBackoffJitter: 1
+cloudProviderBackoffRetries: 6
+cloudProviderRateLimit: true
+cloudProviderRateLimitBucket: 10
+cloudProviderRateLimitQPS: 3
 loadBalancerSku: standard
 location: eastus
 resourceGroup: rg
@@ -71,7 +87,7 @@ vnetName: vnet
 	}
 
 	for _, tt := range tests {
-		got, err := MasterCloudProviderConf(&tt.cs, true)
+		got, err := MasterCloudProviderConf(&tt.cs, true, true)
 		if err != nil {
 			t.Fatal(err)
 			return
@@ -79,7 +95,7 @@ vnetName: vnet
 		if !reflect.DeepEqual(got, tt.wantMaster) {
 			t.Errorf("derived.MasterCloudProviderConf() = \"%v\", want \"%v\"", string(got), string(tt.wantMaster))
 		}
-		got, err = WorkerCloudProviderConf(&tt.cs, true)
+		got, err = WorkerCloudProviderConf(&tt.cs, true, true)
 		if err != nil {
 			t.Fatal(err)
 			return

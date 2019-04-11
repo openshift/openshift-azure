@@ -63,11 +63,11 @@ func (derivedType) KubeReserved(cs *api.OpenShiftManagedCluster, role api.AgentP
 }
 
 func (derivedType) MasterCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
-	return derivedpkg.MasterCloudProviderConf(cs, true)
+	return derivedpkg.MasterCloudProviderConf(cs, true, true)
 }
 
 func (derivedType) WorkerCloudProviderConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
-	return derivedpkg.WorkerCloudProviderConf(cs, true)
+	return derivedpkg.WorkerCloudProviderConf(cs, true, true)
 }
 
 // MaxDataDisksPerVM is a stopgap until k8s 1.12.  It requires that a cluster
