@@ -29,5 +29,5 @@ func (cli *Client) InstantiateTemplate(srcTemplateName, dstNamespace string) err
 		return err
 	}
 
-	return wait.PollImmediate(2*time.Second, 10*time.Minute, ready.CheckTemplateInstanceIsReady(cli.TemplateV1.TemplateInstances(dstNamespace), dstNamespace))
+	return wait.PollImmediate(2*time.Second, 20*time.Minute, ready.CheckTemplateInstanceIsReady(cli.TemplateV1.TemplateInstances(dstNamespace), dstNamespace))
 }
