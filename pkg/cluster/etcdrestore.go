@@ -10,7 +10,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 )
 
-func (u *SimpleUpgrader) EtcdListBackups(ctx context.Context) ([]storage.Blob, error) {
+func (u *Upgrade) EtcdListBackups(ctx context.Context) ([]storage.Blob, error) {
 	bsc := u.StorageClient.GetBlobService()
 	etcdContainer := bsc.GetContainerReference(EtcdBackupContainerName)
 	resp, err := etcdContainer.ListBlobs(storage.ListBlobsParameters{})
@@ -24,7 +24,7 @@ func (u *SimpleUpgrader) EtcdListBackups(ctx context.Context) ([]storage.Blob, e
 	return blobs, nil
 }
 
-func (u *SimpleUpgrader) EtcdRestoreDeleteMasterScaleSet(ctx context.Context) *api.PluginError {
+func (u *Upgrade) EtcdRestoreDeleteMasterScaleSet(ctx context.Context) *api.PluginError {
 	// We may need/want to delete all the scalesets in the future
 	err := u.Ssc.Delete(ctx, u.Cs.Properties.AzProfile.ResourceGroup, names.MasterScalesetName)
 	if err != nil {
@@ -33,7 +33,7 @@ func (u *SimpleUpgrader) EtcdRestoreDeleteMasterScaleSet(ctx context.Context) *a
 	return nil
 }
 
-func (u *SimpleUpgrader) EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context) *api.PluginError {
+func (u *Upgrade) EtcdRestoreDeleteMasterScaleSetHashes(ctx context.Context) *api.PluginError {
 	uBlob, err := u.UpdateBlobService.Read()
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepInitializeUpdateBlob}

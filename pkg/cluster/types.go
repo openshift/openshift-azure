@@ -10,7 +10,6 @@ import (
 	"context"
 
 	azstorage "github.com/Azure/azure-sdk-for-go/storage"
-	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -20,7 +19,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/startup"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient/fake"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
@@ -61,7 +59,7 @@ type Upgrader interface {
 	kubeclient.Interface
 }
 
-type SimpleUpgrader struct {
+type Upgrade struct {
 	kubeclient.Interface
 
 	TestConfig        api.TestConfig
@@ -82,7 +80,7 @@ type SimpleUpgrader struct {
 	GetAPIServerClient func(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient
 }
 
-var _ Upgrader = &SimpleUpgrader{}
+var _ Upgrader = &Upgrade{}
 
 // NewSimpleUpgrader creates a new upgrader instance
 func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (Upgrader, error) {
@@ -106,7 +104,7 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		return nil, err
 	}
 
-	u := &SimpleUpgrader{
+	u := &Upgrade{
 		Interface: kubeclient,
 
 		TestConfig:     testConfig,
@@ -117,10 +115,10 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		Log:            log,
 		ScalerFactory:  scaler.NewFactory(),
 		Hasher: &Hash{
-			log:            log,
-			testConfig:     testConfig,
-			startupFactory: startup.New,
-			arm:            arm,
+			Log:            log,
+			TestConfig:     testConfig,
+			StartupFactory: startup.New,
+			Arm:            arm,
 		},
 		Arm:                arm,
 		Cs:                 cs,
@@ -138,56 +136,15 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 	return u, nil
 }
 
-func getFakeHTTPClient(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient {
-	return wait.NewFakeHTTPClient()
-}
-
-func NewFakeUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig, kubeclient kubeclient.Interface, azs *fake.AzureCloud) (Upgrader, error) {
-	arm, err := arm.New(ctx, log, cs, testConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	u := &SimpleUpgrader{
-		Interface: kubeclient,
-
-		TestConfig:     testConfig,
-		AccountsClient: azs.AccountsClient,
-		StorageClient:  azs.StorageClient,
-		Vmc:            azs.VirtualMachineScaleSetVMsClient,
-		Ssc:            azs.VirtualMachineScaleSetsClient,
-		Kvc:            azs.KeyVaultClient,
-		Log:            log,
-		ScalerFactory:  scaler.NewFactory(),
-		Hasher: &Hash{
-			log:            log,
-			testConfig:     testConfig,
-			startupFactory: startup.New,
-			arm:            arm,
-		},
-		Arm:                arm,
-		GetConsoleClient:   getFakeHTTPClient,
-		GetAPIServerClient: getFakeHTTPClient,
-		Cs:                 cs,
-	}
-
-	u.Cs.Config.ConfigStorageAccountKey = "config"
-	u.Cs.Config.ConfigStorageAccountKey = uuid.NewV4().String()
-	bsc := u.StorageClient.GetBlobService()
-	u.UpdateBlobService = updateblob.NewBlobService(bsc)
-
-	return u, nil
-}
-
-func (u *SimpleUpgrader) EnrichCertificatesFromVault(ctx context.Context) error {
+func (u *Upgrade) EnrichCertificatesFromVault(ctx context.Context) error {
 	return enrich.CertificatesFromVault(ctx, u.Kvc, u.Cs)
 }
 
-func (u *SimpleUpgrader) EnrichStorageAccountKeys(ctx context.Context) error {
+func (u *Upgrade) EnrichStorageAccountKeys(ctx context.Context) error {
 	return enrich.StorageAccountKeys(ctx, u.AccountsClient, u.Cs)
 }
 
-func (u *SimpleUpgrader) GenerateARM(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
+func (u *Upgrade) GenerateARM(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
 	err := enrich.SASURIs(u.StorageClient, u.Cs)
 	if err != nil {
 		return nil, err

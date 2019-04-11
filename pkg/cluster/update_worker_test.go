@@ -121,7 +121,7 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 			// last scale
 			c = targetScaler.EXPECT().Scale(ctx, int64(2)).After(c)
 
-			u := &SimpleUpgrader{
+			u := &Upgrade{
 				UpdateBlobService: ubs,
 				ScalerFactory:     scalerFactory,
 				Vmc:               vmc,
@@ -132,7 +132,7 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 				Cs:                tt.cs,
 			}
 			if got := u.UpdateWorkerAgentPool(ctx, &tt.cs.Properties.AgentPoolProfiles[0], tt.suffix); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SimpleUpgrader.UpdateWorkerAgentPool() = %v, want %v", got, tt.want)
+				t.Errorf("Upgrade.UpdateWorkerAgentPool() = %v, want %v", got, tt.want)
 			}
 		})
 	}

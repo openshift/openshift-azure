@@ -8,11 +8,11 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 )
 
-func (u *SimpleUpgrader) Reimage(ctx context.Context, scaleset, instanceID string) error {
+func (u *Upgrade) Reimage(ctx context.Context, scaleset, instanceID string) error {
 	return u.Vmc.Reimage(ctx, u.Cs.Properties.AzProfile.ResourceGroup, scaleset, instanceID, nil)
 }
 
-func (u *SimpleUpgrader) ListVMHostnames(ctx context.Context) ([]string, error) {
+func (u *Upgrade) ListVMHostnames(ctx context.Context) ([]string, error) {
 	scalesets, err := u.Ssc.List(ctx, u.Cs.Properties.AzProfile.ResourceGroup)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (u *SimpleUpgrader) ListVMHostnames(ctx context.Context) ([]string, error) 
 	return hostnames, nil
 }
 
-func (u *SimpleUpgrader) RunCommand(ctx context.Context, scaleset, instanceID, command string) error {
+func (u *Upgrade) RunCommand(ctx context.Context, scaleset, instanceID, command string) error {
 	return u.Vmc.RunCommand(ctx, u.Cs.Properties.AzProfile.ResourceGroup, scaleset, instanceID, compute.RunCommandInput{
 		CommandID: to.StringPtr("RunShellScript"),
 		Script:    &[]string{command},

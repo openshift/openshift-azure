@@ -14,7 +14,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
-func (u *SimpleUpgrader) initializeStorageClients(ctx context.Context) error {
+func (u *Upgrade) initializeStorageClients(ctx context.Context) error {
 	if u.StorageClient == nil {
 		if u.Cs.Config.ConfigStorageAccountKey == "" {
 			keys, err := u.AccountsClient.ListKeys(ctx, u.Cs.Properties.AzProfile.ResourceGroup, u.Cs.Config.ConfigStorageAccount)
@@ -25,7 +25,7 @@ func (u *SimpleUpgrader) initializeStorageClients(ctx context.Context) error {
 		}
 
 		var err error
-		u.StorageClient, err = storage.NewClient(u.log, u.Cs.Config.ConfigStorageAccount, u.Cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
+		u.StorageClient, err = storage.NewClient(u.Log, u.Cs.Config.ConfigStorageAccount, u.Cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
 		if err != nil {
 			return err
 		}
@@ -37,7 +37,7 @@ func (u *SimpleUpgrader) initializeStorageClients(ctx context.Context) error {
 	return nil
 }
 
-func (u *SimpleUpgrader) writeBlob(blobName string, cs *api.OpenShiftManagedCluster) error {
+func (u *Upgrade) writeBlob(blobName string, cs *api.OpenShiftManagedCluster) error {
 	bsc := u.StorageClient.GetBlobService()
 	c := bsc.GetContainerReference(ConfigContainerName)
 	b := c.GetBlobReference(blobName)
@@ -50,7 +50,7 @@ func (u *SimpleUpgrader) writeBlob(blobName string, cs *api.OpenShiftManagedClus
 	return b.CreateBlockBlobFromReader(bytes.NewReader(json), nil)
 }
 
-func (u *SimpleUpgrader) WriteStartupBlobs() error {
+func (u *Upgrade) WriteStartupBlobs() error {
 	u.Log.Info("writing startup blobs")
 	err := u.writeBlob(MasterStartupBlobName, u.Cs)
 	if err != nil {
@@ -100,7 +100,7 @@ func (u *SimpleUpgrader) WriteStartupBlobs() error {
 	return u.writeBlob(WorkerStartupBlobName, workerCS)
 }
 
-func (u *SimpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context) error {
+func (u *Upgrade) CreateOrUpdateConfigStorageAccount(ctx context.Context) error {
 	u.Log.Info("creating/updating storage account")
 
 	err := u.AccountsClient.Create(ctx, u.Cs.Properties.AzProfile.ResourceGroup, u.Cs.Config.ConfigStorageAccount, azstorage.AccountCreateParameters{
@@ -151,7 +151,7 @@ func (u *SimpleUpgrader) CreateOrUpdateConfigStorageAccount(ctx context.Context)
 	return nil
 }
 
-func (u *SimpleUpgrader) InitializeUpdateBlob(suffix string) error {
+func (u *Upgrade) InitializeUpdateBlob(suffix string) error {
 	blob := updateblob.NewUpdateBlob()
 	for _, app := range u.Cs.Properties.AgentPoolProfiles {
 		h, err := u.Hasher.HashScaleSet(u.Cs, &app)
@@ -173,7 +173,7 @@ func (u *SimpleUpgrader) InitializeUpdateBlob(suffix string) error {
 	return u.UpdateBlobService.Write(blob)
 }
 
-func (u *SimpleUpgrader) ResetUpdateBlob() error {
+func (u *Upgrade) ResetUpdateBlob() error {
 	blob := updateblob.NewUpdateBlob()
 	return u.UpdateBlobService.Write(blob)
 }

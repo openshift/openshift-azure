@@ -5,7 +5,7 @@ import (
 )
 
 // CreateOrUpdateSyncPod creates or updates the sync pod.
-func (u *SimpleUpgrader) CreateOrUpdateSyncPod(ctx context.Context) error {
+func (u *Upgrade) CreateOrUpdateSyncPod(ctx context.Context) error {
 	u.Log.Infof("updating sync pod")
 
 	err := u.writeBlob(SyncBlobName, u.Cs)

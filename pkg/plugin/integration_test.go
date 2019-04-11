@@ -160,7 +160,7 @@ func newFakeUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 		return nil, err
 	}
 
-	u := &cluster.SimpleUpgrader{
+	u := &cluster.Upgrade{
 		Interface: kubeclient,
 
 		TestConfig:     testConfig,
@@ -171,7 +171,7 @@ func newFakeUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 		Kvc:            azs.KeyVaultClient,
 		Log:            log,
 		ScalerFactory:  scaler.NewFactory(),
-		Hasher: &cluster.Hasher{
+		Hasher: &cluster.Hash{
 			Log:            log,
 			TestConfig:     testConfig,
 			StartupFactory: startup.New,

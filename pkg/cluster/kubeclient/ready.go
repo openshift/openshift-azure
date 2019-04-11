@@ -71,7 +71,7 @@ func (u *Kubeclientset) WaitForReadySyncPod(ctx context.Context) error {
 				}
 				err = nil
 			case utilerrors.IsMatchingSyscallError(err, syscall.ECONNREFUSED):
-				u.log.Infof("WaitForReadySyncPod: will retry on the following error %v", err)
+				u.Log.Infof("WaitForReadySyncPod: will retry on the following error %v", err)
 				err = nil
 			}
 

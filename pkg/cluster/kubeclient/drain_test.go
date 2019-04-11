@@ -69,7 +69,7 @@ func TestDrainAndDeleteWorker(t *testing.T) {
 			Log:    logrus.NewEntry(logrus.StandardLogger()),
 		}
 		if err := u.DrainAndDeleteWorker(context.Background(), tt.hostname); err != tt.wantErr {
-			t.Errorf("[%v] SimpleUpgrader.drain() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			t.Errorf("[%v] Upgrade.drain() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
 		actions := tt.kubeclient.Actions()
 		if len(actions) != len(tt.expectedActions) {

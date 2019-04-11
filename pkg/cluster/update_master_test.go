@@ -56,7 +56,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			kc := mock_kubeclient.NewMockInterface(gmc)
 			hasher := mock_cluster.NewMockHasher(gmc)
 
-			u := &SimpleUpgrader{
+			u := &Upgrade{
 				UpdateBlobService: ubs,
 				Vmc:               vmc,
 				Ssc:               ssc,
@@ -106,7 +106,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				c = ubs.EXPECT().Write(uBlob).Return(nil).After(c)
 			}
 			if got := u.UpdateMasterAgentPool(ctx, &tt.cs.Properties.AgentPoolProfiles[0]); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SimpleUpgrader.updateInPlace() = %v, want %v", got, tt.want)
+				t.Errorf("Upgrade.updateInPlace() = %v, want %v", got, tt.want)
 			}
 		})
 	}

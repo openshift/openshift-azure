@@ -13,7 +13,7 @@ import (
 
 // UpdateMasterAgentPool updates one by one all the VMs of the master scale set,
 // in place.
-func (u *SimpleUpgrader) UpdateMasterAgentPool(ctx context.Context, app *api.AgentPoolProfile) *api.PluginError {
+func (u *Upgrade) UpdateMasterAgentPool(ctx context.Context, app *api.AgentPoolProfile) *api.PluginError {
 	ssName := names.MasterScalesetName
 
 	blob, err := u.UpdateBlobService.Read()

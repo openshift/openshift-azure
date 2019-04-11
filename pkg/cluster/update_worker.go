@@ -17,7 +17,7 @@ import (
 // The first scaleset which matches desiredHash, if one exists, is denoted the
 // "target".  We will work to get all our VMs running there.  Any other
 // scalesets are "sources".  We will work to get rid of VMs running in these.
-func (u *SimpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string, app *api.AgentPoolProfile, blob *updateblob.UpdateBlob, desiredHash []byte) (*compute.VirtualMachineScaleSet, []compute.VirtualMachineScaleSet, error) {
+func (u *Upgrade) findScaleSets(ctx context.Context, resourceGroup string, app *api.AgentPoolProfile, blob *updateblob.UpdateBlob, desiredHash []byte) (*compute.VirtualMachineScaleSet, []compute.VirtualMachineScaleSet, error) {
 	scalesets, err := u.Ssc.List(ctx, resourceGroup)
 	if err != nil {
 		return nil, nil, err
@@ -58,7 +58,7 @@ func (u *SimpleUpgrader) findScaleSets(ctx context.Context, resourceGroup string
 // be running in the "target" scale set.  In update scenarios, there will be a
 // "source" scale set which contains out-of-date instances (in crash recovery
 // scenarios, there could be multiple of these).
-func (u *SimpleUpgrader) UpdateWorkerAgentPool(ctx context.Context, app *api.AgentPoolProfile, suffix string) *api.PluginError {
+func (u *Upgrade) UpdateWorkerAgentPool(ctx context.Context, app *api.AgentPoolProfile, suffix string) *api.PluginError {
 	u.Log.Infof("updating worker agent pool %s", app.Name)
 
 	desiredHash, err := u.Hasher.HashScaleSet(u.Cs, app)
@@ -118,7 +118,7 @@ func (u *SimpleUpgrader) UpdateWorkerAgentPool(ctx context.Context, app *api.Age
 // createWorkerScaleSet creates a new scaleset to be our target.  For now, for
 // simplicity, the scaleset has zero instances - we fix this up later.  TODO:
 // improve this.
-func (u *SimpleUpgrader) createWorkerScaleSet(ctx context.Context, app *api.AgentPoolProfile, suffix string, blob *updateblob.UpdateBlob) (*compute.VirtualMachineScaleSet, *api.PluginError) {
+func (u *Upgrade) createWorkerScaleSet(ctx context.Context, app *api.AgentPoolProfile, suffix string, blob *updateblob.UpdateBlob) (*compute.VirtualMachineScaleSet, *api.PluginError) {
 	hash, err := u.Hasher.HashScaleSet(u.Cs, app)
 	if err != nil {
 		return nil, &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolHashScaleSet}
@@ -148,7 +148,7 @@ func (u *SimpleUpgrader) createWorkerScaleSet(ctx context.Context, app *api.Agen
 }
 
 // deleteWorkerScaleSet deletes a (presumably empty) scaleset.
-func (u *SimpleUpgrader) deleteWorkerScaleSet(ctx context.Context, blob *updateblob.UpdateBlob, ss *compute.VirtualMachineScaleSet, resourceGroup string) *api.PluginError {
+func (u *Upgrade) deleteWorkerScaleSet(ctx context.Context, blob *updateblob.UpdateBlob, ss *compute.VirtualMachineScaleSet, resourceGroup string) *api.PluginError {
 	// Delete the persisted scaleset hash.  We do this *before* the scaleset is
 	// deleted to avoid leaking blob entries.
 	delete(blob.ScalesetHashes, *ss.Name)

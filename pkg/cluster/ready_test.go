@@ -150,7 +150,7 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 				}
 			}
 
-			u := &SimpleUpgrader{
+			u := &Upgrade{
 				Vmc:       vmc,
 				Ssc:       ssc,
 				Interface: kc,
@@ -159,10 +159,10 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 			}
 			err := u.WaitForNodesInAgentPoolProfile(ctx, &cs.Properties.AgentPoolProfiles[tt.appIndex], "")
 			if tt.wantErr && tt.expectedErr != err {
-				t.Errorf("SimpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
+				t.Errorf("Upgrade.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
 			}
 			if !tt.wantErr && err != nil {
-				t.Errorf("SimpleUpgrader.waitForNodes() unexpected error = %v", err)
+				t.Errorf("Upgrade.waitForNodes() unexpected error = %v", err)
 			}
 		})
 	}

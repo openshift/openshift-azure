@@ -16,7 +16,7 @@ func getConsoleClient(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient {
 }
 
 // HealthCheck function to verify cluster health
-func (u *SimpleUpgrader) HealthCheck(ctx context.Context) *api.PluginError {
+func (u *Upgrade) HealthCheck(ctx context.Context) *api.PluginError {
 	u.Log.Info("checking developer console health")
 	_, err := wait.ForHTTPStatusOk(ctx, u.Log, u.GetConsoleClient(u.Cs), "https://"+u.Cs.Properties.PublicHostname+"/console/", time.Second)
 	if err != nil {
@@ -30,7 +30,7 @@ func getAPIServerClient(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient {
 	return &http.Client{Transport: healthcheck.RoundTripper(cs.Properties.FQDN, cs.Config.Certificates.Ca.Cert), Timeout: 10 * time.Second}
 }
 
-func (u *SimpleUpgrader) WaitForHealthzStatusOk(ctx context.Context) error {
+func (u *Upgrade) WaitForHealthzStatusOk(ctx context.Context) error {
 	u.Log.Infof("waiting for API server healthz")
 	_, err := wait.ForHTTPStatusOk(ctx, u.Log, u.GetAPIServerClient(u.Cs), "https://"+u.Cs.Properties.FQDN+"/healthz", time.Second)
 	return err
