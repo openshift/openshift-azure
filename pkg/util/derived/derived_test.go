@@ -44,7 +44,7 @@ func TestDerivedCloudProviderConf(t *testing.T) {
 			wantMaster: []byte(`aadClientId: master_client_id
 aadClientSecret: master_client_secrett
 cloudProviderBackoff: true
-cloudProviderBackoffDuration: 6
+cloudProviderBackoffDuration: 5
 cloudProviderBackoffExponent: 1.5
 cloudProviderBackoffJitter: 1
 cloudProviderBackoffRetries: 6
@@ -65,7 +65,7 @@ vnetName: vnet
 			wantWorker: []byte(`aadClientId: worker_client_id
 aadClientSecret: worker_client_secrett
 cloudProviderBackoff: true
-cloudProviderBackoffDuration: 6
+cloudProviderBackoffDuration: 5
 cloudProviderBackoffExponent: 1.5
 cloudProviderBackoffJitter: 1
 cloudProviderBackoffRetries: 6

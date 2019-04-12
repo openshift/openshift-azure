@@ -8,25 +8,48 @@ import (
 )
 
 func baseCloudProviderConf(cs *api.OpenShiftManagedCluster, useInstanceMetadata bool, cloudProviderBackoff bool) *cloudprovider.Config {
-	return &cloudprovider.Config{
-		TenantID:                     cs.Properties.AzProfile.TenantID,
-		SubscriptionID:               cs.Properties.AzProfile.SubscriptionID,
-		ResourceGroup:                cs.Properties.AzProfile.ResourceGroup,
-		LoadBalancerSku:              "standard",
-		Location:                     cs.Location,
-		SecurityGroupName:            "nsg-worker",
-		VMType:                       "vmss",
-		SubnetName:                   "default",
-		VnetName:                     "vnet",
-		UseInstanceMetadata:          useInstanceMetadata, // TODO: hard-wire to true after v3 has gone
-		CloudProviderBackoff:         cloudProviderBackoff,
-		CloudProviderBackoffRetries:  6, // values are ignored if backoff is set to false
-		CloudProviderBackoffJitter:   1.0,
-		CloudProviderBackoffDuration: 6,
-		CloudProviderBackoffExponent: 1.5,
-		CloudProviderRateLimit:       cloudProviderBackoff,
-		CloudProviderRateLimitQPS:    3.0, // values are ignored if ratelimit is set to false
-		CloudProviderRateLimitBucket: 10,
+	if cloudProviderBackoff {
+		return &cloudprovider.Config{
+			TenantID:                     cs.Properties.AzProfile.TenantID,
+			SubscriptionID:               cs.Properties.AzProfile.SubscriptionID,
+			ResourceGroup:                cs.Properties.AzProfile.ResourceGroup,
+			LoadBalancerSku:              "standard",
+			Location:                     cs.Location,
+			SecurityGroupName:            "nsg-worker",
+			VMType:                       "vmss",
+			SubnetName:                   "default",
+			VnetName:                     "vnet",
+			UseInstanceMetadata:          useInstanceMetadata, // TODO: hard-wire to true after v3 has gone
+			CloudProviderBackoff:         cloudProviderBackoff,
+			CloudProviderBackoffRetries:  6,
+			CloudProviderBackoffJitter:   1.0,
+			CloudProviderBackoffDuration: 5,
+			CloudProviderBackoffExponent: 1.5,
+			CloudProviderRateLimit:       cloudProviderBackoff,
+			CloudProviderRateLimitQPS:    3.0,
+			CloudProviderRateLimitBucket: 10,
+		}
+	} else {
+		return &cloudprovider.Config{
+			TenantID:                     cs.Properties.AzProfile.TenantID,
+			SubscriptionID:               cs.Properties.AzProfile.SubscriptionID,
+			ResourceGroup:                cs.Properties.AzProfile.ResourceGroup,
+			LoadBalancerSku:              "standard",
+			Location:                     cs.Location,
+			SecurityGroupName:            "nsg-worker",
+			VMType:                       "vmss",
+			SubnetName:                   "default",
+			VnetName:                     "vnet",
+			UseInstanceMetadata:          useInstanceMetadata, // TODO: hard-wire to true after v3 has gone
+			CloudProviderBackoff:         cloudProviderBackoff,
+			CloudProviderBackoffRetries:  0,
+			CloudProviderBackoffJitter:   0.0,
+			CloudProviderBackoffDuration: 0,
+			CloudProviderBackoffExponent: 0.0,
+			CloudProviderRateLimit:       cloudProviderBackoff,
+			CloudProviderRateLimitQPS:    0.0,
+			CloudProviderRateLimitBucket: 0,
+		}
 	}
 }
 
