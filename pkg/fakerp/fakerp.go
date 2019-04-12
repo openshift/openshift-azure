@@ -321,7 +321,7 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 }
 
 func writeHelpers(log *logrus.Entry, cs *api.OpenShiftManagedCluster) error {
-	b, err := derived.MasterCloudProviderConf(cs, true)
+	b, err := derived.MasterCloudProviderConf(cs, true, true)
 	if err != nil {
 		return err
 	}
