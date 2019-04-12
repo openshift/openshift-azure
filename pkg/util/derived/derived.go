@@ -8,49 +8,29 @@ import (
 )
 
 func baseCloudProviderConf(cs *api.OpenShiftManagedCluster, useInstanceMetadata bool, cloudProviderBackoff bool) *cloudprovider.Config {
-	if cloudProviderBackoff {
-		return &cloudprovider.Config{
-			TenantID:                     cs.Properties.AzProfile.TenantID,
-			SubscriptionID:               cs.Properties.AzProfile.SubscriptionID,
-			ResourceGroup:                cs.Properties.AzProfile.ResourceGroup,
-			LoadBalancerSku:              "standard",
-			Location:                     cs.Location,
-			SecurityGroupName:            "nsg-worker",
-			VMType:                       "vmss",
-			SubnetName:                   "default",
-			VnetName:                     "vnet",
-			UseInstanceMetadata:          useInstanceMetadata, // TODO: hard-wire to true after v3 has gone
-			CloudProviderBackoff:         cloudProviderBackoff,
-			CloudProviderBackoffRetries:  6,
-			CloudProviderBackoffJitter:   1.0,
-			CloudProviderBackoffDuration: 5,
-			CloudProviderBackoffExponent: 1.5,
-			CloudProviderRateLimit:       cloudProviderBackoff,
-			CloudProviderRateLimitQPS:    3.0,
-			CloudProviderRateLimitBucket: 10,
-		}
-	} else {
-		return &cloudprovider.Config{
-			TenantID:                     cs.Properties.AzProfile.TenantID,
-			SubscriptionID:               cs.Properties.AzProfile.SubscriptionID,
-			ResourceGroup:                cs.Properties.AzProfile.ResourceGroup,
-			LoadBalancerSku:              "standard",
-			Location:                     cs.Location,
-			SecurityGroupName:            "nsg-worker",
-			VMType:                       "vmss",
-			SubnetName:                   "default",
-			VnetName:                     "vnet",
-			UseInstanceMetadata:          useInstanceMetadata, // TODO: hard-wire to true after v3 has gone
-			CloudProviderBackoff:         cloudProviderBackoff,
-			CloudProviderBackoffRetries:  0,
-			CloudProviderBackoffJitter:   0.0,
-			CloudProviderBackoffDuration: 0,
-			CloudProviderBackoffExponent: 0.0,
-			CloudProviderRateLimit:       cloudProviderBackoff,
-			CloudProviderRateLimitQPS:    0.0,
-			CloudProviderRateLimitBucket: 0,
-		}
+	cfg := cloudprovider.Config{
+		TenantID:             cs.Properties.AzProfile.TenantID,
+		SubscriptionID:       cs.Properties.AzProfile.SubscriptionID,
+		ResourceGroup:        cs.Properties.AzProfile.ResourceGroup,
+		LoadBalancerSku:      "standard",
+		Location:             cs.Location,
+		SecurityGroupName:    "nsg-worker",
+		VMType:               "vmss",
+		SubnetName:           "default",
+		VnetName:             "vnet",
+		UseInstanceMetadata:  useInstanceMetadata, // TODO: hard-wire to true after v3 has gone
+		CloudProviderBackoff: cloudProviderBackoff,
 	}
+	if cloudProviderBackoff {
+		cfg.CloudProviderBackoffRetries = 6
+		cfg.CloudProviderBackoffJitter = 1.0
+		cfg.CloudProviderBackoffDuration = 5
+		cfg.CloudProviderBackoffExponent = 1.5
+		cfg.CloudProviderRateLimit = cloudProviderBackoff
+		cfg.CloudProviderRateLimitQPS = 3.0
+		cfg.CloudProviderRateLimitBucket = 10
+	}
+	return &cfg
 }
 
 func MasterCloudProviderConf(cs *api.OpenShiftManagedCluster, useInstanceMetadata bool, cloudProviderBackoff bool) ([]byte, error) {
