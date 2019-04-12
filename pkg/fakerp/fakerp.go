@@ -63,7 +63,7 @@ func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShif
 				}
 
 				for i := int64(0); i < app.Count; i++ {
-					hostname := (*op.Properties.TargetResource.ResourceName)[3:] + fmt.Sprintf("%06s", strconv.FormatInt(i, 36))
+					hostname := (*op.Properties.TargetResource.ResourceName)[3:] + fmt.Sprintf("-%06s", strconv.FormatInt(i, 36))
 					cli, err := s.Dial(ctx, hostname)
 					if err != nil {
 						log.Warnf("Dial failed: %v", err)
