@@ -316,7 +316,7 @@ func validateAuthProfile(path string, ap *api.AuthProfile) (errs []error) {
 				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].clientId %q", path, ip.Name, provider.ClientID))
 			}
 			if provider.Secret == "" {
-				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].secret %q", path, ip.Name, provider.Secret))
+				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].secret %q", path, ip.Name, "<hidden>"))
 			}
 			if !isValidUUID(provider.TenantID) {
 				errs = append(errs, fmt.Errorf("invalid %s.identityProviders[%q].tenantId %q", path, ip.Name, provider.TenantID))
