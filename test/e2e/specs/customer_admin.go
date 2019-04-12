@@ -2,13 +2,14 @@ package specs
 
 import (
 	"errors"
-	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/ghodss/yaml"
 	onwv1 "github.com/openshift/api/network/v1"
+	userv1 "github.com/openshift/api/user/v1"
 	v1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -16,6 +17,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/test/sanity"
 )
@@ -233,15 +235,24 @@ var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fa
 	It("should sync AAD admin group", func() {
 		syncSecret, err := sanity.Checker.Client.Admin.CoreV1.Secrets("openshift-infra").Get("aad-group-sync-config", metav1.GetOptions{})
 		Expect(err).ToNot(HaveOccurred())
-		id := "44e69b4e-2e70-42df-bb97-3a890730d7b0"
-		testUser := "testuserdisabled"
-		gid := syncSecret.Data["customerAdminGroupId"]
-		if strings.EqualFold(string(gid), id) {
-			// test the users
-			oca, err := sanity.Checker.Client.Admin.UserV1.Groups().Get("osa-customer-admins", metav1.GetOptions{})
+
+		var provider api.AADIdentityProvider
+		err = yaml.Unmarshal(syncSecret.Data["aad-group-sync.yaml"], &provider)
+		Expect(err).ToNot(HaveOccurred())
+
+		if provider.CustomerAdminGroupID != nil &&
+			*provider.CustomerAdminGroupID == "44e69b4e-2e70-42df-bb97-3a890730d7b0" {
+			var g *userv1.Group
+			err = wait.PollImmediate(2*time.Second, 10*time.Minute, func() (bool, error) {
+				g, err = sanity.Checker.Client.Admin.UserV1.Groups().Get("osa-customer-admins", metav1.GetOptions{})
+				if kerrors.IsNotFound(err) {
+					return false, nil
+				}
+				return err == nil, err
+			})
 			Expect(err).ToNot(HaveOccurred())
-			Expect(len(oca.Users)).To(Equal(1))
-			Expect(strings.HasPrefix(oca.Users[0], testUser)).To(BeTrue())
+			Expect(g.Users).To(HaveLen(1))
+			Expect(g.Users[0]).To(HavePrefix("testuserdisabled"))
 		}
 	})
 	// Placeholder to test that a ded admin cannot delete pods in the default or openshift- namespaces
