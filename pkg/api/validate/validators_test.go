@@ -443,7 +443,7 @@ func TestValidate(t *testing.T) {
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider = aadIdentityProvider
 				oc.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
 			},
-			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders["Azure AD"].secret ""`)},
+			expectedErrs: []error{errors.New(`invalid properties.authProfile.identityProviders["Azure AD"].secret "<hidden>"`)},
 		},
 		"AADIdentityProvider clientId empty": {
 			f: func(oc *api.OpenShiftManagedCluster) {

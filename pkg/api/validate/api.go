@@ -62,7 +62,15 @@ func (v *APIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftMa
 	}
 
 	if !reflect.DeepEqual(cs, old) {
-		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(cs, old)))
+		// TODO: this is a hack because we're using deep.Equal.  To fix properly
+		// we'd probably need to implement our own deep.Equal.
+		csCopy := cs.DeepCopy()
+		if csCopy.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).Secret !=
+			old.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).Secret {
+			csCopy.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).Secret = "<hidden 1>"
+			old.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).Secret = "<hidden 2>"
+		}
+		errs = append(errs, fmt.Errorf("invalid change %s", deep.Equal(csCopy, old)))
 	}
 
 	return
