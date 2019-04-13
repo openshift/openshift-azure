@@ -77,5 +77,7 @@ import:
 - package: github.com/grpc-ecosystem/grpc-gateway
   version: ^v1.8.0
 - package: github.com/kubernetes-incubator/service-catalog
-  repo:    https://github.com/openshift/service-catalog.git
-  version: 3.11
+  version: "3.11"
+  repo: https://github.com/openshift/service-catalog.git
+- package: github.com/spf13/cobra
+  version: v0.0.3

@@ -72,6 +72,7 @@ func (u *kubeclient) EnsureSyncPod(ctx context.Context, syncImage string, hash [
 					Spec: corev1.PodSpec{
 						Containers: []corev1.Container{
 							{
+								Args:            []string{"sync"},
 								Image:           syncImage,
 								ImagePullPolicy: corev1.PullAlways,
 								Name:            "sync",

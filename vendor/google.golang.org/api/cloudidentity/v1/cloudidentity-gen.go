@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,39 +6,13 @@
 
 // Package cloudidentity provides access to the Cloud Identity API.
 //
-// For product documentation, see: https://cloud.google.com/identity/
-//
-// Creating a client
+// See https://cloud.google.com/identity/
 //
 // Usage example:
 //
 //   import "google.golang.org/api/cloudidentity/v1"
 //   ...
-//   ctx := context.Background()
-//   cloudidentityService, err := cloudidentity.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
-//
-//   cloudidentityService, err := cloudidentity.NewService(ctx, option.WithScopes(cloudidentity.CloudIdentityGroupsReadonlyScope))
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   cloudidentityService, err := cloudidentity.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   cloudidentityService, err := cloudidentity.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   cloudidentityService, err := cloudidentity.New(oauthHttpClient)
 package cloudidentity // import "google.golang.org/api/cloudidentity/v1"
 
 import (
@@ -55,8 +29,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -78,44 +50,6 @@ const apiName = "cloudidentity"
 const apiVersion = "v1"
 const basePath = "https://cloudidentity.googleapis.com/"
 
-// OAuth2 scopes used by this API.
-const (
-	// See, change, create, and delete any of the Cloud Identity Groups that
-	// you can access, including the members of each group
-	CloudIdentityGroupsScope = "https://www.googleapis.com/auth/cloud-identity.groups"
-
-	// See any Cloud Identity Groups that you can access, including group
-	// members and their emails
-	CloudIdentityGroupsReadonlyScope = "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
-)
-
-// NewService creates a new Service.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/cloud-identity.groups",
-		"https://www.googleapis.com/auth/cloud-identity.groups.readonly",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new Service. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -443,11 +377,10 @@ type Membership struct {
 	// name](https://cloud.google.com/apis/design/resource_names) of
 	// the
 	// Membership in the format:
-	// `groups/{group_id}/memberships/{member_id}`,
-	// where group_id is the unique ID assigned to the Group to which
-	// Membership
-	// belongs to, and member_id is the unique ID assigned to the
-	// member
+	// `groups/{group_id}/memberships/{member_id}`, where
+	// group_id is the unique ID assigned to the Group to which Membership
+	// belongs
+	// to, and member_id is the unique ID assigned to the member
 	//
 	// Must be left blank while creating a Membership.
 	Name string `json:"name,omitempty"`
@@ -636,20 +569,20 @@ func (s *SearchGroupsResponse) MarshalJSON() ([]byte, error) {
 }
 
 // Status: The `Status` type defines a logical error model that is
-// suitable for
-// different programming environments, including REST APIs and RPC APIs.
-// It is
-// used by [gRPC](https://github.com/grpc). The error model is designed
-// to be:
+// suitable for different
+// programming environments, including REST APIs and RPC APIs. It is
+// used by
+// [gRPC](https://github.com/grpc). The error model is designed to
+// be:
 //
 // - Simple to use and understand for most users
 // - Flexible enough to meet unexpected needs
 //
 // # Overview
 //
-// The `Status` message contains three pieces of data: error code,
-// error
-// message, and error details. The error code should be an enum value
+// The `Status` message contains three pieces of data: error code, error
+// message,
+// and error details. The error code should be an enum value
 // of
 // google.rpc.Code, but it may accept additional error codes if needed.
 // The
@@ -870,10 +803,7 @@ func (c *GroupsCreateCall) Do(opts ...googleapi.CallOption) (*Operation, error) 
 	//   },
 	//   "response": {
 	//     "$ref": "Operation"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups"
-	//   ]
+	//   }
 	// }
 
 }
@@ -999,10 +929,7 @@ func (c *GroupsDeleteCall) Do(opts ...googleapi.CallOption) (*Operation, error) 
 	//   "path": "v1/{+name}",
 	//   "response": {
 	//     "$ref": "Operation"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups"
-	//   ]
+	//   }
 	// }
 
 }
@@ -1142,11 +1069,7 @@ func (c *GroupsGetCall) Do(opts ...googleapi.CallOption) (*Group, error) {
 	//   "path": "v1/{+name}",
 	//   "response": {
 	//     "$ref": "Group"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
-	//   ]
+	//   }
 	// }
 
 }
@@ -1167,9 +1090,13 @@ func (r *GroupsService) List() *GroupsListCall {
 	return c
 }
 
-// PageSize sets the optional parameter "pageSize": The default page
-// size is 200 (max 1000) for the BASIC view, and 50
-// (max 500) for the FULL view.
+// PageSize sets the optional parameter "pageSize": Maximum number of
+// groups to return.
+//
+// View  | Default | Maximum
+// ----- | ------- | -------
+// BASIC | 200     | 1000
+// FULL  | 50      | 500
 func (c *GroupsListCall) PageSize(pageSize int64) *GroupsListCall {
 	c.urlParams_.Set("pageSize", fmt.Sprint(pageSize))
 	return c
@@ -1304,7 +1231,7 @@ func (c *GroupsListCall) Do(opts ...googleapi.CallOption) (*ListGroupsResponse, 
 	//   "parameterOrder": [],
 	//   "parameters": {
 	//     "pageSize": {
-	//       "description": "The default page size is 200 (max 1000) for the BASIC view, and 50\n(max 500) for the FULL view.",
+	//       "description": "Maximum number of groups to return.\n\nView  | Default | Maximum\n----- | ------- | -------\nBASIC | 200     | 1000\nFULL  | 50      | 500",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
@@ -1333,11 +1260,7 @@ func (c *GroupsListCall) Do(opts ...googleapi.CallOption) (*ListGroupsResponse, 
 	//   "path": "v1/groups",
 	//   "response": {
 	//     "$ref": "ListGroupsResponse"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
-	//   ]
+	//   }
 	// }
 
 }
@@ -1521,11 +1444,7 @@ func (c *GroupsLookupCall) Do(opts ...googleapi.CallOption) (*LookupGroupNameRes
 	//   "path": "v1/groups:lookup",
 	//   "response": {
 	//     "$ref": "LookupGroupNameResponse"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
-	//   ]
+	//   }
 	// }
 
 }
@@ -1674,10 +1593,7 @@ func (c *GroupsPatchCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
 	//   },
 	//   "response": {
 	//     "$ref": "Operation"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups"
-	//   ]
+	//   }
 	// }
 
 }
@@ -1698,9 +1614,13 @@ func (r *GroupsService) Search() *GroupsSearchCall {
 	return c
 }
 
-// PageSize sets the optional parameter "pageSize": The default page
-// size is 200 (max 1000) for the BASIC view, and 50
-// (max 500) for the FULL view.
+// PageSize sets the optional parameter "pageSize": Maximum number of
+// groups to return.
+//
+// View  | Default | Maximum
+// ----- | ------- | -------
+// BASIC | 200     | 1000
+// FULL  | 50      | 500
 func (c *GroupsSearchCall) PageSize(pageSize int64) *GroupsSearchCall {
 	c.urlParams_.Set("pageSize", fmt.Sprint(pageSize))
 	return c
@@ -1839,7 +1759,7 @@ func (c *GroupsSearchCall) Do(opts ...googleapi.CallOption) (*SearchGroupsRespon
 	//   "parameterOrder": [],
 	//   "parameters": {
 	//     "pageSize": {
-	//       "description": "The default page size is 200 (max 1000) for the BASIC view, and 50\n(max 500) for the FULL view.",
+	//       "description": "Maximum number of groups to return.\n\nView  | Default | Maximum\n----- | ------- | -------\nBASIC | 200     | 1000\nFULL  | 50      | 500",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
@@ -1868,11 +1788,7 @@ func (c *GroupsSearchCall) Do(opts ...googleapi.CallOption) (*SearchGroupsRespon
 	//   "path": "v1/groups:search",
 	//   "response": {
 	//     "$ref": "SearchGroupsResponse"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
-	//   ]
+	//   }
 	// }
 
 }
@@ -2029,10 +1945,7 @@ func (c *GroupsMembershipsCreateCall) Do(opts ...googleapi.CallOption) (*Operati
 	//   },
 	//   "response": {
 	//     "$ref": "Operation"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups"
-	//   ]
+	//   }
 	// }
 
 }
@@ -2158,10 +2071,7 @@ func (c *GroupsMembershipsDeleteCall) Do(opts ...googleapi.CallOption) (*Operati
 	//   "path": "v1/{+name}",
 	//   "response": {
 	//     "$ref": "Operation"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups"
-	//   ]
+	//   }
 	// }
 
 }
@@ -2301,11 +2211,7 @@ func (c *GroupsMembershipsGetCall) Do(opts ...googleapi.CallOption) (*Membership
 	//   "path": "v1/{+name}",
 	//   "response": {
 	//     "$ref": "Membership"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
-	//   ]
+	//   }
 	// }
 
 }
@@ -2328,9 +2234,13 @@ func (r *GroupsMembershipsService) List(parent string) *GroupsMembershipsListCal
 	return c
 }
 
-// PageSize sets the optional parameter "pageSize": The default page
-// size is 200 (max 1000) for the BASIC view, and 50
-// (max 500) for the FULL view.
+// PageSize sets the optional parameter "pageSize": Maximum number of
+// Memberships to return.
+//
+// View | Default | Maximum
+// -----|---------|--------
+// BASIC| 200     | 1000
+// FULL | 50      | 500
 func (c *GroupsMembershipsListCall) PageSize(pageSize int64) *GroupsMembershipsListCall {
 	c.urlParams_.Set("pageSize", fmt.Sprint(pageSize))
 	return c
@@ -2462,7 +2372,7 @@ func (c *GroupsMembershipsListCall) Do(opts ...googleapi.CallOption) (*ListMembe
 	//   ],
 	//   "parameters": {
 	//     "pageSize": {
-	//       "description": "The default page size is 200 (max 1000) for the BASIC view, and 50\n(max 500) for the FULL view.",
+	//       "description": "Maximum number of Memberships to return.\n\nView | Default | Maximum\n-----|---------|--------\nBASIC| 200     | 1000\nFULL | 50      | 500",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
@@ -2493,11 +2403,7 @@ func (c *GroupsMembershipsListCall) Do(opts ...googleapi.CallOption) (*ListMembe
 	//   "path": "v1/{+parent}/memberships",
 	//   "response": {
 	//     "$ref": "ListMembershipsResponse"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
-	//   ]
+	//   }
 	// }
 
 }
@@ -2695,11 +2601,7 @@ func (c *GroupsMembershipsLookupCall) Do(opts ...googleapi.CallOption) (*LookupM
 	//   "path": "v1/{+parent}/memberships:lookup",
 	//   "response": {
 	//     "$ref": "LookupMembershipNameResponse"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-identity.groups",
-	//     "https://www.googleapis.com/auth/cloud-identity.groups.readonly"
-	//   ]
+	//   }
 	// }
 
 }

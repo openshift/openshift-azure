@@ -45,21 +45,6 @@
     "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
    },
    "documentationLink": "https://cloud.google.com/access-context-manager/docs/reference/rest/",
-   "preferred": false
-  },
-  {
-   "kind": "discovery#directoryItem",
-   "id": "accesscontextmanager:v1",
-   "name": "accesscontextmanager",
-   "version": "v1",
-   "title": "Access Context Manager API",
-   "description": "An API for setting attribute based access control to requests to GCP services.",
-   "discoveryRestUrl": "https://accesscontextmanager.googleapis.com/$discovery/rest?version=v1",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://cloud.google.com/access-context-manager/docs/reference/rest/",
    "preferred": true
   },
   {
@@ -275,7 +260,7 @@
    "id": "analyticsreporting:v4",
    "name": "analyticsreporting",
    "version": "v4",
-   "title": "Analytics Reporting API",
+   "title": "Google Analytics Reporting API",
    "description": "Accesses Analytics report data.",
    "discoveryRestUrl": "https://analyticsreporting.googleapis.com/$discovery/rest?version=v4",
    "icons": {
@@ -524,7 +509,7 @@
    "name": "bigquerydatatransfer",
    "version": "v1",
    "title": "BigQuery Data Transfer API",
-   "description": "Schedule queries or transfer external data from SaaS applications to Google BigQuery on a regular basis.",
+   "description": "Transfers data from partner SaaS applications to Google BigQuery on a scheduled, managed basis.",
    "discoveryRestUrl": "https://bigquerydatatransfer.googleapis.com/$discovery/rest?version=v1",
    "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
@@ -539,7 +524,7 @@
    "name": "bigtableadmin",
    "version": "v1",
    "title": "Cloud Bigtable Admin API",
-   "description": "Administer your Cloud Bigtable tables and instances.",
+   "description": "",
    "discoveryRestUrl": "https://bigtableadmin.googleapis.com/$discovery/rest?version=v1",
    "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
@@ -554,7 +539,7 @@
    "name": "bigtableadmin",
    "version": "v2",
    "title": "Cloud Bigtable Admin API",
-   "description": "Administer your Cloud Bigtable tables and instances.",
+   "description": "",
    "discoveryRestUrl": "https://bigtableadmin.googleapis.com/$discovery/rest?version=v2",
    "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
@@ -696,21 +681,6 @@
   },
   {
    "kind": "discovery#directoryItem",
-   "id": "cloudasset:v1",
-   "name": "cloudasset",
-   "version": "v1",
-   "title": "Cloud Asset API",
-   "description": "The cloud asset API manages the history and inventory of cloud resources.",
-   "discoveryRestUrl": "https://cloudasset.googleapis.com/$discovery/rest?version=v1",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/quickstart-cloud-asset-inventory",
-   "preferred": true
-  },
-  {
-   "kind": "discovery#directoryItem",
    "id": "cloudasset:v1beta1",
    "name": "cloudasset",
    "version": "v1beta1",
@@ -721,8 +691,8 @@
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
     "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
    },
-   "documentationLink": "https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/quickstart-cloud-asset-inventory",
-   "preferred": false
+   "documentationLink": "https://console.cloud.google.com/apis/api/cloudasset.googleapis.com/overview",
+   "preferred": true
   },
   {
    "kind": "discovery#directoryItem",
@@ -861,21 +831,6 @@
   },
   {
    "kind": "discovery#directoryItem",
-   "id": "cloudiot:v1alpha1",
-   "name": "cloudiot",
-   "version": "v1alpha1",
-   "title": "Cloud IoT API",
-   "description": "Registers and manages IoT (Internet of Things) devices that connect to the Google Cloud Platform.",
-   "discoveryRestUrl": "https://cloudiot.googleapis.com/$discovery/rest?version=v1alpha1",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://cloud.google.com/iot",
-   "preferred": false
-  },
-  {
-   "kind": "discovery#directoryItem",
    "id": "cloudiot:v1",
    "name": "cloudiot",
    "version": "v1",
@@ -902,36 +857,6 @@
     "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
    },
    "documentationLink": "https://cloud.google.com/kms/",
-   "preferred": true
-  },
-  {
-   "kind": "discovery#directoryItem",
-   "id": "cloudprivatecatalog:v1beta1",
-   "name": "cloudprivatecatalog",
-   "version": "v1beta1",
-   "title": "Cloud Private Catalog API",
-   "description": "Enable cloud users to discover enterprise catalogs and products in their organizations.",
-   "discoveryRestUrl": "https://cloudprivatecatalog.googleapis.com/$discovery/rest?version=v1beta1",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://sites.google.com/corp/google.com/cloudprivatecatalog",
-   "preferred": true
-  },
-  {
-   "kind": "discovery#directoryItem",
-   "id": "cloudprivatecatalogproducer:v1beta1",
-   "name": "cloudprivatecatalogproducer",
-   "version": "v1beta1",
-   "title": "Cloud Private Catalog Producer API",
-   "description": "Enables cloud users to manage and share enterprise catalogs intheir organizations.",
-   "discoveryRestUrl": "https://cloudprivatecatalogproducer.googleapis.com/$discovery/rest?version=v1beta1",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://sites.google.com/corp/google.com/cloudprivatecatalog",
    "preferred": true
   },
   {
@@ -1071,21 +996,6 @@
   },
   {
    "kind": "discovery#directoryItem",
-   "id": "cloudtasks:v2",
-   "name": "cloudtasks",
-   "version": "v2",
-   "title": "Cloud Tasks API",
-   "description": "Manages the execution of large numbers of distributed requests.",
-   "discoveryRestUrl": "https://cloudtasks.googleapis.com/$discovery/rest?version=v2",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://cloud.google.com/tasks/",
-   "preferred": true
-  },
-  {
-   "kind": "discovery#directoryItem",
    "id": "cloudtasks:v2beta2",
    "name": "cloudtasks",
    "version": "v2beta2",
@@ -1112,7 +1022,7 @@
     "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
    },
    "documentationLink": "https://cloud.google.com/tasks/",
-   "preferred": false
+   "preferred": true
   },
   {
    "kind": "discovery#directoryItem",
@@ -1754,21 +1664,6 @@
   },
   {
    "kind": "discovery#directoryItem",
-   "id": "factchecktools:v1alpha1",
-   "name": "factchecktools",
-   "version": "v1alpha1",
-   "title": "Fact Check Tools API",
-   "description": "",
-   "discoveryRestUrl": "https://factchecktools.googleapis.com/$discovery/rest?version=v1alpha1",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://developers.google.com/fact-check/tools/api/",
-   "preferred": true
-  },
-  {
-   "kind": "discovery#directoryItem",
    "id": "file:v1",
    "name": "file",
    "version": "v1",
@@ -2066,7 +1961,7 @@
    "name": "groupssettings",
    "version": "v1",
    "title": "Groups Settings API",
-   "description": "Manages permission levels and related settings of a group.",
+   "description": "Lets you manage permission levels and related settings of a group.",
    "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/groupssettings/v1/rest",
    "discoveryLink": "./apis/groupssettings/v1/rest",
    "icons": {
@@ -2082,7 +1977,7 @@
    "name": "healthcare",
    "version": "v1alpha",
    "title": "Cloud Healthcare API",
-   "description": "Manage, store, and access healthcare data in Google Cloud Platform.",
+   "description": "",
    "discoveryRestUrl": "https://healthcare.googleapis.com/$discovery/rest?version=v1alpha",
    "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
@@ -2097,7 +1992,7 @@
    "name": "healthcare",
    "version": "v1alpha2",
    "title": "Cloud Healthcare API",
-   "description": "Manage, store, and access healthcare data in Google Cloud Platform.",
+   "description": "",
    "discoveryRestUrl": "https://healthcare.googleapis.com/$discovery/rest?version=v1alpha2",
    "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
@@ -2105,21 +2000,6 @@
    },
    "documentationLink": "https://cloud.google.com/healthcare",
    "preferred": true
-  },
-  {
-   "kind": "discovery#directoryItem",
-   "id": "healthcare:v1beta1",
-   "name": "healthcare",
-   "version": "v1beta1",
-   "title": "Cloud Healthcare API",
-   "description": "Manage, store, and access healthcare data in Google Cloud Platform.",
-   "discoveryRestUrl": "https://healthcare.googleapis.com/$discovery/rest?version=v1beta1",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://cloud.google.com/healthcare",
-   "preferred": false
   },
   {
    "kind": "discovery#directoryItem",
@@ -2429,21 +2309,6 @@
   },
   {
    "kind": "discovery#directoryItem",
-   "id": "monitoring:v3p1alpha1",
-   "name": "monitoring",
-   "version": "v3p1alpha1",
-   "title": "Stackdriver Monitoring API",
-   "description": "Manages your Stackdriver Monitoring data and configurations. Most projects must be associated with a Stackdriver account, with a few exceptions as noted on the individual method pages.",
-   "discoveryRestUrl": "https://monitoring.googleapis.com/$discovery/rest?version=v3p1alpha1",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://cloud.google.com/monitoring/api/",
-   "preferred": false
-  },
-  {
-   "kind": "discovery#directoryItem",
    "id": "monitoring:v3",
    "name": "monitoring",
    "version": "v3",
@@ -2596,6 +2461,21 @@
     "x32": "https://www.google.com/images/icons/product/pagespeed-32.png"
    },
    "documentationLink": "https://developers.google.com/speed/docs/insights/v5/get-started",
+   "preferred": true
+  },
+  {
+   "kind": "discovery#directoryItem",
+   "id": "partners:v2",
+   "name": "partners",
+   "version": "v2",
+   "title": "Google Partners API",
+   "description": "Searches certified companies and creates contact leads with them, and also audits the usage of clients.",
+   "discoveryRestUrl": "https://partners.googleapis.com/$discovery/rest?version=v2",
+   "icons": {
+    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
+    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
+   },
+   "documentationLink": "https://developers.google.com/partners/",
    "preferred": true
   },
   {
@@ -2851,36 +2731,6 @@
   },
   {
    "kind": "discovery#directoryItem",
-   "id": "run:v1alpha1",
-   "name": "run",
-   "version": "v1alpha1",
-   "title": "Cloud Run API",
-   "description": "Deploy and manage user provided container images that scale automatically based on HTTP traffic.",
-   "discoveryRestUrl": "https://run.googleapis.com/$discovery/rest?version=v1alpha1",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://cloud.google.com/run/",
-   "preferred": false
-  },
-  {
-   "kind": "discovery#directoryItem",
-   "id": "run:v1",
-   "name": "run",
-   "version": "v1",
-   "title": "Cloud Run API",
-   "description": "Deploy and manage user provided container images that scale automatically based on HTTP traffic.",
-   "discoveryRestUrl": "https://run.googleapis.com/$discovery/rest?version=v1",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://cloud.google.com/run/",
-   "preferred": true
-  },
-  {
-   "kind": "discovery#directoryItem",
    "id": "runtimeconfig:v1",
    "name": "runtimeconfig",
    "version": "v1",
@@ -3052,21 +2902,6 @@
    "title": "Service Networking API",
    "description": "Provides automatic management of network configurations necessary for certain services.",
    "discoveryRestUrl": "https://servicenetworking.googleapis.com/$discovery/rest?version=v1beta",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://cloud.google.com/service-infrastructure/docs/service-networking/getting-started",
-   "preferred": false
-  },
-  {
-   "kind": "discovery#directoryItem",
-   "id": "servicenetworking:v1",
-   "name": "servicenetworking",
-   "version": "v1",
-   "title": "Service Networking API",
-   "description": "Provides automatic management of network configurations necessary for certain services.",
-   "discoveryRestUrl": "https://servicenetworking.googleapis.com/$discovery/rest?version=v1",
    "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
     "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -3295,7 +3130,7 @@
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
     "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
    },
-   "documentationLink": "https://cloud.google.com/storage-transfer/docs",
+   "documentationLink": "https://cloud.google.com/storage/transfer",
    "preferred": true
   },
   {
@@ -3366,7 +3201,7 @@
    "name": "tasks",
    "version": "v1",
    "title": "Tasks API",
-   "description": "Manages your tasks and task lists.",
+   "description": "Lets you manage your tasks and task lists.",
    "discoveryRestUrl": "https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest",
    "discoveryLink": "./apis/tasks/v1/rest",
    "icons": {
@@ -3519,7 +3354,7 @@
    "name": "videointelligence",
    "version": "v1p1beta1",
    "title": "Cloud Video Intelligence API",
-   "description": "Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text. Supports both asynchronous API and streaming API.",
+   "description": "Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text.",
    "discoveryRestUrl": "https://videointelligence.googleapis.com/$discovery/rest?version=v1p1beta1",
    "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
@@ -3534,23 +3369,8 @@
    "name": "videointelligence",
    "version": "v1p2beta1",
    "title": "Cloud Video Intelligence API",
-   "description": "Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text. Supports both asynchronous API and streaming API.",
+   "description": "Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text.",
    "discoveryRestUrl": "https://videointelligence.googleapis.com/$discovery/rest?version=v1p2beta1",
-   "icons": {
-    "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
-    "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
-   },
-   "documentationLink": "https://cloud.google.com/video-intelligence/docs/",
-   "preferred": false
-  },
-  {
-   "kind": "discovery#directoryItem",
-   "id": "videointelligence:v1p3beta1",
-   "name": "videointelligence",
-   "version": "v1p3beta1",
-   "title": "Cloud Video Intelligence API",
-   "description": "Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text. Supports both asynchronous API and streaming API.",
-   "discoveryRestUrl": "https://videointelligence.googleapis.com/$discovery/rest?version=v1p3beta1",
    "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
     "x32": "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png"
@@ -3564,7 +3384,7 @@
    "name": "videointelligence",
    "version": "v1",
    "title": "Cloud Video Intelligence API",
-   "description": "Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text. Supports both asynchronous API and streaming API.",
+   "description": "Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text.",
    "discoveryRestUrl": "https://videointelligence.googleapis.com/$discovery/rest?version=v1",
    "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",
@@ -3579,7 +3399,7 @@
    "name": "videointelligence",
    "version": "v1beta2",
    "title": "Cloud Video Intelligence API",
-   "description": "Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text. Supports both asynchronous API and streaming API.",
+   "description": "Detects objects, explicit content, and scene changes in videos. It also specifies the region for annotation and transcribes speech to text.",
    "discoveryRestUrl": "https://videointelligence.googleapis.com/$discovery/rest?version=v1beta2",
    "icons": {
     "x16": "https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png",

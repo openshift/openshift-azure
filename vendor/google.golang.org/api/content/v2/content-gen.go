@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,35 +6,13 @@
 
 // Package content provides access to the Content API for Shopping.
 //
-// For product documentation, see: https://developers.google.com/shopping-content
-//
-// Creating a client
+// See https://developers.google.com/shopping-content
 //
 // Usage example:
 //
 //   import "google.golang.org/api/content/v2"
 //   ...
-//   ctx := context.Background()
-//   contentService, err := content.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   contentService, err := content.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   contentService, err := content.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   contentService, err := content.New(oauthHttpClient)
 package content // import "google.golang.org/api/content/v2"
 
 import (
@@ -51,8 +29,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -80,32 +56,6 @@ const (
 	ContentScope = "https://www.googleapis.com/auth/content"
 )
 
-// NewService creates a new APIService.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*APIService, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/content",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new APIService. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*APIService, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -624,7 +574,7 @@ type AccountStatus struct {
 	// AccountLevelIssues: A list of account level issues.
 	AccountLevelIssues []*AccountStatusAccountLevelIssue `json:"accountLevelIssues,omitempty"`
 
-	// DataQualityIssues: DEPRECATED - never populated.
+	// DataQualityIssues: A list of data quality issues.
 	DataQualityIssues []*AccountStatusDataQualityIssue `json:"dataQualityIssues,omitempty"`
 
 	// Kind: Identifies what kind of resource this is. Value: the fixed
@@ -711,26 +661,38 @@ func (s *AccountStatusAccountLevelIssue) MarshalJSON() ([]byte, error) {
 }
 
 type AccountStatusDataQualityIssue struct {
+	// Country: Country for which this issue is reported.
 	Country string `json:"country,omitempty"`
 
+	// Destination: The destination the issue applies to.
 	Destination string `json:"destination,omitempty"`
 
+	// Detail: A more detailed description of the issue.
 	Detail string `json:"detail,omitempty"`
 
+	// DisplayedValue: Actual value displayed on the landing page.
 	DisplayedValue string `json:"displayedValue,omitempty"`
 
+	// ExampleItems: Example items featuring the issue.
 	ExampleItems []*AccountStatusExampleItem `json:"exampleItems,omitempty"`
 
+	// Id: Issue identifier.
 	Id string `json:"id,omitempty"`
 
+	// LastChecked: Last time the account was checked for this issue.
 	LastChecked string `json:"lastChecked,omitempty"`
 
+	// Location: The attribute name that is relevant for the issue.
 	Location string `json:"location,omitempty"`
 
+	// NumItems: Number of items in the account found to have the said
+	// issue.
 	NumItems int64 `json:"numItems,omitempty"`
 
+	// Severity: Severity of the problem.
 	Severity string `json:"severity,omitempty"`
 
+	// SubmittedValue: Submitted value that causes the issue.
 	SubmittedValue string `json:"submittedValue,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Country") to
@@ -756,15 +718,23 @@ func (s *AccountStatusDataQualityIssue) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// AccountStatusExampleItem: An example of an item that has poor data
+// quality. An item value on the landing page differs from what is
+// submitted, or conflicts with a policy.
 type AccountStatusExampleItem struct {
+	// ItemId: Unique item ID as specified in the uploaded product data.
 	ItemId string `json:"itemId,omitempty"`
 
+	// Link: Landing page of the item.
 	Link string `json:"link,omitempty"`
 
+	// SubmittedValue: The item value that was submitted.
 	SubmittedValue string `json:"submittedValue,omitempty"`
 
+	// Title: Title of the item.
 	Title string `json:"title,omitempty"`
 
+	// ValueOnLandingPage: The actual value on the landing page.
 	ValueOnLandingPage string `json:"valueOnLandingPage,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "ItemId") to
@@ -965,7 +935,7 @@ type AccountTaxTaxRule struct {
 	Country string `json:"country,omitempty"`
 
 	// LocationId: State (or province) is which the tax is applicable,
-	// described by its location ID (also called criteria ID).
+	// described by its location id (also called criteria id).
 	LocationId uint64 `json:"locationId,omitempty,string"`
 
 	// RatePercent: Explicit tax rate in percent, represented as a floating
@@ -4443,7 +4413,8 @@ type Order struct {
 	// Acknowledged: Whether the order was acknowledged.
 	Acknowledged bool `json:"acknowledged,omitempty"`
 
-	// ChannelType: Deprecated.
+	// ChannelType: The channel type of the order: "purchaseOnGoogle" or
+	// "googleExpress".
 	ChannelType string `json:"channelType,omitempty"`
 
 	// Customer: The details of the customer who placed the order.
@@ -4452,7 +4423,7 @@ type Order struct {
 	// DeliveryDetails: The details for the delivery.
 	DeliveryDetails *OrderDeliveryDetails `json:"deliveryDetails,omitempty"`
 
-	// Id: The REST ID of the order. Globally unique.
+	// Id: The REST id of the order. Globally unique.
 	Id string `json:"id,omitempty"`
 
 	// Kind: Identifies what kind of resource this is. Value: the fixed
@@ -4464,7 +4435,7 @@ type Order struct {
 
 	MerchantId uint64 `json:"merchantId,omitempty,string"`
 
-	// MerchantOrderId: Merchant-provided ID of the order.
+	// MerchantOrderId: Merchant-provided id of the order.
 	MerchantOrderId string `json:"merchantOrderId,omitempty"`
 
 	// NetAmount: The net amount for the order. For example, if an order was
@@ -4481,8 +4452,9 @@ type Order struct {
 	// PlacedDate: The date when the order was placed, in ISO 8601 format.
 	PlacedDate string `json:"placedDate,omitempty"`
 
-	// Promotions: The details of the merchant provided promotions applied
-	// to the order. More details about the program are here.
+	// Promotions: Deprecated. Ignored if provided for createTestOrder. The
+	// details of the merchant provided promotions applied to the order.
+	// More details about the program are here.
 	Promotions []*OrderLegacyPromotion `json:"promotions,omitempty"`
 
 	// Refunds: Refunds for the order.
@@ -4497,8 +4469,7 @@ type Order struct {
 	// ShippingCostTax: The tax for the total shipping cost.
 	ShippingCostTax *Price `json:"shippingCostTax,omitempty"`
 
-	// ShippingOption: Deprecated. Shipping details are provided with line
-	// items instead.
+	// ShippingOption: The requested shipping option.
 	ShippingOption string `json:"shippingOption,omitempty"`
 
 	// Status: The status of the order.
@@ -4682,9 +4653,8 @@ type OrderCustomerMarketingRightsInfo struct {
 	LastUpdatedTimestamp string `json:"lastUpdatedTimestamp,omitempty"`
 
 	// MarketingEmailAddress: Email address that can be used for marketing
-	// purposes. The field may be empty even if explicitMarketingPreference
-	// is 'granted'. This happens when retrieving an old order from the
-	// customer who deleted their account.
+	// purposes. This field is only filled when explicitMarketingPreference
+	// is equal to 'granted'.
 	MarketingEmailAddress string `json:"marketingEmailAddress,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g.
@@ -4846,7 +4816,7 @@ type OrderLineItem struct {
 	// Cancellations: Cancellations of the line item.
 	Cancellations []*OrderCancellation `json:"cancellations,omitempty"`
 
-	// Id: The ID of the line item.
+	// Id: The id of the line item.
 	Id string `json:"id,omitempty"`
 
 	// Price: Total price for the line item. For example, if two items for
@@ -4933,7 +4903,7 @@ type OrderLineItemProduct struct {
 	// Gtin: Global Trade Item Number (GTIN) of the item.
 	Gtin string `json:"gtin,omitempty"`
 
-	// Id: The REST ID of the product.
+	// Id: The REST id of the product.
 	Id string `json:"id,omitempty"`
 
 	// ImageLink: URL of an image of the item.
@@ -5340,10 +5310,10 @@ type OrderReportTransaction struct {
 	// MerchantId: The ID of the managing account.
 	MerchantId uint64 `json:"merchantId,omitempty,string"`
 
-	// MerchantOrderId: Merchant-provided ID of the order.
+	// MerchantOrderId: Merchant-provided id of the order.
 	MerchantOrderId string `json:"merchantOrderId,omitempty"`
 
-	// OrderId: The ID of the order.
+	// OrderId: The id of the order.
 	OrderId string `json:"orderId,omitempty"`
 
 	// ProductAmount: Total amount for the items.
@@ -5454,7 +5424,7 @@ type OrderShipment struct {
 	// 8601 format. Present only if status is delivered
 	DeliveryDate string `json:"deliveryDate,omitempty"`
 
-	// Id: The ID of the shipment.
+	// Id: The id of the shipment.
 	Id string `json:"id,omitempty"`
 
 	// LineItems: The line items that are shipped.
@@ -5463,7 +5433,7 @@ type OrderShipment struct {
 	// Status: The status of the shipment.
 	Status string `json:"status,omitempty"`
 
-	// TrackingId: The tracking ID for the shipment.
+	// TrackingId: The tracking id for the shipment.
 	TrackingId string `json:"trackingId,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Carrier") to
@@ -5490,7 +5460,7 @@ func (s *OrderShipment) MarshalJSON() ([]byte, error) {
 }
 
 type OrderShipmentLineItemShipment struct {
-	// LineItemId: The ID of the line item that is shipped. Either
+	// LineItemId: The id of the line item that is shipped. Either
 	// lineItemId or productId is required.
 	LineItemId string `json:"lineItemId,omitempty"`
 
@@ -5538,9 +5508,7 @@ type OrderinvoicesCreateChargeInvoiceRequest struct {
 	// operations for a given order.
 	OperationId string `json:"operationId,omitempty"`
 
-	// ShipmentGroupId: [required] ID of the shipment group. It is assigned
-	// by the merchant in the shipLineItems method and is used to group
-	// multiple line items that have the same kind of shipping charges.
+	// ShipmentGroupId: [required] ID of the shipment group.
 	ShipmentGroupId string `json:"shipmentGroupId,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "InvoiceId") to
@@ -6631,7 +6599,7 @@ type OrdersCustomBatchRequestEntry struct {
 	// MerchantId: The ID of the managing account.
 	MerchantId uint64 `json:"merchantId,omitempty,string"`
 
-	// MerchantOrderId: The merchant order ID. Required for
+	// MerchantOrderId: The merchant order id. Required for
 	// updateMerchantOrderId and getByMerchantOrderId methods.
 	MerchantOrderId string `json:"merchantOrderId,omitempty"`
 
@@ -7090,7 +7058,7 @@ type OrdersCustomBatchRequestEntryShipLineItems struct {
 	ShipmentInfos []*OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo `json:"shipmentInfos,omitempty"`
 
 	// TrackingId: Deprecated. Please use shipmentInfo instead. The tracking
-	// ID for the shipment.
+	// id for the shipment.
 	TrackingId string `json:"trackingId,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Carrier") to
@@ -7122,11 +7090,10 @@ type OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo struct {
 	// values.
 	Carrier string `json:"carrier,omitempty"`
 
-	// ShipmentId: The ID of the shipment. This is assigned by the merchant
-	// and is unique to each shipment.
+	// ShipmentId: The ID of the shipment.
 	ShipmentId string `json:"shipmentId,omitempty"`
 
-	// TrackingId: The tracking ID for the shipment.
+	// TrackingId: The tracking id for the shipment.
 	TrackingId string `json:"trackingId,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Carrier") to
@@ -7155,9 +7122,6 @@ func (s *OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo) MarshalJSON() (
 type OrdersCustomBatchRequestEntryUpdateLineItemShippingDetails struct {
 	// DeliverByDate: Updated delivery by date, in ISO 8601 format. If not
 	// specified only ship by date is updated.
-	//
-	// Provided date should be within 1 year timeframe and can not be a date
-	// in the past.
 	DeliverByDate string `json:"deliverByDate,omitempty"`
 
 	// LineItemId: The ID of the line item to set metadata. Either
@@ -7171,9 +7135,6 @@ type OrdersCustomBatchRequestEntryUpdateLineItemShippingDetails struct {
 
 	// ShipByDate: Updated ship by date, in ISO 8601 format. If not
 	// specified only deliver by date is updated.
-	//
-	// Provided date should be within 1 year timeframe and can not be a date
-	// in the past.
 	ShipByDate string `json:"shipByDate,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "DeliverByDate") to
@@ -7216,7 +7177,7 @@ type OrdersCustomBatchRequestEntryUpdateShipment struct {
 	// Status: New status for the shipment. Not updated if missing.
 	Status string `json:"status,omitempty"`
 
-	// TrackingId: The tracking ID for the shipment. Not updated if missing.
+	// TrackingId: The tracking id for the shipment. Not updated if missing.
 	TrackingId string `json:"trackingId,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Carrier") to
@@ -7953,7 +7914,7 @@ type OrdersShipLineItemsRequest struct {
 	ShipmentInfos []*OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo `json:"shipmentInfos,omitempty"`
 
 	// TrackingId: Deprecated. Please use shipmentInfo instead. The tracking
-	// ID for the shipment.
+	// id for the shipment.
 	TrackingId string `json:"trackingId,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Carrier") to
@@ -8018,9 +7979,6 @@ func (s *OrdersShipLineItemsResponse) MarshalJSON() ([]byte, error) {
 type OrdersUpdateLineItemShippingDetailsRequest struct {
 	// DeliverByDate: Updated delivery by date, in ISO 8601 format. If not
 	// specified only ship by date is updated.
-	//
-	// Provided date should be within 1 year timeframe and can not be a date
-	// in the past.
 	DeliverByDate string `json:"deliverByDate,omitempty"`
 
 	// LineItemId: The ID of the line item to set metadata. Either
@@ -8038,9 +7996,6 @@ type OrdersUpdateLineItemShippingDetailsRequest struct {
 
 	// ShipByDate: Updated ship by date, in ISO 8601 format. If not
 	// specified only deliver by date is updated.
-	//
-	// Provided date should be within 1 year timeframe and can not be a date
-	// in the past.
 	ShipByDate string `json:"shipByDate,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "DeliverByDate") to
@@ -8192,7 +8147,7 @@ type OrdersUpdateShipmentRequest struct {
 	// Status: New status for the shipment. Not updated if missing.
 	Status string `json:"status,omitempty"`
 
-	// TrackingId: The tracking ID for the shipment. Not updated if missing.
+	// TrackingId: The tracking id for the shipment. Not updated if missing.
 	TrackingId string `json:"trackingId,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Carrier") to
@@ -9050,8 +9005,8 @@ type Product struct {
 	// CustomAttributes: A list of custom (merchant-provided) attributes. It
 	// can also be used for submitting any attribute of the feed
 	// specification in its generic form (e.g., { "name": "size type",
-	// "value": "regular" }). This is useful for submitting attributes not
-	// explicitly exposed by the API.
+	// "type": "text", "value": "regular" }). This is useful for submitting
+	// attributes not explicitly exposed by the API.
 	CustomAttributes []*CustomAttribute `json:"customAttributes,omitempty"`
 
 	// CustomGroups: A list of custom (merchant-provided) custom attribute
@@ -9121,9 +9076,9 @@ type Product struct {
 	// Gtin: Global Trade Item Number (GTIN) of the item.
 	Gtin string `json:"gtin,omitempty"`
 
-	// Id: The REST ID of the product. Content API methods that operate on
+	// Id: The REST id of the product. Content API methods that operate on
 	// products take this as their productId parameter.
-	// The REST ID for a product is of the form
+	// The REST id for a product is of the form
 	// channel:contentLanguage:targetCountry:offerId.
 	Id string `json:"id,omitempty"`
 
@@ -9190,7 +9145,7 @@ type Product struct {
 	// whitespaces are stripped and multiple whitespaces are replaced by a
 	// single whitespace upon submission. Only valid unicode characters are
 	// accepted. See the products feed specification for details.
-	// Note: Content API methods that operate on products take the REST ID
+	// Note: Content API methods that operate on products take the REST id
 	// of the product, not this identifier.
 	OfferId string `json:"offerId,omitempty"`
 
@@ -9430,7 +9385,7 @@ type ProductShipping struct {
 	// represented by a location group name.
 	LocationGroupName string `json:"locationGroupName,omitempty"`
 
-	// LocationId: The numeric ID of a location that the shipping rate
+	// LocationId: The numeric id of a location that the shipping rate
 	// applies to as defined in the AdWords API.
 	LocationId int64 `json:"locationId,omitempty,string"`
 
@@ -9564,13 +9519,14 @@ func (s *ProductShippingWeight) UnmarshalJSON(data []byte) error {
 }
 
 // ProductStatus: The status of a product, i.e., information about a
-// product computed asynchronously.
+// product computed asynchronously by the data quality analysis.
 type ProductStatus struct {
 	// CreationDate: Date on which the item has been created, in ISO 8601
 	// format.
 	CreationDate string `json:"creationDate,omitempty"`
 
-	// DataQualityIssues: DEPRECATED - never populated
+	// DataQualityIssues: A list of data quality issues associated with the
+	// product.
 	DataQualityIssues []*ProductStatusDataQualityIssue `json:"dataQualityIssues,omitempty"`
 
 	// DestinationStatuses: The intended destinations for the product.
@@ -9597,7 +9553,7 @@ type ProductStatus struct {
 	// Product: Product data after applying all the join inputs.
 	Product *Product `json:"product,omitempty"`
 
-	// ProductId: The ID of the product for which status is reported.
+	// ProductId: The id of the product for which status is reported.
 	ProductId string `json:"productId,omitempty"`
 
 	// Title: The title of the product.
@@ -9631,22 +9587,32 @@ func (s *ProductStatus) MarshalJSON() ([]byte, error) {
 }
 
 type ProductStatusDataQualityIssue struct {
+	// Destination: The destination the issue applies to.
 	Destination string `json:"destination,omitempty"`
 
+	// Detail: A more detailed error string.
 	Detail string `json:"detail,omitempty"`
 
+	// FetchStatus: The fetch status for landing_page_errors.
 	FetchStatus string `json:"fetchStatus,omitempty"`
 
+	// Id: The id of the data quality issue.
 	Id string `json:"id,omitempty"`
 
+	// Location: The attribute name that is relevant for the issue.
 	Location string `json:"location,omitempty"`
 
+	// Severity: The severity of the data quality issue.
 	Severity string `json:"severity,omitempty"`
 
+	// Timestamp: The time stamp of the data quality issue.
 	Timestamp string `json:"timestamp,omitempty"`
 
+	// ValueOnLandingPage: The value of that attribute that was found on the
+	// landing page
 	ValueOnLandingPage string `json:"valueOnLandingPage,omitempty"`
 
+	// ValueProvided: The value the attribute had at time of evaluation.
 	ValueProvided string `json:"valueProvided,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Destination") to
@@ -9766,7 +9732,7 @@ type ProductTax struct {
 	// CLDR territory code.
 	Country string `json:"country,omitempty"`
 
-	// LocationId: The numeric ID of a location that the tax rate applies to
+	// LocationId: The numeric id of a location that the tax rate applies to
 	// as defined in the AdWords API.
 	LocationId int64 `json:"locationId,omitempty,string"`
 
@@ -10506,9 +10472,7 @@ type ShipmentInvoice struct {
 	// LineItemInvoices: [required] Invoice details per line item.
 	LineItemInvoices []*ShipmentInvoiceLineItemInvoice `json:"lineItemInvoices,omitempty"`
 
-	// ShipmentGroupId: [required] ID of the shipment group. It is assigned
-	// by the merchant in the shipLineItems method and is used to group
-	// multiple line items that have the same kind of shipping charges.
+	// ShipmentGroupId: [required] ID of the shipment group.
 	ShipmentGroupId string `json:"shipmentGroupId,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "InvoiceSummary") to
@@ -10544,11 +10508,8 @@ type ShipmentInvoiceLineItemInvoice struct {
 	// products service. Either lineItemId or productId must be set.
 	ProductId string `json:"productId,omitempty"`
 
-	// ShipmentUnitIds: [required] The shipment unit ID is assigned by the
-	// merchant and defines individual quantities within a line item. The
-	// same ID can be assigned to units that are the same while units that
-	// differ must be assigned a different ID (for example: free or
-	// promotional units).
+	// ShipmentUnitIds: [required] Unit IDs to define specific units within
+	// the line item.
 	ShipmentUnitIds []string `json:"shipmentUnitIds,omitempty"`
 
 	// UnitInvoice: [required] Invoice details for a single unit.
@@ -10966,7 +10927,9 @@ type TestOrder struct {
 	// delivery addresses for the delivery.
 	PredefinedDeliveryAddress string `json:"predefinedDeliveryAddress,omitempty"`
 
-	// Promotions: Deprecated. Ignored if provided.
+	// Promotions: Deprecated. The details of the merchant provided
+	// promotions applied to the order. More details about the program are
+	// here.
 	Promotions []*OrderLegacyPromotion `json:"promotions,omitempty"`
 
 	// ShippingCost: The price of shipping for all items. Shipping tax is
@@ -11005,7 +10968,7 @@ func (s *TestOrder) MarshalJSON() ([]byte, error) {
 }
 
 type TestOrderCustomer struct {
-	// Email: Email address of the customer.
+	// Email: Deprecated.
 	Email string `json:"email,omitempty"`
 
 	// ExplicitMarketingPreference: Deprecated. Please use
@@ -11119,7 +11082,7 @@ type TestOrderLineItemProduct struct {
 	// Brand: Brand of the item.
 	Brand string `json:"brand,omitempty"`
 
-	// Channel: Deprecated.
+	// Channel: The item's channel.
 	Channel string `json:"channel,omitempty"`
 
 	// Condition: Condition or state of the item.
@@ -11807,9 +11770,8 @@ func (r *AccountsService) Custombatch(accountscustombatchrequest *AccountsCustom
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *AccountsCustombatchCall) DryRun(dryRun bool) *AccountsCustombatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -11907,7 +11869,7 @@ func (c *AccountsCustombatchCall) Do(opts ...googleapi.CallOption) (*AccountsCus
 	//   "id": "content.accounts.custombatch",
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     }
@@ -11945,9 +11907,8 @@ func (r *AccountsService) Delete(merchantId uint64, accountId uint64) *AccountsD
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *AccountsDeleteCall) DryRun(dryRun bool) *AccountsDeleteCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -12037,7 +11998,7 @@ func (c *AccountsDeleteCall) Do(opts ...googleapi.CallOption) error {
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -12235,9 +12196,8 @@ func (r *AccountsService) Insert(merchantId uint64, account *Account) *AccountsI
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *AccountsInsertCall) DryRun(dryRun bool) *AccountsInsertCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -12341,7 +12301,7 @@ func (c *AccountsInsertCall) Do(opts ...googleapi.CallOption) (*Account, error) 
 	//   ],
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -12727,9 +12687,8 @@ func (r *AccountsService) Patch(merchantId uint64, accountId uint64, account *Ac
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *AccountsPatchCall) DryRun(dryRun bool) *AccountsPatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -12842,7 +12801,7 @@ func (c *AccountsPatchCall) Do(opts ...googleapi.CallOption) (*Account, error) {
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -12889,9 +12848,8 @@ func (r *AccountsService) Update(merchantId uint64, accountId uint64, account *A
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *AccountsUpdateCall) DryRun(dryRun bool) *AccountsUpdateCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -13004,7 +12962,7 @@ func (c *AccountsUpdateCall) Do(opts ...googleapi.CallOption) (*Account, error) 
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -13165,8 +13123,8 @@ type AccountstatusesGetCall struct {
 	header_      http.Header
 }
 
-// Get: Retrieves the status of a Merchant Center account. No
-// itemLevelIssues are returned for multi-client accounts.
+// Get: Retrieves the status of a Merchant Center account. Multi-client
+// accounts can only call this method for sub-accounts.
 func (r *AccountstatusesService) Get(merchantId uint64, accountId uint64) *AccountstatusesGetCall {
 	c := &AccountstatusesGetCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.merchantId = merchantId
@@ -13281,7 +13239,7 @@ func (c *AccountstatusesGetCall) Do(opts ...googleapi.CallOption) (*AccountStatu
 	}
 	return ret, nil
 	// {
-	//   "description": "Retrieves the status of a Merchant Center account. No itemLevelIssues are returned for multi-client accounts.",
+	//   "description": "Retrieves the status of a Merchant Center account. Multi-client accounts can only call this method for sub-accounts.",
 	//   "httpMethod": "GET",
 	//   "id": "content.accountstatuses.get",
 	//   "parameterOrder": [
@@ -13543,9 +13501,8 @@ func (r *AccounttaxService) Custombatch(accounttaxcustombatchrequest *Accounttax
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *AccounttaxCustombatchCall) DryRun(dryRun bool) *AccounttaxCustombatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -13643,7 +13600,7 @@ func (c *AccounttaxCustombatchCall) Do(opts ...googleapi.CallOption) (*Accountta
 	//   "id": "content.accounttax.custombatch",
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     }
@@ -14026,9 +13983,8 @@ func (r *AccounttaxService) Patch(merchantId uint64, accountId uint64, accountta
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *AccounttaxPatchCall) DryRun(dryRun bool) *AccounttaxPatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -14141,7 +14097,7 @@ func (c *AccounttaxPatchCall) Do(opts ...googleapi.CallOption) (*AccountTax, err
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -14188,9 +14144,8 @@ func (r *AccounttaxService) Update(merchantId uint64, accountId uint64, accountt
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *AccounttaxUpdateCall) DryRun(dryRun bool) *AccounttaxUpdateCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -14303,7 +14258,7 @@ func (c *AccounttaxUpdateCall) Do(opts ...googleapi.CallOption) (*AccountTax, er
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -14339,17 +14294,15 @@ type DatafeedsCustombatchCall struct {
 	header_                     http.Header
 }
 
-// Custombatch: Deletes, fetches, gets, inserts and updates multiple
-// datafeeds in a single request.
+// Custombatch:
 func (r *DatafeedsService) Custombatch(datafeedscustombatchrequest *DatafeedsCustomBatchRequest) *DatafeedsCustombatchCall {
 	c := &DatafeedsCustombatchCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.datafeedscustombatchrequest = datafeedscustombatchrequest
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *DatafeedsCustombatchCall) DryRun(dryRun bool) *DatafeedsCustombatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -14442,12 +14395,11 @@ func (c *DatafeedsCustombatchCall) Do(opts ...googleapi.CallOption) (*DatafeedsC
 	}
 	return ret, nil
 	// {
-	//   "description": "Deletes, fetches, gets, inserts and updates multiple datafeeds in a single request.",
 	//   "httpMethod": "POST",
 	//   "id": "content.datafeeds.custombatch",
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     }
@@ -14486,9 +14438,8 @@ func (r *DatafeedsService) Delete(merchantId uint64, datafeedId uint64) *Datafee
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *DatafeedsDeleteCall) DryRun(dryRun bool) *DatafeedsDeleteCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -14571,7 +14522,7 @@ func (c *DatafeedsDeleteCall) Do(opts ...googleapi.CallOption) error {
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -14611,9 +14562,8 @@ func (r *DatafeedsService) Fetchnow(merchantId uint64, datafeedId uint64) *Dataf
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *DatafeedsFetchnowCall) DryRun(dryRun bool) *DatafeedsFetchnowCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -14721,7 +14671,7 @@ func (c *DatafeedsFetchnowCall) Do(opts ...googleapi.CallOption) (*DatafeedsFetc
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -14918,9 +14868,8 @@ func (r *DatafeedsService) Insert(merchantId uint64, datafeed *Datafeed) *Datafe
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *DatafeedsInsertCall) DryRun(dryRun bool) *DatafeedsInsertCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -15024,7 +14973,7 @@ func (c *DatafeedsInsertCall) Do(opts ...googleapi.CallOption) (*Datafeed, error
 	//   ],
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -15261,9 +15210,8 @@ func (r *DatafeedsService) Patch(merchantId uint64, datafeedId uint64, datafeed 
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *DatafeedsPatchCall) DryRun(dryRun bool) *DatafeedsPatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -15376,7 +15324,7 @@ func (c *DatafeedsPatchCall) Do(opts ...googleapi.CallOption) (*Datafeed, error)
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -15424,9 +15372,8 @@ func (r *DatafeedsService) Update(merchantId uint64, datafeedId uint64, datafeed
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *DatafeedsUpdateCall) DryRun(dryRun bool) *DatafeedsUpdateCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -15539,7 +15486,7 @@ func (c *DatafeedsUpdateCall) Do(opts ...googleapi.CallOption) (*Datafeed, error
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -15575,8 +15522,7 @@ type DatafeedstatusesCustombatchCall struct {
 	header_                            http.Header
 }
 
-// Custombatch: Gets multiple Merchant Center datafeed statuses in a
-// single request.
+// Custombatch:
 func (r *DatafeedstatusesService) Custombatch(datafeedstatusescustombatchrequest *DatafeedstatusesCustomBatchRequest) *DatafeedstatusesCustombatchCall {
 	c := &DatafeedstatusesCustombatchCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.datafeedstatusescustombatchrequest = datafeedstatusescustombatchrequest
@@ -15671,7 +15617,6 @@ func (c *DatafeedstatusesCustombatchCall) Do(opts ...googleapi.CallOption) (*Dat
 	}
 	return ret, nil
 	// {
-	//   "description": "Gets multiple Merchant Center datafeed statuses in a single request.",
 	//   "httpMethod": "POST",
 	//   "id": "content.datafeedstatuses.custombatch",
 	//   "path": "datafeedstatuses/batch",
@@ -16080,9 +16025,8 @@ func (r *InventoryService) Custombatch(inventorycustombatchrequest *InventoryCus
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *InventoryCustombatchCall) DryRun(dryRun bool) *InventoryCustombatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -16180,7 +16124,7 @@ func (c *InventoryCustombatchCall) Do(opts ...googleapi.CallOption) (*InventoryC
 	//   "id": "content.inventory.custombatch",
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     }
@@ -16223,9 +16167,8 @@ func (r *InventoryService) Set(merchantId uint64, storeCode string, productId st
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *InventorySetCall) DryRun(dryRun bool) *InventorySetCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -16333,7 +16276,7 @@ func (c *InventorySetCall) Do(opts ...googleapi.CallOption) (*InventorySetRespon
 	//   ],
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -16345,7 +16288,7 @@ func (c *InventorySetCall) Do(opts ...googleapi.CallOption) (*InventorySetRespon
 	//       "type": "string"
 	//     },
 	//     "productId": {
-	//       "description": "The REST ID of the product for which to update price and availability.",
+	//       "description": "The REST id of the product for which to update price and availability.",
 	//       "location": "path",
 	//       "required": true,
 	//       "type": "string"
@@ -16389,9 +16332,8 @@ func (r *LiasettingsService) Custombatch(liasettingscustombatchrequest *Liasetti
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *LiasettingsCustombatchCall) DryRun(dryRun bool) *LiasettingsCustombatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -16489,7 +16431,7 @@ func (c *LiasettingsCustombatchCall) Do(opts ...googleapi.CallOption) (*Liasetti
 	//   "id": "content.liasettings.custombatch",
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     }
@@ -17155,9 +17097,8 @@ func (r *LiasettingsService) Patch(merchantId uint64, accountId uint64, liasetti
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *LiasettingsPatchCall) DryRun(dryRun bool) *LiasettingsPatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -17270,7 +17211,7 @@ func (c *LiasettingsPatchCall) Do(opts ...googleapi.CallOption) (*LiaSettings, e
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -17967,9 +17908,8 @@ func (r *LiasettingsService) Update(merchantId uint64, accountId uint64, liasett
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *LiasettingsUpdateCall) DryRun(dryRun bool) *LiasettingsUpdateCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -18082,7 +18022,7 @@ func (c *LiasettingsUpdateCall) Do(opts ...googleapi.CallOption) (*LiaSettings, 
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -21140,7 +21080,7 @@ type OrdersGetbymerchantorderidCall struct {
 	header_         http.Header
 }
 
-// Getbymerchantorderid: Retrieves an order using merchant order ID.
+// Getbymerchantorderid: Retrieves an order using merchant order id.
 func (r *OrdersService) Getbymerchantorderid(merchantId uint64, merchantOrderId string) *OrdersGetbymerchantorderidCall {
 	c := &OrdersGetbymerchantorderidCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.merchantId = merchantId
@@ -21248,7 +21188,7 @@ func (c *OrdersGetbymerchantorderidCall) Do(opts ...googleapi.CallOption) (*Orde
 	}
 	return ret, nil
 	// {
-	//   "description": "Retrieves an order using merchant order ID.",
+	//   "description": "Retrieves an order using merchant order id.",
 	//   "httpMethod": "GET",
 	//   "id": "content.orders.getbymerchantorderid",
 	//   "parameterOrder": [
@@ -21264,7 +21204,7 @@ func (c *OrdersGetbymerchantorderidCall) Do(opts ...googleapi.CallOption) (*Orde
 	//       "type": "string"
 	//     },
 	//     "merchantOrderId": {
-	//       "description": "The merchant order ID to be looked for.",
+	//       "description": "The merchant order id to be looked for.",
 	//       "location": "path",
 	//       "required": true,
 	//       "type": "string"
@@ -21474,13 +21414,6 @@ type OrdersInstorerefundlineitemCall struct {
 // Instorerefundlineitem: Notifies that item return and refund was
 // handled directly by merchant outside of Google payments processing
 // (e.g. cash refund done in store).
-// Note: We recommend calling the returnrefundlineitem method to refund
-// in-store returns. We will issue the refund directly to the customer.
-// This helps to prevent possible differences arising between merchant
-// and Google transaction records. We also recommend having the point of
-// sale system communicate with Google to ensure that customers do not
-// receive a double refund by first refunding via Google then via an
-// in-store return.
 func (r *OrdersService) Instorerefundlineitem(merchantId uint64, orderId string, ordersinstorerefundlineitemrequest *OrdersInStoreRefundLineItemRequest) *OrdersInstorerefundlineitemCall {
 	c := &OrdersInstorerefundlineitemCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.merchantId = merchantId
@@ -21581,7 +21514,7 @@ func (c *OrdersInstorerefundlineitemCall) Do(opts ...googleapi.CallOption) (*Ord
 	}
 	return ret, nil
 	// {
-	//   "description": "Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).\nNote: We recommend calling the returnrefundlineitem method to refund in-store returns. We will issue the refund directly to the customer. This helps to prevent possible differences arising between merchant and Google transaction records. We also recommend having the point of sale system communicate with Google to ensure that customers do not receive a double refund by first refunding via Google then via an in-store return.",
+	//   "description": "Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).",
 	//   "httpMethod": "POST",
 	//   "id": "content.orders.instorerefundlineitem",
 	//   "parameterOrder": [
@@ -22542,12 +22475,8 @@ type OrdersSetlineitemmetadataCall struct {
 	header_                          http.Header
 }
 
-// Setlineitemmetadata: Sets (or overrides if it already exists)
-// merchant provided annotations in the form of key-value pairs. A
-// common use case would be to supply us with additional structured
-// information about a line item that cannot be provided via other
-// methods. Submitted key-value pairs can be retrieved as part of the
-// orders resource.
+// Setlineitemmetadata: Sets (overrides) merchant provided annotations
+// on the line item.
 func (r *OrdersService) Setlineitemmetadata(merchantId uint64, orderId string, orderssetlineitemmetadatarequest *OrdersSetLineItemMetadataRequest) *OrdersSetlineitemmetadataCall {
 	c := &OrdersSetlineitemmetadataCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.merchantId = merchantId
@@ -22648,7 +22577,7 @@ func (c *OrdersSetlineitemmetadataCall) Do(opts ...googleapi.CallOption) (*Order
 	}
 	return ret, nil
 	// {
-	//   "description": "Sets (or overrides if it already exists) merchant provided annotations in the form of key-value pairs. A common use case would be to supply us with additional structured information about a line item that cannot be provided via other methods. Submitted key-value pairs can be retrieved as part of the orders resource.",
+	//   "description": "Sets (overrides) merchant provided annotations on the line item.",
 	//   "httpMethod": "POST",
 	//   "id": "content.orders.setlineitemmetadata",
 	//   "parameterOrder": [
@@ -23299,9 +23228,8 @@ func (r *PosService) Custombatch(poscustombatchrequest *PosCustomBatchRequest) *
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *PosCustombatchCall) DryRun(dryRun bool) *PosCustombatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -23399,7 +23327,7 @@ func (c *PosCustombatchCall) Do(opts ...googleapi.CallOption) (*PosCustomBatchRe
 	//   "id": "content.pos.custombatch",
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     }
@@ -23439,9 +23367,8 @@ func (r *PosService) Delete(merchantId uint64, targetMerchantId uint64, storeCod
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *PosDeleteCall) DryRun(dryRun bool) *PosDeleteCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -23519,7 +23446,7 @@ func (c *PosDeleteCall) Do(opts ...googleapi.CallOption) error {
 	//   ],
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -23736,9 +23663,8 @@ func (r *PosService) Insert(merchantId uint64, targetMerchantId uint64, posstore
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *PosInsertCall) DryRun(dryRun bool) *PosInsertCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -23844,7 +23770,7 @@ func (c *PosInsertCall) Do(opts ...googleapi.CallOption) (*PosStore, error) {
 	//   ],
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -23898,9 +23824,8 @@ func (r *PosService) Inventory(merchantId uint64, targetMerchantId uint64, posin
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *PosInventoryCall) DryRun(dryRun bool) *PosInventoryCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -24006,7 +23931,7 @@ func (c *PosInventoryCall) Do(opts ...googleapi.CallOption) (*PosInventoryRespon
 	//   ],
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -24213,9 +24138,8 @@ func (r *PosService) Sale(merchantId uint64, targetMerchantId uint64, possalereq
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *PosSaleCall) DryRun(dryRun bool) *PosSaleCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -24321,7 +24245,7 @@ func (c *PosSaleCall) Do(opts ...googleapi.CallOption) (*PosSaleResponse, error)
 	//   ],
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -24372,9 +24296,8 @@ func (r *ProductsService) Custombatch(productscustombatchrequest *ProductsCustom
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *ProductsCustombatchCall) DryRun(dryRun bool) *ProductsCustombatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -24472,7 +24395,7 @@ func (c *ProductsCustombatchCall) Do(opts ...googleapi.CallOption) (*ProductsCus
 	//   "id": "content.products.custombatch",
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     }
@@ -24510,9 +24433,8 @@ func (r *ProductsService) Delete(merchantId uint64, productId string) *ProductsD
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *ProductsDeleteCall) DryRun(dryRun bool) *ProductsDeleteCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -24588,7 +24510,7 @@ func (c *ProductsDeleteCall) Do(opts ...googleapi.CallOption) error {
 	//   ],
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -24600,7 +24522,7 @@ func (c *ProductsDeleteCall) Do(opts ...googleapi.CallOption) error {
 	//       "type": "string"
 	//     },
 	//     "productId": {
-	//       "description": "The REST ID of the product.",
+	//       "description": "The REST id of the product.",
 	//       "location": "path",
 	//       "required": true,
 	//       "type": "string"
@@ -24749,7 +24671,7 @@ func (c *ProductsGetCall) Do(opts ...googleapi.CallOption) (*Product, error) {
 	//       "type": "string"
 	//     },
 	//     "productId": {
-	//       "description": "The REST ID of the product.",
+	//       "description": "The REST id of the product.",
 	//       "location": "path",
 	//       "required": true,
 	//       "type": "string"
@@ -24787,9 +24709,8 @@ func (r *ProductsService) Insert(merchantId uint64, product *Product) *ProductsI
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *ProductsInsertCall) DryRun(dryRun bool) *ProductsInsertCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -24893,7 +24814,7 @@ func (c *ProductsInsertCall) Do(opts ...googleapi.CallOption) (*Product, error) 
 	//   ],
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -25421,7 +25342,7 @@ func (c *ProductstatusesGetCall) Do(opts ...googleapi.CallOption) (*ProductStatu
 	//       "type": "string"
 	//     },
 	//     "productId": {
-	//       "description": "The REST ID of the product.",
+	//       "description": "The REST id of the product.",
 	//       "location": "path",
 	//       "required": true,
 	//       "type": "string"
@@ -25687,9 +25608,8 @@ func (r *ShippingsettingsService) Custombatch(shippingsettingscustombatchrequest
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *ShippingsettingsCustombatchCall) DryRun(dryRun bool) *ShippingsettingsCustombatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -25788,7 +25708,7 @@ func (c *ShippingsettingsCustombatchCall) Do(opts ...googleapi.CallOption) (*Shi
 	//   "id": "content.shippingsettings.custombatch",
 	//   "parameters": {
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     }
@@ -26461,9 +26381,8 @@ func (r *ShippingsettingsService) Patch(merchantId uint64, accountId uint64, shi
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *ShippingsettingsPatchCall) DryRun(dryRun bool) *ShippingsettingsPatchCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -26576,7 +26495,7 @@ func (c *ShippingsettingsPatchCall) Do(opts ...googleapi.CallOption) (*ShippingS
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },
@@ -26623,9 +26542,8 @@ func (r *ShippingsettingsService) Update(merchantId uint64, accountId uint64, sh
 	return c
 }
 
-// DryRun sets the optional parameter "dryRun": Flag to simulate a
-// request like in a live environment. If set to true, dry-run mode
-// checks the validity of the request and returns errors (if any).
+// DryRun sets the optional parameter "dryRun": Flag to run the request
+// in dry-run mode.
 func (c *ShippingsettingsUpdateCall) DryRun(dryRun bool) *ShippingsettingsUpdateCall {
 	c.urlParams_.Set("dryRun", fmt.Sprint(dryRun))
 	return c
@@ -26738,7 +26656,7 @@ func (c *ShippingsettingsUpdateCall) Do(opts ...googleapi.CallOption) (*Shipping
 	//       "type": "string"
 	//     },
 	//     "dryRun": {
-	//       "description": "Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).",
+	//       "description": "Flag to run the request in dry-run mode.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     },

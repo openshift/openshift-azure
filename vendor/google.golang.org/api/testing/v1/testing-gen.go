@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,39 +6,13 @@
 
 // Package testing provides access to the Cloud Testing API.
 //
-// For product documentation, see: https://developers.google.com/cloud-test-lab/
-//
-// Creating a client
+// See https://developers.google.com/cloud-test-lab/
 //
 // Usage example:
 //
 //   import "google.golang.org/api/testing/v1"
 //   ...
-//   ctx := context.Background()
-//   testingService, err := testing.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
-//
-//   testingService, err := testing.NewService(ctx, option.WithScopes(testing.CloudPlatformReadOnlyScope))
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   testingService, err := testing.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   testingService, err := testing.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   testingService, err := testing.New(oauthHttpClient)
 package testing // import "google.golang.org/api/testing/v1"
 
 import (
@@ -55,8 +29,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -87,33 +59,6 @@ const (
 	CloudPlatformReadOnlyScope = "https://www.googleapis.com/auth/cloud-platform.read-only"
 )
 
-// NewService creates a new Service.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/cloud-platform",
-		"https://www.googleapis.com/auth/cloud-platform.read-only",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new Service. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -2522,12 +2467,6 @@ type TestMatrix struct {
 	// that are not allowed.
 	//   "INVALID_ROBO_DIRECTIVES" - There is a conflict in the provided
 	// robo_directives.
-	//   "INVALID_RESOURCE_NAME" - There is at least one invalid resource
-	// name in the provided
-	// robo directives
-	//   "INVALID_DIRECTIVE_ACTION" - Invalid definition of action in the
-	// robo directives
-	// (e.g. a click or ignore action includes an input text field)
 	//   "TEST_LOOP_INTENT_FILTER_NOT_FOUND" - There there is no test loop
 	// intent filter, or the one that is given is
 	// not formatted correctly.
@@ -2758,6 +2697,20 @@ type TestSpecification struct {
 
 	// AndroidTestLoop: An Android Application with a Test Loop.
 	AndroidTestLoop *AndroidTestLoop `json:"androidTestLoop,omitempty"`
+
+	// AutoGoogleLogin: Enables automatic Google account login.
+	// If set, the service will automatically generate a Google test account
+	// and
+	// add it to the device, before executing the test. Note that test
+	// accounts
+	// might be reused.
+	// Many applications show their full set of functionalities when an
+	// account is
+	// present on the device. Logging into the device with these
+	// generated
+	// accounts allows testing more functionalities.
+	// Default is false.
+	AutoGoogleLogin bool `json:"autoGoogleLogin,omitempty"`
 
 	// DisablePerformanceMetrics: Disables performance metrics recording;
 	// may reduce test latency.

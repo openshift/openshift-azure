@@ -5,6 +5,10 @@ matrix:
   include:
   - language: java
     jdk: oraclejdk8
+    env: BUILD=MVN
+
+  - language: java
+    jdk: oraclejdk8
     env: BUILD=BAZEL
 
   - language: java
@@ -23,16 +27,24 @@ install:
   - case "$BUILD" in
       "BAZEL")
         sudo apt-get install bazel ;
-        echo "build --disk_cache=$HOME/bazel-cache" > ~/.bazelrc ;
-        echo "build --experimental_strict_action_env" >> ~/.bazelrc ;
         bazel version;;
+      "MVN")
+        mkdir protoc ;
+        cd protoc ;
+        curl -L -o protoc.zip https://github.com/google/protobuf/releases/download/v3.0.2/protoc-3.0.2-linux-x86_64.zip ;
+        unzip protoc.zip ;
+        export PATH=`pwd`/bin/:$PATH ;
+        protoc --version ;
+        cd .. ;;
     esac
 
 script:
   - case "$BUILD" in
       "BAZEL")
-        cd src ;
+        cd src;
         bazel build --show_result=100 ... ;;
+      "MVN")
+        mvn verify ;;
       "GRADLE")
         ./gradlew clean assemble --stacktrace ;
         ./gradlew check --stacktrace ;;
@@ -49,4 +61,3 @@ cache:
     - $HOME/.gradle
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-    - $HOME/bazel-cache/

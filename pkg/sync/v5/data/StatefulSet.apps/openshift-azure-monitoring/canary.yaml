@@ -17,7 +17,9 @@ spec:
         k8s-app: canary
     spec:
       containers:
-      - env:
+      - args:
+        - canary
+        env:
         - name: HOSTNAME
           valueFrom:
             fieldRef:

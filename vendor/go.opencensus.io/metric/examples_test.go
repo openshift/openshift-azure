@@ -25,13 +25,10 @@ func ExampleRegistry_AddInt64Gauge() {
 	r := metric.NewRegistry()
 	// TODO: allow exporting from a registry
 
-	g, _ := r.AddInt64Gauge("active_request",
-		metric.WithDescription("Number of active requests, per method."),
-		metric.WithUnit(metricdata.UnitDimensionless),
-		metric.WithLabelKeys("method"))
+	g := r.AddInt64Gauge("active_request", "Number of active requests, per method.", metricdata.UnitDimensionless, "method")
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		e, _ := g.GetEntry(metricdata.NewLabelValue(request.Method))
+		e := g.GetEntry(metricdata.NewLabelValue(request.Method))
 		e.Add(1)
 		defer e.Add(-1)
 		// process request ...

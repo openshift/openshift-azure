@@ -14,15 +14,11 @@
 
 package(default_visibility = ["//visibility:public"])
 
-load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
-
 proto_library(
     name = "metrics_proto",
     srcs = ["metrics.proto"],
     deps = [
         "@com_google_protobuf//:timestamp_proto",
-        "@com_google_protobuf//:wrappers_proto",
-        "//opencensus/proto/resource/v1:resource_proto",
     ],
 )
 
@@ -34,15 +30,4 @@ cc_proto_library(
 java_proto_library(
     name = "metrics_proto_java",
     deps = [":metrics_proto"],
-)
-
-go_proto_library(
-    name = "metrics_proto_go",
-    proto = ":metrics_proto",
-    importpath = "github.com/census-instrumentation/opencensus-proto/gen-go/metrics/v1",
-    deps = [
-        "//opencensus/proto/resource/v1:resource_proto_go",
-        "@com_github_golang_protobuf//ptypes/timestamp:go_default_library",
-        "@com_github_golang_protobuf//ptypes/wrappers:go_default_library",
-    ],
 )

@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,35 +6,13 @@
 
 // Package storagetransfer provides access to the Storage Transfer API.
 //
-// For product documentation, see: https://cloud.google.com/storage-transfer/docs
-//
-// Creating a client
+// See https://cloud.google.com/storage/transfer
 //
 // Usage example:
 //
 //   import "google.golang.org/api/storagetransfer/v1"
 //   ...
-//   ctx := context.Background()
-//   storagetransferService, err := storagetransfer.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   storagetransferService, err := storagetransfer.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   storagetransferService, err := storagetransfer.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   storagetransferService, err := storagetransfer.New(oauthHttpClient)
 package storagetransfer // import "google.golang.org/api/storagetransfer/v1"
 
 import (
@@ -51,8 +29,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -80,32 +56,6 @@ const (
 	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 )
 
-// NewService creates a new Service.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/cloud-platform",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new Service. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -783,8 +733,7 @@ func (s *ListTransferJobsResponse) MarshalJSON() ([]byte, error) {
 }
 
 // ObjectConditions: Conditions that determine which objects will be
-// transferred. Applies only
-// to S3 and GCS objects.
+// transferred.
 type ObjectConditions struct {
 	// ExcludePrefixes: `excludePrefixes` must follow the requirements
 	// described for
@@ -845,34 +794,22 @@ type ObjectConditions struct {
 	// The max size of `includePrefixes` is 1000.
 	IncludePrefixes []string `json:"includePrefixes,omitempty"`
 
-	// MaxTimeElapsedSinceLastModification: If specified, only objects with
-	// a `lastModificationTime` on or after
-	// `NOW` - `maxTimeElapsedSinceLastModification` and objects that don't
-	// have
-	// a `lastModificationTime` are transferred.
-	//
-	// Note that `NOW` refers to the creation time of the transfer job,
-	// and
-	// `lastModificationTime` refers to the time of the last change to
-	// the
-	// object's content or metadata. Specifically, this would be the
-	// `updated`
-	// property of GCS objects and the `LastModified` field of S3 objects.
+	// MaxTimeElapsedSinceLastModification:
+	// `maxTimeElapsedSinceLastModification` is the complement
+	// to
+	// `minTimeElapsedSinceLastModification`.
 	MaxTimeElapsedSinceLastModification string `json:"maxTimeElapsedSinceLastModification,omitempty"`
 
-	// MinTimeElapsedSinceLastModification: If specified, only objects with
-	// a `lastModificationTime` before
-	// `NOW` - `minTimeElapsedSinceLastModification` and objects that don't
-	// have a
-	// `lastModificationTime` are transferred.
-	//
-	// Note that `NOW` refers to the creation time of the transfer job,
-	// and
-	// `lastModificationTime` refers to the time of the last change to
-	// the
-	// object's content or metadata. Specifically, this would be the
-	// `updated`
-	// property of GCS objects and the `LastModified` field of S3 objects.
+	// MinTimeElapsedSinceLastModification: If unspecified,
+	// `minTimeElapsedSinceLastModification` takes a zero value
+	// and `maxTimeElapsedSinceLastModification` takes the maximum
+	// possible
+	// value of Duration. Objects that satisfy the object conditions
+	// must either have a `lastModificationTime` greater or equal to
+	// `NOW` - `maxTimeElapsedSinceLastModification` and less than
+	// `NOW` - `minTimeElapsedSinceLastModification`, or not have
+	// a
+	// `lastModificationTime`.
 	MinTimeElapsedSinceLastModification string `json:"minTimeElapsedSinceLastModification,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "ExcludePrefixes") to
@@ -1034,20 +971,20 @@ func (s *Schedule) MarshalJSON() ([]byte, error) {
 }
 
 // Status: The `Status` type defines a logical error model that is
-// suitable for
-// different programming environments, including REST APIs and RPC APIs.
-// It is
-// used by [gRPC](https://github.com/grpc). The error model is designed
-// to be:
+// suitable for different
+// programming environments, including REST APIs and RPC APIs. It is
+// used by
+// [gRPC](https://github.com/grpc). The error model is designed to
+// be:
 //
 // - Simple to use and understand for most users
 // - Flexible enough to meet unexpected needs
 //
 // # Overview
 //
-// The `Status` message contains three pieces of data: error code,
-// error
-// message, and error details. The error code should be an enum value
+// The `Status` message contains three pieces of data: error code, error
+// message,
+// and error details. The error code should be an enum value
 // of
 // google.rpc.Code, but it may accept additional error codes if needed.
 // The
@@ -2059,12 +1996,11 @@ func (r *TransferJobsService) List() *TransferJobsListCall {
 // "job_statuses":["status1","status2",...]}.
 // Since `job_names` and `job_statuses` support multiple values, their
 // values
-// must be specified with array notation. `project_id` is
-// required.
-// `job_names` and `job_statuses` are optional.  The valid values
-// for
-// `job_statuses` are case-insensitive: `ENABLED`, `DISABLED`, and
-// `DELETED`.
+// must be specified with array notation. `project_id` is required.
+// `job_names`
+// and `job_statuses` are optional.  The valid values for `job_statuses`
+// are
+// case-insensitive: `ENABLED`, `DISABLED`, and `DELETED`.
 func (c *TransferJobsListCall) Filter(filter string) *TransferJobsListCall {
 	c.urlParams_.Set("filter", filter)
 	return c
@@ -2186,7 +2122,7 @@ func (c *TransferJobsListCall) Do(opts ...googleapi.CallOption) (*ListTransferJo
 	//   "parameterOrder": [],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "A list of query parameters specified as JSON text in the form of\n{\"project_id\":\"my_project_id\",\n\"job_names\":[\"jobid1\",\"jobid2\",...],\n\"job_statuses\":[\"status1\",\"status2\",...]}.\nSince `job_names` and `job_statuses` support multiple values, their values\nmust be specified with array notation. `project_id` is required.\n`job_names` and `job_statuses` are optional.  The valid values for\n`job_statuses` are case-insensitive: `ENABLED`, `DISABLED`, and `DELETED`.",
+	//       "description": "A list of query parameters specified as JSON text in the form of\n{\"project_id\":\"my_project_id\",\n\"job_names\":[\"jobid1\",\"jobid2\",...],\n\"job_statuses\":[\"status1\",\"status2\",...]}.\nSince `job_names` and `job_statuses` support multiple values, their values\nmust be specified with array notation. `project_id` is required. `job_names`\nand `job_statuses` are optional.  The valid values for `job_statuses` are\ncase-insensitive: `ENABLED`, `DISABLED`, and `DELETED`.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },

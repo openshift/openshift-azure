@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,39 +8,13 @@
 //
 // This package is DEPRECATED. Use package cloud.google.com/go/kms/apiv1 instead.
 //
-// For product documentation, see: https://cloud.google.com/kms/
-//
-// Creating a client
+// See https://cloud.google.com/kms/
 //
 // Usage example:
 //
 //   import "google.golang.org/api/cloudkms/v1"
 //   ...
-//   ctx := context.Background()
-//   cloudkmsService, err := cloudkms.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
-//
-//   cloudkmsService, err := cloudkms.NewService(ctx, option.WithScopes(cloudkms.CloudkmsScope))
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   cloudkmsService, err := cloudkms.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   cloudkmsService, err := cloudkms.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   cloudkmsService, err := cloudkms.New(oauthHttpClient)
 package cloudkms // import "google.golang.org/api/cloudkms/v1"
 
 import (
@@ -57,8 +31,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -90,33 +62,6 @@ const (
 	CloudkmsScope = "https://www.googleapis.com/auth/cloudkms"
 )
 
-// NewService creates a new Service.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/cloud-platform",
-		"https://www.googleapis.com/auth/cloudkms",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new Service. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -497,7 +442,8 @@ func (s *AuditLogConfig) MarshalJSON() ([]byte, error) {
 
 // Binding: Associates `members` with a `role`.
 type Binding struct {
-	// Condition: The condition that is associated with this binding.
+	// Condition: Unimplemented. The condition that is associated with this
+	// binding.
 	// NOTE: an unsatisfied condition will not allow user access via
 	// current
 	// binding. Different bindings, including their conditions, are
@@ -532,7 +478,7 @@ type Binding struct {
 	//    For example, `admins@example.com`.
 	//
 	//
-	// * `domain:{domain}`: The G Suite domain (primary) that represents all
+	// * `domain:{domain}`: A Google Apps domain name that represents all
 	// the
 	//    users of that domain. For example, `google.com` or
 	// `example.com`.
@@ -1163,10 +1109,7 @@ func (s *Expr) MarshalJSON() ([]byte, error) {
 }
 
 // KeyOperationAttestation: Contains an HSM-generated attestation about
-// a key operation. For more
-// information, see [Verifying
-// attestations]
-// (https://cloud.google.com/kms/docs/attest-key).
+// a key operation.
 type KeyOperationAttestation struct {
 	// Content: Output only. The attestation data provided by the HSM when
 	// the key
@@ -1180,9 +1123,6 @@ type KeyOperationAttestation struct {
 	//   "CAVIUM_V1_COMPRESSED" - Cavium HSM attestation compressed with
 	// gzip. Note that this format is
 	// defined by Cavium and subject to change at any time.
-	//   "CAVIUM_V2_COMPRESSED" - Cavium HSM attestation V2 compressed with
-	// gzip. This is a new format
-	// introduced in Cavium's version 3.2-08.
 	Format string `json:"format,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Content") to

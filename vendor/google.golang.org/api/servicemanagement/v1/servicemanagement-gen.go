@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,39 +6,13 @@
 
 // Package servicemanagement provides access to the Service Management API.
 //
-// For product documentation, see: https://cloud.google.com/service-management/
-//
-// Creating a client
+// See https://cloud.google.com/service-management/
 //
 // Usage example:
 //
 //   import "google.golang.org/api/servicemanagement/v1"
 //   ...
-//   ctx := context.Background()
-//   servicemanagementService, err := servicemanagement.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
-//
-//   servicemanagementService, err := servicemanagement.NewService(ctx, option.WithScopes(servicemanagement.ServiceManagementReadonlyScope))
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   servicemanagementService, err := servicemanagement.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   servicemanagementService, err := servicemanagement.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   servicemanagementService, err := servicemanagement.New(oauthHttpClient)
 package servicemanagement // import "google.golang.org/api/servicemanagement/v1"
 
 import (
@@ -55,8 +29,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -93,35 +65,6 @@ const (
 	ServiceManagementReadonlyScope = "https://www.googleapis.com/auth/service.management.readonly"
 )
 
-// NewService creates a new APIService.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*APIService, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/cloud-platform",
-		"https://www.googleapis.com/auth/cloud-platform.read-only",
-		"https://www.googleapis.com/auth/service.management",
-		"https://www.googleapis.com/auth/service.management.readonly",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new APIService. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*APIService, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -489,10 +432,9 @@ func (s *AuditLogConfig) MarshalJSON() ([]byte, error) {
 
 // AuthProvider: Configuration for an anthentication provider, including
 // support for
-// [JSON Web
-// Token
-// (JWT)](https://tools.ietf.org/html/draft-ietf-oauth-json-web-tok
-// en-32).
+// [JSON Web Token
+// (JWT)](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-32)
+// .
 type AuthProvider struct {
 	// Audiences: The list of
 	// JWT
@@ -539,21 +481,18 @@ type AuthProvider struct {
 	Issuer string `json:"issuer,omitempty"`
 
 	// JwksUri: URL of the provider's public key set to validate signature
-	// of the JWT.
-	// See
+	// of the JWT. See
 	// [OpenID
-	// Discovery](https://openid.net/specs/openid-connect-discove
-	// ry-1_0.html#ProviderMetadata).
+	// Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html#
+	// ProviderMetadata).
 	// Optional if the key set document:
 	//  - can be retrieved from
 	//    [OpenID
-	//
 	// Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html
-	// of
-	//    the issuer.
-	//  - can be inferred from the email domain of the issuer (e.g. a
-	// Google
-	//  service account).
+	//
+	//    of the issuer.
+	//  - can be inferred from the email domain of the issuer (e.g. a Google
+	// service account).
 	//
 	// Example: https://www.googleapis.com/oauth2/v1/certs
 	JwksUri string `json:"jwksUri,omitempty"`
@@ -583,10 +522,9 @@ func (s *AuthProvider) MarshalJSON() ([]byte, error) {
 
 // AuthRequirement: User-defined authentication requirements, including
 // support for
-// [JSON Web
-// Token
-// (JWT)](https://tools.ietf.org/html/draft-ietf-oauth-json-web-tok
-// en-32).
+// [JSON Web Token
+// (JWT)](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-32)
+// .
 type AuthRequirement struct {
 	// Audiences: NOTE: This will be deprecated soon, once
 	// AuthProvider.audiences is
@@ -872,12 +810,10 @@ type BackendRule struct {
 	//
 	//     Request path: /api/company/widgetworks/user/johndoe
 	//     Translated:
-	//
 	// https://example.cloudfunctions.net/getUser?cid=widgetworks&uid=johndoe
 	//
 	//     Request path: /api/company/widgetworks/user/johndoe?timezone=EST
 	//     Translated:
-	//
 	// https://example.cloudfunctions.net/getUser?timezone=EST&cid=widgetworks&uid=johndoe
 	//   "APPEND_PATH_TO_ADDRESS" - The request path will be appended to the
 	// backend address.
@@ -895,12 +831,10 @@ type BackendRule struct {
 	//
 	//     Request path: /api/company/widgetworks/user/johndoe
 	//     Translated:
-	//
 	// https://example.appspot.com/api/company/widgetworks/user/johndoe
 	//
 	//     Request path: /api/company/widgetworks/user/johndoe?timezone=EST
 	//     Translated:
-	//
 	// https://example.appspot.com/api/company/widgetworks/user/johndoe?timezone=EST
 	PathTranslation string `json:"pathTranslation,omitempty"`
 
@@ -1047,7 +981,8 @@ func (s *BillingDestination) MarshalJSON() ([]byte, error) {
 
 // Binding: Associates `members` with a `role`.
 type Binding struct {
-	// Condition: The condition that is associated with this binding.
+	// Condition: Unimplemented. The condition that is associated with this
+	// binding.
 	// NOTE: an unsatisfied condition will not allow user access via
 	// current
 	// binding. Different bindings, including their conditions, are
@@ -1082,7 +1017,7 @@ type Binding struct {
 	//    For example, `admins@example.com`.
 	//
 	//
-	// * `domain:{domain}`: The G Suite domain (primary) that represents all
+	// * `domain:{domain}`: A Google Apps domain name that represents all
 	// the
 	//    users of that domain. For example, `google.com` or
 	// `example.com`.
@@ -1197,11 +1132,10 @@ type ConfigChange struct {
 	// 'key' is used. If the field has no unique identifier, the numeric
 	// index
 	// is used.
-	// ##
 	// Examples:
-	//
-	// visibility.rules[selector=="google.LibraryService.CreateBoo
-	// k"].restriction
+	// -
+	// visibility.rules[selector=="google.LibraryService.CreateBook"].restric
+	// tion
 	// -
 	// quota.metric_rules[selector=="google"].metric_costs[key=="reads"].valu
 	// e
@@ -1861,8 +1795,8 @@ func (s *Documentation) MarshalJSON() ([]byte, error) {
 // individual API elements.
 type DocumentationRule struct {
 	// DeprecationDescription: Deprecation description of the selected
-	// element(s). It can be provided if
-	// an element is marked as `deprecated`.
+	// element(s). It can be provided if an
+	// element is marked as `deprecated`.
 	DeprecationDescription string `json:"deprecationDescription,omitempty"`
 
 	// Description: Description of the selected API(s).
@@ -1875,10 +1809,10 @@ type DocumentationRule struct {
 	// Wildcards are only allowed at the end and for a whole component of
 	// the
 	// qualified name, i.e. "foo.*" is ok, but not "foo.b*" or "foo.*.bar".
-	// A
-	// wildcard will match one or more components. To specify a default for
-	// all
-	// applicable elements, the whole pattern "*" is used.
+	// To
+	// specify a default for all applicable elements, the whole pattern
+	// "*"
+	// is used.
 	Selector string `json:"selector,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g.
@@ -1997,13 +1931,11 @@ type Endpoint struct {
 
 	// Target: The specification of an Internet routable address of API
 	// frontend that will
-	// handle requests to this
-	// [API
-	// Endpoint](https://cloud.google.com/apis/design/glossary). It should
-	// be
-	// either a valid IPv4 address or a fully-qualified domain name. For
-	// example,
-	// "8.8.8.8" or "myservice.appspot.com".
+	// handle requests to this [API
+	// Endpoint](https://cloud.google.com/apis/design/glossary).
+	// It should be either a valid IPv4 address or a fully-qualified domain
+	// name.
+	// For example, "8.8.8.8" or "myservice.appspot.com".
 	Target string `json:"target,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Aliases") to
@@ -4184,8 +4116,8 @@ func (s *Option) MarshalJSON() ([]byte, error) {
 // nested documentation set structure.
 type Page struct {
 	// Content: The Markdown content of the page. You can use <code>&#40;==
-	// include {path}
-	// ==&#41;</code> to include content from a Markdown file.
+	// include {path} ==&#41;</code>
+	// to include content from a Markdown file.
 	Content string `json:"content,omitempty"`
 
 	// Name: The name of the page. It will be used as an identity of the
@@ -4351,7 +4283,7 @@ func (s *Policy) MarshalJSON() ([]byte, error) {
 // service
 // usage.
 //
-// The metric based quota configuration works this way:
+// The quota configuration works this way:
 // - The service configuration defines a set of metrics.
 // - For API calls, the quota.metric_rules maps methods to metrics with
 //   corresponding costs.
@@ -4400,8 +4332,6 @@ func (s *Policy) MarshalJSON() ([]byte, error) {
 //        display_name: Write requests
 //        metric_kind: DELTA
 //        value_type: INT64
-//
-//
 type Quota struct {
 	// Limits: List of `QuotaLimit` definitions for the service.
 	Limits []*QuotaLimit `json:"limits,omitempty"`
@@ -4964,20 +4894,20 @@ func (s *SourceInfo) MarshalJSON() ([]byte, error) {
 }
 
 // Status: The `Status` type defines a logical error model that is
-// suitable for
-// different programming environments, including REST APIs and RPC APIs.
-// It is
-// used by [gRPC](https://github.com/grpc). The error model is designed
-// to be:
+// suitable for different
+// programming environments, including REST APIs and RPC APIs. It is
+// used by
+// [gRPC](https://github.com/grpc). The error model is designed to
+// be:
 //
 // - Simple to use and understand for most users
 // - Flexible enough to meet unexpected needs
 //
 // # Overview
 //
-// The `Status` message contains three pieces of data: error code,
-// error
-// message, and error details. The error code should be an enum value
+// The `Status` message contains three pieces of data: error code, error
+// message,
+// and error details. The error code should be an enum value
 // of
 // google.rpc.Code, but it may accept additional error codes if needed.
 // The

@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -8,39 +8,13 @@
 //
 // This package is DEPRECATED. Use package cloud.google.com/go/logging instead.
 //
-// For product documentation, see: https://cloud.google.com/logging/docs/
-//
-// Creating a client
+// See https://cloud.google.com/logging/docs/
 //
 // Usage example:
 //
 //   import "google.golang.org/api/logging/v2beta1"
 //   ...
-//   ctx := context.Background()
-//   loggingService, err := logging.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
-//
-//   loggingService, err := logging.NewService(ctx, option.WithScopes(logging.LoggingWriteScope))
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   loggingService, err := logging.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   loggingService, err := logging.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   loggingService, err := logging.New(oauthHttpClient)
 package logging // import "google.golang.org/api/logging/v2beta1"
 
 import (
@@ -57,8 +31,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -98,36 +70,6 @@ const (
 	LoggingWriteScope = "https://www.googleapis.com/auth/logging.write"
 )
 
-// NewService creates a new Service.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/cloud-platform",
-		"https://www.googleapis.com/auth/cloud-platform.read-only",
-		"https://www.googleapis.com/auth/logging.admin",
-		"https://www.googleapis.com/auth/logging.read",
-		"https://www.googleapis.com/auth/logging.write",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new Service. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -427,8 +369,7 @@ type HttpRequest struct {
 	Status int64 `json:"status,omitempty"`
 
 	// UserAgent: The user agent sent by the client. Example: "Mozilla/4.0
-	// (compatible; MSIE 6.0; Windows 98; Q312461; .NET
-	// CLR 1.0.3705)".
+	// (compatible; MSIE 6.0; Windows 98; Q312461; .NET CLR 1.0.3705)".
 	UserAgent string `json:"userAgent,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "CacheFillBytes") to
@@ -584,7 +525,9 @@ type ListLogEntriesRequest struct {
 
 	// ProjectIds: Deprecated. Use resource_names instead. One or more
 	// project identifiers or project numbers from which to retrieve log
-	// entries. Example: "my-project-1A".
+	// entries. Example: "my-project-1A". If present, these project
+	// identifiers are converted to resource name format and added to the
+	// list of resources in resource_names.
 	ProjectIds []string `json:"projectIds,omitempty"`
 
 	// ResourceNames: Required. Names of one or more parent resources from
@@ -828,15 +771,9 @@ type LogEntry struct {
 	// never return any results.
 	LogName string `json:"logName,omitempty"`
 
-	// Metadata: Deprecated. Output only. Additional metadata about the
-	// monitored resource.Only k8s_container, k8s_pod, and k8s_node
-	// MonitoredResources have this field populated for GKE versions older
-	// than 1.12.6. For GKE versions 1.12.6 and above, the metadata field
-	// has been deprecated. The Kubernetes pod labels that used to be in
-	// metadata.userLabels will now be present in the labels field with a
-	// key prefix of k8s-pod/. The Stackdriver system labels that were
-	// present in the metadata.systemLabels field will no longer be
-	// available in the LogEntry.
+	// Metadata: Output only. Additional metadata about the monitored
+	// resource.Only k8s_container, k8s_pod, and k8s_node MonitoredResources
+	// have this field populated.
 	Metadata *MonitoredResourceMetadata `json:"metadata,omitempty"`
 
 	// Operation: Optional. Information about an operation associated with

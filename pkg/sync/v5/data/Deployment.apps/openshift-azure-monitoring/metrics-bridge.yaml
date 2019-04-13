@@ -38,8 +38,9 @@ spec:
           name: mdm-cert
         - mountPath: /var/etw
           name: socket
-      - command:
-        - /metricsbridge
+      - args:
+        - metricsbridge
+        - --config
         - /config/config.yaml
         image: '*** GENERATED ***'
         name: metricsbridge

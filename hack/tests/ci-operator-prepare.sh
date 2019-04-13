@@ -5,17 +5,11 @@ set_build_images() {
         return
     fi
 
-    export SYNC_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:sync
-    export ETCDBACKUP_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:etcdbackup
-    export AZURE_CONTROLLERS_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:azure-controllers
-    export METRICSBRIDGE_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:metricsbridge
-    export STARTUP_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:startup
-    export TLSPROXY_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:tlsproxy
-    export CANARY_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:canary
+    export AZURE_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:azure
 }
 
 start_monitoring() {
-    make monitoring-build
+    make monitoring
     if [[ -n "$ARTIFACT_DIR" ]]; then
         outputdir="-outputdir=$ARTIFACT_DIR"
     fi

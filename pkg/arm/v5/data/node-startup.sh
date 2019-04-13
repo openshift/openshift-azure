@@ -28,7 +28,7 @@ done
 set +x
 export SASURI='{{ .Config.WorkerStartupSASURI }}'
 set -x
-docker run --privileged --rm --network host -v /:/host:z -e SASURI {{ .Config.Images.Startup }}
+docker run --privileged --rm --network host -v /:/host:z -e SASURI {{ .Config.Images.Startup }} startup
 unset SASURI
 
 update-ca-trust

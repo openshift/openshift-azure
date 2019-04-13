@@ -1,25 +1,15 @@
 TAG=$(shell git describe --tags HEAD)
 GITCOMMIT=$(TAG)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
 LDFLAGS="-X main.gitCommit=$(GITCOMMIT)"
-E2E_IMAGE ?= quay.io/openshift-on-azure/e2e-tests:$(TAG)
-AZURE_CONTROLLERS_IMAGE ?= quay.io/openshift-on-azure/azure-controllers:$(TAG)
-ETCDBACKUP_IMAGE ?= quay.io/openshift-on-azure/etcdbackup:$(TAG)
-TLSPROXY_IMAGE ?= quay.io/openshift-on-azure/tlsproxy:$(TAG)
-METRICSBRIDGE_IMAGE ?= quay.io/openshift-on-azure/metricsbridge:$(TAG)
-SYNC_IMAGE ?= quay.io/openshift-on-azure/sync:$(TAG)
-STARTUP_IMAGE ?= quay.io/openshift-on-azure/startup:$(TAG)
-CANARY_IMAGE ?= quay.io/openshift-on-azure/canary:$(TAG)
 
-ALL_BINARIES = azure-controllers e2e-tests etcdbackup sync metricsbridge startup tlsproxy canary
-ALL_IMAGES = $(addsuffix -image, $(ALL_BINARIES))
-ALL_PUSHES = $(addsuffix -push, $(ALL_BINARIES))
+AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(TAG)
 
 GOPATH ?= $(HOME)/go
 IMAGEBUILDER = ${GOPATH}/bin/imagebuilder
 
-.PHONY: $(ALL_PUSHES) $(ALL_IMAGES) all version clean test unit generate pullregistry secrets
+.PHONY: azure-image azure-push all version clean test unit generate pullregistry secrets
 # all is the default target to build everything
-all: $(ALL_BINARIES)
+all: azure
 
 version:
 	@echo $(GITCOMMIT)
@@ -30,7 +20,7 @@ secrets:
 	oc extract -n azure secret/cluster-secrets-azure --to=secrets
 
 clean:
-	rm -f coverage.out $(ALL_BINARIES) releasenotes
+	rm -f coverage.out azure releasenotes
 
 generate:
 	go generate ./...
@@ -50,100 +40,28 @@ upgrade:
 artifacts:
 	./hack/artifacts.sh
 
-azure-controllers: generate
+azure-image: azure $(IMAGEBUILDER) pullregistry
+	$(IMAGEBUILDER) -f images/azure/Dockerfile -t $(AZURE_IMAGE) .
+
+azure-push: azure-image
+	docker push $(AZURE_IMAGE)
+
+azure: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
-azure-controllers-image: azure-controllers $(IMAGEBUILDER) pullregistry
-	$(IMAGEBUILDER) -f images/azure-controllers/Dockerfile -t $(AZURE_CONTROLLERS_IMAGE) .
+sync-run: generate
+	go run -ldflags ${LDFLAGS} ./cmd/azure sync --run-once --loglevel Debug
 
-azure-controllers-push: azure-controllers-image
-	docker push $(AZURE_CONTROLLERS_IMAGE)
+.PHONY: sync-run
 
-# for backwards compat
-.PHONY: e2e-bin e2e-image e2e-push
-e2e-bin: e2e-tests
-e2e-image: e2e-tests-image
-e2e-push: e2e-tests-push
-
-e2e-tests: generate
-	go test -ldflags ${LDFLAGS} -tags e2e -c -o ./e2e-tests ./test/e2e
-
-e2e-tests-image: e2e-tests $(IMAGEBUILDER) pullregistry
-	$(IMAGEBUILDER) -f images/e2e-tests/Dockerfile -t $(E2E_IMAGE) .
-
-e2e-tests-push: e2e-tests-image
-	docker push $(E2E_IMAGE)
-
-etcdbackup: generate
+monitoring: generate
 	go build -ldflags ${LDFLAGS} ./cmd/$@
 
-etcdbackup-image: etcdbackup $(IMAGEBUILDER) pullregistry
-	$(IMAGEBUILDER) -f images/etcdbackup/Dockerfile -t $(ETCDBACKUP_IMAGE) .
-
-etcdbackup-push: etcdbackup-image
-	docker push $(ETCDBACKUP_IMAGE)
-
-tlsproxy: generate
-	go build -ldflags ${LDFLAGS} ./cmd/tlsproxy
-
-tlsproxy-image: tlsproxy
-	$(IMAGEBUILDER) -f images/tlsproxy/Dockerfile -t $(TLSPROXY_IMAGE) .
-
-tlsproxy-push: tlsproxy-image
-	docker push $(TLSPROXY_IMAGE)
-
-metricsbridge:
-	go build -ldflags ${LDFLAGS} ./cmd/$@
-
-metricsbridge-image: metricsbridge $(IMAGEBUILDER) pullregistry
-	$(IMAGEBUILDER) -f images/metricsbridge/Dockerfile -t $(METRICSBRIDGE_IMAGE) .
-
-metricsbridge-push: metricsbridge-image
-	docker push $(METRICSBRIDGE_IMAGE)
-
-monitoring-build: generate
-	go build -ldflags ${LDFLAGS} ./cmd/monitoring
-
-monitoring-run: monitoring-build
+monitoring-run: monitoring
 	./hack/monitoring.sh
 
 monitoring-stop:
 	./hack/monitoring.sh clean
-
-sync: generate
-	go build -ldflags ${LDFLAGS} ./cmd/$@
-
-sync-image: sync $(IMAGEBUILDER) pullregistry
-	$(IMAGEBUILDER) -f images/sync/Dockerfile -t $(SYNC_IMAGE) .
-
-.PHONY: sync-run
-sync-run: generate
-	go run -ldflags ${LDFLAGS} ./cmd/sync -run-once -loglevel Debug
-
-sync-push: sync-image
-	docker push $(SYNC_IMAGE)
-
-all-image: $(ALL_IMAGES)
-
-all-push: $(ALL_PUSHES)
-
-startup: generate
-	go build -ldflags ${LDFLAGS} ./cmd/$@
-
-startup-image: startup $(IMAGEBUILDER) pullregistry
-	$(IMAGEBUILDER) -f images/startup/Dockerfile -t $(STARTUP_IMAGE) .
-
-startup-push: startup-image
-	docker push $(STARTUP_IMAGE)
-
-canary: generate
-	go build -ldflags ${LDFLAGS} ./cmd/$@
-
-canary-image: canary $(IMAGEBUILDER) pullregistry
-	$(IMAGEBUILDER) -f images/canary/Dockerfile -t $(CANARY_IMAGE) .
-
-canary-push: canary-image
-	docker push $(CANARY_IMAGE)
 
 releasenotes:
 	go build -tags releasenotes ./cmd/$@

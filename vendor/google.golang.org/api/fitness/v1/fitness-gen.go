@@ -1,4 +1,4 @@
-// Copyright 2019 Google LLC.
+// Copyright 2019 Google Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,39 +6,13 @@
 
 // Package fitness provides access to the Fitness.
 //
-// For product documentation, see: https://developers.google.com/fit/rest/
-//
-// Creating a client
+// See https://developers.google.com/fit/rest/
 //
 // Usage example:
 //
 //   import "google.golang.org/api/fitness/v1"
 //   ...
-//   ctx := context.Background()
-//   fitnessService, err := fitness.NewService(ctx)
-//
-// In this example, Google Application Default Credentials are used for authentication.
-//
-// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
-//
-// Other authentication options
-//
-// By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
-//
-//   fitnessService, err := fitness.NewService(ctx, option.WithScopes(fitness.FitnessReproductiveHealthWriteScope))
-//
-// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
-//
-//   fitnessService, err := fitness.NewService(ctx, option.WithAPIKey("AIza..."))
-//
-// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
-//
-//   config := &oauth2.Config{...}
-//   // ...
-//   token, err := config.Exchange(ctx, ...)
-//   fitnessService, err := fitness.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
-//
-// See https://godoc.org/google.golang.org/api/option/ for details on options.
+//   fitnessService, err := fitness.New(oauthHttpClient)
 package fitness // import "google.golang.org/api/fitness/v1"
 
 import (
@@ -55,8 +29,6 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
-	option "google.golang.org/api/option"
-	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -135,49 +107,6 @@ const (
 	FitnessReproductiveHealthWriteScope = "https://www.googleapis.com/auth/fitness.reproductive_health.write"
 )
 
-// NewService creates a new Service.
-func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
-	scopesOption := option.WithScopes(
-		"https://www.googleapis.com/auth/fitness.activity.read",
-		"https://www.googleapis.com/auth/fitness.activity.write",
-		"https://www.googleapis.com/auth/fitness.blood_glucose.read",
-		"https://www.googleapis.com/auth/fitness.blood_glucose.write",
-		"https://www.googleapis.com/auth/fitness.blood_pressure.read",
-		"https://www.googleapis.com/auth/fitness.blood_pressure.write",
-		"https://www.googleapis.com/auth/fitness.body.read",
-		"https://www.googleapis.com/auth/fitness.body.write",
-		"https://www.googleapis.com/auth/fitness.body_temperature.read",
-		"https://www.googleapis.com/auth/fitness.body_temperature.write",
-		"https://www.googleapis.com/auth/fitness.location.read",
-		"https://www.googleapis.com/auth/fitness.location.write",
-		"https://www.googleapis.com/auth/fitness.nutrition.read",
-		"https://www.googleapis.com/auth/fitness.nutrition.write",
-		"https://www.googleapis.com/auth/fitness.oxygen_saturation.read",
-		"https://www.googleapis.com/auth/fitness.oxygen_saturation.write",
-		"https://www.googleapis.com/auth/fitness.reproductive_health.read",
-		"https://www.googleapis.com/auth/fitness.reproductive_health.write",
-	)
-	// NOTE: prepend, so we don't override user-specified scopes.
-	opts = append([]option.ClientOption{scopesOption}, opts...)
-	client, endpoint, err := htransport.NewClient(ctx, opts...)
-	if err != nil {
-		return nil, err
-	}
-	s, err := New(client)
-	if err != nil {
-		return nil, err
-	}
-	if endpoint != "" {
-		s.BasePath = endpoint
-	}
-	return s, nil
-}
-
-// New creates a new Service. It uses the provided http.Client for requests.
-//
-// Deprecated: please use NewService instead.
-// To provide a custom HTTP client, use option.WithHTTPClient.
-// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -2041,6 +1970,166 @@ func (c *UsersDataSourcesListCall) Do(opts ...googleapi.CallOption) (*ListDataSo
 
 }
 
+// method id "fitness.users.dataSources.patch":
+
+type UsersDataSourcesPatchCall struct {
+	s            *Service
+	userId       string
+	dataSourceId string
+	datasource   *DataSource
+	urlParams_   gensupport.URLParams
+	ctx_         context.Context
+	header_      http.Header
+}
+
+// Patch: Updates the specified data source. The dataStreamId, dataType,
+// type, dataStreamName, and device properties with the exception of
+// version, cannot be modified.
+//
+// Data sources are identified by their dataStreamId. This method
+// supports patch semantics.
+func (r *UsersDataSourcesService) Patch(userId string, dataSourceId string, datasource *DataSource) *UsersDataSourcesPatchCall {
+	c := &UsersDataSourcesPatchCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.userId = userId
+	c.dataSourceId = dataSourceId
+	c.datasource = datasource
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *UsersDataSourcesPatchCall) Fields(s ...googleapi.Field) *UsersDataSourcesPatchCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// Context sets the context to be used in this call's Do method. Any
+// pending HTTP request will be aborted if the provided context is
+// canceled.
+func (c *UsersDataSourcesPatchCall) Context(ctx context.Context) *UsersDataSourcesPatchCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns an http.Header that can be modified by the caller to
+// add HTTP headers to the request.
+func (c *UsersDataSourcesPatchCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *UsersDataSourcesPatchCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := make(http.Header)
+	for k, v := range c.header_ {
+		reqHeaders[k] = v
+	}
+	reqHeaders.Set("User-Agent", c.s.userAgent())
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.datasource)
+	if err != nil {
+		return nil, err
+	}
+	reqHeaders.Set("Content-Type", "application/json")
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{userId}/dataSources/{dataSourceId}")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("PATCH", urls, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"userId":       c.userId,
+		"dataSourceId": c.dataSourceId,
+	})
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "fitness.users.dataSources.patch" call.
+// Exactly one of *DataSource or error will be non-nil. Any non-2xx
+// status code is an error. Response headers are in either
+// *DataSource.ServerResponse.Header or (if a response was returned at
+// all) in error.(*googleapi.Error).Header. Use googleapi.IsNotModified
+// to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *UsersDataSourcesPatchCall) Do(opts ...googleapi.CallOption) (*DataSource, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, &googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		}
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	ret := &DataSource{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	if err := gensupport.DecodeResponse(target, res); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Updates the specified data source. The dataStreamId, dataType, type, dataStreamName, and device properties with the exception of version, cannot be modified.\n\nData sources are identified by their dataStreamId. This method supports patch semantics.",
+	//   "httpMethod": "PATCH",
+	//   "id": "fitness.users.dataSources.patch",
+	//   "parameterOrder": [
+	//     "userId",
+	//     "dataSourceId"
+	//   ],
+	//   "parameters": {
+	//     "dataSourceId": {
+	//       "description": "The data stream ID of the data source to update.",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "userId": {
+	//       "description": "Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{userId}/dataSources/{dataSourceId}",
+	//   "request": {
+	//     "$ref": "DataSource"
+	//   },
+	//   "response": {
+	//     "$ref": "DataSource"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/fitness.activity.write",
+	//     "https://www.googleapis.com/auth/fitness.blood_glucose.write",
+	//     "https://www.googleapis.com/auth/fitness.blood_pressure.write",
+	//     "https://www.googleapis.com/auth/fitness.body.write",
+	//     "https://www.googleapis.com/auth/fitness.body_temperature.write",
+	//     "https://www.googleapis.com/auth/fitness.location.write",
+	//     "https://www.googleapis.com/auth/fitness.nutrition.write",
+	//     "https://www.googleapis.com/auth/fitness.oxygen_saturation.write",
+	//     "https://www.googleapis.com/auth/fitness.reproductive_health.write"
+	//   ]
+	// }
+
+}
+
 // method id "fitness.users.dataSources.update":
 
 type UsersDataSourcesUpdateCall struct {
@@ -3336,7 +3425,7 @@ func (c *UsersSessionsListCall) IncludeDeleted(includeDeleted bool) *UsersSessio
 // since epoch). If specified, the API returns sessions modified since
 // this time. The page token is ignored if either start or end time is
 // specified. If none of start time, end time, and the page token is
-// specified, sessions modified in the last 30 days are returned.
+// specified, sessions modified in the last 7 days are returned.
 func (c *UsersSessionsListCall) PageToken(pageToken string) *UsersSessionsListCall {
 	c.urlParams_.Set("pageToken", pageToken)
 	return c
@@ -3466,7 +3555,7 @@ func (c *UsersSessionsListCall) Do(opts ...googleapi.CallOption) (*ListSessionsR
 	//       "type": "boolean"
 	//     },
 	//     "pageToken": {
-	//       "description": "The continuation token, which is used for incremental syncing. To get the next batch of changes, set this parameter to the value of nextPageToken from the previous response. This token is treated as a timestamp (in millis since epoch). If specified, the API returns sessions modified since this time. The page token is ignored if either start or end time is specified. If none of start time, end time, and the page token is specified, sessions modified in the last 30 days are returned.",
+	//       "description": "The continuation token, which is used for incremental syncing. To get the next batch of changes, set this parameter to the value of nextPageToken from the previous response. This token is treated as a timestamp (in millis since epoch). If specified, the API returns sessions modified since this time. The page token is ignored if either start or end time is specified. If none of start time, end time, and the page token is specified, sessions modified in the last 7 days are returned.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },

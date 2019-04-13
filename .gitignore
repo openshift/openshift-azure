@@ -3,16 +3,8 @@
 /env
 /env.*
 !/env.example
-/e2e-tests
+/azure
 /kubeconfig*
-/sync
-/startup
-/monitoring
-/etcdbackup
-/tlsproxy
-/azure-controllers
-/metricsbridge
-/canary
 .vscode
 .idea
 coverage.out

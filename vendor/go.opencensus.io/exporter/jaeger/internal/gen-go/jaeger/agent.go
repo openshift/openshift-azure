@@ -8,7 +8,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/apache/thrift/lib/go/thrift"
+	"git.apache.org/thrift.git/lib/go/thrift"
 )
 
 // (needed to ensure safety because of naive import list construction.)
