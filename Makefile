@@ -1,13 +1,9 @@
-TAG=$(shell git describe --tags HEAD)
-GITCOMMIT=$(TAG)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
+GITCOMMIT=$(shell git describe --tags HEAD)$(shell [[ $$(git status --porcelain) = "" ]] || echo -dirty)
 LDFLAGS="-X main.gitCommit=$(GITCOMMIT)"
 
-AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(TAG)
+AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(GITCOMMIT)
 
-GOPATH ?= $(HOME)/go
-IMAGEBUILDER = ${GOPATH}/bin/imagebuilder
-
-.PHONY: azure-image azure-push all version clean test unit generate pullregistry secrets
+.PHONY: azure-image azure-push all version clean test unit generate secrets artifacts
 # all is the default target to build everything
 all: azure
 
@@ -40,8 +36,8 @@ upgrade:
 artifacts:
 	./hack/artifacts.sh
 
-azure-image: azure $(IMAGEBUILDER) pullregistry
-	$(IMAGEBUILDER) -f images/azure/Dockerfile -t $(AZURE_IMAGE) .
+azure-image: azure
+	./hack/image-build.sh images/azure/Dockerfile $(AZURE_IMAGE)
 
 azure-push: azure-image
 	docker push $(AZURE_IMAGE)
@@ -54,14 +50,17 @@ sync-run: generate
 
 .PHONY: sync-run
 
-monitoring: generate
+monitoring:
 	go build -ldflags ${LDFLAGS} ./cmd/$@
+.PHONY: monitoring
 
 monitoring-run: monitoring
 	./hack/monitoring.sh
 
 monitoring-stop:
 	./hack/monitoring.sh clean
+
+.PHONY: monitoring-run monitoring-stop
 
 releasenotes:
 	go build -tags releasenotes ./cmd/$@
@@ -116,12 +115,6 @@ e2e-forceupdate:
 
 e2e-vnet:
 	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
-
-$(IMAGEBUILDER):
-	go get github.com/openshift/imagebuilder/cmd/imagebuilder
-
-pullregistry: $(IMAGEBUILDER)
-	docker pull registry.access.redhat.com/rhel7:latest
 
 vmimage:
 	./hack/vmimage.sh

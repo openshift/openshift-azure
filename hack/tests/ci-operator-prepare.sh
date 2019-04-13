@@ -5,7 +5,9 @@ set_build_images() {
         return
     fi
 
-    export AZURE_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:azure
+    make azure
+    ./hack/image-build.sh images/azure/Dockerfile azure:$(git describe --tags HEAD)
+    export AZURE_IMAGE=registry.svc.ci.openshift.org/$(</var/run/secrets/kubernetes.io/serviceaccount/namespace)/azure:$(git describe --tags HEAD)
 }
 
 start_monitoring() {
