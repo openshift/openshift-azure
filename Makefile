@@ -20,7 +20,7 @@ secrets:
 	oc extract -n azure secret/cluster-secrets-azure --to=secrets
 
 clean:
-	rm -f coverage.out $(ALL_BINARIES) releasenotes
+	rm -f coverage.out azure releasenotes
 
 generate:
 	go generate ./...
@@ -40,7 +40,7 @@ upgrade:
 artifacts:
 	./hack/artifacts.sh
 
-azure-image: azure
+azure-image: azure $(IMAGEBUILDER) pullregistry
 	$(IMAGEBUILDER) -f images/azure/Dockerfile -t $(AZURE_IMAGE) .
 
 azure-push: azure-image
