@@ -4,42 +4,26 @@ package reporters
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"os"
 	"strings"
 
 	"github.com/Microsoft/ApplicationInsights-Go/appinsights"
 	"github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/config"
 	"github.com/onsi/ginkgo/types"
-	"github.com/sirupsen/logrus"
 )
 
 type azureAppInsightsReporter struct {
-	icli appinsights.TelemetryClient
-	log  *logrus.Entry
-
-	tracer *TraceWriter
+	c appinsights.TelemetryClient
 }
 
 var _ ginkgo.Reporter = &azureAppInsightsReporter{}
 
 // NewAzureAppInsightsReporter returns reporter for Azure App Insights.
-// If io.Reader is provided, it will send all the output from it to the
-// AppInsights with test suite tag.
-func NewAzureAppInsightsReporter(log *logrus.Entry, br io.Reader) ginkgo.Reporter {
-	icli := appinsights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
-	icli.Context().CommonProperties["type"] = "ginkgo"
-	icli.Context().CommonProperties["resourcegroup"] = os.Getenv("RESOURCEGROUP")
-
-	NewTraceWriter(icli, br)
-
-	ar := &azureAppInsightsReporter{
-		icli: icli,
-		log:  log,
+// It will send all the output from it to the AppInsights with test suite tag.
+func NewAzureAppInsightsReporter(c appinsights.TelemetryClient) ginkgo.Reporter {
+	return &azureAppInsightsReporter{
+		c: c,
 	}
-
-	return ar
 }
 
 func (r *azureAppInsightsReporter) SpecSuiteWillBegin(config config.GinkgoConfigType, summary *types.SuiteSummary) {
@@ -71,7 +55,7 @@ func (r *azureAppInsightsReporter) SpecDidComplete(specSummary *types.SpecSummar
 		fmt.Println(err)
 	}
 
-	r.icli.TrackMetric(string(resultJSON), btof(specSummary.Failed()))
+	r.c.TrackMetric(string(resultJSON), btof(specSummary.Failed()))
 	// For debug comment out TrackEvent and output to stdout
 	// fmt.Println(string(resultJSON))
 }

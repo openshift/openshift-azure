@@ -4,7 +4,16 @@ All E2E test result are being sent to `Application Insights"
 
 `Azure Portal -> ResourceGroups -> fakerp-upgrades-insights -> osa-fakeRP-upgrades -> Analytics`
 
-Data is being passed into `customEvents` table in json format:
+
+## Tables:
+`customMetrics` - individual test results. Selector `where customDimensions.type == "ginkgo"`
+`customMetrics` - cluster creation time. Selector `where customDimensions.type == "cluster" and where customDimensions.metric == "creation"`
+
+`traces` - all go tests logs
+``
+``
+
+Data is being passed into `customMetrics` table in json format:
 ```
 result := map[string]interface{}{
 		"ComponentTexts": strings.Join(specSummary.ComponentTexts, " "),
@@ -47,7 +56,7 @@ requests
 // Response time trend when upgrading cluster by cluster ID
 requests
 | summarize avgRequestDuration=avg(duration) by bin(timestamp, 30s),url, id
-| where id =="e2e-upgrade-asalkeld-1386-phmfxi"
+| where id =="<cluster_name>"
 | render timechart
 ```
 
@@ -57,6 +66,6 @@ requests
 ```
 traces
 | where customDimensions.type == "ginkgo"
-| where customDimensions.resourcegroup == "mjudeikis"
+| where customDimensions.resourcegroup == "<cluster_name>"
 | where timestamp > ago(1d)
 ```

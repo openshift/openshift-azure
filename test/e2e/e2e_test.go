@@ -1,20 +1,23 @@
+//+build e2e
+
 package e2e
 
 import (
+	"flag"
+	"fmt"
 	"os"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/Microsoft/ApplicationInsights-Go/appinsights"
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/util/log"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/fakerp"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/realrp"
 	"github.com/openshift/openshift-azure/test/reporters"
-	"github.com/openshift/openshift-azure/test/sanity"
 )
 
 var (
@@ -22,33 +25,38 @@ var (
 )
 
 func TestE2E(t *testing.T) {
-	logger := os.Stdout
-	sanity.GlobalLogger = logger
+	fmt.Printf("e2e tests starting, git commit %s\n", gitCommit)
 
-	fd := int(logger.Fd())
-	capture, err := reporters.NewCapture(fd)
-	if err != nil {
-		panic(err)
-	}
-
-	logrus.SetLevel(log.SanitizeLogLevel("Debug"))
-	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-	logrus.SetOutput(sanity.GlobalLogger)
-	log := logrus.NewEntry(logrus.StandardLogger())
+	flag.Parse()
+	logrus.SetFormatter(&logrus.TextFormatter{})
+	logrus.SetOutput(GinkgoWriter)
+	logrus.SetReportCaller(true)
 
 	RegisterFailHandler(Fail)
 
-	// init reporter to see logs early
-	ar := reporters.NewAzureAppInsightsReporter(log, capture.Reader)
+	c := appinsights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
+	c.Context().CommonProperties["type"] = "ginkgo"
+	c.Context().CommonProperties["resourcegroup"] = os.Getenv("RESOURCEGROUP")
 
-	log.Debugf("e2e tests starting, git commit %s", gitCommit)
-
-	// IMPORTANT: Current AzureAppInsight reported does not support parallel tests
-	// This is due inability to distinguish betwean tests cases in the output.
-	// If at any point parallel execution is needed, GinkoWriter should be initiated
-	// at the spec level, and potentially handled via multiple buffers
 	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
+		ar := reporters.NewAzureAppInsightsReporter(c)
+
+		doneStdout := make(chan struct{})
+		captureStdout, err := reporters.StartCapture(1, c, doneStdout)
+		if err != nil {
+			t.Fatal(err)
+		}
+		doneStderr := make(chan struct{})
+		captureStderr, err := reporters.StartCapture(2, c, doneStderr)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		RunSpecsWithDefaultAndCustomReporters(t, "e2e tests", []Reporter{ar})
+		captureStdout.Close()
+		captureStderr.Close()
+		<-doneStdout
+		<-doneStderr
 	} else {
 		RunSpecs(t, "e2e tests")
 	}
