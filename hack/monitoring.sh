@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 if [[ $# -eq 1 ]]; then
   echo "cleaning"

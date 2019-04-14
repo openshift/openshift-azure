@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 if [[ $# -eq 0 && ! -e _data/containerservice.yaml ]]; then
     echo error: _data/containerservice.yaml must exist

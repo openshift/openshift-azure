@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 if [[ $# -ne 1 ]]; then
     echo usage: $0 resourcegroup
@@ -9,8 +9,6 @@ export RESOURCEGROUP=$1
 
 rm -rf _data
 mkdir -p _data/_out
-
-set -x
 
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
     TEST_IN_PRODUCTION="-use-prod=true"

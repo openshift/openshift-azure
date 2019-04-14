@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -e
 
-set -eo pipefail
+set -o pipefail
 
 if [[ -n "$ARTIFACTS" ]]; then
   ARTIFACT_FLAG="-artifact-dir=$ARTIFACTS"

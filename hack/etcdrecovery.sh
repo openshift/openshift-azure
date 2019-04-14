@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 if [[ $# -ne 2 ]]; then
     echo error: $0 resourcegroup blobname

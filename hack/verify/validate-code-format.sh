@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 
 FILES=$(gofmt -s -l pkg cmd test)
 

@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 set_build_images() {
     if [[ ! -e /usr/local/e2e-secrets/azure ]]; then
@@ -45,7 +45,6 @@ export RESOURCEGROUP="$(basename "$0" .sh)-$prdetail$(cat /dev/urandom | tr -dc 
 
 ln -sf /usr/local/e2e-secrets/azure secrets
 
-set +x
 . ./secrets/secret
 export AZURE_CLIENT_ID="$AZURE_CI_CLIENT_ID"
 export AZURE_CLIENT_SECRET="$AZURE_CI_CLIENT_SECRET"
@@ -55,4 +54,3 @@ export AZURE_LEGACY_WORKER_CLIENT_ID="$AZURE_CI_LEGACY_WORKER_CLIENT_ID"
 export AZURE_LEGACY_WORKER_CLIENT_SECRET="$AZURE_CI_LEGACY_WORKER_CLIENT_SECRET"
 
 az login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID} >/dev/null
-set -x

@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -e
 
-set -eo pipefail
+set -o pipefail
 
 if [[ -z "${CODECOV_UPLOAD_TOKEN}" ]]; then
     echo "CODECOV_UPLOAD_TOKEN must be set"

@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # TODO: we should consider dropping most of this in favour of using Geneva more.
 
