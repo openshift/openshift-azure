@@ -14,6 +14,7 @@ import (
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/fakerp"
 	_ "github.com/openshift/openshift-azure/test/e2e/specs/realrp"
 	"github.com/openshift/openshift-azure/test/reporters"
+	"github.com/openshift/openshift-azure/test/sanity"
 )
 
 var (
@@ -22,8 +23,9 @@ var (
 
 func TestE2E(t *testing.T) {
 	logger := os.Stdout
-	fd := int(logger.Fd())
+	sanity.GlobalLogger = logger
 
+	fd := int(logger.Fd())
 	capture, err := reporters.NewCapture(fd)
 	if err != nil {
 		panic(err)
@@ -31,7 +33,7 @@ func TestE2E(t *testing.T) {
 
 	logrus.SetLevel(log.SanitizeLogLevel("Debug"))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
-	logrus.SetOutput(logger)
+	logrus.SetOutput(sanity.GlobalLogger)
 	log := logrus.NewEntry(logrus.StandardLogger())
 
 	RegisterFailHandler(Fail)

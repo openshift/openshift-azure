@@ -10,8 +10,8 @@ import (
 	"github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
 )
 
-// skip log lines which are just artifacts of ginko
-var exclude = []string{"", "S", "========================", "------------------------------", "•"}
+// skip log lines which are just artifacts of ginkgo
+var exclude = []string{"", "S\n", "SS\n", "========================\n", "------------------------------\n", "•\n"}
 
 type TraceWriter struct {
 	c appinsights.TelemetryClient
