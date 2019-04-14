@@ -50,3 +50,13 @@ requests
 | where id =="e2e-upgrade-asalkeld-1386-phmfxi"
 | render timechart
 ```
+
+
+### Get specific resourcegroup test logs
+
+```
+traces
+| where customDimensions.type == "ginkgo"
+| where customDimensions.resourcegroup == "mjudeikis"
+| where timestamp > ago(1d)
+```

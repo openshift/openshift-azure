@@ -11,7 +11,7 @@ import (
 )
 
 // skip log lines which are just artifacts of ginko
-var exclude = []string{"", "S", "========================", "------------------------------"}
+var exclude = []string{"", "S", "========================", "------------------------------", "•"}
 
 type TraceWriter struct {
 	c appinsights.TelemetryClient
