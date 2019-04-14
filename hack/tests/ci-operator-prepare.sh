@@ -10,8 +10,8 @@ set_build_images() {
 
 start_monitoring() {
     make monitoring
-    if [[ -n "$ARTIFACT_DIR" ]]; then
-        outputdir="-outputdir=$ARTIFACT_DIR"
+    if [[ -n "$ARTIFACTS" ]]; then
+        outputdir="-outputdir=$ARTIFACTS"
     fi
 
     if [ $# -eq 1 ]; then
@@ -33,7 +33,7 @@ if [[ ! -e /usr/local/e2e-secrets/azure ]]; then
     return
 fi
 
-export ARTIFACT_DIR=/tmp/artifacts
+export ARTIFACTS=/tmp/artifacts
 export GOPATH=/go # our prow configuration overrides our image setting to /home/prow/go
 export NO_WAIT=true
 export RESOURCEGROUP_TTL=4h

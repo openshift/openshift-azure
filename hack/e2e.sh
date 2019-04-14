@@ -2,8 +2,8 @@
 
 set -eo pipefail
 
-if [[ -n "$ARTIFACT_DIR" ]]; then
-  ARTIFACT_FLAG="-artifact-dir=$ARTIFACT_DIR"
+if [[ -n "$ARTIFACTS" ]]; then
+  ARTIFACT_FLAG="-artifact-dir=$ARTIFACTS"
 fi
 
 if [[ -n "$FOCUS" ]]; then

@@ -181,7 +181,7 @@ Add vx.y target to `ci-operator/config/openshift/openshift-azure/openshift-opens
 ```
 - artifact_dir: /tmp/artifacts
  as: e2e-upgrade-vx.y
- commands: ARTIFACT_DIR=/tmp/artifacts SOURCE=vx.y make upgrade
+ commands: ARTIFACTS=/tmp/artifacts SOURCE=vx.y make upgrade
  secret:
    name: azure
    mount_path: /usr/secrets

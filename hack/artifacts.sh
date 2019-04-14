@@ -2,25 +2,27 @@
 
 # TODO: we should consider dropping most of this in favour of using Geneva more.
 
-if [[ -z "$ARTIFACT_DIR" ]]; then
-    exit 0
-fi
-
 if [[ ! -e $PWD/_data/_out/admin.kubeconfig ]]; then
     echo "admin.kubeconfig not found, exiting"
     exit 0
 fi
 
+if [[ -z "$ARTIFACTS" ]]; then
+    exit 0
+fi
+
+mkdir -p "$ARTIFACTS"
+
 export KUBECONFIG=$PWD/_data/_out/admin.kubeconfig
 
 for ((i=0; i<3; i++)); do
-    oc logs -n kube-system master-api-master-00000$i >"$ARTIFACT_DIR/api-master-00000$i.log"
-    oc logs -n kube-system master-etcd-master-00000$i >"$ARTIFACT_DIR/etcd-master-00000$i.log"
+    oc logs -n kube-system master-api-master-00000$i >"$ARTIFACTS/api-master-00000$i.log"
+    oc logs -n kube-system master-etcd-master-00000$i >"$ARTIFACTS/etcd-master-00000$i.log"
     true
 done
 
 cm_leader=$(oc get configmap -n kube-system kube-controller-manager -o yaml | grep -o 00000[0-3])
-oc logs controllers-master-$cm_leader -n kube-system >"$ARTIFACT_DIR/controller-manager.log"
+oc logs controllers-master-$cm_leader -n kube-system >"$ARTIFACTS/controller-manager.log"
 
 for deployment in \
         kube-system/sync \
@@ -30,7 +32,7 @@ for deployment in \
 	namespace="${deployment%%/*}"
 	name="${deployment##*/}"
 
-    oc logs -n "$namespace" "deployment/$name" >"$ARTIFACT_DIR/$name.log"
+    oc logs -n "$namespace" "deployment/$name" >"$ARTIFACTS/$name.log"
 done
 
 for kind in \
@@ -41,12 +43,12 @@ for kind in \
         pods \
         statefulsets \
         ; do
-    oc get "$kind" --all-namespaces -o wide >"$ARTIFACT_DIR/$kind"
+    oc get "$kind" --all-namespaces -o wide >"$ARTIFACTS/$kind"
 done
 
 for node in $(oc get nodes -o jsonpath='{.items[*].metadata.name}'); do
-    oc get --raw "/api/v1/nodes/$node/proxy/debug/pprof/goroutine?debug=2" >"$ARTIFACT_DIR/$node-goroutines"
-    hack/scp.sh "$node":'/var/crash/*/vmcore-dmesg.txt' "$ARTIFACT_DIR/$node-vmcore-dmesg.txt"
+    oc get --raw "/api/v1/nodes/$node/proxy/debug/pprof/goroutine?debug=2" >"$ARTIFACTS/$node-goroutines"
+    hack/scp.sh "$node":'/var/crash/*/vmcore-dmesg.txt' "$ARTIFACTS/$node-vmcore-dmesg.txt"
 done
 
 po_pod=$(oc get pod -n openshift-monitoring -l k8s-app=prometheus-operator -o jsonpath='{.items[0].metadata.name}')

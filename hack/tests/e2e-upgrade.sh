@@ -8,8 +8,8 @@ fi
 cleanup() {
     set +e
 
-    if [[ -n "$ARTIFACT_DIR" ]]; then
-        exec &>"$ARTIFACT_DIR/cleanup"
+    if [[ -n "$ARTIFACTS" ]]; then
+        exec &>"$ARTIFACTS/cleanup"
     fi
 
     stop_monitoring

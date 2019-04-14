@@ -78,9 +78,9 @@ verify:
 
 unit: generate
 	go test ./... -coverprofile=coverage.out -covermode=atomic
-ifneq ($(ARTIFACT_DIR),)
-	mkdir -p $(ARTIFACT_DIR)
-	cp coverage.out $(ARTIFACT_DIR)
+ifneq ($(ARTIFACTS),)
+	mkdir -p $(ARTIFACTS)
+	cp coverage.out $(ARTIFACTS)
 endif
 
 .PHONY: cover codecov

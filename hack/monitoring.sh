@@ -6,8 +6,8 @@ if [[ $# -eq 1 ]]; then
   exit 0
 fi
 
-if [[ -n "$ARTIFACT_DIR" ]]; then
-  outputdir="-outputdir=$ARTIFACT_DIR"
+if [[ -n "$ARTIFACTS" ]]; then
+  outputdir="-outputdir=$ARTIFACTS"
 fi
 
 ./monitoring "$outputdir" &
