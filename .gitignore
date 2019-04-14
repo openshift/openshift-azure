@@ -13,6 +13,7 @@ cscope.out
 /secrets
 /fakerp
 /artifacts
+/monitoring
 /id_rsa
 /releasenotes
 /vmimage
