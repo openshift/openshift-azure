@@ -6,6 +6,6 @@ cd data
 
 find -not -path ./archive.tgz -and -not -path ./script.sh -print0 \
   | LANG=C sort -z \
-  | tar --no-recursion --null --files-from=- --owner=root --group=root --mtime=@1546300800 -c \
+  | tar --no-recursion --null --files-from=- --owner=root --group=root --mtime=@1546300800 --mode=g+w,g-s -c \
   | gzip -n \
   >archive.tgz
