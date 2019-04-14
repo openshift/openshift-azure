@@ -76,17 +76,6 @@ verify:
 
 unit: generate
 	go test ./... -coverprofile=coverage.out -covermode=atomic
-ifneq ($(ARTIFACTS),)
-	mkdir -p $(ARTIFACTS)
-	cp coverage.out $(ARTIFACTS)
-endif
-
-.PHONY: cover codecov
-cover: unit
-	go tool cover -html=coverage.out
-
-codecov: unit
-	./hack/codecov-report.sh
 
 .PHONY: e2e e2e-prod e2e-etcdbackuprecovery e2e-keyrotation e2e-reimagevm e2e-changeloglevel e2e-scaleupdown e2e-forceupdate e2e-vnet
 e2e:
