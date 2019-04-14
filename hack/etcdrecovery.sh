@@ -8,7 +8,7 @@ fi
 export RESOURCEGROUP=$1
 export BLOBNAME=$2
 
-go generate ./...
+[[ -e /var/run/secrets/kubernetes.io ]] || go generate ./...
 go run cmd/fakerp/main.go &
 
 trap 'return_id=$?; set +ex; kill $(lsof -t -i :8080); wait $(lsof -t -i :8080); exit $return_id' EXIT

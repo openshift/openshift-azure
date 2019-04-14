@@ -24,7 +24,7 @@ clean:
 	rm -f coverage.out azure releasenotes
 
 generate:
-	go generate ./...
+	@[[ -e /var/run/secrets/kubernetes.io ]] || go generate ./...
 
 test: unit e2e
 

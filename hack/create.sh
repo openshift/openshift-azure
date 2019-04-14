@@ -13,7 +13,7 @@ mkdir -p _data/_out
 if [[ -n "$TEST_IN_PRODUCTION" ]]; then
     TEST_IN_PRODUCTION="-use-prod=true"
 else
-    go generate ./...
+    [[ -e /var/run/secrets/kubernetes.io ]] || go generate ./...
     go run cmd/fakerp/main.go &
 fi
 if [[ -n "$ADMIN_MANIFEST" ]]; then
