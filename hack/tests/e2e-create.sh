@@ -23,4 +23,6 @@ trap cleanup EXIT
 start_monitoring
 set_build_images
 
-make create e2e
+make create
+
+hack/e2e.sh

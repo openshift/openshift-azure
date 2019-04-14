@@ -47,4 +47,4 @@ cp -a "$T/src/github.com/openshift/openshift-azure/_data" .
 
 set_build_images
 
-make e2e-scaleupdown
+FOCUS="\[ScaleUpDown\]\[Fake\]" ./hack/e2e.sh

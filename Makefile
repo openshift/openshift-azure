@@ -77,33 +77,9 @@ verify:
 unit: generate
 	go test ./... -coverprofile=coverage.out -covermode=atomic
 
-.PHONY: e2e e2e-prod e2e-etcdbackuprecovery e2e-keyrotation e2e-reimagevm e2e-changeloglevel e2e-scaleupdown e2e-forceupdate e2e-vnet
+.PHONY: e2e
 e2e:
 	FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
-
-e2e-prod:
-	FOCUS="\[Default\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
-
-e2e-etcdbackuprecovery:
-	FOCUS="\[EtcdRecovery\]\[Fake\]" TIMEOUT=180m ./hack/e2e.sh
-
-e2e-keyrotation:
-	FOCUS="\[KeyRotation\]\[Fake\]" TIMEOUT=180m ./hack/e2e.sh
-
-e2e-reimagevm:
-	FOCUS="\[ReimageVM\]\[Fake\]" TIMEOUT=40m ./hack/e2e.sh
-
-e2e-changeloglevel:
-	FOCUS="\[ChangeLogLevel\]\[Fake\]" TIMEOUT=180m ./hack/e2e.sh
-
-e2e-scaleupdown:
-	FOCUS="\[ScaleUpDown\]\[Fake\]" TIMEOUT=50m ./hack/e2e.sh
-
-e2e-forceupdate:
-	FOCUS="\[ForceUpdate\]\[Fake\]" TIMEOUT=180m ./hack/e2e.sh
-
-e2e-vnet:
-	FOCUS="\[Vnet\]\[Real\]" TIMEOUT=70m ./hack/e2e.sh
 
 vmimage:
 	./hack/vmimage.sh
