@@ -1,11 +1,12 @@
 #!/bin/bash -e
 
 set_build_images() {
-    if [[ ! -e /usr/local/e2e-secrets/azure ]]; then
+    if [[ ! -e /var/run/secrets/kubernetes.io ]]; then
         return
     fi
 
-    export AZURE_IMAGE=registry.svc.ci.openshift.org/$OPENSHIFT_BUILD_NAMESPACE/stable:azure
+    export AZURE_IMAGE=quay.io/openshift-on-azure/ci-azure:$(git describe --tags HEAD)
+    make azure-image
 }
 
 start_monitoring() {
@@ -29,21 +30,22 @@ stop_monitoring() {
     fi
 }
 
-if [[ ! -e /usr/local/e2e-secrets/azure ]]; then
+if [[ ! -e /var/run/secrets/kubernetes.io ]]; then
     return
 fi
 
-export ARTIFACTS=/tmp/artifacts
-export GOPATH=/go # our prow configuration overrides our image setting to /home/prow/go
 export NO_WAIT=true
 export RESOURCEGROUP_TTL=4h
 
-mkdir -p $ARTIFACT_DIR
+mkdir -p $ARTIFACTS
 
-prdetail="$(python -c 'import json, os; o=json.loads(os.environ["CLONEREFS_OPTIONS"]); print "%s-%s-" % (o["refs"][0]["pulls"][0]["author"].lower(), o["refs"][0]["pulls"][0]["number"])' 2>/dev/null || true)"
-export RESOURCEGROUP="$(basename "$0" .sh)-$prdetail$(cat /dev/urandom | tr -dc 'a-z' | fold -w 6 | head -n 1)"
+pullnumber="$(python -c 'import json, os; o=json.loads(os.environ["JOB_SPEC"]); print "%s-" % o["refs"]["pulls"][0]["number"]' 2>/dev/null || true)"
+export RESOURCEGROUP="ci-$pullnumber$(basename "$0" .sh)-$(cat /dev/urandom | tr -dc 'a-z' | fold -w 6 | head -n 1)"
 
-ln -sf /usr/local/e2e-secrets/azure secrets
+echo "RESOURCEGROUP is $RESOURCEGROUP"
+echo
+
+make secrets
 
 . ./secrets/secret
 export AZURE_CLIENT_ID="$AZURE_CI_CLIENT_ID"
