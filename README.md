@@ -6,6 +6,10 @@
 
 ## Prerequisites
 
+Note that this README is targeted at AOS-Azure contributors. If you are not a
+member of this team, these instructions may not work as they will assume you
+have permissions that you may not have.
+
 1. **Utilities**.  Install the following:
    1. [Golang 1.11.6](https://golang.org/dl) (can also use package manager)
    1. Latest [Azure
