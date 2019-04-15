@@ -31,7 +31,11 @@ func fromMSGraphGroup(log *logrus.Entry, kubeGroup *v1.Group, kubeGroupName stri
 	}
 	g.Users = []string{}
 	for _, user := range msGroupMembers {
-		g.Users = append(g.Users, *user.Mail)
+		if user.UserType == graphrbac.Guest && user.Mail != nil {
+			g.Users = append(g.Users, *user.Mail) // doesn't include #EXT#
+		} else {
+			g.Users = append(g.Users, *user.UserPrincipalName)
+		}
 	}
 	sort.Strings(g.Users)
 	return g, !reflect.DeepEqual(kubeGroup, g)
