@@ -33,7 +33,7 @@ type targetsResponse struct {
 	} `json:"data"`
 }
 
-var _ = Describe("Prometheus E2E tests [Prometheus][EveryPR]", func() {
+var _ = Describe("Prometheus E2E tests [Fake][EveryPR]", func() {
 	var (
 		azurecli *azure.Client
 	)
@@ -89,8 +89,12 @@ var _ = Describe("Prometheus E2E tests [Prometheus][EveryPR]", func() {
 		}
 
 		Expect(healthyTargets).To(Equal(map[string]int{
-			"alertmanager-main": 3,
-			"apiserver":         masters,
+			"alertmanager-main":           3,
+			"apiserver":                   masters,
+			"canary":                      2,
+			"etcd-metrics":                3,
+			"router-stats":                3,
+			"cluster-monitoring-operator": 1,
 			// TODO: enable once https://github.com/openshift/cluster-monitoring-operator/pull/230 is backported
 			// "kube-controllers": masters,
 			"kube-state-metrics":  2,

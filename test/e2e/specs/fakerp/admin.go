@@ -19,7 +19,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Openshift on Azure admin e2e tests [Fake]", func() {
+var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
 	It("should run the correct image", func() {
 		// e2e check should ensure that no reg-aws images are running on box
 		pods, err := sanity.Checker.Client.Admin.CoreV1.Pods("").List(metav1.ListOptions{})
