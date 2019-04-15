@@ -146,19 +146,44 @@ queries:
 - query: 'storage_operation_duration_seconds_sum{namespace=~"default|openshift|openshift-.+|kube-.+|", volume_plugin="kubernetes.io/azure-disk"}'
 - query: 'rate(storage_operation_errors_total{namespace=~"default|openshift|openshift-.+|kube-.+|", volume_plugin="kubernetes.io/azure-disk"}[1m])'
   name: storage_operation_errors_rate
+- query: 'haproxy_up'
+- query: 'haproxy_backend_up{namespace=~"default|openshift|openshift-.+|kube-.+|"}'
+- query: 'haproxy_frontend_bytes_in_total != 0'
+- query: 'haproxy_frontend_bytes_out_total != 0'
+- query: 'haproxy_frontend_connections_total != 0'
+- query: 'haproxy_frontend_current_session_rate != 0'
+- query: 'haproxy_frontend_current_sessions != 0'
+- query: 'sum(haproxy_server_bytes_in_total{namespace=~"default|openshift|openshift-.+|kube-.+|"}) without(pod, server) != 0'
+  name: haproxy_server_bytes_in_total_sum
+- query: 'sum(haproxy_server_bytes_out_total{namespace=~"default|openshift|openshift-.+|kube-.+|"}) without(pod, server) != 0'
+  name: haproxy_server_bytes_out_total_sum
+- query: 'sum(haproxy_server_check_failures_total{namespace=~"default|openshift|openshift-.+|kube-.+|"}) without(pod, server) != 0'
+  name: haproxy_server_check_failures_total_sum
+- query: 'sum(haproxy_server_connection_errors_total{namespace=~"default|openshift|openshift-.+|kube-.+|"}) without(pod, server) != 0'
+  name: haproxy_server_connection_errors_total_sum
+- query: 'sum(haproxy_server_connections_total{namespace=~"default|openshift|openshift-.+|kube-.+|"}) without(pod, server) != 0'
+  name: haproxy_server_connections_total_sum
+- query: 'avg(haproxy_server_current_session_rate{namespace=~"default|openshift|openshift-.+|kube-.+|"}) without(pod, server) != 0'
+  name: haproxy_server_current_session_rate_avg
+- query: 'sum(haproxy_server_current_sessions{namespace=~"default|openshift|openshift-.+|kube-.+|"}) without(pod, server) != 0'
+  name: haproxy_server_current_sessions_sum
+- query: 'sum(haproxy_server_http_responses_total{namespace=~"default|openshift|openshift-.+|kube-.+|"}) without(pod, server) != 0'
+  name: haproxy_server_http_responses_total_sum
+- query: 'template_router_reload_seconds_sum'
+- query: 'template_router_reload_seconds_count'
+- query: 'template_router_write_config_seconds_sum'
+- query: 'template_router_write_config_seconds_count'
 - query: 'up'
 - query: 'etcd_server_proposals_pending{namespace="openshift-azure-monitoring"} != 0'
-- query: 'rate(etcd_server_proposals_failed_total{namespace="openshift-azure-monitoring"}[1m]) != 0'
-  name: etcd_server_proposals_failed_rate
+- query: 'etcd_server_proposals_failed_total{namespace="openshift-azure-monitoring"}'
 - query: 'etcd_server_has_leader{namespace="openshift-azure-monitoring"}'
-- query: 'rate(etcd_server_leader_changes_seen_total{namespace="openshift-azure-monitoring"}[1m]) != 0'
-  name: etcd_server_leader_changes_seen_rate
+- query: 'etcd_server_leader_changes_seen_total{namespace="openshift-azure-monitoring"}'
 - query: 'rate(grpc_server_started_total{namespace="openshift-azure-monitoring"}[1m]) != 0'
   name: grpc_server_started_rate
 - query: 'rate(grpc_server_handled_total{namespace="openshift-azure-monitoring"}[1m]) != 0'
   name: grpc_server_handled_rate
 - query: 'etcd_disk_backend_commit_duration_seconds_count{namespace="openshift-azure-monitoring"} != 0'
-- query: 'etcd_disk_backend_commit_duration_seconds_total{namespace="openshift-azure-monitoring"} != 0'
+- query: 'etcd_disk_backend_commit_duration_seconds_sum{namespace="openshift-azure-monitoring"} != 0'
 # account: RPOpenShift
 # namespace: Prometheus
 # region: eastus
