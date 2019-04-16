@@ -11,8 +11,6 @@ if [[ ! -e $PWD/_data/_out/admin.kubeconfig ]]; then
     exit 0
 fi
 
-mkdir -p "$ARTIFACT_DIR"
-
 export KUBECONFIG=$PWD/_data/_out/admin.kubeconfig
 
 for ((i=0; i<3; i++)); do

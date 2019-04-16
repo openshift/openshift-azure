@@ -38,6 +38,8 @@ export GOPATH=/go # our prow configuration overrides our image setting to /home/
 export NO_WAIT=true
 export RESOURCEGROUP_TTL=4h
 
+mkdir -p $ARTIFACT_DIR
+
 prdetail="$(python -c 'import json, os; o=json.loads(os.environ["CLONEREFS_OPTIONS"]); print "%s-%s-" % (o["refs"][0]["pulls"][0]["author"].lower(), o["refs"][0]["pulls"][0]["number"])' 2>/dev/null || true)"
 export RESOURCEGROUP="$(basename "$0" .sh)-$prdetail$(cat /dev/urandom | tr -dc 'a-z' | fold -w 6 | head -n 1)"
 
