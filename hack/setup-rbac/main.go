@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/authorization/mgmt/2015-07-01/authorization"
+	"github.com/Azure/azure-sdk-for-go/services/monitor/mgmt/2017-09-01/insights"
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/fakerp"
@@ -21,7 +22,11 @@ func listActions(ctx context.Context, resourceGroupName string) error {
 		return err
 	}
 
-	cli := azureclient.NewActivityLogsClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
+	// realRP has a conflict with insights package vendoring. This is the reason
+	// we dont use azureclient package here for insights.
+	cli := insights.NewActivityLogsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	cli.Authorizer = authorizer
+	cli.PollingDelay = 10 * time.Second
 
 	pages, err := cli.List(ctx,
 		fmt.Sprintf("eventTimestamp ge '%s' and resourceGroupName eq '%s'",

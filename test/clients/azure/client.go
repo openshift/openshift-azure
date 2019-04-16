@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/Azure/azure-sdk-for-go/services/monitor/mgmt/2017-09-01/insights"
 	"github.com/onsi/ginkgo/config"
 
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
@@ -35,7 +36,6 @@ func (tf rpFocus) match(focusString string) bool {
 // Client is the main controller for azure client objects
 type Client struct {
 	Accounts                         azureclient.AccountsClient
-	ActivityLogs                     azureclient.ActivityLogsClient
 	Applications                     azureclient.ApplicationsClient
 	BlobStorage                      storage.BlobStorageClient
 	OpenShiftManagedClusters         externalapi.OpenShiftManagedClustersClient
@@ -47,6 +47,9 @@ type Client struct {
 	VirtualNetworks                  azureclient.VirtualNetworksClient
 	VirtualNetworksPeerings          azureclient.VirtualNetworksPeeringsClient
 	Groups                           azureclient.GroupsClient
+
+	// clients, with no implementation in the plugin codebase
+	ActivityLogs insights.ActivityLogsClient
 }
 
 // NewClientFromEnvironment creates a new azure client from environment variables.
@@ -96,9 +99,12 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 
 	ctx := context.Background()
 
+	activityLogsCli := insights.NewActivityLogsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	activityLogsCli.Authorizer = authorizer
+
 	return &Client{
 		Accounts:                         azureclient.NewAccountsClient(ctx, subscriptionID, authorizer),
-		ActivityLogs:                     azureclient.NewActivityLogsClient(ctx, subscriptionID, authorizer),
+		ActivityLogs:                     activityLogsCli,
 		Applications:                     azureclient.NewApplicationsClient(ctx, subscriptionID, authorizer),
 		BlobStorage:                      storageClient,
 		OpenShiftManagedClusters:         rpc,
