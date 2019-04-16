@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -332,6 +332,8 @@ type ManagedClusterUpgradeProfileProperties = original.ManagedClusterUpgradeProf
 type ManagedClustersClient = original.ManagedClustersClient
 type ManagedClustersCreateOrUpdateFuture = original.ManagedClustersCreateOrUpdateFuture
 type ManagedClustersDeleteFuture = original.ManagedClustersDeleteFuture
+type ManagedClustersResetAADProfileFuture = original.ManagedClustersResetAADProfileFuture
+type ManagedClustersResetServicePrincipalProfileFuture = original.ManagedClustersResetServicePrincipalProfileFuture
 type ManagedClustersUpdateTagsFuture = original.ManagedClustersUpdateTagsFuture
 type MasterProfile = original.MasterProfile
 type NetworkProfile = original.NetworkProfile

@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ type LocationBasedPerformanceTierClientAPI = original.LocationBasedPerformanceTi
 type LogFilesClientAPI = original.LogFilesClientAPI
 type OperationsClientAPI = original.OperationsClientAPI
 type ReplicasClientAPI = original.ReplicasClientAPI
+type ServerClientAPI = original.ServerClientAPI
 type ServerSecurityAlertPoliciesClientAPI = original.ServerSecurityAlertPoliciesClientAPI
 type ServersClientAPI = original.ServersClientAPI
 type VirtualNetworkRulesClientAPI = original.VirtualNetworkRulesClientAPI

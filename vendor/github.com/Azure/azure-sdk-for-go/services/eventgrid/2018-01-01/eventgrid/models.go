@@ -141,6 +141,62 @@ func PossibleOdataTypeValues() []OdataType {
 	return []OdataType{OdataTypeMediaJobOutput, OdataTypeMicrosoftMediaJobOutputAsset}
 }
 
+// ContainerRegistryArtifactEventData the content of the event request message.
+type ContainerRegistryArtifactEventData struct {
+	// ID - The event ID.
+	ID *string `json:"id,omitempty"`
+	// Timestamp - The time at which the event occurred.
+	Timestamp *date.Time `json:"timestamp,omitempty"`
+	// Action - The action that encompasses the provided event.
+	Action *string `json:"action,omitempty"`
+	// Target - The target of the event.
+	Target *ContainerRegistryArtifactEventTarget `json:"target,omitempty"`
+}
+
+// ContainerRegistryArtifactEventTarget the target of the event.
+type ContainerRegistryArtifactEventTarget struct {
+	// MediaType - The MIME type of the artifact.
+	MediaType *string `json:"mediaType,omitempty"`
+	// Size - The size in bytes of the artifact.
+	Size *int64 `json:"size,omitempty"`
+	// Digest - The digest of the artifact.
+	Digest *string `json:"digest,omitempty"`
+	// Repository - The repository name of the artifact.
+	Repository *string `json:"repository,omitempty"`
+	// Tag - The tag of the artifact.
+	Tag *string `json:"tag,omitempty"`
+	// Name - The name of the artifact.
+	Name *string `json:"name,omitempty"`
+	// Version - The version of the artifact.
+	Version *string `json:"version,omitempty"`
+}
+
+// ContainerRegistryChartDeletedEventData schema of the Data property of an EventGridEvent for a
+// Microsoft.ContainerRegistry.ChartDeleted event.
+type ContainerRegistryChartDeletedEventData struct {
+	// ID - The event ID.
+	ID *string `json:"id,omitempty"`
+	// Timestamp - The time at which the event occurred.
+	Timestamp *date.Time `json:"timestamp,omitempty"`
+	// Action - The action that encompasses the provided event.
+	Action *string `json:"action,omitempty"`
+	// Target - The target of the event.
+	Target *ContainerRegistryArtifactEventTarget `json:"target,omitempty"`
+}
+
+// ContainerRegistryChartPushedEventData schema of the Data property of an EventGridEvent for a
+// Microsoft.ContainerRegistry.ChartPushed event.
+type ContainerRegistryChartPushedEventData struct {
+	// ID - The event ID.
+	ID *string `json:"id,omitempty"`
+	// Timestamp - The time at which the event occurred.
+	Timestamp *date.Time `json:"timestamp,omitempty"`
+	// Action - The action that encompasses the provided event.
+	Action *string `json:"action,omitempty"`
+	// Target - The target of the event.
+	Target *ContainerRegistryArtifactEventTarget `json:"target,omitempty"`
+}
+
 // ContainerRegistryEventActor the agent that initiated the event. For most situations, this could be from
 // the authorization context of the request.
 type ContainerRegistryEventActor struct {
@@ -420,6 +476,74 @@ type IotHubDeviceDisconnectedEventData struct {
 	HubName *string `json:"hubName,omitempty"`
 	// DeviceConnectionStateEventInfo - Information about the device connection state event.
 	DeviceConnectionStateEventInfo *DeviceConnectionStateEventInfo `json:"deviceConnectionStateEventInfo,omitempty"`
+}
+
+// MapsGeofenceEnteredEventData schema of the Data property of an EventGridEvent for a
+// Microsoft.Maps.GeofenceEntered event.
+type MapsGeofenceEnteredEventData struct {
+	// ExpiredGeofenceGeometryID - Lists of the geometry ID of the geofence which is expired relative to the user time in the request.
+	ExpiredGeofenceGeometryID *[]string `json:"expiredGeofenceGeometryId,omitempty"`
+	// Geometries - Lists the fence geometries that either fully contain the coordinate position or have an overlap with the searchBuffer around the fence.
+	Geometries *[]MapsGeofenceGeometry `json:"geometries,omitempty"`
+	// InvalidPeriodGeofenceGeometryID - Lists of the geometry ID of the geofence which is in invalid period relative to the user time in the request.
+	InvalidPeriodGeofenceGeometryID *[]string `json:"invalidPeriodGeofenceGeometryId,omitempty"`
+	// IsEventPublished - True if at least one event is published to the Azure Maps event subscriber, false if no event is published to the Azure Maps event subscriber.
+	IsEventPublished *bool `json:"isEventPublished,omitempty"`
+}
+
+// MapsGeofenceEventProperties schema of the Data property of an EventGridEvent for a Geofence event
+// (GeofenceEntered, GeofenceExited, GeofenceResult).
+type MapsGeofenceEventProperties struct {
+	// ExpiredGeofenceGeometryID - Lists of the geometry ID of the geofence which is expired relative to the user time in the request.
+	ExpiredGeofenceGeometryID *[]string `json:"expiredGeofenceGeometryId,omitempty"`
+	// Geometries - Lists the fence geometries that either fully contain the coordinate position or have an overlap with the searchBuffer around the fence.
+	Geometries *[]MapsGeofenceGeometry `json:"geometries,omitempty"`
+	// InvalidPeriodGeofenceGeometryID - Lists of the geometry ID of the geofence which is in invalid period relative to the user time in the request.
+	InvalidPeriodGeofenceGeometryID *[]string `json:"invalidPeriodGeofenceGeometryId,omitempty"`
+	// IsEventPublished - True if at least one event is published to the Azure Maps event subscriber, false if no event is published to the Azure Maps event subscriber.
+	IsEventPublished *bool `json:"isEventPublished,omitempty"`
+}
+
+// MapsGeofenceExitedEventData schema of the Data property of an EventGridEvent for a
+// Microsoft.Maps.GeofenceExited event.
+type MapsGeofenceExitedEventData struct {
+	// ExpiredGeofenceGeometryID - Lists of the geometry ID of the geofence which is expired relative to the user time in the request.
+	ExpiredGeofenceGeometryID *[]string `json:"expiredGeofenceGeometryId,omitempty"`
+	// Geometries - Lists the fence geometries that either fully contain the coordinate position or have an overlap with the searchBuffer around the fence.
+	Geometries *[]MapsGeofenceGeometry `json:"geometries,omitempty"`
+	// InvalidPeriodGeofenceGeometryID - Lists of the geometry ID of the geofence which is in invalid period relative to the user time in the request.
+	InvalidPeriodGeofenceGeometryID *[]string `json:"invalidPeriodGeofenceGeometryId,omitempty"`
+	// IsEventPublished - True if at least one event is published to the Azure Maps event subscriber, false if no event is published to the Azure Maps event subscriber.
+	IsEventPublished *bool `json:"isEventPublished,omitempty"`
+}
+
+// MapsGeofenceGeometry the geofence geometry.
+type MapsGeofenceGeometry struct {
+	// DeviceID - ID of the device.
+	DeviceID *string `json:"deviceId,omitempty"`
+	// Distance - Distance from the coordinate to the closest border of the geofence. Positive means the coordinate is outside of the geofence. If the coordinate is outside of the geofence, but more than the value of searchBuffer away from the closest geofence border, then the value is 999. Negative means the coordinate is inside of the geofence. If the coordinate is inside the polygon, but more than the value of searchBuffer away from the closest geofencing border,then the value is -999. A value of 999 means that there is great confidence the coordinate is well outside the geofence. A value of -999 means that there is great confidence the coordinate is well within the geofence.
+	Distance *float64 `json:"distance,omitempty"`
+	// GeometryID - The unique ID for the geofence geometry.
+	GeometryID *string `json:"geometryId,omitempty"`
+	// NearestLat - Latitude of the nearest point of the geometry.
+	NearestLat *float64 `json:"nearestLat,omitempty"`
+	// NearestLon - Longitude of the nearest point of the geometry.
+	NearestLon *float64 `json:"nearestLon,omitempty"`
+	// UdID - The unique id returned from user upload service when uploading a geofence. Will not be included in geofencing post API.
+	UdID *string `json:"udId,omitempty"`
+}
+
+// MapsGeofenceResultEventData schema of the Data property of an EventGridEvent for a
+// Microsoft.Maps.GeofenceResult event.
+type MapsGeofenceResultEventData struct {
+	// ExpiredGeofenceGeometryID - Lists of the geometry ID of the geofence which is expired relative to the user time in the request.
+	ExpiredGeofenceGeometryID *[]string `json:"expiredGeofenceGeometryId,omitempty"`
+	// Geometries - Lists the fence geometries that either fully contain the coordinate position or have an overlap with the searchBuffer around the fence.
+	Geometries *[]MapsGeofenceGeometry `json:"geometries,omitempty"`
+	// InvalidPeriodGeofenceGeometryID - Lists of the geometry ID of the geofence which is in invalid period relative to the user time in the request.
+	InvalidPeriodGeofenceGeometryID *[]string `json:"invalidPeriodGeofenceGeometryId,omitempty"`
+	// IsEventPublished - True if at least one event is published to the Azure Maps event subscriber, false if no event is published to the Azure Maps event subscriber.
+	IsEventPublished *bool `json:"isEventPublished,omitempty"`
 }
 
 // MediaJobCanceledEventData job canceled event data
@@ -1179,6 +1303,31 @@ func (mjoped *MediaJobOutputProcessingEventData) UnmarshalJSON(body []byte) erro
 	return nil
 }
 
+// MediaJobOutputProgressEventData job Output Progress Event Data.
+type MediaJobOutputProgressEventData struct {
+	// Label - Gets the Job output label.
+	Label *string `json:"label,omitempty"`
+	// Progress - Gets the Job output progress.
+	Progress *int64 `json:"progress,omitempty"`
+	// JobCorrelationData - Gets the Job correlation data.
+	JobCorrelationData map[string]*string `json:"jobCorrelationData"`
+}
+
+// MarshalJSON is the custom marshaler for MediaJobOutputProgressEventData.
+func (mjoped MediaJobOutputProgressEventData) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if mjoped.Label != nil {
+		objectMap["label"] = mjoped.Label
+	}
+	if mjoped.Progress != nil {
+		objectMap["progress"] = mjoped.Progress
+	}
+	if mjoped.JobCorrelationData != nil {
+		objectMap["jobCorrelationData"] = mjoped.JobCorrelationData
+	}
+	return json.Marshal(objectMap)
+}
+
 // MediaJobOutputScheduledEventData job output scheduled event data
 type MediaJobOutputScheduledEventData struct {
 	// PreviousState - The previous state of the Job. Possible values include: 'Canceled', 'Canceling', 'Error', 'Finished', 'Processing', 'Queued', 'Scheduled'
@@ -1836,7 +1985,7 @@ type StorageBlobCreatedEventData struct {
 	// ContentType - The content type of the blob. This is the same as what would be returned in the Content-Type header from the blob.
 	ContentType *string `json:"contentType,omitempty"`
 	// ContentLength - The size of the blob in bytes. This is the same as what would be returned in the Content-Length header from the blob.
-	ContentLength *int32 `json:"contentLength,omitempty"`
+	ContentLength *int64 `json:"contentLength,omitempty"`
 	// BlobType - The type of blob.
 	BlobType *string `json:"blobType,omitempty"`
 	// URL - The path to the blob.

@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 package securityapi
 
-import original "github.com/Azure/azure-sdk-for-go/services/preview/security/mgmt/2017-08-01-preview/security/securityapi"
+import original "github.com/Azure/azure-sdk-for-go/services/preview/security/mgmt/v2.0/security/securityapi"
 
 type AdvancedThreatProtectionClientAPI = original.AdvancedThreatProtectionClientAPI
 type AlertsClientAPI = original.AlertsClientAPI

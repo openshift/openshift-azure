@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -380,13 +380,6 @@ const (
 	NotSpecified RecurrenceFrequency = original.NotSpecified
 	Week         RecurrenceFrequency = original.Week
 	Year         RecurrenceFrequency = original.Year
-)
-
-type SSISExecutionRuntime = original.SSISExecutionRuntime
-
-const (
-	X64 SSISExecutionRuntime = original.X64
-	X86 SSISExecutionRuntime = original.X86
 )
 
 type SalesforceSinkWriteBehavior = original.SalesforceSinkWriteBehavior
@@ -1226,6 +1219,7 @@ type SQLServerTableDataset = original.SQLServerTableDataset
 type SQLServerTableDatasetTypeProperties = original.SQLServerTableDatasetTypeProperties
 type SQLSink = original.SQLSink
 type SQLSource = original.SQLSource
+type SSISExecutionCredential = original.SSISExecutionCredential
 type SSISExecutionParameter = original.SSISExecutionParameter
 type SSISPackageLocation = original.SSISPackageLocation
 type SSISPropertyOverride = original.SSISPropertyOverride
@@ -1574,9 +1568,6 @@ func PossiblePrestoAuthenticationTypeValues() []PrestoAuthenticationType {
 }
 func PossibleRecurrenceFrequencyValues() []RecurrenceFrequency {
 	return original.PossibleRecurrenceFrequencyValues()
-}
-func PossibleSSISExecutionRuntimeValues() []SSISExecutionRuntime {
-	return original.PossibleSSISExecutionRuntimeValues()
 }
 func PossibleSalesforceSinkWriteBehaviorValues() []SalesforceSinkWriteBehavior {
 	return original.PossibleSalesforceSinkWriteBehaviorValues()

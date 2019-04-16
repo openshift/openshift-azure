@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -73,6 +73,10 @@ const (
 
 type BaseClient = original.BaseClient
 type BasicMediaJobOutput = original.BasicMediaJobOutput
+type ContainerRegistryArtifactEventData = original.ContainerRegistryArtifactEventData
+type ContainerRegistryArtifactEventTarget = original.ContainerRegistryArtifactEventTarget
+type ContainerRegistryChartDeletedEventData = original.ContainerRegistryChartDeletedEventData
+type ContainerRegistryChartPushedEventData = original.ContainerRegistryChartPushedEventData
 type ContainerRegistryEventActor = original.ContainerRegistryEventActor
 type ContainerRegistryEventData = original.ContainerRegistryEventData
 type ContainerRegistryEventRequest = original.ContainerRegistryEventRequest
@@ -94,6 +98,11 @@ type IotHubDeviceConnectedEventData = original.IotHubDeviceConnectedEventData
 type IotHubDeviceCreatedEventData = original.IotHubDeviceCreatedEventData
 type IotHubDeviceDeletedEventData = original.IotHubDeviceDeletedEventData
 type IotHubDeviceDisconnectedEventData = original.IotHubDeviceDisconnectedEventData
+type MapsGeofenceEnteredEventData = original.MapsGeofenceEnteredEventData
+type MapsGeofenceEventProperties = original.MapsGeofenceEventProperties
+type MapsGeofenceExitedEventData = original.MapsGeofenceExitedEventData
+type MapsGeofenceGeometry = original.MapsGeofenceGeometry
+type MapsGeofenceResultEventData = original.MapsGeofenceResultEventData
 type MediaJobCanceledEventData = original.MediaJobCanceledEventData
 type MediaJobCancelingEventData = original.MediaJobCancelingEventData
 type MediaJobError = original.MediaJobError
@@ -107,6 +116,7 @@ type MediaJobOutputCancelingEventData = original.MediaJobOutputCancelingEventDat
 type MediaJobOutputErroredEventData = original.MediaJobOutputErroredEventData
 type MediaJobOutputFinishedEventData = original.MediaJobOutputFinishedEventData
 type MediaJobOutputProcessingEventData = original.MediaJobOutputProcessingEventData
+type MediaJobOutputProgressEventData = original.MediaJobOutputProgressEventData
 type MediaJobOutputScheduledEventData = original.MediaJobOutputScheduledEventData
 type MediaJobOutputStateChangeEventData = original.MediaJobOutputStateChangeEventData
 type MediaJobProcessingEventData = original.MediaJobProcessingEventData

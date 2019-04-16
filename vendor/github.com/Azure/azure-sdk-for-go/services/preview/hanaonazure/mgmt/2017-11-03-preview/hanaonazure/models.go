@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/Azure/go-autorest/tracing"
 	"net/http"
@@ -270,6 +271,10 @@ type HanaInstanceProperties struct {
 	HanaInstanceID *string `json:"hanaInstanceId,omitempty"`
 	// PowerState - Resource power state. Possible values include: 'Starting', 'Started', 'Stopping', 'Stopped', 'Restarting', 'Unknown'
 	PowerState HanaInstancePowerStateEnum `json:"powerState,omitempty"`
+	// ProximityPlacementGroup - Resource proximity placement group
+	ProximityPlacementGroup *string `json:"proximityPlacementGroup,omitempty"`
+	// HwRevision - Hardware revision of a HANA instance
+	HwRevision *string `json:"hwRevision,omitempty"`
 }
 
 // HanaInstancesListResult the response from the List HANA Instances operation.
@@ -418,6 +423,29 @@ func NewHanaInstancesListResultPage(getNextPage func(context.Context, HanaInstan
 	return HanaInstancesListResultPage{fn: getNextPage}
 }
 
+// HanaInstancesRestartFuture an abstraction for monitoring and retrieving the results of a long-running
+// operation.
+type HanaInstancesRestartFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *HanaInstancesRestartFuture) Result(client HanaInstancesClient) (ar autorest.Response, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "hanaonazure.HanaInstancesRestartFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("hanaonazure.HanaInstancesRestartFuture")
+		return
+	}
+	ar.Response = future.Response()
+	return
+}
+
 // HardwareProfile specifies the hardware settings for the HANA instance.
 type HardwareProfile struct {
 	// HardwareType - Name of the hardware type (vendor and/or their product name). Possible values include: 'CiscoUCS', 'HPE'
@@ -506,4 +534,19 @@ type StorageProfile struct {
 	NfsIPAddress *string `json:"nfsIpAddress,omitempty"`
 	// OsDisks - Specifies information about the operating system disk used by the hana instance.
 	OsDisks *[]Disk `json:"osDisks,omitempty"`
+}
+
+// Tags tags field of the HANA instance.
+type Tags struct {
+	// Tags - Tags field of the HANA instance.
+	Tags map[string]*string `json:"tags"`
+}
+
+// MarshalJSON is the custom marshaler for Tags.
+func (t Tags) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if t.Tags != nil {
+		objectMap["tags"] = t.Tags
+	}
+	return json.Marshal(objectMap)
 }

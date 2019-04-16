@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 package networkapi
 
-import original "github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-10-01/network/networkapi"
+import original "github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-12-01/network/networkapi"
 
 type ApplicationGatewaysClientAPI = original.ApplicationGatewaysClientAPI
 type ApplicationSecurityGroupsClientAPI = original.ApplicationSecurityGroupsClientAPI
@@ -31,6 +31,7 @@ type AzureFirewallsClientAPI = original.AzureFirewallsClientAPI
 type BaseClientAPI = original.BaseClientAPI
 type BgpServiceCommunitiesClientAPI = original.BgpServiceCommunitiesClientAPI
 type ConnectionMonitorsClientAPI = original.ConnectionMonitorsClientAPI
+type DdosCustomPoliciesClientAPI = original.DdosCustomPoliciesClientAPI
 type DdosProtectionPlansClientAPI = original.DdosProtectionPlansClientAPI
 type DefaultSecurityRulesClientAPI = original.DefaultSecurityRulesClientAPI
 type ExpressRouteCircuitAuthorizationsClientAPI = original.ExpressRouteCircuitAuthorizationsClientAPI
@@ -64,6 +65,7 @@ type OperationsClientAPI = original.OperationsClientAPI
 type P2sVpnGatewaysClientAPI = original.P2sVpnGatewaysClientAPI
 type P2sVpnServerConfigurationsClientAPI = original.P2sVpnServerConfigurationsClientAPI
 type PacketCapturesClientAPI = original.PacketCapturesClientAPI
+type PeerExpressRouteCircuitConnectionsClientAPI = original.PeerExpressRouteCircuitConnectionsClientAPI
 type ProfilesClientAPI = original.ProfilesClientAPI
 type PublicIPAddressesClientAPI = original.PublicIPAddressesClientAPI
 type PublicIPPrefixesClientAPI = original.PublicIPPrefixesClientAPI
@@ -89,3 +91,4 @@ type VpnGatewaysClientAPI = original.VpnGatewaysClientAPI
 type VpnSitesClientAPI = original.VpnSitesClientAPI
 type VpnSitesConfigurationClientAPI = original.VpnSitesConfigurationClientAPI
 type WatchersClientAPI = original.WatchersClientAPI
+type WebApplicationFirewallPoliciesClientAPI = original.WebApplicationFirewallPoliciesClientAPI

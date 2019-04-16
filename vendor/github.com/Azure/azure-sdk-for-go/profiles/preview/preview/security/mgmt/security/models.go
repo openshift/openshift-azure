@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package security
 import (
 	"context"
 
-	original "github.com/Azure/azure-sdk-for-go/services/preview/security/mgmt/2017-08-01-preview/security"
+	original "github.com/Azure/azure-sdk-for-go/services/preview/security/mgmt/v2.0/security"
 )
 
 const (
@@ -85,17 +85,10 @@ const (
 type KindEnum = original.KindEnum
 
 const (
-	KindDataExportSetting KindEnum = original.KindDataExportSetting
-	KindSetting           KindEnum = original.KindSetting
-)
-
-type KindEnum1 = original.KindEnum1
-
-const (
-	KindAAD                      KindEnum1 = original.KindAAD
-	KindATA                      KindEnum1 = original.KindATA
-	KindCEF                      KindEnum1 = original.KindCEF
-	KindExternalSecuritySolution KindEnum1 = original.KindExternalSecuritySolution
+	KindAAD                      KindEnum = original.KindAAD
+	KindATA                      KindEnum = original.KindATA
+	KindCEF                      KindEnum = original.KindCEF
+	KindExternalSecuritySolution KindEnum = original.KindExternalSecuritySolution
 )
 
 type PricingTier = original.PricingTier
@@ -113,10 +106,20 @@ const (
 	UDP Protocol = original.UDP
 )
 
+type ReportedSeverity = original.ReportedSeverity
+
+const (
+	High          ReportedSeverity = original.High
+	Informational ReportedSeverity = original.Informational
+	Low           ReportedSeverity = original.Low
+	Medium        ReportedSeverity = original.Medium
+)
+
 type SettingKind = original.SettingKind
 
 const (
-	SettingKindDataExportSetting SettingKind = original.SettingKindDataExportSetting
+	SettingKindAlertSuppressionSetting SettingKind = original.SettingKindAlertSuppressionSetting
+	SettingKindDataExportSetting       SettingKind = original.SettingKindDataExportSetting
 )
 
 type Status = original.Status
@@ -168,7 +171,6 @@ type AutoProvisioningSettingProperties = original.AutoProvisioningSettingPropert
 type AutoProvisioningSettingsClient = original.AutoProvisioningSettingsClient
 type BaseClient = original.BaseClient
 type BasicExternalSecuritySolution = original.BasicExternalSecuritySolution
-type BasicSetting = original.BasicSetting
 type CefExternalSecuritySolution = original.CefExternalSecuritySolution
 type CefSolutionProperties = original.CefSolutionProperties
 type CloudError = original.CloudError
@@ -238,15 +240,12 @@ type OperationListPage = original.OperationListPage
 type OperationsClient = original.OperationsClient
 type Pricing = original.Pricing
 type PricingList = original.PricingList
-type PricingListIterator = original.PricingListIterator
-type PricingListPage = original.PricingListPage
 type PricingProperties = original.PricingProperties
 type PricingsClient = original.PricingsClient
 type Resource = original.Resource
 type SensitivityLabel = original.SensitivityLabel
 type Setting = original.Setting
-type SettingKind1 = original.SettingKind1
-type SettingModel = original.SettingModel
+type SettingResource = original.SettingResource
 type SettingsClient = original.SettingsClient
 type SettingsList = original.SettingsList
 type SettingsListIterator = original.SettingsListIterator
@@ -415,12 +414,6 @@ func NewOperationsClient(subscriptionID string, ascLocation string) OperationsCl
 func NewOperationsClientWithBaseURI(baseURI string, subscriptionID string, ascLocation string) OperationsClient {
 	return original.NewOperationsClientWithBaseURI(baseURI, subscriptionID, ascLocation)
 }
-func NewPricingListIterator(page PricingListPage) PricingListIterator {
-	return original.NewPricingListIterator(page)
-}
-func NewPricingListPage(getNextPage func(context.Context, PricingList) (PricingList, error)) PricingListPage {
-	return original.NewPricingListPage(getNextPage)
-}
 func NewPricingsClient(subscriptionID string, ascLocation string) PricingsClient {
 	return original.NewPricingsClient(subscriptionID, ascLocation)
 }
@@ -499,9 +492,6 @@ func PossibleExternalSecuritySolutionKindValues() []ExternalSecuritySolutionKind
 func PossibleFamilyValues() []Family {
 	return original.PossibleFamilyValues()
 }
-func PossibleKindEnum1Values() []KindEnum1 {
-	return original.PossibleKindEnum1Values()
-}
 func PossibleKindEnumValues() []KindEnum {
 	return original.PossibleKindEnumValues()
 }
@@ -510,6 +500,9 @@ func PossiblePricingTierValues() []PricingTier {
 }
 func PossibleProtocolValues() []Protocol {
 	return original.PossibleProtocolValues()
+}
+func PossibleReportedSeverityValues() []ReportedSeverity {
+	return original.PossibleReportedSeverityValues()
 }
 func PossibleSettingKindValues() []SettingKind {
 	return original.PossibleSettingKindValues()

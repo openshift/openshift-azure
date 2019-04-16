@@ -7,7 +7,10 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/Azure/azure-sdk-for-go)](https://goreportcard.com/report/github.com/Azure/azure-sdk-for-go)
 
 azure-sdk-for-go provides Go packages for managing and using Azure services.
-It is continuously tested with Go 1.8, 1.9, 1.10, 1.11 and master.
+It officially supports the last two major releases of Go.  Older versions of
+Go will be kept running in CI until they no longer work due to changes in any
+of the SDK's external dependencies.  The CHANGELOG will be updated when a
+version of Go is removed from CI.
 
 To be notified about updates and changes, subscribe to the [Azure update
 feed](https://azure.microsoft.com/updates/).
@@ -388,7 +391,7 @@ Combined, these techniques will ensure that breaking changes should not occur. I
 ### Built-in Basic Request/Response Logging
 
 Starting with `go-autorest v10.15.0` you can enable basic logging of requests and responses through setting environment variables.
-Setting `AZURE_GO_SDK_LOG_LEVEL` to `LogInfo` will log request/response without their bodies. To include the bodies set the log level to `LogDebug`.
+Setting `AZURE_GO_SDK_LOG_LEVEL` to `INFO` will log request/response without their bodies. To include the bodies set the log level to `DEBUG`.
 
 By default the logger writes to strerr, however it can also write to stdout or a file
 if specified in `AZURE_GO_SDK_LOG_FILE`. Note that if the specified file already exists it will be truncated.

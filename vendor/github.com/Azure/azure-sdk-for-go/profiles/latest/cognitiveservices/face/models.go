@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -74,9 +74,8 @@ const (
 type Gender = original.Gender
 
 const (
-	Female     Gender = original.Female
-	Genderless Gender = original.Genderless
-	Male       Gender = original.Male
+	Female Gender = original.Female
+	Male   Gender = original.Male
 )
 
 type GlassesType = original.GlassesType
@@ -109,17 +108,42 @@ const (
 	NoiseLevelMedium NoiseLevel = original.NoiseLevelMedium
 )
 
+type OperationStatusType = original.OperationStatusType
+
+const (
+	Failed     OperationStatusType = original.Failed
+	Notstarted OperationStatusType = original.Notstarted
+	Running    OperationStatusType = original.Running
+	Succeeded  OperationStatusType = original.Succeeded
+)
+
+type SnapshotApplyMode = original.SnapshotApplyMode
+
+const (
+	CreateNew SnapshotApplyMode = original.CreateNew
+)
+
+type SnapshotObjectType = original.SnapshotObjectType
+
+const (
+	SnapshotObjectTypeFaceList         SnapshotObjectType = original.SnapshotObjectTypeFaceList
+	SnapshotObjectTypeLargeFaceList    SnapshotObjectType = original.SnapshotObjectTypeLargeFaceList
+	SnapshotObjectTypeLargePersonGroup SnapshotObjectType = original.SnapshotObjectTypeLargePersonGroup
+	SnapshotObjectTypePersonGroup      SnapshotObjectType = original.SnapshotObjectTypePersonGroup
+)
+
 type TrainingStatusType = original.TrainingStatusType
 
 const (
-	Failed     TrainingStatusType = original.Failed
-	Nonstarted TrainingStatusType = original.Nonstarted
-	Running    TrainingStatusType = original.Running
-	Succeeded  TrainingStatusType = original.Succeeded
+	TrainingStatusTypeFailed     TrainingStatusType = original.TrainingStatusTypeFailed
+	TrainingStatusTypeNonstarted TrainingStatusType = original.TrainingStatusTypeNonstarted
+	TrainingStatusTypeRunning    TrainingStatusType = original.TrainingStatusTypeRunning
+	TrainingStatusTypeSucceeded  TrainingStatusType = original.TrainingStatusTypeSucceeded
 )
 
 type APIError = original.APIError
 type Accessory = original.Accessory
+type ApplySnapshotRequest = original.ApplySnapshotRequest
 type Attributes = original.Attributes
 type BaseClient = original.BaseClient
 type Blur = original.Blur
@@ -157,10 +181,12 @@ type ListPersistedFace = original.ListPersistedFace
 type ListPerson = original.ListPerson
 type ListPersonGroup = original.ListPersonGroup
 type ListSimilarFace = original.ListSimilarFace
+type ListSnapshot = original.ListSnapshot
 type Makeup = original.Makeup
 type NameAndUserDataContract = original.NameAndUserDataContract
 type Noise = original.Noise
 type Occlusion = original.Occlusion
+type OperationStatus = original.OperationStatus
 type PersistedFace = original.PersistedFace
 type Person = original.Person
 type PersonGroup = original.PersonGroup
@@ -168,8 +194,12 @@ type PersonGroupClient = original.PersonGroupClient
 type PersonGroupPersonClient = original.PersonGroupPersonClient
 type Rectangle = original.Rectangle
 type SimilarFace = original.SimilarFace
+type Snapshot = original.Snapshot
+type SnapshotClient = original.SnapshotClient
+type TakeSnapshotRequest = original.TakeSnapshotRequest
 type TrainingStatus = original.TrainingStatus
 type UpdateFaceRequest = original.UpdateFaceRequest
+type UpdateSnapshotRequest = original.UpdateSnapshotRequest
 type VerifyFaceToFaceRequest = original.VerifyFaceToFaceRequest
 type VerifyFaceToPersonRequest = original.VerifyFaceToPersonRequest
 type VerifyResult = original.VerifyResult
@@ -197,6 +227,9 @@ func NewPersonGroupClient(endpoint string) PersonGroupClient {
 }
 func NewPersonGroupPersonClient(endpoint string) PersonGroupPersonClient {
 	return original.NewPersonGroupPersonClient(endpoint)
+}
+func NewSnapshotClient(endpoint string) SnapshotClient {
+	return original.NewSnapshotClient(endpoint)
 }
 func NewWithoutDefaults(endpoint string) BaseClient {
 	return original.NewWithoutDefaults(endpoint)
@@ -227,6 +260,15 @@ func PossibleHairColorTypeValues() []HairColorType {
 }
 func PossibleNoiseLevelValues() []NoiseLevel {
 	return original.PossibleNoiseLevelValues()
+}
+func PossibleOperationStatusTypeValues() []OperationStatusType {
+	return original.PossibleOperationStatusTypeValues()
+}
+func PossibleSnapshotApplyModeValues() []SnapshotApplyMode {
+	return original.PossibleSnapshotApplyModeValues()
+}
+func PossibleSnapshotObjectTypeValues() []SnapshotObjectType {
+	return original.PossibleSnapshotObjectTypeValues()
 }
 func PossibleTrainingStatusTypeValues() []TrainingStatusType {
 	return original.PossibleTrainingStatusTypeValues()

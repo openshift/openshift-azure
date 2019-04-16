@@ -610,6 +610,23 @@ func PossibleManagedDatabaseStatusValues() []ManagedDatabaseStatus {
 	return []ManagedDatabaseStatus{Creating, Inaccessible, Offline, Online, Shutdown, Updating}
 }
 
+// ManagedInstanceProxyOverride enumerates the values for managed instance proxy override.
+type ManagedInstanceProxyOverride string
+
+const (
+	// ManagedInstanceProxyOverrideDefault ...
+	ManagedInstanceProxyOverrideDefault ManagedInstanceProxyOverride = "Default"
+	// ManagedInstanceProxyOverrideProxy ...
+	ManagedInstanceProxyOverrideProxy ManagedInstanceProxyOverride = "Proxy"
+	// ManagedInstanceProxyOverrideRedirect ...
+	ManagedInstanceProxyOverrideRedirect ManagedInstanceProxyOverride = "Redirect"
+)
+
+// PossibleManagedInstanceProxyOverrideValues returns an array of possible values for the ManagedInstanceProxyOverride const type.
+func PossibleManagedInstanceProxyOverrideValues() []ManagedInstanceProxyOverride {
+	return []ManagedInstanceProxyOverride{ManagedInstanceProxyOverrideDefault, ManagedInstanceProxyOverrideProxy, ManagedInstanceProxyOverrideRedirect}
+}
+
 // ManagementOperationState enumerates the values for management operation state.
 type ManagementOperationState string
 
@@ -951,6 +968,21 @@ const (
 // PossibleSecurityAlertPolicyUseServerDefaultValues returns an array of possible values for the SecurityAlertPolicyUseServerDefault const type.
 func PossibleSecurityAlertPolicyUseServerDefaultValues() []SecurityAlertPolicyUseServerDefault {
 	return []SecurityAlertPolicyUseServerDefault{SecurityAlertPolicyUseServerDefaultDisabled, SecurityAlertPolicyUseServerDefaultEnabled}
+}
+
+// SensitivityLabelSource enumerates the values for sensitivity label source.
+type SensitivityLabelSource string
+
+const (
+	// Current ...
+	Current SensitivityLabelSource = "current"
+	// Recommended ...
+	Recommended SensitivityLabelSource = "recommended"
+)
+
+// PossibleSensitivityLabelSourceValues returns an array of possible values for the SensitivityLabelSource const type.
+func PossibleSensitivityLabelSourceValues() []SensitivityLabelSource {
+	return []SensitivityLabelSource{Current, Recommended}
 }
 
 // ServerConnectionType enumerates the values for server connection type.
@@ -8875,6 +8907,17 @@ type ManagedInstanceProperties struct {
 	DNSZone *string `json:"dnsZone,omitempty"`
 	// DNSZonePartner - The resource id of another managed instance whose DNS zone this managed instance will share after creation.
 	DNSZonePartner *string `json:"dnsZonePartner,omitempty"`
+	// PublicDataEndpointEnabled - Whether or not the public data endpoint is enabled.
+	PublicDataEndpointEnabled *bool `json:"publicDataEndpointEnabled,omitempty"`
+	// ProxyOverride - Connection type used for connecting to the instance. Possible values include: 'ManagedInstanceProxyOverrideProxy', 'ManagedInstanceProxyOverrideRedirect', 'ManagedInstanceProxyOverrideDefault'
+	ProxyOverride ManagedInstanceProxyOverride `json:"proxyOverride,omitempty"`
+	// TimezoneID - Id of the timezone. Allowed values are timezones supported by Windows.
+	// Winodws keeps details on supported timezones, including the id, in registry under
+	// KEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Time Zones.
+	// You can get those registry values via SQL Server by querying SELECT name AS timezone_id FROM sys.time_zone_info.
+	// List of Ids can also be obtained by executing [System.TimeZoneInfo]::GetSystemTimeZones() in PowerShell.
+	// An example of valid timezone id is "Pacific Standard Time" or "W. Europe Standard Time".
+	TimezoneID *string `json:"timezoneId,omitempty"`
 }
 
 // ManagedInstancesCreateOrUpdateFuture an abstraction for monitoring and retrieving the results of a
@@ -9871,6 +9914,276 @@ type RestorableDroppedDatabaseProperties struct {
 	EarliestRestoreDate *date.Time `json:"earliestRestoreDate,omitempty"`
 }
 
+// RestorableDroppedManagedDatabase a restorable dropped managed database resource.
+type RestorableDroppedManagedDatabase struct {
+	autorest.Response `json:"-"`
+	// RestorableDroppedManagedDatabaseProperties - Resource properties.
+	*RestorableDroppedManagedDatabaseProperties `json:"properties,omitempty"`
+	// Location - Resource location.
+	Location *string `json:"location,omitempty"`
+	// Tags - Resource tags.
+	Tags map[string]*string `json:"tags"`
+	// ID - Resource ID.
+	ID *string `json:"id,omitempty"`
+	// Name - Resource name.
+	Name *string `json:"name,omitempty"`
+	// Type - Resource type.
+	Type *string `json:"type,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for RestorableDroppedManagedDatabase.
+func (rdmd RestorableDroppedManagedDatabase) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if rdmd.RestorableDroppedManagedDatabaseProperties != nil {
+		objectMap["properties"] = rdmd.RestorableDroppedManagedDatabaseProperties
+	}
+	if rdmd.Location != nil {
+		objectMap["location"] = rdmd.Location
+	}
+	if rdmd.Tags != nil {
+		objectMap["tags"] = rdmd.Tags
+	}
+	if rdmd.ID != nil {
+		objectMap["id"] = rdmd.ID
+	}
+	if rdmd.Name != nil {
+		objectMap["name"] = rdmd.Name
+	}
+	if rdmd.Type != nil {
+		objectMap["type"] = rdmd.Type
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for RestorableDroppedManagedDatabase struct.
+func (rdmd *RestorableDroppedManagedDatabase) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "properties":
+			if v != nil {
+				var restorableDroppedManagedDatabaseProperties RestorableDroppedManagedDatabaseProperties
+				err = json.Unmarshal(*v, &restorableDroppedManagedDatabaseProperties)
+				if err != nil {
+					return err
+				}
+				rdmd.RestorableDroppedManagedDatabaseProperties = &restorableDroppedManagedDatabaseProperties
+			}
+		case "location":
+			if v != nil {
+				var location string
+				err = json.Unmarshal(*v, &location)
+				if err != nil {
+					return err
+				}
+				rdmd.Location = &location
+			}
+		case "tags":
+			if v != nil {
+				var tags map[string]*string
+				err = json.Unmarshal(*v, &tags)
+				if err != nil {
+					return err
+				}
+				rdmd.Tags = tags
+			}
+		case "id":
+			if v != nil {
+				var ID string
+				err = json.Unmarshal(*v, &ID)
+				if err != nil {
+					return err
+				}
+				rdmd.ID = &ID
+			}
+		case "name":
+			if v != nil {
+				var name string
+				err = json.Unmarshal(*v, &name)
+				if err != nil {
+					return err
+				}
+				rdmd.Name = &name
+			}
+		case "type":
+			if v != nil {
+				var typeVar string
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				rdmd.Type = &typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// RestorableDroppedManagedDatabaseListResult a list of restorable dropped managed databases.
+type RestorableDroppedManagedDatabaseListResult struct {
+	autorest.Response `json:"-"`
+	// Value - Array of results.
+	Value *[]RestorableDroppedManagedDatabase `json:"value,omitempty"`
+	// NextLink - Link to retrieve next page of results.
+	NextLink *string `json:"nextLink,omitempty"`
+}
+
+// RestorableDroppedManagedDatabaseListResultIterator provides access to a complete listing of
+// RestorableDroppedManagedDatabase values.
+type RestorableDroppedManagedDatabaseListResultIterator struct {
+	i    int
+	page RestorableDroppedManagedDatabaseListResultPage
+}
+
+// NextWithContext advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+func (iter *RestorableDroppedManagedDatabaseListResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/RestorableDroppedManagedDatabaseListResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	iter.i++
+	if iter.i < len(iter.page.Values()) {
+		return nil
+	}
+	err = iter.page.NextWithContext(ctx)
+	if err != nil {
+		iter.i--
+		return err
+	}
+	iter.i = 0
+	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *RestorableDroppedManagedDatabaseListResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the enumeration should be started or is not yet complete.
+func (iter RestorableDroppedManagedDatabaseListResultIterator) NotDone() bool {
+	return iter.page.NotDone() && iter.i < len(iter.page.Values())
+}
+
+// Response returns the raw server response from the last page request.
+func (iter RestorableDroppedManagedDatabaseListResultIterator) Response() RestorableDroppedManagedDatabaseListResult {
+	return iter.page.Response()
+}
+
+// Value returns the current value or a zero-initialized value if the
+// iterator has advanced beyond the end of the collection.
+func (iter RestorableDroppedManagedDatabaseListResultIterator) Value() RestorableDroppedManagedDatabase {
+	if !iter.page.NotDone() {
+		return RestorableDroppedManagedDatabase{}
+	}
+	return iter.page.Values()[iter.i]
+}
+
+// Creates a new instance of the RestorableDroppedManagedDatabaseListResultIterator type.
+func NewRestorableDroppedManagedDatabaseListResultIterator(page RestorableDroppedManagedDatabaseListResultPage) RestorableDroppedManagedDatabaseListResultIterator {
+	return RestorableDroppedManagedDatabaseListResultIterator{page: page}
+}
+
+// IsEmpty returns true if the ListResult contains no values.
+func (rdmdlr RestorableDroppedManagedDatabaseListResult) IsEmpty() bool {
+	return rdmdlr.Value == nil || len(*rdmdlr.Value) == 0
+}
+
+// restorableDroppedManagedDatabaseListResultPreparer prepares a request to retrieve the next set of results.
+// It returns nil if no more results exist.
+func (rdmdlr RestorableDroppedManagedDatabaseListResult) restorableDroppedManagedDatabaseListResultPreparer(ctx context.Context) (*http.Request, error) {
+	if rdmdlr.NextLink == nil || len(to.String(rdmdlr.NextLink)) < 1 {
+		return nil, nil
+	}
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
+		autorest.AsJSON(),
+		autorest.AsGet(),
+		autorest.WithBaseURL(to.String(rdmdlr.NextLink)))
+}
+
+// RestorableDroppedManagedDatabaseListResultPage contains a page of RestorableDroppedManagedDatabase
+// values.
+type RestorableDroppedManagedDatabaseListResultPage struct {
+	fn     func(context.Context, RestorableDroppedManagedDatabaseListResult) (RestorableDroppedManagedDatabaseListResult, error)
+	rdmdlr RestorableDroppedManagedDatabaseListResult
+}
+
+// NextWithContext advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+func (page *RestorableDroppedManagedDatabaseListResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/RestorableDroppedManagedDatabaseListResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.rdmdlr)
+	if err != nil {
+		return err
+	}
+	page.rdmdlr = next
+	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *RestorableDroppedManagedDatabaseListResultPage) Next() error {
+	return page.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the page enumeration should be started or is not yet complete.
+func (page RestorableDroppedManagedDatabaseListResultPage) NotDone() bool {
+	return !page.rdmdlr.IsEmpty()
+}
+
+// Response returns the raw server response from the last page request.
+func (page RestorableDroppedManagedDatabaseListResultPage) Response() RestorableDroppedManagedDatabaseListResult {
+	return page.rdmdlr
+}
+
+// Values returns the slice of values for the current page or nil if there are no values.
+func (page RestorableDroppedManagedDatabaseListResultPage) Values() []RestorableDroppedManagedDatabase {
+	if page.rdmdlr.IsEmpty() {
+		return nil
+	}
+	return *page.rdmdlr.Value
+}
+
+// Creates a new instance of the RestorableDroppedManagedDatabaseListResultPage type.
+func NewRestorableDroppedManagedDatabaseListResultPage(getNextPage func(context.Context, RestorableDroppedManagedDatabaseListResult) (RestorableDroppedManagedDatabaseListResult, error)) RestorableDroppedManagedDatabaseListResultPage {
+	return RestorableDroppedManagedDatabaseListResultPage{fn: getNextPage}
+}
+
+// RestorableDroppedManagedDatabaseProperties the restorable dropped managed database's properties.
+type RestorableDroppedManagedDatabaseProperties struct {
+	// DatabaseName - The name of the database.
+	DatabaseName *string `json:"databaseName,omitempty"`
+	// CreationDate - The creation date of the database (ISO8601 format).
+	CreationDate *date.Time `json:"creationDate,omitempty"`
+	// DeletionDate - The deletion date of the database (ISO8601 format).
+	DeletionDate *date.Time `json:"deletionDate,omitempty"`
+	// EarliestRestoreDate - The earliest restore date of the database (ISO8601 format).
+	EarliestRestoreDate *date.Time `json:"earliestRestoreDate,omitempty"`
+}
+
 // RestorePoint database restore points.
 type RestorePoint struct {
 	autorest.Response `json:"-"`
@@ -10033,6 +10346,246 @@ type SecurityAlertPolicyProperties struct {
 	StorageAccountAccessKey *string `json:"storageAccountAccessKey,omitempty"`
 	// RetentionDays - Specifies the number of days to keep in the Threat Detection audit logs.
 	RetentionDays *int32 `json:"retentionDays,omitempty"`
+}
+
+// SensitivityLabel a sensitivity label.
+type SensitivityLabel struct {
+	autorest.Response `json:"-"`
+	// SensitivityLabelProperties - Resource properties.
+	*SensitivityLabelProperties `json:"properties,omitempty"`
+	// ID - Resource ID.
+	ID *string `json:"id,omitempty"`
+	// Name - Resource name.
+	Name *string `json:"name,omitempty"`
+	// Type - Resource type.
+	Type *string `json:"type,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for SensitivityLabel.
+func (sl SensitivityLabel) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if sl.SensitivityLabelProperties != nil {
+		objectMap["properties"] = sl.SensitivityLabelProperties
+	}
+	if sl.ID != nil {
+		objectMap["id"] = sl.ID
+	}
+	if sl.Name != nil {
+		objectMap["name"] = sl.Name
+	}
+	if sl.Type != nil {
+		objectMap["type"] = sl.Type
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for SensitivityLabel struct.
+func (sl *SensitivityLabel) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "properties":
+			if v != nil {
+				var sensitivityLabelProperties SensitivityLabelProperties
+				err = json.Unmarshal(*v, &sensitivityLabelProperties)
+				if err != nil {
+					return err
+				}
+				sl.SensitivityLabelProperties = &sensitivityLabelProperties
+			}
+		case "id":
+			if v != nil {
+				var ID string
+				err = json.Unmarshal(*v, &ID)
+				if err != nil {
+					return err
+				}
+				sl.ID = &ID
+			}
+		case "name":
+			if v != nil {
+				var name string
+				err = json.Unmarshal(*v, &name)
+				if err != nil {
+					return err
+				}
+				sl.Name = &name
+			}
+		case "type":
+			if v != nil {
+				var typeVar string
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				sl.Type = &typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// SensitivityLabelListResult a list of sensitivity labels.
+type SensitivityLabelListResult struct {
+	autorest.Response `json:"-"`
+	// Value - Array of results.
+	Value *[]SensitivityLabel `json:"value,omitempty"`
+	// NextLink - Link to retrieve next page of results.
+	NextLink *string `json:"nextLink,omitempty"`
+}
+
+// SensitivityLabelListResultIterator provides access to a complete listing of SensitivityLabel values.
+type SensitivityLabelListResultIterator struct {
+	i    int
+	page SensitivityLabelListResultPage
+}
+
+// NextWithContext advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+func (iter *SensitivityLabelListResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/SensitivityLabelListResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	iter.i++
+	if iter.i < len(iter.page.Values()) {
+		return nil
+	}
+	err = iter.page.NextWithContext(ctx)
+	if err != nil {
+		iter.i--
+		return err
+	}
+	iter.i = 0
+	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *SensitivityLabelListResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the enumeration should be started or is not yet complete.
+func (iter SensitivityLabelListResultIterator) NotDone() bool {
+	return iter.page.NotDone() && iter.i < len(iter.page.Values())
+}
+
+// Response returns the raw server response from the last page request.
+func (iter SensitivityLabelListResultIterator) Response() SensitivityLabelListResult {
+	return iter.page.Response()
+}
+
+// Value returns the current value or a zero-initialized value if the
+// iterator has advanced beyond the end of the collection.
+func (iter SensitivityLabelListResultIterator) Value() SensitivityLabel {
+	if !iter.page.NotDone() {
+		return SensitivityLabel{}
+	}
+	return iter.page.Values()[iter.i]
+}
+
+// Creates a new instance of the SensitivityLabelListResultIterator type.
+func NewSensitivityLabelListResultIterator(page SensitivityLabelListResultPage) SensitivityLabelListResultIterator {
+	return SensitivityLabelListResultIterator{page: page}
+}
+
+// IsEmpty returns true if the ListResult contains no values.
+func (sllr SensitivityLabelListResult) IsEmpty() bool {
+	return sllr.Value == nil || len(*sllr.Value) == 0
+}
+
+// sensitivityLabelListResultPreparer prepares a request to retrieve the next set of results.
+// It returns nil if no more results exist.
+func (sllr SensitivityLabelListResult) sensitivityLabelListResultPreparer(ctx context.Context) (*http.Request, error) {
+	if sllr.NextLink == nil || len(to.String(sllr.NextLink)) < 1 {
+		return nil, nil
+	}
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
+		autorest.AsJSON(),
+		autorest.AsGet(),
+		autorest.WithBaseURL(to.String(sllr.NextLink)))
+}
+
+// SensitivityLabelListResultPage contains a page of SensitivityLabel values.
+type SensitivityLabelListResultPage struct {
+	fn   func(context.Context, SensitivityLabelListResult) (SensitivityLabelListResult, error)
+	sllr SensitivityLabelListResult
+}
+
+// NextWithContext advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+func (page *SensitivityLabelListResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/SensitivityLabelListResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.sllr)
+	if err != nil {
+		return err
+	}
+	page.sllr = next
+	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *SensitivityLabelListResultPage) Next() error {
+	return page.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the page enumeration should be started or is not yet complete.
+func (page SensitivityLabelListResultPage) NotDone() bool {
+	return !page.sllr.IsEmpty()
+}
+
+// Response returns the raw server response from the last page request.
+func (page SensitivityLabelListResultPage) Response() SensitivityLabelListResult {
+	return page.sllr
+}
+
+// Values returns the slice of values for the current page or nil if there are no values.
+func (page SensitivityLabelListResultPage) Values() []SensitivityLabel {
+	if page.sllr.IsEmpty() {
+		return nil
+	}
+	return *page.sllr.Value
+}
+
+// Creates a new instance of the SensitivityLabelListResultPage type.
+func NewSensitivityLabelListResultPage(getNextPage func(context.Context, SensitivityLabelListResult) (SensitivityLabelListResult, error)) SensitivityLabelListResultPage {
+	return SensitivityLabelListResultPage{fn: getNextPage}
+}
+
+// SensitivityLabelProperties properties of a sensitivity label.
+type SensitivityLabelProperties struct {
+	// LabelName - The label name.
+	LabelName *string `json:"labelName,omitempty"`
+	// LabelID - The label ID.
+	LabelID *string `json:"labelId,omitempty"`
+	// InformationType - The information type.
+	InformationType *string `json:"informationType,omitempty"`
+	// InformationTypeID - The information type ID.
+	InformationTypeID *string `json:"informationTypeId,omitempty"`
 }
 
 // Server an Azure SQL Database server.
@@ -14597,6 +15150,377 @@ type TransparentDataEncryptionActivityProperties struct {
 type TransparentDataEncryptionProperties struct {
 	// Status - The status of the database transparent data encryption. Possible values include: 'TransparentDataEncryptionStatusEnabled', 'TransparentDataEncryptionStatusDisabled'
 	Status TransparentDataEncryptionStatus `json:"status,omitempty"`
+}
+
+// VirtualCluster an Azure SQL virtual cluster.
+type VirtualCluster struct {
+	autorest.Response `json:"-"`
+	// VirtualClusterProperties - Resource properties.
+	*VirtualClusterProperties `json:"properties,omitempty"`
+	// Location - Resource location.
+	Location *string `json:"location,omitempty"`
+	// Tags - Resource tags.
+	Tags map[string]*string `json:"tags"`
+	// ID - Resource ID.
+	ID *string `json:"id,omitempty"`
+	// Name - Resource name.
+	Name *string `json:"name,omitempty"`
+	// Type - Resource type.
+	Type *string `json:"type,omitempty"`
+}
+
+// MarshalJSON is the custom marshaler for VirtualCluster.
+func (vc VirtualCluster) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if vc.VirtualClusterProperties != nil {
+		objectMap["properties"] = vc.VirtualClusterProperties
+	}
+	if vc.Location != nil {
+		objectMap["location"] = vc.Location
+	}
+	if vc.Tags != nil {
+		objectMap["tags"] = vc.Tags
+	}
+	if vc.ID != nil {
+		objectMap["id"] = vc.ID
+	}
+	if vc.Name != nil {
+		objectMap["name"] = vc.Name
+	}
+	if vc.Type != nil {
+		objectMap["type"] = vc.Type
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for VirtualCluster struct.
+func (vc *VirtualCluster) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "properties":
+			if v != nil {
+				var virtualClusterProperties VirtualClusterProperties
+				err = json.Unmarshal(*v, &virtualClusterProperties)
+				if err != nil {
+					return err
+				}
+				vc.VirtualClusterProperties = &virtualClusterProperties
+			}
+		case "location":
+			if v != nil {
+				var location string
+				err = json.Unmarshal(*v, &location)
+				if err != nil {
+					return err
+				}
+				vc.Location = &location
+			}
+		case "tags":
+			if v != nil {
+				var tags map[string]*string
+				err = json.Unmarshal(*v, &tags)
+				if err != nil {
+					return err
+				}
+				vc.Tags = tags
+			}
+		case "id":
+			if v != nil {
+				var ID string
+				err = json.Unmarshal(*v, &ID)
+				if err != nil {
+					return err
+				}
+				vc.ID = &ID
+			}
+		case "name":
+			if v != nil {
+				var name string
+				err = json.Unmarshal(*v, &name)
+				if err != nil {
+					return err
+				}
+				vc.Name = &name
+			}
+		case "type":
+			if v != nil {
+				var typeVar string
+				err = json.Unmarshal(*v, &typeVar)
+				if err != nil {
+					return err
+				}
+				vc.Type = &typeVar
+			}
+		}
+	}
+
+	return nil
+}
+
+// VirtualClusterListResult a list of virtual clusters.
+type VirtualClusterListResult struct {
+	autorest.Response `json:"-"`
+	// Value - Array of results.
+	Value *[]VirtualCluster `json:"value,omitempty"`
+	// NextLink - Link to retrieve next page of results.
+	NextLink *string `json:"nextLink,omitempty"`
+}
+
+// VirtualClusterListResultIterator provides access to a complete listing of VirtualCluster values.
+type VirtualClusterListResultIterator struct {
+	i    int
+	page VirtualClusterListResultPage
+}
+
+// NextWithContext advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+func (iter *VirtualClusterListResultIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/VirtualClusterListResultIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	iter.i++
+	if iter.i < len(iter.page.Values()) {
+		return nil
+	}
+	err = iter.page.NextWithContext(ctx)
+	if err != nil {
+		iter.i--
+		return err
+	}
+	iter.i = 0
+	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *VirtualClusterListResultIterator) Next() error {
+	return iter.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the enumeration should be started or is not yet complete.
+func (iter VirtualClusterListResultIterator) NotDone() bool {
+	return iter.page.NotDone() && iter.i < len(iter.page.Values())
+}
+
+// Response returns the raw server response from the last page request.
+func (iter VirtualClusterListResultIterator) Response() VirtualClusterListResult {
+	return iter.page.Response()
+}
+
+// Value returns the current value or a zero-initialized value if the
+// iterator has advanced beyond the end of the collection.
+func (iter VirtualClusterListResultIterator) Value() VirtualCluster {
+	if !iter.page.NotDone() {
+		return VirtualCluster{}
+	}
+	return iter.page.Values()[iter.i]
+}
+
+// Creates a new instance of the VirtualClusterListResultIterator type.
+func NewVirtualClusterListResultIterator(page VirtualClusterListResultPage) VirtualClusterListResultIterator {
+	return VirtualClusterListResultIterator{page: page}
+}
+
+// IsEmpty returns true if the ListResult contains no values.
+func (vclr VirtualClusterListResult) IsEmpty() bool {
+	return vclr.Value == nil || len(*vclr.Value) == 0
+}
+
+// virtualClusterListResultPreparer prepares a request to retrieve the next set of results.
+// It returns nil if no more results exist.
+func (vclr VirtualClusterListResult) virtualClusterListResultPreparer(ctx context.Context) (*http.Request, error) {
+	if vclr.NextLink == nil || len(to.String(vclr.NextLink)) < 1 {
+		return nil, nil
+	}
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
+		autorest.AsJSON(),
+		autorest.AsGet(),
+		autorest.WithBaseURL(to.String(vclr.NextLink)))
+}
+
+// VirtualClusterListResultPage contains a page of VirtualCluster values.
+type VirtualClusterListResultPage struct {
+	fn   func(context.Context, VirtualClusterListResult) (VirtualClusterListResult, error)
+	vclr VirtualClusterListResult
+}
+
+// NextWithContext advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+func (page *VirtualClusterListResultPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/VirtualClusterListResultPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.vclr)
+	if err != nil {
+		return err
+	}
+	page.vclr = next
+	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *VirtualClusterListResultPage) Next() error {
+	return page.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the page enumeration should be started or is not yet complete.
+func (page VirtualClusterListResultPage) NotDone() bool {
+	return !page.vclr.IsEmpty()
+}
+
+// Response returns the raw server response from the last page request.
+func (page VirtualClusterListResultPage) Response() VirtualClusterListResult {
+	return page.vclr
+}
+
+// Values returns the slice of values for the current page or nil if there are no values.
+func (page VirtualClusterListResultPage) Values() []VirtualCluster {
+	if page.vclr.IsEmpty() {
+		return nil
+	}
+	return *page.vclr.Value
+}
+
+// Creates a new instance of the VirtualClusterListResultPage type.
+func NewVirtualClusterListResultPage(getNextPage func(context.Context, VirtualClusterListResult) (VirtualClusterListResult, error)) VirtualClusterListResultPage {
+	return VirtualClusterListResultPage{fn: getNextPage}
+}
+
+// VirtualClusterProperties the properties of a virtual cluster.
+type VirtualClusterProperties struct {
+	// SubnetID - Subnet resource ID for the virtual cluster.
+	SubnetID *string `json:"subnetId,omitempty"`
+	// Family - If the service has different generations of hardware, for the same SKU, then that can be captured here.
+	Family *string `json:"family,omitempty"`
+	// ChildResources - List of resources in this virtual cluster.
+	ChildResources *[]string `json:"childResources,omitempty"`
+}
+
+// VirtualClustersDeleteFuture an abstraction for monitoring and retrieving the results of a long-running
+// operation.
+type VirtualClustersDeleteFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *VirtualClustersDeleteFuture) Result(client VirtualClustersClient) (ar autorest.Response, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "sql.VirtualClustersDeleteFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("sql.VirtualClustersDeleteFuture")
+		return
+	}
+	ar.Response = future.Response()
+	return
+}
+
+// VirtualClustersUpdateFuture an abstraction for monitoring and retrieving the results of a long-running
+// operation.
+type VirtualClustersUpdateFuture struct {
+	azure.Future
+}
+
+// Result returns the result of the asynchronous operation.
+// If the operation has not completed it will return an error.
+func (future *VirtualClustersUpdateFuture) Result(client VirtualClustersClient) (vc VirtualCluster, err error) {
+	var done bool
+	done, err = future.Done(client)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "sql.VirtualClustersUpdateFuture", "Result", future.Response(), "Polling failure")
+		return
+	}
+	if !done {
+		err = azure.NewAsyncOpIncompleteError("sql.VirtualClustersUpdateFuture")
+		return
+	}
+	sender := autorest.DecorateSender(client, autorest.DoRetryForStatusCodes(client.RetryAttempts, client.RetryDuration, autorest.StatusCodesForRetry...))
+	if vc.Response.Response, err = future.GetResult(sender); err == nil && vc.Response.Response.StatusCode != http.StatusNoContent {
+		vc, err = client.UpdateResponder(vc.Response.Response)
+		if err != nil {
+			err = autorest.NewErrorWithError(err, "sql.VirtualClustersUpdateFuture", "Result", vc.Response.Response, "Failure responding to request")
+		}
+	}
+	return
+}
+
+// VirtualClusterUpdate an update request for an Azure SQL Database virtual cluster.
+type VirtualClusterUpdate struct {
+	// VirtualClusterProperties - Resource properties.
+	*VirtualClusterProperties `json:"properties,omitempty"`
+	// Tags - Resource tags.
+	Tags map[string]*string `json:"tags"`
+}
+
+// MarshalJSON is the custom marshaler for VirtualClusterUpdate.
+func (vcu VirtualClusterUpdate) MarshalJSON() ([]byte, error) {
+	objectMap := make(map[string]interface{})
+	if vcu.VirtualClusterProperties != nil {
+		objectMap["properties"] = vcu.VirtualClusterProperties
+	}
+	if vcu.Tags != nil {
+		objectMap["tags"] = vcu.Tags
+	}
+	return json.Marshal(objectMap)
+}
+
+// UnmarshalJSON is the custom unmarshaler for VirtualClusterUpdate struct.
+func (vcu *VirtualClusterUpdate) UnmarshalJSON(body []byte) error {
+	var m map[string]*json.RawMessage
+	err := json.Unmarshal(body, &m)
+	if err != nil {
+		return err
+	}
+	for k, v := range m {
+		switch k {
+		case "properties":
+			if v != nil {
+				var virtualClusterProperties VirtualClusterProperties
+				err = json.Unmarshal(*v, &virtualClusterProperties)
+				if err != nil {
+					return err
+				}
+				vcu.VirtualClusterProperties = &virtualClusterProperties
+			}
+		case "tags":
+			if v != nil {
+				var tags map[string]*string
+				err = json.Unmarshal(*v, &tags)
+				if err != nil {
+					return err
+				}
+				vcu.Tags = tags
+			}
+		}
+	}
+
+	return nil
 }
 
 // VirtualNetworkRule a virtual network rule.

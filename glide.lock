@@ -1,12 +1,12 @@
-hash: ef8d5a64e6da529f368f9a7bf3d435481a8cd7123756ccc865048893897947d8
-updated: 2019-04-11T15:51:09.84637192+01:00
+hash: 7c099da9b5b12501c3c4a0c7aea302576046a7cf5ce0bb258d327b06309f5262
+updated: 2019-04-16T10:07:26.675648076+03:00
 imports:
 - name: code.cloudfoundry.org/clock
   version: 02e53af36e6c978af692887ed449b74026d76fec
 - name: contrib.go.opencensus.io/exporter/ocagent
   version: 00af367e65149ff1f2f4b93bbfbb84fd9297170d
 - name: github.com/Azure/azure-sdk-for-go
-  version: 1951233eb944a49aa5f7278cba8e3e32a8c958af
+  version: f0ff339f1297d3374fc36bcbfc7d1bbba045d992
   subpackages:
   - profiles/latest/resources/mgmt/resources
   - profiles/preview/resources/mgmt/managedapplications
@@ -17,7 +17,6 @@ imports:
   - services/keyvault/2016-10-01/keyvault
   - services/keyvault/mgmt/2016-10-01/keyvault
   - services/marketplaceordering/mgmt/2015-06-01/marketplaceordering
-  - services/monitor/mgmt/2017-09-01/insights
   - services/network/mgmt/2018-06-01/network
   - services/network/mgmt/2018-07-01/network
   - services/resources/mgmt/2018-05-01/resources
@@ -153,6 +152,14 @@ imports:
 - name: github.com/kubernetes-incubator/service-catalog
   version: c0f3fe8b3d0127d1be39a6dfa56baf96153ad762
   repo: https://github.com/openshift/service-catalog.git
+  subpackages:
+  - pkg/apis/servicecatalog
+  - pkg/apis/servicecatalog/v1beta1
+  - pkg/apis/settings
+  - pkg/apis/settings/v1alpha1
+  - pkg/client/clientset_generated/clientset/scheme
+  - pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1
+  - pkg/filter
 - name: github.com/marstr/guid
   version: 8bd9a64bf37eb297b492a4101fb28e80ac0b290f
 - name: github.com/matttproud/golang_protobuf_extensions

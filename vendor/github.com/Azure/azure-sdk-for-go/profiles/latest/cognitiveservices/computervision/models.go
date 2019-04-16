@@ -1,6 +1,6 @@
 // +build go1.9
 
-// Copyright 2018 Microsoft Corporation
+// Copyright 2019 Microsoft Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -87,6 +87,7 @@ type VisualFeatureTypes = original.VisualFeatureTypes
 
 const (
 	VisualFeatureTypesAdult       VisualFeatureTypes = original.VisualFeatureTypesAdult
+	VisualFeatureTypesBrands      VisualFeatureTypes = original.VisualFeatureTypesBrands
 	VisualFeatureTypesCategories  VisualFeatureTypes = original.VisualFeatureTypesCategories
 	VisualFeatureTypesColor       VisualFeatureTypes = original.VisualFeatureTypesColor
 	VisualFeatureTypesDescription VisualFeatureTypes = original.VisualFeatureTypesDescription
@@ -106,6 +107,7 @@ type CelebritiesModel = original.CelebritiesModel
 type CelebrityResults = original.CelebrityResults
 type ColorInfo = original.ColorInfo
 type DetectResult = original.DetectResult
+type DetectedBrand = original.DetectedBrand
 type DetectedObject = original.DetectedObject
 type DomainModelResults = original.DomainModelResults
 type Error = original.Error
