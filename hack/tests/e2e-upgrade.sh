@@ -31,20 +31,12 @@ trap cleanup EXIT
 GIT_CURRENT="$(git rev-parse --abbrev-ref HEAD)"
 GIT_TARGET="$1"
 
-start_monitoring "_data/containerservice.yaml"
 git checkout $GIT_TARGET
 
-(
-    set +x
-    export AZURE_MASTER_CLIENT_ID=$AZURE_LEGACY_MASTER_CLIENT_ID
-    export AZURE_MASTER_CLIENT_SECRET=$AZURE_LEGACY_MASTER_CLIENT_SECRET
-    export AZURE_WORKER_CLIENT_ID=$AZURE_LEGACY_WORKER_CLIENT_ID
-    export AZURE_WORKER_CLIENT_SECRET=$AZURE_LEGACY_WORKER_CLIENT_SECRET
-    set -x
-    make create
-)
-
+start_monitoring
 set_build_images
+
+make create
 
 # try upgrading just a single image to latest
 ( FOCUS="\[ChangeImage\]\[Fake\]\[LongRunning\]" TIMEOUT=50m ./hack/e2e.sh )
