@@ -377,11 +377,11 @@
 // data/Role.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap.yaml
 // data/Role.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor.yaml
 // data/Role.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader.yaml
+// data/Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml
+// data/Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml
 // data/Role.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml
 // data/Role.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml
 // data/Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml
-// data/Role.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-controller-manager.yaml
-// data/Role.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-scheduler.yaml
 // data/Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml
 // data/Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml
@@ -389,13 +389,13 @@
 // data/RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor-binding.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader-binding.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader-openshift-template-service-broker.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml
-// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-controller-manager.yaml
-// data/RoleBinding.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-scheduler.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-viewers.yaml
-// data/RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics.yaml
+// data/RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics-viewer.yaml
 // data/RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml
 // data/Route.route.openshift.io/default/docker-registry.yaml
 // data/Route.route.openshift.io/default/registry-console.yaml
@@ -8294,6 +8294,46 @@ func roleRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderY
 	return a, nil
 }
 
+var _roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x90\xbd\x4e\xc4\x30\x10\x84\x7b\x3f\xc5\xea\x7a\x07\xd1\x21\xbf\x00\x1d\x05\x05\xfd\xc6\x99\xcb\x59\x71\xbc\xd6\x7a\x7d\x08\x9e\x1e\xe5\xa7\x41\x02\x41\x65\x79\x34\xfe\xe6\x93\xb9\xa6\x37\x68\x4b\x52\x02\xe9\xc8\x71\xe0\x6e\x37\xd1\xf4\xc9\x96\xa4\x0c\xcb\x53\x1b\x92\x3c\xdc\x1f\xdd\x92\xca\x14\xe8\x55\x32\xdc\x0a\xe3\x89\x8d\x83\x23\xe2\x52\xc4\xf6\x6e\xdb\xae\xf4\x23\xa4\x8f\xd0\x02\xc3\xce\xe2\x6e\xd2\xeb\xc4\x86\x40\x17\xd3\x8e\x8b\x23\xca\x3c\x22\x9f\x84\xef\xf5\x51\xc4\x9a\x29\xd7\x9a\xca\x7c\x38\xfa\x09\x57\xee\xd9\x9a\x23\x2a\xbc\x22\x50\xfb\x68\x86\x35\x84\x0c\x9e\xa0\x3e\x4b\x5c\x52\x99\xfd\x46\xf2\x51\x8a\xa9\xe4\x0c\xf5\x2b\x17\x9e\xa1\xe7\xb3\x56\x39\x22\xec\x73\xfe\x00\x38\xed\x19\x2d\x38\x4f\x5c\xd3\xb3\x4a\xaf\xbb\x92\xa7\xcb\xe6\xa8\x68\xd2\x35\xe2\xcc\xa2\x94\x6b\x9a\x57\xae\x9b\xc6\x1d\x3a\x9e\xf9\x3b\x5b\xbc\xfd\x81\x78\xd9\xe6\x8f\xfc\x77\xc7\x7f\xee\xcd\xb0\xfd\x3c\xfe\xd4\x7d\x05\x00\x00\xff\xff\xaf\x63\x8d\xea\xd1\x01\x00\x00")
+
+func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
+		"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml",
+	)
+}
+
+func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml() (*asset, error) {
+	bytes, err := roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x90\xbf\x4e\xc6\x30\x0c\xc4\xf7\x3c\x85\xd5\x3d\x45\x6c\x28\x2f\xc0\xc6\xc0\xc0\xee\x26\xfe\xda\xa8\x69\x1c\xd9\xce\x87\xe0\xe9\x51\xff\x2c\x08\x24\x98\xa2\x9c\xcf\xbf\x3b\x19\x5b\x7e\x23\xd1\xcc\x35\x80\x4c\x18\x47\xec\xb6\xb0\xe4\x4f\xb4\xcc\x75\x5c\x9f\x74\xcc\xfc\x70\x7f\x74\x6b\xae\x29\xc0\x2b\x17\x72\x1b\x19\x26\x34\x0c\x0e\x00\x6b\x65\x3b\xbc\xba\x7f\xe1\x57\x48\x9f\x48\x2a\x19\x1d\x2c\xec\xc6\xbd\x25\x34\x0a\x30\x98\x74\x1a\x1c\x40\xc1\x89\xca\x45\xf8\x6e\x9f\x98\x4d\x4d\xb0\xb5\x5c\xe7\xb3\xa3\x4f\x74\xc3\x5e\x4c\x1d\x40\xc5\x8d\x02\xe8\x87\x1a\x6d\x21\x14\xc2\x44\xe2\x0b\xc7\x35\xd7\xd9\xef\x24\xaf\x71\xa1\xd4\x0b\xc9\xe5\xd6\x86\x91\x02\x9c\xb3\x63\xcf\x49\x2f\xa4\xc1\x79\xc0\x96\x9f\x85\x7b\x3b\x9a\x78\x18\xf6\x6a\x42\xca\x5d\x22\x5d\x5a\xe4\x7a\xcb\xf3\x86\x6d\x4f\xbf\x93\x4c\x97\xfe\x8e\x16\x97\x3f\x10\x2f\x7b\xfc\xa9\xff\xa8\xf6\xcf\x98\x99\xec\x78\xcf\x0b\xba\xaf\x00\x00\x00\xff\xff\x60\xe3\xfc\x60\xbf\x01\x00\x00")
+
+func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
+		"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml",
+	)
+}
+
+func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml() (*asset, error) {
+	bytes, err := roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x8e\x3d\x4e\xc4\x30\x10\x85\x7b\x9f\x62\xb4\x7d\x82\xe8\x90\x2f\x40\x4f\x41\x3f\x71\x1e\x59\x6b\x1d\x8f\x35\x33\x5e\x04\xa7\x47\xeb\x44\x48\x48\x54\xf6\x3c\xbd\x9f\x8f\x5b\x7e\x87\x5a\x96\x1a\x49\x17\x4e\x33\x77\xbf\x8a\xe6\x6f\xf6\x2c\x75\xbe\xbd\xd8\x9c\xe5\xe9\xfe\x1c\x6e\xb9\xae\x91\xde\xa4\x20\xec\x70\x5e\xd9\x39\x06\x22\xae\x55\x7c\x78\xed\x71\xd2\xbf\x25\x7d\x81\x56\x38\x46\x17\x77\x97\xde\x56\x76\x44\xba\xb8\x76\x5c\x02\x51\xe1\x05\xe5\x6c\xf8\x6b\x5f\x44\xdc\x5c\xb9\xb5\x5c\xb7\x83\x71\x5a\xf1\xc1\xbd\xb8\x05\xa2\xca\x3b\x22\xd9\x97\x39\xf6\x98\xa4\xba\x4a\x29\xd0\xf8\x1b\x9b\x2c\x6f\x15\x7a\x5a\xad\x71\x42\x1c\x13\xd3\x11\x0a\xda\x0b\x2c\x86\x89\xb8\xe5\x57\x95\xde\x06\xc6\x44\x97\x07\x97\xc2\xa4\x6b\xc2\xa9\x19\x92\x62\xec\xde\xa1\xcb\x29\x6e\xf0\xf1\x96\x6c\xc7\xe7\x93\x3d\x5d\xc3\x4f\x00\x00\x00\xff\xff\xd6\x41\xb3\x07\x5a\x01\x00\x00")
 
 func roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYamlBytes() ([]byte, error) {
@@ -8350,46 +8390,6 @@ func roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml() (*as
 	}
 
 	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x90\xbd\x4e\xc4\x30\x10\x84\x7b\x3f\xc5\xea\x7a\x07\xd1\x21\xbf\x00\x1d\x05\x05\xfd\xc6\x99\xcb\x59\x71\xbc\xd6\x7a\x7d\x08\x9e\x1e\xe5\xa7\x41\x02\x41\x65\x79\x34\xfe\xe6\x93\xb9\xa6\x37\x68\x4b\x52\x02\xe9\xc8\x71\xe0\x6e\x37\xd1\xf4\xc9\x96\xa4\x0c\xcb\x53\x1b\x92\x3c\xdc\x1f\xdd\x92\xca\x14\xe8\x55\x32\xdc\x0a\xe3\x89\x8d\x83\x23\xe2\x52\xc4\xf6\x6e\xdb\xae\xf4\x23\xa4\x8f\xd0\x02\xc3\xce\xe2\x6e\xd2\xeb\xc4\x86\x40\x17\xd3\x8e\x8b\x23\xca\x3c\x22\x9f\x84\xef\xf5\x51\xc4\x9a\x29\xd7\x9a\xca\x7c\x38\xfa\x09\x57\xee\xd9\x9a\x23\x2a\xbc\x22\x50\xfb\x68\x86\x35\x84\x0c\x9e\xa0\x3e\x4b\x5c\x52\x99\xfd\x46\xf2\x51\x8a\xa9\xe4\x0c\xf5\x2b\x17\x9e\xa1\xe7\xb3\x56\x39\x22\xec\x73\xfe\x00\x38\xed\x19\x2d\x38\x4f\x5c\xd3\xb3\x4a\xaf\xbb\x92\xa7\xcb\xe6\xa8\x68\xd2\x35\xe2\xcc\xa2\x94\x6b\x9a\x57\xae\x9b\xc6\x1d\x3a\x9e\xf9\x3b\x5b\xbc\xfd\x81\x78\xd9\xe6\x8f\xfc\x77\xc7\x7f\xee\xcd\xb0\xfd\x3c\xfe\xd4\x7d\x05\x00\x00\xff\xff\xaf\x63\x8d\xea\xd1\x01\x00\x00")
-
-func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
-		"Role.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-controller-manager.yaml",
-	)
-}
-
-func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml() (*asset, error) {
-	bytes, err := roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x90\xbf\x4e\xc6\x30\x0c\xc4\xf7\x3c\x85\xd5\x3d\x45\x6c\x28\x2f\xc0\xc6\xc0\xc0\xee\x26\xfe\xda\xa8\x69\x1c\xd9\xce\x87\xe0\xe9\x51\xff\x2c\x08\x24\x98\xa2\x9c\xcf\xbf\x3b\x19\x5b\x7e\x23\xd1\xcc\x35\x80\x4c\x18\x47\xec\xb6\xb0\xe4\x4f\xb4\xcc\x75\x5c\x9f\x74\xcc\xfc\x70\x7f\x74\x6b\xae\x29\xc0\x2b\x17\x72\x1b\x19\x26\x34\x0c\x0e\x00\x6b\x65\x3b\xbc\xba\x7f\xe1\x57\x48\x9f\x48\x2a\x19\x1d\x2c\xec\xc6\xbd\x25\x34\x0a\x30\x98\x74\x1a\x1c\x40\xc1\x89\xca\x45\xf8\x6e\x9f\x98\x4d\x4d\xb0\xb5\x5c\xe7\xb3\xa3\x4f\x74\xc3\x5e\x4c\x1d\x40\xc5\x8d\x02\xe8\x87\x1a\x6d\x21\x14\xc2\x44\xe2\x0b\xc7\x35\xd7\xd9\xef\x24\xaf\x71\xa1\xd4\x0b\xc9\xe5\xd6\x86\x91\x02\x9c\xb3\x63\xcf\x49\x2f\xa4\xc1\x79\xc0\x96\x9f\x85\x7b\x3b\x9a\x78\x18\xf6\x6a\x42\xca\x5d\x22\x5d\x5a\xe4\x7a\xcb\xf3\x86\x6d\x4f\xbf\x93\x4c\x97\xfe\x8e\x16\x97\x3f\x10\x2f\x7b\xfc\xa9\xff\xa8\xf6\xcf\x98\x99\xec\x78\xcf\x0b\xba\xaf\x00\x00\x00\xff\xff\x60\xe3\xfc\x60\xbf\x01\x00\x00")
-
-func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
-		"Role.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-scheduler.yaml",
-	)
-}
-
-func roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml() (*asset, error) {
-	bytes, err := roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "Role.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -8534,6 +8534,46 @@ func rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthentication
 	return a, nil
 }
 
+var _rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x9c\xd0\xc1\x4a\x04\x31\x0c\x06\xe0\x7b\x9f\x22\xec\xbd\x2b\xde\xa4\x37\xbd\x78\x5f\xc1\x7b\xa6\xcd\x8e\x71\x3b\x49\x49\xd3\x05\x7d\x7a\xd9\xd9\x41\x11\x44\xd0\x63\xa1\xf9\x92\xff\xc7\xc6\xcf\x64\x9d\x55\x12\xd8\x84\x79\x8f\xc3\x5f\xd4\xf8\x1d\x9d\x55\xf6\xa7\xbb\xbe\x67\xbd\x39\xdf\x86\x13\x4b\x49\x70\xd0\x4a\x0f\x2c\x85\x65\x0e\x0b\x39\x16\x74\x4c\x01\x00\x45\xd4\xd7\x91\x7e\x79\xc2\x8f\xd6\x98\xc8\x84\x9c\x56\x12\x87\xeb\x68\x05\x9d\x12\xec\xdc\x06\xed\x02\x40\xc5\x89\xea\x26\x7c\xff\x3e\xa9\x7a\x77\xc3\xd6\x58\xe6\xeb\xa9\xb1\xd0\x11\x47\xf5\x1e\x00\x04\x17\x4a\xd0\xdf\xba\xd3\x92\x52\x25\x2c\x64\xb1\x6a\x3e\xb1\xcc\xf1\x22\xc5\xac\xe2\xa6\xb5\x92\xc5\x05\x05\x67\xb2\x6d\xac\x37\xcc\x94\xd6\x75\xf1\x0a\x04\xd3\x4a\x07\x3a\xae\xc1\x1a\x3f\x9a\x8e\xf6\x4b\x3b\x01\xe0\xab\x9c\xff\xde\xd2\xc7\xf4\x4a\xd9\x7b\x0a\x71\xd3\x9e\xc8\xce\x9c\xe9\x3e\x67\x1d\xe2\x9f\xee\x9f\xc3\x7c\x04\x00\x00\xff\xff\x01\xd0\x29\x09\xe2\x01\x00\x00")
+
+func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
+		"RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml",
+	)
+}
+
+func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml() (*asset, error) {
+	bytes, err := rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x94\x90\x41\x4b\x34\x31\x0c\x86\xef\xfd\x15\x61\xef\x33\x1f\xdf\x4d\x7a\xd3\x8b\xf7\x15\xbc\x67\xda\xec\x6c\x9c\x4e\x52\x9a\x74\x41\x7f\xbd\xec\xec\xa0\x08\x22\x7a\x2c\x7d\xdf\x87\x27\x2f\x56\x7e\xa6\x66\xac\x12\xa1\x4d\x98\x46\xec\x7e\xd6\xc6\x6f\xe8\xac\x32\x2e\x77\x36\xb2\xfe\xbb\xfc\x0f\x0b\x4b\x8e\x70\xd4\x42\x0f\x2c\x99\x65\x0e\x2b\x39\x66\x74\x8c\x01\x00\x45\xd4\xb7\x8a\x5d\x9f\xf0\x2d\xab\x4f\xd4\x84\x9c\x36\x24\x76\xd7\x5e\x33\x3a\x45\x38\x78\xeb\x74\x08\x00\x05\x27\x2a\x3b\xe1\x6b\x7c\x52\x75\xf3\x86\xb5\xb2\xcc\x37\xd5\x21\xd3\x09\x7b\x71\x0b\x00\x82\x2b\x45\xb0\x57\x73\x5a\x63\x2c\x84\x99\xda\x50\x34\x2d\x2c\xf3\x70\x25\x0d\x96\xce\x94\x7b\xa1\xb6\xa7\xad\x62\xa2\x08\xb7\xbf\xad\x17\x9a\x16\x3a\xd2\x69\xbb\xa7\xf2\x63\xd3\x5e\x7f\x18\x25\x00\x7c\x6e\xf2\x47\x05\xeb\xd3\x0b\x25\xb7\x18\x86\x1d\xf2\x44\xed\xc2\x89\xee\x53\xd2\x2e\xfe\x81\xfb\xad\xfa\x7b\x00\x00\x00\xff\xff\xc9\x90\x0f\x58\xc7\x01\x00\x00")
+
+func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
+		"RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml",
+	)
+}
+
+func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml() (*asset, error) {
+	bytes, err := rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x94\x90\x31\x4b\x04\x41\x0c\x85\xfb\xf9\x15\xe1\xfa\x3d\xb1\x93\xe9\xb4\xb1\x3f\xc1\x3e\x3b\x9b\x5b\xe3\xcd\x26\x43\x92\x39\xd0\x5f\x2f\xee\x2d\x27\x82\x88\x96\x81\xf7\xbe\xf7\xf2\xb0\xf1\x33\x99\xb3\x4a\x06\x1b\xb1\xec\xb1\xc7\x8b\x1a\xbf\x63\xb0\xca\xfe\x74\xe7\x7b\xd6\x9b\xf3\x6d\x3a\xb1\x4c\x19\x0e\x5a\xe9\x81\x65\x62\x99\xd3\x42\x81\x13\x06\xe6\x04\x80\x22\x1a\xab\xc5\x3f\x4f\xf8\x91\xd5\x47\x32\xa1\xa0\x15\x89\x3d\xb4\xb7\x09\x83\x32\xec\xc2\x3a\xed\x12\x40\xc5\x91\xea\x46\xf8\x2e\x1f\x55\xc3\xc3\xb0\x35\x96\xf9\x52\x75\x98\xe8\x88\xbd\x86\x27\x00\xc1\x85\x32\xf8\x9b\x07\x2d\xb9\xa8\x84\x69\xad\x64\xf9\x6a\x1b\x9c\x67\x21\xdb\xa4\xde\xb0\x50\x5e\x23\x86\x8b\x29\x99\x56\x3a\xd0\x71\x7d\xa6\xf1\xa3\x69\x6f\xbf\x2c\x92\x00\xbe\x06\xf9\x4f\xbe\xf7\xf1\x95\x4a\x78\x4e\xc3\x46\x78\x22\x3b\x73\xa1\xfb\x52\xb4\x4b\x5c\x59\x7f\x6f\xfe\x11\x00\x00\xff\xff\x79\x3b\x81\x84\xc3\x01\x00\x00")
 
 func rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYamlBytes() ([]byte, error) {
@@ -8594,46 +8634,6 @@ func rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml
 	return a, nil
 }
 
-var _rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x9c\xd0\xc1\x4a\x04\x31\x0c\x06\xe0\x7b\x9f\x22\xec\xbd\x2b\xde\xa4\x37\xbd\x78\x5f\xc1\x7b\xa6\xcd\x8e\x71\x3b\x49\x49\xd3\x05\x7d\x7a\xd9\xd9\x41\x11\x44\xd0\x63\xa1\xf9\x92\xff\xc7\xc6\xcf\x64\x9d\x55\x12\xd8\x84\x79\x8f\xc3\x5f\xd4\xf8\x1d\x9d\x55\xf6\xa7\xbb\xbe\x67\xbd\x39\xdf\x86\x13\x4b\x49\x70\xd0\x4a\x0f\x2c\x85\x65\x0e\x0b\x39\x16\x74\x4c\x01\x00\x45\xd4\xd7\x91\x7e\x79\xc2\x8f\xd6\x98\xc8\x84\x9c\x56\x12\x87\xeb\x68\x05\x9d\x12\xec\xdc\x06\xed\x02\x40\xc5\x89\xea\x26\x7c\xff\x3e\xa9\x7a\x77\xc3\xd6\x58\xe6\xeb\xa9\xb1\xd0\x11\x47\xf5\x1e\x00\x04\x17\x4a\xd0\xdf\xba\xd3\x92\x52\x25\x2c\x64\xb1\x6a\x3e\xb1\xcc\xf1\x22\xc5\xac\xe2\xa6\xb5\x92\xc5\x05\x05\x67\xb2\x6d\xac\x37\xcc\x94\xd6\x75\xf1\x0a\x04\xd3\x4a\x07\x3a\xae\xc1\x1a\x3f\x9a\x8e\xf6\x4b\x3b\x01\xe0\xab\x9c\xff\xde\xd2\xc7\xf4\x4a\xd9\x7b\x0a\x71\xd3\x9e\xc8\xce\x9c\xe9\x3e\x67\x1d\xe2\x9f\xee\x9f\xc3\x7c\x04\x00\x00\xff\xff\x01\xd0\x29\x09\xe2\x01\x00\x00")
-
-func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
-		"RoleBinding.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-controller-manager.yaml",
-	)
-}
-
-func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml() (*asset, error) {
-	bytes, err := rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-controller-manager.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x94\x90\x41\x4b\x34\x31\x0c\x86\xef\xfd\x15\x61\xef\x33\x1f\xdf\x4d\x7a\xd3\x8b\xf7\x15\xbc\x67\xda\xec\x6c\x9c\x4e\x52\x9a\x74\x41\x7f\xbd\xec\xec\xa0\x08\x22\x7a\x2c\x7d\xdf\x87\x27\x2f\x56\x7e\xa6\x66\xac\x12\xa1\x4d\x98\x46\xec\x7e\xd6\xc6\x6f\xe8\xac\x32\x2e\x77\x36\xb2\xfe\xbb\xfc\x0f\x0b\x4b\x8e\x70\xd4\x42\x0f\x2c\x99\x65\x0e\x2b\x39\x66\x74\x8c\x01\x00\x45\xd4\xb7\x8a\x5d\x9f\xf0\x2d\xab\x4f\xd4\x84\x9c\x36\x24\x76\xd7\x5e\x33\x3a\x45\x38\x78\xeb\x74\x08\x00\x05\x27\x2a\x3b\xe1\x6b\x7c\x52\x75\xf3\x86\xb5\xb2\xcc\x37\xd5\x21\xd3\x09\x7b\x71\x0b\x00\x82\x2b\x45\xb0\x57\x73\x5a\x63\x2c\x84\x99\xda\x50\x34\x2d\x2c\xf3\x70\x25\x0d\x96\xce\x94\x7b\xa1\xb6\xa7\xad\x62\xa2\x08\xb7\xbf\xad\x17\x9a\x16\x3a\xd2\x69\xbb\xa7\xf2\x63\xd3\x5e\x7f\x18\x25\x00\x7c\x6e\xf2\x47\x05\xeb\xd3\x0b\x25\xb7\x18\x86\x1d\xf2\x44\xed\xc2\x89\xee\x53\xd2\x2e\xfe\x81\xfb\xad\xfa\x7b\x00\x00\x00\xff\xff\xc9\x90\x0f\x58\xc7\x01\x00\x00")
-
-func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYamlBytes() ([]byte, error) {
-	return bindataRead(
-		_rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
-		"RoleBinding.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-scheduler.yaml",
-	)
-}
-
-func rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml() (*asset, error) {
-	bytes, err := rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYamlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-scheduler.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
 var _rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x94\x8f\xb1\x4e\x2b\x41\x0c\x45\xfb\xf9\x0a\x2b\x7d\xf2\xf4\x3a\x34\x25\x0d\x7d\x0a\x7a\xef\xce\x0d\x6b\x92\xb5\x47\xb6\x27\x08\xbe\x1e\x65\x85\x94\x06\x81\x28\x2d\xfb\x1e\xdf\xc3\x5d\x9e\xe1\x21\xa6\x95\x7c\xe2\xf9\xc0\x23\x17\x73\xf9\xe0\x14\xd3\xc3\xf9\x21\x0e\x62\xff\xae\xff\xcb\x59\xb4\x55\x3a\xda\x05\x8f\xa2\x4d\xf4\xa5\xac\x48\x6e\x9c\x5c\x0b\x11\xab\x5a\x6e\x91\xb8\x8d\xf4\x2d\x6b\x4c\x70\x45\x62\x43\xf2\x48\x1b\xbd\x71\xa2\xd2\x2e\x7d\x60\x57\x88\x94\x57\x54\x8a\x85\x1d\x6d\xef\x08\x1b\x3e\x63\x7f\x15\xbc\xc1\xe3\x6b\x1f\x9d\x67\x54\xb2\x0e\x8d\x45\x4e\x59\xdc\x2e\x38\xe2\xb4\xd5\xe8\xf2\xe4\x36\xfa\x0f\x2e\x85\xe8\xae\xf2\xcb\xcb\x12\x63\x7a\xc5\x9c\x51\xcb\xfe\x4f\xec\xed\xf0\x0e\x7f\x8f\xc4\x5a\x6f\x09\x68\xca\xcc\x89\x56\x3e\x03\x00\x00\xff\xff\xb7\x70\x51\x80\x79\x01\x00\x00")
 
 func rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYamlBytes() ([]byte, error) {
@@ -8654,22 +8654,22 @@ func rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYaml() (*ass
 	return a, nil
 }
 
-var _rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\xce\xb1\x4e\x03\x31\x0c\xc6\xf1\x3d\x4f\x91\x17\x48\x11\x5b\x95\x0d\x18\xd8\x8b\xc4\xee\xe6\xbe\x72\xe6\x2e\x71\x64\x3b\x87\xd4\xa7\x47\x27\xaa\x8a\x05\x66\x7f\xfa\xfb\x47\x9d\xdf\xa1\xc6\xd2\x72\xd4\x33\x95\x03\x0d\x9f\x45\xf9\x4a\xce\xd2\x0e\xcb\xd1\x0e\x2c\x0f\xdb\x63\x58\xb8\x4d\x39\x9e\x64\xc5\x33\xb7\x89\xdb\x47\xa8\x70\x9a\xc8\x29\x87\x18\x1b\x55\xe4\x08\x2f\x53\xaa\x70\xe5\x62\x69\x63\x7c\x41\x6f\x37\xeb\x54\x90\xa3\x74\x34\x9b\xf9\xe2\x89\xae\x43\x91\xaa\x34\x76\xd1\xbd\xa6\xb2\xe2\x84\xcb\x1e\xa3\xce\xaf\x2a\xa3\xff\x23\x0a\x31\xfe\x80\x5e\xd6\x61\x0e\xdd\x5d\x77\xc6\xfe\x39\xd8\x38\x7f\xa2\xb8\xe5\x90\x6e\xd3\x37\xe8\xc6\x05\x4f\xa5\xc8\x68\x7e\x5f\x77\x95\x0a\x9f\x31\x2c\x2d\x47\xfb\xcb\xfb\x4b\xfa\x1d\x00\x00\xff\xff\x4f\x46\xa6\x8b\x33\x01\x00\x00")
+var _rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\xce\xb1\x4e\x03\x31\x0c\xc6\xf1\x3d\x4f\x91\x17\x48\x11\x5b\x95\x0d\x18\xd8\x8b\xc4\xee\xe6\xbe\x72\xe6\x2e\x71\x64\x3b\x87\xd4\xa7\x47\x27\xaa\x8a\x05\x66\x7f\xfa\xfb\x47\x9d\xdf\xa1\xc6\xd2\x72\xd4\x33\x95\x03\x0d\x9f\x45\xf9\x4a\xce\xd2\x0e\xcb\xd1\x0e\x2c\x0f\xdb\x63\x58\xb8\x4d\x39\x9e\x64\xc5\x33\xb7\x89\xdb\x47\xa8\x70\x9a\xc8\x29\x87\x18\x1b\x55\xe4\x08\x2f\x53\xaa\x70\xe5\x62\x69\x63\x7c\x41\x6f\x37\xeb\x54\x90\xa3\x74\x34\x9b\xf9\xe2\x89\xae\x43\x91\xaa\x34\x76\xd1\xbd\xa6\xb2\xe2\x84\xcb\x1e\xa3\xce\xaf\x2a\xa3\xff\x23\x0a\x31\xfe\x80\x5e\xd6\x61\x0e\xdd\x5d\x77\xc6\xfe\x39\xd8\x38\x7f\xa2\xb8\xe5\x90\x6e\xd3\x37\xe8\xc6\x05\x4f\xa5\xc8\x68\x7e\x5f\x77\x95\x0a\x9f\x31\x2c\x2d\x47\xfb\xcb\xfb\x4b\xfa\x1d\x00\x00\xff\xff\x4f\x46\xa6\x8b\x33\x01\x00\x00")
 
-func rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsYamlBytes() ([]byte, error) {
+func rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerYamlBytes() ([]byte, error) {
 	return bindataRead(
-		_rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsYaml,
-		"RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics.yaml",
+		_rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerYaml,
+		"RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics-viewer.yaml",
 	)
 }
 
-func rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsYaml() (*asset, error) {
-	bytes, err := rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsYamlBytes()
+func rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerYaml() (*asset, error) {
+	bytes, err := rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	info := bindataFileInfo{name: "RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics-viewer.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -14963,11 +14963,11 @@ var _bindata = map[string]func() (*asset, error){
 	"Role.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap.yaml":                                                    roleRbacAuthorizationK8sIoKubeServiceCatalogClusterInfoConfigmapYaml,
 	"Role.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor.yaml":                                                        roleRbacAuthorizationK8sIoKubeServiceCatalogConfigmapAccessorYaml,
 	"Role.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader.yaml":                                          roleRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml":                                     roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml":                                              roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
 	"Role.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml":                                                 roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml,
 	"Role.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml":                                                   roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml,
 	"Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                                                    roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-controller-manager.yaml":                                      roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-scheduler.yaml":                                               roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
 	"Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml":                                                               roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml,
 	"Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                            roleRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml":                                          rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
@@ -14975,13 +14975,13 @@ var _bindata = map[string]func() (*asset, error){
 	"RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor-binding.yaml":                                         rolebindingRbacAuthorizationK8sIoKubeServiceCatalogConfigmapAccessorBindingYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader-binding.yaml":                           rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderBindingYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader-openshift-template-service-broker.yaml": rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderOpenshiftTemplateServiceBrokerYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml":                              rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml":                                       rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml":                                          rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml":                                            rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                                             rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-controller-manager.yaml":                               rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-system/system-leader-locking-kube-scheduler.yaml":                                        rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift/shared-resource-viewers.yaml":                                                       rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYaml,
-	"RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics.yaml":                                                 rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsYaml,
+	"RoleBinding.rbac.authorization.k8s.io/openshift-azure-monitoring/etcd-metrics-viewer.yaml":                                          rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                     rolebindingRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
 	"Route.route.openshift.io/default/docker-registry.yaml":                                                                              routeRouteOpenshiftIoDefaultDockerRegistryYaml,
 	"Route.route.openshift.io/default/registry-console.yaml":                                                                             routeRouteOpenshiftIoDefaultRegistryConsoleYaml,
@@ -15776,12 +15776,12 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"configmap-accessor.yaml":     {roleRbacAuthorizationK8sIoKubeServiceCatalogConfigmapAccessorYaml, map[string]*bintree{}},
 		}},
 		"kube-system": {nil, map[string]*bintree{
-			"extension-apiserver-authentication-reader.yaml":     {roleRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderYaml, map[string]*bintree{}},
-			"system-controller-bootstrap-signer.yaml":            {roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml, map[string]*bintree{}},
-			"system-controller-cloud-provider.yaml":              {roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml, map[string]*bintree{}},
-			"system-controller-token-cleaner.yaml":               {roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml, map[string]*bintree{}},
-			"system-leader-locking-kube-controller-manager.yaml": {roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml, map[string]*bintree{}},
-			"system-leader-locking-kube-scheduler.yaml":          {roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml, map[string]*bintree{}},
+			"extension-apiserver-authentication-reader.yaml":      {roleRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderYaml, map[string]*bintree{}},
+			"system--leader-locking-kube-controller-manager.yaml": {roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml, map[string]*bintree{}},
+			"system--leader-locking-kube-scheduler.yaml":          {roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml, map[string]*bintree{}},
+			"system-controller-bootstrap-signer.yaml":             {roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml, map[string]*bintree{}},
+			"system-controller-cloud-provider.yaml":               {roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml, map[string]*bintree{}},
+			"system-controller-token-cleaner.yaml":                {roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml, map[string]*bintree{}},
 		}},
 		"openshift": {nil, map[string]*bintree{
 			"shared-resource-viewer.yaml": {roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml, map[string]*bintree{}},
@@ -15801,17 +15801,17 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"kube-system": {nil, map[string]*bintree{
 			"extension-apiserver-authentication-reader-binding.yaml":                           {rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderBindingYaml, map[string]*bintree{}},
 			"extension-apiserver-authentication-reader-openshift-template-service-broker.yaml": {rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderOpenshiftTemplateServiceBrokerYaml, map[string]*bintree{}},
+			"system--leader-locking-kube-controller-manager.yaml":                              {rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml, map[string]*bintree{}},
+			"system--leader-locking-kube-scheduler.yaml":                                       {rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml, map[string]*bintree{}},
 			"system-controller-bootstrap-signer.yaml":                                          {rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml, map[string]*bintree{}},
 			"system-controller-cloud-provider.yaml":                                            {rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml, map[string]*bintree{}},
 			"system-controller-token-cleaner.yaml":                                             {rolebindingRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml, map[string]*bintree{}},
-			"system-leader-locking-kube-controller-manager.yaml":                               {rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml, map[string]*bintree{}},
-			"system-leader-locking-kube-scheduler.yaml":                                        {rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml, map[string]*bintree{}},
 		}},
 		"openshift": {nil, map[string]*bintree{
 			"shared-resource-viewers.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftSharedResourceViewersYaml, map[string]*bintree{}},
 		}},
 		"openshift-azure-monitoring": {nil, map[string]*bintree{
-			"etcd-metrics.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsYaml, map[string]*bintree{}},
+			"etcd-metrics-viewer.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftAzureMonitoringEtcdMetricsViewerYaml, map[string]*bintree{}},
 		}},
 		"openshift-template-service-broker": {nil, map[string]*bintree{
 			"templateservicebroker-auth-reader.yaml": {rolebindingRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml, map[string]*bintree{}},
