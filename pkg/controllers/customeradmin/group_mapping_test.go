@@ -38,7 +38,7 @@ func TestFromMSGraphGroup(t *testing.T) {
 			kubeGroupName: osaCustomerAdmins,
 			msGroupMembers: []graphrbac.User{
 				{
-					Mail: to.StringPtr("foo@somewhere.com"),
+					UserPrincipalName: to.StringPtr("foo@somewhere.com"),
 				},
 			},
 			want: &v1.Group{
@@ -59,7 +59,7 @@ func TestFromMSGraphGroup(t *testing.T) {
 			},
 			msGroupMembers: []graphrbac.User{
 				{
-					Mail: to.StringPtr("foo@somewhere.com"),
+					UserPrincipalName: to.StringPtr("foo@somewhere.com"),
 				},
 			},
 			want: &v1.Group{
@@ -81,10 +81,10 @@ func TestFromMSGraphGroup(t *testing.T) {
 			},
 			msGroupMembers: []graphrbac.User{
 				{
-					Mail: to.StringPtr("foo@somewhere.com"),
+					UserPrincipalName: to.StringPtr("foo@somewhere.com"),
 				},
 				{
-					Mail: to.StringPtr("tim@somewhere.com"),
+					UserPrincipalName: to.StringPtr("tim@somewhere.com"),
 				},
 			},
 			want: &v1.Group{
@@ -106,7 +106,8 @@ func TestFromMSGraphGroup(t *testing.T) {
 			},
 			msGroupMembers: []graphrbac.User{
 				{
-					Mail: to.StringPtr("foo@somewhere.com"),
+					Mail:     to.StringPtr("foo@somewhere.com"),
+					UserType: graphrbac.Guest,
 				},
 			},
 			want: &v1.Group{
