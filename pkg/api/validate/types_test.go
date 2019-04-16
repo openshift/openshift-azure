@@ -56,6 +56,38 @@ func TestValidatePluginVersion(t *testing.T) {
 	}
 }
 
+func TestIsValidClusterName(t *testing.T) {
+	invalidClusterNames := []string{
+		"",
+		"k",
+		"my.cluster",
+		"has spaces",
+		"random#characters?",
+		"1234567890",
+		"0cluster",
+		"cluster-",
+		"-cluster",
+		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		"verylongtoolongnameitslongerthan63characterswhoopsthiswontworkatall",
+	}
+	for _, invalidClusterName := range invalidClusterNames {
+		if isValidClusterName(invalidClusterName) {
+			t.Errorf("invalid cluster name passed test: %s", invalidClusterName)
+		}
+	}
+	validClusterNames := []string{
+		"k0",
+		"osa-testing",
+		"ExampleCluster111",
+		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+	}
+	for _, validClusterName := range validClusterNames {
+		if !isValidClusterName(validClusterName) {
+			t.Errorf("valid cluster name failed to pass test: %s", validClusterName)
+		}
+	}
+}
+
 func TestIsValidCloudAppHostname(t *testing.T) {
 	invalidFqdns := []string{
 		"invalid.random.domain",

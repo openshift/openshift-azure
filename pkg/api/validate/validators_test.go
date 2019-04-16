@@ -144,9 +144,13 @@ func TestValidate(t *testing.T) {
 				errors.New(`invalid location ""`),
 			},
 		},
-		"name": {
+		"empty name": {
 			f:            func(oc *api.OpenShiftManagedCluster) { oc.Name = "" },
 			expectedErrs: []error{errors.New(`invalid name ""`)},
+		},
+		"invalid name": {
+			f:            func(oc *api.OpenShiftManagedCluster) { oc.Name = "cluster.name" },
+			expectedErrs: []error{errors.New(`invalid name "cluster.name"`)},
 		},
 		"openshift config invalid api fqdn": {
 			f: func(oc *api.OpenShiftManagedCluster) {

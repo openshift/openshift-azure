@@ -12,6 +12,8 @@ import (
 )
 
 var (
+	rxClusterName = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$`)
+
 	rxRfc1123 = regexp.MustCompile(`(?i)^` +
 		`([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9])` +
 		`(\.([a-z0-9]|[a-z0-9][-a-z0-9]{0,61}[a-z0-9]))*` +
@@ -108,6 +110,10 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func isValidClusterName(n string) bool {
+	return rxClusterName.MatchString(n)
 }
 
 func isValidHostname(h string) bool {
