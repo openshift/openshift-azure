@@ -1,5 +1,6 @@
 TAG=$(shell git describe --tags HEAD)
-GITCOMMIT=$(TAG)$(shell [[ $$(git status --porcelain) = "" ]] && echo -clean || echo -dirty)
+GITSTATUS=$(shell git status --porcelain)
+GITCOMMIT=$(TAG)$(shell [ "$(GITSTATUS)" = "" ] && echo -clean || echo -dirty)
 LDFLAGS="-X main.gitCommit=$(GITCOMMIT)"
 
 AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(TAG)
