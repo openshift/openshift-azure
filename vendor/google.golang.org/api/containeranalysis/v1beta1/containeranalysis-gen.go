@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,35 @@
 
 // Package containeranalysis provides access to the Container Analysis API.
 //
-// See https://cloud.google.com/container-analysis/api/reference/rest/
+// For product documentation, see: https://cloud.google.com/container-analysis/api/reference/rest/
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/containeranalysis/v1beta1"
 //   ...
-//   containeranalysisService, err := containeranalysis.New(oauthHttpClient)
+//   ctx := context.Background()
+//   containeranalysisService, err := containeranalysis.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   containeranalysisService, err := containeranalysis.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   containeranalysisService, err := containeranalysis.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package containeranalysis // import "google.golang.org/api/containeranalysis/v1beta1"
 
 import (
@@ -29,6 +51,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -56,6 +80,32 @@ const (
 	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/cloud-platform",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -238,22 +288,24 @@ func (s *Artifact) MarshalJSON() ([]byte, error) {
 // to sign
 // for).
 type Attestation struct {
+	GenericSignedAttestation *GenericSignedAttestation `json:"genericSignedAttestation,omitempty"`
+
 	// PgpSignedAttestation: A PGP signed attestation.
 	PgpSignedAttestation *PgpSignedAttestation `json:"pgpSignedAttestation,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g.
-	// "PgpSignedAttestation") to unconditionally include in API requests.
-	// By default, fields with empty values are omitted from API requests.
-	// However, any non-pointer, non-interface field appearing in
+	// "GenericSignedAttestation") to unconditionally include in API
+	// requests. By default, fields with empty values are omitted from API
+	// requests. However, any non-pointer, non-interface field appearing in
 	// ForceSendFields will be sent to the server regardless of whether the
 	// field is empty or not. This may be used to include empty fields in
 	// Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "PgpSignedAttestation") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
+	// NullFields is a list of field names (e.g. "GenericSignedAttestation")
+	// to include in API requests with the JSON null value. By default,
+	// fields with empty values are omitted from API requests. However, any
+	// field with an empty value appearing in NullFields will be sent to the
 	// server as null. It is an error if a field in this list has a
 	// non-empty value. This may be used to include null fields in Patch
 	// requests.
@@ -625,8 +677,7 @@ func (s *BatchCreateOccurrencesResponse) MarshalJSON() ([]byte, error) {
 
 // Binding: Associates `members` with a `role`.
 type Binding struct {
-	// Condition: Unimplemented. The condition that is associated with this
-	// binding.
+	// Condition: The condition that is associated with this binding.
 	// NOTE: an unsatisfied condition will not allow user access via
 	// current
 	// binding. Different bindings, including their conditions, are
@@ -661,7 +712,7 @@ type Binding struct {
 	//    For example, `admins@example.com`.
 	//
 	//
-	// * `domain:{domain}`: A Google Apps domain name that represents all
+	// * `domain:{domain}`: The G Suite domain (primary) that represents all
 	// the
 	//    users of that domain. For example, `google.com` or
 	// `example.com`.
@@ -1504,7 +1555,7 @@ func (s *Fingerprint) MarshalJSON() ([]byte, error) {
 }
 
 // FixableTotalByDigest: Per resource and severity counts of fixable and
-// total vulnerabilites.
+// total vulnerabilities.
 type FixableTotalByDigest struct {
 	// FixableCount: The number of fixable vulnerabilities associated with
 	// this resource.
@@ -1549,6 +1600,72 @@ type FixableTotalByDigest struct {
 
 func (s *FixableTotalByDigest) MarshalJSON() ([]byte, error) {
 	type NoMethod FixableTotalByDigest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GenericSignedAttestation: An attestation wrapper that uses the
+// Grafeas `Signature` message.
+// This attestation must define the `serialized_payload` that the
+// `signatures`
+// verify and any metadata necessary to interpret that plaintext.
+// The
+// signatures should always be over the `serialized_payload` bytestring.
+type GenericSignedAttestation struct {
+	// ContentType: Type (for example schema) of the attestation payload
+	// that was signed.
+	// The verifier must ensure that the provided type is one that the
+	// verifier
+	// supports, and that the attestation payload is a valid instantiation
+	// of that
+	// type (for example by validating a JSON schema).
+	//
+	// Possible values:
+	//   "CONTENT_TYPE_UNSPECIFIED" - `ContentType` is not set.
+	//   "SIMPLE_SIGNING_JSON" - Atomic format attestation signature.
+	// See
+	// https://github.com/containers/image/blob/8a5d2f82a6e3263290c8e0276
+	// c3e0f64e77723e7/docs/atomic-signature.md
+	// The payload extracted in `plaintext` is a JSON blob conforming to
+	// the
+	// linked schema.
+	ContentType string `json:"contentType,omitempty"`
+
+	// SerializedPayload: The serialized payload that is verified by one or
+	// more `signatures`.
+	// The encoding and semantic meaning of this payload must match what is
+	// set in
+	// `content_type`.
+	SerializedPayload string `json:"serializedPayload,omitempty"`
+
+	// Signatures: One or more signatures over `serialized_payload`.
+	// Verifier implementations
+	// should consider this attestation message verified if at least
+	// one
+	// `signature` verifies `serialized_payload`.  See `Signature` in
+	// common.proto
+	// for more details on signature structure and verification.
+	Signatures []*Signature `json:"signatures,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "ContentType") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "ContentType") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GenericSignedAttestation) MarshalJSON() ([]byte, error) {
+	type NoMethod GenericSignedAttestation
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -1837,6 +1954,21 @@ type GrafeasV1beta1VulnerabilityDetails struct {
 	// severity.
 	CvssScore float64 `json:"cvssScore,omitempty"`
 
+	// EffectiveSeverity: The distro assigned severity for this
+	// vulnerability when it is
+	// available, and note provider assigned severity when distro has not
+	// yet
+	// assigned a severity for this vulnerability.
+	//
+	// Possible values:
+	//   "SEVERITY_UNSPECIFIED" - Unknown.
+	//   "MINIMAL" - Minimal severity.
+	//   "LOW" - Low severity.
+	//   "MEDIUM" - Medium severity.
+	//   "HIGH" - High severity.
+	//   "CRITICAL" - Critical severity.
+	EffectiveSeverity string `json:"effectiveSeverity,omitempty"`
+
 	// LongDescription: Output only. A detailed description of this
 	// vulnerability.
 	LongDescription string `json:"longDescription,omitempty"`
@@ -2063,27 +2195,23 @@ type Layer struct {
 	// Possible values:
 	//   "DIRECTIVE_UNSPECIFIED" - Default value for unsupported/missing
 	// directive.
-	//   "MAINTAINER" -
-	// https://docs.docker.com/reference/builder/#maintainer
-	//   "RUN" - https://docs.docker.com/reference/builder/#run
-	//   "CMD" - https://docs.docker.com/reference/builder/#cmd
-	//   "LABEL" - https://docs.docker.com/reference/builder/#label
-	//   "EXPOSE" - https://docs.docker.com/reference/builder/#expose
-	//   "ENV" - https://docs.docker.com/reference/builder/#env
-	//   "ADD" - https://docs.docker.com/reference/builder/#add
-	//   "COPY" - https://docs.docker.com/reference/builder/#copy
-	//   "ENTRYPOINT" -
-	// https://docs.docker.com/reference/builder/#entrypoint
-	//   "VOLUME" - https://docs.docker.com/reference/builder/#volume
-	//   "USER" - https://docs.docker.com/reference/builder/#user
-	//   "WORKDIR" - https://docs.docker.com/reference/builder/#workdir
-	//   "ARG" - https://docs.docker.com/reference/builder/#arg
-	//   "ONBUILD" - https://docs.docker.com/reference/builder/#onbuild
-	//   "STOPSIGNAL" -
-	// https://docs.docker.com/reference/builder/#stopsignal
-	//   "HEALTHCHECK" -
-	// https://docs.docker.com/reference/builder/#healthcheck
-	//   "SHELL" - https://docs.docker.com/reference/builder/#shell
+	//   "MAINTAINER" - https://docs.docker.com/engine/reference/builder/
+	//   "RUN" - https://docs.docker.com/engine/reference/builder/
+	//   "CMD" - https://docs.docker.com/engine/reference/builder/
+	//   "LABEL" - https://docs.docker.com/engine/reference/builder/
+	//   "EXPOSE" - https://docs.docker.com/engine/reference/builder/
+	//   "ENV" - https://docs.docker.com/engine/reference/builder/
+	//   "ADD" - https://docs.docker.com/engine/reference/builder/
+	//   "COPY" - https://docs.docker.com/engine/reference/builder/
+	//   "ENTRYPOINT" - https://docs.docker.com/engine/reference/builder/
+	//   "VOLUME" - https://docs.docker.com/engine/reference/builder/
+	//   "USER" - https://docs.docker.com/engine/reference/builder/
+	//   "WORKDIR" - https://docs.docker.com/engine/reference/builder/
+	//   "ARG" - https://docs.docker.com/engine/reference/builder/
+	//   "ONBUILD" - https://docs.docker.com/engine/reference/builder/
+	//   "STOPSIGNAL" - https://docs.docker.com/engine/reference/builder/
+	//   "HEALTHCHECK" - https://docs.docker.com/engine/reference/builder/
+	//   "SHELL" - https://docs.docker.com/engine/reference/builder/
 	Directive string `json:"directive,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Arguments") to
@@ -2549,8 +2677,8 @@ type PackageIssue struct {
 	// FixedLocation: The location of the available fix for vulnerability.
 	FixedLocation *VulnerabilityLocation `json:"fixedLocation,omitempty"`
 
-	// SeverityName: The severity (e.g., distro assigned severity) for this
-	// vulnerability.
+	// SeverityName: Deprecated, use Details.effective_severity instead
+	// The severity (e.g., distro assigned severity) for this vulnerability.
 	SeverityName string `json:"severityName,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AffectedLocation") to
@@ -3010,6 +3138,104 @@ func (s *SetIamPolicyRequest) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// Signature: Verifiers (e.g. Kritis implementations) MUST verify
+// signatures
+// with respect to the trust anchors defined in policy (e.g. a Kritis
+// policy).
+// Typically this means that the verifier has been configured with a map
+// from
+// `public_key_id` to public key material (and any required parameters,
+// e.g.
+// signing algorithm).
+//
+// In particular, verification implementations MUST NOT treat the
+// signature
+// `public_key_id` as anything more than a key lookup hint. The
+// `public_key_id`
+// DOES NOT validate or authenticate a public key; it only provides a
+// mechanism
+// for quickly selecting a public key ALREADY CONFIGURED on the verifier
+// through
+// a trusted channel. Verification implementations MUST reject
+// signatures in any
+// of the following circumstances:
+//   * The `public_key_id` is not recognized by the verifier.
+//   * The public key that `public_key_id` refers to does not verify
+// the
+//     signature with respect to the payload.
+//
+// The `signature` contents SHOULD NOT be "attached" (where the payload
+// is
+// included with the serialized `signature` bytes). Verifiers MUST
+// ignore any
+// "attached" payload and only verify signatures with respect to
+// explicitly
+// provided payload (e.g. a `payload` field on the proto message that
+// holds
+// this Signature, or the canonical serialization of the proto message
+// that
+// holds this signature).
+type Signature struct {
+	// PublicKeyId: The identifier for the public key that verifies this
+	// signature.
+	//   * The `public_key_id` is required.
+	//   * The `public_key_id` MUST be an RFC3986 conformant URI.
+	//   * When possible, the `public_key_id` SHOULD be an immutable
+	// reference,
+	//     such as a cryptographic digest.
+	//
+	// Examples of valid `public_key_id`s:
+	//
+	// OpenPGP V4 public key fingerprint:
+	//   * "openpgp4fpr:74FAF3B861BDA0870C7B6DEF607E48D2A663AEEA"
+	// See https://www.iana.org/assignments/uri-schemes/prov/openpgp4fpr for
+	// more
+	// details on this scheme.
+	//
+	// RFC6920 digest-named SubjectPublicKeyInfo (digest of the
+	// DER
+	// serialization):
+	//   * "ni:///sha-256;cD9o9Cq6LG3jD0iKXqEi_vdjJGecm_iXkbqVoScViaU"
+	//   *
+	// "nih:///sha-256;703f68f42aba2c6de30f488a5ea122fef76324679c9bf89791ba95
+	// a1271589a5"
+	PublicKeyId string `json:"publicKeyId,omitempty"`
+
+	// Signature: The content of the signature, an opaque bytestring.
+	// The payload that this signature verifies MUST be unambiguously
+	// provided
+	// with the Signature during verification. A wrapper message might
+	// provide
+	// the payload explicitly. Alternatively, a message might have a
+	// canonical
+	// serialization that can always be unambiguously computed to derive
+	// the
+	// payload.
+	Signature string `json:"signature,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "PublicKeyId") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "PublicKeyId") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *Signature) MarshalJSON() ([]byte, error) {
+	type NoMethod Signature
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // Source: Source describes the location of the source used for the
 // build.
 type Source struct {
@@ -3110,20 +3336,20 @@ func (s *SourceContext) MarshalJSON() ([]byte, error) {
 }
 
 // Status: The `Status` type defines a logical error model that is
-// suitable for different
-// programming environments, including REST APIs and RPC APIs. It is
-// used by
-// [gRPC](https://github.com/grpc). The error model is designed to
-// be:
+// suitable for
+// different programming environments, including REST APIs and RPC APIs.
+// It is
+// used by [gRPC](https://github.com/grpc). The error model is designed
+// to be:
 //
 // - Simple to use and understand for most users
 // - Flexible enough to meet unexpected needs
 //
 // # Overview
 //
-// The `Status` message contains three pieces of data: error code, error
-// message,
-// and error details. The error code should be an enum value
+// The `Status` message contains three pieces of data: error code,
+// error
+// message, and error details. The error code should be an enum value
 // of
 // google.rpc.Code, but it may accept additional error codes if needed.
 // The

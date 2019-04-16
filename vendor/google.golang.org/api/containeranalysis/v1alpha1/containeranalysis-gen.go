@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,35 @@
 
 // Package containeranalysis provides access to the Container Analysis API.
 //
-// See https://cloud.google.com/container-analysis/api/reference/rest/
+// For product documentation, see: https://cloud.google.com/container-analysis/api/reference/rest/
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/containeranalysis/v1alpha1"
 //   ...
-//   containeranalysisService, err := containeranalysis.New(oauthHttpClient)
+//   ctx := context.Background()
+//   containeranalysisService, err := containeranalysis.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   containeranalysisService, err := containeranalysis.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   containeranalysisService, err := containeranalysis.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package containeranalysis // import "google.golang.org/api/containeranalysis/v1alpha1"
 
 import (
@@ -29,6 +51,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -56,6 +80,32 @@ const (
 	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/cloud-platform",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -567,8 +617,7 @@ func (s *Basis) MarshalJSON() ([]byte, error) {
 
 // Binding: Associates `members` with a `role`.
 type Binding struct {
-	// Condition: Unimplemented. The condition that is associated with this
-	// binding.
+	// Condition: The condition that is associated with this binding.
 	// NOTE: an unsatisfied condition will not allow user access via
 	// current
 	// binding. Different bindings, including their conditions, are
@@ -603,7 +652,7 @@ type Binding struct {
 	//    For example, `admins@example.com`.
 	//
 	//
-	// * `domain:{domain}`: A Google Apps domain name that represents all
+	// * `domain:{domain}`: The G Suite domain (primary) that represents all
 	// the
 	//    users of that domain. For example, `google.com` or
 	// `example.com`.
@@ -1877,27 +1926,23 @@ type Layer struct {
 	// Possible values:
 	//   "DIRECTIVE_UNSPECIFIED" - Default value for unsupported/missing
 	// directive
-	//   "MAINTAINER" -
-	// https://docs.docker.com/reference/builder/#maintainer
-	//   "RUN" - https://docs.docker.com/reference/builder/#run
-	//   "CMD" - https://docs.docker.com/reference/builder/#cmd
-	//   "LABEL" - https://docs.docker.com/reference/builder/#label
-	//   "EXPOSE" - https://docs.docker.com/reference/builder/#expose
-	//   "ENV" - https://docs.docker.com/reference/builder/#env
-	//   "ADD" - https://docs.docker.com/reference/builder/#add
+	//   "MAINTAINER" - https://docs.docker.com/engine/reference/builder/
+	//   "RUN" - https://docs.docker.com/engine/reference/builder/
+	//   "CMD" - https://docs.docker.com/engine/reference/builder/
+	//   "LABEL" - https://docs.docker.com/engine/reference/builder/
+	//   "EXPOSE" - https://docs.docker.com/engine/reference/builder/
+	//   "ENV" - https://docs.docker.com/engine/reference/builder/
+	//   "ADD" - https://docs.docker.com/engine/reference/builder/
 	//   "COPY" - https://docs.docker.com/reference/builder/#copy
-	//   "ENTRYPOINT" -
-	// https://docs.docker.com/reference/builder/#entrypoint
-	//   "VOLUME" - https://docs.docker.com/reference/builder/#volume
-	//   "USER" - https://docs.docker.com/reference/builder/#user
-	//   "WORKDIR" - https://docs.docker.com/reference/builder/#workdir
-	//   "ARG" - https://docs.docker.com/reference/builder/#arg
-	//   "ONBUILD" - https://docs.docker.com/reference/builder/#onbuild
-	//   "STOPSIGNAL" -
-	// https://docs.docker.com/reference/builder/#stopsignal
-	//   "HEALTHCHECK" -
-	// https://docs.docker.com/reference/builder/#healthcheck
-	//   "SHELL" - https://docs.docker.com/reference/builder/#shell
+	//   "ENTRYPOINT" - https://docs.docker.com/engine/reference/builder/
+	//   "VOLUME" - https://docs.docker.com/engine/reference/builder/
+	//   "USER" - https://docs.docker.com/engine/reference/builder/
+	//   "WORKDIR" - https://docs.docker.com/engine/reference/builder/
+	//   "ARG" - https://docs.docker.com/engine/reference/builder/
+	//   "ONBUILD" - https://docs.docker.com/engine/reference/builder/
+	//   "STOPSIGNAL" - https://docs.docker.com/engine/reference/builder/
+	//   "HEALTHCHECK" - https://docs.docker.com/engine/reference/builder/
+	//   "SHELL" - https://docs.docker.com/engine/reference/builder/
 	Directive string `json:"directive,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Arguments") to
@@ -2435,8 +2480,6 @@ type PackageIssue struct {
 	// FixedLocation: The location of the available fix for vulnerability.
 	FixedLocation *VulnerabilityLocation `json:"fixedLocation,omitempty"`
 
-	// SeverityName: The severity (eg: distro assigned severity) for this
-	// vulnerability.
 	SeverityName string `json:"severityName,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "AffectedLocation") to
@@ -2977,20 +3020,20 @@ func (s *Source) MarshalJSON() ([]byte, error) {
 }
 
 // Status: The `Status` type defines a logical error model that is
-// suitable for different
-// programming environments, including REST APIs and RPC APIs. It is
-// used by
-// [gRPC](https://github.com/grpc). The error model is designed to
-// be:
+// suitable for
+// different programming environments, including REST APIs and RPC APIs.
+// It is
+// used by [gRPC](https://github.com/grpc). The error model is designed
+// to be:
 //
 // - Simple to use and understand for most users
 // - Flexible enough to meet unexpected needs
 //
 // # Overview
 //
-// The `Status` message contains three pieces of data: error code, error
-// message,
-// and error details. The error code should be an enum value
+// The `Status` message contains three pieces of data: error code,
+// error
+// message, and error details. The error code should be an enum value
 // of
 // google.rpc.Code, but it may accept additional error codes if needed.
 // The
@@ -3301,6 +3344,21 @@ type VulnerabilityDetails struct {
 	// high
 	// severity.
 	CvssScore float64 `json:"cvssScore,omitempty"`
+
+	// EffectiveSeverity: The distro assigned severity for this
+	// vulnerability when that is
+	// available and note provider assigned severity when distro has not
+	// yet
+	// assigned a severity for this vulnerability.
+	//
+	// Possible values:
+	//   "SEVERITY_UNSPECIFIED" - Unknown Impact
+	//   "MINIMAL" - Minimal Impact
+	//   "LOW" - Low Impact
+	//   "MEDIUM" - Medium Impact
+	//   "HIGH" - High Impact
+	//   "CRITICAL" - Critical Impact
+	EffectiveSeverity string `json:"effectiveSeverity,omitempty"`
 
 	// PackageIssue: The set of affected locations and their fixes (if
 	// available) within

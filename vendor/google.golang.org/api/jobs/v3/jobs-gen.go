@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,39 @@
 
 // Package jobs provides access to the Cloud Talent Solution API.
 //
-// See https://cloud.google.com/talent-solution/job-search/docs/
+// For product documentation, see: https://cloud.google.com/talent-solution/job-search/docs/
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/jobs/v3"
 //   ...
-//   jobsService, err := jobs.New(oauthHttpClient)
+//   ctx := context.Background()
+//   jobsService, err := jobs.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// By default, all available scopes (see "Constants") are used to authenticate. To restrict scopes, use option.WithScopes:
+//
+//   jobsService, err := jobs.NewService(ctx, option.WithScopes(jobs.JobsScope))
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   jobsService, err := jobs.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   jobsService, err := jobs.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package jobs // import "google.golang.org/api/jobs/v3"
 
 import (
@@ -29,6 +55,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -59,6 +87,33 @@ const (
 	JobsScope = "https://www.googleapis.com/auth/jobs"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/cloud-platform",
+		"https://www.googleapis.com/auth/jobs",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -355,7 +410,7 @@ type ClientEvent struct {
 	// implements Cloud Talent Solution.
 	JobEvent *JobEvent `json:"jobEvent,omitempty"`
 
-	// ParentEventId: Required except the first event.
+	// ParentEventId: Optional.
 	//
 	// The event_id of an event that resulted in the current event. For
 	// example, a
@@ -406,14 +461,24 @@ func (s *ClientEvent) MarshalJSON() ([]byte, error) {
 // Parameters needed for commute search.
 type CommuteFilter struct {
 	// AllowImpreciseAddresses: Optional.
-	// If `true`, jobs without street level addresses may also be
-	// returned.
-	// For city level addresses, the city center is used. For state and
-	// coarser
-	// level addresses, text matching is used.
-	// If this field is set to `false` or is not specified, only jobs that
-	// include
-	// street level addresses will be returned by commute search.
+	// If true, jobs without "precise" addresses (street level addresses or
+	// GPS
+	// coordinates) might also be returned. For city and coarser level
+	// addresses,
+	// text matching is used. If this field is set to false or is not
+	// specified,
+	// only jobs that include precise addresses are returned by
+	// Commute
+	// Search.
+	//
+	// Note: If `allow_imprecise_addresses` is set to true, Commute Search
+	// is not
+	// able to calculate accurate commute times to jobs with city level
+	// and
+	// coarser address information. Jobs with imprecise addresses will
+	// return a
+	// `travel_duration` time of 0 regardless of distance from the job
+	// seeker.
 	AllowImpreciseAddresses bool `json:"allowImpreciseAddresses,omitempty"`
 
 	// CommuteMethod: Required.
@@ -3919,12 +3984,11 @@ type SearchJobsRequest struct {
 	// Job.name, Job.requisition_id, Job.language_code.
 	//   "JOB_VIEW_MINIMAL" - A minimal view of the job, with the following
 	// attributes:
-	// Job.name, Job.requisition_id, Job.job_title,
+	// Job.name, Job.requisition_id, Job.title,
 	// Job.company_name, Job.DerivedInfo.locations, Job.language_code.
 	//   "JOB_VIEW_SMALL" - A small view of the job, with the following
 	// attributes in the search
-	// results: Job.name, Job.requisition_id,
-	// Job.job_title,
+	// results: Job.name, Job.requisition_id, Job.title,
 	// Job.company_name, Job.DerivedInfo.locations,
 	// Job.visibility,
 	// Job.language_code, Job.description.
@@ -4708,8 +4772,8 @@ type ProjectsClientEventsCreateCall struct {
 // tools](https://console.cloud.google.com/talent-solution/overvi
 // ew).
 // [Learn
-// more](https://cloud.google.com/talent-solution/job-search/
-// docs/management-tools)
+// more](https://cloud.google.com/talent-solution/docs/manage
+// ment-tools)
 // about self service tools.
 func (r *ProjectsClientEventsService) Create(parent string, createclienteventrequest *CreateClientEventRequest) *ProjectsClientEventsCreateCall {
 	c := &ProjectsClientEventsCreateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
@@ -4808,7 +4872,7 @@ func (c *ProjectsClientEventsCreateCall) Do(opts ...googleapi.CallOption) (*Clie
 	}
 	return ret, nil
 	// {
-	//   "description": "Report events issued when end user interacts with customer's application\nthat uses Cloud Talent Solution. You may inspect the created events in\n[self service\ntools](https://console.cloud.google.com/talent-solution/overview).\n[Learn\nmore](https://cloud.google.com/talent-solution/job-search/docs/management-tools)\nabout self service tools.",
+	//   "description": "Report events issued when end user interacts with customer's application\nthat uses Cloud Talent Solution. You may inspect the created events in\n[self service\ntools](https://console.cloud.google.com/talent-solution/overview).\n[Learn\nmore](https://cloud.google.com/talent-solution/docs/management-tools)\nabout self service tools.",
 	//   "flatPath": "v3/projects/{projectsId}/clientEvents",
 	//   "httpMethod": "POST",
 	//   "id": "jobs.projects.clientEvents.create",

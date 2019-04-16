@@ -5628,14 +5628,6 @@ func (n *NewTeam) GetLDAPDN() string {
 	return *n.LDAPDN
 }
 
-// GetNodeID returns the NodeID field if it's non-nil, zero value otherwise.
-func (n *NewTeam) GetNodeID() string {
-	if n == nil || n.NodeID == nil {
-		return ""
-	}
-	return *n.NodeID
-}
-
 // GetParentTeamID returns the ParentTeamID field if it's non-nil, zero value otherwise.
 func (n *NewTeam) GetParentTeamID() int64 {
 	if n == nil || n.ParentTeamID == nil {
@@ -6276,6 +6268,14 @@ func (p *Pages) GetHTMLURL() string {
 	return *p.HTMLURL
 }
 
+// GetSource returns the Source field.
+func (p *Pages) GetSource() *PagesSource {
+	if p == nil {
+		return nil
+	}
+	return p.Source
+}
+
 // GetStatus returns the Status field if it's non-nil, zero value otherwise.
 func (p *Pages) GetStatus() string {
 	if p == nil || p.Status == nil {
@@ -6362,6 +6362,22 @@ func (p *PagesError) GetMessage() string {
 		return ""
 	}
 	return *p.Message
+}
+
+// GetBranch returns the Branch field if it's non-nil, zero value otherwise.
+func (p *PagesSource) GetBranch() string {
+	if p == nil || p.Branch == nil {
+		return ""
+	}
+	return *p.Branch
+}
+
+// GetPath returns the Path field if it's non-nil, zero value otherwise.
+func (p *PagesSource) GetPath() string {
+	if p == nil || p.Path == nil {
+		return ""
+	}
+	return *p.Path
 }
 
 // GetTotalPages returns the TotalPages field if it's non-nil, zero value otherwise.

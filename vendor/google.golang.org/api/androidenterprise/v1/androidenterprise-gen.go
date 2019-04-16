@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,35 @@
 
 // Package androidenterprise provides access to the Google Play EMM API.
 //
-// See https://developers.google.com/android/work/play/emm-api
+// For product documentation, see: https://developers.google.com/android/work/play/emm-api
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/androidenterprise/v1"
 //   ...
-//   androidenterpriseService, err := androidenterprise.New(oauthHttpClient)
+//   ctx := context.Background()
+//   androidenterpriseService, err := androidenterprise.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   androidenterpriseService, err := androidenterprise.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   androidenterpriseService, err := androidenterprise.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package androidenterprise // import "google.golang.org/api/androidenterprise/v1"
 
 import (
@@ -29,6 +51,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -56,6 +80,32 @@ const (
 	AndroidenterpriseScope = "https://www.googleapis.com/auth/androidenterprise"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/androidenterprise",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -529,42 +579,6 @@ type AdministratorWebTokenSpecWebApps struct {
 
 func (s *AdministratorWebTokenSpecWebApps) MarshalJSON() ([]byte, error) {
 	type NoMethod AdministratorWebTokenSpecWebApps
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
-// AndroidDevicePolicyConfig: Deprecated and unused.
-type AndroidDevicePolicyConfig struct {
-	// Kind: Identifies what kind of resource this is. Value: the fixed
-	// string "androidenterprise#androidDevicePolicyConfig".
-	Kind string `json:"kind,omitempty"`
-
-	// State: Deprecated and unused.
-	State string `json:"state,omitempty"`
-
-	// ServerResponse contains the HTTP response code and headers from the
-	// server.
-	googleapi.ServerResponse `json:"-"`
-
-	// ForceSendFields is a list of field names (e.g. "Kind") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Kind") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *AndroidDevicePolicyConfig) MarshalJSON() ([]byte, error) {
-	type NoMethod AndroidDevicePolicyConfig
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -2718,6 +2732,9 @@ type ProductPolicy struct {
 	// AutoInstallPolicy: The auto-install policy for the product.
 	AutoInstallPolicy *AutoInstallPolicy `json:"autoInstallPolicy,omitempty"`
 
+	// ManagedConfiguration: The managed configuration for the product.
+	ManagedConfiguration *ManagedConfiguration `json:"managedConfiguration,omitempty"`
+
 	// ProductId: The ID of the product. For example,
 	// "app:com.google.android.gm".
 	ProductId string `json:"productId,omitempty"`
@@ -3669,9 +3686,23 @@ func (s *VariableSet) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// WebApp: WebApp resource info.
+// WebApp: A WebApps resource represents a web app created for an
+// enterprise. Web apps are published to managed Google Play and can be
+// distributed like other Android apps. On a user's device, a web app
+// opens its specified URL.
 type WebApp struct {
 	// DisplayMode: The display mode of the web app.
+	//
+	// Possible values include:
+	// - "minimalUi", the device's status bar, navigation bar, the app's
+	// URL, and a refresh button are visible when the app is open. For HTTP
+	// URLs, you can only select this option.
+	// - "standalone", the device's status bar and navigation bar are
+	// visible when the app is open.
+	// - "fullScreen", the app opens in full screen mode, hiding the
+	// device's status and navigation bars. All browser UI elements, page
+	// URL, system status bar and back button are not visible, and the web
+	// app takes up the entirety of the available display area.
 	DisplayMode string `json:"displayMode,omitempty"`
 
 	// Icons: A list of icons representing this website. If absent, a
@@ -3687,9 +3718,8 @@ type WebApp struct {
 	// opens the application.
 	StartUrl string `json:"startUrl,omitempty"`
 
-	// Title: The title of the web application as displayed to the user
-	// (e.g., amongst a list of other applications, or as a label for an
-	// icon).
+	// Title: The title of the web app as displayed to the user (e.g.,
+	// amongst a list of other applications, or as a label for an icon).
 	Title string `json:"title,omitempty"`
 
 	// VersionCode: The current version of the app.
@@ -3700,7 +3730,9 @@ type WebApp struct {
 	// web app up-to-date.
 	VersionCode int64 `json:"versionCode,omitempty,string"`
 
-	// WebAppId: The ID of the application.
+	// WebAppId: The ID of the application. A string of the form
+	// "app:<package name>" where the package name always starts with the
+	// prefix "com.google.enterprise.webapp." followed by a random id.
 	WebAppId string `json:"webAppId,omitempty"`
 
 	// ServerResponse contains the HTTP response code and headers from the
@@ -6460,143 +6492,6 @@ func (c *EnterprisesSetAccountCall) Do(opts ...googleapi.CallOption) (*Enterpris
 	//   },
 	//   "response": {
 	//     "$ref": "EnterpriseAccount"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/androidenterprise"
-	//   ]
-	// }
-
-}
-
-// method id "androidenterprise.enterprises.setAndroidDevicePolicyConfig":
-
-type EnterprisesSetAndroidDevicePolicyConfigCall struct {
-	s                         *Service
-	enterpriseId              string
-	androiddevicepolicyconfig *AndroidDevicePolicyConfig
-	urlParams_                gensupport.URLParams
-	ctx_                      context.Context
-	header_                   http.Header
-}
-
-// SetAndroidDevicePolicyConfig: Deprecated and unused.
-func (r *EnterprisesService) SetAndroidDevicePolicyConfig(enterpriseId string, androiddevicepolicyconfig *AndroidDevicePolicyConfig) *EnterprisesSetAndroidDevicePolicyConfigCall {
-	c := &EnterprisesSetAndroidDevicePolicyConfigCall{s: r.s, urlParams_: make(gensupport.URLParams)}
-	c.enterpriseId = enterpriseId
-	c.androiddevicepolicyconfig = androiddevicepolicyconfig
-	return c
-}
-
-// Fields allows partial responses to be retrieved. See
-// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
-// for more information.
-func (c *EnterprisesSetAndroidDevicePolicyConfigCall) Fields(s ...googleapi.Field) *EnterprisesSetAndroidDevicePolicyConfigCall {
-	c.urlParams_.Set("fields", googleapi.CombineFields(s))
-	return c
-}
-
-// Context sets the context to be used in this call's Do method. Any
-// pending HTTP request will be aborted if the provided context is
-// canceled.
-func (c *EnterprisesSetAndroidDevicePolicyConfigCall) Context(ctx context.Context) *EnterprisesSetAndroidDevicePolicyConfigCall {
-	c.ctx_ = ctx
-	return c
-}
-
-// Header returns an http.Header that can be modified by the caller to
-// add HTTP headers to the request.
-func (c *EnterprisesSetAndroidDevicePolicyConfigCall) Header() http.Header {
-	if c.header_ == nil {
-		c.header_ = make(http.Header)
-	}
-	return c.header_
-}
-
-func (c *EnterprisesSetAndroidDevicePolicyConfigCall) doRequest(alt string) (*http.Response, error) {
-	reqHeaders := make(http.Header)
-	for k, v := range c.header_ {
-		reqHeaders[k] = v
-	}
-	reqHeaders.Set("User-Agent", c.s.userAgent())
-	var body io.Reader = nil
-	body, err := googleapi.WithoutDataWrapper.JSONReader(c.androiddevicepolicyconfig)
-	if err != nil {
-		return nil, err
-	}
-	reqHeaders.Set("Content-Type", "application/json")
-	c.urlParams_.Set("alt", alt)
-	c.urlParams_.Set("prettyPrint", "false")
-	urls := googleapi.ResolveRelative(c.s.BasePath, "enterprises/{enterpriseId}/androidDevicePolicyConfig")
-	urls += "?" + c.urlParams_.Encode()
-	req, err := http.NewRequest("PUT", urls, body)
-	if err != nil {
-		return nil, err
-	}
-	req.Header = reqHeaders
-	googleapi.Expand(req.URL, map[string]string{
-		"enterpriseId": c.enterpriseId,
-	})
-	return gensupport.SendRequest(c.ctx_, c.s.client, req)
-}
-
-// Do executes the "androidenterprise.enterprises.setAndroidDevicePolicyConfig" call.
-// Exactly one of *AndroidDevicePolicyConfig or error will be non-nil.
-// Any non-2xx status code is an error. Response headers are in either
-// *AndroidDevicePolicyConfig.ServerResponse.Header or (if a response
-// was returned at all) in error.(*googleapi.Error).Header. Use
-// googleapi.IsNotModified to check whether the returned error was
-// because http.StatusNotModified was returned.
-func (c *EnterprisesSetAndroidDevicePolicyConfigCall) Do(opts ...googleapi.CallOption) (*AndroidDevicePolicyConfig, error) {
-	gensupport.SetOptions(c.urlParams_, opts...)
-	res, err := c.doRequest("json")
-	if res != nil && res.StatusCode == http.StatusNotModified {
-		if res.Body != nil {
-			res.Body.Close()
-		}
-		return nil, &googleapi.Error{
-			Code:   res.StatusCode,
-			Header: res.Header,
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-	defer googleapi.CloseBody(res)
-	if err := googleapi.CheckResponse(res); err != nil {
-		return nil, err
-	}
-	ret := &AndroidDevicePolicyConfig{
-		ServerResponse: googleapi.ServerResponse{
-			Header:         res.Header,
-			HTTPStatusCode: res.StatusCode,
-		},
-	}
-	target := &ret
-	if err := gensupport.DecodeResponse(target, res); err != nil {
-		return nil, err
-	}
-	return ret, nil
-	// {
-	//   "description": "Deprecated and unused.",
-	//   "httpMethod": "PUT",
-	//   "id": "androidenterprise.enterprises.setAndroidDevicePolicyConfig",
-	//   "parameterOrder": [
-	//     "enterpriseId"
-	//   ],
-	//   "parameters": {
-	//     "enterpriseId": {
-	//       "description": "The ID of the enterprise.",
-	//       "location": "path",
-	//       "required": true,
-	//       "type": "string"
-	//     }
-	//   },
-	//   "path": "enterprises/{enterpriseId}/androidDevicePolicyConfig",
-	//   "request": {
-	//     "$ref": "AndroidDevicePolicyConfig"
-	//   },
-	//   "response": {
-	//     "$ref": "AndroidDevicePolicyConfig"
 	//   },
 	//   "scopes": [
 	//     "https://www.googleapis.com/auth/androidenterprise"
