@@ -16,7 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
-// The retryingRoundTripper implementation is customised to help with multiple
+// The RetryingRoundTripper implementation is customised to help with multiple
 // network connection-related issues seen in CI which we haven't necessarily
 // been able to fully explain yet.  Importantly, it is not yet clear whether any
 // of these issues could impact cluster end-users or whether they are more
@@ -43,7 +43,7 @@ import (
 //    request; no packets from the server arrive; eventually the subsequent
 //    client read times out.
 //
-//    retryingRoundTripper aims to help the above by setting a 30 second timeout
+//    RetryingRoundTripper aims to help the above by setting a 30 second timeout
 //    on client GETs and retrying if the timeout is reached.  This is done only
 //    on GETs since other actions are not idempotent.
 //
@@ -52,21 +52,21 @@ import (
 //    timeout.
 //
 // 3. Even with the default 30 second Dial timeout, sometimes we see unexplained
-//    Dial timeout failures.  retryingRoundTripper retries in these cases.
+//    Dial timeout failures.  RetryingRoundTripper Retries in these cases.
 //
 // 4. The default TLS handshake timeout is 10 seconds.  Sometimes we see this
-//    timeout triggered.  retryingRoundTripper also retries in these cases.
+//    timeout triggered.  RetryingRoundTripper also Retries in these cases.
 
-var timerExpired = errors.New("retryingRoundTripper timer expired")
+var timerExpired = errors.New("RetryingRoundTripper timer expired")
 
-type retryingRoundTripper struct {
-	log *logrus.Entry
+type RetryingRoundTripper struct {
+	Log *logrus.Entry
 	http.RoundTripper
-	retries    int
-	getTimeout time.Duration
+	Retries    int
+	GetTimeout time.Duration
 }
 
-func (rt *retryingRoundTripper) RoundTrip(req *http.Request) (resp *http.Response, err error) {
+func (rt *RetryingRoundTripper) RoundTrip(req *http.Request) (resp *http.Response, err error) {
 	var retry int
 	for {
 		retry++
@@ -77,7 +77,7 @@ func (rt *retryingRoundTripper) RoundTrip(req *http.Request) (resp *http.Respons
 			cancel := make(chan struct{})
 			req.Cancel = cancel
 
-			t := time.NewTimer(rt.getTimeout)
+			t := time.NewTimer(rt.GetTimeout)
 
 			go func() {
 				select {
@@ -99,25 +99,25 @@ func (rt *retryingRoundTripper) RoundTrip(req *http.Request) (resp *http.Respons
 			resp, err = rt.RoundTripper.RoundTrip(req)
 		}
 
-		if err, ok := err.(*net.OpError); retry <= rt.retries && ok {
+		if err, ok := err.(*net.OpError); retry <= rt.Retries && ok {
 			if err.Op == "dial" && err.Err.Error() == "i/o timeout" {
-				rt.log.Warnf("%s: retry %d", err, retry)
+				rt.Log.Warnf("%s: retry %d", err, retry)
 				continue
 			}
 		}
 
-		if retry <= rt.retries && err != nil && err.Error() == "net/http: TLS handshake timeout" {
-			rt.log.Warnf("%s: retry %d", err, retry)
+		if retry <= rt.Retries && err != nil && err.Error() == "net/http: TLS handshake timeout" {
+			rt.Log.Warnf("%s: retry %d", err, retry)
 			continue
 		}
 
-		if retry <= rt.retries && err == timerExpired {
-			rt.log.Warnf("%s: retry %d", err, retry)
+		if retry <= rt.Retries && err == timerExpired {
+			rt.Log.Warnf("%s: retry %d", err, retry)
 			continue
 		}
 
 		if err != nil {
-			rt.log.Warnf("%#v: not retrying", err)
+			rt.Log.Warnf("%#v: not retrying", err)
 		}
 
 		return
@@ -145,12 +145,12 @@ func NewKubeclient(log *logrus.Entry, config *v1.Config, disableKeepAlives bool)
 
 		rt.(*http.Transport).DisableKeepAlives = disableKeepAlives
 
-		// now wrap our retryingRoundTripper around the incoming RoundTripper.
-		return &retryingRoundTripper{
-			log:          log,
+		// now wrap our RetryingRoundTripper around the incoming RoundTripper.
+		return &RetryingRoundTripper{
+			Log:          log,
 			RoundTripper: rt,
-			retries:      5,
-			getTimeout:   30 * time.Second,
+			Retries:      5,
+			GetTimeout:   30 * time.Second,
 		}
 	}
 
