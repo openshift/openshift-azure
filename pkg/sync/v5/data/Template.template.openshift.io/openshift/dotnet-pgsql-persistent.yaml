@@ -80,8 +80,6 @@ objects:
         env:
         - name: DOTNET_STARTUP_PROJECT
           value: ${DOTNET_STARTUP_PROJECT}
-        - name: DOTNET_SDK_VERSION
-          value: ${DOTNET_SDK_VERSION}
         - name: DOTNET_ASSEMBLY_NAME
           value: ${DOTNET_ASSEMBLY_NAME}
         - name: DOTNET_NPM_TOOLS
@@ -233,16 +231,6 @@ objects:
           name: postgresql
           ports:
           - containerPort: 5432
-          readinessProbe:
-            exec:
-              command:
-              - /bin/sh
-              - -i
-              - -c
-              - psql -h 127.0.0.1 -U ${POSTGRESQL_USER} -q -d ${POSTGRESQL_DATABASE}
-                -c 'SELECT 1'
-            initialDelaySeconds: 5
-            timeoutSeconds: 1
           resources:
             limits:
               memory: ${MEMORY_POSTGRESQL_LIMIT}
@@ -314,10 +302,6 @@ parameters:
   displayName: Startup Project
   name: DOTNET_STARTUP_PROJECT
   value: samples/MusicStore
-- description: Set this to configure the default SDK version. This can be set to a
-    specific version, '' (lowest version) or 'latest' (highest version).
-  displayName: SDK Version
-  name: DOTNET_SDK_VERSION
 - description: Set this when the assembly name is overridden in the project file.
   displayName: Startup Assembly
   name: DOTNET_ASSEMBLY_NAME

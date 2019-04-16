@@ -2,8 +2,14 @@ apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
   annotations:
-    description: 3scale API Gateway
-    iconClass: icon-load-balancer
+    description: 3scale's APIcast is an NGINX based API gateway used to integrate
+      your internal and external API services with 3scale's API Management Platform.
+      It supports OpenID connect to integrate with external Identity Providers such
+      as Red Hat Single Sign On, for API traffic authentication
+    iconClass: icon-3scale
+    openshift.io/display-name: 3scale APIcast API Gateway
+    openshift.io/documentation-url: https://access.redhat.com/documentation/en-us/red_hat_3scale/2.saas/html/deployment_options/apicast-openshift
+    openshift.io/provider-display-name: Red Hat, Inc.
     tags: api,gateway,3scale
   name: 3scale-gateway
   namespace: openshift
@@ -13,13 +19,16 @@ objects:
   metadata:
     name: ${APICAST_NAME}
   spec:
-    replicas: 2
+    replicas: 1
     selector:
       deploymentconfig: ${APICAST_NAME}
     strategy:
       type: Rolling
     template:
       metadata:
+        annotations:
+          prometheus.io/port: "9421"
+          prometheus.io/scrape: "true"
         labels:
           deploymentconfig: ${APICAST_NAME}
       spec:
@@ -29,20 +38,20 @@ objects:
             valueFrom:
               secretKeyRef:
                 key: password
-                name: ${CONFIGURATION_URL_SECRET}
+                name: apicast-configuration-url-secret
           - name: THREESCALE_CONFIG_FILE
             value: ${CONFIGURATION_FILE_PATH}
           - name: THREESCALE_DEPLOYMENT_ENV
             value: ${DEPLOYMENT_ENVIRONMENT}
           - name: RESOLVER
             value: ${RESOLVER}
-          - name: APICAST_SERVICES
+          - name: APICAST_SERVICES_LIST
             value: ${SERVICES_LIST}
           - name: APICAST_CONFIGURATION_LOADER
             value: ${CONFIGURATION_LOADER}
           - name: APICAST_LOG_LEVEL
             value: ${LOG_LEVEL}
-          - name: APICAST_PATH_ROUTING_ENABLED
+          - name: APICAST_PATH_ROUTING
             value: ${PATH_ROUTING}
           - name: APICAST_RESPONSE_CODES
             value: ${RESPONSE_CODES}
@@ -54,7 +63,7 @@ objects:
             value: ${MANAGEMENT_API}
           - name: OPENSSL_VERIFY
             value: ${OPENSSL_VERIFY}
-          image: 3scale-amp20/apicast-gateway:1.0-3
+          image: ${AMP_APICAST_IMAGE}
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -70,14 +79,33 @@ objects:
           - containerPort: 8090
             name: management
             protocol: TCP
+          - containerPort: 9421
+            name: metrics
+            protocol: TCP
           readinessProbe:
             httpGet:
               path: /status/ready
               port: management
             initialDelaySeconds: 15
             timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 128Mi
+            requests:
+              cpu: 500m
+              memory: 64Mi
     triggers:
     - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APICAST_NAME}
+        from:
+          kind: ImageStreamTag
+          name: apicast-gateway:latest
+          namespace: openshift
+      type: ImageChange
 - apiVersion: v1
   kind: Service
   metadata:
@@ -94,20 +122,32 @@ objects:
       targetPort: 8090
     selector:
       deploymentconfig: ${APICAST_NAME}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: apicast-configuration-url-secret
+  stringData:
+    password: https://${ACCESS_TOKEN}@${DOMAIN}-admin.3scale.net
+  type: Opaque
 parameters:
 - description: AMP release tag.
   name: AMP_RELEASE
   required: true
-  value: 2.0.0-CR2-redhat-1
-- description: Name of the secret containing the THREESCALE_PORTAL_ENDPOINT with the
-    access-token or provider key
-  name: CONFIGURATION_URL_SECRET
+  value: 2.4.0
+- description: Access Token (not a Service Token) for the 3scale Account Management
+    API
+  name: ACCESS_TOKEN
   required: true
-  value: apicast-configuration-url-secret
+- description: 'The domain found on the URL of your 3scale Admin Portal: https://<domain>-admin.3scale.net'
+  name: DOMAIN
+  required: true
+- name: AMP_APICAST_IMAGE
+  required: true
+  value: amp-apicast:latest
 - description: Path to saved JSON file with configuration for the gateway. Has to
-    be injected to the docker image as read only volume.
+    be injected to the container image as read only volume.
   name: CONFIGURATION_FILE_PATH
-- description: Deployment environment. Can be sandbox or production.
+- description: Deployment environment. Can be staging or production.
   name: DEPLOYMENT_ENVIRONMENT
   required: true
   value: production

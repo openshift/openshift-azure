@@ -19,12 +19,11 @@ spec:
       version: "1.0"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/fuse7/fuse-console:1.0
-    generation: 2
+      name: registry.redhat.io/fuse7/fuse-console:1.0
     importPolicy: {}
     name: "1.0"
     referencePolicy:
-      type: Source
+      type: Local
   - annotations:
       description: Red Hat Fuse 7.1 Console image.
       iconClass: icon-rh-integration
@@ -34,9 +33,22 @@ spec:
       version: "1.1"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/fuse7/fuse-console:1.1
-    generation: 2
+      name: registry.redhat.io/fuse7/fuse-console:1.1
     importPolicy: {}
     name: "1.1"
     referencePolicy:
-      type: Source
+      type: Local
+  - annotations:
+      description: Red Hat Fuse 7.2 Console image.
+      iconClass: icon-rh-integration
+      openshift.io/display-name: Red Hat Fuse 7.2 Console
+      supports: jboss-fuse:7.2.0,java:8,xpaas:1.2
+      tags: jboss-fuse,hawtio,java,xpaas,hidden
+      version: "1.2"
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/fuse7/fuse-console:1.2
+    importPolicy: {}
+    name: "1.2"
+    referencePolicy:
+      type: Local

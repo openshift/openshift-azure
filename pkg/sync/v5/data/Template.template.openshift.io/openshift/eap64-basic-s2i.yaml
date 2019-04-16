@@ -2,7 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 labels:
   template: eap64-basic-s2i
-  xpaas: 1.4.14
+  xpaas: 1.4.18
 message: A new EAP 6 based application has been created in your project.
 metadata:
   annotations:
@@ -18,7 +18,7 @@ metadata:
       a build configuration, application deployment configuration and insecure communication
       using http.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.14
+    version: 1.4.18
   name: eap64-basic-s2i
   namespace: openshift
 objects:
@@ -98,7 +98,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-eap64-openshift:1.8
+          name: jboss-eap64-openshift:1.9
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:

@@ -4,7 +4,7 @@ metadata:
   annotations:
     openshift.io/display-name: Red Hat OpenJDK 8
     openshift.io/provider-display-name: Red Hat, Inc.
-    version: 1.4.14
+    version: 1.4.16
   name: java
   namespace: openshift
 spec:
@@ -22,8 +22,7 @@ spec:
       version: "8"
     from:
       kind: DockerImage
-      name: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:latest
-    generation: 2
+      name: registry.redhat.io/redhat-openjdk-18/openjdk18-openshift:latest
     importPolicy: {}
     name: "8"
     referencePolicy:
@@ -40,7 +39,6 @@ spec:
     from:
       kind: ImageStreamTag
       name: java:8
-    generation: 1
     importPolicy: {}
     name: latest
     referencePolicy:

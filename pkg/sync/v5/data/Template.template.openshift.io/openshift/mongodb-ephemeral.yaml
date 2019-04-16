@@ -19,7 +19,7 @@ metadata:
       WARNING: Any data stored will be lost upon pod destruction. Only use this template for testing
     iconClass: icon-mongodb
     openshift.io/display-name: MongoDB (Ephemeral)
-    openshift.io/documentation-url: https://docs.openshift.org/latest/using_images/db_images/mongodb.html
+    openshift.io/documentation-url: https://docs.okd.io/latest/using_images/db_images/mongodb.html
     openshift.io/long-description: This template provides a standalone MongoDB server
       with a database created.  The database is not stored on persistent storage,
       so any restart of the service will result in all data being lost.  The database
@@ -192,8 +192,8 @@ parameters:
   generate: expression
   name: MONGODB_ADMIN_PASSWORD
   required: true
-- description: Version of MongoDB image to be used (2.4, 2.6, 3.2 or latest).
+- description: Version of MongoDB image to be used (3.6 or latest).
   displayName: Version of MongoDB Image
   name: MONGODB_VERSION
   required: true
-  value: "3.2"
+  value: "3.6"

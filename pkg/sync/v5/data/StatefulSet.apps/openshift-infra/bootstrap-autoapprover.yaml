@@ -6,7 +6,6 @@ metadata:
   name: bootstrap-autoapprover
   namespace: openshift-infra
 spec:
-  podManagementPolicy: OrderedReady
   replicas: 1
   selector:
     matchLabels:
@@ -73,5 +72,3 @@ spec:
         node-role.kubernetes.io/master: "true"
       serviceAccountName: bootstrap-autoapprover
       terminationGracePeriodSeconds: 1
-  updateStrategy:
-    type: RollingUpdate

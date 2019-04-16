@@ -2,7 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 labels:
   template: eap71-postgresql-persistent-s2i
-  xpaas: 1.4.14
+  xpaas: 1.4.18
 message: 'A new EAP 7 and PostgreSQL persistent based application with SSL support
   has been created in your project. The username/password for accessing the PostgreSQL
   database "${DB_DATABASE}" is ${DB_USERNAME}/${DB_PASSWORD}. Please be sure to create
@@ -24,7 +24,7 @@ metadata:
       configuration for PostgreSQL using persistence and secure communication using
       https.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.14
+    version: 1.4.18
   name: eap71-postgresql-persistent-s2i
   namespace: openshift
 objects:
@@ -153,7 +153,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-eap71-openshift:1.3
+          name: jboss-eap71-openshift:1.4
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:
@@ -409,7 +409,7 @@ parameters:
 - description: Git branch/tag reference
   displayName: Git Reference
   name: SOURCE_REPOSITORY_REF
-  value: "1.3"
+  value: "1.4"
 - description: Path within Git project to build; empty for root project directory.
   displayName: Context Directory
   name: CONTEXT_DIR

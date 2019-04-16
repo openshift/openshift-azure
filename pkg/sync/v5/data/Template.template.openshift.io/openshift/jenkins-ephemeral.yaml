@@ -14,7 +14,7 @@ metadata:
       WARNING: Any data stored will be lost upon pod destruction. Only use this template for testing.
     iconClass: icon-jenkins
     openshift.io/display-name: Jenkins (Ephemeral)
-    openshift.io/documentation-url: https://docs.openshift.org/latest/using_images/other_images/jenkins.html
+    openshift.io/documentation-url: https://docs.okd.io/latest/using_images/other_images/jenkins.html
     openshift.io/long-description: This template deploys a Jenkins server capable
       of managing OpenShift Pipeline builds and supporting OpenShift-based oauth login.  The
       Jenkins configuration is stored in non-persistent storage, so this configuration
@@ -186,7 +186,7 @@ parameters:
 - description: Maximum amount of memory the container can use.
   displayName: Memory Limit
   name: MEMORY_LIMIT
-  value: 512Mi
+  value: 1Gi
 - description: The OpenShift Namespace where the Jenkins ImageStream resides.
   displayName: Jenkins ImageStream Namespace
   name: NAMESPACE

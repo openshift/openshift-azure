@@ -98,6 +98,7 @@ func clean(o unstructured.Unstructured) error {
 
 	case "ImageStream.image.openshift.io":
 		jsonpath.MustCompile("$.metadata.annotations.'openshift.io/image.dockerRepositoryCheck'").Delete(o.Object)
+		jsonpath.MustCompile("$.spec.tags[*].generation").Delete(o.Object)
 
 	case "Namespace":
 		// TODO: don't know exactly what we should do here.
@@ -147,6 +148,10 @@ func clean(o unstructured.Unstructured) error {
 
 	case "StatefulSet.apps":
 		cleanPodTemplate(jsonpath.MustCompile("$.spec.template").Get(o.Object)[0].(map[string]interface{}))
+		for _, vct := range jsonpath.MustCompile("$.spec.volumeClaimTemplates[*]").Get(o.Object) {
+			cleanMetadata(vct.(map[string]interface{}))
+		}
+		jsonpath.MustCompile("$.spec.volumeClaimTemplates[*].status").Delete(o.Object)
 	}
 
 	cleanMetadata(o.Object)

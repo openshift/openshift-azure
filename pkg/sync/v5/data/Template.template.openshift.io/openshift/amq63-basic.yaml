@@ -2,7 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 labels:
   template: amq63-basic
-  xpaas: 1.4.14
+  xpaas: 1.4.12
 message: A new messaging service has been created in your project. It will handle
   the protocol(s) "${MQ_PROTOCOL}". The username/password for accessing the service
   is ${MQ_USERNAME}/${MQ_PASSWORD}.
@@ -14,7 +14,7 @@ metadata:
     openshift.io/display-name: Red Hat JBoss A-MQ 6.3 (Ephemeral, no SSL)
     openshift.io/provider-display-name: Red Hat, Inc.
     tags: messaging,amq,jboss
-    version: 1.4.14
+    version: 1.4.12
   name: amq63-basic
   namespace: openshift
 objects:

@@ -1,8 +1,8 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
+  rh-sso: 7.2-v1.4.0
   template: sso72-mysql-persistent
-  xpaas: 1.4.14
 message: 'A new persistent RH-SSO service (using MySQL) has been created in your project.
   The admin username/password for accessing the master realm via the RH-SSO console
   is ${SSO_ADMIN_USERNAME}/${SSO_ADMIN_PASSWORD}. The username/password for accessing
@@ -26,7 +26,7 @@ metadata:
       for MySQL using persistence, and securing RH-SSO communication using passthrough
       TLS.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.14
+    version: rh-sso-7.2-v1.4.0
   name: sso72-mysql-persistent
   namespace: openshift
 objects:
@@ -263,7 +263,7 @@ objects:
         - ${APPLICATION_NAME}
         from:
           kind: ImageStreamTag
-          name: redhat-sso72-openshift:1.2
+          name: redhat-sso72-openshift:1.4
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: ImageChange
     - type: ConfigChange

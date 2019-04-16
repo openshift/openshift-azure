@@ -92,8 +92,14 @@ func defaults(o unstructured.Unstructured) {
 		}
 
 	case "StatefulSet.apps":
+		jsonpath.MustCompile("$.spec.podManagementPolicy").DeleteIfMatch(o.Object, "OrderedReady")
 		jsonpath.MustCompile("$.spec.revisionHistoryLimit").DeleteIfMatch(o.Object, int64(10))
 		jsonpath.MustCompile("$.spec.serviceName").DeleteIfMatch(o.Object, "")
+
+		jsonpath.MustCompile("$.spec.updateStrategy.rollingUpdate.partition").DeleteIfMatch(o.Object, "0")
+		jsonpath.MustCompile("$.spec.updateStrategy.rollingUpdate").DeleteIfMatch(o.Object, map[string]interface{}{})
+		jsonpath.MustCompile("$.spec.updateStrategy.type").DeleteIfMatch(o.Object, "RollingUpdate")
+		jsonpath.MustCompile("$.spec.updateStrategy").DeleteIfMatch(o.Object, map[string]interface{}{})
 
 		for _, c := range jsonpath.MustCompile("$.spec.template.spec").Get(o.Object) {
 			defaultPodSpec(c.(map[string]interface{}))
