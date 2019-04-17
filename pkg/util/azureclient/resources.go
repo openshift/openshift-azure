@@ -6,6 +6,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/sirupsen/logrus"
 )
 
 // DeploymentsClient is a minimal interface for azure DeploymentsClient
@@ -21,9 +22,9 @@ type deploymentsClient struct {
 var _ DeploymentsClient = &deploymentsClient{}
 
 // NewDeploymentsClient creates a new DeploymentsClient
-func NewDeploymentsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) DeploymentsClient {
+func NewDeploymentsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) DeploymentsClient {
 	client := resources.NewDeploymentsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "resources.DeploymentsClient", &client.Client, authorizer)
 	client.PollingDuration = 30 * time.Minute
 
 	return &deploymentsClient{
@@ -47,9 +48,9 @@ type deploymentOperationsClient struct {
 var _ DeploymentOperationsClient = &deploymentOperationsClient{}
 
 // NewDeploymentOperationsClient creates a new DeploymentOperationsClient
-func NewDeploymentOperationsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) DeploymentOperationsClient {
+func NewDeploymentOperationsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) DeploymentOperationsClient {
 	client := resources.NewDeploymentOperationsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "resources.DeploymentOperationsClient", &client.Client, authorizer)
 
 	return &deploymentOperationsClient{
 		DeploymentOperationsClient: client,
@@ -69,9 +70,9 @@ type resourcesClient struct {
 var _ ResourcesClient = &resourcesClient{}
 
 // NewResourcesClient creates a new ResourcesClient
-func NewResourcesClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) ResourcesClient {
+func NewResourcesClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) ResourcesClient {
 	client := resources.NewClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "resources.Client", &client.Client, authorizer)
 
 	return &resourcesClient{
 		Client: client,
@@ -93,9 +94,9 @@ type groupsClient struct {
 var _ GroupsClient = &groupsClient{}
 
 // NewGroupsClient creates a new ResourcesClient
-func NewGroupsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) GroupsClient {
+func NewGroupsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) GroupsClient {
 	client := resources.NewGroupsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "resources.GroupsClient", &client.Client, authorizer)
 
 	return &groupsClient{
 		GroupsClient: client,

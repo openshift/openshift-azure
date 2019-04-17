@@ -5,6 +5,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/sirupsen/logrus"
 )
 
 // ZonesClient is a minimal interface for azure ZonesClient
@@ -20,9 +21,9 @@ type zonesClient struct {
 var _ ZonesClient = &zonesClient{}
 
 // NewZonesClient creates a new ZonesClient
-func NewZonesClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) ZonesClient {
+func NewZonesClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) ZonesClient {
 	client := dns.NewZonesClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "dns.ZonesClient", &client.Client, authorizer)
 
 	return &zonesClient{
 		ZonesClient: client,
@@ -43,9 +44,9 @@ type recordSetsClient struct {
 var _ RecordSetsClient = &recordSetsClient{}
 
 // NewRecordSetsClient creates a new RecordSetsClient
-func NewRecordSetsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) RecordSetsClient {
+func NewRecordSetsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) RecordSetsClient {
 	client := dns.NewRecordSetsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "dns.RecordSetsClient", &client.Client, authorizer)
 
 	return &recordSetsClient{
 		RecordSetsClient: client,

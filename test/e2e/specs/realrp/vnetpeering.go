@@ -13,6 +13,7 @@ import (
 	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 	"github.com/openshift/openshift-azure/pkg/fakerp/client"
 	"github.com/openshift/openshift-azure/test/clients/azure"
+	"github.com/openshift/openshift-azure/test/util/log"
 	tlog "github.com/openshift/openshift-azure/test/util/log"
 )
 
@@ -25,7 +26,7 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 
 	BeforeEach(func() {
 		var err error
-		cli, err = azure.NewClientFromEnvironment(false)
+		cli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), false)
 		Expect(err).NotTo(HaveOccurred())
 
 		cfg, err = client.NewConfig(tlog.GetTestLogger())

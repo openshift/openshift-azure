@@ -5,6 +5,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/sirupsen/logrus"
 )
 
 // RBACApplicationsClient is a minimal interface for azure ApplicationsClient
@@ -22,9 +23,9 @@ type rbacApplicationsClient struct {
 var _ RBACApplicationsClient = &rbacApplicationsClient{}
 
 // NewRBACApplicationsClient creates a new ApplicationsClient
-func NewRBACApplicationsClient(ctx context.Context, tenantID string, authorizer autorest.Authorizer) RBACApplicationsClient {
+func NewRBACApplicationsClient(ctx context.Context, log *logrus.Entry, tenantID string, authorizer autorest.Authorizer) RBACApplicationsClient {
 	client := graphrbac.NewApplicationsClient(tenantID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "graphrbac.ApplicationsClient", &client.Client, authorizer)
 
 	return &rbacApplicationsClient{
 		ApplicationsClient: client,
@@ -43,9 +44,9 @@ type rbacGroupsClient struct {
 var _ RBACGroupsClient = &rbacGroupsClient{}
 
 // NewRBACApplicationsClient creates a new ApplicationsClient
-func NewRBACGroupsClient(ctx context.Context, tenantID string, authorizer autorest.Authorizer) RBACGroupsClient {
+func NewRBACGroupsClient(ctx context.Context, log *logrus.Entry, tenantID string, authorizer autorest.Authorizer) RBACGroupsClient {
 	client := graphrbac.NewGroupsClient(tenantID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "graphrbac.GroupsClient", &client.Client, authorizer)
 
 	return &rbacGroupsClient{
 		GroupsClient: client,
@@ -64,9 +65,9 @@ type servicePrincipalsClient struct {
 var _ ServicePrincipalsClient = &servicePrincipalsClient{}
 
 // NewServicePrincipalsClient create a client to query ServicePrincipal information
-func NewServicePrincipalsClient(ctx context.Context, tenantID string, authorizer autorest.Authorizer) ServicePrincipalsClient {
+func NewServicePrincipalsClient(ctx context.Context, log *logrus.Entry, tenantID string, authorizer autorest.Authorizer) ServicePrincipalsClient {
 	client := graphrbac.NewServicePrincipalsClient(tenantID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "graphrbac.ServicePrincipalsClient", &client.Client, authorizer)
 
 	return &servicePrincipalsClient{
 		ServicePrincipalsClient: client,

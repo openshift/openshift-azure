@@ -46,7 +46,7 @@ func addGroupController(ctx context.Context, log *logrus.Entry, m manager.Manage
 
 	r.userV1 = userv1client.NewForConfigOrDie(m.GetConfig())
 
-	r.aadClient, err = newAADGroupsClient(ctx, r.config)
+	r.aadClient, err = newAADGroupsClient(ctx, log, r.config)
 	if err != nil {
 		return err
 	}

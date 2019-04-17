@@ -17,6 +17,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
+	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
@@ -57,7 +58,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
 
 	It("should ensure no unnecessary VM rotations occured", func() {
 		Expect(os.Getenv("RESOURCEGROUP")).ToNot(BeEmpty())
-		azurecli, err := azure.NewClientFromEnvironment(true)
+		azurecli, err := azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), true)
 		Expect(err).ToNot(HaveOccurred())
 
 		ubs := updateblob.NewBlobService(azurecli.BlobStorage)
@@ -91,7 +92,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
 
 	It("should be possible for an SRE to fetch the RP plugin version", func() {
 		Expect(os.Getenv("RESOURCEGROUP")).ToNot(BeEmpty())
-		azurecli, err := azure.NewClientFromEnvironment(true)
+		azurecli, err := azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), true)
 		Expect(err).ToNot(HaveOccurred())
 
 		By("Using the OSA admin client to fetch the RP plugin version")

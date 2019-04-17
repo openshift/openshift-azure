@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/onsi/ginkgo/config"
+	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
@@ -53,7 +54,7 @@ type Client struct {
 // Setting the storage client is optional and should only be used selectively by
 // tests that need access to the config storage blob because configblob.GetService
 // makes api calls to Azure in order to setup the blob client.
-func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
+func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorageClient bool) (*Client, error) {
 	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
 	if err != nil {
 		return nil, err
@@ -70,7 +71,7 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 
 	var storageClient storage.BlobStorageClient
 	if setStorageClient {
-		storageClient, err = configblob.GetService(context.Background(), cfg)
+		storageClient, err = configblob.GetService(ctx, log, cfg)
 		if err != nil {
 			return nil, err
 		}
@@ -94,21 +95,19 @@ func NewClientFromEnvironment(setStorageClient bool) (*Client, error) {
 
 	rpcAdmin := adminapi.NewClient(rpURL, subscriptionID)
 
-	ctx := context.Background()
-
 	return &Client{
-		Accounts:                         azureclient.NewAccountsClient(ctx, subscriptionID, authorizer),
-		ActivityLogs:                     azureclient.NewActivityLogsClient(ctx, subscriptionID, authorizer),
-		Applications:                     azureclient.NewApplicationsClient(ctx, subscriptionID, authorizer),
+		Accounts:                         azureclient.NewAccountsClient(ctx, log, subscriptionID, authorizer),
+		ActivityLogs:                     azureclient.NewActivityLogsClient(ctx, log, subscriptionID, authorizer),
+		Applications:                     azureclient.NewApplicationsClient(ctx, log, subscriptionID, authorizer),
 		BlobStorage:                      storageClient,
 		OpenShiftManagedClusters:         rpc,
 		OpenShiftManagedClustersAdmin:    rpcAdmin,
-		VirtualMachineScaleSets:          azureclient.NewVirtualMachineScaleSetsClient(ctx, subscriptionID, authorizer),
-		VirtualMachineScaleSetExtensions: azureclient.NewVirtualMachineScaleSetExtensionsClient(ctx, subscriptionID, authorizer),
-		VirtualMachineScaleSetVMs:        azureclient.NewVirtualMachineScaleSetVMsClient(ctx, subscriptionID, authorizer),
-		Resources:                        azureclient.NewResourcesClient(ctx, subscriptionID, authorizer),
-		VirtualNetworks:                  azureclient.NewVirtualNetworkClient(ctx, subscriptionID, authorizer),
-		VirtualNetworksPeerings:          azureclient.NewVirtualNetworksPeeringsClient(ctx, subscriptionID, authorizer),
-		Groups:                           azureclient.NewGroupsClient(ctx, subscriptionID, authorizer),
+		VirtualMachineScaleSets:          azureclient.NewVirtualMachineScaleSetsClient(ctx, log, subscriptionID, authorizer),
+		VirtualMachineScaleSetExtensions: azureclient.NewVirtualMachineScaleSetExtensionsClient(ctx, log, subscriptionID, authorizer),
+		VirtualMachineScaleSetVMs:        azureclient.NewVirtualMachineScaleSetVMsClient(ctx, log, subscriptionID, authorizer),
+		Resources:                        azureclient.NewResourcesClient(ctx, log, subscriptionID, authorizer),
+		VirtualNetworks:                  azureclient.NewVirtualNetworkClient(ctx, log, subscriptionID, authorizer),
+		VirtualNetworksPeerings:          azureclient.NewVirtualNetworksPeeringsClient(ctx, log, subscriptionID, authorizer),
+		Groups:                           azureclient.NewGroupsClient(ctx, log, subscriptionID, authorizer),
 	}, nil
 }

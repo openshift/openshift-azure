@@ -35,7 +35,7 @@ type vaultManager struct {
 	kvc azureclient.KeyVaultClient
 }
 
-func newVaultManager(ctx context.Context, subscriptionID string) (*vaultManager, error) {
+func newVaultManager(ctx context.Context, log *logrus.Entry, subscriptionID string) (*vaultManager, error) {
 	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return nil, err
@@ -52,9 +52,9 @@ func newVaultManager(ctx context.Context, subscriptionID string) (*vaultManager,
 	}
 
 	return &vaultManager{
-		vc:  azureclient.NewVaultMgmtClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
-		spc: azureclient.NewServicePrincipalsClient(ctx, os.Getenv("AZURE_TENANT_ID"), graphauthorizer),
-		kvc: azureclient.NewKeyVaultClient(ctx, vaultauthorizer),
+		vc:  azureclient.NewVaultMgmtClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
+		spc: azureclient.NewServicePrincipalsClient(ctx, log, os.Getenv("AZURE_TENANT_ID"), graphauthorizer),
+		kvc: azureclient.NewKeyVaultClient(ctx, log, vaultauthorizer),
 	}, nil
 }
 

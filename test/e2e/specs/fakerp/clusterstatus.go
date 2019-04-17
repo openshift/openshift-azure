@@ -12,6 +12,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 
 	"github.com/openshift/openshift-azure/test/clients/azure"
+	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Control Plane Pods Status E2E tests [Fake][EveryPR]", func() {
@@ -21,7 +22,7 @@ var _ = Describe("Control Plane Pods Status E2E tests [Fake][EveryPR]", func() {
 
 	BeforeEach(func() {
 		var err error
-		cli, err = azure.NewClientFromEnvironment(false)
+		cli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), false)
 		Expect(err).NotTo(HaveOccurred())
 	})
 

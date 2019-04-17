@@ -5,6 +5,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2018-06-01/network"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/sirupsen/logrus"
 )
 
 // VirtualNetworksClient is a minimal interface for azure VirtualNetworkClient
@@ -23,9 +24,9 @@ type virtualNetworksClient struct {
 var _ VirtualNetworksClient = &virtualNetworksClient{}
 
 // NewVirtualNetworkClient creates a new VirtualNetworkClient
-func NewVirtualNetworkClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualNetworksClient {
+func NewVirtualNetworkClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) VirtualNetworksClient {
 	client := network.NewVirtualNetworksClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "network.VirtualNetworksClient", &client.Client, authorizer)
 
 	return &virtualNetworksClient{
 		VirtualNetworksClient: client,
@@ -50,9 +51,9 @@ type virtualNetworkPeeringsClient struct {
 var _ VirtualNetworksPeeringsClient = &virtualNetworkPeeringsClient{}
 
 // NewVirtualNetworksPeeringsClient creates a new VirtualMachineScaleSetVMsClient
-func NewVirtualNetworksPeeringsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualNetworksPeeringsClient {
+func NewVirtualNetworksPeeringsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) VirtualNetworksPeeringsClient {
 	client := network.NewVirtualNetworkPeeringsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "network.VirtualNetworkPeeringsClient", &client.Client, authorizer)
 
 	return &virtualNetworkPeeringsClient{
 		VirtualNetworkPeeringsClient: client,
@@ -81,9 +82,9 @@ type publicIPAddressesClient struct {
 var _ PublicIPAddressesClient = &publicIPAddressesClient{}
 
 // NewPublicIPAddressesClient creates a new PublicIPAddressesClient
-func NewPublicIPAddressesClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) PublicIPAddressesClient {
+func NewPublicIPAddressesClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) PublicIPAddressesClient {
 	client := network.NewPublicIPAddressesClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "network.PublicIPAddressesClient", &client.Client, authorizer)
 
 	return &publicIPAddressesClient{
 		PublicIPAddressesClient: client,

@@ -16,6 +16,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
+	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", func() {
@@ -30,7 +31,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", fu
 
 	BeforeEach(func() {
 		var err error
-		azurecli, err = azure.NewClientFromEnvironment(false)
+		azurecli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), false)
 		Expect(err).ToNot(HaveOccurred())
 
 		backup, err = random.LowerCaseAlphanumericString(5)

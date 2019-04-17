@@ -12,6 +12,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/Azure/go-autorest/autorest/to"
 	uuid "github.com/satori/go.uuid"
+	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -32,7 +33,7 @@ type aadManager struct {
 	cs  *api.OpenShiftManagedCluster
 }
 
-func newAADManager(ctx context.Context, cs *api.OpenShiftManagedCluster) (*aadManager, error) {
+func newAADManager(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*aadManager, error) {
 	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
 	if err != nil {
 		return nil, err
@@ -44,9 +45,9 @@ func newAADManager(ctx context.Context, cs *api.OpenShiftManagedCluster) (*aadMa
 	}
 
 	return &aadManager{
-		ac:  azureclient.NewRBACApplicationsClient(ctx, cs.Properties.AzProfile.TenantID, graphauthorizer),
-		sc:  azureclient.NewServicePrincipalsClient(ctx, cs.Properties.AzProfile.TenantID, graphauthorizer),
-		rac: azureclient.NewRoleAssignmentsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		ac:  azureclient.NewRBACApplicationsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
+		sc:  azureclient.NewServicePrincipalsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
+		rac: azureclient.NewRoleAssignmentsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
 		cs:  cs,
 	}, nil
 }

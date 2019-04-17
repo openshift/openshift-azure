@@ -22,6 +22,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
+	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", func() {
@@ -35,7 +36,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", fun
 
 	BeforeEach(func() {
 		var err error
-		azurecli, err = azure.NewClientFromEnvironment(true)
+		azurecli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), true)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(azurecli).NotTo(BeNil())
 

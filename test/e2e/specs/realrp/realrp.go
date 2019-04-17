@@ -28,7 +28,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 	// NOTE: Ensure this is always the first test in the [Default][Real] spec!
 	It("should deploy a cluster using the production RP", func() {
 		var err error
-		cli, err = azure.NewClientFromEnvironment(false)
+		cli, err = azure.NewClientFromEnvironment(ctx, log.GetTestLogger(), false)
 		Expect(err).ToNot(HaveOccurred())
 
 		cfg, err = client.NewConfig(log.GetTestLogger())

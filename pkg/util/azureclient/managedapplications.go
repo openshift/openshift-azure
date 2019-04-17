@@ -5,6 +5,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/profiles/preview/resources/mgmt/managedapplications"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/sirupsen/logrus"
 )
 
 // ApplicationsClient is a minimal interface for azure ApplicationsClient
@@ -22,9 +23,9 @@ type applicationsClient struct {
 var _ ApplicationsClient = &applicationsClient{}
 
 // NewApplicationsClient creates a new ApplicationsClient
-func NewApplicationsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) ApplicationsClient {
+func NewApplicationsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) ApplicationsClient {
 	client := managedapplications.NewApplicationsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "managedapplications.ApplicationsClient", &client.Client, authorizer)
 
 	return &applicationsClient{
 		ApplicationsClient: client,

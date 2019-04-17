@@ -173,7 +173,7 @@ func updateAadApplication(ctx context.Context, oc *v20190430.OpenShiftManagedClu
 			return fmt.Errorf("cannot get authorizer: %v", err)
 		}
 
-		aadClient := azureclient.NewRBACApplicationsClient(ctx, conf.TenantID, graphauthorizer)
+		aadClient := azureclient.NewRBACApplicationsClient(ctx, log, conf.TenantID, graphauthorizer)
 		objID, err := aadapp.GetApplicationObjectIDFromAppID(ctx, aadClient, conf.AADClientID)
 		if err != nil {
 			return err

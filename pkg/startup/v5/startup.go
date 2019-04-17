@@ -62,7 +62,7 @@ func (s *startup) WriteFiles(ctx context.Context) error {
 			return err
 		}
 
-		kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
+		kvc := azureclient.NewKeyVaultClient(ctx, s.log, vaultauthorizer)
 
 		s.log.Info("enriching config")
 		err = enrich.CertificatesFromVault(ctx, kvc, s.cs)

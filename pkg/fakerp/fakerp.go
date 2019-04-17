@@ -31,7 +31,7 @@ func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShif
 		return err
 	}
 
-	deploymentOperations := azureclient.NewDeploymentOperationsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
+	deploymentOperations := azureclient.NewDeploymentOperationsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer)
 
 	operations, err := deploymentOperations.List(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", nil)
 	if err != nil {
@@ -50,7 +50,7 @@ func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShif
 		if testConfig.ArtifactDir != "" &&
 			op.Properties.TargetResource != nil &&
 			*op.Properties.TargetResource.ResourceType == "Microsoft.Compute/virtualMachineScaleSets" {
-			s, err := newSSHer(ctx, cs)
+			s, err := newSSHer(ctx, log, cs)
 			if err != nil {
 				log.Warnf("newSSHer failed: %v", err)
 				continue
@@ -103,7 +103,7 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig 
 			return err
 		}
 
-		deployments := azureclient.NewDeploymentsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer)
+		deployments := azureclient.NewDeploymentsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer)
 		future, err := deployments.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, "azuredeploy", resources.Deployment{
 			Properties: &resources.DeploymentProperties{
 				Template: azuretemplate,
@@ -162,7 +162,7 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		cs.Config.PluginVersion = "latest"
 	}
 
-	am, err := newAADManager(ctx, cs)
+	am, err := newAADManager(ctx, log, cs)
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +173,7 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
-	dm, err := newDNSManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
+	dm, err := newDNSManager(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		return nil, err
 	}
 
-	vm, err := newVaultManager(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"))
+	vm, err := newVaultManager(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"))
 	if err != nil {
 		return nil, err
 	}

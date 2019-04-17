@@ -5,6 +5,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2018-09-01/insights"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/sirupsen/logrus"
 )
 
 // ActivityLogsClient is a minimal interface for azure ActivityLogsClient
@@ -19,9 +20,9 @@ type activityLogsClient struct {
 var _ ActivityLogsClient = &activityLogsClient{}
 
 // NewActivityLogsClient creates a new ActivityLogsClient
-func NewActivityLogsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) ActivityLogsClient {
+func NewActivityLogsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) ActivityLogsClient {
 	client := insights.NewActivityLogsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "insights.ActivityLogsClient", &client.Client, authorizer)
 
 	return &activityLogsClient{
 		ActivityLogsClient: client,
