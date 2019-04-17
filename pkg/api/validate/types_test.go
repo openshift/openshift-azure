@@ -59,12 +59,10 @@ func TestValidatePluginVersion(t *testing.T) {
 func TestIsValidClusterName(t *testing.T) {
 	invalidClusterNames := []string{
 		"",
-		"k",
+		"-",
 		"my.cluster",
 		"has spaces",
 		"random#characters?",
-		"1234567890",
-		"0cluster",
 		"cluster-",
 		"-cluster",
 		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -76,7 +74,10 @@ func TestIsValidClusterName(t *testing.T) {
 		}
 	}
 	validClusterNames := []string{
+		"k",
 		"k0",
+		"0cluster",
+		"1234567890",
 		"osa-testing",
 		"ExampleCluster111",
 		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
