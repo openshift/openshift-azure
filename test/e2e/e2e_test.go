@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/Microsoft/ApplicationInsights-Go/appinsights"
 	"github.com/sirupsen/logrus"
 
 	_ "github.com/openshift/openshift-azure/test/e2e/specs"
@@ -33,8 +34,29 @@ func TestE2E(t *testing.T) {
 
 	RegisterFailHandler(Fail)
 
+	c := appinsights.NewTelemetryClient(os.Getenv("AZURE_APP_INSIGHTS_KEY"))
+	c.Context().CommonProperties["type"] = "ginkgo"
+	c.Context().CommonProperties["resourcegroup"] = os.Getenv("RESOURCEGROUP")
+
 	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
-		RunSpecsWithDefaultAndCustomReporters(t, "e2e tests", []Reporter{reporters.NewAzureAppInsightsReporter()})
+		ar := reporters.NewAzureAppInsightsReporter(c)
+
+		doneStdout := make(chan struct{})
+		captureStdout, err := reporters.StartCapture(1, c, doneStdout)
+		if err != nil {
+			t.Fatal(err)
+		}
+		doneStderr := make(chan struct{})
+		captureStderr, err := reporters.StartCapture(2, c, doneStderr)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		RunSpecsWithDefaultAndCustomReporters(t, "e2e tests", []Reporter{ar})
+		captureStdout.Close()
+		captureStderr.Close()
+		<-doneStdout
+		<-doneStderr
 	} else {
 		RunSpecs(t, "e2e tests")
 	}
