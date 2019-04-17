@@ -21,6 +21,7 @@ import (
 	fakesec "github.com/openshift/client-go/security/clientset/versioned/fake"
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -213,6 +214,20 @@ func TestCreateThenUpdateCausesNoRotations(t *testing.T) {
 
 	az := fakecloud.NewFakeAzureCloud(log, []compute.VirtualMachineScaleSetVM{}, []compute.VirtualMachineScaleSet{}, secrets, []storage.Account{}, map[string]map[string][]byte{})
 	cli := fake.NewSimpleClientset()
+	cli.PrependReactor("get", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {
+		get := action.(k8stesting.GetAction)
+		d := &appsv1.Deployment{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      get.GetName(),
+				Namespace: get.GetNamespace(),
+			},
+			Status: appsv1.DeploymentStatus{
+				AvailableReplicas: 1,
+				UpdatedReplicas:   1,
+			},
+		}
+		return true, d, nil
+	})
 	cli.PrependReactor("get", "pods", func(action k8stesting.Action) (bool, runtime.Object, error) {
 		get := action.(k8stesting.GetAction)
 		pod := &corev1.Pod{
