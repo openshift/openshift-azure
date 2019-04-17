@@ -239,7 +239,7 @@ func validateAgentPoolProfile(app *api.AgentPoolProfile, vnet *net.IPNet) (errs 
 		if !rxAgentPoolProfileName.MatchString(app.Name) {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].name %q", app.Name, app.Name))
 		}
-		if app.Count < 1 || app.Count > 20 {
+		if app.Count < 1 || app.Count > 30 {
 			errs = append(errs, fmt.Errorf("invalid properties.agentPoolProfiles[%q].count %d", app.Name, app.Count))
 		}
 
