@@ -1,6 +1,10 @@
 package openshift
 
 import (
+	"net"
+	"net/http"
+	"time"
+
 	servicecatalogv1beta1client "github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset/typed/servicecatalog/v1beta1"
 	oappsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	buildv1client "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
@@ -9,6 +13,7 @@ import (
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	templatev1client "github.com/openshift/client-go/template/clientset/versioned/typed/template/v1"
 	userv1client "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
+	"github.com/sirupsen/logrus"
 	"k8s.io/client-go/discovery"
 	appsv1client "k8s.io/client-go/kubernetes/typed/apps/v1"
 	authorizationv1client "k8s.io/client-go/kubernetes/typed/authorization/v1"
@@ -20,6 +25,7 @@ import (
 	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
@@ -65,40 +71,63 @@ func newClientFromRestConfig(config *rest.Config) *Client {
 	}
 }
 
-func newClientFromKubeConfig(kc *v1.Config) (*Client, error) {
+func newClientFromKubeConfig(log *logrus.Entry, kc *v1.Config) (*Client, error) {
 	restconfig, err := managedcluster.RestConfigFromV1Config(kc)
 	if err != nil {
 		return nil, err
 	}
 
+	restconfig.WrapTransport = func(rt http.RoundTripper) http.RoundTripper {
+		// first, tweak values on the incoming RoundTripper, which we are
+		// relying on being an *http.Transport.
+
+		// see net/http/transport.go: all values are default except the dial
+		// timeout reduction from 30 to 10 seconds.
+		rt.(*http.Transport).DialContext = (&net.Dialer{
+			Timeout:   10 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext
+
+		rt.(*http.Transport).DisableKeepAlives = true
+
+		// now wrap our retryingRoundTripper around the incoming RoundTripper.
+		return &kubeclient.RetryingRoundTripper{
+			Log:          log,
+			RoundTripper: rt,
+			Retries:      5,
+			GetTimeout:   30 * time.Second,
+		}
+	}
+
 	return newClientFromRestConfig(restconfig), nil
 }
 
-func NewAdminClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
+func NewAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
 	kc, err := login("admin", cs)
 	if err != nil {
 		return nil, err
 	}
 
-	return newClientFromKubeConfig(kc)
+	return newClientFromKubeConfig(log, kc)
 }
 
-func NewCustomerAdminClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
+func NewCustomerAdminClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
 	kc, err := login("customer-cluster-admin", cs)
 	if err != nil {
 		return nil, err
 	}
 
-	return newClientFromKubeConfig(kc)
+	return newClientFromKubeConfig(log, kc)
 }
 
-func NewEndUserClient(cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
+func NewEndUserClient(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*Client, error) {
 	kc, err := login("enduser", cs)
 	if err != nil {
 		return nil, err
 	}
 
-	return newClientFromKubeConfig(kc)
+	return newClientFromKubeConfig(log, kc)
 }
 
 type ClientSet struct {
@@ -109,18 +138,18 @@ type ClientSet struct {
 
 // NewClientSet creates a new set of openshift clients scoped for different levels
 // of access
-func NewClientSet(cs *internalapi.OpenShiftManagedCluster) (*ClientSet, error) {
+func NewClientSet(log *logrus.Entry, cs *internalapi.OpenShiftManagedCluster) (*ClientSet, error) {
 	c := &ClientSet{}
 	var err error
-	c.Admin, err = NewAdminClient(cs)
+	c.Admin, err = NewAdminClient(log, cs)
 	if err != nil {
 		return nil, err
 	}
-	c.CustomerAdmin, err = NewCustomerAdminClient(cs)
+	c.CustomerAdmin, err = NewCustomerAdminClient(log, cs)
 	if err != nil {
 		return nil, err
 	}
-	c.EndUser, err = NewEndUserClient(cs)
+	c.EndUser, err = NewEndUserClient(log, cs)
 	if err != nil {
 		return nil, err
 	}

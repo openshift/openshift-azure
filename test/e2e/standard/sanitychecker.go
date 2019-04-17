@@ -62,7 +62,7 @@ func NewSanityChecker(ctx context.Context, log *logrus.Entry, cs *internalapi.Op
 	if err != nil {
 		return nil, err
 	}
-	scc.Client, err = openshift.NewClientSet(cs)
+	scc.Client, err = openshift.NewClientSet(log, cs)
 	if err != nil {
 		return nil, err
 	}
