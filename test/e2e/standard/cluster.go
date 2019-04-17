@@ -233,7 +233,7 @@ func (sc *SanityChecker) checkCanDeployRedhatIoImages(ctx context.Context) error
 		return err
 	}
 	By(fmt.Sprintf("waiting for deployment to be ready (%v)", time.Now()))
-	err = wait.PollImmediate(2*time.Second, 5*time.Minute, ready.CheckDeploymentIsReady(sc.Client.EndUser.AppsV1.Deployments(namespace), deploymentName))
+	err = wait.PollImmediate(5*time.Second, 10*time.Minute, ready.CheckDeploymentIsReady(sc.Client.EndUser.AppsV1.Deployments(namespace), deploymentName))
 	if err != nil {
 		return err
 	}
