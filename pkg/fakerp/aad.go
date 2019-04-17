@@ -3,6 +3,7 @@ package fakerp
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/authorization/mgmt/2015-07-01/authorization"
@@ -74,8 +75,17 @@ func (am *aadManager) ensureApp(ctx context.Context, displayName string, p *api.
 	}
 	p.ClientID = *app.AppID
 
-	sp, err := am.sc.Create(ctx, graphrbac.ServicePrincipalCreateParameters{
-		AppID: app.AppID,
+	var sp graphrbac.ServicePrincipal
+	err = wait.PollInfinite(5*time.Second, func() (bool, error) {
+		sp, err = am.sc.Create(ctx, graphrbac.ServicePrincipalCreateParameters{
+			AppID: app.AppID,
+		})
+		// ugh: Azure client library doesn't have the types registered to
+		// unmarshal all the way down to this error code natively :-(
+		if err != nil && strings.Contains(err.Error(), "NoBackingApplicationObject") {
+			return false, nil
+		}
+		return err == nil, err
 	})
 	if err != nil {
 		return err
@@ -90,7 +100,7 @@ func (am *aadManager) ensureApp(ctx context.Context, displayName string, p *api.
 		})
 		if err, ok := err.(autorest.DetailedError); ok {
 			if err, ok := err.Original.(*azure.RequestError); ok {
-				if err.ServiceError.Code == "PrincipalNotFound" {
+				if err.ServiceError != nil && err.ServiceError.Code == "PrincipalNotFound" {
 					return false, nil
 				}
 			}
