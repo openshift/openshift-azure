@@ -11,6 +11,7 @@ import (
 
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
+	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Change OpenShift Component Log Level E2E tests [ChangeLogLevel][Fake][LongRunning]", func() {
@@ -21,7 +22,7 @@ var _ = Describe("Change OpenShift Component Log Level E2E tests [ChangeLogLevel
 
 	BeforeEach(func() {
 		var err error
-		azurecli, err = azure.NewClientFromEnvironment(true)
+		azurecli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), true)
 		Expect(err).NotTo(HaveOccurred())
 	})
 

@@ -9,6 +9,7 @@ import (
 
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
+	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func() {
@@ -18,7 +19,7 @@ var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func
 
 	BeforeEach(func() {
 		var err error
-		azurecli, err = azure.NewClientFromEnvironment(false)
+		azurecli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(azurecli).NotTo(BeNil())
 	})

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
@@ -18,15 +19,15 @@ type dnsManager struct {
 	dnsDomain        string
 }
 
-func newDNSManager(ctx context.Context, subscriptionID, dnsResourceGroup, dnsDomain string) (*dnsManager, error) {
+func newDNSManager(ctx context.Context, log *logrus.Entry, subscriptionID, dnsResourceGroup, dnsDomain string) (*dnsManager, error) {
 	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return nil, err
 	}
 
 	return &dnsManager{
-		zc:               azureclient.NewZonesClient(ctx, subscriptionID, authorizer),
-		rsc:              azureclient.NewRecordSetsClient(ctx, subscriptionID, authorizer),
+		zc:               azureclient.NewZonesClient(ctx, log, subscriptionID, authorizer),
+		rsc:              azureclient.NewRecordSetsClient(ctx, log, subscriptionID, authorizer),
 		dnsResourceGroup: dnsResourceGroup,
 		dnsDomain:        dnsDomain,
 	}, nil

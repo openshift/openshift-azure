@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
-	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
 
@@ -112,24 +111,13 @@ func (ws *workerScaler) scaleUp(ctx context.Context, count int64) *api.PluginErr
 		}
 	}
 
-	retry, retries := 0, 3
-	for {
-		retry++
-		err := ws.ssc.Update(ctx, ws.resourceGroup, *ws.ss.Name, compute.VirtualMachineScaleSetUpdate{
-			Sku: &compute.Sku{
-				Capacity: to.Int64Ptr(count),
-			},
-		})
-		if err, ok := err.(*azure.ServiceError); ok && retry <= retries && err.Code == "InternalExecutionError" && err.Message == "An internal execution error occurred." {
-			// conflict with cloud controller UpdateInstances call?  can return
-			// InternalExecutionError but the scale worked just fine?
-			ws.log.Warnf("%s: retry %d", err, retry)
-			continue
-		}
-		if err != nil {
-			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateScaleSet}
-		}
-		break
+	err := ws.ssc.Update(ctx, ws.resourceGroup, *ws.ss.Name, compute.VirtualMachineScaleSetUpdate{
+		Sku: &compute.Sku{
+			Capacity: to.Int64Ptr(count),
+		},
+	})
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateScaleSet}
 	}
 
 	vms, err := ws.vmc.List(ctx, ws.resourceGroup, *ws.ss.Name, "", "", "")
@@ -176,23 +164,9 @@ func (ws *workerScaler) scaleDown(ctx context.Context, count int64) *api.PluginE
 		}
 
 		ws.log.Infof("deleting %s", hostname)
-		retry, retries := 0, 3
-		for {
-			retry++
-			err := ws.vmc.Delete(ctx, ws.resourceGroup, *ws.ss.Name, *vm.InstanceID)
-			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolDeleteVM}
-			}
-			if err, ok := err.(*azure.ServiceError); ok && retry <= retries && err.Code == "InternalExecutionError" && err.Message == "An internal execution error occurred." {
-				// conflict with cloud controller UpdateInstances call?  can return
-				// InternalExecutionError but the delete worked just fine?
-				ws.log.Warnf("%s: retry %d", err, retry)
-				continue
-			}
-			if err != nil {
-				return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateScaleSet}
-			}
-			break
+		err := ws.vmc.Delete(ctx, ws.resourceGroup, *ws.ss.Name, *vm.InstanceID)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolDeleteVM}
 		}
 	}
 

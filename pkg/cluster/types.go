@@ -110,10 +110,10 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		Kubeclient: kubeclient,
 
 		testConfig:     testConfig,
-		accountsClient: azureclient.NewAccountsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		vmc:            azureclient.NewVirtualMachineScaleSetVMsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		ssc:            azureclient.NewVirtualMachineScaleSetsClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		kvc:            azureclient.NewKeyVaultClient(ctx, vaultauthorizer),
+		accountsClient: azureclient.NewAccountsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		vmc:            azureclient.NewVirtualMachineScaleSetVMsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		ssc:            azureclient.NewVirtualMachineScaleSetsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		kvc:            azureclient.NewKeyVaultClient(ctx, log, vaultauthorizer),
 		log:            log,
 		scalerFactory:  scaler.NewFactory(),
 		hasher: &hasher{

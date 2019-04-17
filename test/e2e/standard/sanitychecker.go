@@ -56,7 +56,7 @@ func NewSanityChecker(ctx context.Context, log *logrus.Entry, cs *internalapi.Op
 		return nil, err
 	}
 
-	kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
+	kvc := azureclient.NewKeyVaultClient(ctx, log, vaultauthorizer)
 
 	err = enrich.CertificatesFromVault(ctx, kvc, cs)
 	if err != nil {

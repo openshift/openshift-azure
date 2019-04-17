@@ -37,16 +37,16 @@ func start(cfg *Config) error {
 		return err
 	}
 
-	azs := azureclient.NewAccountsClient(ctx, cpc.SubscriptionID, authorizer)
+	azs := azureclient.NewAccountsClient(ctx, log, cpc.SubscriptionID, authorizer)
 
 	vaultauthorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID, azureclient.KeyVaultEndpoint)
 	if err != nil {
 		return err
 	}
 
-	kvc := azureclient.NewKeyVaultClient(ctx, vaultauthorizer)
+	kvc := azureclient.NewKeyVaultClient(ctx, log, vaultauthorizer)
 
-	bsc, err := configblob.GetService(ctx, cpc)
+	bsc, err := configblob.GetService(ctx, log, cpc)
 	if err != nil {
 		return err
 	}

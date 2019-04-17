@@ -6,6 +6,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
 	mgmtkeyvault "github.com/Azure/azure-sdk-for-go/services/keyvault/mgmt/2016-10-01/keyvault"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/sirupsen/logrus"
 )
 
 type VaultMgmtClient interface {
@@ -19,9 +20,9 @@ type vaultsMgmtClient struct {
 var _ VaultMgmtClient = &vaultsMgmtClient{}
 
 // NewVaultMgmtClient get a new client for management actions
-func NewVaultMgmtClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VaultMgmtClient {
+func NewVaultMgmtClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) VaultMgmtClient {
 	client := mgmtkeyvault.NewVaultsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "keyvault.VaultsClient", &client.Client, authorizer)
 
 	return &vaultsMgmtClient{
 		VaultsClient: client,
@@ -42,9 +43,9 @@ var _ KeyVaultClient = &keyVaultsClient{}
 // NewKeyVaultClient gets a new client for accessing vault values.  Important:
 // the authorizer supplied must have its resource set to
 // "https://vault.azure.net"
-func NewKeyVaultClient(ctx context.Context, authorizer autorest.Authorizer) KeyVaultClient {
+func NewKeyVaultClient(ctx context.Context, log *logrus.Entry, authorizer autorest.Authorizer) KeyVaultClient {
 	client := keyvault.New()
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "keyvault.BaseClient", &client.Client, authorizer)
 
 	return &keyVaultsClient{
 		BaseClient: client,

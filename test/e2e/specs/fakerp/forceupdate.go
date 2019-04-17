@@ -10,6 +10,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
+	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func() {
@@ -19,7 +20,7 @@ var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func
 
 	BeforeEach(func() {
 		var err error
-		azurecli, err = azure.NewClientFromEnvironment(true)
+		azurecli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), true)
 		Expect(err).NotTo(HaveOccurred())
 	})
 

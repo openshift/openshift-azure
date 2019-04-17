@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -22,14 +23,14 @@ type ssher struct {
 	masterIPs []string
 }
 
-func newSSHer(ctx context.Context, cs *api.OpenShiftManagedCluster) (*ssher, error) {
+func newSSHer(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*ssher, error) {
 	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return nil, err
 	}
 
 	s := &ssher{
-		pipcli: azureclient.NewPublicIPAddressesClient(ctx, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		pipcli: azureclient.NewPublicIPAddressesClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
 		cs:     cs,
 	}
 

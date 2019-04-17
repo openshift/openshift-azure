@@ -6,6 +6,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/sirupsen/logrus"
 )
 
 // VirtualMachineScaleSetsClient is a minimal interface for azure VirtualMachineScaleSetsClient
@@ -21,9 +22,9 @@ type virtualMachineScaleSetsClient struct {
 var _ VirtualMachineScaleSetsClient = &virtualMachineScaleSetsClient{}
 
 // NewVirtualMachineScaleSetsClient creates a new VirtualMachineScaleSetsClient
-func NewVirtualMachineScaleSetsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetsClient {
+func NewVirtualMachineScaleSetsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetsClient {
 	client := compute.NewVirtualMachineScaleSetsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "compute.VirtualMachineScaleSetsClient", &client.Client, authorizer)
 	client.PollingDuration = 30 * time.Minute
 
 	return &virtualMachineScaleSetsClient{
@@ -47,9 +48,9 @@ type virtualMachineScaleSetVMsClient struct {
 var _ VirtualMachineScaleSetVMsClient = &virtualMachineScaleSetVMsClient{}
 
 // NewVirtualMachineScaleSetVMsClient creates a new VirtualMachineScaleSetVMsClient
-func NewVirtualMachineScaleSetVMsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetVMsClient {
+func NewVirtualMachineScaleSetVMsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetVMsClient {
 	client := compute.NewVirtualMachineScaleSetVMsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "compute.VirtualMachineScaleSetVMsClient", &client.Client, authorizer)
 	client.PollingDuration = 30 * time.Minute
 
 	return &virtualMachineScaleSetVMsClient{
@@ -76,9 +77,9 @@ type virtualMachineScaleSetExtensionsClient struct {
 var _ VirtualMachineScaleSetExtensionsClient = &virtualMachineScaleSetExtensionsClient{}
 
 // NewVirtualMachineScaleSetExtensionsClient creates a new VirtualMachineScaleSetExtensionsClient
-func NewVirtualMachineScaleSetExtensionsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetExtensionsClient {
+func NewVirtualMachineScaleSetExtensionsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetExtensionsClient {
 	client := compute.NewVirtualMachineScaleSetExtensionsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "compute.VirtualMachineScaleSetExtensionsClient", &client.Client, authorizer)
 
 	return &virtualMachineScaleSetExtensionsClient{
 		VirtualMachineScaleSetExtensionsClient: client,

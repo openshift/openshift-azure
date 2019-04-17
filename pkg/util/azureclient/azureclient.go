@@ -20,6 +20,7 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
+	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
@@ -61,7 +62,7 @@ func (ls *loggingSender) Do(req *http.Request) (*http.Response, error) {
 	return resp, err
 }
 
-func setupClient(ctx context.Context, client *autorest.Client, authorizer autorest.Authorizer) {
+func setupClient(ctx context.Context, log *logrus.Entry, clientName string, client *autorest.Client, authorizer autorest.Authorizer) {
 	// if context does not provide languages (sync pod, tests) - use default
 	var languages []string
 	if ctx.Value(api.ContextAcceptLanguages) != nil {
@@ -71,7 +72,8 @@ func setupClient(ctx context.Context, client *autorest.Client, authorizer autore
 	client.Authorizer = authorizer
 	client.RequestInspector = addAcceptLanguages(languages)
 	client.PollingDelay = 10 * time.Second
-	// client.Sender = &loggingSender{client.Sender}
+	client.Sender = &retrySender{Sender: client.Sender, log: log, clientName: clientName}
+	//client.Sender = &loggingSender{client.Sender}
 }
 
 func NewAuthorizer(clientID, clientSecret, tenantID, resource string) (autorest.Authorizer, error) {

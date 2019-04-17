@@ -5,6 +5,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/authorization/mgmt/2015-07-01/authorization"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/sirupsen/logrus"
 )
 
 type RoleAssignmentsClient interface {
@@ -18,9 +19,9 @@ type roleAssignmentsClient struct {
 var _ RoleAssignmentsClient = &roleAssignmentsClient{}
 
 // NewRoleAssignmentsClient creates a new RoleAssignmentsClient
-func NewRoleAssignmentsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) RoleAssignmentsClient {
+func NewRoleAssignmentsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) RoleAssignmentsClient {
 	client := authorization.NewRoleAssignmentsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "authorization.RoleAssignmentsClient", &client.Client, authorizer)
 
 	return &roleAssignmentsClient{
 		RoleAssignmentsClient: client,
@@ -38,9 +39,9 @@ type roleDefinitionsClient struct {
 var _ RoleDefinitionsClient = &roleDefinitionsClient{}
 
 // NewRoleDefinitionsClient creates a new RoleDefinitionsClient
-func NewRoleDefinitionsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) RoleDefinitionsClient {
+func NewRoleDefinitionsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) RoleDefinitionsClient {
 	client := authorization.NewRoleDefinitionsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "authorization.RoleDefinitionsClient", &client.Client, authorizer)
 
 	return &roleDefinitionsClient{
 		RoleDefinitionsClient: client,

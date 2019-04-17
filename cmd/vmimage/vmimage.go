@@ -85,8 +85,8 @@ func run(ctx context.Context, log *logrus.Entry) error {
 	builder := vmimage.Builder{
 		GitCommit:                gitCommit,
 		Log:                      log,
-		Deployments:              azureclient.NewDeploymentsClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
-		Groups:                   azureclient.NewGroupsClient(ctx, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
+		Deployments:              azureclient.NewDeploymentsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
+		Groups:                   azureclient.NewGroupsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
 		SubscriptionID:           os.Getenv("AZURE_SUBSCRIPTION_ID"),
 		Location:                 *location,
 		BuildResourceGroup:       *buildResourceGroup,

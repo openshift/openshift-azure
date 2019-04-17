@@ -61,7 +61,7 @@ func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
 	}
 	m.resourceGroup = os.Getenv("RESOURCEGROUP")
 	m.subscriptionID = os.Getenv("AZURE_SUBSCRIPTION_ID")
-	m.pipcli = azureclient.NewPublicIPAddressesClient(ctx, m.subscriptionID, authorizer)
+	m.pipcli = azureclient.NewPublicIPAddressesClient(ctx, log, m.subscriptionID, authorizer)
 
 	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
 		m.log.Info("application insights configured")

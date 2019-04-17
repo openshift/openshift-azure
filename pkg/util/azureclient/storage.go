@@ -5,6 +5,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/sirupsen/logrus"
 )
 
 // AccountsClient is a minimal interface for azure AccountsClient
@@ -26,9 +27,9 @@ type accountsClient struct {
 var _ AccountsClient = &accountsClient{}
 
 // NewAccountsClient returns a new AccountsClient
-func NewAccountsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) AccountsClient {
+func NewAccountsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) AccountsClient {
 	client := storage.NewAccountsClient(subscriptionID)
-	setupClient(ctx, &client.Client, authorizer)
+	setupClient(ctx, log, "storage.AccountsClient", &client.Client, authorizer)
 
 	return &accountsClient{
 		AccountsClient: client,

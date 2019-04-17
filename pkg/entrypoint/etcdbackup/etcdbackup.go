@@ -50,7 +50,7 @@ func start(cfg *Config) error {
 		return fmt.Errorf("could not read azure.conf %v", err)
 	}
 
-	bsc, err := configblob.GetService(ctx, cpc)
+	bsc, err := configblob.GetService(ctx, log, cpc)
 	if err != nil {
 		return fmt.Errorf("could not find storage account %v", err)
 	}
