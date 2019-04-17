@@ -21,11 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 )
 
-// FakeRPClient is a singleton Azure Client used by all tests which run against the FakeRP
-var FakeRPClient *Client
-
-// RealRPClient is a singleton Azure Client used by all tests which run against the RealRP
-var RealRPClient *Client
+var RPClient *Client
 
 // Client is the main controller for azure client objects
 type Client struct {
@@ -44,14 +40,11 @@ type Client struct {
 	Groups                           resources.GroupsClient
 }
 
-// NewClientFromEnvironment creates a new azure client from environment variables.
-// Setting the storage client is optional and should only be used selectively by
-// tests that need access to the config storage blob because configblob.GetService
-// makes api calls to Azure in order to setup the blob client.
-func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorageClient bool, realRP bool) (*Client, error) {
+// NewClientFromEnvironment creates a new azure client from environment variables and stores it in the RPClient variable
+func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, realRP bool) error {
 	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	cfg := &cloudprovider.Config{
@@ -64,10 +57,11 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorage
 	subscriptionID := cfg.SubscriptionID
 
 	var storageClient storage.BlobStorageClient
-	if setStorageClient {
+	//for now fake RP tests use the Blob Storage, real RP do not
+	if !realRP {
 		storageClient, err = configblob.GetService(ctx, log, cfg)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
@@ -85,7 +79,7 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorage
 
 	rpcAdmin := adminapi.NewClient(rpURL, subscriptionID)
 
-	return &Client{
+	RPClient = &Client{
 		Accounts:                         storage.NewAccountsClient(ctx, log, subscriptionID, authorizer),
 		ActivityLogs:                     insights.NewActivityLogsClient(ctx, log, subscriptionID, authorizer),
 		Applications:                     managedapplications.NewApplicationsClient(ctx, log, subscriptionID, authorizer),
@@ -99,5 +93,6 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorage
 		VirtualNetworks:                  network.NewVirtualNetworkClient(ctx, log, subscriptionID, authorizer),
 		VirtualNetworksPeerings:          network.NewVirtualNetworksPeeringsClient(ctx, log, subscriptionID, authorizer),
 		Groups:                           resources.NewGroupsClient(ctx, log, subscriptionID, authorizer),
-	}, nil
+	}
+	return nil
 }

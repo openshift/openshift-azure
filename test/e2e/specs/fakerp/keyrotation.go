@@ -14,16 +14,16 @@ import (
 var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func() {
 	It("should be possible to maintain a healthy cluster after rotating all credentials", func() {
 		By("Reading the cluster state")
-		before, err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		before, err := azure.RPClient.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(before).NotTo(BeNil())
 
 		By("Executing key rotation on the cluster.")
-		err = azure.FakeRPClient.OpenShiftManagedClustersAdmin.RotateSecrets(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		err = azure.RPClient.OpenShiftManagedClustersAdmin.RotateSecrets(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Reading the cluster state after the update")
-		after, err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		after, err := azure.RPClient.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(after).NotTo(BeNil())
 

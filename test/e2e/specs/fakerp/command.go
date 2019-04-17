@@ -23,13 +23,13 @@ var _ = Describe("Command tests [Command][Fake][LongRunning]", func() {
 
 		startTime := time.Now()
 
-		err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.RunCommand(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm, "RestartKubelet")
+		err := azure.RPClient.OpenShiftManagedClustersAdmin.RunCommand(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm, "RestartKubelet")
 		Expect(err).NotTo(HaveOccurred())
 
-		err = azure.FakeRPClient.OpenShiftManagedClustersAdmin.RunCommand(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm, "RestartDocker")
+		err = azure.RPClient.OpenShiftManagedClustersAdmin.RunCommand(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm, "RestartDocker")
 		Expect(err).NotTo(HaveOccurred())
 
-		err = azure.FakeRPClient.OpenShiftManagedClustersAdmin.RunCommand(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm, "RestartNetworkManager")
+		err = azure.RPClient.OpenShiftManagedClustersAdmin.RunCommand(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm, "RestartNetworkManager")
 		Expect(err).NotTo(HaveOccurred())
 
 		scaleset, _, err := names.GetScaleSetNameAndInstanceID(vm)
@@ -37,7 +37,7 @@ var _ = Describe("Command tests [Command][Fake][LongRunning]", func() {
 
 		wait.PollImmediate(10*time.Second, 2*time.Minute, func() (bool, error) {
 			By("Verifying through azure activity logs that the command ran")
-			logs, err := azure.FakeRPClient.ActivityLogs.List(
+			logs, err := azure.RPClient.ActivityLogs.List(
 				context.Background(),
 				fmt.Sprintf("eventTimestamp ge '%s' and resourceUri eq %s",
 					startTime.Format(time.RFC3339),

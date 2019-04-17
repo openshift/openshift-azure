@@ -21,19 +21,19 @@ import (
 var _ = Describe("Reimage VM E2E tests [ReimageVM][Fake][LongRunning]", func() {
 	It("should be possible for an SRE to reimage a VM in a scale set", func() {
 		By("Reading the cluster state")
-		before, err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		before, err := azure.RPClient.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(before).NotTo(BeNil())
 
 		By("Executing reimage on a vm in the cluster")
-		vmlist, err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.ListClusterVMs(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		vmlist, err := azure.RPClient.OpenShiftManagedClustersAdmin.ListClusterVMs(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(len(*vmlist.VMs)).To(BeNumerically(">=", 6))
 		rand.Seed(time.Now().Unix())
 		vm := (*vmlist.VMs)[rand.Intn(len(*vmlist.VMs))]
 		By(fmt.Sprintf("Reimaging %s", vm))
 		startTime := time.Now()
-		err = azure.FakeRPClient.OpenShiftManagedClustersAdmin.Reimage(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm)
+		err = azure.RPClient.OpenShiftManagedClustersAdmin.Reimage(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm)
 		Expect(err).NotTo(HaveOccurred())
 
 		scaleset, instanceID, err := names.GetScaleSetNameAndInstanceID(vm)
@@ -41,7 +41,7 @@ var _ = Describe("Reimage VM E2E tests [ReimageVM][Fake][LongRunning]", func() {
 
 		wait.PollImmediate(10*time.Second, 2*time.Minute, func() (bool, error) {
 			By("Verifying through azure activity logs that the reimage happened")
-			logs, err := azure.FakeRPClient.ActivityLogs.List(
+			logs, err := azure.RPClient.ActivityLogs.List(
 				context.Background(),
 				fmt.Sprintf("eventTimestamp ge '%s' and resourceUri eq %s",
 					startTime.Format(time.RFC3339),

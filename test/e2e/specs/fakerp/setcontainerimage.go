@@ -38,7 +38,7 @@ var _ = Describe("Change a single image to latest E2E tests [ChangeImage][Fake][
 			},
 		}
 
-		update, err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.CreateOrUpdate(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), &before)
+		update, err := azure.RPClient.OpenShiftManagedClustersAdmin.CreateOrUpdate(ctx, os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), &before)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(update).NotTo(BeNil())
 

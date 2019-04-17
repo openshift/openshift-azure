@@ -17,7 +17,7 @@ import (
 var _ = Describe("Control Plane Pods Status E2E tests [Fake][EveryPR]", func() {
 	It("should allow an SRE to fetch the status of control plane pods", func() {
 		By("Using the OSA admin client to fetch the raw cluster status")
-		b, err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.GetControlPlanePods(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		b, err := azure.RPClient.OpenShiftManagedClustersAdmin.GetControlPlanePods(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(b).NotTo(BeNil())
 

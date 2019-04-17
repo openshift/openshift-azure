@@ -15,7 +15,7 @@ import (
 var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func() {
 	It("should be possible for an SRE to force update a cluster", func() {
 		By("Reading the update blob before the force update")
-		ubs := updateblob.NewBlobService(azure.FakeRPClient.BlobStorage)
+		ubs := updateblob.NewBlobService(azure.RPClient.BlobStorage)
 		before, err := ubs.Read()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(before).NotTo(BeNil())
@@ -23,7 +23,7 @@ var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func
 		Expect(len(before.ScalesetHashes)).To(Equal(2)) // one per worker scaleset
 
 		By("Executing force update on the cluster.")
-		err = azure.FakeRPClient.OpenShiftManagedClustersAdmin.ForceUpdate(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		err = azure.RPClient.OpenShiftManagedClustersAdmin.ForceUpdate(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Reading the update blob after the force update")

@@ -48,13 +48,13 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][EveryPR][LongRunni
 
 	scale := func(ubs updateblob.BlobService, before *updateblob.UpdateBlob, count int64) {
 		By("Fetching the manifest")
-		external, err := azure.FakeRPClient.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		external, err := azure.RPClient.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		err = setCount(&external, count)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Calling CreateOrUpdate on the rp with the scale up manifest")
-		_, err = azure.FakeRPClient.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
+		_, err = azure.RPClient.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Reading the update blob after the scale up")
@@ -83,7 +83,7 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][EveryPR][LongRunni
 
 	It("should be possible to maintain a healthy cluster after scaling it out and in", func() {
 		By("Reading the update blob before the scales")
-		ubs := updateblob.NewBlobService(azure.FakeRPClient.BlobStorage)
+		ubs := updateblob.NewBlobService(azure.RPClient.BlobStorage)
 		before, err := ubs.Read()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(len(before.HostnameHashes)).To(Equal(3)) // one per master instance

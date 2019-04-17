@@ -64,10 +64,10 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdBackupRecovery][Fake][LongRunning
 		Expect(cm1.Data).To(HaveKeyWithValue("value", "before-backup"))
 
 		By(fmt.Sprintf("Running an etcd backup"))
-		err = azure.FakeRPClient.OpenShiftManagedClustersAdmin.Backup(context.Background(), resourceGroup, resourceGroup, backup)
+		err = azure.RPClient.OpenShiftManagedClustersAdmin.Backup(context.Background(), resourceGroup, resourceGroup, backup)
 		Expect(err).NotTo(HaveOccurred())
 
-		backups, err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.ListBackups(context.Background(), resourceGroup, resourceGroup)
+		backups, err := azure.RPClient.OpenShiftManagedClustersAdmin.ListBackups(context.Background(), resourceGroup, resourceGroup)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(backups).To(ContainElement(MatchFields(IgnoreExtras, Fields{"Name": Equal(backup)})))
 
@@ -85,7 +85,7 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdBackupRecovery][Fake][LongRunning
 		Expect(cm2.Data).To(HaveKeyWithValue("value", "after-backup"))
 
 		By("Restore from the backup")
-		err = azure.FakeRPClient.OpenShiftManagedClustersAdmin.Restore(context.Background(), resourceGroup, resourceGroup, backup)
+		err = azure.RPClient.OpenShiftManagedClustersAdmin.Restore(context.Background(), resourceGroup, resourceGroup, backup)
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Confirm the state of the backup")

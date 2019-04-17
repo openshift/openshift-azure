@@ -57,7 +57,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
 
 	It("should ensure no unnecessary VM rotations occured", func() {
 		Expect(os.Getenv("RESOURCEGROUP")).ToNot(BeEmpty())
-		ubs := updateblob.NewBlobService(azure.FakeRPClient.BlobStorage)
+		ubs := updateblob.NewBlobService(azure.RPClient.BlobStorage)
 
 		By("reading the update blob before running an update")
 		before, err := ubs.Read()
@@ -68,11 +68,11 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
 		Expect(len(before.ScalesetHashes)).To(Equal(2)) // one per worker scaleset
 
 		By("running an update")
-		external, err := azure.FakeRPClient.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		external, err := azure.RPClient.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(external).NotTo(BeNil())
 
-		updated, err := azure.FakeRPClient.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
+		updated, err := azure.RPClient.OpenShiftManagedClusters.CreateOrUpdateAndWait(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), external)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(updated.StatusCode).To(Equal(http.StatusOK))
 		Expect(updated).NotTo(BeNil())
@@ -88,7 +88,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
 	It("should be possible for an SRE to fetch the RP plugin version", func() {
 		Expect(os.Getenv("RESOURCEGROUP")).ToNot(BeEmpty())
 		By("Using the OSA admin client to fetch the RP plugin version")
-		result, err := azure.FakeRPClient.OpenShiftManagedClustersAdmin.GetPluginVersion(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		result, err := azure.RPClient.OpenShiftManagedClustersAdmin.GetPluginVersion(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(result).NotTo(BeNil())
 		Expect(*result.PluginVersion).NotTo(BeEmpty())
