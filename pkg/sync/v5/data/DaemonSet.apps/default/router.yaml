@@ -62,10 +62,13 @@ spec:
         name: router
         ports:
         - containerPort: 80
+          hostPort: 80
           name: http
         - containerPort: 443
+          hostPort: 443
           name: https
         - containerPort: 1936
+          hostPort: 1936
           name: stats
         readinessProbe:
           httpGet:
@@ -84,6 +87,7 @@ spec:
         - mountPath: /etc/pki/tls/private
           name: server-certificate
           readOnly: true
+      hostNetwork: true
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
       serviceAccountName: router

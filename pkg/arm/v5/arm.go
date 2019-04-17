@@ -51,7 +51,7 @@ func (g *simpleGenerator) Generate(ctx context.Context, backupBlob string, isUpd
 		},
 	}
 	if !isUpdate {
-		t.Resources = append(t.Resources, g.ipOutbound(), g.lbKubernetes(), g.nsgWorker())
+		t.Resources = append(t.Resources, g.ipOutbound(), g.ipInbound(), g.lbKubernetes(), g.nsgWorker())
 	}
 	for _, app := range g.cs.Properties.AgentPoolProfiles {
 		if app.Role == api.AgentPoolProfileRoleMaster || !isUpdate {

@@ -28,10 +28,6 @@ func (derivedType) OpenShiftVersionTag(cs *api.OpenShiftManagedCluster) (string,
 	return fmt.Sprintf("v%s.%s.%s", parts[0][:1], parts[0][1:], parts[1]), nil
 }
 
-func (derivedType) RouterLBCNamePrefix(cs *api.OpenShiftManagedCluster) string {
-	return strings.Split(cs.Properties.RouterProfiles[0].FQDN, ".")[0]
-}
-
 func (derivedType) AadGroupSyncConf(cs *api.OpenShiftManagedCluster) ([]byte, error) {
 	return derivedpkg.AadGroupSyncConf(cs)
 }

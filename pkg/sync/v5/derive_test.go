@@ -6,21 +6,6 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-func TestDerivedRouterLBCNamePrefix(t *testing.T) {
-	cs := api.OpenShiftManagedCluster{
-		Properties: api.Properties{
-			RouterProfiles: []api.RouterProfile{
-				{
-					FQDN: "one.two.three",
-				},
-			},
-		},
-	}
-	if got := derived.RouterLBCNamePrefix(&cs); got != "one" {
-		t.Errorf("derived.RouterLBCNamePrefix() = %v, want %v", got, "one")
-	}
-}
-
 func TestRegistryURL(t *testing.T) {
 	cs := api.OpenShiftManagedCluster{
 		Config: api.Config{

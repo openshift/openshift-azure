@@ -30,6 +30,7 @@ const (
 	vnetSubnetName                                = "default"
 	ipAPIServerName                               = "ip-apiserver"
 	ipOutboundName                                = "ip-outbound"
+	ipInboundName                                 = "ip-inbound"
 	lbAPIServerName                               = "lb-apiserver"
 	lbAPIServerFrontendConfigurationName          = "frontend"
 	lbAPIServerBackendPoolName                    = "backend"
@@ -38,10 +39,17 @@ const (
 	lbKubernetesName                              = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
 	lbKubernetesOutboundFrontendConfigurationName = "outbound"
 	lbKubernetesOutboundRuleName                  = "outbound"
+	lbKubernetesInboundFrontendConfigurationName  = "inbound"
+	lbKubernetesInboundRuleName443                = "port-443"
+	lbKubernetesInboundRuleName80                 = "port-80"
 	lbKubernetesBackendPoolName                   = "kubernetes" // must match KubeCloudSharedConfiguration ClusterName
+	lbKubernetesProbeName80                       = "probe-80"
+	lbKubernetesProbeName443                      = "probe-443"
 	nsgMasterName                                 = "nsg-master"
 	nsgMasterAllowSSHRuleName                     = "allow_ssh"
 	nsgMasterAllowHTTPSRuleName                   = "allow_https"
+	nsgWorkerAllowHTTPRuleName                    = "allow_http"
+	nsgWorkerAllowHTTPSRuleName                   = "allow_https"
 	nsgWorkerName                                 = "nsg-worker"
 	vmssNicName                                   = "nic"
 	vmssNicPublicIPConfigurationName              = "ip"
@@ -86,6 +94,24 @@ func (g *simpleGenerator) ipAPIServer() *network.PublicIPAddress {
 			IdleTimeoutInMinutes: to.Int32Ptr(15),
 		},
 		Name:     to.StringPtr(ipAPIServerName),
+		Type:     to.StringPtr("Microsoft.Network/publicIPAddresses"),
+		Location: to.StringPtr(g.cs.Location),
+	}
+}
+
+func (g *simpleGenerator) ipInbound() *network.PublicIPAddress {
+	return &network.PublicIPAddress{
+		Sku: &network.PublicIPAddressSku{
+			Name: network.PublicIPAddressSkuNameStandard,
+		},
+		PublicIPAddressPropertiesFormat: &network.PublicIPAddressPropertiesFormat{
+			PublicIPAllocationMethod: network.Static,
+			IdleTimeoutInMinutes:     to.Int32Ptr(15),
+			DNSSettings: &network.PublicIPAddressDNSSettings{
+				DomainNameLabel: to.StringPtr(derived.RouterLBCNamePrefix(g.cs)),
+			},
+		},
+		Name:     to.StringPtr(ipInboundName),
 		Type:     to.StringPtr("Microsoft.Network/publicIPAddresses"),
 		Location: to.StringPtr(g.cs.Location),
 	}
@@ -161,7 +187,7 @@ func (g *simpleGenerator) lbAPIServer() *network.LoadBalancer {
 							) + "/probes/" + lbAPIServerProbeName),
 						},
 						Protocol:             network.TransportProtocolTCP,
-						LoadDistribution:     network.Default,
+						LoadDistribution:     network.SourceIP,
 						FrontendPort:         to.Int32Ptr(443),
 						BackendPort:          to.Int32Ptr(443),
 						IdleTimeoutInMinutes: to.Int32Ptr(15),
@@ -215,10 +241,96 @@ func (g *simpleGenerator) lbKubernetes() *network.LoadBalancer {
 					},
 					Name: to.StringPtr(lbKubernetesOutboundFrontendConfigurationName),
 				},
+				{
+					FrontendIPConfigurationPropertiesFormat: &network.FrontendIPConfigurationPropertiesFormat{
+						PrivateIPAllocationMethod: network.Dynamic,
+						PublicIPAddress: &network.PublicIPAddress{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/publicIPAddresses",
+								ipInboundName,
+							)),
+						},
+					},
+					Name: to.StringPtr(lbKubernetesInboundFrontendConfigurationName),
+				},
 			},
 			BackendAddressPools: &[]network.BackendAddressPool{
 				{
 					Name: to.StringPtr(lbKubernetesBackendPoolName),
+				},
+			},
+			LoadBalancingRules: &[]network.LoadBalancingRule{
+				{
+					LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
+						FrontendIPConfiguration: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								lbKubernetesName,
+							) + "/frontendIPConfigurations/" + lbKubernetesInboundFrontendConfigurationName),
+						},
+						BackendAddressPool: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								lbKubernetesName,
+							) + "/backendAddressPools/" + lbKubernetesBackendPoolName),
+						},
+						Probe: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								lbKubernetesName,
+							) + "/probes/" + lbKubernetesProbeName443),
+						},
+						Protocol:             network.TransportProtocolTCP,
+						LoadDistribution:     network.SourceIP,
+						FrontendPort:         to.Int32Ptr(443),
+						BackendPort:          to.Int32Ptr(443),
+						IdleTimeoutInMinutes: to.Int32Ptr(15),
+						EnableFloatingIP:     to.BoolPtr(false),
+					},
+					Name: to.StringPtr(lbKubernetesInboundRuleName443),
+				},
+				{
+					LoadBalancingRulePropertiesFormat: &network.LoadBalancingRulePropertiesFormat{
+						FrontendIPConfiguration: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								lbKubernetesName,
+							) + "/frontendIPConfigurations/" + lbKubernetesInboundFrontendConfigurationName),
+						},
+						BackendAddressPool: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								lbKubernetesName,
+							) + "/backendAddressPools/" + lbKubernetesBackendPoolName),
+						},
+						Probe: &network.SubResource{
+							ID: to.StringPtr(resourceid.ResourceID(
+								g.cs.Properties.AzProfile.SubscriptionID,
+								g.cs.Properties.AzProfile.ResourceGroup,
+								"Microsoft.Network/loadBalancers",
+								lbKubernetesName,
+							) + "/probes/" + lbKubernetesProbeName80),
+						},
+						Protocol:             network.TransportProtocolTCP,
+						LoadDistribution:     network.SourceIP,
+						FrontendPort:         to.Int32Ptr(80),
+						BackendPort:          to.Int32Ptr(80),
+						IdleTimeoutInMinutes: to.Int32Ptr(15),
+						EnableFloatingIP:     to.BoolPtr(false),
+					},
+					Name: to.StringPtr(lbKubernetesInboundRuleName80),
 				},
 			},
 			OutboundRules: &[]network.OutboundRule{
@@ -246,6 +358,26 @@ func (g *simpleGenerator) lbKubernetes() *network.LoadBalancer {
 						Protocol:             network.Protocol1All,
 						IdleTimeoutInMinutes: to.Int32Ptr(15),
 					},
+				},
+			},
+			Probes: &[]network.Probe{
+				{
+					ProbePropertiesFormat: &network.ProbePropertiesFormat{
+						Protocol:          network.ProbeProtocolTCP,
+						Port:              to.Int32Ptr(443),
+						IntervalInSeconds: to.Int32Ptr(5),
+						NumberOfProbes:    to.Int32Ptr(2),
+					},
+					Name: to.StringPtr(lbKubernetesProbeName443),
+				},
+				{
+					ProbePropertiesFormat: &network.ProbePropertiesFormat{
+						Protocol:          network.ProbeProtocolTCP,
+						Port:              to.Int32Ptr(80),
+						IntervalInSeconds: to.Int32Ptr(5),
+						NumberOfProbes:    to.Int32Ptr(2),
+					},
+					Name: to.StringPtr(lbKubernetesProbeName80),
 				},
 			},
 		},
@@ -316,7 +448,36 @@ func (g *simpleGenerator) nsgMaster() *network.SecurityGroup {
 func (g *simpleGenerator) nsgWorker() *network.SecurityGroup {
 	return &network.SecurityGroup{
 		SecurityGroupPropertiesFormat: &network.SecurityGroupPropertiesFormat{
-			SecurityRules: &[]network.SecurityRule{},
+			SecurityRules: &[]network.SecurityRule{
+				{
+					SecurityRulePropertiesFormat: &network.SecurityRulePropertiesFormat{
+						Description:              to.StringPtr("Allow HTTP traffic"),
+						Protocol:                 network.SecurityRuleProtocolTCP,
+						SourcePortRange:          to.StringPtr("*"),
+						DestinationPortRange:     to.StringPtr("80"),
+						SourceAddressPrefix:      to.StringPtr("Internet"),
+						DestinationAddressPrefix: to.StringPtr("*"),
+						Access:                   network.SecurityRuleAccessAllow,
+						Priority:                 to.Int32Ptr(101),
+						Direction:                network.SecurityRuleDirectionInbound,
+					},
+					Name: to.StringPtr(nsgWorkerAllowHTTPRuleName),
+				},
+				{
+					SecurityRulePropertiesFormat: &network.SecurityRulePropertiesFormat{
+						Description:              to.StringPtr("Allow HTTPS traffic"),
+						Protocol:                 network.SecurityRuleProtocolTCP,
+						SourcePortRange:          to.StringPtr("*"),
+						DestinationPortRange:     to.StringPtr("443"),
+						SourceAddressPrefix:      to.StringPtr("Internet"),
+						DestinationAddressPrefix: to.StringPtr("*"),
+						Access:                   network.SecurityRuleAccessAllow,
+						Priority:                 to.Int32Ptr(102),
+						Direction:                network.SecurityRuleDirectionInbound,
+					},
+					Name: to.StringPtr(nsgWorkerAllowHTTPSRuleName),
+				},
+			},
 		},
 		Name:     to.StringPtr(nsgWorkerName),
 		Type:     to.StringPtr("Microsoft.Network/networkSecurityGroups"),

@@ -636,14 +636,6 @@ var translations = map[string][]struct {
 			Template: "{{ .Config.EtcdMetricsPassword }}",
 		},
 	},
-	"Service/default/router": {
-		{
-			Path: jsonpath.MustCompile("$.metadata.annotations['service.beta.kubernetes.io/azure-dns-label-name']"),
-			F: func(cs *api.OpenShiftManagedCluster) (interface{}, error) {
-				return derived.RouterLBCNamePrefix(cs), nil
-			},
-		},
-	},
 	"StatefulSet.apps/openshift-infra/bootstrap-autoapprover": {
 		{
 			Path:     jsonpath.MustCompile("$.spec.template.spec.containers[0].image"),

@@ -18,6 +18,11 @@ func TestGenerate(t *testing.T) {
 				AgentPoolProfiles: []api.AgentPoolProfile{
 					{Role: api.AgentPoolProfileRoleCompute, Name: "compute"},
 				},
+				RouterProfiles: []api.RouterProfile{
+					{
+						FQDN: "test.eastus.apps.osadev.cloud",
+					},
+				},
 			},
 			Config: api.Config{
 				SSHKey: tls.DummyPrivateKey,
