@@ -44,14 +44,14 @@ func (s *Server) context(handler http.Handler) http.Handler {
 
 		authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
 		if err != nil {
-			s.internalError(w, err.Error())
+			s.badRequest(w, err.Error())
 			return
 		}
 		ctx = context.WithValue(ctx, internalapi.ContextKeyClientAuthorizer, authorizer)
 
 		vaultauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azureclient.KeyVaultEndpoint)
 		if err != nil {
-			s.internalError(w, err.Error())
+			s.badRequest(w, err.Error())
 			return
 		}
 		ctx = context.WithValue(ctx, internalapi.ContextKeyVaultClientAuthorizer, vaultauthorizer)

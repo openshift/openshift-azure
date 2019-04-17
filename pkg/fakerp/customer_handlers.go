@@ -24,13 +24,13 @@ import (
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
-		s.internalError(w, "Failed to read the internal config")
+		s.badRequest(w, "Failed to read the internal config")
 		return
 	}
 
 	authorizer, err := azureclient.GetAuthorizerFromContext(req.Context(), internalapi.ContextKeyClientAuthorizer)
 	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
+		s.badRequest(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
 		return
 	}
 	// TODO: Determine subscription ID from the request path
@@ -39,14 +39,14 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 
 	am, err := newAADManager(req.Context(), cs)
 	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to delete service principals: %v", err))
+		s.badRequest(w, fmt.Sprintf("Failed to delete service principals: %v", err))
 		return
 	}
 
 	s.log.Info("deleting service principals")
 	err = am.deleteApps(req.Context())
 	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to delete service principals: %v", err))
+		s.badRequest(w, fmt.Sprintf("Failed to delete service principals: %v", err))
 		return
 	}
 
@@ -54,12 +54,12 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	// TODO: get resource group from request path
 	dm, err := newDNSManager(req.Context(), os.Getenv("AZURE_SUBSCRIPTION_ID"), os.Getenv("DNS_RESOURCEGROUP"), os.Getenv("DNS_DOMAIN"))
 	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to delete dns records: %v", err))
+		s.badRequest(w, fmt.Sprintf("Failed to delete dns records: %v", err))
 		return
 	}
 	err = dm.deleteOCPDNS(req.Context(), cs)
 	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to delete dns records: %v", err))
+		s.badRequest(w, fmt.Sprintf("Failed to delete dns records: %v", err))
 		return
 	}
 
@@ -75,19 +75,19 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 				}
 			}
 		}
-		s.internalError(w, fmt.Sprintf("Failed to delete resource group: %v", err))
+		s.badRequest(w, fmt.Sprintf("Failed to delete resource group: %v", err))
 		return
 	}
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 		defer cancel()
 		if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
-			s.internalError(w, fmt.Sprintf("Failed to wait for resource group deletion: %v", err))
+			s.badRequest(w, fmt.Sprintf("Failed to wait for resource group deletion: %v", err))
 			return
 		}
 		resp, err := future.Result(gc)
 		if err != nil {
-			s.internalError(w, fmt.Sprintf("Failed to get resource group deletion response: %v", err))
+			s.badRequest(w, fmt.Sprintf("Failed to get resource group deletion response: %v", err))
 			return
 		}
 		// If the resource group deletion is successful, cleanup the object
@@ -122,7 +122,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 		s.log.Info("read old config")
 		oldCs = s.read()
 		if oldCs == nil {
-			s.internalError(w, "Failed to read old config: internal state does not exist")
+			s.badRequest(w, "Failed to read old config: internal state does not exist")
 			return
 		}
 		s.writeState(internalapi.Updating)
@@ -187,7 +187,7 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 		res, err = json.Marshal(oc)
 	}
 	if err != nil {
-		s.internalError(w, fmt.Sprintf("Failed to marshal response: %v", err))
+		s.badRequest(w, fmt.Sprintf("Failed to marshal response: %v", err))
 		return
 	}
 	w.Write(res)

@@ -11,7 +11,7 @@ import (
 
 func (s *Server) adminreply(w http.ResponseWriter, err error, out interface{}) {
 	if err != nil {
-		s.internalError(w, err.Error())
+		s.badRequest(w, err.Error())
 		return
 	}
 
@@ -27,7 +27,7 @@ func (s *Server) adminreply(w http.ResponseWriter, err error, out interface{}) {
 
 	b, err := json.Marshal(out)
 	if err != nil {
-		s.internalError(w, err.Error())
+		s.badRequest(w, err.Error())
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -39,7 +39,7 @@ func (s *Server) adminreply(w http.ResponseWriter, err error, out interface{}) {
 func (s *Server) handleBackup(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
-		s.internalError(w, "Failed to read the internal config")
+		s.badRequest(w, "Failed to read the internal config")
 		return
 	}
 
@@ -53,7 +53,7 @@ func (s *Server) handleBackup(w http.ResponseWriter, req *http.Request) {
 func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
-		s.internalError(w, "Failed to read the internal config")
+		s.badRequest(w, "Failed to read the internal config")
 		return
 	}
 
@@ -65,7 +65,7 @@ func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Requ
 func (s *Server) handleListClusterVMs(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
-		s.internalError(w, "Failed to read the internal config")
+		s.badRequest(w, "Failed to read the internal config")
 		return
 	}
 
@@ -77,7 +77,7 @@ func (s *Server) handleListClusterVMs(w http.ResponseWriter, req *http.Request) 
 func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
-		s.internalError(w, "Failed to read the internal config")
+		s.badRequest(w, "Failed to read the internal config")
 		return
 	}
 
@@ -91,7 +91,7 @@ func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
 func (s *Server) handleListBackups(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
-		s.internalError(w, "Failed to read the internal config")
+		s.badRequest(w, "Failed to read the internal config")
 		return
 	}
 
@@ -108,7 +108,7 @@ func (s *Server) handleListBackups(w http.ResponseWriter, req *http.Request) {
 func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
-		s.internalError(w, "Failed to read the internal config")
+		s.badRequest(w, "Failed to read the internal config")
 		return
 	}
 
@@ -127,14 +127,14 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
-		s.internalError(w, "Failed to read the internal config")
+		s.badRequest(w, "Failed to read the internal config")
 		return
 	}
 
 	deployer := GetDeployer(s.log, cs, s.testConfig)
 	pluginErr := s.plugin.RotateClusterSecrets(req.Context(), cs, deployer)
 	if pluginErr != nil {
-		s.internalError(w, pluginErr.Error())
+		s.badRequest(w, pluginErr.Error())
 		return
 	}
 
@@ -146,7 +146,7 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
-		s.internalError(w, "Failed to read the internal config")
+		s.badRequest(w, "Failed to read the internal config")
 		return
 	}
 
@@ -163,7 +163,7 @@ func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 func (s *Server) handleRunCommand(w http.ResponseWriter, req *http.Request) {
 	cs := s.read()
 	if cs == nil {
-		s.internalError(w, "Failed to read the internal config")
+		s.badRequest(w, "Failed to read the internal config")
 		return
 	}
 
