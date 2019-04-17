@@ -56,6 +56,66 @@ func TestValidatePluginVersion(t *testing.T) {
 	}
 }
 
+func TestIsValidClusterName(t *testing.T) {
+	invalidClusterNames := []string{
+		"",
+		"-",
+		"my.cluster",
+		"has spaces",
+		"random#characters?",
+		"cluster-",
+		"-cluster",
+		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		"verylongtoolongnameitslongerthan63characterswhoopsthiswontworkatall",
+	}
+	for _, invalidClusterName := range invalidClusterNames {
+		if isValidClusterName(invalidClusterName) {
+			t.Errorf("invalid cluster name passed test: %s", invalidClusterName)
+		}
+	}
+	validClusterNames := []string{
+		"k",
+		"k0",
+		"0cluster",
+		"1234567890",
+		"osa-testing",
+		"ExampleCluster111",
+		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+	}
+	for _, validClusterName := range validClusterNames {
+		if !isValidClusterName(validClusterName) {
+			t.Errorf("valid cluster name failed to pass test: %s", validClusterName)
+		}
+	}
+}
+
+func TestIsValidLocation(t *testing.T) {
+	invalidLocations := []string{
+		"",
+		"West US 2",
+		"Brazil South",
+		"random#characters?",
+	}
+	for _, invalidLocation := range invalidLocations {
+		if isValidLocation(invalidLocation) {
+			t.Errorf("invalid location passed test: %s", invalidLocation)
+		}
+	}
+	validLocations := []string{
+		"a",
+		"eastus",
+		"EastUS",
+		"westus2",
+		"westeurope",
+		"canadacentral",
+	}
+	for _, validLocation := range validLocations {
+		if !isValidLocation(validLocation) {
+			t.Errorf("valid location failed to pass test: %s", validLocation)
+		}
+	}
+}
+
 func TestIsValidCloudAppHostname(t *testing.T) {
 	invalidFqdns := []string{
 		"invalid.random.domain",
