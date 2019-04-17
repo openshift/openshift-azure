@@ -9,7 +9,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/ghodss/yaml"
@@ -114,11 +113,8 @@ func GetDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig 
 			return err
 		}
 
-		cli := deployments.Client()
-		cli.PollingDuration = 30 * time.Minute
-
 		log.Info("waiting for arm template deployment to complete")
-		err = future.WaitForCompletionRef(ctx, cli)
+		err = future.WaitForCompletionRef(ctx, deployments.Client())
 		if err != nil {
 			log.Warnf("deployment failed: %#v", err)
 			debugDeployerError(ctx, log, cs, err, testConfig)

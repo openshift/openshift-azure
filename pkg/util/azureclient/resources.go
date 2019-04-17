@@ -2,6 +2,7 @@ package azureclient
 
 import (
 	"context"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
@@ -23,6 +24,7 @@ var _ DeploymentsClient = &deploymentsClient{}
 func NewDeploymentsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) DeploymentsClient {
 	client := resources.NewDeploymentsClient(subscriptionID)
 	setupClient(ctx, &client.Client, authorizer)
+	client.PollingDuration = 30 * time.Minute
 
 	return &deploymentsClient{
 		DeploymentsClient: client,
