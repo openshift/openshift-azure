@@ -2,6 +2,7 @@ package azureclient
 
 import (
 	"context"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest"
@@ -23,6 +24,7 @@ var _ VirtualMachineScaleSetsClient = &virtualMachineScaleSetsClient{}
 func NewVirtualMachineScaleSetsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetsClient {
 	client := compute.NewVirtualMachineScaleSetsClient(subscriptionID)
 	setupClient(ctx, &client.Client, authorizer)
+	client.PollingDuration = 30 * time.Minute
 
 	return &virtualMachineScaleSetsClient{
 		VirtualMachineScaleSetsClient: client,
@@ -48,6 +50,7 @@ var _ VirtualMachineScaleSetVMsClient = &virtualMachineScaleSetVMsClient{}
 func NewVirtualMachineScaleSetVMsClient(ctx context.Context, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetVMsClient {
 	client := compute.NewVirtualMachineScaleSetVMsClient(subscriptionID)
 	setupClient(ctx, &client.Client, authorizer)
+	client.PollingDuration = 30 * time.Minute
 
 	return &virtualMachineScaleSetVMsClient{
 		VirtualMachineScaleSetVMsClient: client,
