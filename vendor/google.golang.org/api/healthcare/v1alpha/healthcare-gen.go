@@ -1,4 +1,4 @@
-// Copyright 2019 Google Inc. All rights reserved.
+// Copyright 2019 Google LLC.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,13 +6,35 @@
 
 // Package healthcare provides access to the Cloud Healthcare API.
 //
-// See https://cloud.google.com/healthcare
+// For product documentation, see: https://cloud.google.com/healthcare
+//
+// Creating a client
 //
 // Usage example:
 //
 //   import "google.golang.org/api/healthcare/v1alpha"
 //   ...
-//   healthcareService, err := healthcare.New(oauthHttpClient)
+//   ctx := context.Background()
+//   healthcareService, err := healthcare.NewService(ctx)
+//
+// In this example, Google Application Default Credentials are used for authentication.
+//
+// For information on how to create and obtain Application Default Credentials, see https://developers.google.com/identity/protocols/application-default-credentials.
+//
+// Other authentication options
+//
+// To use an API key for authentication (note: some APIs do not support API keys), use option.WithAPIKey:
+//
+//   healthcareService, err := healthcare.NewService(ctx, option.WithAPIKey("AIza..."))
+//
+// To use an OAuth token (e.g., a user token obtained via a three-legged OAuth flow), use option.WithTokenSource:
+//
+//   config := &oauth2.Config{...}
+//   // ...
+//   token, err := config.Exchange(ctx, ...)
+//   healthcareService, err := healthcare.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
+//
+// See https://godoc.org/google.golang.org/api/option/ for details on options.
 package healthcare // import "google.golang.org/api/healthcare/v1alpha"
 
 import (
@@ -29,6 +51,8 @@ import (
 
 	gensupport "google.golang.org/api/gensupport"
 	googleapi "google.golang.org/api/googleapi"
+	option "google.golang.org/api/option"
+	htransport "google.golang.org/api/transport/http"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -56,6 +80,32 @@ const (
 	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 )
 
+// NewService creates a new Service.
+func NewService(ctx context.Context, opts ...option.ClientOption) (*Service, error) {
+	scopesOption := option.WithScopes(
+		"https://www.googleapis.com/auth/cloud-platform",
+	)
+	// NOTE: prepend, so we don't override user-specified scopes.
+	opts = append([]option.ClientOption{scopesOption}, opts...)
+	client, endpoint, err := htransport.NewClient(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	s, err := New(client)
+	if err != nil {
+		return nil, err
+	}
+	if endpoint != "" {
+		s.BasePath = endpoint
+	}
+	return s, nil
+}
+
+// New creates a new Service. It uses the provided http.Client for requests.
+//
+// Deprecated: please use NewService instead.
+// To provide a custom HTTP client, use option.WithHTTPClient.
+// If you are using google.golang.org/api/googleapis/transport.APIKey, use option.WithAPIKey with NewService instead.
 func New(client *http.Client) (*Service, error) {
 	if client == nil {
 		return nil, errors.New("client is nil")
@@ -630,8 +680,7 @@ func (s *BigQueryLocation) MarshalJSON() ([]byte, error) {
 
 // Binding: Associates `members` with a `role`.
 type Binding struct {
-	// Condition: Unimplemented. The condition that is associated with this
-	// binding.
+	// Condition: The condition that is associated with this binding.
 	// NOTE: an unsatisfied condition will not allow user access via
 	// current
 	// binding. Different bindings, including their conditions, are
@@ -666,7 +715,7 @@ type Binding struct {
 	//    For example, `admins@example.com`.
 	//
 	//
-	// * `domain:{domain}`: A Google Apps domain name that represents all
+	// * `domain:{domain}`: The G Suite domain (primary) that represents all
 	// the
 	//    users of that domain. For example, `google.com` or
 	// `example.com`.
@@ -1034,41 +1083,6 @@ type Empty struct {
 	googleapi.ServerResponse `json:"-"`
 }
 
-// ErrorDetail: Structure to describe the error encountered during batch
-// operation on one
-// resource. This is used both for sample errors in operation response,
-// and
-// for format of errors in error reports.
-type ErrorDetail struct {
-	// Error: The status of the error.
-	Error *Status `json:"error,omitempty"`
-
-	// Resource: The identifier of the resource.
-	Resource string `json:"resource,omitempty"`
-
-	// ForceSendFields is a list of field names (e.g. "Error") to
-	// unconditionally include in API requests. By default, fields with
-	// empty values are omitted from API requests. However, any non-pointer,
-	// non-interface field appearing in ForceSendFields will be sent to the
-	// server regardless of whether the field is empty or not. This may be
-	// used to include empty fields in Patch requests.
-	ForceSendFields []string `json:"-"`
-
-	// NullFields is a list of field names (e.g. "Error") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
-	// null. It is an error if a field in this list has a non-empty value.
-	// This may be used to include null fields in Patch requests.
-	NullFields []string `json:"-"`
-}
-
-func (s *ErrorDetail) MarshalJSON() ([]byte, error) {
-	type NoMethod ErrorDetail
-	raw := NoMethod(*s)
-	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
-}
-
 // ExportDicomDataRequest: Exports data from the specified DICOM
 // store.
 // If a given resource (e.g., a DICOM object with the same SOPInstance
@@ -1109,17 +1123,6 @@ func (s *ExportDicomDataRequest) MarshalJSON() ([]byte, error) {
 type ExportResourcesRequest struct {
 	// BigqueryDestinationLocation: The BigQuery destination location.
 	// The output will be one BigQuery table per resource type.
-	// The server implements a data-driven FHIR-to-SQL schema mapping in
-	// support
-	// of analytics workloads with BigQuery. Incompatible changes to the
-	// output
-	// schema may be introduced in the future as a result of
-	// continuous
-	// collaboration with the FHIR community to refine the
-	// [desired SQL projection of
-	// FHIR
-	// resources](https://github.com/rbrush/sql-on-fhir/blob/master/sql-
-	// on-fhir.md).
 	BigqueryDestinationLocation *BigQueryLocation `json:"bigqueryDestinationLocation,omitempty"`
 
 	// GcsDestinationLocation: The Cloud Storage destination
@@ -3216,20 +3219,20 @@ func (s *SetIamPolicyRequest) MarshalJSON() ([]byte, error) {
 }
 
 // Status: The `Status` type defines a logical error model that is
-// suitable for different
-// programming environments, including REST APIs and RPC APIs. It is
-// used by
-// [gRPC](https://github.com/grpc). The error model is designed to
-// be:
+// suitable for
+// different programming environments, including REST APIs and RPC APIs.
+// It is
+// used by [gRPC](https://github.com/grpc). The error model is designed
+// to be:
 //
 // - Simple to use and understand for most users
 // - Flexible enough to meet unexpected needs
 //
 // # Overview
 //
-// The `Status` message contains three pieces of data: error code, error
-// message,
-// and error details. The error code should be an enum value
+// The `Status` message contains three pieces of data: error code,
+// error
+// message, and error details. The error code should be an enum value
 // of
 // google.rpc.Code, but it may accept additional error codes if needed.
 // The
@@ -9447,10 +9450,6 @@ type ProjectsLocationsDatasetsFhirStoresExecuteBundleCall struct {
 }
 
 // ExecuteBundle: Executes all the requests in the given Bundle.
-// Conforms to
-// http://hl7.org/fhir/http.html#transaction except that only the
-// transaction
-// update is supported.
 func (r *ProjectsLocationsDatasetsFhirStoresService) ExecuteBundle(parent string, httpbody *HttpBody) *ProjectsLocationsDatasetsFhirStoresExecuteBundleCall {
 	c := &ProjectsLocationsDatasetsFhirStoresExecuteBundleCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
@@ -9548,7 +9547,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresExecuteBundleCall) Do(opts ...google
 	}
 	return ret, nil
 	// {
-	//   "description": "Executes all the requests in the given Bundle.  Conforms to\nhttp://hl7.org/fhir/http.html#transaction except that only the transaction\nupdate is supported.",
+	//   "description": "Executes all the requests in the given Bundle.",
 	//   "flatPath": "v1alpha/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}",
 	//   "httpMethod": "POST",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.executeBundle",
@@ -10965,6 +10964,29 @@ type ProjectsLocationsDatasetsFhirStoresResourcesSearchCall struct {
 }
 
 // Search: Searches resources in the given FHIR store.
+//
+// # Search Parameters
+//
+// The server's capability statement, retrieved
+// through
+// GetCapabilityStatement, indicates which search
+// parameters are supported on each FHIR resource.
+//
+// # Search Modifiers
+//
+// Modifier   | Supported
+// ----------- | ---------
+// `:missing`  | Yes
+// `:exact`    | Yes
+// `:contains` | Yes
+// `:text`     | Yes
+// `:in`       | Yes
+// `:not-in`   | Yes
+// `:above`    | Yes
+// `:below`    | Yes
+// `:[type]`   | Yes
+// `:not`      | Yes
+// `:recurse`  | No
 func (r *ProjectsLocationsDatasetsFhirStoresResourcesService) Search(parent string, searchresourcesrequest *SearchResourcesRequest) *ProjectsLocationsDatasetsFhirStoresResourcesSearchCall {
 	c := &ProjectsLocationsDatasetsFhirStoresResourcesSearchCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
@@ -11062,7 +11084,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresResourcesSearchCall) Do(opts ...goog
 	}
 	return ret, nil
 	// {
-	//   "description": "Searches resources in the given FHIR store.",
+	//   "description": "Searches resources in the given FHIR store.\n\n# Search Parameters\n\nThe server's capability statement, retrieved through\nGetCapabilityStatement, indicates which search\nparameters are supported on each FHIR resource.\n\n# Search Modifiers\n\nModifier   | Supported\n----------- | ---------\n`:missing`  | Yes\n`:exact`    | Yes\n`:contains` | Yes\n`:text`     | Yes\n`:in`       | Yes\n`:not-in`   | Yes\n`:above`    | Yes\n`:below`    | Yes\n`:[type]`   | Yes\n`:not`      | Yes\n`:recurse`  | No",
 	//   "flatPath": "v1alpha/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/resources/_search",
 	//   "httpMethod": "POST",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.resources._search",
@@ -12412,6 +12434,29 @@ type ProjectsLocationsDatasetsFhirStoresResourcesSearchResourcesCall struct {
 }
 
 // SearchResources: Searches resources in the given FHIR store.
+//
+// # Search Parameters
+//
+// The server's capability statement, retrieved
+// through
+// GetCapabilityStatement, indicates which search
+// parameters are supported on each FHIR resource.
+//
+// # Search Modifiers
+//
+// Modifier   | Supported
+// ----------- | ---------
+// `:missing`  | Yes
+// `:exact`    | Yes
+// `:contains` | Yes
+// `:text`     | Yes
+// `:in`       | Yes
+// `:not-in`   | Yes
+// `:above`    | Yes
+// `:below`    | Yes
+// `:[type]`   | Yes
+// `:not`      | Yes
+// `:recurse`  | No
 func (r *ProjectsLocationsDatasetsFhirStoresResourcesService) SearchResources(parent string, resourceType string) *ProjectsLocationsDatasetsFhirStoresResourcesSearchResourcesCall {
 	c := &ProjectsLocationsDatasetsFhirStoresResourcesSearchResourcesCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
@@ -12518,7 +12563,7 @@ func (c *ProjectsLocationsDatasetsFhirStoresResourcesSearchResourcesCall) Do(opt
 	}
 	return ret, nil
 	// {
-	//   "description": "Searches resources in the given FHIR store.",
+	//   "description": "Searches resources in the given FHIR store.\n\n# Search Parameters\n\nThe server's capability statement, retrieved through\nGetCapabilityStatement, indicates which search\nparameters are supported on each FHIR resource.\n\n# Search Modifiers\n\nModifier   | Supported\n----------- | ---------\n`:missing`  | Yes\n`:exact`    | Yes\n`:contains` | Yes\n`:text`     | Yes\n`:in`       | Yes\n`:not-in`   | Yes\n`:above`    | Yes\n`:below`    | Yes\n`:[type]`   | Yes\n`:not`      | Yes\n`:recurse`  | No",
 	//   "flatPath": "v1alpha/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}/fhirStores/{fhirStoresId}/resources/{resourcesId}",
 	//   "httpMethod": "GET",
 	//   "id": "healthcare.projects.locations.datasets.fhirStores.resources.searchResources",
@@ -13033,6 +13078,55 @@ func (r *ProjectsLocationsDatasetsFhirStoresResourcesHistoryService) List(name s
 	return c
 }
 
+// At sets the optional parameter "at": Only include resource versions
+// that were current at some point during the
+// time period specified in the date time value. The date parameter
+// format is
+// yyyy-mm-ddThh:mm:ss[Z|(+|-)hh:mm]
+// Clients may specify any of the following:
+// An entire year: `_at=2019`
+// An entire month: `_at=2019-01`
+// A specific day: `_at=2019-01-20`
+// A specific second: `_at=2018-12-31T23:59:58Z`
+func (c *ProjectsLocationsDatasetsFhirStoresResourcesHistoryListCall) At(at string) *ProjectsLocationsDatasetsFhirStoresResourcesHistoryListCall {
+	c.urlParams_.Set("at", at)
+	return c
+}
+
+// Count sets the optional parameter "count": The maximum number of
+// search results on a page.
+func (c *ProjectsLocationsDatasetsFhirStoresResourcesHistoryListCall) Count(count int64) *ProjectsLocationsDatasetsFhirStoresResourcesHistoryListCall {
+	c.urlParams_.Set("count", fmt.Sprint(count))
+	return c
+}
+
+// Page sets the optional parameter "page": Used to retrieve the first,
+// previous, next, or last page of resource
+// versions when using pagination. Value should be set to the value of
+// the
+// `link.url` field returned in the response to the previous request,
+// where
+// `link.relation` is "first", "previous", "next" or "last".
+// Omit `page` if no previous request has been made.
+func (c *ProjectsLocationsDatasetsFhirStoresResourcesHistoryListCall) Page(page string) *ProjectsLocationsDatasetsFhirStoresResourcesHistoryListCall {
+	c.urlParams_.Set("page", page)
+	return c
+}
+
+// Since sets the optional parameter "since": Only include resource
+// versions that were created at or after the given
+// instant in time. The instant in time uses the
+// format
+// YYYY-MM-DDThh:mm:ss.sss+zz:zz (for example
+// 2015-02-07T13:28:17.239+02:00 or
+// 2017-01-01T00:00:00Z). The time must be specified to the second
+// and
+// include a time zone.
+func (c *ProjectsLocationsDatasetsFhirStoresResourcesHistoryListCall) Since(since string) *ProjectsLocationsDatasetsFhirStoresResourcesHistoryListCall {
+	c.urlParams_.Set("since", since)
+	return c
+}
+
 // Fields allows partial responses to be retrieved. See
 // https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
 // for more information.
@@ -13139,11 +13233,32 @@ func (c *ProjectsLocationsDatasetsFhirStoresResourcesHistoryListCall) Do(opts ..
 	//     "name"
 	//   ],
 	//   "parameters": {
+	//     "at": {
+	//       "description": "Only include resource versions that were current at some point during the\ntime period specified in the date time value. The date parameter format is\nyyyy-mm-ddThh:mm:ss[Z|(+|-)hh:mm]\nClients may specify any of the following:\nAn entire year: `_at=2019`\nAn entire month: `_at=2019-01`\nA specific day: `_at=2019-01-20`\nA specific second: `_at=2018-12-31T23:59:58Z`",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "count": {
+	//       "description": "The maximum number of search results on a page.",
+	//       "format": "int32",
+	//       "location": "query",
+	//       "type": "integer"
+	//     },
 	//     "name": {
 	//       "description": "The name of the resource to retrieve.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+/datasets/[^/]+/fhirStores/[^/]+/resources/[^/]+/[^/]+$",
 	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "page": {
+	//       "description": "Used to retrieve the first, previous, next, or last page of resource\nversions when using pagination. Value should be set to the value of the\n`link.url` field returned in the response to the previous request, where\n`link.relation` is \"first\", \"previous\", \"next\" or \"last\".\nOmit `page` if no previous request has been made.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "since": {
+	//       "description": "Only include resource versions that were created at or after the given\ninstant in time. The instant in time uses the format\nYYYY-MM-DDThh:mm:ss.sss+zz:zz (for example 2015-02-07T13:28:17.239+02:00 or\n2017-01-01T00:00:00Z). The time must be specified to the second and\ninclude a time zone.",
+	//       "location": "query",
 	//       "type": "string"
 	//     }
 	//   },
@@ -15313,6 +15428,24 @@ func (r *ProjectsLocationsDatasetsHl7V2StoresMessagesService) List(parent string
 // - Label(x), a string value of the label with key x as set using the
 // labels
 //   map in Message, e.g. 'Label("priority") = "high"'
+// Negation on the patient ID function and the label function are
+// not
+// supported, e.g. invalid queries: 'NOT PatientId("123456",
+// "MRN")',
+// 'NOT HasLabel("tag1")', 'NOT Label("tag2") = "val2"'.
+// Conjunction of multiple patient ID functions is not supported, e.g.
+// an
+// invalid query: 'PatientId("123456", "MRN") AND PatientId("456789",
+// "MRN")'.
+// Conjunction of multiple label functions is also not supported, e.g.
+// an
+// invalid query: 'HasLabel("tag1") AND Label("tag2") =
+// "val2"'.
+// Conjunction of one patient ID function, one label function and other
+// fields
+// is supported, e.g. a valid query:
+// 'PatientId("123456", "MRN") AND HasLabel("tag1") AND message_type =
+// "ADT"'.
 func (c *ProjectsLocationsDatasetsHl7V2StoresMessagesListCall) Filter(filter string) *ProjectsLocationsDatasetsHl7V2StoresMessagesListCall {
 	c.urlParams_.Set("filter", filter)
 	return c
@@ -15453,7 +15586,7 @@ func (c *ProjectsLocationsDatasetsHl7V2StoresMessagesListCall) Do(opts ...google
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Restricts messages returned to those matching a filter. Syntax:\nhttps://cloud.google.com/appengine/docs/standard/python/search/query_strings\nFields/functions available for filtering are:\n- message_type, from the MSH-9 segment, e.g. 'NOT message_type = \"ADT\"'\n- send_date or sendDate, the YYYY-MM-DD date the message was sent in the\n  dataset's time_zone, from the MSH-7 segment; e.g.\n  'send_date \u003c \"2017-01-02\"'\n- send_time, the timestamp of when the message was sent, using the RFC3339\n  time format for comparisons, from the MSH-7 segment; e.g. 'send_time \u003c\n  \"2017-01-02T00:00:00-05:00\"'\n- send_facility, the hospital/trust that the message came from, from the\n  MSH-4 segment, e.g. 'send_facility = \"RAL\"'\n- HL7RegExp(expr), which does regular expression matching of expr against\n  the HL7 message payload using re2 (http://code.google.com/p/re2/)\n  syntax; e.g. 'HL7RegExp(\"^.*\\|.*\\|CERNER\")'\n- PatientId(value, type), which matches if the message lists a patient\n  having an ID of the given value and type in the PID-2, PID-3, or PID-4\n  segments; e.g. 'PatientId(\"123456\", \"MRN\")'\n- HasLabel(x), a boolean returning true if the message has a label with\n  key x (having any value) set using the labels map in Message; e.g.\n  'HasLabel(\"priority\")'\n- Label(x), a string value of the label with key x as set using the labels\n  map in Message, e.g. 'Label(\"priority\") = \"high\"'",
+	//       "description": "Restricts messages returned to those matching a filter. Syntax:\nhttps://cloud.google.com/appengine/docs/standard/python/search/query_strings\nFields/functions available for filtering are:\n- message_type, from the MSH-9 segment, e.g. 'NOT message_type = \"ADT\"'\n- send_date or sendDate, the YYYY-MM-DD date the message was sent in the\n  dataset's time_zone, from the MSH-7 segment; e.g.\n  'send_date \u003c \"2017-01-02\"'\n- send_time, the timestamp of when the message was sent, using the RFC3339\n  time format for comparisons, from the MSH-7 segment; e.g. 'send_time \u003c\n  \"2017-01-02T00:00:00-05:00\"'\n- send_facility, the hospital/trust that the message came from, from the\n  MSH-4 segment, e.g. 'send_facility = \"RAL\"'\n- HL7RegExp(expr), which does regular expression matching of expr against\n  the HL7 message payload using re2 (http://code.google.com/p/re2/)\n  syntax; e.g. 'HL7RegExp(\"^.*\\|.*\\|CERNER\")'\n- PatientId(value, type), which matches if the message lists a patient\n  having an ID of the given value and type in the PID-2, PID-3, or PID-4\n  segments; e.g. 'PatientId(\"123456\", \"MRN\")'\n- HasLabel(x), a boolean returning true if the message has a label with\n  key x (having any value) set using the labels map in Message; e.g.\n  'HasLabel(\"priority\")'\n- Label(x), a string value of the label with key x as set using the labels\n  map in Message, e.g. 'Label(\"priority\") = \"high\"'\nNegation on the patient ID function and the label function are not\nsupported, e.g. invalid queries: 'NOT PatientId(\"123456\", \"MRN\")',\n'NOT HasLabel(\"tag1\")', 'NOT Label(\"tag2\") = \"val2\"'.\nConjunction of multiple patient ID functions is not supported, e.g. an\ninvalid query: 'PatientId(\"123456\", \"MRN\") AND PatientId(\"456789\", \"MRN\")'.\nConjunction of multiple label functions is also not supported, e.g. an\ninvalid query: 'HasLabel(\"tag1\") AND Label(\"tag2\") = \"val2\"'.\nConjunction of one patient ID function, one label function and other fields\nis supported, e.g. a valid query:\n'PatientId(\"123456\", \"MRN\") AND HasLabel(\"tag1\") AND message_type = \"ADT\"'.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },

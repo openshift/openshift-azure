@@ -14,12 +14,10 @@
 package xfs_test
 
 import (
-	"log"
 	"reflect"
 	"strings"
 	"testing"
 
-	"github.com/prometheus/procfs"
 	"github.com/prometheus/procfs/xfs"
 )
 
@@ -416,9 +414,7 @@ func TestParseStats(t *testing.T) {
 		},
 	}
 
-	for i, tt := range tests {
-		t.Logf("[%02d] test %q", i, tt.name)
-
+	for _, tt := range tests {
 		var (
 			stats *xfs.Stats
 			err   error
@@ -428,7 +424,7 @@ func TestParseStats(t *testing.T) {
 			stats, err = xfs.ParseStats(strings.NewReader(tt.s))
 		}
 		if tt.fs {
-			stats, err = procfs.FS("../fixtures").XFSStats()
+			stats, err = xfs.ReadProcStat("../fixtures/proc")
 		}
 
 		if tt.invalid && err == nil {
@@ -439,7 +435,6 @@ func TestParseStats(t *testing.T) {
 		}
 
 		if want, have := tt.stats, stats; !reflect.DeepEqual(want, have) {
-			log.Printf("stats: %#v", have)
 			t.Errorf("unexpected XFS stats:\nwant:\n%v\nhave:\n%v", want, have)
 		}
 	}

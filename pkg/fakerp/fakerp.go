@@ -49,6 +49,7 @@ func debugDeployerError(ctx context.Context, log *logrus.Entry, cs *api.OpenShif
 		log.Debug(string(b))
 
 		if testConfig.ArtifactDir != "" &&
+			op.Properties.TargetResource != nil &&
 			*op.Properties.TargetResource.ResourceType == "Microsoft.Compute/virtualMachineScaleSets" {
 			s, err := newSSHer(ctx, cs)
 			if err != nil {
