@@ -31,11 +31,11 @@ trap cleanup EXIT
 GIT_CURRENT="$(git rev-parse --abbrev-ref HEAD)"
 GIT_TARGET="$1"
 
+start_monitoring
+
 git checkout $GIT_TARGET
 
-start_monitoring
-set_build_images
-
 make create
+set_build_images
 
 make e2e-scaleupdown

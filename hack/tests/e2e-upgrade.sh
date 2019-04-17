@@ -31,12 +31,12 @@ trap cleanup EXIT
 GIT_CURRENT="$(git rev-parse --abbrev-ref HEAD)"
 GIT_TARGET="$1"
 
+start_monitoring
+
 git checkout $GIT_TARGET
 
-start_monitoring
-set_build_images
-
 make create
+set_build_images
 
 # try upgrading just a single image to latest
 ( FOCUS="\[ChangeImage\]\[Fake\]\[LongRunning\]" TIMEOUT=50m ./hack/e2e.sh )
