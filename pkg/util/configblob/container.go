@@ -45,7 +45,7 @@ func GetService(ctx context.Context, log *logrus.Entry, cpc *cloudprovider.Confi
 		return nil, err
 	}
 
-	storageCli, err := azureclientstorage.NewClient(*acct.Name, *(*keys.Keys)[0].Value, azureclientstorage.DefaultBaseURL, azureclientstorage.DefaultAPIVersion, true)
+	storageCli, err := azureclientstorage.NewClient(log, *acct.Name, *(*keys.Keys)[0].Value, azureclientstorage.DefaultBaseURL, azureclientstorage.DefaultAPIVersion, true)
 	if err != nil {
 		return nil, err
 	}

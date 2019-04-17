@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"strings"
 	"syscall"
 	"time"
@@ -26,6 +25,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	v20190430client "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2019-04-30"
 	adminclient "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
+	utilerrors "github.com/openshift/openshift-azure/pkg/util/errors"
 )
 
 var (
@@ -221,12 +221,8 @@ func main() {
 		// wait for the fake RP to start
 		err := wait.PollImmediate(time.Second, time.Minute, func() (bool, error) {
 			c, err := net.Dial("tcp", shared.LocalHttpAddr)
-			if err, ok := err.(*net.OpError); ok {
-				if err, ok := err.Err.(*os.SyscallError); ok {
-					if err.Err == syscall.ECONNREFUSED {
-						return false, nil
-					}
-				}
+			if utilerrors.IsMatchingSyscallError(err, syscall.ECONNREFUSED) {
+				return false, nil
 			}
 			if err != nil {
 				return false, err

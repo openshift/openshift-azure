@@ -1,9 +1,18 @@
 package storage
 
 import (
+	"bytes"
+	"context"
 	"io"
+	"io/ioutil"
+	"syscall"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/storage"
+	"github.com/sirupsen/logrus"
+
+	"github.com/openshift/openshift-azure/pkg/util/errors"
+	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 const (
@@ -23,12 +32,13 @@ type Client interface {
 
 type client struct {
 	storage.Client
+	log *logrus.Entry
 }
 
 var _ Client = &client{}
 
 // NewClient returns a new Client
-func NewClient(accountName, accountKey, serviceBaseURL, apiVersion string, useHTTPS bool) (Client, error) {
+func NewClient(log *logrus.Entry, accountName, accountKey, serviceBaseURL, apiVersion string, useHTTPS bool) (Client, error) {
 	azs, err := storage.NewClient(accountName, accountKey, serviceBaseURL, apiVersion, useHTTPS)
 	if err != nil {
 		return nil, err
@@ -36,11 +46,15 @@ func NewClient(accountName, accountKey, serviceBaseURL, apiVersion string, useHT
 
 	return &client{
 		Client: azs,
+		log:    log,
 	}, nil
 }
 
 func (c *client) GetBlobService() BlobStorageClient {
-	return &blobStorageClient{BlobStorageClient: c.Client.GetBlobService()}
+	return &blobStorageClient{
+		BlobStorageClient: c.Client.GetBlobService(),
+		log:               c.log,
+	}
 }
 
 // BlobStorageClient is a minimal interface for azure BlobStorageClient
@@ -50,12 +64,16 @@ type BlobStorageClient interface {
 
 type blobStorageClient struct {
 	storage.BlobStorageClient
+	log *logrus.Entry
 }
 
 var _ BlobStorageClient = &blobStorageClient{}
 
 func (c *blobStorageClient) GetContainerReference(name string) Container {
-	return &container{Container: c.BlobStorageClient.GetContainerReference(name)}
+	return &container{
+		Container: c.BlobStorageClient.GetContainerReference(name),
+		log:       c.log,
+	}
 }
 
 // Container is a minimal interface for azure Container
@@ -68,12 +86,16 @@ type Container interface {
 
 type container struct {
 	*storage.Container
+	log *logrus.Entry
 }
 
 var _ Container = &container{}
 
 func (c *container) GetBlobReference(name string) Blob {
-	return &blob{Blob: c.Container.GetBlobReference(name)}
+	return &blob{
+		Blob: c.Container.GetBlobReference(name),
+		log:  c.log,
+	}
 }
 
 // Blob is a minimal interface for azure Blob
@@ -90,6 +112,29 @@ type Blob interface {
 
 type blob struct {
 	*storage.Blob
+	log *logrus.Entry
 }
 
 var _ Blob = &blob{}
+
+func (b *blob) CreateBlockBlobFromReader(blob io.Reader, options *storage.PutBlobOptions) error {
+	ctx := context.Background()
+	data, err := ioutil.ReadAll(blob)
+	if err != nil {
+		return err
+	}
+	retry, retries := 0, 3
+	return wait.PollImmediateUntil(1*time.Second,
+		func() (bool, error) {
+			retry++
+			err := b.Blob.CreateBlockBlobFromReader(bytes.NewReader(data), options)
+			if err == nil {
+				return true, nil
+			}
+			if retry <= retries && errors.IsMatchingSyscallError(err, syscall.ECONNRESET) {
+				b.log.Infof("CreateBlockBlobFromReader: will retry on the following error %v", err)
+				return false, nil
+			}
+			return false, err
+		}, ctx.Done())
+}

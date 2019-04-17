@@ -10,15 +10,15 @@ import (
 	"context"
 	"crypto/x509"
 	"io"
-	"net"
 	"net/http"
 	"net/url"
-	"os"
 	"syscall"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
+
+	"github.com/openshift/openshift-azure/pkg/util/errors"
 )
 
 // PollImmediateUntil will poll until a stop condition is met
@@ -58,24 +58,22 @@ func ForHTTPStatusOk(ctx context.Context, log *logrus.Entry, cli SimpleHTTPClien
 	var resp *http.Response
 	err = PollImmediateUntil(interval, func() (bool, error) {
 		resp, err = cli.Do(req)
+		if errors.IsMatchingSyscallError(err, syscall.ENETUNREACH, syscall.ECONNREFUSED) {
+			log.Debugf("ForHTTPStatusOk: will retry on the following error %v", err)
+			return false, nil
+		}
 		if err, ok := err.(*url.Error); ok {
-			if err, ok := err.Err.(*net.OpError); ok {
-				if err, ok := err.Err.(*os.SyscallError); ok {
-					switch err.Err {
-					case syscall.ENETUNREACH, syscall.ECONNREFUSED:
-						return false, nil
-					}
-				}
-			}
 			if _, ok := err.Err.(x509.UnknownAuthorityError); ok {
-				log.Warn(err)
+				log.Warnf("ForHTTPStatusOk: will retry on the following error %v", err)
 				return false, nil
 			}
 			if err.Timeout() || err.Err == io.EOF || err.Err == io.ErrUnexpectedEOF {
+				log.Debugf("ForHTTPStatusOk: will retry on the following error %v", err)
 				return false, nil
 			}
 		}
 		if err == io.EOF {
+			log.Debugf("ForHTTPStatusOk: will retry on the following error %v", err)
 			return false, nil
 		}
 		if err != nil {
