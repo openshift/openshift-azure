@@ -13,7 +13,7 @@ data:
       developerConsolePublicURL: '*** GENERATED ***'
       masterPublicURL: '*** GENERATED ***'
     customization:
-      branding: ocp
+      branding: azure
       documentationBaseURL: https://docs.openshift.com/container-platform/3.11/
     kind: ConsoleConfig
     servingInfo:
