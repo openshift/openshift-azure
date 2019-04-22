@@ -15,6 +15,8 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/util/retry"
+
+	"github.com/openshift/openshift-azure/pkg/util/jsonpath"
 )
 
 // updateDynamicClient updates the client's server API group resource
@@ -42,7 +44,7 @@ func (s *sync) applyResources(filter func(unstructured.Unstructured) bool, keys 
 			continue
 		}
 
-		if err := write(s.log, s.dyn, s.grs, &o); err != nil {
+		if err := s.write(&o); err != nil {
 			return err
 		}
 	}
@@ -128,14 +130,14 @@ func contains(haystack []string, needle string) bool {
 }
 
 // write synchronises a single object with the API server.
-func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupResources, o *unstructured.Unstructured) error {
-	dc, err := dyn.ClientForGroupVersionKind(o.GroupVersionKind())
+func (s *sync) write(o *unstructured.Unstructured) error {
+	dc, err := s.dyn.ClientForGroupVersionKind(o.GroupVersionKind())
 	if err != nil {
 		return err
 	}
 
 	var gr *discovery.APIGroupResources
-	for _, g := range grs {
+	for _, g := range s.grs {
 		if g.Group.Name == o.GroupVersionKind().Group {
 			gr = g
 			break
@@ -165,8 +167,9 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 		var existing *unstructured.Unstructured
 		existing, err = dc.Resource(res, o.GetNamespace()).Get(o.GetName(), metav1.GetOptions{})
 		if kerrors.IsNotFound(err) {
-			log.Info("Create " + keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
+			s.log.Info("Create " + keyFunc(o.GroupVersionKind().GroupKind(), o.GetNamespace(), o.GetName()))
 			markSyncPodOwned(o)
+			s.fixupRouterArchitecture(o)
 			_, err = dc.Resource(res, o.GetNamespace()).Create(o)
 			if kerrors.IsAlreadyExists(err) {
 				// The "hot path" in write() is Get, check, then maybe Update.
@@ -191,12 +194,13 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 		}
 		defaults(*existing)
 
+		s.fixupRouterArchitecture(o)
 		markSyncPodOwned(o)
 
-		if !needsUpdate(log, existing, o) {
+		if !needsUpdate(s.log, existing, o) {
 			return
 		}
-		printDiff(log, existing, o)
+		printDiff(s.log, existing, o)
 
 		o.SetResourceVersion(rv)
 		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
@@ -204,6 +208,26 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 	})
 
 	return err
+}
+
+func (s *sync) fixupRouterArchitecture(o *unstructured.Unstructured) {
+	// TODO: When the old router architecture (type: loadbalancer) is
+	// non-existent then move these changes into the yaml files
+	if !s.cs.Config.NewRouterArchitecture {
+		return
+	}
+
+	gk := o.GroupVersionKind().GroupKind()
+	if gk.String() == "DaemonSet.apps" && o.GetNamespace() == "default" && o.GetName() == "router" {
+		// update with changes
+		spec := jsonpath.MustCompile("$.spec.template.spec").MustGetObject(o.Object)
+		spec["hostNetwork"] = true
+		jsonpath.MustCompile("$.spec.template.spec").Set(o.Object, spec)
+	}
+	if gk.String() == "Service" && o.GetNamespace() == "default" && o.GetName() == "router" {
+		jsonpath.MustCompile("$.spec.type").Set(o.Object, "ClusterIP")
+		jsonpath.MustCompile("$.metadata.annotations['service.beta.kubernetes.io/azure-dns-label-name']").Delete(o.Object)
+	}
 }
 
 // mark object as sync pod owned

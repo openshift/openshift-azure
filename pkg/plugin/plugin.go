@@ -105,6 +105,17 @@ func (p *plugin) GenerateConfig(ctx context.Context, cs *api.OpenShiftManagedClu
 	if err != nil {
 		return err
 	}
+
+	// TODO: When new clusters are created we need to set the
+	// NewRouterArchitecture flag to true.  This can be removed
+	// once all clusters with the router service of type LoadBalancer
+	// have been removed.
+	if !isUpdate {
+		// we never set this on upgrade because of the router service is immutable
+		// and the we would require nsg-worker rule updates
+		cs.Config.NewRouterArchitecture = true
+	}
+
 	return nil
 }
 

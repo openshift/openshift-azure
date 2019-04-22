@@ -18,3 +18,19 @@ func TestRegistryURL(t *testing.T) {
 		t.Errorf("derived.RegistryURL() = %v, want %v", got, "quay.io")
 	}
 }
+
+// TODO: Remove once old router architecture no longer exists
+func TestDerivedRouterLBCNamePrefix(t *testing.T) {
+	cs := api.OpenShiftManagedCluster{
+		Properties: api.Properties{
+			RouterProfiles: []api.RouterProfile{
+				{
+					FQDN: "one.two.three",
+				},
+			},
+		},
+	}
+	if got := derived.RouterLBCNamePrefix(&cs); got != "one" {
+		t.Errorf("derived.RouterLBCNamePrefix() = %v, want %v", got, "one")
+	}
+}

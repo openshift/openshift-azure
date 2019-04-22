@@ -258,7 +258,8 @@ var marshalled = []byte(`{
 		"genevaLoggingControlPlaneEnvironment": "Config.GenevaLoggingControlPlaneEnvironment",
 		"genevaLoggingControlPlaneRegion": "Config.GenevaLoggingControlPlaneRegion",
 		"genevaMetricsAccount": "Config.GenevaMetricsAccount",
-		"genevaMetricsEndpoint": "Config.GenevaMetricsEndpoint"
+		"genevaMetricsEndpoint": "Config.GenevaMetricsEndpoint",
+		"newRouterArchitecture": true
 	}
 }`)
 

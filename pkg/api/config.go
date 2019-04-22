@@ -80,6 +80,12 @@ type Config struct {
 
 	MasterStartupSASURI string `json:"-"`
 	WorkerStartupSASURI string `json:"-"`
+
+	// TODO: This variables denotes new router architecture that
+	// changes the router to type ClusterIP from LoadBalancer.  This should
+	// be removed once all clusters with router service of type LoadBalancer
+	// are gone.
+	NewRouterArchitecture bool `json:"newRouterArchitecture,omitempty"`
 }
 
 // ComponentLogLevel represents the log levels for the various components of a

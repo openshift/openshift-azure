@@ -334,6 +334,7 @@ func TestAPIParity(t *testing.T) {
 		regexp.MustCompile(`^\.Config\.Images\.ImagePullSecret$`),
 		regexp.MustCompile(`^\.Config\.EtcdMetrics`),
 		regexp.MustCompile(`^\.Config\.(Master|Worker)StartupSASURI$`),
+		regexp.MustCompile(`^\.Config\.NewRouterArchitecture`),
 		regexp.MustCompile(`^\.Properties\.AzProfile\.`),
 		regexp.MustCompile(`^\.Properties\.MasterServicePrincipalProfile\.`),
 		regexp.MustCompile(`^\.Properties\.WorkerServicePrincipalProfile\.`),
