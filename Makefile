@@ -3,12 +3,9 @@ LDFLAGS="-X main.gitCommit=$(GITCOMMIT)"
 
 AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(GITCOMMIT)
 
-.PHONY: azure-image azure-push all version clean test unit generate secrets artifacts
-# all is the default target to build everything
-all: azure
+.PHONY: all artifacts azure-image azure-push clean create delete e2e generate monitoring monitoring-run monitoring-stop secrets sync-run test unit upgrade verify vmimage
 
-version:
-	@echo $(GITCOMMIT)
+all: azure
 
 secrets:
 	@rm -rf secrets
@@ -23,7 +20,6 @@ generate:
 
 test: unit e2e
 
-.PHONY: create delete upgrade
 create:
 	./hack/create.sh ${RESOURCEGROUP}
 
@@ -48,11 +44,8 @@ azure: generate
 sync-run: generate
 	go run -ldflags ${LDFLAGS} ./cmd/azure sync --run-once --loglevel Debug
 
-.PHONY: sync-run
-
 monitoring:
 	go build -ldflags ${LDFLAGS} ./cmd/$@
-.PHONY: monitoring
 
 monitoring-run: monitoring
 	./hack/monitoring.sh
@@ -60,12 +53,9 @@ monitoring-run: monitoring
 monitoring-stop:
 	./hack/monitoring.sh clean
 
-.PHONY: monitoring-run monitoring-stop
-
 releasenotes:
 	go build -tags releasenotes ./cmd/$@
 
-.PHONY: verify
 verify:
 	./hack/verify/validate-generated.sh
 	go vet ./...
@@ -77,11 +67,9 @@ verify:
 unit: generate
 	go test ./... -coverprofile=coverage.out -covermode=atomic
 
-.PHONY: e2e
 e2e:
 	FOCUS="\[CustomerAdmin\]|\[EndUser\]\[Fake\]" TIMEOUT=60m ./hack/e2e.sh
 
 vmimage:
 	./hack/vmimage.sh
 
-.PHONY: vmimage
