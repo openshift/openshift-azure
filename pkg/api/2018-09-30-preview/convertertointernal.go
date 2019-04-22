@@ -12,9 +12,13 @@ import (
 // output where the external request is merged on top of.
 func ToInternal(oc *OpenShiftManagedCluster, old *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
 	cs := &api.OpenShiftManagedCluster{}
-	if old != nil {
+
+	if old == nil {
+		setDefaults(oc)
+	} else {
 		cs = old.DeepCopy()
 	}
+
 	if oc.ID != nil {
 		cs.ID = *oc.ID
 	}

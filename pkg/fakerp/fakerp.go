@@ -272,14 +272,6 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	// /subscriptions/{subscription}/resourcegroups/{resource_group}/providers/Microsoft.ContainerService/openshiftmanagedClusters/{cluster_name}
 	cs.ID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.ContainerService/openshiftmanagedClusters", cs.Name)
 
-	if len(cs.Properties.RouterProfiles) == 0 {
-		cs.Properties.RouterProfiles = []api.RouterProfile{
-			{
-				Name: "default",
-			},
-		}
-	}
-
 	var vaultURL string
 	var err error
 	if cs.Properties.APICertProfile.KeyVaultSecretURL != "" {
