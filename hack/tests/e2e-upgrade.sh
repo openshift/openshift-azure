@@ -32,7 +32,7 @@ trap cleanup EXIT
 T="$(mktemp -d)"
 start_monitoring $T/src/github.com/openshift/openshift-azure/_data/containerservice.yaml
 
-git clone -b "$1" https://github.com/openshift/openshift-azure.git $T/src/github.com/openshift/openshift-azure
+git clone -q -b "$1" https://github.com/openshift/openshift-azure.git $T/src/github.com/openshift/openshift-azure
 ln -sf "$PWD/secrets" "$T/src/github.com/openshift/openshift-azure"
 (
     export AZURE_MASTER_CLIENT_ID=$AZURE_LEGACY_MASTER_CLIENT_ID
