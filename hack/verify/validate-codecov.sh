@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash -e
 
 echo "The following directories contain Go source but no unit tests:"
 

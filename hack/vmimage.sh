@@ -1,10 +1,10 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 cleanup() {
   set +e
 
-  if [[ -n "$ARTIFACT_DIR" ]]; then
-    exec &>"$ARTIFACT_DIR/cleanup"
+  if [[ -n "$ARTIFACTS" ]]; then
+    exec &>"$ARTIFACTS/cleanup"
   fi
 
   make artifacts
@@ -28,7 +28,7 @@ export IMAGE_RESOURCEGROUP="${IMAGE_RESOURCEGROUP:-images}"
 export IMAGE_RESOURCENAME="${IMAGE_RESOURCENAME:-rhel7-3.11-$(TZ=Etc/UTC date +%Y%m%d%H%M)}"
 export IMAGE_STORAGEACCOUNT="${IMAGE_STORAGEACCOUNT:-openshiftimages}"
 
-go generate ./...
+[[ -e /var/run/secrets/kubernetes.io ]] || go generate ./...
 go run -ldflags "-X main.gitCommit=$GITCOMMIT" ./cmd/vmimage -imageResourceGroup "$IMAGE_RESOURCEGROUP" -image "$IMAGE_RESOURCENAME" -imageStorageAccount "$IMAGE_STORAGEACCOUNT"
 
 export AZURE_REGIONS=eastus

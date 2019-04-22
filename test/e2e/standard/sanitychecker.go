@@ -115,7 +115,7 @@ func (sc *SanityChecker) debugValidateTestApp() error {
 		return err
 	}
 
-	return ioutil.WriteFile(os.Getenv("ARTIFACT_DIR")+"/compute-testapp-goroutine-dump", b, 0666)
+	return ioutil.WriteFile(os.Getenv("ARTIFACTS")+"/compute-testapp-goroutine-dump", b, 0666)
 }
 
 func (sc *SanityChecker) ValidateTestApp(ctx context.Context, cookie interface{}) (errs []*TestError) {
@@ -126,7 +126,7 @@ func (sc *SanityChecker) ValidateTestApp(ctx context.Context, cookie interface{}
 		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "validateStatefulApp"})
 	}
-	if os.Getenv("ARTIFACT_DIR") != "" && err != nil {
+	if os.Getenv("ARTIFACTS") != "" && err != nil {
 		err = sc.debugValidateTestApp()
 		if err != nil {
 			errs = append(errs, &TestError{Err: err, Bucket: "validateStatefulApp"})

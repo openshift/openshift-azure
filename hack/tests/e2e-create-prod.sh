@@ -7,7 +7,6 @@ cleanup() {
         exec &>"$ARTIFACTS/cleanup"
     fi
 
-    stop_monitoring
     make artifacts
 
     if [[ -n "$NO_DELETE" ]]; then
@@ -20,8 +19,8 @@ trap cleanup EXIT
 
 . hack/tests/ci-operator-prepare.sh
 
-start_monitoring
-set_build_images
+export RUNNING_UNDER_TEST=false
+export TEST_IN_PRODUCTION=true
 
 make create
 
