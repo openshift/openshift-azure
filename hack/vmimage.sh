@@ -17,6 +17,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
+make secrets
+
 TAG=$(git describe --tags HEAD)
 if [[ $(git status --porcelain) = "" ]]; then
   GITCOMMIT="$TAG-clean"
