@@ -30,12 +30,15 @@ var _ = Describe("Command tests [Command][Fake][LongRunning]", func() {
 		Expect(azurecli).NotTo(BeNil())
 	})
 
-	It("should be possible for an SRE to restart Kubelet and NetworkManager", func() {
+	It("should be possible for an SRE to restart system services on vms", func() {
 		vm := "master-000000"
 
 		startTime := time.Now()
 
 		err := azurecli.OpenShiftManagedClustersAdmin.RunCommand(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm, "RestartKubelet")
+		Expect(err).NotTo(HaveOccurred())
+
+		err = azurecli.OpenShiftManagedClustersAdmin.RunCommand(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm, "RestartDocker")
 		Expect(err).NotTo(HaveOccurred())
 
 		err = azurecli.OpenShiftManagedClustersAdmin.RunCommand(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"), vm, "RestartNetworkManager")
@@ -71,7 +74,7 @@ var _ = Describe("Command tests [Command][Fake][LongRunning]", func() {
 				}
 			}
 
-			return count == 2, nil
+			return count == 3, nil
 		})
 		Expect(err).NotTo(HaveOccurred())
 
