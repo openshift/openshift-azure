@@ -28,13 +28,14 @@ const (
 )
 
 type aadManager struct {
-	ac  azureclient.RBACApplicationsClient
-	sc  azureclient.ServicePrincipalsClient
-	rac azureclient.RoleAssignmentsClient
-	cs  *api.OpenShiftManagedCluster
+	testConfig api.TestConfig
+	ac         azureclient.RBACApplicationsClient
+	sc         azureclient.ServicePrincipalsClient
+	rac        azureclient.RoleAssignmentsClient
+	cs         *api.OpenShiftManagedCluster
 }
 
-func newAADManager(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster) (*aadManager, error) {
+func newAADManager(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (*aadManager, error) {
 	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
 	if err != nil {
 		return nil, err
@@ -46,10 +47,11 @@ func newAADManager(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMana
 	}
 
 	return &aadManager{
-		ac:  azureclient.NewRBACApplicationsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
-		sc:  azureclient.NewServicePrincipalsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
-		rac: azureclient.NewRoleAssignmentsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		cs:  cs,
+		testConfig: testConfig,
+		ac:         azureclient.NewRBACApplicationsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
+		sc:         azureclient.NewServicePrincipalsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
+		rac:        azureclient.NewRoleAssignmentsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		cs:         cs,
 	}, nil
 }
 
@@ -91,7 +93,7 @@ func (am *aadManager) ensureApp(ctx context.Context, displayName string, p *api.
 		return err
 	}
 
-	return wait.PollInfinite(5*time.Second, func() (bool, error) {
+	err = wait.PollInfinite(5*time.Second, func() (bool, error) {
 		_, err = am.rac.Create(ctx, "subscriptions/"+am.cs.Properties.AzProfile.SubscriptionID+"/resourceGroups/"+am.cs.Properties.AzProfile.ResourceGroup, uuid.NewV4().String(), authorization.RoleAssignmentCreateParameters{
 			Properties: &authorization.RoleAssignmentProperties{
 				RoleDefinitionID: &roleDefinitionID,
@@ -107,6 +109,24 @@ func (am *aadManager) ensureApp(ctx context.Context, displayName string, p *api.
 		}
 		return err == nil, err
 	})
+	if err != nil {
+		return err
+	}
+
+	if am.testConfig.ImageResourceName != "" {
+		// needed for the e2e lb test when running from an image
+		_, err = am.rac.Create(ctx, "subscriptions/"+am.cs.Properties.AzProfile.SubscriptionID+"/resourceGroups/"+am.testConfig.ImageResourceGroup+"/providers/Microsoft.Compute/images/"+am.testConfig.ImageResourceName, uuid.NewV4().String(), authorization.RoleAssignmentCreateParameters{
+			Properties: &authorization.RoleAssignmentProperties{
+				RoleDefinitionID: to.StringPtr("/subscriptions/" + am.cs.Properties.AzProfile.SubscriptionID + "/providers/Microsoft.Authorization/roleDefinitions/acdd72a7-3385-48ef-bd42-f606fba81ae7"), // Reader
+				PrincipalID:      sp.ObjectID,
+			},
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (am *aadManager) deleteApp(ctx context.Context, p *api.ServicePrincipalProfile) error {

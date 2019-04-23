@@ -37,7 +37,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	gc := resources.NewGroupsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
 	gc.Authorizer = authorizer
 
-	am, err := newAADManager(req.Context(), s.log, cs)
+	am, err := newAADManager(req.Context(), s.log, cs, s.testConfig)
 	if err != nil {
 		s.badRequest(w, fmt.Sprintf("Failed to delete service principals: %v", err))
 		return

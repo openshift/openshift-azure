@@ -17,7 +17,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-make secrets
+. hack/tests/ci-operator-prepare.sh
 
 TAG=$(git describe --tags HEAD)
 if [[ $(git status --porcelain) = "" ]]; then
@@ -34,7 +34,9 @@ export IMAGE_STORAGEACCOUNT="${IMAGE_STORAGEACCOUNT:-openshiftimages}"
 go run -ldflags "-X main.gitCommit=$GITCOMMIT" ./cmd/vmimage -imageResourceGroup "$IMAGE_RESOURCEGROUP" -image "$IMAGE_RESOURCENAME" -imageStorageAccount "$IMAGE_STORAGEACCOUNT"
 
 export AZURE_REGIONS=eastus
-export RESOURCEGROUP="${IMAGE_RESOURCENAME//./}-e2e"
+if [[ -z "$RESOURCEGROUP" ]]; then
+  export RESOURCEGROUP="${IMAGE_RESOURCENAME//./}-e2e"
+fi
 
 make create
 

@@ -162,7 +162,7 @@ func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, ol
 		cs.Config.PluginVersion = "latest"
 	}
 
-	am, err := newAADManager(ctx, log, cs)
+	am, err := newAADManager(ctx, log, cs, testConfig)
 	if err != nil {
 		return nil, err
 	}
