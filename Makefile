@@ -7,10 +7,10 @@ AZURE_IMAGE ?= quay.io/openshift-on-azure/azure:$(GITCOMMIT)
 
 all: azure
 
+# you must login to the ci cluster before running the secrets target
 secrets:
-	@rm -rf secrets
-	@mkdir secrets
-	@oc extract -n azure secret/cluster-secrets-azure --to=secrets >/dev/null
+	@mkdir -p secrets
+	@oc extract -n azure secret/cluster-secrets-azure --confirm=true --to=secrets >/dev/null
 
 clean:
 	rm -f coverage.out azure releasenotes
