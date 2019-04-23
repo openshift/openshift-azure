@@ -96,13 +96,12 @@ var _ = Describe("Prometheus E2E tests [Fake][EveryPR]", func() {
 			"etcd-metrics":                3,
 			"router-stats":                3,
 			"cluster-monitoring-operator": 1,
-			// TODO: enable once https://github.com/openshift/cluster-monitoring-operator/pull/230 is backported
-			// "kube-controllers": masters,
-			"kube-state-metrics":  2,
-			"kubelet":             nodes * 2,
-			"node-exporter":       nodes,
-			"prometheus-k8s":      2,
-			"prometheus-operator": 1,
+			"kube-controllers":            masters,
+			"kube-state-metrics":          2,
+			"kubelet":                     nodes * 2,
+			"node-exporter":               nodes,
+			"prometheus-k8s":              2,
+			"prometheus-operator":         1,
 		}))
 	})
 })
