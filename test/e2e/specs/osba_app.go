@@ -98,6 +98,9 @@ var _ = Describe("Openshift on Azure end user e2e tests [CostumerAdmin][Fake]", 
 		By("validating openshift broker app")
 		if err = validateOSBAApp(ctx); err != nil {
 			errs = append(errs, err)
+			if err = sanity.Checker.Client.CustomerAdmin.DumpInfo("osba"); err != nil {
+				errs = append(errs, err)
+			}
 		}
 		Expect(errs).To(BeEmpty())
 	})
