@@ -5,6 +5,10 @@ import (
 )
 
 func setDefaults(oc *OpenShiftManagedCluster) {
+	if oc.Properties == nil {
+		oc.Properties = &Properties{}
+	}
+
 	if len(oc.Properties.RouterProfiles) == 0 {
 		oc.Properties.RouterProfiles = []RouterProfile{
 			{
