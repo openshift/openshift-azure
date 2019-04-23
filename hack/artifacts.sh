@@ -18,11 +18,9 @@ export KUBECONFIG=$PWD/_data/_out/admin.kubeconfig
 for ((i=0; i<3; i++)); do
     oc logs -n kube-system master-api-master-00000$i >"$ARTIFACTS/api-master-00000$i.log"
     oc logs -n kube-system master-etcd-master-00000$i >"$ARTIFACTS/etcd-master-00000$i.log"
+    oc logs -n kube-system controllers-master-00000$i >"$ARTIFACTS/controller-manager-00000$i.log"
     true
 done
-
-cm_leader=$(oc get configmap -n kube-system kube-controller-manager -o yaml | grep -o 00000[0-3])
-oc logs controllers-master-$cm_leader -n kube-system >"$ARTIFACTS/controller-manager.log"
 
 for deployment in \
         kube-system/sync \
