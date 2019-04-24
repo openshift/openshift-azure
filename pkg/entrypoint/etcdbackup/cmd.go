@@ -6,7 +6,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
-type Config struct {
+type cmdConfig struct {
 	config.Common
 	blobName    string
 	destination string
@@ -19,7 +19,6 @@ func NewCommand() *cobra.Command {
 	cc := &cobra.Command{
 		Use:  "etcdbackup",
 		Long: "Start Etcd backup and Restore application",
-		Args: cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := configFromCmd(cmd)
 			if err != nil {
@@ -28,7 +27,7 @@ func NewCommand() *cobra.Command {
 			return start(cfg)
 		},
 	}
-	cc.Flags().String("blobname", "", "Name of the blob (without the container)")
+	cc.Flags().String("blobName", "", "Name of the blob (without the container)")
 	cc.Flags().String("destination", "", "Where to place the blob on the filesystem")
 	cc.Flags().Int("maxBackups", 6, "Maximum number of backups to keep")
 	cc.Flags().StringP("action", "a", "save", "Action to be executed [save, download]")
@@ -36,8 +35,8 @@ func NewCommand() *cobra.Command {
 	return cc
 }
 
-func configFromCmd(cmd *cobra.Command) (*Config, error) {
-	c := &Config{}
+func configFromCmd(cmd *cobra.Command) (*cmdConfig, error) {
+	c := &cmdConfig{}
 	var err error
 	c.Common, err = config.CommonConfigFromCmd(cmd)
 	if err != nil {

@@ -37,7 +37,7 @@ func getEtcdClient() (*clientv3.Client, error) {
 	return clientv3.New(cfg)
 }
 
-func start(cfg *Config) error {
+func start(cfg *cmdConfig) error {
 	ctx := context.Background()
 	logrus.SetLevel(log.SanitizeLogLevel(cfg.LogLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})

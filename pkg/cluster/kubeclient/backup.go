@@ -29,7 +29,11 @@ func (u *kubeclient) BackupCluster(ctx context.Context, backupName string) error
 	}
 
 	job.Spec.BackoffLimit = to.Int32Ptr(0)
-	job.Spec.Template.Spec.Containers[0].Args = []string{fmt.Sprintf("-blobname=%s", backupName), "save"}
+	job.Spec.Template.Spec.Containers[0].Args = []string{
+		"etcdbackup",
+		fmt.Sprintf("--blobName=%s", backupName),
+		"--action=save",
+	}
 
 	job, err = u.client.BatchV1().Jobs(job.Namespace).Create(job)
 	if err != nil {

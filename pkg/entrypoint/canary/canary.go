@@ -20,7 +20,7 @@ type ping struct{}
 
 var _ http.Handler = &ping{}
 
-func start(cfg *Config) error {
+func start(cfg *cmdConfig) error {
 	logrus.SetLevel(log.SanitizeLogLevel(cfg.LogLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 	log := logrus.NewEntry(logrus.StandardLogger())

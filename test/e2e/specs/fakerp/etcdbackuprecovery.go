@@ -19,7 +19,7 @@ import (
 	"github.com/openshift/openshift-azure/test/util/log"
 )
 
-var _ = Describe("Etcd Recovery E2E tests [EtcdRecovery][Fake][LongRunning]", func() {
+var _ = Describe("Etcd Recovery E2E tests [EtcdBackupRecovery][Fake][LongRunning]", func() {
 	const (
 		configMapName = "recovery-test-data"
 	)

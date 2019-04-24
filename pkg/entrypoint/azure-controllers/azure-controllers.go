@@ -12,7 +12,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
-func start(cfg *Config) error {
+func start(cfg *cmdConfig) error {
 	ctx := context.Background()
 	logrus.SetLevel(log.SanitizeLogLevel(cfg.LogLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
@@ -23,12 +23,12 @@ func start(cfg *Config) error {
 	// TODO: Expose metrics port after SDK uses controller-runtime's dynamic client
 	// sdk.ExposeMetricsPort()
 
-	kCfg, err := config.GetConfig()
+	managerConfig, err := config.GetConfig()
 	if err != nil {
 		return err
 	}
 
-	m, err := manager.New(kCfg, manager.Options{})
+	m, err := manager.New(managerConfig, manager.Options{})
 	if err != nil {
 		return err
 	}

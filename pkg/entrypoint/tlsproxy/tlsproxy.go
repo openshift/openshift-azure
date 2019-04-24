@@ -18,7 +18,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
-func (c *Config) validate() (errs []error) {
+func (c *cmdConfig) validate() (errs []error) {
 	if _, err := url.Parse(c.hostname); err != nil {
 		errs = append(errs, fmt.Errorf("invalid hostname %q", c.hostname))
 	}
@@ -30,7 +30,7 @@ func (c *Config) validate() (errs []error) {
 	return
 }
 
-func (c *Config) Init() error {
+func (c *cmdConfig) Init() error {
 	logrus.SetLevel(log.SanitizeLogLevel(c.LogLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 	c.log = logrus.NewEntry(logrus.StandardLogger())
@@ -84,7 +84,7 @@ func (c *Config) Init() error {
 	return nil
 }
 
-func (c *Config) Run() error {
+func (c *cmdConfig) Run() error {
 	handlerFunc := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		req.URL.Scheme = c.redirectURL.Scheme
 		req.URL.Host = c.redirectURL.Host
@@ -126,12 +126,12 @@ func (c *Config) Run() error {
 	return http.ListenAndServe(c.listen, handlerFunc)
 }
 
-func (c *Config) authIsOK(rw http.ResponseWriter, req *http.Request) bool {
+func (c *cmdConfig) authIsOK(rw http.ResponseWriter, req *http.Request) bool {
 	username, password, _ := req.BasicAuth()
 	return username == c.username && password == c.password
 }
 
-func start(cfg *Config) error {
+func start(cfg *cmdConfig) error {
 	logrus.SetLevel(log.SanitizeLogLevel(cfg.LogLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 	log := logrus.NewEntry(logrus.StandardLogger())

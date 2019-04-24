@@ -49,7 +49,7 @@ func runStartup(ctx context.Context, log *logrus.Entry) error {
 	return s.WriteFiles(ctx)
 }
 
-func start(cfg *Config) error {
+func start(cfg *cmdConfig) error {
 	logger := logrus.New()
 	logger.Formatter = &logrus.TextFormatter{FullTimestamp: true}
 	logger.SetLevel(log.SanitizeLogLevel(cfg.LogLevel))
