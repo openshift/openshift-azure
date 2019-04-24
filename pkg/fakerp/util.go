@@ -130,16 +130,7 @@ func writeHelpers(log *logrus.Entry, cs *api.OpenShiftManagedCluster) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
-	if err != nil {
-		return err
-	}
-
-	bytes, err := yaml.Marshal(cs)
-	if err != nil {
-		return err
-	}
-	return ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
+	return ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
 }
 
 func (s *Server) writeState(state api.ProvisioningState) error {
