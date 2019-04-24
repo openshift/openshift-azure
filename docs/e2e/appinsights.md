@@ -5,6 +5,12 @@ All E2E test result are being sent to `Application Insights"
 `Azure Portal -> ResourceGroups -> fakerp-upgrades-insights -> osa-fakeRP-upgrades -> Analytics`
 
 
+Example queries:
+
+https://github.com/toddkitta/azure-content/blob/master/articles/application-insights/app-analytics-queries.md
+
+https://docs.microsoft.com/en-us/azure/kusto/query/
+
 ## Tables:
 `customMetrics` - individual test results. Selector `where customDimensions.type == "ginkgo"`
 `customMetrics` - cluster creation time. Selector `where customDimensions.type == "cluster" and where customDimensions.metric == "creation"`
@@ -56,6 +62,14 @@ requests
 // Response time trend when upgrading cluster by cluster ID
 requests
 | summarize avgRequestDuration=avg(duration) by bin(timestamp, 30s),url, id
+| where id =="<cluster_name>"
+| render timechart
+```
+
+To remove y axe duration values higher than 0.5s:
+```
+requests
+| summarize avgRequestDuration=iif(avg(duration) > real(500), real(500), avg(duration)) by bin(timestamp, 30s),url, id
 | where id =="<cluster_name>"
 | render timechart
 ```
