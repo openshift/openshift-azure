@@ -1,8 +1,8 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
+  jws31: "1.4"
   template: jws31-tomcat7-https-s2i
-  xpaas: 1.4.16
 message: A new JWS application for Apache Tomcat 7 has been created in your project.
   The username/password for administering your JWS is ${JWS_ADMIN_USERNAME}/${JWS_ADMIN_PASSWORD}.
   Please be sure to create the secret named "${JWS_HTTPS_SECRET}" containing the ${JWS_HTTPS_CERTIFICATE}
@@ -21,7 +21,7 @@ metadata:
       a build configuration, and application deployment configuration. This also illustrations
       how to connect to the web applicaiton using https.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.16
+    version: "1.4"
   name: jws31-tomcat7-https-s2i
   namespace: openshift
 objects:
@@ -114,7 +114,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-webserver31-tomcat7-openshift:1.2
+          name: jboss-webserver31-tomcat7-openshift:1.4
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:

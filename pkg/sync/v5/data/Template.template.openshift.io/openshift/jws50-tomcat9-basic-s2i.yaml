@@ -1,19 +1,25 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  jws31: "1.4"
-  template: jws31-tomcat7-basic-s2i
-message: A new JWS application for Apache Tomcat 7 has been created in your project.
+  jws50: "1.2"
+  template: jws50-tomcat9-basic-s2i
+message: A new JWS application for Apache Tomcat 9 has been created in your project.
   The username/password for administering your JWS is ${JWS_ADMIN_USERNAME}/${JWS_ADMIN_PASSWORD}.
 metadata:
   annotations:
-    description: Application template for JWS applications built using S2I.
+    description: An example JBoss Web Server application. For more information about
+      using this template, see https://github.com/jboss-openshift/application-templates.
     iconClass: icon-rh-tomcat
-    openshift.io/display-name: JBoss Web Server 3.1 Apache Tomcat 7 (no https)
+    openshift.io/display-name: JBoss Web Server 5.0 Apache Tomcat 9 (no https)
     openshift.io/provider-display-name: Red Hat, Inc.
-    tags: tomcat,tomcat7,java,jboss
-    version: "1.4"
-  name: jws31-tomcat7-basic-s2i
+    tags: tomcat,tomcat9,java,jboss
+    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en/red-hat-jboss-web-server/
+    template.openshift.io/long-description: This template defines resources needed
+      to develop Red Hat JBoss Web Server 5.0 Apache Tomcat 9 based application, including
+      a build configuration, and an application deployment configuration.
+    template.openshift.io/support-url: https://access.redhat.com
+    version: "1.2"
+  name: jws50-tomcat9-basic-s2i
   namespace: openshift
 objects:
 - apiVersion: v1
@@ -76,7 +82,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-webserver31-tomcat7-openshift:1.4
+          name: jboss-webserver50-tomcat9-openshift:1.2
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:

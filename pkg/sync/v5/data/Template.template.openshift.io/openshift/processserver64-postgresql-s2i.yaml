@@ -2,7 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 labels:
   template: processserver64-postgresql-s2i
-  xpaas: 1.4.16
+  xpaas: 1.4.17
 message: A new BPMS application (using PostgreSQL) has been created in your project.
   The username/password for accessing the KIE Server REST or JMS interface is ${KIE_SERVER_USER}/${KIE_SERVER_PASSWORD}.
   For accessing the MySQL database "${DB_DATABASE}" use the credentials ${DB_USERNAME}/${DB_PASSWORD}.
@@ -17,6 +17,7 @@ metadata:
       (Ephemeral with https)
     openshift.io/provider-display-name: Red Hat, Inc.
     tags: processserver,jboss,hidden
+    template.openshift.io/bindable: "false"
     template.openshift.io/documentation-url: https://access.redhat.com/documentation/en/red-hat-jboss-bpm-suite/
     template.openshift.io/long-description: This template defines resources needed
       to develop Red Hat Business Process Suite intelligent process server 6.4 based
@@ -24,7 +25,7 @@ metadata:
       database deployment configuration for PostgreSQL using ephemeral (temporary)
       storage and secure communication using https.
     template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.16
+    version: 1.4.17
   name: processserver64-postgresql-s2i
   namespace: openshift
 objects:
@@ -111,6 +112,8 @@ objects:
 - apiVersion: v1
   kind: BuildConfig
   metadata:
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: "true"
     labels:
       application: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}
@@ -137,7 +140,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-processserver64-openshift:1.3
+          name: jboss-processserver64-openshift:1.5
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:
@@ -153,8 +156,11 @@ objects:
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: "true"
     labels:
       application: ${APPLICATION_NAME}
+      service: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}
   spec:
     replicas: 1
@@ -268,8 +274,11 @@ objects:
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: "true"
     labels:
       application: ${APPLICATION_NAME}
+      service: ${APPLICATION_NAME}-postgresql
     name: ${APPLICATION_NAME}-postgresql
   spec:
     replicas: 1
@@ -391,7 +400,7 @@ parameters:
 - description: Git branch/tag reference
   displayName: Git Reference
   name: SOURCE_REPOSITORY_REF
-  value: "1.3"
+  value: "1.4"
 - description: Path within Git project to build; empty for root project directory.
   displayName: Context Directory
   name: CONTEXT_DIR
@@ -487,6 +496,8 @@ parameters:
   name: MAVEN_MIRROR_URL
 - description: List of directories from which archives will be copied into the deployment
     folder. If unspecified, all archives in /target will be copied.
+  displayName: List of directories from which archives will be copied into the deployment
+    folder.
   name: ARTIFACT_DIR
 - description: The tag to use for the "postgresql" image stream.  Typically, this
     aligns with the major.minor version of PostgreSQL.
@@ -495,5 +506,6 @@ parameters:
   required: true
   value: "9.5"
 - description: Container memory limit
+  displayName: Container memory limit
   name: MEMORY_LIMIT
   value: 1Gi
