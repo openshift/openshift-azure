@@ -4,7 +4,7 @@ metadata:
   annotations:
     openshift.io/display-name: Red Hat JBoss Web Server 3.0 Apache Tomcat 8
     openshift.io/provider-display-name: Red Hat, Inc.
-    version: 1.4.16
+    version: 1.4.17
   name: jboss-webserver30-tomcat8-openshift
   namespace: openshift
 spec:

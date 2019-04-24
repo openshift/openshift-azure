@@ -1,28 +1,24 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  jws31: "1.4"
-  template: jws31-tomcat8-https-s2i
-message: A new JWS application for Apache Tomcat 8 has been created in your project.
-  The username/password for administering your JWS is ${JWS_ADMIN_USERNAME}/${JWS_ADMIN_PASSWORD}.
-  Please be sure to create the secret named "${JWS_HTTPS_SECRET}" containing the ${JWS_HTTPS_CERTIFICATE}
-  file used for serving secure content.
+  jws50: "1.2"
+  template: jws50-tomcat9-mongodb-s2i
+message: A new JWS application for Apache Tomcat 9 (using MongoDB) has been created
+  in your project. The username/password for administering your JWS is ${JWS_ADMIN_USERNAME}/${JWS_ADMIN_PASSWORD}.
+  For accessing the MongoDB database "${DB_DATABASE}" use the credentials ${DB_USERNAME}/${DB_PASSWORD}
+  (Admin password is "${DB_ADMIN_PASSWORD}"). Please be sure to create the secret
+  named "${JWS_HTTPS_SECRET}" containing the ${JWS_HTTPS_CERTIFICATE} file used for
+  serving secure content.
 metadata:
   annotations:
-    description: An example JBoss Web Server application. For more information about
-      using this template, see https://github.com/jboss-openshift/application-templates.
+    description: Application template for JWS MongoDB applications built using S2I.
     iconClass: icon-rh-tomcat
-    openshift.io/display-name: JBoss Web Server 3.1 Apache Tomcat 8 (with https)
+    openshift.io/display-name: JBoss Web Server 5.0 Apache Tomcat 9 + MongoDB (Ephemeral
+      with https)
     openshift.io/provider-display-name: Red Hat, Inc.
-    tags: tomcat,tomcat8,java,jboss,hidden
-    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en/red-hat-jboss-web-server/
-    template.openshift.io/long-description: This template defines resources needed
-      to develop Red Hat JBoss Web Server 3.1 Apache Tomcat 8 based application, including
-      a build configuration, application deployment configuration, and secure communication
-      using https.
-    template.openshift.io/support-url: https://access.redhat.com
-    version: "1.4"
-  name: jws31-tomcat8-https-s2i
+    tags: tomcat,tomcat9,java,jboss,hidden
+    version: "1.2"
+  name: jws50-tomcat9-mongodb-s2i
   namespace: openshift
 objects:
 - apiVersion: v1
@@ -30,6 +26,8 @@ objects:
   metadata:
     annotations:
       description: The web server's http port.
+      service.alpha.openshift.io/dependencies: '[{"name": "${APPLICATION_NAME}-mongodb",
+        "kind": "Service"}]'
     labels:
       application: ${APPLICATION_NAME}
     name: ${APPLICATION_NAME}
@@ -44,6 +42,8 @@ objects:
   metadata:
     annotations:
       description: The web server's https port.
+      service.alpha.openshift.io/dependencies: '[{"name": "${APPLICATION_NAME}-mongodb",
+        "kind": "Service"}]'
     labels:
       application: ${APPLICATION_NAME}
     name: secure-${APPLICATION_NAME}
@@ -53,6 +53,20 @@ objects:
       targetPort: 8443
     selector:
       deploymentConfig: ${APPLICATION_NAME}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: The database server's port.
+    labels:
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-mongodb
+  spec:
+    ports:
+    - port: 27017
+      targetPort: 27017
+    selector:
+      deploymentConfig: ${APPLICATION_NAME}-mongodb
 - apiVersion: v1
   id: ${APPLICATION_NAME}-http
   kind: Route
@@ -114,7 +128,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: jboss-webserver31-tomcat8-openshift:1.4
+          name: jboss-webserver50-tomcat9-openshift:1.2
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
     triggers:
@@ -148,6 +162,24 @@ objects:
       spec:
         containers:
         - env:
+          - name: DB_SERVICE_PREFIX_MAPPING
+            value: ${APPLICATION_NAME}-mongodb=DB
+          - name: DB_JNDI
+            value: ${DB_JNDI}
+          - name: DB_USERNAME
+            value: ${DB_USERNAME}
+          - name: DB_PASSWORD
+            value: ${DB_PASSWORD}
+          - name: DB_DATABASE
+            value: ${DB_DATABASE}
+          - name: DB_ADMIN_PASSWORD
+            value: ${DB_ADMIN_PASSWORD}
+          - name: DB_MIN_POOL_SIZE
+            value: ${DB_MIN_POOL_SIZE}
+          - name: DB_MAX_POOL_SIZE
+            value: ${DB_MAX_POOL_SIZE}
+          - name: DB_TX_ISOLATION
+            value: ${DB_TX_ISOLATION}
           - name: JWS_HTTPS_CERTIFICATE_DIR
             value: /etc/jws-secret-volume
           - name: JWS_HTTPS_CERTIFICATE
@@ -200,6 +232,81 @@ objects:
           name: ${APPLICATION_NAME}:latest
       type: ImageChange
     - type: ConfigChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-mongodb
+  spec:
+    replicas: 1
+    selector:
+      deploymentConfig: ${APPLICATION_NAME}-mongodb
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          application: ${APPLICATION_NAME}
+          deploymentConfig: ${APPLICATION_NAME}-mongodb
+        name: ${APPLICATION_NAME}-mongodb
+      spec:
+        containers:
+        - env:
+          - name: MONGODB_USER
+            value: ${DB_USERNAME}
+          - name: MONGODB_PASSWORD
+            value: ${DB_PASSWORD}
+          - name: MONGODB_DATABASE
+            value: ${DB_DATABASE}
+          - name: MONGODB_ADMIN_PASSWORD
+            value: ${DB_ADMIN_PASSWORD}
+          - name: MONGODB_NOPREALLOC
+            value: ${MONGODB_NOPREALLOC}
+          - name: MONGODB_SMALLFILES
+            value: ${MONGODB_SMALLFILES}
+          - name: MONGODB_QUIET
+            value: ${MONGODB_QUIET}
+          image: mongodb
+          imagePullPolicy: Always
+          livenessProbe:
+            initialDelaySeconds: 30
+            tcpSocket:
+              port: 27017
+            timeoutSeconds: 1
+          name: ${APPLICATION_NAME}-mongodb
+          ports:
+          - containerPort: 27017
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -i
+              - -c
+              - mongo 127.0.0.1:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD
+                --eval="quit()"
+            initialDelaySeconds: 3
+            timeoutSeconds: 1
+          volumeMounts:
+          - mountPath: /var/lib/mongodb/data
+            name: ${APPLICATION_NAME}-data
+        terminationGracePeriodSeconds: 60
+        volumes:
+        - emptyDir:
+            medium: ""
+          name: ${APPLICATION_NAME}-data
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APPLICATION_NAME}-mongodb
+        from:
+          kind: ImageStreamTag
+          name: mongodb:${MONGODB_IMAGE_STREAM_TAG}
+          namespace: ${IMAGE_STREAM_NAMESPACE}
+      type: ImageChange
+    - type: ConfigChange
 parameters:
 - description: The name for the application.
   displayName: Application Name
@@ -218,7 +325,7 @@ parameters:
   displayName: Git Repository URL
   name: SOURCE_REPOSITORY_URL
   required: true
-  value: https://github.com/jboss-openshift/openshift-quickstarts.git
+  value: https://github.com/jboss-openshift/openshift-quickstarts
 - description: Git branch/tag reference
   displayName: Git Reference
   name: SOURCE_REPOSITORY_REF
@@ -226,7 +333,16 @@ parameters:
 - description: Path within Git project to build; empty for root project directory.
   displayName: Context Directory
   name: CONTEXT_DIR
-  value: tomcat-websocket-chat
+  value: todolist/todolist-mongodb
+- description: Database JNDI name used by application to resolve the datasource, e.g.
+    java:/jboss/datasources/mongodb
+  displayName: Database JNDI Name
+  name: DB_JNDI
+- description: Database name
+  displayName: Database Name
+  name: DB_DATABASE
+  required: true
+  value: root
 - description: The name of the secret containing the certificate files
   displayName: Secret Name
   name: JWS_HTTPS_SECRET
@@ -243,6 +359,42 @@ parameters:
 - description: The certificate password
   displayName: Certificate Password
   name: JWS_HTTPS_CERTIFICATE_PASSWORD
+- description: Sets xa-pool/min-pool-size for the configured datasource.
+  displayName: Datasource Minimum Pool Size
+  name: DB_MIN_POOL_SIZE
+- description: Sets xa-pool/max-pool-size for the configured datasource.
+  displayName: Datasource Maximum Pool Size
+  name: DB_MAX_POOL_SIZE
+- description: Sets transaction-isolation for the configured datasource.
+  displayName: Datasource Transaction Isolation
+  name: DB_TX_ISOLATION
+- description: Disable data file preallocation.
+  displayName: MongoDB No Preallocation
+  name: MONGODB_NOPREALLOC
+- description: Set MongoDB to use a smaller default data file size.
+  displayName: MongoDB Small Files
+  name: MONGODB_SMALLFILES
+- description: Runs MongoDB in a quiet mode that attempts to limit the amount of output.
+  displayName: MongoDB Quiet
+  name: MONGODB_QUIET
+- description: Database user name
+  displayName: Database Username
+  from: user[a-zA-Z0-9]{3}
+  generate: expression
+  name: DB_USERNAME
+  required: true
+- description: Database user password
+  displayName: Database Password
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  name: DB_PASSWORD
+  required: true
+- description: Database admin password
+  displayName: Database admin password
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  name: DB_ADMIN_PASSWORD
+  required: true
 - description: JWS Admin User
   displayName: JWS Admin Username
   from: '[a-zA-Z0-9]{8}'
@@ -281,3 +433,9 @@ parameters:
 - description: List of directories from which archives will be copied into the deployment
     folder. If unspecified, all archives in /target will be copied.
   name: ARTIFACT_DIR
+- description: The tag to use for the "mongodb" image stream.  Typically, this aligns
+    with the major.minor version of MongoDB.
+  displayName: MongoDB Image Stream Tag
+  name: MONGODB_IMAGE_STREAM_TAG
+  required: true
+  value: "3.2"
