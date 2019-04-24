@@ -99,7 +99,7 @@ var _ = Describe("Openshift on Azure admin e2e tests [Fake][EveryPR]", func() {
 		result, err := azurecli.OpenShiftManagedClustersAdmin.GetPluginVersion(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(result).NotTo(BeNil())
-		Expect(result.PluginVersion).NotTo(BeEmpty())
+		Expect(*result.PluginVersion).NotTo(BeEmpty())
 		Expect(strings.HasPrefix(*result.PluginVersion, "v")).To(BeTrue())
 	})
 })
