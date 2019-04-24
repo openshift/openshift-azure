@@ -73,31 +73,26 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		s.badRequest(w, fmt.Sprintf("Failed to delete resource group: %v", err))
 		return
 	}
-	go func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-		defer cancel()
-		if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
-			s.badRequest(w, fmt.Sprintf("Failed to wait for resource group deletion: %v", err))
-			return
-		}
-		resp, err := future.Result(gc)
-		if err != nil {
-			s.badRequest(w, fmt.Sprintf("Failed to get resource group deletion response: %v", err))
-			return
-		}
-		// If the resource group deletion is successful, cleanup the object
-		// from the memory so the next GET from the client waiting for this
-		// long-running operation can exit successfully.
-		if resp.StatusCode == http.StatusOK {
-			s.log.Infof("deleted resource group %s", resourceGroup)
-			s.store.Delete(ContainerServicesKey)
-		}
-	}()
+
 	s.writeState(internalapi.Deleting)
-	// Update headers with Location so subsequent GET requests know the
-	// location to query.
-	headers := w.Header()
-	headers.Add(autorest.HeaderLocation, fmt.Sprintf("http://%s%s", s.address, req.URL.Path))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	defer cancel()
+	if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
+		s.badRequest(w, fmt.Sprintf("Failed to wait for resource group deletion: %v", err))
+		return
+	}
+	resp, err := future.Result(gc)
+	if err != nil {
+		s.badRequest(w, fmt.Sprintf("Failed to get resource group deletion response: %v", err))
+		return
+	}
+	// If the resource group deletion is successful, cleanup the object
+	// from the memory so the next GET from the client waiting for this
+	// long-running operation can exit successfully.
+	if resp.StatusCode == http.StatusOK {
+		s.log.Infof("deleted resource group %s", resourceGroup)
+		s.store.Delete(ContainerServicesKey)
+	}
 	// And last but not least, we have accepted this DELETE request
 	// and are processing it in the background.
 	w.WriteHeader(http.StatusAccepted)
