@@ -56,6 +56,18 @@ func (cli *Client) CreateProject(namespace string) error {
 		return fmt.Errorf("failed to wait for default service account: %v", err)
 	}
 
+	err = wait.PollImmediate(time.Second, time.Minute, func() (bool, error) {
+		project, err := cli.ProjectV1.Projects().Get(namespace, metav1.GetOptions{})
+		if err != nil {
+			return false, err
+		}
+		_, found := project.Annotations["openshift.io/sa.scc.uid-range"]
+		return found, nil
+	})
+	if err != nil {
+		return fmt.Errorf("failed to wait for scc: %v", err)
+	}
+
 	return nil
 }
 
