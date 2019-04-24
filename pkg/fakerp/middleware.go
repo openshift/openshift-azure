@@ -4,7 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	internalapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/ghodss/yaml"
+
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
@@ -47,14 +49,28 @@ func (s *Server) context(handler http.Handler) http.Handler {
 			s.badRequest(w, err.Error())
 			return
 		}
-		ctx = context.WithValue(ctx, internalapi.ContextKeyClientAuthorizer, authorizer)
+		ctx = context.WithValue(ctx, api.ContextKeyClientAuthorizer, authorizer)
 
 		vaultauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azureclient.KeyVaultEndpoint)
 		if err != nil {
 			s.badRequest(w, err.Error())
 			return
 		}
-		ctx = context.WithValue(ctx, internalapi.ContextKeyVaultClientAuthorizer, vaultauthorizer)
+		ctx = context.WithValue(ctx, api.ContextKeyVaultClientAuthorizer, vaultauthorizer)
+
+		// add containerservices.yaml object to ctx
+		data, err := s.store.Get(ContainerServicesKey)
+		if err != nil {
+			s.log.Debugf("record %s not found. If this is create, ignore", ContainerServicesKey)
+		}
+
+		var cs *api.OpenShiftManagedCluster
+		err = yaml.Unmarshal(data, &cs)
+		if err == nil {
+			ctx = context.WithValue(ctx, ContainerServicesKey, cs)
+		} else {
+			ctx = context.WithValue(ctx, ContainerServicesKey, nil)
+		}
 
 		handler.ServeHTTP(w, r.WithContext(ctx))
 	})

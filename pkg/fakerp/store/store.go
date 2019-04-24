@@ -17,7 +17,7 @@ type Store interface {
 }
 
 type Storage struct {
-	mutex   *sync.Mutex
+	mutex   sync.Mutex
 	mutexes map[string]*sync.Mutex
 	dir     string
 	log     *logrus.Entry
@@ -25,7 +25,7 @@ type Storage struct {
 
 var _ Store = &Storage{}
 
-func New(log *logrus.Entry, dir string) (Store, error) {
+func New(log *logrus.Entry, dir string) (*Storage, error) {
 	dir = filepath.Clean(dir)
 
 	s := &Storage{

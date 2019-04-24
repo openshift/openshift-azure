@@ -21,11 +21,7 @@ import (
 )
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		s.badRequest(w, "Failed to read the internal config")
-		return
-	}
+	cs := req.Context().Value(ContainerServicesKey).(*internalapi.OpenShiftManagedCluster)
 
 	authorizer, err := azureclient.GetAuthorizerFromContext(req.Context(), internalapi.ContextKeyClientAuthorizer)
 	if err != nil {
@@ -94,7 +90,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		// long-running operation can exit successfully.
 		if resp.StatusCode == http.StatusOK {
 			s.log.Infof("deleted resource group %s", resourceGroup)
-			s.write(nil)
+			s.store.Delete(ContainerServicesKey)
 		}
 	}()
 	s.writeState(internalapi.Deleting)
@@ -112,18 +108,12 @@ func (s *Server) handleGet(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
-	// read old config if it exists
-	var oldCs *internalapi.OpenShiftManagedCluster
+	oldCs := req.Context().Value(ContainerServicesKey).(*internalapi.OpenShiftManagedCluster)
+
 	var err error
 	if !shared.IsUpdate() {
 		s.writeState(internalapi.Creating)
 	} else {
-		s.log.Info("read old config")
-		oldCs = s.read()
-		if oldCs == nil {
-			s.badRequest(w, "Failed to read old config: internal state does not exist")
-			return
-		}
 		s.writeState(internalapi.Updating)
 	}
 

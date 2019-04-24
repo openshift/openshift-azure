@@ -13,6 +13,10 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
+const (
+	ContainerServicesKey = "containerservice.yaml"
+)
+
 func GetTestConfig() api.TestConfig {
 	return api.TestConfig{
 		RunningUnderTest:   os.Getenv("RUNNING_UNDER_TEST") == "true",

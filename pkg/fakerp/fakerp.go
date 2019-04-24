@@ -1,17 +1,14 @@
 package fakerp
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
 
 	azresources "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
-	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
@@ -19,10 +16,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
-	"github.com/openshift/openshift-azure/pkg/util/derived"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
-	"github.com/openshift/openshift-azure/pkg/util/tls"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
@@ -308,62 +303,4 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	}
 
 	return nil
-}
-
-func writeHelpers(log *logrus.Entry, cs *api.OpenShiftManagedCluster) error {
-	b, err := derived.MasterCloudProviderConf(cs, true, true)
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile("_data/_out/azure.conf", b, 0600)
-	if err != nil {
-		return err
-	}
-
-	b, err = derived.AadGroupSyncConf(cs)
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile("_data/_out/aad-group-sync.yaml", b, 0600)
-	if err != nil {
-		return err
-	}
-
-	b, err = tls.PrivateKeyAsBytes(cs.Config.SSHKey)
-	if err != nil {
-		return err
-	}
-	// ensure both the new key and the old key are on disk so
-	// you can SSH in regardless of the state of a VM after an update
-	if _, err = os.Stat("_data/_out/id_rsa"); err == nil {
-		oldb, err := ioutil.ReadFile("_data/_out/id_rsa")
-		if err != nil {
-			return err
-		}
-		if !bytes.Equal(b, oldb) {
-			err = ioutil.WriteFile("_data/_out/id_rsa.old", oldb, 0600)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	err = ioutil.WriteFile("_data/_out/id_rsa", b, 0600)
-	if err != nil {
-		return err
-	}
-
-	b, err = yaml.Marshal(cs.Config.AdminKubeconfig)
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
-	if err != nil {
-		return err
-	}
-
-	bytes, err := yaml.Marshal(cs)
-	if err != nil {
-		return err
-	}
-	return ioutil.WriteFile("_data/containerservice.yaml", bytes, 0600)
 }
