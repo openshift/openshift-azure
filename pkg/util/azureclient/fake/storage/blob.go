@@ -21,6 +21,7 @@ func NewFakeBlobClient(rp *StorageRP) *FakeBlobClient {
 }
 
 func (b *FakeBlobClient) CreateBlockBlobFromReader(blob io.Reader, options *storage.PutBlobOptions) error {
+	b.rp.Calls = append(b.rp.Calls, "BlobClient:CreateBlockBlobFromReader:"+b.name)
 	buf, err := ioutil.ReadAll(blob)
 	if err != nil {
 		return err
@@ -30,21 +31,25 @@ func (b *FakeBlobClient) CreateBlockBlobFromReader(blob io.Reader, options *stor
 }
 
 func (b *FakeBlobClient) CreateBlockBlob(options *storage.PutBlobOptions) error {
+	b.rp.Calls = append(b.rp.Calls, "BlobClient:CreateBlockBlob:"+b.name)
 	// nothing to do
 	return nil
 }
 
 func (b *FakeBlobClient) PutBlock(blockID string, chunk []byte, options *storage.PutBlockOptions) error {
+	b.rp.Calls = append(b.rp.Calls, "BlobClient:PutBlock:"+b.name)
 	b.rp.Blobs[b.container.name][b.name] = append(b.rp.Blobs[b.container.name][b.name], chunk...)
 	return nil
 }
 
 func (b *FakeBlobClient) PutBlockList(blocks []storage.Block, options *storage.PutBlockListOptions) error {
+	b.rp.Calls = append(b.rp.Calls, "BlobClient:PutBlockList:"+b.name)
 	// nothing to do
 	return nil
 }
 
 func (b *FakeBlobClient) Get(options *storage.GetBlobOptions) (io.ReadCloser, error) {
+	b.rp.Calls = append(b.rp.Calls, "BlobClient:Get:"+b.name)
 	blob, exist := b.rp.Blobs[b.container.name][b.name]
 	if !exist {
 		return nil, fmt.Errorf("%s does not exist", b.name)
@@ -53,10 +58,12 @@ func (b *FakeBlobClient) Get(options *storage.GetBlobOptions) (io.ReadCloser, er
 }
 
 func (b *FakeBlobClient) GetSASURI(options storage.BlobSASOptions) (string, error) {
+	b.rp.Calls = append(b.rp.Calls, "BlobClient:GetSAURI:"+b.name)
 	return fmt.Sprintf("http://example.com/somewhere/%s/%s", b.container.name, b.name), nil
 }
 
 func (b *FakeBlobClient) Delete(options *storage.DeleteBlobOptions) error {
+	b.rp.Calls = append(b.rp.Calls, "BlobClient:Delete:"+b.name)
 	exist, _ := b.Exists()
 	if exist {
 		delete(b.rp.Blobs[b.container.name], b.name)

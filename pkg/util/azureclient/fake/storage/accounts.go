@@ -11,6 +11,7 @@ import (
 
 type StorageRP struct {
 	Log   *logrus.Entry
+	Calls []string
 	Accts []storage.Account
 	Blobs map[string]map[string][]byte
 }
@@ -27,6 +28,7 @@ func NewFakeAccountsClient(rp *StorageRP) *FakeAccountsClient {
 
 // Create mocks base method
 func (a *FakeAccountsClient) Create(ctx context.Context, resourceGroupName string, accountName string, parameters storage.AccountCreateParameters) error {
+	a.rp.Calls = append(a.rp.Calls, "AccountsClient:Create:"+accountName)
 	acct := storage.Account{
 		Name: &accountName,
 		Sku:  parameters.Sku,
@@ -40,10 +42,12 @@ func (a *FakeAccountsClient) Create(ctx context.Context, resourceGroupName strin
 
 // ListByResourceGroup mocks base method
 func (a *FakeAccountsClient) ListByResourceGroup(context context.Context, resourceGroup string) (storage.AccountListResult, error) {
+	a.rp.Calls = append(a.rp.Calls, "AccountsClient:ListByResourceGroup")
 	return storage.AccountListResult{Value: &a.rp.Accts}, nil
 }
 
 // ListKeys mocks base method
 func (a *FakeAccountsClient) ListKeys(context context.Context, resourceGroup, accountName string) (storage.AccountListKeysResult, error) {
+	a.rp.Calls = append(a.rp.Calls, "AccountsClient:ListKeys")
 	return storage.AccountListKeysResult{}, fmt.Errorf("FakeAccountsClient.ListKeys() not implemented")
 }

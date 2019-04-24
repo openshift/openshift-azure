@@ -32,16 +32,19 @@ type AzureCloud struct {
 func NewFakeAzureCloud(log *logrus.Entry, secrets []azkeyvault.SecretBundle) *AzureCloud {
 	az := &AzureCloud{
 		ComputeRP: fakecompute.ComputeRP{
-			Vms: map[string][]azcompute.VirtualMachineScaleSetVM{},
-			Ssc: []azcompute.VirtualMachineScaleSet{},
-			Log: log,
+			Vms:   map[string][]azcompute.VirtualMachineScaleSetVM{},
+			Ssc:   []azcompute.VirtualMachineScaleSet{},
+			Calls: []string{},
+			Log:   log,
 		},
 		VaultRP: fakekeyvault.VaultRP{
 			Log:     log,
+			Calls:   []string{},
 			Secrets: secrets,
 		},
 		StorageRP: fakestorage.StorageRP{
 			Log:   log,
+			Calls: []string{},
 			Accts: []azstorage.Account{},
 			Blobs: map[string]map[string][]byte{},
 		},
