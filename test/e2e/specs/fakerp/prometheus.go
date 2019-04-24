@@ -34,7 +34,7 @@ type targetsResponse struct {
 	} `json:"data"`
 }
 
-var _ = Describe("Prometheus E2E tests [Fake][EveryPR]", func() {
+var _ = Describe("Prometheus E2E tests [Fake]", func() {
 	var (
 		azurecli *azure.Client
 	)
