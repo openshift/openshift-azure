@@ -1,39 +1,12 @@
 package fakerp
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 )
-
-func (s *Server) adminreply(w http.ResponseWriter, err error, out interface{}) {
-	if err != nil {
-		s.badRequest(w, err.Error())
-		return
-	}
-
-	if out == nil {
-		return
-	}
-
-	if b, ok := out.([]byte); ok {
-		w.Header().Set("Content-Type", "application/octet-stream")
-		w.Write(b)
-		return
-	}
-
-	b, err := json.Marshal(out)
-	if err != nil {
-		s.badRequest(w, err.Error())
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(b)
-	return
-}
 
 // handleBackup handles admin requests to backup an etcd cluster
 func (s *Server) handleBackup(w http.ResponseWriter, req *http.Request) {

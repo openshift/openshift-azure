@@ -130,7 +130,7 @@ func parsePluginVersion(pluginVersion string) (major, minor int, err error) {
 	return
 }
 
-func createOrUpdate(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
+func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry, cs, oldCs *api.OpenShiftManagedCluster, isAdmin bool, testConfig api.TestConfig) (*api.OpenShiftManagedCluster, error) {
 	log.Info("enrich")
 	err := enrich(cs)
 	if err != nil {

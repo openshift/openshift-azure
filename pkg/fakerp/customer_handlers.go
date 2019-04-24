@@ -2,7 +2,6 @@ package fakerp
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -154,7 +153,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	s.write(cs)
 
 	// apply the request
-	cs, err = createOrUpdate(req.Context(), s.plugin, s.log, cs, oldCs, isAdminRequest, s.testConfig)
+	cs, err = createOrUpdateWrapper(req.Context(), s.plugin, s.log, cs, oldCs, isAdminRequest, s.testConfig)
 	if err != nil {
 		s.writeState(internalapi.Failed)
 		s.badRequest(w, fmt.Sprintf("Failed to apply request: %v", err))
@@ -164,31 +163,4 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	s.writeState(internalapi.Succeeded)
 	// TODO: Should return status.Accepted similar to how we handle DELETEs
 	s.reply(w, req)
-}
-
-func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		// If the object is not found in memory then
-		// it must have been deleted or never existed.
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-	state := s.readState()
-	cs.Properties.ProvisioningState = state
-
-	var res []byte
-	var err error
-	if strings.HasPrefix(req.URL.Path, "/admin") {
-		oc := admin.FromInternal(cs)
-		res, err = json.Marshal(oc)
-	} else {
-		oc := v20190430.FromInternal(cs)
-		res, err = json.Marshal(oc)
-	}
-	if err != nil {
-		s.badRequest(w, fmt.Sprintf("Failed to marshal response: %v", err))
-		return
-	}
-	w.Write(res)
 }
