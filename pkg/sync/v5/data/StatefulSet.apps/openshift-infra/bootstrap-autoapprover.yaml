@@ -72,3 +72,6 @@ spec:
         node-role.kubernetes.io/master: "true"
       serviceAccountName: bootstrap-autoapprover
       terminationGracePeriodSeconds: 1
+  updateStrategy:
+    rollingUpdate:
+      partition: 0

@@ -23,6 +23,7 @@ spec:
         - name: HOSTNAME
           valueFrom:
             fieldRef:
+              apiVersion: v1
               fieldPath: spec.nodeName
         image: '*** GENERATED ***'
         name: canary
@@ -40,6 +41,9 @@ spec:
           name: data
       nodeSelector:
         node-role.kubernetes.io/infra: "true"
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
   volumeClaimTemplates:
   - metadata:
       name: data
