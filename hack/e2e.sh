@@ -11,7 +11,7 @@ if [[ -n "$FOCUS" ]]; then
 fi
 
 if [[ -z "$TIMEOUT" ]]; then
-    TIMEOUT=20m
+    TIMEOUT=60m
 fi
 
 # start the fake rp server if needed
