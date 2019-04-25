@@ -8,48 +8,74 @@ import (
 	"github.com/go-test/deep"
 )
 
-var sampleManagedCluster = &OpenShiftManagedCluster{
-	Properties: &Properties{
-		RouterProfiles: []RouterProfile{
-			{
-				Name:            to.StringPtr("Properties.RouterProfiles[0].Name"),
-				PublicSubdomain: to.StringPtr("NewPublicSubdomain"),
+func sampleManagedCluster() *OpenShiftManagedCluster {
+	return &OpenShiftManagedCluster{
+		Properties: &Properties{
+			RouterProfiles: []RouterProfile{
+				{
+					Name:            to.StringPtr("Properties.RouterProfiles[0].Name"),
+					PublicSubdomain: to.StringPtr("NewPublicSubdomain"),
+				},
 			},
 		},
-	},
+	}
 }
 
 func TestDefaults(t *testing.T) {
 	tests := []struct {
-		name     string
-		input    *OpenShiftManagedCluster
-		expected *OpenShiftManagedCluster
+		name           string
+		changeInput    func(*OpenShiftManagedCluster)
+		expectedChange func(*OpenShiftManagedCluster)
 	}{
 		{
-			name:  "sets default RouterProfile",
-			input: &OpenShiftManagedCluster{},
-			expected: &OpenShiftManagedCluster{
-				Properties: &Properties{
-					RouterProfiles: []RouterProfile{
-						{
-							Name: to.StringPtr("default"),
-						},
+			name: "sets default RouterProfile",
+			changeInput: func(oc *OpenShiftManagedCluster) {
+				oc.Properties = nil
+			},
+			expectedChange: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.RouterProfiles = []RouterProfile{
+					{
+						Name: to.StringPtr("default"),
 					},
-				},
+				}
 			},
 		},
 		{
-			name:     "sets no defaults",
-			input:    sampleManagedCluster,
-			expected: sampleManagedCluster,
+			name: "sets MasterPoolProfile.Count to 3",
+			changeInput: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.MasterPoolProfile = &MasterPoolProfile{
+					VMSize:     (*VMSize)(to.StringPtr("Standard_D2s_v3")),
+					SubnetCIDR: to.StringPtr("10.0.0.0/24"),
+				}
+			},
+			expectedChange: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.MasterPoolProfile = &MasterPoolProfile{
+					Count:      to.Int64Ptr(3),
+					VMSize:     (*VMSize)(to.StringPtr("Standard_D2s_v3")),
+					SubnetCIDR: to.StringPtr("10.0.0.0/24"),
+				}
+			},
+		},
+		{
+			name: "sets no defaults",
 		},
 	}
 
 	for _, test := range tests {
-		setDefaults(test.input)
+		config := sampleManagedCluster()
+		if test.changeInput != nil {
+			test.changeInput(config)
+		}
 
-		if !reflect.DeepEqual(test.input, test.expected) {
-			t.Errorf("%s: unexpected diff %s", test.name, deep.Equal(test.input, test.expected))
+		expected := sampleManagedCluster()
+		if test.expectedChange != nil {
+			test.expectedChange(expected)
+		}
+
+		setDefaults(config)
+
+		if !reflect.DeepEqual(config, expected) {
+			t.Errorf("%s: unexpected diff %s", test.name, deep.Equal(config, expected))
 		}
 	}
 }
