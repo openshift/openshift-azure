@@ -25,7 +25,7 @@ import (
 	"github.com/openshift/openshift-azure/test/util/log"
 )
 
-var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][LongRunning]", func() {
+var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][EveryPR][LongRunning]", func() {
 	const (
 		sampleDeployment = "hello-openshift"
 	)

@@ -9,7 +9,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake]", func() {
+var _ = Describe("Openshift on Azure end user e2e tests [EndUser][Fake][EveryPR]", func() {
 	It("should create and validate test apps [EndUser][Fake][Apps]", func() {
 		ctx := context.Background()
 		By("creating test app")

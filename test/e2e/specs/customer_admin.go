@@ -22,7 +22,7 @@ import (
 	"github.com/openshift/openshift-azure/test/sanity"
 )
 
-var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fake]", func() {
+var _ = Describe("Openshift on Azure customer-admin e2e tests [CustomerAdmin][Fake][EveryPR]", func() {
 	It("should not read nodes", func() {
 		_, err := sanity.Checker.Client.CustomerAdmin.CoreV1.Nodes().Get("master-000000", metav1.GetOptions{})
 		Expect(kerrors.IsForbidden(err)).To(Equal(true))
