@@ -16,4 +16,8 @@ spec:
     port: 443
   selector:
     router: router
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
   type: LoadBalancer
