@@ -96,7 +96,7 @@ func defaults(o unstructured.Unstructured) {
 		jsonpath.MustCompile("$.spec.revisionHistoryLimit").DeleteIfMatch(o.Object, int64(10))
 		jsonpath.MustCompile("$.spec.serviceName").DeleteIfMatch(o.Object, "")
 
-		jsonpath.MustCompile("$.spec.updateStrategy.rollingUpdate.partition").DeleteIfMatch(o.Object, "0")
+		jsonpath.MustCompile("$.spec.updateStrategy.rollingUpdate.partition").DeleteIfMatch(o.Object, int64(0))
 		jsonpath.MustCompile("$.spec.updateStrategy.rollingUpdate").DeleteIfMatch(o.Object, map[string]interface{}{})
 		jsonpath.MustCompile("$.spec.updateStrategy.type").DeleteIfMatch(o.Object, "RollingUpdate")
 		jsonpath.MustCompile("$.spec.updateStrategy").DeleteIfMatch(o.Object, map[string]interface{}{})
@@ -108,5 +108,8 @@ func defaults(o unstructured.Unstructured) {
 	case "StorageClass.storage.k8s.io":
 		jsonpath.MustCompile("$.reclaimPolicy").DeleteIfMatch(o.Object, "Delete")
 		jsonpath.MustCompile("$.volumeBindingMode").DeleteIfMatch(o.Object, "Immediate")
+
+	case "ImageStream.image.openshift.io":
+		jsonpath.MustCompile("$.spec.tags.*.referencePolicy.type").DeleteIfMatch(o.Object, "Source")
 	}
 }

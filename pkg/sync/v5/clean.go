@@ -99,6 +99,7 @@ func clean(o unstructured.Unstructured) error {
 	case "ImageStream.image.openshift.io":
 		jsonpath.MustCompile("$.metadata.annotations.'openshift.io/image.dockerRepositoryCheck'").Delete(o.Object)
 		jsonpath.MustCompile("$.spec.tags[*].generation").Delete(o.Object)
+		jsonpath.MustCompile("$.spec.tags.*.referencePolicy.type").DeleteIfMatch(o.Object, "")
 
 	case "Namespace":
 		// TODO: don't know exactly what we should do here.
