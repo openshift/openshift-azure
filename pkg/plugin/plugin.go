@@ -446,6 +446,8 @@ func (p *plugin) RunCommand(ctx context.Context, cs *api.OpenShiftManagedCluster
 		script = "systemctl restart NetworkManager.service"
 	case api.CommandRestartKubelet:
 		script = "systemctl restart atomic-openshift-node.service"
+	case api.CommandRestartDocker:
+		script = "systemctl restart docker.service"
 	default:
 		return fmt.Errorf("invalid command %q", command)
 	}

@@ -69,6 +69,7 @@ type Command string
 const (
 	CommandRestartNetworkManager = "RestartNetworkManager"
 	CommandRestartKubelet        = "RestartKubelet"
+	CommandRestartDocker         = "RestartDocker"
 )
 
 // PluginError error returned by CreateOrUpdate to specify the step that failed.
