@@ -65,6 +65,8 @@ func TestIsValidClusterName(t *testing.T) {
 		"random#characters?",
 		"cluster-",
 		"-cluster",
+		"anyUPPERCASE",
+		"ExampleCluster111",
 		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 		"verylongtoolongnameitslongerthan63characterswhoopsthiswontworkatall",
 	}
@@ -79,7 +81,6 @@ func TestIsValidClusterName(t *testing.T) {
 		"0cluster",
 		"1234567890",
 		"osa-testing",
-		"ExampleCluster111",
 		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 	}
 	for _, validClusterName := range validClusterNames {
