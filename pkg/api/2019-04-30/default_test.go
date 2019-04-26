@@ -11,6 +11,11 @@ import (
 func sampleManagedCluster() *OpenShiftManagedCluster {
 	return &OpenShiftManagedCluster{
 		Properties: &Properties{
+			MasterPoolProfile: &MasterPoolProfile{
+				Count:      to.Int64Ptr(3),
+				VMSize:     (*VMSize)(to.StringPtr("Standard_D2s_v3")),
+				SubnetCIDR: to.StringPtr("10.0.0.0/24"),
+			},
 			RouterProfiles: []RouterProfile{
 				{
 					Name:            to.StringPtr("Properties.RouterProfiles[0].Name"),
@@ -28,11 +33,14 @@ func TestDefaults(t *testing.T) {
 		expectedChange func(*OpenShiftManagedCluster)
 	}{
 		{
-			name: "sets default RouterProfile",
+			name: "sets all defaults",
 			changeInput: func(oc *OpenShiftManagedCluster) {
 				oc.Properties = nil
 			},
 			expectedChange: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.MasterPoolProfile = &MasterPoolProfile{
+					Count: to.Int64Ptr(3),
+				}
 				oc.Properties.RouterProfiles = []RouterProfile{
 					{
 						Name: to.StringPtr("default"),
@@ -41,7 +49,7 @@ func TestDefaults(t *testing.T) {
 			},
 		},
 		{
-			name: "sets MasterPoolProfile.Count to 3",
+			name: "sets MasterPoolProfile.Count to 3 when empty",
 			changeInput: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.MasterPoolProfile = &MasterPoolProfile{
 					VMSize:     (*VMSize)(to.StringPtr("Standard_D2s_v3")),
