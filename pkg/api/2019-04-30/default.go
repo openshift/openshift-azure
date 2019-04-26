@@ -9,6 +9,14 @@ func setDefaults(oc *OpenShiftManagedCluster) {
 		oc.Properties = &Properties{}
 	}
 
+	if oc.Properties.MasterPoolProfile == nil {
+		oc.Properties.MasterPoolProfile = &MasterPoolProfile{}
+	}
+
+	if oc.Properties.MasterPoolProfile.Count == nil {
+		oc.Properties.MasterPoolProfile.Count = to.Int64Ptr(3)
+	}
+
 	if len(oc.Properties.RouterProfiles) == 0 {
 		oc.Properties.RouterProfiles = []RouterProfile{
 			{
