@@ -57,6 +57,9 @@ monitoring-stop:
 releasenotes:
 	go build -tags releasenotes ./cmd/$@
 
+content:
+	go test -v -tags=content ./pkg/sync/... 
+
 verify:
 	./hack/verify/validate-generated.sh
 	go vet ./...
