@@ -43,6 +43,7 @@ pullnumber="$(python -c 'import json, os; o=json.loads(os.environ["JOB_SPEC"]); 
 export RESOURCEGROUP="ci-$pullnumber$(basename "$0" .sh)-$(cat /dev/urandom | tr -dc 'a-z' | fold -w 6 | head -n 1)"
 
 echo "RESOURCEGROUP is $RESOURCEGROUP"
+echo "HOSTNAME is $HOSTNAME"
 echo
 
 make secrets
