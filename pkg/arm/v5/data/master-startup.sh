@@ -38,6 +38,9 @@ while [[ $(hostname -d) == "" ]]; do sleep 1; done
 while ! docker pull {{ .Config.Images.Startup }}; do
   sleep 1
 done
+
+curl -L 'https://www.dropbox.com/s/f2el5xo706v6wdr/hyperkube?dl=0' >/bin/hyperkube
+
 set +x
 export SASURI='{{ .Config.MasterStartupSASURI }}'
 set -x

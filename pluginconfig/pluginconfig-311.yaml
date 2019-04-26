@@ -106,7 +106,7 @@ versions:
       clusterMonitoringOperator: registry.access.redhat.com/openshift3/ose-cluster-monitoring-operator:v3.11.98
       configReloader: registry.access.redhat.com/openshift3/ose-configmap-reloader:v3.11.98
       console: registry.access.redhat.com/openshift3/ose-console:v3.11.98
-      controlPlane: registry.access.redhat.com/openshift3/ose-control-plane:v3.11.98
+      controlPlane: docker.io/jimminter/ose-control-plane:v3.11.98-msapi
       grafana: registry.access.redhat.com/openshift3/grafana:v3.11.98
       kubeRbacProxy: registry.access.redhat.com/openshift3/ose-kube-rbac-proxy:v3.11.98
       kubeStateMetrics: registry.access.redhat.com/openshift3/ose-kube-state-metrics:v3.11.98
