@@ -42,6 +42,10 @@ ln -sf "$PWD/secrets" "$T/src/github.com/openshift/openshift-azure"
     export AZURE_WORKER_CLIENT_SECRET=$AZURE_LEGACY_WORKER_CLIENT_SECRET
     set -x
     cd "$T/src/github.com/openshift/openshift-azure"
+    # TODO: remove after v3.2 goes away
+    if [[ "$1" == "v3.2" ]]; then
+        GOPATH="$T" go get github.com/golang/mock/mockgen
+    fi
     GOPATH="$T" make create
 )
 
