@@ -2,17 +2,14 @@ package storage
 
 import (
 	"bytes"
-	"context"
 	"io"
 	"io/ioutil"
 	"syscall"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/storage"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/util/errors"
-	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
 const (
@@ -118,23 +115,25 @@ type blob struct {
 var _ Blob = &blob{}
 
 func (b *blob) CreateBlockBlobFromReader(blob io.Reader, options *storage.PutBlobOptions) error {
-	ctx := context.Background()
 	data, err := ioutil.ReadAll(blob)
 	if err != nil {
 		return err
 	}
+
 	retry, retries := 0, 3
-	return wait.PollImmediateUntil(1*time.Second,
-		func() (bool, error) {
-			retry++
-			err := b.Blob.CreateBlockBlobFromReader(bytes.NewReader(data), options)
-			if err == nil {
-				return true, nil
-			}
-			if retry <= retries && errors.IsMatchingSyscallError(err, syscall.ECONNRESET) {
-				b.log.Infof("CreateBlockBlobFromReader: will retry on the following error %v", err)
-				return false, nil
-			}
-			return false, err
-		}, ctx.Done())
+	for {
+		retry++
+
+		err := b.Blob.CreateBlockBlobFromReader(bytes.NewReader(data), options)
+		if err == nil {
+			return nil
+		}
+
+		if retry <= retries && errors.IsMatchingSyscallError(err, syscall.ECONNRESET) {
+			b.log.Warnf("%s: retry %d", err, retry)
+			continue
+		}
+
+		return err
+	}
 }
