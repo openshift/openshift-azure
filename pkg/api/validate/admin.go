@@ -60,7 +60,7 @@ func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenSh
 		}
 
 		for _, newApp := range cs.Properties.AgentPoolProfiles {
-			if newApp.Count == 3 {
+			if newApp.Role == app.Role && newApp.Count == 3 {
 				old.Properties.AgentPoolProfiles[i].Count = newApp.Count
 			}
 		}
