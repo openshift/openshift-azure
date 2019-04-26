@@ -57,6 +57,10 @@ monitoring-stop:
 releasenotes:
 	go build -tags releasenotes ./cmd/$@
 
+content:
+	go test -timeout=300s -tags=content -run=TestContent ./pkg/sync/v$(shell ls -d pkg/sync/v* | sed -e 's/.*v//' | sort -n | tail -1)
+	go generate ./pkg/sync/v$(shell ls -d pkg/sync/v* | sed -e 's/.*v//' | sort -n | tail -1)
+
 verify:
 	./hack/verify/validate-generated.sh
 	go vet ./...
