@@ -25,7 +25,7 @@ func (u *simpleUpgrader) initializeStorageClients(ctx context.Context) error {
 		}
 
 		var err error
-		u.storageClient, err = storage.NewClient(u.cs.Config.ConfigStorageAccount, u.cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
+		u.storageClient, err = storage.NewClient(u.log, u.cs.Config.ConfigStorageAccount, u.cs.Config.ConfigStorageAccountKey, storage.DefaultBaseURL, storage.DefaultAPIVersion, true)
 		if err != nil {
 			return err
 		}

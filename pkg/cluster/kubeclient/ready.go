@@ -2,11 +2,13 @@ package kubeclient
 
 import (
 	"context"
+	"syscall"
 	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	utilerrors "github.com/openshift/openshift-azure/pkg/util/errors"
 	"github.com/openshift/openshift-azure/pkg/util/ready"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
@@ -49,8 +51,8 @@ func (u *kubeclient) WaitForReadySyncPod(ctx context.Context) error {
 				return false, err
 			}
 
-			ready := ready.DeploymentIsReady(d)
-			if ready {
+			isReady := ready.DeploymentIsReady(d)
+			if isReady {
 				return true, nil
 			}
 
@@ -67,6 +69,9 @@ func (u *kubeclient) WaitForReadySyncPod(ctx context.Context) error {
 				if err, ok := err.(*errors.StatusError); ok && err.ErrStatus.Details != nil && len(err.ErrStatus.Details.Causes) == 1 {
 					u.log.Info(err.ErrStatus.Details.Causes[0].Message)
 				}
+				err = nil
+			case utilerrors.IsMatchingSyscallError(err, syscall.ECONNREFUSED):
+				u.log.Infof("WaitForReadySyncPod: will retry on the following error %v", err)
 				err = nil
 			}
 
