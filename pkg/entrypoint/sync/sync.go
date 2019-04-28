@@ -19,7 +19,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
 
-func start(cfg *Config) error {
+func start(cfg *cmdConfig) error {
 	ctx := context.Background()
 	logrus.SetLevel(log.SanitizeLogLevel(cfg.LogLevel))
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})

@@ -6,7 +6,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/entrypoint/config"
 )
 
-type Config struct {
+type cmdConfig struct {
 	config.Common
 }
 
@@ -26,8 +26,8 @@ func NewCommand() *cobra.Command {
 	return cc
 }
 
-func configFromCmd(cmd *cobra.Command) (*Config, error) {
-	c := &Config{}
+func configFromCmd(cmd *cobra.Command) (*cmdConfig, error) {
+	c := &cmdConfig{}
 	var err error
 	c.Common, err = config.CommonConfigFromCmd(cmd)
 	if err != nil {

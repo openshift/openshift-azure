@@ -66,9 +66,9 @@ docker run --rm --network host \
   -v /etc/origin/cloudprovider/:/_data/_out \
   -v $tempBackDir:/out:z \
   {{ .Config.Images.EtcdBackup }} etcdbackup \
-  --blobname={{ .BackupBlobName }} \
+  --blobName={{ .BackupBlobName }} \
   --destination=/out/backup.db \
-  --action download
+  --action=download
 logger -t master-startup.sh "backup downloaded"
 
 # step 2 restore

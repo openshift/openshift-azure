@@ -10,10 +10,9 @@ spec:
         spec:
           containers:
           - args:
+            - etcdbackup
             - --action
             - save
-            command:
-            - etcdbackup
             image: '*** GENERATED ***'
             imagePullPolicy: Always
             name: etcd-backup
