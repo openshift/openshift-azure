@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
@@ -19,6 +18,7 @@ import (
 	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin"
 	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
+	"github.com/openshift/openshift-azure/pkg/fakerp/store"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 )
 
@@ -33,8 +33,7 @@ type Server struct {
 	gc resources.GroupsClient
 
 	sync.RWMutex
-	state internalapi.ProvisioningState
-	cs    *internalapi.OpenShiftManagedCluster
+	store *store.Storage
 
 	log      *logrus.Entry
 	address  string
@@ -51,10 +50,12 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 		inProgress: make(chan struct{}, 1),
 		log:        log,
 		address:    address,
+		store:      store.New(log, "_data"),
 		basePath:   "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{provider}/openShiftManagedClusters/{resourceName}",
 	}
-	var err error
+
 	var errs []error
+	var err error
 	s.testConfig = GetTestConfig()
 	s.pluginTemplate, err = GetPluginTemplate()
 	if err != nil {
@@ -69,42 +70,13 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	if len(errs) > 0 {
 		s.log.Fatal(errs)
 	}
-	// We need to restore the internal cluster state into memory for GETs
-	// and DELETEs to work appropriately.
-	if err := s.load(); err != nil {
-		s.log.Fatal(err)
-	}
 	return s
 }
 
 func (s *Server) Run() {
-	s.SetupRoutes()
+	s.setupRoutes()
 	s.log.Infof("starting server on %s", s.address)
 	s.log.WithError(http.ListenAndServe(s.address, s.router)).Warn("Server exited.")
-}
-
-// The way we run the fake RP during development cannot really
-// be consistent with how the RP runs in production so we need
-// to restore the internal state of the cluster from the
-// filesystem. Whether the file that holds the state exists or
-// not is returned and any other error that was encountered.
-func (s *Server) load() error {
-	b, err := ioutil.ReadFile("_data/containerservice.yaml")
-	switch {
-	case os.IsNotExist(err):
-		return nil
-	case err != nil:
-		return err
-	}
-
-	var cs *api.OpenShiftManagedCluster
-	if err := yaml.Unmarshal(b, &cs); err != nil {
-		return err
-	}
-
-	s.write(cs)
-
-	return nil
 }
 
 func (s *Server) read20190430Request(body io.ReadCloser) (*v20190430.OpenShiftManagedCluster, error) {
@@ -129,28 +101,4 @@ func (s *Server) readAdminRequest(body io.ReadCloser) (*admin.OpenShiftManagedCl
 		return nil, fmt.Errorf("failed to unmarshal request: %v", err)
 	}
 	return oc, nil
-}
-
-func (s *Server) write(cs *internalapi.OpenShiftManagedCluster) {
-	s.Lock()
-	defer s.Unlock()
-	s.cs = cs
-}
-
-func (s *Server) read() *internalapi.OpenShiftManagedCluster {
-	s.RLock()
-	defer s.RUnlock()
-	return s.cs
-}
-
-func (s *Server) writeState(state internalapi.ProvisioningState) {
-	s.Lock()
-	defer s.Unlock()
-	s.state = state
-}
-
-func (s *Server) readState() internalapi.ProvisioningState {
-	s.RLock()
-	defer s.RUnlock()
-	return s.state
 }

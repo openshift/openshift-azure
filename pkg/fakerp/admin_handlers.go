@@ -1,7 +1,6 @@
 package fakerp
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -9,39 +8,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 )
 
-func (s *Server) adminreply(w http.ResponseWriter, err error, out interface{}) {
-	if err != nil {
-		s.badRequest(w, err.Error())
-		return
-	}
-
-	if out == nil {
-		return
-	}
-
-	if b, ok := out.([]byte); ok {
-		w.Header().Set("Content-Type", "application/octet-stream")
-		w.Write(b)
-		return
-	}
-
-	b, err := json.Marshal(out)
-	if err != nil {
-		s.badRequest(w, err.Error())
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(b)
-	return
-}
-
 // handleBackup handles admin requests to backup an etcd cluster
 func (s *Server) handleBackup(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		s.badRequest(w, "Failed to read the internal config")
-		return
-	}
+	cs := req.Context().Value(ContainerService).(*api.OpenShiftManagedCluster)
 
 	backupName := chi.URLParam(req, "backupName")
 
@@ -51,11 +20,7 @@ func (s *Server) handleBackup(w http.ResponseWriter, req *http.Request) {
 
 // handleGetControlPlanePods handles admin requests for the list of control plane pods
 func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		s.badRequest(w, "Failed to read the internal config")
-		return
-	}
+	cs := req.Context().Value(ContainerService).(*api.OpenShiftManagedCluster)
 
 	pods, err := s.plugin.GetControlPlanePods(req.Context(), cs)
 	s.adminreply(w, err, pods)
@@ -63,11 +28,7 @@ func (s *Server) handleGetControlPlanePods(w http.ResponseWriter, req *http.Requ
 
 // handleListClusterVMs handles admin requests for the list of cluster VMs
 func (s *Server) handleListClusterVMs(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		s.badRequest(w, "Failed to read the internal config")
-		return
-	}
+	cs := req.Context().Value(ContainerService).(*api.OpenShiftManagedCluster)
 
 	vms, err := s.plugin.ListClusterVMs(req.Context(), cs)
 	s.adminreply(w, err, vms)
@@ -75,11 +36,7 @@ func (s *Server) handleListClusterVMs(w http.ResponseWriter, req *http.Request) 
 
 // handleReimage handles reimaging a vm in the cluster
 func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		s.badRequest(w, "Failed to read the internal config")
-		return
-	}
+	cs := req.Context().Value(ContainerService).(*api.OpenShiftManagedCluster)
 
 	hostname := chi.URLParam(req, "hostname")
 
@@ -89,11 +46,7 @@ func (s *Server) handleReimage(w http.ResponseWriter, req *http.Request) {
 
 // handleListBackups handles admin requests to list etcd backups
 func (s *Server) handleListBackups(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		s.badRequest(w, "Failed to read the internal config")
-		return
-	}
+	cs := req.Context().Value(ContainerService).(*api.OpenShiftManagedCluster)
 
 	backups, pluginErr := s.plugin.ListEtcdBackups(req.Context(), cs)
 	var err error
@@ -106,11 +59,7 @@ func (s *Server) handleListBackups(w http.ResponseWriter, req *http.Request) {
 
 // handleRestore handles admin requests to restore an etcd cluster from a backup
 func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		s.badRequest(w, "Failed to read the internal config")
-		return
-	}
+	cs := req.Context().Value(ContainerService).(*api.OpenShiftManagedCluster)
 
 	backupName := chi.URLParam(req, "backupName")
 
@@ -125,11 +74,7 @@ func (s *Server) handleRestore(w http.ResponseWriter, req *http.Request) {
 
 // handleRotateSecrets handles admin requests for the rotation of cluster secrets
 func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		s.badRequest(w, "Failed to read the internal config")
-		return
-	}
+	cs := req.Context().Value(ContainerService).(*api.OpenShiftManagedCluster)
 
 	deployer := GetDeployer(s.log, cs, s.testConfig)
 	pluginErr := s.plugin.RotateClusterSecrets(req.Context(), cs, deployer)
@@ -144,11 +89,7 @@ func (s *Server) handleRotateSecrets(w http.ResponseWriter, req *http.Request) {
 
 // handleForceUpdate handles admin requests for the force updates of clusters
 func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		s.badRequest(w, "Failed to read the internal config")
-		return
-	}
+	cs := req.Context().Value(ContainerService).(*api.OpenShiftManagedCluster)
 
 	pluginErr := s.plugin.ForceUpdate(req.Context(), cs, GetDeployer(s.log, cs, s.testConfig))
 	var err error
@@ -161,11 +102,7 @@ func (s *Server) handleForceUpdate(w http.ResponseWriter, req *http.Request) {
 
 // handleRunCommand handles running generic commands on a given vm within a scaleset in the cluster
 func (s *Server) handleRunCommand(w http.ResponseWriter, req *http.Request) {
-	cs := s.read()
-	if cs == nil {
-		s.badRequest(w, "Failed to read the internal config")
-		return
-	}
+	cs := req.Context().Value(ContainerService).(*api.OpenShiftManagedCluster)
 
 	hostname := chi.URLParam(req, "hostname")
 	command := chi.URLParam(req, "command")

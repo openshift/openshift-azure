@@ -6,7 +6,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 )
 
-func (s *Server) SetupRoutes() {
+func (s *Server) setupRoutes() {
 	s.router.Use(middleware.DefaultCompress)
 	s.router.Use(middleware.RedirectSlashes)
 	s.router.Use(middleware.Recoverer)

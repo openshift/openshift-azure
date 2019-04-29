@@ -56,7 +56,6 @@ var _ = Describe("Scale Up/Down E2E tests [ScaleUpDown][Fake][EveryPR][LongRunni
 		By("Fetching the manifest")
 		external, err := azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
-		external.Properties.ProvisioningState = nil // TODO: should not need to do this
 		err = setCount(&external, count)
 		Expect(err).NotTo(HaveOccurred())
 

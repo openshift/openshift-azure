@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	internalapi "github.com/openshift/openshift-azure/pkg/api"
+	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
@@ -47,14 +47,18 @@ func (s *Server) context(handler http.Handler) http.Handler {
 			s.badRequest(w, err.Error())
 			return
 		}
-		ctx = context.WithValue(ctx, internalapi.ContextKeyClientAuthorizer, authorizer)
+		ctx = context.WithValue(ctx, api.ContextKeyClientAuthorizer, authorizer)
 
 		vaultauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azureclient.KeyVaultEndpoint)
 		if err != nil {
 			s.badRequest(w, err.Error())
 			return
 		}
-		ctx = context.WithValue(ctx, internalapi.ContextKeyVaultClientAuthorizer, vaultauthorizer)
+		ctx = context.WithValue(ctx, api.ContextKeyVaultClientAuthorizer, vaultauthorizer)
+
+		// we ignore errors, as those are handled by code using the object
+		cs, _ := s.store.Get(ContainerServiceKey)
+		ctx = context.WithValue(ctx, ContainerService, cs)
 
 		handler.ServeHTTP(w, r.WithContext(ctx))
 	})
