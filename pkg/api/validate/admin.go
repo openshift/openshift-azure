@@ -66,7 +66,8 @@ func (v *AdminAPIValidator) validateUpdateContainerService(cs, oldCs *api.OpenSh
 		}
 	}
 
-	// validating ClusterVersion is the RP's responsibility
+	// validating ProvisioningState and ClusterVersion is the RP's responsibility
+	old.Properties.ProvisioningState = cs.Properties.ProvisioningState
 	old.Properties.ClusterVersion = cs.Properties.ClusterVersion
 
 	old.Config.ComponentLogLevel = cs.Config.ComponentLogLevel

@@ -38,6 +38,11 @@ func TestAPIValidateUpdate(t *testing.T) {
 				errors.New(`invalid change [Properties.AuthProfile.IdentityProviders.slice[0].Provider.Secret: <hidden 1> != <hidden 2>]`),
 			},
 		},
+		"provisioningstate is mutable": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.ProvisioningState = api.Creating // the RP is responsible for checking this
+			},
+		},
 	}
 
 	for name, test := range tests {
