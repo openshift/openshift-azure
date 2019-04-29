@@ -1,15 +1,12 @@
 package fakerp
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
-	"github.com/Azure/azure-sdk-for-go/profiles/latest/resources/mgmt/resources"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 
@@ -17,19 +14,11 @@ import (
 	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 )
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(ContainerService).(*internalapi.OpenShiftManagedCluster)
-
-	authorizer, err := azureclient.GetAuthorizerFromContext(req.Context(), internalapi.ContextKeyClientAuthorizer)
-	if err != nil {
-		s.badRequest(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
-		return
-	}
-	// TODO: Determine subscription ID from the request path
-	gc := resources.NewGroupsClient(os.Getenv("AZURE_SUBSCRIPTION_ID"))
-	gc.Authorizer = authorizer
 
 	am, err := newAADManager(req.Context(), s.log, cs, s.testConfig)
 	if err != nil {
@@ -60,7 +49,14 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	resourceGroup := filepath.Base(req.URL.Path)
 	s.log.Infof("deleting resource group %s", resourceGroup)
 
-	future, err := gc.Delete(req.Context(), resourceGroup)
+	authorizer, err := azureclient.GetAuthorizerFromContext(req.Context(), internalapi.ContextKeyClientAuthorizer)
+	if err != nil {
+		s.badRequest(w, fmt.Sprintf("Failed to determine request credentials: %v", err))
+		return
+	}
+
+	gc := resources.NewGroupsClient(req.Context(), s.log, cs.Properties.AzProfile.SubscriptionID, authorizer)
+	err = gc.Delete(req.Context(), resourceGroup)
 	if err != nil {
 		if autoRestErr, ok := err.(autorest.DetailedError); ok {
 			if original, ok := autoRestErr.Original.(*azure.RequestError); ok {
@@ -75,12 +71,6 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 
 	cs.Properties.ProvisioningState = internalapi.Deleting
 	s.store.Put(ContainerServiceKey, cs)
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
-	defer cancel()
-	if err := future.WaitForCompletionRef(ctx, gc.Client); err != nil {
-		s.badRequest(w, fmt.Sprintf("Failed to wait for resource group deletion: %v", err))
-		return
-	}
 	w.WriteHeader(http.StatusOK)
 }
 
