@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
@@ -68,14 +67,13 @@ func (s *Server) handleGet(w http.ResponseWriter, req *http.Request) {
 func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	oldCs := req.Context().Value(contextKeyContainerService).(*internalapi.OpenShiftManagedCluster)
 
-	// TODO: Align with the production RP once it supports the admin API
-	isAdminRequest := strings.HasPrefix(req.URL.Path, "/admin")
+	isAdmin := isAdminRequest(req)
 
 	// convert the external API manifest into the internal API representation
 	s.log.Info("read request and convert to internal")
 	var cs *internalapi.OpenShiftManagedCluster
 	var err error
-	if isAdminRequest {
+	if isAdmin {
 		cs, err = s.readAdminRequest(req.Body, oldCs)
 		if err == nil {
 			cs.Properties.ProvisioningState = internalapi.AdminUpdating
@@ -94,7 +92,7 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// apply the request
-	cs, err = createOrUpdateWrapper(req.Context(), s.plugin, s.log, cs, oldCs, isAdminRequest, s.testConfig)
+	cs, err = createOrUpdateWrapper(req.Context(), s.plugin, s.log, cs, oldCs, isAdmin, s.testConfig)
 	if err != nil {
 		cs.Properties.ProvisioningState = internalapi.Failed
 		s.store.Put(cs)

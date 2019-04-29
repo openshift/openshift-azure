@@ -25,7 +25,7 @@ func (s *Server) badRequest(w http.ResponseWriter, msg string) {
 	http.Error(w, resp, http.StatusBadRequest)
 }
 
-func (s *Server) isAdminRequest(req *http.Request) bool {
+func isAdminRequest(req *http.Request) bool {
 	// TODO: Align with the production RP once it supports the admin API
 	return strings.HasPrefix(req.URL.Path, "/admin")
 }
@@ -61,7 +61,7 @@ func (s *Server) adminreply(w http.ResponseWriter, err error, out interface{}) {
 func (s *Server) reply(w http.ResponseWriter, req *http.Request, cs *api.OpenShiftManagedCluster) {
 	var res []byte
 	var err error
-	if strings.HasPrefix(req.URL.Path, "/admin") {
+	if isAdminRequest(req) {
 		oc := admin.FromInternal(cs)
 		res, err = json.Marshal(oc)
 	} else {
