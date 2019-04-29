@@ -12,7 +12,7 @@ import (
 
 // GetApplicationObjectIDFromAppID returns the ObjectID of the AAD application
 // corresponding to a given appID
-func GetApplicationObjectIDFromAppID(ctx context.Context, appClient graphrbac.RBACApplicationsClient, appID string) (string, error) {
+func GetApplicationObjectIDFromAppID(ctx context.Context, appClient graphrbac.ApplicationsClient, appID string) (string, error) {
 	app, err := appClient.List(ctx, fmt.Sprintf("appid eq '%s'", appID))
 	if err != nil {
 		return "", err
@@ -41,7 +41,7 @@ func GetServicePrincipalObjectIDFromAppID(ctx context.Context, spc graphrbac.Ser
 }
 
 // UpdateAADApp updates the ReplyURLs in an AAD app.
-func UpdateAADApp(ctx context.Context, appClient graphrbac.RBACApplicationsClient, appObjID string, callbackURL string) error {
+func UpdateAADApp(ctx context.Context, appClient graphrbac.ApplicationsClient, appObjID string, callbackURL string) error {
 	_, err := appClient.Patch(ctx, appObjID, azgraphrbac.ApplicationUpdateParameters{
 		Homepage:       to.StringPtr(callbackURL),
 		ReplyUrls:      &[]string{callbackURL},

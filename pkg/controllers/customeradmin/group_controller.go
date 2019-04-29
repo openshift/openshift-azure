@@ -26,7 +26,7 @@ const (
 
 type reconcileGroup struct {
 	userV1    userv1client.UserV1Interface
-	aadClient graphrbac.RBACGroupsClient
+	aadClient graphrbac.GroupsClient
 	log       *logrus.Entry
 	groupMap  map[string]string
 	config    api.AADIdentityProvider

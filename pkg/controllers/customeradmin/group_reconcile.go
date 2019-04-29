@@ -37,7 +37,7 @@ func updateKubeGroup(log *logrus.Entry, userV1 userv1client.UserV1Interface, kub
 	return nil
 }
 
-func reconcileGroups(log *logrus.Entry, gc azgraphrbac.RBACGroupsClient, userV1 userv1client.UserV1Interface, groupMap map[string]string) error {
+func reconcileGroups(log *logrus.Entry, gc azgraphrbac.GroupsClient, userV1 userv1client.UserV1Interface, groupMap map[string]string) error {
 	aadGroupID, have := groupMap[osaCustomerAdmins]
 	if !have {
 		// CustomerAdminGroupID not configured: ensure the group is empty

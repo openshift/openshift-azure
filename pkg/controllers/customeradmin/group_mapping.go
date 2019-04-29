@@ -42,16 +42,16 @@ func fromMSGraphGroup(log *logrus.Entry, kubeGroup *v1.Group, kubeGroupName stri
 	return g, !reflect.DeepEqual(kubeGroup, g)
 }
 
-func newAADGroupsClient(ctx context.Context, log *logrus.Entry, config api.AADIdentityProvider) (azgraphrbac.RBACGroupsClient, error) {
+func newAADGroupsClient(ctx context.Context, log *logrus.Entry, config api.AADIdentityProvider) (azgraphrbac.GroupsClient, error) {
 	graphauthorizer, err := azureclient.NewAuthorizer(config.ClientID, config.Secret, config.TenantID, azure.PublicCloud.GraphEndpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	return azgraphrbac.NewRBACGroupsClient(ctx, log, config.TenantID, graphauthorizer), nil
+	return azgraphrbac.NewGroupsClient(ctx, log, config.TenantID, graphauthorizer), nil
 }
 
-func getAADGroupMembers(gc azgraphrbac.RBACGroupsClient, groupID string) ([]graphrbac.User, error) {
+func getAADGroupMembers(gc azgraphrbac.GroupsClient, groupID string) ([]graphrbac.User, error) {
 	members, err := gc.GetGroupMembers(context.Background(), groupID)
 	if err != nil {
 		return nil, err

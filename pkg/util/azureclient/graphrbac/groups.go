@@ -10,23 +10,23 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
 
-// RBACGroupsClient is a minimal interface for azure GroupsClient
-type RBACGroupsClient interface {
-	RBACGroupsClientAddons
+// GroupsClient is a minimal interface for azure GroupsClient
+type GroupsClient interface {
+	GroupsClientAddons
 }
 
-type rbacGroupsClient struct {
+type groupsClient struct {
 	graphrbac.GroupsClient
 }
 
-var _ RBACGroupsClient = &rbacGroupsClient{}
+var _ GroupsClient = &groupsClient{}
 
-// NewRBACApplicationsClient creates a new ApplicationsClient
-func NewRBACGroupsClient(ctx context.Context, log *logrus.Entry, tenantID string, authorizer autorest.Authorizer) RBACGroupsClient {
+// NewApplicationsClient creates a new ApplicationsClient
+func NewGroupsClient(ctx context.Context, log *logrus.Entry, tenantID string, authorizer autorest.Authorizer) GroupsClient {
 	client := graphrbac.NewGroupsClient(tenantID)
 	azureclient.SetupClient(ctx, log, "graphrbac.GroupsClient", &client.Client, authorizer)
 
-	return &rbacGroupsClient{
+	return &groupsClient{
 		GroupsClient: client,
 	}
 }

@@ -31,7 +31,7 @@ const (
 
 type aadManager struct {
 	testConfig api.TestConfig
-	ac         graphrbac.RBACApplicationsClient
+	ac         graphrbac.ApplicationsClient
 	sc         graphrbac.ServicePrincipalsClient
 	rac        authorization.RoleAssignmentsClient
 	cs         *api.OpenShiftManagedCluster
@@ -50,7 +50,7 @@ func newAADManager(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMana
 
 	return &aadManager{
 		testConfig: testConfig,
-		ac:         graphrbac.NewRBACApplicationsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
+		ac:         graphrbac.NewApplicationsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
 		sc:         graphrbac.NewServicePrincipalsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
 		rac:        authorization.NewRoleAssignmentsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
 		cs:         cs,
