@@ -11,7 +11,6 @@ import (
 	"time"
 
 	mgmtkeyvault "github.com/Azure/azure-sdk-for-go/services/keyvault/mgmt/2016-10-01/keyvault"
-	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
@@ -44,7 +43,7 @@ func newVaultManager(ctx context.Context, log *logrus.Entry, subscriptionID stri
 		return nil, err
 	}
 
-	graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
+	graphauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, ContextKeyGraphClientAuthorizer)
 	if err != nil {
 		return nil, err
 	}

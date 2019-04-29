@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	ContainerService api.ContextKey = "ContainerService"
+	ContainerService                api.ContextKey = "ContainerService"
+	ContextKeyGraphClientAuthorizer api.ContextKey = "GraphClientAuthorizer"
 )
 
 func GetTestConfig() api.TestConfig {

@@ -38,12 +38,12 @@ type aadManager struct {
 }
 
 func newAADManager(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (*aadManager, error) {
-	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return nil, err
 	}
 
-	graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
+	graphauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, ContextKeyGraphClientAuthorizer)
 	if err != nil {
 		return nil, err
 	}

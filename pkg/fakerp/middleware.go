@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
@@ -48,6 +49,13 @@ func (s *Server) context(handler http.Handler) http.Handler {
 			return
 		}
 		ctx = context.WithValue(ctx, api.ContextKeyClientAuthorizer, authorizer)
+
+		graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
+		if err != nil {
+			s.badRequest(w, err.Error())
+			return
+		}
+		ctx = context.WithValue(ctx, ContextKeyGraphClientAuthorizer, graphauthorizer)
 
 		vaultauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azureclient.KeyVaultEndpoint)
 		if err != nil {
