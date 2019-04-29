@@ -20,14 +20,19 @@ func setDefaults(oc *OpenShiftManagedCluster) {
 	if len(oc.Properties.AgentPoolProfiles) == 0 {
 		oc.Properties.AgentPoolProfiles = []AgentPoolProfile{
 			{
-				Name:  to.StringPtr("infra"),
-				Count: to.Int64Ptr(3),
-				Role:  (*AgentPoolProfileRole)(to.StringPtr("infra")),
+				Name: to.StringPtr("infra"),
+				Role: (*AgentPoolProfileRole)(to.StringPtr("infra")),
 			},
 		}
 	}
 
 	for i := range oc.Properties.AgentPoolProfiles {
+		if oc.Properties.AgentPoolProfiles[i].Name != nil &&
+			*oc.Properties.AgentPoolProfiles[i].Name == "infra" &&
+			oc.Properties.AgentPoolProfiles[i].Count == nil {
+			oc.Properties.AgentPoolProfiles[i].Count = to.Int64Ptr(3)
+		}
+
 		if oc.Properties.AgentPoolProfiles[i].OSType == nil {
 			oc.Properties.AgentPoolProfiles[i].OSType = (*OSType)(to.StringPtr("Linux"))
 		}

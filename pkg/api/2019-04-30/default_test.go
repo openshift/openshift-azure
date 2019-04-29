@@ -25,6 +25,14 @@ func sampleManagedCluster() *OpenShiftManagedCluster {
 					OSType:     (*OSType)(to.StringPtr("Windows")),
 					Role:       (*AgentPoolProfileRole)(to.StringPtr("infra")),
 				},
+				{
+					Name:       to.StringPtr("compute"),
+					Count:      to.Int64Ptr(4),
+					VMSize:     (*VMSize)(to.StringPtr("Standard_D2s_v3")),
+					SubnetCIDR: to.StringPtr("10.0.0.0/24"),
+					OSType:     (*OSType)(to.StringPtr("Windows")),
+					Role:       (*AgentPoolProfileRole)(to.StringPtr("compute")),
+				},
 			},
 			RouterProfiles: []RouterProfile{
 				{
@@ -77,6 +85,15 @@ func TestDefaults(t *testing.T) {
 					VMSize:     (*VMSize)(to.StringPtr("Standard_D2s_v3")),
 					SubnetCIDR: to.StringPtr("10.0.0.0/24"),
 				}
+			},
+		},
+		{
+			name: "sets AgentPoolProfile.Count to 3 on infra when empty",
+			changeInput: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[0].Count = nil
+			},
+			expectedChange: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[0].Count = to.Int64Ptr(3)
 			},
 		},
 		{
