@@ -79,7 +79,7 @@ func (s *Server) Run() {
 	s.log.WithError(http.ListenAndServe(s.address, s.router)).Warn("Server exited.")
 }
 
-func (s *Server) read20190430Request(body io.ReadCloser) (*v20190430.OpenShiftManagedCluster, error) {
+func (s *Server) read20190430Request(body io.ReadCloser, oldCs *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
 	data, err := ioutil.ReadAll(body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read request body: %v", err)
@@ -88,10 +88,10 @@ func (s *Server) read20190430Request(body io.ReadCloser) (*v20190430.OpenShiftMa
 	if err := yaml.Unmarshal(data, &oc); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal request: %v", err)
 	}
-	return oc, nil
+	return v20190430.ToInternal(oc, oldCs)
 }
 
-func (s *Server) readAdminRequest(body io.ReadCloser) (*admin.OpenShiftManagedCluster, error) {
+func (s *Server) readAdminRequest(body io.ReadCloser, oldCs *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
 	data, err := ioutil.ReadAll(body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read request body: %v", err)
@@ -100,5 +100,5 @@ func (s *Server) readAdminRequest(body io.ReadCloser) (*admin.OpenShiftManagedCl
 	if err := yaml.Unmarshal(data, &oc); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal request: %v", err)
 	}
-	return oc, nil
+	return admin.ToInternal(oc, oldCs)
 }

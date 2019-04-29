@@ -7,8 +7,6 @@ import (
 	"strings"
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
-	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
-	admin "github.com/openshift/openshift-azure/pkg/api/admin"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 )
@@ -77,36 +75,32 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	var cs *internalapi.OpenShiftManagedCluster
 	var err error
 	if isAdminRequest {
-		var oc *admin.OpenShiftManagedCluster
-		oc, err := s.readAdminRequest(req.Body)
+		cs, err = s.readAdminRequest(req.Body, oldCs)
 		if err == nil {
-			cs, err = admin.ToInternal(oc, oldCs)
+			cs.Properties.ProvisioningState = internalapi.AdminUpdating
+			s.store.Put(cs)
 		}
 	} else {
-		var oc *v20190430.OpenShiftManagedCluster
-		oc, err := s.read20190430Request(req.Body)
+		cs, err = s.read20190430Request(req.Body, oldCs)
 		if err == nil {
-			cs, err = v20190430.ToInternal(oc, oldCs)
+			cs.Properties.ProvisioningState = internalapi.Updating
+			s.store.Put(cs)
 		}
 	}
 	if err != nil {
 		s.badRequest(w, fmt.Sprintf("Failed to convert to internal type: %v", err))
 		return
 	}
-	// HACK: We persist new ContainerService early.
-	// This will overwrite old copy cs with new req version
-	s.store.Put(cs)
 
 	// apply the request
 	cs, err = createOrUpdateWrapper(req.Context(), s.plugin, s.log, cs, oldCs, isAdminRequest, s.testConfig)
 	if err != nil {
-		oldCs.Properties.ProvisioningState = internalapi.Failed
-		s.store.Put(oldCs)
+		cs.Properties.ProvisioningState = internalapi.Failed
+		s.store.Put(cs)
 		s.badRequest(w, fmt.Sprintf("Failed to apply request: %v", err))
 		return
 	}
 	cs.Properties.ProvisioningState = internalapi.Succeeded
 	s.store.Put(cs)
-	// TODO: Should return status.Accepted similar to how we handle DELETEs
 	s.reply(w, req)
 }
