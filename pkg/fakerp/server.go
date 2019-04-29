@@ -15,7 +15,6 @@ import (
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin"
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/pkg/fakerp/store"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 )
@@ -32,9 +31,8 @@ type Server struct {
 	address  string
 	basePath string
 
-	plugin         internalapi.Plugin
-	testConfig     api.TestConfig
-	pluginTemplate *pluginapi.Config
+	plugin     internalapi.Plugin
+	testConfig api.TestConfig
 }
 
 func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
@@ -50,12 +48,12 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	var errs []error
 	var err error
 	s.testConfig = GetTestConfig()
-	s.pluginTemplate, err = GetPluginTemplate()
+	pluginTemplate, err := GetPluginTemplate()
 	if err != nil {
 		s.log.Fatal(err)
 	}
-	overridePluginTemplate(s.pluginTemplate)
-	s.plugin, errs = plugin.NewPlugin(s.log, s.pluginTemplate, s.testConfig)
+	overridePluginTemplate(pluginTemplate)
+	s.plugin, errs = plugin.NewPlugin(s.log, pluginTemplate, s.testConfig)
 	if len(errs) > 0 {
 		s.log.Fatal(errs)
 	}
