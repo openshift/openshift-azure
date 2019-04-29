@@ -12,7 +12,7 @@ import (
 )
 
 func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
-	cs := req.Context().Value(ContainerService).(*internalapi.OpenShiftManagedCluster)
+	cs := req.Context().Value(contextKeyContainerService).(*internalapi.OpenShiftManagedCluster)
 
 	cs.Properties.ProvisioningState = internalapi.Deleting
 	s.store.Put(cs)
@@ -61,12 +61,12 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) handleGet(w http.ResponseWriter, req *http.Request) {
-	cs := req.Context().Value(ContainerService).(*internalapi.OpenShiftManagedCluster)
+	cs := req.Context().Value(contextKeyContainerService).(*internalapi.OpenShiftManagedCluster)
 	s.reply(w, req, cs)
 }
 
 func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
-	oldCs := req.Context().Value(ContainerService).(*internalapi.OpenShiftManagedCluster)
+	oldCs := req.Context().Value(contextKeyContainerService).(*internalapi.OpenShiftManagedCluster)
 
 	// TODO: Align with the production RP once it supports the admin API
 	isAdminRequest := strings.HasPrefix(req.URL.Path, "/admin")

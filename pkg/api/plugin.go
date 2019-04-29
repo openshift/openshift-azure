@@ -5,13 +5,12 @@ import (
 	"context"
 )
 
-// ContextKey is a type for context property bag payload keys
-type ContextKey string
+type contextKey string
 
 const (
-	ContextKeyClientAuthorizer      ContextKey = "ClientAuthorizer"
-	ContextKeyVaultClientAuthorizer ContextKey = "VaultClientAuthorizer"
-	ContextAcceptLanguages          ContextKey = "AcceptLanguages"
+	ContextKeyClientAuthorizer      contextKey = "ClientAuthorizer"
+	ContextKeyVaultClientAuthorizer contextKey = "VaultClientAuthorizer"
+	ContextAcceptLanguages          contextKey = "AcceptLanguages"
 )
 
 type PluginStep string

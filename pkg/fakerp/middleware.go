@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Azure/go-autorest/autorest/azure"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
@@ -55,7 +56,7 @@ func (s *Server) context(handler http.Handler) http.Handler {
 			s.badRequest(w, err.Error())
 			return
 		}
-		ctx = context.WithValue(ctx, ContextKeyGraphClientAuthorizer, graphauthorizer)
+		ctx = context.WithValue(ctx, contextKeyGraphClientAuthorizer, graphauthorizer)
 
 		vaultauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azureclient.KeyVaultEndpoint)
 		if err != nil {
@@ -66,7 +67,7 @@ func (s *Server) context(handler http.Handler) http.Handler {
 
 		// we ignore errors, as those are handled by code using the object
 		cs, _ := s.store.Get()
-		ctx = context.WithValue(ctx, ContainerService, cs)
+		ctx = context.WithValue(ctx, contextKeyContainerService, cs)
 
 		handler.ServeHTTP(w, r.WithContext(ctx))
 	})

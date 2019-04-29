@@ -85,7 +85,7 @@ func NewAuthorizer(clientID, clientSecret, tenantID, resource string) (autorest.
 	return config.Authorizer()
 }
 
-func GetAuthorizerFromContext(ctx context.Context, key api.ContextKey) (autorest.Authorizer, error) {
+func GetAuthorizerFromContext(ctx context.Context, key interface{}) (autorest.Authorizer, error) {
 	authorizer, ok := ctx.Value(key).(autorest.Authorizer)
 	if !ok {
 		return nil, fmt.Errorf("failed to get authorizer, key %s not found within context", key)

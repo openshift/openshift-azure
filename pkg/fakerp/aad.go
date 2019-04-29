@@ -43,7 +43,7 @@ func newAADManager(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMana
 		return nil, err
 	}
 
-	graphauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, ContextKeyGraphClientAuthorizer)
+	graphauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, contextKeyGraphClientAuthorizer)
 	if err != nil {
 		return nil, err
 	}

@@ -43,7 +43,7 @@ func newVaultManager(ctx context.Context, log *logrus.Entry, subscriptionID stri
 		return nil, err
 	}
 
-	graphauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, ContextKeyGraphClientAuthorizer)
+	graphauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, contextKeyGraphClientAuthorizer)
 	if err != nil {
 		return nil, err
 	}
