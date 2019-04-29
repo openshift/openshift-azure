@@ -15,10 +15,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
 )
 
 type ssher struct {
-	pipcli    azureclient.PublicIPAddressesClient
+	pipcli    network.PublicIPAddressesClient
 	cs        *api.OpenShiftManagedCluster
 	masterIPs []string
 }
@@ -30,7 +31,7 @@ func newSSHer(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCl
 	}
 
 	s := &ssher{
-		pipcli: azureclient.NewPublicIPAddressesClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		pipcli: network.NewPublicIPAddressesClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
 		cs:     cs,
 	}
 

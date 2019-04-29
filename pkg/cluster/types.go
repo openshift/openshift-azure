@@ -19,6 +19,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/startup"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
@@ -63,12 +65,12 @@ type Upgrade struct {
 	kubeclient.Interface
 
 	TestConfig        api.TestConfig
-	AccountsClient    azureclient.AccountsClient
+	AccountsClient    storage.AccountsClient
 	StorageClient     storage.Client
 	UpdateBlobService updateblob.BlobService
-	Vmc               azureclient.VirtualMachineScaleSetVMsClient
-	Ssc               azureclient.VirtualMachineScaleSetsClient
-	Kvc               azureclient.KeyVaultClient
+	Vmc               compute.VirtualMachineScaleSetVMsClient
+	Ssc               compute.VirtualMachineScaleSetsClient
+	Kvc               keyvault.KeyVaultClient
 	Log               *logrus.Entry
 	ScalerFactory     scaler.Factory
 	Hasher            Hasher
@@ -108,10 +110,10 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		Interface: kubeclient,
 
 		TestConfig:     testConfig,
-		AccountsClient: azureclient.NewAccountsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		Vmc:            azureclient.NewVirtualMachineScaleSetVMsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		Ssc:            azureclient.NewVirtualMachineScaleSetsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		Kvc:            azureclient.NewKeyVaultClient(ctx, log, vaultauthorizer),
+		AccountsClient: storage.NewAccountsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		Vmc:            compute.NewVirtualMachineScaleSetVMsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		Ssc:            compute.NewVirtualMachineScaleSetsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		Kvc:            keyvault.NewKeyVaultClient(ctx, log, vaultauthorizer),
 		Log:            log,
 		ScalerFactory:  scaler.NewFactory(),
 		Hasher: &Hash{

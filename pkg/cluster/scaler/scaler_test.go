@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_compute"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
 
@@ -85,8 +85,8 @@ func TestScaleUp(t *testing.T) {
 			gmc := gomock.NewController(t)
 			defer gmc.Finish()
 			kc := mock_kubeclient.NewMockInterface(gmc)
-			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
-			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
+			ssc := mock_compute.NewMockVirtualMachineScaleSetsClient(gmc)
+			vmc := mock_compute.NewMockVirtualMachineScaleSetVMsClient(gmc)
 
 			if len(tt.vmsBefore) != int(tt.count) {
 				// initial listing
@@ -203,8 +203,8 @@ func TestScaleDown(t *testing.T) {
 			ctx := context.Background()
 			gmc := gomock.NewController(t)
 			defer gmc.Finish()
-			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
-			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
+			vmc := mock_compute.NewMockVirtualMachineScaleSetVMsClient(gmc)
+			ssc := mock_compute.NewMockVirtualMachineScaleSetsClient(gmc)
 			kc := mock_kubeclient.NewMockInterface(gmc)
 
 			if len(tt.vmsBefore) != int(tt.count) {

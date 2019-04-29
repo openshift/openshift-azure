@@ -4,12 +4,13 @@ import (
 	"context"
 	"os"
 
-	"github.com/Azure/azure-sdk-for-go/services/authorization/mgmt/2015-07-01/authorization"
+	azauthorization "github.com/Azure/azure-sdk-for-go/services/authorization/mgmt/2015-07-01/authorization"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/fakerp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/authorization"
 )
 
 // ensureRoleDefinitions ensures that the OSA Master and OSA Worker roles are
@@ -20,13 +21,13 @@ func ensureRoleDefinitions(ctx context.Context, log *logrus.Entry) error {
 		return err
 	}
 
-	cli := azureclient.NewRoleDefinitionsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
+	cli := authorization.NewRoleDefinitionsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer)
 
-	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), fakerp.OSAMasterRoleDefinitionID, authorization.RoleDefinition{
+	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), fakerp.OSAMasterRoleDefinitionID, azauthorization.RoleDefinition{
 		Name: to.StringPtr(fakerp.OSAMasterRoleDefinitionID),
-		Properties: &authorization.RoleDefinitionProperties{
+		Properties: &azauthorization.RoleDefinitionProperties{
 			RoleName: to.StringPtr("OSA Master"),
-			Permissions: &[]authorization.Permission{
+			Permissions: &[]azauthorization.Permission{
 				{
 					Actions: &[]string{
 						"Microsoft.Compute/disks/read",
@@ -62,11 +63,11 @@ func ensureRoleDefinitions(ctx context.Context, log *logrus.Entry) error {
 		},
 	})
 
-	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), fakerp.OSAWorkerRoleDefinitionID, authorization.RoleDefinition{
+	_, err = cli.CreateOrUpdate(ctx, "/subscriptions/"+os.Getenv("AZURE_SUBSCRIPTION_ID"), fakerp.OSAWorkerRoleDefinitionID, azauthorization.RoleDefinition{
 		Name: to.StringPtr(fakerp.OSAMasterRoleDefinitionID),
-		Properties: &authorization.RoleDefinitionProperties{
+		Properties: &azauthorization.RoleDefinitionProperties{
 			RoleName: to.StringPtr("OSA Worker"),
-			Permissions: &[]authorization.Permission{
+			Permissions: &[]azauthorization.Permission{
 				{
 					Actions: &[]string{
 						// Think twice before adding anything to this list:

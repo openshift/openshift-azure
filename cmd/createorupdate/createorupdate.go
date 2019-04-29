@@ -23,6 +23,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/graphrbac"
 	v20190430client "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2019-04-30"
 	adminclient "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
 	utilerrors "github.com/openshift/openshift-azure/pkg/util/errors"
@@ -173,7 +174,7 @@ func updateAadApplication(ctx context.Context, oc *v20190430.OpenShiftManagedClu
 			return fmt.Errorf("cannot get authorizer: %v", err)
 		}
 
-		aadClient := azureclient.NewRBACApplicationsClient(ctx, log, conf.TenantID, graphauthorizer)
+		aadClient := graphrbac.NewRBACApplicationsClient(ctx, log, conf.TenantID, graphauthorizer)
 		objID, err := aadapp.GetApplicationObjectIDFromAppID(ctx, aadClient, conf.AADClientID)
 		if err != nil {
 			return err

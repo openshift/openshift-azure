@@ -19,6 +19,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/aadapp"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/graphrbac"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/vaultmgmt"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
@@ -30,9 +33,9 @@ const (
 )
 
 type vaultManager struct {
-	vc  azureclient.VaultMgmtClient
-	spc azureclient.ServicePrincipalsClient
-	kvc azureclient.KeyVaultClient
+	vc  vaultmgmt.VaultMgmtClient
+	spc graphrbac.ServicePrincipalsClient
+	kvc keyvault.KeyVaultClient
 }
 
 func newVaultManager(ctx context.Context, log *logrus.Entry, subscriptionID string) (*vaultManager, error) {
@@ -52,9 +55,9 @@ func newVaultManager(ctx context.Context, log *logrus.Entry, subscriptionID stri
 	}
 
 	return &vaultManager{
-		vc:  azureclient.NewVaultMgmtClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
-		spc: azureclient.NewServicePrincipalsClient(ctx, log, os.Getenv("AZURE_TENANT_ID"), graphauthorizer),
-		kvc: azureclient.NewKeyVaultClient(ctx, log, vaultauthorizer),
+		vc:  vaultmgmt.NewVaultMgmtClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
+		spc: graphrbac.NewServicePrincipalsClient(ctx, log, os.Getenv("AZURE_TENANT_ID"), graphauthorizer),
+		kvc: keyvault.NewKeyVaultClient(ctx, log, vaultauthorizer),
 	}, nil
 }
 

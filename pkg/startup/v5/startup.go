@@ -22,6 +22,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/writers"
@@ -62,7 +63,7 @@ func (s *startup) WriteFiles(ctx context.Context) error {
 			return err
 		}
 
-		kvc := azureclient.NewKeyVaultClient(ctx, s.log, vaultauthorizer)
+		kvc := keyvault.NewKeyVaultClient(ctx, s.log, vaultauthorizer)
 
 		s.log.Info("enriching config")
 		err = enrich.CertificatesFromVault(ctx, kvc, s.cs)

@@ -21,6 +21,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
 	"github.com/openshift/openshift-azure/pkg/util/blackbox"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
@@ -36,7 +37,7 @@ var (
 
 type monitor struct {
 	log    *logrus.Entry
-	pipcli azureclient.PublicIPAddressesClient
+	pipcli network.PublicIPAddressesClient
 	icli   appinsights.TelemetryClient
 
 	resourceGroup  string
@@ -61,7 +62,7 @@ func (m *monitor) init(ctx context.Context, log *logrus.Entry) error {
 	}
 	m.resourceGroup = os.Getenv("RESOURCEGROUP")
 	m.subscriptionID = os.Getenv("AZURE_SUBSCRIPTION_ID")
-	m.pipcli = azureclient.NewPublicIPAddressesClient(ctx, log, m.subscriptionID, authorizer)
+	m.pipcli = network.NewPublicIPAddressesClient(ctx, log, m.subscriptionID, authorizer)
 
 	if os.Getenv("AZURE_APP_INSIGHTS_KEY") != "" {
 		m.log.Info("application insights configured")

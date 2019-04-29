@@ -7,12 +7,12 @@ import (
 	azstorage "github.com/Azure/azure-sdk-for-go/storage"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/vault"
 )
 
-func StorageAccountKeys(ctx context.Context, azs azureclient.AccountsClient, cs *api.OpenShiftManagedCluster) error {
+func StorageAccountKeys(ctx context.Context, azs storage.AccountsClient, cs *api.OpenShiftManagedCluster) error {
 	if cs.Config.RegistryStorageAccountKey == "" {
 		key, err := azs.ListKeys(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Config.RegistryStorageAccount)
 		if err != nil {
@@ -67,7 +67,7 @@ func SASURIs(storageClient storage.Client, cs *api.OpenShiftManagedCluster) (err
 	return
 }
 
-func CertificatesFromVault(ctx context.Context, kvc azureclient.KeyVaultClient, cs *api.OpenShiftManagedCluster) error {
+func CertificatesFromVault(ctx context.Context, kvc keyvault.KeyVaultClient, cs *api.OpenShiftManagedCluster) error {
 	kp, err := vault.GetSecret(ctx, kvc, cs.Properties.APICertProfile.KeyVaultSecretURL)
 	if err != nil {
 		return err

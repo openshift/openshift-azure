@@ -1,62 +1,56 @@
 package fake
 
 import (
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
-	"github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
+	azcompute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
+	azkeyvault "github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
+	azstorage "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
 	"github.com/sirupsen/logrus"
 
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	azurestorage "github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
+	fakecompute "github.com/openshift/openshift-azure/pkg/util/azureclient/fake/compute"
+	fakekeyvault "github.com/openshift/openshift-azure/pkg/util/azureclient/fake/keyvault"
+	fakeresources "github.com/openshift/openshift-azure/pkg/util/azureclient/fake/resources"
+	fakestorage "github.com/openshift/openshift-azure/pkg/util/azureclient/fake/storage"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
-type ComputeRP struct {
-	Vms map[string][]compute.VirtualMachineScaleSetVM
-	Ssc []compute.VirtualMachineScaleSet
-}
-
-type VaultRP struct {
-	Secrets []keyvault.SecretBundle
-}
-
-type StorageRP struct {
-	Accts []storage.Account
-	Blobs map[string]map[string][]byte
-}
-
 type AzureCloud struct {
-	ComputeRP
-	StorageRP
-	VaultRP
+	fakecompute.ComputeRP
+	fakestorage.StorageRP
+	fakekeyvault.VaultRP
 
-	log *logrus.Entry
-
-	AccountsClient                  azureclient.AccountsClient
-	StorageClient                   azurestorage.Client
-	DeploymentsClient               azureclient.DeploymentsClient
-	KeyVaultClient                  azureclient.KeyVaultClient
-	VirtualMachineScaleSetVMsClient azureclient.VirtualMachineScaleSetVMsClient
-	VirtualMachineScaleSetsClient   azureclient.VirtualMachineScaleSetsClient
+	AccountsClient                  storage.AccountsClient
+	StorageClient                   storage.Client
+	DeploymentsClient               resources.DeploymentsClient
+	KeyVaultClient                  keyvault.KeyVaultClient
+	VirtualMachineScaleSetVMsClient compute.VirtualMachineScaleSetVMsClient
+	VirtualMachineScaleSetsClient   compute.VirtualMachineScaleSetsClient
 }
 
-func NewFakeAzureCloud(log *logrus.Entry, secrets []keyvault.SecretBundle) *AzureCloud {
+func NewFakeAzureCloud(log *logrus.Entry, secrets []azkeyvault.SecretBundle) *AzureCloud {
 	az := &AzureCloud{
-		log: log,
-		ComputeRP: ComputeRP{
-			Vms: map[string][]compute.VirtualMachineScaleSetVM{},
-			Ssc: []compute.VirtualMachineScaleSet{},
+		ComputeRP: fakecompute.ComputeRP{
+			Vms: map[string][]azcompute.VirtualMachineScaleSetVM{},
+			Ssc: []azcompute.VirtualMachineScaleSet{},
+			Log: log,
 		},
-		VaultRP: VaultRP{Secrets: secrets},
-		StorageRP: StorageRP{
-			Accts: []storage.Account{},
+		VaultRP: fakekeyvault.VaultRP{
+			Log:     log,
+			Secrets: secrets,
+		},
+		StorageRP: fakestorage.StorageRP{
+			Log:   log,
+			Accts: []azstorage.Account{},
 			Blobs: map[string]map[string][]byte{},
 		},
 	}
-	az.AccountsClient = NewFakeAccountsClient(az)
-	az.StorageClient = NewFakeStorageClient(az)
-	az.KeyVaultClient = NewFakeKeyVaultClient(az)
-	az.DeploymentsClient = NewFakeDeploymentsClient(az)
-	az.VirtualMachineScaleSetVMsClient = NewFakeVirtualMachineScaleSetVMsClient(az)
-	az.VirtualMachineScaleSetsClient = NewFakeVirtualMachineScaleSetsClient(az)
+	az.AccountsClient = fakestorage.NewFakeAccountsClient(&az.StorageRP)
+	az.StorageClient = fakestorage.NewFakeStorageClient(&az.StorageRP)
+	az.KeyVaultClient = fakekeyvault.NewFakeKeyVaultClient(&az.VaultRP)
+	az.VirtualMachineScaleSetVMsClient = fakecompute.NewFakeVirtualMachineScaleSetVMsClient(&az.ComputeRP)
+	az.VirtualMachineScaleSetsClient = fakecompute.NewFakeVirtualMachineScaleSetsClient(&az.ComputeRP)
+	az.DeploymentsClient = fakeresources.NewFakeDeploymentsClient(az.VirtualMachineScaleSetsClient, &az.StorageRP)
 	return az
 }

@@ -12,7 +12,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_compute"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
 
@@ -126,8 +126,8 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 			ctx := context.Background()
 			gmc := gomock.NewController(t)
 			defer gmc.Finish()
-			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
-			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
+			ssc := mock_compute.NewMockVirtualMachineScaleSetsClient(gmc)
+			vmc := mock_compute.NewMockVirtualMachineScaleSetVMsClient(gmc)
 
 			kc := mock_kubeclient.NewMockInterface(gmc)
 			if tt.wantErr {

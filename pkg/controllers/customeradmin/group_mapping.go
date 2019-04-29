@@ -13,6 +13,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	azgraphrbac "github.com/openshift/openshift-azure/pkg/util/azureclient/graphrbac"
 )
 
 // fromMSGraphGroup syncs the values from the given aad group into kubeGroup
@@ -41,16 +42,16 @@ func fromMSGraphGroup(log *logrus.Entry, kubeGroup *v1.Group, kubeGroupName stri
 	return g, !reflect.DeepEqual(kubeGroup, g)
 }
 
-func newAADGroupsClient(ctx context.Context, log *logrus.Entry, config api.AADIdentityProvider) (azureclient.RBACGroupsClient, error) {
+func newAADGroupsClient(ctx context.Context, log *logrus.Entry, config api.AADIdentityProvider) (azgraphrbac.RBACGroupsClient, error) {
 	graphauthorizer, err := azureclient.NewAuthorizer(config.ClientID, config.Secret, config.TenantID, azure.PublicCloud.GraphEndpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	return azureclient.NewRBACGroupsClient(ctx, log, config.TenantID, graphauthorizer), nil
+	return azgraphrbac.NewRBACGroupsClient(ctx, log, config.TenantID, graphauthorizer), nil
 }
 
-func getAADGroupMembers(gc azureclient.RBACGroupsClient, groupID string) ([]graphrbac.User, error) {
+func getAADGroupMembers(gc azgraphrbac.RBACGroupsClient, groupID string) ([]graphrbac.User, error) {
 	members, err := gc.GetGroupMembers(context.Background(), groupID)
 	if err != nil {
 		return nil, err

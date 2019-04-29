@@ -9,12 +9,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
+	azresources "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/util/arm"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 	"github.com/openshift/openshift-azure/pkg/util/template"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
@@ -28,8 +28,8 @@ import (
 type Builder struct {
 	GitCommit                string
 	Log                      *logrus.Entry
-	Deployments              azureclient.DeploymentsClient
-	Groups                   azureclient.GroupsClient
+	Deployments              resources.DeploymentsClient
+	Groups                   resources.GroupsClient
 	SubscriptionID           string
 	Location                 string
 	BuildResourceGroup       string
@@ -115,7 +115,7 @@ func (builder *Builder) Run(ctx context.Context) error {
 	}()
 
 	builder.Log.Infof("creating resource group %s", builder.BuildResourceGroup)
-	_, err = builder.Groups.CreateOrUpdate(ctx, builder.BuildResourceGroup, resources.Group{
+	_, err = builder.Groups.CreateOrUpdate(ctx, builder.BuildResourceGroup, azresources.Group{
 		Location: to.StringPtr(builder.Location),
 		Tags: map[string]*string{
 			"now": to.StringPtr(fmt.Sprintf("%d", time.Now().Unix())),
@@ -128,10 +128,10 @@ func (builder *Builder) Run(ctx context.Context) error {
 
 	builder.Log.Infof("deploying template, ssh to VM if needed via:")
 	builder.Log.Infof("  ssh -i id_rsa cloud-user@%s.%s.cloudapp.azure.com", builder.DomainNameLabel, builder.Location)
-	future, err := builder.Deployments.CreateOrUpdate(ctx, builder.BuildResourceGroup, "azuredeploy", resources.Deployment{
-		Properties: &resources.DeploymentProperties{
+	future, err := builder.Deployments.CreateOrUpdate(ctx, builder.BuildResourceGroup, "azuredeploy", azresources.Deployment{
+		Properties: &azresources.DeploymentProperties{
 			Template: template,
-			Mode:     resources.Incremental,
+			Mode:     azresources.Incremental,
 		},
 	})
 	if err != nil {

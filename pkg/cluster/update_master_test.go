@@ -13,7 +13,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_compute"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_updateblob"
@@ -51,8 +51,8 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			ctx := context.Background()
 
 			ubs := mock_updateblob.NewMockBlobService(gmc)
-			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
-			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
+			vmc := mock_compute.NewMockVirtualMachineScaleSetVMsClient(gmc)
+			ssc := mock_compute.NewMockVirtualMachineScaleSetsClient(gmc)
 			kc := mock_kubeclient.NewMockInterface(gmc)
 			hasher := mock_cluster.NewMockHasher(gmc)
 
