@@ -123,7 +123,7 @@ func TestGetControlPlanePods(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		u := &kubeclient{client: tt.kc}
+		u := &Kubeclientset{Client: tt.kc}
 		got, err := u.GetControlPlanePods(context.Background())
 		if (err != nil) != tt.wantErr {
 			t.Errorf("GetControlPlanePods() error = %v, wantErr %v. Test: %v", err, tt.wantErr, tt.name)

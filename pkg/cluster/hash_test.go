@@ -123,9 +123,9 @@ func TestHashScaleSetStability(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			hasher := hasher{
-				startupFactory: startup.New,
-				arm:            arm,
+			hasher := Hash{
+				StartupFactory: startup.New,
+				Arm:            arm,
 			}
 
 			b, err := hasher.HashScaleSet(cs, &api.AgentPoolProfile{Role: tt.role})

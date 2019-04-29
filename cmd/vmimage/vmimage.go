@@ -12,6 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
@@ -85,8 +86,8 @@ func run(ctx context.Context, log *logrus.Entry) error {
 	builder := vmimage.Builder{
 		GitCommit:                gitCommit,
 		Log:                      log,
-		Deployments:              azureclient.NewDeploymentsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
-		Groups:                   azureclient.NewGroupsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
+		Deployments:              resources.NewDeploymentsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
+		Groups:                   resources.NewGroupsClient(ctx, log, os.Getenv("AZURE_SUBSCRIPTION_ID"), authorizer),
 		SubscriptionID:           os.Getenv("AZURE_SUBSCRIPTION_ID"),
 		Location:                 *location,
 		BuildResourceGroup:       *buildResourceGroup,

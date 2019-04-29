@@ -14,12 +14,12 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, hostname string) error {
+func (u *Kubeclientset) DrainAndDeleteWorker(ctx context.Context, hostname string) error {
 	err := u.setUnschedulable(hostname, true)
 	switch {
 	case err == nil:
 	case kerrors.IsNotFound(err):
-		u.log.Info("drain: node not found, skipping")
+		u.Log.Info("drain: node not found, skipping")
 		return nil
 	default:
 		return err
@@ -30,26 +30,26 @@ func (u *kubeclient) DrainAndDeleteWorker(ctx context.Context, hostname string) 
 		return err
 	}
 
-	return u.client.CoreV1().Nodes().Delete(hostname, &metav1.DeleteOptions{})
+	return u.Client.CoreV1().Nodes().Delete(hostname, &metav1.DeleteOptions{})
 }
 
-func (u *kubeclient) DeleteMaster(hostname string) error {
-	err := u.client.CoreV1().Nodes().Delete(hostname, &metav1.DeleteOptions{})
+func (u *Kubeclientset) DeleteMaster(hostname string) error {
+	err := u.Client.CoreV1().Nodes().Delete(hostname, &metav1.DeleteOptions{})
 	if kerrors.IsNotFound(err) {
 		err = nil
 	}
 	return err
 }
 
-func (u *kubeclient) setUnschedulable(hostname string, unschedulable bool) error {
+func (u *Kubeclientset) setUnschedulable(hostname string, unschedulable bool) error {
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		node, err := u.client.CoreV1().Nodes().Get(hostname, metav1.GetOptions{})
+		node, err := u.Client.CoreV1().Nodes().Get(hostname, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
 
 		node.Spec.Unschedulable = unschedulable
-		_, err = u.client.CoreV1().Nodes().Update(node)
+		_, err = u.Client.CoreV1().Nodes().Update(node)
 		return err
 	})
 }
@@ -70,8 +70,8 @@ func max(i, j time.Duration) time.Duration {
 	return j
 }
 
-func (u *kubeclient) deletePods(ctx context.Context, hostname string) error {
-	podList, err := u.client.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
+func (u *Kubeclientset) deletePods(ctx context.Context, hostname string) error {
+	podList, err := u.Client.CoreV1().Pods(metav1.NamespaceAll).List(metav1.ListOptions{
 		FieldSelector: fields.SelectorFromSet(fields.Set{"spec.nodeName": hostname}).String(),
 	})
 	if err != nil {
@@ -90,7 +90,7 @@ func (u *kubeclient) deletePods(ctx context.Context, hostname string) error {
 			continue
 		}
 
-		err = u.client.CoreV1().Pods(pod.Namespace).Delete(pod.Name, &metav1.DeleteOptions{})
+		err = u.Client.CoreV1().Pods(pod.Namespace).Delete(pod.Name, &metav1.DeleteOptions{})
 		switch {
 		case err == nil:
 			d := 30 * time.Second
@@ -113,7 +113,7 @@ func (u *kubeclient) deletePods(ctx context.Context, hostname string) error {
 	defer t.Stop()
 	return wait.PollImmediateUntil(time.Second, func() (bool, error) {
 		for pod := range pods {
-			p, err := u.client.CoreV1().Pods(pod.Namespace).Get(pod.Name, metav1.GetOptions{})
+			p, err := u.Client.CoreV1().Pods(pod.Namespace).Get(pod.Name, metav1.GetOptions{})
 			switch {
 			case apierrors.IsNotFound(err) || (p != nil && p.ObjectMeta.UID != pod.ObjectMeta.UID):
 				delete(pods, pod)

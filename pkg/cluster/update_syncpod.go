@@ -5,18 +5,18 @@ import (
 )
 
 // CreateOrUpdateSyncPod creates or updates the sync pod.
-func (u *simpleUpgrader) CreateOrUpdateSyncPod(ctx context.Context) error {
-	u.log.Infof("updating sync pod")
+func (u *Upgrade) CreateOrUpdateSyncPod(ctx context.Context) error {
+	u.Log.Infof("updating sync pod")
 
-	err := u.writeBlob(SyncBlobName, u.cs)
+	err := u.writeBlob(SyncBlobName, u.Cs)
 	if err != nil {
 		return err
 	}
 
-	hash, err := u.hasher.HashSyncPod(u.cs)
+	hash, err := u.Hasher.HashSyncPod(u.Cs)
 	if err != nil {
 		return err
 	}
 
-	return u.Kubeclient.EnsureSyncPod(ctx, u.cs.Config.Images.Sync, hash)
+	return u.Interface.EnsureSyncPod(ctx, u.Cs.Config.Images.Sync, hash)
 }

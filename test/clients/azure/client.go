@@ -12,8 +12,13 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/insights"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/managedapplications"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/network"
 	externalapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/2019-04-30"
 	adminapi "github.com/openshift/openshift-azure/pkg/util/azureclient/openshiftmanagedcluster/admin"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/resources"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
@@ -35,19 +40,19 @@ func (tf rpFocus) match(focusString string) bool {
 
 // Client is the main controller for azure client objects
 type Client struct {
-	Accounts                         azureclient.AccountsClient
-	ActivityLogs                     azureclient.ActivityLogsClient
-	Applications                     azureclient.ApplicationsClient
+	Accounts                         storage.AccountsClient
+	ActivityLogs                     insights.ActivityLogsClient
+	Applications                     managedapplications.ApplicationsClient
 	BlobStorage                      storage.BlobStorageClient
 	OpenShiftManagedClusters         externalapi.OpenShiftManagedClustersClient
 	OpenShiftManagedClustersAdmin    *adminapi.Client
-	VirtualMachineScaleSets          azureclient.VirtualMachineScaleSetsClient
-	VirtualMachineScaleSetExtensions azureclient.VirtualMachineScaleSetExtensionsClient
-	VirtualMachineScaleSetVMs        azureclient.VirtualMachineScaleSetVMsClient
-	Resources                        azureclient.ResourcesClient
-	VirtualNetworks                  azureclient.VirtualNetworksClient
-	VirtualNetworksPeerings          azureclient.VirtualNetworksPeeringsClient
-	Groups                           azureclient.GroupsClient
+	VirtualMachineScaleSets          compute.VirtualMachineScaleSetsClient
+	VirtualMachineScaleSetExtensions compute.VirtualMachineScaleSetExtensionsClient
+	VirtualMachineScaleSetVMs        compute.VirtualMachineScaleSetVMsClient
+	Resources                        resources.ResourcesClient
+	VirtualNetworks                  network.VirtualNetworksClient
+	VirtualNetworksPeerings          network.VirtualNetworksPeeringsClient
+	Groups                           resources.GroupsClient
 }
 
 // NewClientFromEnvironment creates a new azure client from environment variables.
@@ -96,18 +101,18 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorage
 	rpcAdmin := adminapi.NewClient(rpURL, subscriptionID)
 
 	return &Client{
-		Accounts:                         azureclient.NewAccountsClient(ctx, log, subscriptionID, authorizer),
-		ActivityLogs:                     azureclient.NewActivityLogsClient(ctx, log, subscriptionID, authorizer),
-		Applications:                     azureclient.NewApplicationsClient(ctx, log, subscriptionID, authorizer),
+		Accounts:                         storage.NewAccountsClient(ctx, log, subscriptionID, authorizer),
+		ActivityLogs:                     insights.NewActivityLogsClient(ctx, log, subscriptionID, authorizer),
+		Applications:                     managedapplications.NewApplicationsClient(ctx, log, subscriptionID, authorizer),
 		BlobStorage:                      storageClient,
 		OpenShiftManagedClusters:         rpc,
 		OpenShiftManagedClustersAdmin:    rpcAdmin,
-		VirtualMachineScaleSets:          azureclient.NewVirtualMachineScaleSetsClient(ctx, log, subscriptionID, authorizer),
-		VirtualMachineScaleSetExtensions: azureclient.NewVirtualMachineScaleSetExtensionsClient(ctx, log, subscriptionID, authorizer),
-		VirtualMachineScaleSetVMs:        azureclient.NewVirtualMachineScaleSetVMsClient(ctx, log, subscriptionID, authorizer),
-		Resources:                        azureclient.NewResourcesClient(ctx, log, subscriptionID, authorizer),
-		VirtualNetworks:                  azureclient.NewVirtualNetworkClient(ctx, log, subscriptionID, authorizer),
-		VirtualNetworksPeerings:          azureclient.NewVirtualNetworksPeeringsClient(ctx, log, subscriptionID, authorizer),
-		Groups:                           azureclient.NewGroupsClient(ctx, log, subscriptionID, authorizer),
+		VirtualMachineScaleSets:          compute.NewVirtualMachineScaleSetsClient(ctx, log, subscriptionID, authorizer),
+		VirtualMachineScaleSetExtensions: compute.NewVirtualMachineScaleSetExtensionsClient(ctx, log, subscriptionID, authorizer),
+		VirtualMachineScaleSetVMs:        compute.NewVirtualMachineScaleSetVMsClient(ctx, log, subscriptionID, authorizer),
+		Resources:                        resources.NewResourcesClient(ctx, log, subscriptionID, authorizer),
+		VirtualNetworks:                  network.NewVirtualNetworkClient(ctx, log, subscriptionID, authorizer),
+		VirtualNetworksPeerings:          network.NewVirtualNetworksPeeringsClient(ctx, log, subscriptionID, authorizer),
+		Groups:                           resources.NewGroupsClient(ctx, log, subscriptionID, authorizer),
 	}, nil
 }

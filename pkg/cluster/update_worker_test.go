@@ -13,7 +13,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_compute"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_scaler"
@@ -78,9 +78,9 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 			ctx := context.Background()
 			log := logrus.NewEntry(logrus.StandardLogger())
 			ubs := mock_updateblob.NewMockBlobService(gmc)
-			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
-			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
-			kc := mock_kubeclient.NewMockKubeclient(gmc)
+			vmc := mock_compute.NewMockVirtualMachineScaleSetVMsClient(gmc)
+			ssc := mock_compute.NewMockVirtualMachineScaleSetsClient(gmc)
+			kc := mock_kubeclient.NewMockInterface(gmc)
 			hasher := mock_cluster.NewMockHasher(gmc)
 			sss := []compute.VirtualMachineScaleSet{
 				{
@@ -121,18 +121,18 @@ func TestUpdateWorkerAgentPool(t *testing.T) {
 			// last scale
 			c = targetScaler.EXPECT().Scale(ctx, int64(2)).After(c)
 
-			u := &simpleUpgrader{
-				updateBlobService: ubs,
-				scalerFactory:     scalerFactory,
-				vmc:               vmc,
-				ssc:               ssc,
-				Kubeclient:        kc,
-				log:               log,
-				hasher:            hasher,
-				cs:                tt.cs,
+			u := &Upgrade{
+				UpdateBlobService: ubs,
+				ScalerFactory:     scalerFactory,
+				Vmc:               vmc,
+				Ssc:               ssc,
+				Interface:         kc,
+				Log:               log,
+				Hasher:            hasher,
+				Cs:                tt.cs,
 			}
 			if got := u.UpdateWorkerAgentPool(ctx, &tt.cs.Properties.AgentPoolProfiles[0], tt.suffix); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("simpleUpgrader.UpdateWorkerAgentPool() = %v, want %v", got, tt.want)
+				t.Errorf("Upgrade.UpdateWorkerAgentPool() = %v, want %v", got, tt.want)
 			}
 		})
 	}

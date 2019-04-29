@@ -1,13 +1,10 @@
 package azureclient
 
 //go:generate go get github.com/golang/mock/mockgen
-//go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/azureclient.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE AccountsClient,ActivityLogsClient,ApplicationsClient,Client,DeploymentOperationsClient,DeploymentsClient,GroupsClient,KeyVaultClient,MarketPlaceAgreementsClient,RBACApplicationsClient,RBACGroupsClient,RecordSetsClient,ResourcesClient,ServicePrincipalsClient,VaultMgmtClient,VirtualMachineScaleSetExtensionsClient,VirtualMachineScaleSetsClient,VirtualMachineScaleSetVMsClient,VirtualNetworksClient,VirtualNetworksPeeringsClient,ZonesClient
+//go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/azureclient.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE Client
 //go:generate gofmt -s -l -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
 //go:generate go get golang.org/x/tools/cmd/goimports
 //go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../../util/mocks/mock_$GOPACKAGE/azureclient.go
-//go:generate mockgen -destination=../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go github.com/openshift/openshift-azure/pkg/util/$GOPACKAGE/storage Client,BlobStorageClient,Container,Blob
-//go:generate gofmt -s -l -w ../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go
-//go:generate goimports -local=github.com/openshift/openshift-azure -e -w ../../util/mocks/mock_$GOPACKAGE/mock_storage/storage.go
 
 import (
 	"context"
@@ -62,7 +59,7 @@ func (ls *loggingSender) Do(req *http.Request) (*http.Response, error) {
 	return resp, err
 }
 
-func setupClient(ctx context.Context, log *logrus.Entry, clientName string, client *autorest.Client, authorizer autorest.Authorizer) {
+func SetupClient(ctx context.Context, log *logrus.Entry, clientName string, client *autorest.Client, authorizer autorest.Authorizer) {
 	// if context does not provide languages (sync pod, tests) - use default
 	var languages []string
 	if ctx.Value(api.ContextAcceptLanguages) != nil {

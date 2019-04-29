@@ -8,15 +8,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (u *kubeclient) GetControlPlanePods(ctx context.Context) ([]v1.Pod, error) {
-	namespaces, err := u.client.CoreV1().Namespaces().List(metav1.ListOptions{})
+func (u *Kubeclientset) GetControlPlanePods(ctx context.Context) ([]v1.Pod, error) {
+	namespaces, err := u.Client.CoreV1().Namespaces().List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 	var pods []v1.Pod
 	for _, namespace := range namespaces.Items {
 		if IsControlPlaneNamespace(namespace.Name) {
-			list, err := u.client.CoreV1().Pods(namespace.Name).List(metav1.ListOptions{IncludeUninitialized: true})
+			list, err := u.Client.CoreV1().Pods(namespace.Name).List(metav1.ListOptions{IncludeUninitialized: true})
 			if err != nil {
 				return nil, err
 			}

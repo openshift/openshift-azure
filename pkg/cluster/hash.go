@@ -25,18 +25,20 @@ type Hasher interface {
 	HashSyncPod(cs *api.OpenShiftManagedCluster) ([]byte, error)
 }
 
-type hasher struct {
-	log            *logrus.Entry
-	testConfig     api.TestConfig
-	startupFactory func(*logrus.Entry, *api.OpenShiftManagedCluster, api.TestConfig) (startup.Interface, error)
-	arm            arm.Interface
+type Hash struct {
+	Log            *logrus.Entry
+	TestConfig     api.TestConfig
+	StartupFactory func(*logrus.Entry, *api.OpenShiftManagedCluster, api.TestConfig) (startup.Interface, error)
+	Arm            arm.Interface
 }
 
+var _ Hasher = &Hash{}
+
 // HashScaleSet returns the hash of a scale set
-func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
+func (h *Hash) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoolProfile) ([]byte, error) {
 	hash := sha256.New()
 
-	if armhd, ok := h.arm.(interface {
+	if armhd, ok := h.Arm.(interface {
 		HashData(*api.AgentPoolProfile) ([]byte, error)
 	}); ok {
 		b, err := armhd.HashData(app) // legacy code path only for v3
@@ -47,7 +49,7 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 		hash.Write(b)
 
 	} else {
-		b, err := h.arm.Hash(app)
+		b, err := h.Arm.Hash(app)
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +57,7 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 		hash.Write(b)
 	}
 
-	s, err := h.startupFactory(h.log, cs, h.testConfig)
+	s, err := h.StartupFactory(h.Log, cs, h.TestConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +94,7 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 		hash.Write(cs.Config.Certificates.OpenShiftConsole.Certs[0].Raw)
 		hash.Write(cs.Config.Certificates.Router.Certs[0].Raw)
 
-		if h.testConfig.DebugHashFunctions {
+		if h.TestConfig.DebugHashFunctions {
 			err = ioutil.WriteFile(fmt.Sprintf("cert-console-%d", time.Now().Unix()), cs.Config.Certificates.OpenShiftConsole.Certs[0].Raw, 0666)
 			if err != nil {
 				return nil, err
@@ -108,8 +110,8 @@ func (h *hasher) HashScaleSet(cs *api.OpenShiftManagedCluster, app *api.AgentPoo
 }
 
 // HashSyncPod returns the hash of the sync pod output
-func (h *hasher) HashSyncPod(cs *api.OpenShiftManagedCluster) ([]byte, error) {
-	s, err := sync.New(h.log, cs, false)
+func (h *Hash) HashSyncPod(cs *api.OpenShiftManagedCluster) ([]byte, error) {
+	s, err := sync.New(h.Log, cs, false)
 	if err != nil {
 		return nil, err
 	}

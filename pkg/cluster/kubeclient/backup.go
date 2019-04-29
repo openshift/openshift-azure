@@ -13,9 +13,9 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/wait"
 )
 
-func (u *kubeclient) BackupCluster(ctx context.Context, backupName string) error {
-	u.log.Infof("running an etcd backup")
-	cronjob, err := u.client.BatchV1beta1().CronJobs("openshift-etcd").Get("etcd-backup", metav1.GetOptions{})
+func (u *Kubeclientset) BackupCluster(ctx context.Context, backupName string) error {
+	u.Log.Infof("running an etcd backup")
+	cronjob, err := u.Client.BatchV1beta1().CronJobs("openshift-etcd").Get("etcd-backup", metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -35,20 +35,20 @@ func (u *kubeclient) BackupCluster(ctx context.Context, backupName string) error
 		"--action=save",
 	}
 
-	job, err = u.client.BatchV1().Jobs(job.Namespace).Create(job)
+	job, err = u.Client.BatchV1().Jobs(job.Namespace).Create(job)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
-		err = u.client.BatchV1().Jobs(job.Namespace).Delete(job.Name, &metav1.DeleteOptions{})
+		err = u.Client.BatchV1().Jobs(job.Namespace).Delete(job.Name, &metav1.DeleteOptions{})
 		if err != nil {
-			u.log.Infof("failed to delete job: %s", job.Name)
+			u.Log.Infof("failed to delete job: %s", job.Name)
 		}
 	}()
 
 	err = wait.PollImmediateUntil(2*time.Second, func() (bool, error) {
-		return ready.CheckJobIsReady(u.client.BatchV1().Jobs(job.Namespace), job.Name)()
+		return ready.CheckJobIsReady(u.Client.BatchV1().Jobs(job.Namespace), job.Name)()
 	}, ctx.Done())
 	if err != nil {
 		return err

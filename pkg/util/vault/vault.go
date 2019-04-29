@@ -8,11 +8,11 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
+	azkeyvault "github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
@@ -32,7 +32,7 @@ func SplitSecretURL(kvURL string) (string, string, error) {
 	return vaultURL, secretName, nil
 }
 
-func GetSecret(ctx context.Context, kvc azureclient.KeyVaultClient, secretURL string) (*api.CertKeyPairChain, error) {
+func GetSecret(ctx context.Context, kvc keyvault.KeyVaultClient, secretURL string) (*api.CertKeyPairChain, error) {
 	vaultURL, secretName, err := SplitSecretURL(secretURL)
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func GetSecret(ctx context.Context, kvc azureclient.KeyVaultClient, secretURL st
 	return &api.CertKeyPairChain{Key: key, Certs: certs}, nil
 }
 
-func ImportCertificate(ctx context.Context, kvc azureclient.KeyVaultClient, vaultURL, name string, chain api.CertKeyPairChain) error {
+func ImportCertificate(ctx context.Context, kvc keyvault.KeyVaultClient, vaultURL, name string, chain api.CertKeyPairChain) error {
 	buf := &bytes.Buffer{}
 	b, err := x509.MarshalPKCS8PrivateKey(chain.Key) // Must be PKCS#8 for Azure Key Vault.
 	if err != nil {
@@ -77,11 +77,11 @@ func ImportCertificate(ctx context.Context, kvc azureclient.KeyVaultClient, vaul
 		}
 	}
 
-	_, err = kvc.ImportCertificate(ctx, vaultURL, name, keyvault.CertificateImportParameters{
+	_, err = kvc.ImportCertificate(ctx, vaultURL, name, azkeyvault.CertificateImportParameters{
 		Base64EncodedCertificate: to.StringPtr(buf.String()),
-		CertificatePolicy: &keyvault.CertificatePolicy{
+		CertificatePolicy: &azkeyvault.CertificatePolicy{
 			ID: to.StringPtr(name),
-			SecretProperties: &keyvault.SecretProperties{
+			SecretProperties: &azkeyvault.SecretProperties{
 				ContentType: to.StringPtr("application/x-pem-file"),
 			},
 		},

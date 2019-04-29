@@ -13,7 +13,7 @@ import (
 	"k8s.io/client-go/util/retry"
 )
 
-func (u *kubeclient) EnsureSyncPod(ctx context.Context, syncImage string, hash []byte) error {
+func (u *Kubeclientset) EnsureSyncPod(ctx context.Context, syncImage string, hash []byte) error {
 	{
 		sa := &corev1.ServiceAccount{
 			ObjectMeta: metav1.ObjectMeta{
@@ -21,7 +21,7 @@ func (u *kubeclient) EnsureSyncPod(ctx context.Context, syncImage string, hash [
 				Namespace: "kube-system",
 			},
 		}
-		_, err := u.client.CoreV1().ServiceAccounts(sa.Namespace).Create(sa)
+		_, err := u.Client.CoreV1().ServiceAccounts(sa.Namespace).Create(sa)
 		if err != nil && !errors.IsAlreadyExists(err) {
 			return err
 		}
@@ -29,7 +29,7 @@ func (u *kubeclient) EnsureSyncPod(ctx context.Context, syncImage string, hash [
 
 	{
 		err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-			existing, err := u.seccli.SecurityV1().SecurityContextConstraints().Get("privileged", metav1.GetOptions{})
+			existing, err := u.Seccli.SecurityV1().SecurityContextConstraints().Get("privileged", metav1.GetOptions{})
 			if err != nil {
 				return err
 			}
@@ -39,7 +39,7 @@ func (u *kubeclient) EnsureSyncPod(ctx context.Context, syncImage string, hash [
 				}
 			}
 			existing.Users = append(existing.Users, "system:serviceaccount:kube-system:sync")
-			_, err = u.seccli.SecurityV1().SecurityContextConstraints().Update(existing)
+			_, err = u.Seccli.SecurityV1().SecurityContextConstraints().Update(existing)
 			return err
 		})
 		if err != nil {
@@ -121,15 +121,15 @@ func (u *kubeclient) EnsureSyncPod(ctx context.Context, syncImage string, hash [
 			},
 		}
 
-		_, err := u.client.AppsV1().Deployments(d.Namespace).Create(d)
+		_, err := u.Client.AppsV1().Deployments(d.Namespace).Create(d)
 		if errors.IsAlreadyExists(err) {
 			err = retry.RetryOnConflict(retry.DefaultRetry, func() error {
-				existing, err := u.client.AppsV1().Deployments(d.Namespace).Get(d.Name, metav1.GetOptions{})
+				existing, err := u.Client.AppsV1().Deployments(d.Namespace).Get(d.Name, metav1.GetOptions{})
 				if err != nil {
 					return err
 				}
 				d.ResourceVersion = existing.ResourceVersion
-				_, err = u.client.AppsV1().Deployments(d.Namespace).Update(d)
+				_, err = u.Client.AppsV1().Deployments(d.Namespace).Update(d)
 				return err
 			})
 		}
@@ -157,16 +157,16 @@ func (u *kubeclient) EnsureSyncPod(ctx context.Context, syncImage string, hash [
 			},
 		}
 
-		_, err := u.client.CoreV1().Services(svc.Namespace).Create(svc)
+		_, err := u.Client.CoreV1().Services(svc.Namespace).Create(svc)
 		if errors.IsAlreadyExists(err) {
 			err = retry.RetryOnConflict(retry.DefaultRetry, func() error {
-				existing, err := u.client.CoreV1().Services(svc.Namespace).Get(svc.Name, metav1.GetOptions{})
+				existing, err := u.Client.CoreV1().Services(svc.Namespace).Get(svc.Name, metav1.GetOptions{})
 				if err != nil {
 					return err
 				}
 				svc.ResourceVersion = existing.ResourceVersion
 				svc.Spec.ClusterIP = existing.Spec.ClusterIP
-				_, err = u.client.CoreV1().Services(svc.Namespace).Update(svc)
+				_, err = u.Client.CoreV1().Services(svc.Namespace).Update(svc)
 				return err
 			})
 		}

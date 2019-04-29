@@ -10,18 +10,18 @@ import (
 	"context"
 	"strings"
 
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
+	azcompute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
 )
 
 // Factory interface is to create new Scaler instances.
 type Factory interface {
-	New(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Kubeclient, resourceGroup string, ss *compute.VirtualMachineScaleSet) Scaler
+	New(log *logrus.Entry, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *azcompute.VirtualMachineScaleSet) Scaler
 }
 
 type scalerFactory struct{}
@@ -44,20 +44,20 @@ type Scaler interface {
 type workerScaler struct {
 	log *logrus.Entry
 
-	ssc        azureclient.VirtualMachineScaleSetsClient
-	vmc        azureclient.VirtualMachineScaleSetVMsClient
-	kubeclient kubeclient.Kubeclient
+	ssc        compute.VirtualMachineScaleSetsClient
+	vmc        compute.VirtualMachineScaleSetVMsClient
+	kubeclient kubeclient.Interface
 
 	resourceGroup string
 
-	ss    *compute.VirtualMachineScaleSet
-	vms   []compute.VirtualMachineScaleSetVM
+	ss    *azcompute.VirtualMachineScaleSet
+	vms   []azcompute.VirtualMachineScaleSetVM
 	vmMap map[string]struct{}
 }
 
 var _ Scaler = &workerScaler{}
 
-func (sf *scalerFactory) New(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Kubeclient, resourceGroup string, ss *compute.VirtualMachineScaleSet) Scaler {
+func (sf *scalerFactory) New(log *logrus.Entry, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *azcompute.VirtualMachineScaleSet) Scaler {
 	return &workerScaler{log: log, ssc: ssc, vmc: vmc, kubeclient: kubeclient, resourceGroup: resourceGroup, ss: ss}
 }
 
@@ -77,7 +77,7 @@ func (ws *workerScaler) initializeCache(ctx context.Context) error {
 // updateCache updates the cached list of scale set VMs, ensures that ws.vmMap is
 // correct, and ensures that the recorded scale set capacity matches the number
 // of VMs.
-func (ws *workerScaler) updateCache(vms []compute.VirtualMachineScaleSetVM) {
+func (ws *workerScaler) updateCache(vms []azcompute.VirtualMachineScaleSetVM) {
 	ws.vms = vms
 
 	ws.vmMap = make(map[string]struct{}, len(ws.vms))
@@ -111,8 +111,8 @@ func (ws *workerScaler) scaleUp(ctx context.Context, count int64) *api.PluginErr
 		}
 	}
 
-	err := ws.ssc.Update(ctx, ws.resourceGroup, *ws.ss.Name, compute.VirtualMachineScaleSetUpdate{
-		Sku: &compute.Sku{
+	err := ws.ssc.Update(ctx, ws.resourceGroup, *ws.ss.Name, azcompute.VirtualMachineScaleSetUpdate{
+		Sku: &azcompute.Sku{
 			Capacity: to.Int64Ptr(count),
 		},
 	})

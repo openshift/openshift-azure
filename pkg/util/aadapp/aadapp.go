@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac"
+	azgraphrbac "github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac"
 	"github.com/Azure/go-autorest/autorest/to"
 
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/graphrbac"
 )
 
 // GetApplicationObjectIDFromAppID returns the ObjectID of the AAD application
 // corresponding to a given appID
-func GetApplicationObjectIDFromAppID(ctx context.Context, appClient azureclient.RBACApplicationsClient, appID string) (string, error) {
+func GetApplicationObjectIDFromAppID(ctx context.Context, appClient graphrbac.RBACApplicationsClient, appID string) (string, error) {
 	app, err := appClient.List(ctx, fmt.Sprintf("appid eq '%s'", appID))
 	if err != nil {
 		return "", err
@@ -27,7 +27,7 @@ func GetApplicationObjectIDFromAppID(ctx context.Context, appClient azureclient.
 
 // GetServicePrincipalObjectIDFromAppID returns the ObjectID of the service
 // principal corresponding to a given appID
-func GetServicePrincipalObjectIDFromAppID(ctx context.Context, spc azureclient.ServicePrincipalsClient, appID string) (string, error) {
+func GetServicePrincipalObjectIDFromAppID(ctx context.Context, spc graphrbac.ServicePrincipalsClient, appID string) (string, error) {
 	sp, err := spc.List(ctx, fmt.Sprintf("appID eq '%s'", appID))
 	if err != nil {
 		return "", err
@@ -41,8 +41,8 @@ func GetServicePrincipalObjectIDFromAppID(ctx context.Context, spc azureclient.S
 }
 
 // UpdateAADApp updates the ReplyURLs in an AAD app.
-func UpdateAADApp(ctx context.Context, appClient azureclient.RBACApplicationsClient, appObjID string, callbackURL string) error {
-	_, err := appClient.Patch(ctx, appObjID, graphrbac.ApplicationUpdateParameters{
+func UpdateAADApp(ctx context.Context, appClient graphrbac.RBACApplicationsClient, appObjID string, callbackURL string) error {
+	_, err := appClient.Patch(ctx, appObjID, azgraphrbac.ApplicationUpdateParameters{
 		Homepage:       to.StringPtr(callbackURL),
 		ReplyUrls:      &[]string{callbackURL},
 		IdentifierUris: &[]string{callbackURL},

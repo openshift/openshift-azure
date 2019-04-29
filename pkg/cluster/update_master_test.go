@@ -13,7 +13,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_compute"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_cluster"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_updateblob"
@@ -51,19 +51,19 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 			ctx := context.Background()
 
 			ubs := mock_updateblob.NewMockBlobService(gmc)
-			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
-			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
-			kc := mock_kubeclient.NewMockKubeclient(gmc)
+			vmc := mock_compute.NewMockVirtualMachineScaleSetVMsClient(gmc)
+			ssc := mock_compute.NewMockVirtualMachineScaleSetsClient(gmc)
+			kc := mock_kubeclient.NewMockInterface(gmc)
 			hasher := mock_cluster.NewMockHasher(gmc)
 
-			u := &simpleUpgrader{
-				updateBlobService: ubs,
-				vmc:               vmc,
-				ssc:               ssc,
-				Kubeclient:        kc,
-				log:               logrus.NewEntry(logrus.StandardLogger()),
-				hasher:            hasher,
-				cs:                tt.cs,
+			u := &Upgrade{
+				UpdateBlobService: ubs,
+				Vmc:               vmc,
+				Ssc:               ssc,
+				Interface:         kc,
+				Log:               logrus.NewEntry(logrus.StandardLogger()),
+				Hasher:            hasher,
+				Cs:                tt.cs,
 			}
 
 			hostnameHashes := map[string][]byte{}
@@ -106,7 +106,7 @@ func TestUpdateMasterAgentPool(t *testing.T) {
 				c = ubs.EXPECT().Write(uBlob).Return(nil).After(c)
 			}
 			if got := u.UpdateMasterAgentPool(ctx, &tt.cs.Properties.AgentPoolProfiles[0]); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("simpleUpgrader.updateInPlace() = %v, want %v", got, tt.want)
+				t.Errorf("Upgrade.updateInPlace() = %v, want %v", got, tt.want)
 			}
 		})
 	}

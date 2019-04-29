@@ -12,7 +12,7 @@ import (
 
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
-	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_azureclient/mock_compute"
 	"github.com/openshift/openshift-azure/pkg/util/mocks/mock_kubeclient"
 )
 
@@ -126,10 +126,10 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 			ctx := context.Background()
 			gmc := gomock.NewController(t)
 			defer gmc.Finish()
-			ssc := mock_azureclient.NewMockVirtualMachineScaleSetsClient(gmc)
-			vmc := mock_azureclient.NewMockVirtualMachineScaleSetVMsClient(gmc)
+			ssc := mock_compute.NewMockVirtualMachineScaleSetsClient(gmc)
+			vmc := mock_compute.NewMockVirtualMachineScaleSetVMsClient(gmc)
 
-			kc := mock_kubeclient.NewMockKubeclient(gmc)
+			kc := mock_kubeclient.NewMockInterface(gmc)
 			if tt.wantErr {
 				if tt.expectedErr == vmListErr {
 					vmc.EXPECT().List(ctx, testRg, names.GetScalesetName(&cs.Properties.AgentPoolProfiles[tt.appIndex], ""), "", "", "").Return(nil, tt.expectedErr)
@@ -150,19 +150,19 @@ func TestWaitForNodesInAgentPoolProfile(t *testing.T) {
 				}
 			}
 
-			u := &simpleUpgrader{
-				vmc:        vmc,
-				ssc:        ssc,
-				Kubeclient: kc,
-				log:        logrus.NewEntry(logrus.StandardLogger()),
-				cs:         cs,
+			u := &Upgrade{
+				Vmc:       vmc,
+				Ssc:       ssc,
+				Interface: kc,
+				Log:       logrus.NewEntry(logrus.StandardLogger()),
+				Cs:        cs,
 			}
 			err := u.WaitForNodesInAgentPoolProfile(ctx, &cs.Properties.AgentPoolProfiles[tt.appIndex], "")
 			if tt.wantErr && tt.expectedErr != err {
-				t.Errorf("simpleUpgrader.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
+				t.Errorf("Upgrade.waitForNodes() wrong error got = %v, expected %v", err, tt.expectedErr)
 			}
 			if !tt.wantErr && err != nil {
-				t.Errorf("simpleUpgrader.waitForNodes() unexpected error = %v", err)
+				t.Errorf("Upgrade.waitForNodes() unexpected error = %v", err)
 			}
 		})
 	}

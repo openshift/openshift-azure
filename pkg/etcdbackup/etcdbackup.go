@@ -15,7 +15,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	azureclientstorage "github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 )
 
 // EtcdBackup used to perform backup maintenance
@@ -27,7 +27,7 @@ type EtcdBackup interface {
 }
 
 type etcdBackup struct {
-	etcdContainer azureclientstorage.Container
+	etcdContainer storage.Container
 	etcdClient    *clientv3.Client
 	maxBackups    int
 	log           *logrus.Entry
@@ -36,7 +36,7 @@ type etcdBackup struct {
 var _ EtcdBackup = &etcdBackup{}
 
 // NewEtcdBackup create a new instance
-func NewEtcdBackup(log *logrus.Entry, etcdContainer azureclientstorage.Container, etcdClient *clientv3.Client, maxBackups int) EtcdBackup {
+func NewEtcdBackup(log *logrus.Entry, etcdContainer storage.Container, etcdClient *clientv3.Client, maxBackups int) EtcdBackup {
 	eb := etcdBackup{
 		etcdContainer: etcdContainer,
 		etcdClient:    etcdClient,

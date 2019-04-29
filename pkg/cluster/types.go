@@ -10,7 +10,6 @@ import (
 	"context"
 
 	azstorage "github.com/Azure/azure-sdk-for-go/storage"
-	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -20,7 +19,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/startup"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient/fake"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/wait"
@@ -58,31 +58,31 @@ type Upgrader interface {
 	WriteStartupBlobs() error
 	GenerateARM(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error)
 
-	kubeclient.Kubeclient
+	kubeclient.Interface
 }
 
-type simpleUpgrader struct {
-	kubeclient.Kubeclient
+type Upgrade struct {
+	kubeclient.Interface
 
-	testConfig        api.TestConfig
-	accountsClient    azureclient.AccountsClient
-	storageClient     storage.Client
-	updateBlobService updateblob.BlobService
-	vmc               azureclient.VirtualMachineScaleSetVMsClient
-	ssc               azureclient.VirtualMachineScaleSetsClient
-	kvc               azureclient.KeyVaultClient
-	log               *logrus.Entry
-	scalerFactory     scaler.Factory
-	hasher            Hasher
-	arm               arm.Interface
+	TestConfig        api.TestConfig
+	AccountsClient    storage.AccountsClient
+	StorageClient     storage.Client
+	UpdateBlobService updateblob.BlobService
+	Vmc               compute.VirtualMachineScaleSetVMsClient
+	Ssc               compute.VirtualMachineScaleSetsClient
+	Kvc               keyvault.KeyVaultClient
+	Log               *logrus.Entry
+	ScalerFactory     scaler.Factory
+	Hasher            Hasher
+	Arm               arm.Interface
 
-	cs *api.OpenShiftManagedCluster
+	Cs *api.OpenShiftManagedCluster
 
-	getConsoleClient   func(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient
-	getAPIServerClient func(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient
+	GetConsoleClient   func(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient
+	GetAPIServerClient func(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient
 }
 
-var _ Upgrader = &simpleUpgrader{}
+var _ Upgrader = &Upgrade{}
 
 // NewSimpleUpgrader creates a new upgrader instance
 func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, initializeStorageClients, disableKeepAlives bool, testConfig api.TestConfig) (Upgrader, error) {
@@ -106,26 +106,26 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 		return nil, err
 	}
 
-	u := &simpleUpgrader{
-		Kubeclient: kubeclient,
+	u := &Upgrade{
+		Interface: kubeclient,
 
-		testConfig:     testConfig,
-		accountsClient: azureclient.NewAccountsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		vmc:            azureclient.NewVirtualMachineScaleSetVMsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		ssc:            azureclient.NewVirtualMachineScaleSetsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
-		kvc:            azureclient.NewKeyVaultClient(ctx, log, vaultauthorizer),
-		log:            log,
-		scalerFactory:  scaler.NewFactory(),
-		hasher: &hasher{
-			log:            log,
-			testConfig:     testConfig,
-			startupFactory: startup.New,
-			arm:            arm,
+		TestConfig:     testConfig,
+		AccountsClient: storage.NewAccountsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		Vmc:            compute.NewVirtualMachineScaleSetVMsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		Ssc:            compute.NewVirtualMachineScaleSetsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
+		Kvc:            keyvault.NewKeyVaultClient(ctx, log, vaultauthorizer),
+		Log:            log,
+		ScalerFactory:  scaler.NewFactory(),
+		Hasher: &Hash{
+			Log:            log,
+			TestConfig:     testConfig,
+			StartupFactory: startup.New,
+			Arm:            arm,
 		},
-		arm:                arm,
-		cs:                 cs,
-		getConsoleClient:   getConsoleClient,
-		getAPIServerClient: getAPIServerClient,
+		Arm:                arm,
+		Cs:                 cs,
+		GetConsoleClient:   getConsoleClient,
+		GetAPIServerClient: getAPIServerClient,
 	}
 
 	if initializeStorageClients {
@@ -138,60 +138,19 @@ func NewSimpleUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShift
 	return u, nil
 }
 
-func getFakeHTTPClient(cs *api.OpenShiftManagedCluster) wait.SimpleHTTPClient {
-	return wait.NewFakeHTTPClient()
+func (u *Upgrade) EnrichCertificatesFromVault(ctx context.Context) error {
+	return enrich.CertificatesFromVault(ctx, u.Kvc, u.Cs)
 }
 
-func NewFakeUpgrader(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig, kubeclient kubeclient.Kubeclient, azs *fake.AzureCloud) (Upgrader, error) {
-	arm, err := arm.New(ctx, log, cs, testConfig)
+func (u *Upgrade) EnrichStorageAccountKeys(ctx context.Context) error {
+	return enrich.StorageAccountKeys(ctx, u.AccountsClient, u.Cs)
+}
+
+func (u *Upgrade) GenerateARM(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
+	err := enrich.SASURIs(u.StorageClient, u.Cs)
 	if err != nil {
 		return nil, err
 	}
 
-	u := &simpleUpgrader{
-		Kubeclient: kubeclient,
-
-		testConfig:     testConfig,
-		accountsClient: azs.AccountsClient,
-		storageClient:  azs.StorageClient,
-		vmc:            azs.VirtualMachineScaleSetVMsClient,
-		ssc:            azs.VirtualMachineScaleSetsClient,
-		kvc:            azs.KeyVaultClient,
-		log:            log,
-		scalerFactory:  scaler.NewFactory(),
-		hasher: &hasher{
-			log:            log,
-			testConfig:     testConfig,
-			startupFactory: startup.New,
-			arm:            arm,
-		},
-		arm:                arm,
-		getConsoleClient:   getFakeHTTPClient,
-		getAPIServerClient: getFakeHTTPClient,
-		cs:                 cs,
-	}
-
-	u.cs.Config.ConfigStorageAccountKey = "config"
-	u.cs.Config.ConfigStorageAccountKey = uuid.NewV4().String()
-	bsc := u.storageClient.GetBlobService()
-	u.updateBlobService = updateblob.NewBlobService(bsc)
-
-	return u, nil
-}
-
-func (u *simpleUpgrader) EnrichCertificatesFromVault(ctx context.Context) error {
-	return enrich.CertificatesFromVault(ctx, u.kvc, u.cs)
-}
-
-func (u *simpleUpgrader) EnrichStorageAccountKeys(ctx context.Context) error {
-	return enrich.StorageAccountKeys(ctx, u.accountsClient, u.cs)
-}
-
-func (u *simpleUpgrader) GenerateARM(ctx context.Context, backupBlob string, isUpdate bool, suffix string) (map[string]interface{}, error) {
-	err := enrich.SASURIs(u.storageClient, u.cs)
-	if err != nil {
-		return nil, err
-	}
-
-	return u.arm.Generate(ctx, backupBlob, isUpdate, suffix)
+	return u.Arm.Generate(ctx, backupBlob, isUpdate, suffix)
 }

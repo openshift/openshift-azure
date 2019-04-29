@@ -15,7 +15,7 @@ import (
 	api "github.com/openshift/openshift-azure/pkg/api"
 	kubeclient "github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	scaler "github.com/openshift/openshift-azure/pkg/cluster/scaler"
-	azureclient "github.com/openshift/openshift-azure/pkg/util/azureclient"
+	compute0 "github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
 )
 
 // MockFactory is a mock of Factory interface
@@ -42,7 +42,7 @@ func (m *MockFactory) EXPECT() *MockFactoryMockRecorder {
 }
 
 // New mocks base method
-func (m *MockFactory) New(log *logrus.Entry, ssc azureclient.VirtualMachineScaleSetsClient, vmc azureclient.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Kubeclient, resourceGroup string, ss *compute.VirtualMachineScaleSet) scaler.Scaler {
+func (m *MockFactory) New(log *logrus.Entry, ssc compute0.VirtualMachineScaleSetsClient, vmc compute0.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *compute.VirtualMachineScaleSet) scaler.Scaler {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "New", log, ssc, vmc, kubeclient, resourceGroup, ss)
 	ret0, _ := ret[0].(scaler.Scaler)

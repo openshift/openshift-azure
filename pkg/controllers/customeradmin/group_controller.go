@@ -17,7 +17,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/graphrbac"
 )
 
 const (
@@ -26,7 +26,7 @@ const (
 
 type reconcileGroup struct {
 	userV1    userv1client.UserV1Interface
-	aadClient azureclient.RBACGroupsClient
+	aadClient graphrbac.RBACGroupsClient
 	log       *logrus.Entry
 	groupMap  map[string]string
 	config    api.AADIdentityProvider

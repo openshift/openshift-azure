@@ -13,6 +13,7 @@ import (
 
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/test/clients/openshift"
@@ -56,7 +57,7 @@ func NewSanityChecker(ctx context.Context, log *logrus.Entry, cs *internalapi.Op
 		return nil, err
 	}
 
-	kvc := azureclient.NewKeyVaultClient(ctx, log, vaultauthorizer)
+	kvc := keyvault.NewKeyVaultClient(ctx, log, vaultauthorizer)
 
 	err = enrich.CertificatesFromVault(ctx, kvc, cs)
 	if err != nil {

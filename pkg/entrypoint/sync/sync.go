@@ -13,6 +13,8 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster"
 	syncapi "github.com/openshift/openshift-azure/pkg/sync"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/storage"
 	"github.com/openshift/openshift-azure/pkg/util/cloudprovider"
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
@@ -37,14 +39,14 @@ func start(cfg *cmdConfig) error {
 		return err
 	}
 
-	azs := azureclient.NewAccountsClient(ctx, log, cpc.SubscriptionID, authorizer)
+	azs := storage.NewAccountsClient(ctx, log, cpc.SubscriptionID, authorizer)
 
 	vaultauthorizer, err := azureclient.NewAuthorizer(cpc.AadClientID, cpc.AadClientSecret, cpc.TenantID, azureclient.KeyVaultEndpoint)
 	if err != nil {
 		return err
 	}
 
-	kvc := azureclient.NewKeyVaultClient(ctx, log, vaultauthorizer)
+	kvc := keyvault.NewKeyVaultClient(ctx, log, vaultauthorizer)
 
 	bsc, err := configblob.GetService(ctx, log, cpc)
 	if err != nil {
