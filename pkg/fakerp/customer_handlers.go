@@ -17,7 +17,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 	cs := req.Context().Value(ContainerService).(*internalapi.OpenShiftManagedCluster)
 
 	cs.Properties.ProvisioningState = internalapi.Deleting
-	s.store.Put(ContainerServiceKey, cs)
+	s.store.Put(cs)
 
 	s.log.Info("deleting service principals")
 	am, err := newAADManager(req.Context(), s.log, cs, s.testConfig)
@@ -59,7 +59,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	s.store.Delete(ContainerServiceKey)
+	s.store.Delete()
 }
 
 func (s *Server) handleGet(w http.ResponseWriter, req *http.Request) {
@@ -95,18 +95,18 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	}
 	// HACK: We persist new ContainerService early.
 	// This will overwrite old copy cs with new req version
-	s.store.Put(ContainerServiceKey, cs)
+	s.store.Put(cs)
 
 	// apply the request
 	cs, err = createOrUpdateWrapper(req.Context(), s.plugin, s.log, cs, oldCs, isAdminRequest, s.testConfig)
 	if err != nil {
 		oldCs.Properties.ProvisioningState = internalapi.Failed
-		s.store.Put(ContainerServiceKey, oldCs)
+		s.store.Put(oldCs)
 		s.badRequest(w, fmt.Sprintf("Failed to apply request: %v", err))
 		return
 	}
 	cs.Properties.ProvisioningState = internalapi.Succeeded
-	s.store.Put(ContainerServiceKey, cs)
+	s.store.Put(cs)
 	// TODO: Should return status.Accepted similar to how we handle DELETEs
 	s.reply(w, req)
 }

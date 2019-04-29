@@ -59,7 +59,7 @@ func (s *Server) adminreply(w http.ResponseWriter, err error, out interface{}) {
 
 // reply return either admin or external api response
 func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
-	cs, err := s.store.Get(ContainerServiceKey)
+	cs, err := s.store.Get()
 	if err != nil {
 		s.badRequest(w, fmt.Sprintf("Failed to call store: %v", err))
 		return

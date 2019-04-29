@@ -33,7 +33,7 @@ type Server struct {
 	gc resources.GroupsClient
 
 	sync.RWMutex
-	store *store.Storage
+	store store.Store
 
 	log      *logrus.Entry
 	address  string

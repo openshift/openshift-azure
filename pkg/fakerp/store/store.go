@@ -1,7 +1,6 @@
 package store
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -13,68 +12,51 @@ import (
 )
 
 type Store interface {
-	Put(key string, cs *api.OpenShiftManagedCluster) error
-	Get(key string) (*api.OpenShiftManagedCluster, error)
-	Delete(key string) error
+	Put(cs *api.OpenShiftManagedCluster) error
+	Get() (*api.OpenShiftManagedCluster, error)
+	Delete() error
 }
 
-type Storage struct {
+type storage struct {
 	dir string
 	log *logrus.Entry
 }
 
-var _ Store = &Storage{}
+var _ Store = &storage{}
 
-func New(log *logrus.Entry, dir string) *Storage {
-	dir = filepath.Clean(dir)
-	return &Storage{
+func New(log *logrus.Entry, dir string) Store {
+	return &storage{
 		dir: dir,
 		log: log,
 	}
 }
 
-func (s *Storage) Put(key string, cs *api.OpenShiftManagedCluster) error {
-	if key == "" {
-		return fmt.Errorf("missing key - unable to save")
-	}
-
-	fnlPath := filepath.Join(s.dir, key)
-	tmpPath := fnlPath + ".tmp"
-
-	if err := os.MkdirAll(s.dir, 0755); err != nil {
-		return err
-	}
-
+func (s *storage) Put(cs *api.OpenShiftManagedCluster) error {
 	b, err := yaml.Marshal(cs)
 	if err != nil {
 		return err
 	}
 
-	if err := ioutil.WriteFile(tmpPath, b, 0644); err != nil {
+	err = os.MkdirAll(s.dir, 0777)
+	if err != nil {
 		return err
 	}
 
-	return os.Rename(tmpPath, fnlPath)
+	return ioutil.WriteFile(filepath.Join(s.dir, "containerservice.yaml"), b, 0666)
 }
 
-// Get a record from the database
-func (s *Storage) Get(key string) (*api.OpenShiftManagedCluster, error) {
-	if key == "" {
-		return nil, fmt.Errorf("missing key - unable to read")
-	}
-	record := filepath.Join(s.dir, key)
-
-	b, err := ioutil.ReadFile(record)
+// TODO: in future, can pass the resourcegroup/resource name here
+func (s *storage) Get() (cs *api.OpenShiftManagedCluster, err error) {
+	b, err := ioutil.ReadFile(filepath.Join(s.dir, "containerservice.yaml"))
 	if err != nil {
 		return nil, err
 	}
 
-	var cs *api.OpenShiftManagedCluster
 	err = yaml.Unmarshal(b, &cs)
-	return cs, err
+	return
 }
 
-func (s *Storage) Delete(key string) error {
-	record := filepath.Join(s.dir, key)
-	return os.RemoveAll(record)
+// TODO: in future, can pass the resourcegroup/resource name here
+func (s *storage) Delete() error {
+	return os.RemoveAll(s.dir)
 }

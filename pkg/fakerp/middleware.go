@@ -57,7 +57,7 @@ func (s *Server) context(handler http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, api.ContextKeyVaultClientAuthorizer, vaultauthorizer)
 
 		// we ignore errors, as those are handled by code using the object
-		cs, _ := s.store.Get(ContainerServiceKey)
+		cs, _ := s.store.Get()
 		ctx = context.WithValue(ctx, ContainerService, cs)
 
 		handler.ServeHTTP(w, r.WithContext(ctx))
