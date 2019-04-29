@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	ContainerServicesKey = "containerservice.yaml"
+	ContainerService    api.ContextKey = "ContainerService"
+	ContainerServiceKey string         = "containerservice.yaml"
 )
 
 func GetTestConfig() api.TestConfig {

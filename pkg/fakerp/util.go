@@ -59,17 +59,13 @@ func (s *Server) adminreply(w http.ResponseWriter, err error, out interface{}) {
 
 // reply return either admin or external api response
 func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
-	cs := req.Context().Value(ContainerServicesKey).(*api.OpenShiftManagedCluster)
-
-	if &cs == nil {
-		// If the object is not found in memory then
-		// it must have been deleted or never existed.
-		w.WriteHeader(http.StatusNoContent)
+	cs, err := s.store.Get(ContainerServiceKey)
+	if err != nil {
+		s.badRequest(w, fmt.Sprintf("Failed to call store: %v", err))
 		return
 	}
 
 	var res []byte
-	var err error
 	if strings.HasPrefix(req.URL.Path, "/admin") {
 		oc := admin.FromInternal(cs)
 		res, err = json.Marshal(oc)
@@ -131,32 +127,4 @@ func writeHelpers(log *logrus.Entry, cs *api.OpenShiftManagedCluster) error {
 		return err
 	}
 	return ioutil.WriteFile("_data/_out/admin.kubeconfig", b, 0600)
-}
-
-func (s *Server) writeState(state api.ProvisioningState) error {
-	data, err := s.store.Get(ContainerServicesKey)
-	if err != nil {
-		return err
-	}
-
-	var cs *api.OpenShiftManagedCluster
-	err = yaml.Unmarshal(data, &cs)
-	if err != nil {
-		return err
-	}
-
-	cs.Properties.ProvisioningState = state
-	data, err = yaml.Marshal(cs)
-	if err != nil {
-		return err
-	}
-	return s.store.Put(ContainerServicesKey, data)
-}
-
-func (s *Server) write(cs *api.OpenShiftManagedCluster) error {
-	data, err := yaml.Marshal(cs)
-	if err != nil {
-		return err
-	}
-	return s.store.Put(ContainerServicesKey, data)
 }

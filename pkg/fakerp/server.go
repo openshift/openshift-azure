@@ -45,20 +45,17 @@ type Server struct {
 }
 
 func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
-	st, err := store.New(log, "_data")
-	if err != nil {
-		log.Fatal(err)
-	}
 	s := &Server{
 		router:     chi.NewRouter(),
 		inProgress: make(chan struct{}, 1),
 		log:        log,
 		address:    address,
-		store:      st,
+		store:      store.New(log, "_data"),
 		basePath:   "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{provider}/openShiftManagedClusters/{resourceName}",
 	}
 
 	var errs []error
+	var err error
 	s.testConfig = GetTestConfig()
 	s.pluginTemplate, err = GetPluginTemplate()
 	if err != nil {
