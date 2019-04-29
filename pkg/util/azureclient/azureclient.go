@@ -70,7 +70,9 @@ func SetupClient(ctx context.Context, log *logrus.Entry, clientName string, clie
 	client.RequestInspector = addAcceptLanguages(languages)
 	client.PollingDelay = 10 * time.Second
 	client.Sender = &retrySender{Sender: client.Sender, log: log, clientName: clientName}
-	//client.Sender = &loggingSender{client.Sender}
+	if os.Getenv("AZURE_DEBUG") != "" {
+		client.Sender = &loggingSender{client.Sender}
+	}
 }
 
 func NewAuthorizer(clientID, clientSecret, tenantID, resource string) (autorest.Authorizer, error) {
