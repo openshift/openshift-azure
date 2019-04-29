@@ -6,9 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"sync"
 
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/ghodss/yaml"
 	"github.com/go-chi/chi"
 	"github.com/sirupsen/logrus"
@@ -22,17 +20,12 @@ import (
 	"github.com/openshift/openshift-azure/pkg/plugin"
 )
 
-var once sync.Once
-
 type Server struct {
 	router *chi.Mux
 	// the server will not process more than a single
 	// PUT request at all times.
 	inProgress chan struct{}
 
-	gc resources.GroupsClient
-
-	sync.RWMutex
 	store store.Store
 
 	log      *logrus.Entry
