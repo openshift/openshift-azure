@@ -61,7 +61,8 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 }
 
 func (s *Server) handleGet(w http.ResponseWriter, req *http.Request) {
-	s.reply(w, req)
+	cs := req.Context().Value(ContainerService).(*internalapi.OpenShiftManagedCluster)
+	s.reply(w, req, cs)
 }
 
 func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
@@ -102,5 +103,6 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	}
 	cs.Properties.ProvisioningState = internalapi.Succeeded
 	s.store.Put(cs)
-	s.reply(w, req)
+
+	s.reply(w, req, cs)
 }
