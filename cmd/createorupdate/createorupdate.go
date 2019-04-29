@@ -89,9 +89,6 @@ func createOrUpdatev20190430(ctx context.Context, log *logrus.Entry, rpc v201904
 
 func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, ac *adminclient.Client, rpc v20190430client.OpenShiftManagedClustersClient, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) (*v20190430.OpenShiftManagedCluster, error) {
 	log.Info("creating/updating cluster")
-	if oc.Properties != nil {
-		oc.Properties.ProvisioningState = nil // TODO: should not need to do this
-	}
 	resp, err := ac.CreateOrUpdate(ctx, resourceGroup, resourceGroup, oc)
 	if err != nil {
 		return nil, err
