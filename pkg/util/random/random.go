@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"io"
 	"math/big"
+	"strings"
 )
 
 // String returns a random string of length n comprised of bytes in letterBytes
@@ -46,14 +47,28 @@ func Bytes(n int) ([]byte, error) {
 	return b, nil
 }
 
+func isMicrosoftReserved(s string) bool {
+	// https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-reserved-resource-name
+	for _, reserved := range []string{"login", "microsoft", "windows", "xbox"} {
+		if strings.Contains(strings.ToLower(s), reserved) {
+			return true
+		}
+	}
+	return false
+}
+
 // StorageAccountName returns a random string suitable for use as an Azure
 // storage account name
 func StorageAccountName(prefix string) (string, error) {
-	name, err := LowerCaseAlphanumericString(24 - len(prefix))
-	if err != nil {
-		return "", err
+	for {
+		name, err := LowerCaseAlphanumericString(24 - len(prefix))
+		if err != nil {
+			return "", err
+		}
+		if !isMicrosoftReserved(name) {
+			return prefix + name, nil
+		}
 	}
-	return prefix + name, nil
 }
 
 // VaultURL returns a random string suitable for use as an Azure key vault URL
@@ -68,10 +83,13 @@ func VaultURL(prefix string) (string, error) {
 // FQDN returns a random fully qualified domain name within a given parent
 // domain
 func FQDN(parentDomain string, n int) (string, error) {
-	d, err := LowerCaseAlphaString(n)
-	if err != nil {
-		return "", err
+	for {
+		d, err := LowerCaseAlphaString(n)
+		if err != nil {
+			return "", err
+		}
+		if !isMicrosoftReserved(d) {
+			return d + "." + parentDomain, nil
+		}
 	}
-
-	return d + "." + parentDomain, nil
 }
