@@ -22,6 +22,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/cluster/names"
+	utilerrors "github.com/openshift/openshift-azure/pkg/util/errors"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 	"github.com/openshift/openshift-azure/pkg/util/statsd"
 )
@@ -132,14 +133,10 @@ func (c *metricsConfig) init() error {
 		if err == nil {
 			break
 		}
-		if err, ok := err.(*net.OpError); ok {
-			if err, ok := err.Err.(*os.SyscallError); ok {
-				if err.Err == syscall.ENOENT {
-					c.log.Warn("socket not found, sleeping...")
-					time.Sleep(5 * time.Second)
-					continue
-				}
-			}
+		if utilerrors.IsMatchingSyscallError(err, syscall.ENOENT) {
+			c.log.Warn("socket not found, sleeping...")
+			time.Sleep(5 * time.Second)
+			continue
 		}
 		return err
 	}
