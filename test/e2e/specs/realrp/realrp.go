@@ -174,7 +174,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 		}
 
 		By(fmt.Sprintf("deleting resource group %s", cfg.ResourceGroup))
-		_, err = cli.Groups.Delete(deleteCtx, cfg.ResourceGroup)
+		err = cli.Groups.Delete(deleteCtx, cfg.ResourceGroup)
 		Expect(err).NotTo(HaveOccurred())
 	})
 })

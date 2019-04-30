@@ -41,9 +41,8 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 		ctx, cancelFn := context.WithTimeout(context.Background(), 30*time.Minute)
 		defer cancelFn()
 		By(fmt.Sprintf("deleting resource group %s", cfg.ResourceGroup))
-		result, err := cli.Groups.Delete(ctx, cfg.ResourceGroup)
+		err := cli.Groups.Delete(ctx, cfg.ResourceGroup)
 		Expect(err).NotTo(HaveOccurred())
-		result.WaitForCompletionRef(ctx, cli.Groups.Client())
 	})
 
 	It("should create the vnet and cluster and verify peering", func() {

@@ -31,26 +31,26 @@ const (
 
 type aadManager struct {
 	testConfig api.TestConfig
-	ac         graphrbac.RBACApplicationsClient
+	ac         graphrbac.ApplicationsClient
 	sc         graphrbac.ServicePrincipalsClient
 	rac        authorization.RoleAssignmentsClient
 	cs         *api.OpenShiftManagedCluster
 }
 
 func newAADManager(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (*aadManager, error) {
-	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
+	authorizer, err := azureclient.GetAuthorizerFromContext(ctx, api.ContextKeyClientAuthorizer)
 	if err != nil {
 		return nil, err
 	}
 
-	graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
+	graphauthorizer, err := azureclient.GetAuthorizerFromContext(ctx, contextKeyGraphClientAuthorizer)
 	if err != nil {
 		return nil, err
 	}
 
 	return &aadManager{
 		testConfig: testConfig,
-		ac:         graphrbac.NewRBACApplicationsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
+		ac:         graphrbac.NewApplicationsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
 		sc:         graphrbac.NewServicePrincipalsClient(ctx, log, cs.Properties.AzProfile.TenantID, graphauthorizer),
 		rac:        authorization.NewRoleAssignmentsClient(ctx, log, cs.Properties.AzProfile.SubscriptionID, authorizer),
 		cs:         cs,

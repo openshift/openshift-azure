@@ -13,9 +13,11 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/tls"
 )
 
+type contextKey string
+
 const (
-	ContainerService    api.ContextKey = "ContainerService"
-	ContainerServiceKey string         = "containerservice.yaml"
+	contextKeyContainerService      contextKey = "ContainerService"
+	contextKeyGraphClientAuthorizer contextKey = "GraphClientAuthorizer"
 )
 
 func GetTestConfig() api.TestConfig {

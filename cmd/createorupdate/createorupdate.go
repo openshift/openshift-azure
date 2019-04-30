@@ -89,9 +89,6 @@ func createOrUpdatev20190430(ctx context.Context, log *logrus.Entry, rpc v201904
 
 func createOrUpdateAdmin(ctx context.Context, log *logrus.Entry, ac *adminclient.Client, rpc v20190430client.OpenShiftManagedClustersClient, resourceGroup string, oc *admin.OpenShiftManagedCluster, manifestFile string) (*v20190430.OpenShiftManagedCluster, error) {
 	log.Info("creating/updating cluster")
-	if oc.Properties != nil {
-		oc.Properties.ProvisioningState = nil // TODO: should not need to do this
-	}
 	resp, err := ac.CreateOrUpdate(ctx, resourceGroup, resourceGroup, oc)
 	if err != nil {
 		return nil, err
@@ -174,7 +171,7 @@ func updateAadApplication(ctx context.Context, oc *v20190430.OpenShiftManagedClu
 			return fmt.Errorf("cannot get authorizer: %v", err)
 		}
 
-		aadClient := graphrbac.NewRBACApplicationsClient(ctx, log, conf.TenantID, graphauthorizer)
+		aadClient := graphrbac.NewApplicationsClient(ctx, log, conf.TenantID, graphauthorizer)
 		objID, err := aadapp.GetApplicationObjectIDFromAppID(ctx, aadClient, conf.AADClientID)
 		if err != nil {
 			return err

@@ -49,6 +49,9 @@ func (v *APIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftMa
 
 	old := oldCs.DeepCopy()
 
+	// validating ProvisioningState is the RP's responsibility
+	old.Properties.ProvisioningState = cs.Properties.ProvisioningState
+
 	for i, app := range old.Properties.AgentPoolProfiles {
 		if app.Role != api.AgentPoolProfileRoleCompute {
 			continue

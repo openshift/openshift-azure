@@ -25,7 +25,7 @@ func (s *Server) badRequest(w http.ResponseWriter, msg string) {
 	http.Error(w, resp, http.StatusBadRequest)
 }
 
-func (s *Server) isAdminRequest(req *http.Request) bool {
+func isAdminRequest(req *http.Request) bool {
 	// TODO: Align with the production RP once it supports the admin API
 	return strings.HasPrefix(req.URL.Path, "/admin")
 }
@@ -58,15 +58,10 @@ func (s *Server) adminreply(w http.ResponseWriter, err error, out interface{}) {
 }
 
 // reply return either admin or external api response
-func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
-	cs, err := s.store.Get(ContainerServiceKey)
-	if err != nil {
-		s.badRequest(w, fmt.Sprintf("Failed to call store: %v", err))
-		return
-	}
-
+func (s *Server) reply(w http.ResponseWriter, req *http.Request, cs *api.OpenShiftManagedCluster) {
 	var res []byte
-	if strings.HasPrefix(req.URL.Path, "/admin") {
+	var err error
+	if isAdminRequest(req) {
 		oc := admin.FromInternal(cs)
 		res, err = json.Marshal(oc)
 	} else {
@@ -77,6 +72,7 @@ func (s *Server) reply(w http.ResponseWriter, req *http.Request) {
 		s.badRequest(w, fmt.Sprintf("Failed to marshal response: %v", err))
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(res)
 }
 

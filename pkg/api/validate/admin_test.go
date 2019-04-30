@@ -33,9 +33,10 @@ func TestAdminAPIValidateUpdate(t *testing.T) {
 				oc.Config.ComponentLogLevel.Node = to.IntPtr(1)
 			},
 		},
-		"clusterversion is mutable": {
+		"provisioningstate and clusterversion are mutable": {
 			f: func(oc *api.OpenShiftManagedCluster) {
-				oc.Properties.ClusterVersion = "foo" // the RP is responsible for checking this
+				oc.Properties.ProvisioningState = api.Creating // the RP is responsible for checking this
+				oc.Properties.ClusterVersion = "foo"           // the RP is responsible for checking this
 			},
 		},
 		"pluginversion is immutable": {

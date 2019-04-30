@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/Azure/go-autorest/autorest/azure"
+
 	"github.com/openshift/openshift-azure/pkg/api"
 	"github.com/openshift/openshift-azure/pkg/util/azureclient"
 )
@@ -18,7 +20,7 @@ func (s *Server) logger(handler http.Handler) http.Handler {
 
 func (s *Server) validator(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPut {
+		if r.Method != http.MethodGet {
 			select {
 			case s.inProgress <- struct{}{}:
 				// continue
@@ -49,6 +51,13 @@ func (s *Server) context(handler http.Handler) http.Handler {
 		}
 		ctx = context.WithValue(ctx, api.ContextKeyClientAuthorizer, authorizer)
 
+		graphauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azure.PublicCloud.GraphEndpoint)
+		if err != nil {
+			s.badRequest(w, err.Error())
+			return
+		}
+		ctx = context.WithValue(ctx, contextKeyGraphClientAuthorizer, graphauthorizer)
+
 		vaultauthorizer, err := azureclient.NewAuthorizerFromEnvironment(azureclient.KeyVaultEndpoint)
 		if err != nil {
 			s.badRequest(w, err.Error())
@@ -57,8 +66,8 @@ func (s *Server) context(handler http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, api.ContextKeyVaultClientAuthorizer, vaultauthorizer)
 
 		// we ignore errors, as those are handled by code using the object
-		cs, _ := s.store.Get(ContainerServiceKey)
-		ctx = context.WithValue(ctx, ContainerService, cs)
+		cs, _ := s.store.Get()
+		ctx = context.WithValue(ctx, contextKeyContainerService, cs)
 
 		handler.ServeHTTP(w, r.WithContext(ctx))
 	})

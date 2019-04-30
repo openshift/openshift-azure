@@ -6,9 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"sync"
 
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/ghodss/yaml"
 	"github.com/go-chi/chi"
 	"github.com/sirupsen/logrus"
@@ -17,12 +15,9 @@ import (
 	internalapi "github.com/openshift/openshift-azure/pkg/api"
 	v20190430 "github.com/openshift/openshift-azure/pkg/api/2019-04-30"
 	admin "github.com/openshift/openshift-azure/pkg/api/admin"
-	pluginapi "github.com/openshift/openshift-azure/pkg/api/plugin"
 	"github.com/openshift/openshift-azure/pkg/fakerp/store"
 	"github.com/openshift/openshift-azure/pkg/plugin"
 )
-
-var once sync.Once
 
 type Server struct {
 	router *chi.Mux
@@ -30,18 +25,14 @@ type Server struct {
 	// PUT request at all times.
 	inProgress chan struct{}
 
-	gc resources.GroupsClient
-
-	sync.RWMutex
-	store *store.Storage
+	store store.Store
 
 	log      *logrus.Entry
 	address  string
 	basePath string
 
-	plugin         internalapi.Plugin
-	testConfig     api.TestConfig
-	pluginTemplate *pluginapi.Config
+	plugin     internalapi.Plugin
+	testConfig api.TestConfig
 }
 
 func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
@@ -57,12 +48,12 @@ func NewServer(log *logrus.Entry, resourceGroup, address string) *Server {
 	var errs []error
 	var err error
 	s.testConfig = GetTestConfig()
-	s.pluginTemplate, err = GetPluginTemplate()
+	pluginTemplate, err := GetPluginTemplate()
 	if err != nil {
 		s.log.Fatal(err)
 	}
-	overridePluginTemplate(s.pluginTemplate)
-	s.plugin, errs = plugin.NewPlugin(s.log, s.pluginTemplate, s.testConfig)
+	overridePluginTemplate(pluginTemplate)
+	s.plugin, errs = plugin.NewPlugin(s.log, pluginTemplate, s.testConfig)
 	if len(errs) > 0 {
 		s.log.Fatal(errs)
 	}
@@ -79,7 +70,7 @@ func (s *Server) Run() {
 	s.log.WithError(http.ListenAndServe(s.address, s.router)).Warn("Server exited.")
 }
 
-func (s *Server) read20190430Request(body io.ReadCloser) (*v20190430.OpenShiftManagedCluster, error) {
+func (s *Server) read20190430Request(body io.ReadCloser, oldCs *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
 	data, err := ioutil.ReadAll(body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read request body: %v", err)
@@ -88,10 +79,10 @@ func (s *Server) read20190430Request(body io.ReadCloser) (*v20190430.OpenShiftMa
 	if err := yaml.Unmarshal(data, &oc); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal request: %v", err)
 	}
-	return oc, nil
+	return v20190430.ToInternal(oc, oldCs)
 }
 
-func (s *Server) readAdminRequest(body io.ReadCloser) (*admin.OpenShiftManagedCluster, error) {
+func (s *Server) readAdminRequest(body io.ReadCloser, oldCs *api.OpenShiftManagedCluster) (*api.OpenShiftManagedCluster, error) {
 	data, err := ioutil.ReadAll(body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read request body: %v", err)
@@ -100,5 +91,5 @@ func (s *Server) readAdminRequest(body io.ReadCloser) (*admin.OpenShiftManagedCl
 	if err := yaml.Unmarshal(data, &oc); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal request: %v", err)
 	}
-	return oc, nil
+	return admin.ToInternal(oc, oldCs)
 }
