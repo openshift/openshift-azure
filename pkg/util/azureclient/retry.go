@@ -3,11 +3,14 @@ package azureclient
 import (
 	"encoding/json"
 	"net/http"
+	"syscall"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/sirupsen/logrus"
+
+	"github.com/openshift/openshift-azure/pkg/util/errors"
 )
 
 type retryKey struct {
@@ -79,7 +82,7 @@ func (rs *retrySender) Do(req *http.Request) (resp *http.Response, err error) {
 			return
 		}
 
-		if retry <= retries && isRetryableError(rs.clientName, err) {
+		if retry <= retries && isRetryableError(rs.clientName, req.Method, err) {
 			rs.log.Warnf("%s: retry %d", err, retry)
 			continue
 		}
@@ -88,7 +91,11 @@ func (rs *retrySender) Do(req *http.Request) (resp *http.Response, err error) {
 	}
 }
 
-func isRetryableError(clientName string, err error) bool {
+func isRetryableError(clientName, method string, err error) bool {
+	if method == http.MethodGet && errors.IsMatchingSyscallError(err, syscall.ECONNRESET) {
+		return true
+	}
+
 	re, ok := err.(*azure.RequestError)
 	if !ok || re.ServiceError == nil {
 		return false

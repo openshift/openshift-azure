@@ -5,6 +5,9 @@ import (
 	"net/url"
 	"os"
 	"syscall"
+
+	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/azure"
 )
 
 // IsMatchingSyscallError returns true when the error is one of the Errno's in match
@@ -12,6 +15,10 @@ import (
 func IsMatchingSyscallError(err error, match ...syscall.Errno) bool {
 	for {
 		switch t := err.(type) {
+		case *azure.RequestError:
+			err = &t.DetailedError
+		case *autorest.DetailedError:
+			err = t.Original
 		case *url.Error:
 			err = t.Err
 		case *net.OpError:

@@ -8,6 +8,9 @@ import (
 	"os"
 	"syscall"
 	"testing"
+
+	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/azure"
 )
 
 func TestIsMatchingSyscallError(t *testing.T) {
@@ -74,6 +77,28 @@ func TestIsMatchingSyscallError(t *testing.T) {
 			name: "url io.EOF",
 			want: false,
 			err:  &url.Error{Err: io.EOF},
+		},
+		{
+			name:  "azure request error : connection reset",
+			want:  true,
+			match: []syscall.Errno{syscall.ECONNRESET},
+			err: &azure.RequestError{
+				DetailedError: autorest.DetailedError{
+					Original:    os.NewSyscallError("io.read", syscall.ECONNRESET),
+					PackageType: "packageType",
+					Method:      "GET",
+					StatusCode:  "500",
+					Message:     "testing",
+				},
+			},
+		},
+		{
+			name:  "autorest detailed error : connection reset",
+			want:  true,
+			match: []syscall.Errno{syscall.ECONNRESET},
+			err: &autorest.DetailedError{
+				Original: os.NewSyscallError("io.read", syscall.ECONNRESET),
+			},
 		},
 	}
 	for _, tt := range tests {
