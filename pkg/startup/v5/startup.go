@@ -152,6 +152,7 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 		case strings.HasSuffix(filepath, ".key"),
 			strings.HasSuffix(filepath, ".kubeconfig"),
 			filepath == "/etc/origin/cloudprovider/azure.conf",
+			filepath == "/etc/origin/master/client.secret",
 			filepath == "/etc/origin/master/session-secrets.yaml",
 			filepath == "/var/lib/origin/.docker/config.json",
 			filepath == "/root/.kube/config":
