@@ -8,10 +8,12 @@ package scaler
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	azcompute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -21,7 +23,7 @@ import (
 
 // Factory interface is to create new Scaler instances.
 type Factory interface {
-	New(log *logrus.Entry, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *azcompute.VirtualMachineScaleSet) Scaler
+	New(log *logrus.Entry, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *azcompute.VirtualMachineScaleSet, testConfig api.TestConfig) Scaler
 }
 
 type scalerFactory struct{}
@@ -53,12 +55,14 @@ type workerScaler struct {
 	ss    *azcompute.VirtualMachineScaleSet
 	vms   []azcompute.VirtualMachineScaleSetVM
 	vmMap map[string]struct{}
+
+	testConfig api.TestConfig
 }
 
 var _ Scaler = &workerScaler{}
 
-func (sf *scalerFactory) New(log *logrus.Entry, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *azcompute.VirtualMachineScaleSet) Scaler {
-	return &workerScaler{log: log, ssc: ssc, vmc: vmc, kubeclient: kubeclient, resourceGroup: resourceGroup, ss: ss}
+func (sf *scalerFactory) New(log *logrus.Entry, ssc compute.VirtualMachineScaleSetsClient, vmc compute.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *azcompute.VirtualMachineScaleSet, testConfig api.TestConfig) Scaler {
+	return &workerScaler{log: log, ssc: ssc, vmc: vmc, kubeclient: kubeclient, resourceGroup: resourceGroup, ss: ss, testConfig: testConfig}
 }
 
 // initializeCache fetches the scale set's VMs from the Azure API and updates
@@ -116,6 +120,24 @@ func (ws *workerScaler) scaleUp(ctx context.Context, count int64) *api.PluginErr
 			Capacity: to.Int64Ptr(count),
 		},
 	})
+	if err != nil && ws.testConfig.RunningUnderTest {
+		w := ws.log.WriterLevel(logrus.WarnLevel)
+		fmt.Fprintln(w, "scale failed")
+		// dump the full error
+		spew.Dump(w, err)
+		// dump the VMSS state
+		ss, err2 := ws.ssc.Get(ctx, ws.resourceGroup, *ws.ss.Name)
+		spew.Dump(w, ss, err2)
+		// try the scale again
+		err2 = ws.ssc.Update(ctx, ws.resourceGroup, *ws.ss.Name, azcompute.VirtualMachineScaleSetUpdate{
+			Sku: &azcompute.Sku{
+				Capacity: to.Int64Ptr(count),
+			},
+		})
+		spew.Dump(w, err2)
+		w.Close()
+		// fail so we see the debugging
+	}
 	if err != nil {
 		return &api.PluginError{Err: err, Step: api.PluginStepUpdateWorkerAgentPoolUpdateScaleSet}
 	}

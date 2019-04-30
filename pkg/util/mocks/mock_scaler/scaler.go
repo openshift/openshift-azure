@@ -42,17 +42,17 @@ func (m *MockFactory) EXPECT() *MockFactoryMockRecorder {
 }
 
 // New mocks base method
-func (m *MockFactory) New(log *logrus.Entry, ssc compute0.VirtualMachineScaleSetsClient, vmc compute0.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *compute.VirtualMachineScaleSet) scaler.Scaler {
+func (m *MockFactory) New(log *logrus.Entry, ssc compute0.VirtualMachineScaleSetsClient, vmc compute0.VirtualMachineScaleSetVMsClient, kubeclient kubeclient.Interface, resourceGroup string, ss *compute.VirtualMachineScaleSet, testConfig api.TestConfig) scaler.Scaler {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "New", log, ssc, vmc, kubeclient, resourceGroup, ss)
+	ret := m.ctrl.Call(m, "New", log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig)
 	ret0, _ := ret[0].(scaler.Scaler)
 	return ret0
 }
 
 // New indicates an expected call of New
-func (mr *MockFactoryMockRecorder) New(log, ssc, vmc, kubeclient, resourceGroup, ss interface{}) *gomock.Call {
+func (mr *MockFactoryMockRecorder) New(log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockFactory)(nil).New), log, ssc, vmc, kubeclient, resourceGroup, ss)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "New", reflect.TypeOf((*MockFactory)(nil).New), log, ssc, vmc, kubeclient, resourceGroup, ss, testConfig)
 }
 
 // MockScaler is a mock of Scaler interface
