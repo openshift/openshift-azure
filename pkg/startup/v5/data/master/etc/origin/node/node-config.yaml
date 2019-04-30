@@ -42,6 +42,8 @@ kubeletArguments:
   - "true"
   runtime-request-timeout:
   - 10m
+  serialize-image-pulls:
+  - "false"
   system-reserved:
   - {{ .Derived.SystemReserved .ContainerService .Role | quote }}
 masterClientConnectionOverrides:
