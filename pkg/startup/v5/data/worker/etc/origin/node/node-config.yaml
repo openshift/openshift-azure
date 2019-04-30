@@ -43,6 +43,8 @@ kubeletArguments:
   - 10m
   kube-reserved:
   - {{ .Derived.KubeReserved .ContainerService .Role | quote }}
+  serialize-image-pulls:
+  - "false"
   system-reserved:
   - {{ .Derived.SystemReserved .ContainerService .Role | quote }}
 masterClientConnectionOverrides:

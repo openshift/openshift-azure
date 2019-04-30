@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"syscall"
 	"time"
 
 	security "github.com/openshift/client-go/security/clientset/versioned"
@@ -11,6 +12,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	v1 "k8s.io/client-go/tools/clientcmd/api/v1"
 
+	utilerrors "github.com/openshift/openshift-azure/pkg/util/errors"
 	"github.com/openshift/openshift-azure/pkg/util/managedcluster"
 )
 
@@ -98,12 +100,22 @@ func (rt *RetryingRoundTripper) RoundTrip(req *http.Request) (resp *http.Respons
 		}
 
 		if err, ok := err.(*net.OpError); retry <= rt.Retries && ok {
+			// grr, "i/o timeout" is defined in internal/poll/fd.go and is thus
+			// inaccessible
 			if err.Op == "dial" && err.Err.Error() == "i/o timeout" {
 				rt.Log.Warnf("%s: retry %d", err, retry)
 				continue
 			}
 		}
 
+		// TODO: on the few occasions I've seen this, it's been down to an API
+		// server crash.  Need to investigate further.
+		if retry <= rt.Retries && utilerrors.IsMatchingSyscallError(err, syscall.ECONNREFUSED) {
+			rt.Log.Warnf("%s: retry %d", err, retry)
+			continue
+		}
+
+		// grr, http.tlsHandshakeTimeoutError is not exported.
 		if retry <= rt.Retries && err != nil && err.Error() == "net/http: TLS handshake timeout" {
 			rt.Log.Warnf("%s: retry %d", err, retry)
 			continue

@@ -108,12 +108,6 @@ kubernetesMasterConfig:
   servicesNodePortRange: ''
   servicesSubnet: 172.30.0.0/16
 masterClients:
-  externalKubernetesClientConnectionOverrides:
-    acceptContentTypes: application/vnd.kubernetes.protobuf,application/json
-    burst: 400
-    contentType: application/vnd.kubernetes.protobuf
-    qps: 200
-  externalKubernetesKubeConfig: ''
   openshiftLoopbackClientConnectionOverrides:
     acceptContentTypes: application/vnd.kubernetes.protobuf,application/json
     burst: 600
@@ -149,7 +143,8 @@ oauthConfig:
         preferredUsername:
         - unique_name
       clientID: {{ (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.ClientID | quote }}
-      clientSecret: {{ (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.Secret | quote }}
+      clientSecret:
+        file: client.secret
       kind: OpenIDIdentityProvider
       urls:
         authorize: {{ print "https://login.microsoftonline.com/" (index .ContainerService.Properties.AuthProfile.IdentityProviders 0).Provider.TenantID "/oauth2/authorize" | quote }}
