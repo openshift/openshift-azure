@@ -6,7 +6,6 @@ package compute
 
 import (
 	"context"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	"github.com/Azure/go-autorest/autorest"
@@ -17,6 +16,7 @@ import (
 
 // VirtualMachineScaleSetsClient is a minimal interface for azure VirtualMachineScaleSetsClient
 type VirtualMachineScaleSetsClient interface {
+	Get(ctx context.Context, resourceGroupName string, VMScaleSetName string) (result compute.VirtualMachineScaleSet, err error)
 	VirtualMachineScaleSetsClientAddons
 }
 
@@ -30,7 +30,6 @@ var _ VirtualMachineScaleSetsClient = &virtualMachineScaleSetsClient{}
 func NewVirtualMachineScaleSetsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) VirtualMachineScaleSetsClient {
 	client := compute.NewVirtualMachineScaleSetsClient(subscriptionID)
 	azureclient.SetupClient(ctx, log, "compute.VirtualMachineScaleSetsClient", &client.Client, authorizer)
-	client.PollingDuration = 30 * time.Minute
 
 	return &virtualMachineScaleSetsClient{
 		VirtualMachineScaleSetsClient: client,

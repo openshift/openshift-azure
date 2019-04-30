@@ -84,6 +84,16 @@ func (s *FakeVirtualMachineScaleSetsClient) Delete(ctx context.Context, resource
 	return nil
 }
 
+// Get Fakes base method
+func (s *FakeVirtualMachineScaleSetsClient) Get(ctx context.Context, resourceGroup, VMScaleSetName string) (compute.VirtualMachineScaleSet, error) {
+	for _, ss := range s.rp.Ssc {
+		if VMScaleSetName == *ss.Name {
+			return ss, nil
+		}
+	}
+	return compute.VirtualMachineScaleSet{}, nil
+}
+
 // List Fakes base method
 func (s *FakeVirtualMachineScaleSetsClient) List(ctx context.Context, resourceGroup string) ([]compute.VirtualMachineScaleSet, error) {
 	return s.rp.Ssc, nil
