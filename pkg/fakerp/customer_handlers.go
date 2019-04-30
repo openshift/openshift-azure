@@ -92,13 +92,14 @@ func (s *Server) handlePut(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// apply the request
-	cs, err = createOrUpdateWrapper(req.Context(), s.plugin, s.log, cs, oldCs, isAdmin, s.testConfig)
+	newCS, err := createOrUpdateWrapper(req.Context(), s.plugin, s.log, cs, oldCs, isAdmin, s.testConfig)
 	if err != nil {
 		cs.Properties.ProvisioningState = internalapi.Failed
 		s.store.Put(cs)
 		s.badRequest(w, fmt.Sprintf("Failed to apply request: %v", err))
 		return
 	}
+	cs = newCS
 	cs.Properties.ProvisioningState = internalapi.Succeeded
 	s.store.Put(cs)
 
