@@ -52,6 +52,23 @@ func TestHashScaleSetStability(t *testing.T) {
 				expectedHash: "fc64527a7a3fc02568083f200de97c9fcb22aea448e57ae46e58f1a76ba1f6f6",
 			},
 		},
+		"v4.2": {
+			{
+				role: api.AgentPoolProfileRoleMaster,
+				// this value should not change
+				expectedHash: "9a4b049bda1bda0bf394b6e5a21c89bb8b219346261de0e6b01d2efb100f3e01",
+			},
+			{
+				role: api.AgentPoolProfileRoleInfra,
+				// this value should not change
+				expectedHash: "a3dd5cb39b243e4e67a2d59cdda59d9179e39a87d6b6201ae7e6ce78c6317a72",
+			},
+			{
+				role: api.AgentPoolProfileRoleCompute,
+				// this value should not change
+				expectedHash: "0b9ada416dcffb9b0ecc5e96bc21b2a9ceaa78e74af82819040cdc14854a3a12",
+			},
+		},
 	}
 
 	// check we're testing all versions in our pluginconfig
@@ -140,6 +157,10 @@ func TestHashSyncPodStability(t *testing.T) {
 			// jminter: 302c... value verified manually against v3.2
 			// this value should not change
 			expectedHash: "302c52d35602ad1c4a6078953abccc36ecd92ba8256b6e118837712a69d7f028",
+		},
+		"v4.2": {
+			// this value should not change
+			expectedHash: "f731d62dc04f805314b912c3720189679cc404a35ee41ee3569fb3f642c8bd29",
 		},
 	}
 
