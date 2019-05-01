@@ -2,10 +2,10 @@ apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
   annotations:
-    description: Red Hat Single Sign-On 7.4 continuous delivery
-    openshift.io/display-name: Red Hat Single Sign-On 7.4 continuous delivery
+    description: Red Hat Single Sign-On Continuous Delivery
+    openshift.io/display-name: Red Hat Single Sign-On Continuous Delivery
     openshift.io/provider-display-name: Red Hat, Inc.
-    version: 7.4.0.CD05
+    version: "6"
   name: redhat-sso-cd-openshift
   namespace: openshift
 spec:
@@ -13,9 +13,9 @@ spec:
     local: false
   tags:
   - annotations:
-      description: Red Hat Single Sign-On 7.3 continuous delivery Tech Preview image
+      description: Red Hat Single Sign-On 7.3 Continuous Delivery Tech Preview image
       iconClass: icon-sso
-      openshift.io/display-name: Red Hat Single Sign-On 7.3 continuous delivery (Tech
+      openshift.io/display-name: Red Hat Single Sign-On 7.3 Continuous Delivery (Tech
         Preview)
       supports: sso:7.3
       tags: sso,keycloak,redhat,hidden
@@ -28,9 +28,9 @@ spec:
     referencePolicy:
       type: Local
   - annotations:
-      description: Red Hat Single Sign-On 7.4 continuous delivery Tech Preview image
+      description: Red Hat Single Sign-On 7.4 Continuous Delivery Tech Preview image
       iconClass: icon-sso
-      openshift.io/display-name: Red Hat Single Sign-On 7.4 continuous delivery (Tech
+      openshift.io/display-name: Red Hat Single Sign-On 7.4 Continuous Delivery (Tech
         Preview)
       supports: sso:7.4
       tags: sso,keycloak,redhat,hidden
@@ -43,10 +43,33 @@ spec:
     referencePolicy:
       type: Local
   - annotations:
-      description: Latest build of Red Hat Single Sign-On 7.4 continuous delivery
-        Tech Preview image
+      description: Red Hat Single Sign-On Continuous Delivery 6 Tech Preview image
       iconClass: icon-sso
-      openshift.io/display-name: Red Hat Single Sign-On 7.4 continuous delivery (Tech
+      openshift.io/display-name: Red Hat Single Sign-On 6 Continuous Delivery (Tech
+        Preview)
+      supports: sso:6
+      tags: sso,keycloak,redhat,hidden
+      version: "6"
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/redhat-sso-7-tech-preview/sso-cd-openshift:6
+    importPolicy: {}
+    name: "6"
+    referencePolicy:
+      type: Local
+  - annotations: null
+    from:
+      kind: ImageStreamTag
+      name: "6"
+    importPolicy: {}
+    name: "6.0"
+    referencePolicy:
+      type: ""
+  - annotations:
+      description: Latest build of Red Hat Single Sign-On Continuous Delivery Tech
+        Preview image
+      iconClass: icon-sso
+      openshift.io/display-name: Red Hat Single Sign-On Continuous Delivery (Tech
         Preview)
       supports: sso:7.4
       tags: sso,keycloak,redhat,hidden
