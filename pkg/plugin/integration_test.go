@@ -69,15 +69,18 @@ func getFakeDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fak
 }
 
 func enrich(cs *api.OpenShiftManagedCluster) error {
+	rg := "testRG"
 	tenantID := uuid.NewV4().String()
 	clientID := uuid.NewV4().String()
 	secret := "suspicious"
 	cs.Properties.AzProfile = api.AzProfile{
 		TenantID:       tenantID,
 		SubscriptionID: uuid.NewV4().String(),
-		ResourceGroup:  "testRG",
+		ResourceGroup:  rg,
 	}
+
 	cs.Properties.AuthProfile.IdentityProviders = make([]api.IdentityProvider, 1)
+	cs.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
 	cs.Properties.AuthProfile.IdentityProviders[0].Provider = &api.AADIdentityProvider{
 		Kind:     "AADIdentityProvider",
 		ClientID: clientID,
@@ -95,7 +98,7 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	}
 
 	// /subscriptions/{subscription}/resourcegroups/{resource_group}/providers/Microsoft.ContainerService/openshiftmanagedClusters/{cluster_name}
-	cs.ID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.ContainerService/openshiftmanagedClusters", cs.Name)
+	cs.ID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, rg, "Microsoft.ContainerService/openshiftmanagedClusters", cs.Name)
 
 	if len(cs.Properties.RouterProfiles) == 0 {
 		cs.Properties.RouterProfiles = []api.RouterProfile{
@@ -115,8 +118,8 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNamePublicHostname
 	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNameRouter
 
-	cs.Properties.PublicHostname = "openshift." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
-	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
+	cs.Properties.PublicHostname = "openshift." + rg + ".cloudapp.azure.com"
+	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + rg + ".cloudapp.azure.com"
 
 	if cs.Properties.FQDN == "" {
 		cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
