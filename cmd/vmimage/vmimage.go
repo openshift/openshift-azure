@@ -35,6 +35,7 @@ var (
 	imageContainer           = flag.String("imageContainer", "images", "image container")
 	clientKey                = flag.String("clientKey", "secrets/client-key.pem", "cdn client key")
 	clientCert               = flag.String("clientCert", "secrets/client-cert.pem", "cdn client cert")
+	validate                 = flag.Bool("validate", false, "If set, will create VM with provided image and will try to update it")
 )
 
 func run(ctx context.Context, log *logrus.Entry) error {
@@ -100,6 +101,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 		SSHKey:                   sshkey,
 		ClientKey:                clientKey,
 		ClientCert:               clientCert,
+		Validate:                 *validate,
 	}
 	err = builder.Run(ctx)
 	if err != nil {
