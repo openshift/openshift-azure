@@ -442,7 +442,34 @@ func getNodeCountFromAz(az *fakecloud.AzureCloud) map[rotationType]int {
 	return nodeCount
 }
 
-func TestCreateThenUpdateCausesNoRotations(t *testing.T) {
+func TestHowAdminConfigChangesCausesRotations(t *testing.T) {
+	tests := []struct {
+		name           string
+		change         func(cs *api.OpenShiftManagedCluster)
+		expectRotation map[rotationType]bool
+	}{
+		{
+			name:           "no changes",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			change:         func(cs *api.OpenShiftManagedCluster) {},
+		},
+		{
+			name:           "change vm image",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: true, rotationSync: true, rotationCompute: true},
+			change:         func(cs *api.OpenShiftManagedCluster) { cs.Config.ImageVersion = "311.12.12345678" },
+		},
+		{
+			name:           "change controller loglevel",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			change:         func(cs *api.OpenShiftManagedCluster) { cs.Config.ComponentLogLevel.ControllerManager = to.IntPtr(5) },
+		},
+		{
+			name:           "change container image",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: true, rotationCompute: false},
+			change:         func(cs *api.OpenShiftManagedCluster) { cs.Config.Images.WebConsole = "newImage" },
+		},
+	}
+
 	log := logrus.NewEntry(logrus.StandardLogger())
 	ctx := context.Background()
 	cs := newTestCs()
@@ -451,23 +478,33 @@ func TestCreateThenUpdateCausesNoRotations(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	errs := p.Validate(ctx, cs, nil, false)
-	if errs != nil {
-		t.Fatal(errs)
-	}
-	expectRotation := map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false}
-	beforeBlob, beforeSyncChecksum, err := getHashes(az, cs)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			log.Infof("--- Test: %s", tt.name)
+			beforeBlob, beforeSyncChecksum, err := getHashes(az, cs)
+			if err != nil {
+				t.Fatal(err)
+			}
+			oldCs := cs.DeepCopy()
+			tt.change(cs)
 
-	if err := p.CreateOrUpdate(ctx, cs, true, getFakeDeployer(log, cs, az)); err != nil {
-		t.Errorf("plugin.CreateOrUpdate [update] error = %v", err)
-	}
+			errs := p.ValidateAdmin(ctx, cs, oldCs)
+			if errs != nil {
+				t.Fatal(errs)
+			}
+			perr := p.CreateOrUpdate(ctx, cs, true, getFakeDeployer(log, cs, az))
+			if perr != nil {
+				t.Fatal(perr)
+			}
 
-	afterBlob, afterSyncChecksum, err := getHashes(az, cs)
-	if err != nil {
-		t.Fatal(err)
-	}
-	rotations := getRotations(beforeBlob, afterBlob, beforeSyncChecksum, afterSyncChecksum)
-	if !reflect.DeepEqual(expectRotation, rotations) {
-		t.Fatalf("rotation mismatch: expected %v, got %v", expectRotation, rotations)
+			afterBlob, afterSyncChecksum, err := getHashes(az, cs)
+			if err != nil {
+				t.Fatal(err)
+			}
+			rotations := getRotations(beforeBlob, afterBlob, beforeSyncChecksum, afterSyncChecksum)
+			if !reflect.DeepEqual(tt.expectRotation, rotations) {
+				t.Fatalf("rotation mismatch: expected %v, got %v", tt.expectRotation, rotations)
+			}
+		})
 	}
 }
