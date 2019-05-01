@@ -16,6 +16,24 @@ func sampleManagedCluster() *OpenShiftManagedCluster {
 				VMSize:     (*VMSize)(to.StringPtr("Standard_D2s_v3")),
 				SubnetCIDR: to.StringPtr("10.0.0.0/24"),
 			},
+			AgentPoolProfiles: []AgentPoolProfile{
+				{
+					Name:       to.StringPtr("infra"),
+					Count:      to.Int64Ptr(4),
+					VMSize:     (*VMSize)(to.StringPtr("Standard_D2s_v3")),
+					SubnetCIDR: to.StringPtr("10.0.0.0/24"),
+					OSType:     (*OSType)(to.StringPtr("Windows")),
+					Role:       (*AgentPoolProfileRole)(to.StringPtr("infra")),
+				},
+				{
+					Name:       to.StringPtr("compute"),
+					Count:      to.Int64Ptr(4),
+					VMSize:     (*VMSize)(to.StringPtr("Standard_D2s_v3")),
+					SubnetCIDR: to.StringPtr("10.0.0.0/24"),
+					OSType:     (*OSType)(to.StringPtr("Windows")),
+					Role:       (*AgentPoolProfileRole)(to.StringPtr("compute")),
+				},
+			},
 			RouterProfiles: []RouterProfile{
 				{
 					Name:            to.StringPtr("Properties.RouterProfiles[0].Name"),
@@ -41,6 +59,14 @@ func TestDefaults(t *testing.T) {
 				oc.Properties.MasterPoolProfile = &MasterPoolProfile{
 					Count: to.Int64Ptr(3),
 				}
+				oc.Properties.AgentPoolProfiles = []AgentPoolProfile{
+					{
+						Name:   to.StringPtr("infra"),
+						Count:  to.Int64Ptr(3),
+						OSType: (*OSType)(to.StringPtr("Linux")),
+						Role:   (*AgentPoolProfileRole)(to.StringPtr("infra")),
+					},
+				}
 				oc.Properties.RouterProfiles = []RouterProfile{
 					{
 						Name: to.StringPtr("default"),
@@ -51,10 +77,7 @@ func TestDefaults(t *testing.T) {
 		{
 			name: "sets MasterPoolProfile.Count to 3 when empty",
 			changeInput: func(oc *OpenShiftManagedCluster) {
-				oc.Properties.MasterPoolProfile = &MasterPoolProfile{
-					VMSize:     (*VMSize)(to.StringPtr("Standard_D2s_v3")),
-					SubnetCIDR: to.StringPtr("10.0.0.0/24"),
-				}
+				oc.Properties.MasterPoolProfile.Count = nil
 			},
 			expectedChange: func(oc *OpenShiftManagedCluster) {
 				oc.Properties.MasterPoolProfile = &MasterPoolProfile{
@@ -62,6 +85,24 @@ func TestDefaults(t *testing.T) {
 					VMSize:     (*VMSize)(to.StringPtr("Standard_D2s_v3")),
 					SubnetCIDR: to.StringPtr("10.0.0.0/24"),
 				}
+			},
+		},
+		{
+			name: "sets AgentPoolProfile.Count to 3 on infra when empty",
+			changeInput: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[0].Count = nil
+			},
+			expectedChange: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[0].Count = to.Int64Ptr(3)
+			},
+		},
+		{
+			name: "sets AgentPoolProfile.OSType to Linux when empty",
+			changeInput: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[0].OSType = nil
+			},
+			expectedChange: func(oc *OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[0].OSType = (*OSType)(to.StringPtr("Linux"))
 			},
 		},
 		{
