@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 make content
+go generate ./...
 
 . hack/tests/ci-operator-prepare.sh
 
