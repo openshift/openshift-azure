@@ -23,6 +23,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/client-go/kubernetes/fake"
 	restclient "k8s.io/client-go/rest"
 	k8stesting "k8s.io/client-go/testing"
@@ -495,6 +496,160 @@ func TestHowAdminConfigChangesCausesRotations(t *testing.T) {
 			perr := p.CreateOrUpdate(ctx, cs, true, getFakeDeployer(log, cs, az))
 			if perr != nil {
 				t.Fatal(perr)
+			}
+
+			afterBlob, afterSyncChecksum, err := getHashes(az, cs)
+			if err != nil {
+				t.Fatal(err)
+			}
+			rotations := getRotations(beforeBlob, afterBlob, beforeSyncChecksum, afterSyncChecksum)
+			if !reflect.DeepEqual(tt.expectRotation, rotations) {
+				t.Fatalf("rotation mismatch: expected %v, got %v", tt.expectRotation, rotations)
+			}
+		})
+	}
+}
+
+func TestHowActionsCauseRotations(t *testing.T) {
+	log := logrus.NewEntry(logrus.StandardLogger())
+	ctx := context.Background()
+	tests := []struct {
+		name           string
+		change         func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error
+		expectRotation map[rotationType]bool
+		expectNodes    map[rotationType]int
+		expectCalls    []string
+	}{
+		{
+			name:           "scale up",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 6, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				oldCs := cs.DeepCopy()
+				for i, p := range cs.Properties.AgentPoolProfiles {
+					if p.Role == api.AgentPoolProfileRoleCompute {
+						cs.Properties.AgentPoolProfiles[i].Count = 6
+					}
+				}
+				errs := p.Validate(ctx, cs, oldCs, false)
+				if errs != nil {
+					return kerrors.NewAggregate(errs)
+				}
+				perr := p.CreateOrUpdate(ctx, cs, true, getFakeDeployer(log, cs, az))
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+		{
+			name:           "rotate cluster secrets",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: true, rotationSync: true, rotationCompute: true},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				perr := p.RotateClusterSecrets(ctx, cs, getFakeDeployer(log, cs, az))
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+		{
+			name:           "GetPluginVersion() cause no rotations",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				p.GetPluginVersion(ctx)
+				return nil
+			},
+		},
+		{
+			name:           "ListClusterVMs() cause no rotations",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				_, perr := p.ListClusterVMs(ctx, cs)
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+		{
+			name:           "ListEtcdBackups() cause no rotations",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				_, perr := p.ListEtcdBackups(ctx, cs)
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+		{
+			name:           "GetControlPlanePods() cause no rotations",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				_, perr := p.GetControlPlanePods(ctx, cs)
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+		{
+			name:           "runcommand - no rotations and correct call",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			expectCalls:    []string{"VirtualMachineScaleSetVMsClient:RunCommand:ss-master:1"},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				perr := p.RunCommand(ctx, cs, "master-000001", "RestartDocker")
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// for this test we always start with a new cluster (unlike the config change test above)
+			cs := newTestCs()
+			az := newFakeAzureCloud(log)
+			p, _, err := setupNewCluster(ctx, log, cs, az)
+
+			beforeBlob, beforeSyncChecksum, err := getHashes(az, cs)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// clear the calls
+			az.ComputeRP.Calls = []string{}
+
+			err = tt.change(p, cs, az)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			for _, ec := range tt.expectCalls {
+				found := false
+				for _, call := range az.ComputeRP.Calls {
+					if call == ec {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Errorf("call %s not found in %v", ec, az.ComputeRP.Calls)
+				}
+			}
+
+			nodeCount := getNodeCountFromAz(az)
+			if !reflect.DeepEqual(tt.expectNodes, nodeCount) {
+				t.Fatalf("node mismatch: expected %v, got %v", tt.expectNodes, nodeCount)
 			}
 
 			afterBlob, afterSyncChecksum, err := getHashes(az, cs)
