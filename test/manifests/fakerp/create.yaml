@@ -16,19 +16,15 @@ properties:
   networkProfile:
     vnetCidr: 10.0.0.0/8
   masterPoolProfile:
-    count: 3
     vmSize: {{ if eq .RunningUnderTest "true" }}Standard_D2s_v3{{ else }}Standard_D4s_v3{{ end }}
     subnetCidr: 10.0.0.0/24
   agentPoolProfiles:
   - name: infra
     role: infra
-    count: 3
     vmSize: {{ if eq .RunningUnderTest "true" }}Standard_D2s_v3{{ else }}Standard_D4s_v3{{ end }}
     subnetCidr: 10.0.0.0/24
-    osType: Linux
   - name: compute
     role: compute
     count: 1
     vmSize: {{ if eq .RunningUnderTest "true" }}Standard_D2s_v3{{ else }}Standard_D4s_v3{{ end }}
     subnetCidr: 10.0.0.0/24
-    osType: Linux
