@@ -1,6 +1,8 @@
 #!/bin/bash -ex
 
 if ! grep /var/lib/docker /etc/fstab; then
+  systemctl stop docker-cleanup.timer
+  systemctl stop docker-cleanup.service
   systemctl stop docker.service
   mkfs.xfs -f /dev/disk/azure/resource-part1
   echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
@@ -12,6 +14,7 @@ if ! grep /var/lib/docker /etc/fstab; then
 }
 EOF
   systemctl start docker.service
+  systemctl start docker-cleanup.timer
 fi
 
 docker pull {{ .Config.Images.Node }} &>/dev/null &
