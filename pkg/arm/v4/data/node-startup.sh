@@ -1,6 +1,10 @@
 #!/bin/bash -ex
 
 if ! grep /var/lib/docker /etc/fstab; then
+{{- if ne .Config.PluginVersion "v4.2" }}
+  systemctl stop docker-cleanup.timer
+  systemctl stop docker-cleanup.service
+{{- end }}
   systemctl stop docker.service
   mkfs.xfs -f /dev/disk/azure/resource-part1
   echo '/dev/disk/azure/resource-part1  /var/lib/docker  xfs  grpquota  0 0' >>/etc/fstab
@@ -14,6 +18,9 @@ if ! grep /var/lib/docker /etc/fstab; then
 EOF
 {{- end }}
   systemctl start docker.service
+{{- if ne .Config.PluginVersion "v4.2" }}
+  systemctl start docker-cleanup.timer
+{{- end }}
 fi
 
 docker pull {{ .Config.Images.Node }} &>/dev/null &
