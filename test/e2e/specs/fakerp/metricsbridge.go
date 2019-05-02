@@ -30,10 +30,8 @@ import (
 var _ = Describe("Metricsbridge E2E check configured queries [Fake]", func() {
 	// queries which usually return no datapoints, but have been verified as valid manually
 	manuallyVerifiedQueries := map[string]bool{
-		"kubelet_runtime_operations_errors != 0":                                                  true,
-		"kubelet_docker_operations_errors != 0":                                                   true,
-		"kube_job_complete{namespace=~\"default|openshift|openshift-.+|kube-.+|\"} != 0":          true,
-		"kube_job_status_completion_time{namespace=~\"default|openshift|openshift-.+|kube-.+|\"}": true,
+		"kubelet_runtime_operations_errors != 0": true,
+		"kubelet_docker_operations_errors != 0":  true,
 	}
 	It("should be possible to get data for each metric in defined queries", func() {
 		By("getting the configMap")
@@ -85,13 +83,9 @@ var _ = Describe("Metricsbridge E2E check configured queries [Fake]", func() {
 				if !present {
 					qStr := q.Query
 
-					//in case of rate( x [1m]), unwrap x
-					re := regexp.MustCompile(`rate\((.+)\[1m\]\)`)
-					qStr = re.ReplaceAllString(qStr, "$1")
-
 					// find any expressions in parenthesis, and replace qStr with the first one found
 					// e.g. sum(foo{bar}) without (baz) != 0 -> foo{bar}
-					re = regexp.MustCompile(`\((.+?)\)`)
+					re := regexp.MustCompile(`\((.+?)\)`)
 					m := re.FindAllStringSubmatch(qStr, -1)
 					if m != nil {
 						//only if there is at least one expression in parenthesis

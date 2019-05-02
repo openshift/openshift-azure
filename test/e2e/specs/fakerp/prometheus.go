@@ -6,14 +6,12 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
-	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/openshift/openshift-azure/pkg/cluster/kubeclient"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
 	"github.com/openshift/openshift-azure/test/util/log"
@@ -59,15 +57,10 @@ var _ = Describe("Prometheus E2E tests [Fake]", func() {
 		req.Header.Add("Authorization", "Bearer "+string(token))
 
 		cli := &http.Client{
-			Transport: &kubeclient.RetryingRoundTripper{
-				Log: log.GetTestLogger(),
-				RoundTripper: &http.Transport{
-					TLSClientConfig: &tls.Config{
-						InsecureSkipVerify: true,
-					},
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
 				},
-				Retries:    5,
-				GetTimeout: 30 * time.Second,
 			},
 		}
 
