@@ -130,3 +130,4 @@ validate canary image empty on v3.2
 ## prevent "Job for docker.service canceled" error on startup ([#1604](https://github.com/openshift/openshift-azure/pull/1604), [@jim-minter](https://github.com/jim-minter), 01/05/2019)
 
 prevent "Job for docker.service canceled" error on startup
+
