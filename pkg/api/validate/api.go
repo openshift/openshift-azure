@@ -53,6 +53,12 @@ func (v *APIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftMa
 	old.Properties.ProvisioningState = cs.Properties.ProvisioningState
 
 	for i, app := range old.Properties.AgentPoolProfiles {
+		for _, newApp := range cs.Properties.AgentPoolProfiles {
+			if newApp.Name == app.Name {
+				old.Properties.AgentPoolProfiles[i].VMSize = newApp.VMSize
+			}
+		}
+
 		if app.Role != api.AgentPoolProfileRoleCompute {
 			continue
 		}

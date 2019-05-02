@@ -22,6 +22,11 @@ func TestAPIValidateUpdate(t *testing.T) {
 				oc.Properties.AgentPoolProfiles[2].Count++
 			},
 		},
+		"change compute VMSize": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[2].VMSize = api.StandardF16sV2
+			},
+		},
 		"invalid change": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Name = "new"
