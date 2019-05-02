@@ -27,24 +27,27 @@ func (builder *Builder) ssh() error {
 		return err
 	}
 
-	io.Copy(os.Stdout, stdout)
+	_, err = io.Copy(os.Stdout, stdout)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
 func (builder *Builder) scp(files []string) error {
-	session, err := builder.newSSHSession()
-	if err != nil {
-		return err
-	}
-	defer session.Close()
-
-	stdoutPipe, err := session.StdoutPipe()
-	if err != nil {
-		return err
-	}
-
 	for _, file := range files {
+		session, err := builder.newSSHSession()
+		if err != nil {
+			return err
+		}
+		defer session.Close()
+
+		stdoutPipe, err := session.StdoutPipe()
+		if err != nil {
+			return err
+		}
+
 		builder.Log.Infof("download %s", file)
 		f, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
@@ -57,10 +60,19 @@ func (builder *Builder) scp(files []string) error {
 			return err
 		}
 
-		// TODO: handle all EOF errors here
 		io.Copy(f, stdoutPipe)
-		session.Wait()
-		session.Close()
+
+		err = session.Wait()
+		if err != nil {
+			return err
+		}
+		err = session.Close()
+		if err == io.EOF {
+			continue
+		}
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

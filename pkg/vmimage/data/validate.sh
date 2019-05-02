@@ -20,5 +20,5 @@ EOF
 
 cp data/etc/yum.repos.d/kickstart.repo /etc/yum.repos.d/kickstart.repo
 
-yum updateinfo > /tmp/info || true
 yum check-update > /tmp/check || true
+yum updateinfo > /tmp/info || true

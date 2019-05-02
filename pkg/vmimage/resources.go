@@ -138,7 +138,7 @@ func nic(subscriptionID, resourceGroup, location string) *network.Interface {
 	}
 }
 
-func vm(subscriptionID, resourceGroup, location string, sshPublicKey string, verify bool, image string) *compute.VirtualMachine {
+func vm(subscriptionID, resourceGroup, location, sshPublicKey, image string, verify bool) *compute.VirtualMachine {
 	var imageReference compute.ImageReference
 	if !verify {
 		imageReference = compute.ImageReference{

@@ -114,6 +114,7 @@ func run(ctx context.Context, log *logrus.Entry) error {
 func main() {
 	flag.Parse()
 	logrus.SetLevel(log.SanitizeLogLevel(*logLevel))
+	logrus.SetReportCaller(true)
 	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
 
 	log := logrus.NewEntry(logrus.StandardLogger())

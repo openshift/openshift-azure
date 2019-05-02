@@ -88,7 +88,7 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 			ip(builder.BuildResourceGroup, builder.Location, builder.DomainNameLabel),
 			nsg(builder.Location),
 			nic(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location),
-			vm(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location, sshPublicKey, builder.Validate, builder.Image),
+			vm(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location, sshPublicKey, builder.Image, builder.Validate),
 			cse,
 		},
 	}
