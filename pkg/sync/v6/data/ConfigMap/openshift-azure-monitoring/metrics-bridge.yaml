@@ -5,6 +5,8 @@ data:
     statsdSocket: /var/etw/mdm_statsd.socket
     queries:
     - query: 'ALERTS'
+    - query: 'ALERTS{alertname="DeadMansSwitch",alertstate="firing"}'
+      name: osacluster_monitored
     - query: 'sum(apiserver_request_count) without (client, code, contentType, resource, scope, subresource, verb)'
       name: apiserver_request_count
     - query: 'sum(apiserver_request_latencies_bucket) without (resource, scope, subresource, verb)'
