@@ -63,6 +63,18 @@ func TestIsMatchingSyscallError(t *testing.T) {
 			},
 		},
 		{
+			name:  "net/http: HTTP/1.x transport connection broken: connection refused",
+			want:  true,
+			match: []syscall.Errno{syscall.ECONNREFUSED},
+			err:   fmt.Errorf("net/http: HTTP/1.x transport connection broken: %v", os.NewSyscallError("write", syscall.ECONNREFUSED)),
+		},
+		{
+			name:  "net/http: HTTP/1.x transport connection broken: something else",
+			want:  false,
+			match: []syscall.Errno{syscall.ECONNREFUSED},
+			err:   fmt.Errorf("net/http: HTTP/1.x transport connection broken: %v", os.NewSyscallError("open", syscall.EADDRNOTAVAIL)),
+		},
+		{
 			name:  "no match",
 			want:  false,
 			match: []syscall.Errno{syscall.ENETUNREACH},
