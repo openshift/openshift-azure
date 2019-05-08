@@ -545,6 +545,13 @@ func TestHowUserConfigChangesCausesRotations(t *testing.T) {
 				}
 			},
 		},
+		{
+			name:           "change AADIdentityProvider",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: false, rotationSync: true, rotationCompute: false},
+			change: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).Secret = "new"
+			},
+		},
 	}
 
 	log := logrus.NewEntry(logrus.StandardLogger())
@@ -721,7 +728,6 @@ func TestHowActionsCauseRotations(t *testing.T) {
 					t.Errorf("call %s not found in %v", ec, az.ComputeRP.Calls)
 				}
 			}
-
 			nodeCount := getNodeCountFromAz(az)
 			if !reflect.DeepEqual(tt.expectNodes, nodeCount) {
 				t.Fatalf("node mismatch: expected %v, got %v", tt.expectNodes, nodeCount)

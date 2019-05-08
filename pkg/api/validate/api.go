@@ -69,6 +69,7 @@ func (v *APIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftMa
 			}
 		}
 	}
+	old.Properties.AuthProfile.IdentityProviders = cs.Properties.AuthProfile.IdentityProviders
 
 	if !reflect.DeepEqual(cs, old) {
 		// TODO: this is a hack because we're using deep.Equal.  To fix properly
