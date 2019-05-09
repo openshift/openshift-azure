@@ -2,18 +2,18 @@ package plugin
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"os"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest/to"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/ghodss/yaml"
 	securityapi "github.com/openshift/api/security/v1"
 	fakesec "github.com/openshift/client-go/security/clientset/versioned/fake"
@@ -23,6 +23,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/client-go/kubernetes/fake"
 	restclient "k8s.io/client-go/rest"
 	k8stesting "k8s.io/client-go/testing"
@@ -36,6 +37,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/pkg/config"
 	"github.com/openshift/openshift-azure/pkg/startup"
+	"github.com/openshift/openshift-azure/pkg/sync"
 	fakecloud "github.com/openshift/openshift-azure/pkg/util/azureclient/fake"
 	"github.com/openshift/openshift-azure/pkg/util/random"
 	"github.com/openshift/openshift-azure/pkg/util/resourceid"
@@ -69,15 +71,19 @@ func getFakeDeployer(log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fak
 }
 
 func enrich(cs *api.OpenShiftManagedCluster) error {
+	rg := "testRG"
+	dnsDomain := "cloudapp.azure.com"
 	tenantID := uuid.NewV4().String()
 	clientID := uuid.NewV4().String()
 	secret := "suspicious"
 	cs.Properties.AzProfile = api.AzProfile{
 		TenantID:       tenantID,
 		SubscriptionID: uuid.NewV4().String(),
-		ResourceGroup:  "testRG",
+		ResourceGroup:  rg,
 	}
+
 	cs.Properties.AuthProfile.IdentityProviders = make([]api.IdentityProvider, 1)
+	cs.Properties.AuthProfile.IdentityProviders[0].Name = "Azure AD"
 	cs.Properties.AuthProfile.IdentityProviders[0].Provider = &api.AADIdentityProvider{
 		Kind:     "AADIdentityProvider",
 		ClientID: clientID,
@@ -95,7 +101,7 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	}
 
 	// /subscriptions/{subscription}/resourcegroups/{resource_group}/providers/Microsoft.ContainerService/openshiftmanagedClusters/{cluster_name}
-	cs.ID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, cs.Properties.AzProfile.ResourceGroup, "Microsoft.ContainerService/openshiftmanagedClusters", cs.Name)
+	cs.ID = resourceid.ResourceID(cs.Properties.AzProfile.SubscriptionID, rg, "Microsoft.ContainerService/openshiftmanagedClusters", cs.Name)
 
 	if len(cs.Properties.RouterProfiles) == 0 {
 		cs.Properties.RouterProfiles = []api.RouterProfile{
@@ -115,18 +121,18 @@ func enrich(cs *api.OpenShiftManagedCluster) error {
 	cs.Properties.APICertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNamePublicHostname
 	cs.Properties.RouterProfiles[0].RouterCertProfile.KeyVaultSecretURL = vaultURL + "/secrets/" + vaultKeyNameRouter
 
-	cs.Properties.PublicHostname = "openshift." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
-	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + os.Getenv("RESOURCEGROUP") + "." + os.Getenv("DNS_DOMAIN")
+	cs.Properties.PublicHostname = "openshift." + rg + "." + dnsDomain
+	cs.Properties.RouterProfiles[0].PublicSubdomain = "apps." + rg + "." + dnsDomain
 
 	if cs.Properties.FQDN == "" {
-		cs.Properties.FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+		cs.Properties.FQDN, err = random.FQDN(cs.Location+"."+dnsDomain, 20)
 		if err != nil {
 			return err
 		}
 	}
 
 	if cs.Properties.RouterProfiles[0].FQDN == "" {
-		cs.Properties.RouterProfiles[0].FQDN, err = random.FQDN(cs.Location+".cloudapp.azure.com", 20)
+		cs.Properties.RouterProfiles[0].FQDN, err = random.FQDN(cs.Location+"."+dnsDomain, 20)
 		if err != nil {
 			return err
 		}
@@ -199,52 +205,14 @@ func newFakeKubeclient(log *logrus.Entry, cli *fake.Clientset, seccli *fakesec.C
 	}
 }
 
-func TestCreateThenUpdateCausesNoRotations(t *testing.T) {
-	cs := &api.OpenShiftManagedCluster{
-		Config: api.Config{
-			ConfigStorageAccount:      "config",
-			RegistryStorageAccount:    "registry",
-			RegistryStorageAccountKey: "foo",
-
-			SSHKey: testtls.DummyPrivateKey,
-			Certificates: api.CertificateConfig{
-				Ca:            api.CertKeyPair{Cert: testtls.DummyCertificate, Key: testtls.DummyPrivateKey},
-				NodeBootstrap: api.CertKeyPair{Cert: testtls.DummyCertificate, Key: testtls.DummyPrivateKey},
-			},
-		},
-		Properties: api.Properties{
-			AgentPoolProfiles: []api.AgentPoolProfile{
-				{Role: api.AgentPoolProfileRoleMaster, Count: 3, Name: "master", VMSize: "Standard_D2s_v3"},
-				{Role: api.AgentPoolProfileRoleCompute, Count: 1, Name: "compute", VMSize: "Standard_D2s_v3"},
-				{Role: api.AgentPoolProfileRoleInfra, Count: 2, Name: "infra", VMSize: "Standard_D2s_v3"},
-			},
-		},
-	}
-	log := logrus.NewEntry(logrus.StandardLogger())
-	ctx := context.Background()
-
-	bKey, _ := tls.PrivateKeyAsBytes(testtls.DummyPrivateKey)
-	bCert, _ := tls.CertAsBytes(testtls.DummyCertificate)
-
-	secret := "PRIVATE KEY\n" + string(bKey) + "CERTIFICATE\n" + string(bCert)
-	secrets := []keyvault.SecretBundle{
-		{
-			ID:    to.StringPtr("PublicHostname"),
-			Value: to.StringPtr(secret),
-		},
-		{
-			ID:    to.StringPtr("Router"),
-			Value: to.StringPtr(secret),
-		},
-	}
-
+func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) (*plugin, *fake.Clientset, error) {
 	data, err := ioutil.ReadFile("../../pluginconfig/pluginconfig-311.yaml")
 	if err != nil {
-		t.Fatal(err)
+		return nil, nil, err
 	}
 	var template *pluginapi.Config
 	if err := yaml.Unmarshal(data, &template); err != nil {
-		t.Fatal(err)
+		return nil, nil, err
 	}
 
 	template.Certificates.GenevaLogging.Cert = testtls.DummyCertificate
@@ -254,7 +222,6 @@ func TestCreateThenUpdateCausesNoRotations(t *testing.T) {
 	template.GenevaImagePullSecret = []byte("pullSecret")
 	template.ImagePullSecret = []byte("imagePullSecret")
 
-	az := fakecloud.NewFakeAzureCloud(log, secrets)
 	cli := fake.NewSimpleClientset()
 	cli.PrependReactor("get", "deployments", func(action k8stesting.Action) (bool, runtime.Object, error) {
 		get := action.(k8stesting.GetAction)
@@ -351,27 +318,348 @@ func TestCreateThenUpdateCausesNoRotations(t *testing.T) {
 	}
 	err = enrich(cs)
 	if err != nil {
-		t.Fatal(err)
+		return nil, nil, err
 	}
 
 	err = p.GenerateConfig(ctx, cs, false)
 	if err != nil {
-		t.Fatal(err)
+		return nil, nil, err
 	}
 
 	if err := p.CreateOrUpdate(ctx, cs, false, getFakeDeployer(log, cs, az)); err != nil {
-		t.Errorf("plugin.CreateOrUpdate [create] error = %v", err)
+		return nil, nil, err
 	}
+	return p, cli, nil
+}
+
+func newTestCs() *api.OpenShiftManagedCluster {
+	return &api.OpenShiftManagedCluster{
+		Name:     "integrationTest",
+		Location: "eastus",
+		Config: api.Config{
+			ConfigStorageAccount:      "config",
+			RegistryStorageAccount:    "registry",
+			RegistryStorageAccountKey: "foo",
+
+			SSHKey: testtls.DummyPrivateKey,
+			Certificates: api.CertificateConfig{
+				Ca:            api.CertKeyPair{Cert: testtls.DummyCertificate, Key: testtls.DummyPrivateKey},
+				NodeBootstrap: api.CertKeyPair{Cert: testtls.DummyCertificate, Key: testtls.DummyPrivateKey},
+			},
+		},
+		Properties: api.Properties{
+			OpenShiftVersion: "v3.11",
+			AgentPoolProfiles: []api.AgentPoolProfile{
+				{Role: api.AgentPoolProfileRoleMaster, Count: 3, Name: "master", VMSize: "Standard_D2s_v3", SubnetCIDR: "10.0.0.0/24", OSType: "Linux"},
+				{Role: api.AgentPoolProfileRoleCompute, Count: 1, Name: "compute", VMSize: "Standard_D2s_v3", SubnetCIDR: "10.0.0.0/24", OSType: "Linux"},
+				{Role: api.AgentPoolProfileRoleInfra, Count: 2, Name: "infra", VMSize: "Standard_D2s_v3", SubnetCIDR: "10.0.0.0/24", OSType: "Linux"},
+			},
+			NetworkProfile: api.NetworkProfile{VnetCIDR: "10.0.0.0/8"},
+		},
+	}
+}
+
+func newFakeAzureCloud(log *logrus.Entry) *fakecloud.AzureCloud {
+	bKey, _ := tls.PrivateKeyAsBytes(testtls.DummyPrivateKey)
+	bCert, _ := tls.CertAsBytes(testtls.DummyCertificate)
+	secret := "PRIVATE KEY\n" + string(bKey) + "CERTIFICATE\n" + string(bCert)
+	secrets := []keyvault.SecretBundle{
+		{
+			ID:    to.StringPtr("PublicHostname"),
+			Value: to.StringPtr(secret),
+		},
+		{
+			ID:    to.StringPtr("Router"),
+			Value: to.StringPtr(secret),
+		},
+	}
+
+	return fakecloud.NewFakeAzureCloud(log, secrets)
+}
+
+func getHashes(az *fakecloud.AzureCloud, cs *api.OpenShiftManagedCluster) (*updateblob.UpdateBlob, string, error) {
 	bsc := az.StorageClient.GetBlobService()
 	updateBlobService := updateblob.NewBlobService(bsc)
-	beforeBlob, err := updateBlobService.Read()
-	// - update
-	if err := p.CreateOrUpdate(ctx, cs, true, getFakeDeployer(log, cs, az)); err != nil {
-		t.Errorf("plugin.CreateOrUpdate [update] error = %v", err)
+	blob, err := updateBlobService.Read()
+	if err != nil {
+		return nil, "", err
 	}
-	// - assert that the hashes are the same
-	afterBlob, err := updateBlobService.Read()
-	if !reflect.DeepEqual(beforeBlob, afterBlob) {
-		t.Errorf("unexpected result:\n%#v\nexpected:\n%#v", spew.Sprint(beforeBlob), spew.Sprint(afterBlob))
+	// get sync deployment checksum annotation
+	// FIXME: only doing it this way as fake kube Get on the deployment
+	// always returns an empty string on the annotation
+	syncer, err := sync.New(az.ComputeRP.Log, cs, false)
+	if err != nil {
+		return nil, "", err
+	}
+	syncChecksum, err := syncer.Hash()
+	if err != nil {
+		return nil, "", err
+	}
+	return blob, hex.EncodeToString(syncChecksum), nil
+}
+
+type rotationType string
+
+const (
+	rotationCompute rotationType = "compute"
+	rotationInfra   rotationType = "infra"
+	rotationMaster  rotationType = "master"
+	rotationSync    rotationType = "sync"
+)
+
+func getRotations(beforeBlob, afterBlob *updateblob.UpdateBlob, beforeSyncChecksum, afterSyncChecksum string) map[rotationType]bool {
+	rotations := map[rotationType]bool{rotationCompute: false, rotationInfra: false, rotationMaster: false, rotationSync: false}
+	for host := range beforeBlob.HostnameHashes {
+		rotated := !reflect.DeepEqual(beforeBlob.HostnameHashes[host], afterBlob.HostnameHashes[host])
+		if rotated {
+			rotations[rotationMaster] = true
+		}
+	}
+	for scaleset := range beforeBlob.ScalesetHashes {
+		rotated := !reflect.DeepEqual(beforeBlob.ScalesetHashes[scaleset], afterBlob.ScalesetHashes[scaleset])
+		if strings.Contains(scaleset, "compute") && rotated {
+			rotations[rotationCompute] = true
+		} else if strings.Contains(scaleset, "infra") && rotated {
+			rotations[rotationInfra] = true
+		}
+	}
+	if beforeSyncChecksum != afterSyncChecksum {
+		rotations[rotationSync] = true
+	}
+	return rotations
+}
+
+func getNodeCountFromAz(az *fakecloud.AzureCloud) map[rotationType]int {
+	nodeCount := map[rotationType]int{rotationCompute: 0, rotationInfra: 0, rotationMaster: 0}
+	for scaleset, vms := range az.ComputeRP.Vms {
+		for _, role := range []rotationType{rotationCompute, rotationInfra, rotationMaster} {
+			if strings.Contains(scaleset, string(role)) {
+				nodeCount[role] += len(vms)
+				break
+			}
+		}
+	}
+
+	return nodeCount
+}
+
+func TestHowAdminConfigChangesCausesRotations(t *testing.T) {
+	tests := []struct {
+		name           string
+		change         func(cs *api.OpenShiftManagedCluster)
+		expectRotation map[rotationType]bool
+	}{
+		{
+			name:           "no changes",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			change:         func(cs *api.OpenShiftManagedCluster) {},
+		},
+		{
+			name:           "change vm image",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: true, rotationSync: true, rotationCompute: true},
+			change:         func(cs *api.OpenShiftManagedCluster) { cs.Config.ImageVersion = "311.12.12345678" },
+		},
+		{
+			name:           "change controller loglevel",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			change:         func(cs *api.OpenShiftManagedCluster) { cs.Config.ComponentLogLevel.ControllerManager = to.IntPtr(5) },
+		},
+		{
+			name:           "change container image",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: true, rotationCompute: false},
+			change:         func(cs *api.OpenShiftManagedCluster) { cs.Config.Images.WebConsole = "newImage" },
+		},
+	}
+
+	log := logrus.NewEntry(logrus.StandardLogger())
+	ctx := context.Background()
+	cs := newTestCs()
+	az := newFakeAzureCloud(log)
+	p, _, err := setupNewCluster(ctx, log, cs, az)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			log.Infof("--- Test: %s", tt.name)
+			beforeBlob, beforeSyncChecksum, err := getHashes(az, cs)
+			if err != nil {
+				t.Fatal(err)
+			}
+			oldCs := cs.DeepCopy()
+			tt.change(cs)
+
+			errs := p.ValidateAdmin(ctx, cs, oldCs)
+			if errs != nil {
+				t.Fatal(errs)
+			}
+			perr := p.CreateOrUpdate(ctx, cs, true, getFakeDeployer(log, cs, az))
+			if perr != nil {
+				t.Fatal(perr)
+			}
+
+			afterBlob, afterSyncChecksum, err := getHashes(az, cs)
+			if err != nil {
+				t.Fatal(err)
+			}
+			rotations := getRotations(beforeBlob, afterBlob, beforeSyncChecksum, afterSyncChecksum)
+			if !reflect.DeepEqual(tt.expectRotation, rotations) {
+				t.Fatalf("rotation mismatch: expected %v, got %v", tt.expectRotation, rotations)
+			}
+		})
+	}
+}
+
+func TestHowActionsCauseRotations(t *testing.T) {
+	log := logrus.NewEntry(logrus.StandardLogger())
+	ctx := context.Background()
+	tests := []struct {
+		name           string
+		change         func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error
+		expectRotation map[rotationType]bool
+		expectNodes    map[rotationType]int
+		expectCalls    []string
+	}{
+		{
+			name:           "scale up",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 6, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				oldCs := cs.DeepCopy()
+				for i, p := range cs.Properties.AgentPoolProfiles {
+					if p.Role == api.AgentPoolProfileRoleCompute {
+						cs.Properties.AgentPoolProfiles[i].Count = 6
+					}
+				}
+				errs := p.Validate(ctx, cs, oldCs, false)
+				if errs != nil {
+					return kerrors.NewAggregate(errs)
+				}
+				perr := p.CreateOrUpdate(ctx, cs, true, getFakeDeployer(log, cs, az))
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+		{
+			name:           "rotate cluster secrets",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: true, rotationSync: true, rotationCompute: true},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				perr := p.RotateClusterSecrets(ctx, cs, getFakeDeployer(log, cs, az))
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+		{
+			name:           "GetPluginVersion() cause no rotations",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				p.GetPluginVersion(ctx)
+				return nil
+			},
+		},
+		{
+			name:           "ListClusterVMs() cause no rotations",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				_, perr := p.ListClusterVMs(ctx, cs)
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+		{
+			name:           "ListEtcdBackups() cause no rotations",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				_, perr := p.ListEtcdBackups(ctx, cs)
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+		{
+			name:           "GetControlPlanePods() cause no rotations",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				_, perr := p.GetControlPlanePods(ctx, cs)
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+		{
+			name:           "runcommand - no rotations and correct call",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			expectNodes:    map[rotationType]int{rotationCompute: 1, rotationInfra: 2, rotationMaster: 3},
+			expectCalls:    []string{"VirtualMachineScaleSetVMsClient:RunCommand:ss-master:1"},
+			change: func(p *plugin, cs *api.OpenShiftManagedCluster, az *fakecloud.AzureCloud) error {
+				perr := p.RunCommand(ctx, cs, "master-000001", "RestartDocker")
+				if perr != nil {
+					return perr
+				}
+				return nil
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// for this test we always start with a new cluster (unlike the config change test above)
+			cs := newTestCs()
+			az := newFakeAzureCloud(log)
+			p, _, err := setupNewCluster(ctx, log, cs, az)
+
+			beforeBlob, beforeSyncChecksum, err := getHashes(az, cs)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// clear the calls
+			az.ComputeRP.Calls = []string{}
+
+			err = tt.change(p, cs, az)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			for _, ec := range tt.expectCalls {
+				found := false
+				for _, call := range az.ComputeRP.Calls {
+					if call == ec {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Errorf("call %s not found in %v", ec, az.ComputeRP.Calls)
+				}
+			}
+
+			nodeCount := getNodeCountFromAz(az)
+			if !reflect.DeepEqual(tt.expectNodes, nodeCount) {
+				t.Fatalf("node mismatch: expected %v, got %v", tt.expectNodes, nodeCount)
+			}
+
+			afterBlob, afterSyncChecksum, err := getHashes(az, cs)
+			if err != nil {
+				t.Fatal(err)
+			}
+			rotations := getRotations(beforeBlob, afterBlob, beforeSyncChecksum, afterSyncChecksum)
+			if !reflect.DeepEqual(tt.expectRotation, rotations) {
+				t.Fatalf("rotation mismatch: expected %v, got %v", tt.expectRotation, rotations)
+			}
+		})
 	}
 }

@@ -12,6 +12,7 @@ import (
 
 type VaultRP struct {
 	Log     *logrus.Entry
+	Calls   []string
 	Secrets []azkeyvault.SecretBundle
 }
 
@@ -27,6 +28,7 @@ func NewFakeKeyVaultClient(rp *VaultRP) keyvault.KeyVaultClient {
 
 // GetSecret Fakes base method
 func (kv *FakeKeyVaultClient) GetSecret(ctx context.Context, vaultBaseURL string, secretName string, secretVersion string) (result azkeyvault.SecretBundle, err error) {
+	kv.rp.Calls = append(kv.rp.Calls, "KeyVaultClient:GetSecret:"+secretName)
 	for _, s := range kv.rp.Secrets {
 		if *s.ID == secretName {
 			return s, nil

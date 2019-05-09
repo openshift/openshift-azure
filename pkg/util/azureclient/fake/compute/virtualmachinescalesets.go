@@ -28,7 +28,8 @@ func (s *FakeVirtualMachineScaleSetsClient) scale(ctx context.Context, resourceG
 	have := int64(len(s.rp.Vms[*ss.Name]))
 	s.rp.Log.Debugf("scale have:%d, cap:%d", have, *ss.Sku.Capacity)
 	if have > *ss.Sku.Capacity {
-		return fmt.Errorf("should not be automatically scaling down")
+		s.rp.Vms[*ss.Name] = s.rp.Vms[*ss.Name][:*ss.Sku.Capacity]
+		return nil
 	}
 	for v := have; *ss.Sku.Capacity > have; v++ {
 		name := fmt.Sprintf("%s-%d", (*ss.Name)[3:], v)
@@ -36,7 +37,7 @@ func (s *FakeVirtualMachineScaleSetsClient) scale(ctx context.Context, resourceG
 		s.rp.Log.Infof("scale have:%d, cap:%d, v:%d, name:%s, compName:%s", have, *ss.Sku.Capacity, v, name, compName)
 		vm := compute.VirtualMachineScaleSetVM{
 			ID:         to.StringPtr(uuid.NewV4().String()),
-			InstanceID: to.StringPtr(uuid.NewV4().String()),
+			InstanceID: to.StringPtr(fmt.Sprintf("%d", v)),
 			Name:       &name,
 			VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
 				OsProfile: &compute.OSProfile{ComputerName: &compName},
@@ -54,6 +55,7 @@ func (s *FakeVirtualMachineScaleSetsClient) scale(ctx context.Context, resourceG
 
 // CreateOrUpdate Fakes base method
 func (s *FakeVirtualMachineScaleSetsClient) CreateOrUpdate(ctx context.Context, resourceGroupName, VMScaleSetName string, parameters compute.VirtualMachineScaleSet) error {
+	s.rp.Calls = append(s.rp.Calls, "VirtualMachineScaleSetsClient:CreateOrUpdate:"+VMScaleSetName)
 	found := false
 	for i, ss := range s.rp.Ssc {
 		if VMScaleSetName == *ss.Name {
@@ -70,6 +72,7 @@ func (s *FakeVirtualMachineScaleSetsClient) CreateOrUpdate(ctx context.Context, 
 
 // Delete Fakes base method
 func (s *FakeVirtualMachineScaleSetsClient) Delete(ctx context.Context, resourceGroupName, VMScaleSetName string) error {
+	s.rp.Calls = append(s.rp.Calls, "VirtualMachineScaleSetsClient:Delete:"+VMScaleSetName)
 	for i, ss := range s.rp.Ssc {
 		if VMScaleSetName == *ss.Name {
 			*ss.Sku.Capacity = 0
@@ -96,11 +99,13 @@ func (s *FakeVirtualMachineScaleSetsClient) Get(ctx context.Context, resourceGro
 
 // List Fakes base method
 func (s *FakeVirtualMachineScaleSetsClient) List(ctx context.Context, resourceGroup string) ([]compute.VirtualMachineScaleSet, error) {
+	s.rp.Calls = append(s.rp.Calls, "VirtualMachineScaleSetsClient:List")
 	return s.rp.Ssc, nil
 }
 
 // Update Fakes base method
 func (s *FakeVirtualMachineScaleSetsClient) Update(ctx context.Context, resourceGroupName, VMScaleSetName string, parameters compute.VirtualMachineScaleSetUpdate) error {
+	s.rp.Calls = append(s.rp.Calls, "VirtualMachineScaleSetsClient:Update:"+VMScaleSetName)
 	for _, ss := range s.rp.Ssc {
 		if VMScaleSetName == *ss.Name {
 			// the scaler changes the capacity
@@ -113,5 +118,6 @@ func (s *FakeVirtualMachineScaleSetsClient) Update(ctx context.Context, resource
 
 // UpdateInstances Fakes base method
 func (s *FakeVirtualMachineScaleSetsClient) UpdateInstances(ctx context.Context, resourceGroupName, VMScaleSetName string, VMInstanceIDs compute.VirtualMachineScaleSetVMInstanceRequiredIDs) error {
-	return fmt.Errorf("fake not implemented")
+	s.rp.Calls = append(s.rp.Calls, "VirtualMachineScaleSetsClient:UpdateInstances:"+VMScaleSetName)
+	return nil
 }
