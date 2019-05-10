@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"regexp"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -14,12 +13,53 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/prometheus/client_golang/api"
 	"github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/prometheus/promql"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/openshift/openshift-azure/pkg/entrypoint/metricsbridge"
 	"github.com/openshift/openshift-azure/pkg/util/roundtrippers"
 	"github.com/openshift/openshift-azure/test/sanity"
 )
+
+func getMetrics(ast promql.Expr) []string {
+	metrics := []string{}
+	switch t := ast.(type) {
+	case *promql.AggregateExpr:
+		metrics = append(metrics, getMetrics(t.Expr)...)
+		metrics = append(metrics, getMetrics(t.Param)...)
+	case *promql.BinaryExpr:
+		metrics = append(metrics, getMetrics(t.LHS)...)
+		metrics = append(metrics, getMetrics(t.RHS)...)
+	case *promql.Call:
+		for _, expr := range t.Args {
+			metrics = append(metrics, getMetrics(expr)...)
+		}
+	case *promql.MatrixSelector:
+		metrics = append(metrics, t.Name)
+	case *promql.VectorSelector:
+		metrics = append(metrics, t.Name)
+	case *promql.SubqueryExpr:
+		metrics = append(metrics, getMetrics(t.Expr)...)
+	case *promql.ParenExpr:
+		metrics = append(metrics, getMetrics(t.Expr)...)
+	case *promql.UnaryExpr:
+		metrics = append(metrics, getMetrics(t.Expr)...)
+	case *promql.NumberLiteral, *promql.StringLiteral, nil:
+		//literals will always work, no metrics to verify
+	default:
+		panic("Promql AST type unknown")
+	}
+	return metrics
+}
+
+func parseMetrics(query string) ([]string, error) {
+	ast, err := promql.ParseExpr(query)
+	l := getMetrics(ast)
+	if err != nil {
+		return nil, err
+	}
+	return l, nil
+}
 
 // Test checks if all configured queries are valid prometheus queries, and if the metric exists
 // Existence of metric is checked by either:
@@ -33,6 +73,7 @@ var _ = Describe("Metricsbridge E2E check configured queries [Fake]", func() {
 		"kubelet_runtime_operations_errors != 0": true,
 		"kubelet_docker_operations_errors != 0":  true,
 	}
+	fmt.Print(manuallyVerifiedQueries)
 	It("should be possible to get data for each metric in defined queries", func() {
 		By("getting the configMap")
 		mbConfigMap, err := sanity.Checker.Client.Admin.CoreV1.ConfigMaps("openshift-azure-monitoring").Get("metrics-bridge", meta_v1.GetOptions{})
@@ -78,28 +119,13 @@ var _ = Describe("Metricsbridge E2E check configured queries [Fake]", func() {
 			value, err := prometheusApi.Query(context.Background(), q.Query, time.Time{})
 			Expect(err).NotTo(HaveOccurred())
 			if len(value.String()) == 0 {
-				//check if query has been verified manually despite not returning datapoints
-				_, present := manuallyVerifiedQueries[q.Query]
-				if !present {
-					qStr := q.Query
-
-					// find any expressions in parenthesis, and replace qStr with the first one found
-					// e.g. sum(foo{bar}) without (baz) != 0 -> foo{bar}
-					re := regexp.MustCompile(`\((.+?)\)`)
-					m := re.FindAllStringSubmatch(qStr, -1)
-					if m != nil {
-						//only if there is at least one expression in parenthesis
-						qStr = m[0][1]
-					}
-
-					//remove anything after the first non-alphanumeric character
-					re = regexp.MustCompile(`(?i)[^_a-z0-9].*`)
-					qStr = re.ReplaceAllString(qStr, "")
-
-					//check if it returns datapoints
-					value, err := prometheusApi.Query(context.Background(), qStr, time.Time{})
+				//parse the expression to get to metic names
+				m, _ := parseMetrics(q.Query)
+				//check if all metrics in the query return values
+				for _, metric := range m {
+					v, err := prometheusApi.Query(context.Background(), metric, time.Time{})
 					Expect(err).NotTo(HaveOccurred())
-					Expect(value.String()).NotTo(BeEmpty())
+					Expect(v.String()).NotTo(BeEmpty())
 				}
 			}
 		}
