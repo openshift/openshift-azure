@@ -11,7 +11,8 @@ data:
       metricsPublicURL: ""
     extensions:
       properties: {}
-      scriptURLs: []
+      scriptURLs:
+      - '*** GENERATED ***'
       stylesheetURLs:
       - '*** GENERATED ***'
     features:
