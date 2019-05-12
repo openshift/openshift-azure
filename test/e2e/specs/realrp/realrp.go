@@ -61,7 +61,7 @@ var _ = Describe("Resource provider e2e tests [Default][Real]", func() {
 				By(fmt.Sprintf("trying to delete %s/%s", *v.Type, *v.Name))
 				_, err := cli.Resources.DeleteByID(ctx, *v.ID)
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).Should(ContainSubstring(`StatusCode=409`))
+				Expect(err.Error()).Should(ContainSubstring(`StatusCode=403`))
 			}
 			err = pages.Next()
 			Expect(err).NotTo(HaveOccurred())
