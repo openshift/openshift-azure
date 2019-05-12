@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 make content
+git status
 go generate ./...
 
 . hack/tests/ci-operator-prepare.sh
