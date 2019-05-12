@@ -12,7 +12,6 @@ cleanup() {
     if [[ -n "$NO_DELETE" ]]; then
         return
     fi
-    make delete
     az group delete -g "$RESOURCEGROUP" --yes --no-wait
 }
 trap cleanup EXIT
@@ -21,7 +20,5 @@ trap cleanup EXIT
 
 export RUNNING_UNDER_TEST=false
 export TEST_IN_PRODUCTION=true
-
-make create
 
 hack/e2e.sh
