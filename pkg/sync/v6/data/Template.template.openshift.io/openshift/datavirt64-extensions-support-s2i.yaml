@@ -162,13 +162,6 @@ objects:
       images:
       - from:
           kind: ImageStreamTag
-          name: jboss-datagrid71-client-openshift:1.0
-          namespace: ${IMAGE_STREAM_NAMESPACE}
-        paths:
-        - destinationDir: ./${CONTEXT_DIR}/extensions/datagrid71
-          sourcePath: /extensions/.
-      - from:
-          kind: ImageStreamTag
           name: ${APPLICATION_NAME}-ext:latest
         paths:
         - destinationDir: ./${CONTEXT_DIR}/extensions/extras
@@ -204,11 +197,6 @@ objects:
         from:
           kind: ImageStreamTag
           name: ${APPLICATION_NAME}-ext:latest
-      type: ImageChange
-    - imageChange:
-        from:
-          kind: ImageStreamTag
-          name: jboss-datagrid71-client-openshift:1.0
       type: ImageChange
     - type: ConfigChange
 - apiVersion: v1
