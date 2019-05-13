@@ -1,14 +1,13 @@
-hash: ef8d5a64e6da529f368f9a7bf3d435481a8cd7123756ccc865048893897947d8
-updated: 2019-04-16T11:35:54.154136608-05:00
+hash: e904afbefd4e91a36d0754abbb49dd5a5bf5f0a8384de3f1b2a33021df68f8ff
+updated: 2019-05-13T21:50:57.599739745-07:00
 imports:
 - name: code.cloudfoundry.org/clock
   version: 02e53af36e6c978af692887ed449b74026d76fec
 - name: contrib.go.opencensus.io/exporter/ocagent
-  version: 738c4b15ad40c960255f4369c5f0f4e95fc68341
+  version: bbad33429d46c63e46ef4ef90d34893d69fd81aa
 - name: github.com/Azure/azure-sdk-for-go
   version: 1951233eb944a49aa5f7278cba8e3e32a8c958af
   subpackages:
-  - profiles/latest/resources/mgmt/resources
   - profiles/preview/resources/mgmt/managedapplications
   - services/authorization/mgmt/2015-07-01/authorization
   - services/compute/mgmt/2018-10-01/compute
@@ -17,7 +16,6 @@ imports:
   - services/keyvault/2016-10-01/keyvault
   - services/keyvault/mgmt/2016-10-01/keyvault
   - services/marketplaceordering/mgmt/2015-06-01/marketplaceordering
-  - services/monitor/mgmt/2017-09-01/insights
   - services/network/mgmt/2018-06-01/network
   - services/network/mgmt/2018-07-01/network
   - services/preview/monitor/mgmt/2018-09-01/insights
@@ -45,7 +43,7 @@ imports:
   subpackages:
   - quantile
 - name: github.com/census-instrumentation/opencensus-proto
-  version: 0994559fc04584b8157b89555e5e14b21bcd769d
+  version: e2601ef16f8a085a69d94ace5133f97438f8945f
   subpackages:
   - gen-go/agent/common/v1
   - gen-go/agent/metrics/v1
@@ -98,7 +96,7 @@ imports:
   subpackages:
   - lru
 - name: github.com/golang/mock
-  version: 51421b967af1f557f93a59e0057aaf15ca02e29c
+  version: 9fa652df1129bef0e734c9cf9bf6dbae9ef3b9fa
   subpackages:
   - gomock
 - name: github.com/golang/protobuf
@@ -117,7 +115,7 @@ imports:
   - ptypes/timestamp
   - ptypes/wrappers
 - name: github.com/google/go-github
-  version: a8383c7edb4ac91a58ae2b931c0cc32d69c157fc
+  version: 901030391ab7f418a984389fd3f8f65e39e5c823
   subpackages:
   - github
 - name: github.com/google/go-querystring
@@ -127,7 +125,7 @@ imports:
 - name: github.com/google/gofuzz
   version: 44d81051d367757e1c7c6a5a86423ece9afcf63c
 - name: github.com/google/uuid
-  version: 0cd6bf5da1e1c83f8b45653022c74f71af0538a4
+  version: c2e93f3ae59f2904160ceaab466009f965df46d6
 - name: github.com/googleapis/gnostic
   version: 0c5108395e2debce0d731cf0287ddf7242066aba
   subpackages:
@@ -135,7 +133,7 @@ imports:
   - compiler
   - extensions
 - name: github.com/grpc-ecosystem/grpc-gateway
-  version: 20f268a412e5b342ebfb1a0eef7c3b7bd6c260ea
+  version: 15c7b2ea9d896c07d9b28eca57050b1ee0aea4d6
   subpackages:
   - internal
   - runtime
@@ -180,8 +178,13 @@ imports:
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
   - pbutil
+- name: github.com/microsoft/ApplicationInsights-Go
+  version: c0ae8a1d47942ac723ce7130b50717effd15e5cf
+  subpackages:
+  - appinsights
+  - appinsights/contracts
 - name: github.com/Microsoft/ApplicationInsights-Go
-  version: 91c278ebf40dacf87986074aed81db50551e0009
+  version: c0ae8a1d47942ac723ce7130b50717effd15e5cf
   subpackages:
   - appinsights
   - appinsights/contracts
@@ -232,6 +235,9 @@ imports:
   subpackages:
   - apps/v1
   - build/v1
+  - image/docker10
+  - image/dockerpre012
+  - image/v1
   - network/v1
   - pkg/serialization
   - project/v1
@@ -284,7 +290,9 @@ imports:
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: 8368d24ba045f26503eb745b624d930cbe214c79
+  version: a1dba9ce8baed984a2495b658c82687f8157b98f
+  subpackages:
+  - xfs
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/sirupsen/logrus
@@ -292,9 +300,9 @@ imports:
 - name: github.com/spf13/cobra
   version: ef82de70bb3f60c65fb8eebacbb2d122ef517385
 - name: github.com/spf13/pflag
-  version: 583c0c0531f06d5278b7d917446061adc344b5cd
+  version: 24fa6976df40757dce6aea913e7b81ade90530e1
 - name: go.opencensus.io
-  version: 75c0cca22312e51bfd4fafdbe9197ae399e18b38
+  version: f24e56296b3a742d13b8368bbb1e831f9b0d2c7f
   subpackages:
   - internal
   - internal/tagencoding
@@ -314,7 +322,7 @@ imports:
   - trace/propagation
   - trace/tracestate
 - name: go.uber.org/atomic
-  version: 1ea20fb1cbb1cc08cbd0d913a96dead89aa18289
+  version: df976f2515e274675050de7b3f42545de80594fd
 - name: go.uber.org/multierr
   version: 3c4937480c32f4c13a875a1829af76c98ca3d40a
 - name: go.uber.org/zap
@@ -354,7 +362,7 @@ imports:
   subpackages:
   - internal
 - name: golang.org/x/sync
-  version: 56d357773e8497dfd526f0727e187720d1093757
+  version: 112230192c580c3556b8cee6403af37a4fc5f28c
   subpackages:
   - semaphore
 - name: golang.org/x/sys
@@ -388,7 +396,7 @@ imports:
   subpackages:
   - rate
 - name: google.golang.org/api
-  version: 9e7f2a839bfefc34110ebbc321850d5a7ad1ebd4
+  version: bbbc0e98e3cc6ddcebca23f9ac35acda33bd5b38
   subpackages:
   - support/bundler
 - name: google.golang.org/appengine
