@@ -10,23 +10,12 @@ import (
 	"github.com/openshift/openshift-azure/pkg/cluster/updateblob"
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
-	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func() {
-	var (
-		azurecli *azure.Client
-	)
-
-	BeforeEach(func() {
-		var err error
-		azurecli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), true)
-		Expect(err).NotTo(HaveOccurred())
-	})
-
 	It("should be possible for an SRE to force update a cluster", func() {
 		By("Reading the update blob before the force update")
-		ubs := updateblob.NewBlobService(azurecli.BlobStorage)
+		ubs := updateblob.NewBlobService(azure.RPClient.BlobStorage)
 		before, err := ubs.Read()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(before).NotTo(BeNil())
@@ -34,7 +23,7 @@ var _ = Describe("Force Update E2E tests [ForceUpdate][Fake][LongRunning]", func
 		Expect(len(before.ScalesetHashes)).To(Equal(2)) // one per worker scaleset
 
 		By("Executing force update on the cluster.")
-		err = azurecli.OpenShiftManagedClustersAdmin.ForceUpdate(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		err = azure.RPClient.OpenShiftManagedClustersAdmin.ForceUpdate(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Reading the update blob after the force update")

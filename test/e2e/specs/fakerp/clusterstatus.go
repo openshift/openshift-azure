@@ -12,23 +12,12 @@ import (
 	v1 "k8s.io/api/core/v1"
 
 	"github.com/openshift/openshift-azure/test/clients/azure"
-	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Control Plane Pods Status E2E tests [Fake][EveryPR]", func() {
-	var (
-		cli *azure.Client
-	)
-
-	BeforeEach(func() {
-		var err error
-		cli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), false)
-		Expect(err).NotTo(HaveOccurred())
-	})
-
 	It("should allow an SRE to fetch the status of control plane pods", func() {
 		By("Using the OSA admin client to fetch the raw cluster status")
-		b, err := cli.OpenShiftManagedClustersAdmin.GetControlPlanePods(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		b, err := azure.RPClient.OpenShiftManagedClustersAdmin.GetControlPlanePods(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(b).NotTo(BeNil())
 

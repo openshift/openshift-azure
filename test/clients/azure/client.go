@@ -4,10 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"regexp"
-	"strings"
 
-	"github.com/onsi/ginkgo/config"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/fakerp/shared"
@@ -24,19 +21,7 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/configblob"
 )
 
-// rpFocus represents the supported RP APIs which e2e tests use to create their azure clients,
-// The client will be configured to work either against the real, fake or admin apis
-type rpFocus string
-
-var (
-	adminRpFocus = rpFocus(regexp.QuoteMeta("[Admin]"))
-	fakeRpFocus  = rpFocus(regexp.QuoteMeta("[Fake]"))
-	realRpFocus  = rpFocus(regexp.QuoteMeta("[Real]"))
-)
-
-func (tf rpFocus) match(focusString string) bool {
-	return strings.Contains(focusString, string(tf))
-}
+var RPClient *Client
 
 // Client is the main controller for azure client objects
 type Client struct {
@@ -55,14 +40,11 @@ type Client struct {
 	Groups                           resources.GroupsClient
 }
 
-// NewClientFromEnvironment creates a new azure client from environment variables.
-// Setting the storage client is optional and should only be used selectively by
-// tests that need access to the config storage blob because configblob.GetService
-// makes api calls to Azure in order to setup the blob client.
-func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorageClient bool) (*Client, error) {
+// NewClientFromEnvironment creates a new azure client from environment variables and stores it in the RPClient variable
+func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, realRP bool) error {
 	authorizer, err := azureclient.NewAuthorizerFromEnvironment("")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	cfg := &cloudprovider.Config{
@@ -75,24 +57,21 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorage
 	subscriptionID := cfg.SubscriptionID
 
 	var storageClient storage.BlobStorageClient
-	if setStorageClient {
+	//for now fake RP tests use the Blob Storage, real RP do not
+	if !realRP {
 		storageClient, err = configblob.GetService(ctx, log, cfg)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
 	var rpURL string
-	focus := config.GinkgoConfig.FocusString
-	switch {
-	case adminRpFocus.match(focus), fakeRpFocus.match(focus):
-		fmt.Println("configuring the fake resource provider")
-		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
-	case realRpFocus.match(focus):
+	if realRP {
 		fmt.Println("configuring the real resource provider")
 		rpURL = externalapi.DefaultBaseURI
-	default:
-		panic(fmt.Sprintf("invalid focus %q - need to -ginkgo.focus=\\[Admin\\], -ginkgo.focus=\\[Fake\\] or -ginkgo.focus=\\[Real\\]", config.GinkgoConfig.FocusString))
+	} else {
+		fmt.Println("configuring the fake resource provider")
+		rpURL = fmt.Sprintf("http://%s", shared.LocalHttpAddr)
 	}
 
 	rpc := externalapi.NewOpenShiftManagedClustersClientWithBaseURI(rpURL, subscriptionID)
@@ -100,7 +79,7 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorage
 
 	rpcAdmin := adminapi.NewClient(rpURL, subscriptionID)
 
-	return &Client{
+	RPClient = &Client{
 		Accounts:                         storage.NewAccountsClient(ctx, log, subscriptionID, authorizer),
 		ActivityLogs:                     insights.NewActivityLogsClient(ctx, log, subscriptionID, authorizer),
 		Applications:                     managedapplications.NewApplicationsClient(ctx, log, subscriptionID, authorizer),
@@ -114,5 +93,6 @@ func NewClientFromEnvironment(ctx context.Context, log *logrus.Entry, setStorage
 		VirtualNetworks:                  network.NewVirtualNetworkClient(ctx, log, subscriptionID, authorizer),
 		VirtualNetworksPeerings:          network.NewVirtualNetworksPeeringsClient(ctx, log, subscriptionID, authorizer),
 		Groups:                           resources.NewGroupsClient(ctx, log, subscriptionID, authorizer),
-	}, nil
+	}
+	return nil
 }

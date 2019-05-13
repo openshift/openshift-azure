@@ -9,33 +9,21 @@ import (
 
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
-	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 var _ = Describe("Key Rotation E2E tests [KeyRotation][Fake][LongRunning]", func() {
-	var (
-		azurecli *azure.Client
-	)
-
-	BeforeEach(func() {
-		var err error
-		azurecli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), false)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(azurecli).NotTo(BeNil())
-	})
-
 	It("should be possible to maintain a healthy cluster after rotating all credentials", func() {
 		By("Reading the cluster state")
-		before, err := azurecli.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		before, err := azure.RPClient.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(before).NotTo(BeNil())
 
 		By("Executing key rotation on the cluster.")
-		err = azurecli.OpenShiftManagedClustersAdmin.RotateSecrets(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		err = azure.RPClient.OpenShiftManagedClustersAdmin.RotateSecrets(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 
 		By("Reading the cluster state after the update")
-		after, err := azurecli.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		after, err := azure.RPClient.OpenShiftManagedClustersAdmin.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 		Expect(after).NotTo(BeNil())
 

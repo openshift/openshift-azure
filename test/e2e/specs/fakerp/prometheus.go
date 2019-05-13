@@ -14,7 +14,6 @@ import (
 
 	"github.com/openshift/openshift-azure/test/clients/azure"
 	"github.com/openshift/openshift-azure/test/sanity"
-	"github.com/openshift/openshift-azure/test/util/log"
 )
 
 type target struct {
@@ -35,16 +34,6 @@ type targetsResponse struct {
 }
 
 var _ = Describe("Prometheus E2E tests [Fake]", func() {
-	var (
-		azurecli *azure.Client
-	)
-
-	BeforeEach(func() {
-		var err error
-		azurecli, err = azure.NewClientFromEnvironment(context.Background(), log.GetTestLogger(), false)
-		Expect(err).NotTo(HaveOccurred())
-	})
-
 	It("should register all the necessary prometheus targets", func() {
 		token, err := sanity.Checker.Client.Admin.GetServiceAccountToken("openshift-monitoring", "prometheus-k8s")
 		Expect(err).NotTo(HaveOccurred())
@@ -81,7 +70,7 @@ var _ = Describe("Prometheus E2E tests [Fake]", func() {
 			}
 		}
 
-		cs, err := azurecli.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
+		cs, err := azure.RPClient.OpenShiftManagedClusters.Get(context.Background(), os.Getenv("RESOURCEGROUP"), os.Getenv("RESOURCEGROUP"))
 		Expect(err).NotTo(HaveOccurred())
 
 		nodes, masters := int(*cs.Properties.MasterPoolProfile.Count), int(*cs.Properties.MasterPoolProfile.Count)
