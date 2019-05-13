@@ -22,6 +22,8 @@ func (s *Server) setupRoutes() {
 	s.router.Get(filepath.Join("/admin", s.basePath, "/listBackups"), s.handleListBackups)
 	s.router.Put(filepath.Join("/admin", s.basePath, "/restore/{backupName}"), s.handleRestore)
 	s.router.Put(filepath.Join("/admin", s.basePath, "/rotate/secrets"), s.handleRotateSecrets)
+	s.router.Put(filepath.Join("/admin", s.basePath, "/rotate/certificates"), s.handleRotateCertificates)
+	s.router.Put(filepath.Join("/admin", s.basePath, "/rotate/certificatesAndSecrets"), s.handleRotateCertificatesAndSecrets)
 	s.router.Get(filepath.Join("/admin", s.basePath, "/status"), s.handleGetControlPlanePods)
 	s.router.Put(filepath.Join("/admin", s.basePath, "/forceUpdate"), s.handleForceUpdate)
 	s.router.Get(filepath.Join("/admin", s.basePath, "/listClusterVMs"), s.handleListClusterVMs)

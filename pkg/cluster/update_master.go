@@ -82,3 +82,103 @@ func (u *Upgrade) UpdateMasterAgentPool(ctx context.Context, app *api.AgentPoolP
 
 	return nil
 }
+
+// UpdateMasterAgentPoolTogether updates in-parallel all the VMs of the master scale set,
+// in place.
+func (u *Upgrade) UpdateMasterAgentPoolTogether(ctx context.Context, app *api.AgentPoolProfile) *api.PluginError {
+	ssName := names.MasterScalesetName
+
+	blob, err := u.UpdateBlobService.Read()
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReadBlob}
+	}
+
+	desiredHash, err := u.Hasher.HashScaleSet(u.Cs, app)
+	if err != nil {
+		return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolHashScaleSet}
+	}
+
+	// drain
+	for i := int64(0); i < app.Count; i++ {
+		hostname := names.GetHostname(app, "", i)
+
+		if bytes.Equal(blob.HostnameHashes[hostname], desiredHash) {
+			u.Log.Infof("skipping vm %q since it's already updated", hostname)
+			continue
+		}
+
+		u.Log.Infof("draining %s", hostname)
+		err = u.Interface.DeleteMaster(hostname)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDrain}
+		}
+	}
+	// stop
+	for i := int64(0); i < app.Count; i++ {
+		hostname := names.GetHostname(app, "", i)
+		instanceID := fmt.Sprintf("%d", i)
+
+		if bytes.Equal(blob.HostnameHashes[hostname], desiredHash) {
+			u.Log.Infof("skipping vm %q since it's already updated", hostname)
+			continue
+		}
+
+		u.Log.Infof("deallocating %s", hostname)
+		err = u.Vmc.Deallocate(ctx, u.Cs.Properties.AzProfile.ResourceGroup, ssName, instanceID)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolDeallocate}
+		}
+	}
+	// update
+	for i := int64(0); i < app.Count; i++ {
+		hostname := names.GetHostname(app, "", i)
+		instanceID := fmt.Sprintf("%d", i)
+
+		if bytes.Equal(blob.HostnameHashes[hostname], desiredHash) {
+			continue
+		}
+
+		u.Log.Infof("updating %s", hostname)
+		err = u.Ssc.UpdateInstances(ctx, u.Cs.Properties.AzProfile.ResourceGroup, ssName, compute.VirtualMachineScaleSetVMInstanceRequiredIDs{
+			InstanceIds: &[]string{instanceID},
+		})
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateVMs}
+		}
+
+		u.Log.Infof("reimaging %s", hostname)
+		err = u.Vmc.Reimage(ctx, u.Cs.Properties.AzProfile.ResourceGroup, ssName, instanceID, nil)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolReimage}
+		}
+	}
+	// start
+	for i := int64(0); i < app.Count; i++ {
+		hostname := names.GetHostname(app, "", i)
+		instanceID := fmt.Sprintf("%d", i)
+
+		if bytes.Equal(blob.HostnameHashes[hostname], desiredHash) {
+			continue
+		}
+		u.Log.Infof("starting %s", hostname)
+		err = u.Vmc.Start(ctx, u.Cs.Properties.AzProfile.ResourceGroup, ssName, instanceID)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolStart}
+		}
+		blob.HostnameHashes[hostname] = desiredHash
+	}
+	// wait
+	for i := int64(0); i < app.Count; i++ {
+		hostname := names.GetHostname(app, "", i)
+		u.Log.Infof("waiting for %s to be ready", hostname)
+		err = u.Interface.WaitForReadyMaster(ctx, hostname)
+		if err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolWaitForReady}
+		}
+
+		if err := u.UpdateBlobService.Write(blob); err != nil {
+			return &api.PluginError{Err: err, Step: api.PluginStepUpdateMasterAgentPoolUpdateBlob}
+		}
+	}
+	return nil
+}

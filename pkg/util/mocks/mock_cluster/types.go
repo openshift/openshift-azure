@@ -336,6 +336,20 @@ func (mr *MockUpgraderMockRecorder) UpdateMasterAgentPool(arg0, arg1 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMasterAgentPool", reflect.TypeOf((*MockUpgrader)(nil).UpdateMasterAgentPool), arg0, arg1)
 }
 
+// UpdateMasterAgentPoolTogether mocks base method
+func (m *MockUpgrader) UpdateMasterAgentPoolTogether(arg0 context.Context, arg1 *api.AgentPoolProfile) *api.PluginError {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMasterAgentPoolTogether", arg0, arg1)
+	ret0, _ := ret[0].(*api.PluginError)
+	return ret0
+}
+
+// UpdateMasterAgentPoolTogether indicates an expected call of UpdateMasterAgentPoolTogether
+func (mr *MockUpgraderMockRecorder) UpdateMasterAgentPoolTogether(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMasterAgentPoolTogether", reflect.TypeOf((*MockUpgrader)(nil).UpdateMasterAgentPoolTogether), arg0, arg1)
+}
+
 // UpdateWorkerAgentPool mocks base method
 func (m *MockUpgrader) UpdateWorkerAgentPool(arg0 context.Context, arg1 *api.AgentPoolProfile, arg2 string) *api.PluginError {
 	m.ctrl.T.Helper()

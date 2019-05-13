@@ -60,6 +60,7 @@ const (
 	PluginStepUpdateWorkerAgentPoolDeleteVM       PluginStep = "UpdateWorkerAgentPoolDeleteVM"
 	PluginStepUpdateSyncPod                       PluginStep = "UpdateSyncPod"
 	PluginStepInvalidateClusterSecrets            PluginStep = "InvalidateClusterSecrets"
+	PluginStepInvalidateClusterCertificates       PluginStep = "InvalidateClusterCertificates"
 	PluginStepRegenerateClusterSecrets            PluginStep = "RegenerateClusterSecrets"
 )
 
@@ -135,6 +136,12 @@ type GenevaActions interface {
 
 	// RotateClusterSecrets rotates the secrets in a cluster's config blob and then updates the cluster
 	RotateClusterSecrets(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
+
+	// RotateClusterCertificates rotates the certificates in a cluster's config blob and then updates the cluster
+	RotateClusterCertificates(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
+
+	// RotateClusterCertificatesAndSecrets rotates the certificates and secrets in a cluster's config blob and then updates the cluster
+	RotateClusterCertificatesAndSecrets(ctx context.Context, cs *OpenShiftManagedCluster, deployer DeployFn) *PluginError
 
 	// GetControlPlanePods fetches a consolidated list of the control plane pods in the cluster
 	GetControlPlanePods(ctx context.Context, oc *OpenShiftManagedCluster) ([]byte, error)

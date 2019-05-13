@@ -433,6 +433,15 @@ func (g *simpleGenerator) Generate(template *pluginapi.Config, setVersionFields 
 	return
 }
 
+// InvalidateCertificates removes some certificates from an OpenShiftManagedCluster.Config
+func (g *simpleGenerator) InvalidateCertificates() (err error) {
+	g.cs.Config.Certificates.EtcdCa = api.CertKeyPair{}
+	g.cs.Config.Certificates.EtcdClient = api.CertKeyPair{}
+	g.cs.Config.Certificates.EtcdServer = api.CertKeyPair{}
+	g.cs.Config.Certificates.EtcdPeer = api.CertKeyPair{}
+	return nil
+}
+
 // InvalidateSecrets removes some secrets from an OpenShiftManagedCluster.Config
 func (g *simpleGenerator) InvalidateSecrets() (err error) {
 	g.cs.Config.SSHKey = nil
