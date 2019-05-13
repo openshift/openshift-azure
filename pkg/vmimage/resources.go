@@ -148,8 +148,8 @@ func vm(subscriptionID, resourceGroup, location string, sshPublicKey string) *co
 				ImageReference: &compute.ImageReference{
 					Publisher: to.StringPtr("RedHat"),
 					Offer:     to.StringPtr("RHEL"),
-					Sku:       to.StringPtr("7-RAW"),
-					Version:   to.StringPtr("latest"),
+					Sku:       to.StringPtr("8"),
+					Version:   to.StringPtr("8.0.2019050711"),
 				},
 				OsDisk: &compute.OSDisk{
 					CreateOption: compute.DiskCreateOptionTypesFromImage,
@@ -157,6 +157,14 @@ func vm(subscriptionID, resourceGroup, location string, sshPublicKey string) *co
 						StorageAccountType: compute.StorageAccountTypesPremiumLRS,
 					},
 					DiskSizeGB: to.Int32Ptr(64),
+				},
+				DataDisks: &[]compute.DataDisk{
+					{
+						Lun:          to.Int32Ptr(0),
+						Caching:      compute.CachingTypesReadOnly,
+						CreateOption: compute.DiskCreateOptionTypesEmpty,
+						DiskSizeGB:   to.Int32Ptr(256),
+					},
 				},
 			},
 			OsProfile: &compute.OSProfile{

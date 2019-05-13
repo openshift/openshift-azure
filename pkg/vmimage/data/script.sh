@@ -5,22 +5,18 @@ exec 2>&1
 export HOME=/root
 cd
 
-echo ,+ | sfdisk --force -u S -N 2 /dev/sda || true
-partprobe
-xfs_growfs /dev/sda2
+mkfs.xfs -f /dev/sdc
+mkdir -p /var/lib/libvirt/images/
+mount /dev/sdc /var/lib/libvirt/images
+
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+sysctl -p /etc/sysctl.conf
 
 yum -y update -x WALinuxAgent # updating WALinuxAgent kills this script
-yum -y install git golang libguestfs-tools-c libvirt-daemon-config-network virt-install
+yum -y install git golang libguestfs-tools-c libvirt-daemon-config-network virt-install libguestfs-xfs libguestfs-tools python36 python36-devel redhat-rpm-config
+alternatives --set python /usr/bin/python3
 
-rpm --import https://packages.microsoft.com/keys/microsoft.asc
-cat >/etc/yum.repos.d/azure-cli.repo <<'EOF'
-[azure-cli]
-baseurl=https://packages.microsoft.com/yumrepos/azure-cli
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.microsoft.com/keys/microsoft.asc
-EOF
-yum -y install azure-cli
+pip3 install --upgrade --pre azure-cli --extra-index-url https://azurecliprod.blob.core.windows.net/edge --no-cache-dir
 
 systemctl start libvirtd.service
 
@@ -43,7 +39,8 @@ while [[ "$(fuser -n tcp 8080)" == "" ]]; do
   sleep 1
 done
 
-firewall-cmd --zone=public --add-port=8080/tcp
+firewall-cmd --zone=public --add-port=8080/tcp --permanent
+firewall-cmd --reload
 
 IMAGE="{{ .Builder.Image }}"
 DISKGIB=${DISKGIB:-32}
@@ -208,6 +205,7 @@ rpm -q atomic-openshift-node --qf '%{VERSION}-%{RELEASE}.%{ARCH}' >/var/tmp/open
 %end
 KICKSTART
 
+# TODO: There is some network connectivity problem from VM to host via bridge virtio. Need to investigate
 # virt-install insists it needs a pty, so we give it one
 python -c "import pty; pty.spawn([
     'virt-install',
@@ -231,6 +229,7 @@ OPENSHIFT="$(virt-cat -a /var/lib/libvirt/images/$IMAGE.raw /var/tmp/openshift-v
 virt-sysprep -a /var/lib/libvirt/images/$IMAGE.raw
 virt-sparsify --in-place /var/lib/libvirt/images/$IMAGE.raw
 
+# TODO: this should work now.
 # RHEL `qemu-img convert` doesn't support converting to the Azure vhd subformat,
 # so use `vhd-footer` utility do the same thing.
 
