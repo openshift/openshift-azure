@@ -93,7 +93,7 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(len(*vnetPeer.VirtualNetworkPeerings)).To(Equal(1))
 		for _, vnetPeering := range *vnetPeer.VirtualNetworkPeerings {
-			Expect(vnetPeering.PeeringState).To(Equal("Connected"))
+			Expect(vnetPeering.PeeringState).To(Equal(network.VirtualNetworkPeeringState("Connected")))
 			Expect(*vnetPeering.Name).To(Equal("OSACustomerVNetPeer"))
 		}
 	})
