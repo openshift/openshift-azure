@@ -56,6 +56,10 @@ import:
   subpackages:
   - prometheus
   - prometheus/promhttp
+- package: github.com/prometheus/prometheus
+  version: v2.8.1
+  subpackages:
+  - promql
 - package: github.com/golang/protobuf
   version: ^1.2.0
   subpackages:

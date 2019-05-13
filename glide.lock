@@ -1,4 +1,4 @@
-hash: ef8d5a64e6da529f368f9a7bf3d435481a8cd7123756ccc865048893897947d8
+hash: 8b5b47b6ab86b5b212e21bdc4cbf3f9f0c9a1d2a19e96f914a0d02b9b6277324
 updated: 2019-04-16T11:35:54.154136608-05:00
 imports:
 - name: code.cloudfoundry.org/clock
@@ -285,6 +285,20 @@ imports:
   - model
 - name: github.com/prometheus/procfs
   version: 8368d24ba045f26503eb745b624d930cbe214c79
+- name: github.com/prometheus/prometheus
+  version: 4d60eb36dcbed725fcac5b27018574118f12fffb
+  subpackages:
+  - pkg/gate
+  - pkg/labels
+  - pkg/textparse
+  - pkg/timestamp
+  - pkg/value
+  - promql
+  - storage
+  - storage/tsdb
+  - util/stats
+  - util/strutil
+  - util/testutil
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/sirupsen/logrus
