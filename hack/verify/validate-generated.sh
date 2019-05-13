@@ -19,6 +19,7 @@ mkdir -p "${T}/src/github.com/openshift/openshift-azure"
 
 cp -a "${DIR}/../.." "${T}/src/github.com/openshift/openshift-azure"
 
+(GOPATH="${T}" go get -d "github.com/go-bindata/go-bindata/go-bindata" && cd "${T}/src/github.com/go-bindata/go-bindata" && git checkout -q 41975c0)
 (cd "${T}/src/github.com/openshift/openshift-azure" && GOPATH="${T}" go generate ./...)
 
 
