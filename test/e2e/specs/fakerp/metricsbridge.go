@@ -12,9 +12,9 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/prometheus/client_golang/api"
-	"github.com/prometheus/client_golang/api/prometheus/v1"
+	promv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/prometheus/promql"
-	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/openshift/openshift-azure/pkg/entrypoint/metricsbridge"
 	"github.com/openshift/openshift-azure/pkg/util/roundtrippers"
@@ -76,7 +76,7 @@ var _ = Describe("Metricsbridge E2E check configured queries [Fake]", func() {
 	fmt.Print(manuallyVerifiedQueries)
 	It("should be possible to get data for each metric in defined queries", func() {
 		By("getting the configMap")
-		mbConfigMap, err := sanity.Checker.Client.Admin.CoreV1.ConfigMaps("openshift-azure-monitoring").Get("metrics-bridge", meta_v1.GetOptions{})
+		mbConfigMap, err := sanity.Checker.Client.Admin.CoreV1.ConfigMaps("openshift-azure-monitoring").Get("metrics-bridge", metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mbConfigMap).ToNot(BeNil())
 
@@ -92,7 +92,7 @@ var _ = Describe("Metricsbridge E2E check configured queries [Fake]", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(token).NotTo(BeEmpty())
 
-		route, err := sanity.Checker.Client.Admin.RouteV1.Routes("openshift-monitoring").Get("prometheus-k8s", meta_v1.GetOptions{})
+		route, err := sanity.Checker.Client.Admin.RouteV1.Routes("openshift-monitoring").Get("prometheus-k8s", metav1.GetOptions{})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(route).NotTo(BeNil())
 
@@ -111,7 +111,7 @@ var _ = Describe("Metricsbridge E2E check configured queries [Fake]", func() {
 		})
 		Expect(err).NotTo(HaveOccurred())
 
-		prometheusApi := v1.NewAPI(cli)
+		prometheusApi := promv1.NewAPI(cli)
 
 		for _, q := range mbConfig.Queries {
 			By(fmt.Sprintf("checking query %s", q.Query))
