@@ -286,6 +286,11 @@ var translations = map[string][]struct {
 			NestedPath: jsonpath.MustCompile("$.extensions.stylesheetURLs[0]"),
 			Template:   "https://branding.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}/branding.css",
 		},
+		{
+			Path:       jsonpath.MustCompile("$.data.'webconsole-config.yaml'"),
+			NestedPath: jsonpath.MustCompile("$.extensions.scriptURLs[0]"),
+			Template:   "https://branding.{{ (index .ContainerService.Properties.RouterProfiles 0).PublicSubdomain }}/branding.js",
+		},
 	},
 	"CronJob.batch/openshift-etcd/etcd-backup": {
 		{
