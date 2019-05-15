@@ -1,3 +1,9 @@
+# v5.1
+
+## Security fix for Microarchitectural Data Sampling (MDS)
+
+* release new VM image
+
 # v5.0
 
 ## latch all configurables that come from the plugin config ([#1407](https://github.com/openshift/openshift-azure/pull/1407), [@jim-minter](https://github.com/jim-minter), 04/04/2019)
