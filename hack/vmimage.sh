@@ -3,21 +3,14 @@
 cleanup() {
   set +e
 
-  if [[ -n "$ARTIFACTS" ]]; then
-    exec &>"$ARTIFACTS/cleanup"
-  fi
+  generate_artifacts
 
-  make artifacts
-
-  if [[ -n "$NO_DELETE" ]]; then
-    return
-  fi
-  make delete
-  az group delete -g "$RESOURCEGROUP" --yes --no-wait
+  delete
 }
+
 trap cleanup EXIT
 
-. hack/tests/ci-operator-prepare.sh
+. hack/tests/ci-prepare.sh
 
 TAG=$(git describe --tags HEAD)
 if [[ $(git status --porcelain) = "" ]]; then

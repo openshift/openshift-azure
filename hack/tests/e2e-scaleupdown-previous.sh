@@ -8,26 +8,18 @@ fi
 cleanup() {
     set +e
 
-    if [[ -n "$ARTIFACTS" ]]; then
-        exec &>"$ARTIFACTS/cleanup"
-    fi
-
-    stop_monitoring
-    make artifacts
+    generate_artifacts
 
     if [[ -n "$T" ]]; then
         rm -rf "$T"
     fi
 
-    if [[ -n "$NO_DELETE" ]]; then
-        return
-    fi
-    make delete
-    az group delete -g "$RESOURCEGROUP" --yes --no-wait
+    delete
 }
+
 trap cleanup EXIT
 
-. hack/tests/ci-operator-prepare.sh
+. hack/tests/ci-prepare.sh
 
 T="$(mktemp -d)"
 start_monitoring $T/src/github.com/openshift/openshift-azure/_data/containerservice.yaml
