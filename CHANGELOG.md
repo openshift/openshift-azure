@@ -1,3 +1,9 @@
+# v4.4
+
+ ## Security fix for Microarchitectural Data Sampling (MDS)
+
+ * release new VM image
+
 # v4.0
 
 ## Canary app ([#1260](https://github.com/openshift/openshift-azure/pull/1260), [@mjudeikis](https://github.com/mjudeikis), 20/03/2019)

@@ -28,7 +28,7 @@ func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster
 	switch cs.Config.PluginVersion {
 	case "v3.2":
 		return v3.New(ctx, log, cs, testConfig), nil
-	case "v4.2", "v4.3":
+	case "v4.2", "v4.3", "v4.4":
 		return v4.New(ctx, log, cs, testConfig), nil
 	}
 
