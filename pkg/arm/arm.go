@@ -30,9 +30,9 @@ func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster
 	switch cs.Config.PluginVersion {
 	case "v3.2":
 		return v3.New(ctx, log, cs, testConfig), nil
-	case "v4.2", "v4.3":
+	case "v4.2", "v4.3", "v4.4":
 		return v4.New(ctx, log, cs, testConfig), nil
-	case "v5.0":
+	case "v5.1":
 		return v5.New(ctx, log, cs, testConfig), nil
 	case "v6.0":
 		return v6.New(ctx, log, cs, testConfig), nil
