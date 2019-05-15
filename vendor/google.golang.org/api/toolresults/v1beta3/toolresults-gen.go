@@ -928,6 +928,7 @@ func (s *Execution) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// FailureDetail: Details for an outcome with a FAILURE outcome summary.
 type FailureDetail struct {
 	// Crashed: If the failure was severe because the system (app) under
 	// test crashed.
@@ -1208,6 +1209,8 @@ func (s *Image) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// InconclusiveDetail: Details for an outcome with an INCONCLUSIVE
+// outcome summary.
 type InconclusiveDetail struct {
 	// AbortedByUser: If the end user aborted the test execution before a
 	// pass or fail could be determined. For example, the user pressed
@@ -1249,6 +1252,11 @@ func (s *InconclusiveDetail) MarshalJSON() ([]byte, error) {
 // IndividualOutcome: Step Id and outcome of each individual step that
 // was run as a group with other steps with the same configuration.
 type IndividualOutcome struct {
+	// MultistepNumber: Unique int given to each step. Ranges from
+	// 0(inclusive) to total number of steps(exclusive). The primary step is
+	// 0.
+	MultistepNumber int64 `json:"multistepNumber,omitempty"`
+
 	// Possible values:
 	//   "failure"
 	//   "flaky"
@@ -1258,9 +1266,12 @@ type IndividualOutcome struct {
 	//   "unset"
 	OutcomeSummary string `json:"outcomeSummary,omitempty"`
 
+	// RunDuration: How long it took for this step to run.
+	RunDuration *Duration `json:"runDuration,omitempty"`
+
 	StepId string `json:"stepId,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "OutcomeSummary") to
+	// ForceSendFields is a list of field names (e.g. "MultistepNumber") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -1268,7 +1279,7 @@ type IndividualOutcome struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "OutcomeSummary") to
+	// NullFields is a list of field names (e.g. "MultistepNumber") to
 	// include in API requests with the JSON null value. By default, fields
 	// with empty values are omitted from API requests. However, any field
 	// with an empty value appearing in NullFields will be sent to the
@@ -2124,6 +2135,7 @@ func (s *ScreenshotCluster) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// SkippedDetail: Details for an outcome with a SKIPPED outcome summary.
 type SkippedDetail struct {
 	// IncompatibleAppVersion: If the App doesn't support the specific API
 	// level.
@@ -2593,6 +2605,7 @@ func (s *StepLabelsEntry) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
+// SuccessDetail: Details for an outcome with a SUCCESS outcome summary.
 type SuccessDetail struct {
 	// OtherNativeCrash: If a native process other than the app crashed.
 	OtherNativeCrash bool `json:"otherNativeCrash,omitempty"`

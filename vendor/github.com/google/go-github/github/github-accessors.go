@@ -932,14 +932,6 @@ func (c *CheckSuiteEvent) GetSender() *User {
 	return c.Sender
 }
 
-// GetPreferenceList returns the PreferenceList field.
-func (c *CheckSuitePreferenceOptions) GetPreferenceList() *PreferenceList {
-	if c == nil {
-		return nil
-	}
-	return c.PreferenceList
-}
-
 // GetPreferences returns the Preferences field.
 func (c *CheckSuitePreferenceResults) GetPreferences() *PreferenceList {
 	if c == nil {
@@ -2002,6 +1994,22 @@ func (d *DeleteEvent) GetSender() *User {
 		return nil
 	}
 	return d.Sender
+}
+
+// GetAction returns the Action field if it's non-nil, zero value otherwise.
+func (d *DeployKeyEvent) GetAction() string {
+	if d == nil || d.Action == nil {
+		return ""
+	}
+	return *d.Action
+}
+
+// GetKey returns the Key field.
+func (d *DeployKeyEvent) GetKey() *Key {
+	if d == nil {
+		return nil
+	}
+	return d.Key
 }
 
 // GetCreatedAt returns the CreatedAt field if it's non-nil, zero value otherwise.
@@ -4972,6 +4980,14 @@ func (m *MarketplacePlanAccount) GetMarketplacePurchase() *MarketplacePurchase {
 	return m.MarketplacePurchase
 }
 
+// GetNodeID returns the NodeID field if it's non-nil, zero value otherwise.
+func (m *MarketplacePlanAccount) GetNodeID() string {
+	if m == nil || m.NodeID == nil {
+		return ""
+	}
+	return *m.NodeID
+}
+
 // GetOrganizationBillingEmail returns the OrganizationBillingEmail field if it's non-nil, zero value otherwise.
 func (m *MarketplacePlanAccount) GetOrganizationBillingEmail() string {
 	if m == nil || m.OrganizationBillingEmail == nil {
@@ -5250,6 +5266,30 @@ func (m *MembershipEvent) GetTeam() *Team {
 		return nil
 	}
 	return m.Team
+}
+
+// GetAction returns the Action field if it's non-nil, zero value otherwise.
+func (m *MetaEvent) GetAction() string {
+	if m == nil || m.Action == nil {
+		return ""
+	}
+	return *m.Action
+}
+
+// GetHook returns the Hook field.
+func (m *MetaEvent) GetHook() *Hook {
+	if m == nil {
+		return nil
+	}
+	return m.Hook
+}
+
+// GetHookID returns the HookID field if it's non-nil, zero value otherwise.
+func (m *MetaEvent) GetHookID() int64 {
+	if m == nil || m.HookID == nil {
+		return 0
+	}
+	return *m.HookID
 }
 
 // GetHTMLURL returns the HTMLURL field if it's non-nil, zero value otherwise.
@@ -7788,6 +7828,14 @@ func (p *PullRequestEvent) GetRequestedReviewer() *User {
 	return p.RequestedReviewer
 }
 
+// GetRequestedTeam returns the RequestedTeam field.
+func (p *PullRequestEvent) GetRequestedTeam() *Team {
+	if p == nil {
+		return nil
+	}
+	return p.RequestedTeam
+}
+
 // GetSender returns the Sender field.
 func (p *PullRequestEvent) GetSender() *User {
 	if p == nil {
@@ -9130,6 +9178,14 @@ func (r *Repository) GetDescription() string {
 		return ""
 	}
 	return *r.Description
+}
+
+// GetDisabled returns the Disabled field if it's non-nil, zero value otherwise.
+func (r *Repository) GetDisabled() bool {
+	if r == nil || r.Disabled == nil {
+		return false
+	}
+	return *r.Disabled
 }
 
 // GetDownloadsURL returns the DownloadsURL field if it's non-nil, zero value otherwise.
@@ -10642,6 +10698,22 @@ func (s *SourceImportAuthor) GetURL() string {
 		return ""
 	}
 	return *s.URL
+}
+
+// GetAction returns the Action field if it's non-nil, zero value otherwise.
+func (s *StarEvent) GetAction() string {
+	if s == nil || s.Action == nil {
+		return ""
+	}
+	return *s.Action
+}
+
+// GetStarredAt returns the StarredAt field if it's non-nil, zero value otherwise.
+func (s *StarEvent) GetStarredAt() Timestamp {
+	if s == nil || s.StarredAt == nil {
+		return Timestamp{}
+	}
+	return *s.StarredAt
 }
 
 // GetStarredAt returns the StarredAt field if it's non-nil, zero value otherwise.

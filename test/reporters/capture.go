@@ -6,8 +6,8 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/Microsoft/ApplicationInsights-Go/appinsights"
-	"github.com/Microsoft/ApplicationInsights-Go/appinsights/contracts"
+	"github.com/microsoft/ApplicationInsights-Go/appinsights"
+	"github.com/microsoft/ApplicationInsights-Go/appinsights/contracts"
 )
 
 type Capture struct {

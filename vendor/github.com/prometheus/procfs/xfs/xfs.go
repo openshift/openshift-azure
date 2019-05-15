@@ -14,12 +14,6 @@
 // Package xfs provides access to statistics exposed by the XFS filesystem.
 package xfs
 
-import (
-	"os"
-	"path"
-	"path/filepath"
-)
-
 // Stats contains XFS filesystem runtime statistics, parsed from
 // /proc/fs/xfs/stat.
 //
@@ -28,11 +22,6 @@ import (
 // kernel source. Most counters are uint32s (same data types used in
 // xfs_stats.h), but some of the "extended precision stats" are uint64s.
 type Stats struct {
-	// The name of the filesystem used to source these statistics.
-	// If empty, this indicates aggregated statistics for all XFS
-	// filesystems on the host.
-	Name string
-
 	ExtentAllocation   ExtentAllocationStats
 	AllocationBTree    BTreeStats
 	BlockMapping       BlockMappingStats
@@ -166,50 +155,4 @@ type ExtendedPrecisionStats struct {
 	FlushBytes uint64
 	WriteBytes uint64
 	ReadBytes  uint64
-}
-
-// ReadProcStat retrieves XFS filesystem runtime statistics
-// from proc/fs/xfs/stat given the profs mount point.
-func ReadProcStat(procfs string) (*Stats, error) {
-	f, err := os.Open(path.Join(procfs, "fs/xfs/stat"))
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	return ParseStats(f)
-}
-
-// ReadSysStats retrieves XFS filesystem runtime statistics for each mounted XFS
-// filesystem.  Only available on kernel 4.4+.  On older kernels, an empty
-// slice of *xfs.Stats will be returned.
-func ReadSysStats(sysfs string) ([]*Stats, error) {
-	matches, err := filepath.Glob(path.Join(sysfs, "fs/xfs/*/stats/stats"))
-	if err != nil {
-		return nil, err
-	}
-
-	stats := make([]*Stats, 0, len(matches))
-	for _, m := range matches {
-		f, err := os.Open(m)
-		if err != nil {
-			return nil, err
-		}
-
-		// "*" used in glob above indicates the name of the filesystem.
-		name := filepath.Base(filepath.Dir(filepath.Dir(m)))
-
-		// File must be closed after parsing, regardless of success or
-		// failure.  Defer is not used because of the loop.
-		s, err := ParseStats(f)
-		_ = f.Close()
-		if err != nil {
-			return nil, err
-		}
-
-		s.Name = name
-		stats = append(stats, s)
-	}
-
-	return stats, nil
 }
