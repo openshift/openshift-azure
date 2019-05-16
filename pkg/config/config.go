@@ -27,9 +27,9 @@ func New(cs *api.OpenShiftManagedCluster, runningUnderTest bool) (Interface, err
 	switch cs.Config.PluginVersion {
 	case "v3.2":
 		return v3.New(cs, runningUnderTest), nil
-	case "v4.2", "v4.3":
+	case "v4.2", "v4.3", "v4.4":
 		return v4.New(cs), nil
-	case "v5.0":
+	case "v5.1":
 		return v5.New(cs), nil
 	case "v6.0":
 		return v6.New(cs), nil
