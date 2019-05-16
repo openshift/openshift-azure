@@ -321,10 +321,10 @@ func (sc *SanityChecker) checkCanAccessServices(ctx context.Context) error {
 			Transport: &kubeclient.RetryingRoundTripper{
 				Log:          sc.Log,
 				RoundTripper: rt,
-				Retries:      5,
+				Retries:      10,
 				GetTimeout:   30 * time.Second,
 			},
-			Timeout: 10 * time.Second,
+			Timeout: 30 * time.Second,
 		}
 
 		By(fmt.Sprintf("checking %s", svc.url))
