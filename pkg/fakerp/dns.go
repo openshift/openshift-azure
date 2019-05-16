@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	azdns "github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
+	azuredns "github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2017-10-01/dns"
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/sirupsen/logrus"
 
@@ -14,10 +14,11 @@ import (
 )
 
 type dnsManager struct {
-	zc               dns.ZonesClient
-	rsc              dns.RecordSetsClient
+	zonesClient      dns.ZonesClient
+	recordSetsClient dns.RecordSetsClient
 	dnsResourceGroup string
 	dnsDomain        string
+	log              *logrus.Entry
 }
 
 func newDNSManager(ctx context.Context, log *logrus.Entry, subscriptionID, dnsResourceGroup, dnsDomain string) (*dnsManager, error) {
@@ -27,15 +28,58 @@ func newDNSManager(ctx context.Context, log *logrus.Entry, subscriptionID, dnsRe
 	}
 
 	return &dnsManager{
-		zc:               dns.NewZonesClient(ctx, log, subscriptionID, authorizer),
-		rsc:              dns.NewRecordSetsClient(ctx, log, subscriptionID, authorizer),
+		zonesClient:      dns.NewZonesClient(ctx, log, subscriptionID, authorizer),
+		recordSetsClient: dns.NewRecordSetsClient(ctx, log, subscriptionID, authorizer),
 		dnsResourceGroup: dnsResourceGroup,
 		dnsDomain:        dnsDomain,
+		log:              log,
 	}, nil
 }
 
-func (dm *dnsManager) createOrUpdateZone(ctx context.Context, resourceGroup, zoneName, parentResourceGroup, parentZoneName string) error {
-	zone, err := dm.zc.CreateOrUpdate(ctx, resourceGroup, zoneName, azdns.Zone{
+func (dm *dnsManager) createOrUpdateDns(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	clusterRootDnsZone := strings.SplitN(cs.Properties.RouterProfiles[0].PublicSubdomain, ".", 2)[1]
+	appsDnsZone := cs.Properties.RouterProfiles[0].PublicSubdomain
+	consoleDnsRecordSet := "openshift"
+	wildcardRecordSet := "*"
+	clusterRg := cs.Properties.AzProfile.ResourceGroup
+
+	dm.log.Debugf("creating cluster root dns zone %q", clusterRootDnsZone)
+	err := dm.createOrUpdateZone(ctx, clusterRg, clusterRootDnsZone, dm.dnsResourceGroup, dm.dnsDomain)
+	if err != nil {
+		return err
+	}
+
+	dm.log.Debugf("creating CNAME record set %q in dns zone %q", consoleDnsRecordSet, clusterRootDnsZone)
+	_, err = dm.recordSetsClient.CreateOrUpdate(ctx, clusterRg, clusterRootDnsZone, "openshift", azuredns.CNAME, azuredns.RecordSet{
+		RecordSetProperties: &azuredns.RecordSetProperties{
+			CnameRecord: &azuredns.CnameRecord{
+				Cname: &cs.Properties.FQDN,
+			},
+			TTL: to.Int64Ptr(60),
+		},
+	}, "", "")
+
+	dm.log.Debugf("creating apps dns zone %q", appsDnsZone)
+	err = dm.createOrUpdateZone(ctx, clusterRg, appsDnsZone, clusterRg, clusterRootDnsZone)
+	if err != nil {
+		return err
+	}
+
+	dm.log.Debugf("creating CNAME record set %q in dns zone %q", wildcardRecordSet, appsDnsZone)
+	_, err = dm.recordSetsClient.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Properties.RouterProfiles[0].PublicSubdomain, wildcardRecordSet, azuredns.CNAME, azuredns.RecordSet{
+		RecordSetProperties: &azuredns.RecordSetProperties{
+			CnameRecord: &azuredns.CnameRecord{
+				Cname: &cs.Properties.RouterProfiles[0].FQDN,
+			},
+			TTL: to.Int64Ptr(60),
+		},
+	}, "", "")
+
+	return err
+}
+
+func (dm *dnsManager) createOrUpdateZone(ctx context.Context, dnsResourceGroup, zoneName, parentDnsZoneResourceGroup, parentDnsZoneName string) error {
+	zone, err := dm.zonesClient.CreateOrUpdate(ctx, dnsResourceGroup, zoneName, azuredns.Zone{
 		Location: to.StringPtr("global"),
 	}, "", "")
 	if err != nil {
@@ -43,7 +87,7 @@ func (dm *dnsManager) createOrUpdateZone(ctx context.Context, resourceGroup, zon
 	}
 
 	// update TTLs
-	rs, err := dm.rsc.Get(ctx, resourceGroup, zoneName, "@", azdns.SOA)
+	rs, err := dm.recordSetsClient.Get(ctx, dnsResourceGroup, zoneName, "@", azuredns.SOA)
 	if err != nil {
 		return err
 	}
@@ -54,33 +98,34 @@ func (dm *dnsManager) createOrUpdateZone(ctx context.Context, resourceGroup, zon
 	rs.RecordSetProperties.SoaRecord.ExpireTime = to.Int64Ptr(60)
 	rs.RecordSetProperties.SoaRecord.MinimumTTL = to.Int64Ptr(60)
 
-	_, err = dm.rsc.CreateOrUpdate(ctx, resourceGroup, zoneName, "@", azdns.SOA, rs, "", "")
+	_, err = dm.recordSetsClient.CreateOrUpdate(ctx, dnsResourceGroup, zoneName, "@", azuredns.SOA, rs, "", "")
 	if err != nil {
 		return err
 	}
 
-	rs, err = dm.rsc.Get(ctx, resourceGroup, zoneName, "@", azdns.NS)
+	rs, err = dm.recordSetsClient.Get(ctx, dnsResourceGroup, zoneName, "@", azuredns.NS)
 	if err != nil {
 		return err
 	}
 
 	rs.RecordSetProperties.TTL = to.Int64Ptr(60)
 
-	_, err = dm.rsc.CreateOrUpdate(ctx, resourceGroup, zoneName, "@", azdns.NS, rs, "", "")
+	_, err = dm.recordSetsClient.CreateOrUpdate(ctx, dnsResourceGroup, zoneName, "@", azuredns.NS, rs, "", "")
 	if err != nil {
 		return err
 	}
 
-	nsRecords := make([]azdns.NsRecord, len(*zone.NameServers))
+	nsRecords := make([]azuredns.NsRecord, len(*zone.NameServers))
 	for i := range *zone.NameServers {
-		nsRecords[i] = azdns.NsRecord{
+		nsRecords[i] = azuredns.NsRecord{
 			Nsdname: &(*zone.NameServers)[i],
 		}
 	}
 
-	// create glue record in parent zone
-	_, err = dm.rsc.CreateOrUpdate(ctx, parentResourceGroup, parentZoneName, strings.Split(zoneName, ".")[0], azdns.NS, azdns.RecordSet{
-		RecordSetProperties: &azdns.RecordSetProperties{
+	relativeRecordSetName := strings.Split(zoneName, ".")[0]
+	dm.log.Debugf("creating NS record set %q in dns zone %q", relativeRecordSetName, parentDnsZoneName)
+	_, err = dm.recordSetsClient.CreateOrUpdate(ctx, parentDnsZoneResourceGroup, parentDnsZoneName, strings.Split(zoneName, ".")[0], azuredns.NS, azuredns.RecordSet{
+		RecordSetProperties: &azuredns.RecordSetProperties{
 			TTL:       to.Int64Ptr(60),
 			NsRecords: &nsRecords,
 		},
@@ -89,63 +134,33 @@ func (dm *dnsManager) createOrUpdateZone(ctx context.Context, resourceGroup, zon
 	return err
 }
 
-func (dm *dnsManager) deleteZone(ctx context.Context, resourceGroup, zoneName, parentResourceGroup, parentZoneName string) error {
-	// delete glue record in parent zone
-	_, err := dm.rsc.Delete(ctx, parentResourceGroup, parentZoneName, strings.Split(zoneName, ".")[0], azdns.NS, "")
+func (dm *dnsManager) deleteDns(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
+	appsDnsZone := cs.Properties.RouterProfiles[0].PublicSubdomain
+	clusterRootDnsZone := strings.SplitN(appsDnsZone, ".", 2)[1]
+	clusterRg := cs.Properties.AzProfile.ResourceGroup
+
+	dm.log.Debugf("deleting apps dns zone %q", appsDnsZone)
+	err := dm.deleteZone(ctx, clusterRg, appsDnsZone, clusterRg, clusterRootDnsZone)
 	if err != nil {
 		return err
 	}
-
-	return dm.zc.Delete(ctx, resourceGroup, zoneName, "")
-}
-
-func (dm *dnsManager) createOrUpdateOCPDNS(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	parentZone := strings.SplitN(cs.Properties.RouterProfiles[0].PublicSubdomain, ".", 2)[1]
-
-	// <random>.osacloud.dev zone
-	err := dm.createOrUpdateZone(ctx, cs.Properties.AzProfile.ResourceGroup, parentZone, dm.dnsResourceGroup, dm.dnsDomain)
+	dm.log.Debugf("deleting cluster root dns zone %q", clusterRootDnsZone)
+	err = dm.deleteZone(ctx, clusterRg, clusterRootDnsZone, dm.dnsResourceGroup, dm.dnsDomain)
 	if err != nil {
 		return err
 	}
-
-	// openshift.<random>.osacloud.dev cname
-	_, err = dm.rsc.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, parentZone, "openshift", azdns.CNAME, azdns.RecordSet{
-		RecordSetProperties: &azdns.RecordSetProperties{
-			CnameRecord: &azdns.CnameRecord{
-				Cname: &cs.Properties.FQDN,
-			},
-			TTL: to.Int64Ptr(60),
-		},
-	}, "", "")
-
-	// apps.<random>.osacloud.dev zone
-	err = dm.createOrUpdateZone(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Properties.RouterProfiles[0].PublicSubdomain, cs.Properties.AzProfile.ResourceGroup, parentZone)
-	if err != nil {
-		return err
-	}
-
-	// *.apps.<random>.osacloud.dev cname
-	_, err = dm.rsc.CreateOrUpdate(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Properties.RouterProfiles[0].PublicSubdomain, "*", azdns.CNAME, azdns.RecordSet{
-		RecordSetProperties: &azdns.RecordSetProperties{
-			CnameRecord: &azdns.CnameRecord{
-				Cname: &cs.Properties.RouterProfiles[0].FQDN,
-			},
-			TTL: to.Int64Ptr(60),
-		},
-	}, "", "")
-
+	dm.log.Debugf("deleting NS record set %q in global root dns zone %q", clusterRg, dm.dnsDomain)
+	_, err = dm.recordSetsClient.Delete(ctx, dm.dnsResourceGroup, dm.dnsDomain, clusterRg, azuredns.NS, "")
 	return err
 }
 
-func (dm *dnsManager) deleteOCPDNS(ctx context.Context, cs *api.OpenShiftManagedCluster) error {
-	parentZone := strings.SplitN(cs.Properties.RouterProfiles[0].PublicSubdomain, ".", 2)[1]
-
-	// apps.<random>.osacloud.dev zone
-	err := dm.deleteZone(ctx, cs.Properties.AzProfile.ResourceGroup, cs.Properties.RouterProfiles[0].PublicSubdomain, cs.Properties.AzProfile.ResourceGroup, parentZone)
+func (dm *dnsManager) deleteZone(ctx context.Context, dnsResourceGroup, zoneName, parentDnsZoneResourceGroup, parentDnsZoneName string) error {
+	relativeRecordSetName := strings.Split(zoneName, ".")[0]
+	dm.log.Debugf("deleting NS record set %q in parent dns zone %q", relativeRecordSetName, parentDnsZoneName)
+	_, err := dm.recordSetsClient.Delete(ctx, parentDnsZoneResourceGroup, parentDnsZoneName, relativeRecordSetName, azuredns.NS, "")
 	if err != nil {
 		return err
 	}
 
-	// <random>.osacloud.dev zone
-	return dm.deleteZone(ctx, cs.Properties.AzProfile.ResourceGroup, parentZone, dm.dnsResourceGroup, dm.dnsDomain)
+	return dm.zonesClient.Delete(ctx, dnsResourceGroup, zoneName, "")
 }

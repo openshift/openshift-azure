@@ -36,7 +36,7 @@ func (s *Server) handleDelete(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	err = dm.deleteOCPDNS(req.Context(), cs)
+	err = dm.deleteDns(req.Context(), cs)
 	if err != nil {
 		s.badRequest(w, fmt.Sprintf("Failed to delete dns records: %v", err))
 		return
