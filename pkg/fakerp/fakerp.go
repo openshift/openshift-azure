@@ -175,7 +175,7 @@ func createOrUpdateWrapper(ctx context.Context, p api.Plugin, log *logrus.Entry,
 	}
 
 	log.Info("setting up DNS")
-	err = dm.createOrUpdateOCPDNS(ctx, cs)
+	err = dm.createOrUpdateDns(ctx, cs)
 	if err != nil {
 		return nil, err
 	}
