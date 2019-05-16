@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-operator
+  namespace: istio-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: istio-operator
+  template:
+    metadata:
+      labels:
+        name: istio-operator
+    spec:
+      containers:
+      - command:
+        - istio-operator
+        - --discoveryCacheDir
+        - /home/istio-operator/.kube/cache/discovery
+        - --istioPrefix=openshift-istio-tech-preview/
+        - --deploymentType=openshift
+        env:
+        - name: WATCH_NAMESPACE
+          value: ""
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OPERATOR_NAME
+          value: istio-operator
+        image: openshift-istio-tech-preview/istio-operator:0.10.0
+        name: istio-operator
+        ports:
+        - containerPort: 60000
+          name: metrics
+        volumeMounts:
+        - mountPath: /home/istio-operator/.kube/cache/discovery
+          name: discovery-cache
+      serviceAccountName: istio-operator
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: discovery-cache

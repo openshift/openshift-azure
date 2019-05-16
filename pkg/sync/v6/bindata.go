@@ -15,6 +15,7 @@
 // data/ClusterRole.rbac.authorization.k8s.io/customer-admin-controller.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/customer-admin-project.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/edit.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/istio-operator.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/namespace-viewer.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/registry-admin.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/registry-editor.yaml
@@ -165,6 +166,7 @@
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-admin.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-project-admin.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-sa.yaml
+// data/ClusterRoleBinding.rbac.authorization.k8s.io/istio-operator-account-istio-operator-cluster-role-binding.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/router-metrics.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/router-router-role.yaml
 // data/ClusterRoleBinding.rbac.authorization.k8s.io/sdn-cluster-reader.yaml
@@ -276,6 +278,8 @@
 // data/CustomResourceDefinition.apiextensions.k8s.io/bundlebindings.automationbroker.io.yaml
 // data/CustomResourceDefinition.apiextensions.k8s.io/bundleinstances.automationbroker.io.yaml
 // data/CustomResourceDefinition.apiextensions.k8s.io/bundles.automationbroker.io.yaml
+// data/CustomResourceDefinition.apiextensions.k8s.io/controlplanes.istio.openshift.com.yaml
+// data/CustomResourceDefinition.apiextensions.k8s.io/installations.istio.openshift.com.yaml
 // data/DaemonSet.apps/default/docker-registry.yaml
 // data/DaemonSet.apps/default/router.yaml
 // data/DaemonSet.apps/kube-service-catalog/apiserver.yaml
@@ -284,6 +288,7 @@
 // data/DaemonSet.apps/openshift-azure-monitoring/etcd-metrics.yaml
 // data/DaemonSet.apps/openshift-template-service-broker/apiserver.yaml
 // data/Deployment.apps/default/registry-console.yaml
+// data/Deployment.apps/istio-operator/istio-operator.yaml
 // data/Deployment.apps/openshift-ansible-service-broker/asb.yaml
 // data/Deployment.apps/openshift-azure-branding/branding.yaml
 // data/Deployment.apps/openshift-azure-monitoring/metrics-bridge.yaml
@@ -361,6 +366,8 @@
 // data/ImageStream.image.openshift.io/openshift/rhpam73-smartrouter-openshift.yaml
 // data/ImageStream.image.openshift.io/openshift/ruby.yaml
 // data/Namespace/default.yaml
+// data/Namespace/istio-operator.yaml
+// data/Namespace/istio-system.yaml
 // data/Namespace/kube-public.yaml
 // data/Namespace/kube-service-catalog.yaml
 // data/Namespace/kube-system.yaml
@@ -454,6 +461,7 @@
 // data/ServiceAccount/default/default.yaml
 // data/ServiceAccount/default/registry.yaml
 // data/ServiceAccount/default/router.yaml
+// data/ServiceAccount/istio-operator/istio-operator.yaml
 // data/ServiceAccount/kube-service-catalog/service-catalog-apiserver.yaml
 // data/ServiceAccount/kube-service-catalog/service-catalog-controller.yaml
 // data/ServiceAccount/kube-system/attachdetach-controller.yaml
@@ -1040,6 +1048,26 @@ func clusterroleRbacAuthorizationK8sIoEditYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/edit.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _clusterroleRbacAuthorizationK8sIoIstioOperatorYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xb4\x58\x3d\x8f\xe3\x46\x0f\xee\xf7\x57\x18\xd7\x1c\xf0\x02\x5e\xe3\xed\x82\x6d\x53\xa4\x09\x52\x1c\x90\xf4\xf4\x0c\x2d\xf1\x3c\x22\xe7\x38\x1c\xfb\x7c\xbf\x3e\xd0\x97\x2d\x4b\xf2\x4a\x7b\xe7\x74\xa3\x01\x4d\x3e\xe4\xf0\xe3\xa1\x21\xd2\x3f\xa8\x89\x84\xdf\x36\xba\x07\xf7\x0a\xd9\x4a\x51\xfa\x01\x46\xc2\xaf\xc7\xdf\xd2\x2b\xc9\xee\xf4\xff\x97\x23\xb1\x7f\xdb\xfc\x1e\x72\x32\xd4\x2f\x12\xf0\xa5\x42\x03\x0f\x06\x6f\x2f\x9b\x0d\x43\x85\x6f\x1b\x4a\x46\xb2\x95\x88\x0a\x26\xfa\xa2\x39\x60\x7a\x7b\xd9\x6e\x20\xd2\x1f\x2a\x39\xa6\x5a\x74\xbb\xf9\xf4\xe9\x65\xb3\x51\x4c\x92\xd5\x61\x77\x17\xc5\xa7\xe6\x90\x50\x4f\xe4\xb0\xfd\x40\xf6\x51\x88\xad\xfd\x8a\x35\xd0\x64\xc8\x76\x92\x90\x2b\x74\x01\xa8\xea\x04\x4f\xd8\x4b\x39\xe1\x03\x15\x15\xc4\x5e\x9f\x53\xb4\x3b\xdd\xe0\x9c\xe4\x5e\xbc\x46\x9e\x22\xf4\x16\x55\xb2\x35\xc7\x13\xea\xbe\xc3\xf6\xf9\x7f\x9f\xa7\x4e\x40\x6c\x0c\x8c\xdc\xf0\x18\x83\x5c\xaa\x2b\x18\x0f\x58\x09\xa7\x1e\x80\x62\x0c\xe4\xe0\xfa\x9d\x0c\x0c\x0f\x39\x74\x17\x8b\x36\xb3\x49\x72\x10\x88\x8b\xa9\xe9\xe6\xd5\x84\x0d\x42\x14\xdf\x4b\xa2\xae\xd1\x8b\xdf\x0d\xb9\xce\x81\x39\x8f\xee\x3d\xb8\x77\x70\x49\x71\x94\x40\xee\x32\xfb\xda\x9e\x92\xe6\x58\x27\xd9\x3e\xfb\x62\xa5\xff\xbe\xa2\x54\xe3\x54\x2c\x28\x99\x0e\x73\x74\x6a\xa4\xca\x06\x46\x5c\x9c\x71\x5f\x8a\x1c\xdb\xbc\xc8\xed\x8f\x5a\x67\x4e\x10\xc8\xbf\x2b\xb3\x84\xc8\xa1\x5a\x05\x0c\x05\xea\x43\x1c\xae\xad\x19\x4a\x29\xaf\x7b\x8e\x87\x75\xf8\x50\xb7\x4a\xc0\x3d\xb1\x27\x2e\xd2\xf8\xbe\xcf\xeb\xe1\x69\x20\xbb\x22\xe7\x4a\x64\x23\xd7\x02\x69\x4a\x7c\x16\x4a\xfd\xeb\x26\xec\x98\xca\xe6\xdd\x69\x55\x1d\xb5\x21\x5f\xa1\x17\xcc\x94\xf6\xd9\xb0\x02\xa6\x03\xa6\x2e\x21\x4b\x60\xdf\xa5\xf9\x76\x13\xa4\x40\x36\xa5\xde\xd5\xdc\x3b\x5d\xa1\x29\xb9\xf6\x7c\xcc\x7b\x54\x46\xc3\xb4\x0a\x20\xa3\x9d\x45\x8f\xc4\x6b\x40\x16\x60\x78\x86\x4b\x5f\x2b\xc9\x88\x9b\xb8\xdd\x90\x9c\x48\x2d\x43\x18\xb5\xb9\x93\x5c\x0e\x14\x6c\x5d\x7e\x54\xc2\x64\xa2\x35\x22\x27\x8a\x92\x5e\x9d\x54\x53\x4c\x9d\x89\x4e\x7a\xa4\xb8\x40\x6b\xc3\xaf\x08\x86\x53\x1b\xad\xab\x12\x91\x53\x49\x07\x9b\xb7\xd0\x7b\xdd\x08\x3b\x61\x53\x09\x31\x00\x77\x6e\x11\x27\x83\x10\x56\x17\x53\xdd\x52\x07\x26\xe7\xe2\x7c\x6b\x3f\x6d\xde\xac\x51\x2b\x75\x0a\x2f\xe8\x6d\x64\x5c\xa0\xb5\x7d\x4d\xe5\x2b\x3a\x5b\x50\xda\x49\xa5\xe1\x87\xe2\xb7\xdc\xe5\xee\x62\x1b\xa8\x47\xd1\x82\x89\xeb\xb8\xea\x8f\x3b\x97\x93\x49\xb5\x2d\x25\xd9\x0a\x1b\x09\x5d\x56\xb2\xcb\x82\x99\x5e\xac\x7e\x63\xfc\x5e\xc7\xbe\xee\xbe\xb4\x2e\x58\x73\xe3\x9e\xc5\x8f\x8b\xaf\xcf\xc8\x40\xa9\x3d\x9c\xc1\x5c\xf9\xb1\x61\x45\x5c\x28\xa6\x49\x5d\xff\x94\xea\xc9\x88\xff\xab\x66\x0a\x83\xea\xd8\x16\x10\x02\x5e\x06\x17\x89\x3c\x3a\xd0\x2d\x71\xfd\xd4\xa2\xef\xf2\x83\xdd\x81\x18\x02\xfd\x98\xd4\x7c\x8e\x7e\xb6\x24\x21\xd2\x0d\xe0\xe3\x89\xd0\xbc\x7f\x7f\xe9\xf1\x40\x4c\x33\x05\xf8\x8c\x68\xdf\xb3\x99\x9f\x50\x3e\x97\x19\x9d\xd2\x1a\x72\xd7\x51\xa6\x24\x66\xad\xfe\x66\x90\x2e\x35\xed\x51\xfa\x7e\x44\xff\x53\x5f\xe4\xc3\xcc\x6c\x98\xec\x83\xaf\x5d\x4d\x2a\xf3\x2f\x15\xe6\x2e\xaa\x7c\xbf\xac\x8c\x39\x0b\x7f\xe9\x74\xfc\xfd\xe5\xcf\x4e\x7a\x77\x1b\xb8\x23\x1d\x4b\x04\xe3\x51\x14\x4d\x8e\xc8\x8a\x27\xc2\xf3\x48\xeb\xa3\x11\x36\xe7\xde\x68\x39\xb8\xdf\x2f\x46\xab\x40\xdf\xa3\x1e\x2d\x27\xcf\xcc\xd4\xf7\x3b\xcf\x83\xe5\x62\xb4\x3d\x3c\xa1\x20\x9f\xb0\x60\xac\x35\xb5\x6f\xae\xa7\x0f\xa4\xc2\x5f\x65\xdf\xfa\xd3\x1d\x9e\x3e\x8d\x97\x52\xf2\x43\x93\x77\x31\xbf\x7f\x99\xd5\xac\x0d\xe9\x22\x95\x86\x48\x47\xec\xc8\xe9\xdd\x7e\xd1\x2d\x0d\x25\xba\x23\x8b\x95\xb7\x35\x82\xd4\x09\xe7\xbe\xc7\x78\x64\xea\xa9\xf6\x21\x64\x64\xf3\x33\x24\x7c\xc0\xaf\xf9\x34\x4b\xb9\x5b\x57\x1a\x73\x57\xe6\xde\x2e\xf6\x57\xea\x3e\x62\xf2\x15\x56\xdf\xb2\x18\x4c\xd9\xbc\x44\xb8\x12\xac\x0a\xad\xc4\x2b\xda\xc1\x0f\xda\x63\x44\x77\xb7\x24\x5d\x6f\xd3\x75\x5a\x5c\xeb\x48\xd4\xee\x22\x71\x23\xf0\x49\x02\xe8\x99\xd8\xf7\x76\x92\x81\x3b\x7a\xa5\x53\xef\x4b\x5d\x97\xa9\xef\x18\xe6\x49\xe6\x1b\x56\x1b\xd1\x80\xdd\x71\xf2\xca\xb1\xab\x90\x87\xef\xbd\x6a\x33\x99\x5d\x42\xee\xd6\x94\xae\xa9\x0d\xc3\x3d\x5d\x52\xfe\x03\xf8\xab\x37\xcb\xf9\x6d\xf2\x59\x30\x06\xdb\xd4\x91\x20\xd0\xfc\x7f\x09\x57\x21\x0f\xa9\xdc\x0b\xa8\x9f\x29\xd2\x7f\x03\x00\x00\xff\xff\xa0\x68\x82\x23\x4d\x13\x00\x00")
+
+func clusterroleRbacAuthorizationK8sIoIstioOperatorYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_clusterroleRbacAuthorizationK8sIoIstioOperatorYaml,
+		"ClusterRole.rbac.authorization.k8s.io/istio-operator.yaml",
+	)
+}
+
+func clusterroleRbacAuthorizationK8sIoIstioOperatorYaml() (*asset, error) {
+	bytes, err := clusterroleRbacAuthorizationK8sIoIstioOperatorYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/istio-operator.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -4044,6 +4072,26 @@ func clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerSaYaml() (*a
 	return a, nil
 }
 
+var _clusterrolebindingRbacAuthorizationK8sIoIstioOperatorAccountIstioOperatorClusterRoleBindingYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\x8e\xb1\x8e\x83\x30\x0c\x86\xf7\x3c\x45\x5e\x20\x9c\xd8\x4e\xd9\xee\x3a\x74\xa7\x52\x77\x27\xb8\xad\x0b\xc4\x91\xe3\x30\xf4\xe9\x2b\x04\x53\x11\x1d\xfd\x5b\xdf\xa7\x0f\x32\x5d\x51\x0a\x71\xf2\x56\x02\xc4\x06\xaa\x3e\x58\xe8\x05\x4a\x9c\x9a\xe1\xb7\x34\xc4\x3f\x73\x1b\x50\xa1\x35\x03\xa5\xde\xdb\xd3\x58\x8b\xa2\x74\x3c\xe2\x3f\xa5\x9e\xd2\xdd\x4c\xa8\xd0\x83\x82\x37\xd6\x26\x98\xd0\x5b\x2a\x4a\xec\x38\xa3\x80\xb2\x38\x88\x91\x6b\x52\xf7\x31\xc7\x55\xe5\x84\x47\x74\x61\x93\x2d\x47\x87\xb7\xc5\x05\x99\xce\xc2\x35\x7f\x89\x33\xd6\xee\xb2\x0e\x2a\x4c\xa9\xe1\x89\x51\x8b\x37\x6e\x83\x2e\x28\x33\x45\xfc\x5b\xf3\x8e\xb8\x75\x2e\x19\xe2\xfe\xf7\x0e\x00\x00\xff\xff\x22\x9d\x74\x69\x42\x01\x00\x00")
+
+func clusterrolebindingRbacAuthorizationK8sIoIstioOperatorAccountIstioOperatorClusterRoleBindingYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_clusterrolebindingRbacAuthorizationK8sIoIstioOperatorAccountIstioOperatorClusterRoleBindingYaml,
+		"ClusterRoleBinding.rbac.authorization.k8s.io/istio-operator-account-istio-operator-cluster-role-binding.yaml",
+	)
+}
+
+func clusterrolebindingRbacAuthorizationK8sIoIstioOperatorAccountIstioOperatorClusterRoleBindingYaml() (*asset, error) {
+	bytes, err := clusterrolebindingRbacAuthorizationK8sIoIstioOperatorAccountIstioOperatorClusterRoleBindingYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ClusterRoleBinding.rbac.authorization.k8s.io/istio-operator-account-istio-operator-cluster-role-binding.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _clusterrolebindingRbacAuthorizationK8sIoRouterMetricsYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\x8d\x31\x4e\x03\x41\x0c\x45\xfb\x39\x85\x2f\x90\x45\x74\x68\x3a\xa0\xa0\x0f\x12\xbd\x33\xfb\xc3\x9a\xec\xda\x23\xdb\x93\x82\xd3\x23\xa4\x68\x1b\x44\xda\xff\xf5\xde\xe3\x2e\x1f\xf0\x10\xd3\x4a\x7e\xe2\x36\xf1\xc8\xc5\x5c\xbe\x39\xc5\x74\xba\x3c\xc5\x24\xf6\x70\x7d\x2c\x17\xd1\xb9\xd2\xeb\x3a\x22\xe1\x47\x5b\xf1\x22\x3a\x8b\x7e\x96\x0d\xc9\x33\x27\xd7\x42\xa4\xbc\xa1\x92\xdb\x48\xf8\x61\x43\xba\xb4\x28\x6e\x2b\x8e\x38\xff\xfe\xdc\xe5\xcd\x6d\xf4\x3b\xad\x42\xf4\x27\xf5\x9f\x39\xc6\xe9\x0b\x2d\xa3\x96\xc3\x0d\x7a\x87\x5f\xa5\xe1\xb9\x35\x1b\x9a\x3b\xd7\xdd\x36\xe4\x82\x11\xb7\x29\x3a\x37\x54\xb2\x0e\x8d\x45\xce\xb9\x2b\x7f\x02\x00\x00\xff\xff\xc2\x73\x04\x05\x10\x01\x00\x00")
 
 func clusterrolebindingRbacAuthorizationK8sIoRouterMetricsYamlBytes() ([]byte, error) {
@@ -6264,6 +6312,46 @@ func customresourcedefinitionApiextensionsK8sIoBundlesAutomationbrokerIoYaml() (
 	return a, nil
 }
 
+var _customresourcedefinitionApiextensionsK8sIoControlplanesIstioOpenshiftComYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x53\x4d\x8f\x13\x31\x0c\xbd\xcf\xaf\xb0\xc4\xb9\x53\xad\x7a\x81\xb9\xa1\x22\x24\xbe\x96\xaa\x2c\xdc\x3d\x13\x77\xc6\x6c\x26\x8e\x62\x67\x96\x0a\xf8\xef\x28\xe9\x74\x81\x85\xa3\xfd\x9c\xf7\x9e\x93\x17\x8c\xfc\x85\x92\xb2\x84\x0e\x30\x32\x7d\x33\x0a\xa5\xd2\xf6\xfe\xb9\xb6\x2c\xdb\xe5\xa6\x27\xc3\x9b\xe6\x9e\x83\xeb\x60\x9f\xd5\x64\x3e\x92\x4a\x4e\x03\xbd\xa2\x13\x07\x36\x96\xd0\xcc\x64\xe8\xd0\xb0\x6b\x00\x02\xce\xd4\xc1\x20\xc1\x92\xf8\xe8\x31\x90\xb6\xac\xc6\xd2\x4a\xa4\xa0\x13\x9f\xac\x1d\x64\x6e\x34\xd2\x50\xe6\xd1\xb9\x4a\x82\xfe\x90\x38\x18\xa5\xbd\xf8\x3c\x07\x2d\xd8\x06\xde\x7e\xfa\x78\x7b\x40\x9b\x3a\x68\xaf\x22\xed\x90\x08\xcb\x89\x3b\x9e\x49\x0d\xe7\xd8\x00\x00\x38\xd2\x21\x71\xb4\xba\xcc\x8f\x4d\xed\x01\xec\x9f\xce\x02\x2b\x20\xd8\x63\x99\x28\x26\x52\x0a\xc6\x61\x04\x9b\x08\x94\xd2\x42\xa9\x4e\xc0\xc3\x44\x01\x6c\x62\x05\xe9\xbf\xd2\x60\xf0\x80\x0a\x55\x9e\x5c\x0b\x6f\xac\x90\x05\x31\x18\x33\x26\x0c\x46\xe4\xc0\x04\xfa\x42\x62\xc0\x01\x26\x8c\x65\xe7\x4d\x4f\x27\x49\x04\x92\x1c\x25\xc0\x21\x89\x2a\x28\x45\x4c\x68\x04\x12\x29\x55\x8f\xda\xc2\xde\x33\x05\x53\x98\xf1\x5c\x89\x0b\x4f\xd5\x5f\xd0\x67\xba\x4a\x3e\x7a\x26\x57\x54\x8e\xaf\xf7\xbb\xdd\xee\x05\x9c\x24\xcd\x80\xc1\x95\x11\x0e\xf0\xf9\x6e\xdf\x36\xeb\x35\x1c\x24\x66\x5f\x5c\x43\x7f\xbe\x6c\x79\x56\xa3\xb9\x85\x23\xa1\xdb\x48\xf0\xe7\x16\x6e\xb3\xf7\x85\x03\x3c\xab\x69\x0b\x1f\x8a\x65\x0e\x27\xe9\x60\x32\x8b\xda\x6d\xb7\x23\xdb\x35\x19\x83\xcc\x73\x0e\x6c\xe7\x6d\x7d\x6a\xee\xb3\x49\xd2\xad\xa3\x85\xfc\x16\x23\x6f\x06\x09\x4b\xb9\xd6\xb2\xd7\xec\x9e\x5d\x5f\xaf\x1a\xba\x64\xe4\xe5\x48\xb5\xb2\x73\xa4\x0e\x1c\x5a\x29\xc7\x24\x39\x76\xf0\xbf\xc4\x5c\xce\xd5\x60\x00\xac\x89\xbc\xc4\xec\x50\x62\x56\xdb\xc5\xfb\xbb\x7f\xa0\xf7\xac\x56\xe1\xe8\x73\x42\xff\x24\x9e\x15\x51\x0e\x63\xf6\x98\xfe\xc6\x1a\x00\x1d\xa4\xd8\xbb\x2d\xd2\x11\x07\x72\xa5\x97\xfb\xb4\xfe\x82\xd5\x8e\x1a\x5a\xd6\x0e\xbe\xff\x6c\x00\x96\xeb\x9f\x5a\x6e\xd0\xc7\x09\x77\xbf\x7b\x6b\xac\x2f\x17\xf0\x07\x0c\x97\xdc\xb9\x0e\x2c\x65\x5a\x29\x25\xe1\x48\x6b\xe7\x57\x00\x00\x00\xff\xff\x08\x5c\x4c\xd0\xab\x03\x00\x00")
+
+func customresourcedefinitionApiextensionsK8sIoControlplanesIstioOpenshiftComYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_customresourcedefinitionApiextensionsK8sIoControlplanesIstioOpenshiftComYaml,
+		"CustomResourceDefinition.apiextensions.k8s.io/controlplanes.istio.openshift.com.yaml",
+	)
+}
+
+func customresourcedefinitionApiextensionsK8sIoControlplanesIstioOpenshiftComYaml() (*asset, error) {
+	bytes, err := customresourcedefinitionApiextensionsK8sIoControlplanesIstioOpenshiftComYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "CustomResourceDefinition.apiextensions.k8s.io/controlplanes.istio.openshift.com.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _customresourcedefinitionApiextensionsK8sIoInstallationsIstioOpenshiftComYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x53\x4d\x6f\x1b\x3b\x0c\xbc\xef\xaf\x18\xe0\x9d\xbd\x86\x91\xcb\x7b\x7b\x7b\x70\x51\x20\xfd\x48\x83\x34\xed\x9d\x5e\xd1\x5e\x36\x5a\x49\x10\x29\xa7\x46\xdb\xff\x5e\x48\x5e\xa7\x69\xda\x23\x39\xdc\x99\x21\x77\x44\x49\x3e\x73\x56\x89\x61\x00\x25\xe1\xaf\xc6\xa1\x56\xda\x3f\xfc\xab\xbd\xc4\xf5\x71\xb3\x63\xa3\x4d\xf7\x20\xc1\x0d\xd8\x16\xb5\x38\xdf\xb1\xc6\x92\x47\x7e\xc5\x7b\x09\x62\x12\x43\x37\xb3\x91\x23\xa3\xa1\x03\x02\xcd\x3c\x40\x82\x1a\x79\x4f\xd6\xd8\x44\x4d\x62\x1f\x13\x07\x9d\x64\x6f\xfd\x18\xe7\x4e\x13\x8f\x75\x9e\x9c\x6b\x24\xe4\x6f\xb3\x04\xe3\xbc\x8d\xbe\xcc\x41\x2b\xb6\xc2\x9b\x8f\x1f\x6e\x6e\xc9\xa6\x01\xfd\x45\xa4\x1f\x33\x37\xde\x7b\x99\x59\x8d\xe6\xd4\x01\x80\x63\x1d\xb3\x24\x6b\xcb\x7c\x5f\xb5\x1e\xb0\x7d\x39\x0b\x51\x10\xec\xa9\xcc\x9c\x32\x2b\x07\x93\x70\x80\x4d\x0c\xe5\x7c\xe4\xdc\x26\xf0\x38\x71\x80\x4d\xa2\x88\xbb\x2f\x3c\x1a\x1e\x49\xd1\xe4\xd9\xf5\xb8\xb6\x4a\x16\xa2\xe1\x50\x28\x53\x30\x66\x07\x8b\xd8\x55\x12\x83\x04\x4c\x94\xea\xce\xab\x1d\xef\x63\x66\xc4\xec\x38\x83\xc6\x1c\x55\xa1\x9c\x28\x93\x31\x62\xe2\xbc\xdc\x09\x5b\x2f\x1c\x4c\x31\xd3\xa9\x11\x57\x9e\xa6\x7f\x24\x5f\xf8\x22\xf9\xe4\x99\x5d\x55\xb9\x7b\xbd\xbd\xba\xba\xfa\x0f\xfb\x98\x67\x50\x70\x75\x44\x02\x3e\xdd\x6f\xfb\x6e\x39\xc3\x6d\x4c\xc5\x57\xd7\xd8\x9d\xce\x5b\x9e\xd4\x78\xee\x71\xc7\xe4\x56\x31\xf8\x53\x8f\x9b\xe2\x7d\xe5\x80\x17\x35\xed\xf1\xbe\x5a\x96\xb0\x8f\x03\x26\xb3\xa4\xc3\x7a\x7d\x10\xbb\x24\x63\x8c\xf3\x5c\x82\xd8\x69\x3d\xc6\x60\x59\x76\xc5\x62\xd6\xb5\xe3\x23\xfb\x35\x25\x59\x8d\x31\x1c\xeb\x59\xeb\x5e\xb3\xfb\xe7\xf2\xf7\x9a\xa1\x73\x46\xfe\x3f\x70\xab\xec\x94\x78\x80\x23\xab\xe5\x21\xc7\x92\x06\xfc\x2d\x31\xe7\xef\x5a\x30\x80\x73\x22\xaf\x9f\xc5\xac\xb5\xab\xf7\xb7\x7f\x40\xef\x44\xad\xc1\xc9\x97\x4c\xfe\x45\x3c\x1b\xa2\x12\x0e\xc5\x53\xfe\x1d\xeb\x00\x1d\x63\xb5\x77\x53\xa5\x13\x8d\xec\x6a\xaf\xec\xf2\xf2\x0a\x16\x3b\x6a\x64\x45\x07\x7c\xfb\xd1\x01\xc7\xcb\x9b\x3a\x6e\xc8\xa7\x89\x36\xbf\x7a\x4b\xac\xcf\x07\x78\x06\xe3\x9c\x3b\x37\xc0\x72\xe1\x85\x32\x66\x3a\xf0\xd2\xf9\x19\x00\x00\xff\xff\x54\x94\xcc\x9a\xab\x03\x00\x00")
+
+func customresourcedefinitionApiextensionsK8sIoInstallationsIstioOpenshiftComYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_customresourcedefinitionApiextensionsK8sIoInstallationsIstioOpenshiftComYaml,
+		"CustomResourceDefinition.apiextensions.k8s.io/installations.istio.openshift.com.yaml",
+	)
+}
+
+func customresourcedefinitionApiextensionsK8sIoInstallationsIstioOpenshiftComYaml() (*asset, error) {
+	bytes, err := customresourcedefinitionApiextensionsK8sIoInstallationsIstioOpenshiftComYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "CustomResourceDefinition.apiextensions.k8s.io/installations.istio.openshift.com.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _daemonsetAppsDefaultDockerRegistryYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xc4\x55\x4d\x6f\xe2\x30\x10\xbd\xf3\x2b\xac\x5e\x2a\x21\xf1\xd1\x43\x2f\xb9\x45\xc4\xd0\xa8\x34\xb0\x49\xda\x55\x4f\x91\xeb\x0c\xc5\xc2\xb1\xb3\xf6\x24\x2b\xf6\xd7\xaf\xa2\x40\x48\x48\x0b\x68\x2f\xeb\x13\x9a\xf1\x7b\x33\xef\x79\x98\xb0\x5c\xbc\x81\xb1\x42\x2b\x87\xb0\x3c\xb7\x93\xf2\x61\xb0\x13\x2a\x75\x88\xc7\x20\xd3\x2a\x02\x1c\x64\x80\x2c\x65\xc8\x9c\x01\x21\x92\x7d\x80\xb4\xd5\x2f\x42\x52\xcd\x77\x60\x46\x06\x3e\x85\x45\xb3\x77\x48\x0a\x1b\x56\x48\x1c\x10\xa2\x58\x06\xce\xf9\x85\x43\xdc\xe6\x8c\xc3\xe9\xb2\xcd\x81\x57\x7c\x16\x24\x70\xd4\xa6\xe6\xce\x18\xf2\xed\xb2\x55\xec\x62\x39\x84\x2c\x97\x0c\xe1\x80\x6d\xf5\x5b\x1d\xd9\xa1\xb9\x48\x44\xc8\xb1\x9d\xea\x70\xad\x90\x09\x05\xa6\x01\x8f\x08\xa8\xf2\xc4\x34\x3a\x08\x0d\xe9\xc2\x8f\xe2\xf0\x3d\x79\x8a\xe3\x75\xe2\x7a\x5e\xd8\x5c\x21\xa4\x64\xb2\x00\x87\x38\x8f\xd3\xe9\xf4\x0a\x32\xa0\x71\x1f\x88\x3c\xbf\x02\x8b\xe8\x2c\xec\x23\xe7\x46\x67\x4e\x2b\x58\x59\xcc\x0d\xe0\x33\xec\x43\xd8\x74\x33\x84\xec\x60\xef\x90\x9c\x59\xfb\x5b\x9b\xf4\x2c\xf7\xe5\x6b\x8e\xb6\x88\x17\x1a\x7b\xf1\x3d\x6f\x49\x7f\xba\x21\x4d\x42\xba\x5e\x45\x7e\xbc\x0a\xdf\x93\xd5\x9a\x06\xd1\x93\x3f\x8f\x13\x1a\xcc\x57\xe1\x8c\xfe\x78\x5d\xc5\x6e\x5f\xf3\xdd\x86\x49\x0b\x77\x57\x74\xc7\xcb\x28\x79\xa6\xef\x7d\xf8\x04\x90\x4f\x6a\xb5\x76\x72\x6c\x78\xbc\x83\x7d\x8f\xf0\xd4\x90\x47\xe7\xee\xeb\x32\x4e\x8e\x25\xfa\xac\x67\x06\x8c\x0f\x63\x33\xb6\x25\xbf\xf2\xb8\xa7\x2a\x11\x0d\xdf\x68\xf8\xcd\x88\xfc\x7b\x81\xd9\x2a\x98\xfb\x8b\xd7\xd0\x8d\xfd\x55\x90\xac\xdd\xf8\xe9\x1b\x53\x8e\xdc\x13\xae\xd5\x46\x7c\x8e\xf7\x99\xbc\xc1\xe4\x19\x0d\x63\x7f\xee\xcf\xdc\x98\xde\x6a\x36\x37\xd8\x5c\x15\x19\xfb\x04\x87\xdc\x0f\x87\x43\xb2\xa0\x01\x0d\xdd\x98\x7a\x64\x38\x1c\xde\x37\x57\xa4\x28\x41\x81\xb5\x6b\xa3\x3f\xa0\x3d\x9b\xd5\x94\x2d\x00\xbb\xe3\x9a\x33\xdc\x3a\x64\xb2\x05\x26\x71\xfb\xa7\x9b\xd2\x06\x1d\xd2\x71\xab\x3a\x96\x6f\xa1\xd2\x56\x49\x8a\x5a\x19\xa1\x04\x0a\x26\x3d\x90\x6c\x1f\x01\xd7\x2a\xb5\x0e\x79\x68\x63\x51\x64\xa0\x0b\x6c\x92\x8f\x4d\xae\x76\xab\xb5\xdd\x4e\x1d\xd8\xf6\x8e\x68\xd6\xc8\xba\xdf\x9b\x01\x96\x8a\xff\x21\xfc\x7b\x59\x06\xac\x2e\x0c\x07\xdb\x2e\x6d\xe0\x57\x01\x16\x6d\xb7\x1d\x9e\x17\x95\x5b\xd3\xac\x13\xcd\x20\xd3\xd5\x5a\x7d\x98\x4e\x5f\x44\x93\x29\xb5\x2c\x32\x78\xd1\x85\xea\xba\x93\x55\x91\x75\xad\xab\x35\x49\x2d\xc6\xae\xcf\x23\x0e\x06\xc5\x46\x70\x86\x60\x2f\xf0\xf4\xde\xe5\x6c\x8f\xd5\x7f\x80\x43\x56\xe9\x14\xa2\xce\x07\xe8\x18\x1d\x19\x2d\x61\xbc\x2b\x3e\xc0\x28\x40\xb0\x63\xa1\x27\x42\x6d\x0c\x73\xc8\x1d\x9a\xa2\xd9\x51\x16\x4c\x29\x38\xb8\x9c\x57\x7d\x04\x5f\x8d\x46\xed\x40\xeb\x5b\x72\x8b\xb0\xda\x8e\xb6\xed\x75\x24\xb8\x8a\x1d\x5d\xd0\x7b\x3b\x6f\x8d\xfa\x1b\x00\x00\xff\xff\x11\x10\x13\x07\x27\x08\x00\x00")
 
 func daemonsetAppsDefaultDockerRegistryYamlBytes() ([]byte, error) {
@@ -6420,6 +6508,26 @@ func deploymentAppsDefaultRegistryConsoleYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "Deployment.apps/default/registry-console.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _deploymentAppsIstioOperatorIstioOperatorYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x9c\x53\xcd\x8e\xda\x4c\x10\xbc\xf3\x14\xad\xbd\x1b\x9b\xcb\x77\x18\xe9\x3b\x58\x40\x94\x43\x58\x2c\x82\x92\x63\x34\x3b\x2e\xe2\xd6\x7a\x7e\x34\x33\x76\xc2\xdb\x47\x83\x59\xaf\x1d\x20\x91\xd2\xc7\xaa\xae\xea\x72\xf7\x58\x3a\xfe\x02\x1f\xd8\x1a\x41\xd2\xb9\x90\xf7\xab\xc5\x2b\x9b\x5a\xd0\x06\xae\xb5\x67\x0d\x13\x17\x1a\x51\xd6\x32\x4a\xb1\x20\x32\x52\x43\x10\x87\xc8\x36\xb3\x0e\x5e\x46\xeb\xaf\x70\x70\x52\xdd\x72\xc1\x41\x25\xa1\x87\x6b\x59\xc9\x20\x68\xb5\x20\x0a\x68\xa1\xa2\xf5\x89\x21\xd2\x32\xaa\xe6\x93\x7c\x41\x1b\x06\xe0\xe1\x9c\x08\xed\x5a\x19\x71\xd5\x4d\x82\xa5\x6a\x67\x16\x0f\x4d\x88\xde\x42\xa5\x52\xd6\x44\xc9\x06\x7e\x14\x66\xa4\xac\xd6\xd2\xd4\xef\x4e\xd9\x3d\x97\x81\xc8\xb2\x9a\x83\xb2\x3d\xfc\x79\x2d\x55\x83\x0d\x4f\xd9\xbc\xb1\x1a\xf9\x5c\x9c\x2f\x5f\xbb\x17\xe4\x2a\x75\xe7\xa3\x78\x66\x79\x11\x54\x1e\x27\xfe\xf9\xbf\x75\x30\xa1\xe1\x53\x1c\xd0\x2c\x42\x35\x99\xf3\xe8\x19\x3f\xf2\x79\x90\xf1\x66\xc7\xb3\xc3\xbb\x70\x6c\x82\xe9\xa7\xdf\x34\xec\xe7\x6b\x79\x5c\x7f\xfc\xf6\x5c\xee\xb6\x9f\xab\x72\xbd\x1d\x79\xa2\x5e\xb6\x1d\x04\x3d\x3d\xdd\x68\xaa\xfd\xe6\xa2\xf8\xbd\xf9\x83\xb7\x5a\x4c\x40\xa2\x13\xa3\xad\x0f\x38\xcd\xd1\x2b\x5e\xc9\xd8\x88\xf1\x8c\xcb\xe4\x7d\x33\x6a\x5f\x6d\x0f\xe5\x71\x7f\xb8\x3b\xef\xee\x75\x53\xb1\x96\xdf\x21\xe8\x8f\xbb\x9b\x4b\x45\xb1\x5c\x15\xcb\xe2\xef\x8f\x27\x95\xb3\x3e\x86\xe9\x2a\xc7\x57\x54\x59\x1f\x05\xfd\x57\x14\x45\x31\x09\x3b\x98\x69\x44\xcf\x2a\x8c\x78\x6f\xdb\x4e\x63\x67\x3b\x33\x37\xd3\x09\x19\x76\xf3\x0f\xef\xe7\x6d\xda\xc8\x64\x97\xce\x2b\x1f\xe0\x7b\x56\x28\x95\x4a\x43\x9e\x1f\x7f\xe4\x10\x6e\xf2\x53\x40\xbb\x78\xde\xb0\x9f\x5e\x52\xa3\xe6\x4e\x0b\xda\x41\xdb\x49\x84\xfb\x01\x7e\x05\x00\x00\xff\xff\x77\xd3\x6e\x86\x6d\x04\x00\x00")
+
+func deploymentAppsIstioOperatorIstioOperatorYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_deploymentAppsIstioOperatorIstioOperatorYaml,
+		"Deployment.apps/istio-operator/istio-operator.yaml",
+	)
+}
+
+func deploymentAppsIstioOperatorIstioOperatorYaml() (*asset, error) {
+	bytes, err := deploymentAppsIstioOperatorIstioOperatorYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Deployment.apps/istio-operator/istio-operator.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -7960,6 +8068,46 @@ func namespaceDefaultYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "Namespace/default.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _namespaceIstioOperatorYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x14\xc9\xb1\x0d\xc2\x40\x0c\x05\xd0\xde\x53\x78\x81\x14\xb4\x37\x04\x25\xfd\x27\xf9\x48\x56\x38\x9f\x65\x1b\x0a\xa6\x47\x29\x9f\x1e\xc2\x1e\xcc\xb2\xe5\x43\xbf\x37\x39\xcd\x8f\xa1\x77\x4c\x56\x60\xa7\x4c\x36\x0e\x34\x86\xa8\x3a\x26\x87\x5a\xb5\xad\x6d\x05\x13\xbd\x52\x2a\xb8\x5f\xf9\x32\xc7\xdb\x7e\xcc\xba\xb4\xe9\xf9\x79\x32\x9d\xcd\x92\x7f\x00\x00\x00\xff\xff\x6c\x9f\x83\x9d\x63\x00\x00\x00")
+
+func namespaceIstioOperatorYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_namespaceIstioOperatorYaml,
+		"Namespace/istio-operator.yaml",
+	)
+}
+
+func namespaceIstioOperatorYaml() (*asset, error) {
+	bytes, err := namespaceIstioOperatorYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Namespace/istio-operator.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _namespaceIstioSystemYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x14\xc9\x31\x0e\xc2\x40\x0c\x04\xc0\xde\xaf\xf0\x07\x52\xd0\xde\x23\x28\xe9\x97\x64\x91\xac\x70\xce\xe9\xd6\x20\xc1\xeb\xa3\x94\xa3\xc1\x88\x07\xa7\xe2\xc8\xe6\xdf\x9b\xed\x91\x5b\xf3\x3b\x3a\x35\xb0\xd2\x3a\x0b\x1b\x0a\xcd\xdc\x13\x9d\xcd\x43\x15\xc7\xa2\x9f\x8a\xdd\x34\xb8\x5e\xf5\x8a\xc4\x3b\xfe\x9c\xba\xb4\xf8\xfe\x79\x72\x26\x8b\xb2\x33\x00\x00\xff\xff\x33\x71\x9e\x71\x61\x00\x00\x00")
+
+func namespaceIstioSystemYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_namespaceIstioSystemYaml,
+		"Namespace/istio-system.yaml",
+	)
+}
+
+func namespaceIstioSystemYaml() (*asset, error) {
+	bytes, err := namespaceIstioSystemYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "Namespace/istio-system.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -9820,6 +9968,26 @@ func serviceaccountDefaultRouterYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "ServiceAccount/default/router.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _serviceaccountIstioOperatorIstioOperatorYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x64\xc9\xa1\x0d\xc4\x30\x0c\x05\x50\x9e\x29\xbc\xc0\x81\xa3\x66\x37\xc3\x49\xe5\x5f\x8e\x81\x55\xc5\x8e\x1c\x37\xf3\x97\x94\x95\xbe\x87\x69\x87\xe6\xb2\x70\xa6\xfd\x6d\xa7\x79\x67\xfa\x6b\x6e\x13\xfd\x89\xc4\xe5\xd5\x86\x16\x3a\x0a\xdc\x88\x1c\x43\x99\x6c\x95\xc5\x27\xa6\x26\x2a\xf2\xe1\x35\x21\xef\xbb\x03\x00\x00\xff\xff\x37\x6a\xf0\x22\x61\x00\x00\x00")
+
+func serviceaccountIstioOperatorIstioOperatorYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_serviceaccountIstioOperatorIstioOperatorYaml,
+		"ServiceAccount/istio-operator/istio-operator.yaml",
+	)
+}
+
+func serviceaccountIstioOperatorIstioOperatorYaml() (*asset, error) {
+	bytes, err := serviceaccountIstioOperatorIstioOperatorYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ServiceAccount/istio-operator/istio-operator.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -14391,6 +14559,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRole.rbac.authorization.k8s.io/customer-admin-controller.yaml":                                                       clusterroleRbacAuthorizationK8sIoCustomerAdminControllerYaml,
 	"ClusterRole.rbac.authorization.k8s.io/customer-admin-project.yaml":                                                          clusterroleRbacAuthorizationK8sIoCustomerAdminProjectYaml,
 	"ClusterRole.rbac.authorization.k8s.io/edit.yaml":                                                                            clusterroleRbacAuthorizationK8sIoEditYaml,
+	"ClusterRole.rbac.authorization.k8s.io/istio-operator.yaml":                                                                  clusterroleRbacAuthorizationK8sIoIstioOperatorYaml,
 	"ClusterRole.rbac.authorization.k8s.io/namespace-viewer.yaml":                                                                clusterroleRbacAuthorizationK8sIoNamespaceViewerYaml,
 	"ClusterRole.rbac.authorization.k8s.io/registry-admin.yaml":                                                                  clusterroleRbacAuthorizationK8sIoRegistryAdminYaml,
 	"ClusterRole.rbac.authorization.k8s.io/registry-editor.yaml":                                                                 clusterroleRbacAuthorizationK8sIoRegistryEditorYaml,
@@ -14541,6 +14710,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-admin.yaml":                                          clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerAdminYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-project-admin.yaml":                                  clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerProjectAdminYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/customer-admin-controller-sa.yaml":                                             clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerSaYaml,
+	"ClusterRoleBinding.rbac.authorization.k8s.io/istio-operator-account-istio-operator-cluster-role-binding.yaml":               clusterrolebindingRbacAuthorizationK8sIoIstioOperatorAccountIstioOperatorClusterRoleBindingYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/router-metrics.yaml":                                                           clusterrolebindingRbacAuthorizationK8sIoRouterMetricsYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/router-router-role.yaml":                                                       clusterrolebindingRbacAuthorizationK8sIoRouterRouterRoleYaml,
 	"ClusterRoleBinding.rbac.authorization.k8s.io/sdn-cluster-reader.yaml":                                                       clusterrolebindingRbacAuthorizationK8sIoSdnClusterReaderYaml,
@@ -14652,6 +14822,8 @@ var _bindata = map[string]func() (*asset, error){
 	"CustomResourceDefinition.apiextensions.k8s.io/bundlebindings.automationbroker.io.yaml":                                      customresourcedefinitionApiextensionsK8sIoBundlebindingsAutomationbrokerIoYaml,
 	"CustomResourceDefinition.apiextensions.k8s.io/bundleinstances.automationbroker.io.yaml":                                     customresourcedefinitionApiextensionsK8sIoBundleinstancesAutomationbrokerIoYaml,
 	"CustomResourceDefinition.apiextensions.k8s.io/bundles.automationbroker.io.yaml":                                             customresourcedefinitionApiextensionsK8sIoBundlesAutomationbrokerIoYaml,
+	"CustomResourceDefinition.apiextensions.k8s.io/controlplanes.istio.openshift.com.yaml":                                       customresourcedefinitionApiextensionsK8sIoControlplanesIstioOpenshiftComYaml,
+	"CustomResourceDefinition.apiextensions.k8s.io/installations.istio.openshift.com.yaml":                                       customresourcedefinitionApiextensionsK8sIoInstallationsIstioOpenshiftComYaml,
 	"DaemonSet.apps/default/docker-registry.yaml":                                                                                daemonsetAppsDefaultDockerRegistryYaml,
 	"DaemonSet.apps/default/router.yaml":                                                                                         daemonsetAppsDefaultRouterYaml,
 	"DaemonSet.apps/kube-service-catalog/apiserver.yaml":                                                                         daemonsetAppsKubeServiceCatalogApiserverYaml,
@@ -14660,6 +14832,7 @@ var _bindata = map[string]func() (*asset, error){
 	"DaemonSet.apps/openshift-azure-monitoring/etcd-metrics.yaml":                                                                daemonsetAppsOpenshiftAzureMonitoringEtcdMetricsYaml,
 	"DaemonSet.apps/openshift-template-service-broker/apiserver.yaml":                                                            daemonsetAppsOpenshiftTemplateServiceBrokerApiserverYaml,
 	"Deployment.apps/default/registry-console.yaml":                                                                              deploymentAppsDefaultRegistryConsoleYaml,
+	"Deployment.apps/istio-operator/istio-operator.yaml":                                                                         deploymentAppsIstioOperatorIstioOperatorYaml,
 	"Deployment.apps/openshift-ansible-service-broker/asb.yaml":                                                                  deploymentAppsOpenshiftAnsibleServiceBrokerAsbYaml,
 	"Deployment.apps/openshift-azure-branding/branding.yaml":                                                                     deploymentAppsOpenshiftAzureBrandingBrandingYaml,
 	"Deployment.apps/openshift-azure-monitoring/metrics-bridge.yaml":                                                             deploymentAppsOpenshiftAzureMonitoringMetricsBridgeYaml,
@@ -14736,43 +14909,45 @@ var _bindata = map[string]func() (*asset, error){
 	"ImageStream.image.openshift.io/openshift/rhpam73-kieserver-openshift.yaml":                                                  imagestreamImageOpenshiftIoOpenshiftRhpam73KieserverOpenshiftYaml,
 	"ImageStream.image.openshift.io/openshift/rhpam73-smartrouter-openshift.yaml":                                                imagestreamImageOpenshiftIoOpenshiftRhpam73SmartrouterOpenshiftYaml,
 	"ImageStream.image.openshift.io/openshift/ruby.yaml":                                                                         imagestreamImageOpenshiftIoOpenshiftRubyYaml,
-	"Namespace/default.yaml":                                                                                                             namespaceDefaultYaml,
-	"Namespace/kube-public.yaml":                                                                                                         namespaceKubePublicYaml,
-	"Namespace/kube-service-catalog.yaml":                                                                                                namespaceKubeServiceCatalogYaml,
-	"Namespace/kube-system.yaml":                                                                                                         namespaceKubeSystemYaml,
-	"Namespace/openshift-ansible-service-broker.yaml":                                                                                    namespaceOpenshiftAnsibleServiceBrokerYaml,
-	"Namespace/openshift-azure-branding.yaml":                                                                                            namespaceOpenshiftAzureBrandingYaml,
-	"Namespace/openshift-azure-logging.yaml":                                                                                             namespaceOpenshiftAzureLoggingYaml,
-	"Namespace/openshift-azure-monitoring.yaml":                                                                                          namespaceOpenshiftAzureMonitoringYaml,
-	"Namespace/openshift-azure.yaml":                                                                                                     namespaceOpenshiftAzureYaml,
-	"Namespace/openshift-console.yaml":                                                                                                   namespaceOpenshiftConsoleYaml,
-	"Namespace/openshift-etcd.yaml":                                                                                                      namespaceOpenshiftEtcdYaml,
-	"Namespace/openshift-infra.yaml":                                                                                                     namespaceOpenshiftInfraYaml,
-	"Namespace/openshift-logging.yaml":                                                                                                   namespaceOpenshiftLoggingYaml,
-	"Namespace/openshift-monitoring.yaml":                                                                                                namespaceOpenshiftMonitoringYaml,
-	"Namespace/openshift-sdn.yaml":                                                                                                       namespaceOpenshiftSdnYaml,
-	"Namespace/openshift-template-service-broker.yaml":                                                                                   namespaceOpenshiftTemplateServiceBrokerYaml,
-	"Namespace/openshift-web-console.yaml":                                                                                               namespaceOpenshiftWebConsoleYaml,
-	"Namespace/openshift.yaml":                                                                                                           namespaceOpenshiftYaml,
-	"OAuthClient.oauth.openshift.io/cockpit-oauth-client.yaml":                                                                           oauthclientOauthOpenshiftIoCockpitOauthClientYaml,
-	"OAuthClient.oauth.openshift.io/openshift-console.yaml":                                                                              oauthclientOauthOpenshiftIoOpenshiftConsoleYaml,
-	"PriorityClass.scheduling.k8s.io/system-cluster-critical.yaml":                                                                       priorityclassSchedulingK8sIoSystemClusterCriticalYaml,
-	"PriorityClass.scheduling.k8s.io/system-node-critical.yaml":                                                                          priorityclassSchedulingK8sIoSystemNodeCriticalYaml,
-	"Role.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml":                                                 roleRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
-	"Role.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap.yaml":                                                    roleRbacAuthorizationK8sIoKubeServiceCatalogClusterInfoConfigmapYaml,
-	"Role.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor.yaml":                                                        roleRbacAuthorizationK8sIoKubeServiceCatalogConfigmapAccessorYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader.yaml":                                          roleRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml":                                     roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml":                                              roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml":                                                 roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml":                                                   roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml,
-	"Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                                                    roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
-	"Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml":                                                               roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml,
-	"Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":                            roleRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml":                                          rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap-binding.yaml":                                     rolebindingRbacAuthorizationK8sIoKubeServiceCatalogClusterInfoConfigmapBindingYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor-binding.yaml":                                         rolebindingRbacAuthorizationK8sIoKubeServiceCatalogConfigmapAccessorBindingYaml,
-	"RoleBinding.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader-binding.yaml":                           rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderBindingYaml,
+	"Namespace/default.yaml":                                                                                   namespaceDefaultYaml,
+	"Namespace/istio-operator.yaml":                                                                            namespaceIstioOperatorYaml,
+	"Namespace/istio-system.yaml":                                                                              namespaceIstioSystemYaml,
+	"Namespace/kube-public.yaml":                                                                               namespaceKubePublicYaml,
+	"Namespace/kube-service-catalog.yaml":                                                                      namespaceKubeServiceCatalogYaml,
+	"Namespace/kube-system.yaml":                                                                               namespaceKubeSystemYaml,
+	"Namespace/openshift-ansible-service-broker.yaml":                                                          namespaceOpenshiftAnsibleServiceBrokerYaml,
+	"Namespace/openshift-azure-branding.yaml":                                                                  namespaceOpenshiftAzureBrandingYaml,
+	"Namespace/openshift-azure-logging.yaml":                                                                   namespaceOpenshiftAzureLoggingYaml,
+	"Namespace/openshift-azure-monitoring.yaml":                                                                namespaceOpenshiftAzureMonitoringYaml,
+	"Namespace/openshift-azure.yaml":                                                                           namespaceOpenshiftAzureYaml,
+	"Namespace/openshift-console.yaml":                                                                         namespaceOpenshiftConsoleYaml,
+	"Namespace/openshift-etcd.yaml":                                                                            namespaceOpenshiftEtcdYaml,
+	"Namespace/openshift-infra.yaml":                                                                           namespaceOpenshiftInfraYaml,
+	"Namespace/openshift-logging.yaml":                                                                         namespaceOpenshiftLoggingYaml,
+	"Namespace/openshift-monitoring.yaml":                                                                      namespaceOpenshiftMonitoringYaml,
+	"Namespace/openshift-sdn.yaml":                                                                             namespaceOpenshiftSdnYaml,
+	"Namespace/openshift-template-service-broker.yaml":                                                         namespaceOpenshiftTemplateServiceBrokerYaml,
+	"Namespace/openshift-web-console.yaml":                                                                     namespaceOpenshiftWebConsoleYaml,
+	"Namespace/openshift.yaml":                                                                                 namespaceOpenshiftYaml,
+	"OAuthClient.oauth.openshift.io/cockpit-oauth-client.yaml":                                                 oauthclientOauthOpenshiftIoCockpitOauthClientYaml,
+	"OAuthClient.oauth.openshift.io/openshift-console.yaml":                                                    oauthclientOauthOpenshiftIoOpenshiftConsoleYaml,
+	"PriorityClass.scheduling.k8s.io/system-cluster-critical.yaml":                                             priorityclassSchedulingK8sIoSystemClusterCriticalYaml,
+	"PriorityClass.scheduling.k8s.io/system-node-critical.yaml":                                                priorityclassSchedulingK8sIoSystemNodeCriticalYaml,
+	"Role.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml":                       roleRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
+	"Role.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap.yaml":                          roleRbacAuthorizationK8sIoKubeServiceCatalogClusterInfoConfigmapYaml,
+	"Role.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor.yaml":                              roleRbacAuthorizationK8sIoKubeServiceCatalogConfigmapAccessorYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader.yaml":                roleRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml":           roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml":                    roleRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system-controller-bootstrap-signer.yaml":                       roleRbacAuthorizationK8sIoKubeSystemSystemControllerBootstrapSignerYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system-controller-cloud-provider.yaml":                         roleRbacAuthorizationK8sIoKubeSystemSystemControllerCloudProviderYaml,
+	"Role.rbac.authorization.k8s.io/kube-system/system-controller-token-cleaner.yaml":                          roleRbacAuthorizationK8sIoKubeSystemSystemControllerTokenCleanerYaml,
+	"Role.rbac.authorization.k8s.io/openshift/shared-resource-viewer.yaml":                                     roleRbacAuthorizationK8sIoOpenshiftSharedResourceViewerYaml,
+	"Role.rbac.authorization.k8s.io/openshift-template-service-broker/templateservicebroker-auth-reader.yaml":  roleRbacAuthorizationK8sIoOpenshiftTemplateServiceBrokerTemplateservicebrokerAuthReaderYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-public/system-controller-bootstrap-signer.yaml":                rolebindingRbacAuthorizationK8sIoKubePublicSystemControllerBootstrapSignerYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/cluster-info-configmap-binding.yaml":           rolebindingRbacAuthorizationK8sIoKubeServiceCatalogClusterInfoConfigmapBindingYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-service-catalog/configmap-accessor-binding.yaml":               rolebindingRbacAuthorizationK8sIoKubeServiceCatalogConfigmapAccessorBindingYaml,
+	"RoleBinding.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader-binding.yaml": rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderBindingYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/extension-apiserver-authentication-reader-openshift-template-service-broker.yaml": rolebindingRbacAuthorizationK8sIoKubeSystemExtensionApiserverAuthenticationReaderOpenshiftTemplateServiceBrokerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-controller-manager.yaml":                              rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeControllerManagerYaml,
 	"RoleBinding.rbac.authorization.k8s.io/kube-system/system--leader-locking-kube-scheduler.yaml":                                       rolebindingRbacAuthorizationK8sIoKubeSystemSystemLeaderLockingKubeSchedulerYaml,
@@ -14830,6 +15005,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ServiceAccount/default/default.yaml":                                                                                                serviceaccountDefaultDefaultYaml,
 	"ServiceAccount/default/registry.yaml":                                                                                               serviceaccountDefaultRegistryYaml,
 	"ServiceAccount/default/router.yaml":                                                                                                 serviceaccountDefaultRouterYaml,
+	"ServiceAccount/istio-operator/istio-operator.yaml":                                                                                  serviceaccountIstioOperatorIstioOperatorYaml,
 	"ServiceAccount/kube-service-catalog/service-catalog-apiserver.yaml":                                                                 serviceaccountKubeServiceCatalogServiceCatalogApiserverYaml,
 	"ServiceAccount/kube-service-catalog/service-catalog-controller.yaml":                                                                serviceaccountKubeServiceCatalogServiceCatalogControllerYaml,
 	"ServiceAccount/kube-system/attachdetach-controller.yaml":                                                                            serviceaccountKubeSystemAttachdetachControllerYaml,
@@ -15116,6 +15292,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"customer-admin-controller.yaml":             {clusterroleRbacAuthorizationK8sIoCustomerAdminControllerYaml, map[string]*bintree{}},
 		"customer-admin-project.yaml":                {clusterroleRbacAuthorizationK8sIoCustomerAdminProjectYaml, map[string]*bintree{}},
 		"edit.yaml":                                  {clusterroleRbacAuthorizationK8sIoEditYaml, map[string]*bintree{}},
+		"istio-operator.yaml":                        {clusterroleRbacAuthorizationK8sIoIstioOperatorYaml, map[string]*bintree{}},
 		"namespace-viewer.yaml":                      {clusterroleRbacAuthorizationK8sIoNamespaceViewerYaml, map[string]*bintree{}},
 		"registry-admin.yaml":                        {clusterroleRbacAuthorizationK8sIoRegistryAdminYaml, map[string]*bintree{}},
 		"registry-editor.yaml":                       {clusterroleRbacAuthorizationK8sIoRegistryEditorYaml, map[string]*bintree{}},
@@ -15268,6 +15445,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"customer-admin-controller-admin.yaml":                                          {clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerAdminYaml, map[string]*bintree{}},
 		"customer-admin-controller-project-admin.yaml":                                  {clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerProjectAdminYaml, map[string]*bintree{}},
 		"customer-admin-controller-sa.yaml":                                             {clusterrolebindingRbacAuthorizationK8sIoCustomerAdminControllerSaYaml, map[string]*bintree{}},
+		"istio-operator-account-istio-operator-cluster-role-binding.yaml":               {clusterrolebindingRbacAuthorizationK8sIoIstioOperatorAccountIstioOperatorClusterRoleBindingYaml, map[string]*bintree{}},
 		"router-metrics.yaml":                                                           {clusterrolebindingRbacAuthorizationK8sIoRouterMetricsYaml, map[string]*bintree{}},
 		"router-router-role.yaml":                                                       {clusterrolebindingRbacAuthorizationK8sIoRouterRouterRoleYaml, map[string]*bintree{}},
 		"sdn-cluster-reader.yaml":                                                       {clusterrolebindingRbacAuthorizationK8sIoSdnClusterReaderYaml, map[string]*bintree{}},
@@ -15409,6 +15587,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"bundlebindings.automationbroker.io.yaml":  {customresourcedefinitionApiextensionsK8sIoBundlebindingsAutomationbrokerIoYaml, map[string]*bintree{}},
 		"bundleinstances.automationbroker.io.yaml": {customresourcedefinitionApiextensionsK8sIoBundleinstancesAutomationbrokerIoYaml, map[string]*bintree{}},
 		"bundles.automationbroker.io.yaml":         {customresourcedefinitionApiextensionsK8sIoBundlesAutomationbrokerIoYaml, map[string]*bintree{}},
+		"controlplanes.istio.openshift.com.yaml":   {customresourcedefinitionApiextensionsK8sIoControlplanesIstioOpenshiftComYaml, map[string]*bintree{}},
+		"installations.istio.openshift.com.yaml":   {customresourcedefinitionApiextensionsK8sIoInstallationsIstioOpenshiftComYaml, map[string]*bintree{}},
 	}},
 	"DaemonSet.apps": {nil, map[string]*bintree{
 		"default": {nil, map[string]*bintree{
@@ -15432,6 +15612,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"Deployment.apps": {nil, map[string]*bintree{
 		"default": {nil, map[string]*bintree{
 			"registry-console.yaml": {deploymentAppsDefaultRegistryConsoleYaml, map[string]*bintree{}},
+		}},
+		"istio-operator": {nil, map[string]*bintree{
+			"istio-operator.yaml": {deploymentAppsIstioOperatorIstioOperatorYaml, map[string]*bintree{}},
 		}},
 		"openshift-ansible-service-broker": {nil, map[string]*bintree{
 			"asb.yaml": {deploymentAppsOpenshiftAnsibleServiceBrokerAsbYaml, map[string]*bintree{}},
@@ -15530,6 +15713,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	}},
 	"Namespace": {nil, map[string]*bintree{
 		"default.yaml":                           {namespaceDefaultYaml, map[string]*bintree{}},
+		"istio-operator.yaml":                    {namespaceIstioOperatorYaml, map[string]*bintree{}},
+		"istio-system.yaml":                      {namespaceIstioSystemYaml, map[string]*bintree{}},
 		"kube-public.yaml":                       {namespaceKubePublicYaml, map[string]*bintree{}},
 		"kube-service-catalog.yaml":              {namespaceKubeServiceCatalogYaml, map[string]*bintree{}},
 		"kube-system.yaml":                       {namespaceKubeSystemYaml, map[string]*bintree{}},
@@ -15708,6 +15893,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"default.yaml":  {serviceaccountDefaultDefaultYaml, map[string]*bintree{}},
 			"registry.yaml": {serviceaccountDefaultRegistryYaml, map[string]*bintree{}},
 			"router.yaml":   {serviceaccountDefaultRouterYaml, map[string]*bintree{}},
+		}},
+		"istio-operator": {nil, map[string]*bintree{
+			"istio-operator.yaml": {serviceaccountIstioOperatorIstioOperatorYaml, map[string]*bintree{}},
 		}},
 		"kube-service-catalog": {nil, map[string]*bintree{
 			"service-catalog-apiserver.yaml":  {serviceaccountKubeServiceCatalogServiceCatalogApiserverYaml, map[string]*bintree{}},
