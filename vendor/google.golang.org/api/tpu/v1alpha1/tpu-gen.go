@@ -707,7 +707,8 @@ type Operation struct {
 	// service that
 	// originally returns it. If you use the default HTTP mapping,
 	// the
-	// `name` should have the format of `operations/some/unique/name`.
+	// `name` should be a resource name ending with
+	// `operations/{unique_id}`.
 	Name string `json:"name,omitempty"`
 
 	// Response: The normal response of the operation in case of success.
@@ -840,6 +841,9 @@ func (s *ReimageNodeRequest) MarshalJSON() ([]byte, error) {
 
 type SchedulingConfig struct {
 	Preemptible bool `json:"preemptible,omitempty"`
+
+	// Reserved: Whether the node is created under a reservation.
+	Reserved bool `json:"reserved,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Preemptible") to
 	// unconditionally include in API requests. By default, fields with

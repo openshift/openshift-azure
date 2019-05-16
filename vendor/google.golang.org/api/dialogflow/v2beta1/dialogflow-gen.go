@@ -781,6 +781,7 @@ type GoogleCloudDialogflowV2Intent struct {
 	//     "intent": "actions.intent.OPTION"
 	//   }
 	// }</pre>
+	//   "GOOGLE_HANGOUTS" - Google Hangouts.
 	DefaultResponsePlatforms []string `json:"defaultResponsePlatforms,omitempty"`
 
 	// DisplayName: Required. The name of this intent.
@@ -1066,6 +1067,7 @@ type GoogleCloudDialogflowV2IntentMessage struct {
 	//     "intent": "actions.intent.OPTION"
 	//   }
 	// }</pre>
+	//   "GOOGLE_HANGOUTS" - Google Hangouts.
 	Platform string `json:"platform,omitempty"`
 
 	// QuickReplies: The quick replies response.
@@ -3480,7 +3482,7 @@ func (s *GoogleCloudDialogflowV2beta1ImportAgentRequest) MarshalJSON() ([]byte, 
 }
 
 // GoogleCloudDialogflowV2beta1InputAudioConfig: Instructs the speech
-// recognizer how to process the audio content.
+// recognizer on how to process the audio content.
 type GoogleCloudDialogflowV2beta1InputAudioConfig struct {
 	// AudioEncoding: Required. Audio encoding of the audio content to
 	// process.
@@ -3567,6 +3569,49 @@ type GoogleCloudDialogflowV2beta1InputAudioConfig struct {
 	// #select-model)
 	// for more details.
 	Model string `json:"model,omitempty"`
+
+	// ModelVariant: Optional. Which variant of the Speech model to use.
+	//
+	// Possible values:
+	//   "SPEECH_MODEL_VARIANT_UNSPECIFIED" - No model variant specified. In
+	// this case Dialogflow defaults to
+	// USE_BEST_AVAILABLE.
+	//   "USE_BEST_AVAILABLE" - Use the best available variant of the
+	// Speech
+	// model that the caller is eligible for.
+	//
+	// Please see the
+	// [Dialogflow
+	// docs](https://cloud.google.com/dialogflow-enterprise/docs/
+	// data-logging) for
+	// how to make your project eligible for enhanced models.
+	//   "USE_STANDARD" - Use standard model variant even if an enhanced
+	// model is available.  See the
+	// [Cloud
+	// Speech
+	// documentation](https://cloud.google.com/speech-to-text/docs/enh
+	// anced-models)
+	// for details about enhanced models.
+	//   "USE_ENHANCED" - Use an enhanced model variant:
+	//
+	// * If an enhanced variant does not exist for the given
+	//   model and request language, Dialogflow falls
+	//   back to the standard variant.
+	//
+	//   The [Cloud Speech
+	//
+	// documentation](https://cloud.google.com/speech-to-text/docs/enhanced-m
+	// odels)
+	//   describes which models have enhanced variants.
+	//
+	// * If the API caller isn't eligible for enhanced models, Dialogflow
+	// returns
+	//   an error.  Please see the [Dialogflow
+	//
+	// docs](https://cloud.google.com/dialogflow-enterprise/docs/data-logging
+	// )
+	//   for how to make your project eligible.
+	ModelVariant string `json:"modelVariant,omitempty"`
 
 	// PhraseHints: Optional. The collection of phrase hints which are used
 	// to boost accuracy
@@ -3704,6 +3749,7 @@ type GoogleCloudDialogflowV2beta1Intent struct {
 	//   }
 	// }</pre>
 	//   "TELEPHONY" - Telephony Gateway.
+	//   "GOOGLE_HANGOUTS" - Google Hangouts.
 	DefaultResponsePlatforms []string `json:"defaultResponsePlatforms,omitempty"`
 
 	// DisplayName: Required. The name of this intent.
@@ -4047,6 +4093,7 @@ type GoogleCloudDialogflowV2beta1IntentMessage struct {
 	//   }
 	// }</pre>
 	//   "TELEPHONY" - Telephony Gateway.
+	//   "GOOGLE_HANGOUTS" - Google Hangouts.
 	Platform string `json:"platform,omitempty"`
 
 	// QuickReplies: Displays quick replies.
@@ -6530,7 +6577,8 @@ type GoogleLongrunningOperation struct {
 	// service that
 	// originally returns it. If you use the default HTTP mapping,
 	// the
-	// `name` should have the format of `operations/some/unique/name`.
+	// `name` should be a resource name ending with
+	// `operations/{unique_id}`.
 	Name string `json:"name,omitempty"`
 
 	// Response: The normal response of the operation in case of success.

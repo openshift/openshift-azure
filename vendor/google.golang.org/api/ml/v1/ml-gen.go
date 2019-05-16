@@ -242,7 +242,7 @@ type ProjectsOperationsService struct {
 //       rpc GetResource(GetResourceRequest) returns
 // (google.api.HttpBody);
 //       rpc UpdateResource(google.api.HttpBody) returns
-// (google.protobuf.Empty);
+//       (google.protobuf.Empty);
 //     }
 //
 // Example with streaming methods:
@@ -360,6 +360,7 @@ type GoogleCloudMlV1__AcceleratorConfig struct {
 	//   "NVIDIA_TESLA_P100" - Nvidia Tesla P100 GPU.
 	//   "NVIDIA_TESLA_V100" - Nvidia Tesla V100 GPU.
 	//   "NVIDIA_TESLA_P4" - Nvidia Tesla P4 GPU.
+	//   "NVIDIA_TESLA_T4" - Nvidia Tesla T4 GPU.
 	//   "TPU_V2" - TPU v2.
 	Type string `json:"type,omitempty"`
 
@@ -466,19 +467,23 @@ func (s *GoogleCloudMlV1__AutoScaling) MarshalJSON() ([]byte, error) {
 // GoogleCloudMlV1__BuiltInAlgorithmOutput: Represents output related to
 // a built-in algorithm Job.
 type GoogleCloudMlV1__BuiltInAlgorithmOutput struct {
-	// Framework: Framework on which the built-in algorithm was trained on.
+	// Framework: Framework on which the built-in algorithm was trained.
 	Framework string `json:"framework,omitempty"`
 
-	// ModelPath: Built-in algorithm's saved model path.
-	// Only set for non-hptuning succeeded jobs.
+	// ModelPath: The Cloud Storage path to the `model/` directory where the
+	// training job
+	// saves the trained model. Only set for successful jobs that don't
+	// use
+	// hyperparameter tuning.
 	ModelPath string `json:"modelPath,omitempty"`
 
 	// PythonVersion: Python version on which the built-in algorithm was
-	// trained on.
+	// trained.
 	PythonVersion string `json:"pythonVersion,omitempty"`
 
-	// RuntimeVersion: CMLE runtime version on which the built-in algorithm
-	// was trained on.
+	// RuntimeVersion: Cloud ML Engine runtime version on which the built-in
+	// algorithm was
+	// trained.
 	RuntimeVersion string `json:"runtimeVersion,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Framework") to
@@ -519,6 +524,7 @@ type GoogleCloudMlV1__Capability struct {
 	//   "NVIDIA_TESLA_P100" - Nvidia Tesla P100 GPU.
 	//   "NVIDIA_TESLA_V100" - Nvidia Tesla V100 GPU.
 	//   "NVIDIA_TESLA_P4" - Nvidia Tesla P4 GPU.
+	//   "NVIDIA_TESLA_T4" - Nvidia Tesla T4 GPU.
 	//   "TPU_V2" - TPU v2.
 	AvailableAccelerators []string `json:"availableAccelerators,omitempty"`
 
@@ -636,9 +642,8 @@ type GoogleCloudMlV1__HyperparameterOutput struct {
 	AllMetrics []*GoogleCloudMlV1HyperparameterOutputHyperparameterMetric `json:"allMetrics,omitempty"`
 
 	// BuiltInAlgorithmOutput: Details related to built-in algorithms
-	// job.
-	// Only set this for built-in algorithms jobs and for trials that
-	// succeeded.
+	// jobs.
+	// Only set for trials of built-in algorithms jobs that have succeeded.
 	BuiltInAlgorithmOutput *GoogleCloudMlV1__BuiltInAlgorithmOutput `json:"builtInAlgorithmOutput,omitempty"`
 
 	// FinalMetric: The final objective metric seen for this trial.
@@ -722,16 +727,16 @@ type GoogleCloudMlV1__HyperparameterSpec struct {
 	// By default, "training/hptuning/metric" will be used.
 	HyperparameterMetricTag string `json:"hyperparameterMetricTag,omitempty"`
 
-	// MaxFailedTrials: Optional. How many failed trials that need to be
-	// seen before failing the
-	// hyperparameter tuning job. User can specify this field to override
+	// MaxFailedTrials: Optional. The number of failed trials that need to
+	// be seen before failing
+	// the hyperparameter tuning job. You can specify this field to override
 	// the
-	// default failing criteria for CloudML Engine hyperparameter tuning
+	// default failing criteria for Cloud ML Engine hyperparameter tuning
 	// jobs.
 	//
-	// Defaults to zero, which means to let the service decide when
-	// a
-	// hyperparameter job should fail.
+	// Defaults to zero, which means the service decides when a
+	// hyperparameter
+	// job should fail.
 	MaxFailedTrials int64 `json:"maxFailedTrials,omitempty"`
 
 	// MaxParallelTrials: Optional. The number of training trials to run
@@ -791,8 +796,7 @@ func (s *GoogleCloudMlV1__HyperparameterSpec) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
-// GoogleCloudMlV1__Job: Represents a training, prediction or
-// explanation job.
+// GoogleCloudMlV1__Job: Represents a training or prediction job.
 type GoogleCloudMlV1__Job struct {
 	// CreateTime: Output only. When the job was created.
 	CreateTime string `json:"createTime,omitempty"`
@@ -1478,11 +1482,9 @@ type GoogleCloudMlV1__PredictionInput struct {
 	// Currently available only for output data.
 	DataFormat string `json:"dataFormat,omitempty"`
 
-	// InputPaths: Required. The Google Cloud Storage location of the input
-	// data files.
-	// May contain wildcards. See <a
-	// href="https://cloud.google.com/storage/docs/gsutil/addlhelp/WildcardNa
-	// mes</a>
+	// InputPaths: Required. The Cloud Storage location of the input data
+	// files. May contain
+	// <a href="/storage/docs/gsutil/addlhelp/WildcardNames">wildcards</a>.
 	InputPaths []string `json:"inputPaths,omitempty"`
 
 	// MaxWorkerCount: Optional. The maximum number of workers to be used
@@ -2094,7 +2096,7 @@ func (s *GoogleCloudMlV1__TrainingInput) MarshalJSON() ([]byte, error) {
 // job. Output only.
 type GoogleCloudMlV1__TrainingOutput struct {
 	// BuiltInAlgorithmOutput: Details related to built-in algorithms
-	// job.
+	// jobs.
 	// Only set for built-in algorithms jobs.
 	BuiltInAlgorithmOutput *GoogleCloudMlV1__BuiltInAlgorithmOutput `json:"builtInAlgorithmOutput,omitempty"`
 
@@ -2301,6 +2303,61 @@ type GoogleCloudMlV1__Version struct {
 	//
 	// The version name must be unique within the model it is created in.
 	Name string `json:"name,omitempty"`
+
+	// PackageUris: Optional. The Google Cloud Storage location of the
+	// packages for custom
+	// prediction and any additional dependencies.
+	PackageUris []string `json:"packageUris,omitempty"`
+
+	// PredictionClass: class PredictionClass(object):
+	//   """A Model performs predictions on a given list of instances.
+	//
+	//   The input instances are the raw values sent by the user. It is the
+	//   responsibility of a Model to translate these instances into
+	//   actual predictions.
+	//
+	//   The input instances and the output use python data types. The
+	// input
+	//   instances have been decoded prior to being passed to the predict
+	//   method. The output, which should use python data types is
+	//   encoded after being returned from the predict method.
+	//   """
+	//
+	//   def predict(self, instances, **kwargs):
+	//     """Returns predictions for the provided instances.
+	//
+	//     Instances are the decoded values from the request. Clients need
+	// not
+	//     worry about decoding json nor base64 decoding.
+	//
+	//     Args:
+	//       instances: A list of instances, as described in the API.
+	//       **kwargs: Additional keyword arguments, will be passed into
+	// the
+	//           client's predict method.
+	//
+	//     Returns:
+	//       A list of outputs containing the prediction results.
+	//     """
+	//
+	//   @classmethod
+	//   def from_path(cls, model_path):
+	//     """Creates a model using the given model path.
+	//
+	//     Path is useful, e.g., to load files from the exported directory
+	//     containing the model.
+	//
+	//     Args:
+	//       model_path: The local directory that contains the exported
+	// model
+	//           file along with any additional files uploaded when creating
+	// the
+	//           version resource.
+	//
+	//     Returns:
+	//       An instance implementing this Model class.
+	//     """
+	PredictionClass string `json:"predictionClass,omitempty"`
 
 	// PythonVersion: Optional. The version of Python used in prediction. If
 	// not set, the default
@@ -2523,7 +2580,7 @@ func (s *GoogleIamV1__AuditLogConfig) MarshalJSON() ([]byte, error) {
 // GoogleIamV1__Binding: Associates `members` with a `role`.
 type GoogleIamV1__Binding struct {
 	// Condition: The condition that is associated with this binding.
-	// NOTE: an unsatisfied condition will not allow user access via
+	// NOTE: An unsatisfied condition will not allow user access via
 	// current
 	// binding. Different bindings, including their conditions, are
 	// examined
@@ -4147,11 +4204,11 @@ func (r *ProjectsJobsService) List(parent string) *ProjectsJobsListCall {
 // object.
 // For example, retrieve jobs with a job identifier that starts with
 // 'census':
-// <p><code>gcloud ml-engine jobs list
+// <p><code>gcloud ai-platform jobs list
 // --filter='jobId:census*'</code>
 // <p>List all failed jobs with names that start with
 // 'rnn':
-// <p><code>gcloud ml-engine jobs list --filter='jobId:rnn*
+// <p><code>gcloud ai-platform jobs list --filter='jobId:rnn*
 // AND state:FAILED'</code>
 // <p>For more examples, see the guide to
 // <a href="/ml-engine/docs/tensorflow/monitor-training">monitoring
@@ -4292,7 +4349,7 @@ func (c *ProjectsJobsListCall) Do(opts ...googleapi.CallOption) (*GoogleCloudMlV
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Specifies the subset of jobs to retrieve.\nYou can filter on the value of one or more attributes of the job object.\nFor example, retrieve jobs with a job identifier that starts with 'census':\n\u003cp\u003e\u003ccode\u003egcloud ml-engine jobs list --filter='jobId:census*'\u003c/code\u003e\n\u003cp\u003eList all failed jobs with names that start with 'rnn':\n\u003cp\u003e\u003ccode\u003egcloud ml-engine jobs list --filter='jobId:rnn*\nAND state:FAILED'\u003c/code\u003e\n\u003cp\u003eFor more examples, see the guide to\n\u003ca href=\"/ml-engine/docs/tensorflow/monitor-training\"\u003emonitoring jobs\u003c/a\u003e.",
+	//       "description": "Optional. Specifies the subset of jobs to retrieve.\nYou can filter on the value of one or more attributes of the job object.\nFor example, retrieve jobs with a job identifier that starts with 'census':\n\u003cp\u003e\u003ccode\u003egcloud ai-platform jobs list --filter='jobId:census*'\u003c/code\u003e\n\u003cp\u003eList all failed jobs with names that start with 'rnn':\n\u003cp\u003e\u003ccode\u003egcloud ai-platform jobs list --filter='jobId:rnn*\nAND state:FAILED'\u003c/code\u003e\n\u003cp\u003eFor more examples, see the guide to\n\u003ca href=\"/ml-engine/docs/tensorflow/monitor-training\"\u003emonitoring jobs\u003c/a\u003e.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -4979,10 +5036,10 @@ func (r *ProjectsLocationsService) List(parent string) *ProjectsLocationsListCal
 }
 
 // PageSize sets the optional parameter "pageSize": The number of
-// locations to retrieve per "page" of results. If there
-// are more remaining results than this number, the response message
-// will
-// contain a valid value in the `next_page_token` field.
+// locations to retrieve per "page" of results. If
+// there are more remaining results than this number, the response
+// message
+// will contain a valid value in the `next_page_token` field.
 //
 // The default value is 20, and the maximum page size is 100.
 func (c *ProjectsLocationsListCall) PageSize(pageSize int64) *ProjectsLocationsListCall {
@@ -5109,7 +5166,7 @@ func (c *ProjectsLocationsListCall) Do(opts ...googleapi.CallOption) (*GoogleClo
 	//   ],
 	//   "parameters": {
 	//     "pageSize": {
-	//       "description": "Optional. The number of locations to retrieve per \"page\" of results. If there\nare more remaining results than this number, the response message will\ncontain a valid value in the `next_page_token` field.\n\nThe default value is 20, and the maximum page size is 100.",
+	//       "description": "Optional. The number of locations to retrieve per \"page\" of results. If\nthere are more remaining results than this number, the response message\nwill contain a valid value in the `next_page_token` field.\n\nThe default value is 20, and the maximum page size is 100.",
 	//       "format": "int32",
 	//       "location": "query",
 	//       "type": "integer"
