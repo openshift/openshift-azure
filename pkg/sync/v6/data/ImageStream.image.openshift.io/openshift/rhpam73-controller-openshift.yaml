@@ -25,3 +25,17 @@ spec:
     name: "1.0"
     referencePolicy:
       type: Local
+  - annotations:
+      description: Red Hat Process Automation Manager 7.3 - Standalone Controller
+        image.
+      iconClass: icon-jboss
+      supports: rhpam:7.3
+      tags: rhpam
+      version: "1.1"
+    from:
+      kind: DockerImage
+      name: registry.redhat.io/rhpam-7/rhpam73-controller-openshift:1.1
+    importPolicy: {}
+    name: "1.1"
+    referencePolicy:
+      type: Local

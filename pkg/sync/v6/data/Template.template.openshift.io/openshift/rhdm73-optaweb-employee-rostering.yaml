@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhdm: "1.0"
+  rhdm: "1.1"
   template: rhdm73-optaweb-employee-rostering
 message: |-
   A new Decision Manager Optaweb employee rostering application have been created in your project.
@@ -24,7 +24,7 @@ metadata:
       shift, taking into account labor regulations, skill requirements, employee preferences
       and other constraints.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "1.0"
+    version: "1.1"
   name: rhdm73-optaweb-employee-rostering
   namespace: openshift
 objects:
@@ -375,11 +375,11 @@ parameters:
   name: OPTAWEB_IMAGE_STREAM_NAME
   required: true
   value: rhdm73-optaweb-employee-rostering-openshift
-- description: A named pointer to an image in an image stream. Default is "1.0".
+- description: A named pointer to an image in an image stream. Default is "1.1".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: "1.0"
+  value: "1.1"
 - description: Optaweb employee rostering persistence datasource (Sets the org.optaweb.employeerostering.persistence.datasource
     system property)
   displayName: Optaweb Employee Rostering Persistence Datasource

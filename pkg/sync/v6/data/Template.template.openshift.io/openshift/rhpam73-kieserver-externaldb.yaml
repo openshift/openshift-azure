@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhpam: "1.0"
+  rhpam: "1.1"
   template: rhpam73-kieserver-externaldb
 message: |-
   A new Process Automation Manager KIE server application have been created in your project.
@@ -25,9 +25,9 @@ metadata:
     template.openshift.io/long-description: This template defines resources needed
       to execute Rules and Processes on Red Hat Process Automation Manager KIE server
       7.3, including application deployment configuration, secure and insecure http
-      communication using a external database.
+      communication, using a external database.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "1.0"
+    version: "1.1"
   name: rhpam73-kieserver-externaldb
   namespace: openshift
 objects:
@@ -95,6 +95,7 @@ objects:
   metadata:
     annotations:
       description: Route for KIE server's http service.
+      haproxy.router.openshift.io/balance: source
     labels:
       application: ${APPLICATION_NAME}
       service: ${APPLICATION_NAME}-kieserver
@@ -138,6 +139,7 @@ objects:
       deploymentConfig: ${APPLICATION_NAME}-kieserver
     strategy:
       rollingParams:
+        maxSurge: 100%
         maxUnavailable: 0
       type: Rolling
     template:
@@ -188,8 +190,14 @@ objects:
             value: ${KIE_SERVER_PWD}
           - name: KIE_SERVER_CONTAINER_DEPLOYMENT
             value: ${KIE_SERVER_CONTAINER_DEPLOYMENT}
+          - name: MAVEN_MIRROR_URL
+            value: ${MAVEN_MIRROR_URL}
+          - name: MAVEN_MIRROR_OF
+            value: ${MAVEN_MIRROR_OF}
           - name: MAVEN_REPOS
             value: RHPAMCENTR,EXTERNAL
+          - name: RHPAMCENTR_MAVEN_REPO_ID
+            value: repo-rhpamcentr
           - name: RHPAMCENTR_MAVEN_REPO_SERVICE
             value: ${BUSINESS_CENTRAL_MAVEN_SERVICE}
           - name: RHPAMCENTR_MAVEN_REPO_PATH
@@ -412,10 +420,22 @@ parameters:
   name: APPLICATION_NAME
   required: true
   value: myapp
-- description: The id to use for the maven repository, if set. Default is generated
-    randomly.
+- description: Maven mirror that the KIE server must use. If you configure a mirror,
+    this mirror must contain all artifacts that are required for building and deploying
+    your services.
+  displayName: Maven mirror URL
+  name: MAVEN_MIRROR_URL
+- description: Maven mirror configuration for KIE server.
+  displayName: Maven mirror of
+  name: MAVEN_MIRROR_OF
+  value: external:*
+- description: 'The id to use for the maven repository. If set, it can be excluded
+    from the optionally configured mirror by adding it to MAVEN_MIRROR_OF. For example:
+    external:*,!repo-rhpamcentr,!repo-custom. If MAVEN_MIRROR_URL is set but MAVEN_MIRROR_ID
+    is not set, an id will be generated randomly, but won''t be usable in MAVEN_MIRROR_OF.'
   displayName: Maven repository ID
   name: MAVEN_REPO_ID
+  value: repo-custom
 - description: Fully qualified URL to a Maven repository or service.
   displayName: Maven repository URL
   name: MAVEN_REPO_URL
@@ -427,7 +447,7 @@ parameters:
   displayName: Maven repository password
   name: MAVEN_REPO_PASSWORD
 - description: The service name for the optional business central, where it can be
-    reached, to allow service lookups (for maven repo usage), if required
+    reached, to allow service lookups (for maven repo usage), if required.
   displayName: Name of the Maven service hosted by Business Central
   name: BUSINESS_CENTRAL_MAVEN_SERVICE
 - description: Username to access the Maven service hosted by Business Central inside
@@ -438,20 +458,20 @@ parameters:
     EAP.
   displayName: Password for the Maven service hosted by Business Central
   name: BUSINESS_CENTRAL_MAVEN_PASSWORD
-- description: KIE administrator username
+- description: KIE administrator username.
   displayName: KIE Admin User
   name: KIE_ADMIN_USER
   value: adminUser
-- description: KIE administrator password
+- description: KIE administrator password.
   displayName: KIE Admin Password
   from: '[a-zA-Z]{6}[0-9]{1}!'
   generate: expression
   name: KIE_ADMIN_PWD
-- description: KIE server username (Sets the org.kie.server.user system property)
+- description: KIE server username. (Sets the org.kie.server.user system property)
   displayName: KIE Server User
   name: KIE_SERVER_USER
   value: executionUser
-- description: KIE server password (Sets the org.kie.server.pwd system property)
+- description: KIE server password. (Sets the org.kie.server.pwd system property)
   displayName: KIE Server Password
   from: '[a-zA-Z]{6}[0-9]{1}!'
   generate: expression
@@ -469,35 +489,35 @@ parameters:
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhpam73-kieserver-openshift
-- description: A named pointer to an image in an image stream. Default is "1.0".
+- description: A named pointer to an image in an image stream. Default is "1.1".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: "1.0"
+  value: "1.1"
 - description: The service name for the optional smart router.
   displayName: Smart Router Service
   name: KIE_SERVER_ROUTER_SERVICE
 - description: The host name of the smart router, which can be the service name resolved
-    by OpenShift or a globally resolvable domain name
+    by OpenShift or a globally resolvable domain name.
   displayName: Smart Router Host
   name: KIE_SERVER_ROUTER_HOST
-- description: Port on which the smart router server listens (router property org.kie.server.router.port)
+- description: Port on which the smart router server listens. (Router property org.kie.server.router.port)
   displayName: Smart Router listening port
   name: KIE_SERVER_ROUTER_PORT
-- description: KIE server router protocol (Used to build the org.kie.server.router.url.external
+- description: KIE server router protocol. (Used to build the org.kie.server.router.url.external
     property)
   displayName: Smart Router protocol
   name: KIE_SERVER_ROUTER_PROTOCOL
-- description: KIE server controller username (Sets the org.kie.server.controller.user
+- description: KIE server controller username. (Sets the org.kie.server.controller.user
     system property)
   displayName: KIE Server Controller User
   name: KIE_SERVER_CONTROLLER_USER
   value: controllerUser
-- description: KIE server controller password (Sets the org.kie.server.controller.pwd
+- description: KIE server controller password. (Sets the org.kie.server.controller.pwd
     system property)
   displayName: KIE Server Controller Password
   name: KIE_SERVER_CONTROLLER_PWD
-- description: KIE server controller token for bearer authentication (Sets the org.kie.server.controller.token
+- description: KIE server controller token for bearer authentication. (Sets the org.kie.server.controller.token
     system property)
   displayName: KIE Server Controller Token
   name: KIE_SERVER_CONTROLLER_TOKEN
@@ -506,18 +526,18 @@ parameters:
     set, will be used to discover host and port)
   displayName: KIE Server Controller Service
   name: KIE_SERVER_CONTROLLER_SERVICE
-- description: KIE server controller host (Used to set the org.kie.server.controller
+- description: KIE server controller host. (Used to set the org.kie.server.controller
     system property)
   displayName: KIE Server Controller host
   name: KIE_SERVER_CONTROLLER_HOST
-- description: KIE server controller port (Used to set the org.kie.server.controller
+- description: KIE server controller port. (Used to set the org.kie.server.controller
     system property)
   displayName: KIE Server Controller port
   name: KIE_SERVER_CONTROLLER_PORT
 - description: Hibernate persistence schema.
   displayName: KIE Server Persistence Schema
   name: KIE_SERVER_PERSISTENCE_SCHEMA
-- description: KIE server external database Hibernate dialect
+- description: KIE server external database Hibernate dialect.
   displayName: KIE Server External Database Dialect
   name: KIE_SERVER_EXTERNALDB_DIALECT
   required: true
@@ -535,9 +555,9 @@ parameters:
     to true. Default value is false.
   displayName: Non XA datasource
   name: KIE_SERVER_EXTERNALDB_NONXA
-- description: Sets the datasources jdbc connection url. Note that, if you are using
+- description: Sets the datasource jdbc connection url. Note that, if you are using
     PostgreSQL do not use this field, use the SERVICE_HOST and PORT. If using SERVICE_PORT
-    and HOST there is no need to fill this parameter
+    and HOST there is no need to fill this parameter.
   displayName: KIE Server External Database URL
   name: KIE_SERVER_EXTERNALDB_URL
 - description: The predefined driver name, available values are mysql, postgresql
@@ -546,7 +566,7 @@ parameters:
   name: KIE_SERVER_EXTERNALDB_DRIVER
   required: true
 - description: Database JNDI name used by application to resolve the datasource, e.g.
-    java:/jboss/datasources/ExampleDS
+    java:/jboss/datasources/ExampleDS.
   displayName: Database JNDI Name
   name: KIE_SERVER_EXTERNALDB_JNDI
   required: true
@@ -592,6 +612,8 @@ parameters:
   displayName: KIE Server External Database Driver Type
   name: KIE_SERVER_EXTERNALDB_DRIVER_TYPE
 - description: The KIE Server mode. Valid values are 'DEVELOPMENT' or 'PRODUCTION'.
+    In production mode, you can not deploy SNAPSHOT versions of artifacts on the KIE
+    server and can not change the version of an artifact in an existing container.
     (Sets the org.kie.server.mode system property).
   displayName: KIE Server Mode
   name: KIE_SERVER_MODE
@@ -614,30 +636,32 @@ parameters:
     hostname, e.g.: secure-<application-name>-kieserver-<project>.<default-domain-suffix>'
   displayName: KIE Server Custom https Route Hostname
   name: KIE_SERVER_HOSTNAME_HTTPS
-- description: If true, will use secure-APPLICATION_NAME-kieserver vs. APPLICATION_NAME-kieserver
-    as the route name.
+- description: If true, the KIE server will use secure-<application-name>-kieserver
+    vs. <application-name>-kieserver as the KIE server route endpoint for Business
+    Central to report. Therefore, Business Central displays the secure link to the
+    user.
   displayName: Use the secure route name to link application requests to KIE_SERVER_HOSTNAME_HTTPS
     vs KIE_SERVER_HOSTNAME_HTTP.
   name: KIE_SERVER_USE_SECURE_ROUTE_NAME
   value: "false"
-- description: The name of the secret containing the keystore file
+- description: The name of the secret containing the keystore file.
   displayName: KIE Server Keystore Secret Name
   name: KIE_SERVER_HTTPS_SECRET
   required: true
-- description: The name of the keystore file within the secret
+- description: The name of the keystore file within the secret.
   displayName: KIE Server Keystore Filename
   name: KIE_SERVER_HTTPS_KEYSTORE
   value: keystore.jks
-- description: The name associated with the server certificate
+- description: The name associated with the server certificate.
   displayName: KIE Server Certificate Name
   name: KIE_SERVER_HTTPS_NAME
   value: jboss
-- description: The password for the keystore and certificate
+- description: The password for the keystore and certificate.
   displayName: KIE Server Keystore Password
   name: KIE_SERVER_HTTPS_PASSWORD
   value: mykeystorepass
-- description: KIE server bypass auth user (Sets the org.kie.server.bypass.auth.user
-    system property)
+- description: Allows the KIE server to bypass the authenticated user for task related
+    operations e.g. queries. (Sets the org.kie.server.bypass.auth.user system property)
   displayName: KIE Server Bypass Auth User
   name: KIE_SERVER_BYPASS_AUTH_USER
   value: "false"
@@ -645,7 +669,7 @@ parameters:
   displayName: Timer service data store refresh interval (in milliseconds)
   name: TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL
   value: "30000"
-- description: KIE server Container memory limit
+- description: KIE server Container memory limit.
   displayName: KIE Server Container Memory Limit
   name: KIE_SERVER_MEMORY_LIMIT
   value: 1Gi
@@ -653,36 +677,37 @@ parameters:
   displayName: KIE Server Container Deployment
   name: KIE_SERVER_CONTAINER_DEPLOYMENT
 - description: Disable management api and don't allow KIE containers to be deployed/undeployed
-    or started/stopped sets the property org.kie.server.mgmt.api.disabled to true
+    or started/stopped. Sets the property org.kie.server.mgmt.api.disabled to true
     and org.kie.server.startup.strategy to LocalContainersStartupStrategy.
   displayName: Disable KIE Server Management
   name: KIE_SERVER_MGMT_DISABLED
 - description: When set to OpenShiftStartupStrategy, allows KIE server to start up
-    independently used shared state from OpenShift API service; when set to LocalContainersStartupStrategy,
+    independently using shared state from OpenShift API service and to connect to
+    a Business Central that uses OpenShift integration. When set to LocalContainersStartupStrategy,
     allows KIE server to start up and function with local config, even when a controller
-    is configured and unavailable
+    is configured and unavailable.
   displayName: KIE Server Startup Strategy
   name: KIE_SERVER_STARTUP_STRATEGY
-- description: RH-SSO URL
+- description: RH-SSO URL.
   displayName: RH-SSO URL
   name: SSO_URL
-- description: RH-SSO Realm name
+- description: RH-SSO Realm name.
   displayName: RH-SSO Realm name
   name: SSO_REALM
-- description: KIE Server RH-SSO Client name
+- description: KIE Server RH-SSO Client name.
   displayName: KIE Server RH-SSO Client name
   name: KIE_SERVER_SSO_CLIENT
-- description: KIE Server RH-SSO Client Secret
+- description: KIE Server RH-SSO Client Secret.
   displayName: KIE Server RH-SSO Client Secret
   name: KIE_SERVER_SSO_SECRET
 - description: RH-SSO Realm Admin Username used to create the Client if it doesn't
-    exist
+    exist.
   displayName: RH-SSO Realm Admin Username
   name: SSO_USERNAME
-- description: RH-SSO Realm Admin Password used to create the Client
+- description: RH-SSO Realm Admin Password used to create the Client.
   displayName: RH-SSO Realm Admin Password
   name: SSO_PASSWORD
-- description: RH-SSO Disable SSL Certificate Validation
+- description: RH-SSO Disable SSL Certificate Validation.
   displayName: RH-SSO Disable SSL Certificate Validation
   name: SSO_DISABLE_SSL_CERTIFICATE_VALIDATION
   value: "false"
@@ -690,13 +715,13 @@ parameters:
   displayName: RH-SSO Principal Attribute
   name: SSO_PRINCIPAL_ATTRIBUTE
   value: preferred_username
-- description: LDAP Endpoint to connect for authentication
+- description: LDAP Endpoint to connect for authentication.
   displayName: LDAP Endpoint
   name: AUTH_LDAP_URL
-- description: Bind DN used for authentication
+- description: Bind DN used for authentication.
   displayName: LDAP Bind DN
   name: AUTH_LDAP_BIND_DN
-- description: LDAP Credentials used for authentication
+- description: LDAP Credentials used for authentication.
   displayName: LDAP Bind Credentials
   name: AUTH_LDAP_BIND_CREDENTIAL
 - description: The JMX ObjectName of the JaasSecurityDomain used to decrypt the password.
@@ -759,7 +784,7 @@ parameters:
     context. Disable recursion by setting this to 0.
   displayName: LDAP Role recursion
   name: AUTH_LDAP_ROLE_RECURSION
-- description: A role included for all authenticated users
+- description: A role included for all authenticated users.
   displayName: LDAP Default role
   name: AUTH_LDAP_DEFAULT_ROLE
 - description: Name of the attribute within the roleCtxDN context which contains the

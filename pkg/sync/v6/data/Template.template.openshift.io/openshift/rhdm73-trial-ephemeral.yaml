@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhdm: "1.0"
+  rhdm: "1.1"
   template: rhdm73-trial-ephemeral
 message: |-
   A new Decision Manager trial environment has been created.
@@ -31,7 +31,7 @@ metadata:
       7.3, including application deployment configuration, secure and insecure http
       communication.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "1.0"
+    version: "1.1"
   name: rhdm73-trial-ephemeral
   namespace: openshift
 objects:
@@ -343,6 +343,8 @@ objects:
             value: ${KIE_SERVER_CONTAINER_DEPLOYMENT}
           - name: MAVEN_REPOS
             value: RHDMCENTR,EXTERNAL
+          - name: RHDMCENTR_MAVEN_REPO_ID
+            value: repo-rhdmcentr
           - name: RHDMCENTR_MAVEN_REPO_SERVICE
             value: ${APPLICATION_NAME}-rhdmcentr
           - name: RHDMCENTR_MAVEN_REPO_PATH
@@ -500,40 +502,42 @@ parameters:
   required: true
   value: myapp
 - description: Default password used for multiple components for user convenience
-    in this trial environment
+    in this trial environment.
   displayName: Default Password
   name: DEFAULT_PASSWORD
   required: true
   value: RedHat
-- description: KIE administrator username
+- description: KIE administrator username.
   displayName: KIE Admin User
   name: KIE_ADMIN_USER
   value: adminUser
-- description: KIE server username (Sets the org.kie.server.user system property)
+- description: KIE server username. (Sets the org.kie.server.user system property)
   displayName: KIE Server User
   name: KIE_SERVER_USER
   value: executionUser
-- description: KIE server bypass auth user (Sets the org.kie.server.bypass.auth.user
-    system property)
+- description: Allows the KIE server to bypass the authenticated user for task related
+    operations e.g. queries. (Sets the org.kie.server.bypass.auth.user system property)
   displayName: KIE Server Bypass Auth User
   name: KIE_SERVER_BYPASS_AUTH_USER
   value: "false"
-- description: KIE server controller username (Sets the org.kie.server.controller.user
+- description: KIE server controller username. (Sets the org.kie.server.controller.user
     system property)
   displayName: KIE Server Controller User
   name: KIE_SERVER_CONTROLLER_USER
   value: controllerUser
 - description: The KIE Server mode. Valid values are 'DEVELOPMENT' or 'PRODUCTION'.
+    In production mode, you can not deploy SNAPSHOT versions of artifacts on the KIE
+    server and can not change the version of an artifact in an existing container.
     (Sets the org.kie.server.mode system property).
   displayName: KIE Server Mode
   name: KIE_SERVER_MODE
   value: DEVELOPMENT
-- description: KIE server mbeans enabled/disabled (Sets the kie.mbeans and kie.scanner.mbeans
+- description: KIE server mbeans enabled/disabled. (Sets the kie.mbeans and kie.scanner.mbeans
     system properties)
   displayName: KIE MBeans
   name: KIE_MBEANS
   value: enabled
-- description: KIE server class filtering (Sets the org.drools.server.filter.classes
+- description: KIE server class filtering. (Sets the org.drools.server.filter.classes
     system property)
   displayName: Drools Server Filter Classes
   name: DROOLS_SERVER_FILTER_CLASSES
@@ -543,27 +547,27 @@ parameters:
   displayName: KIE Server Custom http Route Hostname
   name: KIE_SERVER_HOSTNAME_HTTP
 - description: Sets the Access-Control-Allow-Origin response header value in the KIE
-    Server (useful for CORS support)
+    Server (useful for CORS support).
   displayName: KIE Server Access-Control-Allow-Origin response header
   name: KIE_SERVER_ACCESS_CONTROL_ALLOW_ORIGIN
   value: '*'
 - description: Sets the Access-Control-Allow-Methods response header value in the
-    KIE Server (useful for CORS support)
+    KIE Server (useful for CORS support).
   displayName: KIE Server Access-Control-Allow-Methods response header
   name: KIE_SERVER_ACCESS_CONTROL_ALLOW_METHODS
   value: GET, POST, OPTIONS, PUT
 - description: Sets the Access-Control-Allow-Headers response header value in the
-    KIE Server (useful for CORS support)
+    KIE Server (useful for CORS support).
   displayName: KIE Server Access-Control-Allow-Headers response header
   name: KIE_SERVER_ACCESS_CONTROL_ALLOW_HEADERS
   value: Accept, Authorization, Content-Type, X-Requested-With
 - description: Sets the Access-Control-Allow-Credentials response header value in
-    the KIE Server (useful for CORS support)
+    the KIE Server (useful for CORS support).
   displayName: KIE Server Access-Control-Allow-Credentials response header
   name: KIE_SERVER_ACCESS_CONTROL_ALLOW_CREDENTIALS
   value: "true"
 - description: Sets the Access-Control-Max-Age response header value in the KIE Server
-    (useful for CORS support)
+    (useful for CORS support).
   displayName: KIE Server Access-Control-Max-Age response header
   name: KIE_SERVER_ACCESS_CONTROL_MAX_AGE
   value: "1"
@@ -584,11 +588,11 @@ parameters:
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhdm73-kieserver-openshift
-- description: A named pointer to an image in an image stream. Default is "1.0".
+- description: A named pointer to an image in an image stream. Default is "1.1".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: "1.0"
+  value: "1.1"
 - description: 'KIE Server Container deployment configuration in format: containerId=groupId:artifactId:version|c2=g2:a2:v2'
   displayName: KIE Server Container Deployment
   name: KIE_SERVER_CONTAINER_DEPLOYMENT
@@ -596,6 +600,7 @@ parameters:
     randomly.
   displayName: Maven repository ID
   name: MAVEN_REPO_ID
+  value: repo-custom
 - description: Fully qualified URL to a Maven repository or service.
   displayName: Maven repository URL
   name: MAVEN_REPO_URL
@@ -614,40 +619,40 @@ parameters:
 - description: The directory to use for git hooks, if required.
   displayName: Git hooks directory
   name: GIT_HOOKS_DIR
-- description: Decision Central Container memory limit
+- description: Decision Central Container memory limit.
   displayName: Decision Central Container Memory Limit
   name: DECISION_CENTRAL_MEMORY_LIMIT
   value: 2Gi
-- description: KIE server Container memory limit
+- description: KIE server Container memory limit.
   displayName: KIE Server Container Memory Limit
   name: KIE_SERVER_MEMORY_LIMIT
   value: 1Gi
-- description: RH-SSO URL
+- description: RH-SSO URL.
   displayName: RH-SSO URL
   name: SSO_URL
-- description: RH-SSO Realm name
+- description: RH-SSO Realm name.
   displayName: RH-SSO Realm name
   name: SSO_REALM
-- description: Decision Central RH-SSO Client name
+- description: Decision Central RH-SSO Client name.
   displayName: Decision Central RH-SSO Client name
   name: DECISION_CENTRAL_SSO_CLIENT
-- description: Decision Central RH-SSO Client Secret
+- description: Decision Central RH-SSO Client Secret.
   displayName: Decision Central RH-SSO Client Secret
   name: DECISION_CENTRAL_SSO_SECRET
-- description: KIE Server RH-SSO Client name
+- description: KIE Server RH-SSO Client name.
   displayName: KIE Server RH-SSO Client name
   name: KIE_SERVER_SSO_CLIENT
-- description: KIE Server RH-SSO Client Secret
+- description: KIE Server RH-SSO Client Secret.
   displayName: KIE Server RH-SSO Client Secret
   name: KIE_SERVER_SSO_SECRET
 - description: RH-SSO Realm Admin Username used to create the Client if it doesn't
-    exist
+    exist.
   displayName: RH-SSO Realm Admin Username
   name: SSO_USERNAME
-- description: RH-SSO Realm Admin Password used to create the Client
+- description: RH-SSO Realm Admin Password used to create the Client.
   displayName: RH-SSO Realm Admin Password
   name: SSO_PASSWORD
-- description: RH-SSO Disable SSL Certificate Validation
+- description: RH-SSO Disable SSL Certificate Validation.
   displayName: RH-SSO Disable SSL Certificate Validation
   name: SSO_DISABLE_SSL_CERTIFICATE_VALIDATION
   value: "false"
@@ -655,13 +660,13 @@ parameters:
   displayName: RH-SSO Principal Attribute
   name: SSO_PRINCIPAL_ATTRIBUTE
   value: preferred_username
-- description: LDAP Endpoint to connect for authentication
+- description: LDAP Endpoint to connect for authentication.
   displayName: LDAP Endpoint
   name: AUTH_LDAP_URL
-- description: Bind DN used for authentication
+- description: Bind DN used for authentication.
   displayName: LDAP Bind DN
   name: AUTH_LDAP_BIND_DN
-- description: LDAP Credentials used for authentication
+- description: LDAP Credentials used for authentication.
   displayName: LDAP Bind Credentials
   name: AUTH_LDAP_BIND_CREDENTIAL
 - description: The JMX ObjectName of the JaasSecurityDomain used to decrypt the password.
@@ -724,7 +729,7 @@ parameters:
     context. Disable recursion by setting this to 0.
   displayName: LDAP Role recursion
   name: AUTH_LDAP_ROLE_RECURSION
-- description: A role included for all authenticated users
+- description: A role included for all authenticated users.
   displayName: LDAP Default role
   name: AUTH_LDAP_DEFAULT_ROLE
 - description: Name of the attribute within the roleCtxDN context which contains the
@@ -753,7 +758,7 @@ parameters:
   displayName: LDAP Referral user attribute ID
   name: AUTH_LDAP_REFERRAL_USER_ATTRIBUTE_ID_TO_CHECK
 - description: When present, the RoleMapping Login Module will be configured to use
-    the provided file. This property defines the fully-qualified file path and name
+    the provided file. This parameter defines the fully-qualified file path and name
     of a properties file or resource which maps roles to replacement roles. The format
     is original_role=role1,role2,role3
   displayName: RoleMapping rolesProperties file path
