@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  rhpam: "1.0"
+  rhpam: "1.1"
   template: rhpam73-authoring-ha
 message: |-
   A new persistent HA Process Automation Manager application has been created in your project.
@@ -34,7 +34,7 @@ metadata:
       configuration, secure and insecure http communication and persistent volumes
       to store data that needs to survive a restart.
     template.openshift.io/support-url: https://access.redhat.com
-    version: "1.0"
+    version: "1.1"
   name: rhpam73-authoring-ha
   namespace: openshift
 objects:
@@ -655,8 +655,12 @@ objects:
             value: ${KIE_SERVER_USER}
           - name: MAVEN_MIRROR_URL
             value: ${MAVEN_MIRROR_URL}
+          - name: MAVEN_MIRROR_OF
+            value: ${MAVEN_MIRROR_OF}
           - name: MAVEN_REPOS
             value: RHPAMCENTR,EXTERNAL
+          - name: RHPAMCENTR_MAVEN_REPO_ID
+            value: repo-rhpamcentr
           - name: RHPAMCENTR_MAVEN_REPO_SERVICE
             value: ${APPLICATION_NAME}-rhpamcentr
           - name: RHPAMCENTR_MAVEN_REPO_PATH
@@ -1314,59 +1318,59 @@ parameters:
   name: APPLICATION_NAME
   required: true
   value: myapp
-- description: KIE administrator username
+- description: KIE administrator username.
   displayName: KIE Admin User
   name: KIE_ADMIN_USER
   value: adminUser
-- description: KIE administrator password
+- description: KIE administrator password.
   displayName: KIE Admin Password
   from: '[a-zA-Z]{6}[0-9]{1}!'
   generate: expression
   name: KIE_ADMIN_PWD
-- description: KIE server controller username (Sets the org.kie.server.controller.user
+- description: KIE server controller username. (Sets the org.kie.server.controller.user
     system property)
   displayName: KIE Server Controller User
   name: KIE_SERVER_CONTROLLER_USER
   value: controllerUser
-- description: KIE server controller password (Sets the org.kie.server.controller.pwd
+- description: KIE server controller password. (Sets the org.kie.server.controller.pwd
     system property)
   displayName: KIE Server Controller Password
   from: '[a-zA-Z]{6}[0-9]{1}!'
   generate: expression
   name: KIE_SERVER_CONTROLLER_PWD
-- description: KIE server controller token for bearer authentication (Sets the org.kie.server.controller.token
+- description: KIE server controller token for bearer authentication. (Sets the org.kie.server.controller.token
     system property)
   displayName: KIE Server Controller Token
   name: KIE_SERVER_CONTROLLER_TOKEN
-- description: KIE server username (Sets the org.kie.server.user system property)
+- description: KIE server username. (Sets the org.kie.server.user system property)
   displayName: KIE Server User
   name: KIE_SERVER_USER
   value: executionUser
-- description: KIE server password (Sets the org.kie.server.pwd system property)
+- description: KIE server password. (Sets the org.kie.server.pwd system property)
   displayName: KIE Server Password
   from: '[a-zA-Z]{6}[0-9]{1}!'
   generate: expression
   name: KIE_SERVER_PWD
-- description: KIE server bypass auth user (Sets the org.kie.server.bypass.auth.user
-    system property)
+- description: Allows the KIE server to bypass the authenticated user for task related
+    operations e.g. queries. (Sets the org.kie.server.bypass.auth.user system property)
   displayName: KIE Server Bypass Auth User
   name: KIE_SERVER_BYPASS_AUTH_USER
   value: "false"
-- description: KIE server persistence datasource (Sets the org.kie.server.persistence.ds
+- description: KIE server persistence datasource. (Sets the org.kie.server.persistence.ds
     system property)
   displayName: KIE Server Persistence DS
   name: KIE_SERVER_PERSISTENCE_DS
   value: java:/jboss/datasources/rhpam
-- description: KIE server MySQL database username
+- description: KIE server MySQL database username.
   displayName: KIE Server MySQL Database User
   name: KIE_SERVER_MYSQL_USER
   value: rhpam
-- description: KIE server MySQL database password
+- description: KIE server MySQL database password.
   displayName: KIE Server MySQL Database Password
   from: '[a-zA-Z]{6}[0-9]{1}!'
   generate: expression
   name: KIE_SERVER_MYSQL_PWD
-- description: KIE server MySQL database name
+- description: KIE server MySQL database name.
   displayName: KIE Server MySQL Database Name
   name: KIE_SERVER_MYSQL_DB
   value: rhpam7
@@ -1387,77 +1391,81 @@ parameters:
   name: DB_VOLUME_CAPACITY
   required: true
   value: 1Gi
-- description: KIE server MySQL Hibernate dialect
+- description: KIE server MySQL Hibernate dialect.
   displayName: KIE Server MySQL Dialect
   name: KIE_SERVER_MYSQL_DIALECT
   required: true
   value: org.hibernate.dialect.MySQL57Dialect
 - description: The KIE Server mode. Valid values are 'DEVELOPMENT' or 'PRODUCTION'.
+    In production mode, you can not deploy SNAPSHOT versions of artifacts on the KIE
+    server and can not change the version of an artifact in an existing container.
     (Sets the org.kie.server.mode system property).
   displayName: KIE Server Mode
   name: KIE_SERVER_MODE
   value: DEVELOPMENT
-- description: KIE server mbeans enabled/disabled (Sets the kie.mbeans and kie.scanner.mbeans
+- description: KIE server mbeans enabled/disabled. (Sets the kie.mbeans and kie.scanner.mbeans
     system properties)
   displayName: KIE MBeans
   name: KIE_MBEANS
   value: enabled
-- description: KIE server class filtering (Sets the org.drools.server.filter.classes
+- description: KIE server class filtering. (Sets the org.drools.server.filter.classes
     system property)
   displayName: Drools Server Filter Classes
   name: DROOLS_SERVER_FILTER_CLASSES
   value: "true"
-- description: 'Custom hostname for http service route.  Leave blank for default hostname,
-    e.g.: <application-name>-rhpamcentr-<project>.<default-domain-suffix>'
+- description: 'Custom hostname for http service route for Business Central. Leave
+    blank for default hostname, e.g.: <application-name>-rhpamcentr-<project>.<default-domain-suffix>'
   displayName: Business Central Custom http Route Hostname
   name: BUSINESS_CENTRAL_HOSTNAME_HTTP
-- description: 'Custom hostname for https service route.  Leave blank for default
-    hostname, e.g.: secure-<application-name>-rhpamcentr-<project>.<default-domain-suffix>'
+- description: 'Custom hostname for https service route for Business Central. Leave
+    blank for default hostname, e.g.: secure-<application-name>-rhpamcentr-<project>.<default-domain-suffix>'
   displayName: Business Central Custom https Route Hostname
   name: BUSINESS_CENTRAL_HOSTNAME_HTTPS
-- description: 'Custom hostname for http service route. Leave blank for default hostname,
-    e.g.: <application-name>-kieserver-<project>.<default-domain-suffix>'
+- description: 'Custom hostname for http service route for KIE Server. Leave blank
+    for default hostname, e.g.: <application-name>-kieserver-<project>.<default-domain-suffix>'
   displayName: KIE Server Custom http Route Hostname
   name: KIE_SERVER_HOSTNAME_HTTP
-- description: 'Custom hostname for https service route.  Leave blank for default
-    hostname, e.g.: secure-<application-name>-kieserver-<project>.<default-domain-suffix>'
+- description: 'Custom hostname for https service route for KIE Server. Leave blank
+    for default hostname, e.g.: secure-<application-name>-kieserver-<project>.<default-domain-suffix>'
   displayName: KIE Server Custom https Route Hostname
   name: KIE_SERVER_HOSTNAME_HTTPS
-- description: If true, will use secure-APPLICATION_NAME-kieserver vs. APPLICATION_NAME-kieserver
-    as the route name.
+- description: If true, the KIE server will use secure-<application-name>-kieserver
+    vs. <application-name>-kieserver as the KIE server route endpoint for Business
+    Central to report. Therefore, Business Central displays the secure link to the
+    user.
   displayName: Use the secure route name to link application requests to KIE_SERVER_HOSTNAME_HTTPS
     vs KIE_SERVER_HOSTNAME_HTTP.
   name: KIE_SERVER_USE_SECURE_ROUTE_NAME
   value: "false"
-- description: The name of the secret containing the keystore file
+- description: The name of the secret containing the keystore file for Business Central.
   displayName: Business Central Server Keystore Secret Name
   name: BUSINESS_CENTRAL_HTTPS_SECRET
   required: true
-- description: The name of the keystore file within the secret
+- description: The name of the keystore file within the secret.
   displayName: Business Central Server Keystore Filename
   name: BUSINESS_CENTRAL_HTTPS_KEYSTORE
   value: keystore.jks
-- description: The name associated with the server certificate
+- description: The name associated with the server certificate.
   displayName: Business Central Server Certificate Name
   name: BUSINESS_CENTRAL_HTTPS_NAME
   value: jboss
-- description: The password for the keystore and certificate
+- description: The password for the keystore and certificate.
   displayName: Business Central Server Keystore Password
   name: BUSINESS_CENTRAL_HTTPS_PASSWORD
   value: mykeystorepass
-- description: The name of the secret containing the keystore file
+- description: The name of the secret containing the keystore file for KIE Server.
   displayName: KIE Server Keystore Secret Name
   name: KIE_SERVER_HTTPS_SECRET
   required: true
-- description: The name of the keystore file within the secret
+- description: The name of the keystore file within the secret.
   displayName: KIE Server Keystore Filename
   name: KIE_SERVER_HTTPS_KEYSTORE
   value: keystore.jks
-- description: The name associated with the server certificate
+- description: The name associated with the server certificate.
   displayName: KIE Server Certificate Name
   name: KIE_SERVER_HTTPS_NAME
   value: jboss
-- description: The password for the keystore and certificate
+- description: The password for the keystore and certificate.
   displayName: KIE Server Keystore Password
   name: KIE_SERVER_HTTPS_PASSWORD
   value: mykeystorepass
@@ -1465,7 +1473,7 @@ parameters:
     node before give up.
   displayName: AppFormer elastic search reconnection tries.
   name: APPFORMER_ELASTIC_RETRIES
-- description: The port to connect to the JMS broker. Defaults to 61616
+- description: The port to connect to the JMS broker. Defaults to 61616.
   displayName: AppFormer JMS Broker port.
   name: APPFORMER_JMS_BROKER_PORT
   value: "61616"
@@ -1480,8 +1488,8 @@ parameters:
   generate: expression
   name: APPFORMER_JMS_BROKER_PASSWORD
   required: true
-- description: 'Custom hostname for http service route.  Leave blank for default hostname,
-    e.g.: <application-name>-rhpamindex-<project>.<default-domain-suffix>'
+- description: 'Custom hostname for http service route for Elasticsearch.  Leave blank
+    for default hostname, e.g.: <application-name>-rhpamindex-<project>.<default-domain-suffix>'
   displayName: Elasticsearch Custom http Route Hostname
   name: ES_HOSTNAME_HTTP
 - description: Sets the ES cluster.name and configure it on Business Central. Defaults
@@ -1560,20 +1568,24 @@ parameters:
   name: ES_VOLUME_CAPACITY
   required: true
   value: 1Gi
-- description: Enables connection to KIE Server via OpenShift internal Service endpoint
-    (Sets the org.kie.server.controller.openshift.prefer.kieserver.service system
-    property)
+- description: If OpenShift integration of Business Central is turned on, setting
+    this parameter to true enables connection to KIE Server via an OpenShift internal
+    Service endpoint. (Sets the org.kie.server.controller.openshift.prefer.kieserver.service
+    system property)
   displayName: Prefer KIE Server OpenShift Service [Tech Preview]
   name: KIE_SERVER_CONTROLLER_OPENSHIFT_PREFER_KIESERVER_SERVICE
   value: "false"
-- description: KIE ServerTemplate Cache TTL in milliseconds (Sets the org.kie.server.controller.template.cache.ttl
+- description: KIE ServerTemplate Cache TTL in milliseconds. (Sets the org.kie.server.controller.template.cache.ttl
     system property)
   displayName: KIE ServerTemplate Cache TTL [Tech Preview]
   name: KIE_SERVER_CONTROLLER_TEMPLATE_CACHE_TTL
   value: "60000"
-- description: If set to true, turns on OpenShift integration feature (Sets the org.kie.workbench.controller.openshift.enabled
-    system property)
-  displayName: Enable OpenShift Integration [Tech Preview]
+- description: If set to true, turns on OpenShift integration feature in Business
+    Central. With OpenShift integration, Business Central automatically discovers
+    and connects to any KIE server in the same namespace, provided that OpenShift
+    integration (OpenShiftStartupStrategy) is enabled on the KIE server. (Sets the
+    org.kie.workbench.controller.openshift.enabled system property)
+  displayName: Enable OpenShift Integration. [Tech Preview]
   name: KIE_WORKBENCH_CONTROLLER_OPENSHIFT_ENABLED
   value: "false"
 - description: Namespace in which the ImageStreams for Red Hat Middleware images are
@@ -1589,18 +1601,27 @@ parameters:
   name: KIE_SERVER_IMAGE_STREAM_NAME
   required: true
   value: rhpam73-kieserver-openshift
-- description: A named pointer to an image in an image stream. Default is "1.0".
+- description: A named pointer to an image in an image stream. Default is "1.1".
   displayName: ImageStream Tag
   name: IMAGE_STREAM_TAG
   required: true
-  value: "1.0"
-- description: Maven mirror to use by Business Central and KIE server.
+  value: "1.1"
+- description: Maven mirror that Business Central and KIE server must use. If you
+    configure a mirror, this mirror must contain all artifacts that are required for
+    building and deploying your services.
   displayName: Maven mirror URL
   name: MAVEN_MIRROR_URL
-- description: The id to use for the maven repository, if set. Default is generated
-    randomly.
+- description: Maven mirror configuration for KIE server.
+  displayName: Maven mirror of
+  name: MAVEN_MIRROR_OF
+  value: external:*,!repo-rhpamcentr
+- description: 'The id to use for the maven repository. If set, it can be excluded
+    from the optionally configured mirror by adding it to MAVEN_MIRROR_OF. For example:
+    external:*,!repo-rhpamcentr,!repo-custom. If MAVEN_MIRROR_URL is set but MAVEN_MIRROR_ID
+    is not set, an id will be generated randomly, but won''t be usable in MAVEN_MIRROR_OF.'
   displayName: Maven repository ID
   name: MAVEN_REPO_ID
+  value: repo-custom
 - description: Fully qualified URL to a Maven repository or service.
   displayName: Maven repository URL
   name: MAVEN_REPO_URL
@@ -1631,50 +1652,51 @@ parameters:
   name: TIMER_SERVICE_DATA_STORE_REFRESH_INTERVAL
   required: true
   value: "60000"
-- description: Size of the persistent storage for Business Central's runtime data.
+- description: Size of the persistent storage for Business Central runtime data.
   displayName: Business Central Volume Capacity
   name: BUSINESS_CENTRAL_VOLUME_CAPACITY
   required: true
   value: 1Gi
-- description: Business Central Container memory limit
+- description: Business Central Container memory limit.
   displayName: Business Central Container Memory Limit
   name: BUSINESS_CENTRAL_MEMORY_LIMIT
   value: 2Gi
-- description: KIE server Container memory limit
+- description: KIE server Container memory limit.
   displayName: KIE Server Container Memory Limit
   name: KIE_SERVER_MEMORY_LIMIT
   value: 1Gi
 - description: 'When set to OpenShiftStartupStrategy, allows KIE server to start up
-    independently used shared state from OpenShift API service. Default: ControllerBasedStartupStrategy'
+    independently using shared state from OpenShift API service and to connect to
+    a Business Central that uses OpenShift integration. Default: ControllerBasedStartupStrategy'
   displayName: KIE Server Startup Strategy
   name: KIE_SERVER_STARTUP_STRATEGY
   value: ControllerBasedStartupStrategy
-- description: RH-SSO URL
+- description: RH-SSO URL.
   displayName: RH-SSO URL
   name: SSO_URL
-- description: RH-SSO Realm name
+- description: RH-SSO Realm name.
   displayName: RH-SSO Realm name
   name: SSO_REALM
-- description: Business Central RH-SSO Client name
+- description: Business Central RH-SSO Client name.
   displayName: Business Central RH-SSO Client name
   name: BUSINESS_CENTRAL_SSO_CLIENT
-- description: Business Central RH-SSO Client Secret
+- description: Business Central RH-SSO Client Secret.
   displayName: Business Central RH-SSO Client Secret
   name: BUSINESS_CENTRAL_SSO_SECRET
-- description: KIE Server RH-SSO Client name
+- description: KIE Server RH-SSO Client name.
   displayName: KIE Server RH-SSO Client name
   name: KIE_SERVER_SSO_CLIENT
-- description: KIE Server RH-SSO Client Secret
+- description: KIE Server RH-SSO Client Secret.
   displayName: KIE Server RH-SSO Client Secret
   name: KIE_SERVER_SSO_SECRET
 - description: RH-SSO Realm Admin Username used to create the Client if it doesn't
-    exist
+    exist.
   displayName: RH-SSO Realm Admin Username
   name: SSO_USERNAME
-- description: RH-SSO Realm Admin Password used to create the Client
+- description: RH-SSO Realm Admin Password used to create the Client.
   displayName: RH-SSO Realm Admin Password
   name: SSO_PASSWORD
-- description: RH-SSO Disable SSL Certificate Validation
+- description: RH-SSO Disable SSL Certificate Validation.
   displayName: RH-SSO Disable SSL Certificate Validation
   name: SSO_DISABLE_SSL_CERTIFICATE_VALIDATION
   value: "false"
@@ -1682,13 +1704,13 @@ parameters:
   displayName: RH-SSO Principal Attribute
   name: SSO_PRINCIPAL_ATTRIBUTE
   value: preferred_username
-- description: LDAP Endpoint to connect for authentication
+- description: LDAP Endpoint to connect for authentication.
   displayName: LDAP Endpoint
   name: AUTH_LDAP_URL
-- description: Bind DN used for authentication
+- description: Bind DN used for authentication.
   displayName: LDAP Bind DN
   name: AUTH_LDAP_BIND_DN
-- description: LDAP Credentials used for authentication
+- description: LDAP Credentials used for authentication.
   displayName: LDAP Bind Credentials
   name: AUTH_LDAP_BIND_CREDENTIAL
 - description: The JMX ObjectName of the JaasSecurityDomain used to decrypt the password.
@@ -1780,7 +1802,7 @@ parameters:
   displayName: LDAP Referral user attribute ID
   name: AUTH_LDAP_REFERRAL_USER_ATTRIBUTE_ID_TO_CHECK
 - description: When present, the RoleMapping Login Module will be configured to use
-    the provided file. This property defines the fully-qualified file path and name
+    the provided file. This parameter defines the fully-qualified file path and name
     of a properties file or resource which maps roles to replacement roles. The format
     is original_role=role1,role2,role3
   displayName: RoleMapping rolesProperties file path
