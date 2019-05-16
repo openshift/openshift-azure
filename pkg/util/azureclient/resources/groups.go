@@ -2,6 +2,7 @@ package resources
 
 import (
 	"context"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
@@ -26,6 +27,7 @@ var _ GroupsClient = &groupsClient{}
 func NewGroupsClient(ctx context.Context, log *logrus.Entry, subscriptionID string, authorizer autorest.Authorizer) GroupsClient {
 	client := resources.NewGroupsClient(subscriptionID)
 	azureclient.SetupClient(ctx, log, "resources.GroupsClient", &client.Client, authorizer)
+	client.PollingDuration = 2 * time.Hour
 
 	return &groupsClient{
 		GroupsClient: client,

@@ -33,7 +33,7 @@ var _ = Describe("Peer Vnet tests [Vnet][Real][LongRunning]", func() {
 	})
 
 	AfterEach(func() {
-		ctx, cancelFn := context.WithTimeout(context.Background(), 30*time.Minute)
+		ctx, cancelFn := context.WithTimeout(context.Background(), 2*time.Hour)
 		defer cancelFn()
 		By(fmt.Sprintf("deleting resource group %s", cfg.ResourceGroup))
 		err := azure.RPClient.Groups.Delete(ctx, cfg.ResourceGroup)
