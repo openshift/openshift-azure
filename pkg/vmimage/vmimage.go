@@ -42,18 +42,32 @@ type Builder struct {
 	SSHKey                   *rsa.PrivateKey
 	ClientKey                *rsa.PrivateKey
 	ClientCert               *x509.Certificate
+
+	Validate bool
 }
 
 func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
-	script, err := template.Template("script.sh", string(MustAsset("script.sh")), nil, map[string]interface{}{
-		"Archive":      MustAsset("archive.tgz"),
-		"Builder":      builder,
-		"ClientID":     os.Getenv("AZURE_CLIENT_ID"),
-		"ClientSecret": os.Getenv("AZURE_CLIENT_SECRET"),
-		"TenantID":     os.Getenv("AZURE_TENANT_ID"),
-	})
-	if err != nil {
-		return nil, err
+	var script []byte
+	var err error
+	if !builder.Validate {
+		script, err = template.Template("script.sh", string(MustAsset("script.sh")), nil, map[string]interface{}{
+			"Archive":      MustAsset("archive.tgz"),
+			"Builder":      builder,
+			"ClientID":     os.Getenv("AZURE_CLIENT_ID"),
+			"ClientSecret": os.Getenv("AZURE_CLIENT_SECRET"),
+			"TenantID":     os.Getenv("AZURE_TENANT_ID"),
+		})
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		script, err = template.Template("validate.sh", string(MustAsset("validate.sh")), nil, map[string]interface{}{
+			"Archive": MustAsset("archive.tgz"),
+			"Builder": builder,
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	cse, err := cse(builder.Location, script)
@@ -74,7 +88,7 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 			ip(builder.BuildResourceGroup, builder.Location, builder.DomainNameLabel),
 			nsg(builder.Location),
 			nic(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location),
-			vm(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location, sshPublicKey),
+			vm(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location, sshPublicKey, builder.Image, builder.Validate),
 			cse,
 		},
 	}
@@ -147,6 +161,14 @@ func (builder *Builder) Run(ctx context.Context) error {
 	err = future.WaitForCompletionRef(ctx, cli)
 	if err != nil {
 		return err
+	}
+
+	if builder.Validate {
+		builder.Log.Infof("copy file from VM")
+		err := builder.scp([]string{"/tmp/info", "/tmp/check"})
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
