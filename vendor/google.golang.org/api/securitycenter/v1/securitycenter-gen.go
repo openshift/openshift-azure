@@ -717,6 +717,86 @@ func (s *Finding) MarshalJSON() ([]byte, error) {
 type GetIamPolicyRequest struct {
 }
 
+// GoogleCloudSecuritycenterV1RunAssetDiscoveryResponse: Response of
+// asset discovery run
+type GoogleCloudSecuritycenterV1RunAssetDiscoveryResponse struct {
+	// Duration: The duration between asset discovery run start and end
+	Duration string `json:"duration,omitempty"`
+
+	// State: The state of an asset discovery run.
+	//
+	// Possible values:
+	//   "STATE_UNSPECIFIED" - Asset discovery run state was unspecified.
+	//   "COMPLETED" - Asset discovery run completed successfully.
+	//   "SUPERSEDED" - Asset discovery run was cancelled with tasks still
+	// pending, as another
+	// run for the same organization was started with a higher priority.
+	//   "TERMINATED" - Asset discovery run was killed and terminated.
+	State string `json:"state,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Duration") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Duration") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudSecuritycenterV1RunAssetDiscoveryResponse) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudSecuritycenterV1RunAssetDiscoveryResponse
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleCloudSecuritycenterV1beta1RunAssetDiscoveryResponse: Response
+// of asset discovery run
+type GoogleCloudSecuritycenterV1beta1RunAssetDiscoveryResponse struct {
+	// Duration: The duration between asset discovery run start and end
+	Duration string `json:"duration,omitempty"`
+
+	// State: The state of an asset discovery run.
+	//
+	// Possible values:
+	//   "STATE_UNSPECIFIED" - Asset discovery run state was unspecified.
+	//   "COMPLETED" - Asset discovery run completed successfully.
+	//   "SUPERSEDED" - Asset discovery run was cancelled with tasks still
+	// pending, as another
+	// run for the same organization was started with a higher priority.
+	//   "TERMINATED" - Asset discovery run was killed and terminated.
+	State string `json:"state,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Duration") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Duration") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleCloudSecuritycenterV1beta1RunAssetDiscoveryResponse) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleCloudSecuritycenterV1beta1RunAssetDiscoveryResponse
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
 // GroupAssetsRequest: Request message for grouping by assets.
 type GroupAssetsRequest struct {
 	// CompareDuration: When compare_duration is set, the GroupResult's
@@ -791,20 +871,18 @@ type GroupAssetsRequest struct {
 	// * boolean literals `true` and `false` without quotes.
 	//
 	// The following field and operator combinations are supported:
-	// name | `=`
-	// update_time | `>`, `<`, `>=`, `<=`
-	// iam_policy.policy_blob | '=', ':'
-	// resource_properties | '=', ':', `>`, `<`, `>=`, `<=`
-	// security_marks | '=', ':'
-	// security_center_properties.resource_name | '=',
-	// ':'
-	// security_center_properties.resource_type | '=',
-	// ':'
-	// security_center_properties.resource_parent | '=',
-	// ':'
-	// security_center_properties.resource_project | '=',
-	// ':'
-	// security_center_properties.resource_owners | '=', ':'
+	//
+	// * name: `=`
+	// * update_time: `>`, `<`, `>=`, `<=`, `=`
+	// * create_time: `>`, `<`, `>=`, `<=`, `=`
+	// * iam_policy.policy_blob: `=`, `:`
+	// * resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
+	// * security_marks: `=`, `:`
+	// * security_center_properties.resource_name: `=`, `:`
+	// * security_center_properties.resource_type: `=`, `:`
+	// * security_center_properties.resource_parent: `=`, `:`
+	// * security_center_properties.resource_project: `=`, `:`
+	// * security_center_properties.resource_owners: `=`, `:`
 	//
 	// For example, `resource_properties.size = 100` is a valid filter
 	// string.
@@ -998,15 +1076,16 @@ type GroupFindingsRequest struct {
 	// * boolean literals `true` and `false` without quotes.
 	//
 	// The following field and operator combinations are supported:
-	// name | `=`
-	// parent | '=', ':'
-	// resource_name | '=', ':'
-	// state | '=', ':'
-	// category | '=', ':'
-	// external_uri | '=', ':'
-	// event_time | `>`, `<`, `>=`, `<=`
-	// security_marks | '=', ':'
-	// source_properties | '=', ':', `>`, `<`, `>=`, `<=`
+	//
+	// * name: `=`
+	// * parent: `=`, `:`
+	// * resource_name: `=`, `:`
+	// * state: `=`, `:`
+	// * category: `=`, `:`
+	// * external_uri: `=`, `:`
+	// * event_time: `>`, `<`, `>=`, `<=`
+	// * security_marks: `=`, `:`
+	// * source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
 	//
 	// For example, `source_properties.size = 100` is a valid filter string.
 	Filter string `json:"filter,omitempty"`
@@ -1463,7 +1542,8 @@ type Operation struct {
 	// service that
 	// originally returns it. If you use the default HTTP mapping,
 	// the
-	// `name` should have the format of `operations/some/unique/name`.
+	// `name` should be a resource name ending with
+	// `operations/{unique_id}`.
 	Name string `json:"name,omitempty"`
 
 	// Response: The normal response of the operation in case of success.
@@ -2691,20 +2771,17 @@ func (c *OrganizationsAssetsListCall) FieldMask(fieldMask string) *Organizations
 // * boolean literals `true` and `false` without quotes.
 //
 // The following are the allowed field and operator combinations:
-// name | `=`
-// update_time | `>`, `<`, `>=`, `<=`
-// iam_policy.policy_blob | '=', ':'
-// resource_properties | '=', ':', `>`, `<`, `>=`, `<=`
-// security_marks | '=', ':'
-// security_center_properties.resource_name | '=',
-// ':'
-// security_center_properties.resource_type | '=',
-// ':'
-// security_center_properties.resource_parent | '=',
-// ':'
-// security_center_properties.resource_project | '=',
-// ':'
-// security_center_properties.resource_owners | '=', ':'
+//
+// * name: `=`
+// * update_time: `>`, `<`, `>=`, `<=`
+// * iam_policy.policy_blob: `=`, `:`
+// * resource_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
+// * security_marks: `=`, `:`
+// * security_center_properties.resource_name: `=`, `:`
+// * security_center_properties.resource_type: `=`, `:`
+// * security_center_properties.resource_parent: `=`, `:`
+// * security_center_properties.resource_project: `=`, `:`
+// * security_center_properties.resource_owners: `=`, `:`
 //
 // For example, `resource_properties.size = 100` is a valid filter
 // string.
@@ -2896,7 +2973,7 @@ func (c *OrganizationsAssetsListCall) Do(opts ...googleapi.CallOption) (*ListAss
 	//       "type": "string"
 	//     },
 	//     "filter": {
-	//       "description": "Expression that defines the filter to apply across assets.\nThe expression is a list of zero or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `\u003cfield\u003e \u003coperator\u003e \u003cvalue\u003e` and may have a `-`\ncharacter in front of them to indicate negation. The fields map to those\ndefined in the Asset resource. Examples include:\n\n* name\n* security_center_properties.resource_name\n* resource_properties.a_property\n* security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `\u003e`, `\u003c`, `\u003e=`, `\u003c=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following are the allowed field and operator combinations:\nname | `=`\nupdate_time | `\u003e`, `\u003c`, `\u003e=`, `\u003c=`\niam_policy.policy_blob | '=', ':'\nresource_properties | '=', ':', `\u003e`, `\u003c`, `\u003e=`, `\u003c=`\nsecurity_marks | '=', ':'\nsecurity_center_properties.resource_name | '=', ':'\nsecurity_center_properties.resource_type | '=', ':'\nsecurity_center_properties.resource_parent | '=', ':'\nsecurity_center_properties.resource_project | '=', ':'\nsecurity_center_properties.resource_owners | '=', ':'\n\nFor example, `resource_properties.size = 100` is a valid filter string.",
+	//       "description": "Expression that defines the filter to apply across assets.\nThe expression is a list of zero or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `\u003cfield\u003e \u003coperator\u003e \u003cvalue\u003e` and may have a `-`\ncharacter in front of them to indicate negation. The fields map to those\ndefined in the Asset resource. Examples include:\n\n* name\n* security_center_properties.resource_name\n* resource_properties.a_property\n* security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `\u003e`, `\u003c`, `\u003e=`, `\u003c=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following are the allowed field and operator combinations:\n\n* name: `=`\n* update_time: `\u003e`, `\u003c`, `\u003e=`, `\u003c=`\n* iam_policy.policy_blob: `=`, `:`\n* resource_properties: `=`, `:`, `\u003e`, `\u003c`, `\u003e=`, `\u003c=`\n* security_marks: `=`, `:`\n* security_center_properties.resource_name: `=`, `:`\n* security_center_properties.resource_type: `=`, `:`\n* security_center_properties.resource_parent: `=`, `:`\n* security_center_properties.resource_project: `=`, `:`\n* security_center_properties.resource_owners: `=`, `:`\n\nFor example, `resource_properties.size = 100` is a valid filter string.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -5398,15 +5475,16 @@ func (c *OrganizationsSourcesFindingsListCall) FieldMask(fieldMask string) *Orga
 // * boolean literals `true` and `false` without quotes.
 //
 // The following field and operator combinations are supported:
-// name | `=`
-// parent | '=', ':'
-// resource_name | '=', ':'
-// state | '=', ':'
-// category | '=', ':'
-// external_uri | '=', ':'
-// event_time | `>`, `<`, `>=`, `<=`
-// security_marks | '=', ':'
-// source_properties | '=', ':', `>`, `<`, `>=`, `<=`
+//
+// name: `=`
+// parent: `=`, `:`
+// resource_name: `=`, `:`
+// state: `=`, `:`
+// category: `=`, `:`
+// external_uri: `=`, `:`
+// event_time: `>`, `<`, `>=`, `<=`
+// security_marks: `=`, `:`
+// source_properties: `=`, `:`, `>`, `<`, `>=`, `<=`
 //
 // For example, `source_properties.size = 100` is a valid filter string.
 func (c *OrganizationsSourcesFindingsListCall) Filter(filter string) *OrganizationsSourcesFindingsListCall {
@@ -5595,7 +5673,7 @@ func (c *OrganizationsSourcesFindingsListCall) Do(opts ...googleapi.CallOption) 
 	//       "type": "string"
 	//     },
 	//     "filter": {
-	//       "description": "Expression that defines the filter to apply across findings.\nThe expression is a list of one or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `\u003cfield\u003e \u003coperator\u003e \u003cvalue\u003e` and may have a `-`\ncharacter in front of them to indicate negation. Examples include:\n\n * name\n * source_properties.a_property\n * security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `\u003e`, `\u003c`, `\u003e=`, `\u003c=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\nname | `=`\nparent | '=', ':'\nresource_name | '=', ':'\nstate | '=', ':'\ncategory | '=', ':'\nexternal_uri | '=', ':'\nevent_time | `\u003e`, `\u003c`, `\u003e=`, `\u003c=`\nsecurity_marks | '=', ':'\nsource_properties | '=', ':', `\u003e`, `\u003c`, `\u003e=`, `\u003c=`\n\nFor example, `source_properties.size = 100` is a valid filter string.",
+	//       "description": "Expression that defines the filter to apply across findings.\nThe expression is a list of one or more restrictions combined via logical\noperators `AND` and `OR`.\nParentheses are supported, and `OR` has higher precedence than `AND`.\n\nRestrictions have the form `\u003cfield\u003e \u003coperator\u003e \u003cvalue\u003e` and may have a `-`\ncharacter in front of them to indicate negation. Examples include:\n\n * name\n * source_properties.a_property\n * security_marks.marks.marka\n\nThe supported operators are:\n\n* `=` for all value types.\n* `\u003e`, `\u003c`, `\u003e=`, `\u003c=` for integer values.\n* `:`, meaning substring matching, for strings.\n\nThe supported value types are:\n\n* string literals in quotes.\n* integer literals without quotes.\n* boolean literals `true` and `false` without quotes.\n\nThe following field and operator combinations are supported:\n\nname: `=`\nparent: `=`, `:`\nresource_name: `=`, `:`\nstate: `=`, `:`\ncategory: `=`, `:`\nexternal_uri: `=`, `:`\nevent_time: `\u003e`, `\u003c`, `\u003e=`, `\u003c=`\nsecurity_marks: `=`, `:`\nsource_properties: `=`, `:`, `\u003e`, `\u003c`, `\u003e=`, `\u003c=`\n\nFor example, `source_properties.size = 100` is a valid filter string.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },

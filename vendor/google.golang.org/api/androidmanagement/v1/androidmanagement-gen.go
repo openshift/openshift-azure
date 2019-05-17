@@ -568,6 +568,9 @@ type ApplicationReport struct {
 	// app.
 	InstallerPackageName string `json:"installerPackageName,omitempty"`
 
+	// KeyedAppStates: List of keyed app states reported by the app.
+	KeyedAppStates []*KeyedAppState `json:"keyedAppStates,omitempty"`
+
 	// PackageName: Package name of the app.
 	PackageName string `json:"packageName,omitempty"`
 
@@ -617,6 +620,72 @@ type ApplicationReport struct {
 
 func (s *ApplicationReport) MarshalJSON() ([]byte, error) {
 	type NoMethod ApplicationReport
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// ApplicationReportingSettings: Settings controlling the behavior of
+// application reports.
+type ApplicationReportingSettings struct {
+	// IncludeRemovedApps: Whether removed apps are included in application
+	// reports.
+	IncludeRemovedApps bool `json:"includeRemovedApps,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "IncludeRemovedApps")
+	// to unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "IncludeRemovedApps") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ApplicationReportingSettings) MarshalJSON() ([]byte, error) {
+	type NoMethod ApplicationReportingSettings
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// BlockAction: An action to block access to apps and data on a fully
+// managed device or in a work profile. This action also triggers a
+// device or work profile to displays a user-facing notification with
+// information (where possible) on how to correct the compliance issue.
+// Note: wipeAction must also be specified.
+type BlockAction struct {
+	// BlockAfterDays: Number of days the policy is non-compliant before the
+	// device or work profile is blocked. To block access immediately, set
+	// to 0. blockAfterDays must be less than wipeAfterDays.
+	BlockAfterDays int64 `json:"blockAfterDays,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "BlockAfterDays") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "BlockAfterDays") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *BlockAction) MarshalJSON() ([]byte, error) {
+	type NoMethod BlockAction
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -948,6 +1017,10 @@ type Device struct {
 	//   "PROVISIONING" - The device is being provisioned. Newly enrolled
 	// devices are in this state until they have a policy applied.
 	State string `json:"state,omitempty"`
+
+	// SystemProperties: Map of selected system properties name and value
+	// related to the device.
+	SystemProperties map[string]string `json:"systemProperties,omitempty"`
 
 	// User: The user who owns the device.
 	User *User `json:"user,omitempty"`
@@ -1451,6 +1524,64 @@ type HardwareStatus struct {
 
 func (s *HardwareStatus) MarshalJSON() ([]byte, error) {
 	type NoMethod HardwareStatus
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// KeyedAppState: Keyed app state reported by the app.
+type KeyedAppState struct {
+	// CreateTime: The creation time of the app state on the device.
+	CreateTime string `json:"createTime,omitempty"`
+
+	// Data: Optionally, a machine-readable value to be read by the EMM. For
+	// example, setting values that the admin can choose to query against in
+	// the EMM console (e.g. “notify me if the battery_warning data <
+	// 10”).
+	Data string `json:"data,omitempty"`
+
+	// Key: The key for the app state. Acts as a point of reference for what
+	// the app is providing state for. For example, when providing managed
+	// configuration feedback, this key could be the managed configuration
+	// key.
+	Key string `json:"key,omitempty"`
+
+	// LastUpdateTime: The time the app state was most recently updated.
+	LastUpdateTime string `json:"lastUpdateTime,omitempty"`
+
+	// Message: Optionally, a free-form message string to explain the app
+	// state. If the state was triggered by a particular value (e.g. a
+	// managed configuration value), it should be included in the message.
+	Message string `json:"message,omitempty"`
+
+	// Severity: The severity of the app state.
+	//
+	// Possible values:
+	//   "SEVERITY_UNSPECIFIED" - Unspecified severity level.
+	//   "INFO" - Information severity level.
+	//   "ERROR" - Error severity level. This should only be set for genuine
+	// error conditions that a management organization needs to take action
+	// to fix.
+	Severity string `json:"severity,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "CreateTime") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "CreateTime") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *KeyedAppState) MarshalJSON() ([]byte, error) {
+	type NoMethod KeyedAppState
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -2551,6 +2682,9 @@ type Policy struct {
 	// until the device locks. A value of 0 means there is no restriction.
 	MaximumTimeToLock int64 `json:"maximumTimeToLock,omitempty,string"`
 
+	// MinimumApiLevel: The minimum allowed Android API level.
+	MinimumApiLevel int64 `json:"minimumApiLevel,omitempty"`
+
 	// MobileNetworksConfigDisabled: Whether configuring mobile networks is
 	// disabled.
 	MobileNetworksConfigDisabled bool `json:"mobileNetworksConfigDisabled,omitempty"`
@@ -2626,6 +2760,10 @@ type Policy struct {
 	// on the device should be explicitly marked as 'BLOCKED' in the
 	// applications policy.
 	PlayStoreMode string `json:"playStoreMode,omitempty"`
+
+	// PolicyEnforcementRules: Rules that define the behavior when a
+	// particular policy can not be applied on device
+	PolicyEnforcementRules []*PolicyEnforcementRule `json:"policyEnforcementRules,omitempty"`
 
 	// PrivateKeySelectionEnabled: Allows showing UI on a device for a user
 	// to choose a private key alias if there are no matching rules in
@@ -2759,6 +2897,48 @@ type Policy struct {
 
 func (s *Policy) MarshalJSON() ([]byte, error) {
 	type NoMethod Policy
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// PolicyEnforcementRule: A rule that defines the actions to take if a
+// device or work profile is not compliant with the policy specified in
+// settingName.
+type PolicyEnforcementRule struct {
+	// BlockAction: An action to block access to apps and data on a fully
+	// managed device or in a work profile. This action also triggers a
+	// user-facing notification with information (where possible) on how to
+	// correct the compliance issue. Note: wipeAction must also be
+	// specified.
+	BlockAction *BlockAction `json:"blockAction,omitempty"`
+
+	// SettingName: The top-level policy to enforce. For example,
+	// applications or passwordRequirements.
+	SettingName string `json:"settingName,omitempty"`
+
+	// WipeAction: An action to reset a fully managed device or delete a
+	// work profile. Note: blockAction must also be specified.
+	WipeAction *WipeAction `json:"wipeAction,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "BlockAction") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "BlockAction") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *PolicyEnforcementRule) MarshalJSON() ([]byte, error) {
+	type NoMethod PolicyEnforcementRule
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -3125,6 +3305,10 @@ func (s *Status) MarshalJSON() ([]byte, error) {
 // StatusReportingSettings: Settings controlling the behavior of status
 // reports.
 type StatusReportingSettings struct {
+	// ApplicationReportingSettings: Application reporting settings. Only
+	// applicable if application_reports_enabled is true.
+	ApplicationReportingSettings *ApplicationReportingSettings `json:"applicationReportingSettings,omitempty"`
+
 	// ApplicationReportsEnabled: Whether app reports are enabled.
 	ApplicationReportsEnabled bool `json:"applicationReportsEnabled,omitempty"`
 
@@ -3151,7 +3335,7 @@ type StatusReportingSettings struct {
 	SoftwareInfoEnabled bool `json:"softwareInfoEnabled,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g.
-	// "ApplicationReportsEnabled") to unconditionally include in API
+	// "ApplicationReportingSettings") to unconditionally include in API
 	// requests. By default, fields with empty values are omitted from API
 	// requests. However, any non-pointer, non-interface field appearing in
 	// ForceSendFields will be sent to the server regardless of whether the
@@ -3160,10 +3344,10 @@ type StatusReportingSettings struct {
 	ForceSendFields []string `json:"-"`
 
 	// NullFields is a list of field names (e.g.
-	// "ApplicationReportsEnabled") to include in API requests with the JSON
-	// null value. By default, fields with empty values are omitted from API
-	// requests. However, any field with an empty value appearing in
-	// NullFields will be sent to the server as null. It is an error if a
+	// "ApplicationReportingSettings") to include in API requests with the
+	// JSON null value. By default, fields with empty values are omitted
+	// from API requests. However, any field with an empty value appearing
+	// in NullFields will be sent to the server as null. It is an error if a
 	// field in this list has a non-empty value. This may be used to include
 	// null fields in Patch requests.
 	NullFields []string `json:"-"`
@@ -3483,6 +3667,41 @@ type WebToken struct {
 
 func (s *WebToken) MarshalJSON() ([]byte, error) {
 	type NoMethod WebToken
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// WipeAction: An action to reset a fully managed device or delete a
+// work profile. Note: blockAction must also be specified.
+type WipeAction struct {
+	// PreserveFrp: Whether the factory-reset protection data is preserved
+	// on the device. This setting doesn’t apply to work profiles.
+	PreserveFrp bool `json:"preserveFrp,omitempty"`
+
+	// WipeAfterDays: Number of days the policy is non-compliant before the
+	// device or work profile is wiped. wipeAfterDays must be greater than
+	// blockAfterDays.
+	WipeAfterDays int64 `json:"wipeAfterDays,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "PreserveFrp") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "PreserveFrp") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *WipeAction) MarshalJSON() ([]byte, error) {
+	type NoMethod WipeAction
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }

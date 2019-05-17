@@ -5,7 +5,7 @@
 
 // The newrepo command utilizes go-github as a cli tool for
 // creating new repositories. It takes an auth token as
-// an enviroment variable and creates the new repo under
+// an environment variable and creates the new repo under
 // the account affiliated with that token.
 package main
 
@@ -16,7 +16,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/google/go-github/v24/github"
+	"github.com/google/go-github/v25/github"
 	"golang.org/x/oauth2"
 )
 

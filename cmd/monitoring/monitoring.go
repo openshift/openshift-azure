@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/microsoft/ApplicationInsights-Go/appinsights"
 	"github.com/ghodss/yaml"
+	"github.com/microsoft/ApplicationInsights-Go/appinsights"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/wait"
 

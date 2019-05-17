@@ -56,6 +56,13 @@ import:
   subpackages:
   - prometheus
   - prometheus/promhttp
+- package: github.com/prometheus/prometheus
+  version: v2.8.1
+  subpackages:
+  - promql
+# Remove the following 2 lines when we up the required version of go to 1.12+
+- package: github.com/prometheus/tsdb
+  version: v0.6.1
 - package: github.com/golang/protobuf
   version: ^1.2.0
   subpackages:
@@ -71,13 +78,13 @@ import:
 - package: github.com/beorn7/perks
   subpackages:
   - quantile
-- package: github.com/Microsoft/ApplicationInsights-Go
+- package: github.com/microsoft/ApplicationInsights-Go
   subpackages:
   - appinsights
 - package: github.com/grpc-ecosystem/grpc-gateway
   version: ^v1.8.0
 - package: github.com/kubernetes-incubator/service-catalog
-  version: "3.11"
+  version: v3.11
   repo: https://github.com/openshift/service-catalog.git
 - package: github.com/spf13/cobra
   version: v0.0.3
