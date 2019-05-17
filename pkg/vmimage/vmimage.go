@@ -88,7 +88,7 @@ func (builder *Builder) generateTemplate() (map[string]interface{}, error) {
 			ip(builder.BuildResourceGroup, builder.Location, builder.DomainNameLabel),
 			nsg(builder.Location),
 			nic(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location),
-			vm(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location, sshPublicKey, builder.Image, builder.Validate),
+			vm(builder.SubscriptionID, builder.BuildResourceGroup, builder.Location, sshPublicKey, builder.Image, builder.ImageResourceGroup, builder.Validate),
 			cse,
 		},
 	}
@@ -165,7 +165,7 @@ func (builder *Builder) Run(ctx context.Context) error {
 
 	if builder.Validate {
 		builder.Log.Infof("copy file from VM")
-		err := builder.scp([]string{"/tmp/info", "/tmp/check"})
+		err := builder.scp([]string{"/tmp/info", "/tmp/check", "/tmp/scap-report.html"})
 		if err != nil {
 			return err
 		}

@@ -1,0 +1,207 @@
+# audit_rules_kernel_module_loading_rmmod
+-w /usr/sbin/rmmod -p x -k modules
+# audit_rules_kernel_module_loading_delete
+-a always,exit -F arch=b32 -S delete_module -F key=modules
+-a always,exit -F arch=b64 -S delete_module -F key=modules
+# audit_rules_kernel_module_loading_finit_module
+-a always,exit -F arch=b32 -S finit_module -F key=modules
+-a always,exit -F arch=b64 -S finit_module -F key=modules
+# audit_rules_kernel_module_loading_insmod
+-w /usr/sbin/insmod -p x -k modules
+# audit_rules_kernel_module_loading_modprobe
+-w /usr/sbin/modprobe -p x -k modules
+# audit_rules_kernel_module_loading_create
+-a always,exit -F arch=b32 -S create_module -F key=modules
+-a always,exit -F arch=b64 -S create_module -F key=modules
+# audit_rules_kernel_module_loading_init
+-a always,exit -F arch=b32 -S init_module -F key=modules
+-a always,exit -F arch=b64 -S init_module -F key=modules
+# audit_rules_login_events_lastlog
+-w /var/log/lastlog -p wa -k logins
+# audit_rules_login_events_faillock
+-w /var/run/faillock/ -p wa -k logins
+# audit_rules_login_events_tallylog
+-w /var/log/tallylog -p wa -k logins
+# audit_rules_dac_modification_fchown
+-a always,exit -F arch=b32 -S fchown -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S fchown -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_setxattr
+-a always,exit -F arch=b32 -S setxattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S setxattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_fsetxattr
+-a always,exit -F arch=b32 -S fsetxattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S fsetxattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_lsetxattr
+-a always,exit -F arch=b32 -S lsetxattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S lsetxattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_removexattr
+-a always,exit -F arch=b32 -S removexattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S removexattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_fremovexattr
+-a always,exit -F arch=b32 -S fremovexattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S fremovexattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_lremovexattr
+-a always,exit -F arch=b32 -S lremovexattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S lremovexattr -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_fchownat
+-a always,exit -F arch=b32 -S fchownat -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S fchownat -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_chmod
+-a always,exit -F arch=b32 -S chmod -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S chmod -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_fchmod
+-a always,exit -F arch=b32 -S fchmod -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S fchmod -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_fchodat
+-a always,exit -F arch=b32 -S fchmodat -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S fchmodat -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_chown
+-a always,exit -F arch=b32 -S chown -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S chown -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+# audit_rules_dac_modification_lchown
+-a always,exit -F arch=b32 -S lchown -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+-a always,exit -F arch=b64 -S lchown -F auid>=1000 -F auid!=4294967295 -F key=perm_mod
+
+# audit_rules_execution_setfiles
+-a always,exit -F path=/usr/sbin/setfiles -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged-priv_change
+
+# audit_rules_execution_setsebool
+-a always,exit -F path=/usr/sbin/setsebool -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged-priv_change
+
+# audit_rules_execution_semanage
+-a always,exit -F path=/usr/sbin/semanage -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged-priv_change
+
+# audit_rules_execution_chcon
+-a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged-priv_change
+
+# audit_rules_file_deletion_events_rmdir
+-a always,exit -F arch=b32 -S rmdir -F auid>=1000 -F auid!=4294967295 -F key=delete
+-a always,exit -F arch=b64 -S rmdir -F auid>=1000 -F auid!=4294967295 -F key=delete
+
+# audit_rules_file_deletion_events_unlinkat
+-a always,exit -F arch=b32 -S unlinkat -F auid>=1000 -F auid!=4294967295 -F key=delete
+-a always,exit -F arch=b64 -S unlinkat -F auid>=1000 -F auid!=4294967295 -F key=delete
+
+# audit_rules_file_deletion_events_rename
+-a always,exit -F arch=b32 -S rename -F auid>=1000 -F auid!=4294967295 -F key=delete
+-a always,exit -F arch=b64 -S rename -F auid>=1000 -F auid!=4294967295 -F key=delete
+
+# audit_rules_file_deletion_events_renameat
+-a always,exit -F arch=b32 -S renameat -F auid>=1000 -F auid!=4294967295 -F key=delete
+-a always,exit -F arch=b64 -S renameat -F auid>=1000 -F auid!=4294967295 -F key=delete
+
+# audit_rules_file_deletion_events_unlink
+-a always,exit -F arch=b32 -S unlink -F auid>=1000 -F auid!=4294967295 -F key=delete
+-a always,exit -F arch=b64 -S unlink -F auid>=1000 -F auid!=4294967295 -F key=delete
+
+# audit_rules_privileged_commands_passwd
+-a always,exit -F path=/usr/bin/passwd -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_sudo
+-a always,exit -F path=/usr/bin/sudo -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_postdrop
+-a always,exit -F path=/usr/sbin/postdrop -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_chsh
+-a always,exit -F path=/usr/bin/chsh -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_gpasswd
+-a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_chage
+-a always,exit -F path=/usr/bin/chage -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_userhelper
+-a always,exit -F path=/usr/sbin/userhelper -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_pam_timestamp
+-a always,exit -F path=/usr/sbin/pam_timestamp_check -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_crontab
+-a always,exit -F path=/usr/bin/crontab -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_umount
+-a always,exit -F path=/usr/bin/umount -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_unix_chkpwd
+-a always,exit -F path=/usr/sbin/unix_chkpwd -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_ssh_keysign
+-a always,exit -F path=/usr/libexec/openssh/ssh-keysign -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_sudoedit
+-a always,exit -F path=/usr/bin/sudoedit -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_postqueue
+-a always,exit -F path=/usr/sbin/postqueue -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_su
+-a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_privileged_commands_newgrp
+-a always,exit -F path=/usr/bin/newgrp -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+# audit_rules_unsuccessful_file_modification_creat
+-a always,exit -F arch=b32 -S creat -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b32 -S creat -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S creat -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S creat -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+
+# audit_rules_unsuccessful_file_modification_open
+-a always,exit -F arch=b32 -S open -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b32 -S open -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S open -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S open -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+
+# audit_rules_unsuccessful_file_modification_open_by_handle_at
+-a always,exit -F arch=b32 -S open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b32 -S open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+
+# audit_rules_unsuccessful_file_modification_ftruncate
+-a always,exit -F arch=b32 -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b32 -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+
+
+# audit_rules_unsuccessful_file_modification_openat
+-a always,exit -F arch=b32 -S openat -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b32 -S openat -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S openat -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S openat -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+
+
+# audit_rules_unsuccessful_file_modification_truncate
+-a always,exit -F arch=b32 -S truncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b32 -S truncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S truncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -F key=access
+-a always,exit -F arch=b64 -S truncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
+
+
+# audit_rules_sysadmin_actions
+-w /etc/sudoers -p wa -k actions
+-w /etc/sudoers.d/ -p wa -k actions
+
+# audit_rules_usergroup_modification_shadow
+-w /etc/shadow -p wa -k audit_rules_usergroup_modification
+
+# audit_rules_media_export
+-a always,exit -F arch=ARCH -S mount -F auid>=1000 -F auid!=4294967295 -F key=export
+
+# audit_rules_usergroup_modification_opasswd
+-w /etc/security/opasswd -p wa -k audit_rules_usergroup_modification
+
+# audit_rules_system_shutdown
+-f 2
+
+# audit_rules_usergroup_modification_gshadow
+-w /etc/gshadow -p wa -k audit_rules_usergroup_modification
+
+# audit_rules_usergroup_modification_passwd
+-w /etc/passwd -p wa -k audit_rules_usergroup_modification
+
+# audit_rules_usergroup_modification_group
+-w /etc/group -p wa -k audit_rules_usergroup_modification

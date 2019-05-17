@@ -67,7 +67,6 @@ zerombr
 @^minimal
 -NetworkManager-team
 -Red_Hat_Enterprise_Linux-Release_Notes-7-en-US
--audit*
 -biosdevname
 -btrfs-progs
 -dracut-config-rescue
@@ -124,10 +123,12 @@ EOF
 yum -y update
 yum -y install \
     ansible \
+    aide \
     atomic \
     atomic-openshift-clients \
     atomic-openshift-docker-excluder \
     atomic-openshift-node \
+    audit \
     bind-utils \
     ceph-common \
     chrony \
@@ -204,6 +205,75 @@ sed -i -e 's/^ResourceDisk.Format=.*/ResourceDisk.Format=n/' /etc/waagent.conf
 rpm -q kernel --last | sed -n '1 {s/^[^-]*-//; s/ .*$//; p}' >/var/tmp/kernel-version
 rpm -q atomic-openshift-node --qf '%{VERSION}-%{RELEASE}.%{ARCH}' >/var/tmp/openshift-version
 
+# Image hardening
+
+# accounts_minimum_age_login_defs
+sed -i -e 's/PASS_MIN_DAYS.*/PASS_MIN_DAYS     1/g' /etc/login.defs
+sed -i -e 's/PASS_MAX_DAYS.*/PASS_MAX_DAYS     60/g' /etc/login.defs
+
+# no_empty_passwords
+sed --follow-symlinks -i 's/\<nullok\>//g' /etc/pam.d/system-auth
+sed --follow-symlinks -i 's/\<nullok\>//g' /etc/pam.d/password-auth
+
+# disable_ctrlaltdel_reboot
+systemctl mask ctrl-alt-del.target
+
+# accounts_logon_fail_delay
+echo 'FAIL_DELAY 4' >> /etc/login.defs
+
+# accounts_tmout
+echo -e '\n# Set TMOUT to 600 per security requirements' >> /etc/profile
+echo 'TMOUT=600' >> /etc/profile
+
+# accounts_max_concurrent_login_sessions
+echo '*	hard	maxlogins	10' >> /etc/security/limits.conf
+
+## banner_etc_issue
+sed -i -e '/^#Banner.*/ a \
+Banner /etc/issue.net' /etc/ssh/sshd_config
+
+## enable and start auditd service
+systemctl enable auditd.service
+
+##sed -i -e '/^#PermitRootLogin.*/ a \
+##PermitRootLogin no' /etc/ssh/sshd_config
+# sed -i -e '/^#PrintLastLog.*/ a \
+# PrintLastLog yes/' /etc/ssh/sshd_config
+# sed -i -e '/^#PasswordAuthentication.*/ a \
+# PasswordAuthentication no' /etc/ssh/sshd_config
+#
+# file_permissions_sshd_pub_key
+# chmod 0644 /etc/ssh/*.pub
+#chmod 0644 /etc/ssh/ssh_host_ecdsa_key.pub
+#chmod 0644 /etc/ssh/ssh_host_ed25519_key.pub
+#chmod 0644 /etc/ssh/ssh_host_rsa_key.pub
+# file_permissions_sshd_private_key
+# chmod 0600 /etc/ssh/*_key
+#chmod 0600 /etc/ssh/ssh_host_ecdsa_key
+#chmod 0600 /etc/ssh/ssh_host_ed25519_key
+#chmod 0600 /etc/ssh/ssh_host_rsa_key
+#
+# ensure_gpgcheck_repo_metadata
+# echo 'repo_gpgcheck=1' >> /etc/yum.conf
+# ensure_gpgcheck_local_packages
+# echo 'localpkg_gpgcheck=1' >> /etc/yum.conf
+
+#
+## Initialize aide's db
+## aide_verify_ext_attributes aide_verify_acls aide_use_fips_hashes
+echo 'FIPSR = p+i+n+u+g+s+m+c+acl+selinux+xattrs+sha256' >> /etc/aide.conf
+#
+## aide_use_fips_hashes
+sed -i -e 's/^NORMAL = .*/NORMAL = FIPSR+sha512/g' /etc/aide.conf
+#
+## aide_periodic_cron_checking
+## aide_scan_notification
+echo '05 4 * * * root /usr/sbin/aide --check | logger -s -t aide' >> /etc/crontab
+#
+aide --init
+mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+restorecon -Rv /var/lib/aide/
+
 >/var/tmp/kickstart_completed
 %end
 KICKSTART
@@ -212,7 +282,7 @@ KICKSTART
 python -c "import pty; pty.spawn([
     'virt-install',
     '--disk', '/var/lib/libvirt/images/$IMAGE.raw,size=$DISKGIB,format=raw',
-    '--extra-args', 'console=ttyS0,115200n8 earlyprintk=ttyS0,115200 ks=file:/rhel7.ks',
+   '--extra-args', 'console=ttyS0,115200n8 earlyprintk=ttyS0,115200 ks=file:/rhel7.ks',
     '--graphics', 'none',
     '--initrd-inject', 'rhel7.ks',
     '--location', 'http://$IP:8080/content/dist/rhel/server/7/7.6/x86_64/kickstart',
