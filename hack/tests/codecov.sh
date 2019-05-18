@@ -2,7 +2,7 @@
 
 set -o pipefail
 
-. hack/tests/ci-operator-prepare.sh
+. hack/tests/ci-prepare.sh
 
 make unit
 

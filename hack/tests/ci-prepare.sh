@@ -30,6 +30,31 @@ stop_monitoring() {
     fi
 }
 
+generate_artifacts() {
+  if [[ -n "$ARTIFACTS" ]]; then
+      exec &>"$ARTIFACTS/cleanup"
+  fi
+
+  stop_monitoring
+
+  make artifacts
+}
+
+delete() {
+  realrp="$1"
+
+  if [[ -n "$NO_DELETE" ]]; then
+      return
+  fi
+
+  # only delete for fakerp
+  if [[ -z "$realrp" ]]; then
+    make delete
+  fi
+
+  az group delete -g "$RESOURCEGROUP" --yes --no-wait
+}
+
 if [[ ! -e /var/run/secrets/kubernetes.io ]]; then
     return
 fi
