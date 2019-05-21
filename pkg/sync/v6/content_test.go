@@ -16,6 +16,7 @@ import (
 	imagev1 "github.com/openshift/api/image/v1"
 	templatev1 "github.com/openshift/api/template/v1"
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	kjson "k8s.io/apimachinery/pkg/runtime/serializer/json"
@@ -245,6 +246,40 @@ func handleTemplates(index index) error {
 	return nil
 }
 
+func handleRole(item *item) (string, error) {
+	b, err := get(item.SourceURL)
+	if err != nil {
+		return "", err
+	}
+
+	var cr rbacv1.ClusterRole
+
+	s := kjson.NewYAMLSerializer(kjson.DefaultMetaFactory, scheme.Scheme, scheme.Scheme)
+	_, _, err = s.Decode(b, nil, &cr)
+	if err != nil {
+		return "", err
+	}
+
+	cr.Name = item.Name
+
+	err = writeObject(&cr, item.Path)
+	if err != nil {
+		return "", err
+	}
+
+	return cr.Name + ".yaml", nil
+}
+
+func handleRoles() error {
+	clusterMonitoringView := item{
+		SourceURL: "https://raw.githubusercontent.com/openshift/cluster-monitoring-operator/master/assets/cluster-monitoring-operator/cluster-role.yaml",
+		Path:      "data/ClusterRole.rbac.authorization.k8s.io/geneva-cluster-monitoring-view.yaml",
+		Name:      "geneva-cluster-monitoring-view",
+	}
+	_, err := handleRole(&clusterMonitoringView)
+	return err
+}
+
 func TestContent(t *testing.T) {
 	b, err := get("https://github.com/openshift/library/raw/master/official/index.json")
 	if err != nil {
@@ -263,6 +298,11 @@ func TestContent(t *testing.T) {
 	}
 
 	err = handleTemplates(index)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = handleRoles()
 	if err != nil {
 		t.Fatal(err)
 	}

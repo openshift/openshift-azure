@@ -15,6 +15,7 @@
 // data/ClusterRole.rbac.authorization.k8s.io/customer-admin-controller.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/customer-admin-project.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/edit.yaml
+// data/ClusterRole.rbac.authorization.k8s.io/geneva-cluster-monitoring-view.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/namespace-viewer.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/registry-admin.yaml
 // data/ClusterRole.rbac.authorization.k8s.io/registry-editor.yaml
@@ -1044,6 +1045,26 @@ func clusterroleRbacAuthorizationK8sIoEditYaml() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/edit.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _clusterroleRbacAuthorizationK8sIoGenevaClusterMonitoringViewYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x2c\xcc\x31\x0e\xc2\x30\x0c\x85\xe1\xdd\xa7\xb0\xba\xa7\x88\x0d\x65\x65\x60\x67\x60\x77\x53\xab\x58\x6d\xe3\xc8\x4e\x82\xc4\xe9\x51\x45\xd7\x4f\xef\xfd\x54\xe4\xc5\xe6\xa2\x39\xa2\x4d\x94\x46\x6a\xf5\xad\x26\x5f\xaa\xa2\x79\x5c\x6f\x3e\x8a\x5e\xfa\x15\x56\xc9\x73\xc4\xfb\xd6\xbc\xb2\x3d\x75\x63\xd8\xb9\xd2\x4c\x95\x22\x20\x66\xda\x39\xe2\xc2\x99\x3b\x85\xf4\x1f\x85\x5d\xb3\x54\x35\xc9\x4b\xe8\xc2\x1f\xb0\xb6\xb1\x47\x08\x48\x45\x1e\xa6\xad\xf8\x71\x0d\x38\x0c\x80\x68\xec\xda\x2c\xf1\x69\x47\xd0\x0b\x25\x76\x40\xec\x6c\xd3\xe9\x0b\x57\xf8\x05\x00\x00\xff\xff\x6a\xe3\xb5\x4d\xb4\x00\x00\x00")
+
+func clusterroleRbacAuthorizationK8sIoGenevaClusterMonitoringViewYamlBytes() ([]byte, error) {
+	return bindataRead(
+		_clusterroleRbacAuthorizationK8sIoGenevaClusterMonitoringViewYaml,
+		"ClusterRole.rbac.authorization.k8s.io/geneva-cluster-monitoring-view.yaml",
+	)
+}
+
+func clusterroleRbacAuthorizationK8sIoGenevaClusterMonitoringViewYaml() (*asset, error) {
+	bytes, err := clusterroleRbacAuthorizationK8sIoGenevaClusterMonitoringViewYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "ClusterRole.rbac.authorization.k8s.io/geneva-cluster-monitoring-view.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -3888,7 +3909,7 @@ func clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringOperatorYaml() (*a
 	return a, nil
 }
 
-var _clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringViewYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x84\x8d\x41\x4a\xc4\x40\x10\x45\xf7\x7d\x8a\xba\x40\x22\xee\xa4\x77\xea\xc2\xfd\x08\xee\x6b\x3a\x7f\x32\xe5\x24\x55\x4d\x75\x75\x84\x39\xbd\x88\x41\x04\xc1\x59\x7e\x78\xff\x3d\xae\xf2\x06\x6f\x62\x9a\xc9\x8f\x5c\x46\xee\x71\x36\x97\x2b\x87\x98\x8e\x97\x87\x36\x8a\xdd\x6d\xf7\xe9\x22\x3a\x65\x7a\x5e\x7a\x0b\xf8\xc1\x16\x3c\x89\x4e\xa2\x73\x5a\x11\x3c\x71\x70\x4e\x44\xca\x2b\x32\x95\x6f\x68\x58\x4d\x25\xcc\x45\xe7\x61\x13\x7c\x24\xb7\x05\x07\x9c\xbe\x40\xae\xf2\xe2\xd6\xeb\x3f\xd1\x44\xf4\xa7\x79\x33\xd1\xfa\xf1\x1d\x25\x5a\x4e\xc3\xfe\x7e\x85\x6f\x52\xf0\x58\x8a\x75\x8d\x1f\xc1\x0c\xc5\xc6\xfb\x6c\x95\x0b\x32\x59\x85\xb6\xb3\x9c\x62\xe0\x6b\x77\xfc\x92\xa7\xcf\x00\x00\x00\xff\xff\x1b\x2e\x8a\x83\x27\x01\x00\x00")
+var _clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringViewYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x7c\xcd\x41\x4a\x04\x31\x10\x85\xe1\x7d\x4e\x91\x0b\xa4\xc5\x9d\x64\xa7\x2e\xdc\x8f\xe0\xbe\x26\xfd\xa6\xa7\x9c\xee\xaa\x50\xa9\x44\x98\xd3\x8b\xd8\x88\x28\xba\x7c\xf0\xf8\x3f\xaa\xfc\x02\x6b\xac\x92\xa3\x1d\xa9\x4c\xd4\xfd\xac\xc6\x57\x72\x56\x99\x2e\x77\x6d\x62\xbd\x19\xb7\xe1\xc2\x32\xe7\xf8\xb8\xf6\xe6\xb0\x83\xae\x78\x60\x99\x59\x96\xb0\xc1\x69\x26\xa7\x1c\x62\x14\xda\x90\x63\xf9\x3c\xa5\x4d\x85\x5d\x8d\x65\x49\x83\xf1\x16\x4c\x57\x1c\x70\xfa\x38\x52\xe5\x27\xd3\x5e\xff\x41\x43\x8c\xbf\xcc\x2f\x62\x81\x60\x50\xfa\x4b\x6a\xfd\xf8\x8a\xe2\x2d\x87\xb4\x47\x9e\x61\x83\x0b\xee\x4b\xd1\x2e\xfe\xa3\xb3\xcf\x56\xa9\x20\x47\xad\x90\x76\xe6\x93\x27\xba\x76\xc3\xb7\x78\x78\x0f\x00\x00\xff\xff\xe9\x30\x3e\x16\x2e\x01\x00\x00")
 
 func clusterrolebindingRbacAuthorizationK8sIoClusterMonitoringViewYamlBytes() ([]byte, error) {
 	return bindataRead(
@@ -14475,6 +14496,7 @@ var _bindata = map[string]func() (*asset, error){
 	"ClusterRole.rbac.authorization.k8s.io/customer-admin-controller.yaml":                                                       clusterroleRbacAuthorizationK8sIoCustomerAdminControllerYaml,
 	"ClusterRole.rbac.authorization.k8s.io/customer-admin-project.yaml":                                                          clusterroleRbacAuthorizationK8sIoCustomerAdminProjectYaml,
 	"ClusterRole.rbac.authorization.k8s.io/edit.yaml":                                                                            clusterroleRbacAuthorizationK8sIoEditYaml,
+	"ClusterRole.rbac.authorization.k8s.io/geneva-cluster-monitoring-view.yaml":                                                  clusterroleRbacAuthorizationK8sIoGenevaClusterMonitoringViewYaml,
 	"ClusterRole.rbac.authorization.k8s.io/namespace-viewer.yaml":                                                                clusterroleRbacAuthorizationK8sIoNamespaceViewerYaml,
 	"ClusterRole.rbac.authorization.k8s.io/registry-admin.yaml":                                                                  clusterroleRbacAuthorizationK8sIoRegistryAdminYaml,
 	"ClusterRole.rbac.authorization.k8s.io/registry-editor.yaml":                                                                 clusterroleRbacAuthorizationK8sIoRegistryEditorYaml,
@@ -15204,6 +15226,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"customer-admin-controller.yaml":             {clusterroleRbacAuthorizationK8sIoCustomerAdminControllerYaml, map[string]*bintree{}},
 		"customer-admin-project.yaml":                {clusterroleRbacAuthorizationK8sIoCustomerAdminProjectYaml, map[string]*bintree{}},
 		"edit.yaml":                                  {clusterroleRbacAuthorizationK8sIoEditYaml, map[string]*bintree{}},
+		"geneva-cluster-monitoring-view.yaml":        {clusterroleRbacAuthorizationK8sIoGenevaClusterMonitoringViewYaml, map[string]*bintree{}},
 		"namespace-viewer.yaml":                      {clusterroleRbacAuthorizationK8sIoNamespaceViewerYaml, map[string]*bintree{}},
 		"registry-admin.yaml":                        {clusterroleRbacAuthorizationK8sIoRegistryAdminYaml, map[string]*bintree{}},
 		"registry-editor.yaml":                       {clusterroleRbacAuthorizationK8sIoRegistryEditorYaml, map[string]*bintree{}},

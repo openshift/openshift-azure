@@ -5,7 +5,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cluster-monitoring-view
+  name: geneva-cluster-monitoring-view
 subjects:
 - kind: ServiceAccount
   name: geneva
