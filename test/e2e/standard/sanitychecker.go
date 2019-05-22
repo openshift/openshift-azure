@@ -204,6 +204,19 @@ func (sc *SanityChecker) ValidateCluster(ctx context.Context) (errs []*TestError
 		sc.Client.EndUser.DumpInfo("", "checkCanUseAzureFile")
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanUseAzureFile"})
 	}
+	sc.Log.Debugf("validating that the cluster enforces emptydir quotas")
+	err = sc.checkEnforcesEmptyDirQuotas(ctx)
+	if err != nil {
+		sc.Log.Error(err)
+		errs = append(errs, &TestError{Err: err, Bucket: "checkEnforcesEmptyDirQuotas"})
+	}
+	sc.Log.Debugf("validating that Docker builds are not permitted")
+	err = sc.checkCantDoDockerBuild(ctx)
+	if err != nil {
+		sc.Log.Error(err)
+		sc.Client.EndUser.DumpInfo("", "checkCantDoDockerBuild")
+		errs = append(errs, &TestError{Err: err, Bucket: "checkCantDoDockerBuild"})
+	}
 	return
 }
 
