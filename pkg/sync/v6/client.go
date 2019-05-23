@@ -200,6 +200,16 @@ func write(log *logrus.Entry, dyn dynamic.ClientPool, grs []*discovery.APIGroupR
 
 		o.SetResourceVersion(rv)
 		_, err = dc.Resource(res, o.GetNamespace()).Update(o)
+		if err != nil && strings.Contains(err.Error(), "updates to parameters are forbidden") {
+			log.Infof("object %s is not updateable, will delete and re-create", o.GetName())
+			err = dc.Resource(res, o.GetNamespace()).Delete(o.GetName(), &metav1.DeleteOptions{})
+			if err != nil {
+				return
+			}
+			o.SetResourceVersion("")
+			_, err = dc.Resource(res, o.GetNamespace()).Create(o)
+		}
+
 		return
 	})
 
