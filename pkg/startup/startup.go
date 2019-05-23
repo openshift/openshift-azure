@@ -17,11 +17,13 @@ import (
 	v4 "github.com/openshift/openshift-azure/pkg/startup/v4"
 	v5 "github.com/openshift/openshift-azure/pkg/startup/v5"
 	v6 "github.com/openshift/openshift-azure/pkg/startup/v6"
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
 )
 
 // Interface is a singleton interface to interact with startup
 type Interface interface {
 	WriteFiles(ctx context.Context) error
+	WriteFilesExt(ctx context.Context, kvc keyvault.KeyVaultClient, hostname, domainname, dirPrefix string) error
 	Hash(role api.AgentPoolProfileRole) ([]byte, error)
 }
 

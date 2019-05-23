@@ -75,6 +75,10 @@ func (s *startup) WriteFiles(ctx context.Context) error {
 	return s.writeFiles(role, writers.NewFilesystemWriter(), hostname, domainname)
 }
 
+func (s *startup) WriteFilesExt(ctx context.Context, kvc keyvault.KeyVaultClient, hostname, domainname, dirPrefix string) error {
+	return fmt.Errorf("startup %s does not support WriteFilesExt", s.cs.Config.PluginVersion)
+}
+
 func (s *startup) Hash(role api.AgentPoolProfileRole) ([]byte, error) {
 	hash := sha256.New()
 

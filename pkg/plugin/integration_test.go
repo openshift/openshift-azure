@@ -2,11 +2,15 @@ package plugin
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -321,6 +325,7 @@ func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 		return nil, nil, err
 	}
 
+	az.ComputeRP.Cs = cs
 	err = p.GenerateConfig(ctx, cs, false)
 	if err != nil {
 		return nil, nil, err
@@ -431,10 +436,10 @@ func getRotations(beforeBlob, afterBlob *updateblob.UpdateBlob, beforeSyncChecks
 
 func getNodeCountFromAz(az *fakecloud.AzureCloud) map[rotationType]int {
 	nodeCount := map[rotationType]int{rotationCompute: 0, rotationInfra: 0, rotationMaster: 0}
-	for scaleset, vms := range az.ComputeRP.Vms {
+	for _, scaleset := range az.ComputeRP.State {
 		for _, role := range []rotationType{rotationCompute, rotationInfra, rotationMaster} {
-			if strings.Contains(scaleset, string(role)) {
-				nodeCount[role] += len(vms)
+			if strings.Contains(scaleset.Name, string(role)) {
+				nodeCount[role] += len(scaleset.Vms)
 				break
 			}
 		}
@@ -475,6 +480,7 @@ func TestHowAdminConfigChangesCausesRotations(t *testing.T) {
 	ctx := context.Background()
 	cs := newTestCs()
 	az := newFakeAzureCloud(log)
+	defer az.Cleanup()
 	p, _, err := setupNewCluster(ctx, log, cs, az)
 	if err != nil {
 		t.Fatal(err)
@@ -701,6 +707,7 @@ func TestHowActionsCauseRotations(t *testing.T) {
 			// for this test we always start with a new cluster (unlike the config change test above)
 			cs := newTestCs()
 			az := newFakeAzureCloud(log)
+			defer az.Cleanup()
 			p, _, err := setupNewCluster(ctx, log, cs, az)
 
 			beforeBlob, beforeSyncChecksum, err := getHashes(az, cs)
@@ -742,5 +749,178 @@ func TestHowActionsCauseRotations(t *testing.T) {
 				t.Fatalf("rotation mismatch: expected %v, got %v", tt.expectRotation, rotations)
 			}
 		})
+	}
+}
+
+func fileHash(path string) (string, error) {
+	hasher := sha256.New()
+	s, err := ioutil.ReadFile(path)
+	hasher.Write(s)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(hasher.Sum(nil)), nil
+}
+
+func hashCurrentFiles(az *fakecloud.AzureCloud, log *logrus.Entry) func() map[string]map[string][]string {
+	type bothHashes struct {
+		before string
+		after  string
+	}
+	hashes := map[string]bothHashes{}
+	prefix := ""
+	parentDir := ""
+	beforeCallback := func(path string, fi os.FileInfo, err error) error {
+		if fi.IsDir() {
+			return nil
+		}
+		hash, err := fileHash(path)
+		if err != nil {
+			return err
+		}
+		hashes[prefix+strings.TrimPrefix(path, parentDir)] = bothHashes{before: hash}
+		return nil
+	}
+	afterCallback := func(path string, fi os.FileInfo, err error) error {
+		if fi.IsDir() {
+			return nil
+		}
+		hash, err := fileHash(path)
+		if err != nil {
+			return err
+		}
+		var bh bothHashes
+		bh, ok := hashes[prefix+strings.TrimPrefix(path, parentDir)]
+		if !ok {
+			bh = bothHashes{}
+		}
+		bh.after = hash
+		hashes[prefix+strings.TrimPrefix(path, parentDir)] = bh
+		return nil
+	}
+	for _, scaleset := range az.ComputeRP.State {
+		for _, vm := range scaleset.Vms {
+			prefix = fmt.Sprintf("%s:%s:", scaleset.Name, *vm.InstanceID)
+			parentDir = scaleset.VmsDir[*vm.InstanceID]
+			filepath.Walk(scaleset.VmsDir[*vm.InstanceID], beforeCallback)
+		}
+	}
+
+	return func() map[string]map[string][]string {
+		for _, scaleset := range az.ComputeRP.State {
+			for _, vm := range scaleset.Vms {
+				prefix = fmt.Sprintf("%s:%s:", scaleset.Name, *vm.InstanceID)
+				parentDir = scaleset.VmsDir[*vm.InstanceID]
+				filepath.Walk(scaleset.VmsDir[*vm.InstanceID], afterCallback)
+			}
+		}
+		diff := map[string]map[string][]string{}
+		for key, val := range hashes {
+			if val.before != val.after {
+				keySplit := strings.Split(key, ":")
+				_, ok := diff[keySplit[0]]
+				if !ok {
+					diff[keySplit[0]] = map[string][]string{}
+				}
+				_, ok = diff[keySplit[0]][keySplit[1]]
+				if !ok {
+					diff[keySplit[0]][keySplit[1]] = []string{}
+				}
+				diff[keySplit[0]][keySplit[1]] = append(diff[keySplit[0]][keySplit[1]], keySplit[2])
+			}
+		}
+		return diff
+	}
+}
+
+func TestHowRotateClusterSecretsChangesFiles(t *testing.T) {
+	log := logrus.NewEntry(logrus.StandardLogger())
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetFormatter(&logrus.TextFormatter{DisableTimestamp: true})
+	ctx := context.Background()
+
+	cs := newTestCs()
+	az := newFakeAzureCloud(log)
+	defer az.Cleanup()
+	p, _, err := setupNewCluster(ctx, log, cs, az)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	whatFilesChanged := hashCurrentFiles(az, log)
+
+	perr := p.RotateClusterSecrets(ctx, cs, getFakeDeployer(log, cs, az))
+	if perr != nil {
+		t.Fatal(perr)
+	}
+
+	// For now we are ignoring the instance
+	expected := map[string][]string{
+		"ss-master": {
+			"/etc/origin/master/master.proxy-client.key",
+			"/etc/origin/master/session-secrets.yaml",
+			"/etc/origin/node/node.kubeconfig",
+			"/etc/origin/master/master.server.key",
+			"/etc/origin/master/openshift-master.kubeconfig",
+			"/etc/origin/master/master.proxy-client.crt",
+			"/root/.kube/config",
+			"/etc/origin/master/admin.key",
+			"/etc/origin/master/admin.kubeconfig",
+			"/etc/origin/master/master.kubelet-client.crt",
+			"/etc/origin/master/admin.crt",
+			"/etc/origin/node/sdn.kubeconfig",
+			"/etc/origin/master/master.kubelet-client.key",
+			"/etc/origin/master/master.server.crt",
+		},
+		"ss-infra": {
+			"/etc/origin/node/pods/sdn.yaml",
+			"/etc/origin/node/ca.crt",
+			"/etc/origin/node/node-bootstrapper.key",
+			"/etc/sysconfig/atomic-openshift-node",
+			"/var/lib/origin/.docker/config.json",
+			"/etc/origin/node/bootstrap.kubeconfig",
+			"/etc/origin/node/node-bootstrapper.crt",
+			"/etc/origin/node/resolv.conf",
+			"/etc/pki/ca-trust/source/anchors/openshift-ca.crt",
+			"/etc/origin/node/pods/ovs.yaml",
+			"/etc/origin/node/node-config.yaml",
+			"/etc/origin/cloudprovider/azure.conf",
+			"/etc/origin/node/sdn.kubeconfig",
+		},
+		"ss-compute": {
+			"/etc/origin/node/sdn.kubeconfig",
+			"/etc/origin/cloudprovider/azure.conf",
+			"/etc/origin/node/pods/ovs.yaml",
+			"/etc/origin/node/node-bootstrapper.crt",
+			"/etc/origin/node/node-config.yaml",
+			"/etc/origin/node/resolv.conf",
+			"/etc/origin/node/bootstrap.kubeconfig",
+			"/etc/sysconfig/atomic-openshift-node",
+			"/etc/origin/node/node-bootstrapper.key",
+			"/var/lib/origin/.docker/config.json",
+			"/etc/origin/node/ca.crt",
+			"/etc/origin/node/pods/sdn.yaml",
+			"/etc/pki/ca-trust/source/anchors/openshift-ca.crt",
+		},
+	}
+	actual := whatFilesChanged()
+	for ssFullName := range actual {
+		found := false
+		for ss := range expected {
+			if strings.HasPrefix(ssFullName, ss) {
+				found = true
+				for instance := range actual[ssFullName] {
+					sort.Slice(actual[ssFullName][instance], func(i, j int) bool { return actual[ssFullName][instance][i] < actual[ssFullName][instance][j] })
+					sort.Slice(expected[ss], func(i, j int) bool { return expected[ss][i] < expected[ss][j] })
+					if !reflect.DeepEqual(actual[ssFullName][instance], expected[ss]) {
+						t.Errorf("unexpected %v != %v", actual[ssFullName][instance], expected[ss])
+					}
+				}
+				break
+			}
+		}
+		if !found {
+			t.Errorf("unexpected scaleset %s", ssFullName)
+		}
 	}
 }

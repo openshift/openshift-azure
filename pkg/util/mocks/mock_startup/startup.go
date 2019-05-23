@@ -11,6 +11,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 
 	api "github.com/openshift/openshift-azure/pkg/api"
+	keyvault "github.com/openshift/openshift-azure/pkg/util/azureclient/keyvault"
 )
 
 // MockInterface is a mock of Interface interface
@@ -48,6 +49,20 @@ func (m *MockInterface) WriteFiles(ctx context.Context) error {
 func (mr *MockInterfaceMockRecorder) WriteFiles(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteFiles", reflect.TypeOf((*MockInterface)(nil).WriteFiles), ctx)
+}
+
+// WriteFilesExt mocks base method
+func (m *MockInterface) WriteFilesExt(ctx context.Context, kvc keyvault.KeyVaultClient, hostname, domainname, dirPrefix string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WriteFilesExt", ctx, kvc, hostname, domainname, dirPrefix)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WriteFilesExt indicates an expected call of WriteFilesExt
+func (mr *MockInterfaceMockRecorder) WriteFilesExt(ctx, kvc, hostname, domainname, dirPrefix interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteFilesExt", reflect.TypeOf((*MockInterface)(nil).WriteFilesExt), ctx, kvc, hostname, domainname, dirPrefix)
 }
 
 // Hash mocks base method

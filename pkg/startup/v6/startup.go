@@ -72,20 +72,32 @@ func (s *startup) WriteFiles(ctx context.Context) error {
 		}
 	}
 
-	return s.writeFiles(role, writers.NewFilesystemWriter(), hostname, domainname)
+	return s.writeFiles(role, writers.NewFilesystemWriter(), hostname, domainname, "/host")
+}
+
+func (s *startup) WriteFilesExt(ctx context.Context, kvc keyvault.KeyVaultClient, hostname, domainname, dirPrefix string) error {
+	role := names.GetAgentRole(hostname)
+	if role == api.AgentPoolProfileRoleMaster {
+		s.log.Info("enriching config")
+		err := enrich.CertificatesFromVault(ctx, kvc, s.cs)
+		if err != nil {
+			return err
+		}
+	}
+	return s.writeFiles(role, writers.NewFilesystemWriter(), hostname, domainname, dirPrefix)
 }
 
 func (s *startup) Hash(role api.AgentPoolProfileRole) ([]byte, error) {
 	hash := sha256.New()
 
-	err := s.writeFiles(role, writers.NewTarWriter(hash), "", "")
+	err := s.writeFiles(role, writers.NewTarWriter(hash), "", "", "/host")
 	if err != nil {
 		return nil, err
 	}
 
 	if s.testConfig.DebugHashFunctions {
 		buf := &bytes.Buffer{}
-		err = s.writeFiles(role, writers.NewTarWriter(buf), "", "")
+		err = s.writeFiles(role, writers.NewTarWriter(buf), "", "", "/host")
 		if err != nil {
 			return nil, err
 		}
@@ -98,7 +110,7 @@ func (s *startup) Hash(role api.AgentPoolProfileRole) ([]byte, error) {
 	return hash.Sum(nil), nil
 }
 
-func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, hostname, domainname string) error {
+func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, hostname, domainname, dirPrefix string) error {
 	assetNames := AssetNames()
 	sort.Strings(assetNames)
 
@@ -161,7 +173,7 @@ func (s *startup) writeFiles(role api.AgentPoolProfileRole, w writers.Writer, ho
 			perm = 0644
 		}
 
-		filepath = "/host" + filepath
+		filepath = path.Join(dirPrefix, filepath)
 
 		parentDir := path.Dir(filepath)
 		err = w.MkdirAll(parentDir, 0755)

@@ -1,6 +1,8 @@
 package fake
 
 import (
+	"os"
+
 	azcompute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	azkeyvault "github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault"
 	azstorage "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2018-02-01/storage"
@@ -29,10 +31,19 @@ type AzureCloud struct {
 	VirtualMachineScaleSetsClient   compute.VirtualMachineScaleSetsClient
 }
 
+// Cleanup all resources
+func (a *AzureCloud) Cleanup() {
+	for _, scaleset := range a.ComputeRP.State {
+		for instanceID := range scaleset.VmsDir {
+			os.RemoveAll(scaleset.VmsDir[instanceID])
+		}
+	}
+}
+
 func NewFakeAzureCloud(log *logrus.Entry, secrets []azkeyvault.SecretBundle) *AzureCloud {
 	az := &AzureCloud{
 		ComputeRP: fakecompute.ComputeRP{
-			Vms:   map[string][]azcompute.VirtualMachineScaleSetVM{},
+			State: []fakecompute.ScaleSetState{},
 			Ssc:   []azcompute.VirtualMachineScaleSet{},
 			Calls: []string{},
 			Log:   log,
@@ -52,8 +63,8 @@ func NewFakeAzureCloud(log *logrus.Entry, secrets []azkeyvault.SecretBundle) *Az
 	az.AccountsClient = fakestorage.NewFakeAccountsClient(&az.StorageRP)
 	az.StorageClient = fakestorage.NewFakeStorageClient(&az.StorageRP)
 	az.KeyVaultClient = fakekeyvault.NewFakeKeyVaultClient(&az.VaultRP)
-	az.VirtualMachineScaleSetVMsClient = fakecompute.NewFakeVirtualMachineScaleSetVMsClient(&az.ComputeRP)
-	az.VirtualMachineScaleSetsClient = fakecompute.NewFakeVirtualMachineScaleSetsClient(&az.ComputeRP)
+	az.VirtualMachineScaleSetVMsClient = fakecompute.NewFakeVirtualMachineScaleSetVMsClient(az.KeyVaultClient, &az.ComputeRP)
+	az.VirtualMachineScaleSetsClient = fakecompute.NewFakeVirtualMachineScaleSetsClient(az.VirtualMachineScaleSetVMsClient, &az.ComputeRP)
 	az.DeploymentsClient = fakeresources.NewFakeDeploymentsClient(az.VirtualMachineScaleSetsClient, &az.StorageRP)
 	return az
 }

@@ -2,59 +2,48 @@ package compute
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
 	azcompute "github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2018-10-01/compute"
-	"github.com/Azure/go-autorest/autorest/to"
-	uuid "github.com/satori/go.uuid"
+
+	"github.com/openshift/openshift-azure/pkg/util/azureclient/compute"
 )
 
 type FakeVirtualMachineScaleSetsClient struct {
-	rp *ComputeRP
+	rp  *ComputeRP
+	vms compute.VirtualMachineScaleSetVMsClient
 }
 
+var _ compute.VirtualMachineScaleSetsClient = &FakeVirtualMachineScaleSetsClient{}
+
 // NewFakeVirtualMachineScaleSetsClient creates a new Fake instance
-func NewFakeVirtualMachineScaleSetsClient(rp *ComputeRP) *FakeVirtualMachineScaleSetsClient {
-	return &FakeVirtualMachineScaleSetsClient{rp: rp}
+func NewFakeVirtualMachineScaleSetsClient(vms compute.VirtualMachineScaleSetVMsClient, rp *ComputeRP) *FakeVirtualMachineScaleSetsClient {
+	return &FakeVirtualMachineScaleSetsClient{rp: rp, vms: vms}
 }
 
 func (s *FakeVirtualMachineScaleSetsClient) scale(ctx context.Context, resourceGroupName string, ss *azcompute.VirtualMachineScaleSet) error {
-	_, rgExist := s.rp.Vms[*ss.Name]
-	if !rgExist {
-		s.rp.Vms[*ss.Name] = []azcompute.VirtualMachineScaleSetVM{}
-	}
-
-	have := int64(len(s.rp.Vms[*ss.Name]))
-	s.rp.Log.Debugf("scale have:%d, cap:%d", have, *ss.Sku.Capacity)
+	stateIndex := s.rp.getScaleSetStateIndex(*ss.Name)
+	have := int64(len(s.rp.State[stateIndex].Vms))
 	if have > *ss.Sku.Capacity {
-		s.rp.Vms[*ss.Name] = s.rp.Vms[*ss.Name][:*ss.Sku.Capacity]
+		for ix := range s.rp.State[stateIndex].Vms[*ss.Sku.Capacity:have] {
+			err := s.vms.Delete(ctx, resourceGroupName, *ss.Name, *s.rp.State[stateIndex].Vms[ix].InstanceID)
+			if err != nil {
+				return err
+			}
+		}
 		return nil
 	}
 	for v := have; *ss.Sku.Capacity > have; v++ {
-		name := fmt.Sprintf("%s-%d", (*ss.Name)[3:], v)
-		compName := fmt.Sprintf("%s-%06d", (*ss.Name)[3:], v)
-		s.rp.Log.Infof("scale have:%d, cap:%d, v:%d, name:%s, compName:%s", have, *ss.Sku.Capacity, v, name, compName)
-		vm := compute.VirtualMachineScaleSetVM{
-			ID:         to.StringPtr(uuid.NewV4().String()),
-			InstanceID: to.StringPtr(fmt.Sprintf("%d", v)),
-			Name:       &name,
-			VirtualMachineScaleSetVMProperties: &compute.VirtualMachineScaleSetVMProperties{
-				OsProfile: &compute.OSProfile{ComputerName: &compName},
-			},
-			Location: ss.Location,
-			Plan:     ss.Plan,
-			Tags:     ss.Tags,
-			Zones:    ss.Zones,
+		err := s.vms.Start(ctx, resourceGroupName, *ss.Name, s.rp.createVM(ss, stateIndex, int(v)))
+		if err != nil {
+			return err
 		}
-		s.rp.Vms[*ss.Name] = append(s.rp.Vms[*ss.Name], vm)
 		have++
 	}
 	return nil
 }
 
 // CreateOrUpdate Fakes base method
-func (s *FakeVirtualMachineScaleSetsClient) CreateOrUpdate(ctx context.Context, resourceGroupName, VMScaleSetName string, parameters compute.VirtualMachineScaleSet) error {
+func (s *FakeVirtualMachineScaleSetsClient) CreateOrUpdate(ctx context.Context, resourceGroupName, VMScaleSetName string, parameters azcompute.VirtualMachineScaleSet) error {
 	s.rp.Calls = append(s.rp.Calls, "VirtualMachineScaleSetsClient:CreateOrUpdate:"+VMScaleSetName)
 	found := false
 	for i, ss := range s.rp.Ssc {
@@ -67,6 +56,15 @@ func (s *FakeVirtualMachineScaleSetsClient) CreateOrUpdate(ctx context.Context, 
 	if !found {
 		s.rp.Ssc = append(s.rp.Ssc, parameters)
 	}
+
+	if s.rp.getScaleSetStateIndex(VMScaleSetName) == -1 {
+		s.rp.State = append(s.rp.State, ScaleSetState{
+			Name:   VMScaleSetName,
+			Vms:    []azcompute.VirtualMachineScaleSetVM{},
+			VmsDir: map[string]string{},
+		})
+	}
+
 	return s.scale(ctx, resourceGroupName, &parameters)
 }
 
@@ -88,23 +86,23 @@ func (s *FakeVirtualMachineScaleSetsClient) Delete(ctx context.Context, resource
 }
 
 // Get Fakes base method
-func (s *FakeVirtualMachineScaleSetsClient) Get(ctx context.Context, resourceGroup, VMScaleSetName string) (compute.VirtualMachineScaleSet, error) {
+func (s *FakeVirtualMachineScaleSetsClient) Get(ctx context.Context, resourceGroup, VMScaleSetName string) (azcompute.VirtualMachineScaleSet, error) {
 	for _, ss := range s.rp.Ssc {
 		if VMScaleSetName == *ss.Name {
 			return ss, nil
 		}
 	}
-	return compute.VirtualMachineScaleSet{}, nil
+	return azcompute.VirtualMachineScaleSet{}, nil
 }
 
 // List Fakes base method
-func (s *FakeVirtualMachineScaleSetsClient) List(ctx context.Context, resourceGroup string) ([]compute.VirtualMachineScaleSet, error) {
+func (s *FakeVirtualMachineScaleSetsClient) List(ctx context.Context, resourceGroup string) ([]azcompute.VirtualMachineScaleSet, error) {
 	s.rp.Calls = append(s.rp.Calls, "VirtualMachineScaleSetsClient:List")
 	return s.rp.Ssc, nil
 }
 
 // Update Fakes base method
-func (s *FakeVirtualMachineScaleSetsClient) Update(ctx context.Context, resourceGroupName, VMScaleSetName string, parameters compute.VirtualMachineScaleSetUpdate) error {
+func (s *FakeVirtualMachineScaleSetsClient) Update(ctx context.Context, resourceGroupName, VMScaleSetName string, parameters azcompute.VirtualMachineScaleSetUpdate) error {
 	s.rp.Calls = append(s.rp.Calls, "VirtualMachineScaleSetsClient:Update:"+VMScaleSetName)
 	for _, ss := range s.rp.Ssc {
 		if VMScaleSetName == *ss.Name {
@@ -117,7 +115,7 @@ func (s *FakeVirtualMachineScaleSetsClient) Update(ctx context.Context, resource
 }
 
 // UpdateInstances Fakes base method
-func (s *FakeVirtualMachineScaleSetsClient) UpdateInstances(ctx context.Context, resourceGroupName, VMScaleSetName string, VMInstanceIDs compute.VirtualMachineScaleSetVMInstanceRequiredIDs) error {
+func (s *FakeVirtualMachineScaleSetsClient) UpdateInstances(ctx context.Context, resourceGroupName, VMScaleSetName string, VMInstanceIDs azcompute.VirtualMachineScaleSetVMInstanceRequiredIDs) error {
 	s.rp.Calls = append(s.rp.Calls, "VirtualMachineScaleSetsClient:UpdateInstances:"+VMScaleSetName)
 	return nil
 }
