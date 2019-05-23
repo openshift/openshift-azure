@@ -28,9 +28,9 @@ var _ = Describe("Etcd Recovery E2E tests [EtcdBackupRecovery][Fake][LongRunning
 	)
 
 	BeforeEach(func() {
-		backup, err := random.LowerCaseAlphanumericString(5)
+		randomTag, err := random.LowerCaseAlphanumericString(5)
 		Expect(err).ToNot(HaveOccurred())
-		backup = "e2e-test-" + backup
+		backup = "e2e-test-" + randomTag
 		namespace, err = random.LowerCaseAlphanumericString(5)
 		Expect(err).ToNot(HaveOccurred())
 		namespace = "e2e-test-" + namespace
