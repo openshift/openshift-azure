@@ -510,6 +510,88 @@ func TestHowAdminConfigChangesCausesRotations(t *testing.T) {
 	}
 }
 
+func TestHowUserConfigChangesCausesRotations(t *testing.T) {
+	tests := []struct {
+		name           string
+		change         func(cs *api.OpenShiftManagedCluster)
+		expectRotation map[rotationType]bool
+	}{
+		{
+			name:           "no changes",
+			expectRotation: map[rotationType]bool{rotationMaster: false, rotationInfra: false, rotationSync: false, rotationCompute: false},
+			change:         func(cs *api.OpenShiftManagedCluster) {},
+		},
+		{
+			// Note: master and infra must be changed together.
+			name:           "change master and infra vm size",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: true, rotationSync: false, rotationCompute: false},
+			change: func(cs *api.OpenShiftManagedCluster) {
+				for i := range cs.Properties.AgentPoolProfiles {
+					if cs.Properties.AgentPoolProfiles[i].Role != api.AgentPoolProfileRoleCompute {
+						cs.Properties.AgentPoolProfiles[i].VMSize = "Standard_D16s_v3"
+					}
+				}
+			},
+		},
+		{
+			// Note: master is rotating here, is this expected?
+			name:           "change compute vm size",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: false, rotationSync: false, rotationCompute: true},
+			change: func(cs *api.OpenShiftManagedCluster) {
+				for i := range cs.Properties.AgentPoolProfiles {
+					if cs.Properties.AgentPoolProfiles[i].Role == api.AgentPoolProfileRoleCompute {
+						cs.Properties.AgentPoolProfiles[i].VMSize = "Standard_F16s_v2"
+					}
+				}
+			},
+		},
+		{
+			name:           "change AADIdentityProvider",
+			expectRotation: map[rotationType]bool{rotationMaster: true, rotationInfra: false, rotationSync: true, rotationCompute: false},
+			change: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).Secret = "new"
+			},
+		},
+	}
+
+	log := logrus.NewEntry(logrus.StandardLogger())
+	ctx := context.Background()
+	cs := newTestCs()
+	az := newFakeAzureCloud(log)
+	p, _, err := setupNewCluster(ctx, log, cs, az)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			beforeBlob, beforeSyncChecksum, err := getHashes(az, cs)
+			if err != nil {
+				t.Fatal(err)
+			}
+			oldCs := cs.DeepCopy()
+			tt.change(cs)
+
+			errs := p.Validate(ctx, cs, oldCs, false)
+			if errs != nil {
+				t.Fatal(errs)
+			}
+			perr := p.CreateOrUpdate(ctx, cs, true, getFakeDeployer(log, cs, az))
+			if perr != nil {
+				t.Fatal(perr)
+			}
+
+			afterBlob, afterSyncChecksum, err := getHashes(az, cs)
+			if err != nil {
+				t.Fatal(err)
+			}
+			rotations := getRotations(beforeBlob, afterBlob, beforeSyncChecksum, afterSyncChecksum)
+			if !reflect.DeepEqual(tt.expectRotation, rotations) {
+				t.Fatalf("rotation mismatch: expected %v, got %v", tt.expectRotation, rotations)
+			}
+		})
+	}
+}
+
 func TestHowActionsCauseRotations(t *testing.T) {
 	log := logrus.NewEntry(logrus.StandardLogger())
 	ctx := context.Background()
@@ -646,7 +728,6 @@ func TestHowActionsCauseRotations(t *testing.T) {
 					t.Errorf("call %s not found in %v", ec, az.ComputeRP.Calls)
 				}
 			}
-
 			nodeCount := getNodeCountFromAz(az)
 			if !reflect.DeepEqual(tt.expectNodes, nodeCount) {
 				t.Fatalf("node mismatch: expected %v, got %v", tt.expectNodes, nodeCount)

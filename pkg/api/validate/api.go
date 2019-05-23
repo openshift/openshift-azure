@@ -53,6 +53,12 @@ func (v *APIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftMa
 	old.Properties.ProvisioningState = cs.Properties.ProvisioningState
 
 	for i, app := range old.Properties.AgentPoolProfiles {
+		for _, newApp := range cs.Properties.AgentPoolProfiles {
+			if newApp.Name == app.Name {
+				old.Properties.AgentPoolProfiles[i].VMSize = newApp.VMSize
+			}
+		}
+
 		if app.Role != api.AgentPoolProfileRoleCompute {
 			continue
 		}
@@ -63,6 +69,7 @@ func (v *APIValidator) validateUpdateContainerService(cs, oldCs *api.OpenShiftMa
 			}
 		}
 	}
+	old.Properties.AuthProfile.IdentityProviders = cs.Properties.AuthProfile.IdentityProviders
 
 	if !reflect.DeepEqual(cs, old) {
 		// TODO: this is a hack because we're using deep.Equal.  To fix properly

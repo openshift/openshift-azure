@@ -22,6 +22,11 @@ func TestAPIValidateUpdate(t *testing.T) {
 				oc.Properties.AgentPoolProfiles[2].Count++
 			},
 		},
+		"change compute VMSize": {
+			f: func(oc *api.OpenShiftManagedCluster) {
+				oc.Properties.AgentPoolProfiles[2].VMSize = api.StandardF16sV2
+			},
+		},
 		"invalid change": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Name = "new"
@@ -30,12 +35,9 @@ func TestAPIValidateUpdate(t *testing.T) {
 				errors.New(`invalid change [Name: new != openshift]`),
 			},
 		},
-		"secrets hidden": {
+		"change AADIdentityProvider": {
 			f: func(oc *api.OpenShiftManagedCluster) {
 				oc.Properties.AuthProfile.IdentityProviders[0].Provider.(*api.AADIdentityProvider).Secret = "new"
-			},
-			expectedErrs: []error{
-				errors.New(`invalid change [Properties.AuthProfile.IdentityProviders.slice[0].Provider.Secret: <hidden 1> != <hidden 2>]`),
 			},
 		},
 		"provisioningstate is mutable": {
