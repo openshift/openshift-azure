@@ -2,7 +2,11 @@ package azurecontrollers
 
 import (
 	"context"
+	"fmt"
+	"net"
+	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -20,8 +24,16 @@ func start(cfg *cmdConfig) error {
 
 	log.Print("azure-controller pod starting")
 
-	// TODO: Expose metrics port after SDK uses controller-runtime's dynamic client
-	// sdk.ExposeMetricsPort()
+	l, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.metricsPort))
+	if err != nil {
+		return err
+	}
+
+	mux := &http.ServeMux{}
+	mux.Handle("/healthz/ready", http.HandlerFunc(readyHandler))
+	mux.Handle("/metrics", promhttp.Handler())
+
+	go http.Serve(l, mux)
 
 	managerConfig, err := config.GetConfig()
 	if err != nil {
@@ -41,4 +53,8 @@ func start(cfg *cmdConfig) error {
 
 	log.Print("starting manager")
 	return m.Start(stopCh)
+}
+
+func readyHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }
