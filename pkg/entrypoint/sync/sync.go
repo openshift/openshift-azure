@@ -134,7 +134,7 @@ func start(cfg *cmdConfig) error {
 		return s.PrintDB()
 	}
 
-	l, err := net.Listen("tcp", ":8080")
+	l, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.metricsPort))
 	if err != nil {
 		return err
 	}

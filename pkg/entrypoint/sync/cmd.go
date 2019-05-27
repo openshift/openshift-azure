@@ -10,9 +10,10 @@ import (
 
 type cmdConfig struct {
 	config.Common
-	dryRun   bool
-	once     bool
-	interval time.Duration
+	dryRun      bool
+	once        bool
+	interval    time.Duration
+	metricsPort int
 }
 
 // NewCommand returns the cobra command for "sync".
@@ -31,6 +32,7 @@ func NewCommand() *cobra.Command {
 	cc.Flags().Bool("dry-run", false, "Print resources to be synced instead of mutating cluster state.")
 	cc.Flags().Bool("run-once", false, "If true, run only once then quit.")
 	cc.Flags().Duration("interval", 3*time.Minute, "How often the sync process going to be rerun.")
+	cc.Flags().Int("metrics-port", 8080, "The port on which to serve metrics")
 
 	return cc
 }
@@ -51,6 +53,10 @@ func configFromCmd(cmd *cobra.Command) (*cmdConfig, error) {
 		return nil, err
 	}
 	c.interval, err = cmd.Flags().GetDuration("interval")
+	if err != nil {
+		return nil, err
+	}
+	c.metricsPort, err = cmd.Flags().GetInt("metrics-port")
 	if err != nil {
 		return nil, err
 	}
