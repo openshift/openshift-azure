@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: customer-admin-controller
+    azure-app: customer-admin-controller
+  name: azure-controllers
+  namespace: openshift-monitoring
+spec:
+  endpoints:
+  - interval: 1m
+    metrics_path: /metrics
+    port: http
+    scheme: http
+  jobLabel: azure-controllers
+  namespaceSelector:
+    matchNames:
+    - openshift-infra
+  selector:
+    matchLabels:
+      app: customer-admin-controller

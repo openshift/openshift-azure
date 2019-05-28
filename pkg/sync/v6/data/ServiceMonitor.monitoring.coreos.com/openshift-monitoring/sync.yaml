@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: sync
+    azure-app: sync
+  name: sync
+  namespace: openshift-monitoring
+spec:
+  endpoints:
+  - interval: 1m
+    metrics_path: /metrics
+    port: http
+    scheme: http
+  jobLabel: sync
+  namespaceSelector:
+    matchNames:
+    - kube-system
+  selector:
+    matchLabels:
+      app: sync
