@@ -23,6 +23,7 @@ if [[ "$FOCUS" == *"\[Fake\]"* ]]; then
 fi
 
 go test \
+-race \
 -ldflags "-X github.com/openshift/openshift-azure/test/e2e.gitCommit=COMMIT" \
 ./test/e2e \
 -timeout "$TIMEOUT" \
