@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
@@ -99,6 +100,7 @@ func start(cfg *cmdConfig) error {
 
 	mux := &http.ServeMux{}
 	mux.Handle("/healthz/ready", http.HandlerFunc(s.ReadyHandler))
+	mux.Handle(cfg.metricsEndpoint, promhttp.Handler())
 
 	go http.Serve(l, mux)
 
