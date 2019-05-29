@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app: customer-admin-controller
   name: customer-admin-controller
   namespace: openshift-infra
 spec:
@@ -18,6 +20,15 @@ spec:
         - azure-controllers
         image: '*** GENERATED ***'
         name: customer-admin-controller
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          httpGet:
+            path: healthz/ready
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 10
         volumeMounts:
         - mountPath: /_data/_out
           name: aad-group-sync-config
