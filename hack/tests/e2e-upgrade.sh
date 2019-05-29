@@ -27,10 +27,6 @@ start_monitoring $T/src/github.com/openshift/openshift-azure/_data/containerserv
 git clone -q -b "$1" https://github.com/openshift/openshift-azure.git $T/src/github.com/openshift/openshift-azure
 ln -sf "$PWD/secrets" "$T/src/github.com/openshift/openshift-azure"
 (
-    export AZURE_MASTER_CLIENT_ID=$AZURE_LEGACY_MASTER_CLIENT_ID
-    export AZURE_MASTER_CLIENT_SECRET=$AZURE_LEGACY_MASTER_CLIENT_SECRET
-    export AZURE_WORKER_CLIENT_ID=$AZURE_LEGACY_WORKER_CLIENT_ID
-    export AZURE_WORKER_CLIENT_SECRET=$AZURE_LEGACY_WORKER_CLIENT_SECRET
     cd "$T/src/github.com/openshift/openshift-azure"
     # TODO: remove after v3.2 goes away
     if [[ "$1" == "v3.2" ]]; then
