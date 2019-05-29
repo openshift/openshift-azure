@@ -8,7 +8,7 @@ metadata:
   namespace: openshift-monitoring
 spec:
   endpoints:
-  - interval: 1m
+  - interval: 30s
     metrics_path: /metrics
     port: http
     scheme: http

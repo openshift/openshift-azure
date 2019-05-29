@@ -14,7 +14,7 @@ spec:
       username:
         key: username
         name: router-stats
-    interval: 1m
+    interval: 30s
     metrics_path: /metrics
     port: router-stats
     scheme: http

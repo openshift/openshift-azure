@@ -15,7 +15,7 @@ spec:
       username:
         key: username
         name: etcd-metrics
-    interval: 1m
+    interval: 30s
     metrics_path: /metrics
     port: metrics
     scheme: https
