@@ -3,6 +3,7 @@ package sync
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
 	"time"
@@ -91,7 +92,7 @@ func start(cfg *cmdConfig) error {
 		return s.PrintDB()
 	}
 
-	l, err := net.Listen("tcp", ":8080")
+	l, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.httpPort))
 	if err != nil {
 		return err
 	}
