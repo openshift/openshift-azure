@@ -145,14 +145,6 @@ func NewKubeclient(log *logrus.Entry, config *v1.Config, disableKeepAlives bool)
 		// first, tweak values on the incoming RoundTripper, which we are
 		// relying on being an *http.Transport.
 
-		// see net/http/transport.go: all values are default except the dial
-		// timeout reduction from 30 to 10 seconds.
-		rt.(*http.Transport).DialContext = (&net.Dialer{
-			Timeout:   10 * time.Second,
-			KeepAlive: 30 * time.Second,
-			DualStack: true,
-		}).DialContext
-
 		rt.(*http.Transport).DisableKeepAlives = disableKeepAlives
 
 		// now wrap our RetryingRoundTripper around the incoming RoundTripper.
