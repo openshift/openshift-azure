@@ -8,6 +8,8 @@ import (
 
 type cmdConfig struct {
 	config.Common
+	httpPort        int
+	metricsEndpoint string
 }
 
 // NewCommand returns the cobra command for "azure-controllers".
@@ -23,6 +25,9 @@ func NewCommand() *cobra.Command {
 			return start(cfg)
 		},
 	}
+	cc.Flags().Int("http-port", 8080, "The http server port")
+	cc.Flags().String("metrics-endpoint", "/metrics", "The endpoint for serving azure-controllers metrics")
+
 	return cc
 }
 
@@ -33,5 +38,14 @@ func configFromCmd(cmd *cobra.Command) (*cmdConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+	c.httpPort, err = cmd.Flags().GetInt("http-port")
+	if err != nil {
+		return nil, err
+	}
+	c.metricsEndpoint, err = cmd.Flags().GetString("metrics-endpoint")
+	if err != nil {
+		return nil, err
+	}
+
 	return c, nil
 }
