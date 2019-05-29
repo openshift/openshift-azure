@@ -39,6 +39,8 @@ func defaultPodSpec(obj map[string]interface{}) {
 	jsonpath.MustCompile("$.volumes.*.secret.defaultMode").DeleteIfMatch(obj, int64(0644))
 }
 
+// defaults removes default values, which don't have to be specified in sync pods config
+// and are filled when applying the configuration to a cluster
 func defaults(o unstructured.Unstructured) {
 	gk := o.GroupVersionKind().GroupKind()
 
@@ -96,7 +98,7 @@ func defaults(o unstructured.Unstructured) {
 		jsonpath.MustCompile("$.spec.revisionHistoryLimit").DeleteIfMatch(o.Object, int64(10))
 		jsonpath.MustCompile("$.spec.serviceName").DeleteIfMatch(o.Object, "")
 
-		jsonpath.MustCompile("$.spec.updateStrategy.rollingUpdate.partition").DeleteIfMatch(o.Object, "0")
+		jsonpath.MustCompile("$.spec.updateStrategy.rollingUpdate.partition").DeleteIfMatch(o.Object, int64(0))
 		jsonpath.MustCompile("$.spec.updateStrategy.rollingUpdate").DeleteIfMatch(o.Object, map[string]interface{}{})
 		jsonpath.MustCompile("$.spec.updateStrategy.type").DeleteIfMatch(o.Object, "RollingUpdate")
 		jsonpath.MustCompile("$.spec.updateStrategy").DeleteIfMatch(o.Object, map[string]interface{}{})
