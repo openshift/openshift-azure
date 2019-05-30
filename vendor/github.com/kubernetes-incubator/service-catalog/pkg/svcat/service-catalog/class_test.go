@@ -36,49 +36,26 @@ var _ = Describe("Class", func() {
 	var (
 		sdk          *SDK
 		svcCatClient *fake.Clientset
-		csc          *v1beta1.ClusterServiceClass
-		csc2         *v1beta1.ClusterServiceClass
-		sc           *v1beta1.ServiceClass
-		sc2          *v1beta1.ServiceClass
+		sc           *v1beta1.ClusterServiceClass
+		sc2          *v1beta1.ClusterServiceClass
 	)
 
 	BeforeEach(func() {
-		csc = &v1beta1.ClusterServiceClass{ObjectMeta: metav1.ObjectMeta{Name: "foobar"}}
-		csc2 = &v1beta1.ClusterServiceClass{ObjectMeta: metav1.ObjectMeta{Name: "barbaz"}}
-		sc = &v1beta1.ServiceClass{ObjectMeta: metav1.ObjectMeta{Name: "foobar", Namespace: "default"}}
-		sc2 = &v1beta1.ServiceClass{ObjectMeta: metav1.ObjectMeta{Name: "barbaz", Namespace: "ns2"}}
-		svcCatClient = fake.NewSimpleClientset(csc, csc2, sc, sc2)
+		sc = &v1beta1.ClusterServiceClass{ObjectMeta: metav1.ObjectMeta{Name: "foobar"}}
+		sc2 = &v1beta1.ClusterServiceClass{ObjectMeta: metav1.ObjectMeta{Name: "barbaz"}}
+		svcCatClient = fake.NewSimpleClientset(sc, sc2)
 		sdk = &SDK{
 			ServiceCatalogClient: svcCatClient,
 		}
 	})
 
 	Describe("RetrieveClasses", func() {
-		It("Calls the generated v1beta1 List methods", func() {
-			classes, err := sdk.RetrieveClasses(ScopeOptions{Scope: AllScope})
+		It("Calls the generated v1beta1 List method", func() {
+			classes, err := sdk.RetrieveClasses()
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(classes).Should(ConsistOf(csc, csc2, sc, sc2))
+			Expect(classes).Should(ConsistOf(*sc, *sc2))
 			Expect(svcCatClient.Actions()[0].Matches("list", "clusterserviceclasses")).To(BeTrue())
-			Expect(svcCatClient.Actions()[1].Matches("list", "serviceclasses")).To(BeTrue())
-		})
-		It("Filters by namespace scope", func() {
-			classes, err := sdk.RetrieveClasses(ScopeOptions{Scope: NamespaceScope, Namespace: "default"})
-
-			Expect(err).NotTo(HaveOccurred())
-			Expect(classes).Should(ConsistOf(sc))
-			Expect(len(svcCatClient.Actions())).Should(Equal(1))
-			Expect(svcCatClient.Actions()[0].Matches("list", "serviceclasses")).To(BeTrue())
-
-		})
-		It("Filters by cluster scope", func() {
-			classes, err := sdk.RetrieveClasses(ScopeOptions{Scope: ClusterScope, Namespace: "default"})
-
-			Expect(err).NotTo(HaveOccurred())
-			Expect(classes).Should(ConsistOf(csc, csc2))
-			Expect(len(svcCatClient.Actions())).Should(Equal(1))
-			Expect(svcCatClient.Actions()[0].Matches("list", "clusterserviceclasses")).To(BeTrue())
-
 		})
 		It("Bubbles up errors", func() {
 			badClient := &fake.Clientset{}
@@ -90,7 +67,7 @@ var _ = Describe("Class", func() {
 				ServiceCatalogClient: badClient,
 			}
 
-			_, err := sdk.RetrieveClasses(ScopeOptions{Scope: AllScope})
+			_, err := sdk.RetrieveClasses()
 
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).Should(ContainSubstring(errorMessage))
@@ -99,10 +76,10 @@ var _ = Describe("Class", func() {
 	})
 	Describe("RetrieveClassByName", func() {
 		It("Calls the generated v1beta1 List method with the passed in class", func() {
-			className := csc.Name
+			className := sc.Name
 			realClient := &fake.Clientset{}
 			realClient.AddReactor("list", "clusterserviceclasses", func(action testing.Action) (bool, runtime.Object, error) {
-				return true, &v1beta1.ClusterServiceClassList{Items: []v1beta1.ClusterServiceClass{*csc}}, nil
+				return true, &v1beta1.ClusterServiceClassList{Items: []v1beta1.ClusterServiceClass{*sc}}, nil
 			})
 			sdk = &SDK{
 				ServiceCatalogClient: realClient,
@@ -110,7 +87,7 @@ var _ = Describe("Class", func() {
 			class, err := sdk.RetrieveClassByName(className)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(class).To(Equal(csc))
+			Expect(class).To(Equal(sc))
 			actions := realClient.Actions()
 			Expect(actions[0].Matches("list", "clusterserviceclasses")).To(BeTrue())
 			requirements := actions[0].(testing.ListActionImpl).GetListRestrictions().Fields.Requirements()
@@ -142,10 +119,10 @@ var _ = Describe("Class", func() {
 	})
 	Describe("RetrieveClassByID", func() {
 		It("Calls the generated v1beta1 get method", func() {
-			classID := fmt.Sprintf("%v", csc.UID)
+			classID := fmt.Sprintf("%v", sc.UID)
 			realClient := &fake.Clientset{}
 			realClient.AddReactor("get", "clusterserviceclasses", func(action testing.Action) (bool, runtime.Object, error) {
-				return true, csc, nil
+				return true, sc, nil
 			})
 			sdk = &SDK{
 				ServiceCatalogClient: realClient,
@@ -182,23 +159,23 @@ var _ = Describe("Class", func() {
 				},
 				Spec: v1beta1.ClusterServicePlanSpec{
 					ClusterServiceClassRef: v1beta1.ClusterObjectReference{
-						Name: csc.Name,
+						Name: sc.Name,
 					},
 				},
 			}
 			realClient := &fake.Clientset{}
 			realClient.AddReactor("get", "clusterserviceclasses", func(action testing.Action) (bool, runtime.Object, error) {
-				return true, csc, nil
+				return true, sc, nil
 			})
 			sdk = &SDK{
 				ServiceCatalogClient: realClient,
 			}
 			class, err := sdk.RetrieveClassByPlan(classPlan)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(class).To(Equal(csc))
+			Expect(class).To(Equal(sc))
 			actions := realClient.Actions()
 			Expect(actions[0].Matches("get", "clusterserviceclasses")).To(BeTrue())
-			Expect(actions[0].(testing.GetActionImpl).Name).To(Equal(csc.Name))
+			Expect(actions[0].(testing.GetActionImpl).Name).To(Equal(sc.Name))
 		})
 		It("Bubbles up errors", func() {
 			fakeClassName := "not_real"
@@ -228,29 +205,6 @@ var _ = Describe("Class", func() {
 			actions := badClient.Actions()
 			Expect(actions[0].Matches("get", "clusterserviceclasses")).To(BeTrue())
 			Expect(actions[0].(testing.GetActionImpl).Name).To(Equal(fakeClassName))
-		})
-	})
-	Describe("CreateClass", func() {
-		It("Calls the generated v1beta1 create method with the passed in class", func() {
-			className := "newclass"
-			csc.Name = className
-			class, err := sdk.CreateClass(csc)
-
-			Expect(err).NotTo(HaveOccurred())
-			Expect(class).To(Equal(csc))
-			actions := svcCatClient.Actions()
-			Expect(actions[0].Matches("create", "clusterserviceclasses")).To(BeTrue())
-			objectFromRequest := actions[0].(testing.CreateActionImpl).Object.(*v1beta1.ClusterServiceClass)
-			Expect(objectFromRequest.Name).To(Equal(className))
-		})
-		It("Bubbles up errors", func() {
-			class, err := sdk.CreateClass(csc)
-
-			Expect(class).To(BeNil())
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).Should(ContainSubstring("unable to create class"))
-			actions := svcCatClient.Actions()
-			Expect(actions[0].Matches("create", "clusterserviceclasses")).To(BeTrue())
 		})
 	})
 })

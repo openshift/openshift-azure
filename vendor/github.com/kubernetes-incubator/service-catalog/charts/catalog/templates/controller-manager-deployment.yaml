@@ -16,9 +16,6 @@ spec:
     metadata:
       annotations:
         prometheus.io/scrape: "{{ .Values.controllerManager.enablePrometheusScrape }}"
-      {{ if .Values.controllerManager.annotations }}
-{{ toYaml .Values.controllerManager.annotations | indent 8 }}
-      {{- end }}
       labels:
         app: {{ template "fullname" . }}-controller-manager
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
@@ -31,7 +28,12 @@ spec:
         image: {{ .Values.image }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         resources:
-{{ toYaml .Values.controllerManager.resources | indent 10 }}
+          requests:
+            cpu: 100m
+            memory: 20Mi
+          limits:
+            cpu: 100m
+            memory: 30Mi
         env:
         - name: K8S_NAMESPACE
           valueFrom:
@@ -41,7 +43,6 @@ spec:
         - controller-manager
         - --secure-port
         - "8444"
-        - "--cluster-id-configmap-namespace={{ .Release.Namespace }}"
         {{ if .Values.controllerManager.leaderElection.activated -}}
         - "--leader-election-namespace={{ .Release.Namespace }}"
         - "--leader-elect-resource-lock=configmaps"
@@ -69,8 +70,10 @@ spec:
         - --broker-relist-interval
         - {{ .Values.controllerManager.brokerRelistInterval }}
         {{- end }}
+        {{- if .Values.originatingIdentityEnabled }}
         - --feature-gates
-        - OriginatingIdentity={{.Values.originatingIdentityEnabled}}
+        - OriginatingIdentity=true
+        {{- end }}
         {{- if .Values.asyncBindingOperationsEnabled }}
         - --feature-gates
         - AsyncBindingOperations=true
@@ -79,9 +82,9 @@ spec:
         - --feature-gates
         - CatalogRestrictions=true
         {{- end }}
-        {{- if .Values.namespacedServiceBrokerDisabled }}
+        {{- if .Values.namespacedServiceBrokerEnabled }}
         - --feature-gates
-        - NamespacedServiceBroker=false
+        - NamespacedServiceBroker=true
         {{- end }}
         ports:
         - containerPort: 8444
@@ -89,7 +92,6 @@ spec:
         - name: service-catalog-cert
           mountPath: /var/run/kubernetes-service-catalog
           readOnly: true
-        {{- if .Values.controllerManager.healthcheck.enabled }}
         readinessProbe:
           httpGet:
             port: 8444
@@ -110,11 +112,6 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 2
-        {{- end }}
-      {{ if .Values.controllerManager.nodeSelector }}
-      nodeSelector:
-         {{ .Values.controllerManager.nodeSelector }}
-      {{ end }}
       volumes:
       - name: service-catalog-cert
         secret:

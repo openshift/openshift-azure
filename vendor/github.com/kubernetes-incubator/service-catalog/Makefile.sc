@@ -57,7 +57,7 @@ STAT           = stat -c '%Y %n'
 endif
 
 TYPES_FILES    = $(shell find pkg/apis -name types.go)
-GO_VERSION    ?= 1.10
+GO_VERSION    ?= 1.9
 
 ALL_ARCH=amd64 arm arm64 ppc64le s390x
 ALL_CLIENT_PLATFORM=darwin linux windows
@@ -77,7 +77,7 @@ endif
 BASEIMAGE?=gcr.io/google-containers/debian-base-$(ARCH):0.3
 
 GO_BUILD       = env CGO_ENABLED=0 GOOS=$(PLATFORM) GOARCH=$(ARCH) \
-                  go build $(GOFLAGS) -a -tags netgo -installsuffix netgo \
+                  go build -i $(GOFLAGS) -a -tags netgo -installsuffix netgo \
                   -ldflags '-s -w -X $(SC_PKG)/pkg.VERSION=$(VERSION) $(BUILD_LDFLAGS)'
 
 BASE_PATH      = $(ROOT:/src/github.com/kubernetes-incubator/service-catalog/=)
@@ -110,9 +110,7 @@ ifdef NO_DOCKER
 	scBuildImageTarget =
 else
 	# Mount .pkg as pkg so that we save our cached "go build" output files
-	DOCKER_CMD = docker run --security-opt label:disable --rm \
-	  -v $(CURDIR):/go/src/$(SC_PKG) \
-	  -v $(CURDIR)/.cache:/root/.cache/ \
+	DOCKER_CMD = docker run --security-opt label:disable --rm -v $(CURDIR):/go/src/$(SC_PKG) \
 	  -v $(CURDIR)/.pkg:/go/pkg --env AZURE_STORAGE_CONNECTION_STRING scbuildimage
 	scBuildImageTarget = .scBuildImage
 endif
@@ -146,26 +144,42 @@ $(BINDIR)/service-catalog: .init .generate_files cmd/service-catalog
 
 # This section contains the code generation stuff
 #################################################
-GENERATORS = $(addprefix $(BINDIR)/, defaulter-gen deepcopy-gen conversion-gen \
-	     client-gen lister-gen informer-gen openapi-gen)
+.generate_exes: $(BINDIR)/defaulter-gen \
+                $(BINDIR)/deepcopy-gen \
+                $(BINDIR)/conversion-gen \
+                $(BINDIR)/client-gen \
+                $(BINDIR)/lister-gen \
+                $(BINDIR)/informer-gen \
+                $(BINDIR)/openapi-gen
+	touch $@
 
-.PHONY: generators
-generators: $(GENERATORS)
+$(BINDIR)/defaulter-gen: .init
+	$(DOCKER_CMD) go build -o $@ $(SC_PKG)/vendor/k8s.io/code-generator/cmd/defaulter-gen
 
-.SECONDEXPANSION:
+$(BINDIR)/deepcopy-gen: .init
+	$(DOCKER_CMD) go build -o $@ $(SC_PKG)/vendor/k8s.io/code-generator/cmd/deepcopy-gen
 
-# We specify broad dependencies for these generator binaries: each one depends
-# on everything under its source tree as well as gengo's.  This uses GNU Make's
-# secondary expansion feature to pass $* to `find`.
-$(BINDIR)/%-gen: $$(shell find vendor/k8s.io/code-generator/cmd/$$*-gen vendor/k8s.io/gengo) .init
-	$(DOCKER_CMD) go build -o $@ $(SC_PKG)/vendor/k8s.io/code-generator/cmd/$*-gen
+$(BINDIR)/conversion-gen: .init
+	$(DOCKER_CMD) go build -o $@ $(SC_PKG)/vendor/k8s.io/code-generator/cmd/conversion-gen
+
+$(BINDIR)/client-gen: .init
+	$(DOCKER_CMD) go build -o $@ $(SC_PKG)/vendor/k8s.io/code-generator/cmd/client-gen
+
+$(BINDIR)/lister-gen: .init
+	$(DOCKER_CMD) go build -o $@ $(SC_PKG)/vendor/k8s.io/code-generator/cmd/lister-gen
+
+$(BINDIR)/informer-gen: .init
+	$(DOCKER_CMD) go build -o $@ $(SC_PKG)/vendor/k8s.io/code-generator/cmd/informer-gen
+
+$(BINDIR)/openapi-gen: vendor/k8s.io/code-generator/cmd/openapi-gen
+	$(DOCKER_CMD) go build -o $@ $(SC_PKG)/$^
 
 .PHONY: $(BINDIR)/e2e.test
 $(BINDIR)/e2e.test: .init
 	$(DOCKER_CMD) go test -c -o $@ $(SC_PKG)/test/e2e
 
 # Regenerate all files if the gen exes changed or any "types.go" files changed
-.generate_files: .init generators $(TYPES_FILES)
+.generate_files: .init .generate_exes $(TYPES_FILES)
 	# generate apiserver deps
 	$(DOCKER_CMD) $(BUILD_DIR)/update-apiserver-gen.sh
 	# generate all pkg/client contents
@@ -182,8 +196,6 @@ $(BINDIR):
 	mkdir -p $@
 
 .scBuildImage: build/build-image/Dockerfile
-	mkdir -p .cache
-	mkdir -p .pkg
 	sed -i "s/GO_VERSION/$(GO_VERSION)/g" build/build-image/Dockerfile
 	docker build -t scbuildimage -f build/build-image/Dockerfile .
 	touch $@
@@ -206,6 +218,7 @@ verify: .init verify-generated verify-client-gen verify-docs verify-vendor
 	  'for i in $$(find $(TOP_SRC_DIRS) -name *.go \
 	    | grep -v ^pkg/kubernetes/ \
 	    | grep -v generated \
+	    | grep -v ^pkg/client/ \
 	    | grep -v v1beta1/defaults.go); \
 	  do \
 	   golint --set_exit_status $$i || exit 1; \
@@ -222,14 +235,14 @@ verify: .init verify-generated verify-client-gen verify-docs verify-vendor
 	@echo Running tag verification:
 	@$(DOCKER_CMD) build/verify-tags.sh
 
-verify-docs: .init
+verify-docs: .init docs
 	@echo Running href checker$(SKIP_COMMENT):
 	@$(DOCKER_CMD) verify-links.sh -s .pkg -s .bundler -s _plugins -s _includes -t $(SKIP_HTTP) .
 
-verify-generated: .init generators
+verify-generated: .init .generate_exes
 	$(DOCKER_CMD) $(BUILD_DIR)/update-apiserver-gen.sh --verify-only
 
-verify-client-gen: .init generators
+verify-client-gen: .init .generate_exes
 	$(DOCKER_CMD) $(BUILD_DIR)/verify-client-gen.sh
 
 format: .init
@@ -260,10 +273,6 @@ test-unit: .init build
 	$(DOCKER_CMD) go test -race $(UNIT_TEST_FLAGS) \
 	  $(addprefix $(SC_PKG)/,$(TEST_DIRS)) $(UNIT_TEST_LOG_FLAGS)
 
-test-update-goldenfiles: .init
-	@echo Updating golden files to match current test output
-	$(DOCKER_CMD) go test ./cmd/svcat/... -update
-
 build-integration: .generate_files
 	$(DOCKER_CMD) go test -race github.com/kubernetes-incubator/service-catalog/test/integration/... -c
 
@@ -272,7 +281,7 @@ test-integration: .init $(scBuildImageTarget) build build-integration
 	contrib/hack/setup-kubectl.sh
 	contrib/hack/test-apiserver.sh
 	# golang integration tests
-	$(DOCKER_CMD) ./integration.test -test.v $(INT_TEST_FLAGS)
+	$(DOCKER_CMD) test/integration.sh $(INT_TEST_FLAGS)
 
 clean-e2e: .init $(scBuildImageTarget)
 	$(DOCKER_CMD) rm -f $(BINDIR)/e2e.test
@@ -286,6 +295,7 @@ clean: clean-bin clean-build-image clean-generated clean-coverage
 
 clean-bin: .init $(scBuildImageTarget)
 	$(DOCKER_CMD) rm -rf $(BINDIR)
+	rm -f .generate_exes
 
 clean-build-image: .init $(scBuildImageTarget)
 	$(DOCKER_CMD) rm -rf .pkg

@@ -25,9 +25,8 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/pkg/errors"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
@@ -35,7 +34,7 @@ import (
 func (sdk *SDK) RetrieveBindings(ns string) (*v1beta1.ServiceBindingList, error) {
 	bindings, err := sdk.ServiceCatalog().ServiceBindings(ns).List(v1.ListOptions{})
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to list bindings in %s", ns)
+		return nil, fmt.Errorf("unable to list bindings in %s (%s)", ns, err)
 	}
 
 	return bindings, nil
@@ -45,7 +44,7 @@ func (sdk *SDK) RetrieveBindings(ns string) (*v1beta1.ServiceBindingList, error)
 func (sdk *SDK) RetrieveBinding(ns, name string) (*v1beta1.ServiceBinding, error) {
 	binding, err := sdk.ServiceCatalog().ServiceBindings(ns).Get(name, v1.GetOptions{})
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to get binding '%s.%s'", ns, name)
+		return nil, fmt.Errorf("unable to get binding '%s.%s' (%+v)", ns, name, err)
 	}
 	return binding, nil
 }
@@ -56,7 +55,7 @@ func (sdk *SDK) RetrieveBindingsByInstance(instance *v1beta1.ServiceInstance,
 	// Not using a filtered list operation because it's not supported yet.
 	results, err := sdk.ServiceCatalog().ServiceBindings(instance.Namespace).List(v1.ListOptions{})
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to search bindings")
+		return nil, fmt.Errorf("unable to search bindings (%s)", err)
 	}
 
 	var bindings []v1beta1.ServiceBinding
@@ -97,14 +96,14 @@ func (sdk *SDK) Bind(namespace, bindingName, externalID, instanceName, secretNam
 
 	result, err := sdk.ServiceCatalog().ServiceBindings(namespace).Create(request)
 	if err != nil {
-		return nil, errors.Wrap(err, "bind request failed")
+		return nil, fmt.Errorf("bind request failed (%s)", err)
 	}
 
 	return result, nil
 }
 
 // Unbind deletes all bindings associated to an instance.
-func (sdk *SDK) Unbind(ns, instanceName string) ([]types.NamespacedName, error) {
+func (sdk *SDK) Unbind(ns, instanceName string) ([]v1beta1.ServiceBinding, error) {
 	instance, err := sdk.RetrieveInstance(ns, instanceName)
 	if err != nil {
 		return nil, err
@@ -113,22 +112,12 @@ func (sdk *SDK) Unbind(ns, instanceName string) ([]types.NamespacedName, error) 
 	if err != nil {
 		return nil, err
 	}
-
-	namespacedNames := []types.NamespacedName{}
-	for _, b := range bindings {
-		namespacedNames = append(namespacedNames, types.NamespacedName{Namespace: b.Namespace, Name: b.Name})
-	}
-	return sdk.DeleteBindings(namespacedNames)
-}
-
-// DeleteBindings deletes bindings by name.
-func (sdk *SDK) DeleteBindings(bindings []types.NamespacedName) ([]types.NamespacedName, error) {
 	var g sync.WaitGroup
 	errs := make(chan error, len(bindings))
-	deletedBindings := make(chan types.NamespacedName, len(bindings))
+	deletedBindings := make(chan v1beta1.ServiceBinding, len(bindings))
 	for _, binding := range bindings {
 		g.Add(1)
-		go func(binding types.NamespacedName) {
+		go func(binding v1beta1.ServiceBinding) {
 			defer g.Done()
 			err := sdk.DeleteBinding(binding.Namespace, binding.Name)
 			if err == nil {
@@ -145,7 +134,7 @@ func (sdk *SDK) DeleteBindings(bindings []types.NamespacedName) ([]types.Namespa
 	// Collect any errors that occurred into a single formatted error
 	bindErr := &multierror.Error{
 		ErrorFormat: func(errors []error) string {
-			return joinErrors("error:", errors, "\n  ")
+			return joinErrors("could not remove some bindings:", errors, "\n  ")
 		},
 	}
 	for err := range errs {
@@ -153,7 +142,7 @@ func (sdk *SDK) DeleteBindings(bindings []types.NamespacedName) ([]types.Namespa
 	}
 
 	//Range over the deleted bindings to build a slice to return
-	deleted := []types.NamespacedName(nil)
+	deleted := []v1beta1.ServiceBinding(nil)
 	for b := range deletedBindings {
 		deleted = append(deleted, b)
 	}
@@ -164,7 +153,7 @@ func (sdk *SDK) DeleteBindings(bindings []types.NamespacedName) ([]types.Namespa
 func (sdk *SDK) DeleteBinding(ns, bindingName string) error {
 	err := sdk.ServiceCatalog().ServiceBindings(ns).Delete(bindingName, &v1.DeleteOptions{})
 	if err != nil {
-		return errors.Wrapf(err, "remove binding %s/%s failed", ns, bindingName)
+		return fmt.Errorf("remove binding %s/%s failed (%s)", ns, bindingName, err)
 	}
 	return nil
 }
@@ -223,8 +212,11 @@ func (sdk *SDK) WaitForBinding(ns, name string, interval time.Duration, timeout 
 	err = wait.PollImmediate(interval, *timeout,
 		func() (bool, error) {
 			binding, err = sdk.RetrieveBinding(ns, name)
-			if err != nil {
-				return true, err
+			if nil != err {
+				if apierrors.IsNotFound(err) {
+					return true, nil
+				}
+				return false, err
 			}
 
 			if len(binding.Status.Conditions) == 0 {
@@ -239,22 +231,18 @@ func (sdk *SDK) WaitForBinding(ns, name string, interval time.Duration, timeout 
 	return binding, err
 }
 
-// IsBindingReady returns true if the instance is in the Ready status.
+// IsBindingReady returns if the instance is in the Ready status.
 func (sdk *SDK) IsBindingReady(binding *v1beta1.ServiceBinding) bool {
-	return sdk.bindingHasStatus(binding, v1beta1.ServiceBindingConditionReady)
+	return sdk.BindingHasStatus(binding, v1beta1.ServiceBindingConditionReady)
 }
 
-// IsBindingFailed returns true if the instance is in the Failed status.
+// IsBindingFailed returns if the instance is in the Failed status.
 func (sdk *SDK) IsBindingFailed(binding *v1beta1.ServiceBinding) bool {
-	return sdk.bindingHasStatus(binding, v1beta1.ServiceBindingConditionFailed)
+	return sdk.BindingHasStatus(binding, v1beta1.ServiceBindingConditionFailed)
 }
 
 // BindingHasStatus returns if the instance is in the specified status.
-func (sdk *SDK) bindingHasStatus(binding *v1beta1.ServiceBinding, status v1beta1.ServiceBindingConditionType) bool {
-	if binding == nil {
-		return false
-	}
-
+func (sdk *SDK) BindingHasStatus(binding *v1beta1.ServiceBinding, status v1beta1.ServiceBindingConditionType) bool {
 	for _, cond := range binding.Status.Conditions {
 		if cond.Type == status &&
 			cond.Status == v1beta1.ConditionTrue {

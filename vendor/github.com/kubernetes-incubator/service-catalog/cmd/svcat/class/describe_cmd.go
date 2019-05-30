@@ -22,7 +22,6 @@ import (
 	"github.com/kubernetes-incubator/service-catalog/cmd/svcat/command"
 	"github.com/kubernetes-incubator/service-catalog/cmd/svcat/output"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	servicecatalog "github.com/kubernetes-incubator/service-catalog/pkg/svcat/service-catalog"
 	"github.com/spf13/cobra"
 )
 
@@ -40,10 +39,10 @@ func NewDescribeCmd(cxt *command.Context) *cobra.Command {
 		Use:     "class NAME",
 		Aliases: []string{"classes", "cl"},
 		Short:   "Show details of a specific class",
-		Example: command.NormalizeExamples(`
+		Example: `
   svcat describe class mysqldb
   svcat describe class -uuid 997b8372-8dac-40ac-ae65-758b4a5075a5
-`),
+`,
 		PreRunE: command.PreRunE(describeCmd),
 		RunE:    command.RunE(describeCmd),
 	}
@@ -89,7 +88,7 @@ func (c *describeCmd) describe() error {
 
 	output.WriteClassDetails(c.Output, class)
 
-	plans, err := c.App.RetrievePlans(servicecatalog.RetrievePlanOptions{Scope: servicecatalog.AllScope, ClassID: class.Name})
+	plans, err := c.App.RetrievePlansByClass(class)
 	if err != nil {
 		return err
 	}

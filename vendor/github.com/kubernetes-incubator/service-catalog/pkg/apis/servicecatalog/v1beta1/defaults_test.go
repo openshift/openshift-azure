@@ -38,7 +38,8 @@ func init() {
 		panic(fmt.Sprintf("Error parsing groupversion: %v", err))
 	}
 
-	externalGroupVersion := schema.GroupVersion{Group: servicecatalog.GroupName, Version: api.Scheme.PrioritizedVersionsForGroup(servicecatalog.GroupName)[0].Version}
+	externalGroupVersion := schema.GroupVersion{Group: servicecatalog.GroupName,
+		Version: api.Registry.GroupOrDie(servicecatalog.GroupName).GroupVersion.Version}
 
 	testapi.Groups[servicecatalog.GroupName] = testapi.NewTestGroup(
 		groupVersion,
@@ -113,6 +114,15 @@ func TestSetDefaultClusterServiceBroker(t *testing.T) {
 			t.Errorf(
 				"%v: unexpected default RelistBehavior: expected %v, got %v",
 				tc.name, tc.behavior, actualSpec.RelistBehavior,
+			)
+		}
+
+		if tc.duration == nil && actualSpec.RelistDuration == nil {
+			continue
+		} else if *tc.duration != *actualSpec.RelistDuration {
+			t.Errorf(
+				"%v: unexpected RelistDuration: expected %v, got %v",
+				tc.name, tc.duration, actualSpec.RelistDuration,
 			)
 		}
 	}

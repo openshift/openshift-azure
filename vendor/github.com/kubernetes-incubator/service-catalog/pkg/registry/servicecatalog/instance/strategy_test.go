@@ -20,12 +20,13 @@ import (
 	"fmt"
 	"testing"
 
+	utilfeature "k8s.io/apiserver/pkg/util/feature"
+
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog"
 	scfeatures "github.com/kubernetes-incubator/service-catalog/pkg/features"
-	sctestutil "github.com/kubernetes-incubator/service-catalog/test/util"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	utilfeature "k8s.io/apiserver/pkg/util/feature"
+	"k8s.io/apiserver/pkg/authentication/user"
+	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 )
 
 func getTestInstance() *servicecatalog.ServiceInstance {
@@ -53,6 +54,14 @@ func getTestInstance() *servicecatalog.ServiceInstance {
 			},
 		},
 	}
+}
+
+func contextWithUserName(userName string) genericapirequest.Context {
+	ctx := genericapirequest.NewContext()
+	userInfo := &user.DefaultInfo{
+		Name: userName,
+	}
+	return genericapirequest.WithUser(ctx, userInfo)
 }
 
 // TestInstanceUpdate tests that updates to the spec of an Instance.
@@ -137,10 +146,9 @@ func TestInstanceUpdate(t *testing.T) {
 			shouldPlanRefClear:        true,
 		},
 	}
-	creatorUserName := "creator"
-	createContext := sctestutil.ContextWithUserName(creatorUserName)
+
 	for _, tc := range cases {
-		instanceRESTStrategies.PrepareForUpdate(createContext, tc.newer, tc.older)
+		instanceRESTStrategies.PrepareForUpdate(nil, tc.newer, tc.older)
 
 		expectedGeneration := tc.older.Generation
 		if tc.shouldGenerationIncrement {
@@ -166,12 +174,12 @@ func TestInstanceUpdate(t *testing.T) {
 // as the user changes for different modifications of the instance.
 func TestInstanceUserInfo(t *testing.T) {
 	// Enable the OriginatingIdentity feature
-	prevOrigIDEnablement := sctestutil.EnableOriginatingIdentity(t, true)
-	defer utilfeature.DefaultFeatureGate.Set(fmt.Sprintf("%v=%v", scfeatures.OriginatingIdentity, prevOrigIDEnablement))
+	utilfeature.DefaultFeatureGate.Set(fmt.Sprintf("%v=true", scfeatures.OriginatingIdentity))
+	defer utilfeature.DefaultFeatureGate.Set(fmt.Sprintf("%v=false", scfeatures.OriginatingIdentity))
 
 	creatorUserName := "creator"
 	createdInstance := getTestInstance()
-	createContext := sctestutil.ContextWithUserName(creatorUserName)
+	createContext := contextWithUserName(creatorUserName)
 	instanceRESTStrategies.PrepareForCreate(createContext, createdInstance)
 
 	if e, a := creatorUserName, createdInstance.Spec.UserInfo.Username; e != a {
@@ -181,7 +189,7 @@ func TestInstanceUserInfo(t *testing.T) {
 	updaterUserName := "updater"
 	updatedInstance := getTestInstance()
 	updatedInstance.Spec.UpdateRequests = updatedInstance.Spec.UpdateRequests + 1
-	updateContext := sctestutil.ContextWithUserName(updaterUserName)
+	updateContext := contextWithUserName(updaterUserName)
 	instanceRESTStrategies.PrepareForUpdate(updateContext, updatedInstance, createdInstance)
 
 	if e, a := updaterUserName, updatedInstance.Spec.UserInfo.Username; e != a {
@@ -190,7 +198,7 @@ func TestInstanceUserInfo(t *testing.T) {
 
 	deleterUserName := "deleter"
 	deletedInstance := getTestInstance()
-	deleteContext := sctestutil.ContextWithUserName(deleterUserName)
+	deleteContext := contextWithUserName(deleterUserName)
 	instanceRESTStrategies.CheckGracefulDelete(deleteContext, deletedInstance, nil)
 
 	if e, a := deleterUserName, deletedInstance.Spec.UserInfo.Username; e != a {
@@ -232,8 +240,6 @@ func TestInstanceUpdateForUpdateRequests(t *testing.T) {
 			expectedValue: 2,
 		},
 	}
-	creatorUserName := "creator"
-	createContext := sctestutil.ContextWithUserName(creatorUserName)
 	for _, tc := range cases {
 		oldInstance := getTestInstance()
 		oldInstance.Spec.UpdateRequests = tc.oldValue
@@ -241,7 +247,7 @@ func TestInstanceUpdateForUpdateRequests(t *testing.T) {
 		newInstance := getTestInstance()
 		newInstance.Spec.UpdateRequests = tc.newValue
 
-		instanceRESTStrategies.PrepareForUpdate(createContext, newInstance, oldInstance)
+		instanceRESTStrategies.PrepareForUpdate(nil, newInstance, oldInstance)
 
 		if e, a := tc.expectedValue, newInstance.Spec.UpdateRequests; e != a {
 			t.Errorf("%s: got unexpected UpdateRequests: expected %v, got %v", tc.name, e, a)
@@ -252,9 +258,7 @@ func TestInstanceUpdateForUpdateRequests(t *testing.T) {
 // TestExternalIDSet checks that we set the ExternalID if the user doesn't provide it.
 func TestExternalIDSet(t *testing.T) {
 	createdInstanceCredential := getTestInstance()
-	creatorUserName := "creator"
-	createContext := sctestutil.ContextWithUserName(creatorUserName)
-	instanceRESTStrategies.PrepareForCreate(createContext, createdInstanceCredential)
+	instanceRESTStrategies.PrepareForCreate(nil, createdInstanceCredential)
 
 	if createdInstanceCredential.Spec.ExternalID == "" {
 		t.Error("Expected an ExternalID to be set, but got none")
@@ -266,9 +270,7 @@ func TestExternalIDUserProvided(t *testing.T) {
 	userExternalID := "my-id"
 	createdInstanceCredential := getTestInstance()
 	createdInstanceCredential.Spec.ExternalID = userExternalID
-	creatorUserName := "creator"
-	createContext := sctestutil.ContextWithUserName(creatorUserName)
-	instanceRESTStrategies.PrepareForCreate(createContext, createdInstanceCredential)
+	instanceRESTStrategies.PrepareForCreate(nil, createdInstanceCredential)
 
 	if createdInstanceCredential.Spec.ExternalID != userExternalID {
 		t.Errorf("Modified user provided ExternalID to %q", createdInstanceCredential.Spec.ExternalID)

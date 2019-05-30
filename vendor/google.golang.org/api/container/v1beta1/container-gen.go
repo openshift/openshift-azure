@@ -942,7 +942,9 @@ type Cluster struct {
 	// node for hosting
 	// containers. This is provisioned from within the
 	// `container_ipv4_cidr`
-	// range.
+	// range. This field will only be set when cluster is in route-based
+	// network
+	// mode.
 	NodeIpv4CidrSize int64 `json:"nodeIpv4CidrSize,omitempty"`
 
 	// NodePools: The node pools associated with this cluster.
@@ -1040,6 +1042,11 @@ type Cluster struct {
 	// VerticalPodAutoscaling: Cluster-level Vertical Pod Autoscaling
 	// configuration.
 	VerticalPodAutoscaling *VerticalPodAutoscaling `json:"verticalPodAutoscaling,omitempty"`
+
+	// WorkloadIdentityConfig: Configuration for the use of Kubernetes
+	// Service Accounts in GCP IAM
+	// policies.
+	WorkloadIdentityConfig *WorkloadIdentityConfig `json:"workloadIdentityConfig,omitempty"`
 
 	// Zone: [Output only] The name of the Google Compute
 	// Engine
@@ -1213,11 +1220,11 @@ type ClusterUpdate struct {
 
 	// DesiredNodePoolId: The node pool to be upgraded. This field is
 	// mandatory if
-	// "desired_node_version", "desired_image_family"
-	// or
-	// "desired_node_pool_autoscaling" is specified and there is more than
-	// one
-	// node pool on the cluster.
+	// "desired_node_version",
+	// "desired_image_family",
+	// "desired_node_pool_autoscaling", or
+	// "desired_workload_metadata_config"
+	// is specified and there is more than one node pool on the cluster.
 	DesiredNodePoolId string `json:"desiredNodePoolId,omitempty"`
 
 	// DesiredNodeVersion: The Kubernetes version to change the nodes to
@@ -1240,6 +1247,10 @@ type ClusterUpdate struct {
 	// the PodSecurityPolicy feature.
 	DesiredPodSecurityPolicyConfig *PodSecurityPolicyConfig `json:"desiredPodSecurityPolicyConfig,omitempty"`
 
+	// DesiredPrivateClusterConfig: The desired private cluster
+	// configuration.
+	DesiredPrivateClusterConfig *PrivateClusterConfig `json:"desiredPrivateClusterConfig,omitempty"`
+
 	// DesiredResourceUsageExportConfig: The desired configuration for
 	// exporting resource usage.
 	DesiredResourceUsageExportConfig *ResourceUsageExportConfig `json:"desiredResourceUsageExportConfig,omitempty"`
@@ -1247,6 +1258,9 @@ type ClusterUpdate struct {
 	// DesiredVerticalPodAutoscaling: Cluster-level Vertical Pod Autoscaling
 	// configuration.
 	DesiredVerticalPodAutoscaling *VerticalPodAutoscaling `json:"desiredVerticalPodAutoscaling,omitempty"`
+
+	// DesiredWorkloadIdentityConfig: Configuration for Workload Identity.
+	DesiredWorkloadIdentityConfig *WorkloadIdentityConfig `json:"desiredWorkloadIdentityConfig,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "DesiredAddonsConfig")
 	// to unconditionally include in API requests. By default, fields with
@@ -1319,6 +1333,39 @@ type CompleteIPRotationRequest struct {
 
 func (s *CompleteIPRotationRequest) MarshalJSON() ([]byte, error) {
 	type NoMethod CompleteIPRotationRequest
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// ConsumptionMeteringConfig: Parameters for controlling consumption
+// metering.
+type ConsumptionMeteringConfig struct {
+	// Enabled: Whether to enable consumption metering for this cluster. If
+	// enabled, a
+	// second BigQuery table will be created to hold resource
+	// consumption
+	// records.
+	Enabled bool `json:"enabled,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Enabled") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Enabled") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *ConsumptionMeteringConfig) MarshalJSON() ([]byte, error) {
+	type NoMethod ConsumptionMeteringConfig
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
@@ -1438,7 +1485,7 @@ type DailyMaintenanceWindow struct {
 
 	// StartTime: Time within the maintenance window to start the
 	// maintenance operations.
-	// It must be in format "HH:MM”, where HH : [00-23] and MM : [00-59]
+	// It must be in format "HH:MM", where HH : [00-23] and MM : [00-59]
 	// GMT.
 	StartTime string `json:"startTime,omitempty"`
 
@@ -3310,6 +3357,10 @@ func (s *PodSecurityPolicyConfig) MarshalJSON() ([]byte, error) {
 
 // PrivateClusterConfig: Configuration options for private clusters.
 type PrivateClusterConfig struct {
+	// EnablePeeringRouteSharing: Whether to enable route sharing over the
+	// network peering.
+	EnablePeeringRouteSharing bool `json:"enablePeeringRouteSharing,omitempty"`
+
 	// EnablePrivateEndpoint: Whether the master's internal IP address is
 	// used as the cluster endpoint.
 	EnablePrivateEndpoint bool `json:"enablePrivateEndpoint,omitempty"`
@@ -3339,21 +3390,21 @@ type PrivateClusterConfig struct {
 	PublicEndpoint string `json:"publicEndpoint,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g.
-	// "EnablePrivateEndpoint") to unconditionally include in API requests.
-	// By default, fields with empty values are omitted from API requests.
-	// However, any non-pointer, non-interface field appearing in
+	// "EnablePeeringRouteSharing") to unconditionally include in API
+	// requests. By default, fields with empty values are omitted from API
+	// requests. However, any non-pointer, non-interface field appearing in
 	// ForceSendFields will be sent to the server regardless of whether the
 	// field is empty or not. This may be used to include empty fields in
 	// Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "EnablePrivateEndpoint") to
-	// include in API requests with the JSON null value. By default, fields
-	// with empty values are omitted from API requests. However, any field
-	// with an empty value appearing in NullFields will be sent to the
-	// server as null. It is an error if a field in this list has a
-	// non-empty value. This may be used to include null fields in Patch
-	// requests.
+	// NullFields is a list of field names (e.g.
+	// "EnablePeeringRouteSharing") to include in API requests with the JSON
+	// null value. By default, fields with empty values are omitted from API
+	// requests. However, any field with an empty value appearing in
+	// NullFields will be sent to the server as null. It is an error if a
+	// field in this list has a non-empty value. This may be used to include
+	// null fields in Patch requests.
 	NullFields []string `json:"-"`
 }
 
@@ -3405,6 +3456,10 @@ type ResourceUsageExportConfig struct {
 	// BigqueryDestination: Configuration to use BigQuery as usage export
 	// destination.
 	BigqueryDestination *BigQueryDestination `json:"bigqueryDestination,omitempty"`
+
+	// ConsumptionMeteringConfig: Configuration to enable resource
+	// consumption metering.
+	ConsumptionMeteringConfig *ConsumptionMeteringConfig `json:"consumptionMeteringConfig,omitempty"`
 
 	// EnableNetworkEgressMetering: Whether to enable network egress
 	// metering for this cluster. If enabled, a
@@ -4540,6 +4595,9 @@ type UpdateNodePoolRequest struct {
 	//  field has been deprecated and replaced by the name field.
 	ProjectId string `json:"projectId,omitempty"`
 
+	// WorkloadMetadataConfig: The desired image type for the node pool.
+	WorkloadMetadataConfig *WorkloadMetadataConfig `json:"workloadMetadataConfig,omitempty"`
+
 	// Zone: Deprecated. The name of the Google Compute
 	// Engine
 	// [zone](/compute/docs/zones#available) in which the
@@ -4706,6 +4764,38 @@ type VerticalPodAutoscaling struct {
 
 func (s *VerticalPodAutoscaling) MarshalJSON() ([]byte, error) {
 	type NoMethod VerticalPodAutoscaling
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// WorkloadIdentityConfig: Configuration for the use of Kubernetes
+// Service Accounts in GCP IAM
+// policies.
+type WorkloadIdentityConfig struct {
+	// IdentityNamespace: IAM Identity Namespace to attach all Kubernetes
+	// Service Accounts to.
+	IdentityNamespace string `json:"identityNamespace,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "IdentityNamespace")
+	// to unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "IdentityNamespace") to
+	// include in API requests with the JSON null value. By default, fields
+	// with empty values are omitted from API requests. However, any field
+	// with an empty value appearing in NullFields will be sent to the
+	// server as null. It is an error if a field in this list has a
+	// non-empty value. This may be used to include null fields in Patch
+	// requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *WorkloadIdentityConfig) MarshalJSON() ([]byte, error) {
+	type NoMethod WorkloadIdentityConfig
 	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }

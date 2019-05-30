@@ -17,19 +17,17 @@ limitations under the License.
 package clusterserviceplan
 
 import (
-	"context"
 	"errors"
 	"fmt"
 
 	scmeta "github.com/kubernetes-incubator/service-catalog/pkg/api/meta"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog"
 	"github.com/kubernetes-incubator/service-catalog/pkg/registry/servicecatalog/server"
-	"github.com/kubernetes-incubator/service-catalog/pkg/registry/servicecatalog/tableconvertor"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	metav1beta1 "k8s.io/apimachinery/pkg/apis/meta/v1beta1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/generic/registry"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -101,7 +99,7 @@ func toSelectableFields(servicePlan *servicecatalog.ClusterServicePlan) fields.S
 	spSpecificFieldsSet["spec.clusterServiceClassRef.name"] = servicePlan.Spec.ClusterServiceClassRef.Name
 	spSpecificFieldsSet["spec.externalName"] = servicePlan.Spec.ExternalName
 	spSpecificFieldsSet["spec.externalID"] = servicePlan.Spec.ExternalID
-	return generic.AddObjectMetaFieldsSet(spSpecificFieldsSet, &servicePlan.ObjectMeta, false)
+	return generic.AddObjectMetaFieldsSet(spSpecificFieldsSet, &servicePlan.ObjectMeta, true)
 }
 
 // GetAttrs returns labels and fields of a given object for filtering purposes.
@@ -144,30 +142,8 @@ func NewStorage(opts server.Options) (rest.Storage, rest.Storage) {
 		CreateStrategy: clusterServicePlanRESTStrategies,
 		UpdateStrategy: clusterServicePlanRESTStrategies,
 		DeleteStrategy: clusterServicePlanRESTStrategies,
-
-		TableConvertor: tableconvertor.NewTableConvertor(
-			[]metav1beta1.TableColumnDefinition{
-				{Name: "Name", Type: "string", Format: "name"},
-				{Name: "External-Name", Type: "string"},
-				{Name: "Broker", Type: "string"},
-				{Name: "Class", Type: "string"},
-				{Name: "Age", Type: "string"},
-			},
-			func(obj runtime.Object, m metav1.Object, name, age string) ([]interface{}, error) {
-				plan := obj.(*servicecatalog.ClusterServicePlan)
-				cells := []interface{}{
-					name,
-					plan.Spec.ExternalName,
-					plan.Spec.ClusterServiceBrokerName,
-					plan.Spec.ClusterServiceClassRef.Name,
-					age,
-				}
-				return cells, nil
-			},
-		),
-
-		Storage:     storageInterface,
-		DestroyFunc: dFunc,
+		Storage:        storageInterface,
+		DestroyFunc:    dFunc,
 	}
 
 	statusStore := store
@@ -183,12 +159,6 @@ type StatusREST struct {
 	store *registry.Store
 }
 
-var (
-	_ rest.Storage = &StatusREST{}
-	_ rest.Getter  = &StatusREST{}
-	_ rest.Updater = &StatusREST{}
-)
-
 // New returns a new ClusterServicePlan
 func (r *StatusREST) New() runtime.Object {
 	return &servicecatalog.ClusterServicePlan{}
@@ -196,12 +166,12 @@ func (r *StatusREST) New() runtime.Object {
 
 // Get retrieves the object from the storage. It is required to support Patch
 // and to implement the rest.Getter interface.
-func (r *StatusREST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
+func (r *StatusREST) Get(ctx genericapirequest.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
 	return r.store.Get(ctx, name, options)
 }
 
 // Update alters the status subset of an object and it
 // implements rest.Updater interface
-func (r *StatusREST) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc) (runtime.Object, bool, error) {
+func (r *StatusREST) Update(ctx genericapirequest.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc) (runtime.Object, bool, error) {
 	return r.store.Update(ctx, name, objInfo, createValidation, updateValidation)
 }

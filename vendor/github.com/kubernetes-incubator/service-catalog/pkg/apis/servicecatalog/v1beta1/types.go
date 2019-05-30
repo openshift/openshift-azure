@@ -136,13 +136,13 @@ type CommonServiceBrokerSpec struct {
 // This is an example of a whitelist on service externalName.
 // Goal: Only list Services with the externalName of FooService and BarService,
 // Solution: restrictions := ServiceCatalogRestrictions{
-// 		ServiceClass: ["spec.externalName in (FooService, BarService)"]
+// 		ServiceClass: ["externalName in (FooService, BarService)"]
 // }
 //
 // This is an example of a blacklist on service externalName.
 // Goal: Allow all services except the ones with the externalName of FooService and BarService,
 // Solution: restrictions := ServiceCatalogRestrictions{
-// 		ServiceClass: ["spec.externalName notin (FooService, BarService)"]
+// 		ServiceClass: ["externalName notin (FooService, BarService)"]
 // }
 //
 // This whitelists plans called "Demo", and blacklists (but only a single element in
@@ -150,7 +150,7 @@ type CommonServiceBrokerSpec struct {
 // Goal: Allow all plans with the externalName demo, but not AABBCC, and not a specific service by name,
 // Solution: restrictions := ServiceCatalogRestrictions{
 // 		ServiceClass: ["name!=AABBB-CCDD-EEGG-HIJK"]
-// 		ServicePlan: ["spec.externalName in (Demo)", "name!=AABBCC"]
+// 		ServicePlan: ["externalName in (Demo)", "name!=AABBCC"]
 // }
 //
 // CatalogRestrictions strings have a special format similar to Label Selectors,
@@ -165,15 +165,11 @@ type CommonServiceBrokerSpec struct {
 //
 // ServiceClass allowed property names:
 //   name - the value set to [Cluster]ServiceClass.Name
-//   spec.externalName - the value set to [Cluster]ServiceClass.Spec.ExternalName
-//   spec.externalID - the value set to [Cluster]ServiceClass.Spec.ExternalID
+//   externalName - the value set to [Cluster]ServiceClass.Spec.ExternalName
+//
 // ServicePlan allowed property names:
-//   name - the value set to [Cluster]ServicePlan.Name
-//   spec.externalName - the value set to [Cluster]ServicePlan.Spec.ExternalName
-//   spec.externalID - the value set to [Cluster]ServicePlan.Spec.ExternalID
-//   spec.free - the value set to [Cluster]ServicePlan.Spec.Free
-//   spec.serviceClass.name - the value set to ServicePlan.Spec.ServiceClassRef.Name
-//   spec.clusterServiceClass.name - the value set to ClusterServicePlan.Spec.ClusterServiceClassRef.Name
+//   name - the value set to [Cluster]ServiceClass.Name
+//   externalName - the value set to [Cluster]ServiceClass.Spec.ExternalName
 type CatalogRestrictions struct {
 	// ServiceClass represents a selector for plans, used to filter catalog re-lists.
 	ServiceClass []string `json:"serviceClass,omitempty"`
@@ -767,84 +763,48 @@ type ServiceInstance struct {
 }
 
 // PlanReference defines the user specification for the desired
-// (Cluster)ServicePlan and (Cluster)ServiceClass. Because there are
-// multiple ways to specify the desired Class/Plan, this structure specifies the
-// allowed ways to specify the intent. Note: a user may specify either cluster
-// scoped OR namespace scoped identifiers, but NOT both, as they are mutually
-// exclusive.
+// ServicePlan and ServiceClass. Because there are multiple ways to
+// specify the desired Class/Plan, this structure specifies the
+// allowed ways to specify the intent.
 //
 // Currently supported ways:
 //  - ClusterServiceClassExternalName and ClusterServicePlanExternalName
 //  - ClusterServiceClassExternalID and ClusterServicePlanExternalID
 //  - ClusterServiceClassName and ClusterServicePlanName
-//  - ServiceClassExternalName and ServicePlanExternalName
-//  - ServiceClassExternalID and ServicePlanExternalID
-//  - ServiceClassName and ServicePlanName
 //
 // For any of these ways, if a ClusterServiceClass only has one plan
 // then the corresponding service plan field is optional.
 type PlanReference struct {
 	// ClusterServiceClassExternalName is the human-readable name of the
-	// service as reported by the ClusterServiceBroker. Note that if the
-	// ClusterServiceBroker changes the name of the ClusterServiceClass,
-	// it will not be reflected here, and to see the current name of the
-	// ClusterServiceClass, you should follow the ClusterServiceClassRef below.
+	// service as reported by the broker. Note that if the broker changes
+	// the name of the ClusterServiceClass, it will not be reflected here,
+	// and to see the current name of the ClusterServiceClass, you should
+	// follow the ClusterServiceClassRef below.
 	//
 	// Immutable.
 	ClusterServiceClassExternalName string `json:"clusterServiceClassExternalName,omitempty"`
 	// ClusterServicePlanExternalName is the human-readable name of the plan
-	// as reported by the ClusterServiceBroker. Note that if the
-	// ClusterServiceBroker changes the name of the ClusterServicePlan, it will
-	// not be reflected here, and to see the current name of the
-	// ClusterServicePlan, you should follow the ClusterServicePlanRef below.
+	// as reported by the broker. Note that if the broker changes the name
+	// of the ClusterServicePlan, it will not be reflected here, and to see
+	// the current name of the ClusterServicePlan, you should follow the
+	// ClusterServicePlanRef below.
 	ClusterServicePlanExternalName string `json:"clusterServicePlanExternalName,omitempty"`
 
-	// ClusterServiceClassExternalID is the ClusterServiceBroker's external id
-	// for the class.
+	// ClusterServiceClassExternalID is the broker's external id for the class.
 	//
 	// Immutable.
 	ClusterServiceClassExternalID string `json:"clusterServiceClassExternalID,omitempty"`
 
-	// ClusterServicePlanExternalID is the ClusterServiceBroker's external id for
-	// the plan.
+	// ClusterServicePlanExternalID is the broker's external id for the plan.
 	ClusterServicePlanExternalID string `json:"clusterServicePlanExternalID,omitempty"`
 
-	// ClusterServiceClassName is the kubernetes name of the ClusterServiceClass.
+	// ClusterServiceClassName is the kubernetes name of the
+	// ClusterServiceClass.
 	//
 	// Immutable.
 	ClusterServiceClassName string `json:"clusterServiceClassName,omitempty"`
 	// ClusterServicePlanName is kubernetes name of the ClusterServicePlan.
 	ClusterServicePlanName string `json:"clusterServicePlanName,omitempty"`
-
-	// ServiceClassExternalName is the human-readable name of the
-	// service as reported by the ServiceBroker. Note that if the ServiceBroker
-	// changes the name of the ServiceClass, it will not be reflected here,
-	// and to see the current name of the ServiceClass, you should
-	// follow the ServiceClassRef below.
-	//
-	// Immutable.
-	ServiceClassExternalName string `json:"serviceClassExternalName,omitempty"`
-	// ServicePlanExternalName is the human-readable name of the plan
-	// as reported by the ServiceBroker. Note that if the ServiceBroker changes
-	// the name of the ServicePlan, it will not be reflected here, and to see
-	// the current name of the ServicePlan, you should follow the
-	// ServicePlanRef below.
-	ServicePlanExternalName string `json:"servicePlanExternalName,omitempty"`
-
-	// ServiceClassExternalID is the ServiceBroker's external id for the class.
-	//
-	// Immutable.
-	ServiceClassExternalID string `json:"serviceClassExternalID,omitempty"`
-
-	// ServicePlanExternalID is the ServiceBroker's external id for the plan.
-	ServicePlanExternalID string `json:"servicePlanExternalID,omitempty"`
-
-	// ServiceClassName is the kubernetes name of the ServiceClass.
-	//
-	// Immutable.
-	ServiceClassName string `json:"serviceClassName,omitempty"`
-	// ServicePlanName is kubernetes name of the ServicePlan.
-	ServicePlanName string `json:"servicePlanName,omitempty"`
 }
 
 // ServiceInstanceSpec represents the desired state of an Instance.
@@ -853,22 +813,15 @@ type ServiceInstanceSpec struct {
 	PlanReference `json:",inline"`
 
 	// ClusterServiceClassRef is a reference to the ClusterServiceClass
-	// that the user selected. This is set by the controller based on the
-	// cluster-scoped values specified in the PlanReference.
+	// that the user selected.
+	// This is set by the controller based on
+	// ClusterServiceClassExternalName
 	ClusterServiceClassRef *ClusterObjectReference `json:"clusterServiceClassRef,omitempty"`
 	// ClusterServicePlanRef is a reference to the ClusterServicePlan
-	// that the user selected. This is set by the controller based on the
-	// cluster-scoped values specified in the PlanReference.
+	// that the user selected.
+	// This is set by the controller based on
+	// ClusterServicePlanExternalName
 	ClusterServicePlanRef *ClusterObjectReference `json:"clusterServicePlanRef,omitempty"`
-
-	// ServiceClassRef is a reference to the ServiceClass that the user selected.
-	// This is set by the controller based on the namespace-scoped values
-	// specified in the PlanReference.
-	ServiceClassRef *LocalObjectReference `json:"serviceClassRef,omitempty"`
-	// ServicePlanRef is a reference to the ServicePlan that the user selected.
-	// This is set by the controller based on the namespace-scoped values
-	// specified in the PlanReference.
-	ServicePlanRef *LocalObjectReference `json:"servicePlanRef,omitempty"`
 
 	// Parameters is a set of the parameters to be passed to the underlying
 	// broker. The inline YAML/JSON payload to be translated into equivalent
@@ -1037,15 +990,6 @@ type ServiceInstancePropertiesState struct {
 	// ClusterServicePlanExternalID is the external ID of the plan that the
 	// broker knows this ServiceInstance to be on.
 	ClusterServicePlanExternalID string `json:"clusterServicePlanExternalID"`
-
-	// ServicePlanExternalName is the name of the plan that the broker knows this
-	// ServiceInstance to be on. This is the human readable plan name from the
-	// OSB API.
-	ServicePlanExternalName string `json:"servicePlanExternalName,omitempty"`
-
-	// ServicePlanExternalID is the external ID of the plan that the
-	// broker knows this ServiceInstance to be on.
-	ServicePlanExternalID string `json:"servicePlanExternalID,omitempty"`
 
 	// Parameters is a blob of the parameters and their values that the broker
 	// knows about for this ServiceInstance.  If a parameter was sourced from
@@ -1373,8 +1317,6 @@ const (
 	FilterSpecClusterServiceClassName = "spec.clusterServiceClass.name"
 	// SpecServiceClassName is only used for plans, the parent service class name.
 	FilterSpecServiceClassName = "spec.serviceClass.name"
-	// FilterSpecFree is only used for plans, determines if the plan is free.
-	FilterSpecFree = "spec.free"
 )
 
 // SecretTransform is a single transformation that is applied to the

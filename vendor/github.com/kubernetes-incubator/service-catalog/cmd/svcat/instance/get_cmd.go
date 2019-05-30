@@ -17,8 +17,6 @@ limitations under the License.
 package instance
 
 import (
-	"fmt"
-
 	"github.com/kubernetes-incubator/service-catalog/cmd/svcat/command"
 	"github.com/kubernetes-incubator/service-catalog/cmd/svcat/output"
 	"github.com/spf13/cobra"
@@ -26,54 +24,38 @@ import (
 
 type getCmd struct {
 	*command.Namespaced
-	*command.Formatted
-	*command.PlanFiltered
-	*command.ClassFiltered
-	name string
+	name         string
+	outputFormat string
+}
+
+func (c *getCmd) SetFormat(format string) {
+	c.outputFormat = format
 }
 
 // NewGetCmd builds a "svcat get instances" command
 func NewGetCmd(cxt *command.Context) *cobra.Command {
-	getCmd := &getCmd{
-		Namespaced:    command.NewNamespaced(cxt),
-		Formatted:     command.NewFormatted(),
-		ClassFiltered: command.NewClassFiltered(),
-		PlanFiltered:  command.NewPlanFiltered(),
-	}
+	getCmd := &getCmd{Namespaced: command.NewNamespacedCommand(cxt)}
 	cmd := &cobra.Command{
-		Use:     "instances [NAME]",
+		Use:     "instances [name]",
 		Aliases: []string{"instance", "inst"},
 		Short:   "List instances, optionally filtered by name",
-		Example: command.NormalizeExamples(`
+		Example: `
   svcat get instances
-  svcat get instances --class redis
-  svcat get instances --plan default
   svcat get instances --all-namespaces
   svcat get instance wordpress-mysql-instance
   svcat get instance -n ci concourse-postgres-instance
-`),
+`,
 		PreRunE: command.PreRunE(getCmd),
 		RunE:    command.RunE(getCmd),
 	}
-	getCmd.AddNamespaceFlags(cmd.Flags(), true)
-	getCmd.AddOutputFlags(cmd.Flags())
-	getCmd.AddClassFlag(cmd)
-	getCmd.AddPlanFlag(cmd)
-
+	command.AddNamespaceFlags(cmd.Flags(), true)
+	command.AddOutputFlags(cmd.Flags())
 	return cmd
 }
 
 func (c *getCmd) Validate(args []string) error {
 	if len(args) > 0 {
 		c.name = args[0]
-
-		if c.ClassFilter != "" {
-			return fmt.Errorf("class filter is not supported when specifiying instance name")
-		}
-
-		if c.PlanFilter != "" {
-			return fmt.Errorf("plan filter is not supported when specifiying instance name")
-		}
 	}
 
 	return nil
@@ -88,12 +70,12 @@ func (c *getCmd) Run() error {
 }
 
 func (c *getCmd) getAll() error {
-	instances, err := c.App.RetrieveInstances(c.Namespace, c.ClassFilter, c.PlanFilter)
+	instances, err := c.App.RetrieveInstances(c.Namespace)
 	if err != nil {
 		return err
 	}
 
-	output.WriteInstanceList(c.Output, c.OutputFormat, instances)
+	output.WriteInstanceList(c.Output, c.outputFormat, instances)
 	return nil
 }
 
@@ -103,7 +85,7 @@ func (c *getCmd) get() error {
 		return err
 	}
 
-	output.WriteInstance(c.Output, c.OutputFormat, *instance)
+	output.WriteInstance(c.Output, c.outputFormat, *instance)
 
 	return nil
 }
