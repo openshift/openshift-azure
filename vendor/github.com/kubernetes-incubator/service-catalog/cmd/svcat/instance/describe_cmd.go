@@ -31,18 +31,18 @@ type describeCmd struct {
 
 // NewDescribeCmd builds a "svcat describe instance" command
 func NewDescribeCmd(cxt *command.Context) *cobra.Command {
-	describeCmd := &describeCmd{Namespaced: command.NewNamespaced(cxt)}
+	describeCmd := &describeCmd{Namespaced: command.NewNamespacedCommand(cxt)}
 	cmd := &cobra.Command{
 		Use:     "instance NAME",
 		Aliases: []string{"instances", "inst"},
 		Short:   "Show details of a specific instance",
-		Example: command.NormalizeExamples(`
+		Example: `
   svcat describe instance wordpress-mysql-instance
-`),
+`,
 		PreRunE: command.PreRunE(describeCmd),
 		RunE:    command.RunE(describeCmd),
 	}
-	describeCmd.AddNamespaceFlags(cmd.Flags(), false)
+	command.AddNamespaceFlags(cmd.Flags(), false)
 	return cmd
 }
 

@@ -17,6 +17,8 @@ limitations under the License.
 package api
 
 import (
+	"k8s.io/apimachinery/pkg/apimachinery/announced"
+	"k8s.io/apimachinery/pkg/apimachinery/registered"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -27,6 +29,9 @@ import (
 )
 
 var (
+	groupFactoryRegistry = make(announced.APIGroupFactoryRegistry)
+	// Registry is an instance of an API registry.
+	Registry = registered.NewOrDie("")
 	// Scheme for API object types
 	Scheme = runtime.NewScheme()
 	// ParameterCodec handles versioning of objects that are converted to query parameters.
@@ -36,8 +41,8 @@ var (
 )
 
 func init() {
-	servicecataloginstall.Install(Scheme)
-	settingsinstall.Install(Scheme)
+	servicecataloginstall.Install(groupFactoryRegistry, Registry, Scheme)
+	settingsinstall.Install(groupFactoryRegistry, Registry, Scheme)
 
 	// we need to add the options to empty v1
 	// TODO fix the server code to avoid this

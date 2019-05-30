@@ -259,7 +259,7 @@ func TestValidateClusterServiceBroker(t *testing.T) {
 			valid: true,
 		},
 		{
-			name: "valid clusterservicebroker - manual behavior with RelistDuration",
+			name: "invalid clusterservicebroker - manual behavior with RelistDuration",
 			broker: &servicecatalog.ClusterServiceBroker{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "test-clusterservicebroker",
@@ -272,7 +272,7 @@ func TestValidateClusterServiceBroker(t *testing.T) {
 					},
 				},
 			},
-			valid: true,
+			valid: false,
 		},
 		{
 			name: "valid clusterservicebroker - manual behavior without RelistDuration",
@@ -291,7 +291,7 @@ func TestValidateClusterServiceBroker(t *testing.T) {
 			valid: true,
 		},
 		{
-			name: "valid clusterservicebroker - duration behavior defaulting to controller provided value",
+			name: "invalid clusterservicebroker - duration behavior without duration",
 			broker: &servicecatalog.ClusterServiceBroker{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "test-clusterservicebroker",
@@ -304,7 +304,7 @@ func TestValidateClusterServiceBroker(t *testing.T) {
 					},
 				},
 			},
-			valid: true,
+			valid: false,
 		},
 		{
 			name: "invalid clusterservicebroker - relistBehavior is invalid",
@@ -402,7 +402,7 @@ func TestValidateClusterServiceBroker(t *testing.T) {
 						CatalogRestrictions: &servicecatalog.CatalogRestrictions{
 							ServiceClass: []string{
 								"name==foobar",
-								"spec.externalName in (foobar, bazboof, wizzbang)",
+								"externalName in (foobar, bazboof, wizzbang)",
 							},
 						},
 					},
@@ -423,26 +423,6 @@ func TestValidateClusterServiceBroker(t *testing.T) {
 						CatalogRestrictions: &servicecatalog.CatalogRestrictions{
 							ServiceClass: []string{
 								"invalid restriction",
-							},
-						},
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			name: "invalid clusterservicebroker - catalogRequirements.serviceClass - invalid property",
-			broker: &servicecatalog.ClusterServiceBroker{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "test-broker",
-				},
-				Spec: servicecatalog.ClusterServiceBrokerSpec{
-					CommonServiceBrokerSpec: servicecatalog.CommonServiceBrokerSpec{
-						URL:            "http://example.com",
-						RelistBehavior: servicecatalog.ServiceBrokerRelistBehaviorManual,
-						CatalogRestrictions: &servicecatalog.CatalogRestrictions{
-							ServiceClass: []string{
-								"spec.invalidProperty==foobar",
 							},
 						},
 					},
@@ -483,7 +463,7 @@ func TestValidateClusterServiceBroker(t *testing.T) {
 						CatalogRestrictions: &servicecatalog.CatalogRestrictions{
 							ServicePlan: []string{
 								"name==foobar",
-								"spec.externalName in (foobar, bazboof, wizzbang)",
+								"externalName in (foobar, bazboof, wizzbang)",
 							},
 						},
 					},
@@ -512,26 +492,6 @@ func TestValidateClusterServiceBroker(t *testing.T) {
 			valid: false,
 		},
 		{
-			name: "invalid clusterservicebroker - catalogRequirements.servicePlan - invalid property",
-			broker: &servicecatalog.ClusterServiceBroker{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "test-broker",
-				},
-				Spec: servicecatalog.ClusterServiceBrokerSpec{
-					CommonServiceBrokerSpec: servicecatalog.CommonServiceBrokerSpec{
-						URL:            "http://example.com",
-						RelistBehavior: servicecatalog.ServiceBrokerRelistBehaviorManual,
-						CatalogRestrictions: &servicecatalog.CatalogRestrictions{
-							ServicePlan: []string{
-								"spec.invalidProperty notin (foo, bar)",
-							},
-						},
-					},
-				},
-			},
-			valid: false,
-		},
-		{
 			name: "valid clusterservicebroker - catalogRequirements with serviceClass and servicePlan",
 			broker: &servicecatalog.ClusterServiceBroker{
 				ObjectMeta: metav1.ObjectMeta{
@@ -543,12 +503,12 @@ func TestValidateClusterServiceBroker(t *testing.T) {
 						RelistBehavior: servicecatalog.ServiceBrokerRelistBehaviorManual,
 						CatalogRestrictions: &servicecatalog.CatalogRestrictions{
 							ServiceClass: []string{
-								"name=barfoobar",
-								"spec.externalName in (barfoobar, batbazboof, batwizzbang)",
+								"name==barfoobar",
+								"externalName in (barfoobar, batbazboof, batwizzbang)",
 							},
 							ServicePlan: []string{
 								"name==foobar",
-								"spec.externalName in (foobar, bazboof, wizzbang)",
+								"externalName in (foobar, bazboof, wizzbang)",
 							},
 						},
 					},
@@ -559,14 +519,13 @@ func TestValidateClusterServiceBroker(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			errs := ValidateClusterServiceBroker(tc.broker)
-			if len(errs) != 0 && tc.valid {
-				t.Errorf("unexpected error: %v", errs)
-			} else if len(errs) == 0 && !tc.valid {
-				t.Error("unexpected success")
-			}
-		})
+		errs := ValidateClusterServiceBroker(tc.broker)
+		if len(errs) != 0 && tc.valid {
+			t.Errorf("%v: unexpected error: %v", tc.name, errs)
+			return
+		} else if len(errs) == 0 && !tc.valid {
+			t.Errorf("%v: unexpected success", tc.name)
+		}
 	}
 
 	updateCases := []struct {
@@ -667,14 +626,13 @@ func TestValidateClusterServiceBroker(t *testing.T) {
 		},
 	}
 	for _, tc := range updateCases {
-		t.Run(tc.name, func(t *testing.T) {
-			errs := ValidateClusterServiceBrokerUpdate(tc.newBroker, tc.oldBroker)
-			if len(errs) != 0 && tc.valid {
-				t.Errorf("unexpected error: %v", errs)
-			} else if len(errs) == 0 && !tc.valid {
-				t.Error("unexpected success")
-			}
-		})
+		errs := ValidateClusterServiceBrokerUpdate(tc.newBroker, tc.oldBroker)
+		if len(errs) != 0 && tc.valid {
+			t.Errorf("%v: unexpected error: %v", tc.name, errs)
+			continue
+		} else if len(errs) == 0 && !tc.valid {
+			t.Errorf("%v: unexpected success", tc.name)
+		}
 	}
 }
 
@@ -867,7 +825,7 @@ func TestValidateServiceBroker(t *testing.T) {
 			valid: true,
 		},
 		{
-			name: "valid servicebroker - manual behavior with RelistDuration",
+			name: "invalid servicebroker - manual behavior with RelistDuration",
 			broker: &servicecatalog.ServiceBroker{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test-clusterservicebroker",
@@ -881,7 +839,7 @@ func TestValidateServiceBroker(t *testing.T) {
 					},
 				},
 			},
-			valid: true,
+			valid: false,
 		},
 		{
 			name: "valid servicebroker - manual behavior without RelistDuration",
@@ -901,7 +859,7 @@ func TestValidateServiceBroker(t *testing.T) {
 			valid: true,
 		},
 		{
-			name: "valid servicebroker - duration behavior defaulting to controller provided value",
+			name: "invalid servicebroker - duration behavior without duration",
 			broker: &servicecatalog.ServiceBroker{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test-clusterservicebroker",
@@ -915,7 +873,7 @@ func TestValidateServiceBroker(t *testing.T) {
 					},
 				},
 			},
-			valid: true,
+			valid: false,
 		},
 		{
 			name: "invalid servicebroker - relistBehavior is invalid",
@@ -987,14 +945,13 @@ func TestValidateServiceBroker(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			errs := ValidateServiceBroker(tc.broker)
-			if len(errs) != 0 && tc.valid {
-				t.Errorf("unexpected error: %v", errs)
-			} else if len(errs) == 0 && !tc.valid {
-				t.Error("unexpected success")
-			}
-		})
+		errs := ValidateServiceBroker(tc.broker)
+		if len(errs) != 0 && tc.valid {
+			t.Errorf("%v: unexpected error: %v", tc.name, errs)
+			continue
+		} else if len(errs) == 0 && !tc.valid {
+			t.Errorf("%v: unexpected success", tc.name)
+		}
 	}
 
 	updateCases := []struct {
@@ -1101,13 +1058,12 @@ func TestValidateServiceBroker(t *testing.T) {
 		},
 	}
 	for _, tc := range updateCases {
-		t.Run(tc.name, func(t *testing.T) {
-			errs := ValidateServiceBrokerUpdate(tc.newBroker, tc.oldBroker)
-			if len(errs) != 0 && tc.valid {
-				t.Errorf("unexpected error: %v", errs)
-			} else if len(errs) == 0 && !tc.valid {
-				t.Error("unexpected success")
-			}
-		})
+		errs := ValidateServiceBrokerUpdate(tc.newBroker, tc.oldBroker)
+		if len(errs) != 0 && tc.valid {
+			t.Errorf("%v: unexpected error: %v", tc.name, errs)
+			continue
+		} else if len(errs) == 0 && !tc.valid {
+			t.Errorf("%v: unexpected success", tc.name)
+		}
 	}
 }

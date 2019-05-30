@@ -33,13 +33,12 @@ import (
 )
 
 const (
-	// PluginName is name of admission plug-in
-	PluginName = "BrokerAuthSarCheck"
+	pluginName = "BrokerAuthSarCheck"
 )
 
 // Register registers a plugin
 func Register(plugins *admission.Plugins) {
-	plugins.Register(PluginName, func(io.Reader) (admission.Interface, error) {
+	plugins.Register(pluginName, func(io.Reader) (admission.Interface, error) {
 		return NewSARCheck()
 	})
 }

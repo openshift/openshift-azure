@@ -17,11 +17,11 @@ limitations under the License.
 package output
 
 import (
+	"fmt"
 	"io"
 	"strings"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/kubernetes-incubator/service-catalog/pkg/svcat/service-catalog"
 )
 
 func getClassStatusText(status v1beta1.ClusterServiceClassStatus) string {
@@ -31,35 +31,32 @@ func getClassStatusText(status v1beta1.ClusterServiceClassStatus) string {
 	return statusActive
 }
 
-func writeClassListTable(w io.Writer, classes []servicecatalog.Class) {
+func writeClassListTable(w io.Writer, classes []v1beta1.ClusterServiceClass) {
 	t := NewListTable(w)
-
 	t.SetHeader([]string{
 		"Name",
-		"Namespace",
 		"Description",
 	})
-	t.SetVariableColumn(3)
-
 	for _, class := range classes {
 		t.Append([]string{
-			class.GetExternalName(),
-			class.GetNamespace(),
-			class.GetDescription(),
+			class.Spec.ExternalName,
+			class.Spec.Description,
 		})
 	}
-
 	t.Render()
 }
 
 // WriteClassList prints a list of classes in the specified output format.
-func WriteClassList(w io.Writer, outputFormat string, classes ...servicecatalog.Class) {
+func WriteClassList(w io.Writer, outputFormat string, classes ...v1beta1.ClusterServiceClass) {
+	classList := v1beta1.ClusterServiceClassList{
+		Items: classes,
+	}
 	switch outputFormat {
-	case FormatJSON:
-		writeJSON(w, classes)
-	case FormatYAML:
-		writeYAML(w, classes, 0)
-	case FormatTable:
+	case formatJSON:
+		writeJSON(w, classList)
+	case formatYAML:
+		writeYAML(w, classList, 0)
+	case formatTable:
 		writeClassListTable(w, classes)
 	}
 }
@@ -67,13 +64,25 @@ func WriteClassList(w io.Writer, outputFormat string, classes ...servicecatalog.
 // WriteClass prints a single class in the specified output format.
 func WriteClass(w io.Writer, outputFormat string, class v1beta1.ClusterServiceClass) {
 	switch outputFormat {
-	case FormatJSON:
+	case formatJSON:
 		writeJSON(w, class)
-	case FormatYAML:
+	case formatYAML:
 		writeYAML(w, class, 0)
-	case FormatTable:
-		writeClassListTable(w, []servicecatalog.Class{&class})
+	case formatTable:
+		writeClassListTable(w, []v1beta1.ClusterServiceClass{class})
 	}
+}
+
+// WriteParentClass prints identifying information for a parent class.
+func WriteParentClass(w io.Writer, class *v1beta1.ClusterServiceClass) {
+	fmt.Fprintln(w, "\nClass:")
+	t := NewDetailsTable(w)
+	t.AppendBulk([][]string{
+		{"Name:", class.Spec.ExternalName},
+		{"UUID:", string(class.Name)},
+		{"Status:", getClassStatusText(class.Status)},
+	})
+	t.Render()
 }
 
 // WriteClassDetails prints details for a single class.

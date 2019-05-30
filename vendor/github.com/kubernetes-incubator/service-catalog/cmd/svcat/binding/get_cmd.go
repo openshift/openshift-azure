@@ -24,32 +24,33 @@ import (
 
 type getCmd struct {
 	*command.Namespaced
-	*command.Formatted
-	name string
+	name         string
+	outputFormat string
+}
+
+func (c *getCmd) SetFormat(format string) {
+	c.outputFormat = format
 }
 
 // NewGetCmd builds a "svcat get bindings" command
 func NewGetCmd(cxt *command.Context) *cobra.Command {
-	getCmd := &getCmd{
-		Namespaced: command.NewNamespaced(cxt),
-		Formatted:  command.NewFormatted(),
-	}
+	getCmd := &getCmd{Namespaced: command.NewNamespacedCommand(cxt)}
 	cmd := &cobra.Command{
-		Use:     "bindings [NAME]",
+		Use:     "bindings [name]",
 		Aliases: []string{"binding", "bnd"},
 		Short:   "List bindings, optionally filtered by name",
-		Example: command.NormalizeExamples(`
+		Example: `
   svcat get bindings
   svcat get bindings --all-namespaces
   svcat get binding wordpress-mysql-binding
   svcat get binding -n ci concourse-postgres-binding
-`),
+`,
 		PreRunE: command.PreRunE(getCmd),
 		RunE:    command.RunE(getCmd),
 	}
 
-	getCmd.AddNamespaceFlags(cmd.Flags(), true)
-	getCmd.AddOutputFlags(cmd.Flags())
+	command.AddNamespaceFlags(cmd.Flags(), true)
+	command.AddOutputFlags(cmd.Flags())
 	return cmd
 }
 
@@ -75,7 +76,7 @@ func (c *getCmd) getAll() error {
 		return err
 	}
 
-	output.WriteBindingList(c.Output, c.OutputFormat, bindings)
+	output.WriteBindingList(c.Output, c.outputFormat, bindings)
 	return nil
 }
 
@@ -85,6 +86,6 @@ func (c *getCmd) get() error {
 		return err
 	}
 
-	output.WriteBinding(c.Output, c.OutputFormat, *binding)
+	output.WriteBinding(c.Output, c.outputFormat, *binding)
 	return nil
 }

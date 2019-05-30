@@ -96,45 +96,6 @@ func newFakeServiceCatalogClientForTest(sc *servicecatalog.ClusterServiceClass, 
 	return fakeClient
 }
 
-func newFakeServiceCatalogClientForNamespacedTest(sc *servicecatalog.ServiceClass, sps []*servicecatalog.ServicePlan, classFilter string) *fake.Clientset {
-	fakeClient := &fake.Clientset{}
-
-	// react to the given service class list and to gets
-	fakeClient.AddReactor("get", "serviceclasses", func(action core.Action) (bool, runtime.Object, error) {
-		if sc != nil {
-			return true, sc, nil
-		}
-		return true, nil, apierrors.NewNotFound(schema.GroupResource{}, "")
-	})
-
-	scList := &servicecatalog.ServiceClassList{
-		ListMeta: metav1.ListMeta{
-			ResourceVersion: "1",
-		}}
-	if sc != nil {
-		scList.Items = append(scList.Items, *sc)
-	}
-	fakeClient.AddReactor("list", "serviceclasses", func(action core.Action) (bool, runtime.Object, error) {
-		return true, scList, nil
-	})
-
-	// react to the given plans
-	spList := &servicecatalog.ServicePlanList{
-		ListMeta: metav1.ListMeta{
-			ResourceVersion: "1",
-		}}
-	for _, sp := range sps {
-		if classFilter == "" || classFilter == sp.Spec.ServiceClassRef.Name {
-			spList.Items = append(spList.Items, *sp)
-		}
-	}
-	fakeClient.AddReactor("list", "serviceplans", func(action core.Action) (bool, runtime.Object, error) {
-		return true, spList, nil
-	})
-
-	return fakeClient
-}
-
 // newServiceInstance returns a new instance for the specified namespace.
 func newServiceInstance(namespace string) servicecatalog.ServiceInstance {
 	return servicecatalog.ServiceInstance{
@@ -149,22 +110,6 @@ func newClusterServiceClass(id string, name string) *servicecatalog.ClusterServi
 			Name: id,
 		},
 		Spec: servicecatalog.ClusterServiceClassSpec{
-			CommonServiceClassSpec: servicecatalog.CommonServiceClassSpec{
-				ExternalID:   id,
-				ExternalName: name,
-			},
-		},
-	}
-	return sc
-}
-
-// newServiceClass returns a new serviceclass.
-func newServiceClass(id string, name string) *servicecatalog.ServiceClass {
-	sc := &servicecatalog.ServiceClass{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: id,
-		},
-		Spec: servicecatalog.ServiceClassSpec{
 			CommonServiceClassSpec: servicecatalog.CommonServiceClassSpec{
 				ExternalID:   id,
 				ExternalName: name,
@@ -217,49 +162,6 @@ func newClusterServicePlans(count uint, useDifferentClasses bool) []*servicecata
 	return []*servicecatalog.ClusterServicePlan{}
 }
 
-// newServicePlans returns new serviceplans.
-func newServicePlans(count uint, useDifferentClasses bool) []*servicecatalog.ServicePlan {
-	classname := "test-serviceclass"
-	sp1 := &servicecatalog.ServicePlan{
-		ObjectMeta: metav1.ObjectMeta{Name: "bar-id"},
-		Spec: servicecatalog.ServicePlanSpec{
-			CommonServicePlanSpec: servicecatalog.CommonServicePlanSpec{
-				ExternalName: "bar",
-				ExternalID:   "12345",
-			},
-			ServiceClassRef: servicecatalog.LocalObjectReference{
-				Name: classname,
-			},
-		},
-	}
-	if useDifferentClasses {
-		classname = "different-serviceclass"
-	}
-	sp2 := &servicecatalog.ServicePlan{
-		ObjectMeta: metav1.ObjectMeta{Name: "baz-id"},
-		Spec: servicecatalog.ServicePlanSpec{
-			CommonServicePlanSpec: servicecatalog.CommonServicePlanSpec{
-				ExternalName: "baz",
-				ExternalID:   "23456",
-			},
-			ServiceClassRef: servicecatalog.LocalObjectReference{
-				Name: classname,
-			},
-		},
-	}
-
-	if 0 == count {
-		return []*servicecatalog.ServicePlan{}
-	}
-	if 1 == count {
-		return []*servicecatalog.ServicePlan{sp1}
-	}
-	if 2 == count {
-		return []*servicecatalog.ServicePlan{sp1, sp2}
-	}
-	return []*servicecatalog.ServicePlan{}
-}
-
 func TestWithListFailure(t *testing.T) {
 	fakeClient := &fake.Clientset{}
 	fakeClient.AddReactor("list", "clusterserviceclasses", func(action core.Action) (bool, runtime.Object, error) {
@@ -289,30 +191,18 @@ func TestWithPlanWorks(t *testing.T) {
 	cases := []struct {
 		name          string
 		requestedPlan servicecatalog.PlanReference
-		namespaced    bool
 	}{
-		{"cluster external name",
-			servicecatalog.PlanReference{ClusterServiceClassExternalName: "foo", ClusterServicePlanExternalName: "bar"}, false},
-		{"cluster external id",
-			servicecatalog.PlanReference{ClusterServiceClassExternalID: "foo", ClusterServicePlanExternalID: "12345"}, false},
-		{"cluster k8s",
-			servicecatalog.PlanReference{ClusterServiceClassName: "foo-id", ClusterServicePlanName: "bar-id"}, false},
-		{"ns external name",
-			servicecatalog.PlanReference{ServiceClassExternalName: "foo", ServicePlanExternalName: "bar"}, true},
-		{"ns external id",
-			servicecatalog.PlanReference{ServiceClassExternalID: "foo", ServicePlanExternalID: "bar"}, true},
-		{"ns k8s",
-			servicecatalog.PlanReference{ServiceClassName: "foo", ServicePlanName: "bar"}, true},
+		{"external name",
+			servicecatalog.PlanReference{ClusterServiceClassExternalName: "foo", ClusterServicePlanExternalName: "bar"}},
+		{"external id",
+			servicecatalog.PlanReference{ClusterServiceClassExternalID: "foo", ClusterServicePlanExternalID: "12345"}},
+		{"k8s",
+			servicecatalog.PlanReference{ClusterServiceClassName: "foo-id", ClusterServicePlanName: "bar-id"}},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var fakeClient *fake.Clientset
-			if tc.namespaced {
-				fakeClient = newFakeServiceCatalogClientForNamespacedTest(nil, newServicePlans(1, false), "" /* do not use get */)
-			} else {
-				fakeClient = newFakeServiceCatalogClientForTest(nil, newClusterServicePlans(1, false), "" /* do not use get */)
-			}
+			fakeClient := newFakeServiceCatalogClientForTest(nil, newClusterServicePlans(1, false), "" /* do not use get */)
 			handler, informerFactory, err := newHandlerForTest(fakeClient)
 			if err != nil {
 				t.Errorf("unexpected error initializing handler: %v", err)
@@ -335,28 +225,19 @@ func TestWithPlanWorks(t *testing.T) {
 	}
 }
 
-func TestWithNoPlanFailsWithNoClass(t *testing.T) {
+func TestWithNoPlanFailsWithNoClusterServiceClass(t *testing.T) {
 	cases := []struct {
 		name          string
 		requestedPlan servicecatalog.PlanReference
-		namespaced    bool
 	}{
-		{"cluster external name", servicecatalog.PlanReference{ClusterServiceClassExternalName: "bad-class"}, false},
-		{"cluster external id", servicecatalog.PlanReference{ClusterServiceClassExternalID: "bad-class"}, false},
-		{"cluster k8s", servicecatalog.PlanReference{ClusterServiceClassName: "bad-class"}, false},
-		{"ns external name", servicecatalog.PlanReference{ServiceClassExternalName: "bad-class"}, true},
-		{"ns external id", servicecatalog.PlanReference{ServiceClassExternalID: "bad-class"}, true},
-		{"ns k8s", servicecatalog.PlanReference{ServiceClassName: "bad-class"}, true},
+		{"external name", servicecatalog.PlanReference{ClusterServiceClassExternalName: "bad-class"}},
+		{"external id", servicecatalog.PlanReference{ClusterServiceClassExternalID: "bad-class"}},
+		{"k8s", servicecatalog.PlanReference{ClusterServiceClassName: "bad-class"}},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var fakeClient *fake.Clientset
-			if tc.namespaced {
-				fakeClient = newFakeServiceCatalogClientForNamespacedTest(nil, newServicePlans(1, false), "" /* do not use get */)
-			} else {
-				fakeClient = newFakeServiceCatalogClientForTest(nil, newClusterServicePlans(1, false), "" /* do not use get */)
-			}
+			fakeClient := newFakeServiceCatalogClientForTest(nil, newClusterServicePlans(1, false), "" /* do not use get */)
 			handler, informerFactory, err := newHandlerForTest(fakeClient)
 			if err != nil {
 				t.Errorf("unexpected error initializing handler: %v", err)
@@ -382,40 +263,23 @@ func TestWithNoPlanWorksWithSinglePlan(t *testing.T) {
 		name          string
 		requestedPlan servicecatalog.PlanReference
 		resolvedPlan  servicecatalog.PlanReference
-		namespaced    bool
 	}{
-		{"cluster external name",
+		{"external name",
 			servicecatalog.PlanReference{ClusterServiceClassExternalName: "foo"},
-			servicecatalog.PlanReference{ClusterServiceClassExternalName: "foo", ClusterServicePlanExternalName: "bar"}, false},
-		{"cluster external id",
+			servicecatalog.PlanReference{ClusterServiceClassExternalName: "foo", ClusterServicePlanExternalName: "bar"}},
+		{"external id",
 			servicecatalog.PlanReference{ClusterServiceClassExternalID: "foo"},
-			servicecatalog.PlanReference{ClusterServiceClassExternalID: "foo", ClusterServicePlanExternalID: "12345"}, false},
-		{"cluster k8s", servicecatalog.PlanReference{ClusterServiceClassName: "foo-id"},
-			servicecatalog.PlanReference{ClusterServiceClassName: "foo-id", ClusterServicePlanName: "bar-id"}, false},
-		{"ns external name",
-			servicecatalog.PlanReference{ServiceClassExternalName: "foo"},
-			servicecatalog.PlanReference{ServiceClassExternalName: "foo", ServicePlanExternalName: "bar"}, true},
-		{"ns external id",
-			servicecatalog.PlanReference{ServiceClassExternalID: "foo"},
-			servicecatalog.PlanReference{ServiceClassExternalID: "foo", ServicePlanExternalID: "12345"}, true},
-		{"ns k8s", servicecatalog.PlanReference{ServiceClassName: "foo-id"},
-			servicecatalog.PlanReference{ServiceClassName: "foo-id", ServicePlanName: "bar-id"}, true},
+			servicecatalog.PlanReference{ClusterServiceClassExternalID: "foo", ClusterServicePlanExternalID: "12345"}},
+		{"k8s", servicecatalog.PlanReference{ClusterServiceClassName: "foo-id"},
+			servicecatalog.PlanReference{ClusterServiceClassName: "foo-id", ClusterServicePlanName: "bar-id"}},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var fakeClient *fake.Clientset
-			if tc.namespaced {
-				sc := newServiceClass("foo-id", "foo")
-				sps := newServicePlans(1, false)
-				glog.V(4).Infof("Created Service as %+v", sc)
-				fakeClient = newFakeServiceCatalogClientForNamespacedTest(sc, sps, "" /* do not use get */)
-			} else {
-				csc := newClusterServiceClass("foo-id", "foo")
-				csps := newClusterServicePlans(1, false)
-				glog.V(4).Infof("Created Service as %+v", csc)
-				fakeClient = newFakeServiceCatalogClientForTest(csc, csps, "" /* do not use get */)
-			}
+			sc := newClusterServiceClass("foo-id", "foo")
+			sps := newClusterServicePlans(1, false)
+			glog.V(4).Infof("Created Service as %+v", sc)
+			fakeClient := newFakeServiceCatalogClientForTest(sc, sps, "" /* do not use get */)
 
 			handler, informerFactory, err := newHandlerForTest(fakeClient)
 			if err != nil {
@@ -446,30 +310,18 @@ func TestWithNoPlanFailsWithMultiplePlans(t *testing.T) {
 	cases := []struct {
 		name          string
 		requestedPlan servicecatalog.PlanReference
-		namespaced    bool
 	}{
-		{"cluster external name", servicecatalog.PlanReference{ClusterServiceClassExternalName: "foo"}, false},
-		{"cluster external id", servicecatalog.PlanReference{ClusterServiceClassExternalID: "foo"}, false},
-		{"cluster k8s", servicecatalog.PlanReference{ClusterServiceClassName: "foo-id"}, false},
-		{"ns external name", servicecatalog.PlanReference{ServiceClassExternalName: "foo"}, true},
-		{"ns external id", servicecatalog.PlanReference{ServiceClassExternalID: "foo"}, true},
-		{"ns k8s", servicecatalog.PlanReference{ServiceClassName: "foo-id"}, true},
+		{"external name", servicecatalog.PlanReference{ClusterServiceClassExternalName: "foo"}},
+		{"external id", servicecatalog.PlanReference{ClusterServiceClassExternalID: "foo"}},
+		{"k8s", servicecatalog.PlanReference{ClusterServiceClassName: "foo-id"}},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var fakeClient *fake.Clientset
-			if tc.namespaced {
-				sc := newServiceClass("foo-id", "foo")
-				sps := newServicePlans(2, false)
-				glog.V(4).Infof("Created Service as %+v", sc)
-				fakeClient = newFakeServiceCatalogClientForNamespacedTest(sc, sps, "" /* do not use get */)
-			} else {
-				csc := newClusterServiceClass("foo-id", "foo")
-				csps := newClusterServicePlans(2, false)
-				glog.V(4).Infof("Created Service as %+v", csc)
-				fakeClient = newFakeServiceCatalogClientForTest(csc, csps, "" /* do not use get */)
-			}
+			sc := newClusterServiceClass("foo-id", "foo")
+			sps := newClusterServicePlans(2, false)
+			glog.V(4).Infof("Created Service as %+v", sc)
+			fakeClient := newFakeServiceCatalogClientForTest(sc, sps, "" /* do not use get */)
 			handler, informerFactory, err := newHandlerForTest(fakeClient)
 			if err != nil {
 				t.Errorf("unexpected error initializing handler: %v", err)
@@ -497,43 +349,24 @@ func TestWithNoPlanSucceedsWithMultiplePlansFromDifferentClasses(t *testing.T) {
 		name          string
 		requestedPlan servicecatalog.PlanReference
 		resolvedPlan  servicecatalog.PlanReference
-		namespaced    bool
 	}{
-		{"cluster external name",
+		{"external name",
 			servicecatalog.PlanReference{ClusterServiceClassExternalName: "foo"},
-			servicecatalog.PlanReference{ClusterServiceClassExternalName: "foo", ClusterServicePlanExternalName: "bar"}, false},
-		{"cluster external id",
+			servicecatalog.PlanReference{ClusterServiceClassExternalName: "foo", ClusterServicePlanExternalName: "bar"}},
+		{"external id",
 			servicecatalog.PlanReference{ClusterServiceClassExternalID: "foo"},
-			servicecatalog.PlanReference{ClusterServiceClassExternalID: "foo", ClusterServicePlanExternalID: "12345"}, false},
-		{"cluster k8s", servicecatalog.PlanReference{ClusterServiceClassName: "foo-id"},
-			servicecatalog.PlanReference{ClusterServiceClassName: "foo-id", ClusterServicePlanName: "bar-id"}, false},
-		{"ns external name",
-			servicecatalog.PlanReference{ServiceClassExternalName: "foo"},
-			servicecatalog.PlanReference{ServiceClassExternalName: "foo", ServicePlanExternalName: "bar"}, true},
-		{"ns external id",
-			servicecatalog.PlanReference{ServiceClassExternalID: "foo"},
-			servicecatalog.PlanReference{ServiceClassExternalID: "foo", ServicePlanExternalID: "12345"}, true},
-		{"ns k8s", servicecatalog.PlanReference{ServiceClassName: "foo-id"},
-			servicecatalog.PlanReference{ServiceClassName: "foo-id", ServicePlanName: "bar-id"}, true},
+			servicecatalog.PlanReference{ClusterServiceClassExternalID: "foo", ClusterServicePlanExternalID: "12345"}},
+		{"k8s", servicecatalog.PlanReference{ClusterServiceClassName: "foo-id"},
+			servicecatalog.PlanReference{ClusterServiceClassName: "foo-id", ClusterServicePlanName: "bar-id"}},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			var fakeClient *fake.Clientset
+			sc := newClusterServiceClass("foo-id", "foo")
+			sps := newClusterServicePlans(2, true)
+			glog.V(4).Infof("Created Service as %+v", sc)
 			classFilter := "test-serviceclass"
-
-			if tc.namespaced {
-				sc := newServiceClass("foo-id", "foo")
-				sps := newServicePlans(2, true)
-				glog.V(4).Infof("Created Service as %+v", sc)
-				fakeClient = newFakeServiceCatalogClientForNamespacedTest(sc, sps, classFilter /* do not use get */)
-			} else {
-				csc := newClusterServiceClass("foo-id", "foo")
-				csps := newClusterServicePlans(2, true)
-				glog.V(4).Infof("Created Service as %+v", csc)
-				fakeClient = newFakeServiceCatalogClientForTest(csc, csps, classFilter /* do not use get */)
-			}
-
+			fakeClient := newFakeServiceCatalogClientForTest(sc, sps, classFilter /* do not use get */)
 			handler, informerFactory, err := newHandlerForTest(fakeClient)
 			if err != nil {
 				t.Errorf("unexpected error initializing handler: %v", err)

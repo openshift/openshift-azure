@@ -40,9 +40,9 @@ func ParseVariableJSON(params string) (map[string]interface{}, error) {
 // ParseVariableAssignments converts a string array of variable assignments
 // into a map of keys and values
 // Example:
-// [a=b c=abc1232=== d=banana d=pineapple] becomes map[a:b c:abc1232=== d:[banana pineapple]]
-func ParseVariableAssignments(params []string) (map[string]interface{}, error) {
-	variables := make(map[string]interface{})
+// [a=b c=abc1232===] becomes map[a:b c:abc1232===]
+func ParseVariableAssignments(params []string) (map[string]string, error) {
+	variables := map[string]string{}
 	for _, p := range params {
 
 		parts := strings.SplitN(p, "=", 2)
@@ -56,21 +56,7 @@ func ParseVariableAssignments(params []string) (map[string]interface{}, error) {
 		}
 		value := strings.TrimSpace(parts[1])
 
-		storedValue, ok := variables[variable]
-		// Logic to add new value to map variables:
-		// if variable DNE: add pair to variables as variable:value
-		// if variable exists in form of variable:value, create array to hold old value&new value
-		// if variable exists in form variable:[some values], append new value to existing array
-		if !ok {
-			variables[variable] = value // if there is no key, add key&value as string
-		} else {
-			switch storedValType := storedValue.(type) {
-			case string:
-				variables[variable] = []string{storedValType, value}
-			case []string:
-				variables[variable] = append(storedValType, value)
-			}
-		}
+		variables[variable] = value
 	}
 
 	return variables, nil
