@@ -85,9 +85,7 @@ function os::build::setup_env() {
   if [[ "${TRAVIS:-}" != "true" ]]; then
     local go_version
     go_version=($(go version))
-    local expected_order=$(printf "%s\n%s\n" "${OS_REQUIRED_GO_VERSION}" "${go_version[2]}")
-    local actual_order=$(echo "${expected_order}" | sort --version-sort)
-    if [[ "${actual_order}" != "${expected_order}" ]]; then
+    if [[ "${go_version[2]}" < "${OS_REQUIRED_GO_VERSION}" ]]; then
       os::log::fatal "Detected Go version: ${go_version[*]}.
 Builds require Go version ${OS_REQUIRED_GO_VERSION} or greater."
     fi

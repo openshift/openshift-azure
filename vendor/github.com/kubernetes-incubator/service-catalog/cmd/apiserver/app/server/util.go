@@ -31,7 +31,6 @@ import (
 	"k8s.io/apiserver/pkg/admission/initializer"
 	admissionmetrics "k8s.io/apiserver/pkg/admission/metrics"
 	"k8s.io/apiserver/pkg/authorization/authorizerfactory"
-	apiopenapi "k8s.io/apiserver/pkg/endpoints/openapi"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericserveroptions "k8s.io/apiserver/pkg/server/options"
 	kubeinformers "k8s.io/client-go/informers"
@@ -44,7 +43,7 @@ import (
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/internalclientset"
 	informers "github.com/kubernetes-incubator/service-catalog/pkg/client/informers_generated/internalversion"
 	"github.com/kubernetes-incubator/service-catalog/pkg/openapi"
-	"github.com/kubernetes-incubator/service-catalog/pkg/util/kube"
+	"github.com/kubernetes-incubator/service-catalog/pkg/svcat/kube"
 	"github.com/kubernetes-incubator/service-catalog/pkg/version"
 )
 
@@ -97,7 +96,7 @@ func buildGenericConfig(s *ServiceCatalogServerOptions) (*genericapiserver.Recom
 
 	if s.ServeOpenAPISpec {
 		genericConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(
-			openapi.GetOpenAPIDefinitions, apiopenapi.NewDefinitionNamer(api.Scheme))
+			openapi.GetOpenAPIDefinitions, api.Scheme)
 		if genericConfig.OpenAPIConfig.Info == nil {
 			genericConfig.OpenAPIConfig.Info = &spec.Info{}
 		}

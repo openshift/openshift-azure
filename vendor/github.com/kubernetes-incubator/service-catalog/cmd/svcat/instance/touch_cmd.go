@@ -30,18 +30,18 @@ type touchInstanceCmd struct {
 
 // NewTouchCommand builds a "svcat touch instance" command.
 func NewTouchCommand(cxt *command.Context) *cobra.Command {
-	touchInstanceCmd := &touchInstanceCmd{Namespaced: command.NewNamespaced(cxt)}
+	touchInstanceCmd := &touchInstanceCmd{Namespaced: command.NewNamespacedCommand(cxt)}
 	cmd := &cobra.Command{
 		Use:   "instance",
 		Short: "Touch an instance to make service-catalog try to process the spec again",
 		Long: `Touch instance will increment the updateRequests field on the instance. 
 Then, service catalog will process the instance's spec again. It might do an update, a delete, or 
 nothing.`,
-		Example: command.NormalizeExamples(`svcat touch instance wordpress-mysql-instance --namespace mynamespace`),
+		Example: `svcat touch instance wordpress-mysql-instance --namespace mynamespace`,
 		PreRunE: command.PreRunE(touchInstanceCmd),
 		RunE:    command.RunE(touchInstanceCmd),
 	}
-	touchInstanceCmd.AddNamespaceFlags(cmd.Flags(), false)
+	command.AddNamespaceFlags(cmd.Flags(), false)
 
 	return cmd
 }

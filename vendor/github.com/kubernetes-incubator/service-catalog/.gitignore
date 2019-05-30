@@ -25,6 +25,3 @@ contrib/examples/consumer/Gopkg.lock
 contrib/examples/consumer
 contrib/examples/vendor/*
 integration.test*
-debug.test*
-
-/_output

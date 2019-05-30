@@ -37,7 +37,7 @@ import (
 	"github.com/kubernetes-incubator/service-catalog/cmd/svcat/versions"
 	svcatclient "github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset"
 	"github.com/kubernetes-incubator/service-catalog/pkg/svcat"
-	"github.com/kubernetes-incubator/service-catalog/pkg/util/kube"
+	"github.com/kubernetes-incubator/service-catalog/pkg/svcat/kube"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -115,19 +115,14 @@ func buildRootCommand(cxt *command.Context) *cobra.Command {
 	cmd.PersistentFlags().StringVar(&opts.KubeContext, "context", "", "name of the kubeconfig context to use.")
 	cmd.PersistentFlags().StringVar(&opts.KubeConfig, "kubeconfig", "", "path to kubeconfig file. Overrides $KUBECONFIG")
 
-	cmd.AddCommand(newCreateCmd(cxt))
 	cmd.AddCommand(newGetCmd(cxt))
 	cmd.AddCommand(newDescribeCmd(cxt))
-	cmd.AddCommand(broker.NewRegisterCmd(cxt))
-	cmd.AddCommand(broker.NewDeregisterCmd(cxt))
 	cmd.AddCommand(instance.NewProvisionCmd(cxt))
 	cmd.AddCommand(instance.NewDeprovisionCmd(cxt))
 	cmd.AddCommand(binding.NewBindCmd(cxt))
 	cmd.AddCommand(binding.NewUnbindCmd(cxt))
 	cmd.AddCommand(newSyncCmd(cxt))
-	if !plugin.IsPlugin() {
-		cmd.AddCommand(newInstallCmd(cxt))
-	}
+	cmd.AddCommand(newInstallCmd(cxt))
 	cmd.AddCommand(newTouchCmd(cxt))
 	cmd.AddCommand(versions.NewVersionCmd(cxt))
 	cmd.AddCommand(newCompletionCmd(cxt))
@@ -142,16 +137,6 @@ func newSyncCmd(cxt *command.Context) *cobra.Command {
 		Aliases: []string{"relist"},
 	}
 	cmd.AddCommand(broker.NewSyncCmd(cxt))
-
-	return cmd
-}
-
-func newCreateCmd(cxt *command.Context) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create a user-defined resource",
-	}
-	cmd.AddCommand(class.NewCreateCmd(cxt))
 
 	return cmd
 }
@@ -186,8 +171,7 @@ func newDescribeCmd(cxt *command.Context) *cobra.Command {
 
 func newInstallCmd(cxt *command.Context) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "install",
-		Short: "Install Service Catalog related tools",
+		Use: "install",
 	}
 	cmd.AddCommand(plugin.NewInstallCmd(cxt))
 

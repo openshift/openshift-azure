@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"github.com/pkg/errors"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -35,33 +34,13 @@ const (
 )
 
 // RetrieveInstances lists all instances in a namespace.
-func (sdk *SDK) RetrieveInstances(ns, classFilter, planFilter string) (*v1beta1.ServiceInstanceList, error) {
+func (sdk *SDK) RetrieveInstances(ns string) (*v1beta1.ServiceInstanceList, error) {
 	instances, err := sdk.ServiceCatalog().ServiceInstances(ns).List(v1.ListOptions{})
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to list instances in %s", ns)
+		return nil, fmt.Errorf("unable to list instances in %s (%s)", ns, err)
 	}
 
-	if classFilter == "" && planFilter == "" {
-		return instances, nil
-	}
-
-	filtered := v1beta1.ServiceInstanceList{
-		Items: []v1beta1.ServiceInstance{},
-	}
-
-	for _, instance := range instances.Items {
-		if classFilter != "" && instance.Spec.GetSpecifiedClusterServiceClass() != classFilter {
-			continue
-		}
-
-		if planFilter != "" && instance.Spec.GetSpecifiedClusterServicePlan() != planFilter {
-			continue
-		}
-
-		filtered.Items = append(filtered.Items, instance)
-	}
-
-	return &filtered, nil
+	return instances, nil
 }
 
 // RetrieveInstance gets an instance by its name.
@@ -226,27 +205,6 @@ func (sdk *SDK) TouchInstance(ns, name string, retries int) error {
 	return fmt.Errorf("could not sync service broker after %d tries", retries)
 }
 
-// WaitForInstanceToNotExist waits for the specified instance to no longer exist.
-func (sdk *SDK) WaitForInstanceToNotExist(ns, name string, interval time.Duration, timeout *time.Duration) (instance *v1beta1.ServiceInstance, err error) {
-	if timeout == nil {
-		notimeout := time.Duration(math.MaxInt64)
-		timeout = &notimeout
-	}
-
-	err = wait.PollImmediate(interval, *timeout,
-		func() (bool, error) {
-			instance, err = sdk.ServiceCatalog().ServiceInstances(ns).Get(name, v1.GetOptions{})
-			if err != nil {
-				if apierrors.IsNotFound(err) {
-					err = nil
-				}
-				return true, err
-			}
-			return false, err
-		})
-	return instance, err
-}
-
 // WaitForInstance waits for the instance to complete the current operation (or fail).
 func (sdk *SDK) WaitForInstance(ns, name string, interval time.Duration, timeout *time.Duration) (instance *v1beta1.ServiceInstance, err error) {
 	if timeout == nil {
@@ -258,6 +216,9 @@ func (sdk *SDK) WaitForInstance(ns, name string, interval time.Duration, timeout
 		func() (bool, error) {
 			instance, err = sdk.RetrieveInstance(ns, name)
 			if nil != err {
+				if apierrors.IsNotFound(err) {
+					return true, nil
+				}
 				return false, err
 			}
 

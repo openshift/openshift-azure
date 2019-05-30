@@ -29,7 +29,6 @@ import (
 	scmeta "github.com/kubernetes-incubator/service-catalog/pkg/api/meta"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	v1beta1informers "github.com/kubernetes-incubator/service-catalog/pkg/client/informers_generated/externalversions/servicecatalog/v1beta1"
-	sctestutil "github.com/kubernetes-incubator/service-catalog/test/util"
 	osb "github.com/pmorie/go-open-service-broker-client/v2"
 	fakeosb "github.com/pmorie/go-open-service-broker-client/v2/fake"
 	corev1 "k8s.io/api/core/v1"
@@ -71,7 +70,7 @@ func TestReconcileServiceBindingNonExistingServiceInstance(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
@@ -137,29 +136,15 @@ func TestReconcileServiceBindingUnresolvedClusterServiceClassReference(t *testin
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	actions := fakeCatalogClient.Actions()
-	assertNumberOfActions(t, actions, 1)
-
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding)
-	assertServiceBindingReadyFalse(t, updatedServiceBinding, errorServiceInstanceRefsUnresolved)
-	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
-
-	events := getRecordedEvents(testController)
-	assertNumEvents(t, events, 1)
-
-	expectedEvent := warningEventBuilder(errorServiceInstanceRefsUnresolved).msgf(
-		"Binding cannot begin because ClusterServiceClass and ClusterServicePlan references for ServiceInstance \"%s/%s\" have not been resolved yet",
-		binding.Namespace, binding.Spec.ServiceInstanceRef.Name,
-	)
-	if err := checkEvents(events, expectedEvent.stringArr()); err != nil {
-		t.Fatal(err)
-	}
+	// There are no actions.
+	assertNumberOfActions(t, actions, 0)
 }
 
 // TestReconcileServiceBindingUnresolvedClusterServicePlanReference
-// tests reconcileBinding to ensure a binding fails when a ClusterServicePlanRef has not been resolved.
+// tests reconcileBinding to ensure a binding fails when a ClusterServiceClassRef has not been resolved.
 func TestReconcileServiceBindingUnresolvedClusterServicePlanReference(t *testing.T) {
 	_, fakeCatalogClient, fakeClusterServiceBrokerClient, testController, sharedInformers := newTestController(t, noFakeActions())
 
@@ -204,25 +189,11 @@ func TestReconcileServiceBindingUnresolvedClusterServicePlanReference(t *testing
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	actions := fakeCatalogClient.Actions()
-	assertNumberOfActions(t, actions, 1)
-
-	updatedServiceBinding := assertUpdateStatus(t, actions[0], binding)
-	assertServiceBindingReadyFalse(t, updatedServiceBinding, errorServiceInstanceRefsUnresolved)
-	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
-
-	events := getRecordedEvents(testController)
-	assertNumEvents(t, events, 1)
-
-	expectedEvent := warningEventBuilder(errorServiceInstanceRefsUnresolved).msgf(
-		"Binding cannot begin because ClusterServiceClass and ClusterServicePlan references for ServiceInstance \"%s/%s\" have not been resolved yet",
-		binding.Namespace, binding.Spec.ServiceInstanceRef.Name,
-	)
-	if err := checkEvents(events, expectedEvent.stringArr()); err != nil {
-		t.Fatal(err)
-	}
+	// There are no actions.
+	assertNumberOfActions(t, actions, 0)
 }
 
 // TestReconcileBindingNonExistingClusterServiceClass tests reconcileBinding to ensure a
@@ -268,7 +239,7 @@ func TestReconcileServiceBindingNonExistingClusterServiceClass(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	actions := fakeCatalogClient.Actions()
 	// There is one action to update to failed status because there's
@@ -342,7 +313,7 @@ func TestReconcileServiceBindingWithSecretConflict(t *testing.T) {
 	assertGetNamespaceAction(t, fakeKubeClient.Actions())
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
 
 	err := reconcileServiceBinding(t, testController, binding)
 	if err == nil {
@@ -350,7 +321,7 @@ func TestReconcileServiceBindingWithSecretConflict(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertBind(t, brokerActions[0], &osb.BindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -360,7 +331,6 @@ func TestReconcileServiceBindingWithSecretConflict(t *testing.T) {
 		BindResource: &osb.BindResource{
 			AppGUID: strPtr(testNamespaceGUID),
 		},
-		Context: testContext,
 	})
 
 	actions := fakeCatalogClient.Actions()
@@ -459,7 +429,7 @@ func TestReconcileServiceBindingWithParameters(t *testing.T) {
 	assertGetNamespaceAction(t, fakeKubeClient.Actions())
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
 
 	err = reconcileServiceBinding(t, testController, binding)
 	if err != nil {
@@ -467,7 +437,7 @@ func TestReconcileServiceBindingWithParameters(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertBind(t, brokerActions[0], &osb.BindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -484,7 +454,6 @@ func TestReconcileServiceBindingWithParameters(t *testing.T) {
 		BindResource: &osb.BindResource{
 			AppGUID: strPtr(testNamespaceGUID),
 		},
-		Context: testContext,
 	})
 
 	actions := fakeCatalogClient.Actions()
@@ -602,7 +571,7 @@ func TestReconcileServiceBindingWithSecretTransform(t *testing.T) {
 	assertGetNamespaceAction(t, fakeKubeClient.Actions())
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
 
 	err := testController.reconcileServiceBinding(binding)
 	if err != nil {
@@ -610,7 +579,7 @@ func TestReconcileServiceBindingWithSecretTransform(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertBind(t, brokerActions[0], &osb.BindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -620,7 +589,6 @@ func TestReconcileServiceBindingWithSecretTransform(t *testing.T) {
 		BindResource: &osb.BindResource{
 			AppGUID: strPtr(testNamespaceGUID),
 		},
-		Context: testContext,
 	})
 
 	actions := fakeCatalogClient.Actions()
@@ -702,7 +670,7 @@ func TestReconcileServiceBindingNonbindableClusterServiceClass(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
@@ -785,7 +753,7 @@ func TestReconcileServiceBindingNonbindableClusterServiceClassBindablePlan(t *te
 	assertGetNamespaceAction(t, fakeKubeClient.Actions())
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
 
 	err := reconcileServiceBinding(t, testController, binding)
 	if err != nil {
@@ -793,7 +761,7 @@ func TestReconcileServiceBindingNonbindableClusterServiceClassBindablePlan(t *te
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertBind(t, brokerActions[0], &osb.BindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -803,7 +771,6 @@ func TestReconcileServiceBindingNonbindableClusterServiceClassBindablePlan(t *te
 		BindResource: &osb.BindResource{
 			AppGUID: strPtr(testNamespaceGUID),
 		},
-		Context: testContext,
 	})
 
 	actions := fakeCatalogClient.Actions()
@@ -878,7 +845,7 @@ func TestReconcileServiceBindingBindableClusterServiceClassNonbindablePlan(t *te
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
@@ -914,7 +881,7 @@ func TestReconcileServiceBindingServiceInstanceNotReady(t *testing.T) {
 
 	sharedInformers.ClusterServiceBrokers().Informer().GetStore().Add(getTestClusterServiceBroker())
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
-	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithClusterRefs())
+	sharedInformers.ServiceInstances().Informer().GetStore().Add(getTestServiceInstanceWithRefs())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
 	binding := &v1beta1.ServiceBinding{
@@ -937,7 +904,7 @@ func TestReconcileServiceBindingServiceInstanceNotReady(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
@@ -964,8 +931,7 @@ func TestReconcileServiceBindingServiceInstanceNotReady(t *testing.T) {
 func TestReconcileServiceBindingNamespaceError(t *testing.T) {
 	fakeKubeClient, fakeCatalogClient, fakeClusterServiceBrokerClient, testController, sharedInformers := newTestController(t, noFakeActions())
 
-	// prepend to override the default test namespace
-	fakeKubeClient.PrependReactor("get", "namespaces", func(action clientgotesting.Action) (bool, runtime.Object, error) {
+	fakeKubeClient.AddReactor("get", "namespaces", func(action clientgotesting.Action) (bool, runtime.Object, error) {
 		return true, &corev1.Namespace{}, errors.New("No namespace")
 	})
 
@@ -973,7 +939,7 @@ func TestReconcileServiceBindingNamespaceError(t *testing.T) {
 	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(getTestClusterServiceClass())
 	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(getTestClusterServicePlan())
 
-	instance := getTestServiceInstanceWithClusterRefs()
+	instance := getTestServiceInstanceWithRefs()
 	setServiceInstanceCondition(instance, v1beta1.ServiceInstanceConditionReady, v1beta1.ConditionTrue, "", "")
 	sharedInformers.ServiceInstances().Informer().GetStore().Add(instance)
 
@@ -998,7 +964,7 @@ func TestReconcileServiceBindingNamespaceError(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
@@ -1119,7 +1085,7 @@ func TestReconcileServiceBindingDelete(t *testing.T) {
 			assertDeleteSecretAction(t, fakeKubeClient.Actions(), binding.Spec.SecretName)
 			fakeKubeClient.ClearActions()
 
-			assertNumberOfBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
+			assertNumberOfClusterServiceBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
 
 			err := reconcileServiceBinding(t, testController, binding)
 			if err != nil {
@@ -1127,7 +1093,7 @@ func TestReconcileServiceBindingDelete(t *testing.T) {
 			}
 
 			brokerActions := fakeClusterServiceBrokerClient.Actions()
-			assertNumberOfBrokerActions(t, brokerActions, 1)
+			assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 			assertUnbind(t, brokerActions[0], &osb.UnbindRequest{
 				BindingID:  testServiceBindingGUID,
 				InstanceID: testServiceInstanceGUID,
@@ -1207,7 +1173,7 @@ func TestReconcileServiceBindingDeleteUnresolvedClusterServiceClassReference(t *
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	actions := fakeCatalogClient.Actions()
 	// The actions should be:
@@ -1393,7 +1359,7 @@ func TestReconcileServiceBindingDeleteFailedServiceBinding(t *testing.T) {
 	assertDeleteSecretAction(t, fakeKubeClient.Actions(), binding.Spec.SecretName)
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
 
 	err := reconcileServiceBinding(t, testController, binding)
 	if err != nil {
@@ -1401,7 +1367,7 @@ func TestReconcileServiceBindingDeleteFailedServiceBinding(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertUnbind(t, brokerActions[0], &osb.UnbindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -1596,7 +1562,7 @@ func TestReconcileServiceBindingWithFailureCondition(t *testing.T) {
 	assertNumberOfActions(t, actions, 0)
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	events := getRecordedEvents(testController)
 	assertNumEvents(t, events, 0)
@@ -1627,7 +1593,7 @@ func TestReconcileServiceBindingWithServiceBindingCallFailure(t *testing.T) {
 	assertGetNamespaceAction(t, fakeKubeClient.Actions())
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
 
 	if err := reconcileServiceBinding(t, testController, binding); err == nil {
 		t.Fatal("ServiceBinding creation should fail")
@@ -1649,17 +1615,16 @@ func TestReconcileServiceBindingWithServiceBindingCallFailure(t *testing.T) {
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertBind(t, brokerActions[0], &osb.BindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
 		ServiceID:  testClusterServiceClassGUID,
 		PlanID:     testClusterServicePlanGUID,
-		AppGUID:    strPtr(testNamespaceGUID),
+		AppGUID:    strPtr(""),
 		BindResource: &osb.BindResource{
-			AppGUID: strPtr(testNamespaceGUID),
+			AppGUID: strPtr(""),
 		},
-		Context: testContext,
 	})
 
 	events := getRecordedEvents(testController)
@@ -1702,7 +1667,7 @@ func TestReconcileServiceBindingWithServiceBindingFailure(t *testing.T) {
 	assertGetNamespaceAction(t, fakeKubeClient.Actions())
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
 
 	if err := reconcileServiceBinding(t, testController, binding); err != nil {
 		t.Fatalf("ServiceBinding creation should complete: %v", err)
@@ -1724,17 +1689,16 @@ func TestReconcileServiceBindingWithServiceBindingFailure(t *testing.T) {
 	assertServiceBindingOrphanMitigationSet(t, updatedServiceBinding, false)
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertBind(t, brokerActions[0], &osb.BindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
 		ServiceID:  testClusterServiceClassGUID,
 		PlanID:     testClusterServicePlanGUID,
-		AppGUID:    strPtr(testNamespaceGUID),
+		AppGUID:    strPtr(""),
 		BindResource: &osb.BindResource{
-			AppGUID: strPtr(testNamespaceGUID),
+			AppGUID: strPtr(""),
 		},
-		Context: testContext,
 	})
 
 	events := getRecordedEvents(testController)
@@ -2033,8 +1997,10 @@ func TestReconcileUnbindingWithClusterServiceBrokerHTTPError(t *testing.T) {
 func TestReconcileBindingUsingOriginatingIdentity(t *testing.T) {
 	for _, tc := range originatingIdentityTestCases {
 		func() {
-			prevOrigIDEnablement := sctestutil.EnableOriginatingIdentity(t, tc.enableOriginatingIdentity)
-			defer utilfeature.DefaultFeatureGate.Set(fmt.Sprintf("%v=%v", scfeatures.OriginatingIdentity, prevOrigIDEnablement))
+			if tc.enableOriginatingIdentity {
+				utilfeature.DefaultFeatureGate.Set(fmt.Sprintf("%v=true", scfeatures.OriginatingIdentity))
+				defer utilfeature.DefaultFeatureGate.Set(fmt.Sprintf("%v=false", scfeatures.OriginatingIdentity))
+			}
 
 			fakeKubeClient, fakeCatalogClient, fakeBrokerClient, testController, sharedInformers := newTestController(t, fakeosb.FakeClientConfiguration{
 				BindReaction: &fakeosb.BindReaction{
@@ -2064,7 +2030,7 @@ func TestReconcileBindingUsingOriginatingIdentity(t *testing.T) {
 			assertGetNamespaceAction(t, fakeKubeClient.Actions())
 			fakeKubeClient.ClearActions()
 
-			assertNumberOfBrokerActions(t, fakeBrokerClient.Actions(), 0)
+			assertNumberOfClusterServiceBrokerActions(t, fakeBrokerClient.Actions(), 0)
 
 			err := reconcileServiceBinding(t, testController, binding)
 			if err != nil {
@@ -2072,7 +2038,7 @@ func TestReconcileBindingUsingOriginatingIdentity(t *testing.T) {
 			}
 
 			brokerActions := fakeBrokerClient.Actions()
-			assertNumberOfBrokerActions(t, brokerActions, 1)
+			assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 			actualRequest, ok := brokerActions[0].Request.(*osb.BindRequest)
 			if !ok {
 				t.Errorf("%v: unexpected request type; expected %T, got %T", tc.name, &osb.BindRequest{}, actualRequest)
@@ -2090,8 +2056,13 @@ func TestReconcileBindingUsingOriginatingIdentity(t *testing.T) {
 func TestReconcileBindingDeleteUsingOriginatingIdentity(t *testing.T) {
 	for _, tc := range originatingIdentityTestCases {
 		func() {
-			prevOrigIDEnablement := sctestutil.EnableOriginatingIdentity(t, tc.enableOriginatingIdentity)
-			defer utilfeature.DefaultFeatureGate.Set(fmt.Sprintf("%v=%v", scfeatures.OriginatingIdentity, prevOrigIDEnablement))
+			if tc.enableOriginatingIdentity {
+				err := utilfeature.DefaultFeatureGate.Set(fmt.Sprintf("%v=true", scfeatures.OriginatingIdentity))
+				if err != nil {
+					t.Fatalf("Failed to enable originating identity feature: %v", err)
+				}
+				defer utilfeature.DefaultFeatureGate.Set(fmt.Sprintf("%v=false", scfeatures.OriginatingIdentity))
+			}
 
 			fakeKubeClient, fakeCatalogClient, fakeBrokerClient, testController, sharedInformers := newTestController(t, fakeosb.FakeClientConfiguration{
 				UnbindReaction: &fakeosb.UnbindReaction{
@@ -2123,7 +2094,7 @@ func TestReconcileBindingDeleteUsingOriginatingIdentity(t *testing.T) {
 			assertDeleteSecretAction(t, fakeKubeClient.Actions(), binding.Spec.SecretName)
 			fakeKubeClient.ClearActions()
 
-			assertNumberOfBrokerActions(t, fakeBrokerClient.Actions(), 0)
+			assertNumberOfClusterServiceBrokerActions(t, fakeBrokerClient.Actions(), 0)
 
 			err := reconcileServiceBinding(t, testController, binding)
 			if err != nil {
@@ -2131,7 +2102,7 @@ func TestReconcileBindingDeleteUsingOriginatingIdentity(t *testing.T) {
 			}
 
 			brokerActions := fakeBrokerClient.Actions()
-			assertNumberOfBrokerActions(t, brokerActions, 1)
+			assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 			actualRequest, ok := brokerActions[0].Request.(*osb.UnbindRequest)
 			if !ok {
 				t.Errorf("%v: unexpected request type; expected %T, got %T", tc.name, &osb.UnbindRequest{}, actualRequest)
@@ -2179,7 +2150,7 @@ func TestReconcileBindingSuccessOnFinalRetry(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertBind(t, brokerActions[0], &osb.BindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -2189,7 +2160,6 @@ func TestReconcileBindingSuccessOnFinalRetry(t *testing.T) {
 		BindResource: &osb.BindResource{
 			AppGUID: strPtr(testNamespaceGUID),
 		},
-		Context: testContext,
 	})
 
 	actions := fakeCatalogClient.Actions()
@@ -2305,7 +2275,7 @@ func TestReconcileBindingWithSecretConflictFailedAfterFinalRetry(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertBind(t, brokerActions[0], &osb.BindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -2315,7 +2285,6 @@ func TestReconcileBindingWithSecretConflictFailedAfterFinalRetry(t *testing.T) {
 		BindResource: &osb.BindResource{
 			AppGUID: strPtr(testNamespaceGUID),
 		},
-		Context: testContext,
 	})
 
 	actions := fakeCatalogClient.Actions()
@@ -2375,7 +2344,7 @@ func TestReconcileServiceBindingWithStatusUpdateError(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	actions := fakeCatalogClient.Actions()
 	assertNumberOfActions(t, actions, 1)
@@ -2480,7 +2449,7 @@ func TestReconcileServiceBindingWithSecretParameters(t *testing.T) {
 	assertActionEquals(t, kubeActions[1], "get", "secrets")
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
 
 	err = reconcileServiceBinding(t, testController, binding)
 	if err != nil {
@@ -2488,7 +2457,7 @@ func TestReconcileServiceBindingWithSecretParameters(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertBind(t, brokerActions[0], &osb.BindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -2502,7 +2471,6 @@ func TestReconcileServiceBindingWithSecretParameters(t *testing.T) {
 		BindResource: &osb.BindResource{
 			AppGUID: strPtr(testNamespaceGUID),
 		},
-		Context: testContext,
 	})
 
 	actions := fakeCatalogClient.Actions()
@@ -2661,14 +2629,14 @@ func TestReconcileBindingWithSetOrphanMitigation(t *testing.T) {
 			assertGetNamespaceAction(t, fakeKubeClient.Actions())
 			fakeKubeClient.ClearActions()
 
-			assertNumberOfBrokerActions(t, fakeServiceBrokerClient.Actions(), 0)
+			assertNumberOfClusterServiceBrokerActions(t, fakeServiceBrokerClient.Actions(), 0)
 
 			if err := reconcileServiceBinding(t, testController, binding); tc.shouldReturnError && err == nil || !tc.shouldReturnError && err != nil {
 				t.Fatalf("expected to return %v from reconciliation attempt, got %v", tc.shouldReturnError, err)
 			}
 
 			brokerActions := fakeServiceBrokerClient.Actions()
-			assertNumberOfBrokerActions(t, brokerActions, 1)
+			assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 			assertBind(t, brokerActions[0], &osb.BindRequest{
 				BindingID:  testServiceBindingGUID,
 				InstanceID: testServiceInstanceGUID,
@@ -2678,7 +2646,6 @@ func TestReconcileBindingWithSetOrphanMitigation(t *testing.T) {
 				BindResource: &osb.BindResource{
 					AppGUID: strPtr(testNamespaceGUID),
 				},
-				Context: testContext,
 			})
 
 			kubeActions := fakeKubeClient.Actions()
@@ -2750,7 +2717,7 @@ func TestReconcileBindingWithOrphanMitigationInProgress(t *testing.T) {
 	assertDeleteSecretAction(t, fakeKubeClient.Actions(), binding.Spec.SecretName)
 
 	brokerActions := fakeServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertUnbind(t, brokerActions[0], &osb.UnbindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -2823,7 +2790,7 @@ func TestReconcileBindingWithOrphanMitigationReconciliationRetryTimeOut(t *testi
 	assertDeleteSecretAction(t, fakeKubeClient.Actions(), binding.Spec.SecretName)
 
 	brokerActions := fakeServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertUnbind(t, brokerActions[0], &osb.UnbindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -2910,7 +2877,7 @@ func TestReconcileServiceBindingDeleteDuringOngoingOperation(t *testing.T) {
 	assertDeleteSecretAction(t, fakeKubeClient.Actions(), binding.Spec.SecretName)
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
 
 	err := reconcileServiceBinding(t, testController, binding)
 	if err != nil {
@@ -2918,7 +2885,7 @@ func TestReconcileServiceBindingDeleteDuringOngoingOperation(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertUnbind(t, brokerActions[0], &osb.UnbindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -3006,7 +2973,7 @@ func TestReconcileServiceBindingDeleteDuringOrphanMitigation(t *testing.T) {
 	assertDeleteSecretAction(t, fakeKubeClient.Actions(), binding.Spec.SecretName)
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeClusterServiceBrokerClient.Actions(), 0)
 
 	err := reconcileServiceBinding(t, testController, binding)
 	if err != nil {
@@ -3014,7 +2981,7 @@ func TestReconcileServiceBindingDeleteDuringOrphanMitigation(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertUnbind(t, brokerActions[0], &osb.UnbindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -3083,7 +3050,7 @@ func TestReconcileServiceBindingAsynchronousBind(t *testing.T) {
 	assertGetNamespaceAction(t, fakeKubeClient.Actions())
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeServiceBrokerClient.Actions(), 0)
 
 	if err := reconcileServiceBinding(t, testController, binding); err != nil {
 		t.Fatalf("a valid binding should not fail: %v", err)
@@ -3095,7 +3062,7 @@ func TestReconcileServiceBindingAsynchronousBind(t *testing.T) {
 
 	// Broker actions
 	brokerActions := fakeServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertBind(t, brokerActions[0], &osb.BindRequest{
 		BindingID:  testServiceBindingGUID,
 		InstanceID: testServiceInstanceGUID,
@@ -3106,7 +3073,6 @@ func TestReconcileServiceBindingAsynchronousBind(t *testing.T) {
 			AppGUID: strPtr(testNamespaceGUID),
 		},
 		AcceptsIncomplete: true,
-		Context:           testContext,
 	})
 
 	// Kube actions
@@ -3177,7 +3143,7 @@ func TestReconcileServiceBindingAsynchronousUnbind(t *testing.T) {
 	assertDeleteSecretAction(t, fakeKubeClient.Actions(), binding.Spec.SecretName)
 	fakeKubeClient.ClearActions()
 
-	assertNumberOfBrokerActions(t, fakeServiceBrokerClient.Actions(), 0)
+	assertNumberOfClusterServiceBrokerActions(t, fakeServiceBrokerClient.Actions(), 0)
 
 	if err := reconcileServiceBinding(t, testController, binding); err != nil {
 		t.Fatalf("a valid binding should not fail: %v", err)
@@ -3189,7 +3155,7 @@ func TestReconcileServiceBindingAsynchronousUnbind(t *testing.T) {
 
 	// Broker actions
 	brokerActions := fakeServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertUnbind(t, brokerActions[0], &osb.UnbindRequest{
 		BindingID:         testServiceBindingGUID,
 		InstanceID:        testServiceInstanceGUID,
@@ -3227,7 +3193,7 @@ func TestPollServiceBinding(t *testing.T) {
 	}
 
 	validatePollBindingLastOperationAction := func(t *testing.T, actions []fakeosb.Action) {
-		assertNumberOfBrokerActions(t, actions, 1)
+		assertNumberOfClusterServiceBrokerActions(t, actions, 1)
 
 		operationKey := osb.OperationKey(testOperation)
 		assertPollBindingLastOperation(t, actions[0], &osb.BindingLastOperationRequest{
@@ -3240,7 +3206,7 @@ func TestPollServiceBinding(t *testing.T) {
 	}
 
 	validatePollBindingLastOperationAndGetBindingActions := func(t *testing.T, actions []fakeosb.Action) {
-		assertNumberOfBrokerActions(t, actions, 2)
+		assertNumberOfClusterServiceBrokerActions(t, actions, 2)
 
 		operationKey := osb.OperationKey(testOperation)
 		assertPollBindingLastOperation(t, actions[0], &osb.BindingLastOperationRequest{
@@ -3855,7 +3821,7 @@ func TestPollServiceBinding(t *testing.T) {
 			if tc.validateBrokerActionsFunc != nil {
 				tc.validateBrokerActionsFunc(t, brokerActions)
 			} else {
-				assertNumberOfBrokerActions(t, brokerActions, 0)
+				assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 			}
 
 			// Kube actions

@@ -173,28 +173,15 @@ func TestShouldReconcileClusterServiceBroker(t *testing.T) {
 			reconcile: true,
 		},
 		{
-			name: "ready, duration behavior, nil duration, interval not elapsed",
+			name: "ready, duration behavior, nil duration",
 			broker: func() *v1beta1.ClusterServiceBroker {
-				t := metav1.NewTime(time.Now().Add(-23 * time.Hour))
-				broker := getTestClusterServiceBrokerWithStatusAndTime(v1beta1.ConditionTrue, t, t)
+				broker := getTestClusterServiceBrokerWithStatus(v1beta1.ConditionTrue)
 				broker.Spec.RelistBehavior = v1beta1.ServiceBrokerRelistBehaviorDuration
 				broker.Spec.RelistDuration = nil
 				return broker
 			}(),
 			now:       time.Now(),
 			reconcile: false,
-		},
-		{
-			name: "ready, duration behavior, nil duration, interval elapsed",
-			broker: func() *v1beta1.ClusterServiceBroker {
-				t := metav1.NewTime(time.Now().Add(-25 * time.Hour))
-				broker := getTestClusterServiceBrokerWithStatusAndTime(v1beta1.ConditionTrue, t, t)
-				broker.Spec.RelistBehavior = v1beta1.ServiceBrokerRelistBehaviorDuration
-				broker.Spec.RelistDuration = nil
-				return broker
-			}(),
-			now:       time.Now(),
-			reconcile: true,
 		},
 		{
 			name: "ready, manual behavior",
@@ -209,26 +196,24 @@ func TestShouldReconcileClusterServiceBroker(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			var ltt *time.Time
-			if len(tc.broker.Status.Conditions) != 0 {
-				ltt = &tc.broker.Status.Conditions[0].LastTransitionTime.Time
-			}
+		var ltt *time.Time
+		if len(tc.broker.Status.Conditions) != 0 {
+			ltt = &tc.broker.Status.Conditions[0].LastTransitionTime.Time
+		}
 
-			if tc.broker.Spec.RelistDuration != nil {
-				interval := tc.broker.Spec.RelistDuration.Duration
-				lastRelistTime := tc.broker.Status.LastCatalogRetrievalTime
-				t.Logf("now: %v, interval: %v, last transition time: %v, last relist time: %v", tc.now, interval, ltt, lastRelistTime)
-			} else {
-				t.Logf("broker.Spec.RelistDuration set to nil")
-			}
+		if tc.broker.Spec.RelistDuration != nil {
+			interval := tc.broker.Spec.RelistDuration.Duration
+			lastRelistTime := tc.broker.Status.LastCatalogRetrievalTime
+			t.Logf("%v: now: %v, interval: %v, last transition time: %v, last relist time: %v", tc.name, tc.now, interval, ltt, lastRelistTime)
+		} else {
+			t.Logf("broker.Spec.RelistDuration set to nil")
+		}
 
-			actual := shouldReconcileClusterServiceBroker(tc.broker, tc.now, 24*time.Hour)
+		actual := shouldReconcileClusterServiceBroker(tc.broker, tc.now)
 
-			if e, a := tc.reconcile, actual; e != a {
-				t.Errorf("unexpected result: %s", expectedGot(e, a))
-			}
-		})
+		if e, a := tc.reconcile, actual; e != a {
+			t.Errorf("%v: unexpected result: %s", tc.name, expectedGot(e, a))
+		}
 	}
 }
 
@@ -261,7 +246,7 @@ func TestReconcileClusterServiceBrokerExistingServiceClassAndServicePlan(t *test
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	listRestrictions := clientgotesting.ListRestrictions{
@@ -310,7 +295,7 @@ func TestReconcileClusterServiceBrokerRemovedClusterServiceClass(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	listRestrictions := clientgotesting.ListRestrictions{
@@ -378,7 +363,7 @@ func TestReconcileClusterServiceBrokerRemovedAndRestoredClusterServiceClass(t *t
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	listRestrictions := clientgotesting.ListRestrictions{
@@ -435,7 +420,7 @@ func TestReconcileClusterServiceBrokerRemovedClusterServicePlan(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	listRestrictions := clientgotesting.ListRestrictions{
@@ -476,7 +461,7 @@ func TestReconcileClusterServiceBrokerExistingClusterServiceClassDifferentBroker
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	actions := fakeCatalogClient.Actions()
@@ -528,7 +513,7 @@ func TestReconcileClusterServiceBrokerExistingClusterServicePlanDifferentClass(t
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	actions := fakeCatalogClient.Actions()
@@ -597,7 +582,7 @@ func TestReconcileClusterServiceBrokerDelete(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 0)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 
 	// Verify no core kube actions occurred
 	kubeActions := fakeKubeClient.Actions()
@@ -657,7 +642,7 @@ func TestReconcileClusterServiceBrokerErrorFetchingCatalog(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	actions := fakeCatalogClient.Actions()
@@ -710,7 +695,7 @@ func TestReconcileClusterServiceBrokerZeroServices(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	// Verify no core kube actions occurred
@@ -857,10 +842,10 @@ func testReconcileClusterServiceBrokerWithAuth(t *testing.T, authInfo *v1beta1.C
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
 	if shouldSucceed {
 		// GetCatalog
-		assertNumberOfBrokerActions(t, brokerActions, 1)
+		assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 		assertGetCatalog(t, brokerActions[0])
 	} else {
-		assertNumberOfBrokerActions(t, brokerActions, 0)
+		assertNumberOfClusterServiceBrokerActions(t, brokerActions, 0)
 	}
 
 	actions := fakeCatalogClient.Actions()
@@ -918,7 +903,7 @@ func TestReconcileClusterServiceBrokerWithReconcileError(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	actions := fakeCatalogClient.Actions()
@@ -975,7 +960,7 @@ func TestReconcileClusterServiceBrokerSuccessOnFinalRetry(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	actions := fakeCatalogClient.Actions()
@@ -1022,7 +1007,7 @@ func TestReconcileClusterServiceBrokerFailureOnFinalRetry(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	actions := fakeCatalogClient.Actions()
@@ -1073,7 +1058,7 @@ func TestReconcileClusterServiceBrokerWithStatusUpdateError(t *testing.T) {
 	}
 
 	brokerActions := fakeClusterServiceBrokerClient.Actions()
-	assertNumberOfBrokerActions(t, brokerActions, 1)
+	assertNumberOfClusterServiceBrokerActions(t, brokerActions, 1)
 	assertGetCatalog(t, brokerActions[0])
 
 	actions := fakeCatalogClient.Actions()
@@ -1334,265 +1319,4 @@ func reconcileClusterServiceBroker(t *testing.T, testController *controller, bro
 		t.Errorf("reconcileClusterServiceBroker shouldn't mutate input, but it does: %s", expectedGot(clone, broker))
 	}
 	return err
-}
-
-// TestReconcileUpdatesManagedClassesAndPlans
-// verifies that when an service classes and plans are updated during relist
-// that they are flagged as service catalog managed.
-func TestReconcileUpdatesManagedClassesAndPlans(t *testing.T) {
-	_, fakeCatalogClient, _, testController, sharedInformers := newTestController(t, getTestCatalogConfig())
-
-	testClusterServiceClass := getTestClusterServiceClass()
-	testClusterServicePlan := getTestClusterServicePlan()
-
-	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(testClusterServiceClass)
-	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(testClusterServicePlan)
-
-	fakeCatalogClient.AddReactor("list", "clusterserviceclasses", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-		return true, &v1beta1.ClusterServiceClassList{
-			Items: []v1beta1.ClusterServiceClass{
-				*testClusterServiceClass,
-			},
-		}, nil
-	})
-	fakeCatalogClient.AddReactor("list", "clusterserviceplans", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-		return true, &v1beta1.ClusterServicePlanList{
-			Items: []v1beta1.ClusterServicePlan{
-				*testClusterServicePlan,
-			},
-		}, nil
-	})
-
-	if err := reconcileClusterServiceBroker(t, testController, getTestClusterServiceBroker()); err != nil {
-		t.Fatalf("This should not fail: %v", err)
-	}
-
-	actions := fakeCatalogClient.Actions()
-
-	c := assertUpdate(t, actions[2], testClusterServiceClass)
-	updatedClass, ok := c.(metav1.Object)
-	if !ok {
-		t.Fatalf("could not cast %T to metav1.Object", c)
-	}
-	if !isServiceCatalogManagedResource(updatedClass) {
-		t.Error("expected the class to have a service catalog controller reference")
-	}
-
-	p := assertUpdate(t, actions[3], testClusterServicePlan)
-	updatedPlan, ok := p.(metav1.Object)
-	if !ok {
-		t.Fatalf("could not cast %T to metav1.Object", p)
-	}
-	if !isServiceCatalogManagedResource(updatedPlan) {
-		t.Error("expected the plan to have a service catalog controller reference")
-	}
-}
-
-// TestReconcileMarksNewResourcesAsManaged
-// verifies that when new service classes and plans are created during relist
-// that they are flagged as service catalog managed.
-func TestReconcileCreatesManagedClassesAndPlans(t *testing.T) {
-	_, fakeCatalogClient, _, testController, _ := newTestController(t, getTestCatalogConfig())
-
-	testClusterServiceClass := getTestClusterServiceClass()
-	testClusterServicePlan := getTestClusterServicePlan()
-
-	if err := reconcileClusterServiceBroker(t, testController, getTestClusterServiceBroker()); err != nil {
-		t.Fatalf("This should not fail: %v", err)
-	}
-
-	actions := fakeCatalogClient.Actions()
-
-	// Verify that the new class and plan are marked as managed
-	c := assertCreate(t, actions[2], testClusterServiceClass)
-	createdClass, ok := c.(metav1.Object)
-	if !ok {
-		t.Fatalf("could not cast %T to metav1.Object", c)
-	}
-	if !isServiceCatalogManagedResource(createdClass) {
-		t.Error("expected the class to have a service catalog controller reference")
-	}
-
-	p := assertCreate(t, actions[3], testClusterServicePlan)
-	createdPlan, ok := p.(metav1.Object)
-	if !ok {
-		t.Fatalf("could not cast %T to metav1.Object", p)
-	}
-	if !isServiceCatalogManagedResource(createdPlan) {
-		t.Error("expected the plan to have a service catalog controller reference")
-	}
-}
-
-// TestReconcileDoesNotUpdateUserDefinedClassesAndPlans
-// verifies that user-defined classes and plans are not modified
-// during relist.
-func TestReconcileMarksExistingClassesAndPlansAsManaged(t *testing.T) {
-	_, fakeCatalogClient, _, testController, sharedInformers := newTestController(t, getTestCatalogConfig())
-
-	testClusterServiceClass := getTestClusterServiceClass()
-	testClusterServicePlan := getTestClusterServicePlan()
-
-	// Remove the controller ref, but keep the same names as resources returned during broker list
-	testClusterServiceClass.ObjectMeta.OwnerReferences = nil
-	testClusterServicePlan.ObjectMeta.OwnerReferences = nil
-
-	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(testClusterServiceClass)
-	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(testClusterServicePlan)
-
-	fakeCatalogClient.AddReactor("list", "clusterserviceclasses", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-		return true, &v1beta1.ClusterServiceClassList{
-			Items: []v1beta1.ClusterServiceClass{
-				*testClusterServiceClass,
-			},
-		}, nil
-	})
-	fakeCatalogClient.AddReactor("list", "clusterserviceplans", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-		return true, &v1beta1.ClusterServicePlanList{
-			Items: []v1beta1.ClusterServicePlan{
-				*testClusterServicePlan,
-			},
-		}, nil
-	})
-
-	if err := reconcileClusterServiceBroker(t, testController, getTestClusterServiceBroker()); err != nil {
-		t.Fatalf("This should not fail: %v", err)
-	}
-
-	actions := fakeCatalogClient.Actions()
-
-	// Verify that the existing class and plan are now marked as managed
-	c := assertUpdate(t, actions[2], testClusterServiceClass)
-	updatedClass, ok := c.(metav1.Object)
-	if !ok {
-		t.Fatalf("could not cast %T to metav1.Object", c)
-	}
-	if !isServiceCatalogManagedResource(updatedClass) {
-		t.Error("expected the class to have a service catalog controller reference")
-	}
-
-	p := assertUpdate(t, actions[3], testClusterServicePlan)
-	updatedPlan, ok := p.(metav1.Object)
-	if !ok {
-		t.Fatalf("could not cast %T to metav1.Object", p)
-	}
-	if !isServiceCatalogManagedResource(updatedPlan) {
-		t.Error("expected the plan to have a service catalog controller reference")
-	}
-}
-
-// TestReconcileDoesNotDeleteUserDefinedClassesAndPlans
-// verifies that user-defined plans are not marked with RemovedFromBrokerCatalog during a list.
-func TestReconcileDoesNotUpdateUserDefinedClassesAndPlans(t *testing.T) {
-	_, fakeCatalogClient, _, testController, sharedInformers := newTestController(t, getTestCatalogConfig())
-
-	testClusterServiceClass := getTestClusterServiceClass()
-	testClusterServicePlan := getTestClusterServicePlan()
-
-	// Flag the class and plan as user-defined with unique names not found in the broker catalog
-	testClusterServiceClass.OwnerReferences = nil
-	testClusterServiceClass.Name = "user-defined-class"
-	testClusterServicePlan.OwnerReferences = nil
-	testClusterServicePlan.Name = "user-defined-plan"
-
-	sharedInformers.ClusterServiceClasses().Informer().GetStore().Add(testClusterServiceClass)
-	sharedInformers.ClusterServicePlans().Informer().GetStore().Add(testClusterServicePlan)
-
-	fakeCatalogClient.AddReactor("list", "clusterserviceclasses", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-		return true, &v1beta1.ClusterServiceClassList{
-			Items: []v1beta1.ClusterServiceClass{
-				*testClusterServiceClass,
-			},
-		}, nil
-	})
-	fakeCatalogClient.AddReactor("list", "clusterserviceplans", func(action clientgotesting.Action) (bool, runtime.Object, error) {
-		return true, &v1beta1.ClusterServicePlanList{
-			Items: []v1beta1.ClusterServicePlan{
-				*testClusterServicePlan,
-			},
-		}, nil
-	})
-
-	if err := reconcileClusterServiceBroker(t, testController, getTestClusterServiceBroker()); err != nil {
-		t.Fatalf("This should not fail: %v", err)
-	}
-
-	actions := fakeCatalogClient.Actions()
-
-	// Verify none of the actions affected the user-defined class and plan
-	for _, a := range actions {
-		r := a.GetResource().Resource
-		if a.GetVerb() == "update" &&
-			(r == "clusterserviceclasses" || r == "clusterserviceplans") {
-			t.Errorf("expected user-defined classes and plans to be ignored but found action %+v", a)
-		}
-	}
-}
-
-func TestIsServiceCatalogManagedResource(t *testing.T) {
-	testcases := []struct {
-		name     string
-		resource metav1.Object
-		want     bool
-	}{
-		{"unmanaged service class", &v1beta1.ServiceClass{}, false},
-		{"unmanaged service plan", &v1beta1.ServicePlan{}, false},
-		{"managed service class", &v1beta1.ServiceClass{ObjectMeta: metav1.ObjectMeta{OwnerReferences: []metav1.OwnerReference{
-			{Controller: truePtr(), APIVersion: v1beta1.SchemeGroupVersion.String()}}}}, true},
-		{"managed service plan", &v1beta1.ServicePlan{ObjectMeta: metav1.ObjectMeta{OwnerReferences: []metav1.OwnerReference{
-			{Controller: truePtr(), APIVersion: v1beta1.SchemeGroupVersion.String()}}}}, true},
-	}
-
-	for _, tc := range testcases {
-		t.Run(tc.name, func(t *testing.T) {
-			got := isServiceCatalogManagedResource(tc.resource)
-			if tc.want != got {
-				t.Fatalf("WANT: %v, GOT: %v", tc.want, got)
-			}
-		})
-	}
-}
-
-func TestMarkAsServiceCatalogManagedResource(t *testing.T) {
-	testcases := []struct {
-		name     string
-		resource metav1.Object
-	}{
-		{"service class", &v1beta1.ServiceClass{}},
-		{"service plan", &v1beta1.ServicePlan{}},
-	}
-
-	for _, tc := range testcases {
-		t.Run(tc.name, func(t *testing.T) {
-			broker := getTestClusterServiceBroker()
-			markAsServiceCatalogManagedResource(tc.resource, broker)
-
-			numOwners := len(tc.resource.GetOwnerReferences())
-			if numOwners != 1 {
-				t.Fatalf("Expected 1 owner reference, got %v", numOwners)
-			}
-
-			gotOwner := tc.resource.GetOwnerReferences()[0]
-
-			gotIsController := gotOwner.Controller != nil && *gotOwner.Controller == true
-			if !gotIsController {
-				t.Errorf("Expected a controller reference, but Controller is false")
-			}
-
-			gotBlockOwnerDeletion := gotOwner.BlockOwnerDeletion != nil && *gotOwner.BlockOwnerDeletion == true
-			if gotBlockOwnerDeletion {
-				t.Errorf("Expected the controller reference to not modify deletion semantics, but BlockOwnerDeletion is true")
-			}
-
-			wantAPIVersion := v1beta1.SchemeGroupVersion.String()
-			gotAPIVersion := gotOwner.APIVersion
-			if wantAPIVersion != gotAPIVersion {
-				t.Errorf("unexpected APIVersion. WANT: %q, GOT: %q", wantAPIVersion, gotAPIVersion)
-			}
-
-			// Also verify that our pair of functions work together
-			if !isServiceCatalogManagedResource(tc.resource) {
-				t.Fatal("expected isServiceCatalogManagedResource to return true")
-			}
-		})
-	}
 }

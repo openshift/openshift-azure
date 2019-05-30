@@ -32,16 +32,18 @@ type describeCmd struct {
 
 // NewDescribeCmd builds a "svcat describe binding" command
 func NewDescribeCmd(cxt *command.Context) *cobra.Command {
-	describeCmd := &describeCmd{Namespaced: command.NewNamespaced(cxt)}
+	describeCmd := &describeCmd{Namespaced: command.NewNamespacedCommand(cxt)}
 	cmd := &cobra.Command{
 		Use:     "binding NAME",
 		Aliases: []string{"bindings", "bnd"},
 		Short:   "Show details of a specific binding",
-		Example: command.NormalizeExamples(`svcat describe binding wordpress-mysql-binding`),
+		Example: `
+  svcat describe binding wordpress-mysql-binding
+`,
 		PreRunE: command.PreRunE(describeCmd),
 		RunE:    command.RunE(describeCmd),
 	}
-	describeCmd.AddNamespaceFlags(cmd.Flags(), false)
+	command.AddNamespaceFlags(cmd.Flags(), false)
 	cmd.Flags().BoolVar(
 		&describeCmd.showSecrets,
 		"show-secrets",
