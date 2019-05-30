@@ -31,14 +31,9 @@ const (
 )
 
 const (
-	// FormatJSON is the --output flag value for json output.
-	FormatJSON = "json"
-
-	// FormatTable is the --output flag value for tablular output.
-	FormatTable = "table"
-
-	// FormatYAML is the --output flag value for yaml output.
-	FormatYAML = "yaml"
+	formatJSON  = "json"
+	formatTable = "table"
+	formatYAML  = "yaml"
 )
 
 func formatStatusShort(condition string, conditionStatus v1beta1.ConditionStatus, reason string) string {

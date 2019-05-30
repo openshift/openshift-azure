@@ -197,14 +197,6 @@ func TestServiceInstanceFieldLabelConversionFunc(t *testing.T) {
 			success:  true,
 		},
 		{
-			name:     "spec.externalID works",
-			inLabel:  "spec.externalID",
-			inValue:  "externalid",
-			outLabel: "spec.externalID",
-			outValue: "externalid",
-			success:  true,
-		},
-		{
 			name:          "random fails",
 			inLabel:       "spec.random",
 			inValue:       "randomvalue",
@@ -215,29 +207,7 @@ func TestServiceInstanceFieldLabelConversionFunc(t *testing.T) {
 		},
 	}
 	runTestCases(t, cases, "ServiceInstanceFieldLabelConversionFunc", ServiceInstanceFieldLabelConversionFunc)
-}
 
-func TestServiceBindingFieldLabelConversionFunc(t *testing.T) {
-	cases := []testcase{
-		{
-			name:     "spec.externalID works",
-			inLabel:  "spec.externalID",
-			inValue:  "externalid",
-			outLabel: "spec.externalID",
-			outValue: "externalid",
-			success:  true,
-		},
-		{
-			name:          "random fails",
-			inLabel:       "spec.random",
-			inValue:       "randomvalue",
-			outLabel:      "",
-			outValue:      "",
-			success:       false,
-			expectedError: "field label not supported: spec.random",
-		},
-	}
-	runTestCases(t, cases, "ServiceBindingFieldLabelConversionFunc", ServiceBindingFieldLabelConversionFunc)
 }
 
 func runTestCases(t *testing.T, cases []testcase, testFuncName string, testFunc conversionFunc) {

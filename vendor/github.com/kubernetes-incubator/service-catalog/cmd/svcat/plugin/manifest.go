@@ -55,11 +55,6 @@ var reservedFlags = map[string]struct{}{
 	"vmodule":         {},
 }
 
-// full paths of commands that should not show up in the plugin
-var commandsToSkip = map[string]struct{}{
-	"svcat install": {},
-}
-
 // Manifest is the root structure of the kubectl plugin manifest.
 type Manifest struct {
 	Plugin `yaml:",inline"`
@@ -69,9 +64,6 @@ type Manifest struct {
 type Plugin struct {
 	// Name of the command for the help text. Required.
 	Name string `yaml:"name"`
-
-	// Use is the one-line description of how the command is used.
-	Use string `yaml:"use"`
 
 	// ShortDesc is a one-line description of the command. Required.
 	ShortDesc string `yaml:"shortDesc"`
@@ -116,14 +108,12 @@ func (m *Manifest) convertToPlugin(cmd *cobra.Command) Plugin {
 	p := Plugin{}
 
 	p.Name = strings.Split(cmd.Use, " ")[0]
-	p.Use = cmd.Use
 	p.ShortDesc = cmd.Short
 	if p.ShortDesc == "" {
 		p.ShortDesc = " " // The plugin won't validate if empty
 	}
 	p.LongDesc = cmd.Long
 	p.Command = "./" + cmd.CommandPath()
-	p.Example = cmd.Example
 
 	p.Flags = []Flag{}
 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
@@ -133,11 +123,9 @@ func (m *Manifest) convertToPlugin(cmd *cobra.Command) Plugin {
 		}
 	})
 
-	p.Tree = []Plugin{}
-	for _, subCmd := range cmd.Commands() {
-		if _, skip := commandsToSkip[subCmd.CommandPath()]; !skip {
-			p.Tree = append(p.Tree, m.convertToPlugin(subCmd))
-		}
+	p.Tree = make([]Plugin, len(cmd.Commands()))
+	for i, subCmd := range cmd.Commands() {
+		p.Tree[i] = m.convertToPlugin(subCmd)
 	}
 	return p
 }

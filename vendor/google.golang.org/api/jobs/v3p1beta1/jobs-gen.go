@@ -3123,7 +3123,7 @@ type JobQuery struct {
 	// This filter specifies a list of job names to be excluded during
 	// search.
 	//
-	// At most 200 excluded job names are allowed.
+	// At most 400 excluded job names are allowed.
 	ExcludedJobs []string `json:"excludedJobs,omitempty"`
 
 	// JobCategories: Optional.
@@ -3862,7 +3862,8 @@ type Operation struct {
 	// service that
 	// originally returns it. If you use the default HTTP mapping,
 	// the
-	// `name` should have the format of `operations/some/unique/name`.
+	// `name` should be a resource name ending with
+	// `operations/{unique_id}`.
 	Name string `json:"name,omitempty"`
 
 	// Response: The normal response of the operation in case of success.

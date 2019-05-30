@@ -19,11 +19,10 @@ package clusterserviceclass
 // this was copied from where else and edited to fit our objects
 
 import (
-	"context"
-
 	"github.com/kubernetes-incubator/service-catalog/pkg/api"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	genericapirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
 	"k8s.io/apiserver/pkg/storage/names"
 
@@ -87,7 +86,7 @@ func (clusterServiceClassRESTStrategy) NamespaceScoped() bool {
 }
 
 // PrepareForCreate receives the incoming ClusterServiceClass.
-func (clusterServiceClassRESTStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
+func (clusterServiceClassRESTStrategy) PrepareForCreate(ctx genericapirequest.Context, obj runtime.Object) {
 	clusterServiceClass, ok := obj.(*sc.ClusterServiceClass)
 	if !ok {
 		glog.Fatal("received a non-clusterserviceclass object to create")
@@ -95,7 +94,7 @@ func (clusterServiceClassRESTStrategy) PrepareForCreate(ctx context.Context, obj
 	clusterServiceClass.Status = sc.ClusterServiceClassStatus{}
 }
 
-func (clusterServiceClassRESTStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
+func (clusterServiceClassRESTStrategy) Validate(ctx genericapirequest.Context, obj runtime.Object) field.ErrorList {
 	return scv.ValidateClusterServiceClass(obj.(*sc.ClusterServiceClass))
 }
 
@@ -107,7 +106,7 @@ func (clusterServiceClassRESTStrategy) AllowUnconditionalUpdate() bool {
 	return false
 }
 
-func (clusterServiceClassRESTStrategy) PrepareForUpdate(ctx context.Context, new, old runtime.Object) {
+func (clusterServiceClassRESTStrategy) PrepareForUpdate(ctx genericapirequest.Context, new, old runtime.Object) {
 	newServiceClass, ok := new.(*sc.ClusterServiceClass)
 	if !ok {
 		glog.Fatal("received a non-clusterserviceclass object to update to")
@@ -123,7 +122,7 @@ func (clusterServiceClassRESTStrategy) PrepareForUpdate(ctx context.Context, new
 	newServiceClass.Spec.ClusterServiceBrokerName = oldServiceClass.Spec.ClusterServiceBrokerName
 }
 
-func (clusterServiceClassRESTStrategy) ValidateUpdate(ctx context.Context, new, old runtime.Object) field.ErrorList {
+func (clusterServiceClassRESTStrategy) ValidateUpdate(ctx genericapirequest.Context, new, old runtime.Object) field.ErrorList {
 	newServiceclass, ok := new.(*sc.ClusterServiceClass)
 	if !ok {
 		glog.Fatal("received a non-clusterserviceclass object to validate to")
@@ -136,7 +135,7 @@ func (clusterServiceClassRESTStrategy) ValidateUpdate(ctx context.Context, new, 
 	return scv.ValidateClusterServiceClassUpdate(newServiceclass, oldServiceclass)
 }
 
-func (clusterServiceClassStatusRESTStrategy) PrepareForUpdate(ctx context.Context, new, old runtime.Object) {
+func (clusterServiceClassStatusRESTStrategy) PrepareForUpdate(ctx genericapirequest.Context, new, old runtime.Object) {
 	newServiceClass, ok := new.(*sc.ClusterServiceClass)
 	if !ok {
 		glog.Fatal("received a non-clusterserviceClass object to update to")
@@ -149,6 +148,6 @@ func (clusterServiceClassStatusRESTStrategy) PrepareForUpdate(ctx context.Contex
 	newServiceClass.Spec = oldServiceClass.Spec
 }
 
-func (clusterServiceClassStatusRESTStrategy) ValidateUpdate(ctx context.Context, new, old runtime.Object) field.ErrorList {
+func (clusterServiceClassStatusRESTStrategy) ValidateUpdate(ctx genericapirequest.Context, new, old runtime.Object) field.ErrorList {
 	return field.ErrorList{}
 }

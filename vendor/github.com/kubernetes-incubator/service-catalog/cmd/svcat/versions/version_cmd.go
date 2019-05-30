@@ -35,10 +35,10 @@ func NewVersionCmd(cxt *command.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "Provides the version for the Service Catalog client and server",
-		Example: command.NormalizeExamples(`
+		Example: `
   svcat version
   svcat version --client
-`),
+`,
 		PreRunE: command.PreRunE(versionCmd),
 		RunE:    command.RunE(versionCmd),
 	}
@@ -66,17 +66,20 @@ func (c *versionCmd) Run() error {
 }
 
 func (c *versionCmd) version() error {
+	client := ""
 	if c.client {
-		output.WriteClientVersion(c.Output, pkg.VERSION)
+		client = pkg.VERSION
 	}
 
+	server := ""
 	if c.server {
 		version, err := c.App.ServerVersion()
 		if err != nil {
 			return err
 		}
-		output.WriteServerVersion(c.Output, version.GitVersion)
+		server = version.GitVersion
 	}
 
+	output.WriteVersion(c.Output, client, server)
 	return nil
 }

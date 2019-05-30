@@ -53,7 +53,7 @@ func TestValidateClusterServiceClass(t *testing.T) {
 			valid:        true,
 		},
 		{
-			name: "valid serviceClass - uppercase in externalID",
+			name: "valid serviceClass - uppercase in GUID",
 			serviceClass: func() *servicecatalog.ClusterServiceClass {
 				s := validClusterServiceClass()
 				s.Spec.ExternalID = "40D-0983-1b89"
@@ -62,19 +62,10 @@ func TestValidateClusterServiceClass(t *testing.T) {
 			valid: true,
 		},
 		{
-			name: "valid serviceClass - period in externalID",
+			name: "valid serviceClass - period in GUID",
 			serviceClass: func() *servicecatalog.ClusterServiceClass {
 				s := validClusterServiceClass()
 				s.Spec.ExternalID = "4315f5e1-0139-4ecf-9706-9df0aff33e5a.plan-name"
-				return s
-			}(),
-			valid: true,
-		},
-		{
-			name: "valid serviceClass - underscore in ExternalID",
-			serviceClass: func() *servicecatalog.ClusterServiceClass {
-				s := validClusterServiceClass()
-				s.Spec.ExternalID = "4315f5e1-0139-4ecf-9706-9df0aff33e5a_plan-name"
 				return s
 			}(),
 			valid: true,
@@ -98,10 +89,19 @@ func TestValidateClusterServiceClass(t *testing.T) {
 			valid: false,
 		},
 		{
-			name: "invalid serviceClass - empty externalID",
+			name: "invalid serviceClass - missing guid",
 			serviceClass: func() *servicecatalog.ClusterServiceClass {
 				s := validClusterServiceClass()
 				s.Spec.ExternalID = ""
+				return s
+			}(),
+			valid: false,
+		},
+		{
+			name: "invalid serviceClass - invalid guid",
+			serviceClass: func() *servicecatalog.ClusterServiceClass {
+				s := validClusterServiceClass()
+				s.Spec.ExternalID = "1234-4354a\\%-49b"
 				return s
 			}(),
 			valid: false,
@@ -163,14 +163,13 @@ func TestValidateClusterServiceClass(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			errs := ValidateClusterServiceClass(tc.serviceClass)
-			if len(errs) != 0 && tc.valid {
-				t.Errorf("unexpected error: %v", errs)
-			} else if len(errs) == 0 && !tc.valid {
-				t.Error("unexpected success")
-			}
-		})
+		errs := ValidateClusterServiceClass(tc.serviceClass)
+		if len(errs) != 0 && tc.valid {
+			t.Errorf("%v: unexpected error: %v", tc.name, errs)
+			continue
+		} else if len(errs) == 0 && !tc.valid {
+			t.Errorf("%v: unexpected success", tc.name)
+		}
 	}
 }
 
@@ -204,7 +203,7 @@ func TestValidateServiceClass(t *testing.T) {
 			valid:        true,
 		},
 		{
-			name: "valid serviceClass - uppercase in externalID",
+			name: "valid serviceClass - uppercase in GUID",
 			serviceClass: func() *servicecatalog.ServiceClass {
 				s := validServiceClass()
 				s.Spec.ExternalID = "40D-0983-1b89"
@@ -213,7 +212,7 @@ func TestValidateServiceClass(t *testing.T) {
 			valid: true,
 		},
 		{
-			name: "valid serviceClass - period in externalID",
+			name: "valid serviceClass - period in GUID",
 			serviceClass: func() *servicecatalog.ServiceClass {
 				s := validServiceClass()
 				s.Spec.ExternalID = "4315f5e1-0139-4ecf-9706-9df0aff33e5a.plan-name"
@@ -231,15 +230,6 @@ func TestValidateServiceClass(t *testing.T) {
 			valid: true,
 		},
 		{
-			name: "valid serviceClass - underscore in ExternalID",
-			serviceClass: func() *servicecatalog.ServiceClass {
-				s := validServiceClass()
-				s.Spec.ExternalID = "4315f5e1-0139-4ecf-9706-9df0aff33e5a_plan-name"
-				return s
-			}(),
-			valid: true,
-		},
-		{
 			name: "invalid serviceClass - has no namespace",
 			serviceClass: func() *servicecatalog.ServiceClass {
 				s := validServiceClass()
@@ -249,10 +239,19 @@ func TestValidateServiceClass(t *testing.T) {
 			valid: false,
 		},
 		{
-			name: "invalid serviceClass - empty externalID",
+			name: "invalid serviceClass - missing guid",
 			serviceClass: func() *servicecatalog.ServiceClass {
 				s := validServiceClass()
 				s.Spec.ExternalID = ""
+				return s
+			}(),
+			valid: false,
+		},
+		{
+			name: "invalid serviceClass - invalid guid",
+			serviceClass: func() *servicecatalog.ServiceClass {
+				s := validServiceClass()
+				s.Spec.ExternalID = "1234-4354a\\%-49b"
 				return s
 			}(),
 			valid: false,
@@ -314,13 +313,12 @@ func TestValidateServiceClass(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			errs := ValidateServiceClass(tc.serviceClass)
-			if len(errs) != 0 && tc.valid {
-				t.Errorf("unexpected error: %v", errs)
-			} else if len(errs) == 0 && !tc.valid {
-				t.Error("unexpected success")
-			}
-		})
+		errs := ValidateServiceClass(tc.serviceClass)
+		if len(errs) != 0 && tc.valid {
+			t.Errorf("%v: unexpected error: %v", tc.name, errs)
+			continue
+		} else if len(errs) == 0 && !tc.valid {
+			t.Errorf("%v: unexpected success", tc.name)
+		}
 	}
 }

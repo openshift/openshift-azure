@@ -41,99 +41,16 @@ import (
 	"github.com/kubernetes-incubator/service-catalog/internal/test"
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
 	"github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset/fake"
-	svcatfake "github.com/kubernetes-incubator/service-catalog/pkg/client/clientset_generated/clientset/fake"
 	"github.com/kubernetes-incubator/service-catalog/pkg/svcat"
 	"github.com/kubernetes-incubator/service-catalog/pkg/svcat/service-catalog"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	k8stesting "k8s.io/client-go/testing"
 )
 
 var catalogRequestRegex = regexp.MustCompile("/apis/servicecatalog.k8s.io/v1beta1/(.*)")
 var coreRequestRegex = regexp.MustCompile("/api/v1/(.*)")
-
-// Verify that svcat gracefully handles when the namespaced broker feature flag is disabled
-// TODO: Once we take Namespaced brokers out from behind the feature flag, this test won't be necessary
-func TestGetSvcatWithNamespacedBrokerFeatureDisabled(t *testing.T) {
-	// Verify that commands work with the feature disabled, and don't return errors
-	testcases := []struct {
-		cmd        string
-		wantOutput string
-	}{
-		{"get brokers", "my-cluster-broker"},
-		{"get classes", "my-cluster-class"},
-		{"get class my-cluster-class", "my-cluster-class"},
-		{"get plans", "my-cluster-plan"},
-		{"get plan my-cluster-plan", "my-cluster-plan"},
-	}
-
-	for _, tc := range testcases {
-		t.Run(tc.cmd, func(t *testing.T) {
-
-			// Setup fake data for the app
-			var fakes = []runtime.Object{
-				&v1beta1.ClusterServiceBroker{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "my-cluster-broker",
-					},
-				},
-				&v1beta1.ClusterServiceClass{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "my-cluster-class",
-					},
-					Spec: v1beta1.ClusterServiceClassSpec{
-						CommonServiceClassSpec: v1beta1.CommonServiceClassSpec{
-							ExternalName: "my-cluster-class",
-						},
-					},
-				},
-				&v1beta1.ClusterServicePlan{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "my-cluster-plan",
-					},
-					Spec: v1beta1.ClusterServicePlanSpec{
-						CommonServicePlanSpec: v1beta1.CommonServicePlanSpec{
-							ExternalName: "my-cluster-plan",
-						},
-					},
-				},
-			}
-			svcatClient := svcatfake.NewSimpleClientset(fakes...)
-
-			// When the feature flag isn't enabled, the server will return resource not found
-			svcatClient.PrependReactor("list", "servicebrokers",
-				func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-					return true, nil, k8serrors.NewNotFound(v1beta1.Resource("servicebrokers"), "")
-				})
-			svcatClient.PrependReactor("list", "serviceclasses",
-				func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-					return true, nil, k8serrors.NewNotFound(v1beta1.Resource("serviceclasses"), "")
-				})
-			svcatClient.PrependReactor("list", "serviceplans",
-				func(action k8stesting.Action) (handled bool, ret runtime.Object, err error) {
-					return true, nil, k8serrors.NewNotFound(v1beta1.Resource("serviceplans"), "")
-				})
-
-			cxt := newContext()
-			cxt.App = &svcat.App{
-				CurrentNamespace: "default",
-				SvcatClient:      &servicecatalog.SDK{ServiceCatalogClient: svcatClient},
-			}
-
-			gotOutput := executeFakeCommand(t, tc.cmd, cxt, false)
-
-			if !strings.Contains(gotOutput, tc.wantOutput) {
-				t.Fatalf("unexpected command output \n\nWANT:\n%q\n\nGOT:\n%q\n", tc.wantOutput, gotOutput)
-			}
-		})
-	}
-
-}
 
 func TestCommandValidation(t *testing.T) {
 	testcases := []struct {
@@ -161,8 +78,6 @@ func TestCommandValidation(t *testing.T) {
 		{"completion no shell specified", "completion", "Shell not specified"},
 		{"completion too many args", "completion arg0 arg1", "Too many arguments. Expected only the shell type"},
 		{"completion unsupported shell", "completion unsupportedShell", "Unsupported shell type \"unsupportedShell\""},
-		{"completion unsupported shell", "completion bash", ""},
-		{"completion unsupported shell", "completion zsh", ""},
 	}
 
 	for _, tc := range testcases {
@@ -186,8 +101,6 @@ func TestCommandOutput(t *testing.T) {
 		{name: "get broker (json)", cmd: "get broker ups-broker -o json", golden: "output/get-broker.json"},
 		{name: "get broker (yaml)", cmd: "get broker ups-broker -o yaml", golden: "output/get-broker.yaml"},
 		{name: "describe broker", cmd: "describe broker ups-broker", golden: "output/describe-broker.txt"},
-		{name: "register broker", cmd: "register ups-broker --url http://upsbroker.com", golden: "output/register-broker.txt"},
-		{name: "deregister broker", cmd: "deregister ups-broker", golden: "output/deregister-broker.txt"},
 
 		{name: "list all classes", cmd: "get classes", golden: "output/get-classes.txt"},
 		{name: "list all classes (json)", cmd: "get classes -o json", golden: "output/get-classes.json"},
@@ -198,14 +111,10 @@ func TestCommandOutput(t *testing.T) {
 		{name: "get class by uuid", cmd: "get class --uuid 4f6e6cf6-ffdd-425f-a2c7-3c9258ad2468", golden: "output/get-class.txt"},
 		{name: "describe class by name", cmd: "describe class user-provided-service", golden: "output/describe-class.txt"},
 		{name: "describe class uuid", cmd: "describe class --uuid 4f6e6cf6-ffdd-425f-a2c7-3c9258ad2468", golden: "output/describe-class.txt"},
-		{name: "create class", cmd: "create class new-class --from user-provided-service", golden: "output/create-class.txt"},
 
 		{name: "list all plans", cmd: "get plans", golden: "output/get-plans.txt"},
 		{name: "list all plans (json)", cmd: "get plans -o json", golden: "output/get-plans.json"},
 		{name: "list all plans (yaml)", cmd: "get plans -o yaml", golden: "output/get-plans.yaml"},
-		{name: "list all namespaced plans", cmd: "get plans --scope namespace", golden: "output/get-namespaced-plans.txt"},
-		{name: "list all namespaced plans (json)", cmd: "get plans --scope namespace -o json", golden: "output/get-namespaced-plans.json"},
-		{name: "list all namespaced plans (yaml)", cmd: "get plans --scope namespace -o yaml", golden: "output/get-namespaced-plans.yaml"},
 		{name: "get plan by name", cmd: "get plan default", golden: "output/get-plan.txt"},
 		{name: "get plan by name (json)", cmd: "get plan default -o json", golden: "output/get-plan.json"},
 		{name: "get plan by name (yaml)", cmd: "get plan default -o yaml", golden: "output/get-plan.yaml"},
@@ -224,22 +133,12 @@ func TestCommandOutput(t *testing.T) {
 		{name: "list all instances in a namespace", cmd: "get instances -n test-ns", golden: "output/get-instances.txt"},
 		{name: "list all instances in a namespace (json)", cmd: "get instances -n test-ns -o json", golden: "output/get-instances.json"},
 		{name: "list all instances in a namespace (yaml)", cmd: "get instances -n test-ns -o yaml", golden: "output/get-instances.yaml"},
-		{name: "list all instances filtered by existing plan", cmd: "get instances --all-namespaces --plan default", golden: "output/get-instances-all-namespaces-by-plan.txt"},
-		{name: "list all instances filtered by not existing plan", cmd: "get instances --all-namespaces --plan wrong", golden: "output/get-instances-all-namespaces-by-wrong-plan.txt"},
-		{name: "list all instances filtered by existing class", cmd: "get instances --all-namespaces --class user-provided-service", golden: "output/get-instances-all-namespaces-by-class.txt"},
-		{name: "list all instances filtered by not existing class", cmd: "get instances --all-namespaces --class wrong", golden: "output/get-instances-all-namespaces-by-wrong-class.txt"},
 		{name: "list all instances", cmd: "get instances --all-namespaces", golden: "output/get-instances-all-namespaces.txt"},
 		{name: "get instance", cmd: "get instance ups-instance -n test-ns", golden: "output/get-instance.txt"},
 		{name: "get instance (json)", cmd: "get instance ups-instance -n test-ns -o json", golden: "output/get-instance.json"},
 		{name: "get instance (yaml)", cmd: "get instance ups-instance -n test-ns -o yaml", golden: "output/get-instance.yaml"},
 		{name: "describe instance", cmd: "describe instance ups-instance -n test-ns", golden: "output/describe-instance.txt"},
-		{name: "bind instance", cmd: "bind ups-instance --name ups-binding -n test-ns", golden: "output/bind-instance.txt"},
-		{name: "bind instance and wait", cmd: "bind ups-instance --name ups-binding -n test-ns --wait", golden: "output/bind-instance-and-wait.txt"},
-		{name: "unbind instance", cmd: "unbind ups-instance -n test-ns", golden: "output/unbind-instance.txt"},
-		{name: "unbind instance and wait", cmd: "unbind ups-instance -n test-ns --wait", golden: "output/unbind-instance-and-wait.txt"},
-		{name: "provision instance", cmd: "provision ups-instance -n test-ns --class user-provided-service --plan default", golden: "output/provision-instance.txt"},
-		{name: "provision instance and wait", cmd: "provision ups-instance -n test-ns --class user-provided-service --plan default --wait", golden: "output/provision-instance-and-wait.txt"},
-		{name: "deprovision instance", cmd: "deprovision ups-instance -n test-ns", golden: "output/deprovision-instance.txt"},
+
 		{name: "list all bindings in a namespace", cmd: "get bindings -n test-ns", golden: "output/get-bindings.txt"},
 		{name: "list all bindings in a namespace (json)", cmd: "get bindings -n test-ns -o json", golden: "output/get-bindings.json"},
 		{name: "list all bindings in a namespace (yaml)", cmd: "get bindings -n test-ns -o yaml", golden: "output/get-bindings.yaml"},
@@ -249,11 +148,8 @@ func TestCommandOutput(t *testing.T) {
 		{name: "get binding (yaml)", cmd: "get binding ups-binding -n test-ns -o yaml", golden: "output/get-binding.yaml"},
 		{name: "describe binding", cmd: "describe binding ups-binding -n test-ns", golden: "output/describe-binding.txt"},
 		{name: "describe binding and decode secret", cmd: "describe binding ups-binding -n test-ns --show-secrets", golden: "output/describe-binding-show-secrets.txt"},
-		{name: "delete binding", cmd: "unbind --name ups-binding -n test-ns", golden: "output/delete-binding.txt"},
-		{name: "delete binding and wait", cmd: "unbind --name ups-binding -n test-ns --wait", golden: "output/delete-binding-and-wait.txt"},
 
 		{name: "completion bash", cmd: "completion bash", golden: "output/completion-bash.txt"},
-		{name: "completion zsh", cmd: "completion zsh", golden: "output/completion-zsh.txt"},
 	}
 
 	for _, tc := range testcases {
@@ -336,7 +232,7 @@ func TestNamespacedCommands(t *testing.T) {
 			cxt := newContext()
 			cxt.App = &svcat.App{
 				CurrentNamespace: contextNS,
-				SvcatClient:      &servicecatalog.SDK{ServiceCatalogClient: fakeClient},
+				SDK:              &servicecatalog.SDK{ServiceCatalogClient: fakeClient},
 			}
 			cxt.Output = ioutil.Discard
 
@@ -391,7 +287,7 @@ func TestParametersForBinding(t *testing.T) {
 
 			cxt := newContext()
 			cxt.App = &svcat.App{
-				SvcatClient: &servicecatalog.SDK{ServiceCatalogClient: fakeClient},
+				SDK: &servicecatalog.SDK{ServiceCatalogClient: fakeClient},
 			}
 			cxt.Output = ioutil.Discard
 
@@ -629,17 +525,10 @@ func apihandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method != http.MethodGet {
-		requestBody, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte(err.Error()))
-			return
-		}
-
-		// Just echo back whatever was sent for now, these tests are being refactored very soon to become e2e
-		// so more mocking work isn't necessary
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(requestBody)
+		// Anything more interesting than a GET, i.e. it relies upon server behavior
+		// probably should be an integration test instead
+		w.WriteHeader(500)
+		w.Write([]byte(fmt.Sprintf("unallowed method for request %s %s", r.Method, r.RequestURI)))
 		return
 	}
 
@@ -650,7 +539,6 @@ func apihandler(w http.ResponseWriter, r *http.Request) {
 		match = filepath.Join("core", coreMatch[1])
 	}
 
-	match = strings.Replace(match, "?", "_", -1) // windows doesn't allow '?' in filenames
 	relpath, err := url.PathUnescape(match)
 	if err != nil {
 		w.WriteHeader(500)

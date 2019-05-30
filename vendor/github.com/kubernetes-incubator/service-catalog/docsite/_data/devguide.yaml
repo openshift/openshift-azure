@@ -15,8 +15,6 @@ toc:
   path: /docs/devguide/#building
 - title: Testing
   path: /docs/devguide/#testing
-- title: FeatureGates
-  path: "#featuregates"
 - title: Documentation
   path: "#documentation"
 - title: Making a Contribution

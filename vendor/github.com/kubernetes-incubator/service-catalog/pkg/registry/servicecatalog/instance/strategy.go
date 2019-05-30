@@ -19,8 +19,6 @@ package instance
 // this was copied from where else and edited to fit our objects
 
 import (
-	"context"
-
 	api "github.com/kubernetes-incubator/service-catalog/pkg/api"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -105,7 +103,7 @@ func (instanceRESTStrategy) NamespaceScoped() bool {
 // PrepareForCreate receives a the incoming ServiceInstance and clears it's
 // Status and Service[Class|Plan]Ref fields. These are not user settable fields.
 // It also creates a UUID if the user hasn't specified one.
-func (instanceRESTStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
+func (instanceRESTStrategy) PrepareForCreate(ctx genericapirequest.Context, obj runtime.Object) {
 	instance, ok := obj.(*sc.ServiceInstance)
 	if !ok {
 		glog.Fatal("received a non-instance object to create")
@@ -116,7 +114,7 @@ func (instanceRESTStrategy) PrepareForCreate(ctx context.Context, obj runtime.Ob
 	}
 
 	if utilfeature.DefaultFeatureGate.Enabled(scfeatures.OriginatingIdentity) {
-		setServiceInstanceUserInfo(ctx, instance)
+		setServiceInstanceUserInfo(instance, ctx)
 	}
 
 	// Creating a brand new object, thus it must have no
@@ -134,7 +132,7 @@ func (instanceRESTStrategy) PrepareForCreate(ctx context.Context, obj runtime.Ob
 	instance.Generation = 1
 }
 
-func (instanceRESTStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
+func (instanceRESTStrategy) Validate(ctx genericapirequest.Context, obj runtime.Object) field.ErrorList {
 	return scv.ValidateServiceInstance(obj.(*sc.ServiceInstance))
 }
 
@@ -146,7 +144,7 @@ func (instanceRESTStrategy) AllowUnconditionalUpdate() bool {
 	return false
 }
 
-func (instanceRESTStrategy) PrepareForUpdate(ctx context.Context, new, old runtime.Object) {
+func (instanceRESTStrategy) PrepareForUpdate(ctx genericapirequest.Context, new, old runtime.Object) {
 	newServiceInstance, ok := new.(*sc.ServiceInstance)
 	if !ok {
 		glog.Fatal("received a non-instance object to update to")
@@ -180,13 +178,13 @@ func (instanceRESTStrategy) PrepareForUpdate(ctx context.Context, new, old runti
 	// spec changes and other changes to the object.
 	if !apiequality.Semantic.DeepEqual(oldServiceInstance.Spec, newServiceInstance.Spec) {
 		if utilfeature.DefaultFeatureGate.Enabled(scfeatures.OriginatingIdentity) {
-			setServiceInstanceUserInfo(ctx, newServiceInstance)
+			setServiceInstanceUserInfo(newServiceInstance, ctx)
 		}
 		newServiceInstance.Generation = oldServiceInstance.Generation + 1
 	}
 }
 
-func (instanceRESTStrategy) ValidateUpdate(ctx context.Context, new, old runtime.Object) field.ErrorList {
+func (instanceRESTStrategy) ValidateUpdate(ctx genericapirequest.Context, new, old runtime.Object) field.ErrorList {
 	newServiceInstance, ok := new.(*sc.ServiceInstance)
 	if !ok {
 		glog.Fatal("received a non-instance object to validate to")
@@ -204,19 +202,19 @@ func (instanceRESTStrategy) ValidateUpdate(ctx context.Context, new, old runtime
 // Note that this is a hack way of setting the UserInfo. However, there is not
 // currently any other mechanism in the Delete strategies for getting access to
 // the resource being deleted and the context.
-func (instanceRESTStrategy) CheckGracefulDelete(ctx context.Context, obj runtime.Object, options *metav1.DeleteOptions) bool {
+func (instanceRESTStrategy) CheckGracefulDelete(ctx genericapirequest.Context, obj runtime.Object, options *metav1.DeleteOptions) bool {
 	if utilfeature.DefaultFeatureGate.Enabled(scfeatures.OriginatingIdentity) {
 		serviceInstance, ok := obj.(*sc.ServiceInstance)
 		if !ok {
 			glog.Fatal("received a non-instance object to delete")
 		}
-		setServiceInstanceUserInfo(ctx, serviceInstance)
+		setServiceInstanceUserInfo(serviceInstance, ctx)
 	}
 	// Don't actually do graceful deletion. We are just using this strategy to set the user info prior to reconciling the delete.
 	return false
 }
 
-func (instanceStatusRESTStrategy) PrepareForUpdate(ctx context.Context, new, old runtime.Object) {
+func (instanceStatusRESTStrategy) PrepareForUpdate(ctx genericapirequest.Context, new, old runtime.Object) {
 	newServiceInstance, ok := new.(*sc.ServiceInstance)
 	if !ok {
 		glog.Fatal("received a non-instance object to update to")
@@ -229,7 +227,7 @@ func (instanceStatusRESTStrategy) PrepareForUpdate(ctx context.Context, new, old
 	newServiceInstance.Spec = oldServiceInstance.Spec
 }
 
-func (instanceStatusRESTStrategy) ValidateUpdate(ctx context.Context, new, old runtime.Object) field.ErrorList {
+func (instanceStatusRESTStrategy) ValidateUpdate(ctx genericapirequest.Context, new, old runtime.Object) field.ErrorList {
 	newServiceInstance, ok := new.(*sc.ServiceInstance)
 	if !ok {
 		glog.Fatal("received a non-instance object to validate to")
@@ -242,7 +240,7 @@ func (instanceStatusRESTStrategy) ValidateUpdate(ctx context.Context, new, old r
 	return scv.ValidateServiceInstanceStatusUpdate(newServiceInstance, oldServiceInstance)
 }
 
-func (instanceReferenceRESTStrategy) PrepareForUpdate(ctx context.Context, new, old runtime.Object) {
+func (instanceReferenceRESTStrategy) PrepareForUpdate(ctx genericapirequest.Context, new, old runtime.Object) {
 	newServiceInstance, ok := new.(*sc.ServiceInstance)
 	if !ok {
 		glog.Fatal("received a non-instance object to update to")
@@ -256,23 +254,13 @@ func (instanceReferenceRESTStrategy) PrepareForUpdate(ctx context.Context, new, 
 	// again.
 	newClusterServiceClassRef := newServiceInstance.Spec.ClusterServiceClassRef
 	newClusterServicePlanRef := newServiceInstance.Spec.ClusterServicePlanRef
-	newServiceClassRef := newServiceInstance.Spec.ServiceClassRef
-	newServicePlanRef := newServiceInstance.Spec.ServicePlanRef
-
-	// Lock down the spec to the the original values
 	newServiceInstance.Spec = oldServiceInstance.Spec
-
-	// Explicitly update the reference fields to the new ones submitted
 	newServiceInstance.Spec.ClusterServiceClassRef = newClusterServiceClassRef
 	newServiceInstance.Spec.ClusterServicePlanRef = newClusterServicePlanRef
-	newServiceInstance.Spec.ServiceClassRef = newServiceClassRef
-	newServiceInstance.Spec.ServicePlanRef = newServicePlanRef
-
-	// Lock down the status as well
 	newServiceInstance.Status = oldServiceInstance.Status
 }
 
-func (instanceReferenceRESTStrategy) ValidateUpdate(ctx context.Context, new, old runtime.Object) field.ErrorList {
+func (instanceReferenceRESTStrategy) ValidateUpdate(ctx genericapirequest.Context, new, old runtime.Object) field.ErrorList {
 	newServiceInstance, ok := new.(*sc.ServiceInstance)
 	if !ok {
 		glog.Fatal("received a non-instance object to validate to")
@@ -286,7 +274,7 @@ func (instanceReferenceRESTStrategy) ValidateUpdate(ctx context.Context, new, ol
 }
 
 // setServiceInstanceUserInfo injects user.Info from the request context
-func setServiceInstanceUserInfo(ctx context.Context, instance *sc.ServiceInstance) {
+func setServiceInstanceUserInfo(instance *sc.ServiceInstance, ctx genericapirequest.Context) {
 	instance.Spec.UserInfo = nil
 	if user, ok := genericapirequest.UserFrom(ctx); ok {
 		instance.Spec.UserInfo = &sc.UserInfo{

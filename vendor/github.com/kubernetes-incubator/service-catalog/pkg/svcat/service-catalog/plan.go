@@ -20,7 +20,6 @@ import (
 	"fmt"
 
 	"github.com/kubernetes-incubator/service-catalog/pkg/apis/servicecatalog/v1beta1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 )
@@ -33,72 +32,24 @@ const (
 	FieldServiceClassRef = "spec.clusterServiceClassRef.name"
 )
 
-// RetrievePlanOptions allows to specify which plans will be retrieved
-type RetrievePlanOptions struct {
-	ClassID   string
-	Namespace string
-	Scope     Scope
-}
-
-// Plan provides a unifying layer of cluster and namespace scoped plan resources.
-type Plan interface {
-
-	// GetName returns the plan's name.
-	GetName() string
-
-	// GetNamespace returns the plan's namespace, or "" if it's cluster-scoped.
-	GetNamespace() string
-
-	// GetExternalName returns the plan's external name.
-	GetExternalName() string
-
-	// GetDescription returns the plan description.
-	GetDescription() string
-
-	// GetClassID returns the plan's class name.
-	GetClassID() string
-}
-
 // RetrievePlans lists all plans defined in the cluster.
-func (sdk *SDK) RetrievePlans(opts RetrievePlanOptions) ([]Plan, error) {
-	var plans []Plan
-
-	if opts.Scope.Matches(ClusterScope) {
-		csp, err := sdk.ServiceCatalog().ClusterServicePlans().List(v1.ListOptions{})
-		if err != nil {
-			return nil, fmt.Errorf("unable to list cluster-scoped plans (%s)", err)
-		}
-
-		for _, p := range csp.Items {
-			if opts.ClassID != "" && p.GetClassID() != opts.ClassID {
-				continue
-			}
-
-			plan := p
-			plans = append(plans, &plan)
-		}
+func (sdk *SDK) RetrievePlans(opts *FilterOptions) ([]v1beta1.ClusterServicePlan, error) {
+	plans, err := sdk.ServiceCatalog().ClusterServicePlans().List(v1.ListOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("unable to list plans (%s)", err)
 	}
 
-	if opts.Scope.Matches(NamespaceScope) {
-		sp, err := sdk.ServiceCatalog().ServicePlans(opts.Namespace).List(v1.ListOptions{})
-		if err != nil {
-			// Gracefully handle when the feature-flag for namespaced broker resources isn't enabled on the server.
-			if errors.IsNotFound(err) {
-				return plans, nil
+	if opts != nil && opts.ClassID != "" {
+		plansFiltered := make([]v1beta1.ClusterServicePlan, 0)
+		for _, p := range plans.Items {
+			if p.Spec.ClusterServiceClassRef.Name == opts.ClassID {
+				plansFiltered = append(plansFiltered, p)
 			}
-			return nil, fmt.Errorf("unable to list plans in %q (%s)", opts.Namespace, err)
 		}
-		for _, p := range sp.Items {
-			if opts.ClassID != "" && p.GetClassID() != opts.ClassID {
-				continue
-			}
-
-			plan := p
-			plans = append(plans, &plan)
-		}
+		return plansFiltered, nil
 	}
 
-	return plans, nil
+	return plans.Items, nil
 }
 
 // RetrievePlanByName gets a plan by its external name.
@@ -126,6 +77,20 @@ func (sdk *SDK) RetrievePlanByID(uuid string) (*v1beta1.ClusterServicePlan, erro
 		return nil, fmt.Errorf("unable to get plan by uuid '%s' (%s)", uuid, err)
 	}
 	return plan, nil
+}
+
+// RetrievePlansByClass retrieves all plans for a class.
+func (sdk *SDK) RetrievePlansByClass(class *v1beta1.ClusterServiceClass,
+) ([]v1beta1.ClusterServicePlan, error) {
+	planOpts := v1.ListOptions{
+		FieldSelector: fields.OneTermEqualSelector(FieldServiceClassRef, class.Name).String(),
+	}
+	plans, err := sdk.ServiceCatalog().ClusterServicePlans().List(planOpts)
+	if err != nil {
+		return nil, fmt.Errorf("unable to list plans (%s)", err)
+	}
+
+	return plans.Items, nil
 }
 
 // RetrievePlanByClassAndPlanNames gets a plan by its class/plan name combination.

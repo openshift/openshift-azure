@@ -3,28 +3,18 @@ title: Resources
 layout: docwithnav
 ---
 
-# Service Catalog Resources
-
 The Service Catalog resource model specifies all the behaviors that 
 Service Catalog supports. This document details each resource.
 
 All of these resources are also defined in Go code at
 [`pkg/apis/servicecatalog/v1beta1/types.go`](https://github.com/kubernetes-incubator/service-catalog/blob/master/pkg/apis/servicecatalog/v1beta1/types.go).
 
-
-## Service Brokers
+# ClusterServiceBroker
 
 Before a Service can be used by an Application it must first be registered
 with the Kubernetes platform. Since Services are managed by Service Brokers
 we must first register the Service Broker by creating an instance of a
-`ClusterServiceBroker` or a `ServiceBroker`. These resources are similar, 
-however one is cluster-scoped and one is namespace-scoped.
-
-### ClusterServiceBroker
-
-If you would like to make a service broker available cluster wide, you register 
-the broker using a `ClusterServiceBroker` resource. This will result in Service Class 
-and Service Plan objects being created with a cluster-scope as well. 
+`ClusterServiceBroker`:
 
 ```console
 kubectl create -f broker.yaml
@@ -41,39 +31,15 @@ kind: ClusterServiceBroker
     url: http://broker-url.com
 ```
 
-### ServiceBroker
+**Note:** The `ClusterServiceBroker` resource is  cluster-scoped, and doesn't 
+have a namespace.
 
-If you would like to make a service broker available to only a single namespace, you register 
-the broker using a `ServiceBroker` resource. This will result in Service Class 
-and Service Plan objects being created with a namespace-scope as well.
+# ClusterServiceClass
 
-```console
-kubectl create -f broker.yaml
-```
-
-The `broker.yaml` looks similar to this:
-
-```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
-kind: ServiceBroker
-  metadata:
-    name: broker-name
-    namespace: default
-  spec:
-    url: http://broker-url.com
-```
-
-## Service Classes
-
-After a Service Broker has been registered by creating either a `ClusterServiceBroker` or 
-`ServiceBroker`, the Service Catalog  will query the Service Broker (at the `url` specified) for the list
+After a `ClusterServiceBroker` resource is created, the Service Catalog 
+will query the Service Broker (at the `url` specified) for the list
 of available Services (the catalog). Each Service will then have a corresponding
-`ClusterServiceClass` or `ServiceClass` resource created.
-
-### ClusterServiceClass
-
-After a `ClusterServiceBroker` resource is created, each service provided by the broker will then have a corresponding
-`ClusterServiceClass` resource created. These resources will also be cluster-scoped. A `ClusterServiceClass` looks similar to this example:
+`ClusterServiceClass` resource created:
 
 ```yaml
 apiVersion: servicecatalog.k8s.io/v1beta1
@@ -89,47 +55,26 @@ spec:
   planUpdatable: false
 ```
 
-## ServiceClass
+**Note:** The `ClusterServiceClass` resource is  cluster-scoped, and doesn't 
+have a namespace.
 
-After a `ServiceBroker` resource is created, each service provided by the broker will then have a corresponding
-`ServiceClass` resource created. These resources will also be namespaced-scoped. A `ServiceClass` looks similar to this example:
+# ClusterServicePlan
 
-```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
-kind: ServiceClass
-metadata:
-  name: 4f6e6cf6-ffdd-425f-a2c7-3c9258ad2468
-  namespace: default
-spec:
-  bindable: true
-  serviceBrokerName: ups-broker
-  description: A user provided service
-  externalID: 4f6e6cf6-ffdd-425f-a2c7-3c9258ad2468
-  externalName: user-provided-service
-  planUpdatable: false
-```
-
-## Service Plans
-
-Each Service Class has one or more Plans associated with it. Each
-`{ClusterServiceClass, ClusterServicePlan}` or `{ServiceClass, ServicePlan}` pair is the broker's 
-service that we can provision. Plans generally indicate details like cost, performance, or 
+Each `ClusterServiceClass` has one or more Plans associated with it. Each
+`{ClusterServiceClass, ClusterServicePlan}` pair is the broker's service that 
+we can provision. Plans generally indicate details like cost, performance, or 
 quality-of-service.
-
-### ClusterServicePlan
 
 For each plan of each `ClusterServiceClass`, a `ClusterServicePlan` will be created.
 
-### ServicePlan
+**Note:** The `ClusterServicePlan` resource is  cluster-scoped, and doesn't 
+have a namespace.
 
-For each plan of each `ServiceClass`, a `ServicePlan` will be created.
-
-## ServiceInstance
+# ServiceInstance
 
 Use a `ServiceInstance` to tell the broker to provision a new service. The 
-`ServiceInstance` can use either cluster-scoped or namespace-scoped Service Class 
-and Service Plan resources. When using `ServiceClass` and `ServicePlan`, the `ServiceInstance`
-must be in the same namespace.
+`ServiceInstance` indicates the `ClusterServiceClass` and `ClusterServicePlan`
+name to be provisioned.
 
 Create the `ServiceInstance`:
 
@@ -150,22 +95,9 @@ spec:
   clusterServicePlanExternalName: free
  ```
 
-or
+## Service Instance Parameters
 
-```yaml
-apiVersion: servicecatalog.k8s.io/v1beta1
-kind: ServiceInstance
-metadata:
-  namespace: default
-  name: test-database
-spec:
-  serviceClassExternalName: small-db
-  servicePlanExternalName: free
- ```
-
-### Service Instance Parameters
-
-Each `ServiceInstance` has a `parameters` field that you can add 
+Each `ServiceInstance` has a `paramters` field that you can add 
 metadata to. Service Catalog passes this metadata directly through to the
 service broker.
 
@@ -191,7 +123,7 @@ you have to manually increment the `UpdateRequests` field in the
 
 For more information, see the documentation on [parameters](parameters.md).
 
-## ServiceBinding
+# ServiceBinding
 
 `ServiceBinding` is the final resource that will be created in most
 workflows. This resource indicates that an application wants to connect
