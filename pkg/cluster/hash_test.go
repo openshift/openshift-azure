@@ -32,23 +32,6 @@ func TestHashScaleSetStability(t *testing.T) {
 		role         api.AgentPoolProfileRole
 		expectedHash string
 	}{
-		"v3.2": {
-			{
-				role: api.AgentPoolProfileRoleMaster,
-				// this value should not change
-				expectedHash: "e43619d6476b958470ec8e95f83c1023f15c63bb7d896adc2246cc1d9da68d0e",
-			},
-			{
-				role: api.AgentPoolProfileRoleInfra,
-				// this value should not change
-				expectedHash: "d438d7076d6a3495d0663323dd81600b389f992499750df0a859d208d9fa42f7",
-			},
-			{
-				role: api.AgentPoolProfileRoleCompute,
-				// this value should not change
-				expectedHash: "fc64527a7a3fc02568083f200de97c9fcb22aea448e57ae46e58f1a76ba1f6f6",
-			},
-		},
 		"v4.2": {
 			{
 				role: api.AgentPoolProfileRoleMaster,
@@ -201,10 +184,6 @@ func TestHashSyncPodStability(t *testing.T) {
 	tests := map[string]struct {
 		expectedHash string
 	}{
-		"v3.2": {
-			// this value should not change
-			expectedHash: "302c52d35602ad1c4a6078953abccc36ecd92ba8256b6e118837712a69d7f028",
-		},
 		"v4.2": {
 			// this value should not change
 			expectedHash: "f731d62dc04f805314b912c3720189679cc404a35ee41ee3569fb3f642c8bd29",

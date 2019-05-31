@@ -21,8 +21,8 @@ type Config struct {
 	DeployVersion    string `envconfig:"DEPLOY_VERSION" required:"true"`
 	RunningUnderTest string `envconfig:"RUNNING_UNDER_TEST"`
 
-	Region        string `envconfig:"AZURE_REGION"`
-	Regions       string `envconfig:"AZURE_REGIONS"`
+	Region        string
+	Regions       string `envconfig:"AZURE_REGIONS" required:"true"`
 	ResourceGroup string `envconfig:"RESOURCEGROUP" required:"true"`
 
 	ResourceGroupTTL string `envconfig:"RESOURCEGROUP_TTL"`
@@ -35,19 +35,11 @@ func NewConfig(log *logrus.Entry) (*Config, error) {
 	if err := envconfig.Process("", &c); err != nil {
 		return nil, err
 	}
-	// After v3 dies, goal here is to use AZURE_REGIONS both to define the
-	// region set externally via secrets/secret and allow restricting it.  In
-	// the interim, v3 has a hard-coded region set which can be overridden by
-	// AZURE_REGION; v4.2, v4.3, v4.4 and v5.1 will use AZURE_REGIONS.  Also allow a
-	// cross-over period during which AZURE_REGIONS is not yet defined in
-	// developer environments.
-	if c.Regions != "" {
-		regions := strings.Split(c.Regions, ",")
-		rand.Seed(time.Now().UTC().UnixNano())
-		c.Region = regions[rand.Intn(len(regions))]
-	}
+	regions := strings.Split(c.Regions, ",")
+	rand.Seed(time.Now().UTC().UnixNano())
+	c.Region = regions[rand.Intn(len(regions))]
 	if c.Region == "" {
-		return nil, fmt.Errorf("must set AZURE_REGION and/or AZURE_REGIONS")
+		return nil, fmt.Errorf("must set AZURE_REGIONS to a comma separated list")
 	}
 	log.Infof("using region %s", c.Region)
 	if c.AADClientID == "" {

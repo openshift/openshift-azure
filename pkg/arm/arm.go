@@ -14,7 +14,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	v3 "github.com/openshift/openshift-azure/pkg/arm/v3"
 	v4 "github.com/openshift/openshift-azure/pkg/arm/v4"
 	v5 "github.com/openshift/openshift-azure/pkg/arm/v5"
 	v6 "github.com/openshift/openshift-azure/pkg/arm/v6"
@@ -28,8 +27,6 @@ type Interface interface {
 
 func New(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftManagedCluster, testConfig api.TestConfig) (Interface, error) {
 	switch cs.Config.PluginVersion {
-	case "v3.2":
-		return v3.New(ctx, log, cs, testConfig), nil
 	case "v4.2", "v4.3", "v4.4":
 		return v4.New(ctx, log, cs, testConfig), nil
 	case "v5.1":

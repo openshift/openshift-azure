@@ -248,7 +248,7 @@ func validateImageConfig(path, version string, i *pluginapi.ImageConfig) (errs [
 		errs = append(errs, fmt.Errorf("invalid %s.azureControllers %q", path, i.AzureControllers))
 	}
 
-	if (i.Canary == "") != (version == "v3.2") {
+	if i.Canary == "" {
 		errs = append(errs, fmt.Errorf("invalid %s.canary %q", path, i.Canary))
 	}
 
