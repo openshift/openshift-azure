@@ -26,7 +26,7 @@ func (sc *SanityChecker) createStatefulApp(ctx context.Context, namespace string
 	sc.Log.Debugf("instantiating %s template", statefulApp)
 	err := sc.Client.EndUser.InstantiateTemplate(statefulApp, namespace)
 	if err != nil {
-		sc.Client.EndUser.DumpInfo(namespace)
+		sc.Client.EndUser.DumpInfo(namespace, "createStatefulApp")
 		return err
 	}
 	return nil
@@ -36,7 +36,7 @@ func (sc *SanityChecker) createStatelessApp(ctx context.Context, namespace strin
 	sc.Log.Debugf("instantiating %s template", statelessApp)
 	err := sc.Client.EndUser.InstantiateTemplate(statelessApp, namespace)
 	if err != nil {
-		sc.Client.EndUser.DumpInfo(namespace)
+		sc.Client.EndUser.DumpInfo(namespace, "createStatelessApp")
 		return err
 	}
 	return nil

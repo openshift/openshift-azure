@@ -264,7 +264,7 @@ func (sc *SanityChecker) checkCanCreateLB(ctx context.Context) error {
 		By(fmt.Sprintf("waiting for %s to be ready (%v)", lb, time.Now()))
 		err = wait.PollImmediate(2*time.Second, 10*time.Minute, ready.CheckServiceIsReady(sc.Client.EndUser.CoreV1.Services(namespace), lb))
 		if err != nil {
-			sc.Client.EndUser.DumpInfo(namespace)
+			sc.Client.EndUser.DumpInfo(namespace, "checkCanCreateLB")
 			return err
 		}
 	}

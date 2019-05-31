@@ -85,6 +85,12 @@ func (sc *SanityChecker) CreateTestApp(ctx context.Context) (interface{}, []*Tes
 		sc.Log.Error(err)
 		errs = append(errs, &TestError{Err: err, Bucket: "createStatefulApp"})
 	}
+	if len(errs) > 0 {
+		err := sc.Client.EndUser.DumpInfo(namespace, "createStatefulApp")
+		if err != nil {
+			sc.Log.Warn(err)
+		}
+	}
 	return namespace, errs
 }
 
@@ -133,6 +139,12 @@ func (sc *SanityChecker) ValidateTestApp(ctx context.Context, cookie interface{}
 			errs = append(errs, &TestError{Err: err, Bucket: "validateStatefulApp"})
 		}
 	}
+	if len(errs) > 0 {
+		err := sc.Client.EndUser.DumpInfo(namespace, "validateStatefulApp")
+		if err != nil {
+			sc.Log.Warn(err)
+		}
+	}
 	return
 }
 
@@ -147,48 +159,56 @@ func (sc *SanityChecker) ValidateCluster(ctx context.Context) (errs []*TestError
 	err = sc.checkMonitoringStackHealth(ctx)
 	if err != nil {
 		sc.Log.Error(err)
+		sc.Client.EndUser.DumpInfo("", "checkMonitoringStackHealth")
 		errs = append(errs, &TestError{Err: err, Bucket: "checkMonitoringStackHealth"})
 	}
 	sc.Log.Debugf("validating that pod disruption budgets are immutable")
 	err = sc.checkDisallowsPdbMutations(ctx)
 	if err != nil {
 		sc.Log.Error(err)
+		sc.Client.EndUser.DumpInfo("", "checkDisallowsPdbMutations")
 		errs = append(errs, &TestError{Err: err, Bucket: "checkDisallowsPdbMutations"})
 	}
 	sc.Log.Debugf("validating that an end user cannot access infrastructure components")
 	err = sc.checkCannotAccessInfraResources(ctx)
 	if err != nil {
 		sc.Log.Error(err)
+		sc.Client.EndUser.DumpInfo("", "checkCannotAccessInfraResources")
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCannotAccessInfraResources"})
 	}
 	sc.Log.Debugf("validating that the cluster can pull redhat.io images")
 	err = sc.checkCanDeployRedhatIoImages(ctx)
 	if err != nil {
 		sc.Log.Error(err)
+		sc.Client.EndUser.DumpInfo("", "checkCanDeployRedhatIoImages")
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanDeployRedhatIoImages"})
 	}
 	sc.Log.Debugf("validating that the cluster can create ELB and ILB")
 	err = sc.checkCanCreateLB(ctx)
 	if err != nil {
 		sc.Log.Error(err)
+		sc.Client.EndUser.DumpInfo("", "checkCanCreateLB")
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanCreateLB"})
 	}
 	sc.Log.Debugf("validating that cluster services are available")
 	err = sc.checkCanAccessServices(ctx)
 	if err != nil {
 		sc.Log.Error(err)
+		sc.Client.EndUser.DumpInfo("", "checkCanAccessServices")
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanAccessServices"})
 	}
 	sc.Log.Debugf("validating that the cluster can use azure-file storage")
 	err = sc.checkCanUseAzureFileStorage(ctx)
 	if err != nil {
 		sc.Log.Error(err)
+		sc.Client.EndUser.DumpInfo("", "checkCanUseAzureFile")
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCanUseAzureFile"})
 	}
 	sc.Log.Debugf("validating that Docker builds are not permitted")
 	err = sc.checkCantDoDockerBuild(ctx)
 	if err != nil {
 		sc.Log.Error(err)
+		sc.Client.EndUser.DumpInfo("", "checkCantDoDockerBuild")
 		errs = append(errs, &TestError{Err: err, Bucket: "checkCantDoDockerBuild"})
 	}
 	return
