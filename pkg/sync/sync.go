@@ -8,7 +8,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/openshift/openshift-azure/pkg/api"
-	v3 "github.com/openshift/openshift-azure/pkg/sync/v3"
 	v4 "github.com/openshift/openshift-azure/pkg/sync/v4"
 	v5 "github.com/openshift/openshift-azure/pkg/sync/v5"
 	v6 "github.com/openshift/openshift-azure/pkg/sync/v6"
@@ -23,8 +22,6 @@ type Interface interface {
 
 func New(log *logrus.Entry, cs *api.OpenShiftManagedCluster, initClients bool) (Interface, error) {
 	switch cs.Config.PluginVersion {
-	case "v3.2":
-		return v3.New(log, cs, initClients)
 	case "v4.2", "v4.3", "v4.4":
 		return v4.New(log, cs, initClients)
 	case "v5.1":
