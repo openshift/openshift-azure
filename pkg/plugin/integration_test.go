@@ -334,7 +334,7 @@ func setupNewCluster(ctx context.Context, log *logrus.Entry, cs *api.OpenShiftMa
 
 func newTestCs() *api.OpenShiftManagedCluster {
 	return &api.OpenShiftManagedCluster{
-		Name:     "integrationTest",
+		Name:     "integration-test",
 		Location: "eastus",
 		Config: api.Config{
 			ConfigStorageAccount:      "config",
