@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 
@@ -22,6 +23,54 @@ import (
 	"github.com/openshift/openshift-azure/pkg/util/enrich"
 	"github.com/openshift/openshift-azure/pkg/util/log"
 )
+
+// TODO(charlesakalugwu): Add unit tests for the handling of these metrics once
+//  the upstream library supports it
+var (
+	syncInfoGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "sync_info",
+			Help: "General information about the sync process.",
+		},
+		[]string{"plugin_version", "image", "period_seconds"},
+	)
+
+	syncErrorsCounter = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "sync_errors_total",
+			Help: "Total number of errors encountered during sync executions.",
+		},
+	)
+
+	syncInFlightGauge = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "sync_executions_inflight",
+			Help: "Number of sync executions in progress.",
+		},
+	)
+
+	syncLastExecutedGauge = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "sync_last_executed",
+			Help: "The last time a sync was executed.",
+		},
+	)
+
+	syncDurationSummary = prometheus.NewSummary(
+		prometheus.SummaryOpts{
+			Name: "sync_duration_seconds",
+			Help: "The duration of sync executions.",
+		},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(syncInfoGauge)
+	prometheus.MustRegister(syncErrorsCounter)
+	prometheus.MustRegister(syncDurationSummary)
+	prometheus.MustRegister(syncInFlightGauge)
+	prometheus.MustRegister(syncLastExecutedGauge)
+}
 
 func start(cfg *cmdConfig) error {
 	ctx := context.Background()
@@ -71,6 +120,11 @@ func start(cfg *cmdConfig) error {
 		return err
 	}
 	log.Printf("running sync for plugin %s", cs.Config.PluginVersion)
+	syncInfoGauge.With(prometheus.Labels{
+		"plugin_version": cs.Config.PluginVersion,
+		"image":          cs.Config.Images.Sync,
+		"period_seconds": fmt.Sprintf("%d", int(cfg.interval.Seconds())),
+	}).Set(1)
 
 	log.Print("enriching config")
 	err = enrich.CertificatesFromVault(ctx, kvc, cs)
@@ -107,11 +161,17 @@ func start(cfg *cmdConfig) error {
 	t := time.NewTicker(cfg.interval)
 	for {
 		log.Print("starting sync")
+		startTime := time.Now()
+		syncInFlightGauge.Inc()
 		if err := s.Sync(ctx); err != nil {
 			log.Printf("sync error: %s", err)
+			syncErrorsCounter.Inc()
 		} else {
 			log.Print("sync done")
 		}
+		syncDurationSummary.Observe(time.Now().Sub(startTime).Seconds())
+		syncLastExecutedGauge.SetToCurrentTime()
+		syncInFlightGauge.Dec()
 		if cfg.once {
 			return nil
 		}
