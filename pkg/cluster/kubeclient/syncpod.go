@@ -143,6 +143,9 @@ func (u *Kubeclientset) EnsureSyncPod(ctx context.Context, syncImage string, has
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "sync",
 				Namespace: "kube-system",
+				Labels: map[string]string{
+					"app": "sync",
+				},
 			},
 			Spec: corev1.ServiceSpec{
 				Ports: []corev1.ServicePort{
