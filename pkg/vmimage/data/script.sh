@@ -208,11 +208,22 @@ rpm -q kernel --last | sed -n '1 {s/^[^-]*-//; s/ .*$//; p}' >/var/tmp/kernel-ve
 rpm -q atomic-openshift-node --qf '%{VERSION}-%{RELEASE}.%{ARCH}' >/var/tmp/openshift-version
 
 # Image hardening
+# Currently this is disabled because it breaks CIFS mounts.
 # Setup fips inside of grub
 # dracut -f
 # sed -i -re 's/GRUB_CMDLINE_LINUX="(.*)"$/GRUB_CMDLINE_LINUX="\1 fips=1"/' /etc/default/grub
 # grub2-mkconfig -o /boot/grub2/grub.cfg
 # grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+
+# chronyd_or_ntpd_set_maxpoll
+sed -i -re 's/^(server [0-9]\.rhel\..*$)/\1 maxpoll 10/g' /etc/ntp.conf
+sed -i -re 's/^(server [0-9]\.rhel\..*$)/\1 maxpoll 10/g' /etc/chrony.conf
+
+# auditd_data_retention_space_left
+sed -i -e 's/^space_left.*$/space_left = 100/g' /etc/audit/auditd.conf
+# content_rule_auditd_data_retention_space_left_action
+sed -i -e '$ a \
+space_left_action = email' /etc/audit/auditd.conf
 
 # accounts_minimum_age_login_defs
 sed -i -e 's/PASS_MIN_DAYS.*/PASS_MIN_DAYS     1/g' /etc/login.defs
@@ -232,13 +243,17 @@ echo 'FAIL_DELAY 4' >> /etc/login.defs
 echo -e '\n# Set TMOUT to 600 per security requirements' >> /etc/profile
 echo 'TMOUT=600' >> /etc/profile
 
+# chronyd_or_ntpd_set_maxpoll
+echo 'maxpoll 10' >> /etc/ntp.conf
+
 # accounts_max_concurrent_login_sessions
 echo '*	hard	maxlogins	10' >> /etc/security/limits.conf
 
-# ensure_gpgcheck_repo_metadata
-# echo 'repo_gpgcheck=1' >> /etc/yum.conf
 # ensure_gpgcheck_local_packages
-# echo 'localpkg_gpgcheck=1' >> /etc/yum.conf
+echo 'localpkg_gpgcheck=1' >> /etc/yum.conf
+
+#	sysctl_kernel_randomize_va_space
+echo 'kernel.randomize_va_space = 2' >> /etc/sysctl.conf
 
 >/var/tmp/kickstart_completed
 %end
