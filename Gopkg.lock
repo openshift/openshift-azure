@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:12deff417c2ed17a1656fc7eb90c7c5013e70a1b9b4a90ed5f1bf3d1687f57e3"
+  name = "github.com/Azure/go-autorest"
+  packages = ["autorest/to"]
+  pruneopts = "UT"
+  revision = "f29a2eccaa178b367df0405778cd85e0af7b4225"
+  version = "v12.1.0"
+
+[[projects]]
   digest = "1:b7a8552c62868d867795b63eaf4f45d3e92d36db82b428e680b9c95a8c33e5b1"
   name = "github.com/gogo/protobuf"
   packages = [
@@ -27,20 +35,29 @@
   version = "v1.0"
 
 [[projects]]
-  digest = "1:2df26f1ea8c1f94ee11df09f8a6028b2c4f13074fe6795ee56cbdd7fa20b6ed2"
+  branch = "master"
+  digest = "1:0a11d339bd5d58ed5ff45fe12f0d9d4644a062683493954d508aa7b986f4ea59"
   name = "github.com/openshift/installer"
   packages = [
     "pkg/ipnet",
     "pkg/types",
     "pkg/types/aws",
+    "pkg/types/azure",
     "pkg/types/libvirt",
     "pkg/types/none",
     "pkg/types/openstack",
     "pkg/types/vsphere",
   ]
   pruneopts = "UT"
-  revision = "e3fceacc975953f56cb09931e6be015a36eb6075"
-  version = "v0.16.1"
+  revision = "0e4119dd152586a6cfed0f8bed512ceccbdfdac3"
+
+[[projects]]
+  digest = "1:dd8a1304266039163d377d2b7338d098de86686f90642d329377b2859f379a64"
+  name = "github.com/openshift/openshift-azure"
+  packages = ["pkg/util/random"]
+  pruneopts = "UT"
+  revision = "a21e027271541f2cf75b4c166dbc40962d04db00"
+  version = "v5.1"
 
 [[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
@@ -153,7 +170,9 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/Azure/go-autorest/autorest/to",
     "github.com/openshift/installer/pkg/types",
+    "github.com/openshift/openshift-azure/pkg/util/random",
     "github.com/spf13/cobra",
   ]
   solver-name = "gps-cdcl"

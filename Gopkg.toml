@@ -1,6 +1,12 @@
+
+[[constraint]]
+  name = "github.com/Azure/go-autorest"
+  version = "12.1.0"
+
 [[constraint]]
   name = "github.com/openshift/installer"
-  version = "0.16.1"
+  // We use HEAD. For the release this should be pointed to release 
+  branch = "master"
 
 [[constraint]]
   name = "github.com/spf13/cobra"

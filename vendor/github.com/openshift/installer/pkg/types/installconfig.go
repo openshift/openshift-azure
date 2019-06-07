@@ -5,6 +5,7 @@ import (
 
 	"github.com/openshift/installer/pkg/ipnet"
 	"github.com/openshift/installer/pkg/types/aws"
+	"github.com/openshift/installer/pkg/types/azure"
 	"github.com/openshift/installer/pkg/types/libvirt"
 	"github.com/openshift/installer/pkg/types/none"
 	"github.com/openshift/installer/pkg/types/openstack"
@@ -15,8 +16,8 @@ import (
 const (
 	// InstallConfigVersion is the version supported by this package.
 	// If you bump this, you must also update the list of convertable values in
-	// pkg/conversion/installconfig.go
-	InstallConfigVersion = "v1beta4"
+	// pkg/types/conversion/installconfig.go
+	InstallConfigVersion = "v1"
 )
 
 var (
@@ -25,7 +26,7 @@ var (
 	// platforms presented to the user in the interactive wizard.
 	PlatformNames = []string{
 		aws.Name,
-		vsphere.Name,
+		azure.Name,
 	}
 	// HiddenPlatformNames is a slice with all the
 	// hidden-but-supported platform names. This list isn't presented
@@ -33,6 +34,7 @@ var (
 	HiddenPlatformNames = []string{
 		none.Name,
 		openstack.Name,
+		vsphere.Name,
 	}
 )
 
@@ -97,6 +99,10 @@ type Platform struct {
 	// VSphere is the configuration used when installing on vSphere.
 	// +optional
 	VSphere *vsphere.Platform `json:"vsphere,omitempty"`
+
+	// Azure is the configuration used when installing on Azure.
+	// +optional
+	Azure *azure.Platform `json:"azure,omitempty"`
 }
 
 // Name returns a string representation of the platform (e.g. "aws" if
@@ -116,6 +122,8 @@ func (p *Platform) Name() string {
 		return openstack.Name
 	case p.VSphere != nil:
 		return vsphere.Name
+	case p.Azure != nil:
+		return azure.Name
 	default:
 		return ""
 	}
