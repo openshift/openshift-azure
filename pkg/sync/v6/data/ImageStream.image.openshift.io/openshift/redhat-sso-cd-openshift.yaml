@@ -64,7 +64,7 @@ spec:
     importPolicy: {}
     name: "6.0"
     referencePolicy:
-      type: ""
+      type: Local
   - annotations:
       description: Latest build of Red Hat Single Sign-On Continuous Delivery Tech
         Preview image
