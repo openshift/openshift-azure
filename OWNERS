@@ -1,0 +1,20 @@
+approvers:
+- asalkeld
+- jim-minter
+- kwoodson
+- mjudeikis
+- pweil-
+reviewers:
+- asalkeld
+- charlesakalugwu
+- ehashman
+- gburges
+- grantomation
+- jim-minter
+- kwoodson
+- makdaam
+- mjudeikis
+- thekad
+- y-cote
+labels:
+- sig/azure
