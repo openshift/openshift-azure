@@ -5,7 +5,7 @@
 
 [[constraint]]
   name = "github.com/openshift/installer"
-  // We use HEAD. For the release this should be pointed to release 
+  # We use HEAD. For the release this should be pointed to release
   branch = "master"
 
 [[constraint]]

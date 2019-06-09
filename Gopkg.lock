@@ -52,14 +52,6 @@
   revision = "0e4119dd152586a6cfed0f8bed512ceccbdfdac3"
 
 [[projects]]
-  digest = "1:dd8a1304266039163d377d2b7338d098de86686f90642d329377b2859f379a64"
-  name = "github.com/openshift/openshift-azure"
-  packages = ["pkg/util/random"]
-  pruneopts = "UT"
-  revision = "a21e027271541f2cf75b4c166dbc40962d04db00"
-  version = "v5.1"
-
-[[projects]]
   digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
   name = "github.com/pkg/errors"
   packages = ["."]
@@ -171,9 +163,11 @@
   analyzer-version = 1
   input-imports = [
     "github.com/Azure/go-autorest/autorest/to",
+    "github.com/openshift/installer/pkg/ipnet",
     "github.com/openshift/installer/pkg/types",
-    "github.com/openshift/openshift-azure/pkg/util/random",
+    "github.com/openshift/installer/pkg/types/azure",
     "github.com/spf13/cobra",
+    "k8s.io/apimachinery/pkg/apis/meta/v1",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
