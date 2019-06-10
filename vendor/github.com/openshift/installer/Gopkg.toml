@@ -1,0 +1,118 @@
+ignored = [
+  "github.com/openshift/installer/tests*",
+  "github.com/openshift/installer/pkg/terraform/exec*"
+]
+
+required = [
+  #needed in pkg/terraform/exec
+  "golang.org/x/net/html/charset"
+]
+
+[prune]
+  non-go = true
+  go-tests = true
+  unused-packages = true
+
+[[constraint]]
+  name = "gopkg.in/AlecAivazis/survey.v1"
+  version = "1.8.1"
+
+[[constraint]]
+  name = "github.com/aws/aws-sdk-go"
+  version = "1.16.14"
+
+[[constraint]]
+  name = "github.com/Azure/azure-sdk-for-go"
+  version = "v29.0.0"
+
+[[constraint]]
+  name = "github.com/coreos/ignition"
+  version = "0.26.0"
+
+[[constraint]]
+  name = "github.com/libvirt/libvirt-go"
+  version = "4.7.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/shurcooL/vfsgen"
+
+[[constraint]]
+  name = "github.com/sirupsen/logrus"
+  version = "1.2.0"
+
+[[constraint]]
+  name = "github.com/stretchr/testify"
+  version = "1.2.2"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/vincent-petithory/dataurl"
+
+[[override]]
+  name = "k8s.io/api"
+  version = "kubernetes-1.12.2"
+
+[[override]]
+  name = "k8s.io/apimachinery"
+  version = "kubernetes-1.12.2"
+
+[[override]]
+  name = "k8s.io/client-go"
+  version = "9.0.0"
+
+[[constraint]]
+  name = "github.com/openshift/cluster-api"
+  revision = "cad0f8326cd26bd92fe2f0f90b5ca2e2cbc8a210"
+
+[[constraint]]
+  name = "sigs.k8s.io/cluster-api-provider-aws"
+  source = "https://github.com/openshift/cluster-api-provider-aws.git"
+  revision = "15fe4b4ea5636f8516c238490fc6a85d44161181"
+
+[[constraint]]
+  name = "github.com/openshift/cluster-api-provider-libvirt"
+  revision = "2705e5265b62886d8df453b8d4a4601dc0c33084"
+
+[[constraint]]
+  name = "github.com/pkg/errors"
+  version = "0.8.0"
+
+[[constraint]]
+  name = "github.com/awalterschulze/gographviz"
+  version = "2.0.0"
+
+[[constraint]]
+  name = "github.com/gophercloud/utils"
+  branch = "master"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/gophercloud/gophercloud"
+
+[[constraint]]
+  branch = "master"
+  name = "sigs.k8s.io/cluster-api-provider-openstack"
+  source = "https://github.com/openshift/cluster-api-provider-openstack.git"
+
+[[constraint]]
+  name = "github.com/pkg/sftp"
+  version = "1.10.0"
+
+# TODO: Remove this after 1.14 rebase lands
+# Azure cluster-api already on 1.14, pin to lower one until cluster-api gets backports
+[[constraint]]
+  revision = "702ef3a407263373a619b4df1be7fda77ef2a7e5"
+  name = "sigs.k8s.io/cluster-api-provider-azure"
+  source = "https://github.com/openshift/cluster-api-provider-azure.git"
+
+# controller-runtime changed schema location. pin until 1.14 backport lands to all packages
+[[constraint]]
+  revision = "12d98582e72927b6cd0123e2b4e819f9341ce62c"
+  name = "sigs.k8s.io/controller-runtime"
+  source = "https://github.com/kubernetes-sigs/controller-runtime.git"
+
+# pin until rebase lands 
+[[constraint]]
+  revision = "4b6d10a82cd4949ade8056e5fbbf29e0765a0f47"
+  name = "github.com/openshift/cloud-credential-operator"

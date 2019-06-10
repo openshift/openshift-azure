@@ -1,16 +1,36 @@
 
+# HACK: Current vendoring in broken. To work around we 
+# construct fake vendoring by:
+# cp -r ../installer/vendor ./
+# cp -r ../installer ./vendor/github.com/openshift/
+# rm -rf ./vendor/github.com/openshift/installer/vendor
+#[[constraint]]
+#  name = "github.com/openshift/installer"
+#  branch = "release-4.2"
+
 [[constraint]]
   name = "github.com/Azure/go-autorest"
   version = "12.1.0"
 
 [[constraint]]
-  name = "github.com/openshift/installer"
-  # We use HEAD. For the release this should be pointed to release
-  branch = "master"
+  name = "github.com/ghodss/yaml"
+  version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/kelseyhightower/envconfig"
+  version = "1.4.0"
+
+[[constraint]]
+  name = "github.com/pkg/errors"
+  version = "0.8.1"
 
 [[constraint]]
   name = "github.com/spf13/cobra"
-  version = "0.0.4"
+  version = "0.0.5"
+
+[[constraint]]
+  version = "kubernetes-1.12.2"
+  name = "k8s.io/apimachinery"
 
 [prune]
   go-tests = true
