@@ -14,20 +14,21 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 	"github.com/ghodss/yaml"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/openshift/installer/pkg/asset"
 	"github.com/openshift/installer/pkg/asset/installconfig"
+	icazure "github.com/openshift/installer/pkg/asset/installconfig/azure"
 	"github.com/openshift/installer/pkg/asset/store"
-
 	targetassets "github.com/openshift/installer/pkg/asset/targets"
 	"github.com/openshift/installer/pkg/ipnet"
 	"github.com/openshift/installer/pkg/types"
 	"github.com/openshift/installer/pkg/types/azure"
 	"github.com/openshift/installer/pkg/types/defaults"
+	openstackvalidation "github.com/openshift/installer/pkg/types/openstack/validation"
 	"github.com/openshift/installer/pkg/types/validation"
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"github.com/openshift/openshift-azure/pkg/util/random"
 )
 
@@ -66,7 +67,7 @@ func newEnvConfig() (*EnvConfig, error) {
 	return &c, nil
 }
 
-func getInstallConfig(name string, ec EnvConfig) (*types.InstallConfig, error) {
+func getInstallConfig(name string, ec *EnvConfig) (*types.InstallConfig, error) {
 	// TODO: move to util/secrets
 	fqdn, err := random.FQDN(baseDomain, 5)
 	if err != nil {
@@ -124,7 +125,7 @@ func getInstallConfig(name string, ec EnvConfig) (*types.InstallConfig, error) {
 	return &cfg, nil
 }
 
-func saveCredentials(credentials Credentials, filePath string) error {
+func saveCredentials(credentials icazure.Credentials, filePath string) error {
 	jsonCreds, err := json.Marshal(credentials)
 	err = os.MkdirAll(filepath.Dir(filePath), 0700)
 	if err != nil {
@@ -151,14 +152,14 @@ func run() error {
 
 	ec, err := newEnvConfig()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	cfg, err := getInstallConfig(name, ec)
 	if err != nil {
 		return errors.Wrap(err, "failed to get InstallConfig")
 	}
 
-	err = saveCredentials(azure.Credentials{
+	err = saveCredentials(icazure.Credentials{
 		SubscriptionID: ec.SubscriptionID,
 		ClientID:       ec.ClientID,
 		ClientSecret:   ec.ClientSecret,
