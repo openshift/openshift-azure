@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -35,6 +37,11 @@ var (
 )
 
 type EnvConfig struct {
+	SubscriptionID string `envconfig:"AZURE_SUBSCRIPTION_ID" required:"true"`
+	ClientID       string `envconfig:"AZURE_CLIENT_ID" required:"true"`
+	ClientSecret   string `envconfig:"AZURE_CLIENT_SECRET" required:"true"`
+	TenantID       string `envconfig:"AZURE_TENANT_ID" required:"true"`
+
 	Region  string
 	Regions string `envconfig:"AZURE_REGIONS" required:"true"`
 }
@@ -59,7 +66,7 @@ func newEnvConfig() (*EnvConfig, error) {
 	return &c, nil
 }
 
-func getInstallConfig(name string) (*types.InstallConfig, error) {
+func getInstallConfig(name string, ec EnvConfig) (*types.InstallConfig, error) {
 	// TODO: move to util/secrets
 	fqdn, err := random.FQDN(baseDomain, 5)
 	if err != nil {
@@ -72,11 +79,6 @@ func getInstallConfig(name string) (*types.InstallConfig, error) {
 	}
 	defer file.Close()
 	pullSecret, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
-	ec, err := newEnvConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -122,6 +124,16 @@ func getInstallConfig(name string) (*types.InstallConfig, error) {
 	return &cfg, nil
 }
 
+func saveCredentials(credentials Credentials, filePath string) error {
+	jsonCreds, err := json.Marshal(credentials)
+	err = os.MkdirAll(filepath.Dir(filePath), 0700)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(filePath, jsonCreds, 0600)
+}
+
 func run() error {
 	rootCmd := &cobra.Command{
 		Use:  "./azure [component]",
@@ -137,9 +149,23 @@ func run() error {
 		return err
 	}
 
-	cfg, err := getInstallConfig(name)
+	ec, err := newEnvConfig()
+	if err != nil {
+		return nil, err
+	}
+	cfg, err := getInstallConfig(name, ec)
 	if err != nil {
 		return errors.Wrap(err, "failed to get InstallConfig")
+	}
+
+	err = saveCredentials(azure.Credentials{
+		SubscriptionID: ec.SubscriptionID,
+		ClientID:       ec.ClientID,
+		ClientSecret:   ec.ClientSecret,
+		TenantID:       ec.TenantID,
+	}, filepath.Join(os.Getenv("HOME"), ".azure", "osServicePrincipal.json"))
+	if err != nil {
+		return err
 	}
 
 	defaults.SetInstallConfigDefaults(cfg)
