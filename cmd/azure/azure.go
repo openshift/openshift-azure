@@ -3,9 +3,13 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/openshift/installer/pkg/ipnet"
 	"github.com/openshift/installer/pkg/types"
 	"github.com/openshift/installer/pkg/types/azure"
@@ -20,10 +24,29 @@ var (
 	baseDomain = "osadev.cloud"
 )
 
+type EnvConfig struct {
+	Region  string
+	Regions string `envconfig:"AZURE_REGIONS" required:"true"`
+}
+
 func main() {
 	if err := run(); err != nil {
 		panic(err)
 	}
+}
+
+func newEnvConfig() (*EnvConfig, error) {
+	var c EnvConfig
+	if err := envconfig.Process("", &c); err != nil {
+		return nil, err
+	}
+	regions := strings.Split(c.Regions, ",")
+	rand.Seed(time.Now().UTC().UnixNano())
+	c.Region = regions[rand.Intn(len(regions))]
+	if c.Region == "" {
+		return nil, fmt.Errorf("must set AZURE_REGIONS to a comma separated list")
+	}
+	return &c, nil
 }
 
 func run() error {
@@ -52,6 +75,11 @@ func run() error {
 	}
 	defer file.Close()
 	pullSecret, err := ioutil.ReadAll(file)
+	if err != nil {
+		return err
+	}
+
+	ec, err := newEnvConfig()
 	if err != nil {
 		return err
 	}
@@ -88,7 +116,9 @@ func run() error {
 			Hyperthreading: types.HyperthreadingEnabled,
 		},
 		Platform: types.Platform{
-			Azure: &azure.Platform{},
+			Azure: &azure.Platform{
+				Region: ec.Region,
+			},
 		},
 		PullSecret: string(pullSecret),
 	}
